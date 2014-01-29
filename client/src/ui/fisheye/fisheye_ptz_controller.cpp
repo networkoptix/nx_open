@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include <QtCore/QEasingCurve>
+#include <common/common_meta_types.h>
 
 #include <utils/math/math.h>
 #include <utils/math/linear_combination.h>
