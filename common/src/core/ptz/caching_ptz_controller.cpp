@@ -190,8 +190,18 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         QMutexLocker locker(&m_mutex);
         switch (command) {
         case Qn::CreatePresetPtzCommand:
-            if(m_data.fields & Qn::PresetsPtzField)
-                m_data.presets.append(data.value<QnPtzPreset>());
+            if(m_data.fields & Qn::PresetsPtzField) {
+                QnPtzPreset preset = data.value<QnPtzPreset>();
+                bool exists = false;
+                for(int i = 0; i < m_data.presets.size(); i++) {
+                    if(m_data.presets[i].id == preset.id) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists)
+                    m_data.presets.append(preset);
+            }
             break;
         case Qn::UpdatePresetPtzCommand:
             if(m_data.fields & Qn::PresetsPtzField) {
@@ -216,8 +226,18 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
             }
             break;
         case Qn::CreateTourPtzCommand:
-            if(m_data.fields & Qn::ToursPtzField)
-                m_data.tours.append(data.value<QnPtzTour>());
+            if(m_data.fields & Qn::ToursPtzField) {
+                QnPtzTour tour = data.value<QnPtzTour>();
+                bool exists = false;
+                for(int i = 0; i < m_data.tours.size(); i++) {
+                    if(m_data.tours[i].id == tour.id) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists)
+                    m_data.tours.append(tour);
+            }
             break;
         case Qn::RemoveTourPtzCommand:
             if(m_data.fields & Qn::PresetsPtzField) {
