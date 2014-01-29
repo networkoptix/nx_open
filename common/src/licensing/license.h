@@ -50,7 +50,7 @@ public:
     const QString &brand() const;
     const QString &expiration() const; // TODO: #Ivan Passing date as a string is totally evil. Please make sure your code is easy to use!!!
 
-	const QByteArray& rawLicense() const;
+    const QByteArray& rawLicense() const;
 
     QByteArray toString() const; 
 
@@ -96,7 +96,7 @@ public:
 
     QList<QByteArray> allLicenseKeys() const;
     bool haveLicenseKey(const QByteArray& key) const;
-	QnLicensePtr getLicenseByKey(const QByteArray& key) const;
+    QnLicensePtr getLicenseByKey(const QByteArray& key) const;
 
     /**
      * \returns                         Total number of digital cameras allowed.
@@ -170,7 +170,7 @@ private:
     QByteArray m_hardwareId1;
 
     // Pre 1.5
-	QByteArray m_oldHardwareId;
+    QByteArray m_oldHardwareId;
 
     // The one 1.6 uses
     QByteArray m_hardwareId2;

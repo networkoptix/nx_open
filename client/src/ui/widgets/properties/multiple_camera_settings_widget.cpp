@@ -202,7 +202,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             if (camera->isDtsBased()) {
                 ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, false);
-        		ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, false);
+                ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, false);
             }
 
             Qt::CheckState audioState = camera->isAudioEnabled() ? Qt::Checked : Qt::Unchecked;

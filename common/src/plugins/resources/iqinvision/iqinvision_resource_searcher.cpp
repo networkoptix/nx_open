@@ -259,7 +259,7 @@ QnResourceList QnPlIqResourceSearcher::findResources()
             QString sender;
             quint16 senderPort;
 
-            int readed = receiveSock->recvFrom(datagram.data(), datagram.size(),	sender, senderPort);
+            int readed = receiveSock->recvFrom(datagram.data(), datagram.size(), sender, senderPort);
 
             if (senderPort == NATIVE_DISCOVERY_RESPONSE_PORT && readed > 128) // minimum response size
                 processNativePacket(result, datagram.left(readed), iface.address);

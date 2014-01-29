@@ -52,8 +52,8 @@ private:
     QnLicenseListModel *m_model;
     QNetworkAccessManager *m_httpClient;
     QnLicenseList m_licenses;
-	QMap<QNetworkReply*, QByteArray> m_replyKeyMap;
-	QMap<int, QByteArray> m_handleKeyMap;
+    QMap<QNetworkReply*, QByteArray> m_replyKeyMap;
+    QMap<int, QByteArray> m_handleKeyMap;
 };
 
 #endif // QN_LICENSE_MANAGER_WIDGET_H

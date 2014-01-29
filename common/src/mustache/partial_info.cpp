@@ -53,7 +53,7 @@ QnPartialInfo::QnPartialInfo (BusinessEventType::Value value) {
             attrName = lit("typeMediaServerStarted");
             eventLogoFilename = lit("server.png");
             break;
-		}
+        }
     default:
         break;
     }
