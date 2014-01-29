@@ -21,6 +21,7 @@ private slots:
     void at_ptzManageToursAction_triggered();
 
     void at_debugCalibratePtzAction_triggered();
+    void at_debugGetPtzPositionAction_triggered();
 };
 
 #endif // WORKBENCH_PTZ_HANDLER_H

@@ -139,7 +139,13 @@ public:
         InvalidPtzValue = 0xDEADF00D
     };
 
-    QnActiPtzControllerPrivate(const QnActiResourcePtr &resource): resource(resource), pendingCommand(Qn::InvalidPtzCommand) {}
+    QnActiPtzControllerPrivate(const QnActiResourcePtr &resource): 
+        resource(resource), 
+        pendingCommand(Qn::InvalidPtzCommand),
+        currentPosition(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue),
+        currentSpeed(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue)
+    {}
+
     virtual ~QnActiPtzControllerPrivate() {}
 
     void init();
@@ -291,14 +297,21 @@ bool QnActiPtzControllerPrivate::processQueriesLocked() {
             break;
         }
         case Qn::AbsoluteDeviceMovePtzCommand: {
-            if(currentPosition == position)
-                break;
+            /* Stop first. 
+             * If we don't do that, absolute movement will not work. */
+            if(currentSpeed.zoom != 0)
+                status = status & continuousZoomQuery(0);
+            if(currentSpeed.pan != 0 || currentSpeed.tilt != 0)
+                status = status & continuousPanTiltQuery(0, 0);
 
+            /* Then move to a position. */
             if(currentPosition.pan != position.pan || currentPosition.tilt != position.tilt)
                 status = status & absolutePanTiltQuery(position.pan, position.tilt, speed.pan);
 
-            if(currentPosition.zoom != position.zoom)
-                status = status & absoluteZoomQuery(position.zoom);
+            /* Issue zoom command EVEN if zoom wasn't changed. 
+             * This is because acti cameras sometimes outright ignore absolute
+             * zoom commands. */
+            status = status & absoluteZoomQuery(position.zoom);
 
             if(status) {
                 currentPosition = position;
