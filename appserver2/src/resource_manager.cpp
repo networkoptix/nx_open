@@ -22,7 +22,7 @@ namespace ec2
         auto queryDoneHandler = [handler]( ErrorCode errorCode, const ApiResourceTypeList& resTypeList ) {
             QnResourceTypeList outResTypeList;
             if( errorCode == ErrorCode::ok )
-                ;   //TODO/IMPL moving data from resTypeList to outResTypeList
+				resTypeList.toResourceTypeList(outResTypeList);
             handler->done( errorCode, outResTypeList );
         };
         m_queryProcessor->processQueryAsync<nullptr_t, ApiResourceTypeList, decltype(queryDoneHandler)>

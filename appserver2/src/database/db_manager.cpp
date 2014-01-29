@@ -172,7 +172,7 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 		return ErrorCode::failure;
 
 	QSqlQuery queryParents(m_sdb);
-	queryParents.prepare("select from_resourcetype_id as id, to_resourcetype_id as parentId from vms_resourcetype_parents order by from_resourcetype_id");
+	queryParents.prepare("select from_resourcetype_id as id, to_resourcetype_id as parentId from vms_resourcetype_parents order by from_resourcetype_id, to_resourcetype_id desc");
 
 	if (!queryParents.exec())
 		return ErrorCode::failure;

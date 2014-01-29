@@ -15,15 +15,17 @@ struct ApiResourceTypeData: public ApiData
 	std::vector<qint32> parentId;
 
 	void fromResource(const QnResourceTypePtr& resource);
-	void toResource(QnResourceTypePtr resource);
+	void toResource(QnResourceTypePtr resource) const;
 	QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
 };
 
 struct ApiResourceTypeList: public ApiData {
-	std::vector<ApiResourceTypeData> data;
-
 	void loadFromQuery(QSqlQuery& query);
+	void toResourceTypeList(QnResourceTypeList resTypeList) const;
+
 	QN_DECLARE_STRUCT_SERIALIZATORS();
+
+	std::vector<ApiResourceTypeData> data;
 };
 
 }
