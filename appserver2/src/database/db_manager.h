@@ -4,6 +4,7 @@
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 #include "nx_ec/data/camera_data.h"
+#include "nx_ec/data/ec2_resource_type_data.h"
 
 
 class QSqlDatabase;
@@ -19,7 +20,8 @@ namespace ec2
         static QnDbManager* instance();
 
 
-		// todo: const QnTransaction<QueryDataType> MUST be used. Const absent as temporary solution because we are still using ID instead of GUID
+		// ------------ transactions --------------------------------------
+
         template<class QueryDataType>
         ErrorCode executeTransaction( const QnTransaction<QueryDataType>& /*tran*/ )
         {
@@ -28,6 +30,11 @@ namespace ec2
         }
 
         ErrorCode executeTransaction(const QnTransaction<ApiCameraData>& tran);
+		
+		// --------- get methods ---------------------
+		ErrorCode getResourceTypes(ApiResourceTypeList& tran);
+
+		// --------- misc -----------------------------
 
 		int getNextSequence();
     private:

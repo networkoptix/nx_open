@@ -160,4 +160,38 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tr
     return result;
 }
 
+// -------------------- getters ----------------------------
+ErrorCode QnDbManager::getResourceTypes(ApiResourceTypeList& data)
+{
+	QSqlQuery queryTypes(m_sdb);
+	queryTypes.prepare("	select rt.id, rt.name, m.name as manufacture \
+				  from vms_resourcetype rt \
+				  join vms_manufacture m on m.id = rt.manufacture_id \
+				  order by rt.id");
+	if (!queryTypes.exec())
+		return ErrorCode::failure;
+
+	QSqlQuery queryParents(m_sdb);
+	queryParents.prepare("select from_resourcetype_id as id, to_resourcetype_id as parent_id from vms_resourcetype_parents order by from_resourcetype_id");
+
+	if (!queryParents.exec())
+		return ErrorCode::failure;
+	
+	data.resourceTypes.resize(queryTypes.size());
+	int idx = 0;
+
+	QSqlRecord rec = queryTypes.record();
+	int idIdx = rec.indexOf("id");
+	int nameIdx = rec.indexOf("name");
+	int manufactureIdx = rec.indexOf("manufacture");
+
+	while (queryTypes.next())
+	{
+		ApiResourceTypeData& typeData = data.resourceTypes[idx++];
+		typeData.id = queryTypes.value(idIdx).toInt();
+	}
+
+	return ErrorCode::ok;
+}
+
 }
