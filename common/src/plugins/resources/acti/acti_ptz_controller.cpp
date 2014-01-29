@@ -52,6 +52,7 @@ namespace {
     };
 
     int toActiZoomSpeed(qreal zoomSpeed) {
+#if 0
         zoomSpeed = qBound(-1.0, zoomSpeed, 1.0);
         if(qFuzzyIsNull(zoomSpeed)) {
             return 0;
@@ -59,6 +60,16 @@ namespace {
             /* Zoom speed is an int in [2, 7] range. */
             return qMin(7, qFloor(2.0 + 6.0 * qAbs(zoomSpeed))) * qSign(zoomSpeed); 
         }
+#else
+        /* Even though zoom speed is specified to be in [2, 7] range, 
+         * passing values other than 2 makes the camera ignore STOP commands. 
+         * This is the case for KCM8111, untested on other models => enabling it for all models. */
+        if(qFuzzyIsNull(zoomSpeed)) {
+            return 0;
+        } else {
+            return zoomSpeed > 0 ? 2 : -2;
+        }
+#endif
     }
 
     int toActiPanTiltSpeed(qreal panTiltSpeed) {
