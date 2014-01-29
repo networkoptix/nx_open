@@ -188,7 +188,7 @@ ErrorCode QnDbManager::getResourceTypes(ApiResourceTypeList& data)
 		int id = queryParents.value(idIdx).toInt();
 		int parentId = queryParents.value(parentIdIdx).toInt();
 
-		for (; data.data[idx].id != id && idx < data.data.size(););
+		for (; data.data[idx].id != id && idx < data.data.size(); idx++);
 		if (idx == data.data.size())
 			break;
 		data.data[idx].parentId.push_back(parentId);

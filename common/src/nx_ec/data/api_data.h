@@ -1,5 +1,5 @@
-#ifndef __COMMON_TRANSACTION_DATA_H__
-#define __COMMON_TRANSACTION_DATA_H__
+#ifndef __API_DATA_H__
+#define __API_DATA_H__
 
 #include <QtSql/QtSql>
 #include "nx_ec/binary_serialization_helper.h"
@@ -59,40 +59,18 @@ void doAutoBind(QSqlQuery& query, const char* fieldName, const std::vector<T>& f
 #define TO_IDX_VAR(x) x ## idx
 
 #define DECLARE_FIELD_IDX(R, D, FIELD) int TO_IDX_VAR(FIELD) = rec.indexOf(QLatin1String(TO_STRING(FIELD)));
-#define ASSIGN_FIELD(R, D, FIELD) queryFieldToDataObj(query, TO_IDX_VAR(FIELD), data[idx].FIELD);
+#define ASSIGN_FIELD(R, D, FIELD) queryFieldToDataObj(query, TO_IDX_VAR(FIELD), value.FIELD);
 
-/*
-#define DECLARE_FIELD_IDX(R, D, FIELD) int TO_IDX_VAR(FIELD) = rec.indexOf(QLatin1String(TO_STRING(FIELD)));
-#define ASSIGN_FIELD(R, D, FIELD) queryFieldToDataObj(query, TO_IDX_VAR(FIELD), data[idx].FIELD);
-
-#define QN_QUERY_TO_DATA_OBJECT(TYPE, FIELD_SEQ, ...) \
-	void TYPE::loadFromQuery(QSqlQuery& query) \
+#define QN_QUERY_TO_DATA_OBJECT(TYPE, data, FIELD_SEQ, ...) \
 { \
-	data.resize(query.size());\
-	int idx = 0;\
 	QSqlRecord rec = query.record();\
 	BOOST_PP_SEQ_FOR_EACH(DECLARE_FIELD_IDX, ~, FIELD_SEQ) \
+	int idx = 0;\
 	while (query.next())\
 	{\
+		TYPE value;\
 		BOOST_PP_SEQ_FOR_EACH(ASSIGN_FIELD, ~, FIELD_SEQ) \
-		idx++;\
-	}\
-}
-*/
-
-#define DECLARE_FIELD_IDX(R, D, FIELD) int TO_IDX_VAR(FIELD) = rec.indexOf(QLatin1String(TO_STRING(FIELD)));
-#define ASSIGN_FIELD(R, DATA, FIELD) queryFieldToDataObj(query, TO_IDX_VAR(FIELD), data[idx].FIELD);
-
-#define QN_QUERY_TO_DATA_OBJECT(DATA, FIELD_SEQ, ...) \
-{ \
-	DATA.resize(query.size());\
-	int idx = 0;\
-	QSqlRecord rec = query.record();\
-	BOOST_PP_SEQ_FOR_EACH(DECLARE_FIELD_IDX, ~, FIELD_SEQ) \
-	while (query.next())\
-	{\
-		BOOST_PP_SEQ_FOR_EACH(ASSIGN_FIELD, DATA, FIELD_SEQ) \
-		idx++;\
+		data.push_back(value);\
 	}\
 }
 
@@ -101,4 +79,4 @@ inline void queryFieldToDataObj(QSqlQuery& query, int idx, QByteArray& field) { 
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, QString& field) { field = query.value(idx).toString(); }
 
 
-#endif // __COMMON_TRANSACTION_DATA_H__
+#endif // __API_DATA_H__
