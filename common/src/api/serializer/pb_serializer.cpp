@@ -254,8 +254,8 @@ void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_server
             if(pb_storage.has_usedforwriting())
                 parameters["usedForWriting"] = QString::number(pb_storage.usedforwriting());
 
-            // TODO: #Ivan looks like this code can crash even when we have the types in pool
-            QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName(QLatin1String("Storage"))->getId(), parameters); // TODO: #Ivan no types in pool => crash
+            // This code assumes we already have "Storage" resource type in qnResTypePool
+            QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName(QLatin1String("Storage"))->getId(), parameters);
             storage = qSharedPointerDynamicCast<QnAbstractStorageResource> (st);
             if (storage)
                 storages.append(storage);

@@ -857,6 +857,8 @@ namespace Qn {
          */
         DebugCalibratePtzAction,
 
+        DebugGetPtzPositionAction,
+
         /**
          * Opens up debug control panel.
          */

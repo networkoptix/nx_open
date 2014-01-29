@@ -1287,6 +1287,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::SingleTarget | Qn::DevMode).
         text(tr("Calibrate PTZ"));
 
+    factory(Qn::DebugGetPtzPositionAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::DevMode).
+        text(tr("Get PTZ Position"));
+
     factory(Qn::DebugControlPanelAction).
         flags(Qn::GlobalHotkey | Qn::DevMode).
         shortcut(tr("Ctrl+Alt+Shift+D")).
