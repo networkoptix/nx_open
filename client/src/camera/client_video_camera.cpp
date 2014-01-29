@@ -222,6 +222,7 @@ void QnClientVideoCamera::stopExport() {
         m_exportRecorder->setNeedCalcSignature(false);
 
         connect(m_exportRecorder, SIGNAL(finished()), m_exportRecorder, SLOT(deleteLater()));
+        connect(m_exportRecorder, SIGNAL(finished()), this, SIGNAL(exportStopped()));
         m_exportRecorder->pleaseStop();
     }
     QMutexLocker lock(&m_exportMutex);

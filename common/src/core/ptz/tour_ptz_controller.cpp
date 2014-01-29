@@ -84,10 +84,6 @@ bool QnTourPtzController::createTourInternal(QnPtzTour tour) {
     if(!getPresets(&presets))
         return false;
 
-    /* We need to check validity of the tour first. */
-    if (!tour.isValid(presets))
-        return false;
-
     /* Not so important so fix and continue. */
     tour.optimize();
 

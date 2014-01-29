@@ -1,21 +1,20 @@
 import io, sys, os, platform
 import ConfigParser
 import argparse
+import contextlib
 from os.path import dirname, join
     
 #class Config:
 #    pass
 
-class cd:         
-    def __init__(self, newPath):
-        self.newPath = newPath
-
-    def __enter__(self):
-        self.savedPath = os.getcwd()
-        os.chdir(self.newPath)
-
-    def __exit__(self, etype, value, traceback):
-        os.chdir(self.savedPath)
+@contextlib.contextmanager
+def cd(xdir):
+    olddir = os.getcwd()
+    try:
+        os.chdir(xdir)
+        yield
+    finally:
+        os.chdir(olddir)
     
 def get_environment_variable(variable):
     #print (os.path.abspath(__file__))
