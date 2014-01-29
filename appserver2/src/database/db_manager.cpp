@@ -8,7 +8,7 @@ static QnDbManager* globalInstance = 0;
 
 QnDbManager::QnDbManager()
 {
-	m_sdb = QSqlDatabase::addDatabase("QSQLITE");
+	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
 	m_sdb.setDatabaseName("c:/develop/netoptix_new_ec/appserver/db/ecs.db");
 	if (m_sdb.open())
 	{
@@ -25,7 +25,7 @@ bool QnDbManager::createDatabase()
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;
 
-	return false;
+	return true;
 }
 
 QnDbManager::~QnDbManager()

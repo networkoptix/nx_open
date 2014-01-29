@@ -1,12 +1,20 @@
 
 #include "resource_manager.h"
+#include <QtConcurrent>
+#include "database/db_manager.h"
 
 
 namespace ec2
 {
     ReqID QnResourceManager::getResourceTypes( impl::GetResourceTypesHandlerPtr handler )
     {
-        //TODO/IMPL
+		
+		ApiResourceTypeList resTypes;
+		dbManager->getResourceTypes(resTypes);
+
+		QnResourceTypeList result;
+		ErrorCode errorCode;
+		QtConcurrent::run( std::bind( std::mem_fn( &impl::GetResourceTypesHandler::done ), handler, errorCode, result ) );
         return INVALID_REQ_ID;
     }
 
