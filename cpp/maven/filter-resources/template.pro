@@ -6,7 +6,7 @@ LIBTYPE = ${libtype}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
 QT += ${qt.libs}
-ADDITIONAL_QT_INCLUDES=${environment.dir}/qt-custom
+ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 
 
 ## GLOBAL CONFIGURATIONS
