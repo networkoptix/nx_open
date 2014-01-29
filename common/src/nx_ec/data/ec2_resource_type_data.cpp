@@ -20,7 +20,7 @@ void ApiResourceTypeList::loadFromQuery(QSqlQuery& query)
 	QN_QUERY_TO_DATA_OBJECT(ApiResourceTypeData, data, (id) (name) (manufacture) );
 }
 
-void ApiResourceTypeList::toResourceTypeList(QnResourceTypeList resTypeList) const
+void ApiResourceTypeList::toResourceTypeList(QnResourceTypeList& resTypeList) const
 {
 	resTypeList.reserve(data.size());
 	for(int i = 0; i < data.size(); ++i) {

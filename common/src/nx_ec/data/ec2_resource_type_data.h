@@ -21,7 +21,7 @@ struct ApiResourceTypeData: public ApiData
 
 struct ApiResourceTypeList: public ApiData {
 	void loadFromQuery(QSqlQuery& query);
-	void toResourceTypeList(QnResourceTypeList resTypeList) const;
+	void toResourceTypeList(QnResourceTypeList& resTypeList) const;
 
 	QN_DECLARE_STRUCT_SERIALIZATORS();
 
