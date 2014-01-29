@@ -724,7 +724,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Connect to display. */
     display()->view()->addAction(action(Qn::FreespaceAction));
     connect(action(Qn::FreespaceAction),SIGNAL(triggered()),                        this,           SLOT(at_freespaceAction_triggered()));
-    connect(action(Qn::FullscreenAction),SIGNAL(triggered()),                       this,           SLOT(at_fullscreenAction_triggered()));
+    connect(action(Qn::EffectiveMaximizeAction),    SIGNAL(triggered()),            this,           SLOT(at_fullscreenAction_triggered()));
     connect(display(),                  SIGNAL(viewportGrabbed()),                  this,           SLOT(disableProxyUpdates()));
     connect(display(),                  SIGNAL(viewportUngrabbed()),                this,           SLOT(enableProxyUpdates()));
     connect(display(),                  SIGNAL(widgetChanged(Qn::ItemRole)),        this,           SLOT(at_display_widgetChanged(Qn::ItemRole)));

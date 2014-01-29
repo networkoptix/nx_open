@@ -477,6 +477,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
     context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
 
+    context->menu()->registerAlias(Qn::EffectiveMaximizeAction, Qn::FullscreenAction);
+
     /* Create main window. */
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
     context->setMainWindow(mainWindow.data());
