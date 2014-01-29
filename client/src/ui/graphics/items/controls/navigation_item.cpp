@@ -52,7 +52,7 @@ namespace {
         palette.setColor(QPalette::WindowText, qnGlobals->selectedFrameColor());
         label->setPalette(palette);
 
-        QnClockDataProvider *dp = new QnClockDataProvider(label);
+        QnClockDataProvider *dp = new QnClockDataProvider(lit("hh:mm:ss"), label);
         QObject::connect(dp, SIGNAL(timeChanged(QString)), label, SLOT(setText(QString)));
         return label;
     }

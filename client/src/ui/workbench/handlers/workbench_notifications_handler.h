@@ -45,6 +45,8 @@ private slots:
     void at_licensePool_licensesChanged();
     void at_settings_valueChanged(int id);
 private:
+    void requestSmtpSettings();
+
     void addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
 
     /**
@@ -55,6 +57,7 @@ private:
     void setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible);
     void setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible);
 
+    void checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message);
 private:
     QnWorkbenchUserEmailWatcher* m_userEmailWatcher;
 };

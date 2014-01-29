@@ -16,12 +16,12 @@ class QnPtzToursDialog : public QnAbstractPtzDialog {
 
     typedef QnAbstractPtzDialog base_type;
 public:
-    explicit QnPtzToursDialog(QWidget *parent = 0);
+    explicit QnPtzToursDialog(const QnPtzControllerPtr &controller, QWidget *parent = 0);
     ~QnPtzToursDialog();
 
 protected:
     virtual void loadData(const QnPtzData &data) override;
-    virtual void saveData() const override;
+    virtual void saveData() override;
     virtual Qn::PtzDataFields requiredFields() const override;
 
 private slots:
@@ -30,6 +30,8 @@ private slots:
     void at_deleteTourButton_clicked();
 
 private:
+    bool saveTours();
+
     QScopedPointer<Ui::PtzToursDialog> ui;
     QnPtzTourListModel *m_model;
     QnPtzTourList m_oldTours;

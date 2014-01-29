@@ -256,8 +256,11 @@ void QnSystrayWindow::findServiceInfo()
     if (m_appServerHandle == 0)
         m_appServerHandle  = OpenService(m_scManager, (LPCWSTR) m_appServerServiceName.data(),   SERVICE_QUERY_STATUS);
 
-    if (!m_mediaServerHandle && !m_appServerHandle)
+    if (!m_mediaServerHandle && !m_appServerHandle && m_firstTimeToolTipError) {
         showMessage(tr("No %1 services installed").arg(lit(QN_ORGANIZATION_NAME)));
+     //   m_trayIcon->setIcon(m_iconBad);   //TODO: #Elric why do we have the same icon for error? And why it is crashed here?
+        m_firstTimeToolTipError = false;
+    }
 }
 
 void QnSystrayWindow::setVisible(bool visible)
@@ -319,6 +322,7 @@ void QnSystrayWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
         case QSystemTrayIcon::DoubleClick:
         case QSystemTrayIcon::Trigger:
             m_trayIcon->contextMenu()->popup(QCursor::pos());
+            m_trayIcon->contextMenu()->activateWindow();
             break;
         case QSystemTrayIcon::MiddleClick:
             break;
@@ -370,13 +374,17 @@ void QnSystrayWindow::updateServiceInfo()
         return;
     }
 
-    GetServiceInfoAsyncTask *mediaServerTask = new GetServiceInfoAsyncTask(m_mediaServerHandle);
-    connect(mediaServerTask, SIGNAL(finished(quint64)), this, SLOT(mediaServerInfoUpdated(quint64)), Qt::QueuedConnection);
-    QThreadPool::globalInstance()->start(mediaServerTask);
-   
-    GetServiceInfoAsyncTask *appServerTask = new GetServiceInfoAsyncTask(m_appServerHandle);
-    connect(appServerTask, SIGNAL(finished(quint64)), this, SLOT(appServerInfoUpdated(quint64)), Qt::QueuedConnection);
-    QThreadPool::globalInstance()->start(appServerTask);
+    if (m_mediaServerHandle) {
+        GetServiceInfoAsyncTask *mediaServerTask = new GetServiceInfoAsyncTask(m_mediaServerHandle);
+        connect(mediaServerTask, SIGNAL(finished(quint64)), this, SLOT(mediaServerInfoUpdated(quint64)), Qt::QueuedConnection);
+        QThreadPool::globalInstance()->start(mediaServerTask);
+    }
+
+    if (m_appServerHandle) {
+        GetServiceInfoAsyncTask *appServerTask = new GetServiceInfoAsyncTask(m_appServerHandle);
+        connect(appServerTask, SIGNAL(finished(quint64)), this, SLOT(appServerInfoUpdated(quint64)), Qt::QueuedConnection);
+        QThreadPool::globalInstance()->start(appServerTask);
+    }
 }
 
 void QnSystrayWindow::appServerInfoUpdated(quint64 status) {

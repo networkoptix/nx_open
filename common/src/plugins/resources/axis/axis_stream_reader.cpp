@@ -95,6 +95,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
     //================ profile setup ======================== 
     
     // -------------- check if profile already exists
+    for (int i = 0; i < 3; ++i)
     {
         CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
         const QString& requestPath = QLatin1String("/axis-cgi/param.cgi?action=list&group=StreamProfile");
@@ -119,6 +120,11 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
 
         QByteArray body;
         http.readAll(body);
+        if (body.isEmpty()) {
+            msleep(rand() % 50);
+            continue; // sometime axis returns empty profiles list
+        }
+        
         QList<QByteArray> lines = body.split('\n');
         for (int i = 0; i < lines.size(); ++i)
         {

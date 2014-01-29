@@ -55,7 +55,7 @@ void QnPtzTourWidget::at_moveSpotUpButton_clicked() {
     if (!index.isValid() || index.row() == 0)
         return;
 
-    m_model->moveRow(QModelIndex(), index.row(), QModelIndex(), index.row() - 1);
+    m_model->moveRow(index.parent(), index.row(), index.parent(), index.row() - 1);
 }
 
 void QnPtzTourWidget::at_moveSpotDownButton_clicked() {
@@ -63,5 +63,5 @@ void QnPtzTourWidget::at_moveSpotDownButton_clicked() {
     if (!index.isValid() || index.row() == m_model->rowCount() - 1)
         return;
 
-    m_model->moveRow(QModelIndex(), index.row(), QModelIndex(), index.row() + 1);
+    m_model->moveRow(index.parent(), index.row(), index.parent(), index.row() + 2); // that is not an error, see QAbstractItemModel docs
 }

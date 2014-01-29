@@ -53,7 +53,7 @@
 
                     <Directory Id="ImageFormats" Name="imageformats">
                     </Directory>    
-                    
+
                     <Directory Id="Plugins" Name="plugins">
                     </Directory>                        
 
@@ -130,6 +130,7 @@
             </Component>
         </ComponentGroup>
 
+        <?if ${quicksync} = true ?>
         <ComponentGroup Id="ClientQuickSync" Directory="Plugins">
             <Component>
                 <File Id="ClientQuickSyncDll" Name="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll"/>
@@ -138,6 +139,7 @@
                 <File Id="ClientQuickSyncXml" Name="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml"/>                               
             </Component>
         </ComponentGroup>                            
+        <?endif?>
 
         <ComponentGroup Id="ClientQTLibraries" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
@@ -222,7 +224,9 @@
             <ComponentGroupRef Id="ClientVoxComponent"/>
             <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentRef Id="ClientConfiguration" />
+            <?if ${quicksync} = true ?>
             <ComponentGroupRef Id="ClientQuickSync"/>
+            <?endif?>
             <ComponentGroupRef Id="ClientFFmpegLibraries"/>
             <ComponentGroupRef Id="ClientQTLibraries" />
             <ComponentGroupRef Id="ImageFormats" />

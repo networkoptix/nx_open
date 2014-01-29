@@ -36,7 +36,7 @@
 				<executions>
 					<execution>
 						<id>default-cli</id>
-						<phase>compile</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
@@ -53,7 +53,7 @@
 				<executions>
 					<execution>
 						<id>pack-binaries</id>
-						<phase>prepare-package</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>

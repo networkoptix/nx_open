@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en" sourcelanguage="en">
+<TS version="2.1" language="en" sourcelanguage="en">
 <context>
     <name>QnBusinessStringsHelper</name>
     <message numerus="yes">
@@ -26,6 +26,7 @@
         </translation>
     </message>
     <message numerus="yes">
+        <location filename="../src/business/business_strings_helper.cpp" line="277"/>
         <source>%n times, first: %2 %1</source>
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
@@ -34,6 +35,7 @@
         </translation>
     </message>
     <message numerus="yes">
+        <location filename="../src/business/business_strings_helper.cpp" line="292"/>
         <source>First occurrence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
@@ -42,6 +44,7 @@
         </translation>
     </message>
     <message numerus="yes">
+        <location filename="../src/business/business_strings_helper.cpp" line="312"/>
         <source>No video frame received during last %n seconds.</source>
         <translation type="unfinished">
             <numerusform></numerusform>

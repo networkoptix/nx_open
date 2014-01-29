@@ -35,12 +35,14 @@ public:
     const QString tourName() const;
     Q_SLOT void setTourName(const QString &name);
 
+    QnPtzPresetList sortedPresets() const;
     const QnPtzPresetList &presets() const;
     Q_SLOT void setPresets(const QnPtzPresetList &presets);
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
+    virtual bool moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild) override;
     virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 

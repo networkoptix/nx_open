@@ -1,7 +1,9 @@
 #ifndef QN_CONNECTIVE_H
 #define QN_CONNECTIVE_H
 
+#ifndef Q_MOC_RUN
 #include <boost/type_traits/is_base_of.hpp>
+#endif
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>

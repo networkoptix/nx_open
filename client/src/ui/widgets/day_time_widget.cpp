@@ -88,6 +88,7 @@ protected:
 // -------------------------------------------------------------------------- //
 QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     base_type(parent),
+    m_timeFormat(lit("hh:mm")),
     m_localOffset(0)
 {
     m_headerLabel = new QLabel(this);
@@ -129,7 +130,6 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     connect(m_tableWidget, SIGNAL(itemClicked(QTableWidgetItem *)), this, SLOT(at_tableWidget_itemClicked(QTableWidgetItem *)));
 
     setDate(QDate::currentDate());
-    updateTimeFormat();
     updateCurrentTime();
     updateEnabled();
 }
@@ -236,21 +236,6 @@ void QnDayTimeWidget::updateCurrentTime() {
     m_currentTime = qnSyncTime->currentMSecsSinceEpoch();
 }
 
-void QnDayTimeWidget::updateTimeFormat() {
-    QString timeFormat;
-    if(QLocale().timeFormat().contains(lit("ap"), Qt::CaseInsensitive)) {
-        timeFormat = lit("h ap");
-    } else {
-        timeFormat = lit("hh:mm");
-    }
-
-    if(m_timeFormat == timeFormat)
-        return;
-
-    m_timeFormat = timeFormat;
-    m_tableWidget->update();
-}
-
 void QnDayTimeWidget::updateEnabled() {
     for(int row = 0; row < m_tableWidget->rowCount(); row++) {
         for(int col = 0; col < m_tableWidget->columnCount(); col++) {
@@ -261,13 +246,6 @@ void QnDayTimeWidget::updateEnabled() {
             item->setFlags(m_enabledPeriod.intersects(period) ? (Qt::ItemIsSelectable | Qt::ItemIsEnabled) : Qt::NoItemFlags);
         }
     }
-}
-
-void QnDayTimeWidget::changeEvent(QEvent *event) {
-    if(event->type() == QEvent::LocaleChange)
-        updateTimeFormat();
-
-    base_type::changeEvent(event);
 }
 
 void QnDayTimeWidget::at_tableWidget_itemClicked(QTableWidgetItem *item) {

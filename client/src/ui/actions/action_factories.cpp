@@ -110,10 +110,14 @@ void QnPtzGoToPresetActionFactory::at_action_triggered() {
 
 QList<QAction *> QnPtzStartTourActionFactory::newActions(const QnActionParameters &parameters, QObject *parent) {
     QList<QAction *> result;
+    QnPtzPresetList presets;
     QnPtzTourList tours;
 
     QnMediaResourceWidget* widget = parameters.widget<QnMediaResourceWidget>();
-    if (!widget || !widget->ptzController() || !widget->ptzController()->getTours(&tours))
+    if (!widget ||
+            !widget->ptzController() ||
+            !widget->ptzController()->getPresets(&presets) ||
+            !widget->ptzController()->getTours(&tours))
         return result;
 
     qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
@@ -121,6 +125,9 @@ QList<QAction *> QnPtzStartTourActionFactory::newActions(const QnActionParameter
     });
 
     foreach(const QnPtzTour &tour, tours) {
+        if (!tour.isValid(presets))
+            continue;
+
         QAction *action = new QAction(parent);
         action->setText(tour.name);
 

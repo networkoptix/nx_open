@@ -1885,7 +1885,9 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
         m_titleItem->size().height()
     ));
 
-    m_notificationsItem->setX(m_notificationsItem->x() - oldRect.width() + rect.width());
+    if (m_notificationsXAnimator->isRunning())
+        m_notificationsXAnimator->stop();
+    m_notificationsItem->setX(rect.right() + (m_notificationsOpened ? -m_notificationsItem->size().width() : 1.0 /* Just in case. */));
 
     updateTreeGeometry();
     updateNotificationsGeometry();
@@ -1938,9 +1940,15 @@ void QnWorkbenchUi::at_sliderResizerWidget_geometryChanged() {
     if(m_ignoreSliderResizerGeometryChanges)
         return;
 
+    QRectF sliderResizerGeometry = m_sliderResizerWidget->geometry();
+    if (!sliderResizerGeometry.isValid()) {
+        updateSliderResizerGeometry();
+        return;
+    }
+
     QRectF sliderGeometry = m_sliderItem->geometry();
 
-    qreal targetHeight = sliderGeometry.bottom() - m_sliderResizerWidget->geometry().center().y();
+    qreal targetHeight = sliderGeometry.bottom() - sliderResizerGeometry.center().y();
     qreal minHeight = m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height();
     qreal jmpHeight = minHeight + 48.0;
     qreal maxHeight = minHeight + 196.0;

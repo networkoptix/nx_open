@@ -49,11 +49,9 @@ if get_environment_variable('platform') == 'windows':
         lib_target_dir = join('${project.build.directory}', arch, 'lib')
         help_dir = join('${project.build.directory}', arch, 'bin/help')
             
-        if os.path.exists(help_dir):
-            shutil.rmtree(help_dir)
-            shutil.copytree(join(basedir, 'help'), help_dir)                        
-
-        #shutil.rmtree('help')
+        #if os.path.exists(help_dir):
+        #    shutil.rmtree(help_dir)
+        #    shutil.copytree(join(basedir, 'help'), help_dir)
 
         if not os.path.exists(target_dir):
             mkdir_p(target_dir)        
@@ -94,8 +92,7 @@ if get_environment_variable('platform') == 'windows':
             target_plugins = join(target_dir, config, 'plugins')
             if not os.path.exists(target_plugins):
                 os.makedirs(join(target_dir, config, 'plugins'))
-            shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), target_vox)                        
-            shutil.copy2('${root.dir}/plugins/quicksyncdecoder/hw_decoding_conf.xml', target_plugins)
+            #shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), target_vox)                        
 
 else:     
     lib_source_dir = '${qt.dir}/lib'
@@ -104,9 +101,9 @@ else:
     target_dir = join('${project.build.directory}', 'bin')
     help_dir = join('${project.build.directory}', 'bin/help')
     
-    if os.path.exists(help_dir):
-        shutil.rmtree(help_dir)
-        shutil.copytree('help', help_dir)    
+#    if os.path.exists(help_dir):
+#        shutil.rmtree(help_dir)
+#        shutil.copytree('help', help_dir)    
     
     if get_environment_variable('platform') == 'linux':
         for qtlib in qtlibs:

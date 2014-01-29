@@ -103,8 +103,7 @@ public:
 
     /**
      * This function returns a PTZ controller associated with this widget.
-     * Note that this function never returns NULL. Also note that several
-     * different widgets may return the same PTZ controller instance.
+     * Note that this function never returns NULL. 
      *
      * \returns                         PTZ controller associated with this widget.
      */

@@ -41,10 +41,9 @@
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
-        <ClientHelpSourceDir>${libdir}/help</ClientHelpSourceDir>
-        <help.language>english</help.language>
+        <ClientHelpSourceDir>${environment.dir}/help/${release.version}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
-        <ClientVoxSourceDir>${libdir}/${arch}/bin/${build.configuration}/vox</ClientVoxSourceDir>
+        <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
@@ -200,6 +199,16 @@
         </profile>     
 
         <profile>
+            <id>quicksync</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>	
+                <module>quicksyncdecoder</module>       
+            </modules>	
+        </profile>   
+
+        <profile>
             <id>main</id>
             <activation>
                 <property>
@@ -212,6 +221,7 @@
                 <module>appserver2</module>
                 <!--<module>plugins/axiscamplugin</module>-->
                 <module>plugins/genericrtspplugin</module>
+                <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>mediaserver</module>
                 <module>mediaproxy</module>
@@ -359,6 +369,9 @@
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA</additional.defines>
             </properties>
+            <modules>
+                <module>plugins/isd_native_plugin</module>
+            </modules>
         </profile>	
         <profile>
             <id>linux-x64</id>
