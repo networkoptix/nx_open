@@ -1,4 +1,5 @@
 #include "camera_list_dialog.h"
+#include "ui_camera_list_dialog.h"
 
 #include <QtGui/QClipboard>
 #include <QtWidgets/QMenu>
@@ -6,13 +7,13 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 
-#include <ui_camera_list_dialog.h>
 #include <ui/models/camera_list_model.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/actions/action_manager.h>
-#include "ui/common/grid_widget_helper.h"
+#include <ui/common/grid_widget_helper.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -34,7 +35,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
 
     QList<QnCameraListModel::Column> columns;
     columns << QnCameraListModel::RecordingColumn << QnCameraListModel::NameColumn << QnCameraListModel::VendorColumn << QnCameraListModel::ModelColumn <<
-               QnCameraListModel::FirmwareColumn << QnCameraListModel::IPColumn << QnCameraListModel::UniqIdColumn << QnCameraListModel::ServerColumn;
+               QnCameraListModel::FirmwareColumn << QnCameraListModel::DriverColumn << QnCameraListModel::IPColumn << QnCameraListModel::UniqIdColumn << QnCameraListModel::ServerColumn;
 
     m_model->setColumns(columns);
 
@@ -70,6 +71,20 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
 
 QnCameraListDialog::~QnCameraListDialog()
 {
+}
+
+void QnCameraListDialog::setServer(const QnMediaServerResourcePtr &server)
+{
+    if(m_server == server)
+        return;
+
+    m_server = server;
+    m_model->setResources(qnResPool->getAllEnabledCameras(m_server));
+}
+
+const QnMediaServerResourcePtr &QnCameraListDialog::server() const 
+{
+    return m_server;
 }
 
 void QnCameraListDialog::at_searchStringChanged(const QString& text)
@@ -142,10 +157,10 @@ void QnCameraListDialog::at_copyToClipboard()
 
 void QnCameraListDialog::at_modelChanged()
 {
-    if (m_mediaServer == 0)
+    if (!m_server)
         setWindowTitle(tr("Camera List - %n camera(s) found", "", m_resourceSearch->rowCount()));
     else
-        setWindowTitle(tr("Camera List for media server '%1' - %n camera(s) found", "", m_resourceSearch->rowCount()).arg(QUrl(m_mediaServer->getUrl()).host()));
+        setWindowTitle(tr("Camera List for media server '%1' - %n camera(s) found", "", m_resourceSearch->rowCount()).arg(QUrl(m_server->getUrl()).host()));
 }
 
 void QnCameraListDialog::at_resPool_resourceRemoved(const QnResourcePtr & resource)
@@ -156,14 +171,7 @@ void QnCameraListDialog::at_resPool_resourceRemoved(const QnResourcePtr & resour
 void QnCameraListDialog::at_resPool_resourceAdded(const QnResourcePtr & resource)
 {
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (camera) {
-        if (m_mediaServer == 0 || camera->getParentId() == m_mediaServer->getId())
+    if (camera && (!m_server || camera->getParentId() == m_server->getId()))
         m_model->addResource(camera);
-    }
 }
 
-void QnCameraListDialog::setMediaServerResource(QnResourcePtr server)
-{
-    m_mediaServer = server;
-    m_model->setResources(qnResPool->getAllEnabledCameras(m_mediaServer));
-}

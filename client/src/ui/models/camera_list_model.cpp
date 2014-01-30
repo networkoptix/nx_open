@@ -75,6 +75,9 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
             case FirmwareColumn:
                 result = camera->getFirmware();
                 break;
+            case DriverColumn:
+                result = camera->getDriverName();
+                break;
             case IPColumn:
                 result = camera->getHostAddress();
                 break;
@@ -103,9 +106,10 @@ QString QnCameraListModel::columnTitle(Column column) const
     switch(column) {
     case RecordingColumn: return tr("Recording");
     case NameColumn:      return tr("Name");
-    case VendorColumn:    return tr("Driver");
+    case VendorColumn:    return tr("Vendor");
     case ModelColumn:     return tr("Model");
     case FirmwareColumn:  return tr("Firmware");
+    case DriverColumn:    return tr("Driver");
     case IPColumn:        return tr("IP/Name");
     case UniqIdColumn:    return tr("ID/MAC");
     case ServerColumn:    return tr("Server");
