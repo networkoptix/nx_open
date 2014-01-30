@@ -5,6 +5,7 @@
 #include "transaction/transaction.h"
 #include "nx_ec/data/camera_data.h"
 #include "nx_ec/data/ec2_resource_type_data.h"
+#include "nx_ec/data/mserver_data.h"
 
 
 class QSqlDatabase;
@@ -36,7 +37,10 @@ namespace ec2
 		ErrorCode doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& resourceTypeList);
 
 		//getCameras
-		ErrorCode doQuery(const QnId& mServerId, ApiCameraDataList& cameraList);
+        ErrorCode doQuery(const QnId& mServerId, ApiCameraDataList& cameraList);
+
+        //getServers
+        ErrorCode doQuery(ApiMediaServerDataList& serverList);
 
 		// --------- misc -----------------------------
 

@@ -225,4 +225,30 @@ ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraL
 	return ErrorCode::ok;
 }
 
+// ----------- getServers --------------------
+
+ErrorCode QnDbManager::doQuery(ApiMediaServerDataList& serverList)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare(QString("select r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
+                          s.api_url as apiUrl, s.auth_key as authKey, s.streaming_url as streamingUrl, s.version, s.net_addr_list as netAddrList, s.reserve, s.panic_mode as panicMode \
+                          from vms_resource r \
+                          join vms_server s on s.resource_ptr_id = r.id order by r.id"));
+
+    if (!query.exec())
+        return ErrorCode::failure;
+
+    QSqlQuery queryStorage(m_sdb);
+    queryStorage.prepare(QString("select r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
+                          s.space_limit as spaceLimit, used_for_writing as usedForWriting \
+                          from vms_resource r \
+                          join vms_storage s on s.resource_ptr_id = r.id order by r.parent_id"));
+
+    if (!queryStorage.exec())
+        return ErrorCode::failure;
+
+    serverList.loadFromQuery(query);
+    return ErrorCode::ok;
+}
+
 }
