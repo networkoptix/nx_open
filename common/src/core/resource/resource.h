@@ -451,6 +451,8 @@ public:
     virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) = 0;
 };
 
+typedef QSharedPointer<QnResourceFactory> QnResourceFactoryPtr;
+
 
 class QnResourceProcessor
 {

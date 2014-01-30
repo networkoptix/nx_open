@@ -8,89 +8,10 @@
 
 namespace ec2
 {
-    Ec2DirectConnection::Ec2DirectConnection( ServerQueryProcessor* queryProcessor, QSharedPointer<QnResourceFactory> factory )
+    Ec2DirectConnection::Ec2DirectConnection( ServerQueryProcessor* queryProcessor, const QnResourceFactoryPtr& resourceFactory )
     :
-        m_queryProcessor( queryProcessor ),
-        m_resourceManager( new QnResourceManager<ServerQueryProcessor>(m_queryProcessor) ),
-        m_mediaServerManager( new QnMediaServerManager<ServerQueryProcessor>(m_queryProcessor) ),
-        m_cameraManager( new QnCameraManager<ServerQueryProcessor>(m_queryProcessor, factory) ),
-        m_dbManager(new QnDbManager(factory))
+        BaseEc2Connection<ServerQueryProcessor>( queryProcessor, resourceFactory ),
+        m_dbManager( new QnDbManager(resourceFactory) )
     {
-    }
-
-    AbstractResourceManagerPtr Ec2DirectConnection::getResourceManager()
-    {
-        return m_resourceManager;
-    }
-
-    AbstractMediaServerManagerPtr Ec2DirectConnection::getMediaServerManager()
-    {
-        return m_mediaServerManager;
-    }
-
-    AbstractCameraManagerPtr Ec2DirectConnection::getCameraManager()
-    {
-        return m_cameraManager;
-    }
-
-    AbstractLicenseManagerPtr Ec2DirectConnection::getLicenseManager()
-    {
-        return nullptr;
-    }
-
-    AbstractBusinessEventManagerPtr Ec2DirectConnection::getBusinessEventManager()
-    {
-        return nullptr;
-    }
-
-    AbstractUserManagerPtr Ec2DirectConnection::getUserManager()
-    {
-        return nullptr;
-    }
-
-    AbstractLayoutManagerPtr Ec2DirectConnection::getLayoutManager()
-    {
-        return nullptr;
-    }
-
-    AbstractStoredFileManagerPtr Ec2DirectConnection::getStoredFileManager()
-    {
-        return nullptr;
-    }
-
-    ReqID Ec2DirectConnection::setPanicMode( PanicMode value, impl::SimpleHandlerPtr handler )
-    {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
-    }
-
-    ReqID Ec2DirectConnection::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
-    {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
-    }
-
-    ReqID Ec2DirectConnection::dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler )
-    {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
-    }
-
-    ReqID Ec2DirectConnection::restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler )
-    {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
-    }
-
-    ReqID Ec2DirectConnection::getSettingsAsync( impl::GetSettingsHandlerPtr handler )
-    {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
-    }
-
-    ReqID Ec2DirectConnection::saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler )
-    {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
     }
 }

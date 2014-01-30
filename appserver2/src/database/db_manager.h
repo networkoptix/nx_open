@@ -15,7 +15,7 @@ namespace ec2
     class QnDbManager
     {
     public:
-		QnDbManager(QSharedPointer<QnResourceFactory> factory);
+		QnDbManager(QnResourceFactoryPtr factory);
 		virtual ~QnDbManager();
 
         static QnDbManager* instance();
@@ -58,7 +58,7 @@ namespace ec2
     private:
         QSqlDatabase m_sdb;
 		QMutex m_mutex;
-		QSharedPointer<QnResourceFactory>  m_resourceFactory;
+		QnResourceFactoryPtr  m_resourceFactory;
     };
 };
 

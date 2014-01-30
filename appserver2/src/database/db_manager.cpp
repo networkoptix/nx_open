@@ -6,7 +6,7 @@ namespace ec2
 
 static QnDbManager* globalInstance = 0;
 
-QnDbManager::QnDbManager(QSharedPointer<QnResourceFactory> factory)
+QnDbManager::QnDbManager(QnResourceFactoryPtr factory)
 {
 	m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");

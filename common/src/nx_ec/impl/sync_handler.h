@@ -41,82 +41,35 @@ namespace ec2
             ErrorCode m_errorCode;
         };
 
-        class AddCameraSyncHandler
+        template<class BaseHandler, class OutDataType>
+        class CustomSyncHandler
         :
             public SyncHandler,
-            public AddCameraHandler
+            public BaseHandler
         {
         public:
-            QnVirtualCameraResourceListPtr cameraList() const {
-                return m_cameras;
-            }
+            CustomSyncHandler( OutDataType* const outParam )
+                : m_outParam( outParam ) {}
 
-            virtual void done( const ErrorCode& errorCode, const QnVirtualCameraResourceListPtr& cameras ) override {
-                m_cameras = cameras;
+            virtual void done( const ErrorCode& errorCode, const OutDataType& _outParam ) override
+            {
+                *m_outParam = _outParam;
                 SyncHandler::done( errorCode );
             }
 
         private:
-            QnVirtualCameraResourceListPtr m_cameras;
+            OutDataType* const m_outParam;
         };
 
-        class SyncConnectHandler
-        :
-            public SyncHandler,
-            public ConnectHandler
+
+        template<class HandlerType, class OutParamType, class AsyncFuncType>
+        ErrorCode doSyncCall( AsyncFuncType asyncFunc, OutParamType* outParam )
         {
-        public:
-            AbstractECConnectionPtr connection() const {
-                return m_connection;
-            }
-
-            virtual void done( const ErrorCode& errorCode, const AbstractECConnectionPtr& connection ) override {
-                m_connection = connection;
-                SyncHandler::done( errorCode );
-            }
-
-        private:
-            AbstractECConnectionPtr m_connection;
-        };
-
-        class GetResourceTypesSyncHandler
-        :
-            public SyncHandler,
-            public GetResourceTypesHandler
-        {
-        public:
-            const QnResourceTypeList& resourceTypeList() const {
-                return m_resourceTypeList;
-            }
-
-            virtual void done( const ErrorCode& errorCode, const QnResourceTypeList& resTypeList ) override {
-                m_resourceTypeList = resTypeList;
-                SyncHandler::done( errorCode );
-            }
-
-        private:
-            QnResourceTypeList m_resourceTypeList;
-        };
-
-        class GetCamerasSyncHandler
-            :
-            public SyncHandler,
-            public GetCamerasHandler
-        {
-        public:
-            const QnVirtualCameraResourceList& cameraList() const {
-                return m_cameraList;
-            }
-
-            virtual void done( const ErrorCode& errorCode, const QnVirtualCameraResourceList& cameras) override {
-                m_cameraList = cameras;
-                SyncHandler::done( errorCode );
-            }
-
-        private:
-            QnVirtualCameraResourceList m_cameraList;
-        };
-
+            auto syncHandler = std::make_shared<impl::CustomSyncHandler<HandlerType, OutParamType>>( outParam );
+            asyncFunc( syncHandler );
+            syncHandler->wait();
+            return syncHandler->errorCode();
+        }
     }
 }
 

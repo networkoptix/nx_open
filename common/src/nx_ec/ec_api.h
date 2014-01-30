@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <QtCore/QObject>
+#include <QtCore/QUrl>
 
 #include "api/model/email_attachment.h"
 #include "impl/ec_api_impl.h"
@@ -37,11 +38,8 @@ namespace ec2
             return getResourceTypes( std::static_pointer_cast<impl::GetResourceTypesHandler>(std::make_shared<impl::CustomGetResourceTypesHandler<TargetType, HandlerType>>(target, handler)) );
         }
         ErrorCode getResourceTypesSync( QnResourceTypeList* const resTypeList ) {
-            auto syncHandler = std::make_shared<impl::GetResourceTypesSyncHandler>();
-            getResourceTypes( syncHandler );
-            syncHandler->wait();
-            *resTypeList = syncHandler->resourceTypeList();
-            return syncHandler->errorCode();
+            using namespace std::placeholders;
+            return impl::doSyncCall<impl::GetResourceTypesHandler>( std::bind(std::mem_fn(&AbstractResourceManager::getResourceTypes), this, _1), resTypeList );
         }
         /*!
             \param handler Functor with params: (ErrorCode, const QnResourceList&)
@@ -91,7 +89,6 @@ namespace ec2
         template<class TargetType, class HandlerType> ReqID remove( const QnResourcePtr& resource, TargetType* target, HandlerType handler ) {
             return remove( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
-
 
     protected:
         virtual ReqID getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
@@ -166,11 +163,8 @@ namespace ec2
             return addCamera( camRes, std::static_pointer_cast<impl::AddCameraHandler>(std::make_shared<impl::CustomAddCameraHandler<TargetType, HandlerType>>(target, handler)) );
         }
         ErrorCode addCameraSync( const QnVirtualCameraResourcePtr& camRes, QnVirtualCameraResourceListPtr* const cameras ) {
-            auto syncHandler = std::make_shared<impl::AddCameraSyncHandler>();
-            addCamera( camRes, syncHandler );
-            syncHandler->wait();
-            *cameras = syncHandler->cameraList();
-            return syncHandler->errorCode();
+            using namespace std::placeholders;
+            return impl::doSyncCall<impl::AddCameraHandler>( std::bind(std::mem_fn(&AbstractCameraManager::addCamera), this, camRes, _1), cameras );
         }
         /*!
             \param handler Functor with params: (ErrorCode)
@@ -186,11 +180,8 @@ namespace ec2
         }
 
         ErrorCode getCamerasSync(const QnId& mServerId, QnVirtualCameraResourceList* const cameraList ) {
-            auto syncHandler = std::make_shared<impl::GetCamerasSyncHandler>();
-            getCameras(mServerId, syncHandler );
-            syncHandler->wait();
-            *cameraList = syncHandler->cameraList();
-            return syncHandler->errorCode();
+            using namespace std::placeholders;
+            return impl::doSyncCall<impl::GetCamerasHandler>( std::bind(std::mem_fn(&AbstractCameraManager::getCameras), this, mServerId, _1), cameraList );
         }
 
 
@@ -534,11 +525,6 @@ namespace ec2
 
     typedef std::shared_ptr<AbstractECConnection> AbstractECConnectionPtr;
 
-    class ECAddress
-    {
-        //TODO/IMPL
-    };
-
     /*!
         \note All methods are asynchronous if other not specified
     */
@@ -550,29 +536,27 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> ReqID testConnection( const ECAddress& addr, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> ReqID testConnection( const QUrl& addr, TargetType* target, HandlerType handler ) {
             return testConnectionAsync( addr, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
+            \param addr Empty url designates local EC ("local" means dll linked to executable, not EC running on local host)
             \param handler Functor with params: (ErrorCode, AbstractECConnectionPtr)
         */
-        template<class TargetType, class HandlerType> ReqID connect( const ECAddress& addr, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> ReqID connect( const QUrl& addr, TargetType* target, HandlerType handler ) {
             return connectAsync( addr, std::static_pointer_cast<impl::ConnectHandler>(std::make_shared<impl::CustomConnectHandler<TargetType, HandlerType>>(target, handler)) );
         }
-        ErrorCode connectSync( const ECAddress& addr, AbstractECConnectionPtr* const connection ) {
-            auto syncHandler = std::make_shared<impl::SyncConnectHandler>();
-            connectAsync( addr, syncHandler );
-            syncHandler->wait();
-            *connection = syncHandler->connection();
-            return syncHandler->errorCode();
+        ErrorCode connectSync( const QUrl& addr, AbstractECConnectionPtr* const connection ) {
+            using namespace std::placeholders;
+            return impl::doSyncCall<impl::ConnectHandler>( std::bind(std::mem_fn(&AbstractECConnectionFactory::connectAsync), this, addr, _1), connection );
         }
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
 		virtual void setResourceFactory(QSharedPointer<QnResourceFactory> factory) = 0;
 
     protected:
-        virtual ReqID testConnectionAsync( const ECAddress& addr, impl::SimpleHandlerPtr handler ) = 0;
-        virtual ReqID connectAsync( const ECAddress& addr, impl::ConnectHandlerPtr handler ) = 0;
+        virtual ReqID testConnectionAsync( const QUrl& addr, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler ) = 0;
     };
 }
 

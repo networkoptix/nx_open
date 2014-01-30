@@ -25,14 +25,14 @@ namespace ec2
     }
 
     //!Implementation of AbstractECConnectionFactory::testConnectionAsync
-    ReqID Ec2DirectConnectionFactory::testConnectionAsync( const ECAddress& /*addr*/, impl::SimpleHandlerPtr handler )
+    ReqID Ec2DirectConnectionFactory::testConnectionAsync( const QUrl& /*addr*/, impl::SimpleHandlerPtr handler )
     {
         QtConcurrent::run( std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, ec2::ErrorCode::ok ) );
         return 0;
     }
 
     //!Implementation of AbstractECConnectionFactory::connectAsync
-    ReqID Ec2DirectConnectionFactory::connectAsync( const ECAddress& /*addr*/, impl::ConnectHandlerPtr handler )
+    ReqID Ec2DirectConnectionFactory::connectAsync( const QUrl& /*addr*/, impl::ConnectHandlerPtr handler )
     {
         {
             std::lock_guard<std::mutex> lk( m_mutex );
@@ -62,4 +62,3 @@ namespace ec2
 		m_resourceFactory = factory;
 	}
 }
-
