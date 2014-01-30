@@ -479,6 +479,14 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     Qn::ActionId effectiveMaximizeActionId = Qn::FullscreenAction;
 #ifdef Q_OS_LINUX
+    /* In Ubuntu its launcher is configured to be shown when a non-fullscreen window has appeared.
+     * In our case it means that launcher overlaps our fullscreen window when the user opens any dialogs.
+     * To prevent such overlapping there was an attempt to hide unity launcher when the main window
+     * has been activated. But now we can't hide launcher window because there is no any visible window for it.
+     * Unity-3D launcher is like a 3D-effect activated by compiz window manager.
+     * We can investigate possibilities of changing the behavior of unity compiz plugin but now
+     * we just disable fullscreen for unity-3d desktop session.
+     */
     if (QnX11LauncherWorkaround::isUnity3DSession())
         effectiveMaximizeActionId = Qn::MaximizeAction;
 #endif
