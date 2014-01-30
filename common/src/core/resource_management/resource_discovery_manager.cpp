@@ -447,9 +447,14 @@ void QnResourceDiscoveryManager::dtsAssignment()
     }
 }
 
-void QnResourceDiscoveryManager::setDisabledVendors(const QStringList& vendors)
+void QnResourceDiscoveryManager::setDisabledVendors(const QList<QString> &vendors)
 {
     m_disabledVendorsForAutoSearch = vendors.toSet();
+}
+
+QList<QString> QnResourceDiscoveryManager::disabledVendors() const 
+{
+    return m_disabledVendorsForAutoSearch.toList();
 }
 
 QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const 

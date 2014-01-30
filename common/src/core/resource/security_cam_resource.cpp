@@ -44,8 +44,8 @@ QnSecurityCamResource::QnSecurityCamResource():
     foreach(const QnUserResourcePtr &user, qnResPool->getResources().filtered<QnUserResource>())
         if(user->getName() == lit("admin"))
             admin = user;
-    if(!admin || !QnLexical::deserialize(admin->getProperty(lit("autoCameraSettings")), &m_cameraControlDisabled))
-        m_cameraControlDisabled = false;
+
+    m_cameraControlDisabled = !(admin ? QnLexical::deserialized(admin->getProperty(lit("autoCameraSettings")), true) : true);
 
     connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
 
