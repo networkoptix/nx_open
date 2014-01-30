@@ -14,8 +14,10 @@ QnServerSettingsWidget::~QnServerSettingsWidget() {
 
 void QnServerSettingsWidget::submitToSettings() {
     ui->smtpSettingsWidget->submitToSettings();
+    ui->cameraSettingsWidget->submitToSettings();
 }
 
 void QnServerSettingsWidget::updateFromSettings() {
     ui->smtpSettingsWidget->updateFromSettings();
+    ui->cameraSettingsWidget->updateFromSettings();
 }

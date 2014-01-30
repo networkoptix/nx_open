@@ -68,7 +68,7 @@ void QnServerMessageProcessor::loadRuntimeInfo(const QnMessage &message) {
 void QnServerMessageProcessor::handleMessage(const QnMessage &message) {
     base_type::handleMessage(message);
 
-    NX_LOG( QString::fromLatin1("Received message %1, resourceId %2, resource %3").
+    NX_LOG( lit("Received message %1, resourceId %2, resource %3").
             arg(Qn::toString(message.messageType)).arg(message.resourceId.toString()).arg(message.resource ? message.resource->getName() : QString("NULL")), cl_logDEBUG1 );
 
     switch (message.messageType) {

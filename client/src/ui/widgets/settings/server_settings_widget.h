@@ -19,6 +19,7 @@ public:
 
     virtual void submitToSettings() override;
     virtual void updateFromSettings() override;
+
 private:
     QScopedPointer<Ui::ServerSettingsWidget> ui;
 };

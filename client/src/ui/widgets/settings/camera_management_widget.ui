@@ -22,9 +22,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="cameraSettingsCheckBox">
+    <widget class="QCheckBox" name="autoSettingsCheckBox">
      <property name="text">
-      <string>Enable automatic image quality adjustment</string>
+      <string>Enable automatic camera settings optimization</string>
      </property>
     </widget>
    </item>
