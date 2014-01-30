@@ -13,6 +13,7 @@
 #include "version.h"
 #include "ui/widgets/main_window.h"
 #include "client/client_settings.h"
+#include <api/global_settings.h>
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
@@ -344,6 +345,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
+    QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
@@ -406,7 +408,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // Create and start SessionManager
     QnSessionManager::instance()->start();
 
-    QnResourcePool::instance(); // to initialize net state;
     ffmpegInit();
 
     //===========================================================================

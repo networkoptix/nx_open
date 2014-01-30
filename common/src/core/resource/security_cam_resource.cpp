@@ -1,5 +1,8 @@
 #include "security_cam_resource.h"
+
 #include <QtCore/QMutexLocker>
+
+#include <api/global_settings.h>
 
 #include <utils/common/lexical.h>
 
@@ -39,13 +42,7 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     addFlags(live_cam);
 
-    // TODO: #Elric there must be a better place for this. Also evil hardcode.
-    QnUserResourcePtr admin;
-    foreach(const QnUserResourcePtr &user, qnResPool->getResources().filtered<QnUserResource>())
-        if(user->getName() == lit("admin"))
-            admin = user;
-
-    m_cameraControlDisabled = !(admin ? QnLexical::deserialized(admin->getProperty(lit("autoCameraSettings")), true) : true);
+    m_cameraControlDisabled = !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
 
     connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
 

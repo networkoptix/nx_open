@@ -21,7 +21,6 @@ public:
 
 private:
     QScopedPointer<Ui::CameraManagementWidget> ui;
-    QnResourcePropertyAdaptor<bool> *m_autoDiscoveryAdaptor, *m_autoSettingsAdaptor;
 };
 
 #endif // QN_CAMERA_MANAGEMENT_WIDGET_H

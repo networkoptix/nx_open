@@ -7,6 +7,7 @@
 #include <QtCore/QThreadPool>
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
 
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource/camera_resource.h>
@@ -72,6 +73,7 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager( const CameraDriverRestri
     m_cameraDriverRestrictionList( cameraDriverRestrictionList )
 {
     connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
+    connect(QnGlobalSettings::instance(), &QnGlobalSettings::cameraAutoDiscoveryChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
 }
 
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
@@ -105,7 +107,7 @@ QnResourceDiscoveryManager* QnResourceDiscoveryManager::instance()
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
     QMutexLocker locker(&m_searchersListMutex);
-    serv->setShouldBeUsed(!m_disabledVendorsForAutoSearch.contains(serv->manufacture()) && !m_disabledVendorsForAutoSearch.contains(lit("all")));
+    updateSearcherUsage(serv);
     m_searchersList.push_back(serv);
 }
 
@@ -460,4 +462,25 @@ QList<QString> QnResourceDiscoveryManager::disabledVendors() const
 QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const 
 { 
     return m_state; 
+}
+
+void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher) {
+    // TODO: #Elric strictly speaking, we must do this under lock.
+
+    searcher->setShouldBeUsed(
+        QnGlobalSettings::instance()->isCameraAutoDiscoveryEnabled() &&
+        !m_disabledVendorsForAutoSearch.contains(searcher->manufacture()) && 
+        !m_disabledVendorsForAutoSearch.contains(lit("all"))
+    );
+}
+
+void QnResourceDiscoveryManager::updateSearchersUsage() {
+    ResourceSearcherList searchers;
+    {
+        QMutexLocker locker(&m_searchersListMutex);
+        searchers = m_searchersList;
+    }
+
+    foreach(QnAbstractResourceSearcher *searcher, searchers)
+        updateSearcherUsage(searcher);
 }

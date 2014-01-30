@@ -132,6 +132,10 @@ private:
     void appendManualDiscoveredResources(QnResourceList& resources);
     void dtsAssignment();
 
+    void updateSearcherUsage(QnAbstractResourceSearcher *searcher);
+    void updateSearchersUsage();
+
+private:
     QMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
