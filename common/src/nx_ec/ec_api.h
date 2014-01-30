@@ -184,6 +184,16 @@ namespace ec2
         template<class TargetType, class HandlerType> ReqID getCameras( QnId mediaServerId, TargetType* target, HandlerType handler ) {
             return getCameras( std::static_pointer_cast<impl::GetCamerasHandler>(std::make_shared<impl::CustomGetCamerasHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+        ErrorCode getCamerasSync(const QnId& mServerId, QnVirtualCameraResourceList* const cameraList ) {
+            auto syncHandler = std::make_shared<impl::GetCamerasSyncHandler>();
+            getCameras(mServerId, syncHandler );
+            syncHandler->wait();
+            *cameraList = syncHandler->cameraList();
+            return syncHandler->errorCode();
+        }
+
+
         /*!
             \param handler Functor with params: (ErrorCode, const QnCameraHistoryList& cameras)
         */

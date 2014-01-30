@@ -97,6 +97,26 @@ namespace ec2
         private:
             QnResourceTypeList m_resourceTypeList;
         };
+
+        class GetCamerasSyncHandler
+            :
+            public SyncHandler,
+            public GetCamerasHandler
+        {
+        public:
+            const QnVirtualCameraResourceList& cameraList() const {
+                return m_cameraList;
+            }
+
+            virtual void done( const ErrorCode& errorCode, const QnVirtualCameraResourceList& cameras) override {
+                m_cameraList = cameras;
+                SyncHandler::done( errorCode );
+            }
+
+        private:
+            QnVirtualCameraResourceList m_cameraList;
+        };
+
     }
 }
 

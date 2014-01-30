@@ -679,6 +679,7 @@ static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 void QnMain::loadResourcesFromECS()
 {
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+#ifdef OLD_EC
 
     QnVirtualCameraResourceList cameras;
     while (appServerConnection->getCameras(cameras, m_mediaServer->getId()) != 0)
@@ -686,6 +687,16 @@ void QnMain::loadResourcesFromECS()
         qDebug() << "QnMain::run(): Can't get cameras. Reason: " << appServerConnection->getLastError();
         QnSleep::msleep(10000);
     }
+#else
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::createConnection2Sync();
+
+    QnVirtualCameraResourceList cameras;
+    while (ec2Connection->getCameraManager()->getCamerasSync(m_mediaServer->getId(), &cameras) != ec2::ErrorCode::ok)
+    {
+        qDebug() << "QnMain::run(): Can't get cameras. Reason: "; // << ec2Connection->getLastError();
+        QnSleep::msleep(10000);
+    }
+#endif
 
     QnManualCameraInfoMap manualCameras;
     foreach(const QnSecurityCamResourcePtr &camera, cameras)

@@ -304,7 +304,7 @@ namespace ec2
         ///////// Handlers for AbstractCameraManager
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER( AddCamera, ErrorCode, QnVirtualCameraResourceListPtr )
-        DEFINE_TWO_ARG_HANDLER( GetCameras, ErrorCode, QnVirtualCameraResourceListPtr )
+        DEFINE_TWO_ARG_HANDLER( GetCameras, ErrorCode, QnVirtualCameraResourceList )
         DEFINE_TWO_ARG_HANDLER( GetCamerasHistory, ErrorCode, QnCameraHistoryListPtr )
         
 

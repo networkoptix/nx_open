@@ -203,11 +203,10 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 
 // ----------- getCameras --------------------
 
-ErrorCode QnDbManager::doQuery(const QnResourceParameters& filter, ApiCameraDataList& cameraList)
+ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraList)
 {
 	QSqlQuery query(m_sdb);
-	QString filterStr;
-	QnId mServerId = filter["mServerId"].toInt();
+    QString filterStr;
 	if (mServerId.isValid()) {
 		filterStr = QString("where r.parent_id = %1").arg(mServerId);
 	}

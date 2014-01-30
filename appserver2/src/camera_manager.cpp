@@ -73,16 +73,13 @@ namespace ec2
     ReqID QnCameraManager<QueryProcessorType>::getCameras( QnId mediaServerId, impl::GetCamerasHandlerPtr handler )
     {
 		auto queryDoneHandler = [handler, this]( ErrorCode errorCode, const ApiCameraDataList& cameras) {
-			QnVirtualCameraResourceListPtr outData(new QnVirtualCameraResourceList());
+			QnVirtualCameraResourceList outData;
 			if( errorCode == ErrorCode::ok )
-				cameras.toCameraList(*outData.data(), m_resourceFactory.data());
+				cameras.toCameraList(outData, m_resourceFactory.data());
 			handler->done( errorCode, outData);
 		};
-		QnResourceParameters params;
-		if (mediaServerId.isValid())
-			params["serverId"] = mediaServerId.toString();
-		m_queryProcessor->processQueryAsync<QnResourceParameters, ApiCameraDataList, decltype(queryDoneHandler)>
-			( params, queryDoneHandler );
+		m_queryProcessor->processQueryAsync<QnId, ApiCameraDataList, decltype(queryDoneHandler)>
+			( mediaServerId, queryDoneHandler );
 		return INVALID_REQ_ID;
     }
 

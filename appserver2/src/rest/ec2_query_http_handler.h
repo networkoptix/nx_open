@@ -19,14 +19,14 @@
 
 namespace ec2
 {
-    template<class T>
-    void parseHttpRequestParams( const QnRequestParamList& params, T* const data );
+    void parseHttpRequestParams( const QnRequestParamList& params, QnId* id) {}
 
-    template<>
-    void parseHttpRequestParams<nullptr_t>( const QnRequestParamList& params, nullptr_t* ) {}
+    //template<class T>
+    //void parseHttpRequestParams( const QnRequestParamList& params, T* const data );
 
-    template<>
-    void parseHttpRequestParams<QnResourceParameters>( const QnRequestParamList& params, QnResourceParameters* const data )
+    void parseHttpRequestParams( const QnRequestParamList& params, nullptr_t* ) {}
+
+    void parseHttpRequestParams( const QnRequestParamList& params, QnResourceParameters* const data )
     {
         std::for_each(
             params.begin(),
