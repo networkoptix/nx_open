@@ -15,8 +15,8 @@
 
 #include <recorder/recording_manager.h>
 
-#include "serverutil.h"
-#include "settings.h"
+#include <media_server/serverutil.h>
+#include <media_server/settings.h>
 
 #include "utils/network/simple_http_client.h"
 

@@ -1,7 +1,7 @@
 #include "main_window.h"
 
 #ifdef Q_OS_MACX
-#include "mac_utils.h"
+#include <ui/workaround/mac_utils.h>
 #endif
 
 #include <QtCore/QFile>
@@ -16,18 +16,19 @@
 #include <utils/common/environment.h>
 
 #include <core/resource/media_server_resource.h>
+#include <core/resource/file_processor.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <api/session_manager.h>
 
-#include "ui/common/palette.h"
-#include "ui/common/frame_section.h"
-#include "ui/actions/action_manager.h"
-#include "ui/graphics/view/graphics_view.h"
-#include "ui/graphics/view/graphics_scene.h"
-#include "ui/graphics/view/gradient_background_painter.h"
-#include "ui/graphics/instruments/instrument_manager.h"
+#include <ui/common/palette.h>
+#include <ui/common/frame_section.h>
+#include <ui/actions/action_manager.h>
+#include <ui/graphics/view/graphics_view.h>
+#include <ui/graphics/view/graphics_scene.h>
+#include <ui/graphics/view/gradient_background_painter.h>
+#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -48,19 +49,18 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 
-#include "ui/style/skin.h"
-#include "ui/style/globals.h"
-#include "ui/style/noptix_style.h"
-#include "ui/style/proxy_style.h"
-#include "ui/workaround/qtbug_workaround.h"
+#include <ui/style/skin.h>
+#include <ui/style/globals.h>
+#include <ui/style/noptix_style.h>
+#include <ui/style/proxy_style.h>
+#include <ui/workaround/qtbug_workaround.h>
 #include <ui/screen_recording/screen_recorder.h>
 
-#include "file_processor.h"
-#include "client/client_settings.h"
+#include <client/client_settings.h>
 
 #include "resource_browser_widget.h"
-#include "dwm.h"
 #include "layout_tab_bar.h"
+#include "dwm.h"
 
 namespace {
 

@@ -3,7 +3,7 @@
 #include <api/app_server_connection.h>
 
 #include <client/client_settings.h>
-#include <client_message_processor.h>
+#include <client/client_message_processor.h>
 
 #include <business/business_strings_helper.h>
 

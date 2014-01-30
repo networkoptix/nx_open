@@ -31,6 +31,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/file_processor.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -82,8 +83,6 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_target_provider.h>
-
-#include <file_processor.h>
 
 #include "workbench_layout.h"
 #include "workbench_item.h"

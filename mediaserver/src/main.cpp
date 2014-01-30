@@ -117,9 +117,9 @@
 #include <utils/network/ssl_socket.h>
 
 
-#include "server_message_processor.h"
-#include "settings.h"
-#include "serverutil.h"
+#include <media_server/server_message_processor.h>
+#include <media_server/settings.h>
+#include <media_server/serverutil.h>
 #include "version.h"
 
 #ifdef _WIN32

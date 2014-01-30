@@ -19,7 +19,7 @@
 #include <business/business_event_rule.h>
 #include <business/business_rule_processor.h>
 #include <business/business_event_connector.h>
-#include "serverutil.h"
+#include <utils/common/serverutil.h>
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
