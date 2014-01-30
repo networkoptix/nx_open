@@ -1,11 +1,14 @@
 #include "abstract_ptz_dialog.h"
 
+#include <QtCore/QEventLoop>
+
+#include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLayout>
+#include <QtWidgets/QPushButton>
 
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_data.h>
-
-#include <ui/dialogs/ptz_synchronize_dialog.h>
 
 QnAbstractPtzDialog::QnAbstractPtzDialog(const QnPtzControllerPtr &controller, QWidget *parent, Qt::WindowFlags windowFlags) :
     base_type(parent, windowFlags),
@@ -37,9 +40,30 @@ void QnAbstractPtzDialog::synchronize() {
         m_commands.enqueue(Qn::SynchronizePtzCommand);
         m_controller->synchronize(requiredFields());
 
-        QScopedPointer<QnPtzSynchronizeDialog> dialog(new QnPtzSynchronizeDialog(this));
-        connect(this, SIGNAL(synchronized()), dialog, SLOT(accept()));
-        dialog->exec();
+        QEventLoop loop;
+        connect(this,            SIGNAL(synchronized()),   &loop, SLOT(quit()));
+
+        QList<QWidget*> disabled;
+        QLayout* dialogLayout = this->layout();
+        for (int i = 0; i < dialogLayout->count(); i++) {
+            QWidget* widget = dialogLayout->itemAt(i)->widget();
+            if (!widget)
+                continue;
+            if (QDialogButtonBox* buttonBox = dynamic_cast<QDialogButtonBox*>(widget)) {
+                buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+                disabled << buttonBox->button(QDialogButtonBox::Ok);
+                connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked), &loop, SLOT(quit()));
+            } else
+                disabled << widget;
+        }
+        foreach (QWidget* widget, disabled)
+            widget->setEnabled(false);
+
+        loop.exec();
+
+        foreach (QWidget* widget, disabled)
+            widget->setEnabled(true);
+
     } else {
         m_commands.clear(); //we will not wait for other commands
         m_commands.enqueue(Qn::SynchronizePtzCommand);

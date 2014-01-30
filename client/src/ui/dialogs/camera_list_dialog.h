@@ -23,7 +23,10 @@ class QnCameraListDialog: public QDialog, public QnWorkbenchContextAware {
 public:
     explicit QnCameraListDialog(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
     virtual ~QnCameraListDialog();
-    void setMediaServerResource(QnResourcePtr server);
+
+    void setServer(const QnMediaServerResourcePtr &server);
+    const QnMediaServerResourcePtr &server() const;
+
 private slots:
     void at_searchStringChanged(const QString &text);
     void at_customContextMenuRequested(const QPoint &pos);
@@ -44,7 +47,7 @@ private:
     QAction* m_selectAllAction;
     QAction* m_exportAction;
     QAction* m_clipboardAction;
-    QnResourcePtr m_mediaServer;
+    QnMediaServerResourcePtr m_server;
 };
 
 #endif // QN_CAMERA_LIST_DIALOG_H
