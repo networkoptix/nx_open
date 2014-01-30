@@ -82,7 +82,7 @@ namespace ec2
 		if (mediaServerId.isValid())
 			params["serverId"] = mediaServerId.toString();
 		m_queryProcessor->processQueryAsync<QnResourceParameters, ApiCameraDataList, decltype(queryDoneHandler)>
-			( ec2::getResourceTypes, params, queryDoneHandler );
+			( params, queryDoneHandler );
 		return INVALID_REQ_ID;
     }
 
