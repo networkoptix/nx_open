@@ -19,6 +19,22 @@
 
 namespace ec2
 {
+    template<class T>
+    void parseHttpRequestParams( const QnRequestParamList& params, T* const data );
+
+    template<>
+    void parseHttpRequestParams<nullptr_t>( const QnRequestParamList& params, nullptr_t* ) {}
+
+    template<>
+    void parseHttpRequestParams<QnResourceParameters>( const QnRequestParamList& params, QnResourceParameters* const data )
+    {
+        std::for_each(
+            params.begin(),
+            params.end(),
+            [data]( const QnRequestParamList::value_type& val ){ data->insert(val.first.toLatin1(), val.second); } );
+    }
+
+
     //!Http request handler for GET requests
     template<class InputData, class OutputData>
     class QueryHttpHandler
@@ -30,12 +46,6 @@ namespace ec2
         :
             m_queryProcessor( queryProcessor )
         {
-        }
-
-        template<class T>
-        void parseHttpRequestParams( const QnRequestParamList& params, T* const data )
-        {
-            //TODO/IMPL
         }
 
         //!Implementation of QnRestRequestHandler::executeGet

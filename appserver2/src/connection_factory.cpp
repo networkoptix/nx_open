@@ -52,6 +52,9 @@ namespace ec2
         restProcessorPool->registerHandler(
             QString::fromLatin1("ec2/addCamera"),
             new UpdateHttpHandler<ApiCameraData>(&m_queryProcessor) );
+        restProcessorPool->registerHandler(
+            QString::fromLatin1("ec2/getCameras"),
+            new QueryHttpHandler<QnResourceParameters, ApiCameraDataList>(&m_queryProcessor) );
     }
 
 	void Ec2DirectConnectionFactory::setResourceFactory(QSharedPointer<QnResourceFactory> factory)

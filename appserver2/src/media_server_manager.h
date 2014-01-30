@@ -9,11 +9,14 @@
 
 namespace ec2
 {
+    template<class QueryProcessorType>
     class QnMediaServerManager
     :
         public AbstractMediaServerManager
     {
     public:
+        QnMediaServerManager( QueryProcessorType* const queryProcessor );
+
         //!Implementation of QnMediaServerManager::getServers
         virtual ReqID getServers( impl::GetServersHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::save
@@ -24,6 +27,8 @@ namespace ec2
         virtual ReqID remove( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
 
     private:
+        QueryProcessorType* const m_queryProcessor;
+
         QnTransaction<ApiMediaServerData> prepareTransaction( ApiCommand command, const QnMediaServerResourcePtr& resource );
     };
 }
