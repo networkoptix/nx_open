@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 
     QnSystrayWindow window(&foundEnterpriseControllersModel);
 
-    QObject::connect(&app, SIGNAL(messageReceived(const QString&)), &window, SLOT(handleMessage(const QString&)));
+    QObject::connect(&app, SIGNAL(messageReceived(const QString &)), &window, SLOT(handleMessage(const QString &)));
 
     if (!argument.isEmpty())
         window.executeAction(argument);

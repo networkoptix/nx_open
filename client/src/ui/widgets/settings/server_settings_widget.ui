@@ -34,6 +34,25 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Camera Management</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QnCameraManagementWidget" name="widget" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>32</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>System Configuration Backup and Restore</string>
@@ -78,6 +97,12 @@
    <class>QnDatabaseManagementWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/settings/database_management_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnCameraManagementWidget</class>
+   <extends>QWidget</extends>
+   <header>ui/widgets/settings/camera_management_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
