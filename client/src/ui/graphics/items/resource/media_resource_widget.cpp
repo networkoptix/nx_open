@@ -195,6 +195,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateIconButton();
     updateAspectRatio();
     updateCursor();
+    updateFisheye();
     setImageEnhancement(item->imageEnhancement());
 }
 
