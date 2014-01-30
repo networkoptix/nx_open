@@ -206,13 +206,18 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 ErrorCode QnDbManager::doQuery(const QnResourceParameters& filter, ApiCameraDataList& cameraList)
 {
 	QSqlQuery query(m_sdb);
-	query.prepare("select r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
+	QString filterStr;
+	QnId mServerId = filter["mServerId"].toInt();
+	if (mServerId.isValid()) {
+		filterStr = QString("where r.parent_id = %1").arg(mServerId);
+	}
+	query.prepare(QString("select r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
 		c.audio_enabled as audioEnabled, c.control_disabled as controlDisabled, c.firmware, c.vendor, c.manually_added as manuallyAdded, \
 		c.region, c.schedule_disabled as scheduleDisabled, c.motion_type as motionType, \
 		c.group_name as groupName, c.group_id as groupId, c.mac, c. model, c.secondary_quality as secondaryQuality, \
 		c.status_flags as statusFlags, c.physical_id as physicalId, c.password, login, c.dewarping_params as dewarpingParams \
 		from vms_resource r \
-		join vms_camera c on c.resource_ptr_id = r.id");
+		join vms_camera c on c.resource_ptr_id = r.id ") + QString(filterStr));
 
 	if (!query.exec())
 		return ErrorCode::failure;
