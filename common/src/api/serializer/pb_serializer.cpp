@@ -105,7 +105,7 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
     parameters["disabled"] = QString::number((int)pb_cameraResource.disabled());
     parameters["parentId"] = QString::number(pb_cameraResource.parentid());
 
-    camera = resourceFactory.createResource(pb_cameraResource.typeid_(), parameters).dynamicCast<QnNetworkResource>();
+    camera = resourceFactory.createResource(pb_cameraResource.resourcetypeid(), parameters).dynamicCast<QnNetworkResource>();
     if (camera.isNull())
         return;
 
@@ -412,7 +412,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_cameraResource.set_id(cameraPtr->getId().toInt());
     pb_cameraResource.set_parentid(cameraPtr->getParentId().toInt());
     pb_cameraResource.set_name(cameraPtr->getName().toUtf8().constData());
-    pb_cameraResource.set_typeid_(cameraPtr->getTypeId().toInt());
+    pb_cameraResource.set_resourcetypeid(cameraPtr->getTypeId().toInt());
     pb_cameraResource.set_url(cameraPtr->getUrl().toUtf8().constData());
     pb_camera.set_mac(cameraPtr->getMAC().toString().toUtf8().constData());
     pb_camera.set_physicalid(cameraPtr->getPhysicalId().toUtf8().constData());
@@ -1143,8 +1143,8 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QB
     //
     //block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(hardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
     //if (QnLicense(block).isValid(hardwareId)) {
-    //    license = QnLicensePtr(new QnLicense(block));
-    //    return;
+    //	license = QnLicensePtr(new QnLicense(block));
+    //	return;
     //}
 
     block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(oldHardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
