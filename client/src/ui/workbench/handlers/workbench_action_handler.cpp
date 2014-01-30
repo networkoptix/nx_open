@@ -1216,7 +1216,7 @@ void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
     QRect oldGeometry = businessRulesDialog()->geometry();
     businessRulesDialog()->show();
     businessRulesDialog()->raise();
-    businessRulesDialog()->activateWindow();
+    businessRulesDialog()->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
     if(!newlyCreated)
         businessRulesDialog()->setGeometry(oldGeometry);
 }
@@ -1259,7 +1259,7 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
     QRect oldGeometry = businessEventsLogDialog()->geometry();
     businessEventsLogDialog()->show();
     businessEventsLogDialog()->raise();
-    businessEventsLogDialog()->activateWindow();
+    businessEventsLogDialog()->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
     if(!newlyCreated)
         businessEventsLogDialog()->setGeometry(oldGeometry);
 }
@@ -1274,10 +1274,10 @@ void QnWorkbenchActionHandler::at_cameraListAction_triggered()
         newlyCreated = true;
     }
     QRect oldGeometry = cameraListDialog()->geometry();
-    cameraListDialog()->setMediaServerResource(server);
+    cameraListDialog()->setServer(server);
     cameraListDialog()->show();
     cameraListDialog()->raise();
-    cameraListDialog()->activateWindow();
+    cameraListDialog()->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
     if(!newlyCreated)
         cameraListDialog()->setGeometry(oldGeometry);
 }
