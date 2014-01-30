@@ -192,7 +192,7 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 		int id = queryParents.value(idIdx).toInt();
 		int parentId = queryParents.value(parentIdIdx).toInt();
 
-		for (; data.data[idx].id != id && idx < data.data.size(); idx++);
+		for (; idx < data.data.size() && data.data[idx].id != id; idx++);
 		if (idx == data.data.size())
 			break;
 		data.data[idx].parentId.push_back(parentId);
@@ -216,12 +216,40 @@ ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraL
 		c.group_name as groupName, c.group_id as groupId, c.mac, c. model, c.secondary_quality as secondaryQuality, \
 		c.status_flags as statusFlags, c.physical_id as physicalId, c.password, login, c.dewarping_params as dewarpingParams \
 		from vms_resource r \
-		join vms_camera c on c.resource_ptr_id = r.id ") + QString(filterStr));
+		join vms_camera c on c.resource_ptr_id = r.id %1 order by r.id").arg(filterStr));
+
+
+    QSqlQuery queryScheduleTask(m_sdb);
+    QString filterStr2;
+    if (mServerId.isValid()) 
+        filterStr2 = QString("where r.parent_id = %1").arg(mServerId);
+    
+    queryScheduleTask.prepare(QString("st.id, st.source_id as sourceId, st.start_time as startTime, st.end_time as endTime, st.do_record_audio as doRecordAudio, \
+                                       st.record_type as recordType, st.day_of_week as dayOfWeek, st.before_threshold as beforeThreshold, st.after_threshold as afterThreshold, \
+                                       st.stream_quality as streamQuality, st.fps \
+                                       from vms_scheduletask st \
+                                       join vms_resource r on r.id = st.source_id %1 order by r.parent_id").arg(filterStr2));
+
 
 	if (!query.exec())
 		return ErrorCode::failure;
+    if (!queryScheduleTask.exec())
+        return ErrorCode::failure;
 
 	cameraList.loadFromQuery(query);
+
+    ScheduleTaskList sheduleTaskList;
+    sheduleTaskList.loadFromQuery(queryScheduleTask);
+
+    int idx = 0;
+    foreach(const ScheduleTask& scheduleTaskData, sheduleTaskList.data)
+    {
+        for (; idx < cameraList.data.size() && scheduleTaskData.sourceId != cameraList.data[idx].id; idx++);
+        if (idx == cameraList.data.size())
+            break;
+        cameraList.data[idx].scheduleTask.push_back(std::move(scheduleTaskData));
+    }
+
 	return ErrorCode::ok;
 }
 
@@ -248,6 +276,19 @@ ErrorCode QnDbManager::doQuery(ApiMediaServerDataList& serverList)
         return ErrorCode::failure;
 
     serverList.loadFromQuery(query);
+
+    ApiStorageDataList storageList;
+    storageList.loadFromQuery(queryStorage);
+
+    int idx = 0;
+    foreach(const ApiStorageData& storageData, storageList.data)
+    {
+        for (; idx < serverList.data.size() && storageData.parentId != serverList.data[idx].id; idx++);
+        if (idx == serverList.data.size())
+            break;
+        serverList.data[idx].storages.push_back(std::move(storageData));
+    }
+
     return ErrorCode::ok;
 }
 

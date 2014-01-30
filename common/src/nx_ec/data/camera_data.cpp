@@ -96,9 +96,9 @@ void ApiCameraData::fromResource(const QnVirtualCameraResourcePtr& resource)
 	vendor = resource->getVendor();
 }
 
-void ApiCameraDataList::loadFromQuery(QSqlQuery& query)
+void ScheduleTaskList::loadFromQuery(QSqlQuery& query)
 {
-	QN_QUERY_TO_DATA_OBJECT(ApiCameraData, data, apiCameraDataFields ApiResourceDataFields)
+	QN_QUERY_TO_DATA_OBJECT(ScheduleTask, data, apiScheduleTaskFields)
 }
 
 QnResourceParameters ApiCameraData::toHashMap() const
@@ -129,6 +129,11 @@ void ApiCameraDataList::toCameraList(QnVirtualCameraResourceList& outData, QnRes
 			outData << camera;
 		}
 	}
+}
+
+void ApiCameraDataList::loadFromQuery(QSqlQuery& query)
+{
+    QN_QUERY_TO_DATA_OBJECT(ApiCameraData, data, apiCameraDataFields ApiResourceDataFields)
 }
 
 }

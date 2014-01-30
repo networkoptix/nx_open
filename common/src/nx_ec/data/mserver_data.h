@@ -8,17 +8,21 @@
 
 namespace ec2
 {
-    struct ApiStorageData: public ApiData
+    struct ApiStorageData: public ApiResourceData
     {
-        qint32       id;
-        QString      name;
-        QString      url;
         qint64       spaceLimit;
         bool         usedForWriting;
 
-        QnResourceParameters toHashMap(const QString& serverId) const;
+        QnResourceParameters toHashMap() const;
         void toResource(QnAbstractStorageResourcePtr resource) const;
         QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
+    };
+
+    struct ApiStorageDataList: public ApiData {
+        std::vector<ApiStorageData> data;
+
+        void loadFromQuery(QSqlQuery& query);
+        QN_DECLARE_STRUCT_SERIALIZATORS();
     };
 
     struct ApiMediaServerData: public ApiResourceData
@@ -45,11 +49,12 @@ namespace ec2
     };
 }
 
-#define ApiStorageDataFields (id) (name) (url) (spaceLimit) (usedForWriting)
+#define ApiStorageDataFields  (spaceLimit) (usedForWriting)
 #define medisServerDataFields (apiUrl) (netAddrList) (reserve) (storages) (panicMode) (streamingUrl) (version)
 
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiStorageData, ApiStorageDataFields)
 QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiMediaServerData, ApiResourceData, medisServerDataFields)
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiMediaServerDataList, (data))
+QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiStorageDataList, (data))
 
 #endif //MSERVER_DATA_H
