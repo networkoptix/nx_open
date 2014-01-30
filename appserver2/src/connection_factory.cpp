@@ -35,9 +35,15 @@ namespace ec2
         {
             std::lock_guard<std::mutex> lk( m_mutex );
             if( !m_connection )
-                m_connection.reset( new Ec2DirectConnection() );
+                m_connection.reset( new Ec2DirectConnection(m_resourceFactory) );
         }
         QtConcurrent::run( std::bind( std::mem_fn( &impl::ConnectHandler::done ), handler, ec2::ErrorCode::ok, m_connection ) );
         return 0;
     }
+
+	void Ec2DirectConnectionFactory::setResourceFactory(QSharedPointer<QnResourceFactory> factory)
+	{
+		m_resourceFactory = factory;
+	}
 }
+

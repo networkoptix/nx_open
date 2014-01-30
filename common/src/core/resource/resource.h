@@ -38,6 +38,8 @@ public:
     }
 };
 
+typedef QMap<QByteArray, QString> QnResourceParameters;
+/*
 class QnResourceParameters: public QMap<QString, QString> {
     typedef QMap<QString, QString> base_type;
 
@@ -48,6 +50,7 @@ public:
         return base_type::operator[](QLatin1String(key));
     }
 };
+*/
 
 class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>
 {

@@ -37,14 +37,14 @@ void QnNetworkResource::deserialize(const QnResourceParameters& parameters)
     const char* LOGIN = "login";
     const char* PASSWORD = "password";
 
-    if (parameters.contains(QLatin1String(MAC)))
-        setMAC(parameters[QLatin1String(MAC)]);
+    if (parameters.contains(MAC))
+        setMAC(parameters[MAC]);
 
-    if (parameters.contains(QLatin1String(PHYSICALID)))
-        setPhysicalId(parameters[QLatin1String(PHYSICALID)]);
+    if (parameters.contains(PHYSICALID))
+        setPhysicalId(parameters[PHYSICALID]);
 
-    if (parameters.contains(QLatin1String(LOGIN)) && parameters.contains(QLatin1String(PASSWORD)))
-        setAuth(parameters[QLatin1String(LOGIN)], parameters[QLatin1String(PASSWORD)]);
+    if (parameters.contains(LOGIN) && parameters.contains(PASSWORD))
+        setAuth(parameters[LOGIN], parameters[PASSWORD]);
 }
 
 QString QnNetworkResource::getUniqueId() const

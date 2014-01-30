@@ -32,9 +32,9 @@ void QnAviResource::deserialize(const QnResourceParameters& parameters)
 {
     QnAbstractArchiveResource::deserialize(parameters);
 
-    if (parameters.contains(QLatin1String("file")))
+    if (parameters.contains("file"))
     {
-        QString file = parameters[QLatin1String("file")];
+        QString file = parameters["file"];
         setUrl(QDir::cleanPath(file));
         setName(QnFile::fileName(file));
     }

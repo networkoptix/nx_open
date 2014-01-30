@@ -3,6 +3,7 @@
 #include "api/serializer/serializer.h"
 #include "utils/common/json.h"
 #include <QAuthenticator>
+#include "core/resource/security_cam_resource.h"
 
 
 namespace ec2 {
@@ -24,12 +25,12 @@ ScheduleTask ScheduleTask::fromResource(const QnResourcePtr& cameraRes, const Qn
 	return result;
 }
 
-QnScheduleTask ScheduleTask::toResource()
+QnScheduleTask ScheduleTask::toResource() const
 {
 	return QnScheduleTask(id, sourceId, dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio);
 }
 
-void ApiCameraData::toResource(QnVirtualCameraResourcePtr resource)
+void ApiCameraData::toResource(QnVirtualCameraResourcePtr resource) const
 {
 	ApiResourceData::toResource(resource);
 
@@ -93,6 +94,41 @@ void ApiCameraData::fromResource(const QnVirtualCameraResourcePtr& resource)
 	statusFlags = resource->statusFlags();
 	dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(resource->getDewarpingParams());
 	vendor = resource->getVendor();
+}
+
+void ApiCameraDataList::loadFromQuery(QSqlQuery& query)
+{
+	QN_QUERY_TO_DATA_OBJECT(ApiCameraData, data, apiCameraDataFields ApiResourceDataFields)
+}
+
+QnResourceParameters ApiCameraData::toHashMap() const
+{
+	QnResourceParameters parameters;
+	parameters["id"] = QString::number(id);
+	parameters["name"] = name;
+	parameters["url"] = url;
+	parameters["mac"] = mac;
+	parameters["physicalId"] = physicalId;
+	parameters["login"] = login;
+	parameters["password"] = password;
+	parameters["status"] = QString::number(status);
+	parameters["disabled"] = QString::number(disabled);
+	parameters["parentId"] = QString::number(parentId);
+
+	return parameters;
+}
+
+void ApiCameraDataList::toCameraList(QnVirtualCameraResourceList& outData, QnResourceFactory* factory) const
+{
+	outData.reserve(data.size());
+	for(int i = 0; i < data.size(); ++i) 
+	{
+		QnVirtualCameraResourcePtr camera = factory->createResource(data[i].typeId, data[i].toHashMap()).dynamicCast<QnVirtualCameraResource>();
+		if (camera) {
+			data[i].toResource(camera);
+			outData << camera;
+		}
+	}
 }
 
 }

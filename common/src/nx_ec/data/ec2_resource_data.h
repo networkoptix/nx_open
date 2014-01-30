@@ -24,12 +24,13 @@ struct ApiResourceData: public ApiData {
     bool          disabled;
 
 	void fromResource(const QnResourcePtr& resource);
-	void toResource(QnResourcePtr resource);
+	void toResource(QnResourcePtr resource) const;
     QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
 };
 
 }
 
-QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiResourceData, (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled) )
+#define ApiResourceDataFields (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled)
+QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiResourceData,  ApiResourceDataFields)
 
 #endif // __RESOURCE_TRANSACTION_DATA_H__

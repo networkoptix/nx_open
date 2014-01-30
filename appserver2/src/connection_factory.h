@@ -28,8 +28,10 @@ namespace ec2
         //!Implementation of AbstractECConnectionFactory::connectAsync
         virtual ReqID connectAsync( const ECAddress& addr, impl::ConnectHandlerPtr handler ) override;
 
+		virtual void setResourceFactory(QSharedPointer<QnResourceFactory>) override;
     private:
         std::shared_ptr<Ec2DirectConnection> m_connection;
+		QSharedPointer<QnResourceFactory> m_resourceFactory;
         std::mutex m_mutex;
     };
 }

@@ -267,12 +267,12 @@ namespace QnBinary
     void TYPE::deserialize(BinaryStream<T>& stream) \
 { \
     QnBinary::deserialize(*this, &stream); \
-}
+} \
 
 
 #define QN_DECLARE_STRUCT_SERIALIZATORS() \
     template <class T> void serialize(BinaryStream<T>& stream); \
-    template <class T> void deserialize(BinaryStream<T>& stream); \
+    template <class T> void deserialize(BinaryStream<T>& stream);
 
 
 

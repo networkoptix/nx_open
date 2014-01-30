@@ -135,26 +135,26 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
 
     QMutexLocker locker(&m_mutex);
 
-    if (parameters.contains(QLatin1String("id")))
-        setId(parameters[QLatin1String("id")]);
+    if (parameters.contains("id"))
+        setId(parameters["id"]);
 
-    if (parameters.contains(QLatin1String("typeId")))
-        setTypeId(parameters[QLatin1String("typeId")]);
+    if (parameters.contains("typeId"))
+        setTypeId(parameters["typeId"]);
 
-    if (parameters.contains(QLatin1String("parentId")))
-        setParentId(parameters[QLatin1String("parentId")]);
+    if (parameters.contains("parentId"))
+        setParentId(parameters["parentId"]);
 
-    if (parameters.contains(QLatin1String("name")))
-        setName(parameters[QLatin1String("name")]);
+    if (parameters.contains("name"))
+        setName(parameters["name"]);
 
-    if (parameters.contains(QLatin1String("url")))
-        setUrl(parameters[QLatin1String("url")]);
+    if (parameters.contains("url"))
+        setUrl(parameters["url"]);
 
-    if (parameters.contains(QLatin1String("status")))
-        m_status = (QnResource::Status)parameters[QLatin1String("status")].toInt();
+    if (parameters.contains("status"))
+        m_status = (QnResource::Status)parameters["status"].toInt();
 
-    if (parameters.contains(QLatin1String("disabled")))
-        m_disabled = parameters[QLatin1String("disabled")].toInt();
+    if (parameters.contains("disabled"))
+        m_disabled = parameters["disabled"].toInt();
 
     blockSignals(signalsBlocked);
 }

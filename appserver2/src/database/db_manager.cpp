@@ -6,8 +6,9 @@ namespace ec2
 
 static QnDbManager* globalInstance = 0;
 
-QnDbManager::QnDbManager()
+QnDbManager::QnDbManager(QSharedPointer<QnResourceFactory> factory)
 {
+	m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
 	m_sdb.setDatabaseName("c:/develop/netoptix_new_ec/appserver/db/ecs.db");
 	if (m_sdb.open())
@@ -161,6 +162,9 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tr
 }
 
 // -------------------- getters ----------------------------
+
+// ----------- getResourceTypes --------------------
+
 ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 {
 	QSqlQuery queryTypes(m_sdb);
@@ -194,6 +198,26 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 		data.data[idx].parentId.push_back(parentId);
 	}
 
+	return ErrorCode::ok;
+}
+
+// ----------- getCameras --------------------
+
+ErrorCode QnDbManager::doQuery(QnParamList& filter, ApiCameraDataList& cameraList)
+{
+	QSqlQuery query(m_sdb);
+	query.prepare("select r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
+		c.audio_enabled as audioEnabled, c.control_disabled as controlDisabled, c.firmware, c.vendor, c.manually_added as manuallyAdded, \
+		c.region, c.schedule_disabled as scheduleDisabled, c.motion_type as motionType, \
+		c.group_name as groupName, c.group_id as groupId, c.mac, c. model, c.secondary_quality as secondaryQuality, \
+		c.status_flags as statusFlags, c.physical_id as physicalId, c.password, login, c.dewarping_params as dewarpingParams \
+		from vms_resource r \
+		join vms_camera c on c.resource_ptr_id = r.id");
+
+	if (!query.exec())
+		return ErrorCode::failure;
+
+	cameraList.loadFromQuery(query);
 	return ErrorCode::ok;
 }
 

@@ -133,7 +133,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, co
     if (resourceType->getName() == QLatin1String("Storage"))
     {
 
-        result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(parameters[QLatin1String("url")]));
+        result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(parameters["url"]));
         if (result)
             result->deserialize(parameters);
     }

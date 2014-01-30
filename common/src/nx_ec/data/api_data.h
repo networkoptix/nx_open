@@ -13,6 +13,24 @@ struct ApiData {
 
 }
 
+/*
+#define FIELD_TO_HASHMAP(R, D, FIELD) result[TO_STRING(FIELD)] = FIELD;
+
+#define QN_DEFINE_STRUCT_TO_HASH_MAP(TYPE, FIELD_SEQ) \
+	QMap<QByteArray, QString> TYPE::toHashMap() const { \
+	QMap<QByteArray, QString> result; \
+	BOOST_PP_SEQ_FOR_EACH(FIELD_TO_HASHMAP, ~, FIELD_SEQ) \
+	return result; \
+}
+
+#define QN_DEFINE_DERIVED_STRUCT_TO_HASH_MAP(TYPE, BASE_TYPE, FIELD_SEQ) \
+	QMap<QByteArray, QString> TYPE::toHashMap() const { \
+	QMap<QByteArray, QString> result = BASE_TYPE::toHashMap(); \
+	BOOST_PP_SEQ_FOR_EACH(FIELD_TO_HASHMAP, ~, FIELD_SEQ) \
+	return result; \
+}
+*/
+
 #define QN_DECLARE_STRUCT_SQL_BINDER() \
     inline void autoBindValues(QSqlQuery& query) const;
 
@@ -74,9 +92,11 @@ void doAutoBind(QSqlQuery& query, const char* fieldName, const std::vector<T>& f
 	}\
 }
 
+inline void queryFieldToDataObj(QSqlQuery& query, int idx, bool& field) { field = query.value(idx).toBool(); }
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, qint32& field) { field = query.value(idx).toInt(); }
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, QByteArray& field) { field = query.value(idx).toByteArray(); }
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, QString& field) { field = query.value(idx).toString(); }
-
+template <class T> void queryFieldToDataObj(QSqlQuery& query, int idx, std::vector<T>& field) { ; }
+template <class T> void queryFieldToDataObj(QSqlQuery& query, int idx, T& field, typename std::enable_if<std::is_enum<T>::value>::type* = NULL ) { field = (T) query.value(idx).toInt(); }
 
 #endif // __API_DATA_H__

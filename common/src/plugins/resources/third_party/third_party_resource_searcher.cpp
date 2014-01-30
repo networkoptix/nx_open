@@ -68,11 +68,11 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
         ++it )
     {
         const QByteArray& valLatin1 = it.value().toLatin1();
-        if( it.key() == QLatin1String("physicalId") )
+        if( it.key() == "physicalId")
             strcpy( cameraInfo.uid, valLatin1.data() );
-        else if( it.key() == QLatin1String("url") )
+        else if( it.key() == "url")
             strcpy( cameraInfo.url, valLatin1.data() );
-        else if( it.key() == QLatin1String("name") )
+        else if( it.key() == "name")
             resourceName = it.value();
     }
     nxcip_qt::CameraDiscoveryManager* discoveryManager = NULL;

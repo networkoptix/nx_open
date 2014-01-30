@@ -15,7 +15,7 @@ void ApiResourceData::fromResource(const QnResourcePtr& resource)
 	disabled = resource->isDisabled();
 }
 
-void ApiResourceData::toResource(QnResourcePtr resource)
+void ApiResourceData::toResource(QnResourcePtr resource) const
 {
 	resource->setId(id);
 	resource->setGuid(guid);

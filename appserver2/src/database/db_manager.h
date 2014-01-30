@@ -14,7 +14,7 @@ namespace ec2
     class QnDbManager
     {
     public:
-		QnDbManager();
+		QnDbManager(QSharedPointer<QnResourceFactory> factory);
 		virtual ~QnDbManager();
 
         static QnDbManager* instance();
@@ -33,7 +33,10 @@ namespace ec2
 		
 		// --------- get methods ---------------------
         //getResourceTypes
-		ErrorCode doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& tran);
+		ErrorCode doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& resourceTypeList);
+
+		//getCameras
+		ErrorCode doQuery(QnParamList& filter, ApiCameraDataList& cameraList);
 
 		// --------- misc -----------------------------
 
@@ -51,6 +54,7 @@ namespace ec2
     private:
         QSqlDatabase m_sdb;
 		QMutex m_mutex;
+		QSharedPointer<QnResourceFactory>  m_resourceFactory;
     };
 };
 

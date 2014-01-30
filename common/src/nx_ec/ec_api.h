@@ -556,6 +556,7 @@ namespace ec2
             return syncHandler->errorCode();
         }
 
+		virtual void setResourceFactory(QSharedPointer<QnResourceFactory> factory) = 0;
     protected:
         virtual ReqID testConnectionAsync( const ECAddress& addr, impl::SimpleHandlerPtr handler ) = 0;
         virtual ReqID connectAsync( const ECAddress& addr, impl::ConnectHandlerPtr handler ) = 0;

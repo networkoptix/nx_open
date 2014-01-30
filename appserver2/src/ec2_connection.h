@@ -23,7 +23,7 @@ namespace ec2
         public AbstractECConnection
     {
     public:
-        Ec2DirectConnection();
+        Ec2DirectConnection(QSharedPointer<QnResourceFactory> factory);
 
         virtual AbstractResourceManagerPtr getResourceManager() override;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() override;

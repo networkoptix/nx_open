@@ -16,7 +16,7 @@ struct ScheduleTask: public ApiData
 					beforeThreshold(0), afterThreshold(0), streamQuality(Qn::QualityNotDefined), fps(0.0) {}
 
 	static ScheduleTask fromResource(const QnResourcePtr& cameraRes, const QnScheduleTask& resScheduleTask);
-	QnScheduleTask toResource();
+	QnScheduleTask toResource() const;
 
     qint32   id;
     qint32   sourceId;
@@ -56,17 +56,27 @@ struct ApiCameraData: public ApiResourceData
     QString             vendor;
 
 	void fromResource(const QnVirtualCameraResourcePtr& resource);
-	void toResource(QnVirtualCameraResourcePtr resource);
+	void toResource(QnVirtualCameraResourcePtr resource) const;
+	QnResourceParameters toHashMap() const;
     QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
 };
 
+struct ApiCameraDataList: public ApiData
+{
+	std::vector<ApiCameraData> data;
+	
+	QN_DECLARE_STRUCT_SERIALIZATORS();
+
+	void loadFromQuery(QSqlQuery& query);
+	void toCameraList(QnVirtualCameraResourceList& outData, QnResourceFactory* factory) const;
+};
+
 }
-
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ScheduleTask, (id) (sourceId) (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) \
-                                (beforeThreshold) (afterThreshold) (streamQuality) (fps) )
-
-QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiCameraData, ApiResourceData, (scheduleDisabled) (motionType) (region) (mac) (login)\
-                                        (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) (firmware) (groupId) (groupName) (secondaryQuality)\
-                                        (controlDisabled) (statusFlags) (dewarpingParams) (vendor))
+										(beforeThreshold) (afterThreshold) (streamQuality) (fps) )
+#define apiCameraDataFields (scheduleDisabled) (motionType) (region) (mac) (login) (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) \
+							(firmware) (groupId) (groupName) (secondaryQuality) (controlDisabled) (statusFlags) (dewarpingParams) (vendor)
+QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiCameraData, ApiResourceData, apiCameraDataFields)
+QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiCameraDataList, (data) )
 
 #endif // __API_CAMERA_DATA_H_

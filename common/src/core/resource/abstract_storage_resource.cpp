@@ -98,10 +98,10 @@ void QnAbstractStorageResource::deserialize(const QnResourceParameters& paramete
     const char* SPACELIMIT = "spaceLimit";
     const char* USEDFORWRITING = "usedForWriting";
 
-    if (parameters.contains(QLatin1String(SPACELIMIT)))
-        setSpaceLimit(parameters[QLatin1String(SPACELIMIT)].toLongLong());
-    if(parameters.contains(QLatin1String(USEDFORWRITING)))
-        setUsedForWriting(parameters[QLatin1String(USEDFORWRITING)].toInt());
+    if (parameters.contains(SPACELIMIT))
+        setSpaceLimit(parameters[SPACELIMIT].toLongLong());
+    if(parameters.contains(USEDFORWRITING))
+        setUsedForWriting(parameters[USEDFORWRITING].toInt());
 }
 
 float QnAbstractStorageResource::getAvarageWritingUsage() const
