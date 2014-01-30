@@ -11,6 +11,7 @@
 
 #include "ec2_connection.h"
 #include "nx_ec/ec_api.h"
+#include "server_query_processor.h"
 
 
 namespace ec2
@@ -28,8 +29,11 @@ namespace ec2
         //!Implementation of AbstractECConnectionFactory::connectAsync
         virtual ReqID connectAsync( const ECAddress& addr, impl::ConnectHandlerPtr handler ) override;
 
+        virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) override;
 		virtual void setResourceFactory(QSharedPointer<QnResourceFactory>) override;
+
     private:
+        ServerQueryProcessor m_queryProcessor;
         std::shared_ptr<Ec2DirectConnection> m_connection;
 		QSharedPointer<QnResourceFactory> m_resourceFactory;
         std::mutex m_mutex;

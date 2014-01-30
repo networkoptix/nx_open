@@ -26,19 +26,3 @@ void QnAbstractTransaction::createNewID()
 
 }
 
-
-#if 1
-
-#include "nx_ec/data/camera_data.h"
-static void test()
-{
-    ec2::ApiCameraData data;
-    BinaryStream<QByteArray> stream;
-    data.serialize(stream);
-    data.deserialize(stream);
-
-    ec2::QnTransaction<ec2::ApiCameraData> tran;
-    tran.deserialize(stream);
-}
-#endif
-

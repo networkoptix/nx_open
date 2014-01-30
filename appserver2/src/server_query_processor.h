@@ -28,24 +28,24 @@ namespace ec2
         template<class QueryDataType, class HandlerType>
             void processUpdateAsync( const QnTransaction<QueryDataType>& tran, HandlerType handler )
         {
-            ErrorCode errorCode = dbManager->executeTransaction( tran );
-            if( errorCode != ErrorCode::ok )
-            {
+            ErrorCode errorCode = ErrorCode::ok;
+
+            auto scopedGuardFunc = [&errorCode, &handler]( ServerQueryProcessor* ){
                 QtConcurrent::run( std::bind( handler, errorCode ) );
+            };
+            std::unique_ptr<ServerQueryProcessor, decltype(scopedGuardFunc)> scopedGuard( this, scopedGuardFunc );
+
+            errorCode = dbManager->executeTransaction( tran );
+            if( errorCode != ErrorCode::ok )
                 return;
-            }
 
             // saving transaction to the log
             errorCode = transactionLog->saveTransaction( tran );
             if( errorCode != ErrorCode::ok )
-            {
-                QtConcurrent::run( std::bind( handler, errorCode ) );
                 return;
-            }
 
             // delivering transaction to remote peers
             clusterManager->distributeAsync( tran );
-            QtConcurrent::run( std::bind( handler, errorCode ) );
         }
 
         /*!
@@ -53,14 +53,13 @@ namespace ec2
             TODO let compiler guess template params
         */
         template<class InputData, class OutputData, class HandlerType>
-            void processQueryAsync( ApiCommand /*cmd*/, InputData input, HandlerType handler )
+            void processQueryAsync( InputData input, HandlerType handler )
         {
-            auto func = [input, handler]() {
+            QtConcurrent::run( [input, handler]() {
                 OutputData output;
-                ErrorCode errorCode = dbManager->doQuery( input, output );
+                const ErrorCode errorCode = dbManager->doQuery( input, output );
                 handler( errorCode, output );
-            };
-            QtConcurrent::run( func );
+            } );
         }
     };
 }
