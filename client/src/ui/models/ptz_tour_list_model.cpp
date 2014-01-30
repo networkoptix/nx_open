@@ -178,5 +178,5 @@ qint64 QnPtzTourListModel::estimatedTimeSecs(const QnPtzTour &tour) const {
     qint64 result = 0;
     foreach (const QnPtzTourSpot spot, tour.spots)
         result += spot.stayTime;
-    return result;
+    return result / 1000;
 }
