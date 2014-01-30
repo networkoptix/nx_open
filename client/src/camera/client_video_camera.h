@@ -75,6 +75,7 @@ public:
 signals:
     void exportProgress(int progress);
     void exportFinished(int status, const QString &fileName);
+    void exportStopped();
 
 public slots:
     virtual void startDisplay();

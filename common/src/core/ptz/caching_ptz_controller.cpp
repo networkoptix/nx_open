@@ -5,7 +5,7 @@
 #include <core/resource/resource.h>
 
 QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr &baseController):
-	base_type(baseController),
+    base_type(baseController),
     m_initialized(false)
 {
     if(!initialize()) {
@@ -18,13 +18,13 @@ QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr &baseCon
 }
 
 QnCachingPtzController::~QnCachingPtzController() {
-	return;
+    return;
 }
 
 bool QnCachingPtzController::extends(Qn::PtzCapabilities capabilities) {
-	return 
+    return 
         (capabilities & Qn::AsynchronousPtzCapability) &&
-		!(capabilities & Qn::SynchronizedPtzCapability);
+        !(capabilities & Qn::SynchronizedPtzCapability);
 }
 
 Qn::PtzCapabilities QnCachingPtzController::getCapabilities() {
@@ -33,30 +33,30 @@ Qn::PtzCapabilities QnCachingPtzController::getCapabilities() {
 }
 
 bool QnCachingPtzController::continuousMove(const QVector3D &speed) {
-	if(!base_type::continuousMove(speed))
-		return false;
+    if(!base_type::continuousMove(speed))
+        return false;
 
-	QMutexLocker locker(&m_mutex);
-	m_data.fields &= ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
-	return true;
+    QMutexLocker locker(&m_mutex);
+    m_data.fields &= ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
+    return true;
 }
 
 bool QnCachingPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
     if(!base_type::absoluteMove(space, position, speed))
-		return false;
+        return false;
 
     QMutexLocker locker(&m_mutex);
     m_data.fields &= ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
-	return true;
+    return true;
 }
 
 bool QnCachingPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
     if(!base_type::viewportMove(aspectRatio, viewport, speed))
-		return false;
+        return false;
 
     QMutexLocker locker(&m_mutex);
     m_data.fields &= ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
-	return true;
+    return true;
 }
 
 bool QnCachingPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
@@ -64,12 +64,12 @@ bool QnCachingPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D
         return false;
 
     QMutexLocker locker(&m_mutex);
-	if(space == Qn::DevicePtzCoordinateSpace) {
-		if(m_data.fields & Qn::DevicePositionPtzField) {
-			*position = m_data.devicePosition;
-			return true;
+    if(space == Qn::DevicePtzCoordinateSpace) {
+        if(m_data.fields & Qn::DevicePositionPtzField) {
+            *position = m_data.devicePosition;
+            return true;
         } else {
-			return false;
+            return false;
         }
     } else {
         if(m_data.fields & Qn::LogicalPositionPtzField) {
@@ -117,19 +117,19 @@ bool QnCachingPtzController::getFlip(Qt::Orientations *flip) {
 }
 
 bool QnCachingPtzController::createPreset(const QnPtzPreset &preset) {
-	return base_type::createPreset(preset); 
+    return base_type::createPreset(preset); 
 }
 
 bool QnCachingPtzController::updatePreset(const QnPtzPreset &preset) {
-	return base_type::updatePreset(preset);
+    return base_type::updatePreset(preset);
 }
 
 bool QnCachingPtzController::removePreset(const QString &presetId) {
-	return base_type::removePreset(presetId);
+    return base_type::removePreset(presetId);
 }
 
 bool QnCachingPtzController::activatePreset(const QString &presetId, qreal speed) {
-	return base_type::activatePreset(presetId, speed);
+    return base_type::activatePreset(presetId, speed);
 }
 
 bool QnCachingPtzController::getPresets(QnPtzPresetList *presets) {
@@ -146,15 +146,15 @@ bool QnCachingPtzController::getPresets(QnPtzPresetList *presets) {
 }
 
 bool QnCachingPtzController::createTour(const QnPtzTour &tour) {
-	return base_type::createTour(tour); 
+    return base_type::createTour(tour); 
 }
 
 bool QnCachingPtzController::removeTour(const QString &tourId) {
-	return base_type::removeTour(tourId); 
+    return base_type::removeTour(tourId); 
 }
 
 bool QnCachingPtzController::activateTour(const QString &tourId) {
-	return base_type::activateTour(tourId); 
+    return base_type::activateTour(tourId); 
 }
 
 bool QnCachingPtzController::getTours(QnPtzTourList *tours) {
@@ -175,37 +175,47 @@ bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
         return false;
 
     QMutexLocker locker(&m_mutex);
-	*data = m_data;
-	data->query = query;
-	data->fields &= query;
-	return true;
+    *data = m_data;
+    data->query = query;
+    data->fields &= query;
+    return true;
 }
 
 bool QnCachingPtzController::synchronize(Qn::PtzDataFields query) {
-	return base_type::synchronize(query);
+    return base_type::synchronize(query);
 }
 
 void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant &data) {
-	if(data.isValid()) {
-		QMutexLocker locker(&m_mutex);
-		switch (command) {
-		case Qn::CreatePresetPtzCommand:
-			if(m_data.fields & Qn::PresetsPtzField)
-				m_data.presets.append(data.value<QnPtzPreset>());
-			break;
-		case Qn::UpdatePresetPtzCommand:
-			if(m_data.fields & Qn::PresetsPtzField) {
-				QnPtzPreset preset = data.value<QnPtzPreset>();
-				for(int i = 0; i < m_data.presets.size(); i++) {
-					if(m_data.presets[i].id == preset.id) {
-						m_data.presets[i] = preset;
-						break;
+    if(data.isValid()) {
+        QMutexLocker locker(&m_mutex);
+        switch (command) {
+        case Qn::CreatePresetPtzCommand:
+            if(m_data.fields & Qn::PresetsPtzField) {
+                QnPtzPreset preset = data.value<QnPtzPreset>();
+                bool exists = false;
+                for(int i = 0; i < m_data.presets.size(); i++) {
+                    if(m_data.presets[i].id == preset.id) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists)
+                    m_data.presets.append(preset);
+            }
+            break;
+        case Qn::UpdatePresetPtzCommand:
+            if(m_data.fields & Qn::PresetsPtzField) {
+                QnPtzPreset preset = data.value<QnPtzPreset>();
+                for(int i = 0; i < m_data.presets.size(); i++) {
+                    if(m_data.presets[i].id == preset.id) {
+                        m_data.presets[i] = preset;
+                        break;
                     }
                 }
             }
-			break;
-		case Qn::RemovePresetPtzCommand:
-			if(m_data.fields & Qn::PresetsPtzField) {
+            break;
+        case Qn::RemovePresetPtzCommand:
+            if(m_data.fields & Qn::PresetsPtzField) {
                 QString presetId = data.value<QString>();
                 for(int i = 0; i < m_data.presets.size(); i++) {
                     if(m_data.presets[i].id == presetId) {
@@ -214,12 +224,22 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
                     }
                 }
             }
-			break;
-		case Qn::CreateTourPtzCommand:
-            if(m_data.fields & Qn::ToursPtzField)
-                m_data.tours.append(data.value<QnPtzTour>());
             break;
-		case Qn::RemoveTourPtzCommand:
+        case Qn::CreateTourPtzCommand:
+            if(m_data.fields & Qn::ToursPtzField) {
+                QnPtzTour tour = data.value<QnPtzTour>();
+                bool exists = false;
+                for(int i = 0; i < m_data.tours.size(); i++) {
+                    if(m_data.tours[i].id == tour.id) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists)
+                    m_data.tours.append(tour);
+            }
+            break;
+        case Qn::RemoveTourPtzCommand:
             if(m_data.fields & Qn::PresetsPtzField) {
                 QString tourId = data.value<QString>();
                 for(int i = 0; i < m_data.tours.size(); i++) {
@@ -251,12 +271,12 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
             m_data.tours = data.value<QnPtzTourList>();
             break;
         case Qn::GetDataPtzCommand:
-		case Qn::SynchronizePtzCommand:
-			updateCacheLocked(data.value<QnPtzData>());
-			break;
-		default:
-			break;
-		}
+        case Qn::SynchronizePtzCommand:
+            updateCacheLocked(data.value<QnPtzData>());
+            break;
+        default:
+            break;
+        }
     }
 
     base_type::baseFinished(command, data);
@@ -275,14 +295,14 @@ void QnCachingPtzController::updateCacheLocked(const QnPtzData &data) {
     if(data.query == Qn::AllPtzFields)
         m_initialized = true;
 
-	Qn::PtzDataFields fields = data.fields & ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
-	if(fields == Qn::NoPtzFields)
-		return;
+    Qn::PtzDataFields fields = data.fields & ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
+    if(fields == Qn::NoPtzFields)
+        return;
 
-	if(fields & Qn::DeviceLimitsPtzField)	m_data.deviceLimits = data.deviceLimits;
-	if(fields & Qn::LogicalLimitsPtzField)	m_data.logicalLimits = data.logicalLimits;
-    if(fields & Qn::FlipPtzField)			m_data.flip = data.flip;
-    if(fields & Qn::PresetsPtzField)		m_data.presets = data.presets;
-    if(fields & Qn::ToursPtzField)			m_data.tours = data.tours;
+    if(fields & Qn::DeviceLimitsPtzField)   m_data.deviceLimits = data.deviceLimits;
+    if(fields & Qn::LogicalLimitsPtzField)  m_data.logicalLimits = data.logicalLimits;
+    if(fields & Qn::FlipPtzField)           m_data.flip = data.flip;
+    if(fields & Qn::PresetsPtzField)        m_data.presets = data.presets;
+    if(fields & Qn::ToursPtzField)          m_data.tours = data.tours;
     m_data.fields |= fields;
 }

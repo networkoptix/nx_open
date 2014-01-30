@@ -33,12 +33,6 @@ public:
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
 
-    /*virtual bool getProjection(Qn::Projection *projection) override;
-    virtual bool setProjection(Qn::Projection projection) override;*/
-
-    ///virtual void changePanoMode() override;
-    ///virtual QString getPanoModeText() const override;
-
     QnMediaDewarpingParams mediaDewarpingParams() const;
     QnItemDewarpingParams itemDewarpingParams() const;
 
@@ -46,6 +40,8 @@ protected:
     virtual void tick(int deltaMSecs) override;
 
 private:
+    Q_SIGNAL void finishedLater(Qn::PtzCommand command, const QVariant &data);
+
     Q_SLOT void updateLimits();
     Q_SLOT void updateCapabilities();
     Q_SLOT void updateAspectRatio();
@@ -56,6 +52,7 @@ private:
     QVector3D boundedPosition(const QVector3D &position);
     QVector3D getPositionInternal();
     void absoluteMoveInternal(const QVector3D &position);
+
 private:
     enum AnimationMode {
         NoAnimation,

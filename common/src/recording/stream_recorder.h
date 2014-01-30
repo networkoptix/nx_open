@@ -204,6 +204,9 @@ private:
     QRectF m_srcRect;
     ImageCorrectionParams m_contrastParams;
     QnItemDewarpingParams m_itemDewarpingParams;
+
+    /** If true method close() will emit signal recordingFinished() at the end. */
+    bool m_recordingFinished;
 };
 
 #endif // _STREAM_RECORDER_H__

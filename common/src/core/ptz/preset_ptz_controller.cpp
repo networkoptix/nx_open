@@ -68,7 +68,7 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
 
     QnPtzPresetData data;
     data.space = hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
-    if(!getPosition(data.space, &data.position))
+    if(!getPosition(data.space, &data.position)) // TODO: #Elric this won't work for async base controller.
         return false;
 
     QMutexLocker locker(&m_mutex);

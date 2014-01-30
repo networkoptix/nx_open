@@ -74,7 +74,7 @@ public:
     virtual void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) = 0;
     virtual void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data) = 0;
     virtual void serializeLicense(const QnLicensePtr& license, QByteArray& data) = 0;
-	virtual void serializeLicenses(const QList<QnLicensePtr>& licenses, QByteArray& data) = 0;
+    virtual void serializeLicenses(const QList<QnLicensePtr>& licenses, QByteArray& data) = 0;
     virtual void serializeCameraServerItem(const QnCameraHistoryItem& cameraHistory, QByteArray& data) = 0;
     virtual void serializeBusinessRules(const QnBusinessEventRuleList&, QByteArray& data) = 0;
     virtual void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) = 0;

@@ -73,8 +73,8 @@ QnWorkbenchExportHandler::QnWorkbenchExportHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(Qn::ExportTimeSelectionAction), SIGNAL(triggered()), this,   SLOT(at_exportTimeSelectionAction_triggered()));
-    connect(action(Qn::ExportLayoutAction),        SIGNAL(triggered()), this,   SLOT(at_exportLayoutAction_triggered()));
+    connect(action(Qn::ExportTimeSelectionAction), &QAction::triggered, this,   &QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered);
+    connect(action(Qn::ExportLayoutAction),        &QAction::triggered, this,   &QnWorkbenchExportHandler::at_exportLayoutAction_triggered);
 }
 
 #ifdef Q_OS_WIN

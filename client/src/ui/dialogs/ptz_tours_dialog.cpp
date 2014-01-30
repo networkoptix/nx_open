@@ -2,7 +2,9 @@
 #include "ui_ptz_tours_dialog.h"
 
 #include <QtCore/QUuid>
+
 #include <QtWidgets/QStyledItemDelegate>
+#include <QtWidgets/QMessageBox>
 
 #include <common/common_globals.h>
 
@@ -28,8 +30,8 @@ protected:
     }
 };
 
-QnPtzToursDialog::QnPtzToursDialog(QWidget *parent) :
-    base_type(parent),
+QnPtzToursDialog::QnPtzToursDialog(const QnPtzControllerPtr &controller, QWidget *parent) :
+    base_type(controller, parent),
     ui(new Ui::PtzToursDialog),
     m_model(new QnPtzTourListModel(this))
 {
@@ -59,7 +61,7 @@ void QnPtzToursDialog::loadData(const QnPtzData &data) {
         ui->tourTable->setCurrentIndex(ui->tourTable->model()->index(0, 0));
 }
 
-void QnPtzToursDialog::saveData() const {
+bool QnPtzToursDialog::saveTours() {
     auto findTourById = [](const QnPtzTourList &list, const QString &id, QnPtzTour &result) {
         foreach (const QnPtzTour &tour, list) {
             if (tour.id != id)
@@ -70,13 +72,14 @@ void QnPtzToursDialog::saveData() const {
         return false;
     };
 
+    bool result = true;
     // update or remove existing tours
     foreach (const QnPtzTour &tour, m_oldTours) {
         QnPtzTour updated;
         if (!findTourById(m_model->tours(), tour.id, updated))
-            ptzController()->removeTour(tour.id);
+            result &= removeTour(tour.id);
         else if (tour != updated)
-            ptzController()->createTour(updated);
+            result &= createTour(updated);
     }
 
     //create new tours
@@ -84,8 +87,14 @@ void QnPtzToursDialog::saveData() const {
         QnPtzTour existing;
         if (findTourById(m_oldTours, tour.id, existing))
             continue;
-        ptzController()->createTour(tour);
+        result &= createTour(tour);
     }
+
+    return result;
+}
+
+void QnPtzToursDialog::saveData() {
+    saveTours();
 }
 
 Qn::PtzDataFields QnPtzToursDialog::requiredFields() const {

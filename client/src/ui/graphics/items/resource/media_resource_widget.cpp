@@ -100,7 +100,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     }
 
     /* Set up PTZ controller. */
-    m_ptzController.reset(new QnFisheyePtzController(this));
+    m_ptzController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
     m_ptzController.reset(new QnPresetPtzController(m_ptzController));
     m_ptzController.reset(new QnTourPtzController(m_ptzController));
     if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera))
@@ -195,6 +195,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateIconButton();
     updateAspectRatio();
     updateCursor();
+    updateFisheye();
     setImageEnhancement(item->imageEnhancement());
 }
 

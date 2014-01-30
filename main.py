@@ -1,21 +1,20 @@
 import io, sys, os, platform
 import ConfigParser
 import argparse
+import contextlib
 from os.path import dirname, join
     
 #class Config:
 #    pass
 
-class cd:         
-    def __init__(self, newPath):
-        self.newPath = newPath
-
-    def __enter__(self):
-        self.savedPath = os.getcwd()
-        os.chdir(self.newPath)
-
-    def __exit__(self, etype, value, traceback):
-        os.chdir(self.savedPath)
+@contextlib.contextmanager
+def cd(xdir):
+    olddir = os.getcwd()
+    try:
+        os.chdir(xdir)
+        yield
+    finally:
+        os.chdir(olddir)
     
 def get_environment_variable(variable):
     #print (os.path.abspath(__file__))
@@ -37,10 +36,7 @@ def get_environment_variable(variable):
         if platform.architecture()[0] == '64bit':
             return 'x64'
         else:
-            return 'x86'      
-
-    elif variable == 'configuration':        
-        return 'release'			
+            return 'x86'        
            
     else:        
         if os.getenv(variable):
@@ -48,7 +44,7 @@ def get_environment_variable(variable):
         else:
             config = ConfigParser.RawConfigParser(allow_no_value=True)
             config.readfp(open(os.path.dirname(os.path.abspath(__file__)) + '/customization/' + '/default-values.properties'))
-            #config.readfp(open(os.path.dirname(os.path.abspath(__file__)) + '/customization/' + customization + '/build.properties'))
+            config.readfp(open(os.path.dirname(os.path.abspath(__file__)) + '/customization/' + customization + '/build.properties'))
             return config.get("basic", variable)  
 
 def get_environment_build_dir():

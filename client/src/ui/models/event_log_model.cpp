@@ -384,8 +384,8 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
                 }
             }
             resId = action.getRuntimeParams().getActionResourceId();
-    	default:
-        	break;
+        default:
+            break;
     }
 
     QnResourcePtr res = getResourceById(resId);
@@ -506,7 +506,14 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
+    if (index.column() < 0 || index.column() >= m_columns.size())
+        return QVariant();
+
     const Column &column = m_columns[index.column()];
+
+    if (index.row() < 0 || index.row() >= m_index->size())
+        return QVariant();
+
     const QnBusinessActionData &action = m_index->at(index.row());
     
     switch(role)

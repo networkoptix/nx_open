@@ -1,6 +1,8 @@
 #include "fisheye_ptz_controller.h"
 
-#include <QtCore/QEasingCurve>
+#include <cassert>
+
+#include <common/common_meta_types.h>
 
 #include <utils/math/math.h>
 #include <utils/math/linear_combination.h>
@@ -27,6 +29,7 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     m_renderer = widget->renderer();
     m_renderer->setFisheyeController(this);
 
+    connect(this,               &QnFisheyePtzController::finishedLater,         this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
     connect(m_widget,           &QnResourceWidget::aspectRatioChanged,          this, &QnFisheyePtzController::updateAspectRatio);
     connect(m_widget,           &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnFisheyePtzController::updateMediaDewarpingParams);
     connect(m_widget->item(),   &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnFisheyePtzController::updateItemDewarpingParams);
@@ -37,8 +40,8 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
 }
 
 QnFisheyePtzController::~QnFisheyePtzController() {
-    if(m_widget)
-        disconnect(m_widget, NULL, this, NULL);
+    /* We must be deleted from our thread because of the renderer access below. */
+    assert(thread() == QThread::currentThread());
 
     if (m_renderer)
         m_renderer->setFisheyeController(0);
@@ -73,18 +76,19 @@ void QnFisheyePtzController::updateLimits() {
         m_limits.minTilt = -90.0;
         m_limits.maxTilt = 90.0;
 
-        // If circle edge is out of picture, reduce maxumum angle
+        // If circle edge is out of picture, reduce maximum angle
         if (maxY > 1.0)
             m_limits.minTilt += (maxY - 1.0) * 180.0;
         if (minY < 0.0)
             m_limits.maxTilt += minY * 180.0;
-        /*
-        // not tested yet. Also, I am not sure that it need for real cameras
+        
+#if 0
+        // not tested yet. Also, I am not sure that it's needed for real cameras
         if (maxX > 1.0)
             m_limits.maxPan -= (maxX - 1.0) * 180.0;
         if (minX < 0.0)
             m_limits.minPan -= minX * 180.0;
-        */
+#endif
     } else {
         m_unlimitedPan = true;
         m_limits.minPan = 0.0;
@@ -161,21 +165,6 @@ QVector3D QnFisheyePtzController::boundedPosition(const QVector3D &position) {
     return result;
 }
 
-void QnFisheyePtzController::tick(int deltaMSecs) {
-    if(m_animationMode == SpeedAnimation) {
-        QVector3D speed = m_speed * QVector3D(60.0, 60.0, -30.0);
-        absoluteMoveInternal(boundedPosition(getPositionInternal() + speed * deltaMSecs / 1000.0));
-    } else if(m_animationMode == PositionAnimation) {
-        m_progress += m_relativeSpeed * deltaMSecs / 1000.0;
-        if(m_progress >= 1.0) {
-            absoluteMoveInternal(m_endPosition);
-            stopListening();
-        } else {
-            absoluteMoveInternal(boundedPosition(linearCombine(1.0 - m_progress, m_startPosition, m_progress, m_endPosition)));
-        }
-    }
-}
-
 QVector3D QnFisheyePtzController::getPositionInternal() {
     return QVector3D(
         qRadiansToDegrees(m_itemDewarpingParams.xAngle),
@@ -193,6 +182,21 @@ void QnFisheyePtzController::absoluteMoveInternal(const QVector3D &position) {
         m_widget->item()->setDewarpingParams(m_itemDewarpingParams);
 }
 
+void QnFisheyePtzController::tick(int deltaMSecs) {
+    if(m_animationMode == SpeedAnimation) {
+        QVector3D speed = m_speed * QVector3D(60.0, 60.0, -30.0);
+        absoluteMoveInternal(boundedPosition(getPositionInternal() + speed * deltaMSecs / 1000.0));
+    } else if(m_animationMode == PositionAnimation) {
+        m_progress += m_relativeSpeed * deltaMSecs / 1000.0;
+        if(m_progress >= 1.0) {
+            absoluteMoveInternal(m_endPosition);
+            stopListening();
+        } else {
+            absoluteMoveInternal(boundedPosition(linearCombine(1.0 - m_progress, m_startPosition, m_progress, m_endPosition)));
+        }
+    }
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnAbstractPtzController implementation
@@ -206,41 +210,16 @@ bool QnFisheyePtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits
         return false;
 
     *limits = m_limits;
+
+    emit finishedLater(Qn::GetLogicalLimitsPtzCommand, QVariant::fromValue(*limits));
     return true;
 }
 
 bool QnFisheyePtzController::getFlip(Qt::Orientations *flip) {
     *flip = 0;
+    emit finishedLater(Qn::GetFlipPtzCommand, QVariant::fromValue(*flip));
     return true;
 }
-
-#if 0
-bool QnFisheyePtzController::getProjection(Qn::Projection *projection) {
-    qreal factor = m_dewarpingParams.panoFactor;
-
-    if(qFuzzyCompare(factor, 1.0)) {
-        *projection = Qn::RectilinearProjection;
-    } else if(qFuzzyCompare(factor, 2.0)) {
-        *projection = Qn::Equirectangular2xProjection;
-    } else if(qFuzzyCompare(factor, 4.0)) {
-        *projection = Qn::Equirectangular4xProjection;
-    } else {
-        *projection = Qn::RectilinearProjection;
-    }
-
-    return true;
-}
-
-bool QnFisheyePtzController::setProjection(Qn::Projection projection) {
-    return true; // TODO: #PTZ
-    /*switch(projection) {
-    case Qn::RectilinearProjection:
-        m_dewarpingParams.panoFactor = 1.0;
-        break;
-        case Qn::
-    }*/
-}
-#endif
 
 bool QnFisheyePtzController::continuousMove(const QVector3D &speed) {
     m_speed = speed;
@@ -252,6 +231,7 @@ bool QnFisheyePtzController::continuousMove(const QVector3D &speed) {
         startListening();
     }
 
+    emit finishedLater(Qn::ContinuousMovePtzCommand, QVariant::fromValue(speed));
     return true;
 }
 
@@ -273,6 +253,8 @@ bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QV
         
         startListening();
     }
+
+    emit finishedLater(Qn::AbsoluteLogicalMovePtzCommand, QVariant::fromValue(position));
     return true;
 }
 
@@ -281,5 +263,7 @@ bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D
         return false;
     
     *position = getPositionInternal();
+
+    emit finishedLater(Qn::GetLogicalPositionPtzCommand, QVariant::fromValue(*position));
     return true;
 }

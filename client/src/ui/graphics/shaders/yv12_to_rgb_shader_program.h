@@ -186,7 +186,7 @@ protected:
 
 class QnFisheyeRectilinearProgram : public QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
     QnFisheyeRectilinearProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
 protected:
@@ -195,7 +195,7 @@ protected:
 
 class QnFisheyeEquirectangularHProgram : public QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
     QnFisheyeEquirectangularHProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
 protected:
@@ -204,7 +204,7 @@ protected:
 
 class QnFisheyeEquirectangularVProgram : public QnFisheyeShaderProgram<QnYv12ToRgbWithGammaShaderProgram>
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
     QnFisheyeEquirectangularVProgram(const QGLContext *context = NULL, QObject *parent = NULL, const QString& gammaStr = lit("y"));
 protected:
