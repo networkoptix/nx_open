@@ -145,7 +145,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
+    <widget class="QnDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -167,6 +167,11 @@
    <extends>QWidget</extends>
    <header location="global">ui/widgets/ptz_tour_widget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnDialogButtonBox</class>
+   <extends>QDialogButtonBox</extends>
+   <header location="global">ui/widgets/dialog_button_box.h</header>
   </customwidget>
  </customwidgets>
  <resources>

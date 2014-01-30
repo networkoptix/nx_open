@@ -10,6 +10,8 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_data.h>
 
+#include <ui/widgets/dialog_button_box.h>
+
 QnAbstractPtzDialog::QnAbstractPtzDialog(const QnPtzControllerPtr &controller, QWidget *parent, Qt::WindowFlags windowFlags) :
     base_type(parent, windowFlags),
     m_controller(controller),
@@ -18,7 +20,7 @@ QnAbstractPtzDialog::QnAbstractPtzDialog(const QnPtzControllerPtr &controller, Q
     connect(this, &QnAbstractPtzDialog::synchronizeLater, this, &QnAbstractPtzDialog::synchronize, Qt::QueuedConnection);
     connect(m_controller, &QnAbstractPtzController::finished, this, &QnAbstractPtzDialog::at_controller_finished);
 
-    synchronize();
+    synchronize(tr("Loading..."));
 }
 
 QnAbstractPtzDialog::~QnAbstractPtzDialog() {
@@ -26,13 +28,13 @@ QnAbstractPtzDialog::~QnAbstractPtzDialog() {
 
 void QnAbstractPtzDialog::accept() {
     saveData();
-    synchronize();
+    synchronize(tr("Saving..."));
     base_type::accept();
 }
 
-void QnAbstractPtzDialog::synchronize() {
+void QnAbstractPtzDialog::synchronize(const QString &title) {
     if (!isVisible()) {
-        emit synchronizeLater();
+        emit synchronizeLater(title);
         return;
     }
 
@@ -45,14 +47,17 @@ void QnAbstractPtzDialog::synchronize() {
 
         QList<QWidget*> disabled;
         QLayout* dialogLayout = this->layout();
+
         for (int i = 0; i < dialogLayout->count(); i++) {
             QWidget* widget = dialogLayout->itemAt(i)->widget();
             if (!widget)
                 continue;
-            if (QDialogButtonBox* buttonBox = dynamic_cast<QDialogButtonBox*>(widget)) {
+            if (QnDialogButtonBox* buttonBox = dynamic_cast<QnDialogButtonBox*>(widget)) {
                 buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
                 disabled << buttonBox->button(QDialogButtonBox::Ok);
                 connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked), &loop, SLOT(quit()));
+                buttonBox->showProgress(title);
+                connect(this, SIGNAL(synchronized()), buttonBox, SLOT(hideProgress()));
             } else
                 disabled << widget;
         }
