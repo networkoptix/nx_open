@@ -292,7 +292,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     item->setText(QnBusinessStringsHelper::eventAtResource(params, qnSettings->isIpShownInTree()));
     item->setTooltipText(QnBusinessStringsHelper::eventDescription(businessAction, QnBusinessAggregationInfo(), qnSettings->isIpShownInTree(), false));
 
-    if (businessAction->actionType() == BusinessActionType::PlaySoundRepeated) {
+    const bool soundAction = businessAction->actionType() == BusinessActionType::PlaySoundRepeated;
+    if (soundAction) {
         QString soundUrl = businessAction->getParams().getSoundUrl();
         m_itemsByLoadingSound.insert(soundUrl, item);
         context()->instance<QnAppServerNotificationCache>()->downloadFile(soundUrl);
@@ -305,8 +306,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     switch (eventType) {
     case BusinessEventType::Camera_Motion: {
+        QIcon icon = soundAction ? qnSkin->icon("events/camera.png") : qnSkin->icon("events/camera.png");
         item->addActionButton(
-            qnSkin->icon("events/camera.png"),
+            icon,
             tr("Browse Archive"),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource).withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000)
@@ -315,8 +317,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Camera_Input: {
+        QIcon icon = soundAction ? qnSkin->icon("events/camera.png") : qnSkin->icon("events/camera.png");
         item->addActionButton(
-            qnSkin->icon("events/camera.png"),
+            icon,
             tr("Open Camera"),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)

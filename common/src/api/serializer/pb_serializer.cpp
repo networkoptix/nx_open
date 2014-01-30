@@ -1143,8 +1143,8 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QB
     //
     //block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(hardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));
     //if (QnLicense(block).isValid(hardwareId)) {
-    //	license = QnLicensePtr(new QnLicense(block));
-    //	return;
+    //    license = QnLicensePtr(new QnLicense(block));
+    //    return;
     //}
 
     block = combineV1LicenseBlock(QString::fromUtf8(pb_license.name().c_str()), QString::fromUtf8(pb_license.key().c_str()), QString::fromUtf8(oldHardwareId), pb_license.cameracount(), QString::fromUtf8(pb_license.signature().c_str()));

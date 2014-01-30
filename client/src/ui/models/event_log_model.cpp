@@ -384,8 +384,8 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
                 }
             }
             resId = action.getRuntimeParams().getActionResourceId();
-    	default:
-        	break;
+        default:
+            break;
     }
 
     QnResourcePtr res = getResourceById(resId);

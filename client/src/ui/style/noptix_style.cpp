@@ -73,7 +73,7 @@ QnNoptixStyle::~QnNoptixStyle() {
     return;
 }
 
-QPixmap	QnNoptixStyle::generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *option) const {
+QPixmap QnNoptixStyle::generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *option) const {
     if(iconMode == QIcon::Disabled) {
         QImage image = QImage(pixmap.size(), QImage::Format_ARGB32);
         image.fill(qRgba(0, 0, 0, 0));

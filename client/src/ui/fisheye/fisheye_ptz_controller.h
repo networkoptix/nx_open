@@ -40,6 +40,8 @@ protected:
     virtual void tick(int deltaMSecs) override;
 
 private:
+    Q_SIGNAL void finishedLater(Qn::PtzCommand command, const QVariant &data);
+
     Q_SLOT void updateLimits();
     Q_SLOT void updateCapabilities();
     Q_SLOT void updateAspectRatio();

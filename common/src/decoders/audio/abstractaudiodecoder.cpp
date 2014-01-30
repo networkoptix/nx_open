@@ -4,5 +4,5 @@
 
 CLAbstractAudioDecoder* CLAudioDecoderFactory::createDecoder(QnCompressedAudioDataPtr data)
 {
-	return new CLFFmpegAudioDecoder(data);
+    return new CLFFmpegAudioDecoder(data);
 }

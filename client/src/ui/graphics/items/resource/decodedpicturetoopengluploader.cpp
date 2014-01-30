@@ -2462,7 +2462,7 @@ void DecodedPictureToOpenGLUploader::savePicToFile( AVFrame* const pic, int pts 
         m_rgbaBuf,
         pic->width,
         pic->height,
-        QImage::Format_ARGB32 );	//QImage::Format_ARGB4444_Premultiplied );
+        QImage::Format_ARGB32 ); //QImage::Format_ARGB4444_Premultiplied );
     const QString& fileName = QString::fromLatin1("C:\\temp\\%1_%2.png").arg(m_fileNumber++, 3, 10, QLatin1Char('0')).arg(pts);
     img.save(fileName, "png");
     /*if( !img.save( fileName, "bmp" ) )
