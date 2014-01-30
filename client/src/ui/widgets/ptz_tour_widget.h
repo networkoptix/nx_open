@@ -33,6 +33,7 @@ private slots:
     void at_moveSpotUpButton_clicked();
     void at_moveSpotDownButton_clicked();
 
+    void at_tableViewport_resizeEvent();
 private:
     QScopedPointer<Ui::PtzTourWidget> ui;
     QnPtzTourModel *m_model;
