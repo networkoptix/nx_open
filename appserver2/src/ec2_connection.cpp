@@ -12,7 +12,7 @@ namespace ec2
     :
         m_resourceManager( new QnResourceManager<decltype(m_queryProcessor)>(&m_queryProcessor) ),
         m_mediaServerManager( new QnMediaServerManager() ),
-        m_cameraManager( new QnCameraManager<decltype(m_queryProcessor)>(&m_queryProcessor) ),
+        m_cameraManager( new QnCameraManager<decltype(m_queryProcessor)>(&m_queryProcessor, factory) ),
 		m_dbManager(new QnDbManager(factory))
     {
     }

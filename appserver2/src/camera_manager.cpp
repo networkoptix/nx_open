@@ -38,9 +38,10 @@ namespace ec2
   //  }
 
     template<class QueryProcessorType>
-    QnCameraManager<QueryProcessorType>::QnCameraManager( QueryProcessorType* const queryProcessor )
+    QnCameraManager<QueryProcessorType>::QnCameraManager( QueryProcessorType* const queryProcessor, QSharedPointer<QnResourceFactory> factory)
     :
-        m_queryProcessor( queryProcessor )
+        m_queryProcessor( queryProcessor ),
+		m_resourceFactory( factory )
     {
     }
 
@@ -93,8 +94,18 @@ namespace ec2
     template<class QueryProcessorType>
     ReqID QnCameraManager<QueryProcessorType>::getCameras( QnId mediaServerId, impl::GetCamerasHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+		auto queryDoneHandler = [handler, this]( ErrorCode errorCode, const ApiCameraDataList& cameras) {
+			QnVirtualCameraResourceListPtr outData(new QnVirtualCameraResourceList());
+			if( errorCode == ErrorCode::ok )
+				cameras.toCameraList(*outData.data(), m_resourceFactory.data());
+			handler->done( errorCode, outData);
+		};
+		QnResourceParameters params;
+		if (mediaServerId.isValid())
+			params["serverId"] = mediaServerId.toString();
+		m_queryProcessor->processQueryAsync<QnResourceParameters, ApiCameraDataList, decltype(queryDoneHandler)>
+			( ec2::getResourceTypes, params, queryDoneHandler );
+		return INVALID_REQ_ID;
     }
 
     template<class QueryProcessorType>

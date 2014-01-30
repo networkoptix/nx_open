@@ -15,7 +15,7 @@ namespace ec2
         public AbstractCameraManager
     {
     public:
-        QnCameraManager( QueryProcessorType* const queryProcessor );
+        QnCameraManager( QueryProcessorType* const queryProcessor, QSharedPointer<QnResourceFactory> factory);
 
         //!Implementation of AbstractCameraManager::addCamera
         virtual ReqID addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) override;
@@ -32,6 +32,7 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
+		QSharedPointer<QnResourceFactory> m_resourceFactory;
 
         QnTransaction<ApiCameraData> prepareTransaction( ec2::ApiCommand cmd, const QnVirtualCameraResourcePtr& resource );
     };

@@ -36,7 +36,7 @@ namespace ec2
 		ErrorCode doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& resourceTypeList);
 
 		//getCameras
-		ErrorCode doQuery(QnParamList& filter, ApiCameraDataList& cameraList);
+		ErrorCode doQuery(const QnResourceParameters& filter, ApiCameraDataList& cameraList);
 
 		// --------- misc -----------------------------
 

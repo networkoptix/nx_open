@@ -203,7 +203,7 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 
 // ----------- getCameras --------------------
 
-ErrorCode QnDbManager::doQuery(QnParamList& filter, ApiCameraDataList& cameraList)
+ErrorCode QnDbManager::doQuery(const QnResourceParameters& filter, ApiCameraDataList& cameraList)
 {
 	QSqlQuery query(m_sdb);
 	query.prepare("select r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
