@@ -1159,6 +1159,7 @@ void QnMain::run()
 
     QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
 
+
     QString disabledVendors = MSSettings::roSettings()->value("disabledVendors").toString();
     QStringList disabledVendorList;
     if (disabledVendors.contains(";"))

@@ -3,6 +3,7 @@
 
 #include "rest/server/request_handler.h"
 
+// TODO: #Elric misspelled, FavicoNNNNNN
 class QnRestFavicoHandler: public QnRestRequestHandler
 {
 public:
