@@ -1,10 +1,13 @@
-
 #include "security_cam_resource.h"
 #include <QtCore/QMutexLocker>
 
-#include <business/business_event_connector.h>
-#include "api/app_server_connection.h"
+#include <utils/common/lexical.h>
 
+#include <core/resource_management/resource_pool.h>
+
+#include <business/business_event_connector.h>
+
+#include "user_resource.h"
 
 #define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
 
@@ -36,7 +39,13 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     addFlags(live_cam);
 
-    m_cameraControlDisabled = !QnAppServerConnectionFactory::allowCameraChanges();
+    // TODO: #Elric there must be a better place for this. Also evil hardcode.
+    QnUserResourcePtr admin;
+    foreach(const QnUserResourcePtr &user, qnResPool->getResources().filtered<QnUserResource>())
+        if(user->getName() == lit("admin"))
+            admin = user;
+    if(!admin || !QnLexical::deserialize(admin->getProperty(lit("autoCameraSettings")), &m_cameraControlDisabled))
+        m_cameraControlDisabled = false;
 
     connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
 

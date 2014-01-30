@@ -224,7 +224,6 @@ public:
     static QUrl publicUrl();
     static QByteArray prevSessionKey();
     static QByteArray sessionKey();
-    static bool allowCameraChanges();
     static QString systemName();
     static int defaultMediaProxyPort();
     static QnSoftwareVersion currentVersion();
@@ -237,7 +236,6 @@ public:
     static void setDefaultMediaProxyPort(int port);
     static void setCurrentVersion(const QnSoftwareVersion &version);
     static void setPublicIp(const QString &publicIp);
-    static void setAllowCameraChanges(bool allowCameraChanges);
     static void setSystemName(const QString& systemName);
 
     static void setSessionKey(const QByteArray& sessionKey);

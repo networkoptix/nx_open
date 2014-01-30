@@ -51,7 +51,7 @@ namespace Qn {
 class QnMessage
 {
 public:
-    QnMessage(): messageType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online), allowCameraChanges(true) {}
+    QnMessage(): messageType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online) {}
 
     Qn::Message_Type messageType;
     quint32 seqNumber;
@@ -86,7 +86,6 @@ public:
 
     QString filename;
     QString publicIp;
-    bool allowCameraChanges;
 
     QnKvPairListsById kvPairs;
 
