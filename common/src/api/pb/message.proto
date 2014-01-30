@@ -40,6 +40,8 @@ message Message {
 
         KvPairChange            = 16;
         KvPairDelete            = 17;
+
+        Command                 = 18;
     }
 
     required Type type = 1;
@@ -165,3 +167,14 @@ message KvPairDeleteMessage {
     repeated KvPair kvPair = 1;
 }
 
+message CommandMessage {
+    extend Message {
+        required CommandMessage message = 113;
+    }
+
+    enum Command {
+        Reboot = 0;
+    }
+
+    required Command command = 1;
+}
