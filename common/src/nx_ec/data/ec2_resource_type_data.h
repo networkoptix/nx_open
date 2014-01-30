@@ -31,7 +31,7 @@ struct ApiResourceTypeList: public ApiData {
 }
 
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiResourceTypeData, (id) (name) (manufacture) (parentId) )
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiResourceTypeList, (resourceTypes))
+QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiResourceTypeList, (data))
 
 
 #endif // __EC2_RESOURCE_TYPE_DATA_H_

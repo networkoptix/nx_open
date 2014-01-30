@@ -5,24 +5,39 @@
 #include "utils/network/tcp_connection_processor.h"
 #include "request_handler.h"
 
+
+class QnRestProcessorPool
+{
+public:
+    typedef QMap<QString, QnRestRequestHandlerPtr> Handlers;
+
+    /*!
+        Takes ownership of \a handler
+    */
+    void registerHandler( const QString& path, QnRestRequestHandler* handler );
+    QnRestRequestHandlerPtr findHandler( QString path ) const;
+    const Handlers& handlers() const;
+
+    static void initStaticInstance( QnRestProcessorPool* _instance );
+    static QnRestProcessorPool* instance();
+
+private:
+    Handlers m_handlers;
+};
+
 class QnRestConnectionProcessorPrivate;
 
 class QnRestConnectionProcessor: public QnTCPConnectionProcessor {
     Q_OBJECT
-public:
-    typedef QMap<QString, QnRestRequestHandlerPtr> Handlers;
 
+public:
     QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRestConnectionProcessor();
-
-    static void registerHandler(const QString& path, QnRestRequestHandler* handler);
-    static QnRestRequestHandlerPtr findHandler(QString path);
 
 protected:
     virtual void run() override;
 
 private:
-    static Handlers m_handlers;
     Q_DECLARE_PRIVATE(QnRestConnectionProcessor);
 };
 

@@ -15,12 +15,13 @@ namespace ec2
 
         template <class T>
         ErrorCode saveTransaction(QnTransaction<T> tran) {
-            BinaryStream<QByteArray> stream;
+            QByteArray serializedTran;
+            OutputBinaryStream<QByteArray> stream( &serializedTran );
             tran.serialize(stream);
-            return saveToLogInternal(stream);
+            return saveToLogInternal(serializedTran);
         }
     private:
-        ErrorCode saveToLogInternal(const BinaryStream<QByteArray>& data);
+        ErrorCode saveToLogInternal(const QByteArray& data);
     };
 };
 

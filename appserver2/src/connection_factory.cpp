@@ -9,6 +9,8 @@
 
 #include <QtConcurrent>
 
+#include "rest/ec2_query_http_handler.h"
+#include "rest/ec2_update_http_handler.h"
 #include "transaction/transaction.h"
 
 
@@ -35,10 +37,21 @@ namespace ec2
         {
             std::lock_guard<std::mutex> lk( m_mutex );
             if( !m_connection )
-                m_connection.reset( new Ec2DirectConnection(m_resourceFactory) );
+                m_connection.reset( new Ec2DirectConnection( &m_queryProcessor, m_resourceFactory) );
         }
         QtConcurrent::run( std::bind( std::mem_fn( &impl::ConnectHandler::done ), handler, ec2::ErrorCode::ok, m_connection ) );
         return 0;
+    }
+
+    void Ec2DirectConnectionFactory::registerRestHandlers( QnRestProcessorPool* const restProcessorPool )
+    {
+        restProcessorPool->registerHandler(
+            QString::fromLatin1("ec2/getResourceTypes"),
+            new QueryHttpHandler<nullptr_t, ApiResourceTypeList>(&m_queryProcessor) );
+
+        restProcessorPool->registerHandler(
+            QString::fromLatin1("ec2/addCamera"),
+            new UpdateHttpHandler<ApiCameraData>(&m_queryProcessor) );
     }
 
 	void Ec2DirectConnectionFactory::setResourceFactory(QSharedPointer<QnResourceFactory> factory)

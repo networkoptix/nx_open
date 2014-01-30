@@ -37,7 +37,7 @@ namespace ec2
             TODO let compiler guess template params
         */
         template<class InputData, class OutputData, class HandlerType>
-            void processQueryAsync( ApiCommand /*cmd*/, InputData /*input*/, HandlerType handler )
+            void processQueryAsync( InputData /*input*/, HandlerType handler )
         {
             //TODO/IMPL
             QtConcurrent::run( std::bind( handler, ErrorCode::failure, OutputData() ) );

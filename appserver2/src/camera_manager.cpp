@@ -15,28 +15,6 @@
 
 namespace ec2
 {
-  //  //!This function is intended to perform actions same for every request
-  //  template<class TransactionType,
-  //           class PrepareTransactionFuncType    //functor with no params, returning TransactionType
-  //          >
-  //      ErrorCode doUpdateRequest( PrepareTransactionFuncType prepareTranFunc )
-  //  {
-		//// todo: const TransactionType& MUST be used. Const absent as temporary solution because we are still using ID instead of GUID
-
-  //      const TransactionType& tran = prepareTranFunc();
-  //      ErrorCode errorCode = dbManager->executeTransaction( tran );
-  //      if( errorCode != ErrorCode::ok )
-  //          return errorCode;
-
-  //      // saving transaction to the log
-  //      errorCode = transactionLog->saveTransaction( tran );
-  //      if( errorCode != ErrorCode::ok )
-  //          return errorCode;
-
-  //      // delivering transaction to remote peers
-  //      return clusterManager->distributeAsync( tran );
-  //  }
-
     template<class QueryProcessorType>
     QnCameraManager<QueryProcessorType>::QnCameraManager( QueryProcessorType* const queryProcessor )
     :

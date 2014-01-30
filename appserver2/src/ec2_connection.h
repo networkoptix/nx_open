@@ -23,7 +23,7 @@ namespace ec2
         public AbstractECConnection
     {
     public:
-        Ec2DirectConnection(QSharedPointer<QnResourceFactory> factory);
+        Ec2DirectConnection( ServerQueryProcessor* queryProcessor, QSharedPointer<QnResourceFactory> factory );
 
         virtual AbstractResourceManagerPtr getResourceManager() override;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() override;
@@ -42,7 +42,7 @@ namespace ec2
         virtual ReqID saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
 
     private:
-        ServerQueryProcessor m_queryProcessor;
+        ServerQueryProcessor* m_queryProcessor;
         AbstractResourceManagerPtr m_resourceManager;
         AbstractMediaServerManagerPtr m_mediaServerManager;
         AbstractCameraManagerPtr m_cameraManager;
