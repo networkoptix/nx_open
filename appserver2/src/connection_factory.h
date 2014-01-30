@@ -25,16 +25,16 @@ namespace ec2
         virtual ~Ec2DirectConnectionFactory();
 
         //!Implementation of AbstractECConnectionFactory::testConnectionAsync
-        virtual ReqID testConnectionAsync( const ECAddress& addr, impl::SimpleHandlerPtr handler ) override;
+        virtual ReqID testConnectionAsync( const QUrl& addr, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractECConnectionFactory::connectAsync
-        virtual ReqID connectAsync( const ECAddress& addr, impl::ConnectHandlerPtr handler ) override;
+        virtual ReqID connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler ) override;
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) override;
 		virtual void setResourceFactory(QSharedPointer<QnResourceFactory>) override;
 
     private:
         ServerQueryProcessor m_queryProcessor;
-        std::shared_ptr<Ec2DirectConnection> m_connection;
+        AbstractECConnectionPtr m_connection;
 		QSharedPointer<QnResourceFactory> m_resourceFactory;
         std::mutex m_mutex;
     };

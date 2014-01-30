@@ -1002,7 +1002,7 @@ void QnMain::run()
     ec2::AbstractECConnectionPtr ec2Connection;
     while (!needToStop())
     {
-        const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( ec2::ECAddress(), &ec2Connection );
+        const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QUrl(), &ec2Connection );
         if( errorCode == ec2::ErrorCode::ok )
         {
             NX_LOG( QString::fromLatin1("Connected to local EC2"), cl_logWARNING );
