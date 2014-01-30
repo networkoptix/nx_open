@@ -440,6 +440,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_thumbnailsVisible(false),
     m_rulerHeight(0.0),
     m_prefferedHeight(0.0),
+    m_lastMinuteAnimationDelta(0),
     m_pixmapCache(new QnTimeSliderPixmapCache(this)),
     m_localOffset(0)
 {
@@ -449,6 +450,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 
     /* Set default vector sizes. */
     m_lineData.resize(maxLines);
+
+    generateProgressPatterns();
 
     /* Prepare kinetic zoom processor. */
     KineticCuttingProcessor *kineticProcessor = new KineticCuttingProcessor(QMetaType::QReal, this);
@@ -964,6 +967,55 @@ qint64 QnTimeSlider::animationEnd() {
     return m_animationEnd == std::numeric_limits<qint64>::max() ? maximum() : m_animationEnd;
 }
 
+void QnTimeSlider::generateProgressPatterns() {
+    const qreal stripeWidth = 8.0;
+    const qreal stripesAlpha = 0.4;
+
+    QPainterPath path;
+    path.moveTo(0.0, 0.0);
+    path.lineTo(stripeWidth, 0.0);
+    path.lineTo(0.0, stripeWidth * 2);
+    path.closeSubpath();
+
+    path.moveTo(stripeWidth * 2, 0.0);
+    path.lineTo(stripeWidth * 3, 0.0);
+    path.lineTo(stripeWidth, stripeWidth * 4);
+    path.lineTo(0.0, stripeWidth * 4);
+    path.closeSubpath();
+
+    path.moveTo(stripeWidth * 4, 0.0);
+    path.lineTo(stripeWidth * 4, stripeWidth * 2);
+    path.lineTo(stripeWidth * 3, stripeWidth * 4);
+    path.lineTo(stripeWidth * 2, stripeWidth * 4);
+    path.closeSubpath();
+
+
+    QColor pastColor = QColor::fromRgbF(m_colors.pastBackground.redF() * m_colors.pastBackground.alphaF(),
+                                        m_colors.pastBackground.greenF() * m_colors.pastBackground.alphaF(),
+                                        m_colors.pastBackground.blueF() * m_colors.pastBackground.alphaF(),
+                                        stripesAlpha);
+
+    m_progressPastPattern = QPixmap(stripeWidth * 4, stripeWidth * 4);
+    m_progressPastPattern.fill(Qt::transparent);
+
+    QPainter pastPainter(&m_progressPastPattern);
+    pastPainter.setRenderHint(QPainter::Antialiasing);
+    pastPainter.fillPath(path, pastColor);
+
+
+    QColor futureColor = QColor::fromRgbF(m_colors.futureBackground.redF() * m_colors.futureBackground.alphaF(),
+                                          m_colors.futureBackground.greenF() * m_colors.futureBackground.alphaF(),
+                                          m_colors.futureBackground.blueF() * m_colors.futureBackground.alphaF(),
+                                          stripesAlpha);
+
+    m_progressFuturePattern = QPixmap(stripeWidth * 4, stripeWidth * 4);
+    m_progressFuturePattern.fill(Qt::transparent);
+
+    QPainter futurePainter(&m_progressFuturePattern);
+    futurePainter.setRenderHint(QPainter::Antialiasing);
+    futurePainter.fillPath(path, futureColor);
+}
+
 bool QnTimeSlider::isAnimatingWindow() const {
     return m_animating || kineticProcessor()->isRunning();
 }
@@ -1110,6 +1162,10 @@ void QnTimeSlider::freezeThumbnails() {
     }
 }
 
+void QnTimeSlider::animateLastMinute(int deltaMSecs) {
+    m_lastMinuteAnimationDelta += deltaMSecs;
+}
+
 const QVector<qint64> &QnTimeSlider::indicators() const {
     return m_indicators;
 }
@@ -1137,6 +1193,7 @@ const QnTimeSliderColors &QnTimeSlider::colors() const {
 
 void QnTimeSlider::setColors(const QnTimeSliderColors &colors) {
     m_colors = colors;
+    generateProgressPatterns();
 }
 
 
@@ -1537,14 +1594,27 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
             QRectF lineRect(lineBarRect.left(), lineTop, lineBarRect.width(), lineHeight);
 
             drawPeriodsBar(
-                painter, 
-                m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),  
-                m_lineData[line].timeStorage.aggregated(Qn::MotionContent), 
+                painter,
+                m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),
+                m_lineData[line].timeStorage.aggregated(Qn::MotionContent),
                 lineRect
             );
 
+            lineTop += lineHeight;
+        }
+
+        drawLastMinute(painter, lineBarRect);
+
+        lineTop = lineBarRect.top();
+        for(int line = 0; line < m_lineCount; line++) {
+            qreal lineHeight = lineUnit * effectiveLineStretch(line);
+            if(qFuzzyIsNull(lineHeight))
+                continue;
+
+            QRectF lineRect(lineBarRect.left(), lineTop, lineBarRect.width(), lineHeight);
+
             drawSeparator(painter, lineRect);
-            
+
             lineTop += lineHeight;
         }
     }
@@ -1610,6 +1680,35 @@ void QnTimeSlider::drawSeparator(QPainter *painter, const QRectF &rect) {
     QnScopedPainterPenRollback penRollback(painter, QPen(m_colors.separator, 0));
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
     painter->drawLine(rect.topLeft(), rect.topRight());
+}
+
+void QnTimeSlider::drawLastMinute(QPainter *painter, const QRectF &rect) {
+    const qreal moveSpeed = 0.05;
+
+    qint64 startTime = QDateTime::currentDateTime().addSecs(-60).toMSecsSinceEpoch();
+    int startPos = quickPositionFromValue(startTime);
+    if (startPos >= rect.right())
+        return;
+
+    qreal shift = qMod(m_lastMinuteAnimationDelta * moveSpeed, static_cast<qreal>(m_progressPastPattern.width()));
+    m_lastMinuteAnimationDelta = shift / moveSpeed;
+    QTransform brushTransform = QTransform::fromTranslate(-shift, 0.0);
+
+    int sliderPos = quickPositionFromValue(sliderPosition());
+
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+
+    if (sliderPos > startPos && !qFuzzyIsNull(startPos - sliderPos)) {
+        QBrush brush(m_progressPastPattern);
+        brush.setTransform(brushTransform);
+        painter->fillRect(QRectF(QPointF(startPos, rect.top()), rect.bottomRight()), brush);
+    }
+
+    if (!qFuzzyIsNull(rect.right() - sliderPos)) {
+        QBrush brush(m_progressFuturePattern);
+        brush.setTransform(brushTransform);
+        painter->fillRect(QRectF(QPointF(startPos, rect.top()), rect.bottomRight()), brush);
+    }
 }
 
 void QnTimeSlider::drawSelection(QPainter *painter) {
@@ -2028,6 +2127,7 @@ void QnTimeSlider::tick(int deltaMSecs) {
     }
 
     animateThumbnails(deltaMSecs);
+    animateLastMinute(deltaMSecs);
 }
 
 void QnTimeSlider::sliderChange(SliderChange change) {

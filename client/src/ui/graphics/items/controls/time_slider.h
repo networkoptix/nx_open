@@ -276,6 +276,7 @@ private:
     void drawMarker(QPainter *painter, qint64 pos, const QColor &color);
     void drawSelection(QPainter *painter);
     void drawSeparator(QPainter *painter, const QRectF &rect);
+    void drawLastMinute(QPainter *painter, const QRectF &rect);
     void drawDates(QPainter *painter, const QRectF &rect);
     void drawThumbnails(QPainter *painter, const QRectF &rect);
     void drawThumbnail(QPainter *painter, const ThumbnailData &data, const QRectF &targetRect, const QRectF &boundingRect);
@@ -307,6 +308,7 @@ private:
     void animateThumbnails(int deltaMSecs);
     bool animateThumbnail(qreal dt, ThumbnailData &data);
     void freezeThumbnails();
+    void animateLastMinute(int deltaMSecs);
 
     void setThumbnailSelecting(qint64 time, bool selecting);
 
@@ -314,6 +316,8 @@ private:
     void setAnimationEnd(qint64 end);
     qint64 animationStart();
     qint64 animationEnd();
+
+    void generateProgressPatterns();
 
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
@@ -369,6 +373,10 @@ private:
 
     qreal m_rulerHeight;
     qreal m_prefferedHeight;
+
+    int m_lastMinuteAnimationDelta;
+    QPixmap m_progressPastPattern;
+    QPixmap m_progressFuturePattern;
 
     QnTimeSliderPixmapCache *m_pixmapCache;
 
