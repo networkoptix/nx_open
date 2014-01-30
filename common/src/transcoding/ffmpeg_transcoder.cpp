@@ -269,6 +269,8 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnConstAbstractMediaDataPtr medi
 
     if (m_audioCodec == CODEC_ID_NONE && media->dataType == QnAbstractMediaData::AUDIO)
         return 0;
+	else if (m_videoCodec == CODEC_ID_NONE && media->dataType == QnAbstractMediaData::VIDEO)
+		return 0;
 
     AVRational srcRate = {1, 1000000};
     int streamIndex = 0;
