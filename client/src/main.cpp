@@ -390,6 +390,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Initialize log. */
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    //TODO: #GDM should not close application because of this shit, just send cl_log to stdout/stderr
     if (!QDir().mkpath(dataLocation + QLatin1String("/log"))) {
         out << "Could not create log folder" << dataLocation + QLatin1String("/log");
         return 0;
