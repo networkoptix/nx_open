@@ -46,4 +46,4 @@ public:
 
 Q_DECLARE_METATYPE(GraphicsWidgetSceneData *);
 
-#endif	//GRAPHICS_WIDGET_SCENE_DATA_H
+#endif //GRAPHICS_WIDGET_SCENE_DATA_H

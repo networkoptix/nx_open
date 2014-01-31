@@ -19,7 +19,7 @@
 */
 class win32_exception
 : 
-	public std::exception
+    public std::exception
 {
 public:
     typedef const void *Address; 
@@ -32,13 +32,13 @@ public:
     unsigned code() const;
 
     static void translate( 
-		unsigned int code, 
-		PEXCEPTION_POINTERS info );
+        unsigned int code, 
+        PEXCEPTION_POINTERS info );
 
 protected:
-	std::string m_what;
+    std::string m_what;
 
-	win32_exception( PEXCEPTION_POINTERS info );
+    win32_exception( PEXCEPTION_POINTERS info );
 
 private:
     Address mWhere;
@@ -47,7 +47,7 @@ private:
 
 class access_violation
 : 
-	public win32_exception
+    public win32_exception
 {
 public:
     bool isWrite() const;
@@ -58,10 +58,10 @@ private:
     Address mBadAddress;
     access_violation( PEXCEPTION_POINTERS info );
     friend void win32_exception::translate( 
-		unsigned int code, 
-		PEXCEPTION_POINTERS info );
+        unsigned int code, 
+        PEXCEPTION_POINTERS info );
 };
 
-#endif	//SYSTEMEXCEPT_WIN32_H
+#endif    //SYSTEMEXCEPT_WIN32_H
 
 #endif

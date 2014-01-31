@@ -12,8 +12,9 @@
 #include <core/ptz/ptz_tour.h>
 
 #include <ui/models/ptz_tour_list_model.h>
-
 #include <ui/widgets/ptz_tour_widget.h>
+
+#include <utils/common/event_processors.h>
 
 class QnPtzToursDialogItemDelegate: public QStyledItemDelegate {
     typedef QStyledItemDelegate base_type;
@@ -36,10 +37,31 @@ QnPtzToursDialog::QnPtzToursDialog(const QnPtzControllerPtr &controller, QWidget
     m_model(new QnPtzTourListModel(this))
 {
     ui->setupUi(this);
-    ui->tourTable->setModel(m_model);
 
-    connect(ui->tourTable->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(at_table_currentRowChanged(QModelIndex,QModelIndex)));
-    ui->tourTable->setItemDelegate(new QnPtzToursDialogItemDelegate(this));
+    ui->tableView->setModel(m_model);
+    ui->tableView->horizontalHeader()->setVisible(true);
+
+    ui->tableView->resizeColumnsToContents();
+
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourListModel::NameColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourListModel::DetailsColumn, QHeaderView::Interactive);
+
+    ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
+    ui->tableView->installEventFilter(this);
+
+    ui->tableView->setItemDelegate(new QnPtzToursDialogItemDelegate(this));
+
+    connect(ui->tableView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(at_tableView_currentRowChanged(QModelIndex,QModelIndex)));
+
+    ui->tableView->clearSelection();
+
+    // TODO: #Elric replace with a single connect call
+    QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
+    resizeSignalizer->setEventType(QEvent::Resize);
+    ui->tableView->viewport()->installEventFilter(resizeSignalizer);
+    connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_tableViewport_resizeEvent()), Qt::QueuedConnection);
+
 
     connect(ui->tourEditWidget, SIGNAL(tourChanged(QnPtzTour)), m_model, SLOT(updateTour(QnPtzTour)));
 
@@ -51,43 +73,32 @@ QnPtzToursDialog::~QnPtzToursDialog() {
 }
 
 void QnPtzToursDialog::loadData(const QnPtzData &data) {
-    m_oldTours = data.tours;
-
     ui->tourEditWidget->setPtzPresets(data.presets);
     m_model->setTours(data.tours);
     m_model->setPresets(data.presets);
 
     if (!data.tours.isEmpty())
-        ui->tourTable->setCurrentIndex(ui->tourTable->model()->index(0, 0));
+        ui->tableView->setCurrentIndex(ui->tableView->model()->index(0, 0));
+
+    ui->tableView->resizeColumnsToContents();
+    ui->tableView->horizontalHeader()->setStretchLastSection(true);
+    ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
 }
 
 bool QnPtzToursDialog::saveTours() {
-    auto findTourById = [](const QnPtzTourList &list, const QString &id, QnPtzTour &result) {
-        foreach (const QnPtzTour &tour, list) {
-            if (tour.id != id)
-                continue;
-            result = tour;
-            return true;
-        }
-        return false;
-    };
-
     bool result = true;
-    // update or remove existing tours
-    foreach (const QnPtzTour &tour, m_oldTours) {
-        QnPtzTour updated;
-        if (!findTourById(m_model->tours(), tour.id, updated))
-            result &= removeTour(tour.id);
-        else if (tour != updated)
-            result &= createTour(updated);
-    }
 
-    //create new tours
-    foreach (const QnPtzTour &tour, m_model->tours()) {
-        QnPtzTour existing;
-        if (findTourById(m_oldTours, tour.id, existing))
+    foreach (const QnPtzTourItemModel &model, m_model->tourModels()) {
+        if (!model.modified)
             continue;
-        result &= createTour(tour);
+
+        QnPtzTour updated(model.tour);
+        if (updated.id.isEmpty())
+            updated.id = QUuid::createUuid().toString();
+        else
+            result &= removeTour(updated.id);
+
+        result &= createTour(updated);
     }
 
     return result;
@@ -101,7 +112,7 @@ Qn::PtzDataFields QnPtzToursDialog::requiredFields() const {
     return Qn::PresetsPtzField | Qn::ToursPtzField;
 }
 
-void QnPtzToursDialog::at_table_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
+void QnPtzToursDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
     Q_UNUSED(previous)
     if (!current.isValid()) {
         ui->stackedWidget->setCurrentWidget(ui->noTourPage);
@@ -116,15 +127,30 @@ void QnPtzToursDialog::at_table_currentRowChanged(const QModelIndex &current, co
 
 void QnPtzToursDialog::at_addTourButton_clicked() {
     m_model->insertRow(m_model->rowCount());
-    ui->tourTable->selectionModel()->clear();
-    ui->tourTable->selectionModel()->setCurrentIndex(m_model->index(m_model->rowCount()-1, 0), QItemSelectionModel::Select);
-    ui->tourTable->selectionModel()->select(m_model->index(m_model->rowCount()-1, 0), QItemSelectionModel::Select);
+    ui->tableView->setCurrentIndex(m_model->index(m_model->rowCount() - 1, 0));
+    if (m_model->rowCount() == 1) {
+        ui->tableView->resizeColumnsToContents();
+        ui->tableView->horizontalHeader()->setStretchLastSection(true);
+        ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
+    }
+
+    ui->tableView->selectionModel()->clear();
+    ui->tableView->selectionModel()->setCurrentIndex(m_model->index(m_model->rowCount()-1, 0), QItemSelectionModel::Select);
+    ui->tableView->selectionModel()->select(m_model->index(m_model->rowCount()-1, 0), QItemSelectionModel::Select);
 }
 
 void QnPtzToursDialog::at_deleteTourButton_clicked() {
-    QModelIndex index = ui->tourTable->selectionModel()->currentIndex();
+    QModelIndex index = ui->tableView->selectionModel()->currentIndex();
     if (!index.isValid())
         return;
 
     m_model->removeRow(index.row());
+}
+
+void QnPtzToursDialog::at_tableViewport_resizeEvent() {
+    QModelIndexList selectedIndices = ui->tableView->selectionModel()->selectedRows();
+    if(selectedIndices.isEmpty())
+        return;
+
+    ui->tableView->scrollTo(selectedIndices.front());
 }

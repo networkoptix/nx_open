@@ -491,7 +491,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     //if true, decoding to tmp frame which will be later scaled/converted to supported format
     const bool useTmpFrame =
         (dec->targetMemoryType() == QnAbstractPictureDataRef::pstSysMemPic) &&
-    	(!QnGLRenderer::isPixelFormatSupported(pixFmt) ||
+        (!QnGLRenderer::isPixelFormatSupported(pixFmt) ||
          !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) ||
          scaleFactor != QnFrameScaler::factor_1);
 
@@ -616,7 +616,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         //checkig once again for need to scale, since previous check could be incorrect due to unknown pixel format (this actual for some images, e.g., jpeg)
         const bool scalingStillNeeded =
             (dec->targetMemoryType() == QnAbstractPictureDataRef::pstSysMemPic) &&
-    	    (!QnGLRenderer::isPixelFormatSupported(pixFmt) ||
+            (!QnGLRenderer::isPixelFormatSupported(pixFmt) ||
              !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) ||
              scaleFactor != QnFrameScaler::factor_1);
 

@@ -60,8 +60,8 @@ QnResourceDisplay::~QnResourceDisplay()
 {
     if (m_camera && !m_camera->isDisplayStarted())
     {
-		if (m_counter)
-        	m_counter->deleteLater();
+        if (m_counter)
+            m_counter->deleteLater();
         m_camera->deleteLater();
     }
 

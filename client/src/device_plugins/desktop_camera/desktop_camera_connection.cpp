@@ -20,7 +20,7 @@ public:
         for (int i = 0; i < 2; ++i) {
             m_serializers[i].setAdditionFlags(0);
             m_serializers[i].setLiveMarker(true);
-		}
+        }
     }
     virtual ~QnDesktopCameraDataConsumer()
     {

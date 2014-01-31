@@ -58,25 +58,25 @@ namespace
         switch (sample_type) 
         {
           case st_unknown:  
-        word_size = 2;	break;
+        word_size = 2; break;
           case st_uchar:  
           case st_schar:  
-        word_size = 1;	break;
+        word_size = 1; break;
           case st_mulaw:
-        word_size = 1;	break;
+        word_size = 1; break;
     #if 0
           case st_adpcm:  /* maybe I mean 0.5 */
-        word_size = 1;	break;
+        word_size = 1; break;
     #endif
           case st_short: 
-        word_size = 2;	break;
+        word_size = 2; break;
           case st_int: 
         /* Yes I mean 4 not sizeof(int) these are machine independent defs */
-        word_size = 4;	break;
+        word_size = 4; break;
           case st_float: 
-        word_size = 4;	break;
+        word_size = 4; break;
           case st_double: 
-        word_size = 8;	break;
+        word_size = 8; break;
           default:
         fprintf(stderr,"Unknown encoding format error\n");
         word_size = 2;
@@ -145,7 +145,7 @@ namespace
         data_size = num_channels*num_samples*get_word_size(sample_type)+ 8+16+12;
         /* WAV files are always LITTLE_ENDIAN (i.e. intel x86 format) */
         if (EST_BIG_ENDIAN) data_size = SWAPINT(data_size);
-        //fwrite(&data_size,1,4,fp);	/* total number of bytes in file */
+        //fwrite(&data_size,1,4,fp); /* total number of bytes in file */
         fp->write( (const char*)&data_size, 4 );
         info = "WAVE";
         //fwrite(info,4,1,fp);
@@ -155,7 +155,7 @@ namespace
         fp->write( (const char*)info, 4 );
         data_size = 16;
         if (EST_BIG_ENDIAN) data_size = SWAPINT(data_size);
-        //fwrite(&data_size,1,4,fp);	/* size of header */
+        //fwrite(&data_size,1,4,fp); /* size of header */
         fp->write( (const char*)&data_size, 4 );
         switch (sample_type)
         {
@@ -170,34 +170,34 @@ namespace
               return misc_write_error;
         }
         if (EST_BIG_ENDIAN) data_short = SWAPSHORT(data_short);
-        //fwrite(&data_short,1,2,fp);	/* sample type */
+        //fwrite(&data_short,1,2,fp); /* sample type */
         fp->write( (const char*)&data_short, 2 );
         data_short = num_channels;
         if (EST_BIG_ENDIAN) data_short = SWAPSHORT(data_short);
-        //fwrite(&data_short,1,2,fp);	/* number of channels */
+        //fwrite(&data_short,1,2,fp); /* number of channels */
         fp->write( (const char*)&data_short, 2 );
         data_int = sample_rate;
         if (EST_BIG_ENDIAN) data_int = SWAPINT(data_int);
-        //fwrite(&data_int,1,4,fp);	/* sample rate */
+        //fwrite(&data_int,1,4,fp); /* sample rate */
         fp->write( (const char*)&data_int, 4 );
         data_int = sample_rate * num_channels * get_word_size(sample_type);
         if (EST_BIG_ENDIAN) data_int = SWAPINT(data_int);
-        //fwrite(&data_int,1,4,fp);	/* Average bytes per second */
+        //fwrite(&data_int,1,4,fp); /* Average bytes per second */
         fp->write( (const char*)&data_int, 4 );
         data_short = num_channels * get_word_size(sample_type);
         if (EST_BIG_ENDIAN) data_short = SWAPSHORT(data_short);
-        //fwrite(&data_short,1,2,fp);	/* block align */
+        //fwrite(&data_short,1,2,fp); /* block align */
         fp->write( (const char*)&data_short, 2 );
         data_short = get_word_size(sample_type) * 8;
         if (EST_BIG_ENDIAN) data_short = SWAPSHORT(data_short);
-        //fwrite(&data_short,1,2,fp);	/* bits per sample */
+        //fwrite(&data_short,1,2,fp); /* bits per sample */
         fp->write( (const char*)&data_short, 2 );
         info = "data";
         //fwrite(info,4,1,fp);
         fp->write( info, 4 );
         data_size = num_channels*num_samples*get_word_size(sample_type);
         if (EST_BIG_ENDIAN) data_size = SWAPINT(data_size);
-        //fwrite(&data_size,1,4,fp);	/* total number of bytes in data */
+        //fwrite(&data_size,1,4,fp); /* total number of bytes in data */
         fp->write( (const char*)&data_size, 4 );
         
         return save_raw_data(fp,data,offset,num_samples,num_channels,

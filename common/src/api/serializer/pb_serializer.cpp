@@ -105,7 +105,7 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
     parameters["disabled"] = QString::number((int)pb_cameraResource.disabled());
     parameters["parentId"] = QString::number(pb_cameraResource.parentid());
 
-    camera = resourceFactory.createResource(pb_cameraResource.typeid_(), parameters).dynamicCast<QnNetworkResource>();
+    camera = resourceFactory.createResource(pb_cameraResource.resourcetypeid(), parameters).dynamicCast<QnNetworkResource>();
     if (camera.isNull())
         return;
 
@@ -254,8 +254,8 @@ void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_server
             if(pb_storage.has_usedforwriting())
                 parameters["usedForWriting"] = QString::number(pb_storage.usedforwriting());
 
-            // TODO: #Ivan looks like this code can crash even when we have the types in pool
-            QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName(QLatin1String("Storage"))->getId(), parameters); // TODO: #Ivan no types in pool => crash
+            // This code assumes we already have "Storage" resource type in qnResTypePool
+            QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName(QLatin1String("Storage"))->getId(), parameters);
             storage = qSharedPointerDynamicCast<QnAbstractStorageResource> (st);
             if (storage)
                 storages.append(storage);
@@ -412,7 +412,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_cameraResource.set_id(cameraPtr->getId().toInt());
     pb_cameraResource.set_parentid(cameraPtr->getParentId().toInt());
     pb_cameraResource.set_name(cameraPtr->getName().toUtf8().constData());
-    pb_cameraResource.set_typeid_(cameraPtr->getTypeId().toInt());
+    pb_cameraResource.set_resourcetypeid(cameraPtr->getTypeId().toInt());
     pb_cameraResource.set_url(cameraPtr->getUrl().toUtf8().constData());
     pb_camera.set_mac(cameraPtr->getMAC().toString().toUtf8().constData());
     pb_camera.set_physicalid(cameraPtr->getPhysicalId().toUtf8().constData());

@@ -2,13 +2,9 @@
 
 #include "acti_ptz_controller.h"
 
-#include <utils/math/math.h>
-#include <utils/math/space_mapper.h>
+#include <utils/common/model_functions.h>
 
 #include "acti_resource.h"
-
-static const qreal DIGITAL_ZOOM_COEFF = 5.0;
-static const qreal ANALOG_ZOOM = 16.0;
 
 namespace {
 
@@ -17,7 +13,7 @@ namespace {
     }
 
     // ACTi 8111
-    qreal pointsData[][2] = {
+    /*qreal pointsData[][2] = {
         {0, 1.0},
         {100, 1.2},
         {200, 1.4},
@@ -35,45 +31,166 @@ namespace {
         {937, 11.6},
         {950, 12.13},
         {1000, 16.0},
-    };
-
-    qreal toLogicalScale(qreal src, qreal rangeMin, qreal rangeMax) {
-        return src/1000.0 * (rangeMax-rangeMin) + rangeMin;
-    }
+    };*/
 
 } // anonymous namespace
 
 
 // TODO: #Elric #PTZ use mutex
 
-QnActiPtzController::QnActiPtzController(const QnActiResourcePtr &resource):
-    base_type(resource),
-    m_resource(resource),
-    m_isFlipped(false),
-    m_isMirrored(false),
-    m_devicePanSpeed(0),
-    m_deviceTiltSpeed(0),
-    m_deviceZoomSpeed(0)
-{
-    init();
+// -------------------------------------------------------------------------- //
+// Utility
+// -------------------------------------------------------------------------- //
+namespace {
+    struct ActiPtzVector {
+        ActiPtzVector(): pan(0), tilt(0), zoom(0) {}
+        ActiPtzVector(int pan, int tilt, int zoom): pan(pan), tilt(tilt), zoom(zoom) {}
+
+        QN_DEFINE_STRUCT_OPERATOR_EQ(ActiPtzVector, (pan)(tilt)(zoom), friend);
+
+        int pan, tilt, zoom;
+    };
+
+    int toActiZoomSpeed(qreal zoomSpeed) {
+#if 0
+        zoomSpeed = qBound(-1.0, zoomSpeed, 1.0);
+        if(qFuzzyIsNull(zoomSpeed)) {
+            return 0;
+        } else {
+            /* Zoom speed is an int in [2, 7] range. */
+            return qMin(7, qFloor(2.0 + 6.0 * qAbs(zoomSpeed))) * qSign(zoomSpeed); 
+        }
+#else
+        /* Even though zoom speed is specified to be in [2, 7] range, 
+         * passing values other than 2 makes the camera ignore STOP commands. 
+         * This is the case for KCM8111, untested on other models => enabling it for all models. */
+        if(qFuzzyIsNull(zoomSpeed)) {
+            return 0;
+        } else {
+            return zoomSpeed > 0 ? 2 : -2;
+        }
+#endif
+    }
+
+    int toActiPanTiltSpeed(qreal panTiltSpeed) {
+        panTiltSpeed = qBound(-1.0, panTiltSpeed, 1.0);
+        if(qFuzzyIsNull(panTiltSpeed)) {
+            return 0;
+        } else {
+            return qMin(5, qFloor(1.0 + 5.0 * qAbs(panTiltSpeed))) * qSign(panTiltSpeed);
+        }
+    }
+
+    ActiPtzVector toActiPtzSpeed(const QVector3D &speed) {
+        return ActiPtzVector(
+            toActiPanTiltSpeed(speed.x()),
+            toActiPanTiltSpeed(speed.y()),
+            toActiZoomSpeed(speed.z())
+        );
+    }
+
+    QString actiZoomDirection(int deviceZoomSpeed) {
+        if(deviceZoomSpeed < 0) {
+            return lit("WIDE");
+        } else if(deviceZoomSpeed == 0) {
+            return lit("STOP");
+        } else {
+            return lit("TELE");
+        }
+    }
+
+    QString actiPanTiltDirection(int devicePanSpeed, int deviceTiltSpeed) {
+        if(devicePanSpeed < 0) {
+            if(deviceTiltSpeed < 0) {
+                return lit("DOWNLEFT");
+            } else if(deviceTiltSpeed == 0) {
+                return lit("LEFT");
+            } else {
+                return lit("UPLEFT");
+            }
+        } else if(devicePanSpeed == 0) {
+            if(deviceTiltSpeed < 0) {
+                return lit("DOWN");
+            } else if(deviceTiltSpeed == 0) {
+                return lit("STOP");
+            } else {
+                return lit("UP");
+            }
+        } else {
+            if(deviceTiltSpeed < 0) {
+                return lit("DOWNRIGHT");
+            } else if(deviceTiltSpeed == 0) {
+                return lit("RIGHT");
+            } else {
+                return lit("UPRIGHT");
+            }
+        }
+    }
+
+} // anonymous namespace
+
+
+// -------------------------------------------------------------------------- //
+// QnActiPtzControllerPrivate
+// -------------------------------------------------------------------------- //
+class QnActiPtzControllerPrivate {
+public:
+    enum {
+        InvalidPtzValue = 0xDEADF00D
+    };
+
+    QnActiPtzControllerPrivate(const QnActiResourcePtr &resource): 
+        resource(resource), 
+        pendingCommand(Qn::InvalidPtzCommand),
+        currentPosition(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue),
+        currentSpeed(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue)
+    {}
+
+    virtual ~QnActiPtzControllerPrivate() {}
+
+    void init();
     
-    panTiltDirection(0, 0); /* Init function-local static. */
-}
+    bool query(const QString &request, QByteArray *body = NULL, bool keepAllData = false) const;
+    bool continuousZoomQuery(int zoomSpeed);
+    bool continuousPanTiltQuery(int panSpeed, int tiltSpeed);
+    bool absoluteZoomQuery(int zoom);
+    bool absolutePanTiltQuery(int pan, int tilt, int panTiltSpeed);
 
-QnActiPtzController::~QnActiPtzController() {
-    return;
-}
+    bool processQueries();
+    bool processQueriesLocked();
 
-void QnActiPtzController::init() {
+    bool continuousMove(const ActiPtzVector &speed);
+    bool absoluteMove(const ActiPtzVector &position, int panTiltSpeed);
+    bool getPosition(ActiPtzVector *position);
+
+public:
+    QMutex mutex;
+    QMutex queryMutex;
+
+    QnActiResourcePtr resource;
+    Qn::PtzCapabilities capabilities;
+    Qt::Orientations flip;
+
+    Qn::PtzCommand pendingCommand;
+    ActiPtzVector pendingSpeed;
+    ActiPtzVector pendingPosition;
+
+    ActiPtzVector currentSpeed;
+    ActiPtzVector currentPosition;
+};
+
+void QnActiPtzControllerPrivate::init() {
     QByteArray flipData;
     if(!query(lit("VIDEO_FLIP_MODE"), &flipData))
         return;
-    m_isFlipped = flipData.toInt() == 1;
+    if(flipData.toInt() == 1)
+        flip |= Qt::Vertical;
 
     QByteArray mirrorData;
     if(!query(lit("VIDEO_MIRROR_MODE"), &mirrorData))
         return;
-    m_isMirrored = mirrorData.toInt() == 1;
+    if(mirrorData.toInt() == 1)
+        flip |= Qt::Horizontal;
 
     QByteArray zoomData;
     if(!query(lit("ZOOM_CAP_GET"), &zoomData, true))
@@ -81,191 +198,177 @@ void QnActiPtzController::init() {
     if(!zoomData.startsWith("ZOOM_CAP_GET="))
         return;
 
-    m_capabilities = Qn::NoPtzCapabilities;
-    if(m_resource->getModel() == lit("KCM3311")) {
-        m_capabilities |= Qn::ContinuousZoomCapability;
+    capabilities = Qn::NoPtzCapabilities;
+    if(resource->getModel() == lit("KCM3311")) {
+        capabilities |= Qn::ContinuousZoomCapability;
     } else {
-        m_capabilities |= Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability;
+        capabilities |= Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability;
     }
-    m_capabilities |= Qn::FlipPtzCapability;
+    capabilities |= Qn::FlipPtzCapability;
 
 #if 0
-    qreal minPanLogical = -17500, maxPanLogical = 17500; // todo: move to camera XML
-    qreal minPanPhysical = 360, maxPanPhysical = 0; // todo: move to camera XML
-    qreal minTiltLogical = 0, maxTiltLogical = 9000; //  // todo: move to camera XML
-    
-    qreal minTiltPhysical = -90, maxTiltPhysical = 0; //  // todo: move to camera XML
-    if (!m_isFlipped) {
-        qSwap(minTiltPhysical, maxTiltPhysical);
+    if (!m_isFlipped)
         m_capabilities &= ~Qn::AbsolutePtzCapabilities; // acti 8111 has bug for absolute position if flip turned off
-    }
-
-    if(m_capabilities & Qn::AbsolutePtzCapabilities)
-        m_capabilities |= Qn::LogicalPositioningPtzCapability;
-
-    QList<QByteArray> zoomParams = zoomData.split('=')[1].split(',');
-    m_minAngle = m_resource->unquoteStr(zoomParams[0]).toInt();
-    if (zoomParams.size() > 1)
-        m_maxAngle = m_resource->unquoteStr(zoomParams[1]).toInt();
-#endif
-
-#if 0
-    QnScalarSpaceMapper xMapper(minPanLogical, maxPanLogical, minPanPhysical, maxPanPhysical, Qn::PeriodicExtrapolation);
-    QnScalarSpaceMapper yMapper(minTiltLogical, maxTiltLogical, minTiltPhysical, maxTiltPhysical, Qn::ConstantExtrapolation);
-
-    qreal f35Max = m_maxAngle/DIGITAL_ZOOM_COEFF;
-    qreal f35Min = f35Max / ANALOG_ZOOM;
-
-    QVector<QPair<qreal, qreal> > data;
-    for (uint i = 0; i < sizeof(pointsData)/sizeof(pointsData[0]); ++i)
-        data << QPair<qreal, qreal>(toLogicalScale(pointsData[i][0], m_minAngle, m_maxAngle), pointsData[i][1] * f35Min);
-    QnScalarSpaceMapper zMapper(data, Qn::ConstantExtrapolation);
-
-    //QnScalarSpaceMapper toCameraZMapper(0.0, 1000.0, f35Min, f35Min*ANALOG_ZOOM, Qn::ConstantExtrapolation);
-
-    m_spaceMapper = new QnPtzSpaceMapper(QnVectorSpaceMapper(xMapper, yMapper, zMapper), 
-                                         //QnVectorSpaceMapper(xMapper, yMapper, toCameraZMapper),
-                                         QStringList());
 #endif
 }
 
-bool QnActiPtzController::query(const QString &request, QByteArray *body, bool keepAllData) const {
+bool QnActiPtzControllerPrivate::query(const QString &request, QByteArray *body, bool keepAllData) const {
+    qDebug() << "ACTI REQUEST" << request;
+
     CLHttpStatus status;
-    QByteArray data = m_resource->makeActiRequest(lit("encoder"), request, status, keepAllData);
+    QByteArray data = resource->makeActiRequest(lit("encoder"), request, status, keepAllData);
     if(body)
         *body = data;
     return status == CL_HTTP_SUCCESS;
 }
 
-int QnActiPtzController::toDeviceZoomSpeed(qreal zoomSpeed) {
-    zoomSpeed = qBound(-1.0, zoomSpeed, 1.0);
-    if(qFuzzyIsNull(zoomSpeed)) {
-        return 0;
-    } else {
-        /* Zoom speed is an int in [2, 7] range. */
-        return qMin(7, qFloor(2.0 + 6.0 * qAbs(zoomSpeed))) * qSign(zoomSpeed); 
-    }
-}
-
-int QnActiPtzController::toDevicePanTiltSpeed(qreal panTiltSpeed) {
-    panTiltSpeed = qBound(-1.0, panTiltSpeed, 1.0);
-    if(qFuzzyIsNull(panTiltSpeed)) {
-        return 0;
-    } else {
-        return qMin(5, qFloor(1.0 + 5.0 * qAbs(panTiltSpeed))) * qSign(panTiltSpeed);
-    }
-}
-
-QString QnActiPtzController::zoomDirection(int deviceZoomSpeed) {
-    if(deviceZoomSpeed < 0) {
-        return lit("WIDE");
-    } else if(deviceZoomSpeed == 0) {
-        return lit("STOP");
-    } else {
-        return lit("TELE");
-    }
-}
-
-QString QnActiPtzController::panTiltDirection(int devicePanSpeed, int deviceTiltSpeed) {
-    if(devicePanSpeed < 0) {
-        if(deviceTiltSpeed < 0) {
-            return lit("DOWNLEFT");
-        } else if(deviceTiltSpeed == 0) {
-            return lit("LEFT");
-        } else {
-            return lit("UPLEFT");
-        }
-    } else if(devicePanSpeed == 0) {
-        if(deviceTiltSpeed < 0) {
-            return lit("DOWN");
-        } else if(deviceTiltSpeed == 0) {
-            return lit("STOP");
-        } else {
-            return lit("UP");
-        }
-    } else {
-        if(deviceTiltSpeed < 0) {
-            return lit("DOWNRIGHT");
-        } else if(deviceTiltSpeed == 0) {
-            return lit("RIGHT");
-        } else {
-            return lit("UPRIGHT");
-        }
-    }
-}
-
-bool QnActiPtzController::continuousZoomInternal(int deviceZoomSpeed) {
-    if(m_deviceZoomSpeed == deviceZoomSpeed)
-        return true;
-
-    if(deviceZoomSpeed != 0)
-        continuousZoomInternal(0); /* This is needed because ACTI does not support changing PTZ speed "on the go". We need to stop the movement first. */
-
-    m_deviceZoomSpeed = deviceZoomSpeed;
-
-    QString request = lit("ZOOM=%1").arg(zoomDirection(deviceZoomSpeed));
-    if(deviceZoomSpeed != 0)
-        request += lit(",%1").arg(qAbs(deviceZoomSpeed));
+bool QnActiPtzControllerPrivate::continuousZoomQuery(int zoomSpeed) {
+    QString request = lit("ZOOM=%1").arg(actiZoomDirection(zoomSpeed));
+    if(zoomSpeed != 0)
+        request += lit(",%1").arg(qAbs(zoomSpeed));
 
     return query(request);
 }
 
-bool QnActiPtzController::continuousMoveInternal(int devicePanSpeed, int deviceTiltSpeed) {
-    if (!m_isFlipped) // TODO: #Elric why only flip? Also check for mirror?
-        deviceTiltSpeed *= -1;
-
-    if(m_devicePanSpeed == devicePanSpeed && m_deviceTiltSpeed == deviceTiltSpeed)
-        return true;
-
-    if(devicePanSpeed != 0 || deviceTiltSpeed != 0)
-        continuousMoveInternal(0, 0); /* This is needed because ACTI does not support changing PTZ speed "on the go". We need to stop the movement first. */
-
-    m_devicePanSpeed = devicePanSpeed;
-    m_deviceTiltSpeed = deviceTiltSpeed;
-
-    QString request = lit("MOVE=%1").arg(panTiltDirection(devicePanSpeed, deviceTiltSpeed));
-    if (devicePanSpeed != 0)
-        request += lit(",%1").arg(qAbs(devicePanSpeed));
-    if (deviceTiltSpeed != 0)
-        request += lit(",%1").arg(qAbs(deviceTiltSpeed));
+bool QnActiPtzControllerPrivate::continuousPanTiltQuery(int panSpeed, int tiltSpeed) {
+    QString request = lit("MOVE=%1").arg(actiPanTiltDirection(panSpeed, tiltSpeed));
+    if (panSpeed != 0)
+        request += lit(",%1").arg(qAbs(panSpeed));
+    if (tiltSpeed != 0)
+        request += lit(",%1").arg(qAbs(tiltSpeed));
 
     return query(request);
 }
 
-Qn::PtzCapabilities QnActiPtzController::getCapabilities() {
-    return m_capabilities;
+bool QnActiPtzControllerPrivate::absoluteZoomQuery(int zoom) {
+    return query(lit("ZOOM=DIRECT,%1").arg(zoom));
 }
 
-bool QnActiPtzController::continuousMove(const QVector3D &speed) {
-    bool status0 = continuousZoomInternal(toDeviceZoomSpeed(speed.z()));
-    bool status1 = continuousMoveInternal(toDevicePanTiltSpeed(speed.x()), toDevicePanTiltSpeed(speed.y()));
-
-    return status0 && status1;
+bool QnActiPtzControllerPrivate::absolutePanTiltQuery(int pan, int tilt, int panTiltSpeed) {
+    return query(lit("POSITION=ABSOLUTE,%1,%2,%3,%3").arg(pan).arg(tilt).arg(panTiltSpeed));
 }
 
-bool QnActiPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
-    if(space != Qn::DevicePtzCoordinateSpace)
-        return false;
+bool QnActiPtzControllerPrivate::processQueriesLocked() {
+    bool result = true;
+    bool first = true;
 
-    m_devicePanSpeed = 0;
-    m_deviceTiltSpeed = 0;
-    m_deviceZoomSpeed = 0;
+    while(true) {
+        Qn::PtzCommand command;
+        ActiPtzVector speed;
+        ActiPtzVector position;
+        bool status = true;
 
-    int devicePanTiltSpeed = toDevicePanTiltSpeed(qBound(0.01, speed, 1.0));
-    if(!query(lit("POSITION=ABSOLUTE,%1,%2,%3,%3").arg(int(position.x())).arg(int(position.y())).arg(devicePanTiltSpeed)))
-        return false;
+        {
+            QMutexLocker locker(&mutex);
+            command = pendingCommand;
+            speed = pendingSpeed;
+            position = pendingPosition;
 
-    if(!query(lit("ZOOM=DIRECT,%1").arg(position.z())))
-        return false;
+            pendingCommand = Qn::InvalidPtzCommand;
+        }
 
+        switch(command) {
+        case Qn::ContinuousMovePtzCommand: {
+            if(currentSpeed == speed)
+                break;
+
+            /* Stop first. */
+            if(currentSpeed.zoom != 0)
+                status = status & continuousZoomQuery(0);
+            if(currentSpeed.pan != 0 || currentSpeed.tilt != 0)
+                status = status & continuousPanTiltQuery(0, 0);
+
+            /* Then move. */
+            if(speed.zoom != 0)
+                status = status & continuousZoomQuery(speed.zoom);
+            if(speed.pan != 0 || speed.tilt != 0)
+                status = status & continuousPanTiltQuery(speed.pan, speed.tilt);
+
+            if(status) {
+                currentSpeed = speed;
+                if(speed.zoom != 0)
+                    currentPosition.zoom = InvalidPtzValue;
+                if(speed.pan != 0 || speed.tilt != 0)
+                    currentPosition.pan = currentPosition.tilt = InvalidPtzValue;
+            } else {
+                currentSpeed = currentPosition = ActiPtzVector(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue);
+            }
+
+            break;
+        }
+        case Qn::AbsoluteDeviceMovePtzCommand: {
+            /* Stop first. 
+             * If we don't do that, absolute movement will not work. */
+            if(currentSpeed.zoom != 0)
+                status = status & continuousZoomQuery(0);
+            if(currentSpeed.pan != 0 || currentSpeed.tilt != 0)
+                status = status & continuousPanTiltQuery(0, 0);
+
+            /* Then move to a position. */
+            if(currentPosition.pan != position.pan || currentPosition.tilt != position.tilt)
+                status = status & absolutePanTiltQuery(position.pan, position.tilt, speed.pan);
+
+            /* Issue zoom command EVEN if zoom wasn't changed. 
+             * This is because acti cameras sometimes outright ignore absolute
+             * zoom commands. */
+            status = status & absoluteZoomQuery(position.zoom);
+
+            if(status) {
+                currentPosition = position;
+                currentSpeed = ActiPtzVector(0, 0, 0);
+            } else {
+                currentSpeed = currentPosition = ActiPtzVector(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue);
+            }
+
+            break;
+        }
+        default:
+            return result;
+        }
+
+        if(first) {
+            first = false;
+            result = status;
+        }
+    }
+}
+
+bool QnActiPtzControllerPrivate::processQueries() {
+    if(!queryMutex.tryLock())
+        return true; /* Just assume that it will work. */
+
+    bool result = processQueriesLocked();
+
+    queryMutex.unlock();
+
+    return result;
+}
+
+bool QnActiPtzControllerPrivate::continuousMove(const ActiPtzVector &speed) {
+    {
+        QMutexLocker locker(&mutex);
+        pendingSpeed = speed;
+        pendingCommand = Qn::ContinuousMovePtzCommand;
+    }
+
+    processQueries();
     return true;
 }
 
-bool QnActiPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
-    if(space != Qn::DevicePtzCoordinateSpace)
-        return false;
+bool QnActiPtzControllerPrivate::absoluteMove(const ActiPtzVector &position, int panTiltSpeed) {
+    {
+        QMutexLocker locker(&mutex);
+        pendingPosition = position;
+        pendingSpeed = ActiPtzVector(panTiltSpeed, panTiltSpeed, 0);
+        pendingCommand = Qn::AbsoluteDeviceMovePtzCommand;
+    }
 
-    QMutexLocker lock(&m_mutex);
+    processQueries();
+    return true;
+}
+
+bool QnActiPtzControllerPrivate::getPosition(ActiPtzVector *position) {
+    /* Always send the requests, don't use cached values. This is safer. */
 
     QByteArray positionData;
     if(!query(lit("POSITION_GET"), &positionData))
@@ -278,21 +381,57 @@ bool QnActiPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *p
     QList<QByteArray> panTiltData = positionData.split(',');
     if (panTiltData.size() != 2)
         return false;
+
+    position->pan = panTiltData[0].toInt();
+    position->tilt = panTiltData[1].toInt();
+    position->zoom = zoomData.toInt();
+    return true;
+}
+
+
+// -------------------------------------------------------------------------- //
+// QnActiPtzController
+// -------------------------------------------------------------------------- //
+QnActiPtzController::QnActiPtzController(const QnActiResourcePtr &resource):
+    base_type(resource),
+    d(new QnActiPtzControllerPrivate(resource))
+{
+    d->init();
+}
+
+QnActiPtzController::~QnActiPtzController() {
+    return;
+}
+
+Qn::PtzCapabilities QnActiPtzController::getCapabilities() {
+    return d->capabilities;
+}
+
+bool QnActiPtzController::continuousMove(const QVector3D &speed) {
+    return d->continuousMove(toActiPtzSpeed(speed));
+}
+
+bool QnActiPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
+    if(space != Qn::DevicePtzCoordinateSpace)
+        return false;
     
-    position->setX(panTiltData[0].toInt());
-    position->setY(panTiltData[1].toInt());
-    position->setZ(zoomData.toInt());
+    return d->absoluteMove(ActiPtzVector(position.x(), position.y(), position.z()), toActiPanTiltSpeed(qBound(0.01, speed, 1.0))); /* We don't want to get zero speed, hence 0.01 bound. */
+}
+
+bool QnActiPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
+    if(space != Qn::DevicePtzCoordinateSpace)
+        return false;
+
+    ActiPtzVector devicePosition;
+    if(!d->getPosition(&devicePosition))
+        return false;
+
+    *position = QVector3D(devicePosition.pan, devicePosition.tilt, devicePosition.zoom);
     return true;
 }
 
 bool QnActiPtzController::getFlip(Qt::Orientations *flip) {
-    *flip = 0;
-
-    if(m_isFlipped)
-        *flip |= Qt::Vertical;
-    if(m_isMirrored)
-        *flip |= Qt::Horizontal;
-
+    *flip = d->flip;
     return true;
 }
 

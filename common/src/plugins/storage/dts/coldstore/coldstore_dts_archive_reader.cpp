@@ -113,7 +113,7 @@ bool QnColdStoreDelegate::open(QnResourcePtr resource)
     while(m_eventfileList.size()  > m_datafileList.size())
         m_eventfileList.removeLast();
 
-//    if (m_eventfileList.size() < 2)	try to read last file
+//    if (m_eventfileList.size() < 2)    try to read last file
     if (m_eventfileList.size() < 1)
     {
         if (m_loggedError == false)
@@ -151,7 +151,7 @@ bool QnColdStoreDelegate::open(QnResourcePtr resource)
     }
 
 
-//    cl_log.log("Open2 time = ", t.elapsed(), cl_logALWAYS);	
+//    cl_log.log("Open2 time = ", t.elapsed(), cl_logALWAYS);    
 
 
     m_opend = true;
@@ -392,7 +392,7 @@ bool QnColdStoreDelegate::openCSFile(int f_index, int event_index)
     //t.restart();    
 
 //    if (f_index > (m_datafileList.size()-2) )
-    if (f_index > (m_datafileList.size()-1) )	// Try to read last file
+    if (f_index > (m_datafileList.size()-1) )    // Try to read last file
       {
         Q_ASSERT(false);
         return false;
@@ -621,13 +621,13 @@ bool QnColdStoreDelegate::openEventFile(int f_index)
     QDomDocument doc;
 
     if (!doc.setContent(m_fileContent))
-    {	
-        // doc set failed, so try adding closing XML to it and try again	
+    {    
+        // doc set failed, so try adding closing XML to it and try again    
         m_fileContent = m_fileContent + "</EventList></IQeyeDirectToStorageMetadata>";
     
 
         if (!doc.setContent(m_fileContent))
-        {	
+        {    
             cl_log.log("openEventFile setContent failed", cl_logALWAYS);
             return false;
         }

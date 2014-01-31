@@ -25,7 +25,7 @@
 namespace {
 
 /** Size of the random nonce */
-#define SOAP_WSSE_NONCELEN	(20)
+#define SOAP_WSSE_NONCELEN (20)
 
 /**
 @fn static void calc_nonce(struct soap *soap, char nonce[SOAP_WSSE_NONCELEN])

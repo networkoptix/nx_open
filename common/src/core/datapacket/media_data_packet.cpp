@@ -179,7 +179,7 @@ inline bool mathImage_sse2(const __m128i* data, const __m128i* mask, int maskSta
     }
     return false;
 }
-#endif	//__i386
+#endif    //__i386
 
 inline bool mathImage_cpu(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
 {
