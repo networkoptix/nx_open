@@ -36,7 +36,6 @@ namespace {
         ((TimeObject,               "time"))
         ((EmailObject,              "email"))
         ((StatusObject,             "status"))
-        ((DisabledObject,           "disabled"))
         ((PanicObject,              "panic"))
         ((BusinessActionObject,     "businessAction"))
         ((KvPairObject,             "kvPair"))
@@ -818,17 +817,6 @@ int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnReso
     return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(StatusObject), requestHeaders, requestParams, "", target, slot);
 }
 
-int QnAppServerConnection::setResourceDisabledAsync(const QnId &resourceId, bool disabled, QObject *target, const char *slot)
-{
-    QnRequestHeaderList requestHeaders(m_requestHeaders);
-    QnRequestParamList requestParams(m_requestParams);
-
-    requestParams.append(QnRequestParam("id", resourceId.toString()));
-    requestParams.append(QnRequestParam("disabled", QString::number((int)disabled)));
-
-    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(DisabledObject), requestHeaders, requestParams, "", target, slot);
-}
-
 int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resources, QObject *target, const char *slot)
 {
     QnRequestHeaderList requestHeaders(m_requestHeaders);
@@ -891,23 +879,6 @@ int QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActio
     m_serializer.serializeBusinessAction(businessAction, body);
 
     return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(BusinessActionObject), requestHeaders, requestParams, body, target, slot);
-}
-
-int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resources, QObject *target, const char *slot)
-{
-    QnRequestHeaderList requestHeaders(m_requestHeaders);
-    QnRequestParamList requestParams(m_requestParams);
-
-    int n = 1;
-    foreach (const QnResourcePtr resource, resources)
-    {
-        requestParams.append(QnRequestParam(QString(QLatin1String("id%1")).arg(n), resource->getId().toString()));
-        requestParams.append(QnRequestParam(QString(QLatin1String("disabled%1")).arg(n), QString::number((int)resource->isDisabled())));
-
-        n++;
-    }
-
-    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(DisabledObject), requestHeaders, requestParams, "", target, slot);
 }
 
 int QnAppServerConnection::resetBusinessRulesAsync(QObject *target, const char *slot) {

@@ -4,6 +4,8 @@
 
 #include <core/resource/resource.h>
 
+#include <utils/common/container.h>
+
 QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
     m_initialized(false)
@@ -192,62 +194,45 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         case Qn::CreatePresetPtzCommand:
             if(m_data.fields & Qn::PresetsPtzField) {
                 QnPtzPreset preset = data.value<QnPtzPreset>();
-                bool exists = false;
-                for(int i = 0; i < m_data.presets.size(); i++) {
-                    if(m_data.presets[i].id == preset.id) {
-                        exists = true;
-                        break;
-                    }
-                }
-                if (!exists)
+                int idx = qnIndexOf(m_data.presets, [&](const QnPtzPreset &old) { return old.id == preset.id; });
+                if (idx < 0)
                     m_data.presets.append(preset);
+                else
+                    m_data.presets[idx] = preset;
             }
             break;
         case Qn::UpdatePresetPtzCommand:
             if(m_data.fields & Qn::PresetsPtzField) {
                 QnPtzPreset preset = data.value<QnPtzPreset>();
-                for(int i = 0; i < m_data.presets.size(); i++) {
-                    if(m_data.presets[i].id == preset.id) {
-                        m_data.presets[i] = preset;
-                        break;
-                    }
-                }
+                int idx = qnIndexOf(m_data.presets, [&](const QnPtzPreset &old) { return old.id == preset.id; });
+                if (idx >= 0)
+                    m_data.presets[idx] = preset;
             }
             break;
         case Qn::RemovePresetPtzCommand:
             if(m_data.fields & Qn::PresetsPtzField) {
                 QString presetId = data.value<QString>();
-                for(int i = 0; i < m_data.presets.size(); i++) {
-                    if(m_data.presets[i].id == presetId) {
-                        m_data.presets.removeAt(i);
-                        break;
-                    }
-                }
+                int idx = qnIndexOf(m_data.presets, [&](const QnPtzPreset &old) { return old.id == presetId; });
+                if (idx >= 0)
+                    m_data.presets.removeAt(idx);
             }
             break;
         case Qn::CreateTourPtzCommand:
             if(m_data.fields & Qn::ToursPtzField) {
                 QnPtzTour tour = data.value<QnPtzTour>();
-                bool exists = false;
-                for(int i = 0; i < m_data.tours.size(); i++) {
-                    if(m_data.tours[i].id == tour.id) {
-                        exists = true;
-                        break;
-                    }
-                }
-                if (!exists)
+                int idx = qnIndexOf(m_data.tours, [&](const QnPtzTour &old) { return old.id == tour.id; });
+                if (idx < 0)
                     m_data.tours.append(tour);
+                else
+                    m_data.tours[idx] = tour;
             }
             break;
         case Qn::RemoveTourPtzCommand:
             if(m_data.fields & Qn::PresetsPtzField) {
                 QString tourId = data.value<QString>();
-                for(int i = 0; i < m_data.tours.size(); i++) {
-                    if(m_data.tours[i].id == tourId) {
-                        m_data.tours.removeAt(i);
-                        break;
-                    }
-                }
+                int idx = qnIndexOf(m_data.tours, [&](const QnPtzTour &old) { return old.id == tourId; });
+                if (idx >= 0)
+                    m_data.tours.removeAt(idx);
             }
             break;
         case Qn::GetDeviceLimitsPtzCommand:

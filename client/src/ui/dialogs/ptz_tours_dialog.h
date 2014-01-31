@@ -25,16 +25,16 @@ protected:
     virtual Qn::PtzDataFields requiredFields() const override;
 
 private slots:
-    void at_table_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
+    void at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
     void at_addTourButton_clicked();
     void at_deleteTourButton_clicked();
 
+    void at_tableViewport_resizeEvent();
 private:
     bool saveTours();
 
     QScopedPointer<Ui::PtzToursDialog> ui;
     QnPtzTourListModel *m_model;
-    QnPtzTourList m_oldTours;
 };
 
 #endif // PTZ_TOURS_DIALOG_H

@@ -192,6 +192,12 @@ bool QnMessage::load(const pb::Message &message)
         break;
     }
 
+    case pb::Message_Type_Command:
+    {
+        const pb::CommandMessage &commandMessage = message.GetExtension(pb::CommandMessage::message);
+        command = static_cast<Command>(commandMessage.command());
+        break;
+    }
     default:
         break;
     }
