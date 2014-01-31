@@ -23,7 +23,7 @@ void ApiResourceData::toResource(QnResourcePtr resource) const
 	resource->setParentId(parentId);
 	resource->setName(name);
 	resource->setUrl(url);
-	resource->setStatus(status);
+	resource->setStatus(status, true);
 	resource->setDisabled(disabled);
 }
 
