@@ -1,5 +1,8 @@
 #include "mserver_resource_searcher.h"
 
+#include <media_server/serverutil.h>
+#include <media_server/settings.h>
+
 #include <business/business_event_connector.h>
 
 #include "core/dataprovider/live_stream_provider.h"
@@ -13,8 +16,6 @@
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 
-#include "settings.h"
-#include "serverutil.h"
 
 static quint16 DISCOVERY_PORT = 54013;
 static const int UPDATE_IF_LIST_INTERVAL = 1000 * 60;
