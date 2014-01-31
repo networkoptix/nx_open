@@ -201,7 +201,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::SaveCurrentLayoutAsAction));
     addAction(action(Qn::ExitAction));
     addAction(action(Qn::EscapeHotkeyAction));
-    addAction(action(Qn::FullscreenAction));
+    addAction(action(Qn::FullscreenMaximizeHotkeyAction));
     addAction(action(Qn::AboutAction));
     addAction(action(Qn::PreferencesGeneralTabAction));
     addAction(action(Qn::BusinessEventsLogAction));
@@ -232,6 +232,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     connect(action(Qn::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
+    connect(action(Qn::FullscreenMaximizeHotkeyAction), SIGNAL(triggered()),                action(Qn::EffectiveMaximizeAction),    SLOT(trigger()));
 
     menu()->setTargetProvider(m_ui.data());
 
@@ -514,8 +515,13 @@ void QnMainWindow::updateDwmState() {
         m_frameMargins = !isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);*/
 #ifdef Q_OS_LINUX
         // On linux window manager cannot disable titlebar leaving border in place. Thus we have to disable decorations completely and draw our own border.
+        if (isMaximized()) {
+            m_drawCustomFrame = false;
+            m_frameMargins = QMargins(0, 0, 0, 0);
+        } else {
         m_drawCustomFrame = true;
         m_frameMargins = QMargins(2, 2, 2, 2);
+        }
 #else
         m_drawCustomFrame = false;
         m_frameMargins = QMargins(0, 0, 0, 0);

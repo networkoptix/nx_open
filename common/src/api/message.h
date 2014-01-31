@@ -51,7 +51,7 @@ namespace Qn {
 class QnMessage
 {
 public:
-    QnMessage(): messageType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online) {}
+    QnMessage(): messageType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online), allowCameraChanges(-1) {}
 
     enum Command {
         Reboot = 0
@@ -90,6 +90,9 @@ public:
 
     QString filename;
     QString publicIp;
+
+    // -1 if unset
+    int allowCameraChanges;
 
     QnKvPairListsById kvPairs;
 

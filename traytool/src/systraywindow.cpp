@@ -763,7 +763,7 @@ void QnSystrayWindow::onSettingsAction()
 {
     QUrl appServerUrl = getAppServerURL();
 
-    QStringList urlList = m_settings.value(lit("appserverUrlHistory")).toString().split(lit(';'));
+    QStringList urlList = m_settings.value(lit("appserverUrlHistory")).toString().split(L';');
     urlList.insert(0, appServerUrl.toString());
     urlList.removeDuplicates();
 
@@ -1017,7 +1017,7 @@ void QnSystrayWindow::saveData()
         m_appServerSettings.setValue(lit("publicIpMode"), ECS_PUBLIC_IP_MODE_MANUAL);
 
     m_appServerSettings.setValue(lit("manualPublicIp"), ui->ecsManuaPublicIPEdit->text());
-    QStringList urlList = m_settings.value(lit("appserverUrlHistory")).toString().split(lit(';'));
+    QStringList urlList = m_settings.value(lit("appserverUrlHistory")).toString().split(L';');
     urlList.insert(0, getAppServerURL().toString());
     urlList.removeDuplicates();
     QString rez;
@@ -1026,7 +1026,7 @@ void QnSystrayWindow::saveData()
         str = str.trimmed();
         if (!str.isEmpty()) {
             if (!rez.isEmpty())
-                rez += lit(';');
+                rez += L';';
             rez += str;
         }
     }
@@ -1068,9 +1068,9 @@ void QnSystrayWindow::onTestButtonClicked()
         return;
     }
 
-    QnConnectionTestingDialog dialog(url, this);
-    dialog.setModal(true);
-    dialog.exec();
+    QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(this));
+    dialog->testEnterpriseController(url);
+    dialog->exec();
 }
 
 void QnSystrayWindow::onFindAppServerButtonClicked()
