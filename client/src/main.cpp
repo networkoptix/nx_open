@@ -364,8 +364,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
             argsMessage += fromNativePath(QFile::decodeName(argv[i])) + QLatin1Char('\n');
 
         while (application->isRunning()) {
-            if (application->sendMessage(argsMessage))
+            if (application->sendMessage(argsMessage)) {
+                out << "Another instance is already running";
                 return 0;
+            }
         }
     }
 
@@ -386,10 +388,14 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Initialize log. */
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
+    if (!QDir().mkpath(dataLocation + QLatin1String("/log"))) {
+        out << "Could not create log folder" << dataLocation + QLatin1String("/log");
         return 0;
-    if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
+    }
+    if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1)) {
+        out << "Could not create log file" << dataLocation + QLatin1String("/log/log_file");
         return 0;
+    }
 
 
     QnHelpHandler helpHandler;
