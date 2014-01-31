@@ -58,6 +58,7 @@ bool QnX11LauncherWorkaround::isUnity3DSession() {
         if (realPath.endsWith(lit("unity-2d-panel")))
             return false;
     }
+    return hasUnityPanelService;
 #endif
     return false;
 }
