@@ -569,9 +569,9 @@ int QnPlAxisResource::getChannelNumAxis() const
 template<class _Pair>
     struct select1st
         : public std::unary_function<_Pair, typename _Pair::first_type>
-    {	// functor for unary first of pair selector operator
+    {    // functor for unary first of pair selector operator
     const typename _Pair::first_type& operator()(const _Pair& _Left) const
-        {	// apply first selector operator to pair operand
+        {    // apply first selector operator to pair operand
         return (_Left.first);
         }
     };

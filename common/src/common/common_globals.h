@@ -159,7 +159,7 @@ public:
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
-        FisheyePtzCapabilities              = ContinuousPtzCapabilities | AbsolutePtzCapabilities | LogicalPositioningPtzCapability | VirtualPtzCapability
+        FisheyePtzCapabilities              = ContinuousPtzCapabilities | AbsolutePtzCapabilities | LogicalPositioningPtzCapability | AsynchronousPtzCapability | SynchronizedPtzCapability | VirtualPtzCapability
     };
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);

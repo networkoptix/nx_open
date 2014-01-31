@@ -53,7 +53,7 @@ namespace ec2
             TODO let compiler guess template params
         */
         template<class InputData, class OutputData, class HandlerType>
-            void processQueryAsync( InputData input, HandlerType handler )
+            void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputData input, HandlerType handler )
         {
             QtConcurrent::run( [input, handler]() {
                 OutputData output;

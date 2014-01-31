@@ -132,6 +132,9 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
+                            <environmentVariables>
+                                <PATH>${environment.dir}/python/x86;${environment.dir}/python/x86/Scripts;${env.PATH}</PATH>
+                            </environmentVariables>      
                             <executable>${environment.dir}/python/x86/python.exe</executable>
                             <arguments>
                                 <argument>install_packages.py</argument>
@@ -148,6 +151,9 @@
                         </goals>
                         <configuration>
                             <executable>${environment.dir}/python/x64/python.exe</executable>
+                            <environmentVariables>
+                                <PATH>${environment.dir}/python/x86;${environment.dir}/python/x86/Scripts;${env.PATH}</PATH>
+                            </environmentVariables>      
                             <arguments>
                                 <argument>install_packages.py</argument>
                             </arguments>
@@ -163,6 +169,9 @@
                         </goals>
                         <configuration>
                             <executable>${python.dir}/python</executable>
+                            <environmentVariables>                            
+                                <PATH>${python.dir}:${env.PATH}</PATH>
+                            </environmentVariables>           
                             <arguments>
                                 <argument>install_packages.py</argument>
                             </arguments>

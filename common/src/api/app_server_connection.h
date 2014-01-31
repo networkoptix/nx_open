@@ -153,9 +153,6 @@ public:
     int setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot);
     int setResourcesStatusAsync(const QnResourceList& resources, QObject *target, const char *slot);
 
-    int setResourceDisabledAsync(const QnId &resourceId, bool disabled, QObject *target, const char *slot);
-    int setResourcesDisabledAsync(const QnResourceList& resources, QObject *target, const char *slot);
-
     int dumpDatabaseAsync(QObject *target, const char *slot);
     int restoreDatabaseAsync(const QByteArray &data, QObject *target, const char *slot);
 

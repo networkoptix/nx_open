@@ -34,8 +34,13 @@ Release
 x86
 x64
 target
-build_environment/python/packages/*/build
+build_environment/python/build_packages/*/build
 build_environment/python/packages/llutil/llutil.egg-info
+build_environment/python/build_packages/ecapi_pb2/ecapi_pb2.egg-info/PKG-INFO
+build_environment/python/build_packages/ecapi_pb2/ecapi_pb2.egg-info/SOURCES.txt
+build_environment/python/build_packages/ecapi_pb2/ecapi_pb2.egg-info/dependency_links.txt
+build_environment/python/build_packages/ecapi_pb2/ecapi_pb2.egg-info/top_level.txt
+build_environment/python/build_packages/ecapi_pb2/pb2.proto
 build_environment/target
 build_environment/x86
 build_environment/x64

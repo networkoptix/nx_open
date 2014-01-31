@@ -23,6 +23,7 @@ struct QnPtzTourSpot: public boost::equality_comparable1<QnPtzTourSpot> {
 
 struct QnPtzTour: public boost::equality_comparable1<QnPtzTour> {
     QnPtzTour() {}
+    QnPtzTour(const QnPtzTour &tour): id(tour.id), name(tour.name), spots(tour.spots) {}
     QnPtzTour(const QString &id, const QString &name, const QnPtzTourSpotList &spots): id(id), name(name), spots(spots) {}
 
     QString id;

@@ -1,0 +1,26 @@
+/**********************************************************
+* 30 jan 2014
+* akolesnikov
+***********************************************************/
+
+#ifndef EC2_REST_REQUEST_PARAMS_H
+#define EC2_REST_REQUEST_PARAMS_H
+
+#include <algorithm>
+
+#include <QtCore/QUrlQuery>
+
+#include <core/resource/resource.h>
+#include <utils/common/id.h>
+#include <utils/common/request_param.h>
+
+
+namespace ec2
+{
+    void parseHttpRequestParams( const QnRequestParamList& params, QnId* id);
+    void parseHttpRequestParams( const QnRequestParamList& params, nullptr_t* );
+    void parseHttpRequestParams( const QnRequestParamList& params, QnResourceParameters* const data );
+    void toUrlParams( const QnId& id, QUrlQuery* const query );
+}
+
+#endif  //EC2_REST_REQUEST_PARAMS_H

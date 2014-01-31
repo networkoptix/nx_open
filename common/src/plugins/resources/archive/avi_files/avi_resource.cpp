@@ -19,8 +19,8 @@ QnAviResource::QnAviResource(const QString& file)
     setUrl(file);
     QString shortName = QFileInfo(file).fileName();
     setName(shortName.mid(shortName.indexOf(QLatin1Char('?'))+1));
-	if (FileTypeSupport::isImageFileExt(file)) 
-		addFlags(QnResource::still_image);
+    if (FileTypeSupport::isImageFileExt(file)) 
+        addFlags(QnResource::still_image);
     m_timeZoneOffset = Qn::InvalidUtcOffset;
 }
 

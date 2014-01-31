@@ -31,11 +31,11 @@ protected:
     bool createTour(const QnPtzTour &tour);
     bool removeTour(const QString &tourId);
 signals:
-    void synchronizeLater();
+    void synchronizeLater(const QString &title);
     void synchronized();
 
 private slots:
-    void synchronize();
+    void synchronize(const QString &title);
 
     void at_controller_finished(Qn::PtzCommand command, const QVariant &data);
 

@@ -46,10 +46,10 @@ namespace ec2
 
         //preparing output data
         QnVirtualCameraResourceListPtr cameraList( new QnVirtualCameraResourceList() );
-		ApiCommand command = ec2::updateCamera;
+		ApiCommand::Value command = ApiCommand::updateCamera;
 		if (!resource->getId().isValid()) {
 			resource->setId(dbManager->getNextSequence());
-			command = ec2::addCamera;
+			command = ApiCommand::addCamera;
 		}
         cameraList->push_back( resource );
 
@@ -79,7 +79,7 @@ namespace ec2
 			handler->done( errorCode, outData);
 		};
 		m_queryProcessor->processQueryAsync<QnId, ApiCameraDataList, decltype(queryDoneHandler)>
-			( mediaServerId, queryDoneHandler );
+			( ApiCommand::getCameras, mediaServerId, queryDoneHandler );
 		return INVALID_REQ_ID;
     }
 
@@ -111,7 +111,9 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    QnTransaction<ApiCameraData> QnCameraManager<QueryProcessorType>::prepareTransaction( ec2::ApiCommand cmd, const QnVirtualCameraResourcePtr& resource )
+    QnTransaction<ApiCameraData> QnCameraManager<QueryProcessorType>::prepareTransaction(
+        ApiCommand::Value cmd,
+        const QnVirtualCameraResourcePtr& resource )
     {
 		QnTransaction<ApiCameraData> result;
 		result.command = cmd;

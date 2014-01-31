@@ -6,21 +6,27 @@
 #include <vector>
 #include "nx_ec/binary_serialization_helper.h"
 
+
 namespace ec2
 {
-
-    enum ApiCommand
+    namespace ApiCommand
     {
-		NotDefined,
+        enum Value
+        {
+		    NotDefined,
 
-        getResourceTypes,
+            getResourceTypes,
 
-        addCamera,
-		updateCamera,
-        removeCamera,
+            addCamera,
+		    updateCamera,
+            removeCamera,
+            getCameras,
 
-        saveMediaServer
-    };
+            saveMediaServer
+        };
+
+        QString toString( Value val );
+    }
 
     struct QnUuid {
 		QnUuid(): data1(0), data2(0), data3(0), data4(0) {}
@@ -36,7 +42,7 @@ namespace ec2
     class QnAbstractTransaction
     {
     public:
-		QnAbstractTransaction(): command(NotDefined), persistent(true) {}
+		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(true) {}
 
         void createNewID();
         
@@ -53,7 +59,7 @@ namespace ec2
             QN_DECLARE_STRUCT_SERIALIZATORS();
         };
 
-        ApiCommand command;
+        ApiCommand::Value command;
         ID id;
         bool persistent;
 

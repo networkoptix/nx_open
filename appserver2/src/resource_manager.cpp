@@ -25,7 +25,8 @@ namespace ec2
 				resTypeList.toResourceTypeList(outResTypeList);
             handler->done( errorCode, outResTypeList );
         };
-        m_queryProcessor->processQueryAsync<nullptr_t, ApiResourceTypeList, decltype(queryDoneHandler)>( nullptr, queryDoneHandler );
+        m_queryProcessor->processQueryAsync<nullptr_t, ApiResourceTypeList, decltype(queryDoneHandler)>
+            ( ApiCommand::getResourceTypes, nullptr, queryDoneHandler );
         return INVALID_REQ_ID;
     }
 

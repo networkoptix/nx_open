@@ -34,7 +34,7 @@ namespace ec2
         QueryProcessorType* const m_queryProcessor;
 		QSharedPointer<QnResourceFactory> m_resourceFactory;
 
-        QnTransaction<ApiCameraData> prepareTransaction( ec2::ApiCommand cmd, const QnVirtualCameraResourcePtr& resource );
+        QnTransaction<ApiCameraData> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourcePtr& resource );
     };
 }
 

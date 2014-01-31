@@ -72,6 +72,14 @@ void QnServerMessageProcessor::handleMessage(const QnMessage &message) {
             arg(Qn::toString(message.messageType)).arg(message.resourceId.toString()).arg(message.resource ? message.resource->getName() : QString("NULL")), cl_logDEBUG1 );
 
     switch (message.messageType) {
+    case Qn::Message_Type_Command: {
+        switch (message.command) {
+            case QnMessage::Command::Reboot: {
+                exit(0);
+            }
+        }
+        break;
+    }
     case Qn::Message_Type_License: {
         // New license added. LicensePool verifies it.
         qnLicensePool->addLicense(message.license);
