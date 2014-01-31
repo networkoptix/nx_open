@@ -40,10 +40,13 @@ bool QnX11LauncherWorkaround::eventFilter(QObject *obj, QEvent *event) {
 bool QnX11LauncherWorkaround::isUnity3DSession() {
 #ifdef Q_OS_LINUX
     /* This function assumes that unity session sets environment variable
-       XDG_CURRENT_DESKTOP to 'Unity' and has running process whose name is unity-panel-service. */
+       XDG_CURRENT_DESKTOP to 'Unity', has running process whose name is unity-panel-service
+       and hasn't process unity-2d-panel. */
 
     if (qgetenv("XDG_CURRENT_DESKTOP") != "Unity")
         return false;
+
+    bool hasUnityPanelService = false;
 
     QDir procDir(lit("/proc"));
     QStringList entries = procDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -51,7 +54,9 @@ bool QnX11LauncherWorkaround::isUnity3DSession() {
         QFileInfo info(lit("/proc/") + procEntry + lit("/exe"));
         QString realPath = info.symLinkTarget();
         if (realPath.endsWith(lit("unity-panel-service")))
-            return true;
+            hasUnityPanelService = true;
+        if (realPath.endsWith(lit("unity-2d-panel")))
+            return false;
     }
 #endif
     return false;
