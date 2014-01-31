@@ -62,7 +62,8 @@ void QnServerMessageProcessor::handleConnectionClosed(const QString &errorString
 
 void QnServerMessageProcessor::loadRuntimeInfo(const QnMessage &message) {
     base_type::loadRuntimeInfo(message);
-    QnAppServerConnectionFactory::setAllowCameraChanges(message.allowCameraChanges);
+    if (message.allowCameraChanges != -1)
+        QnAppServerConnectionFactory::setAllowCameraChanges(message.allowCameraChanges);
 }
 
 void QnServerMessageProcessor::handleMessage(const QnMessage &message) {

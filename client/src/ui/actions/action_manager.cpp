@@ -582,30 +582,22 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::EscapeHotkeyAction).
         flags(Qn::GlobalHotkey).
+        autoRepeat(false).
         shortcut(tr("Esc")).
         shortcutContext(Qt::WidgetWithChildrenShortcut).
         text(tr("Stop current action"));
 
     factory(Qn::FullscreenAction).
-        flags(Qn::GlobalHotkey).
+        flags(Qn::NoTarget).
         text(tr("Go to Fullscreen")).
         toggledText(tr("Exit Fullscreen")).
-        autoRepeat(false).
-#ifdef Q_OS_MAC
-        shortcut(tr("Ctrl+F")).
-#else
-        shortcut(tr("Alt+Enter")).
-        shortcut(tr("Alt+Return")).
-#endif
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));
 
-    registerAlias(Qn::EffectiveMaximizeAction, Qn::FullscreenAction);
 
     factory(Qn::MinimizeAction).
         flags(Qn::NoTarget).
         text(tr("Minimize")).
         icon(qnSkin->icon("titlebar/minimize.png"));
-
 
     factory(Qn::MaximizeAction).
         flags(Qn::NoTarget).
@@ -613,6 +605,19 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Restore Down")).
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));
+
+
+    factory(Qn::FullscreenMaximizeHotkeyAction).
+        flags(Qn::GlobalHotkey).
+        autoRepeat(false).
+#ifdef Q_OS_MAC
+        shortcut(tr("Ctrl+F")).
+#else
+        shortcut(tr("Alt+Enter")).
+        shortcut(tr("Alt+Return")).
+#endif
+        shortcutContext(Qt::WidgetWithChildrenShortcut);
+
 
     factory(Qn::MessageBoxAction).
         flags(Qn::NoTarget).

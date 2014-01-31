@@ -255,6 +255,11 @@ namespace Qn {
         EffectiveMaximizeAction,
 
         /**
+         * Just triggers EffectiveMaximizeAction which should be alias to FullscreenAction or MaximizeAction.
+         */
+        FullscreenMaximizeHotkeyAction,
+
+        /**
          * Goes to fullscreen and slides out all panels.
          */
         FreespaceAction,
