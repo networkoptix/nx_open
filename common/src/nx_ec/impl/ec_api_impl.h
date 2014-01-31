@@ -132,7 +132,9 @@ namespace ec2
     enum class ErrorCode
     {
         ok,
-        failure
+        failure,
+        ioError,
+        serverError
     };
 
     QString toString( ErrorCode errorCode );

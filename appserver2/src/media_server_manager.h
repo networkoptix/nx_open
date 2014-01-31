@@ -30,7 +30,7 @@ namespace ec2
         QueryProcessorType* const m_queryProcessor;
         QSharedPointer<QnResourceFactory> m_resourcefactory;
 
-        QnTransaction<ApiMediaServerData> prepareTransaction( ApiCommand command, const QnMediaServerResourcePtr& resource );
+        QnTransaction<ApiMediaServerData> prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource );
     };
 }
 

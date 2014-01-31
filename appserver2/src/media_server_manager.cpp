@@ -41,7 +41,7 @@ namespace ec2
     ReqID QnMediaServerManager<T>::save( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler )
     {
         //create transaction
-        const QnTransaction<ApiMediaServerData>& tran = prepareTransaction( ec2::saveMediaServer, resource );
+        const QnTransaction<ApiMediaServerData>& tran = prepareTransaction( ApiCommand::saveMediaServer, resource );
 
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, _1 ) );
@@ -64,7 +64,7 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiMediaServerData> QnMediaServerManager<T>::prepareTransaction( ApiCommand command, const QnMediaServerResourcePtr& resource )
+    QnTransaction<ApiMediaServerData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource )
     {
         QnTransaction<ApiMediaServerData> tran;
         tran.createNewID();

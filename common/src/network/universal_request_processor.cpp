@@ -50,7 +50,8 @@ bool QnUniversalRequestProcessor::authenticate()
             path = path.left(path.size()-1);
         if (path.startsWith(L'/'))
             path = path.mid(1);
-        bool needAuth = (path != lit("api/ping")) && !path.startsWith(lit("api/camera_event")); //TODO: #AK this class (libcommon's) is not supposed to know about api/ping etc.. (it's mediaserver's)
+        //bool needAuth = (path != lit("api/ping")) && !path.startsWith(lit("api/camera_event")); //TODO: #AK this class (libcommon's) is not supposed to know about api/ping etc.. (it's mediaserver's)
+        bool needAuth = false;
 
         QElapsedTimer t;
         t.restart();

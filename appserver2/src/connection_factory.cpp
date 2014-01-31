@@ -46,15 +46,15 @@ namespace ec2
     void Ec2DirectConnectionFactory::registerRestHandlers( QnRestProcessorPool* const restProcessorPool )
     {
         restProcessorPool->registerHandler(
-            QString::fromLatin1("ec2/getResourceTypes"),
-            new QueryHttpHandler<nullptr_t, ApiResourceTypeList>(&m_queryProcessor) );
+            QString::fromLatin1("ec2/%1").arg(ApiCommand::toString(ApiCommand::getResourceTypes)),
+            new QueryHttpHandler<nullptr_t, ApiResourceTypeList>(&m_queryProcessor, ApiCommand::getResourceTypes) );
 
         restProcessorPool->registerHandler(
-            QString::fromLatin1("ec2/addCamera"),
+            QString::fromLatin1("ec2/%1").arg(ApiCommand::toString(ApiCommand::addCamera)),
             new UpdateHttpHandler<ApiCameraData>(&m_queryProcessor) );
         restProcessorPool->registerHandler(
-            QString::fromLatin1("ec2/getCameras"),
-            new QueryHttpHandler<QnId, ApiCameraDataList>(&m_queryProcessor) );
+            QString::fromLatin1("ec2/%1").arg(ApiCommand::toString(ApiCommand::getCameras)),
+            new QueryHttpHandler<QnId, ApiCameraDataList>(&m_queryProcessor, ApiCommand::getCameras) );
     }
 
 	void Ec2DirectConnectionFactory::setResourceFactory(QSharedPointer<QnResourceFactory> factory)

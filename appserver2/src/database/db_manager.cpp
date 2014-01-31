@@ -8,9 +8,9 @@ static QnDbManager* globalInstance = 0;
 
 QnDbManager::QnDbManager(QnResourceFactoryPtr factory)
 {
-	m_resourceFactory = factory;
+    m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
-	m_sdb.setDatabaseName("c:/develop/netoptix_new_ec/appserver/db/ecs.db");
+	m_sdb.setDatabaseName("c:/develop/netoptix_vms/appserver/db/ecs.db");
 	if (m_sdb.open())
 	{
 		if (!createDatabase()) // create tables is DB is empty
@@ -19,13 +19,14 @@ QnDbManager::QnDbManager(QnResourceFactoryPtr factory)
 	else {
 		qWarning() << "can't initialize sqlLite database! Actions log is not created!";
 	}
+
+	Q_ASSERT(!globalInstance);
+	globalInstance = this;
 }
 
 bool QnDbManager::createDatabase()
 {
-	Q_ASSERT(!globalInstance);
-	globalInstance = this;
-
+    //TODO/IMPL
 	return true;
 }
 
@@ -142,7 +143,7 @@ int QnDbManager::getNextSequence()
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tran)
 {
 	ErrorCode result;
-	if (tran.command == ec2::updateCamera) {
+	if (tran.command == ApiCommand::updateCamera) {
 		result = updateResource(tran.params);
 		if (result !=ErrorCode::ok)
 			return result;
