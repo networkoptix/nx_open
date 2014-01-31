@@ -30,7 +30,7 @@ struct ApiResourceData: public ApiData {
 
 }
 
-#define ApiResourceDataFields() (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled)
+#define ApiResourceDataFields (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled)
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiResourceData,  ApiResourceDataFields)
 
 #endif // __RESOURCE_TRANSACTION_DATA_H__

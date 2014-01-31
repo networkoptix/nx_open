@@ -81,9 +81,9 @@ struct ApiCameraDataList: public ApiData
 
 }
 
-#define apiScheduleTaskFields() (id) (sourceId) (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) (beforeThreshold) (afterThreshold) (streamQuality) (fps) 
+#define apiScheduleTaskFields (id) (sourceId) (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) (beforeThreshold) (afterThreshold) (streamQuality) (fps) 
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ScheduleTask, apiScheduleTaskFields)
-#define apiCameraDataFields() (scheduleDisabled) (motionType) (region) (mac) (login) (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) \
+#define apiCameraDataFields (scheduleDisabled) (motionType) (region) (mac) (login) (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) \
 							(firmware) (groupId) (groupName) (secondaryQuality) (controlDisabled) (statusFlags) (dewarpingParams) (vendor)
 QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiCameraData, ApiResourceData, apiCameraDataFields)
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiCameraDataList, (data) )

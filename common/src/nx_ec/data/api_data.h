@@ -66,7 +66,7 @@ inline void doAutoBind(QSqlQuery& query, const char* fieldName, const QString& f
 }
 
 template <class T>
-void doAutoBind(QSqlQuery& query, const char* fieldName, const std::vector<T>& field) {
+void doAutoBind(QSqlQuery& , const char* , const std::vector<T>& ) {
 	//
 }
 
