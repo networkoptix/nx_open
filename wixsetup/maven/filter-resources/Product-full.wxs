@@ -557,6 +557,7 @@
                             <Component Id="EcsPermanentConfiguration" Permanent="yes" NeverOverwrite="yes">
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\${appserver.name}">
+                                    <RegistryValue Type="string" Name="firstRun" Value="True"/>
                                     <RegistryValue Type="string" Name="allowCameraChanges" Value="[ALLOW_CAMERA_CHANGES]"/>
                                     <RegistryValue Type="string" Name="ecsGuid" Value="[APPSERVER_GUID]" KeyPath="yes"/>
                                 </RegistryKey>

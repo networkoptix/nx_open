@@ -254,16 +254,17 @@ namespace QJson {
      * Deserializes a value from a JSON utf-8-encoded string.
      *
      * \param value                     JSON string to deserialize.
+     * \param defaultValue              Value to return in case of deserialization failure.
      * \param[out] success              Deserialization status.
      * \returns                         Deserialization target.
      */
     template<class T>
-    T deserialized(const QByteArray &value, bool *success = NULL) {
+    T deserialized(const QByteArray &value, const T &defaultValue = T(), bool *success = NULL) {
         T target;
         bool result = QJson::deserialize(value, &target);
         if (success)
             *success = result;
-        return target;
+        return result ? target : defaultValue;
     }
 
 } // namespace QJson

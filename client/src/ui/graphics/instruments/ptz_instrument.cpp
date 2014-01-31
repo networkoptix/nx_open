@@ -752,13 +752,7 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
             connect(widget, SIGNAL(fisheyeChanged()), this, SLOT(updateOverlayWidget()));
 
             PtzData &data = m_dataByWidget[widget];
-            // TODO: #5.2 remove executor, use context in QObject::connect
-            data.capabilitiesConnection = QObject::connect(
-                widget->ptzController().data(), 
-                &QnAbstractPtzController::capabilitiesChanged, 
-                newExecutor([=] { this->updateCapabilities(widget); }, widget),
-                &QnExecutor::execute
-            );
+            data.capabilitiesConnection = connect(widget->ptzController(), &QnAbstractPtzController::capabilitiesChanged, this, [=]{ this->updateCapabilities(widget); });
 
             updateCapabilities(widget);
             updateOverlayWidget(widget);
@@ -778,7 +772,7 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     disconnect(object, NULL, this, NULL);
 
     PtzData &data = m_dataByWidget[object];
-    QObject::disconnect(data.capabilitiesConnection);
+    disconnect(data.capabilitiesConnection);
     
     m_dataByWidget.remove(object);
 }

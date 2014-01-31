@@ -6,11 +6,11 @@
 #include "business/events/abstract_business_event.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
-#include "serverutil.h"
+#include <media_server/serverutil.h>
 #include "business/business_action_factory.h"
 #include "core/resource_management/resource_pool.h"
 #include "recorder/storage_manager.h"
-#include "settings.h"
+#include <media_server/settings.h>
 
 
 static const qint64 EVENTS_CLEANUP_INTERVAL = 1000000ll * 3600;

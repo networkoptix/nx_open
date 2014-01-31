@@ -16,7 +16,7 @@
 // -------------------------------------------------------------------------- //
 QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(baseController->resource(), lit("ptzTours"), this)),
+    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(baseController->resource(), lit("ptzTours"), QnPtzTourHash(), this)),
     m_executor(new QnPtzTourExecutor(baseController))
 {
     assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */

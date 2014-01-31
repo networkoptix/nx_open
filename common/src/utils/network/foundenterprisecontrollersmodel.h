@@ -24,10 +24,10 @@ class FoundEnterpriseControllersModel
 public:
     enum Role
     {
-        urlRole = Qt::DisplayRole,
-        seedRole = Qt::UserRole + 1,
-        appServerIPRole,
-        appServerPortRole
+        UrlRole = Qt::UserRole + 1,
+        SeedRole,
+        IpRole,
+        PortRole
     };
 
     //!Connects to finder's signals
@@ -65,12 +65,11 @@ public slots:
         const QString& seed );
 
 protected:
-    class FoundModuleData
-    {
+    class FoundModuleData {
     public:
         QString seed;
         QString url;
-        std::vector<QString> ipAddresses;
+        QList<QString> ipAddresses;
         TypeSpecificParamMap params;
 
         bool operator<( const FoundModuleData& right ) const
