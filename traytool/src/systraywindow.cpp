@@ -1068,9 +1068,9 @@ void QnSystrayWindow::onTestButtonClicked()
         return;
     }
 
-    QnConnectionTestingDialog dialog(url, this);
-    dialog.setModal(true);
-    dialog.exec();
+    QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(this));
+    dialog->testEnterpriseController(url);
+    dialog->exec();
 }
 
 void QnSystrayWindow::onFindAppServerButtonClicked()
