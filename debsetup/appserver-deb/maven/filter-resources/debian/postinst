@@ -138,6 +138,7 @@ case "$1" in
       fi
 
       "$BIN_DIR/certgen" -i
+      $CFG_HELPER firstRun "True"
 
       chmod 600 $VAR_DIR/db/ecs.db
       chmod 600 "$SSL_CERT"
