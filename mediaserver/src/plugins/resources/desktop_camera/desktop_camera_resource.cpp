@@ -2,7 +2,7 @@
 
 #include "desktop_camera_resource.h"
 #include "desktop_camera_reader.h"
-#include "serverutil.h"
+#include <media_server/serverutil.h>
 
 const char* QnDesktopCameraResource::MANUFACTURE = "VIRTUAL_CAMERA";
 

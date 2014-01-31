@@ -5,6 +5,7 @@
 
 #include <QtGui/QIcon>
 #include <QtGui/QPixmap>
+#include <QtGui/QMovie>
 
 #include <utils/common/singleton.h>
 
@@ -48,6 +49,12 @@ public:
     QPixmap pixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
     QPixmap pixmap(const QIcon &icon, int w, int h, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
     QPixmap pixmap(const QIcon &icon, int extent, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
+
+    QMovie* loadMovie(const QString &name, QObject* parent = 0);
+
+    QMovie* loadMovie(const char *name, QObject* parent = 0) {
+        return loadMovie(QLatin1String(name), parent);
+    }
 
     // TODO: #Elric this one creates NEW style => naming is evil. Remove?
     QStyle *style();

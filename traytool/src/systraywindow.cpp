@@ -763,7 +763,7 @@ void QnSystrayWindow::onSettingsAction()
 {
     QUrl appServerUrl = getAppServerURL();
 
-    QStringList urlList = m_settings.value(lit("appserverUrlHistory")).toString().split(lit(';'));
+    QStringList urlList = m_settings.value(lit("appserverUrlHistory")).toString().split(L';');
     urlList.insert(0, appServerUrl.toString());
     urlList.removeDuplicates();
 
@@ -785,8 +785,8 @@ void QnSystrayWindow::onSettingsAction()
     ui->radioButtonPublicIPAuto->setChecked(allowPublicIP < 1);
     ui->radioButtonCustomPublicIP->setChecked(allowPublicIP > 1);
     
-    Qt::CheckState discoveryState = getDiscoveryState();
-    ui->checkBoxDiscovery->setCheckState(discoveryState);
+    //Qt::CheckState discoveryState = getDiscoveryState();
+    //ui->checkBoxDiscovery->setCheckState(discoveryState);
 
     onRadioButtonPublicIpChanged();
 
@@ -814,7 +814,7 @@ void QnSystrayWindow::onSettingsAction()
     ui->tabAppServer->setEnabled(m_appServerHandle != 0);
     ui->tabMediaServer->setEnabled(m_mediaServerHandle != 0);
 
-    ui->ecsCameraControlCheckBox->setChecked(readAllowCameraChanges());
+    //ui->ecsCameraControlCheckBox->setChecked(readAllowCameraChanges());
 
     showNormal();
 }
@@ -838,8 +838,8 @@ bool QnSystrayWindow::isAppServerParamChanged() const
     if (m_appServerSettings.value(lit("publicIpMode")).toString() != publicIpMode)
         return true;
 
-    if(readAllowCameraChanges() != ui->ecsCameraControlCheckBox->isChecked())
-        return true;
+    /*if(readAllowCameraChanges() != ui->ecsCameraControlCheckBox->isChecked())
+        return true;*/
 
     return false;
 }
@@ -870,8 +870,8 @@ bool QnSystrayWindow::isMediaServerParamChanged() const
     if (m_mediaServerSettings.value(lit("publicIPEnabled")).toInt() != publicIPState)
         return true;
 
-    if (getDiscoveryState() != ui->checkBoxDiscovery->checkState())
-        return true;
+    /*if (getDiscoveryState() != ui->checkBoxDiscovery->checkState())
+        return true;*/
 
     return false;
 }
@@ -1017,7 +1017,7 @@ void QnSystrayWindow::saveData()
         m_appServerSettings.setValue(lit("publicIpMode"), ECS_PUBLIC_IP_MODE_MANUAL);
 
     m_appServerSettings.setValue(lit("manualPublicIp"), ui->ecsManuaPublicIPEdit->text());
-    QStringList urlList = m_settings.value(lit("appserverUrlHistory")).toString().split(lit(';'));
+    QStringList urlList = m_settings.value(lit("appserverUrlHistory")).toString().split(L';');
     urlList.insert(0, getAppServerURL().toString());
     urlList.removeDuplicates();
     QString rez;
@@ -1026,7 +1026,7 @@ void QnSystrayWindow::saveData()
         str = str.trimmed();
         if (!str.isEmpty()) {
             if (!rez.isEmpty())
-                rez += lit(';');
+                rez += L';';
             rez += str;
         }
     }
@@ -1034,7 +1034,7 @@ void QnSystrayWindow::saveData()
 
     setAppServerURL(QString(lit("https://%1:%2")).arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
 
-    writeAllowCameraChanges(ui->ecsCameraControlCheckBox->isChecked());
+    //writeAllowCameraChanges(ui->ecsCameraControlCheckBox->isChecked());
 
     m_mediaServerSettings.setValue(lit("staticPublicIP"), ui->staticPublicIPEdit->text());
     if (!ui->groupBoxPublicIP->isChecked())
@@ -1044,7 +1044,7 @@ void QnSystrayWindow::saveData()
     else
         m_mediaServerSettings.setValue(lit("publicIPEnabled"), 2);
 
-    Qt::CheckState discoveryState = ui->checkBoxDiscovery->checkState();
+    /*Qt::CheckState discoveryState = ui->checkBoxDiscovery->checkState();
     if (discoveryState != Qt::PartiallyChecked)
     {
         QString disabledVendors;
@@ -1052,7 +1052,7 @@ void QnSystrayWindow::saveData()
             m_mediaServerSettings.setValue(lit("disabledVendors"), lit(""));
         else
             m_mediaServerSettings.setValue(lit("disabledVendors"), lit("all"));
-    }
+    }*/
 }
 
 void QnSystrayWindow::onTestButtonClicked()
@@ -1068,9 +1068,9 @@ void QnSystrayWindow::onTestButtonClicked()
         return;
     }
 
-    QnConnectionTestingDialog dialog(url, this);
-    dialog.setModal(true);
-    dialog.exec();
+    QScopedPointer<QnConnectionTestingDialog> dialog(new QnConnectionTestingDialog(this));
+    dialog->testEnterpriseController(url);
+    dialog->exec();
 }
 
 void QnSystrayWindow::onFindAppServerButtonClicked()
@@ -1081,8 +1081,8 @@ void QnSystrayWindow::onFindAppServerButtonClicked()
     if( !selectedSrvIndex.isValid() )
         return;
 
-    ui->appIPEdit->setText( m_foundEnterpriseControllersModel->data(selectedSrvIndex, FoundEnterpriseControllersModel::appServerIPRole).toString() );
-    ui->appPortSpinBox->setValue( m_foundEnterpriseControllersModel->data(selectedSrvIndex, FoundEnterpriseControllersModel::appServerPortRole).toInt() );
+    ui->appIPEdit->setText( m_foundEnterpriseControllersModel->data(selectedSrvIndex, FoundEnterpriseControllersModel::IpRole).toString() );
+    ui->appPortSpinBox->setValue( m_foundEnterpriseControllersModel->data(selectedSrvIndex, FoundEnterpriseControllersModel::PortRole).toInt() );
 }
 
 void QnSystrayWindow::onAppServerUrlHistoryComboBoxCurrentChanged( int index )

@@ -29,6 +29,9 @@ QnRemotePtzController::~QnRemotePtzController() {
 
 Qn::PtzCapabilities QnRemotePtzController::getCapabilities() {
     Qn::PtzCapabilities result = m_resource->getPtzCapabilities();
+    if(result == Qn::NoPtzCapabilities)
+        return Qn::NoPtzCapabilities;
+
     if(result & Qn::VirtualPtzCapability)
         return Qn::NoPtzCapabilities; /* Can't have remote virtual PTZ. */
 

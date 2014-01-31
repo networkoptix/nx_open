@@ -39,7 +39,7 @@ Q_DECLARE_METATYPE(QnPtzPresetRecordHash)
 // -------------------------------------------------------------------------- //
 QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseController): 
     base_type(baseController),
-    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzPresetRecordHash>(baseController->resource(), lit("ptzPresets"), this))
+    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzPresetRecordHash>(baseController->resource(), lit("ptzPresets"), QnPtzPresetRecordHash(), this))
 {
     m_asynchronous = baseController->hasCapabilities(Qn::AsynchronousPtzCapability);
     connect(this, &QnPresetPtzController::finishedLater, this, &QnAbstractPtzController::finished, Qt::QueuedConnection);

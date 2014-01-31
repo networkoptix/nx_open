@@ -25,8 +25,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <client/client_settings.h>
-
-#include <client_message_processor.h>
+#include <client/client_message_processor.h>
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint

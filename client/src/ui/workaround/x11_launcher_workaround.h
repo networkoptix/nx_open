@@ -15,6 +15,9 @@ class QnX11LauncherWorkaround: public QObject {
 public:
     QnX11LauncherWorkaround();
     virtual ~QnX11LauncherWorkaround();
+
+    static bool isUnity3DSession();
+
 protected:
     bool eventFilter(QObject *, QEvent *);
 private:

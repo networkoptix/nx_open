@@ -5,7 +5,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include "recorder/file_deletor.h"
-#include "serverutil.h"
+#include <media_server/serverutil.h>
 
 
 QnMotionHelper::QnMotionHelper()

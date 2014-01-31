@@ -953,20 +953,6 @@ void QnAppServerConnectionFactory::setPublicIp(const QString &publicIp)
     }
 }
 
-bool QnAppServerConnectionFactory::allowCameraChanges()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
-        return factory->m_allowCameraChanges;
-    return true; // default value
-}
-
-void QnAppServerConnectionFactory::setAllowCameraChanges(bool allowCameraChanges)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_allowCameraChanges = allowCameraChanges;
-    }
-}
-
 int QnAppServerConnectionFactory::defaultMediaProxyPort()
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {

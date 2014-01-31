@@ -73,6 +73,10 @@ public:
         return disconnect(sender, signal, receiver, method);
     }
 
+    static bool disconnect(const QMetaObject::Connection &connection) {
+        return QObject::disconnect(connection);
+    }
+
 protected:
     ConnectiveBase() {}
     virtual ~ConnectiveBase() {}
