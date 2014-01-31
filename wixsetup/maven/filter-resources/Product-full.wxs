@@ -264,24 +264,6 @@
                             Win64="no"/>
         </Property>
 
-        <Property Id="SERVER_GUID" Secure="yes">
-            <RegistrySearch Id="ServerGuidReg"
-                            Root="HKLM"
-                            Key="Software\${company.name}\${mediaserver.name}"
-                            Name="serverGuid"
-                            Type="raw"
-                            Win64="yes"/>
-        </Property>
-
-        <Property Id="SERVER_GUID32" Secure="yes">
-            <RegistrySearch Id="ServerGuidReg32"
-                            Root="HKLM"
-                            Key="Software\${company.name}\${mediaserver.name}"
-                            Name="serverGuid"
-                            Type="raw"
-                            Win64="no"/>
-        </Property>
-
         <!-- Client properties-->
         <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>
         <Property Id="CLIENT_APPSERVER_PORT" Secure="yes" Value="7001"/>
@@ -651,13 +633,6 @@
                                 <ServiceControl Id="Stop${customization}ServerService" Name="${customization}MediaServer" Stop="both" Wait="yes" Remove="uninstall" />
                             </Component>
 
-                            <Component Id="ServerConfigurationGuid" Permanent="yes" NeverOverwrite="yes">
-                                <RegistryKey Root="HKLM"
-                                             Key="Software\[Manufacturer]\${mediaserver.name}">
-                                    <RegistryValue Type="string" Name="serverGuid" Value="[SERVER_GUID]" KeyPath="yes"/>
-                                </RegistryKey>
-                            </Component>
-
                             <Component Id="ServerConfiguration" Permanent="yes">
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\${mediaserver.name}">
@@ -919,7 +894,6 @@
             <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
 
             <ComponentRef Id='ServerConfiguration'/>
-            <ComponentRef Id='ServerConfigurationGuid'/>
 
             <ComponentRef Id="ServerExecutable" />
             <ComponentGroupRef Id="ServerFFmpegLibraries"/>
