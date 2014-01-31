@@ -21,7 +21,9 @@ namespace ec2
 		    updateCamera,
             removeCamera,
             getCameras,
+            getCameraHistoryList,
 
+            getMediaServerList,
             saveMediaServer
         };
 

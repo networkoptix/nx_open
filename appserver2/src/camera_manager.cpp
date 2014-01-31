@@ -92,7 +92,8 @@ namespace ec2
                 cameraHistory.toResourceList(outData);
             handler->done( errorCode, outData);
         };
-        m_queryProcessor->processQueryAsync<nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> ( nullptr, queryDoneHandler );
+        m_queryProcessor->processQueryAsync<nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> (
+            ApiCommand::getCameraHistoryList, nullptr, queryDoneHandler );
         return INVALID_REQ_ID;
     }
 

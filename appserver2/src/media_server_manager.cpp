@@ -33,7 +33,8 @@ namespace ec2
                 servers.toResourceList(outData, m_resourcefactory.data());
             handler->done( errorCode, outData);
         };
-        m_queryProcessor->processQueryAsync<nullptr_t, ApiMediaServerDataList, decltype(queryDoneHandler)> (nullptr, queryDoneHandler);
+        m_queryProcessor->processQueryAsync<nullptr_t, ApiMediaServerDataList, decltype(queryDoneHandler)> (
+            ApiCommand::getMediaServerList, nullptr, queryDoneHandler);
         return INVALID_REQ_ID;
     }
 

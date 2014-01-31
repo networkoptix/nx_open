@@ -19,6 +19,8 @@ namespace ec2
                     return "removeCamera";
                 case getCameras:
                     return "getCameras";
+                case getCameraHistoryList:
+                    return "getCameraHistoryList";
                 case saveMediaServer:
                     return "saveMediaServer";
                 default:
