@@ -94,9 +94,9 @@
                         </goals>
                         <configuration>
                             <target>
-<!--                                <exec dir="${environment.dir}" executable="hg" failifexecutionfails="true">
+                                <exec dir="${environment.dir}" executable="hg" failifexecutionfails="true">
                                     <arg line="pull -u"/> 
-                                </exec> -->
+                                </exec>
                                 <chmod file="${environment.dir}/${buildenv.script}" perm="755"/>    
                                 <exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="true">
                                     <arg line="${arch} ${toolchain.version}"/> 
