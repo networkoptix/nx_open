@@ -29,7 +29,6 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     m_renderer = widget->renderer();
     m_renderer->setFisheyeController(this);
 
-    connect(this,               &QnFisheyePtzController::finishedLater,         this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
     connect(m_widget,           &QnResourceWidget::aspectRatioChanged,          this, &QnFisheyePtzController::updateAspectRatio);
     connect(m_widget,           &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnFisheyePtzController::updateMediaDewarpingParams);
     connect(m_widget->item(),   &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnFisheyePtzController::updateItemDewarpingParams);
@@ -103,7 +102,7 @@ void QnFisheyePtzController::updateLimits() {
 void QnFisheyePtzController::updateCapabilities() {
     Qn::PtzCapabilities capabilities;
     if(m_mediaDewarpingParams.enabled) {
-        capabilities = Qn::FisheyePtzCapabilities;
+        capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability | Qn::VirtualPtzCapability;
     } else {
         capabilities = Qn::NoPtzCapabilities;
     }
@@ -211,13 +210,11 @@ bool QnFisheyePtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits
 
     *limits = m_limits;
 
-    emit finishedLater(Qn::GetLogicalLimitsPtzCommand, QVariant::fromValue(*limits));
     return true;
 }
 
 bool QnFisheyePtzController::getFlip(Qt::Orientations *flip) {
     *flip = 0;
-    emit finishedLater(Qn::GetFlipPtzCommand, QVariant::fromValue(*flip));
     return true;
 }
 
@@ -231,7 +228,6 @@ bool QnFisheyePtzController::continuousMove(const QVector3D &speed) {
         startListening();
     }
 
-    emit finishedLater(Qn::ContinuousMovePtzCommand, QVariant::fromValue(speed));
     return true;
 }
 
@@ -254,7 +250,6 @@ bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QV
         startListening();
     }
 
-    emit finishedLater(Qn::AbsoluteLogicalMovePtzCommand, QVariant::fromValue(position));
     return true;
 }
 
@@ -264,6 +259,5 @@ bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D
     
     *position = getPositionInternal();
 
-    emit finishedLater(Qn::GetLogicalPositionPtzCommand, QVariant::fromValue(*position));
     return true;
 }
