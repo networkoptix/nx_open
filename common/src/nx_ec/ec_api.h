@@ -197,6 +197,12 @@ namespace ec2
         template<class TargetType, class HandlerType> ReqID getCameraHistoryList( TargetType* target, HandlerType handler ) {
             return getCameraHistoryList( std::static_pointer_cast<impl::GetCamerasHistoryHandler>(std::make_shared<impl::CustomGetCamerasHistoryHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+        ErrorCode getCameraHistoryListSync(QnCameraHistoryList* const cameraHistoryList ) {
+            using namespace std::placeholders;
+            return impl::doSyncCall<impl::GetCamerasHistoryHandler>( std::bind(std::mem_fn(&AbstractCameraManager::getCameraHistoryList), this,  _1), cameraHistoryList );
+        }
+
         /*!
             \param handler Functor with params: (ErrorCode)
         */

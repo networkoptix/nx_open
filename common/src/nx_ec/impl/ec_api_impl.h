@@ -305,7 +305,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER( AddCamera, ErrorCode, QnVirtualCameraResourceListPtr )
         DEFINE_TWO_ARG_HANDLER( GetCameras, ErrorCode, QnVirtualCameraResourceList )
-        DEFINE_TWO_ARG_HANDLER( GetCamerasHistory, ErrorCode, QnCameraHistoryListPtr )
+        DEFINE_TWO_ARG_HANDLER( GetCamerasHistory, ErrorCode, QnCameraHistoryList )
         
 
         //////////////////////////////////////////////////////////

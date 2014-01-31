@@ -292,4 +292,17 @@ ErrorCode QnDbManager::doQuery(ApiMediaServerDataList& serverList)
     return ErrorCode::ok;
 }
 
+//getCameraServerItems
+ErrorCode QnDbManager::doQuery(ApiCameraServerItemDataList& historyList)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare(QString("select server_guid as serverGuid, timestamp, physical_id as physicalId from vms_cameraserveritem"));
+    if (!query.exec())
+        return ErrorCode::failure;
+
+    historyList.loadFromQuery(query);
+
+    return ErrorCode::ok;
+}
+
 }

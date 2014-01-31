@@ -748,9 +748,9 @@ void QnMain::loadResourcesFromECS()
     }
 
     QnCameraHistoryList cameraHistoryList;
-    while (appServerConnection->getCameraHistoryList(cameraHistoryList) != 0)
+    while (ec2Connection->getCameraManager()->getCameraHistoryListSync(&cameraHistoryList) != ec2::ErrorCode::ok)
     {
-        qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << appServerConnection->getLastError();
+        qDebug() << "QnMain::run(): Can't get cameras history. Reason: "; // << appServerConnection->getLastError();
         QnSleep::msleep(1000);
     }
 

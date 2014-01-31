@@ -6,6 +6,7 @@
 #include "nx_ec/data/camera_data.h"
 #include "nx_ec/data/ec2_resource_type_data.h"
 #include "nx_ec/data/mserver_data.h"
+#include "nx_ec/data/camera_server_item_data.h"
 
 
 class QSqlDatabase;
@@ -41,6 +42,9 @@ namespace ec2
 
         //getServers
         ErrorCode doQuery(ApiMediaServerDataList& serverList);
+
+        //getCameraServerItems
+        ErrorCode doQuery(ApiCameraServerItemDataList& historyList);
 
 		// --------- misc -----------------------------
 
