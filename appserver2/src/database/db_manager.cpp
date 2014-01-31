@@ -255,7 +255,7 @@ ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraL
 
 // ----------- getServers --------------------
 
-ErrorCode QnDbManager::doQuery(ApiMediaServerDataList& serverList)
+ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiMediaServerDataList& serverList)
 {
     QSqlQuery query(m_sdb);
     query.prepare(QString("select r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
@@ -293,7 +293,7 @@ ErrorCode QnDbManager::doQuery(ApiMediaServerDataList& serverList)
 }
 
 //getCameraServerItems
-ErrorCode QnDbManager::doQuery(ApiCameraServerItemDataList& historyList)
+ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiCameraServerItemDataList& historyList)
 {
     QSqlQuery query(m_sdb);
     query.prepare(QString("select server_guid as serverGuid, timestamp, physical_id as physicalId from vms_cameraserveritem"));

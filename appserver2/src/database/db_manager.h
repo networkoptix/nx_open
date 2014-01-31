@@ -41,10 +41,10 @@ namespace ec2
         ErrorCode doQuery(const QnId& mServerId, ApiCameraDataList& cameraList);
 
         //getServers
-        ErrorCode doQuery(ApiMediaServerDataList& serverList);
+        ErrorCode doQuery(nullptr_t /*dummy*/, ApiMediaServerDataList& serverList);
 
         //getCameraServerItems
-        ErrorCode doQuery(ApiCameraServerItemDataList& historyList);
+        ErrorCode doQuery(nullptr_t /*dummy*/, ApiCameraServerItemDataList& historyList);
 
 		// --------- misc -----------------------------
 

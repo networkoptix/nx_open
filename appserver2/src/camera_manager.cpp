@@ -86,7 +86,13 @@ namespace ec2
     template<class QueryProcessorType>
     ReqID QnCameraManager<QueryProcessorType>::getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler )
     {
-        //TODO/IMPL
+        auto queryDoneHandler = [handler]( ErrorCode errorCode, const ApiCameraServerItemDataList& cameraHistory) {
+            QnCameraHistoryList outData;
+            if( errorCode == ErrorCode::ok )
+                cameraHistory.toResourceList(outData);
+            handler->done( errorCode, outData);
+        };
+        m_queryProcessor->processQueryAsync<nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> ( nullptr, queryDoneHandler );
         return INVALID_REQ_ID;
     }
 

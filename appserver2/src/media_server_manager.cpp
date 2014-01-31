@@ -17,16 +17,23 @@ using namespace ec2;
 namespace ec2
 {
     template<class QueryProcessorType>
-    QnMediaServerManager<QueryProcessorType>::QnMediaServerManager( QueryProcessorType* const queryProcessor )
+    QnMediaServerManager<QueryProcessorType>::QnMediaServerManager( QueryProcessorType* const queryProcessor, QSharedPointer<QnResourceFactory> factory)
     :
-        m_queryProcessor( queryProcessor )
+        m_queryProcessor( queryProcessor ),
+        m_resourcefactory(factory)
     {
     }
 
     template<class T>
     ReqID QnMediaServerManager<T>::getServers( impl::GetServersHandlerPtr handler )
     {
-        //TODO/IMPL
+        auto queryDoneHandler = [handler, this]( ErrorCode errorCode, const ApiMediaServerDataList& servers) {
+            QnMediaServerResourceList outData;
+            if( errorCode == ErrorCode::ok )
+                servers.toResourceList(outData, m_resourcefactory.data());
+            handler->done( errorCode, outData);
+        };
+        m_queryProcessor->processQueryAsync<nullptr_t, ApiMediaServerDataList, decltype(queryDoneHandler)> (nullptr, queryDoneHandler);
         return INVALID_REQ_ID;
     }
 
