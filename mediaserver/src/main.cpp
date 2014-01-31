@@ -718,9 +718,9 @@ void QnMain::loadResourcesFromECS()
 
     //reading media servers list
     QnMediaServerResourceList mediaServerList;
-    while( appServerConnection->getServers( mediaServerList) != 0 )
+    while( ec2Connection->getMediaServerManager()->getServersSync( &mediaServerList) != ec2::ErrorCode::ok )
     {
-        NX_LOG( QString::fromLatin1("QnMain::run(). Can't get media servers. Reason %1").arg(QLatin1String(appServerConnection->getLastError())), cl_logERROR );
+        qWarning() << "QnMain::run(). Can't get media servers."; //.arg(QLatin1String(appServerConnection->getLastError())), cl_logERROR );
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 
@@ -733,10 +733,11 @@ void QnMain::loadResourcesFromECS()
         qnResPool->addResource( mediaServer );
         //requesting remote server cameras
         QnVirtualCameraResourceList cameras;
-        while( appServerConnection->getCameras(cameras, mediaServer->getId()) != 0 )
+        //while( appServerConnection->getCameras(cameras, mediaServer->getId()) != 0 )
+        while (ec2Connection->getCameraManager()->getCamerasSync(mediaServer->getId(), &cameras) != ec2::ErrorCode::ok)
         {
             NX_LOG( QString::fromLatin1("QnMain::run(). Error retreiving server %1(%2) cameras from enterprise controller. %3").
-                arg(mediaServer->getId()).arg(mediaServer->getGuid()).arg(QLatin1String(appServerConnection->getLastError())), cl_logERROR );
+                arg(mediaServer->getId()).arg(mediaServer->getGuid()).arg(QLatin1String("" /*appServerConnection->getLastError()*/)), cl_logERROR );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
         }
         foreach( const QnVirtualCameraResourcePtr &camera, cameras )

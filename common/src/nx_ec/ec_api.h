@@ -116,6 +116,12 @@ namespace ec2
         template<class TargetType, class HandlerType> ReqID getServers( TargetType* target, HandlerType handler ) {
             return getServers( std::static_pointer_cast<impl::GetServersHandler>(std::make_shared<impl::CustomGetServersHandler<TargetType, HandlerType>>(target, handler)) );
         }
+        
+        ErrorCode getServersSync(QnMediaServerResourceList* const serverList ) {
+            using namespace std::placeholders;
+            return impl::doSyncCall<impl::GetServersHandler>( std::bind(std::mem_fn(&AbstractMediaServerManager::getServers), this, _1), serverList );
+        }
+
         /*!
             \param handler Functor with params: (ErrorCode)
         */
