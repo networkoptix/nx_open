@@ -13,6 +13,7 @@
 #include "version.h"
 #include "ui/widgets/main_window.h"
 #include "client/client_settings.h"
+#include <api/global_settings.h>
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
@@ -76,7 +77,7 @@ extern "C"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "core/resource/camera_history.h"
-#include "client_message_processor.h"
+#include "client/client_message_processor.h"
 #include "client/client_translation_manager.h"
 
 #ifdef Q_OS_LINUX
@@ -344,6 +345,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
+    QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
@@ -412,7 +414,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // Create and start SessionManager
     QnSessionManager::instance()->start();
 
-    QnResourcePool::instance(); // to initialize net state;
     ffmpegInit();
 
     //===========================================================================

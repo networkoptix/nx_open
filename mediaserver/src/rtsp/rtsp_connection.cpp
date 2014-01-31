@@ -41,7 +41,7 @@
 #include "utils/common/synctime.h"
 #include "utils/network/tcp_listener.h"
 #include "network/authenticate_helper.h"
-#include "../settings.h"
+#include <media_server/settings.h>
 
 
 class QnTcpListener;

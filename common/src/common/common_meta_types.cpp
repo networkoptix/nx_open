@@ -114,6 +114,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnStringBoolPairList>("QList<QPair<QString,bool> >");
     qRegisterMetaType<QnStringVariantPairList>("QnStringVariantPairList");
     qRegisterMetaType<QnStringVariantPairList>("QList<QPair<QString,QVariant> >");
+    qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
 
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
     qRegisterMetaType<QnAbstractBusinessActionList>();

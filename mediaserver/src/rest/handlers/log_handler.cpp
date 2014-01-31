@@ -7,7 +7,7 @@
 #include "utils/common/util.h"
 #include <utils/common/log.h>
 
-#include "serverutil.h"
+#include <media_server/serverutil.h>
 
 static const int READ_BLOCK_SIZE = 1024*512;
 

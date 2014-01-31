@@ -50,12 +50,12 @@ namespace QnLexical {
     }
 
     template<class T>
-    T deserialized(const QString &value, bool *success = NULL) {
+    T deserialized(const QString &value, const T &defaultValue, bool *success = NULL) {
         T target;
         bool result = QnLexical::deserialize(value, &target);
         if (success)
             *success = result;
-        return target;
+        return result ? target : defaultValue;
     }
 
 } // namespace QnLexical

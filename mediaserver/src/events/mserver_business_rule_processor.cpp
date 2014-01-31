@@ -7,7 +7,7 @@
 #include "core/resource/media_server_resource.h"
 #include "core/resource/security_cam_resource.h"
 #include "recorder/recording_manager.h"
-#include "serverutil.h"
+#include <media_server/serverutil.h>
 #include "api/app_server_connection.h"
 #include "core/resource_management/resource_pool.h"
 

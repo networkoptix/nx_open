@@ -20,7 +20,7 @@
 #include "core/resource/camera_resource.h"
 #include "cached_output_stream.h"
 #include "network/authenticate_helper.h"
-#include "../settings.h"
+#include <media_server/settings.h>
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;

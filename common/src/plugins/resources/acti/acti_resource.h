@@ -79,6 +79,9 @@ public:
     //!Called by http server on receiving message from camera
     void cameraMessageReceived( const QString& path, const QnRequestParamList& message );
 
+    static void setEventPort(int eventPort);
+    static int eventPort();
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

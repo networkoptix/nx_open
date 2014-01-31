@@ -39,12 +39,14 @@
 #include <camera/caching_time_period_loader.h>
 
 #include <client/client_connection_data.h>
+#include <client/client_message_processor.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_directory_browser.h>
+#include <core/resource/file_processor.h>
 
 #include <device_plugins/server_camera/appserver.h>
 
@@ -115,8 +117,6 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
-#include "client_message_processor.h"
-#include "file_processor.h"
 #include "version.h"
 
 // TODO: #Elric remove this include
