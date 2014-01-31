@@ -957,9 +957,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
         break;
     case VirtualMovement:
         // TODO: #PTZ for some reason uncommenting these calls makes the movement look crappy... investigate!
-        /*if(info->mouseScreenPos() != info->mousePressScreenPos())*/ {
-            //QCursor::setPos(info->mousePressScreenPos());
-
+        if(info->mouseScreenPos() != info->mousePressScreenPos()) {
             QPointF delta = info->mouseItemPos() - info->lastMouseItemPos();
             qreal scale = target()->size().width() / 2.0;
             QPointF shift(delta.x() / scale, -delta.y() / scale);
@@ -970,6 +968,12 @@ void PtzInstrument::dragMove(DragInfo *info) {
             qreal speed = 0.5 * position.z();
             QVector3D positionDelta(shift.x() * speed, shift.y() * speed, 0.0);
             target()->ptzController()->absoluteMove(Qn::LogicalPtzCoordinateSpace, position + positionDelta, 2.0); /* 2.0 means instant movement. */
+
+            /* Calling setPos on each move event causes serious lags which I've so far
+             * was unable to explain. This is worked around by invoking it not that frequently. 
+             * Note that we don't account for screen-relative position here. */
+            if((info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() > 128)
+                QCursor::setPos(info->mousePressScreenPos()); // TODO: #PTZ #Elric this still looks bad, but not as bad as it looked before.
         }
         break;
     default:
@@ -977,7 +981,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
     }
 }
 
-void PtzInstrument::finishDrag(DragInfo *) {
+void PtzInstrument::finishDrag(DragInfo *info) {
     
     if(target()) {
         switch (m_movement) {
@@ -1001,6 +1005,7 @@ void PtzInstrument::finishDrag(DragInfo *) {
             break;
         }
         case VirtualMovement:
+            QCursor::setPos(info->mousePressScreenPos());
             target()->unsetCursor();
             break;
         default:
