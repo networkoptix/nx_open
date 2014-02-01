@@ -354,12 +354,12 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& bus
         return ErrorCode::failure;
 
     QSqlQuery queryRuleEventRes(m_sdb);
-    queryRuleEventRes.prepare(QString("SELECT * from vms_businessrule_event_resource order by businessrule_id"));
+    queryRuleEventRes.prepare(QString("SELECT * from vms_businessrule_event_resources order by businessrule_id"));
     if (!queryRuleEventRes.exec())
         return ErrorCode::failure;
 
     QSqlQuery queryRuleActionRes(m_sdb);
-    queryRuleActionRes.prepare(QString("SELECT * from vms_businessrule_action_resource order by businessrule_id"));
+    queryRuleActionRes.prepare(QString("SELECT * from vms_businessrule_action_resources order by businessrule_id"));
     if (!queryRuleActionRes.exec())
         return ErrorCode::failure;
 
