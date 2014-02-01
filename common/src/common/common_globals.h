@@ -159,7 +159,6 @@ public:
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
-        FisheyePtzCapabilities              = ContinuousPtzCapabilities | AbsolutePtzCapabilities | LogicalPositioningPtzCapability | AsynchronousPtzCapability | SynchronizedPtzCapability | VirtualPtzCapability
     };
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
@@ -334,9 +333,10 @@ public:
  */
 #define QN_USE_QT_STRING_LITERALS
 #ifdef QN_USE_QT_STRING_LITERALS
-#   define lit QStringLiteral
+namespace QnLitDetail { template<int N> void check_string_literal(const char (&)[N]) {} }
+#   define lit(s) (QnLitDetail::check_string_literal(s), QStringLiteral(s))
 #else
-#   define lit QLatin1String
+#   define lit(s) QLatin1String(s)
 #endif
 
 

@@ -2,7 +2,7 @@
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
-#include "serverutil.h"
+#include <media_server/serverutil.h>
 
 QnRestPingHandler::QnRestPingHandler()
 {

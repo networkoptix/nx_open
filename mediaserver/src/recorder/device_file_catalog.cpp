@@ -15,7 +15,7 @@
 #include "motion/motion_helper.h"
 #include <QtCore/QDebug>
 #include "recording_manager.h"
-#include "serverutil.h"
+#include <media_server/serverutil.h>
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/resource.h"
 

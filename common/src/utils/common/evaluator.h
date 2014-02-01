@@ -141,7 +141,7 @@ namespace Qee {
 
     private:
         Lexer *m_lexer;
-        QVector<Instruction> m_program;
+        Program m_program;
     };
 
 
@@ -235,7 +235,7 @@ namespace Qee {
         Resolver *m_resolver;
     };
 
-} // namespace QnExp
+} // namespace Qee
 
 Q_DECLARE_METATYPE(Qee::Function)
 

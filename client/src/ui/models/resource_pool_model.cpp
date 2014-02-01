@@ -14,6 +14,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/file_processor.h>
 #include <core/resource_management/resource_pool.h>
 
 #include "plugins/storage/file_storage/layout_storage_resource.h"
@@ -27,8 +28,6 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
-
-#include "file_processor.h"
 
 namespace {
     const char *pureTreeResourcesOnlyMimeType = "application/x-noptix-pure-tree-resources-only";

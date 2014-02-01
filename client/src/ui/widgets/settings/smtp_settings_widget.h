@@ -31,6 +31,7 @@ private:
     void stopTesting(QString result);
     void loadSettings(QString server, QnEmail::ConnectionType connectionType, int port = 0);
     void updateFocusedElement();
+
 private slots:
     void at_portComboBox_currentIndexChanged(int index);
     void at_testButton_clicked();
@@ -53,7 +54,7 @@ private:
     int m_requestHandle;
     int m_testHandle;
 
-    QTimer* m_timeoutTimer;
+    QTimer *m_timeoutTimer;
 
     bool m_settingsReceived;
 };

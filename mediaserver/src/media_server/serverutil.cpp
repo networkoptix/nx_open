@@ -5,8 +5,8 @@
 
 #include <core/resource/media_server_resource.h>
 
-#include "serverutil.h"
-#include "settings.h"
+#include <media_server/serverutil.h>
+#include <media_server/settings.h>
 #include "version.h"
 
 static QnMediaServerResourcePtr m_server;

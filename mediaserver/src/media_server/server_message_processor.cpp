@@ -15,8 +15,8 @@
 
 #include <recorder/recording_manager.h>
 
-#include "serverutil.h"
-#include "settings.h"
+#include <media_server/serverutil.h>
+#include <media_server/settings.h>
 
 #include "utils/network/simple_http_client.h"
 
@@ -62,13 +62,12 @@ void QnServerMessageProcessor::handleConnectionClosed(const QString &errorString
 
 void QnServerMessageProcessor::loadRuntimeInfo(const QnMessage &message) {
     base_type::loadRuntimeInfo(message);
-    QnAppServerConnectionFactory::setAllowCameraChanges(message.allowCameraChanges);
 }
 
 void QnServerMessageProcessor::handleMessage(const QnMessage &message) {
     base_type::handleMessage(message);
 
-    NX_LOG( QString::fromLatin1("Received message %1, resourceId %2, resource %3").
+    NX_LOG( lit("Received message %1, resourceId %2, resource %3").
             arg(Qn::toString(message.messageType)).arg(message.resourceId.toString()).arg(message.resource ? message.resource->getName() : QString("NULL")), cl_logDEBUG1 );
 
     switch (message.messageType) {

@@ -13,6 +13,7 @@
 #include "version.h"
 #include "ui/widgets/main_window.h"
 #include "client/client_settings.h"
+#include <api/global_settings.h>
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
@@ -76,7 +77,7 @@ extern "C"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "core/resource/camera_history.h"
-#include "client_message_processor.h"
+#include "client/client_message_processor.h"
 #include "client/client_translation_manager.h"
 
 #ifdef Q_OS_LINUX
@@ -344,6 +345,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
+    QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
@@ -364,8 +366,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
             argsMessage += fromNativePath(QFile::decodeName(argv[i])) + QLatin1Char('\n');
 
         while (application->isRunning()) {
-            if (application->sendMessage(argsMessage))
+            if (application->sendMessage(argsMessage)) {
+                out << "Another instance is already running";
                 return 0;
+            }
         }
     }
 
@@ -386,10 +390,15 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Initialize log. */
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
+    //TODO: #GDM should not close application because of this shit, just send cl_log to stdout/stderr
+    if (!QDir().mkpath(dataLocation + QLatin1String("/log"))) {
+        out << "Could not create log folder" << dataLocation + QLatin1String("/log");
         return 0;
-    if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
+    }
+    if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1)) {
+        out << "Could not create log file" << dataLocation + QLatin1String("/log/log_file");
         return 0;
+    }
 
 
     QnHelpHandler helpHandler;
@@ -406,7 +415,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // Create and start SessionManager
     QnSessionManager::instance()->start();
 
-    QnResourcePool::instance(); // to initialize net state;
     ffmpegInit();
 
     //===========================================================================
@@ -476,6 +484,21 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
     context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
+
+    Qn::ActionId effectiveMaximizeActionId = Qn::FullscreenAction;
+#ifdef Q_OS_LINUX
+    /* In Ubuntu its launcher is configured to be shown when a non-fullscreen window has appeared.
+     * In our case it means that launcher overlaps our fullscreen window when the user opens any dialogs.
+     * To prevent such overlapping there was an attempt to hide unity launcher when the main window
+     * has been activated. But now we can't hide launcher window because there is no any visible window for it.
+     * Unity-3D launcher is like a 3D-effect activated by compiz window manager.
+     * We can investigate possibilities of changing the behavior of unity compiz plugin but now
+     * we just disable fullscreen for unity-3d desktop session.
+     */
+    if (QnX11LauncherWorkaround::isUnity3DSession())
+        effectiveMaximizeActionId = Qn::MaximizeAction;
+#endif
+    context->menu()->registerAlias(Qn::EffectiveMaximizeAction, effectiveMaximizeActionId);
 
     /* Create main window. */
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));

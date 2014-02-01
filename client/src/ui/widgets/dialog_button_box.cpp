@@ -1,5 +1,7 @@
 #include "dialog_button_box.h"
 
+#include <QtGui/QMovie>
+
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QHBoxLayout>
 
@@ -12,7 +14,15 @@ QnProgressWidget::QnProgressWidget(QWidget *parent):
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setSizeConstraint(QLayout::SetFixedSize);
-    m_img->setPixmap(qnSkin->pixmap("loading.gif"));
+
+    QMovie* movie = qnSkin->loadMovie("loading.gif", this);
+    connect(movie, &QMovie::updated, [=](){m_img->setPixmap(movie->currentPixmap());});
+    m_img->setPixmap(movie->currentPixmap());
+
+    if (movie->loopCount() >= 0)
+        connect(movie, &QMovie::finished, movie, &QMovie::start);
+    movie->start();
+
     layout->addWidget(m_img);
     layout->addWidget(m_text);
     m_text->setVisible(false);

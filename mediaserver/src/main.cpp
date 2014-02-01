@@ -22,6 +22,7 @@
 
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
+#include <api/global_settings.h>
 
 #include <appserver/processor.h>
 
@@ -31,8 +32,6 @@
 #include <business/events/reasoned_business_event.h>
 
 #include <camera/camera_pool.h>
-
-#include <common/global_settings.h>
 
 #include <core/misc/schedule_task.h>
 #include <core/resource_management/camera_driver_restriction_list.h>
@@ -117,15 +116,16 @@
 #include <utils/network/ssl_socket.h>
 
 
-#include "server_message_processor.h"
-#include "settings.h"
-#include "serverutil.h"
+#include <media_server/server_message_processor.h>
+#include <media_server/settings.h>
+#include <media_server/serverutil.h>
 #include "version.h"
 
 #ifdef _WIN32
 #include "common/systemexcept_win32.h"
 #endif
 #include "core/ptz/server_ptz_controller_pool.h"
+#include "plugins/resources/acti/acti_resource.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -826,7 +826,6 @@ void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
 void QnMain::initTcpListener()
 {
     int rtspPort = MSSettings::roSettings()->value("rtspPort", DEFAUT_RTSP_PORT).toInt();
-    Qn::GlobalSettings::instance()->setHttpPort(rtspPort);    //required for QnActiResource (which is in libcommon). #todo: make qSettings global???
 #ifdef USE_SINGLE_STREAMING_PORT
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
     QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnStorageStatusHandler());
@@ -846,6 +845,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
     QnRestConnectionProcessor::registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsHandler());
 #ifdef ENABLE_ACTI
+    QnActiResource::setEventPort(rtspPort);
     QnRestConnectionProcessor::registerHandler("api/camera_event", new QnCameraEventHandler());  //used to receive event from acti camera. TODO: remove this from api
 #endif
     QnRestConnectionProcessor::registerHandler("favicon.ico", new QnRestFavicoHandler());
@@ -953,6 +953,8 @@ void QnMain::run()
 
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
+    QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
+
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
@@ -1002,7 +1004,6 @@ void QnMain::run()
     }
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
     QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
-    QnAppServerConnectionFactory::setAllowCameraChanges(connectInfo->allowCameraChanges);
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
@@ -1159,6 +1160,7 @@ void QnMain::run()
     UPNPDeviceSearcher::initGlobalInstance( new UPNPDeviceSearcher() );
 
     QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
+
 
     QString disabledVendors = MSSettings::roSettings()->value("disabledVendors").toString();
     QStringList disabledVendorList;

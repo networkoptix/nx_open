@@ -46,6 +46,10 @@ build_environment/x86
 build_environment/x64
 build_environment/arm
 
+appserver/scripts/ecl/ecproto
+appserver/scripts/ecl/ecl.egg-info
+appserver/scripts/ecl/build
+appserver/scripts/ecl/dist
 appserver/.idea
 appserver/env
 appserver/gen

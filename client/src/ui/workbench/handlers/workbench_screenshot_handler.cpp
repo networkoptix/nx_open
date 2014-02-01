@@ -12,6 +12,8 @@
 
 #include <client/client_settings.h>
 
+#include <core/resource/file_processor.h>
+
 #include <transcoding/filters/contrast_image_filter.h>
 #include <transcoding/filters/fisheye_image_filter.h>
 
@@ -24,7 +26,6 @@
 #include <utils/common/environment.h>
 #include <utils/common/warnings.h>
 
-#include "file_processor.h"
 
 namespace {
     void drawTimeStamp(QImage &image, Qn::Corner position, const QString &timestamp) {

@@ -212,3 +212,7 @@ QString QnSkin::path(const QString &name) const {
         return name;
     return m_basePath + name;
 }
+
+QMovie* QnSkin::loadMovie(const QString &name, QObject *parent) {
+    return new QMovie(path(name), QByteArray(), parent);
+}
