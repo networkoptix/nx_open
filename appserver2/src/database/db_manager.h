@@ -8,6 +8,7 @@
 #include "nx_ec/data/mserver_data.h"
 #include "nx_ec/data/camera_server_item_data.h"
 #include "nx_ec/data/ec2_user_data.h"
+#include "nx_ec/data/ec2_business_rule_data.h"
 
 
 class QSqlDatabase;
@@ -50,6 +51,9 @@ namespace ec2
         //getUserList
         ErrorCode doQuery(nullptr_t /*dummy*/, ApiUserDataList& userList);
 
+        //getBusinessRuleList
+        ErrorCode doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& userList);
+
 		// --------- misc -----------------------------
 
 		int getNextSequence();
@@ -63,6 +67,8 @@ namespace ec2
 		ErrorCode updateCameraSchedule(const ApiCameraData& data);
 
 		bool createDatabase();
+        
+        void mergeRuleResource(QSqlQuery& query, ApiBusinessRuleDataList& data, std::vector<qint32> ApiBusinessRuleData::*resList);
     private:
         QSqlDatabase m_sdb;
 		QMutex m_mutex;

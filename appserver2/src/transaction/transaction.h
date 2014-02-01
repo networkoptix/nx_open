@@ -26,7 +26,9 @@ namespace ec2
             getMediaServerList,
             saveMediaServer,
 
-            getUserList
+            getUserList,
+
+            getBusinessRuleList
         };
 
         QString toString( Value val );

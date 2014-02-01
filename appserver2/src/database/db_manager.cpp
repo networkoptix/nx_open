@@ -1,5 +1,6 @@
 #include "db_manager.h"
 #include <QtSql/QtSql>
+#include "nx_ec/data/ec2_business_rule_data.h"
 
 namespace ec2
 {
@@ -320,6 +321,54 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiUserDataList& userList)
         return ErrorCode::failure;
 
     userList.loadFromQuery(query);
+
+    return ErrorCode::ok;
+}
+
+void QnDbManager::mergeRuleResource(QSqlQuery& query, ApiBusinessRuleDataList& data, std::vector<qint32> ApiBusinessRuleData::*resList)
+{
+    int idx = 0;
+    QSqlRecord rec = query.record();
+    int ruleIdIdx = rec.indexOf("businessrule_id");
+    int resourceIdIdx = rec.indexOf("resource_id");
+    while (query.next())
+    {
+        int id = query.value(ruleIdIdx).toInt();
+        int resourceId = query.value(resourceIdIdx).toInt();
+
+        for (; idx < data.data.size() && data.data[idx].id != id; idx++);
+        if (idx == data.data.size())
+            break;
+        (data.data[idx].*resList).push_back(resourceId);
+    }
+}
+
+//getBusinessRules
+ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& businessRuleList)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare(QString("SELECT id, event_type as eventType, event_condition as eventCondition, event_state as eventState, action_type as actionType, \
+                          action_params as actionParams, aggregation_period as aggregationPeriod, disabled, comments, schedule \
+                          FROM vms_businessrule order by id"));
+    if (!query.exec())
+        return ErrorCode::failure;
+
+    QSqlQuery queryRuleEventRes(m_sdb);
+    queryRuleEventRes.prepare(QString("SELECT * from vms_businessrule_event_resource order by businessrule_id"));
+    if (!queryRuleEventRes.exec())
+        return ErrorCode::failure;
+
+    QSqlQuery queryRuleActionRes(m_sdb);
+    queryRuleActionRes.prepare(QString("SELECT * from vms_businessrule_action_resource order by businessrule_id"));
+    if (!queryRuleActionRes.exec())
+        return ErrorCode::failure;
+
+    businessRuleList.loadFromQuery(query);
+
+    // merge data
+
+    mergeRuleResource(queryRuleEventRes, businessRuleList, &ApiBusinessRuleData::eventResource);
+    mergeRuleResource(queryRuleActionRes, businessRuleList, &ApiBusinessRuleData::actionResource);
 
     return ErrorCode::ok;
 }

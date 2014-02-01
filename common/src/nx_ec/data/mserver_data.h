@@ -10,6 +10,8 @@ namespace ec2
 {
     struct ApiStorageData: public ApiResourceData
     {
+        ApiStorageData(): spaceLimit(0), usedForWriting(0) {}
+
         qint64       spaceLimit;
         bool         usedForWriting;
 
@@ -27,6 +29,8 @@ namespace ec2
 
     struct ApiMediaServerData: public ApiResourceData
     {
+        ApiMediaServerData(): reserve(false), panicMode(0) {}
+
         QString      apiUrl;
         QString      netAddrList;
         bool         reserve;

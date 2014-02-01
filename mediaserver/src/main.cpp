@@ -772,9 +772,9 @@ void QnMain::loadResourcesFromECS()
 
     //loading business rules
     QnBusinessEventRuleList rules;
-    while( appServerConnection->getBusinessRules(rules) != 0 )
+    while( ec2Connection->getBusinessEventManager()->getBusinessRulesSync(&rules) != ec2::ErrorCode::ok )
     {
-        qDebug() << "QnMain::run(): Can't get business rules. Reason: " << appServerConnection->getLastError();
+        qDebug() << "QnMain::run(): Can't get business rules. Reason: "; // << appServerConnection->getLastError();
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 

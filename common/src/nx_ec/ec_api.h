@@ -277,6 +277,12 @@ namespace ec2
         template<class TargetType, class HandlerType> ReqID getBusinessRules( TargetType* target, HandlerType handler ) {
             return getBusinessRules( std::static_pointer_cast<impl::GetBusinessRules>(std::make_shared<impl::CustomGetBusinessRules<TargetType, HandlerType>>(target, handler)) );
         }
+
+        ErrorCode getBusinessRulesSync(QnBusinessEventRuleList* const businessEventList ) {
+            using namespace std::placeholders;
+            return impl::doSyncCall<impl::GetBusinessRulesHandler>( std::bind(std::mem_fn(&AbstractBusinessEventManager::getBusinessRules), this, _1), businessEventList );
+        }
+
         /*!
             \param handler Functor with params: (ErrorCode)
         */

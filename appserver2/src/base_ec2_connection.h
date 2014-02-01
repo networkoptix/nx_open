@@ -46,6 +46,7 @@ namespace ec2
         AbstractMediaServerManagerPtr m_mediaServerManager;
         AbstractCameraManagerPtr m_cameraManager;
         AbstractUserManagerPtr m_userManager;
+        AbstractBusinessEventManagerPtr m_businessEventManager;
     };
 }
 

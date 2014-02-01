@@ -43,6 +43,9 @@ struct ScheduleTaskList: public ApiData
 
 struct ApiCameraData: public ApiResourceData 
 {
+    ApiCameraData(): scheduleDisabled(false), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryQuality(Qn::SSQualityNotDefined),
+                     controlDisabled(false), statusFlags(0) {}
+
     bool                scheduleDisabled;
     Qn::MotionType      motionType;
     QString             region;

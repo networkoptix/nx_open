@@ -13,7 +13,10 @@
 namespace ec2
 {
 
-struct ApiResourceData: public ApiData {
+struct ApiResourceData: public ApiData 
+{
+    ApiResourceData(): id(0), typeId(0), parentId(0), status(QnResource::Offline), disabled(false) {}
+
     qint32        id;
     QString       guid;
     qint32        typeId;

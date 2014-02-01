@@ -9,6 +9,8 @@ namespace ec2
 
 struct ApiUserData: public ApiResourceData
 {
+    ApiUserData(): isAdmin(false), rights(0) {}
+    
     QString password;
     bool isAdmin;
     qint64 rights;

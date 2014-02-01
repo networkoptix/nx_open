@@ -8,6 +8,7 @@
 #include "client_query_processor.h"
 #include "server_query_processor.h"
 #include "user_manager.h"
+#include "business_event_manager.h"
 
 
 namespace ec2
@@ -19,7 +20,8 @@ namespace ec2
         m_resourceManager( new QnResourceManager<T>(m_queryProcessor) ),
         m_mediaServerManager( new QnMediaServerManager<T>(m_queryProcessor, resourceFactory) ),
         m_cameraManager( new QnCameraManager<T>(m_queryProcessor, resourceFactory) ),
-        m_userManager( new QnUserManager<T>(m_queryProcessor, resourceFactory) )
+        m_userManager( new QnUserManager<T>(m_queryProcessor, resourceFactory) ),
+        m_businessEventManager( new QnBusinessEventManager<T>(m_queryProcessor, resourceFactory) )
     {
     }
 
@@ -50,7 +52,7 @@ namespace ec2
     template<class T>
     AbstractBusinessEventManagerPtr BaseEc2Connection<T>::getBusinessEventManager()
     {
-        return nullptr;
+        return m_businessEventManager;
     }
 
     template<class T>
