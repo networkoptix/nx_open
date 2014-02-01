@@ -24,7 +24,9 @@ namespace ec2
             getCameraHistoryList,
 
             getMediaServerList,
-            saveMediaServer
+            saveMediaServer,
+
+            getUserList
         };
 
         QString toString( Value val );

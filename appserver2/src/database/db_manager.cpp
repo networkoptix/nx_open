@@ -306,4 +306,22 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiCameraServerItemDataList&
     return ErrorCode::ok;
 }
 
+//getUsers
+ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiUserDataList& userList)
+{
+    //digest = md5('%s:%s:%s' % (self.user.username.lower(), 'NetworkOptix', password)).hexdigest()
+    QSqlQuery query(m_sdb);
+    query.prepare(QString("select r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
+                          u.password, u.is_superuser as isAdmin, u.email, p.digest as digest, u.password as hash, p.rights \
+                          from vms_resource r \
+                          join auth_user u  on u.id = r.id\
+                          join vms_userprofile p on p.user_id = u.id"));
+    if (!query.exec())
+        return ErrorCode::failure;
+
+    userList.loadFromQuery(query);
+
+    return ErrorCode::ok;
+}
+
 }

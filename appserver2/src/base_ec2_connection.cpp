@@ -7,6 +7,7 @@
 
 #include "client_query_processor.h"
 #include "server_query_processor.h"
+#include "user_manager.h"
 
 
 namespace ec2
@@ -17,7 +18,8 @@ namespace ec2
         m_queryProcessor( queryProcessor ),
         m_resourceManager( new QnResourceManager<T>(m_queryProcessor) ),
         m_mediaServerManager( new QnMediaServerManager<T>(m_queryProcessor, resourceFactory) ),
-        m_cameraManager( new QnCameraManager<T>(m_queryProcessor, resourceFactory) )
+        m_cameraManager( new QnCameraManager<T>(m_queryProcessor, resourceFactory) ),
+        m_userManager( new QnUserManager<T>(m_queryProcessor, resourceFactory) )
     {
     }
 
@@ -54,7 +56,7 @@ namespace ec2
     template<class T>
     AbstractUserManagerPtr BaseEc2Connection<T>::getUserManager()
     {
-        return nullptr;
+        return m_userManager;
     }
 
     template<class T>

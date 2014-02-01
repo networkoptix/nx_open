@@ -761,9 +761,9 @@ void QnMain::loadResourcesFromECS()
 
     //loading business rules
     QnUserResourceList users;
-    while( appServerConnection->getUsers(users) != 0 )
+    while(ec2Connection->getUserManager()->getUsersSync(&users)  != ec2::ErrorCode::ok)
     {
-        qDebug() << "QnMain::run(): Can't get users. Reason: " << appServerConnection->getLastError();
+        qDebug() << "QnMain::run(): Can't get users. Reason: "; // << appServerConnection->getLastError();
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 

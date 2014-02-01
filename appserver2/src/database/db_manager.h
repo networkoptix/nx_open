@@ -7,6 +7,7 @@
 #include "nx_ec/data/ec2_resource_type_data.h"
 #include "nx_ec/data/mserver_data.h"
 #include "nx_ec/data/camera_server_item_data.h"
+#include "nx_ec/data/ec2_user_data.h"
 
 
 class QSqlDatabase;
@@ -45,6 +46,9 @@ namespace ec2
 
         //getCameraServerItems
         ErrorCode doQuery(nullptr_t /*dummy*/, ApiCameraServerItemDataList& historyList);
+
+        //getUserList
+        ErrorCode doQuery(nullptr_t /*dummy*/, ApiUserDataList& userList);
 
 		// --------- misc -----------------------------
 

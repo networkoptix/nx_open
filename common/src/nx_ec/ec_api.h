@@ -363,6 +363,13 @@ namespace ec2
         template<class TargetType, class HandlerType> ReqID getUsers( QnUserResourceList& users, TargetType* target, HandlerType handler ) {
             return getUsers( getUsers, std::static_pointer_cast<impl::GetUsersHandler>(std::make_shared<impl::CustomGetUsersHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+        ErrorCode getUsersSync(QnUserResourceList* const userList ) {
+            using namespace std::placeholders;
+            return impl::doSyncCall<impl::GetUsersHandler>( std::bind(std::mem_fn(&AbstractUserManager::getUsers), this, _1), userList );
+        }
+
+
         /*!
             \param handler Functor with params: (ErrorCode)
         */
