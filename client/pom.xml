@@ -36,7 +36,7 @@
         <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->
         <windows.defines/>
-        <linux.defines/>
+        <linux.defines>LIGHT_CLIENT</linux.defines>
         <mac.defines/>
     </properties>   
     <profiles>
