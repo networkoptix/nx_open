@@ -347,6 +347,11 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const {
 
+#ifdef LIGHT_CLIENT
+    while (!layout->getItems().isEmpty())
+        layout->removeItem(*(layout->getItems().begin()));
+#endif
+
     if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
         return;
 
