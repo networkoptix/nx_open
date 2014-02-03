@@ -291,11 +291,11 @@ void QnLog::initLog(const QString& logLevelStr) {
     }
     cl_log.setLogLevel(logLevel);
 
-    CL_LOG(cl_logALWAYS) {
+    if (needWarnLogLevel) {
         cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
-        if (needWarnLogLevel) 
-            cl_log.log("Unknown log level specified. Using level ", QnLog::logLevelToString(logLevel), cl_logALWAYS);
+        cl_log.log("Unknown log level specified. Using level ", QnLog::logLevelToString(logLevel), cl_logALWAYS);
     }
+
 }
 
 void QnLog::initLog( QnLog* externalInstance )
