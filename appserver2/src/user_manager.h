@@ -14,7 +14,7 @@ namespace ec2
         public AbstractUserManager
     {
     public:
-        QnUserManager( QueryProcessorType* const queryProcessor, QSharedPointer<QnResourceFactory> factory );
+        QnUserManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
 
         virtual ReqID getUsers( impl::GetUsersHandlerPtr handler ) override;
         virtual ReqID save( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
@@ -23,7 +23,7 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
-        QSharedPointer<QnResourceFactory> m_resourcefactory;
+        ResourceContext m_resCtx;
 
         QnTransaction<ApiUserData> prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource );
     };

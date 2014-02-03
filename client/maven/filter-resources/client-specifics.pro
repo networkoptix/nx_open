@@ -11,8 +11,9 @@ TRANSLATIONS += ${basedir}/translations/client_en.ts \
 #				${basedir}/translations/client_pt-BR.ts \
 
 INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
-                ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/
-				
+                ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/ \
+                ${root.dir}/appserver2/src/
+
 include($$ADDITIONAL_QT_INCLUDES/qtsingleapplication/src/qtsingleapplication.pri)
 
 mac {

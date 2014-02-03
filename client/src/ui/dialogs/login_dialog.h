@@ -6,6 +6,7 @@
 #include <QtWidgets/QDialog>
 
 #include <api/model/connection_info.h>
+#include <nx_ec/ec_api.h>
 #include <utils/network/networkoptixmodulefinder.h>
 #include <utils/network/foundenterprisecontrollersmodel.h>
 
@@ -13,6 +14,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "compatibility_version_installation_dialog.h"
+
 
 class QStandardItemModel;
 class QStandardItem;
@@ -78,7 +80,11 @@ private slots:
     void at_saveButton_clicked();
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
+#ifdef OLD_EC
     void at_connectFinished(int status, QnConnectionInfoPtr connectionInfo, int requestHandle);
+#else
+    void at_ec2ConnectFinished( ec2::ErrorCode, ec2::AbstractECConnectionPtr );
+#endif
 
     void at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed);
     void at_entCtrlFinder_remoteModuleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed );

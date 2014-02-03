@@ -8,10 +8,7 @@
 
 #include <memory>
 
-#include "camera_manager.h"
-#include "media_server_manager.h"
 #include "nx_ec/ec_api.h"
-#include "resource_manager.h"
 #include "core/resource_management/resource_pool.h"
 
 
@@ -23,7 +20,9 @@ namespace ec2
         public AbstractECConnection
     {
     public:
-        BaseEc2Connection( QueryProcessorType* queryProcessor, const QnResourceFactoryPtr& resourceFactory, QnResourcePool* resPool );
+        BaseEc2Connection(
+            QueryProcessorType* queryProcessor,
+            const ResourceContext& resCtx );
 
         virtual AbstractResourceManagerPtr getResourceManager() override;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() override;
@@ -43,6 +42,7 @@ namespace ec2
 
     private:
         QueryProcessorType* m_queryProcessor;
+        AbstractLicenseManagerPtr m_licenseManager;
         AbstractResourceManagerPtr m_resourceManager;
         AbstractMediaServerManagerPtr m_mediaServerManager;
         AbstractCameraManagerPtr m_cameraManager;

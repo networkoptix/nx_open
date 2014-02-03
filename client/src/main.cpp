@@ -105,6 +105,7 @@ extern "C"
 #include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
 #include "core/ptz/client_ptz_controller_pool.h"
+#include <nx_ec/ec2_lib.h>
 
 
 
@@ -375,6 +376,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Initialize connections. */
     initAppServerConnection();
+
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
+	ec2ConnectionFactory->setResourceFactory(QSharedPointer<QnResourceFactory>(new QnMediaServerResourceFactory()));
+    QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
+
     qnSettings->save();
     if (!QDir(qnSettings->mediaFolder()).exists())
         QDir().mkpath(qnSettings->mediaFolder());

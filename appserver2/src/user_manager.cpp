@@ -15,10 +15,10 @@
 namespace ec2
 {
     template<class QueryProcessorType>
-    QnUserManager<QueryProcessorType>::QnUserManager( QueryProcessorType* const queryProcessor, QSharedPointer<QnResourceFactory> factory)
+    QnUserManager<QueryProcessorType>::QnUserManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
         :
         m_queryProcessor( queryProcessor ),
-        m_resourcefactory(factory)
+        m_resCtx(resCtx)
     {
     }
 

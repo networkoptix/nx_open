@@ -5,6 +5,10 @@
 
 #include "base_ec2_connection.h"
 
+#include "camera_manager.h"
+#include "managers/license_manager.h"
+#include "media_server_manager.h"
+#include "resource_manager.h"
 #include "client_query_processor.h"
 #include "server_query_processor.h"
 #include "user_manager.h"
@@ -14,14 +18,17 @@
 namespace ec2
 {
     template<class T>
-    BaseEc2Connection<T>::BaseEc2Connection( T* queryProcessor, const QnResourceFactoryPtr& resourceFactory, QnResourcePool* resPool )
+    BaseEc2Connection<T>::BaseEc2Connection(
+        T* queryProcessor,
+        const ResourceContext& resCtx )
     :
         m_queryProcessor( queryProcessor ),
+        m_licenseManager( new QnLicenseManager<T>(m_queryProcessor) ),
         m_resourceManager( new QnResourceManager<T>(m_queryProcessor) ),
-        m_mediaServerManager( new QnMediaServerManager<T>(m_queryProcessor, resourceFactory) ),
-        m_cameraManager( new QnCameraManager<T>(m_queryProcessor, resourceFactory) ),
-        m_userManager( new QnUserManager<T>(m_queryProcessor, resourceFactory) ),
-        m_businessEventManager( new QnBusinessEventManager<T>(m_queryProcessor, resourceFactory, resPool) )
+        m_mediaServerManager( new QnMediaServerManager<T>(m_queryProcessor, resCtx) ),
+        m_cameraManager( new QnCameraManager<T>(m_queryProcessor, resCtx) ),
+        m_userManager( new QnUserManager<T>(m_queryProcessor, resCtx) ),
+        m_businessEventManager( new QnBusinessEventManager<T>(m_queryProcessor, resCtx) )
     {
     }
 

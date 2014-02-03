@@ -15,6 +15,8 @@ namespace ec2
         {
 		    NotDefined,
 
+            connect,
+
             getResourceTypes,
 
             addCamera,

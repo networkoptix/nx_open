@@ -9,8 +9,6 @@
 #include <condition_variable>
 #include <mutex>
 
-#include <QtCore/QObject>
-
 #include "ec_api_impl.h"
 
 
@@ -20,18 +18,12 @@ namespace ec2
     {
         //!Allows executing ec api methods synchronously
         class SyncHandler
-        :
-            public QObject
         {
-            Q_OBJECT
-
         public:
             SyncHandler();
 
             void wait();
             ErrorCode errorCode() const;
-
-        public slots:
             void done( ErrorCode errorCode );
 
         private:

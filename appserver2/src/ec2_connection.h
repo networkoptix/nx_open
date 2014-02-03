@@ -20,7 +20,9 @@ namespace ec2
         public BaseEc2Connection<ServerQueryProcessor>
     {
     public:
-        Ec2DirectConnection( ServerQueryProcessor* queryProcessor, const QnResourceFactoryPtr& resourceFactory, QnResourcePool* resPool );
+        Ec2DirectConnection( ServerQueryProcessor* queryProcessor, const ResourceContext& resCtx );
+
+        virtual QnConnectionInfo connectionInfo() const;
 
     private:
 		std::unique_ptr<QnDbManager> m_dbManager;

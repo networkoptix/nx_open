@@ -242,6 +242,7 @@ public:
     static QnAppServerConnectionPtr createConnection(const QUrl &url);
 
     static void setEC2ConnectionFactory( ec2::AbstractECConnectionFactory* ec2ConnectionFactory );
+    static ec2::AbstractECConnectionFactory* ec2ConnectionFactory();
     static ec2::AbstractECConnectionPtr createConnection2Sync();
 
 private:

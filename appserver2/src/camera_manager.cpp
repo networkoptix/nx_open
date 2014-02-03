@@ -16,10 +16,10 @@
 namespace ec2
 {
     template<class QueryProcessorType>
-    QnCameraManager<QueryProcessorType>::QnCameraManager( QueryProcessorType* const queryProcessor, QSharedPointer<QnResourceFactory> factory)
+    QnCameraManager<QueryProcessorType>::QnCameraManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
     :
         m_queryProcessor( queryProcessor ),
-		m_resourceFactory( factory )
+		m_resCtx( resCtx )
     {
     }
 
@@ -75,7 +75,7 @@ namespace ec2
 		auto queryDoneHandler = [handler, this]( ErrorCode errorCode, const ApiCameraDataList& cameras) {
 			QnVirtualCameraResourceList outData;
 			if( errorCode == ErrorCode::ok )
-				cameras.toCameraList(outData, m_resourceFactory.data());
+				cameras.toCameraList(outData, m_resCtx.resFactory.data());
 			handler->done( errorCode, outData);
 		};
 		m_queryProcessor->processQueryAsync<QnId, ApiCameraDataList, decltype(queryDoneHandler)>

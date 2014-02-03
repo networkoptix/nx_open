@@ -134,7 +134,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                             }
 
 
-                            ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::createConnection2Sync();
+                            ec2::AbstractECConnectionPtr ec2Connection;
+                            QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync( QUrl(), &ec2Connection );
                             QnVirtualCameraResourceListPtr cameraList2;
                             const ec2::ErrorCode errorCode = ec2Connection->getCameraManager()->addCameraSync( cameraResource, &cameraList2 );
                             if( errorCode != ec2::ErrorCode::ok )
@@ -348,7 +349,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
 
 
-                        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::createConnection2Sync();
+                        ec2::AbstractECConnectionPtr ec2Connection;
+                        QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync( QUrl(), &ec2Connection );
                         QnVirtualCameraResourceListPtr cameraList2;
                         const ec2::ErrorCode errorCode = ec2Connection->getCameraManager()->addCameraSync( cameraResource, &cameraList2 );
                         if( errorCode != ec2::ErrorCode::ok )

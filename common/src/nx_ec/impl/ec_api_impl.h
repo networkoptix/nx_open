@@ -134,7 +134,8 @@ namespace ec2
         ok,
         failure,
         ioError,
-        serverError
+        serverError,
+        unauthorized
     };
 
     QString toString( ErrorCode errorCode );
