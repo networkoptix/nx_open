@@ -72,8 +72,24 @@ public:
         const std::string& str = ostr.str();
         {
             QMutexLocker mutx(&m_mutex);
-            if (!m_file.isOpen())
+            if (!m_file.isOpen()) {
+
+                switch (logLevel) {
+                case cl_logERROR:
+                case cl_logWARNING:
+                {
+                    QTextStream out(stderr);
+                    out << str.c_str();
+                    break;
+                }
+                default:
+                {
+                    QTextStream out(stdout);
+                    out << str.c_str();
+                }
+                }
                 return;
+            }
             m_file.write(str.c_str());
             m_file.flush();
             if (m_file.size() >= m_maxFileSize)
