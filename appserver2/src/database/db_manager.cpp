@@ -7,6 +7,42 @@ namespace ec2
 
 static QnDbManager* globalInstance = 0;
 
+
+template <class MainData>
+void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<qint32> MainData::*subList)
+{
+    int idx = 0;
+    QSqlRecord rec = query.record();
+    int idIdx = rec.indexOf("parentId");
+    int resourceIdIdx = rec.indexOf("id");
+    while (query.next())
+    {
+        int id = query.value(idIdx).toInt();
+        int resourceId = query.value(resourceIdIdx).toInt();
+
+        for (; idx < data.size() && data[idx].id != id; idx++);
+        if (idx == data.size())
+            break;
+        (data[idx].*subList).push_back(resourceId);
+    }
+}
+
+template <class MainData, class SubData>
+void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subDataList, std::vector<SubData> MainData::*subDataListField, qint32 SubData::*parentIdField)
+{
+    //ScheduleTaskList sheduleTaskList;
+    //sheduleTaskList.loadFromQuery(queryScheduleTask);
+
+    int idx = 0;
+    foreach(const SubData& subData, subDataList)
+    {
+        for (; idx < data.size() && subData.*parentIdField != data[idx].id; idx++);
+        if (idx == data.size())
+            break;
+        (data[idx].*subDataListField).push_back(std::move(subData));
+    }
+}
+
 QnDbManager::QnDbManager(QnResourceFactoryPtr factory)
 {
     m_resourceFactory = factory;
@@ -185,20 +221,7 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 
 	data.loadFromQuery(queryTypes);
 
-	int idx = 0;
-	QSqlRecord rec = queryParents.record();
-	int idIdx = rec.indexOf("id");
-	int parentIdIdx = rec.indexOf("parentId");
-	while (queryParents.next())
-	{
-		int id = queryParents.value(idIdx).toInt();
-		int parentId = queryParents.value(parentIdIdx).toInt();
-
-		for (; idx < data.data.size() && data.data[idx].id != id; idx++);
-		if (idx == data.data.size())
-			break;
-		data.data[idx].parentId.push_back(parentId);
-	}
+    mergeIdListData<ApiResourceTypeData>(queryParents, data.data, &ApiResourceTypeData::parentId);
 
 	return ErrorCode::ok;
 }
@@ -243,19 +266,13 @@ ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraL
     ScheduleTaskList sheduleTaskList;
     sheduleTaskList.loadFromQuery(queryScheduleTask);
 
-    int idx = 0;
-    foreach(const ScheduleTask& scheduleTaskData, sheduleTaskList.data)
-    {
-        for (; idx < cameraList.data.size() && scheduleTaskData.sourceId != cameraList.data[idx].id; idx++);
-        if (idx == cameraList.data.size())
-            break;
-        cameraList.data[idx].scheduleTask.push_back(std::move(scheduleTaskData));
-    }
+    mergeObjectListData<ApiCameraData, ScheduleTask>(cameraList.data, sheduleTaskList.data, &ApiCameraData::scheduleTask, &ScheduleTask::sourceId);
 
 	return ErrorCode::ok;
 }
 
 // ----------- getServers --------------------
+
 
 ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiMediaServerDataList& serverList)
 {
@@ -282,14 +299,7 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiMediaServerDataList& serv
     ApiStorageDataList storageList;
     storageList.loadFromQuery(queryStorage);
 
-    int idx = 0;
-    foreach(const ApiStorageData& storageData, storageList.data)
-    {
-        for (; idx < serverList.data.size() && storageData.parentId != serverList.data[idx].id; idx++);
-        if (idx == serverList.data.size())
-            break;
-        serverList.data[idx].storages.push_back(std::move(storageData));
-    }
+    mergeObjectListData<ApiMediaServerData, ApiStorageData>(serverList.data, storageList.data, &ApiMediaServerData::storages, &ApiStorageData::parentId);
 
     return ErrorCode::ok;
 }
@@ -325,24 +335,6 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiUserDataList& userList)
     return ErrorCode::ok;
 }
 
-void QnDbManager::mergeRuleResource(QSqlQuery& query, ApiBusinessRuleDataList& data, std::vector<qint32> ApiBusinessRuleData::*resList)
-{
-    int idx = 0;
-    QSqlRecord rec = query.record();
-    int ruleIdIdx = rec.indexOf("businessrule_id");
-    int resourceIdIdx = rec.indexOf("resource_id");
-    while (query.next())
-    {
-        int id = query.value(ruleIdIdx).toInt();
-        int resourceId = query.value(resourceIdIdx).toInt();
-
-        for (; idx < data.data.size() && data.data[idx].id != id; idx++);
-        if (idx == data.data.size())
-            break;
-        (data.data[idx].*resList).push_back(resourceId);
-    }
-}
-
 //getBusinessRules
 ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& businessRuleList)
 {
@@ -354,12 +346,12 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& bus
         return ErrorCode::failure;
 
     QSqlQuery queryRuleEventRes(m_sdb);
-    queryRuleEventRes.prepare(QString("SELECT * from vms_businessrule_event_resources order by businessrule_id"));
+    queryRuleEventRes.prepare(QString("SELECT businessrule_id as parentId, resource_id as id from vms_businessrule_event_resources order by businessrule_id"));
     if (!queryRuleEventRes.exec())
         return ErrorCode::failure;
 
     QSqlQuery queryRuleActionRes(m_sdb);
-    queryRuleActionRes.prepare(QString("SELECT * from vms_businessrule_action_resources order by businessrule_id"));
+    queryRuleActionRes.prepare(QString("SELECT businessrule_id as parentId, resource_id as id from vms_businessrule_action_resources order by businessrule_id"));
     if (!queryRuleActionRes.exec())
         return ErrorCode::failure;
 
@@ -367,8 +359,8 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& bus
 
     // merge data
 
-    mergeRuleResource(queryRuleEventRes, businessRuleList, &ApiBusinessRuleData::eventResource);
-    mergeRuleResource(queryRuleActionRes, businessRuleList, &ApiBusinessRuleData::actionResource);
+    mergeIdListData<ApiBusinessRuleData>(queryRuleEventRes, businessRuleList.data, &ApiBusinessRuleData::eventResource);
+    mergeIdListData<ApiBusinessRuleData>(queryRuleActionRes, businessRuleList.data, &ApiBusinessRuleData::actionResource);
 
     return ErrorCode::ok;
 }
