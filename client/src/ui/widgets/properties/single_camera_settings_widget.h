@@ -171,6 +171,8 @@ private:
 
     bool m_readOnly;
 
+    bool m_updating;
+
     QnCameraMotionMaskWidget *m_motionWidget;
     QVBoxLayout *m_motionLayout;
     bool m_inUpdateMaxFps;

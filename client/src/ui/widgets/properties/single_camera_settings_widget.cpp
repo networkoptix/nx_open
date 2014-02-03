@@ -39,6 +39,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 
+#include <utils/common/scoped_value_rollback.h>
 #include <utils/license_usage_helper.h>
 
 
@@ -56,6 +57,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_hasScheduleControlsChanges(false),
     m_hasMotionControlsChanges(false),
     m_readOnly(false),
+    m_updating(false),
     m_motionWidget(NULL),
     m_inUpdateMaxFps(false),
     m_widgetsRecreator(0),
@@ -393,6 +395,8 @@ bool QnSingleCameraSettingsWidget::licensedParametersModified() const
 }
 
 void QnSingleCameraSettingsWidget::updateFromResource() {
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
     loadAdvancedSettings();
 
     if(!m_camera) {
@@ -862,6 +866,9 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
 }
 
 void QnSingleCameraSettingsWidget::at_dbDataChanged() {
+    if (m_updating)
+        return;
+
     ui->tabWidget->setTabEnabled(Qn::FisheyeCameraSettingsTab, ui->checkBoxDewarping->isChecked());
     setHasDbChanges(true);
 }
@@ -923,8 +930,10 @@ void QnSingleCameraSettingsWidget::refreshAdvancedSettings()
     }
 }
 
-void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged()
-{
+void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged() {
+    if (m_updating)
+        return;
+
     at_dbDataChanged();
     at_cameraDataChanged();
 
