@@ -25,11 +25,16 @@ static QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
     return addListStrings.join(QLatin1String(";"));
 }
 
+void ApiStorageData::fromResource(QnAbstractStorageResourcePtr resource)
+{
+    ApiResourceData::fromResource(resource);
+    spaceLimit = resource->getSpaceLimit();
+    usedForWriting = resource->isUsedForWriting();
+}
+
 void ApiStorageData::toResource(QnAbstractStorageResourcePtr resource) const
 {
-    resource->setId(id);
-    resource->setName(name);
-    resource->setUrl(url);
+    ApiResourceData::toResource(resource);
     resource->setSpaceLimit(spaceLimit);
     resource->setUsedForWriting(usedForWriting);
 }
@@ -50,6 +55,24 @@ QnResourceParameters ApiStorageData::toHashMap() const
 void ApiStorageDataList::loadFromQuery(QSqlQuery& query)
 {
     QN_QUERY_TO_DATA_OBJECT(ApiStorageData, data, ApiStorageDataFields ApiResourceDataFields)
+}
+
+void ApiMediaServerData::fromResource(QnMediaServerResourcePtr resource)
+{
+    ApiResourceData::fromResource(resource);
+
+    netAddrList = serializeNetAddrList(resource->getNetAddrList());
+    apiUrl = resource->getUrl();
+    reserve = resource->getReserve();
+    panicMode = resource->getPanicMode();
+    streamingUrl = resource->getStreamingUrl();
+    version = resource->getVersion().toString();
+    //authKey = resource-> getetAuthKey();
+
+    QnAbstractStorageResourceList storageList = resource->getStorages();
+    storages.reserve(storageList.size());
+    for (int i = 0; i < storageList.size(); ++i)
+        storages[i].fromResource(storageList[i]);
 }
 
 void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, QnResourceFactory* factory) const

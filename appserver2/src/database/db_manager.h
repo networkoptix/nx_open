@@ -34,6 +34,7 @@ namespace ec2
         }
 
         ErrorCode executeTransaction(const QnTransaction<ApiCameraData>& tran);
+        ErrorCode executeTransaction(const QnTransaction<ApiMediaServerData>& tran);
 		
 		// --------- get methods ---------------------
         //getResourceTypes
@@ -63,8 +64,11 @@ namespace ec2
 
 		ErrorCode updateCamera(const ApiCameraData& data);
 		ErrorCode insertCamera(const ApiCameraData& data);
+        ErrorCode updateCameraSchedule(const ApiCameraData& data);
 
-		ErrorCode updateCameraSchedule(const ApiCameraData& data);
+        ErrorCode updateMediaServer(const ApiMediaServerData& data);
+        ErrorCode insertMediaServer(const ApiMediaServerData& data);
+        ErrorCode updateStorages(const ApiMediaServerData&);
 
 		bool createDatabase();
         

@@ -21,8 +21,10 @@ namespace ec2
                     return "getCameras";
                 case getCameraHistoryList:
                     return "getCameraHistoryList";
-                case saveMediaServer:
-                    return "saveMediaServer";
+                case updateMediaServer:
+                    return "updateMediaServer";
+                case addMediaServer:
+                    return "addMediaServer";
                 default:
                     return "unknown";
             }

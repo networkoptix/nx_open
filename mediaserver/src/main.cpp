@@ -397,17 +397,17 @@ void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddr
     server->setApiUrl(QString("http://%1:%2").arg(myAddress).arg(port));
 }
 
-QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection, QnMediaServerResource::PanicMode* pm)
+QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, QnMediaServerResource::PanicMode* pm)
 {
     QnMediaServerResourceList servers;
     *pm = QnMediaServerResource::PM_None;
 
     while (servers.isEmpty())
     {
-        if (appServerConnection->getServers(servers) == 0)
+        while( ec2Connection->getMediaServerManager()->getServersSync( &servers) == ec2::ErrorCode::ok )
             break;
 
-        qDebug() << "findServer(): Call to getServers failed. Reason: " << appServerConnection->getLastError();
+        qDebug() << "findServer(): Call to getServers failed. Reason: "; // << appServerConnection->getLastError();
         QnSleep::msleep(1000);
     }
 
@@ -421,23 +421,23 @@ QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection
     return QnMediaServerResourcePtr();
 }
 
-QnMediaServerResourcePtr registerServer(QnAppServerConnectionPtr appServerConnection, QnMediaServerResourcePtr serverPtr)
+QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, QnMediaServerResourcePtr serverPtr)
 {
     QnMediaServerResourceList servers;
     serverPtr->setStatus(QnResource::Online);
 
-    QByteArray authKey;
-    if (appServerConnection->saveServer(serverPtr, servers, authKey) != 0)
+    if (ec2Connection->getMediaServerManager()->saveServerSync(serverPtr, &servers) != ec2::ErrorCode::ok)
     {
-        qDebug() << "registerServer(): Call to registerServer failed. Reason: " << appServerConnection->getLastError();
-
+        qDebug() << "registerServer(): Call to registerServer failed. Reason: "; // << appServerConnection->getLastError();
         return QnMediaServerResourcePtr();
     }
-
+    
+    /*
     if (!authKey.isEmpty()) {
         MSSettings::roSettings()->setValue("authKey", authKey);
         QnAppServerConnectionFactory::setAuthKey(authKey);
     }
+    */
 
     return servers.at(0);
 }
@@ -678,9 +678,8 @@ static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 
 void QnMain::loadResourcesFromECS()
 {
-    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 #ifdef OLD_EC
-
+    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     QnVirtualCameraResourceList cameras;
     while (appServerConnection->getCameras(cameras, m_mediaServer->getId()) != 0)
     {
@@ -784,16 +783,19 @@ void QnMain::loadResourcesFromECS()
 
 void QnMain::at_localInterfacesChanged()
 {
-    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-
     m_mediaServer->setNetAddrList(allLocalAddresses());
-
+#ifdef OLD_EC
+    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     appServerConnection->saveAsync(m_mediaServer, this, SLOT(at_serverSaved(int, const QnResourceList&, int)));
+#else
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::createConnection2Sync();
+    ec2Connection->getMediaServerManager()->saveServer(m_mediaServer, this, &QnMain::at_serverSaved);
+#endif
 }
 
-void QnMain::at_serverSaved(int status, const QnResourceList &, int)
+void QnMain::at_serverSaved(ec2::ErrorCode err, const QnResourceList &)
 {
-    if (status != 0)
+    if (err != ec2::ErrorCode::ok)
         qWarning() << "Error saving server.";
 }
 
@@ -995,6 +997,8 @@ void QnMain::run()
     QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool());
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+
+
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
     connect(QnStorageManager::instance(), SIGNAL(noStoragesAvailable()), this, SLOT(at_noStorages()));
     connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr, QnBusiness::EventReason)), this, SLOT(at_storageFailure(QnResourcePtr, QnBusiness::EventReason)));
@@ -1112,7 +1116,7 @@ void QnMain::run()
     QnMediaServerResource::PanicMode pm;
     while (m_mediaServer.isNull())
     {
-        QnMediaServerResourcePtr server = findServer(appServerConnection, &pm);
+        QnMediaServerResourcePtr server = findServer(ec2Connection, &pm);
 
         if (!server) {
             server = QnMediaServerResourcePtr(new QnMediaServerResource());
@@ -1139,7 +1143,7 @@ void QnMain::run()
         if (storages.isEmpty())
             server->setStorages(createStorages());
 
-        m_mediaServer = registerServer(appServerConnection, server);
+        m_mediaServer = registerServer(ec2Connection, server);
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
     }

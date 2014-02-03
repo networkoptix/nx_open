@@ -122,30 +122,89 @@ ErrorCode QnDbManager::insertCamera(const ApiCameraData& data)
 
 ErrorCode QnDbManager::updateCamera(const ApiCameraData& data)
 {
-	QSqlQuery insQuery(m_sdb);
-	insQuery.prepare("UPDATE vms_camera SET\
+	QSqlQuery query(m_sdb);
+	query.prepare("UPDATE vms_camera SET\
 					 audio_enabled = :audioEnabled, control_disabled = :controlDisabled, firmware = :firmware, vendor = :vendor, manually_added = :manuallyAdded, region = :region,\
 					 schedule_disabled = :scheduleDisabled, motion_type = :motionType, group_name = :groupName, group_id = :groupId,\
 					 mac = :mac, model = :model, secondary_quality = :secondaryQuality, status_flags = :statusFlags, physical_id = :physicalId, \
 					 password = :password, login = :login, dewarping_params = :dewarpingParams\
 					 WHERE resource_ptr_id = :id");
-	data.autoBindValues(insQuery);
+	data.autoBindValues(query);
 
 	QMutexLocker lock(&m_mutex);
-	return insQuery.exec() ? ErrorCode::ok : ErrorCode::failure;
+	return query.exec() ? ErrorCode::ok : ErrorCode::failure;
+}
+
+ErrorCode QnDbManager::insertMediaServer(const ApiMediaServerData& data)
+{
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO vms_server (api_url, auth_key, streaming_url, version, net_addr_list, reserve, panic_mode, resource_ptr_id) VALUES\
+                     (:apiUrl, :authKey, :streamingUrl, :version, :netAddrList, :reserve, :panicMode, :id");
+    data.autoBindValues(insQuery);
+
+    QMutexLocker lock(&m_mutex);
+    if (insQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
+ErrorCode QnDbManager::updateMediaServer(const ApiMediaServerData& data)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare("UPDATE vms_server SET\
+                     api_url = :apiUrl, auth_key = :authKey, streaming_url = :streamingUrl, version = :version, \
+                     net_addr_list = :netAddrList, reserve = :reserve, panic_mode= :panicMode \
+                     WHERE resource_ptr_id = :id");
+    data.autoBindValues(query);
+
+    QMutexLocker lock(&m_mutex);
+    return query.exec() ? ErrorCode::ok : ErrorCode::failure;
+}
+
+ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
+{
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_storage where resource_ptr_id in (select id from vms_resource r where parent_id = :id");
+    delQuery.bindValue("id", data.id);
+    if (!delQuery.exec()) 
+        return ErrorCode::failure;
+
+    delQuery.prepare("DELETE FROM vms_resource where where parent_id = :id");
+    delQuery.bindValue("id", data.id);
+    if (!delQuery.exec()) 
+        return ErrorCode::failure;
+
+    for (int i = 0; i < data.storages.size(); ++i)
+    foreach(const ApiStorageData& storage, data.storages)
+    {
+        ErrorCode result = insertResource(storage);
+        if (result != ErrorCode::ok)
+            return result;
+
+        QSqlQuery insQuery(m_sdb);
+        insQuery.prepare("INSERT INTO vms_storage (space_limit, used_for_writing, resource_ptr_id) VALUES\
+                         (:spaceLimit, :usedForWriting, :id)");
+        storage.autoBindValues(insQuery);
+
+        if (!insQuery.exec()) 
+            return ErrorCode::failure;
+    }
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data)
 {
-	QMutexLocker lock(&m_mutex);
-
 	QSqlQuery delQuery(m_sdb);
 	delQuery.prepare("DELETE FROM vms_scheduletask where source_id = :id");
 	delQuery.bindValue("id", data.id);
 	if (!delQuery.exec()) 
 		return ErrorCode::failure;
 
-	foreach(ScheduleTask task, data.scheduleTask) 
+	foreach(const ScheduleTask& task, data.scheduleTask) 
 	{
 		QSqlQuery insQuery(m_sdb);
 		insQuery.prepare("INSERT INTO vms_scheduletask (id, source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES\
@@ -178,6 +237,8 @@ int QnDbManager::getNextSequence()
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tran)
 {
+    QMutexLocker lock(&m_mutex);
+
 	ErrorCode result;
 	if (tran.command == ApiCommand::updateCamera) {
 		result = updateResource(tran.params);
@@ -193,7 +254,31 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tr
 	}
 	if (result !=ErrorCode::ok)
 		return result;
-	updateCameraSchedule(tran.params);
+	result = updateCameraSchedule(tran.params);
+
+    return result;
+}
+
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiMediaServerData>& tran)
+{
+    QMutexLocker lock(&m_mutex);
+
+    ErrorCode result;
+    if (tran.command == ApiCommand::updateMediaServer) {
+        result = updateResource(tran.params);
+        if (result !=ErrorCode::ok)
+            return result;
+        result = updateMediaServer(tran.params);
+    }
+    else {
+        result = insertResource(tran.params);
+        if (result !=ErrorCode::ok)
+            return result;
+        result = insertMediaServer(tran.params);
+    }
+    if (result !=ErrorCode::ok)
+        return result;
+    result = updateStorages(tran.params);
 
     return result;
 }

@@ -134,6 +134,12 @@ namespace ec2
         template<class TargetType, class HandlerType> ReqID saveServer( const QnMediaServerResourcePtr& mserver, TargetType* target, HandlerType handler ) {
             return saveServer( mserver, std::static_pointer_cast<impl::SaveServerHandler>(std::make_shared<impl::CustomSaveServerHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+        ErrorCode saveServerSync( const QnMediaServerResourcePtr& serverRes, QnMediaServerResourceList* const servers ) {
+            using namespace std::placeholders;
+            return impl::doSyncCall<impl::SaveServerHandler>( std::bind(std::mem_fn(&AbstractMediaServerManager::saveServer), this, serverRes, _1), servers );
+        }
+
         /*!
             \param handler Functor with params: (ErrorCode)
         */

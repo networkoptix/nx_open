@@ -11,6 +11,7 @@
 #include "network/universal_tcp_listener.h"
 
 #include "utils/common/long_runnable.h"
+#include "nx_ec/impl/ec_api_impl.h"
 
 
 class QnAppserverResourceProcessor;
@@ -34,7 +35,7 @@ public slots:
 private slots:
     void loadResourcesFromECS();
     void at_localInterfacesChanged();
-    void at_serverSaved(int, const QnResourceList&, int);
+    void at_serverSaved(ec2::ErrorCode err, const QnResourceList&);
     void at_cameraIPConflict(QHostAddress host, QStringList macAddrList);
     void at_noStorages();
     void at_storageFailure(QnResourcePtr storage, QnBusiness::EventReason reason);

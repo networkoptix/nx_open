@@ -16,6 +16,7 @@ namespace ec2
         bool         usedForWriting;
 
         QnResourceParameters toHashMap() const;
+        void fromResource(QnAbstractStorageResourcePtr resource);
         void toResource(QnAbstractStorageResourcePtr resource) const;
         QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
     };
@@ -40,6 +41,7 @@ namespace ec2
         QString      authKey;
         std::vector<ApiStorageData>  storages;
         
+        void fromResource(QnMediaServerResourcePtr resource);
         void toResource(QnMediaServerResourcePtr resource, QnResourceFactory* factory) const;
         QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
     };

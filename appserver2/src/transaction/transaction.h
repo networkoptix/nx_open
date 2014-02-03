@@ -24,7 +24,8 @@ namespace ec2
             getCameraHistoryList,
 
             getMediaServerList,
-            saveMediaServer,
+            addMediaServer,
+            updateMediaServer,
 
             getUserList,
 

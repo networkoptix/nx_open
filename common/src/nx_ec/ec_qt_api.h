@@ -38,7 +38,7 @@ namespace ec2
             void emitGetResourcesDone( const ErrorCode p1, const QnResourceList& p2 ) { emit onGetResourcesDone( p1, p2 ); }
             void emitGetResourceDone( const ErrorCode p1, const QnResourcePtr& p2 ) { emit onGetResourceDone( p1, p2 ); }
             void emitGetKvPairsDone( const ErrorCode p1, const QnKvPairListsById& p2 ) { emit onGetKvPairsDone( p1, p2 ); }
-            void emitSaveServerDone( const ErrorCode p1, const QnMediaServerResourceList& p2, const QByteArray& p3 ) { emit onSaveServerDone( p1, p2, p3 ); }
+            void emitSaveServerDone( const ErrorCode p1, const QnMediaServerResourceList& p2) { emit onSaveServerDone( p1, p2); }
             void emitGetServersDone( const ErrorCode p1, const QnMediaServerResourceList& p2 ) { emit onGetServersDone( p1, p2 ); }
             void emitAddCameraDone( const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( p1, p2 ); }
             void emitGetCamerasDone( const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( p1, p2 ); }
@@ -60,7 +60,7 @@ namespace ec2
             void onGetResourcesDone( const ErrorCode, const QnResourceList& );
             void onGetResourceDone( const ErrorCode, const QnResourcePtr& );
             void onGetKvPairsDone( const ErrorCode, const QnKvPairListsById& );
-            void onSaveServerDone( const ErrorCode, const QnMediaServerResourceList&, const QByteArray& );
+            void onSaveServerDone( const ErrorCode, const QnMediaServerResourceList&);
             void onGetServersDone( const ErrorCode, const QnMediaServerResourceList& );
             void onAddCameraDone( const ErrorCode, const QnVirtualCameraResourceList& );
             void onGetCamerasDone( const ErrorCode, const QnVirtualCameraResourceList& );
