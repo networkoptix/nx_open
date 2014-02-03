@@ -5,6 +5,8 @@
 #include "business/business_fwd.h"
 #include "api_data.h"
 
+class QnResourcePool;
+
 namespace ec2
 {
     
@@ -32,7 +34,7 @@ struct ApiBusinessRuleData: public ApiData
 
     bool system; // system rule cannot be deleted 
 
-    void toResource(QnBusinessEventRulePtr resource) const;
+    void toResource(QnBusinessEventRulePtr resource, QnResourcePool* resourcePool) const;
     QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
 
 };
@@ -44,7 +46,7 @@ struct ApiBusinessRuleDataList: public ApiData
     QN_DECLARE_STRUCT_SERIALIZATORS();
 
     void loadFromQuery(QSqlQuery& query);
-    void toResourceList(QnBusinessEventRuleList& outData) const;
+    void toResourceList(QnBusinessEventRuleList& outData, QnResourcePool* resourcePool) const;
 };
 
 }

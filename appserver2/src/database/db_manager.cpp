@@ -30,9 +30,6 @@ void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<
 template <class MainData, class SubData>
 void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subDataList, std::vector<SubData> MainData::*subDataListField, qint32 SubData::*parentIdField)
 {
-    //ScheduleTaskList sheduleTaskList;
-    //sheduleTaskList.loadFromQuery(queryScheduleTask);
-
     int idx = 0;
     foreach(const SubData& subData, subDataList)
     {
@@ -47,7 +44,9 @@ QnDbManager::QnDbManager(QnResourceFactoryPtr factory)
 {
     m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
-	m_sdb.setDatabaseName("c:/develop/netoptix_vms/appserver/db/ecs.db");
+	//m_sdb.setDatabaseName("c:/develop/netoptix_vms/appserver/db/ecs.db");
+    m_sdb.setDatabaseName("c:/Windows/System32/config/systemprofile/AppData/Local/Network Optix/Enterprise Controller/db/ecs.db");
+    
 	if (m_sdb.open())
 	{
 		if (!createDatabase()) // create tables is DB is empty

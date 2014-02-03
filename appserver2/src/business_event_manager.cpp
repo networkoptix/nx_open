@@ -13,10 +13,11 @@ namespace ec2
 {
 
 template<class QueryProcessorType>
-QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager( QueryProcessorType* const queryProcessor, QSharedPointer<QnResourceFactory> factory)
+QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager( QueryProcessorType* const queryProcessor, QSharedPointer<QnResourceFactory> factory, QnResourcePool* resourcePool)
     :
     m_queryProcessor( queryProcessor ),
-    m_resourcefactory(factory)
+    m_resourcefactory(factory),
+    m_resourcePool(resourcePool)
 {
 }
 
@@ -24,10 +25,10 @@ QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager( QueryProcess
 template<class T>
 ReqID QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandlerPtr handler )
 {
-    auto queryDoneHandler = [handler]( ErrorCode errorCode, const ApiBusinessRuleDataList& users) {
+    auto queryDoneHandler = [handler, this]( ErrorCode errorCode, const ApiBusinessRuleDataList& rules) {
         QnBusinessEventRuleList outData;
         if( errorCode == ErrorCode::ok )
-            users.toResourceList(outData);
+            rules.toResourceList(outData, m_resourcePool);
         handler->done( errorCode, outData);
     };
     m_queryProcessor->processQueryAsync<nullptr_t, ApiBusinessRuleDataList, decltype(queryDoneHandler)> ( ApiCommand::getBusinessRuleList, nullptr, queryDoneHandler);

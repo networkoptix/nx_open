@@ -31,11 +31,13 @@ namespace ec2
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) override;
 		virtual void setResourceFactory(QSharedPointer<QnResourceFactory>) override;
+        virtual void setResourcePool(QnResourcePool* pool) override;
 
     private:
         ServerQueryProcessor m_queryProcessor;
         AbstractECConnectionPtr m_connection;
 		QSharedPointer<QnResourceFactory> m_resourceFactory;
+        QnResourcePool* m_resPool;
         std::mutex m_mutex;
     };
 }

@@ -12,6 +12,7 @@
 #include "media_server_manager.h"
 #include "nx_ec/ec_api.h"
 #include "resource_manager.h"
+#include "core/resource_management/resource_pool.h"
 
 
 namespace ec2
@@ -22,7 +23,7 @@ namespace ec2
         public AbstractECConnection
     {
     public:
-        BaseEc2Connection( QueryProcessorType* queryProcessor, const QnResourceFactoryPtr& resourceFactory );
+        BaseEc2Connection( QueryProcessorType* queryProcessor, const QnResourceFactoryPtr& resourceFactory, QnResourcePool* resPool );
 
         virtual AbstractResourceManagerPtr getResourceManager() override;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() override;

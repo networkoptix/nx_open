@@ -19,7 +19,7 @@ namespace ec2
         public BaseEc2Connection<ClientQueryProcessor>
     {
     public:
-        RemoteEC2Connection( ClientQueryProcessor* queryProcessor, const QnResourceFactoryPtr& resourceFactory );
+        RemoteEC2Connection( ClientQueryProcessor* queryProcessor, const QnResourceFactoryPtr& resourceFactory , QnResourcePool* resPool);
     };
 }
 

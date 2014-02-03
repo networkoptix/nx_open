@@ -8,9 +8,9 @@
 
 namespace ec2
 {
-    RemoteEC2Connection::RemoteEC2Connection( ClientQueryProcessor* queryProcessor, const QnResourceFactoryPtr& resourceFactory )
+    RemoteEC2Connection::RemoteEC2Connection( ClientQueryProcessor* queryProcessor, const QnResourceFactoryPtr& resourceFactory, QnResourcePool* resPool )
     :
-        BaseEc2Connection<ClientQueryProcessor>( queryProcessor, resourceFactory )
+        BaseEc2Connection<ClientQueryProcessor>( queryProcessor, resourceFactory, resPool )
     {
     }
 }

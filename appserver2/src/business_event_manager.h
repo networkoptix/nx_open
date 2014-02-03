@@ -13,7 +13,7 @@ namespace ec2
         public AbstractBusinessEventManager
     {
     public:
-        QnBusinessEventManager( QueryProcessorType* const queryProcessor, QSharedPointer<QnResourceFactory> factory );
+        QnBusinessEventManager( QueryProcessorType* const queryProcessor, QSharedPointer<QnResourceFactory> factory, QnResourcePool* resourcePool );
 
         virtual ReqID getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) override;
 
@@ -28,6 +28,7 @@ namespace ec2
     private:
         QueryProcessorType* const m_queryProcessor;
         QSharedPointer<QnResourceFactory> m_resourcefactory;
+        QnResourcePool* m_resourcePool;
 
         QnTransaction<ApiBusinessRuleData> prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource );
     };

@@ -578,7 +578,7 @@ namespace ec2
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
 		virtual void setResourceFactory(QSharedPointer<QnResourceFactory> factory) = 0;
-
+        virtual void setResourcePool(QnResourcePool* pool) = 0;
     protected:
         virtual ReqID testConnectionAsync( const QUrl& addr, impl::SimpleHandlerPtr handler ) = 0;
         virtual ReqID connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler ) = 0;

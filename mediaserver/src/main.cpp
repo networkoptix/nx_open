@@ -1002,6 +1002,7 @@ void QnMain::run()
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
 	ec2ConnectionFactory->setResourceFactory(QSharedPointer<QnResourceFactory>(new QnMediaServerResourceFactory()));
+    ec2ConnectionFactory->setResourcePool(qnResPool);
     ec2::AbstractECConnectionPtr ec2Connection;
     while (!needToStop())
     {

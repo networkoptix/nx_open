@@ -6,15 +6,14 @@
 namespace ec2
 {
 
-void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource) const
+void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource, QnResourcePool* resourcePool) const
 {
     resource->setId(id);
     resource->setEventType(eventType);
     
     QnResourceList resList;
     foreach(qint32 resId, eventResource) {
-        resource->setEventResources(resList);
-        QnResourcePtr res = qnResPool->getResourceById(resId);
+        QnResourcePtr res = resourcePool->getResourceById(resId);
         if (res)
             resList << res;
     }
@@ -28,8 +27,7 @@ void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource) const
 
     resList.clear();
     foreach(qint32 resId, actionResource) {
-        resource->setEventResources(resList);
-        QnResourcePtr res = qnResPool->getResourceById(resId);
+        QnResourcePtr res = resourcePool->getResourceById(resId);
         if (res)
             resList << res;
     }
@@ -45,14 +43,14 @@ void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource) const
     resource->setSystem(system);
 }
 
-void ApiBusinessRuleDataList::toResourceList(QnBusinessEventRuleList& outData) const
+void ApiBusinessRuleDataList::toResourceList(QnBusinessEventRuleList& outData, QnResourcePool* resourcePool) const
 {
     outData.reserve(data.size());
     for(int i = 0; i < data.size(); ++i) 
     {
-        QnBusinessEventRulePtr user(new QnBusinessEventRule());
-        data[i].toResource(user);
-        outData << user;
+        QnBusinessEventRulePtr rule(new QnBusinessEventRule());
+        data[i].toResource(rule, resourcePool);
+        outData << rule;
     }
 }
 
