@@ -42,15 +42,22 @@ void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subD
 
 QnDbManager::QnDbManager(QnResourceFactoryPtr factory)
 {
+    m_storageTypeId = 0;
     m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
-	//m_sdb.setDatabaseName("c:/develop/netoptix_vms/appserver/db/ecs.db");
-    m_sdb.setDatabaseName("c:/Windows/System32/config/systemprofile/AppData/Local/Network Optix/Enterprise Controller/db/ecs.db");
+	m_sdb.setDatabaseName("c:/develop/netoptix_vms/appserver/db/ecs.db");
+    //m_sdb.setDatabaseName("c:/Windows/System32/config/systemprofile/AppData/Local/Network Optix/Enterprise Controller/db/ecs.db");
     
 	if (m_sdb.open())
 	{
 		if (!createDatabase()) // create tables is DB is empty
 			qWarning() << "can't create tables for sqlLite database!";
+
+        QSqlQuery query(m_sdb);
+        query.prepare("select * from vms_resourcetype where name = 'Storage'");
+        Q_ASSERT(query.exec());
+        if (query.next())
+            m_storageTypeId = query.value("id").toInt();
 	}
 	else {
 		qWarning() << "can't initialize sqlLite database! Actions log is not created!";
@@ -82,7 +89,6 @@ ErrorCode QnDbManager::insertResource(const ApiResourceData& data)
     insQuery.prepare("INSERT INTO vms_resource (id, guid, xtype_id, parent_id, name, url, status, disabled) VALUES(:id, :guid, :typeId, :parentId, :name, :url, :status, :disabled)");
     data.autoBindValues(insQuery);
 	if (insQuery.exec()) {
-		//data.id = insQuery.lastInsertId().toInt();
 		return ErrorCode::ok;
 	}
 	else {
@@ -94,11 +100,16 @@ ErrorCode QnDbManager::insertResource(const ApiResourceData& data)
 ErrorCode QnDbManager::updateResource(const ApiResourceData& data)
 {
 	QSqlQuery insQuery(m_sdb);
-	insQuery.prepare("UPDATE vms_resource SET guid = :guid, xtype_id = :xtype_id, parent_id = :parent_id, name = :name, url = :url, status = :status, disabled = :disabled WHERE id = :id");
+	insQuery.prepare("UPDATE vms_resource SET guid = :guid, xtype_id = :typeId, parent_id = :parentId, name = :name, url = :url, status = :status, disabled = :disabled WHERE id = :id");
 	data.autoBindValues(insQuery);
 
-	QMutexLocker lock(&m_mutex);
-	return insQuery.exec() ? ErrorCode::ok : ErrorCode::failure;
+    if (insQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return ErrorCode::failure;
+    }
 }
 
 ErrorCode QnDbManager::insertCamera(const ApiCameraData& data)
@@ -110,7 +121,6 @@ ErrorCode QnDbManager::insertCamera(const ApiCameraData& data)
 					 :mac, :model, :secondaryQuality, :statusFlags, :physicalId, :password, :login, :dewarpingParams)");
 	data.autoBindValues(insQuery);
 
-	QMutexLocker lock(&m_mutex);
 	if (insQuery.exec()) {
 		return ErrorCode::ok;
 	}
@@ -131,7 +141,6 @@ ErrorCode QnDbManager::updateCamera(const ApiCameraData& data)
 					 WHERE resource_ptr_id = :id");
 	data.autoBindValues(query);
 
-	QMutexLocker lock(&m_mutex);
 	return query.exec() ? ErrorCode::ok : ErrorCode::failure;
 }
 
@@ -139,10 +148,8 @@ ErrorCode QnDbManager::insertMediaServer(const ApiMediaServerData& data)
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT INTO vms_server (api_url, auth_key, streaming_url, version, net_addr_list, reserve, panic_mode, resource_ptr_id) VALUES\
-                     (:apiUrl, :authKey, :streamingUrl, :version, :netAddrList, :reserve, :panicMode, :id");
+                     (:apiUrl, :authKey, :streamingUrl, :version, :netAddrList, :reserve, :panicMode, :id)");
     data.autoBindValues(insQuery);
-
-    QMutexLocker lock(&m_mutex);
     if (insQuery.exec()) {
         return ErrorCode::ok;
     }
@@ -161,24 +168,35 @@ ErrorCode QnDbManager::updateMediaServer(const ApiMediaServerData& data)
                      WHERE resource_ptr_id = :id");
     data.autoBindValues(query);
 
-    QMutexLocker lock(&m_mutex);
-    return query.exec() ? ErrorCode::ok : ErrorCode::failure;
+    if (query.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
 }
 
 ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
 {
     QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_storage where resource_ptr_id in (select id from vms_resource r where parent_id = :id");
+    delQuery.prepare("DELETE FROM vms_storage WHERE resource_ptr_id in (select id from vms_resource where parent_id = :id and xtype_id=:typeId)");
     delQuery.bindValue("id", data.id);
-    if (!delQuery.exec()) 
+    delQuery.bindValue("typeId", m_storageTypeId);
+    if (!delQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
         return ErrorCode::failure;
+    }
 
-    delQuery.prepare("DELETE FROM vms_resource where where parent_id = :id");
-    delQuery.bindValue("id", data.id);
-    if (!delQuery.exec()) 
+    QSqlQuery delQuery2(m_sdb);
+    delQuery2.prepare("DELETE FROM vms_resource WHERE parent_id = :id and xtype_id=:typeId");
+    delQuery2.bindValue("id", data.id);
+    delQuery2.bindValue("typeId", m_storageTypeId);
+    if (!delQuery2.exec()) {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
         return ErrorCode::failure;
+    }
 
-    for (int i = 0; i < data.storages.size(); ++i)
     foreach(const ApiStorageData& storage, data.storages)
     {
         ErrorCode result = insertResource(storage);
@@ -190,8 +208,10 @@ ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
                          (:spaceLimit, :usedForWriting, :id)");
         storage.autoBindValues(insQuery);
 
-        if (!insQuery.exec()) 
+        if (!insQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
             return ErrorCode::failure;
+        }
     }
     return ErrorCode::ok;
 }
@@ -201,8 +221,10 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data)
 	QSqlQuery delQuery(m_sdb);
 	delQuery.prepare("DELETE FROM vms_scheduletask where source_id = :id");
 	delQuery.bindValue("id", data.id);
-	if (!delQuery.exec()) 
-		return ErrorCode::failure;
+	if (!delQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::failure;
+    }
 
 	foreach(const ScheduleTask& task, data.scheduleTask) 
 	{
@@ -211,8 +233,10 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data)
 					     (:id, :sourceId, :startTime, :endTime, :doRecordAudio, :recordType, :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps)");
 		task.autoBindValues(insQuery);
 
-		if (!insQuery.exec()) 
+		if (!insQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
 			return ErrorCode::failure;
+        }
 	}
 	return ErrorCode::ok;
 }
@@ -223,12 +247,16 @@ int QnDbManager::getNextSequence()
 
 	QSqlQuery query(m_sdb);
 	query.prepare("update sqlite_sequence set seq = seq + 1 where name=\"vms_resource\"");
-	if (!query.exec())
+	if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
 		return 0;
+    }
 	QSqlQuery query2(m_sdb);
 	query.prepare("select seq from sqlite_sequence where name=\"vms_resource\"");
-	if (!query.exec())
+	if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
 		return 0;
+    }
 	query.next();
 	int result = query.value(0).toInt();
 	return result;
@@ -294,14 +322,18 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 				  from vms_resourcetype rt \
 				  join vms_manufacture m on m.id = rt.manufacture_id \
 				  order by rt.id");
-	if (!queryTypes.exec())
+	if (!queryTypes.exec()) {
+        qWarning() << Q_FUNC_INFO << queryTypes.lastError().text();
 		return ErrorCode::failure;
+    }
 
 	QSqlQuery queryParents(m_sdb);
 	queryParents.prepare("select from_resourcetype_id as id, to_resourcetype_id as parentId from vms_resourcetype_parents order by from_resourcetype_id, to_resourcetype_id desc");
 
-	if (!queryParents.exec())
+	if (!queryParents.exec()) {
+        qWarning() << Q_FUNC_INFO << queryParents.lastError().text();
 		return ErrorCode::failure;
+    }
 
 	data.loadFromQuery(queryTypes);
 
@@ -340,10 +372,14 @@ ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraL
                                        join vms_resource r on r.id = st.source_id %1 order by r.parent_id").arg(filterStr2));
 
 
-	if (!query.exec())
+	if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
 		return ErrorCode::failure;
-    if (!queryScheduleTask.exec())
+    }
+    if (!queryScheduleTask.exec()) {
+        qWarning() << Q_FUNC_INFO << queryScheduleTask.lastError().text();
         return ErrorCode::failure;
+    }
 
 	cameraList.loadFromQuery(query);
 
@@ -366,8 +402,10 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiMediaServerDataList& serv
                           from vms_resource r \
                           join vms_server s on s.resource_ptr_id = r.id order by r.id"));
 
-    if (!query.exec())
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
+    }
 
     QSqlQuery queryStorage(m_sdb);
     queryStorage.prepare(QString("select r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
@@ -375,8 +413,10 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiMediaServerDataList& serv
                           from vms_resource r \
                           join vms_storage s on s.resource_ptr_id = r.id order by r.parent_id"));
 
-    if (!queryStorage.exec())
+    if (!queryStorage.exec()) {
+        qWarning() << Q_FUNC_INFO << queryStorage.lastError().text();
         return ErrorCode::failure;
+    }
 
     serverList.loadFromQuery(query);
 
@@ -393,8 +433,10 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiCameraServerItemDataList&
 {
     QSqlQuery query(m_sdb);
     query.prepare(QString("select server_guid as serverGuid, timestamp, physical_id as physicalId from vms_cameraserveritem"));
-    if (!query.exec())
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
+    }
 
     historyList.loadFromQuery(query);
 
@@ -411,8 +453,10 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiUserDataList& userList)
                           from vms_resource r \
                           join auth_user u  on u.id = r.id\
                           join vms_userprofile p on p.user_id = u.id"));
-    if (!query.exec())
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
+    }
 
     userList.loadFromQuery(query);
 
@@ -426,18 +470,24 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& bus
     query.prepare(QString("SELECT id, event_type as eventType, event_condition as eventCondition, event_state as eventState, action_type as actionType, \
                           action_params as actionParams, aggregation_period as aggregationPeriod, disabled, comments, schedule \
                           FROM vms_businessrule order by id"));
-    if (!query.exec())
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
+    }
 
     QSqlQuery queryRuleEventRes(m_sdb);
     queryRuleEventRes.prepare(QString("SELECT businessrule_id as parentId, resource_id as id from vms_businessrule_event_resources order by businessrule_id"));
-    if (!queryRuleEventRes.exec())
+    if (!queryRuleEventRes.exec()) {
+        qWarning() << Q_FUNC_INFO << queryRuleEventRes.lastError().text();
         return ErrorCode::failure;
+    }
 
     QSqlQuery queryRuleActionRes(m_sdb);
     queryRuleActionRes.prepare(QString("SELECT businessrule_id as parentId, resource_id as id from vms_businessrule_action_resources order by businessrule_id"));
-    if (!queryRuleActionRes.exec())
+    if (!queryRuleActionRes.exec()) {
+        qWarning() << Q_FUNC_INFO << queryRuleActionRes.lastError().text();
         return ErrorCode::failure;
+    }
 
     businessRuleList.loadFromQuery(query);
 

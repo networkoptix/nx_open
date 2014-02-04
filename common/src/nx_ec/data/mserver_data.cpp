@@ -70,7 +70,7 @@ void ApiMediaServerData::fromResource(QnMediaServerResourcePtr resource)
     //authKey = resource-> getetAuthKey();
 
     QnAbstractStorageResourceList storageList = resource->getStorages();
-    storages.reserve(storageList.size());
+    storages.resize(storageList.size());
     for (int i = 0; i < storageList.size(); ++i)
         storages[i].fromResource(storageList[i]);
 }

@@ -404,7 +404,7 @@ QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, 
 
     while (servers.isEmpty())
     {
-        while( ec2Connection->getMediaServerManager()->getServersSync( &servers) == ec2::ErrorCode::ok )
+        if( ec2Connection->getMediaServerManager()->getServersSync( &servers) == ec2::ErrorCode::ok )
             break;
 
         qDebug() << "findServer(): Call to getServers failed. Reason: "; // << appServerConnection->getLastError();
@@ -424,7 +424,7 @@ QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, 
 QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, QnMediaServerResourcePtr serverPtr)
 {
     QnMediaServerResourceList servers;
-    serverPtr->setStatus(QnResource::Online);
+    serverPtr->setStatus(QnResource::Online, true);
 
     if (ec2Connection->getMediaServerManager()->saveServerSync(serverPtr, &servers) != ec2::ErrorCode::ok)
     {
@@ -1010,6 +1010,7 @@ void QnMain::run()
         QSharedPointer<QnResourceFactory>(QnResourceDiscoveryManager::instance()),
         qnResPool,
         qnResTypePool );
+    ec2ConnectionFactory->setContext(resCtx);
     ec2::AbstractECConnectionPtr ec2Connection;
     while (!needToStop())
     {

@@ -41,6 +41,12 @@ struct ApiData {
     BOOST_PP_SEQ_FOR_EACH(BIND_FIELD, ~, FIELD_SEQ) \
 }
 
+#define QN_DEFINE_STRUCT_SQL_BINDER_DERIVED(TYPE, FIELD_SEQ, ...) \
+    void TYPE::autoBindValues(QSqlQuery& query)  const\
+{ \
+    BOOST_PP_SEQ_FOR_EACH(BIND_FIELD, ~, FIELD_SEQ) \
+    query.bindValue(QLatin1String(":id"), id); \
+}
 
 #define QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS() \
     QN_DECLARE_STRUCT_SERIALIZATORS(); \
@@ -52,7 +58,7 @@ struct ApiData {
 
 #define QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS(TYPE, BASE_TYPE, FIELD_SEQ, ... /* PREFIX */) \
 	QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(TYPE, BASE_TYPE, FIELD_SEQ); \
-	QN_DEFINE_STRUCT_SQL_BINDER(TYPE, FIELD_SEQ);
+	QN_DEFINE_STRUCT_SQL_BINDER_DERIVED(TYPE, FIELD_SEQ);
 
 // --------------- fill query params from a object
 

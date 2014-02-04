@@ -77,6 +77,7 @@ namespace ec2
         QSqlDatabase m_sdb;
 		QMutex m_mutex;
 		QnResourceFactoryPtr  m_resourceFactory;
+        qint32 m_storageTypeId;
     };
 };
 

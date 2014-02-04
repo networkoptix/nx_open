@@ -56,7 +56,7 @@ namespace ec2
 }
 
 #define ApiStorageDataFields  (spaceLimit) (usedForWriting)
-#define medisServerDataFields (apiUrl) (netAddrList) (reserve) (storages) (panicMode) (streamingUrl) (version)
+#define medisServerDataFields (apiUrl) (netAddrList) (reserve) (panicMode) (streamingUrl) (version) (authKey) (storages)
 
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiStorageData, ApiStorageDataFields)
 QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiMediaServerData, ApiResourceData, medisServerDataFields)
