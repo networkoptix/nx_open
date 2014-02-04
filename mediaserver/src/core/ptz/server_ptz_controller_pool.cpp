@@ -24,7 +24,7 @@ void QnServerPtzControllerPool::unregisterResource(const QnResourcePtr &resource
     disconnect(resource, NULL, this, NULL);
 }
 
-QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourcePtr &resource) {
+QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourcePtr &resource) const {
     if(!resource->isInitialized())
         return QnPtzControllerPtr();
 
