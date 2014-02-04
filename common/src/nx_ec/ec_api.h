@@ -58,11 +58,12 @@ namespace ec2
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> ReqID setResourceStatus( const QnId& resourceId, QnResource::Status status, TargetType* target, HandlerType handler ) {
-            return setResourceStatus( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return setResourceStatus(resourceId, status, std::static_pointer_cast<impl::SetResourceStatusHandler>(std::make_shared<impl::CustomSetResourceStatusHandler<TargetType, HandlerType>>(target, handler)) );
         }
         ErrorCode setResourceStatusSync( const QnId& id, QnResource::Status status) {
             using namespace std::placeholders;
-            return impl::doSyncCall<impl::SimpleHandler>( std::bind(&AbstractResourceManager::setResourceStatus, this, id, status, _1) );
+            QnId rezId;
+            return impl::doSyncCall<impl::SetResourceStatusHandler>( std::bind(&AbstractResourceManager::setResourceStatus, this, id, status, _1), &rezId );
         }
 
         /*!
@@ -100,8 +101,7 @@ namespace ec2
         virtual ReqID getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
         virtual ReqID getResources( impl::GetResourcesHandlerPtr handler ) = 0;
         virtual ReqID getResource( const QnId& id, impl::GetResourceHandlerPtr handler ) = 0;
-        virtual ReqID setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SimpleHandlerPtr handler ) = 0;
-
+        virtual ReqID setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler ) = 0;
         virtual ReqID getKvPairs( const QnResourcePtr &resource, impl::GetKvPairsHandlerPtr handler ) = 0;
         virtual ReqID setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler ) = 0;
         virtual ReqID save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler ) = 0;
@@ -175,12 +175,12 @@ namespace ec2
         /*!
             Returns list of all available cameras. 
             \todo is it really needed?
-            \param handler Functor with params: (ErrorCode, const QnVirtualCameraResourceListPtr& cameras)
+            \param handler Functor with params: (ErrorCode, const QnVirtualCameraResourceList& cameras)
         */
         template<class TargetType, class HandlerType> ReqID addCamera( const QnVirtualCameraResourcePtr& camRes, TargetType* target, HandlerType handler ) {
             return addCamera( camRes, std::static_pointer_cast<impl::AddCameraHandler>(std::make_shared<impl::CustomAddCameraHandler<TargetType, HandlerType>>(target, handler)) );
         }
-        ErrorCode addCameraSync( const QnVirtualCameraResourcePtr& camRes, QnVirtualCameraResourceListPtr* const cameras ) {
+        ErrorCode addCameraSync( const QnVirtualCameraResourcePtr& camRes, QnVirtualCameraResourceList* const cameras ) {
             using namespace std::placeholders;
             return impl::doSyncCall<impl::AddCameraHandler>( std::bind(std::mem_fn(&AbstractCameraManager::addCamera), this, camRes, _1), cameras );
         }

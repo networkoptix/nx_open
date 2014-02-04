@@ -45,13 +45,13 @@ namespace ec2
 #endif
 
         //preparing output data
-        QnVirtualCameraResourceListPtr cameraList( new QnVirtualCameraResourceList() );
+        QnVirtualCameraResourceList cameraList;
 		ApiCommand::Value command = ApiCommand::updateCamera;
 		if (!resource->getId().isValid()) {
 			resource->setId(dbManager->getNextSequence());
 			command = ApiCommand::addCamera;
 		}
-        cameraList->push_back( resource );
+        cameraList.push_back( resource );
 
         //performing request
         auto tran = prepareTransaction( command, resource );

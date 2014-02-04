@@ -16,17 +16,20 @@ public:
     void processResources(const QnResourceList &resources);
 
 private:
-    QnAppServerConnectionPtr m_appServer;
+    //QnAppServerConnectionPtr m_appServer;
     ec2::AbstractECConnectionPtr m_ec2Connection;
     QnId m_serverId;
-    QSet<QnResourcePtr> m_awaitingSetStatus;
-    QMap<int, QnResourcePtr> m_handleToResource;
+    
+    QSet<QnId> m_awaitingSetStatus;
+    QSet<QnId> m_setStatusInProgress;
+    //QMap<int, QnResourcePtr> m_handleToResource;
 private:
     void updateResourceStatusAsync(const QnResourcePtr &resource);
     bool isSetStatusInProgress(const QnResourcePtr &resource);
 private slots:
     void at_resource_statusChanged(const QnResourcePtr& resource);
-    void requestFinished(const QnHTTPRawResponse& response, int handle);
+    //void requestFinished(const QnHTTPRawResponse& response, int handle);
+    void requestFinished2(ec2::ErrorCode errCode, const QnId& id);
 };
 
 #endif //_server_appserver_processor_h_

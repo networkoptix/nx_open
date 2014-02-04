@@ -235,12 +235,13 @@ namespace ec2
         public:
             void emitSimpleDone( const ErrorCode p1 ) { emit onSimpleDone( p1 ); }
             void emitGetResourceTypesDone( const ErrorCode p1, const QnResourceTypeList& p2 ) { emit onGetResourceTypesDone( p1, p2 ); }
+            void emitSetResourceStatusDone( const ErrorCode p1, const QnId& p2 ) { emit onSetResourceStatusDone( p1, p2 ); }
             void emitGetResourcesDone( const ErrorCode p1, const QnResourceList& p2 ) { emit onGetResourcesDone( p1, p2 ); }
             void emitGetResourceDone( const ErrorCode p1, const QnResourcePtr& p2 ) { emit onGetResourceDone( p1, p2 ); }
             void emitGetKvPairsDone( const ErrorCode p1, const QnKvPairListsById& p2 ) { emit onGetKvPairsDone( p1, p2 ); }
             void emitSaveServerDone( const ErrorCode p1, const QnMediaServerResourceList& p2) { emit onSaveServerDone( p1, p2 ); }
             void emitGetServersDone( const ErrorCode p1, const QnMediaServerResourceList& p2 ) { emit onGetServersDone( p1, p2 ); }
-            void emitAddCameraDone( const ErrorCode p1, const QnVirtualCameraResourceListPtr& p2 ) { emit onAddCameraDone( p1, p2 ); }
+            void emitAddCameraDone( const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( p1, p2 ); }
             void emitGetCamerasDone( const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( p1, p2 ); }
             void emitGetCamerasHistoryDone( const ErrorCode p1, const QnCameraHistoryList& p2 ) { emit onGetCamerasHistoryDone( p1, p2 ); }
             void emitGetUsersDone( const ErrorCode p1, const QnUserResourceList& p2 ) { emit onGetUsersDone( p1, p2 ); }
@@ -257,12 +258,13 @@ namespace ec2
         signals:
             void onSimpleDone( const ErrorCode );
             void onGetResourceTypesDone( const ErrorCode, const QnResourceTypeList& );
+            void onSetResourceStatusDone( const ErrorCode, const QnId& );
             void onGetResourcesDone( const ErrorCode, const QnResourceList& );
             void onGetResourceDone( const ErrorCode, const QnResourcePtr& );
             void onGetKvPairsDone( const ErrorCode, const QnKvPairListsById& );
             void onSaveServerDone( const ErrorCode, const QnMediaServerResourceList&);
             void onGetServersDone( const ErrorCode, const QnMediaServerResourceList& );
-            void onAddCameraDone( const ErrorCode, const QnVirtualCameraResourceListPtr& );
+            void onAddCameraDone( const ErrorCode, const QnVirtualCameraResourceList& );
             void onGetCamerasDone( const ErrorCode, const QnVirtualCameraResourceList& );
             void onGetCamerasHistoryDone( const ErrorCode, const QnCameraHistoryList& );
             void onGetUsersDone( const ErrorCode, const QnUserResourceList& );
@@ -290,6 +292,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractResourceManager
         //////////////////////////////////////////////////////////
+        DEFINE_TWO_ARG_HANDLER( SetResourceStatus, ErrorCode, QnId )
         DEFINE_TWO_ARG_HANDLER( GetResourceTypes, ErrorCode, QnResourceTypeList )
         DEFINE_TWO_ARG_HANDLER( GetResources, ErrorCode, QnResourceList )
         DEFINE_TWO_ARG_HANDLER( GetResource, ErrorCode, QnResourcePtr )
@@ -306,7 +309,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractCameraManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( AddCamera, ErrorCode, QnVirtualCameraResourceListPtr )
+        DEFINE_TWO_ARG_HANDLER( AddCamera, ErrorCode, QnVirtualCameraResourceList )
         DEFINE_TWO_ARG_HANDLER( GetCameras, ErrorCode, QnVirtualCameraResourceList )
         DEFINE_TWO_ARG_HANDLER( GetCamerasHistory, ErrorCode, QnCameraHistoryList )
         

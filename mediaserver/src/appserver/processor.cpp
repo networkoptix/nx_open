@@ -9,7 +9,7 @@
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
     : m_serverId(serverId)
 {
-    m_appServer = QnAppServerConnectionFactory::createConnection();
+    //m_appServer = QnAppServerConnectionFactory::createConnection();
     connect(qnResPool, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
 
     QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync( QUrl(), &m_ec2Connection );
@@ -50,22 +50,25 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
         if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(cameraResource->getUrl()))
             continue; //race condition. manual camera just deleted
-
+#ifdef OLD_EC
         if (m_appServer->addCamera(cameraResource, cameras) != 0)
         {
             qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << m_appServer->getLastError();
             continue;
         }
+#else
+        const ec2::ErrorCode errorCode = m_ec2Connection->getCameraManager()->addCameraSync( cameraResource, &cameras );
+        if( errorCode != ec2::ErrorCode::ok ) {
+            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: "; // << m_appServer->getLastError();
+            continue;
+        }
+#endif
+
         if (cameras.isEmpty())
         {
             qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Unknown error code. Possible old ECS version is used!";
             continue;
         }
-
-        QnVirtualCameraResourceListPtr cameraList2;
-        const ec2::ErrorCode errorCode = m_ec2Connection->getCameraManager()->addCameraSync( cameraResource, &cameraList2 );
-        if( errorCode != ec2::ErrorCode::ok )
-            NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
 
         // cameras contains updated resource with all fields
         QnResourcePool::instance()->addResource(cameras.first());
@@ -74,10 +77,27 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
 void QnAppserverResourceProcessor::updateResourceStatusAsync(const QnResourcePtr &resource)
 {
-    int handle = m_appServer->setResourceStatusAsync(resource->getId(), resource->getStatus(), this, "requestFinished");
-    m_handleToResource.insert(handle, resource);
+    if (!resource)
+        return;
+
+    //int handle = m_appServer->setResourceStatusAsync(resource->getId(), resource->getStatus(), this, "requestFinished");
+    m_setStatusInProgress.insert(resource->getId());
+    m_ec2Connection->getResourceManager()->setResourceStatus(resource->getId(), resource->getStatus(), this, &QnAppserverResourceProcessor::requestFinished2);
 }
 
+void QnAppserverResourceProcessor::requestFinished2(ec2::ErrorCode errCode, const QnId& id)
+{
+    if (errCode != ec2::ErrorCode::ok)
+        qCritical() << "Failed to update resource status" << id;
+
+    m_setStatusInProgress.remove(id);
+    if (m_awaitingSetStatus.contains(id)) {
+        m_awaitingSetStatus.remove(id);
+        updateResourceStatusAsync(qnResPool->getResourceById(id));
+    }
+}
+
+#ifdef OLD_EC
 void QnAppserverResourceProcessor::requestFinished(const QnHTTPRawResponse& response, int handle)
 {
     QnResourcePtr resource = m_handleToResource.value(handle);
@@ -91,15 +111,11 @@ void QnAppserverResourceProcessor::requestFinished(const QnHTTPRawResponse& resp
         m_awaitingSetStatus.remove(resource);
     }
 }
+#endif
 
 bool QnAppserverResourceProcessor::isSetStatusInProgress(const QnResourcePtr &resource)
 {
-    foreach(const QnResourcePtr& res, m_handleToResource.values())
-    {
-        if (res == resource)
-            return true;
-    }
-    return false;
+    return m_setStatusInProgress.contains(resource->getId());
 }
 
 void QnAppserverResourceProcessor::at_resource_statusChanged(const QnResourcePtr &resource)
@@ -109,5 +125,5 @@ void QnAppserverResourceProcessor::at_resource_statusChanged(const QnResourcePtr
     if (!isSetStatusInProgress(resource))
         updateResourceStatusAsync(resource);
     else
-        m_awaitingSetStatus << resource;
+        m_awaitingSetStatus << resource->getId();
 }

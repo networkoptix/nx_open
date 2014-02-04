@@ -136,7 +136,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
                             ec2::AbstractECConnectionPtr ec2Connection;
                             QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync( QUrl(), &ec2Connection );
-                            QnVirtualCameraResourceListPtr cameraList2;
+                            QnVirtualCameraResourceList cameraList2;
                             const ec2::ErrorCode errorCode = ec2Connection->getCameraManager()->addCameraSync( cameraResource, &cameraList2 );
                             if( errorCode != ec2::ErrorCode::ok )
                                 NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
@@ -351,7 +351,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
                         ec2::AbstractECConnectionPtr ec2Connection;
                         QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync( QUrl(), &ec2Connection );
-                        QnVirtualCameraResourceListPtr cameraList2;
+                        QnVirtualCameraResourceList cameraList2;
                         const ec2::ErrorCode errorCode = ec2Connection->getCameraManager()->addCameraSync( cameraResource, &cameraList2 );
                         if( errorCode != ec2::ErrorCode::ok )
                             NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );

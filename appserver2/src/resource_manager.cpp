@@ -45,13 +45,12 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnResourceManager<T>::setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SimpleHandlerPtr handler )
+    ReqID QnResourceManager<T>::setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler )
     {
         //performing request
         auto tran = prepareTransaction( ApiCommand::setResourceStatus, resourceId, status );
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, _1));
-
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SetResourceStatusHandler::done ), handler, _1, resourceId));
         return INVALID_REQ_ID;
     }
 
