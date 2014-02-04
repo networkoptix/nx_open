@@ -60,6 +60,11 @@ namespace ec2
         template<class TargetType, class HandlerType> ReqID setResourceStatus( const QnId& resourceId, QnResource::Status status, TargetType* target, HandlerType handler ) {
             return setResourceStatus( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
+        ErrorCode setResourceStatusSync( const QnId& id, QnResource::Status status) {
+            using namespace std::placeholders;
+            return impl::doSyncCall<impl::SimpleHandler>( std::bind(&AbstractResourceManager::setResourceStatus, this, id, status, _1) );
+        }
+
         /*!
             \param handler Functor with params: (ErrorCode, const QnKvPairListsById&)
         */

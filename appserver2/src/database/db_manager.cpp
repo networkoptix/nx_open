@@ -83,18 +83,50 @@ QnDbManager* QnDbManager::instance()
     return globalInstance;
 }
 
+ErrorCode QnDbManager::insertAddParam(const ApiResourceParam& param)
+{
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO vms_kvpair (resource_id, name, value) VALUES(:resourceId, :name, :value)");
+    param.autoBindValues(insQuery);
+    if (insQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
+ErrorCode QnDbManager::deleteAddParams(qint32 resourceId)
+{
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("DELETE FROM vms_kvpair WHERE resource_id = :resourceId");
+    insQuery.bindValue(":resourceId", resourceId);
+    if (insQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
 ErrorCode QnDbManager::insertResource(const ApiResourceData& data)
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT INTO vms_resource (id, guid, xtype_id, parent_id, name, url, status, disabled) VALUES(:id, :guid, :typeId, :parentId, :name, :url, :status, :disabled)");
     data.autoBindValues(insQuery);
-	if (insQuery.exec()) {
-		return ErrorCode::ok;
-	}
-	else {
+	if (!insQuery.exec()) {
 		qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
 		return ErrorCode::failure;
 	}
+    foreach(const ApiResourceParam& param, data.addParams) {
+        ErrorCode result = insertAddParam(param);
+        if (result != ErrorCode::ok)
+            return result;
+    }
+
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::updateResource(const ApiResourceData& data)
@@ -103,13 +135,22 @@ ErrorCode QnDbManager::updateResource(const ApiResourceData& data)
 	insQuery.prepare("UPDATE vms_resource SET guid = :guid, xtype_id = :typeId, parent_id = :parentId, name = :name, url = :url, status = :status, disabled = :disabled WHERE id = :id");
 	data.autoBindValues(insQuery);
 
-    if (insQuery.exec()) {
-        return ErrorCode::ok;
-    }
-    else {
+    if (!insQuery.exec()) {
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
         return ErrorCode::failure;
     }
+
+    ErrorCode result = deleteAddParams(data.id);
+    if (result != ErrorCode::ok)
+        return result;
+
+    foreach(const ApiResourceParam& param, data.addParams) {
+        ErrorCode result = insertAddParam(param);
+        if (result != ErrorCode::ok)
+            return result;
+    }
+
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::insertCamera(const ApiCameraData& data)
@@ -262,6 +303,23 @@ int QnDbManager::getNextSequence()
 	return result;
 }
 
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiSetResourceStatusData>& tran)
+{
+    Q_ASSERT_X(0, Q_FUNC_INFO, "implement me!!!");
+
+    QMutexLocker lock(&m_mutex);
+
+    QSqlQuery query(m_sdb);
+    query.prepare("UPDATE vms_resource set status = :status where id = :id");
+    query.bindValue(":status", tran.params.status);
+    query.bindValue(":id", tran.params.id);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
+    
+    return ErrorCode::ok;
+}
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tran)
 {
@@ -349,28 +407,33 @@ ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraL
 	QSqlQuery query(m_sdb);
     QString filterStr;
 	if (mServerId.isValid()) {
-		filterStr = QString("where r.parent_id = %1").arg(mServerId);
+		filterStr = QString("WHERE r.parent_id = %1").arg(mServerId);
 	}
-	query.prepare(QString("select r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
+	query.prepare(QString("SELECT r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
 		c.audio_enabled as audioEnabled, c.control_disabled as controlDisabled, c.firmware, c.vendor, c.manually_added as manuallyAdded, \
 		c.region, c.schedule_disabled as scheduleDisabled, c.motion_type as motionType, \
 		c.group_name as groupName, c.group_id as groupId, c.mac, c. model, c.secondary_quality as secondaryQuality, \
 		c.status_flags as statusFlags, c.physical_id as physicalId, c.password, login, c.dewarping_params as dewarpingParams \
-		from vms_resource r \
-		join vms_camera c on c.resource_ptr_id = r.id %1 order by r.id").arg(filterStr));
+		FROM vms_resource r \
+		JOIN vms_camera c on c.resource_ptr_id = r.id %1 ORDER BY r.id").arg(filterStr));
 
 
     QSqlQuery queryScheduleTask(m_sdb);
     QString filterStr2;
     if (mServerId.isValid()) 
-        filterStr2 = QString("where r.parent_id = %1").arg(mServerId);
+        filterStr2 = QString("WHERE r.parent_id = %1").arg(mServerId);
     
     queryScheduleTask.prepare(QString("SELECT st.id, st.source_id as sourceId, st.start_time as startTime, st.end_time as endTime, st.do_record_audio as doRecordAudio, \
                                        st.record_type as recordType, st.day_of_week as dayOfWeek, st.before_threshold as beforeThreshold, st.after_threshold as afterThreshold, \
                                        st.stream_quality as streamQuality, st.fps \
-                                       from vms_scheduletask st \
-                                       join vms_resource r on r.id = st.source_id %1 order by r.parent_id").arg(filterStr2));
+                                       FROM vms_scheduletask st \
+                                       JOIN vms_resource r on r.id = st.source_id %1 ORDER BY r.parent_id").arg(filterStr2));
 
+    QSqlQuery queryParams(m_sdb);
+    queryParams.prepare(QString("SELECT kv.resource_id as resourceId, kv.value, kv.name \
+                                 FROM vms_kvpair kv \
+                                 JOIN vms_camera c on c.resource_ptr_id = kv.resource_id \
+                                 JOIN vms_resource r on r.id = kv.source_id %1 ORDER BY r.id").arg(filterStr2));
 
 	if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -380,13 +443,21 @@ ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraL
         qWarning() << Q_FUNC_INFO << queryScheduleTask.lastError().text();
         return ErrorCode::failure;
     }
+    if (!queryParams.exec()) {
+        qWarning() << Q_FUNC_INFO << queryParams.lastError().text();
+        return ErrorCode::failure;
+    }
 
 	cameraList.loadFromQuery(query);
 
     ScheduleTaskList sheduleTaskList;
     sheduleTaskList.loadFromQuery(queryScheduleTask);
 
+    std::vector<ApiResourceParam> params;
+    QN_QUERY_TO_DATA_OBJECT(ApiResourceParam, params, ApiResourceParamFields);
+
     mergeObjectListData<ApiCameraData, ScheduleTask>(cameraList.data, sheduleTaskList.data, &ApiCameraData::scheduleTask, &ScheduleTask::sourceId);
+    mergeObjectListData<ApiCameraData, ApiResourceParam>(cameraList.data, params, &ApiCameraData::addParams, &ApiResourceParam::resourceId);
 
 	return ErrorCode::ok;
 }

@@ -18,6 +18,7 @@ namespace ec2
             connect,
 
             getResourceTypes,
+            setResourceStatus,
 
             addCamera,
 		    updateCamera,

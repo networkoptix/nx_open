@@ -1155,10 +1155,8 @@ void QnMain::run()
     syncStoragesToSettings(m_mediaServer);
 
     int status;
-    do
-    {
-        status = appServerConnection->setResourceStatus(m_mediaServer->getId(), QnResource::Online);
-    } while (status != 0);
+    do {
+    } while (ec2Connection->getResourceManager()->setResourceStatusSync(m_mediaServer->getId(), QnResource::Online) != ec2::ErrorCode::ok);
 
 
     QStringList usedPathList;

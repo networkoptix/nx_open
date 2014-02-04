@@ -62,6 +62,32 @@ namespace ec2
             syncHandler->wait();
             return syncHandler->errorCode();
         }
+
+
+
+
+        template<class BaseHandler>
+        class CustomSyncHandler1
+            :
+            public SyncHandler,
+            public BaseHandler
+        {
+        public:
+            virtual void done( const ErrorCode& errorCode ) override
+            {
+                SyncHandler::done( errorCode );
+            }
+        };
+
+
+        template<class HandlerType, class AsyncFuncType>
+        ErrorCode doSyncCall( AsyncFuncType asyncFunc )
+        {
+            auto syncHandler = std::make_shared<impl::CustomSyncHandler1<HandlerType>>();
+            asyncFunc( syncHandler );
+            syncHandler->wait();
+            return syncHandler->errorCode();
+        }
     }
 }
 

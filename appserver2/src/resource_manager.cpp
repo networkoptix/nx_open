@@ -47,7 +47,11 @@ namespace ec2
     template<class T>
     ReqID QnResourceManager<T>::setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SimpleHandlerPtr handler )
     {
-        //TODO/IMPL
+        //performing request
+        auto tran = prepareTransaction( ApiCommand::setResourceStatus, resourceId, status );
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, _1));
+
         return INVALID_REQ_ID;
     }
 
@@ -86,6 +90,19 @@ namespace ec2
         return INVALID_REQ_ID;
     }
 
+    template<class QueryProcessorType>
+    QnTransaction<ApiSetResourceStatusData> QnResourceManager<QueryProcessorType>::prepareTransaction(
+        ApiCommand::Value cmd,
+        const QnId& id, QnResource::Status status)
+    {
+        QnTransaction<ApiSetResourceStatusData> result;
+        result.command = cmd;
+        result.createNewID();
+        result.persistent = true;
+        result.params.id = id;
+        result.params.status = status;
+        return result;
+    }
 
 
     template class QnResourceManager<ServerQueryProcessor>;

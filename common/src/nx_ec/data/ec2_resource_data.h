@@ -13,6 +13,18 @@
 namespace ec2
 {
 
+struct ApiResourceParam: public ApiData
+{
+    ApiResourceParam() {}
+    ApiResourceParam(qint32 resourceId, const QString& name, const QString& value): resourceId(resourceId), name(name), value(value) {}
+
+    qint32 resourceId;
+    QString name;
+    QString value;
+
+    QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
+};
+
 struct ApiResourceData: public ApiData 
 {
     ApiResourceData(): id(0), typeId(0), parentId(0), status(QnResource::Offline), disabled(false) {}
@@ -25,15 +37,28 @@ struct ApiResourceData: public ApiData
     QString       url;
     QnResource::Status    status;
     bool          disabled;
+    std::vector<ApiResourceParam> addParams;
 
 	void fromResource(const QnResourcePtr& resource);
 	void toResource(QnResourcePtr resource) const;
     QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
 };
 
+struct ApiSetResourceStatusData: public ApiData
+{
+    qint32 id;
+    QnResource::Status    status;
+
+    QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
+};
+
 }
 
-#define ApiResourceDataFields (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled)
+#define ApiResourceParamFields (resourceId) (name) (value)
+QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiResourceParam, ApiResourceParamFields)
+
+#define ApiResourceDataFields (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled) (addParams)
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiResourceData,  ApiResourceDataFields)
+QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiSetResourceStatusData,  (id) (status) )
 
 #endif // __RESOURCE_TRANSACTION_DATA_H__

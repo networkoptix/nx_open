@@ -13,6 +13,13 @@ void ApiResourceData::fromResource(const QnResourcePtr& resource)
 	url = resource->getUrl();
 	status = resource->getStatus();
 	disabled = resource->isDisabled();
+
+    QnParamList params = resource->getResourceParamList();
+    foreach(const QnParam& param, resource->getResourceParamList().list())
+    {
+        if (param.domain() == QnDomainDatabase)
+            addParams.push_back(ApiResourceParam(id, param.name(), param.value().toString()));
+    }
 }
 
 void ApiResourceData::toResource(QnResourcePtr resource) const
@@ -25,6 +32,9 @@ void ApiResourceData::toResource(QnResourcePtr resource) const
 	resource->setUrl(url);
 	resource->setStatus(status, true);
 	resource->setDisabled(disabled);
+
+    foreach(const ApiResourceParam& param, addParams)
+        resource->setParam(param.name, param.value, QnDomainDatabase);
 }
 
 }

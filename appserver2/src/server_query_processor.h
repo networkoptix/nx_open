@@ -61,6 +61,20 @@ namespace ec2
                 handler( errorCode, output );
             } );
         }
+
+        /*!
+            \param handler Functor ( ErrorCode, OutputData )
+            TODO let compiler guess template params
+        */
+        template<class OutputData, class InputParamType1, class InputParamType2, class HandlerType>
+            void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputParamType1 input1, InputParamType2 input2, HandlerType handler )
+        {
+            QtConcurrent::run( [input1, input2, handler]() {
+                OutputData output;
+                const ErrorCode errorCode = dbManager->doQuery( input1, input2, output );
+                handler( errorCode, output );
+            } );
+        }
     };
 }
 
