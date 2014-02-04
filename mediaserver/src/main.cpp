@@ -404,10 +404,11 @@ QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, 
 
     while (servers.isEmpty())
     {
-        if( ec2Connection->getMediaServerManager()->getServersSync( &servers) == ec2::ErrorCode::ok )
+        ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->getServersSync( &servers);
+        if( rez == ec2::ErrorCode::ok )
             break;
 
-        qDebug() << "findServer(): Call to getServers failed. Reason: "; // << appServerConnection->getLastError();
+        qDebug() << "findServer(): Call to getServers failed. Reason: " << ec2::toString(rez);
         QnSleep::msleep(1000);
     }
 
@@ -426,9 +427,10 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
     QnMediaServerResourceList servers;
     serverPtr->setStatus(QnResource::Online, true);
 
-    if (ec2Connection->getMediaServerManager()->saveServerSync(serverPtr, &servers) != ec2::ErrorCode::ok)
+    ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->saveServerSync(serverPtr, &servers);
+    if (rez != ec2::ErrorCode::ok)
     {
-        qDebug() << "registerServer(): Call to registerServer failed. Reason: "; // << appServerConnection->getLastError();
+        qDebug() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
         return QnMediaServerResourcePtr();
     }
     
@@ -678,25 +680,16 @@ static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 
 void QnMain::loadResourcesFromECS()
 {
-#ifdef OLD_EC
-    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    QnVirtualCameraResourceList cameras;
-    while (appServerConnection->getCameras(cameras, m_mediaServer->getId()) != 0)
-    {
-        qDebug() << "QnMain::run(): Can't get cameras. Reason: " << appServerConnection->getLastError();
-        QnSleep::msleep(10000);
-    }
-#else
     ec2::AbstractECConnectionPtr ec2Connection;
     QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync( QUrl(), &ec2Connection );
 
     QnVirtualCameraResourceList cameras;
-    while (ec2Connection->getCameraManager()->getCamerasSync(m_mediaServer->getId(), &cameras) != ec2::ErrorCode::ok)
+    ec2::ErrorCode rez;
+    while ((rez = ec2Connection->getCameraManager()->getCamerasSync(m_mediaServer->getId(), &cameras)) != ec2::ErrorCode::ok)
     {
-        qDebug() << "QnMain::run(): Can't get cameras. Reason: "; // << ec2Connection->getLastError();
+        qDebug() << "QnMain::run(): Can't get cameras. Reason: " << ec2::toString(rez);
         QnSleep::msleep(10000);
     }
-#endif
 
     QnManualCameraInfoMap manualCameras;
     foreach(const QnSecurityCamResourcePtr &camera, cameras)
@@ -748,9 +741,10 @@ void QnMain::loadResourcesFromECS()
     }
 
     QnCameraHistoryList cameraHistoryList;
-    while (ec2Connection->getCameraManager()->getCameraHistoryListSync(&cameraHistoryList) != ec2::ErrorCode::ok)
+    ec2::ErrorCode rez;
+    while (( rez = ec2Connection->getCameraManager()->getCameraHistoryListSync(&cameraHistoryList)) != ec2::ErrorCode::ok)
     {
-        qDebug() << "QnMain::run(): Can't get cameras history. Reason: "; // << appServerConnection->getLastError();
+        qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);
         QnSleep::msleep(1000);
     }
 
@@ -761,9 +755,10 @@ void QnMain::loadResourcesFromECS()
 
     //loading business rules
     QnUserResourceList users;
-    while(ec2Connection->getUserManager()->getUsersSync(&users)  != ec2::ErrorCode::ok)
+    ec2::ErrorCode rez;
+    while(( rez = ec2Connection->getUserManager()->getUsersSync(&users))  != ec2::ErrorCode::ok)
     {
-        qDebug() << "QnMain::run(): Can't get users. Reason: "; // << appServerConnection->getLastError();
+        qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 
@@ -772,9 +767,10 @@ void QnMain::loadResourcesFromECS()
 
     //loading business rules
     QnBusinessEventRuleList rules;
-    while( ec2Connection->getBusinessEventManager()->getBusinessRulesSync(&rules) != ec2::ErrorCode::ok )
+    ec2::ErrorCode rez;
+    while( (rez = ec2Connection->getBusinessEventManager()->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )
     {
-        qDebug() << "QnMain::run(): Can't get business rules. Reason: "; // << appServerConnection->getLastError();
+        qDebug() << "QnMain::run(): Can't get business rules. Reason: " << ec2::toString(rez);
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 
@@ -785,13 +781,8 @@ void QnMain::loadResourcesFromECS()
 void QnMain::at_localInterfacesChanged()
 {
     m_mediaServer->setNetAddrList(allLocalAddresses());
-#ifdef OLD_EC
-    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    appServerConnection->saveAsync(m_mediaServer, this, SLOT(at_serverSaved(int, const QnResourceList&, int)));
-#else
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::createConnection2Sync();
     ec2Connection->getMediaServerManager()->saveServer(m_mediaServer, this, &QnMain::at_serverSaved);
-#endif
 }
 
 void QnMain::at_serverSaved(ec2::ErrorCode err, const QnResourceList &)
