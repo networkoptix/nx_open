@@ -75,7 +75,7 @@ void ApiMediaServerData::fromResource(QnMediaServerResourcePtr resource)
         storages[i].fromResource(storageList[i]);
 }
 
-void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, QnResourceFactory* factory) const
+void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, QnResourceFactory* factory, const QnResourceTypePool* resTypePool) const
 {
     ApiResourceData::toResource(resource);
 
@@ -90,7 +90,7 @@ void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, QnResourc
     resource->setVersion(QnSoftwareVersion(version));
     //resource->setAuthKey(authKey);
 
-    QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(QLatin1String("Storage"));
+    QnResourceTypePtr resType = resTypePool->getResourceTypeByName(QLatin1String("Storage"));
     if (!resType)
         return;
 
@@ -109,13 +109,13 @@ void ApiMediaServerDataList::loadFromQuery(QSqlQuery& query)
     QN_QUERY_TO_DATA_OBJECT(ApiMediaServerData, data, medisServerDataFields ApiResourceDataFields)
 }
 
-void ApiMediaServerDataList::toResourceList(QnMediaServerResourceList& outData, QnResourceFactory* factory) const
+void ApiMediaServerDataList::toResourceList(QnMediaServerResourceList& outData, QnResourceFactory* factory, const QnResourceTypePool* resTypePool) const
 {
     outData.reserve(data.size());
     for(int i = 0; i < data.size(); ++i) 
     {
         QnMediaServerResourcePtr server(new QnMediaServerResource());
-        data[i].toResource(server, factory);
+        data[i].toResource(server, factory, resTypePool);
         outData << server;
     }
 }

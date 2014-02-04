@@ -42,7 +42,7 @@ namespace ec2
         std::vector<ApiStorageData>  storages;
         
         void fromResource(QnMediaServerResourcePtr resource);
-        void toResource(QnMediaServerResourcePtr resource, QnResourceFactory* factory) const;
+        void toResource(QnMediaServerResourcePtr resource, QnResourceFactory* factory, const QnResourceTypePool* resTypePool) const;
         QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
     };
 
@@ -50,7 +50,7 @@ namespace ec2
         std::vector<ApiMediaServerData> data;
 
         void loadFromQuery(QSqlQuery& query);
-        void toResourceList(QnMediaServerResourceList& outData, QnResourceFactory* factory) const;
+        void toResourceList(QnMediaServerResourceList& outData, QnResourceFactory* factory, const QnResourceTypePool* resTypePool) const;
         QN_DECLARE_STRUCT_SERIALIZATORS();
     };
 }

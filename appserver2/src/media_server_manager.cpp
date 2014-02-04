@@ -31,7 +31,7 @@ namespace ec2
         auto queryDoneHandler = [handler, this]( ErrorCode errorCode, const ApiMediaServerDataList& servers) {
             QnMediaServerResourceList outData;
             if( errorCode == ErrorCode::ok )
-                servers.toResourceList(outData, m_resCtx.resFactory.data());
+                servers.toResourceList(outData, m_resCtx.resFactory.data(), m_resCtx.resTypePool);
             handler->done( errorCode, outData);
         };
         m_queryProcessor->processQueryAsync<nullptr_t, ApiMediaServerDataList, decltype(queryDoneHandler)> (
