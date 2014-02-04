@@ -83,7 +83,7 @@ private slots:
 #ifdef OLD_EC
     void at_connectFinished(int status, QnConnectionInfoPtr connectionInfo, int requestHandle);
 #else
-    void at_ec2ConnectFinished( ec2::ErrorCode, ec2::AbstractECConnectionPtr );
+    void at_ec2ConnectFinished( ec2::ReqID, ec2::ErrorCode, ec2::AbstractECConnectionPtr );
 #endif
 
     void at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed);

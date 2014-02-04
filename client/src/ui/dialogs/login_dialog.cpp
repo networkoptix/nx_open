@@ -342,7 +342,7 @@ void QnLoginDialog::updateUsability() {
 // -------------------------------------------------------------------------- //
 
 #ifndef OLD_EC
-void QnLoginDialog::at_ec2ConnectFinished( ec2::ErrorCode errorCode, ec2::AbstractECConnectionPtr connection )
+void QnLoginDialog::at_ec2ConnectFinished( ec2::ReqID, ec2::ErrorCode errorCode, ec2::AbstractECConnectionPtr connection )
 {
     updateUsability();
 
