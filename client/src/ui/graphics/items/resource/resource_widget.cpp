@@ -130,7 +130,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setTransformOrigin(Center);
 
     /* Set up shadow. */
-    shadowItem()->setColor(qnGlobals->shadowColor());
+    if (shadowItem())
+        shadowItem()->setColor(qnGlobals->shadowColor());
     setShadowDisplacement(defaultShadowDisplacement);
 
     /* Set up frame. */
