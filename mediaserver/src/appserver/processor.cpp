@@ -51,7 +51,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
             continue; //race condition. manual camera just deleted
         const ec2::ErrorCode errorCode = m_ec2Connection->getCameraManager()->addCameraSync( cameraResource, &cameras );
         if( errorCode != ec2::ErrorCode::ok ) {
-            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << ec2::toString(ErrorCode);
+            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << ec2::toString(errorCode);
             continue;
         }
 

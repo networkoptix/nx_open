@@ -741,7 +741,6 @@ void QnMain::loadResourcesFromECS()
     }
 
     QnCameraHistoryList cameraHistoryList;
-    ec2::ErrorCode rez;
     while (( rez = ec2Connection->getCameraManager()->getCameraHistoryListSync(&cameraHistoryList)) != ec2::ErrorCode::ok)
     {
         qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);
@@ -755,7 +754,6 @@ void QnMain::loadResourcesFromECS()
 
     //loading business rules
     QnUserResourceList users;
-    ec2::ErrorCode rez;
     while(( rez = ec2Connection->getUserManager()->getUsersSync(&users))  != ec2::ErrorCode::ok)
     {
         qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);
@@ -767,7 +765,6 @@ void QnMain::loadResourcesFromECS()
 
     //loading business rules
     QnBusinessEventRuleList rules;
-    ec2::ErrorCode rez;
     while( (rez = ec2Connection->getBusinessEventManager()->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )
     {
         qDebug() << "QnMain::run(): Can't get business rules. Reason: " << ec2::toString(rez);
