@@ -62,11 +62,11 @@ namespace ec2
                 std::unique_lock<std::mutex> lk( m_mutex );
                 if( !httpClient->doGet( requestUrl ) )
                 {
-                    QtConcurrent::run( std::bind( handler, ErrorCode::failure, OutputData() ) );
+                    //QtConcurrent::run( std::bind( handler, ErrorCode::failure, OutputData() ) );
                     return;
                 }
-                auto func = std::bind( std::mem_fn( &ClientQueryProcessor::processHttpResponse<OutputData, HandlerType> ), this, httpClient, handler );
-                m_runningHttpRequests[httpClient] = new CustomHandler<decltype(func)>(func);
+                //auto func = std::bind( std::mem_fn( &ClientQueryProcessor::processHttpResponse<OutputData, HandlerType> ), this, httpClient, handler );
+                //m_runningHttpRequests[httpClient] = new CustomHandler<decltype(func)>(func);
             }
         }
 

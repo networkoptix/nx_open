@@ -74,7 +74,7 @@ namespace ec2
     {
         LoginInfo loginInfo;
         m_remoteQueryProcessor.processQueryAsync<LoginInfo, ConnectionInfo>(
-            ApiCommand::connect, std::move(loginInfo), std::bind(std::mem_fn(&Ec2DirectConnectionFactory::remoteConnectionFinished), this) );
+            ApiCommand::connect, loginInfo, std::bind(std::mem_fn(&Ec2DirectConnectionFactory::remoteConnectionFinished), this) );
         //TODO/IMPL
         return 0;
     }

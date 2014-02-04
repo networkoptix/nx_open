@@ -37,4 +37,9 @@ namespace ec2
     {
         query->addQueryItem( ID_PARAM_NAME, id.toString() );
     }
+
+    void toUrlParams( const LoginInfo& loginInfo, QUrlQuery* const query )
+    {
+        //TODO/IMPL
+    }
 }

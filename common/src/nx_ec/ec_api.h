@@ -562,12 +562,18 @@ namespace ec2
     struct ResourceContext
     {
         QSharedPointer<QnResourceFactory> resFactory;
-        const QnResourcePool* pool;
+        QnResourcePool* pool;
         const QnResourceTypePool* resTypePool;
 
+        ResourceContext()
+        :
+            pool( nullptr ),
+            resTypePool( nullptr )
+        {
+        }
         ResourceContext(
             QSharedPointer<QnResourceFactory> _resFactory,
-            const QnResourcePool* _pool,
+            QnResourcePool* _pool,
             const QnResourceTypePool* _resTypePool )
         :
             resFactory( _resFactory ),
