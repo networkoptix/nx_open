@@ -21,7 +21,9 @@
 // -------------------------------------------------------------------------- //
 QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     base_type(widget->resource()->toResourcePtr()),
-    m_animationMode(NoAnimation)
+    m_animationMode(NoAnimation),
+    m_mediaDewarpingParams(widget->dewarpingParams()),
+    m_itemDewarpingParams(widget->item()->dewarpingParams())
 {
     m_widget = widget;
     m_widget->registerAnimation(this);
@@ -34,8 +36,8 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     connect(m_widget->item(),   &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnFisheyePtzController::updateItemDewarpingParams);
 
     updateAspectRatio();
-    updateItemDewarpingParams();
-    updateMediaDewarpingParams();
+    updateLimits();
+    updateCapabilities();
 }
 
 QnFisheyePtzController::~QnFisheyePtzController() {

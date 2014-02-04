@@ -99,6 +99,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         m_sensStaticText[i].setPerformanceHint(QStaticText::AggressiveCaching);
     }
 
+    updateAspectRatio();
+
     /* Set up PTZ controller. */
     m_ptzController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
     m_ptzController.reset(new QnPresetPtzController(m_ptzController));
@@ -193,7 +195,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     at_histogramButton_toggled(enhancementButton->isChecked());
     updateButtonsVisibility();
     updateIconButton();
-    updateAspectRatio();
+
     updateCursor();
     updateFisheye();
     setImageEnhancement(item->imageEnhancement());
@@ -893,9 +895,9 @@ void QnMediaResourceWidget::updateAspectRatio() {
 
     QSize sourceSize = m_renderer->sourceSize();
 
-    if (!sourceSize.isEmpty())
-        if (item() && item()->dewarpingParams().enabled && m_dewarpingParams.enabled)
-            sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
+    qreal dewarpingRatio = item() && item()->dewarpingParams().enabled && m_dewarpingParams.enabled
+            ? item()->dewarpingParams().panoFactor
+            : 1.0;
 
     QString resourceId;
     if (const QnNetworkResource *networkResource = dynamic_cast<const QnNetworkResource*>(resource()->toResource()))
@@ -903,13 +905,17 @@ void QnMediaResourceWidget::updateAspectRatio() {
 
     if(sourceSize.isEmpty()) {
         setAspectRatio(
-            resourceId.isEmpty() ? -1.0 : qnSettings->resourceAspectRatios().value(resourceId, -1.0)
-        );
+                    dewarpingRatio * (
+                        resourceId.isEmpty()
+                        ? -1.0
+                        : qnSettings->resourceAspectRatios().value(resourceId, -1.0))
+                    );
     } else {
         setAspectRatio(
-            QnGeometry::aspectRatio(sourceSize) *
-            QnGeometry::aspectRatio(channelLayout()->size()) *
-            (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()))
+                    dewarpingRatio *
+                    QnGeometry::aspectRatio(sourceSize) *
+                    QnGeometry::aspectRatio(channelLayout()->size()) *
+                    (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()))
         );
 
         if (!resourceId.isEmpty()) {
