@@ -347,12 +347,16 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const {
 
-#ifdef LIGHT_CLIENT
-    while (!layout->getItems().isEmpty())
-        layout->removeItem(*(layout->getItems().begin()));
-#endif
+    if (qnSettings->lightMode() > 0) {
+        while (!layout->getItems().isEmpty())
+            layout->removeItem(*(layout->getItems().begin()));
+    }
 
-    if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
+    int maxItems = qnSettings->lightMode() == 0
+            ? qnSettings->maxSceneVideoItems()
+            : 1;
+
+    if (layout->getItems().size() >= maxItems)
         return;
 
     {
@@ -800,6 +804,10 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
+    int maxItems = qnSettings->lightMode() == 0
+            ? qnSettings->maxSceneVideoItems()
+            : 1;
+
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
         QHash<QUuid, QnLayoutItemData> itemDataByUuid;
@@ -819,7 +827,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
         /* Add to layout. */
         foreach(const QnLayoutItemData &data, itemDataByUuid) {
-            if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
+            if (layout->getItems().size() >= maxItems)
                 return;
 
             layout->addItem(data);

@@ -1066,8 +1066,12 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     QnResourceWidget::Buttons buttons = widget->checkedButtons();
     delete widget;
 
+    int maxItems = qnSettings->lightMode() == 0
+            ? qnSettings->maxSceneVideoItems()
+            : 1;
+
     QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
-    if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
+    if (layout->getItems().size() >= maxItems)
         return;
     layout->addItem(data);
     display()->widget(data.uuid)->setCheckedButtons(buttons);

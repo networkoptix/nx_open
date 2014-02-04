@@ -117,6 +117,9 @@ public:
 
         USER_IDLE_TIMEOUT_MSECS,
 
+        /** Light client mode - no animations, no background, no opacity, no notifications, 1 camera only allowed. */
+        LIGHT_MODE,
+
         VARIABLE_COUNT
     };
 
@@ -202,6 +205,7 @@ private:
         QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)
 
         QN_DECLARE_RW_PROPERTY(Qn::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
+        QN_DECLARE_RW_PROPERTY(int,                         lightMode,              setLightMode,               LIGHT_MODE,                 0)  //int because of intended flags system
 
     QN_END_PROPERTY_STORAGE()
 

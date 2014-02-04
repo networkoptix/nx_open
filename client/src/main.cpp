@@ -307,6 +307,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool skipMediaFolderScan = false;
     bool noFullScreen = false;
     bool noVersionMismatchCheck = false;
+    int lightMode = 0;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -325,6 +326,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
     commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
 #endif
+    commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString());
+
     commandLineParser.parse(argc, argv, stderr);
 
     initLog(logLevel);
@@ -333,6 +336,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
         qnSettings->setDevMode(true);
     }
+
+    qnSettings->setLightMode(lightMode);
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);

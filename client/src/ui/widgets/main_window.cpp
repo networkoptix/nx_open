@@ -103,13 +103,8 @@ namespace {
         }
     }
 
-#ifdef LIGHT_CLIENT
-    int minimalWindowWidth = 400;
-    int minimalWindowHeight = 300;
-#else
     int minimalWindowWidth = 800;
     int minimalWindowHeight = 600;
-#endif
 
 } // anonymous namespace
 
@@ -155,8 +150,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Set up properties. */
     setWindowTitle(QApplication::applicationName());
     setAcceptDrops(true);
-    setMinimumWidth(minimalWindowWidth);
-    setMinimumHeight(minimalWindowHeight);
+    setMinimumWidth(qnSettings->lightMode() > 0 ? minimalWindowWidth / 2 : minimalWindowWidth);
+    setMinimumHeight(qnSettings->lightMode() > 0 ? minimalWindowHeight / 2 : minimalWindowHeight);
     setPaletteColor(this, QPalette::Window, Qt::black);
 
 
@@ -173,11 +168,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
         // TODO: #Elric move to ctor^ ?
 
-#ifndef LIGHT_CLIENT
-    m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
-    m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
-#endif
-
+    if (qnSettings->lightMode() == 0) {
+        m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
+        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+    }
 
     /* Set up model & control machinery. */
     display()->setScene(m_scene.data());
