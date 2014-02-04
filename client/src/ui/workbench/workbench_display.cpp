@@ -1852,6 +1852,9 @@ void QnWorkbenchDisplay::at_resource_disabledChanged(const QnResourcePtr &resour
 }
 
 void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction) {
+    if (qnSettings->lightMode() & Qn::LightModeNoNotifications)
+        return;
+
     QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().getEventResourceId(), QnResourcePool::AllResources);
     if (!resource)
         return;
@@ -1875,6 +1878,9 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QVariant &resource, 
 }
 
 void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resource, int type) {
+    if (qnSettings->lightMode() & Qn::LightModeNoNotifications)
+        return;
+
     foreach(QnResourceWidget *widget, this->widgets(resource)) {
         if(widget->zoomTargetWidget())
             continue; /* Don't draw notification on zoom widgets. */
