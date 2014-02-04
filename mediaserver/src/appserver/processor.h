@@ -16,7 +16,6 @@ public:
     void processResources(const QnResourceList &resources);
 
 private:
-    //QnAppServerConnectionPtr m_appServer;
     ec2::AbstractECConnectionPtr m_ec2Connection;
     QnId m_serverId;
     

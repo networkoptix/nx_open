@@ -180,7 +180,7 @@ namespace ec2
         template<class TargetType, class HandlerType> ReqID addCamera( const QnVirtualCameraResourcePtr& camRes, TargetType* target, HandlerType handler ) {
             return addCamera( camRes, std::static_pointer_cast<impl::AddCameraHandler>(std::make_shared<impl::CustomAddCameraHandler<TargetType, HandlerType>>(target, handler)) );
         }
-        ErrorCode addCameraSync( const QnVirtualCameraResourcePtr& camRes, QnVirtualCameraResourceList* const cameras ) {
+        ErrorCode addCameraSync( const QnVirtualCameraResourcePtr& camRes, QnVirtualCameraResourceList* const cameras = 0) {
             using namespace std::placeholders;
             return impl::doSyncCall<impl::AddCameraHandler>( std::bind(std::mem_fn(&AbstractCameraManager::addCamera), this, camRes, _1), cameras );
         }

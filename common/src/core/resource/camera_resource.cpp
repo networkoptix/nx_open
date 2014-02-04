@@ -151,10 +151,10 @@ void QnVirtualCameraResource::deserialize(const QnResourceParameters &parameters
 
 void QnVirtualCameraResource::save()
 {
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    if (conn->saveSync(::toSharedPointer(this)) != 0) {
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::createConnection2Sync();
+    if (conn->getCameraManager()->addCameraSync(::toSharedPointer(this)) != ec2::ErrorCode::ok) {
         qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
-            << getPhysicalId() << ". Description: " << conn->getLastError();
+            << getPhysicalId() << ". Description: "; //<< conn->getLastError();
     }
 }
 

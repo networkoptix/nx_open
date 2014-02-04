@@ -9,7 +9,6 @@
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
     : m_serverId(serverId)
 {
-    //m_appServer = QnAppServerConnectionFactory::createConnection();
     connect(qnResPool, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
 
     QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync( QUrl(), &m_ec2Connection );
@@ -50,19 +49,11 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
         if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(cameraResource->getUrl()))
             continue; //race condition. manual camera just deleted
-#ifdef OLD_EC
-        if (m_appServer->addCamera(cameraResource, cameras) != 0)
-        {
-            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << m_appServer->getLastError();
-            continue;
-        }
-#else
         const ec2::ErrorCode errorCode = m_ec2Connection->getCameraManager()->addCameraSync( cameraResource, &cameras );
         if( errorCode != ec2::ErrorCode::ok ) {
-            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: "; // << m_appServer->getLastError();
+            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: "; // todo: addReason
             continue;
         }
-#endif
 
         if (cameras.isEmpty())
         {
@@ -80,7 +71,6 @@ void QnAppserverResourceProcessor::updateResourceStatusAsync(const QnResourcePtr
     if (!resource)
         return;
 
-    //int handle = m_appServer->setResourceStatusAsync(resource->getId(), resource->getStatus(), this, "requestFinished");
     m_setStatusInProgress.insert(resource->getId());
     m_ec2Connection->getResourceManager()->setResourceStatus(resource->getId(), resource->getStatus(), this, &QnAppserverResourceProcessor::requestFinished2);
 }

@@ -60,7 +60,7 @@ namespace ec2
 
 		int getNextSequence();
     private:
-        ErrorCode updateResource(const ApiResourceData& data);
+        ErrorCode updateResource(const ApiResourceData& data, bool hasAddParams);
 		ErrorCode insertResource(const ApiResourceData& data);
 
         ErrorCode insertAddParam(const ApiResourceParam& param);

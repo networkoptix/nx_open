@@ -45,7 +45,8 @@ namespace ec2
 
             virtual void done( const ErrorCode& errorCode, const OutDataType& _outParam ) override
             {
-                *m_outParam = _outParam;
+                if (m_outParam)
+                    *m_outParam = _outParam;
                 SyncHandler::done( errorCode );
             }
 
