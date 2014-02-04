@@ -16,7 +16,7 @@
 #include "ptz_data.h"
 
 /**
- * A thread-safe interface for accessing camera's PTZ functions.
+ * A thread-safe blocking interface for accessing camera's PTZ functions.
  */
 class QnAbstractPtzController: public Connective<QObject> {
     Q_OBJECT
@@ -260,6 +260,7 @@ public:
      * Synchronizes this controller's internal caches with the actual target values.
      * 
      * \param query                     Data fields to synchronize.
+     * \returns                         Whether the operation was successful.     
      */
     virtual bool synchronize(Qn::PtzDataFields query) = 0;
 
