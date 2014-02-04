@@ -8,16 +8,19 @@
 
 namespace ec2
 {
-    Ec2DirectConnection::Ec2DirectConnection( ServerQueryProcessor* queryProcessor, const ResourceContext& resCtx )
+    Ec2DirectConnection::Ec2DirectConnection(
+        ServerQueryProcessor* queryProcessor,
+        const ResourceContext& resCtx,
+        const QnConnectionInfo& connectionInfo )
     :
         BaseEc2Connection<ServerQueryProcessor>( queryProcessor, resCtx ),
-        m_dbManager( new QnDbManager(resCtx.resFactory) )
+        m_dbManager( new QnDbManager(resCtx.resFactory) ),
+        m_connectionInfo( connectionInfo )
     {
     }
 
     QnConnectionInfo Ec2DirectConnection::connectionInfo() const
     {
-        //TODO/IMPL
-        return QnConnectionInfo();
+        return m_connectionInfo;
     }
 }

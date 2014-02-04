@@ -35,7 +35,7 @@ public slots:
 private slots:
     void loadResourcesFromECS();
     void at_localInterfacesChanged();
-    void at_serverSaved(ec2::ErrorCode err, const QnResourceList&);
+    void at_serverSaved(ec2::ReqID, ec2::ErrorCode err, const QnResourceList&);
     void at_cameraIPConflict(QHostAddress host, QStringList macAddrList);
     void at_noStorages();
     void at_storageFailure(QnResourcePtr storage, QnBusiness::EventReason reason);

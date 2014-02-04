@@ -1097,6 +1097,7 @@ ec2::AbstractECConnectionPtr QnAppServerConnectionFactory::createConnection2Sync
 }
 
 
+#ifdef OLD_EC
 bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
 {
     QList<QnResourceTypePtr> resourceTypeList;
@@ -1111,6 +1112,7 @@ bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
 
     return true;
 }
+#endif
 
 bool initResourceTypes(ec2::AbstractECConnectionPtr ec2Connection)
 {

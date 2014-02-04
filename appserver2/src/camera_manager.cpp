@@ -26,6 +26,8 @@ namespace ec2
     template<class QueryProcessorType>
     ReqID QnCameraManager<QueryProcessorType>::addCamera( const QnVirtualCameraResourcePtr& resource, impl::AddCameraHandlerPtr handler )
     {
+        const ReqID reqID = generateRequestID();
+
 #if 0
         //building async pipe
         const QnTransaction<ApiCameraData>& tran = prepareTransaction( ec2::addCamera, resource );
@@ -57,9 +59,9 @@ namespace ec2
         auto tran = prepareTransaction( command, resource );
 
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::AddCameraHandler::done ), handler, _1, cameraList ) );
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::AddCameraHandler::done ), handler, reqID, _1, cameraList ) );
         
-        return INVALID_REQ_ID;
+        return reqID;
     }
 
     template<class QueryProcessorType>
@@ -72,29 +74,33 @@ namespace ec2
     template<class QueryProcessorType>
     ReqID QnCameraManager<QueryProcessorType>::getCameras( QnId mediaServerId, impl::GetCamerasHandlerPtr handler )
     {
-		auto queryDoneHandler = [handler, this]( ErrorCode errorCode, const ApiCameraDataList& cameras) {
+        const ReqID reqID = generateRequestID();
+
+		auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraDataList& cameras) {
 			QnVirtualCameraResourceList outData;
 			if( errorCode == ErrorCode::ok )
-				cameras.toCameraList(outData, m_resCtx.resFactory.data());
-			handler->done( errorCode, outData);
+				cameras.toCameraList(outData, m_resCtx.resFactory);
+			handler->done( reqID, errorCode, outData);
 		};
 		m_queryProcessor->processQueryAsync<QnId, ApiCameraDataList, decltype(queryDoneHandler)>
 			( ApiCommand::getCameras, mediaServerId, queryDoneHandler );
-		return INVALID_REQ_ID;
+		return reqID;
     }
 
     template<class QueryProcessorType>
     ReqID QnCameraManager<QueryProcessorType>::getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler )
     {
-        auto queryDoneHandler = [handler]( ErrorCode errorCode, const ApiCameraServerItemDataList& cameraHistory) {
+        const ReqID reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraServerItemDataList& cameraHistory) {
             QnCameraHistoryList outData;
             if( errorCode == ErrorCode::ok )
                 cameraHistory.toResourceList(outData);
-            handler->done( errorCode, outData);
+            handler->done( reqID, errorCode, outData);
         };
         m_queryProcessor->processQueryAsync<nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> (
             ApiCommand::getCameraHistoryList, nullptr, queryDoneHandler );
-        return INVALID_REQ_ID;
+        return reqID;
     }
 
     template<class QueryProcessorType>

@@ -5,6 +5,7 @@
 #include <QString>
 #include <vector>
 #include "nx_ec/binary_serialization_helper.h"
+#include "nx_ec/ec_api.h"
 
 
 namespace ec2
@@ -94,6 +95,8 @@ namespace ec2
             params.serialize(stream);
         }
     };
+
+    ReqID generateRequestID();
 }
 
 QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnUuid, (data1) (data2) (data3) (data4) )

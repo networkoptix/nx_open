@@ -9,7 +9,6 @@
 #include <memory>
 #include <mutex>
 
-#include "ec2_connection.h"
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/connection_data.h"
 #include "client_query_processor.h"
@@ -43,7 +42,16 @@ namespace ec2
 
         ReqID establishDirectConnection( impl::ConnectHandlerPtr handler );
         ReqID establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler );
-        void remoteConnectionFinished( ErrorCode errorCode, const ConnectionInfo& connectionInfo );
+        //!Called on client side after receiving connection response from remote server
+        void remoteConnectionFinished(
+            ReqID reqID,
+            ErrorCode errorCode,
+            const ConnectionInfo& connectionInfo,
+            impl::ConnectHandlerPtr handler );
+        //!Called on server side to handle connection request from remote host
+        ErrorCode doRemoteConnectionSync(
+            const LoginInfo& loginInfo,
+            ConnectionInfo* const connectionInfo );
     };
 }
 

@@ -21,7 +21,7 @@
 	<name>HD Witness New Enterprise Controller</name>    
 
     <properties>
-        <product.title>${mediaserver.name}</product.title>  
+        <product.title>${appserver2.name}</product.title>  
         <!--Global libs-->		
         <qt.libs>core network xml sql concurrent</qt.libs>
         <global.libs>-lcommon -lpostproc -lprotobuf</global.libs>

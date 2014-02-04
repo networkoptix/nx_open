@@ -1,7 +1,7 @@
-#include "api_data.h"
 #ifndef __CAMERA_SERVER_ITEM_DATA_H__
 #define __CAMERA_SERVER_ITEM_DATA_H__
 
+#include "api_data.h"
 #include "ec2_resource_data.h"
 #include "core/resource/camera_history.h"
 

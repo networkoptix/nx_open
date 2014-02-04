@@ -21,9 +21,6 @@
 */
 namespace ec2
 {
-    typedef int ReqID;
-    const ReqID INVALID_REQ_ID = -1;
-
     /*!
         \note All methods are asynchronous if other not specified
     */
@@ -566,18 +563,19 @@ namespace ec2
 
     struct ResourceContext
     {
-        QSharedPointer<QnResourceFactory> resFactory;
+        QnResourceFactory* resFactory;
         QnResourcePool* pool;
         const QnResourceTypePool* resTypePool;
 
         ResourceContext()
         :
+            resFactory( nullptr ),
             pool( nullptr ),
             resTypePool( nullptr )
         {
         }
         ResourceContext(
-            QSharedPointer<QnResourceFactory> _resFactory,
+            QnResourceFactory* _resFactory,
             QnResourcePool* _pool,
             const QnResourceTypePool* _resTypePool )
         :

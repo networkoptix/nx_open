@@ -24,7 +24,7 @@ namespace ec2
 
             void wait();
             ErrorCode errorCode() const;
-            void done( ErrorCode errorCode );
+            void done( ReqID reqID, ErrorCode errorCode );
 
         private:
             std::condition_variable m_cond;
@@ -43,11 +43,11 @@ namespace ec2
             CustomSyncHandler( OutDataType* const outParam )
                 : m_outParam( outParam ) {}
 
-            virtual void done( const ErrorCode& errorCode, const OutDataType& _outParam ) override
+            virtual void done( ReqID reqID, const ErrorCode& errorCode, const OutDataType& _outParam ) override
             {
                 if (m_outParam)
                     *m_outParam = _outParam;
-                SyncHandler::done( errorCode );
+                SyncHandler::done( reqID, errorCode );
             }
 
         private:
@@ -74,9 +74,9 @@ namespace ec2
             public BaseHandler
         {
         public:
-            virtual void done( const ErrorCode& errorCode ) override
+            virtual void done( ReqID reqID, const ErrorCode& errorCode ) override
             {
-                SyncHandler::done( errorCode );
+                SyncHandler::done( reqID, errorCode );
             }
         };
 

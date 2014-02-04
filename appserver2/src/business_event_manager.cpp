@@ -24,14 +24,16 @@ QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager( QueryProcess
 template<class T>
 ReqID QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandlerPtr handler )
 {
-    auto queryDoneHandler = [handler, this]( ErrorCode errorCode, const ApiBusinessRuleDataList& rules) {
+    const ReqID reqID = generateRequestID();
+
+    auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiBusinessRuleDataList& rules) {
         QnBusinessEventRuleList outData;
         if( errorCode == ErrorCode::ok )
             rules.toResourceList(outData, m_resCtx.pool);
-        handler->done( errorCode, outData);
+        handler->done( reqID, errorCode, outData);
     };
     m_queryProcessor->processQueryAsync<nullptr_t, ApiBusinessRuleDataList, decltype(queryDoneHandler)> ( ApiCommand::getBusinessRuleList, nullptr, queryDoneHandler);
-    return INVALID_REQ_ID;
+    return reqID;
 }
 
 template<class T>
