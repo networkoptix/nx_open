@@ -224,6 +224,24 @@ namespace Qn {
      */
     const QString customAspectRatioKey = lit("overrideAr");
 
+    /**
+     * Flags describing the client light mode.
+     */
+    enum LightModeFlag {
+        LightModeNoAnimation    = 0x01,
+        LightModeSmallWindow    = 0x02,
+        LightModeNoBackground   = 0x04,
+        LightModeNoOpacity      = 0x08,
+        LightModeNoNotifications= 0x10,
+        LightModeSingleItem     = 0x20,
+
+        LightModeFull           = 0xFF
+
+    };
+    Q_DECLARE_FLAGS(LightModeFlags, LightModeFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(LightModeFlags)
+
+
 } // namespace Qn
 
 Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);

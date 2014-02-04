@@ -178,7 +178,7 @@ qreal VariantAnimator::easingCurveValue(qreal progress) const {
 }
 
 void VariantAnimator::updateCurrentTime(int currentTime) {
-    if (qnSettings->lightMode() > 0) {
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation) {
         updateCurrentValue(internalTargetValue());
         stop();
         return;

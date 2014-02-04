@@ -501,7 +501,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(titleMenuSignalizer,        SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_titleItem_contextMenuRequested(QObject *, QEvent *)));
     connect(action(Qn::ToggleTitleBarAction), SIGNAL(toggled(bool)),                                                                this,                           SLOT(at_toggleTitleBarAction_toggled(bool)));
 
-    if (qnSettings->lightMode() == 0)
+    if (!(qnSettings->lightMode() & Qn::LightModeNoNotifications))
         createNotificationsGuiElements();
 
     /* Calendar. */
@@ -835,7 +835,7 @@ QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
 }
 
 void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     m_inFreespace = false;
@@ -858,7 +858,7 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
 }
 
 void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     m_inFreespace = false;
@@ -881,7 +881,7 @@ void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
 }
 
 void QnWorkbenchUi::setTitleOpened(bool opened, bool animate, bool save) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     m_inFreespace = false;
@@ -905,7 +905,7 @@ void QnWorkbenchUi::setTitleOpened(bool opened, bool animate, bool save) {
 }
 
 void QnWorkbenchUi::setNotificationsOpened(bool opened, bool animate, bool save) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     if (!m_notificationsItem)
@@ -934,7 +934,7 @@ void QnWorkbenchUi::setNotificationsOpened(bool opened, bool animate, bool save)
 }
 
 void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     m_inFreespace = false;
@@ -959,7 +959,7 @@ void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate) {
 }
 
 void QnWorkbenchUi::setDayTimeWidgetOpened(bool opened, bool animate) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     m_inFreespace = false;
@@ -976,7 +976,7 @@ void QnWorkbenchUi::setDayTimeWidgetOpened(bool opened, bool animate) {
 }
 
 void QnWorkbenchUi::setTreeVisible(bool visible, bool animate) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     bool changed = m_treeVisible != visible;
@@ -989,7 +989,7 @@ void QnWorkbenchUi::setTreeVisible(bool visible, bool animate) {
 }
 
 void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     bool changed = m_sliderVisible != visible;
@@ -1007,7 +1007,7 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
 }
 
 void QnWorkbenchUi::setTitleVisible(bool visible, bool animate) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     bool changed = m_titleVisible != visible;
@@ -1022,7 +1022,7 @@ void QnWorkbenchUi::setTitleVisible(bool visible, bool animate) {
 }
 
 void QnWorkbenchUi::setNotificationsVisible(bool visible, bool animate) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     if (!m_notificationsItem)
@@ -1038,7 +1038,7 @@ void QnWorkbenchUi::setNotificationsVisible(bool visible, bool animate) {
 }
 
 void QnWorkbenchUi::setCalendarVisible(bool visible, bool animate) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     bool changed = m_calendarVisible != visible;
@@ -1103,7 +1103,7 @@ void QnWorkbenchUi::setWindowButtonsUsed(bool windowButtonsUsed) {
 }
 
 void QnWorkbenchUi::setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     if(animate) {
@@ -1125,7 +1125,7 @@ void QnWorkbenchUi::setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpac
 }
 
 void QnWorkbenchUi::setSliderOpacity(qreal opacity, bool animate) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     if(animate) {
@@ -1143,7 +1143,7 @@ void QnWorkbenchUi::setSliderOpacity(qreal opacity, bool animate) {
 }
 
 void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     if(animate) {
@@ -1161,7 +1161,7 @@ void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpa
 }
 
 void QnWorkbenchUi::setNotificationsOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     if (!m_notificationsItem)
@@ -1184,7 +1184,7 @@ void QnWorkbenchUi::setNotificationsOpacity(qreal foregroundOpacity, qreal backg
 }
 
 void QnWorkbenchUi::setCalendarOpacity(qreal opacity, bool animate) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     if(animate) {
@@ -1202,7 +1202,7 @@ void QnWorkbenchUi::setCalendarOpacity(qreal opacity, bool animate) {
 }
 
 void QnWorkbenchUi::setZoomButtonsOpacity(qreal opacity, bool animate) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     if(animate) {
@@ -1213,7 +1213,7 @@ void QnWorkbenchUi::setZoomButtonsOpacity(qreal opacity, bool animate) {
 }
 
 void QnWorkbenchUi::updateTreeOpacity(bool animate) {
-    if (qnSettings->lightMode() > 0) {
+    if (qnSettings->lightMode() & Qn::LightModeNoOpacity) {
         qreal opacity = m_treeVisible ? opaque : hidden;
         setTreeOpacity(opacity, opacity, false);
         return;
@@ -1231,7 +1231,7 @@ void QnWorkbenchUi::updateTreeOpacity(bool animate) {
 }
 
 void QnWorkbenchUi::updateSliderOpacity(bool animate) {
-    if (qnSettings->lightMode() > 0) {
+    if (qnSettings->lightMode() & Qn::LightModeNoOpacity) {
         qreal opacity = m_sliderVisible ? opaque : hidden;
         setSliderOpacity(opacity, false);
         setZoomButtonsOpacity(opacity, false);
@@ -1253,7 +1253,7 @@ void QnWorkbenchUi::updateSliderOpacity(bool animate) {
 }
 
 void QnWorkbenchUi::updateTitleOpacity(bool animate) {
-    if (qnSettings->lightMode() > 0) {
+    if (qnSettings->lightMode() & Qn::LightModeNoOpacity) {
         qreal opacity = m_titleVisible ? opaque : hidden;
         setTitleOpacity(opacity, opacity, false);
         return;
@@ -1286,7 +1286,7 @@ void QnWorkbenchUi::updateNotificationsOpacity(bool animate) {
 }
 
 void QnWorkbenchUi::updateCalendarOpacity(bool animate) {
-    if (qnSettings->lightMode() > 0) {
+    if (qnSettings->lightMode() & Qn::LightModeNoOpacity) {
         qreal opacity = m_calendarVisible ? opaque : hidden;
         setCalendarOpacity(opacity, false);
         return;
@@ -1304,7 +1304,7 @@ void QnWorkbenchUi::updateCalendarOpacity(bool animate) {
 }
 
 void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     bool calendarEmpty = true;
@@ -1328,7 +1328,7 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
 }
 
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     bool sliderVisible =
@@ -1811,7 +1811,7 @@ QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const {
 }
 
 void QnWorkbenchUi::setOpenedPanels(Panels panels, bool animate, bool save) {
-    if (qnSettings->lightMode() > 0)
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
     setTreeOpened(panels & TreePanel, animate, save);

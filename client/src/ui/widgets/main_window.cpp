@@ -150,10 +150,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Set up properties. */
     setWindowTitle(QApplication::applicationName());
     setAcceptDrops(true);
-    setMinimumWidth(qnSettings->lightMode() > 0 ? minimalWindowWidth / 2 : minimalWindowWidth);
-    setMinimumHeight(qnSettings->lightMode() > 0 ? minimalWindowHeight / 2 : minimalWindowHeight);
-    setPaletteColor(this, QPalette::Window, Qt::black);
 
+    bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;
+    setMinimumWidth(smallWindow ? minimalWindowWidth / 2 : minimalWindowWidth);
+    setMinimumHeight(smallWindow ? minimalWindowHeight / 2 : minimalWindowHeight);
+    setPaletteColor(this, QPalette::Window, Qt::black);
 
     /* Set up scene & view. */
     m_scene.reset(new QnGraphicsScene(this));
@@ -168,7 +169,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
         // TODO: #Elric move to ctor^ ?
 
-    if (qnSettings->lightMode() == 0) {
+    if (!(qnSettings->lightMode() & Qn::LightModeNoBackground)) {
         m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
         m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
     }

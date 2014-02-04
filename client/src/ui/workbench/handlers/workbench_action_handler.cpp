@@ -347,14 +347,14 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const {
 
-    if (qnSettings->lightMode() > 0) {
+    if (qnSettings->lightMode() & Qn::LightModeSingleItem) {
         while (!layout->getItems().isEmpty())
             layout->removeItem(*(layout->getItems().begin()));
     }
 
-    int maxItems = qnSettings->lightMode() == 0
-            ? qnSettings->maxSceneVideoItems()
-            : 1;
+    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
+            ? 1
+            : qnSettings->maxSceneVideoItems();
 
     if (layout->getItems().size() >= maxItems)
         return;
@@ -804,9 +804,9 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
-    int maxItems = qnSettings->lightMode() == 0
-            ? qnSettings->maxSceneVideoItems()
-            : 1;
+    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
+            ? 1
+            : qnSettings->maxSceneVideoItems();
 
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
