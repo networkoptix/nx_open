@@ -305,8 +305,6 @@ int QnDbManager::getNextSequence()
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiSetResourceStatusData>& tran)
 {
-    Q_ASSERT_X(0, Q_FUNC_INFO, "implement me!!!");
-
     QMutexLocker lock(&m_mutex);
 
     QSqlQuery query(m_sdb);
