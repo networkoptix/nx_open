@@ -87,6 +87,7 @@ namespace ec2
         return INVALID_REQ_ID;
     }
 
+    /*
     ReqID BaseEc2Connection<ServerQueryProcessor>::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
     {
         const ReqID reqID = generateRequestID();
@@ -95,8 +96,9 @@ namespace ec2
         QtConcurrent::run( std::bind( std::mem_fn( &impl::CurrentTimeHandler::done ), handler, reqID, ec2::ErrorCode::ok, curTime ) );
         return reqID;
     }
-
-    ReqID BaseEc2Connection<ClientQueryProcessor>::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
+    */
+    template <class T>
+    ReqID BaseEc2Connection<T>::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
     {
         const ReqID reqID = generateRequestID();
 
@@ -111,6 +113,7 @@ namespace ec2
 
         return reqID;
     }
+    
 
 
     template<class T>

@@ -571,4 +571,10 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& bus
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, qint64& currentTime)
+{
+    currentTime = QDateTime::currentMSecsSinceEpoch();
+    return ErrorCode::ok;
+}
+
 }

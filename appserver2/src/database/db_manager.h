@@ -56,6 +56,9 @@ namespace ec2
         //getBusinessRuleList
         ErrorCode doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& userList);
 
+        //getCurrentTime
+        ErrorCode doQuery(nullptr_t /*dummy*/, qint64& userList);
+
 		// --------- misc -----------------------------
 
 		int getNextSequence();

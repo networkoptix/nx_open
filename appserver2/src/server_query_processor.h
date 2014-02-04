@@ -12,6 +12,7 @@
 #include "database/db_manager.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
+#include <QDateTime>
 
 
 namespace ec2
@@ -21,12 +22,10 @@ namespace ec2
     public:
         static ErrorCode getCurrentTime( nullptr_t, qint64* curTime )
         {
-            //TODO
-            return ErrorCode::failure;
+            *curTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+            return ErrorCode::ok;
         }
     };
-
-
 
 
     class ServerQueryProcessor
@@ -66,7 +65,7 @@ namespace ec2
             TODO let compiler guess template params
         */
         template<class InputData, class OutputData, class HandlerType>
-            void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputData input, HandlerType handler )
+            void processQueryAsync( ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
             QtConcurrent::run( [input, handler]() {
                 OutputData output;
