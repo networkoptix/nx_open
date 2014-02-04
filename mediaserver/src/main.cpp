@@ -687,7 +687,8 @@ void QnMain::loadResourcesFromECS()
         QnSleep::msleep(10000);
     }
 #else
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::createConnection2Sync();
+    ec2::AbstractECConnectionPtr ec2Connection;
+    QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync( QUrl(), &ec2Connection );
 
     QnVirtualCameraResourceList cameras;
     while (ec2Connection->getCameraManager()->getCamerasSync(m_mediaServer->getId(), &cameras) != ec2::ErrorCode::ok)
@@ -1005,8 +1006,10 @@ void QnMain::run()
 
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
-	ec2ConnectionFactory->setResourceFactory(QSharedPointer<QnResourceFactory>(new QnMediaServerResourceFactory()));
-    ec2ConnectionFactory->setResourcePool(qnResPool);
+    ec2::ResourceContext resCtx(
+        QSharedPointer<QnResourceFactory>(new QnMediaServerResourceFactory()),
+        qnResPool,
+        qnResTypePool );
     ec2::AbstractECConnectionPtr ec2Connection;
     while (!needToStop())
     {

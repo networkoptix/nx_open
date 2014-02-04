@@ -11,6 +11,8 @@
 
 #include "ec2_connection.h"
 #include "nx_ec/ec_api.h"
+#include "nx_ec/data/connection_data.h"
+#include "client_query_processor.h"
 #include "server_query_processor.h"
 
 
@@ -30,15 +32,18 @@ namespace ec2
         virtual ReqID connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler ) override;
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) override;
-		virtual void setResourceFactory(QSharedPointer<QnResourceFactory>) override;
-        virtual void setResourcePool(QnResourcePool* pool) override;
+        virtual void setContext( const ResourceContext& resCtx ) override;
 
     private:
-        ServerQueryProcessor m_queryProcessor;
-        AbstractECConnectionPtr m_connection;
-		QSharedPointer<QnResourceFactory> m_resourceFactory;
-        QnResourcePool* m_resPool;
+        ServerQueryProcessor m_serverQueryProcessor;
+        ClientQueryProcessor m_remoteQueryProcessor;
+        AbstractECConnectionPtr m_directConnection;
         std::mutex m_mutex;
+        ResourceContext m_resCtx;
+
+        ReqID establishDirectConnection( impl::ConnectHandlerPtr handler );
+        ReqID establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler );
+        void remoteConnectionFinished( ErrorCode errorCode, const ConnectionInfo& connectionInfo );
     };
 }
 

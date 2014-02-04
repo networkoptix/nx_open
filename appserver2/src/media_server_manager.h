@@ -15,7 +15,7 @@ namespace ec2
         public AbstractMediaServerManager
     {
     public:
-        QnMediaServerManager( QueryProcessorType* const queryProcessor, QSharedPointer<QnResourceFactory> factory );
+        QnMediaServerManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
 
         //!Implementation of QnMediaServerManager::getServers
         virtual ReqID getServers( impl::GetServersHandlerPtr handler ) override;
@@ -28,7 +28,7 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
-        QSharedPointer<QnResourceFactory> m_resourcefactory;
+        ResourceContext m_resCtx;
 
         QnTransaction<ApiMediaServerData> prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource );
     };

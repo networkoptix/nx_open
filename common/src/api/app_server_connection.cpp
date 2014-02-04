@@ -1076,6 +1076,11 @@ void QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2::AbstractECConne
     ec2ConnectionFactoryInstance = _ec2ConnectionFactory;
 }
 
+ec2::AbstractECConnectionFactory* QnAppServerConnectionFactory::ec2ConnectionFactory()
+{
+    return ec2ConnectionFactoryInstance;
+}
+
 ec2::AbstractECConnectionPtr QnAppServerConnectionFactory::createConnection2Sync()
 {
     ec2::AbstractECConnectionPtr ec2Connection;

@@ -7,6 +7,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 
+#include "api/model/connection_info.h"
 #include "api/model/email_attachment.h"
 #include "impl/ec_api_impl.h"
 #include "impl/sync_handler.h"
@@ -491,6 +492,8 @@ namespace ec2
     public:
         virtual ~AbstractECConnection() {}
 
+        virtual QnConnectionInfo connectionInfo() const = 0;
+
         virtual AbstractResourceManagerPtr getResourceManager() = 0;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() = 0;
         virtual AbstractCameraManagerPtr getCameraManager() = 0;
@@ -556,6 +559,24 @@ namespace ec2
 
     typedef std::shared_ptr<AbstractECConnection> AbstractECConnectionPtr;
 
+    struct ResourceContext
+    {
+        QSharedPointer<QnResourceFactory> resFactory;
+        const QnResourcePool* pool;
+        const QnResourceTypePool* resTypePool;
+
+        ResourceContext(
+            QSharedPointer<QnResourceFactory> _resFactory,
+            const QnResourcePool* _pool,
+            const QnResourceTypePool* _resTypePool )
+        :
+            resFactory( _resFactory ),
+            pool( _pool ),
+            resTypePool( _resTypePool )
+        {
+        }
+    };
+
     /*!
         \note All methods are asynchronous if other not specified
     */
@@ -583,8 +604,8 @@ namespace ec2
         }
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
-		virtual void setResourceFactory(QSharedPointer<QnResourceFactory> factory) = 0;
-        virtual void setResourcePool(QnResourcePool* pool) = 0;
+        virtual void setContext( const ResourceContext& resCtx ) = 0;
+
     protected:
         virtual ReqID testConnectionAsync( const QUrl& addr, impl::SimpleHandlerPtr handler ) = 0;
         virtual ReqID connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler ) = 0;

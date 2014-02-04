@@ -12,7 +12,7 @@ QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
     m_appServer = QnAppServerConnectionFactory::createConnection();
     connect(qnResPool, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
 
-    m_ec2Connection = QnAppServerConnectionFactory::createConnection2Sync();
+    QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync( QUrl(), &m_ec2Connection );
 }
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
