@@ -10,15 +10,16 @@ namespace ec2
 {
     RemoteEC2Connection::RemoteEC2Connection(
         ClientQueryProcessor* queryProcessor,
-        const ResourceContext& resCtx )
+        const ResourceContext& resCtx,
+        const QnConnectionInfo& connectionInfo )
     :
-        BaseEc2Connection<ClientQueryProcessor>( queryProcessor, resCtx )
+        BaseEc2Connection<ClientQueryProcessor>( queryProcessor, resCtx ),
+        m_connectionInfo( connectionInfo )
     {
     }
 
     QnConnectionInfo RemoteEC2Connection::connectionInfo() const
     {
-        //TODO/IMPL
-        return QnConnectionInfo();
+        return m_connectionInfo;
     }
 }

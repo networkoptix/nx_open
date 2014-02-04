@@ -58,16 +58,15 @@ namespace ec2
 
             nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
+
+            std::unique_lock<std::mutex> lk( m_mutex );
+            if( !httpClient->doGet( requestUrl ) )
             {
-                std::unique_lock<std::mutex> lk( m_mutex );
-                if( !httpClient->doGet( requestUrl ) )
-                {
-                    //QtConcurrent::run( std::bind( handler, ErrorCode::failure, OutputData() ) );
-                    return;
-                }
-                //auto func = std::bind( std::mem_fn( &ClientQueryProcessor::processHttpResponse<OutputData, HandlerType> ), this, httpClient, handler );
-                //m_runningHttpRequests[httpClient] = new CustomHandler<decltype(func)>(func);
+                QtConcurrent::run( std::bind( handler, ErrorCode::failure, OutputData() ) );
+                return;
             }
+            auto func = std::bind( std::mem_fn( &ClientQueryProcessor::processHttpResponse<OutputData, HandlerType> ), this, httpClient, handler );
+            m_runningHttpRequests[httpClient] = new CustomHandler<decltype(func)>(func);
         }
 
     public slots:
@@ -84,7 +83,7 @@ namespace ec2
 
             handler->doIt();
         }
-         
+
     private:
         class AbstractHandler
         {
@@ -125,7 +124,7 @@ namespace ec2
             InputBinaryStream<QByteArray> inputStream( httpClient->response()->messageBody );
             OutputData outputData;
             QnBinary::deserialize( outputData, &inputStream );
-            return handler( ErrorCode::ok, outputData );
+            //return handler( ErrorCode::ok, outputData );
         }
     };
 }

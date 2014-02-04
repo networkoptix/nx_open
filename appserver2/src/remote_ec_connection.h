@@ -21,9 +21,13 @@ namespace ec2
     public:
         RemoteEC2Connection(
             ClientQueryProcessor* queryProcessor,
-            const ResourceContext& resCtx );
+            const ResourceContext& resCtx,
+            const QnConnectionInfo& connectionInfo );
 
         virtual QnConnectionInfo connectionInfo() const override;
+
+    private:
+        const QnConnectionInfo m_connectionInfo;
     };
 }
 

@@ -378,7 +378,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     initAppServerConnection();
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
-	ec2ConnectionFactory->setResourceFactory(QSharedPointer<QnResourceFactory>(new QnMediaServerResourceFactory()));
+    ec2::ResourceContext resCtx(
+        &QnServerCameraFactory::instance(),
+        qnResPool,
+        qnResTypePool );
+	ec2ConnectionFactory->setContext( resCtx );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
     qnSettings->save();

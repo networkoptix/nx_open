@@ -28,7 +28,7 @@ private:
 private slots:
     void at_resource_statusChanged(const QnResourcePtr& resource);
     //void requestFinished(const QnHTTPRawResponse& response, int handle);
-    void requestFinished2(ec2::ErrorCode errCode, const QnId& id);
+    void requestFinished2( ec2::ReqID reqID, ec2::ErrorCode errCode, const QnId& id );
 };
 
 #endif //_server_appserver_processor_h_

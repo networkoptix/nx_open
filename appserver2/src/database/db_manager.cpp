@@ -40,7 +40,7 @@ void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subD
     }
 }
 
-QnDbManager::QnDbManager(QnResourceFactoryPtr factory)
+QnDbManager::QnDbManager(QnResourceFactory* factory)
 {
     m_storageTypeId = 0;
     m_resourceFactory = factory;

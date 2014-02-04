@@ -782,7 +782,7 @@ void QnMain::at_localInterfacesChanged()
     ec2Connection->getMediaServerManager()->saveServer(m_mediaServer, this, &QnMain::at_serverSaved);
 }
 
-void QnMain::at_serverSaved(ec2::ErrorCode err, const QnResourceList &)
+void QnMain::at_serverSaved(ec2::ReqID, ec2::ErrorCode err, const QnResourceList &)
 {
     if (err != ec2::ErrorCode::ok)
         qWarning() << "Error saving server.";
@@ -995,16 +995,18 @@ void QnMain::run()
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
     ec2::ResourceContext resCtx(
-        QSharedPointer<QnResourceFactory>(QnResourceDiscoveryManager::instance()),
+        QnResourceDiscoveryManager::instance(),
         qnResPool,
         qnResTypePool );
     ec2ConnectionFactory->setContext(resCtx);
     ec2::AbstractECConnectionPtr ec2Connection;
+    QnConnectionInfoPtr connectInfo(new QnConnectionInfo());
     while (!needToStop())
     {
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QUrl(), &ec2Connection );
         if( errorCode == ec2::ErrorCode::ok )
         {
+            *connectInfo = ec2Connection->connectionInfo();
             NX_LOG( QString::fromLatin1("Connected to local EC2"), cl_logWARNING );
             break;
         }
@@ -1015,7 +1017,7 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
 
-    QnConnectionInfoPtr connectInfo(new QnConnectionInfo());
+#ifdef OLD_EC
     while (!needToStop())
     {
         if (appServerConnection->connect(connectInfo) == 0)
@@ -1032,6 +1034,8 @@ void QnMain::run()
         if (!needToStop())
             QnSleep::msleep(1000);
     }
+#endif
+
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
     QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
 
@@ -1060,20 +1064,22 @@ void QnMain::run()
         return;
     }
 
-    while (!needToStop() && !initResourceTypes(ec2Connection))
-    {
-        QnSleep::msleep(1000);
-    }
+#ifdef OLD_EC
     while (!needToStop() && !initResourceTypes(appServerConnection))
+#else
+    while (!needToStop() && !initResourceTypes(ec2Connection))
+#endif
     {
         QnSleep::msleep(1000);
     }
 
 
+#ifdef OLD_EC
     while (!needToStop() && !initLicenses(appServerConnection))
     {
         QnSleep::msleep(1000);
     }
+#endif
 
     if (needToStop())
         return;

@@ -1,0 +1,175 @@
+/**********************************************************
+* 29 jan 2014
+* akolesnikov
+***********************************************************/
+
+#ifndef EC2_BASE_QUERY_HTTP_HANDLER_H
+#define EC2_BASE_QUERY_HTTP_HANDLER_H
+
+#include <condition_variable>
+#include <mutex>
+
+#include <QtCore/QByteArray>
+#include <QtConcurrent>
+
+#include <rest/server/request_handler.h>
+#include <utils/network/http/httptypes.h>
+
+#include "request_params.h"
+#include "server_query_processor.h"
+
+
+namespace ec2
+{
+    //!Http request handler for GET requests
+    template<class InputData, class OutputData, class ChildType>
+    class BaseQueryHttpHandler
+    :
+        public QnRestRequestHandler
+    {
+    public:
+        BaseQueryHttpHandler( ApiCommand::Value cmdCode )
+        :
+            m_cmdCode( cmdCode )
+        {
+        }
+
+        //!Implementation of QnRestRequestHandler::executeGet
+        virtual int executeGet(
+            const QString& /*path*/,
+            const QnRequestParamList& params,
+            QByteArray& result,
+            QByteArray& contentType )
+        {
+            InputData inputData;
+            parseHttpRequestParams( params, &inputData );
+
+            ErrorCode errorCode = ErrorCode::ok;
+            bool finished = false;
+
+            auto queryDoneHandler = [&result, &errorCode, &contentType, &finished, this]( ErrorCode _errorCode, const OutputData& outputData )
+            {
+                if( _errorCode == ErrorCode::ok )
+                {
+                    OutputBinaryStream<QByteArray> stream( &result );
+                    outputData.serialize( stream );
+                    contentType = "application/octet-stream";
+                }
+                errorCode = _errorCode;
+
+                std::unique_lock<std::mutex> lk( m_mutex );
+                finished = true;
+                m_cond.notify_all();
+            };
+
+            static_cast<ChildType*>(this)->processQueryAsync<decltype(queryDoneHandler)>(
+                m_cmdCode,
+                inputData,
+                queryDoneHandler );
+
+            std::unique_lock<std::mutex> lk( m_mutex );
+            m_cond.wait( lk, [&finished]{ return finished; } );
+
+            return errorCode == ErrorCode::ok
+                ? nx_http::StatusCode::ok
+                : nx_http::StatusCode::internalServerError;
+        }
+
+        //!Implementation of QnRestRequestHandler::executePost
+        virtual int executePost(
+            const QString& /*path*/,
+            const QnRequestParamList& /*params*/,
+            const QByteArray& /*body*/,
+            QByteArray& /*result*/,
+            QByteArray& /*contentType*/ )
+        {
+            return nx_http::StatusCode::badRequest;
+        }
+
+        //!Implementation of QnRestRequestHandler::description
+        virtual QString description() const
+        {
+            //TODO/IMPL
+            return QString();
+        }
+
+    private:
+        ApiCommand::Value m_cmdCode;
+        std::condition_variable m_cond;
+        std::mutex m_mutex;
+    };
+
+
+    //!Http request handler for GET requests
+    template<class InputData, class OutputData>
+    class QueryHttpHandler2
+    :
+        public BaseQueryHttpHandler<InputData, OutputData, QueryHttpHandler2<InputData, OutputData> >
+    {
+    public:
+        typedef BaseQueryHttpHandler<InputData, OutputData, QueryHttpHandler2<InputData, OutputData> > parent_type;
+
+        QueryHttpHandler2(
+            ApiCommand::Value cmdCode,
+            ServerQueryProcessor* const queryProcessor )
+        :
+            parent_type( cmdCode ),
+            m_cmdCode( cmdCode ),
+            m_queryProcessor( queryProcessor )
+        {
+        }
+
+        template<class HandlerType>
+        void processQueryAsync( ApiCommand::Value cmdCode, const InputData& inputData, HandlerType handler )
+        {
+            m_queryProcessor->processQueryAsync<InputData, OutputData, HandlerType>(
+                m_cmdCode,
+                inputData,
+                handler );
+        }
+
+        //!Implementation of QnRestRequestHandler::description
+        virtual QString description() const
+        {
+            //TODO/IMPL
+            return QString();
+        }
+
+    private:
+        ServerQueryProcessor* const m_queryProcessor;
+        ApiCommand::Value m_cmdCode;
+    };
+
+
+
+    template<class InputData, class OutputData, class QueryHandlerType>
+    class FlexibleQueryHttpHandler
+    :
+        public BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData, QueryHandlerType> >
+    {
+    public:
+        typedef BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData, QueryHandlerType> > parent_type;
+
+        FlexibleQueryHttpHandler( ApiCommand::Value cmdCode, QueryHandlerType queryHandler )
+        :
+            parent_type( cmdCode ),
+            m_queryHandler( queryHandler )
+        {
+        }
+
+        template<class HandlerType>
+        void processQueryAsync( ApiCommand::Value cmdCode, const InputData& inputData, HandlerType handler )
+        {
+            QtConcurrent::run( [this, inputData, handler]() {
+                OutputData output;
+                const ErrorCode errorCode = m_queryHandler( inputData, &output );
+                handler( errorCode, output );
+            } );
+        }
+
+    private:
+        QueryHandlerType m_queryHandler;
+    };
+}
+
+#endif  //EC2_BASE_QUERY_HTTP_HANDLER_H

@@ -1,5 +1,8 @@
 #include "transaction.h"
 
+#include <atomic>
+
+
 namespace ec2
 {
 
@@ -9,6 +12,8 @@ namespace ec2
         {
             switch( val )
             {
+                case connect:
+                    return "connect";
                 case getResourceTypes:
                     return "getResourceTypes";
                 case addCamera:
@@ -54,5 +59,10 @@ namespace ec2
         id.number = ++m_staticNumber;
     }
 
-}
 
+    ReqID generateRequestID()
+    {
+        static std::atomic<int> requestID;
+        return ++requestID;
+    }
+}

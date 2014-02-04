@@ -26,14 +26,16 @@ namespace ec2
     template<class T>
     ReqID QnUserManager<T>::getUsers( impl::GetUsersHandlerPtr handler )
     {
-        auto queryDoneHandler = [handler]( ErrorCode errorCode, const ApiUserDataList& users) {
+        const ReqID reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiUserDataList& users) {
             QnUserResourceList outData;
             if( errorCode == ErrorCode::ok )
                 users.toResourceList(outData);
-            handler->done( errorCode, outData);
+            handler->done( reqID, errorCode, outData );
         };
         m_queryProcessor->processQueryAsync<nullptr_t, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUserList, nullptr, queryDoneHandler);
-        return INVALID_REQ_ID;
+        return reqID;
     }
 
     template<class T>

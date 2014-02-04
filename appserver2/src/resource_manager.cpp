@@ -19,15 +19,17 @@ namespace ec2
     template<class T>
     ReqID QnResourceManager<T>::getResourceTypes( impl::GetResourceTypesHandlerPtr handler )
     {
-        auto queryDoneHandler = [handler]( ErrorCode errorCode, const ApiResourceTypeList& resTypeList ) {
+        const ReqID reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiResourceTypeList& resTypeList ) {
             QnResourceTypeList outResTypeList;
             if( errorCode == ErrorCode::ok )
 				resTypeList.toResourceTypeList(outResTypeList);
-            handler->done( errorCode, outResTypeList );
+            handler->done( reqID, errorCode, outResTypeList );
         };
         m_queryProcessor->processQueryAsync<nullptr_t, ApiResourceTypeList, decltype(queryDoneHandler)>
             ( ApiCommand::getResourceTypes, nullptr, queryDoneHandler );
-        return INVALID_REQ_ID;
+        return reqID;
     }
 
     template<class T>
@@ -47,11 +49,13 @@ namespace ec2
     template<class T>
     ReqID QnResourceManager<T>::setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler )
     {
+        const ReqID reqID = generateRequestID();
+
         //performing request
         auto tran = prepareTransaction( ApiCommand::setResourceStatus, resourceId, status );
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SetResourceStatusHandler::done ), handler, _1, resourceId));
-        return INVALID_REQ_ID;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SetResourceStatusHandler::done ), handler, reqID, _1, resourceId));
+        return reqID;
     }
 
     template<class T>

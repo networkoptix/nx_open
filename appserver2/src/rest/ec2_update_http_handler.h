@@ -45,10 +45,10 @@ namespace ec2
         //!Implementation of QnRestRequestHandler::executePost
         virtual int executePost(
             const QString& /*path*/,
-            const QnRequestParamList& params,
+            const QnRequestParamList& /*params*/,
             const QByteArray& body,
-            QByteArray& result,
-            QByteArray& contentType )
+            QByteArray& /*result*/,
+            QByteArray& /*contentType*/ )
         {
             QnTransaction<RequestDataType> tran;
             //tran.command = ;
