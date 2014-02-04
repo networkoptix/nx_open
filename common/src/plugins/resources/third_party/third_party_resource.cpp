@@ -411,12 +411,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 
     //TODO/IMPL initializing PTZ
 
-    // TODO: #Elric this is totally evil, copypasta from ONVIF resource.
-    {
-        QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-        if (conn->saveSync(::toSharedPointer(this).staticCast<QnVirtualCameraResource>()) != 0)
-            qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
-    }
+    save();
 
     return CameraDiagnostics::NoErrorResult();
 }

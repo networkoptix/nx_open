@@ -20,6 +20,7 @@ namespace ec2
 
             getResourceTypes,
             setResourceStatus,
+            setResourceParams,
 
             addCamera,
 		    updateCamera,
@@ -94,7 +95,7 @@ namespace ec2
         template <class T2>
         void serialize(OutputBinaryStream<T2>& stream) {
             QnAbstractTransaction::serialize(stream);
-            params.serialize(stream);
+            QnBinary::serialize(params, &stream);
         }
     };
 

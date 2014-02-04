@@ -53,7 +53,13 @@ void QnAbstractResourcePropertyAdaptor::saveValue() {
     m_serializedValue = serializedValue;
 
     m_resource->setProperty(m_key, m_serializedValue);
-    QnAppServerConnectionFactory::createConnection()->saveAsync(resource()->getId(), QnKvPairList() << QnKvPair(m_key, m_serializedValue));
+    ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::createConnection2Sync();
+    connection->getResourceManager()->save(resource()->getId(), QnKvPairList() << QnKvPair(m_key, m_serializedValue), this, &QnAbstractResourcePropertyAdaptor::at_paramsSaved);
+}
+
+void QnAbstractResourcePropertyAdaptor::at_paramsSaved(ec2::ReqID, ec2::ErrorCode)
+{
+
 }
 
 void QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged(const QnResourcePtr &, const QString &key) {

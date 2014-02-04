@@ -32,11 +32,13 @@ namespace ec2
         //!Implementation of AbstractResourceManager::save
         virtual ReqID save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::save
-        virtual ReqID save( int resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
+        virtual ReqID save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::remove
         virtual ReqID remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
     private:
         QnTransaction<ApiSetResourceStatusData> prepareTransaction( ApiCommand::Value cmd, const QnId& id, QnResource::Status status);
+        QnTransaction<ApiResourceParams> prepareTransaction(ApiCommand::Value cmd, const QnId& id, const QnKvPairList& kvPairs);
+
     private:
         QueryProcessorType* const m_queryProcessor;
     };

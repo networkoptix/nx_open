@@ -80,10 +80,14 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnResourceManager<T>::save( int resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler )
+    ReqID QnResourceManager<T>::save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const ReqID reqID = generateRequestID();
+        ApiCommand::Value command = ApiCommand::setResourceParams;
+        auto tran = prepareTransaction( command, resourceId, kvPairs );
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        return reqID;
     }
 
     template<class T>
@@ -107,6 +111,20 @@ namespace ec2
         return result;
     }
 
+    template<class QueryProcessorType>
+    QnTransaction<ApiResourceParams> QnResourceManager<QueryProcessorType>::prepareTransaction(
+        ApiCommand::Value cmd,
+        const QnId& id, const QnKvPairList& kvPairs)
+    {
+        QnTransaction<ApiResourceParams> result;
+        result.command = cmd;
+        result.createNewID();
+        result.persistent = true;
+        result.params.reserve(kvPairs.size());
+        foreach(const QnKvPair& pair, kvPairs)
+            result.params.push_back(ApiResourceParam(id, pair.name(), pair.value()));
+        return result;
+    }
 
     template class QnResourceManager<ServerQueryProcessor>;
     template class QnResourceManager<ClientQueryProcessor>;

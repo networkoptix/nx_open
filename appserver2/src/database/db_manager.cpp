@@ -97,6 +97,20 @@ ErrorCode QnDbManager::insertAddParam(const ApiResourceParam& param)
     }
 }
 
+ErrorCode QnDbManager::removeAddParam(const ApiResourceParam& param)
+{
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_kvpair where resource_id = :resourceId and name = :name");
+    param.autoBindValues(delQuery);
+    if (delQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
 ErrorCode QnDbManager::deleteAddParams(qint32 resourceId)
 {
     QSqlQuery insQuery(m_sdb);
@@ -129,7 +143,7 @@ ErrorCode QnDbManager::insertResource(const ApiResourceData& data)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::updateResource(const ApiResourceData& data, bool hasAddParams)
+ErrorCode QnDbManager::updateResource(const ApiResourceData& data)
 {
 	QSqlQuery insQuery(m_sdb);
 	insQuery.prepare("UPDATE vms_resource SET guid = :guid, xtype_id = :typeId, parent_id = :parentId, name = :name, url = :url, status = :status, disabled = :disabled WHERE id = :id");
@@ -140,8 +154,7 @@ ErrorCode QnDbManager::updateResource(const ApiResourceData& data, bool hasAddPa
         return ErrorCode::failure;
     }
 
-    // hasAddParams used for optimization
-    if (hasAddParams)
+    if (!data.addParams.empty()) 
     {
         ErrorCode result = deleteAddParams(data.id);
         if (result != ErrorCode::ok)
@@ -328,7 +341,7 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tr
 
 	ErrorCode result;
 	if (tran.command == ApiCommand::updateCamera) {
-		result = updateResource(tran.params, true);
+		result = updateResource(tran.params);
 		if (result !=ErrorCode::ok)
 			return result;
 		result = updateCamera(tran.params);
@@ -352,7 +365,7 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiMediaServerData
 
     ErrorCode result;
     if (tran.command == ApiCommand::updateMediaServer) {
-        result = updateResource(tran.params, false);
+        result = updateResource(tran.params);
         if (result !=ErrorCode::ok)
             return result;
         result = updateMediaServer(tran.params);
@@ -368,6 +381,23 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiMediaServerData
     result = updateStorages(tran.params);
 
     return result;
+}
+
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiResourceParams>& tran)
+{
+    QMutexLocker lock(&m_mutex);
+
+    foreach(const ApiResourceParam& param, tran.params) 
+    {
+        ErrorCode result = removeAddParam(param);
+        if (result != ErrorCode::ok)
+            return result;
+        result = insertAddParam(param);
+        if (result != ErrorCode::ok)
+            return result;
+    }
+
+    return ErrorCode::ok;
 }
 
 // -------------------- getters ----------------------------

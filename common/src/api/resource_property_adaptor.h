@@ -6,6 +6,7 @@
 
 #include <utils/common/json.h>
 #include <utils/common/lexical.h>
+#include "nx_ec/impl/ec_api_impl.h"
 
 
 // TODO: #Elric move out serialization after a merge with customization branch
@@ -49,7 +50,7 @@ protected:
 
 private:
     Q_SLOT void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
-
+    Q_SLOT void at_paramsSaved(ec2::ReqID, ec2::ErrorCode);
 private:
     QnResourcePtr m_resource;
     QString m_key;
@@ -157,6 +158,5 @@ protected:
         return QnLexical::deserialize(value, target);
     }
 };
-
 
 #endif // QN_RESOURCE_PROPERTY_ADAPTOR_H

@@ -28,24 +28,6 @@ namespace ec2
     {
         const ReqID reqID = generateRequestID();
 
-#if 0
-        //building async pipe
-        const QnTransaction<ApiCameraData>& tran = prepareTransaction( ec2::addCamera, resource );
-
-        AsyncPipeline pipeline;
-        pipeline.addSyncCall( std::bind( std::mem_fn(&QnDbManager::executeTransaction), dbManager, tran ) );
-        pipeline.addSyncCall( std::bind( std::mem_fn(&QnTransactionLog::saveTransaction), transactionLog, tran ) );
-        pipeline.addAsyncCall( std::bind( std::mem_fn(&QnClusterManager::distributeAsync), clusterManager, tran ) );
-        //preparing output data
-        pipeline.addSyncCall( []() {
-            cameraList.reset( new QnVirtualCameraResourceList() );
-            return ErrorCode::ok; } );
-        pipeline.addSyncCall( std::bind( std::mem_fn(&impl::AddCameraHandler::done), handler, ErrorCode::ok, cameraList ) );
-        AsyncPipelineExecuter::instance()->run(pipeline);
-
-        return INVALID_REQ_ID;
-#endif
-
         //preparing output data
         QnVirtualCameraResourceList cameraList;
 		ApiCommand::Value command = ApiCommand::updateCamera;

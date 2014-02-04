@@ -25,6 +25,8 @@ struct ApiResourceParam: public ApiData
     QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
 };
 
+typedef std::vector<ApiResourceParam> ApiResourceParams;
+
 struct ApiResourceData: public ApiData 
 {
     ApiResourceData(): id(0), typeId(0), parentId(0), status(QnResource::Offline), disabled(false) {}

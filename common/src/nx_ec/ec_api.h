@@ -84,8 +84,8 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> ReqID save( int resourceId, const QnKvPairList& kvPairs, TargetType* target, HandlerType handler ) {
-            return save( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        template<class TargetType, class HandlerType> ReqID save( const QnId& resourceId, const QnKvPairList& kvPairs, TargetType* target, HandlerType handler ) {
+            return save(resourceId, kvPairs,  std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode)
@@ -102,7 +102,7 @@ namespace ec2
         virtual ReqID getKvPairs( const QnResourcePtr &resource, impl::GetKvPairsHandlerPtr handler ) = 0;
         virtual ReqID setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler ) = 0;
         virtual ReqID save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler ) = 0;
-        virtual ReqID save( int resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
         virtual ReqID remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
     typedef std::shared_ptr<AbstractResourceManager> AbstractResourceManagerPtr;

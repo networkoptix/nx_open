@@ -36,6 +36,7 @@ namespace ec2
         ErrorCode executeTransaction(const QnTransaction<ApiCameraData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiMediaServerData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiSetResourceStatusData>& tran);
+        ErrorCode executeTransaction(const QnTransaction<ApiResourceParams>& tran);
 		
 		// --------- get methods ---------------------
         //getResourceTypes
@@ -63,10 +64,11 @@ namespace ec2
 
 		int getNextSequence();
     private:
-        ErrorCode updateResource(const ApiResourceData& data, bool hasAddParams);
+        ErrorCode updateResource(const ApiResourceData& data);
 		ErrorCode insertResource(const ApiResourceData& data);
 
         ErrorCode insertAddParam(const ApiResourceParam& param);
+        ErrorCode removeAddParam(const ApiResourceParam& param);
         ErrorCode deleteAddParams(qint32 resourceId);
 
 		ErrorCode updateCamera(const ApiCameraData& data);
