@@ -175,11 +175,17 @@ qreal VariantAnimator::easingCurveValue(qreal progress) const {
 }
 
 void VariantAnimator::updateCurrentTime(int currentTime) {
+#ifdef LIGHT_CLIENT
+    Q_UNUSED(currentTime);
+    updateCurrentValue(internalTargetValue());
+    stop();
+#else
     updateCurrentValue(interpolated(
         internalStartValue(), 
         internalTargetValue(), 
         easingCurveValue(easingCurveProgress(currentTime))
     ));
+#endif
 }
 
 QVariant VariantAnimator::interpolated(const QVariant &from, const QVariant &to, qreal progress) const {

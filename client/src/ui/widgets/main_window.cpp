@@ -103,8 +103,13 @@ namespace {
         }
     }
 
+#ifdef LIGHT_CLIENT
+    int minimalWindowWidth = 400;
+    int minimalWindowHeight = 300;
+#else
     int minimalWindowWidth = 800;
     int minimalWindowHeight = 600;
+#endif
 
 } // anonymous namespace
 
@@ -168,8 +173,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
         // TODO: #Elric move to ctor^ ?
 
+#ifndef LIGHT_CLIENT
     m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
     m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+#endif
 
 
     /* Set up model & control machinery. */
