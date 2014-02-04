@@ -431,7 +431,7 @@ ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraL
     queryParams.prepare(QString("SELECT kv.resource_id as resourceId, kv.value, kv.name \
                                  FROM vms_kvpair kv \
                                  JOIN vms_camera c on c.resource_ptr_id = kv.resource_id \
-                                 JOIN vms_resource r on r.id = kv.source_id %1 ORDER BY r.id").arg(filterStr2));
+                                 JOIN vms_resource r on r.id = kv.resource_id %1 ORDER BY r.id").arg(filterStr2));
 
 	if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
