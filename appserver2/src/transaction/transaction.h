@@ -33,7 +33,9 @@ namespace ec2
 
             getUserList,
 
-            getBusinessRuleList
+            getBusinessRuleList,
+
+            getCurrentTime
         };
 
         QString toString( Value val );

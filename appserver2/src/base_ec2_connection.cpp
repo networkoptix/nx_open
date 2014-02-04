@@ -87,12 +87,31 @@ namespace ec2
         return INVALID_REQ_ID;
     }
 
-    template<class T>
-    ReqID BaseEc2Connection<T>::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
+    ReqID BaseEc2Connection<ServerQueryProcessor>::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const ReqID reqID = generateRequestID();
+        qint64 curTime = 0;
+        CommonRequestsProcessor::getCurrentTime( nullptr, &curTime );
+        QtConcurrent::run( std::bind( std::mem_fn( &impl::CurrentTimeHandler::done ), handler, reqID, ec2::ErrorCode::ok, curTime ) );
+        return reqID;
     }
+
+    ReqID BaseEc2Connection<ClientQueryProcessor>::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
+    {
+        const ReqID reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const qint64& currentTime) {
+            qint64 outData = 0;
+            if( errorCode == ErrorCode::ok )
+                outData = currentTime;
+            handler->done( reqID, errorCode, outData);
+        };
+        m_queryProcessor->processQueryAsync<nullptr_t, qint64, decltype(queryDoneHandler)> (
+            ApiCommand::getCurrentTime, nullptr, queryDoneHandler );
+
+        return reqID;
+    }
+
 
     template<class T>
     ReqID BaseEc2Connection<T>::dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler )

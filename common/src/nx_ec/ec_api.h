@@ -518,6 +518,12 @@ namespace ec2
         template<class TargetType, class HandlerType> ReqID getCurrentTime( TargetType* target, HandlerType handler ) {
             return getCurrentTime( std::static_pointer_cast<impl::CurrentTimeHandler>(std::make_shared<impl::impl::CustomCurrentTimeHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+        ErrorCode getCurrentTimeSync(qint64* const time) {
+            using namespace std::placeholders;
+            return impl::doSyncCall<impl::CurrentTimeHandler>( std::bind(&AbstractECConnection::getCurrentTime, this, _1), time );
+        }
+
         /*!
             \param handler Functor with params: (ErrorCode, QByteArray dbFile)
         */

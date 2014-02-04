@@ -55,6 +55,12 @@ namespace ec2
             new FlexibleQueryHttpHandler<LoginInfo, ConnectionInfo, decltype(doRemoteConnectionSyncFunc)>
                 (ApiCommand::connect, doRemoteConnectionSyncFunc) );
 
+        auto getCurrentTimeSyncFunc = std::bind( &CommonRequestsProcessor::getCurrentTime, _1, _2 );
+        restProcessorPool->registerHandler(
+            lit("ec2/%1").arg(ApiCommand::toString(ApiCommand::getCurrentTime)),
+            new FlexibleQueryHttpHandler<nullptr_t, qint64, decltype(getCurrentTimeSyncFunc)>
+                (ApiCommand::getCurrentTime, getCurrentTimeSyncFunc) );
+
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(ApiCommand::getResourceTypes)),
             new QueryHttpHandler2<nullptr_t, ApiResourceTypeList>(ApiCommand::getResourceTypes, &m_serverQueryProcessor) );

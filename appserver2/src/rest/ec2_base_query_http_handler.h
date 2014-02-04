@@ -52,7 +52,7 @@ namespace ec2
                 if( _errorCode == ErrorCode::ok )
                 {
                     OutputBinaryStream<QByteArray> stream( &result );
-                    outputData.serialize( stream );
+                    QnBinary::serialize( outputData, &stream );
                     contentType = "application/octet-stream";
                 }
                 errorCode = _errorCode;

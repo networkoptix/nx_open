@@ -16,6 +16,19 @@
 
 namespace ec2
 {
+    class CommonRequestsProcessor
+    {
+    public:
+        static ErrorCode getCurrentTime( nullptr_t, qint64* curTime )
+        {
+            //TODO
+            return ErrorCode::failure;
+        }
+    };
+
+
+
+
     class ServerQueryProcessor
     {
     public:
