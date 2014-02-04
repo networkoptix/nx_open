@@ -15,12 +15,12 @@ private:
     QnMediaServerResourcePtr m_resource;
 };
 
-QnMediaServerResource::QnMediaServerResource():
+QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
     QnResource(),
     m_panicMode(PM_None),
     m_guard(NULL)
 {
-    setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
+    setTypeId(resTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
     removeFlags(QnResource::media); // TODO: #Elric is this call needed here?
     setName(tr("Server"));
@@ -98,7 +98,7 @@ QnResourcePtr QnMediaServerResourceFactory::createResource(QnId resourceTypeId, 
 {
     Q_UNUSED(resourceTypeId)
 
-    QnResourcePtr result(new QnMediaServerResource());
+    QnResourcePtr result(new QnMediaServerResource(qnResTypePool));
     result->deserialize(parameters);
 
     return result;

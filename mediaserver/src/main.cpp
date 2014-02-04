@@ -1007,7 +1007,7 @@ void QnMain::run()
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
     ec2::ResourceContext resCtx(
-        QSharedPointer<QnResourceFactory>(new QnMediaServerResourceFactory()),
+        QSharedPointer<QnResourceFactory>(QnResourceDiscoveryManager::instance()),
         qnResPool,
         qnResTypePool );
     ec2::AbstractECConnectionPtr ec2Connection;
@@ -1122,7 +1122,7 @@ void QnMain::run()
         QnMediaServerResourcePtr server = findServer(ec2Connection, &pm);
 
         if (!server) {
-            server = QnMediaServerResourcePtr(new QnMediaServerResource());
+            server = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
             server->setGuid(serverGuid());
             server->setPanicMode(pm);
         }

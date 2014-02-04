@@ -202,7 +202,7 @@ void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_server
 {
     const pb::Server& pb_server = pb_serverResource.GetExtension(pb::Server::resource);
 
-    server = QnMediaServerResourcePtr(new QnMediaServerResource());
+    server = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
     server->setId(pb_serverResource.id());
     server->setName(QString::fromUtf8(pb_serverResource.name().c_str()));
     server->setUrl(QString::fromUtf8(pb_serverResource.url().c_str()));

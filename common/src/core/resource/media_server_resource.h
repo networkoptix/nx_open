@@ -19,7 +19,7 @@ class QnMediaServerResource : public QnResource
 public:
     enum PanicMode {PM_None, PM_BusinessEvents, PM_User};
 
-    QnMediaServerResource();
+    QnMediaServerResource(const QnResourceTypePool* resTypePool);
     virtual ~QnMediaServerResource();
 
     virtual QString getUniqueId() const;

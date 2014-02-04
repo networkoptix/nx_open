@@ -114,7 +114,7 @@ void ApiMediaServerDataList::toResourceList(QnMediaServerResourceList& outData, 
     outData.reserve(data.size());
     for(int i = 0; i < data.size(); ++i) 
     {
-        QnMediaServerResourcePtr server(new QnMediaServerResource());
+        QnMediaServerResourcePtr server(new QnMediaServerResource(resTypePool));
         data[i].toResource(server, factory, resTypePool);
         outData << server;
     }
