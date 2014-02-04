@@ -186,11 +186,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     m_controller.reset(new QnWorkbenchController(this));
     m_ui.reset(new QnWorkbenchUi(this));
-#ifdef LIGHT_CLIENT
-    m_ui->setFlags(0);
-#else
     m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
-#endif
 
 
     /* Set up handlers. */
