@@ -5,6 +5,7 @@
 
 #include "security_cam_resource.h"
 #include <deque>
+#include "nx_ec/impl/ec_api_impl.h"
 
 class QnAbstractDTSFactory;
 
@@ -32,10 +33,10 @@ public slots:
     void issueOccured();
     void noCameraIssues();
 private slots:
-    void at_saveAsyncFinished(int, const QnResourceList &, int);
+    void at_saveAsyncFinished(ec2::ReqID, ec2::ErrorCode, const QnVirtualCameraResourceList &);
 protected:
     void save();
-    int saveAsync(QObject *target, const char *slot);
+    int saveAsync();
 
 private:
     QnAbstractDTSFactory* m_dtsFactory;

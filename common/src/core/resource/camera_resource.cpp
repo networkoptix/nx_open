@@ -159,12 +159,6 @@ void QnVirtualCameraResource::save()
     }
 }
 
-int QnVirtualCameraResource::saveAsync(QObject *target, const char *slot)
-{
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    return conn->saveAsync(::toSharedPointer(this), target, slot);
-}
-
 QString QnVirtualCameraResource::toSearchString() const
 {
     QString result;
@@ -181,12 +175,18 @@ void QnVirtualCameraResource::issueOccured()
         if (!hasStatusFlags(HasIssuesFlag)) {
             addStatusFlags(HasIssuesFlag);
             lock.unlock();
-            saveAsync(this, SLOT(at_saveAsyncFinished(int, const QnResourceList &, int)));
+            saveAsync();
         }
     }
 }
 
-void QnVirtualCameraResource::at_saveAsyncFinished(int, const QnResourceList &, int)
+int QnVirtualCameraResource::saveAsync()
+{
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::createConnection2Sync();
+    return conn->getCameraManager()->addCamera(::toSharedPointer(this), this, &QnVirtualCameraResource::at_saveAsyncFinished);
+}
+
+void QnVirtualCameraResource::at_saveAsyncFinished(ec2::ReqID, ec2::ErrorCode, const QnVirtualCameraResourceList &)
 {
     // not used
 }
@@ -201,6 +201,6 @@ void QnVirtualCameraResource::noCameraIssues()
     if (m_issueTimes.empty() && hasStatusFlags(HasIssuesFlag)) {
         removeStatusFlags(HasIssuesFlag);
         lock.unlock();
-        saveAsync(this, SLOT(at_saveAsyncFinished(int, const QnResourceList &, int)));
+        saveAsync();
     }
 }
