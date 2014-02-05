@@ -98,6 +98,9 @@ client/client.mak*
 client/x86
 client/x64
 client/arm
+client/client_lite/x86
+client/client_lite/x64
+client/client_lite/arm
 
 client/contrib/bespin/debug
 client/contrib/bespin/release
