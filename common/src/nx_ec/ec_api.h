@@ -187,6 +187,11 @@ namespace ec2
         template<class TargetType, class HandlerType> ReqID addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem ) {
             return addCameraHistoryItem( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
+        ErrorCode addCameraHistoryItemSync( const QnCameraHistoryItem& historyItem) {
+            using namespace std::placeholders;
+            return impl::doSyncCall<impl::SimpleHandler>( std::bind(std::mem_fn(&AbstractCameraManager::addCameraHistoryItem), this, historyItem, _1));
+        }
+
         /*!
             \param handler Functor with params: (ErrorCode, const QnVirtualCameraResourceList& cameras)
         */

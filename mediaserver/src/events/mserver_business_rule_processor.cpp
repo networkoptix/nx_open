@@ -67,7 +67,7 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr
         return false;
     if (mediaServer->getPanicMode() == QnMediaServerResource::PM_User)
         return true; // ignore panic business action if panic mode turn on by user
-
+    
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
     QnMediaServerResource::PanicMode val = QnMediaServerResource::PM_None;
     if (action->getToggleState() == Qn::OnState)

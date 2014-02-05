@@ -49,8 +49,12 @@ namespace ec2
     template<class QueryProcessorType>
     ReqID QnCameraManager<QueryProcessorType>::addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const ReqID reqID = generateRequestID();
+        ApiCommand::Value command = ApiCommand::addCameraHistoryList;
+        auto tran = prepareTransaction( command, cameraHistoryItem );
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        return reqID;
     }
 
     template<class QueryProcessorType>
@@ -112,6 +116,18 @@ namespace ec2
         return result;
     }
 
+    template<class QueryProcessorType>
+    QnTransaction<ApiCameraServerItemData> QnCameraManager<QueryProcessorType>::prepareTransaction(
+        ApiCommand::Value cmd,
+        const QnCameraHistoryItem& historyItem )
+    {
+        QnTransaction<ApiCameraServerItemData> result;
+        result.command = cmd;
+        result.createNewID();
+        result.persistent = true;
+        result.params.fromResource(historyItem);
+        return result;
+    }
 
 
     template class QnCameraManager<ServerQueryProcessor>;

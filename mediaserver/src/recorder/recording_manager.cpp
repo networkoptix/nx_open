@@ -141,9 +141,11 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(res->getParentId()));
     QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getGuid());
-    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    if (appServerConnection->addCameraHistoryItem(cameraHistoryItem) != 0) {
-        qCritical() << "ECS server error during execute method addCameraHistoryItem: " << appServerConnection->getLastError();
+
+    ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection2Sync();
+    ec2::ErrorCode errCode = appServerConnection->getCameraManager()->addCameraHistoryItemSync(cameraHistoryItem);
+    if (errCode != ec2::ErrorCode::ok) {
+        qCritical() << "ECS server error during execute method addCameraHistoryItem: " << ec2::toString(errCode);
         return false;
     }
     return true;

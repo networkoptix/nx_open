@@ -400,7 +400,27 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiResourceParams>
     return ErrorCode::ok;
 }
 
-// -------------------- getters ----------------------------
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraServerItemData>& tran)
+{
+    QMutexLocker lock(&m_mutex);
+
+    QSqlQuery query(m_sdb);
+    query.prepare("INSERT INTO vms_cameraserveritem (server_guid, timestamp, physical_id) VALUES(:serverGuid, :timestamp, :physicalId)");
+    tran.params.autoBindValues(query);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
+
+    return ErrorCode::ok;
+}
+
+
+/* 
+-------------------------------------------------------------
+-------------------------- getters --------------------------
+ ------------------------------------------------------------
+*/
 
 // ----------- getResourceTypes --------------------
 

@@ -5,7 +5,7 @@
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/camera_data.h"
 #include "transaction/transaction.h"
-
+#include "nx_ec/data/camera_server_item_data.h"
 
 namespace ec2
 {
@@ -35,6 +35,7 @@ namespace ec2
 		ResourceContext m_resCtx;
 
         QnTransaction<ApiCameraData> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourcePtr& resource );
+        QnTransaction<ApiCameraServerItemData> prepareTransaction( ApiCommand::Value cmd, const QnCameraHistoryItem& historyItem );
     };
 }
 

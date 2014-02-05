@@ -3,6 +3,13 @@
 namespace ec2
 {
 
+void ApiCameraServerItemData::fromResource(const QnCameraHistoryItem& item)
+{
+    physicalId = item.physicalId;
+    serverGuid = item.mediaServerGuid;
+    timestamp = item.timestamp;
+}
+
 void ApiCameraServerItemDataList::loadFromQuery(QSqlQuery& query) 
 { 
     QN_QUERY_TO_DATA_OBJECT(query, ApiCameraServerItemData, data, ApiCameraServerItemFields) 
