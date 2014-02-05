@@ -17,7 +17,7 @@ void ApiResourceTypeData::toResource(QnResourceTypePtr resource) const
 
 void ApiResourceTypeList::loadFromQuery(QSqlQuery& query)
 {
-	QN_QUERY_TO_DATA_OBJECT(ApiResourceTypeData, data, (id) (name) (manufacture) );
+	QN_QUERY_TO_DATA_OBJECT(query, ApiResourceTypeData, data, (id) (name) (manufacture) );
 }
 
 void ApiResourceTypeList::toResourceTypeList(QnResourceTypeList& resTypeList) const

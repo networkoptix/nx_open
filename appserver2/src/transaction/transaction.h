@@ -21,6 +21,7 @@ namespace ec2
             getResourceTypes,
             setResourceStatus,
             setResourceParams,
+            getResourceParams,
 
             addCamera,
 		    updateCamera,

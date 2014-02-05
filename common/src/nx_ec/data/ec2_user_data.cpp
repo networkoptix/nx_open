@@ -28,7 +28,7 @@ namespace ec2
 
     void ApiUserDataList::loadFromQuery(QSqlQuery& query)
     {
-        QN_QUERY_TO_DATA_OBJECT(ApiUserData, data, ApiUserDataFields ApiResourceDataFields)
+        QN_QUERY_TO_DATA_OBJECT(query, ApiUserData, data, ApiUserDataFields ApiResourceDataFields)
     }
 
 }

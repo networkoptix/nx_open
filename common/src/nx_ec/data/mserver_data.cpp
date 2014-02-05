@@ -54,7 +54,7 @@ QnResourceParameters ApiStorageData::toHashMap() const
 
 void ApiStorageDataList::loadFromQuery(QSqlQuery& query)
 {
-    QN_QUERY_TO_DATA_OBJECT(ApiStorageData, data, ApiStorageDataFields ApiResourceDataFields)
+    QN_QUERY_TO_DATA_OBJECT(query, ApiStorageData, data, ApiStorageDataFields ApiResourceDataFields)
 }
 
 void ApiMediaServerData::fromResource(QnMediaServerResourcePtr resource)
@@ -106,7 +106,7 @@ void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, QnResourc
 
 void ApiMediaServerDataList::loadFromQuery(QSqlQuery& query)
 {
-    QN_QUERY_TO_DATA_OBJECT(ApiMediaServerData, data, medisServerDataFields ApiResourceDataFields)
+    QN_QUERY_TO_DATA_OBJECT(query, ApiMediaServerData, data, medisServerDataFields ApiResourceDataFields)
 }
 
 void ApiMediaServerDataList::toResourceList(QnMediaServerResourceList& outData, QnResourceFactory* factory, const QnResourceTypePool* resTypePool) const

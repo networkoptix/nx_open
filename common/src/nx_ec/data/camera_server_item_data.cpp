@@ -5,7 +5,7 @@ namespace ec2
 
 void ApiCameraServerItemDataList::loadFromQuery(QSqlQuery& query) 
 { 
-    QN_QUERY_TO_DATA_OBJECT(ApiCameraServerItemData, data, ApiCameraServerItemFields) 
+    QN_QUERY_TO_DATA_OBJECT(query, ApiCameraServerItemData, data, ApiCameraServerItemFields) 
 }
 
 void ApiCameraServerItemDataList::toResourceList(QnCameraHistoryList& cameraServerItems) const

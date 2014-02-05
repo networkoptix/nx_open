@@ -83,9 +83,9 @@ void doAutoBind(QSqlQuery& , const char* , const std::vector<T>& ) {
 #define TO_IDX_VAR(x) x ## idx
 
 #define DECLARE_FIELD_IDX(R, D, FIELD) int TO_IDX_VAR(FIELD) = rec.indexOf(QLatin1String(TO_STRING(FIELD)));
-#define ASSIGN_FIELD(R, D, FIELD) if (TO_IDX_VAR(FIELD) >= 0) queryFieldToDataObj(query, TO_IDX_VAR(FIELD), value.FIELD);
+#define ASSIGN_FIELD(R, query, FIELD) if (TO_IDX_VAR(FIELD) >= 0) queryFieldToDataObj(query, TO_IDX_VAR(FIELD), value.FIELD);
 
-#define QN_QUERY_TO_DATA_OBJECT(TYPE, data, FIELD_SEQ, ...) \
+#define QN_QUERY_TO_DATA_OBJECT(query, TYPE, data, FIELD_SEQ, ...) \
 { \
 	QSqlRecord rec = query.record();\
 	BOOST_PP_SEQ_FOR_EACH(DECLARE_FIELD_IDX, ~, FIELD_SEQ) \
@@ -93,7 +93,7 @@ void doAutoBind(QSqlQuery& , const char* , const std::vector<T>& ) {
 	while (query.next())\
 	{\
 		TYPE value;\
-		BOOST_PP_SEQ_FOR_EACH(ASSIGN_FIELD, ~, FIELD_SEQ) \
+		BOOST_PP_SEQ_FOR_EACH(ASSIGN_FIELD, query, FIELD_SEQ) \
 		data.push_back(value);\
 	}\
 }

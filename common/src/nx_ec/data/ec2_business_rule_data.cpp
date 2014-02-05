@@ -56,7 +56,7 @@ void ApiBusinessRuleDataList::toResourceList(QnBusinessEventRuleList& outData, Q
 
 void ApiBusinessRuleDataList::loadFromQuery(QSqlQuery& query)
 {
-    QN_QUERY_TO_DATA_OBJECT(ApiBusinessRuleData, data, ApiBusinessRuleFields)
+    QN_QUERY_TO_DATA_OBJECT(query, ApiBusinessRuleData, data, ApiBusinessRuleFields)
 }
 
 }

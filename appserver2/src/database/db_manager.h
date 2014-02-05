@@ -60,6 +60,9 @@ namespace ec2
         //getCurrentTime
         ErrorCode doQuery(nullptr_t /*dummy*/, qint64& userList);
 
+        //getResourceParams
+        ErrorCode doQuery(const QnId& resourceId, ApiResourceParams& params);
+
 		// --------- misc -----------------------------
 
 		int getNextSequence();

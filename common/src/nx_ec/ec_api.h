@@ -66,8 +66,8 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode, const QnKvPairListsById&)
         */
-        template<class TargetType, class HandlerType> ReqID getKvPairs( const QnResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return getKvPairs( resource, std::static_pointer_cast<impl::GetKvPairsHandler>(std::make_shared<impl::CustomGetKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
+        template<class TargetType, class HandlerType> ReqID getKvPairs( const QnId& resourceId, TargetType* target, HandlerType handler ) {
+            return getKvPairs( resourceId, std::static_pointer_cast<impl::GetKvPairsHandler>(std::make_shared<impl::CustomGetKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode)
@@ -85,7 +85,7 @@ namespace ec2
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> ReqID save( const QnId& resourceId, const QnKvPairList& kvPairs, TargetType* target, HandlerType handler ) {
-            return save(resourceId, kvPairs,  std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return save(resourceId, kvPairs,  std::static_pointer_cast<impl::SaveKvPairsHandler>(std::make_shared<impl::CustomSaveKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode)
@@ -99,10 +99,10 @@ namespace ec2
         virtual ReqID getResources( impl::GetResourcesHandlerPtr handler ) = 0;
         virtual ReqID getResource( const QnId& id, impl::GetResourceHandlerPtr handler ) = 0;
         virtual ReqID setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler ) = 0;
-        virtual ReqID getKvPairs( const QnResourcePtr &resource, impl::GetKvPairsHandlerPtr handler ) = 0;
+        virtual ReqID getKvPairs( const QnId &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
         virtual ReqID setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler ) = 0;
         virtual ReqID save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler ) = 0;
-        virtual ReqID save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual ReqID remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
     typedef std::shared_ptr<AbstractResourceManager> AbstractResourceManagerPtr;

@@ -26,13 +26,13 @@ namespace ec2
         //!Implementation of AbstractResourceManager::setResourceStatus
         virtual ReqID setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::getKvPairs
-        virtual ReqID getKvPairs( const QnResourcePtr &resource, impl::GetKvPairsHandlerPtr handler ) override;
+        virtual ReqID getKvPairs( const QnId &resourceId, impl::GetKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::setResourceDisabled
         virtual ReqID setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::save
         virtual ReqID save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::save
-        virtual ReqID save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
+        virtual ReqID save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::remove
         virtual ReqID remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
     private:

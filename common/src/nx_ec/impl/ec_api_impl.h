@@ -148,6 +148,7 @@ namespace ec2
             void emitGetResourcesDone( ReqID reqID, const ErrorCode p1, const QnResourceList& p2 ) { emit onGetResourcesDone( reqID, p1, p2 ); }
             void emitGetResourceDone( ReqID reqID, const ErrorCode p1, const QnResourcePtr& p2 ) { emit onGetResourceDone( reqID, p1, p2 ); }
             void emitGetKvPairsDone( ReqID reqID, const ErrorCode p1, const QnKvPairListsById& p2 ) { emit onGetKvPairsDone( reqID, p1, p2 ); }
+            void emitSaveKvPairsDone( ReqID reqID, const ErrorCode p1, const QnKvPairListsById& p2) { emit onSaveKvPairsDone( reqID, p1, p2 ); }
             void emitSaveServerDone( ReqID reqID, const ErrorCode p1, const QnMediaServerResourceList& p2) { emit onSaveServerDone( reqID, p1, p2 ); }
             void emitGetServersDone( ReqID reqID, const ErrorCode p1, const QnMediaServerResourceList& p2 ) { emit onGetServersDone( reqID, p1, p2 ); }
             void emitAddCameraDone( ReqID reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( reqID, p1, p2 ); }
@@ -171,6 +172,7 @@ namespace ec2
             void onGetResourcesDone( ReqID reqID, const ErrorCode, const QnResourceList& );
             void onGetResourceDone( ReqID reqID, const ErrorCode, const QnResourcePtr& );
             void onGetKvPairsDone( ReqID reqID, const ErrorCode, const QnKvPairListsById& );
+            void onSaveKvPairsDone( ReqID reqID, const ErrorCode, const QnKvPairListsById&);
             void onSaveServerDone( ReqID reqID, const ErrorCode, const QnMediaServerResourceList&);
             void onGetServersDone( ReqID reqID, const ErrorCode, const QnMediaServerResourceList& );
             void onAddCameraDone( ReqID reqID, const ErrorCode, const QnVirtualCameraResourceList& );
@@ -205,6 +207,7 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER( GetResources, ErrorCode, QnResourceList )
         DEFINE_TWO_ARG_HANDLER( GetResource, ErrorCode, QnResourcePtr )
         DEFINE_TWO_ARG_HANDLER( GetKvPairs, ErrorCode, QnKvPairListsById )
+        DEFINE_TWO_ARG_HANDLER( SaveKvPairs, ErrorCode, QnKvPairListsById )
 
 
         //////////////////////////////////////////////////////////

@@ -59,10 +59,23 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnResourceManager<T>::getKvPairs( const QnResourcePtr &resource, impl::GetKvPairsHandlerPtr handler )
+    ReqID QnResourceManager<T>::getKvPairs( const QnId &resourceId, impl::GetKvPairsHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const ReqID reqID = generateRequestID();
+        
+        auto queryDoneHandler = [reqID, handler, resourceId]( ErrorCode errorCode, const ApiResourceParams& params) {
+            QnKvPairListsById outData;
+            outData.insert(resourceId, QnKvPairList());
+            if( errorCode == ErrorCode::ok ) {
+                QnKvPairList& outParams = outData.begin().value();
+                foreach(const ApiResourceParam& param, params)
+                    outParams << QnKvPair(param.name, param.value);
+            }
+            handler->done( reqID, errorCode, outData);
+        };
+        m_queryProcessor->processQueryAsync<QnId, ApiResourceParams, decltype(queryDoneHandler)>
+            ( ApiCommand::getResourceParams, resourceId, queryDoneHandler );
+        return reqID;
     }
 
     template<class T>
@@ -80,13 +93,16 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnResourceManager<T>::save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler )
+    ReqID QnResourceManager<T>::save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SaveKvPairsHandlerPtr handler )
     {
         const ReqID reqID = generateRequestID();
         ApiCommand::Value command = ApiCommand::setResourceParams;
         auto tran = prepareTransaction( command, resourceId, kvPairs );
+        QnKvPairListsById outData;
+        outData.insert(resourceId, kvPairs);
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveKvPairsHandler::done ), handler, reqID, _1, outData) );
+
         return reqID;
     }
 
