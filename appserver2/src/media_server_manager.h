@@ -24,13 +24,14 @@ namespace ec2
         //!Implementation of QnMediaServerManager::saveServer
         virtual int saveServer( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::remove
-        virtual int remove( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
+        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
         ResourceContext m_resCtx;
 
         QnTransaction<ApiMediaServerData> prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource );
+        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
     };
 }
 

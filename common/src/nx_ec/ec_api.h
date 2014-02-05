@@ -146,15 +146,15 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int remove( const QnMediaServerResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return remove( resource, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        template<class TargetType, class HandlerType> int remove( const QnId& id, TargetType* target, HandlerType handler ) {
+            return remove( id, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
     protected:
         virtual int getServers( impl::GetServersHandlerPtr handler ) = 0;
         virtual int save( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
         virtual int saveServer( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) = 0;
-        virtual int remove( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
     };
     typedef std::shared_ptr<AbstractMediaServerManager> AbstractMediaServerManagerPtr;
 
@@ -226,8 +226,8 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int remove( const QnVirtualCameraResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return remove( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        template<class TargetType, class HandlerType> int remove( const QnId& id, TargetType* target, HandlerType handler ) {
+            return remove(id, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
     signals:
@@ -239,7 +239,7 @@ namespace ec2
         virtual int getCameras( QnId mediaServerId, impl::GetCamerasHandlerPtr handler ) = 0;
         virtual int getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler ) = 0;
         virtual int save( const QnVirtualCameraResourceList& cameras, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int remove( const QnVirtualCameraResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
     };
     typedef std::shared_ptr<AbstractCameraManager> AbstractCameraManagerPtr;
 

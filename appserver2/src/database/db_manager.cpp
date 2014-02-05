@@ -282,11 +282,11 @@ ErrorCode QnDbManager::updateMediaServer(const ApiMediaServerData& data)
     }
 }
 
-ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
+ErrorCode QnDbManager::removeStoragesByServer(qint32 id)
 {
     QSqlQuery delQuery(m_sdb);
     delQuery.prepare("DELETE FROM vms_storage WHERE resource_ptr_id in (select id from vms_resource where parent_id = :id and xtype_id=:typeId)");
-    delQuery.bindValue("id", data.id);
+    delQuery.bindValue("id", id);
     delQuery.bindValue("typeId", m_storageTypeId);
     if (!delQuery.exec()) {
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
@@ -295,16 +295,24 @@ ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
 
     QSqlQuery delQuery2(m_sdb);
     delQuery2.prepare("DELETE FROM vms_resource WHERE parent_id = :id and xtype_id=:typeId");
-    delQuery2.bindValue("id", data.id);
+    delQuery2.bindValue("id", id);
     delQuery2.bindValue("typeId", m_storageTypeId);
     if (!delQuery2.exec()) {
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
         return ErrorCode::failure;
     }
+    return ErrorCode::ok;
+}
 
+ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
+{
+    ErrorCode result = removeStoragesByServer(data.id);
+    if (result != ErrorCode::ok)
+        return result;
+    
     foreach(const ApiStorageData& storage, data.storages)
     {
-        ErrorCode result = insertResource(storage);
+        result = insertResource(storage);
         if (result != ErrorCode::ok)
             return result;
 
@@ -481,20 +489,157 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiPanicModeData>&
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::deleteResourceTable(const qint32 id)
+{
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_resource where id = :id");
+    delQuery.bindValue(QLatin1String(":id"), id);
+    if (delQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
+ErrorCode QnDbManager::deleteCameraTable(const qint32 id)
+{
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_camera where resource_ptr_id = :id");
+    delQuery.bindValue(QLatin1String(":id"), id);
+    if (delQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
+ErrorCode QnDbManager::deleteServerTable(const qint32 id)
+{
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_server where resource_ptr_id = :id");
+    delQuery.bindValue(QLatin1String(":id"), id);
+    if (delQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
+ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 id)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare("select c.physical_id , (select count(*) from vms_camera where physical_id = c.physical_id) as cnt \
+                  FROM vms_camera c WHERE c.resource_ptr_id = :id");
+    query.bindValue(QLatin1String(":id"), id);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
+    query.next();
+    if (query.value("cnt").toInt() > 1)
+        return ErrorCode::ok; // camera instance on a other media server still present
+
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_cameraserveritem where physical_id = :physical_id");
+    delQuery.bindValue(QLatin1String(":physical_id"), query.value("physical_id").toString());
+    if (delQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
+ErrorCode QnDbManager::deleteBusinessRuleResourceTable(qint32 id, const QString& tableName)
+{
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare(QString("DELETE FROM %1 where resource_id = :id").arg(tableName));
+    delQuery.bindValue(QLatin1String(":id"), id);
+    if (delQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
+ErrorCode QnDbManager::removeCamera(const qint32 id)
+{
+    QnDbTransactionLocker tran(&m_tran);
+
+    ErrorCode err = deleteAddParams(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteBusinessRuleResourceTable(id, "vms_businessrule_action_resources");
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteBusinessRuleResourceTable(id, "vms_businessrule_event_resources");
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteCameraServerItemTable(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteCameraTable(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteResourceTable(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    tran.commit();
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::removeServer(const qint32 id)
+{
+    QnDbTransactionLocker tran(&m_tran);
+
+    ErrorCode err = deleteAddParams(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = removeStoragesByServer(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteServerTable(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteResourceTable(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    tran.commit();
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
 {
     switch (tran.command)
     {
-    case removeCamera:
-        removeCamera(tran.params.id);
-        break;
-    case removeMediaServer:
-        removeMediaServer(tran.params.id);
-        break;
+    case ApiCommand::removeCamera:
+        return removeCamera(tran.params.id);
+    case ApiCommand::removeMediaServer:
+        return removeServer(tran.params.id);
     default:
         qWarning() << "Remove operation is not implemented for command" << toString(tran.command);
         break;
     }
+    return ErrorCode::unsupported;
 }
 
 /* 

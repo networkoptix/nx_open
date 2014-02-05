@@ -97,10 +97,13 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::remove( const QnVirtualCameraResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::remove( const QnId& id, impl::SimpleHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const int reqID = generateRequestID();
+        auto tran = prepareTransaction( ApiCommand::removeCamera, id );
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        return reqID;
     }
 
     template<class QueryProcessorType>
@@ -129,6 +132,16 @@ namespace ec2
         return result;
     }
 
+    template<class T>
+    QnTransaction<ApiIdData> QnCameraManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
+    {
+        QnTransaction<ApiIdData> tran;
+        tran.createNewID();
+        tran.command = command;
+        tran.persistent = true;
+        tran.params.id = id;
+        return tran;
+    }
 
     template class QnCameraManager<ServerQueryProcessor>;
     template class QnCameraManager<FixedUrlClientQueryProcessor>;

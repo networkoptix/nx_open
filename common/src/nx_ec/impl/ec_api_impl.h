@@ -93,6 +93,7 @@ namespace ec2
         failure,
         ioError,
         serverError,
+        unsupported,
         unauthorized
     };
 

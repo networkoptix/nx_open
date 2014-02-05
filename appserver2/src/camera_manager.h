@@ -28,7 +28,7 @@ namespace ec2
         //!Implementation of AbstractCameraManager::save
         virtual int save( const QnVirtualCameraResourceList& cameras, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::remove
-        virtual int remove( const QnVirtualCameraResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
+        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
@@ -36,6 +36,7 @@ namespace ec2
 
         QnTransaction<ApiCameraData> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourcePtr& resource );
         QnTransaction<ApiCameraServerItemData> prepareTransaction( ApiCommand::Value cmd, const QnCameraHistoryItem& historyItem );
+        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
     };
 }
 

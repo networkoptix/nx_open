@@ -39,6 +39,8 @@ namespace ec2
                     return "addMediaServer";
                 case updateMediaServer:
                     return "updateMediaServer";
+                case removeMediaServer:
+                    return "removeMediaServer";
 
                 case getUserList:
                     return "getUserList";

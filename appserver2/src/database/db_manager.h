@@ -40,6 +40,7 @@ namespace ec2
         ErrorCode executeTransaction(const QnTransaction<ApiCameraServerItemData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiPanicModeData>& tran);
 
+        // delete camera, server t.e.c
         ErrorCode executeTransaction(const QnTransaction<ApiIdData>& tran);
 		
 		// --------- get methods ---------------------
@@ -102,6 +103,7 @@ namespace ec2
 
         ErrorCode updateResource(const ApiResourceData& data);
 		ErrorCode insertResource(const ApiResourceData& data);
+        ErrorCode deleteResourceTable(const qint32 id);
 
         ErrorCode insertAddParam(const ApiResourceParam& param);
         ErrorCode removeAddParam(const ApiResourceParam& param);
@@ -110,10 +112,17 @@ namespace ec2
 		ErrorCode updateCamera(const ApiCameraData& data);
 		ErrorCode insertCamera(const ApiCameraData& data);
         ErrorCode updateCameraSchedule(const ApiCameraData& data);
+        ErrorCode removeCamera(const qint32 id);
+        ErrorCode deleteCameraTable(const qint32 id);
+        ErrorCode deleteCameraServerItemTable(qint32 id);
+        ErrorCode deleteBusinessRuleResourceTable(qint32 id, const QString& tableName);
 
         ErrorCode updateMediaServer(const ApiMediaServerData& data);
         ErrorCode insertMediaServer(const ApiMediaServerData& data);
         ErrorCode updateStorages(const ApiMediaServerData&);
+        ErrorCode removeServer(const qint32 id);
+        ErrorCode deleteServerTable(const qint32 id);
+        ErrorCode removeStoragesByServer(qint32 id);
 
 		bool createDatabase();
         
