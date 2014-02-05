@@ -15,15 +15,15 @@ namespace ec2
     public:
         QnBusinessEventManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
 
-        virtual ReqID getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) override;
+        virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) override;
 
-        virtual ReqID addBusinessRule( const QnBusinessEventRulePtr& businessRule, impl::SimpleHandlerPtr handler ) override;
-        virtual ReqID testEmailSettings( const QnKvPairList& settings, impl::SimpleHandlerPtr handler ) override;
-        virtual ReqID sendEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, const QnEmailAttachmentList& attachments, impl::SimpleHandlerPtr handler ) override;
-        virtual ReqID save( const QnBusinessEventRulePtr& rule, impl::SimpleHandlerPtr handler ) override;
-        virtual ReqID deleteRule( int ruleId, impl::SimpleHandlerPtr handler ) override;
-        virtual ReqID broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) override;
-        virtual ReqID resetBusinessRules( impl::SimpleHandlerPtr handler ) override;
+        virtual int addBusinessRule( const QnBusinessEventRulePtr& businessRule, impl::SimpleHandlerPtr handler ) override;
+        virtual int testEmailSettings( const QnKvPairList& settings, impl::SimpleHandlerPtr handler ) override;
+        virtual int sendEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, const QnEmailAttachmentList& attachments, impl::SimpleHandlerPtr handler ) override;
+        virtual int save( const QnBusinessEventRulePtr& rule, impl::SimpleHandlerPtr handler ) override;
+        virtual int deleteRule( int ruleId, impl::SimpleHandlerPtr handler ) override;
+        virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) override;
+        virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;

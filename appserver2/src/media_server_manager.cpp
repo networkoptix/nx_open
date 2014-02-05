@@ -5,7 +5,7 @@
 
 #include <QtConcurrent>
 
-#include "client_query_processor.h"
+#include "fixed_url_client_query_processor.h"
 #include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
 #include "transaction/transaction_log.h"
@@ -26,9 +26,9 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnMediaServerManager<T>::getServers( impl::GetServersHandlerPtr handler )
+    int QnMediaServerManager<T>::getServers( impl::GetServersHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
 
         auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiMediaServerDataList& servers) {
             QnMediaServerResourceList outData;
@@ -42,9 +42,9 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnMediaServerManager<T>::save( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    int QnMediaServerManager<T>::save( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
 
         //create transaction
         const QnTransaction<ApiMediaServerData>& tran = prepareTransaction( ApiCommand::addMediaServer, resource );
@@ -54,9 +54,9 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnMediaServerManager<T>::saveServer( const QnMediaServerResourcePtr& resource, impl::SaveServerHandlerPtr handler )
+    int QnMediaServerManager<T>::saveServer( const QnMediaServerResourcePtr& resource, impl::SaveServerHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
 
         QnMediaServerResourceList serverList;
         ApiCommand::Value command = ApiCommand::updateMediaServer;
@@ -84,7 +84,7 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnMediaServerManager<T>::remove( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    int QnMediaServerManager<T>::remove( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
@@ -104,5 +104,5 @@ namespace ec2
 
 
     template class QnMediaServerManager<ServerQueryProcessor>;
-    template class QnMediaServerManager<ClientQueryProcessor>;
+    template class QnMediaServerManager<FixedUrlClientQueryProcessor>;
 }

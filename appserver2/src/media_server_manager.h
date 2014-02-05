@@ -18,13 +18,13 @@ namespace ec2
         QnMediaServerManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
 
         //!Implementation of QnMediaServerManager::getServers
-        virtual ReqID getServers( impl::GetServersHandlerPtr handler ) override;
+        virtual int getServers( impl::GetServersHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::save
-        virtual ReqID save( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
+        virtual int save( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::saveServer
-        virtual ReqID saveServer( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) override;
+        virtual int saveServer( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::remove
-        virtual ReqID remove( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
+        virtual int remove( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;

@@ -5,6 +5,8 @@
 
 #include "ec_api_impl.h"
 
+#include <QtCore/QMetaType>
+
 
 namespace ec2
 {

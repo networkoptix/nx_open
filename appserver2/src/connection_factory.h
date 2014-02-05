@@ -26,9 +26,9 @@ namespace ec2
         virtual ~Ec2DirectConnectionFactory();
 
         //!Implementation of AbstractECConnectionFactory::testConnectionAsync
-        virtual ReqID testConnectionAsync( const QUrl& addr, impl::SimpleHandlerPtr handler ) override;
+        virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) override;
         //!Implementation of AbstractECConnectionFactory::connectAsync
-        virtual ReqID connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler ) override;
+        virtual int connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler ) override;
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) override;
         virtual void setContext( const ResourceContext& resCtx ) override;
@@ -40,18 +40,28 @@ namespace ec2
         std::mutex m_mutex;
         ResourceContext m_resCtx;
 
-        ReqID establishDirectConnection( impl::ConnectHandlerPtr handler );
-        ReqID establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler );
+        int establishDirectConnection( impl::ConnectHandlerPtr handler );
+        int establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler );
         //!Called on client side after receiving connection response from remote server
         void remoteConnectionFinished(
-            ReqID reqID,
+            int reqID,
             ErrorCode errorCode,
-            const ConnectionInfo& connectionInfo,
+            const QnConnectionInfo& connectionInfo,
+            const QUrl& ecURL,
             impl::ConnectHandlerPtr handler );
+        //!Called on client side after receiving test connection response from remote server
+        void remoteTestConnectionFinished(
+            int reqID,
+            ErrorCode errorCode,
+            const QnConnectionInfo& connectionInfo,
+            const QUrl& ecURL,
+            impl::TestConnectionHandlerPtr handler );
         //!Called on server side to handle connection request from remote host
-        ErrorCode doRemoteConnectionSync(
+        ErrorCode fillConnectionInfo(
             const LoginInfo& loginInfo,
-            ConnectionInfo* const connectionInfo );
+            QnConnectionInfo* const connectionInfo );
+        int testDirectConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler );
+        int testRemoteConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler );
     };
 }
 

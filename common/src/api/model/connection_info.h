@@ -1,9 +1,10 @@
 #ifndef QN_CONNECTION_INFO_H
 #define QN_CONNECTION_INFO_H
 
-#include <QtCore/QSharedPointer>
 #include <QtCore/QMetaType>
+#include <QtCore/QSharedPointer>
 
+#include <nx_ec/binary_serialization_helper.h>
 #include <utils/common/software_version.h>
 
 #include "compatibility.h"
@@ -18,7 +19,31 @@ struct QnConnectionInfo {
     QString publicIp;
     QString brand;
     bool allowCameraChanges;
+
+    QN_DECLARE_STRUCT_SERIALIZATORS();
 };
+
+Q_DECLARE_METATYPE( QnConnectionInfo );
+
+namespace QnBinary
+{
+    template<class T>
+    void deserialize( QnSoftwareVersion& version, const InputBinaryStream<T>* const inputStream )
+    {
+        QString versionStr;
+        deserialize<T>( versionStr, inputStream );
+        version = QnSoftwareVersion(versionStr);
+    }
+
+    template<class T>
+    void serialize( const QnSoftwareVersion& version, OutputBinaryStream<T>* outputBinaryStream )  
+    {
+        serialize<T>( version.toString(), outputBinaryStream );
+    }
+}
+
+//TODO: #ak serialize version and compatibilityItems
+QN_DEFINE_STRUCT_SERIALIZATORS (QnConnectionInfo, (version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand)(allowCameraChanges) )
 
 // TODO: #Elric remove shared pointer?
 typedef QSharedPointer<QnConnectionInfo> QnConnectionInfoPtr;

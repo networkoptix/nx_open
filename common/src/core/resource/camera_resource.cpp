@@ -186,7 +186,7 @@ int QnVirtualCameraResource::saveAsync()
     return conn->getCameraManager()->addCamera(::toSharedPointer(this), this, &QnVirtualCameraResource::at_saveAsyncFinished);
 }
 
-void QnVirtualCameraResource::at_saveAsyncFinished(ec2::ReqID, ec2::ErrorCode, const QnVirtualCameraResourceList &)
+void QnVirtualCameraResource::at_saveAsyncFinished(int, ec2::ErrorCode, const QnVirtualCameraResourceList &)
 {
     // not used
 }

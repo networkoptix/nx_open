@@ -5,7 +5,7 @@
 
 #include <QtConcurrent>
 
-#include "client_query_processor.h"
+#include "fixed_url_client_query_processor.h"
 #include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
 #include "transaction/transaction_log.h"
@@ -24,9 +24,9 @@ namespace ec2
 
 
     template<class T>
-    ReqID QnUserManager<T>::getUsers( impl::GetUsersHandlerPtr handler )
+    int QnUserManager<T>::getUsers( impl::GetUsersHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
 
         auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiUserDataList& users) {
             QnUserResourceList outData;
@@ -39,14 +39,14 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnUserManager<T>::save( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    int QnUserManager<T>::save( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler )
     {
         Q_ASSERT_X(0, Q_FUNC_INFO, "Implement me!!!");
         return INVALID_REQ_ID;
     }
 
     template<class T>
-    ReqID QnUserManager<T>::remove( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    int QnUserManager<T>::remove( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler )
     {
         Q_ASSERT_X(0, Q_FUNC_INFO, "Implement me!!!");
         return INVALID_REQ_ID;
@@ -64,6 +64,6 @@ namespace ec2
     }
 
     template class QnUserManager<ServerQueryProcessor>;
-    template class QnUserManager<ClientQueryProcessor>;
+    template class QnUserManager<FixedUrlClientQueryProcessor>;
 
 }

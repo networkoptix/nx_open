@@ -141,6 +141,9 @@ namespace QnBinary {
     template <class T, class T2>
     void serialize(const std::vector<T2>& field, OutputBinaryStream<T>* binStream);
 
+    template <class T, class T2>
+    void serialize(const QList<T2>& field, OutputBinaryStream<T>* binStream);
+
     // -------------------- deserialize ---------------------
 
     template <class T>
@@ -263,6 +266,26 @@ namespace QnBinary
         deserialize(size, binStream);
         field.resize(size);
         std::for_each( field.begin(), field.end(), [binStream](T2& val){ QnBinary::deserialize(val, binStream); } );
+    }
+
+    template <class T, class T2>
+    void serialize(const QList<T2>& field, OutputBinaryStream<T>* binStream) 
+    {
+        QnBinary::serialize((qint32) field.size(), binStream);
+        using namespace std::placeholders;
+        std::for_each( field.begin(), field.end(), [binStream](const T2& val){ QnBinary::serialize(val, binStream); } );
+    }
+
+    template <class T, class T2>
+    void deserialize(QList<T2>& field, const InputBinaryStream<T>* binStream) 
+    {
+        qint32 size;
+        deserialize(size, binStream);
+        for( qint32 i = 0; i < size; ++i )
+        {
+            field.push_back( T2() );
+            QnBinary::deserialize(field.back(), binStream);
+        }
     }
 }
 

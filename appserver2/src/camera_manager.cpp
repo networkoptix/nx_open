@@ -8,7 +8,7 @@
 #include "cluster/cluster_manager.h"
 #include "core/resource/camera_resource.h"
 #include "database/db_manager.h"
-#include "client_query_processor.h"
+#include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 #include "transaction/transaction_log.h"
 
@@ -24,9 +24,9 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    ReqID QnCameraManager<QueryProcessorType>::addCamera( const QnVirtualCameraResourcePtr& resource, impl::AddCameraHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::addCamera( const QnVirtualCameraResourcePtr& resource, impl::AddCameraHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
 
         //preparing output data
         QnVirtualCameraResourceList cameraList;
@@ -47,9 +47,9 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    ReqID QnCameraManager<QueryProcessorType>::addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
         ApiCommand::Value command = ApiCommand::addCameraHistoryList;
         auto tran = prepareTransaction( command, cameraHistoryItem );
         using namespace std::placeholders;
@@ -58,9 +58,9 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    ReqID QnCameraManager<QueryProcessorType>::getCameras( QnId mediaServerId, impl::GetCamerasHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::getCameras( QnId mediaServerId, impl::GetCamerasHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
 
 		auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraDataList& cameras) {
 			QnVirtualCameraResourceList outData;
@@ -74,9 +74,9 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    ReqID QnCameraManager<QueryProcessorType>::getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
 
         auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraServerItemDataList& cameraHistory) {
             QnCameraHistoryList outData;
@@ -90,14 +90,14 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    ReqID QnCameraManager<QueryProcessorType>::save( const QnVirtualCameraResourceList& cameras, impl::SimpleHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::save( const QnVirtualCameraResourceList& cameras, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
     template<class QueryProcessorType>
-    ReqID QnCameraManager<QueryProcessorType>::remove( const QnVirtualCameraResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::remove( const QnVirtualCameraResourcePtr& resource, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
@@ -131,5 +131,5 @@ namespace ec2
 
 
     template class QnCameraManager<ServerQueryProcessor>;
-    template class QnCameraManager<ClientQueryProcessor>;
+    template class QnCameraManager<FixedUrlClientQueryProcessor>;
 }

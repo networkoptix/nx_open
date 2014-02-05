@@ -10,6 +10,7 @@
 
 #include <QtCore/QObject.h>
 
+#include <api/model/connection_info.h>
 #include <api/model/kvpair.h>
 #include <business/business_fwd.h>
 #include <core/resource/camera_history.h>
@@ -33,7 +34,7 @@
         Custom##REQUEST_NAME##Handler( TargetType* target, HandlerType func, Qt::ConnectionType connectionType = Qt::AutoConnection ) {         \
             QObject::connect( static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func, connectionType ); \
         }                                                                               \
-        virtual void done( ReqID reqID, const FIRST_ARG_TYPE& val1 ) override { emit##REQUEST_NAME##Done( reqID, val1 ); }; \
+        virtual void done( int reqID, const FIRST_ARG_TYPE& val1 ) override { emit##REQUEST_NAME##Done( reqID, val1 ); }; \
     };
 
 
@@ -51,7 +52,7 @@
             QObject::connect( static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func, connectionType ); \
         } \
         virtual void done( \
-            ReqID reqID, \
+            int reqID, \
             const FIRST_ARG_TYPE& val1, \
             const SECOND_ARG_TYPE& val2 ) override { emit##REQUEST_NAME##Done( reqID, val1, val2 ); }; \
     };
@@ -71,7 +72,7 @@
             QObject::connect( static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func, connectionType ); \
         } \
         virtual void done( \
-            ReqID reqID, \
+            int reqID, \
             const FIRST_ARG_TYPE& val1, \
             const SECOND_ARG_TYPE& val2, \
             const THIRD_ARG_TYPE& val3 ) override { emit##REQUEST_NAME##Done( reqID, val1, val2, val3 ); }; \
@@ -80,9 +81,9 @@
 
 namespace ec2
 {
-    typedef int ReqID;
-    const ReqID INVALID_REQ_ID = -1;
+    const int INVALID_REQ_ID = -1;
 
+    
     class AbstractECConnection;
     typedef std::shared_ptr<AbstractECConnection> AbstractECConnectionPtr;
 
@@ -106,7 +107,7 @@ namespace ec2
             typedef Param1 first_type;
 
             virtual ~OneParamHandler() {}
-            virtual void done( ReqID reqID, const Param1& val1 ) = 0;
+            virtual void done( int reqID, const Param1& val1 ) = 0;
         };
 
 
@@ -118,7 +119,7 @@ namespace ec2
             typedef Param2 second_type;
 
             virtual ~TwoParamHandler() {}
-            virtual void done( ReqID reqID, const Param1& val1, const Param2& val2 ) = 0;
+            virtual void done( int reqID, const Param1& val1, const Param2& val2 ) = 0;
         };
 
 
@@ -131,7 +132,7 @@ namespace ec2
             typedef Param3 third_type;
 
             virtual ~ThreeParamHandler() {}
-            virtual void done( ReqID reqID, const Param1& val1, const Param2& val2, const Param3& val3 ) = 0;
+            virtual void done( int reqID, const Param1& val1, const Param2& val2, const Param3& val3 ) = 0;
         };
 
 
@@ -142,52 +143,54 @@ namespace ec2
             Q_OBJECT
 
         public:
-            void emitSimpleDone( ReqID reqID, const ErrorCode p1 ) { emit onSimpleDone( reqID, p1 ); }
-            void emitGetResourceTypesDone( ReqID reqID, const ErrorCode p1, const QnResourceTypeList& p2 ) { emit onGetResourceTypesDone( reqID, p1, p2 ); }
-            void emitSetResourceStatusDone( ReqID reqID, const ErrorCode p1, const QnId& p2 ) { emit onSetResourceStatusDone( reqID, p1, p2 ); }
-            void emitGetResourcesDone( ReqID reqID, const ErrorCode p1, const QnResourceList& p2 ) { emit onGetResourcesDone( reqID, p1, p2 ); }
-            void emitGetResourceDone( ReqID reqID, const ErrorCode p1, const QnResourcePtr& p2 ) { emit onGetResourceDone( reqID, p1, p2 ); }
-            void emitGetKvPairsDone( ReqID reqID, const ErrorCode p1, const QnKvPairListsById& p2 ) { emit onGetKvPairsDone( reqID, p1, p2 ); }
-            void emitSaveKvPairsDone( ReqID reqID, const ErrorCode p1, const QnKvPairListsById& p2) { emit onSaveKvPairsDone( reqID, p1, p2 ); }
-            void emitSaveServerDone( ReqID reqID, const ErrorCode p1, const QnMediaServerResourceList& p2) { emit onSaveServerDone( reqID, p1, p2 ); }
-            void emitGetServersDone( ReqID reqID, const ErrorCode p1, const QnMediaServerResourceList& p2 ) { emit onGetServersDone( reqID, p1, p2 ); }
-            void emitAddCameraDone( ReqID reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( reqID, p1, p2 ); }
-            void emitGetCamerasDone( ReqID reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( reqID, p1, p2 ); }
-            void emitGetCamerasHistoryDone( ReqID reqID, const ErrorCode p1, const QnCameraHistoryList& p2 ) { emit onGetCamerasHistoryDone( reqID, p1, p2 ); }
-            void emitGetUsersDone( ReqID reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onGetUsersDone( reqID, p1, p2 ); }
-            void emitGetBusinessRulesDone( ReqID reqID, const ErrorCode p1, const QnBusinessEventRuleList& p2 ) { emit onGetBusinessRulesDone( reqID, p1, p2 ); }
-            void emitGetLicensesDone( ReqID reqID, const ErrorCode p1, const QnLicenseList& p2 ) { emit onGetLicensesDone( reqID, p1, p2 ); }
-            void emitGetLayoutsDone( ReqID reqID, const ErrorCode p1, const QnLayoutResourceList& p2 ) { emit onGetLayoutsDone( reqID, p1, p2 ); }
-            void emitGetStoredFileDone( ReqID reqID, const ErrorCode p1, const QByteArray& p2 ) { emit onGetStoredFileDone( reqID, p1, p2 ); }
-            void emitListDirectoryDone( ReqID reqID, const ErrorCode p1, const QStringList& p2 ) { emit onListDirectoryDone( reqID, p1, p2 ); }
-            void emitCurrentTimeDone( ReqID reqID, const ErrorCode p1, const qint64& p2 ) { emit onCurrentTimeDone( reqID, p1, p2 ); }
-            void emitDumpDatabaseDone( ReqID reqID, const ErrorCode p1, const QByteArray& p2 ) { emit onDumpDatabaseDone( reqID, p1, p2 ); }
-            void emitGetSettingsDone( ReqID reqID, const ErrorCode p1, const QnKvPairList& p2 ) { emit onGetSettingsDone( reqID, p1, p2 ); }
-            void emitConnectDone( ReqID reqID, const ErrorCode p1, AbstractECConnectionPtr p2 ) { emit onConnectDone( reqID, p1, p2 ); }
+            void emitSimpleDone( int reqID, const ErrorCode p1 ) { emit onSimpleDone( reqID, p1 ); }
+            void emitGetResourceTypesDone( int reqID, const ErrorCode p1, const QnResourceTypeList& p2 ) { emit onGetResourceTypesDone( reqID, p1, p2 ); }
+            void emitSetResourceStatusDone( int reqID, const ErrorCode p1, const QnId& p2 ) { emit onSetResourceStatusDone( reqID, p1, p2 ); }
+            void emitGetResourcesDone( int reqID, const ErrorCode p1, const QnResourceList& p2 ) { emit onGetResourcesDone( reqID, p1, p2 ); }
+            void emitGetResourceDone( int reqID, const ErrorCode p1, const QnResourcePtr& p2 ) { emit onGetResourceDone( reqID, p1, p2 ); }
+            void emitGetKvPairsDone( int reqID, const ErrorCode p1, const QnKvPairListsById& p2 ) { emit onGetKvPairsDone( reqID, p1, p2 ); }
+            void emitSaveKvPairsDone( int reqID, const ErrorCode p1, const QnKvPairListsById& p2 ) { emit onSaveKvPairsDone( reqID, p1, p2 ); }
+            void emitSaveServerDone( int reqID, const ErrorCode p1, const QnMediaServerResourceList& p2) { emit onSaveServerDone( reqID, p1, p2 ); }
+            void emitGetServersDone( int reqID, const ErrorCode p1, const QnMediaServerResourceList& p2 ) { emit onGetServersDone( reqID, p1, p2 ); }
+            void emitAddCameraDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( reqID, p1, p2 ); }
+            void emitGetCamerasDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( reqID, p1, p2 ); }
+            void emitGetCamerasHistoryDone( int reqID, const ErrorCode p1, const QnCameraHistoryList& p2 ) { emit onGetCamerasHistoryDone( reqID, p1, p2 ); }
+            void emitGetUsersDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onGetUsersDone( reqID, p1, p2 ); }
+            void emitGetBusinessRulesDone( int reqID, const ErrorCode p1, const QnBusinessEventRuleList& p2 ) { emit onGetBusinessRulesDone( reqID, p1, p2 ); }
+            void emitGetLicensesDone( int reqID, const ErrorCode p1, const QnLicenseList& p2 ) { emit onGetLicensesDone( reqID, p1, p2 ); }
+            void emitGetLayoutsDone( int reqID, const ErrorCode p1, const QnLayoutResourceList& p2 ) { emit onGetLayoutsDone( reqID, p1, p2 ); }
+            void emitGetStoredFileDone( int reqID, const ErrorCode p1, const QByteArray& p2 ) { emit onGetStoredFileDone( reqID, p1, p2 ); }
+            void emitListDirectoryDone( int reqID, const ErrorCode p1, const QStringList& p2 ) { emit onListDirectoryDone( reqID, p1, p2 ); }
+            void emitCurrentTimeDone( int reqID, const ErrorCode p1, const qint64& p2 ) { emit onCurrentTimeDone( reqID, p1, p2 ); }
+            void emitDumpDatabaseDone( int reqID, const ErrorCode p1, const QByteArray& p2 ) { emit onDumpDatabaseDone( reqID, p1, p2 ); }
+            void emitGetSettingsDone( int reqID, const ErrorCode p1, const QnKvPairList& p2 ) { emit onGetSettingsDone( reqID, p1, p2 ); }
+            void emitTestConnectionDone( int reqID, const ErrorCode p1, const QnConnectionInfo& p2 ) { emit onTestConnectionDone( reqID, p1, p2 ); }
+            void emitConnectDone( int reqID, const ErrorCode p1, AbstractECConnectionPtr p2 ) { emit onConnectDone( reqID, p1, p2 ); }
         
         signals:
-            void onSimpleDone( ReqID reqID, const ErrorCode );
-            void onGetResourceTypesDone( ReqID reqID, const ErrorCode, const QnResourceTypeList& );
-            void onSetResourceStatusDone( ReqID reqID, const ErrorCode, const QnId& );
-            void onGetResourcesDone( ReqID reqID, const ErrorCode, const QnResourceList& );
-            void onGetResourceDone( ReqID reqID, const ErrorCode, const QnResourcePtr& );
-            void onGetKvPairsDone( ReqID reqID, const ErrorCode, const QnKvPairListsById& );
-            void onSaveKvPairsDone( ReqID reqID, const ErrorCode, const QnKvPairListsById&);
-            void onSaveServerDone( ReqID reqID, const ErrorCode, const QnMediaServerResourceList&);
-            void onGetServersDone( ReqID reqID, const ErrorCode, const QnMediaServerResourceList& );
-            void onAddCameraDone( ReqID reqID, const ErrorCode, const QnVirtualCameraResourceList& );
-            void onGetCamerasDone( ReqID reqID, const ErrorCode, const QnVirtualCameraResourceList& );
-            void onGetCamerasHistoryDone( ReqID reqID, const ErrorCode, const QnCameraHistoryList& );
-            void onGetUsersDone( ReqID reqID, const ErrorCode, const QnUserResourceList& );
-            void onGetBusinessRulesDone( ReqID reqID, const ErrorCode, const QnBusinessEventRuleList& );
-            void onGetLicensesDone( ReqID reqID, const ErrorCode, const QnLicenseList& );
-            void onGetLayoutsDone( ReqID reqID, const ErrorCode, const QnLayoutResourceList& );
-            void onGetStoredFileDone( ReqID reqID, const ErrorCode, const QByteArray& );
-            void onListDirectoryDone( ReqID reqID, const ErrorCode, const QStringList& );
-            void onCurrentTimeDone( ReqID reqID, const ErrorCode, const qint64& );
-            void onDumpDatabaseDone( ReqID reqID, const ErrorCode, const QByteArray& );
-            void onGetSettingsDone( ReqID reqID, const ErrorCode, const QnKvPairList& );
-            void onConnectDone( ReqID reqID, const ErrorCode, AbstractECConnectionPtr );
+            void onSimpleDone( int reqID, const ErrorCode );
+            void onGetResourceTypesDone( int reqID, const ErrorCode, const QnResourceTypeList& );
+            void onSetResourceStatusDone( int reqID, const ErrorCode, const QnId& );
+            void onGetResourcesDone( int reqID, const ErrorCode, const QnResourceList& );
+            void onGetResourceDone( int reqID, const ErrorCode, const QnResourcePtr& );
+            void onGetKvPairsDone( int reqID, const ErrorCode, const QnKvPairListsById& );
+            void onSaveKvPairsDone( int reqID, const ErrorCode, const QnKvPairListsById& );
+            void onSaveServerDone( int reqID, const ErrorCode, const QnMediaServerResourceList&);
+            void onGetServersDone( int reqID, const ErrorCode, const QnMediaServerResourceList& );
+            void onAddCameraDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
+            void onGetCamerasDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
+            void onGetCamerasHistoryDone( int reqID, const ErrorCode, const QnCameraHistoryList& );
+            void onGetUsersDone( int reqID, const ErrorCode, const QnUserResourceList& );
+            void onGetBusinessRulesDone( int reqID, const ErrorCode, const QnBusinessEventRuleList& );
+            void onGetLicensesDone( int reqID, const ErrorCode, const QnLicenseList& );
+            void onGetLayoutsDone( int reqID, const ErrorCode, const QnLayoutResourceList& );
+            void onGetStoredFileDone( int reqID, const ErrorCode, const QByteArray& );
+            void onListDirectoryDone( int reqID, const ErrorCode, const QStringList& );
+            void onCurrentTimeDone( int reqID, const ErrorCode, const qint64& );
+            void onDumpDatabaseDone( int reqID, const ErrorCode, const QByteArray& );
+            void onGetSettingsDone( int reqID, const ErrorCode, const QnKvPairList& );
+            void onTestConnectionDone( int reqID, const ErrorCode, const QnConnectionInfo& );
+            void onConnectDone( int reqID, const ErrorCode, AbstractECConnectionPtr );
         };
 
 
@@ -267,8 +270,12 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractECConnectionFactory
         //////////////////////////////////////////////////////////
+        DEFINE_TWO_ARG_HANDLER( TestConnection, ErrorCode, QnConnectionInfo )
         DEFINE_TWO_ARG_HANDLER( Connect, ErrorCode, AbstractECConnectionPtr )
     }
+
+    Q_DECLARE_METATYPE( ErrorCode );
+    Q_ENUMS( ErrorCode );
 }
 
 #endif  //EC_API_IMPL_H

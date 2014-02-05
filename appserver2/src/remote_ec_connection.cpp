@@ -9,11 +9,12 @@
 namespace ec2
 {
     RemoteEC2Connection::RemoteEC2Connection(
-        ClientQueryProcessor* queryProcessor,
+        const FixedUrlClientQueryProcessorPtr& queryProcessor,
         const ResourceContext& resCtx,
         const QnConnectionInfo& connectionInfo )
     :
-        BaseEc2Connection<ClientQueryProcessor>( queryProcessor, resCtx ),
+        BaseEc2Connection<FixedUrlClientQueryProcessor>( queryProcessor.get(), resCtx ),
+        m_queryProcessor( queryProcessor ),
         m_connectionInfo( connectionInfo )
     {
     }

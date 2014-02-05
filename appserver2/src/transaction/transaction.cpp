@@ -12,10 +12,16 @@ namespace ec2
         {
             switch( val )
             {
+                case testConnection:
+                    return "testConnection";
                 case connect:
                     return "connect";
+
                 case getResourceTypes:
                     return "getResourceTypes";
+                case setResourceStatus:
+                    return "setResourceStatus";
+
                 case addCamera:
                     return "addCamera";
                 case updateCamera:
@@ -26,10 +32,19 @@ namespace ec2
                     return "getCameras";
                 case getCameraHistoryList:
                     return "getCameraHistoryList";
-                case updateMediaServer:
-                    return "updateMediaServer";
+
+                case getMediaServerList:
+                    return "getMediaServerList";
                 case addMediaServer:
                     return "addMediaServer";
+                case updateMediaServer:
+                    return "updateMediaServer";
+
+                case getUserList:
+                    return "getUserList";
+                case getBusinessRuleList:
+                    return "getBusinessRuleList";
+
                 default:
                     return "unknown";
             }
@@ -60,7 +75,7 @@ namespace ec2
     }
 
 
-    ReqID generateRequestID()
+    int generateRequestID()
     {
         static std::atomic<int> requestID;
         return ++requestID;

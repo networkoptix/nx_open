@@ -1,7 +1,7 @@
 
 #include "license_manager.h"
 
-#include "client_query_processor.h"
+#include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 
 
@@ -15,14 +15,14 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnLicenseManager<T>::getLicenses( impl::GetLicensesHandlerPtr handler )
+    int QnLicenseManager<T>::getLicenses( impl::GetLicensesHandlerPtr handler )
     {
         //TODO/IMPL
         return 0;
     }
     
     template<class T>
-    ReqID QnLicenseManager<T>::addLicensesAsync( const QList<QnLicensePtr>& licenses, impl::SimpleHandlerPtr handler )
+    int QnLicenseManager<T>::addLicensesAsync( const QList<QnLicensePtr>& licenses, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return 0;
@@ -31,5 +31,5 @@ namespace ec2
 
 
     template class QnLicenseManager<ServerQueryProcessor>;
-    template class QnLicenseManager<ClientQueryProcessor>;
+    template class QnLicenseManager<FixedUrlClientQueryProcessor>;
 }

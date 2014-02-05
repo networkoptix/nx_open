@@ -16,7 +16,7 @@ protected:
     virtual void unregisterResource(const QnResourcePtr &resource) override;
     virtual QnPtzControllerPtr createController(const QnResourcePtr &resource) override;
 private slots:
-    void at_addCameraDone(ec2::ReqID, ec2::ErrorCode, const QnVirtualCameraResourceList &);
+    void at_addCameraDone(int, ec2::ErrorCode, const QnVirtualCameraResourceList &);
 };
 
 #endif // QN_SERVER_PTZ_CONTROLLER_POOL_H

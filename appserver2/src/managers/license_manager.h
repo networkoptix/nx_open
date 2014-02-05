@@ -17,8 +17,8 @@ namespace ec2
     public:
         QnLicenseManager( QueryProcessorType* const queryProcessor );
 
-        virtual ReqID getLicenses( impl::GetLicensesHandlerPtr handler ) override;
-        virtual ReqID addLicensesAsync( const QList<QnLicensePtr>& licenses, impl::SimpleHandlerPtr handler ) override;
+        virtual int getLicenses( impl::GetLicensesHandlerPtr handler ) override;
+        virtual int addLicensesAsync( const QList<QnLicensePtr>& licenses, impl::SimpleHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;

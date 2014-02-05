@@ -35,7 +35,7 @@ protected:
     virtual void innerValueChanged(const QString &value) = 0;
 
 private slots:
-   void at_connection_replyReceived(ec2::ReqID handle, ec2::ErrorCode err, const QnKvPairListsById &kvPairs);
+   void at_connection_replyReceived(int handle, ec2::ErrorCode err, const QnKvPairListsById &kvPairs);
 
 private:
     void load();

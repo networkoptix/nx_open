@@ -2438,11 +2438,11 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
 
     foreach(QnMediaServerResourcePtr resource, resources)
     {
-        bool isPanicMode = resource->getPanicMode() != QnMediaServerResource::PM_None;
+        bool isPanicMode = resource->getPanicMode() != Qn::PM_None;
         if(isPanicMode != checked) {
-            QnMediaServerResource::PanicMode val = QnMediaServerResource::PM_None;
+            Qn::PanicMode val = Qn::PM_None;
             if (checked)
-                val = QnMediaServerResource::PM_User;
+                val = Qn::PM_User;
             resource->setPanicMode(val);
             connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
         }
