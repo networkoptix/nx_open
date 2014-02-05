@@ -5,48 +5,48 @@
 namespace ec2
 {
 
-QnDbTransaction::QnDbTransaction(QSqlDatabase& sdb, QReadWriteLock& mutex): 
+QnDbManager::QnDbTransaction::QnDbTransaction(QSqlDatabase& sdb, QReadWriteLock& mutex): 
     m_sdb(sdb),
     m_mutex(mutex)
 {
 
 }
 
-void QnDbTransaction::beginTran()
+void QnDbManager::QnDbTransaction::beginTran()
 {
     m_mutex.lockForWrite();
     QSqlQuery query(m_sdb);
     query.exec("BEGIN TRANSACTION");
 }
 
-void QnDbTransaction::rollback()
+void QnDbManager::QnDbTransaction::rollback()
 {
     QSqlQuery query(m_sdb);
     query.exec("ROLLBACK");
     m_mutex.unlock();
 }
 
-void QnDbTransaction::commit()
+void QnDbManager::QnDbTransaction::commit()
 {
     QSqlQuery query(m_sdb);
     query.exec("COMMIT");
     m_mutex.unlock();
 }
 
-QnDbTransactionLocker::QnDbTransactionLocker(QnDbTransaction* tran): 
+QnDbManager::QnDbTransactionLocker::QnDbTransactionLocker(QnDbTransaction* tran): 
     m_tran(tran), 
     m_committed(false)
 {
     m_tran->beginTran();
 }
 
-QnDbTransactionLocker::~QnDbTransactionLocker()
+QnDbManager::QnDbTransactionLocker::~QnDbTransactionLocker()
 {
     if (!m_committed)
         m_tran->rollback();
 }
 
-void QnDbTransactionLocker::commit()
+void QnDbManager::QnDbTransactionLocker::commit()
 {
     m_tran->commit();
     m_committed = true;

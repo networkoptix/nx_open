@@ -15,34 +15,6 @@ class QSqlDatabase;
 
 namespace ec2
 {
-    class QnDbTransactionLocker;
-
-    class QnDbTransaction
-    {
-    public:
-        QnDbTransaction(QSqlDatabase& m_sdb, QReadWriteLock& mutex);
-    private:
-        friend class QnDbTransactionLocker;
-
-        void beginTran();
-        void rollback();
-        void commit();
-    private:
-        QSqlDatabase& m_sdb;
-        QReadWriteLock& m_mutex;
-    };
-
-    class QnDbTransactionLocker
-    {
-    public:
-        QnDbTransactionLocker(QnDbTransaction* tran);
-        ~QnDbTransactionLocker();
-        void commit();
-    private:
-        bool m_committed;
-        QnDbTransaction* m_tran;
-    };
-
     class QnDbManager
     {
     public:
@@ -97,6 +69,35 @@ namespace ec2
 
 		int getNextSequence();
     private:
+
+        class QnDbTransactionLocker;
+
+        class QnDbTransaction
+        {
+        public:
+            QnDbTransaction(QSqlDatabase& m_sdb, QReadWriteLock& mutex);
+        private:
+            friend class QnDbTransactionLocker;
+
+            void beginTran();
+            void rollback();
+            void commit();
+        private:
+            QSqlDatabase& m_sdb;
+            QReadWriteLock& m_mutex;
+        };
+
+        class QnDbTransactionLocker
+        {
+        public:
+            QnDbTransactionLocker(QnDbTransaction* tran);
+            ~QnDbTransactionLocker();
+            void commit();
+        private:
+            bool m_committed;
+            QnDbTransaction* m_tran;
+        };
+
         ErrorCode updateResource(const ApiResourceData& data);
 		ErrorCode insertResource(const ApiResourceData& data);
 
