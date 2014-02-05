@@ -9,14 +9,15 @@
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>2.2.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>wixsetup-full</artifactId>
+    <artifactId>wixsetup-light-client</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Full Installer</name>
+    <name>HD Witness Client Only Installer</name>
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>
-        <install.type>full</install.type>
-        <client_name>client.exe</client_name>
-        <product_name>${product.name}.exe</product_name>
+        <install.type>client-only</install.type>
+        <client_name>client_lite.exe</client_name>        
+        <product_name>${product.name} Lite.exe</product_name>
     </properties>
+    <build />
 </project>

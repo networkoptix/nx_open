@@ -92,7 +92,7 @@
                         <configuration>
                             <executable>${python.dir}/python</executable>
                             <arguments>
-                                <argument>${project.build.directory}/gen-resources.py</argument>
+                                <argument>${project.build.directory}/gen_resources.py</argument>
                             </arguments>
                             <workingDirectory>${project.build.directory}</workingDirectory>		
                         </configuration>
