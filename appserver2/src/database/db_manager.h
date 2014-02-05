@@ -39,6 +39,8 @@ namespace ec2
         ErrorCode executeTransaction(const QnTransaction<ApiResourceParams>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiCameraServerItemData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiPanicModeData>& tran);
+
+        ErrorCode executeTransaction(const QnTransaction<ApiIdData>& tran);
 		
 		// --------- get methods ---------------------
         //getResourceTypes

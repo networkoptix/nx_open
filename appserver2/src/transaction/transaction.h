@@ -34,6 +34,7 @@ namespace ec2
             getMediaServerList,
             addMediaServer,
             updateMediaServer,
+            removeMediaServer,
 
             getUserList,
 

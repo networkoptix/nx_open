@@ -481,6 +481,22 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiPanicModeData>&
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
+{
+    switch (tran.command)
+    {
+    case removeCamera:
+        removeCamera(tran.params.id);
+        break;
+    case removeMediaServer:
+        removeMediaServer(tran.params.id);
+        break;
+    default:
+        qWarning() << "Remove operation is not implemented for command" << toString(tran.command);
+        break;
+    }
+}
+
 /* 
 -------------------------------------------------------------
 -------------------------- getters --------------------------
