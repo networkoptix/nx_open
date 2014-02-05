@@ -22,6 +22,7 @@ namespace ec2
             setResourceStatus,
             setResourceParams,
             getResourceParams,
+            setPanicMode,
 
             addCamera,
 		    updateCamera,

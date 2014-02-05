@@ -17,7 +17,7 @@ private:
 
 QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
     QnResource(),
-    m_panicMode(PM_None),
+    m_panicMode(Qn::PM_None),
     m_guard(NULL)
 {
     setTypeId(resTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
@@ -203,11 +203,11 @@ bool QnMediaServerResource::getReserve() const
     return m_reserve;
 }
 
-QnMediaServerResource::PanicMode QnMediaServerResource::getPanicMode() const {
+Qn::PanicMode QnMediaServerResource::getPanicMode() const {
     return m_panicMode;
 }
 
-void QnMediaServerResource::setPanicMode(PanicMode panicMode) {
+void QnMediaServerResource::setPanicMode(Qn::PanicMode panicMode) {
     if(m_panicMode == panicMode)
         return;
 

@@ -46,6 +46,12 @@ namespace ec2
         QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
     };
 
+    struct ApiPanicModeData: public ApiData
+    {
+        Qn::PanicMode mode;
+        QN_DECLARE_STRUCT_SERIALIZATORS();
+    };
+
     struct ApiMediaServerDataList: public ApiData {
         std::vector<ApiMediaServerData> data;
 
@@ -62,5 +68,6 @@ QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiStorageData, ApiStorageDataField
 QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiMediaServerData, ApiResourceData, medisServerDataFields)
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiMediaServerDataList, (data))
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiStorageDataList, (data))
+QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiPanicModeData, (mode))
 
 #endif //MSERVER_DATA_H

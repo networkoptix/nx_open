@@ -17,7 +17,6 @@ class QnMediaServerResource : public QnResource
     Q_PROPERTY(QString streamingUrl READ getStreamingUrl WRITE setStreamingUrl)
 
 public:
-    enum PanicMode {PM_None, PM_BusinessEvents, PM_User};
 
     QnMediaServerResource(const QnResourceTypePool* resTypePool);
     virtual ~QnMediaServerResource();
@@ -47,8 +46,8 @@ public:
     void setReserve(bool reserve = true);
     bool getReserve() const;
 
-    PanicMode getPanicMode() const;
-    void setPanicMode(PanicMode panicMode);
+    Qn::PanicMode getPanicMode() const;
+    void setPanicMode(Qn::PanicMode panicMode);
 
     //virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
@@ -76,7 +75,7 @@ private:
     QnAbstractStorageResourceList m_storages;
     bool m_primaryIFSelected;
     bool m_reserve;
-    PanicMode m_panicMode;
+    Qn::PanicMode m_panicMode;
     QnSoftwareVersion m_version;
     QMap<int, QString> m_runningIfRequests;
     QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.

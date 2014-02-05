@@ -65,14 +65,14 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr
     QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceByGuid(serverGuid()));
     if (!mediaServer)
         return false;
-    if (mediaServer->getPanicMode() == QnMediaServerResource::PM_User)
+    if (mediaServer->getPanicMode() == Qn::PM_User)
         return true; // ignore panic business action if panic mode turn on by user
     
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    QnMediaServerResource::PanicMode val = QnMediaServerResource::PM_None;
+    Qn::PanicMode val = Qn::PM_None;
     if (action->getToggleState() == Qn::OnState)
-        val =  QnMediaServerResource::PM_BusinessEvents;
-    conn->setPanicMode(val);
+        val =  Qn::PM_BusinessEvents;
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::createConnection2Sync();
+    conn->setPanicModeSync(val);
     mediaServer->setPanicMode(val);
     return true;
 }

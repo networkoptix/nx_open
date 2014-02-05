@@ -231,7 +231,7 @@ void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_server
 
     if (pb_server.has_panicmode())
     {
-        server->setPanicMode(QnMediaServerResource::PanicMode(pb_server.panicmode()));
+        server->setPanicMode(Qn::PanicMode(pb_server.panicmode()));
     }
 
     if (pb_server.storage_size() > 0)

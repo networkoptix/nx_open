@@ -85,7 +85,7 @@ void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, QnResourc
     resource->setUrl(apiUrl);
     resource->setNetAddrList(resNetAddrList);
     resource->setReserve(reserve);
-    resource->setPanicMode((QnMediaServerResource::PanicMode) panicMode);
+    resource->setPanicMode((Qn::PanicMode) panicMode);
     resource->setStreamingUrl(streamingUrl);
     resource->setVersion(QnSoftwareVersion(version));
     //resource->setAuthKey(authKey);

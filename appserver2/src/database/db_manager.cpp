@@ -415,6 +415,20 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraServerIte
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiPanicModeData>& tran)
+{
+    QMutexLocker lock(&m_mutex);
+
+    QSqlQuery query(m_sdb);
+    query.prepare("UPDATE vms_server SET panic_mode = :mode");
+    query.bindValue(QLatin1String(":mode"), (int) tran.params.mode);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
+
+    return ErrorCode::ok;
+}
 
 /* 
 -------------------------------------------------------------

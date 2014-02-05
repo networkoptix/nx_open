@@ -485,12 +485,6 @@ namespace ec2
     };
     typedef std::shared_ptr<AbstractStoredFileManager> AbstractStoredFileManagerPtr;
 
-    enum class PanicMode
-    {
-        on,
-        off
-    };
-
     /*!
         \note All methods are asynchronous if other not specified
     */
@@ -513,8 +507,12 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> ReqID setPanicMode( PanicMode value, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> ReqID setPanicMode( Qn::PanicMode value, TargetType* target, HandlerType handler ) {
             return setPanicMode( value, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+        ErrorCode setPanicModeSync(Qn::PanicMode value) {
+            using namespace std::placeholders;
+            return impl::doSyncCall<impl::SimpleHandler>( std::bind(&AbstractECConnection::setPanicMode, this, value, _1));
         }
 
         /*!
@@ -562,7 +560,7 @@ namespace ec2
         //virtual void cancelRequest( ReqID requestID ) = 0;
 
     protected:
-        virtual ReqID setPanicMode( PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
+        virtual ReqID setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
         virtual ReqID getCurrentTime( impl::CurrentTimeHandlerPtr handler ) = 0;
         virtual ReqID dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
         virtual ReqID restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) = 0;

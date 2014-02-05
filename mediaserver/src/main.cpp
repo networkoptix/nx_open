@@ -397,10 +397,10 @@ void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddr
     server->setApiUrl(QString("http://%1:%2").arg(myAddress).arg(port));
 }
 
-QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, QnMediaServerResource::PanicMode* pm)
+QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, Qn::PanicMode* pm)
 {
     QnMediaServerResourceList servers;
-    *pm = QnMediaServerResource::PM_None;
+    *pm = Qn::PM_None;
 
     while (servers.isEmpty())
     {
@@ -1111,7 +1111,7 @@ void QnMain::run()
 
     QHostAddress publicAddress = getPublicAddress();
 
-    QnMediaServerResource::PanicMode pm;
+    Qn::PanicMode pm;
     while (m_mediaServer.isNull())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection, &pm);

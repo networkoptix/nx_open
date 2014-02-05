@@ -10,7 +10,8 @@
 
 #include "nx_ec/ec_api.h"
 #include "core/resource_management/resource_pool.h"
-
+#include "nx_ec/data/mserver_data.h"
+#include "transaction/transaction.h"
 
 namespace ec2
 {
@@ -33,13 +34,14 @@ namespace ec2
         virtual AbstractLayoutManagerPtr getLayoutManager() override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
 
-        virtual ReqID setPanicMode( PanicMode value, impl::SimpleHandlerPtr handler ) override;
+        virtual ReqID setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
         virtual ReqID getCurrentTime( impl::CurrentTimeHandlerPtr handler ) override;
         virtual ReqID dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
         virtual ReqID restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) override;
         virtual ReqID getSettingsAsync( impl::GetSettingsHandlerPtr handler ) override;
         virtual ReqID saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
-
+    private:
+        QnTransaction<ApiPanicModeData> prepareTransaction( ApiCommand::Value cmd, const Qn::PanicMode& mode);
     private:
         QueryProcessorType* m_queryProcessor;
         AbstractLicenseManagerPtr m_licenseManager;
