@@ -102,6 +102,7 @@
                                     <arg line="${arch} ${toolchain.version}"/> 
                                 </exec>
                             </target>
+                            <skip>${rsync.skip}</skip>
                         </configuration>
                     </execution>    
                 </executions>
