@@ -3,7 +3,7 @@
 #include <QtConcurrent>
 #include "database/db_manager.h"
 
-#include "client_query_processor.h"
+#include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 
 
@@ -17,9 +17,9 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnResourceManager<T>::getResourceTypes( impl::GetResourceTypesHandlerPtr handler )
+    int QnResourceManager<T>::getResourceTypes( impl::GetResourceTypesHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
 
         auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiResourceTypeList& resTypeList ) {
             QnResourceTypeList outResTypeList;
@@ -33,23 +33,23 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnResourceManager<T>::getResources( impl::GetResourcesHandlerPtr handler )
+    int QnResourceManager<T>::getResources( impl::GetResourcesHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
     template<class T>
-    ReqID QnResourceManager<T>::getResource( const QnId& id, impl::GetResourceHandlerPtr handler )
+    int QnResourceManager<T>::getResource( const QnId& id, impl::GetResourceHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
     template<class T>
-    ReqID QnResourceManager<T>::setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler )
+    int QnResourceManager<T>::setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
 
         //performing request
         auto tran = prepareTransaction( ApiCommand::setResourceStatus, resourceId, status );
@@ -59,9 +59,9 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnResourceManager<T>::getKvPairs( const QnId &resourceId, impl::GetKvPairsHandlerPtr handler )
+    int QnResourceManager<T>::getKvPairs( const QnId &resourceId, impl::GetKvPairsHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
         
         auto queryDoneHandler = [reqID, handler, resourceId]( ErrorCode errorCode, const ApiResourceParams& params) {
             QnKvPairListsById outData;
@@ -79,23 +79,23 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnResourceManager<T>::setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler )
+    int QnResourceManager<T>::setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
     template<class T>
-    ReqID QnResourceManager<T>::save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler )
+    int QnResourceManager<T>::save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
     template<class T>
-    ReqID QnResourceManager<T>::save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SaveKvPairsHandlerPtr handler )
+    int QnResourceManager<T>::save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SaveKvPairsHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
         ApiCommand::Value command = ApiCommand::setResourceParams;
         auto tran = prepareTransaction( command, resourceId, kvPairs );
         QnKvPairListsById outData;
@@ -107,7 +107,7 @@ namespace ec2
     }
 
     template<class T>
-    ReqID QnResourceManager<T>::remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    int QnResourceManager<T>::remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
@@ -143,5 +143,5 @@ namespace ec2
     }
 
     template class QnResourceManager<ServerQueryProcessor>;
-    template class QnResourceManager<ClientQueryProcessor>;
+    template class QnResourceManager<FixedUrlClientQueryProcessor>;
 }

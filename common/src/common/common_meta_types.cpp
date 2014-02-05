@@ -153,6 +153,8 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<Qn::Corner>();
     qRegisterMetaTypeStreamOperators<Qn::Corner>();
 
+    qRegisterMetaType<QnConnectionInfo>();
+
     QnJsonSerializer::registerSerializer<QUuid>();
 
     qn_commonMetaTypes_initialized = true;

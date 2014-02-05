@@ -9,7 +9,7 @@
 #include "managers/license_manager.h"
 #include "media_server_manager.h"
 #include "resource_manager.h"
-#include "client_query_processor.h"
+#include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 #include "user_manager.h"
 #include "business_event_manager.h"
@@ -81,9 +81,9 @@ namespace ec2
     }
 
     template<class T>
-    ReqID BaseEc2Connection<T>::setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler )
+    int BaseEc2Connection<T>::setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
 
         ApiCommand::Value command = ApiCommand::setPanicMode;
 
@@ -107,9 +107,9 @@ namespace ec2
     }
     */
     template <class T>
-    ReqID BaseEc2Connection<T>::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
+    int BaseEc2Connection<T>::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
 
         auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const qint64& currentTime) {
             qint64 outData = 0;
@@ -126,28 +126,28 @@ namespace ec2
 
 
     template<class T>
-    ReqID BaseEc2Connection<T>::dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler )
+    int BaseEc2Connection<T>::dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
     template<class T>
-    ReqID BaseEc2Connection<T>::restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler )
+    int BaseEc2Connection<T>::restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
     template<class T>
-    ReqID BaseEc2Connection<T>::getSettingsAsync( impl::GetSettingsHandlerPtr handler )
+    int BaseEc2Connection<T>::getSettingsAsync( impl::GetSettingsHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
     template<class T>
-    ReqID BaseEc2Connection<T>::saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler )
+    int BaseEc2Connection<T>::saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
@@ -164,6 +164,6 @@ namespace ec2
         return result;
     }
 
-    template class BaseEc2Connection<ClientQueryProcessor>;
+    template class BaseEc2Connection<FixedUrlClientQueryProcessor>;
     template class BaseEc2Connection<ServerQueryProcessor>;
 }

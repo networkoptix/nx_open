@@ -782,7 +782,7 @@ void QnMain::at_localInterfacesChanged()
     ec2Connection->getMediaServerManager()->saveServer(m_mediaServer, this, &QnMain::at_serverSaved);
 }
 
-void QnMain::at_serverSaved(ec2::ReqID, ec2::ErrorCode err, const QnResourceList &)
+void QnMain::at_serverSaved(int, ec2::ErrorCode err, const QnResourceList &)
 {
     if (err != ec2::ErrorCode::ok)
         qWarning() << "Error saving server.";
@@ -859,6 +859,7 @@ void QnMain::initTcpListener()
     m_universalTcpListener->enableSSLMode();
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
+    m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
 
@@ -991,7 +992,6 @@ void QnMain::run()
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
     connect(QnStorageManager::instance(), SIGNAL(noStoragesAvailable()), this, SLOT(at_noStorages()));
     connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr, QnBusiness::EventReason)), this, SLOT(at_storageFailure(QnResourcePtr, QnBusiness::EventReason)));
-
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
     ec2::ResourceContext resCtx(
@@ -1478,8 +1478,16 @@ void stopServer(int signal)
 static void printVersion();
 static void printHelp();
 
+
+int testDigest();
+
 int main(int argc, char* argv[])
 {
+    //return testDigest();
+
+
+
+
 #if __arm__
 #if defined(__GNUC__)
 # if defined(__i386__)
@@ -1557,3 +1565,56 @@ static void printHelp()
         "  --runtime-conf-file      Path to config file which is used to save some. By default "<<MSSettings::defaultRunTimeSettingsFilePath().toStdString()<<"\n"
         ;
 }
+
+
+namespace nx_http
+{
+extern bool calcDigestResponse(
+    const QString& method,
+    const QString& userName,
+    const QString& userPassword,
+    const QUrl& url,
+    const nx_http::Header::WWWAuthenticate& wwwAuthenticateHeader,
+    nx_http::Header::DigestAuthorization* const digestAuthorizationHeader );
+}
+
+//int testDigest()
+//{
+//    {
+//    nx_http::Header::WWWAuthenticate wwwAuthenticateHeader;
+//    wwwAuthenticateHeader.authScheme = nx_http::Header::AuthScheme::digest;
+//    wwwAuthenticateHeader.params["realm"] = "Surveillance Server";
+//    wwwAuthenticateHeader.params["nonce"] = "06737538";
+//    nx_http::Header::DigestAuthorization digestAuthorizationHeader;
+//
+//    bool res = nx_http::calcDigestResponse(
+//        lit("DESCRIBE"),
+//        lit("admin"), lit("admin"),
+//        QUrl(lit("rtsp://192.168.1.104:554/0")),
+//        wwwAuthenticateHeader,
+//        &digestAuthorizationHeader );
+//
+//    int x = 0;
+//
+//    }
+//
+//
+//    {
+//    nx_http::Header::WWWAuthenticate wwwAuthenticateHeader;
+//    wwwAuthenticateHeader.authScheme = nx_http::Header::AuthScheme::digest;
+//    wwwAuthenticateHeader.params["realm"] = "Surveillance Server";
+//    wwwAuthenticateHeader.params["nonce"] = "41261936";
+//    nx_http::Header::DigestAuthorization digestAuthorizationHeader;
+//
+//    bool res = nx_http::calcDigestResponse(
+//        lit("DESCRIBE"),
+//        lit("admin"), lit("admin"),
+//        QUrl(lit("rtsp://192.168.1.104:554/0")),
+//        wwwAuthenticateHeader,
+//        &digestAuthorizationHeader );
+//
+//    int x = 0;
+//    }
+//
+//    return 0;
+//}

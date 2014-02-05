@@ -56,7 +56,11 @@ void QnConnectionTestingDialog::testEnterpriseController(const QUrl &url) {
 
     setHelpTopic(this, Qn::Login_Help);
 
-    QnAppServerConnectionFactory::createConnection(url)->testConnectionAsync(this, SLOT(at_ecConnection_result(int, QnConnectionInfoPtr, int)));
+    //QnAppServerConnectionFactory::createConnection(url)->testConnectionAsync(this, SLOT(at_ecConnection_result(int, QnConnectionInfoPtr, int)));
+    QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
+        url,
+        this,
+        &QnConnectionTestingDialog::at_ecConnection_result );
 
     m_timeoutTimer->start();
 }
@@ -112,15 +116,15 @@ void QnConnectionTestingDialog::tick() {
     updateUi(false, tr("Request timed out."));
 }
 
-void QnConnectionTestingDialog::at_ecConnection_result(int status, QnConnectionInfoPtr connectionInfo, int requestHandle) {
-    Q_UNUSED(requestHandle)
+void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode errorCode, QnConnectionInfo connectionInfo) {
+    Q_UNUSED(reqID)
 
     if (!m_timeoutTimer->isActive())
         return;
     m_timeoutTimer->stop();
     ui->progressBar->setValue(ui->progressBar->maximum());
 
-    QnCompatibilityChecker remoteChecker(connectionInfo->compatibilityItems);
+    QnCompatibilityChecker remoteChecker(connectionInfo.compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
 
     QnCompatibilityChecker* compatibilityChecker;
@@ -134,14 +138,14 @@ void QnConnectionTestingDialog::at_ecConnection_result(int status, QnConnectionI
     QString detail;
     int helpTopicId = -1;
 
-    bool compatibleProduct = qnSettings->isDevMode() || connectionInfo->brand.isEmpty()
-            || connectionInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+    bool compatibleProduct = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
+            || connectionInfo.brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
 
-    if (status == 202) {
+    if (errorCode == ec2::ErrorCode::unauthorized) {
         success = false;
         detail = tr("Login or password you have entered are incorrect, please try again.");
         helpTopicId = Qn::Login_Help;
-    } else if (status != 0) {
+    } else if (errorCode != ec2::ErrorCode::ok) {
         success = false;
         detail = tr("Connection to the Enterprise Controller could not be established.\n"\
                     "Connection details that you have entered are incorrect, please try again.\n\n"\
@@ -151,16 +155,16 @@ void QnConnectionTestingDialog::at_ecConnection_result(int status, QnConnectionI
         success = false;
         detail = tr("You are trying to connect to incompatible Enterprise Controller.");
         helpTopicId = Qn::Login_Help;
-    } else if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo->version)) {
+    } else if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo.version)) {
         QnSoftwareVersion minSupportedVersion("1.4");
 
-        if (connectionInfo->version < minSupportedVersion) {
+        if (connectionInfo.version < minSupportedVersion) {
             detail = tr("Enterprise Controller has a different version:\n"\
                         " - Client version: %1.\n"\
                         " - EC version: %2.\n"\
                         "Compatibility mode for versions lower than %3 is not supported.")
                     .arg(QLatin1String(QN_ENGINE_VERSION))
-                    .arg(connectionInfo->version.toString())
+                    .arg(connectionInfo.version.toString())
                     .arg(minSupportedVersion.toString());
             success = false;
             helpTopicId = Qn::VersionMismatch_Help;
@@ -170,7 +174,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int status, QnConnectionI
                         " - EC version: %2.\n"\
                         "You will be asked to restart the client in compatibility mode.")
                     .arg(QLatin1String(QN_ENGINE_VERSION))
-                    .arg(connectionInfo->version.toString());
+                    .arg(connectionInfo.version.toString());
             helpTopicId = Qn::VersionMismatch_Help;
         }
     }

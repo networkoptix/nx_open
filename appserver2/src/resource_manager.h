@@ -18,23 +18,23 @@ namespace ec2
         QnResourceManager( QueryProcessorType* const queryProcessor );
 
         //!Implementation of AbstractResourceManager::getResourceTypes
-        virtual ReqID getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) override;
+        virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::getResources
-        virtual ReqID getResources( impl::GetResourcesHandlerPtr handler ) override;
+        virtual int getResources( impl::GetResourcesHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::getResource
-        virtual ReqID getResource( const QnId& id, impl::GetResourceHandlerPtr handler ) override;
+        virtual int getResource( const QnId& id, impl::GetResourceHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::setResourceStatus
-        virtual ReqID setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler ) override;
+        virtual int setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::getKvPairs
-        virtual ReqID getKvPairs( const QnId &resourceId, impl::GetKvPairsHandlerPtr handler ) override;
+        virtual int getKvPairs( const QnId &resourceId, impl::GetKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::setResourceDisabled
-        virtual ReqID setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler ) override;
+        virtual int setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::save
-        virtual ReqID save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler ) override;
+        virtual int save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::save
-        virtual ReqID save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) override;
+        virtual int save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::remove
-        virtual ReqID remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
+        virtual int remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
     private:
         QnTransaction<ApiSetResourceStatusData> prepareTransaction( ApiCommand::Value cmd, const QnId& id, QnResource::Status status);
         QnTransaction<ApiResourceParams> prepareTransaction(ApiCommand::Value cmd, const QnId& id, const QnKvPairList& kvPairs);

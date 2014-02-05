@@ -18,10 +18,12 @@
 #include "version.h"
 
 
+
 namespace ec2
 {
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory()
     {
+        qRegisterMetaType<ErrorCode>();
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
@@ -29,15 +31,16 @@ namespace ec2
     }
 
     //!Implementation of AbstractECConnectionFactory::testConnectionAsync
-    ReqID Ec2DirectConnectionFactory::testConnectionAsync( const QUrl& /*addr*/, impl::SimpleHandlerPtr handler )
+    int Ec2DirectConnectionFactory::testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
-        QtConcurrent::run( std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, ec2::ErrorCode::ok ) );
-        return reqID;
+        if( addr.isEmpty() )
+            return testDirectConnection( addr, handler );
+        else
+            return testRemoteConnection( addr, handler );
     }
 
     //!Implementation of AbstractECConnectionFactory::connectAsync
-    ReqID Ec2DirectConnectionFactory::connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler )
+    int Ec2DirectConnectionFactory::connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler )
     {
         if( addr.isEmpty() )
             return establishDirectConnection( handler );
@@ -49,20 +52,19 @@ namespace ec2
     {
         using namespace std::placeholders;
 
-        auto doRemoteConnectionSyncFunc = std::bind( &Ec2DirectConnectionFactory::doRemoteConnectionSync, this, _1, _2 );
+        auto doRemoteConnectionSyncFunc = std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 );
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(ApiCommand::connect)),
-            new FlexibleQueryHttpHandler<LoginInfo, ConnectionInfo, decltype(doRemoteConnectionSyncFunc)>
+            new FlexibleQueryHttpHandler<LoginInfo, QnConnectionInfo, decltype(doRemoteConnectionSyncFunc)>
                 (ApiCommand::connect, doRemoteConnectionSyncFunc) );
 
-        /*
-        auto getCurrentTimeSyncFunc = std::bind( &CommonRequestsProcessor::getCurrentTime, _1, _2 );
+        auto doRemoteTestConnectionSyncFunc = std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 );
         restProcessorPool->registerHandler(
-            lit("ec2/%1").arg(ApiCommand::toString(ApiCommand::getCurrentTime)),
-            new FlexibleQueryHttpHandler<nullptr_t, qint64, decltype(getCurrentTimeSyncFunc)>
-                (ApiCommand::getCurrentTime, getCurrentTimeSyncFunc) );
-        */
-        restProcessorPool->registerHandler(
+            lit("ec2/%1").arg(ApiCommand::toString(ApiCommand::testConnection)),
+            new FlexibleQueryHttpHandler<LoginInfo, QnConnectionInfo, decltype(doRemoteTestConnectionSyncFunc)>
+                (ApiCommand::testConnection, doRemoteTestConnectionSyncFunc) );
+
+     restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(ApiCommand::getCurrentTime)),
             new QueryHttpHandler2<nullptr_t, qint64>(ApiCommand::getCurrentTime, &m_serverQueryProcessor) );
 
@@ -83,15 +85,13 @@ namespace ec2
         m_resCtx = resCtx;
     }
 
-    ReqID Ec2DirectConnectionFactory::establishDirectConnection( impl::ConnectHandlerPtr handler )
+    int Ec2DirectConnectionFactory::establishDirectConnection( impl::ConnectHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
 
         LoginInfo loginInfo;
-        ConnectionInfo internalConnectionInfo;
-        doRemoteConnectionSync( loginInfo, &internalConnectionInfo );   //todo: #ak not appropriate here
         QnConnectionInfo connectionInfo;
-        internalConnectionInfo.copy( &connectionInfo );
+        fillConnectionInfo( loginInfo, &connectionInfo );   //todo: #ak not appropriate here
         {
             std::lock_guard<std::mutex> lk( m_mutex );
             if( !m_directConnection )
@@ -101,49 +101,83 @@ namespace ec2
         return reqID;
     }
 
-    ReqID Ec2DirectConnectionFactory::establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler )
+    int Ec2DirectConnectionFactory::establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler )
     {
-        const ReqID reqID = generateRequestID();
+        const int reqID = generateRequestID();
 
         LoginInfo loginInfo;
 #if 1
-        auto func = [this, reqID, handler]( ErrorCode errorCode, const ConnectionInfo& connectionInfo ) {
-            remoteConnectionFinished(reqID, errorCode, connectionInfo, handler); };
-        m_remoteQueryProcessor.processQueryAsync<LoginInfo, ConnectionInfo>(
-            ApiCommand::connect, loginInfo, func );
+        auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
+            remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
+        m_remoteQueryProcessor.processQueryAsync<LoginInfo, QnConnectionInfo>(
+            addr, ApiCommand::connect, loginInfo, func );
 #else
+        //TODO: #ak investigate, what's wrong with following code
         using namespace std::placeholders;
-        m_remoteQueryProcessor.processQueryAsync<LoginInfo, ConnectionInfo>(
+        m_remoteQueryProcessor.processQueryAsync<LoginInfo, QnConnectionInfo>(
             ApiCommand::connect, loginInfo, std::bind(&Ec2DirectConnectionFactory::remoteConnectionFinished, this, _1, _2) );
 #endif
         return reqID;
     }
 
     void Ec2DirectConnectionFactory::remoteConnectionFinished(
-        ReqID reqID,
+        int reqID,
         ErrorCode errorCode,
-        const ConnectionInfo& connectionInfo,
+        const QnConnectionInfo& connectionInfo,
+        const QUrl& ecURL,
         impl::ConnectHandlerPtr handler )
     {
         if( errorCode != ErrorCode::ok )
             return handler->done( reqID, errorCode, AbstractECConnectionPtr() );
-        QnConnectionInfo outConnectionInfo;
-        connectionInfo.copy( &outConnectionInfo );
         return handler->done(
             reqID,
             errorCode,
-            AbstractECConnectionPtr(new RemoteEC2Connection( &m_remoteQueryProcessor, m_resCtx, outConnectionInfo )) );
+            AbstractECConnectionPtr(new RemoteEC2Connection(
+                std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
+                m_resCtx,
+                connectionInfo )) );
     }
 
-    ErrorCode Ec2DirectConnectionFactory::doRemoteConnectionSync(
+    void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
+        int reqID,
+        ErrorCode errorCode,
+        const QnConnectionInfo& connectionInfo,
+        const QUrl& /*ecURL*/,
+        impl::TestConnectionHandlerPtr handler )
+    {
+        return handler->done( reqID, errorCode, connectionInfo );
+    }
+
+    ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
         const LoginInfo& loginInfo,
-        ConnectionInfo* const connectionInfo )
+        QnConnectionInfo* const connectionInfo )
     {
         //TODO/IMPL
-        connectionInfo->version = lit(QN_APPLICATION_VERSION);
+        connectionInfo->version = QnSoftwareVersion(lit(QN_APPLICATION_VERSION));
         connectionInfo->brand = lit(QN_CUSTOMIZATION_NAME);
         connectionInfo->ecsGuid = lit( "ECS_HUID" );
 
         return ErrorCode::ok;
+    }
+
+    int Ec2DirectConnectionFactory::testDirectConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        QnConnectionInfo connectionInfo;
+        fillConnectionInfo( LoginInfo(), &connectionInfo );
+        QtConcurrent::run( std::bind( &impl::TestConnectionHandler::done, handler, reqID, ec2::ErrorCode::ok, connectionInfo ) );
+        return reqID;
+    }
+
+    int Ec2DirectConnectionFactory::testRemoteConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+
+        LoginInfo loginInfo;
+        auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
+            remoteTestConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
+        m_remoteQueryProcessor.processQueryAsync<LoginInfo, QnConnectionInfo>(
+            addr, ApiCommand::testConnection, loginInfo, func );
+        return reqID;
     }
 }

@@ -33,7 +33,7 @@ public slots:
     void issueOccured();
     void noCameraIssues();
 private slots:
-    void at_saveAsyncFinished(ec2::ReqID, ec2::ErrorCode, const QnVirtualCameraResourceList &);
+    void at_saveAsyncFinished(int, ec2::ErrorCode, const QnVirtualCameraResourceList &);
 protected:
     void save();
     int saveAsync();

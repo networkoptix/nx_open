@@ -556,6 +556,76 @@ namespace nx_http
         return false;
     }
 
+    //bool calcDigestResponse(
+    //    const QString& method,
+    //    const QString& userName,
+    //    const QString& userPassword,
+    //    const QUrl& url,
+    //    const Header::WWWAuthenticate& wwwAuthenticateHeader,
+    //    Header::DigestAuthorization* const digestAuthorizationHeader )
+    //{
+    //    if( wwwAuthenticateHeader.authScheme != Header::AuthScheme::digest )
+    //        return false;
+
+    //    //reading params
+    //    QMap<BufferType, BufferType>::const_iterator nonceIter = wwwAuthenticateHeader.params.find("nonce");
+    //    const BufferType nonce = nonceIter != wwwAuthenticateHeader.params.end() ? nonceIter.value() : BufferType();
+    //    QMap<BufferType, BufferType>::const_iterator realmIter = wwwAuthenticateHeader.params.find("realm");
+    //    const BufferType realm = realmIter != wwwAuthenticateHeader.params.end() ? realmIter.value() : BufferType();
+    //    QMap<BufferType, BufferType>::const_iterator qopIter = wwwAuthenticateHeader.params.find("qop");
+    //    const BufferType qop = qopIter != wwwAuthenticateHeader.params.end() ? qopIter.value() : BufferType();
+
+    //    if( qop.indexOf("auth-int") != -1 )
+    //        return false;   //qop=auth-int is not supported
+
+    //    BufferType nonceCount = "00000001";     //TODO/IMPL
+    //    BufferType clientNonce = "0a4f113b";    //TODO/IMPL
+
+    //    QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
+
+    //    //HA1
+    //    md5HashCalc.addData( userName.toLatin1() );
+    //    md5HashCalc.addData( ":" );
+    //    md5HashCalc.addData( realm );
+    //    md5HashCalc.addData( ":" );
+    //    md5HashCalc.addData( userPassword.toLatin1() );
+    //    const BufferType& ha1 = md5HashCalc.result().toHex();
+    //    //HA2, qop=auth-int is not supported
+    //    md5HashCalc.reset();
+    //    md5HashCalc.addData( method.toLatin1() );
+    //    md5HashCalc.addData( ":" );
+    //    //md5HashCalc.addData( url.path().toLatin1() );
+    //    md5HashCalc.addData( url.toString().toLatin1() );
+    //    const BufferType& ha2 = md5HashCalc.result().toHex();
+    //    //response
+    //    digestAuthorizationHeader->addParam( "username", userName.toLatin1() );
+    //    digestAuthorizationHeader->addParam( "realm", realm );
+    //    digestAuthorizationHeader->addParam( "nonce", nonce );
+    //    digestAuthorizationHeader->addParam( "uri", url.toString().toLatin1() );
+    //    md5HashCalc.reset();
+    //    md5HashCalc.addData( ha1 );
+    //    md5HashCalc.addData( ":" );
+    //    md5HashCalc.addData( nonce );
+    //    md5HashCalc.addData( ":" );
+    //    if( !qop.isEmpty() )
+    //    {
+    //        md5HashCalc.addData( nonceCount );
+    //        md5HashCalc.addData( ":" );
+    //        md5HashCalc.addData( clientNonce );
+    //        md5HashCalc.addData( ":" );
+    //        md5HashCalc.addData( qop );
+    //        md5HashCalc.addData( ":" );
+
+    //        digestAuthorizationHeader->addParam( "qop", qop );
+    //        digestAuthorizationHeader->addParam( "nc", nonceCount );
+    //        digestAuthorizationHeader->addParam( "cnonce", clientNonce );
+    //    }
+    //    md5HashCalc.addData( ha2 );
+    //    digestAuthorizationHeader->addParam( "response", md5HashCalc.result().toHex() );
+    //    return true;
+    //}
+
+
     bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::HttpResponse& response )
     {
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers

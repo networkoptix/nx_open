@@ -58,7 +58,7 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
     return controller;
 }
 
-void QnServerPtzControllerPool::at_addCameraDone(ec2::ReqID, ec2::ErrorCode, const QnVirtualCameraResourceList &)
+void QnServerPtzControllerPool::at_addCameraDone(int, ec2::ErrorCode, const QnVirtualCameraResourceList &)
 {
 
 }

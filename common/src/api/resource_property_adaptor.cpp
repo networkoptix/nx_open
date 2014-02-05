@@ -57,7 +57,7 @@ void QnAbstractResourcePropertyAdaptor::saveValue() {
     connection->getResourceManager()->save(resource()->getId(), QnKvPairList() << QnKvPair(m_key, m_serializedValue), this, &QnAbstractResourcePropertyAdaptor::at_paramsSaved);
 }
 
-void QnAbstractResourcePropertyAdaptor::at_paramsSaved(ec2::ReqID, ec2::ErrorCode)
+void QnAbstractResourcePropertyAdaptor::at_paramsSaved(int, ec2::ErrorCode)
 {
 
 }

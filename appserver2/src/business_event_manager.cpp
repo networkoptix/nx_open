@@ -3,7 +3,7 @@
 #include <functional>
 #include <QtConcurrent>
 
-#include "client_query_processor.h"
+#include "fixed_url_client_query_processor.h"
 #include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
 #include "transaction/transaction_log.h"
@@ -22,9 +22,9 @@ QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager( QueryProcess
 
 
 template<class T>
-ReqID QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandlerPtr handler )
+int QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandlerPtr handler )
 {
-    const ReqID reqID = generateRequestID();
+    const int reqID = generateRequestID();
 
     auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiBusinessRuleDataList& rules) {
         QnBusinessEventRuleList outData;
@@ -37,49 +37,49 @@ ReqID QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandler
 }
 
 template<class T>
-ReqID QnBusinessEventManager<T>::addBusinessRule( const QnBusinessEventRulePtr& businessRule, impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::addBusinessRule( const QnBusinessEventRulePtr& businessRule, impl::SimpleHandlerPtr handler )
 {
     Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
 }
 
 template<class T>
-ReqID QnBusinessEventManager<T>::testEmailSettings( const QnKvPairList& settings, impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::testEmailSettings( const QnKvPairList& settings, impl::SimpleHandlerPtr handler )
 {
     Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
 }
 
 template<class T>
-ReqID QnBusinessEventManager<T>::sendEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, const QnEmailAttachmentList& attachments, impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::sendEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, const QnEmailAttachmentList& attachments, impl::SimpleHandlerPtr handler )
 {
     Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
 }
 
 template<class T>
-ReqID QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::SimpleHandlerPtr handler )
 {
     Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
 }
 
 template<class T>
-ReqID QnBusinessEventManager<T>::deleteRule( int ruleId, impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::deleteRule( int ruleId, impl::SimpleHandlerPtr handler )
 {
     Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
 }
 
 template<class T>
-ReqID QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler )
 {
     Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
 }
 
 template<class T>
-ReqID QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handler )
 {
     Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
@@ -97,6 +97,6 @@ QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction
 }
 
 template class QnBusinessEventManager<ServerQueryProcessor>;
-template class QnBusinessEventManager<ClientQueryProcessor>;
+template class QnBusinessEventManager<FixedUrlClientQueryProcessor>;
 
 }

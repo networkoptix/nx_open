@@ -34,12 +34,12 @@ namespace ec2
         virtual AbstractLayoutManagerPtr getLayoutManager() override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
 
-        virtual ReqID setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
-        virtual ReqID getCurrentTime( impl::CurrentTimeHandlerPtr handler ) override;
-        virtual ReqID dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
-        virtual ReqID restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) override;
-        virtual ReqID getSettingsAsync( impl::GetSettingsHandlerPtr handler ) override;
-        virtual ReqID saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
+        virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
+        virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) override;
+        virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
+        virtual int restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) override;
+        virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) override;
+        virtual int saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
     private:
         QnTransaction<ApiPanicModeData> prepareTransaction( ApiCommand::Value cmd, const Qn::PanicMode& mode);
     private:

@@ -29,7 +29,7 @@ namespace ec2
             return m_errorCode;
         }
 
-        void SyncHandler::done( ReqID reqID, ErrorCode _errorCode )
+        void SyncHandler::done( int reqID, ErrorCode _errorCode )
         {
             std::unique_lock<std::mutex> lk( m_mutex );
             m_done = true;

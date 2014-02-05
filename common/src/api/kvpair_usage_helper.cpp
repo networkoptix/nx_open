@@ -106,7 +106,7 @@ void QnAbstractKvPairUsageHelper::save() {
         &QnAbstractKvPairUsageHelper::at_connection_replyReceived);
 }
 
-void QnAbstractKvPairUsageHelper::at_connection_replyReceived(ec2::ReqID handle, ec2::ErrorCode err, const QnKvPairListsById &kvPairs) 
+void QnAbstractKvPairUsageHelper::at_connection_replyReceived(int handle, ec2::ErrorCode err, const QnKvPairListsById &kvPairs) 
 {
     if(err != ec2::ErrorCode::ok) {
         qnWarning("Failed to save/load kvPairs.");

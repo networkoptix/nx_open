@@ -16,6 +16,7 @@ namespace ec2
         {
 		    NotDefined,
 
+            testConnection,
             connect,
 
             getResourceTypes,
@@ -36,7 +37,6 @@ namespace ec2
             updateMediaServer,
 
             getUserList,
-
             getBusinessRuleList,
 
             getCurrentTime
@@ -102,7 +102,7 @@ namespace ec2
         }
     };
 
-    ReqID generateRequestID();
+    int generateRequestID();
 }
 
 QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnUuid, (data1) (data2) (data3) (data4) )

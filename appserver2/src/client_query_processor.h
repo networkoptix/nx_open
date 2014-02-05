@@ -30,14 +30,17 @@ namespace ec2
         Q_OBJECT
 
     public:
-        virtual ~ClientQueryProcessor() {}
+        virtual ~ClientQueryProcessor()
+        {
+            assert( m_runningHttpRequests.empty() );
+        }
 
         //!Asynchronously executes update query
         /*!
             \param handler Functor ( ErrorCode )
         */
         template<class QueryDataType, class HandlerType>
-            void processUpdateAsync( const QnTransaction<QueryDataType>& /*tran*/, HandlerType handler )
+            void processUpdateAsync( const QUrl& ecBaseUrl, const QnTransaction<QueryDataType>& /*tran*/, HandlerType handler )
         {
             //TODO/IMPL
             QtConcurrent::run( std::bind( handler, ErrorCode::failure ) );
@@ -48,9 +51,9 @@ namespace ec2
             TODO allow compiler guess template params
         */
         template<class InputData, class OutputData, class HandlerType>
-            void processQueryAsync( ApiCommand::Value cmdCode, InputData input, HandlerType handler )
+            void processQueryAsync( const QUrl& ecBaseUrl, ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
-            QUrl requestUrl( m_ecBaseUrl );
+            QUrl requestUrl( ecBaseUrl );
             requestUrl.setPath( QString::fromLatin1("ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;
             toUrlParams( input, &query );
@@ -103,7 +106,6 @@ namespace ec2
             Handler m_handler;
         };
 
-        QUrl m_ecBaseUrl;
         std::mutex m_mutex;
         std::map<nx_http::AsyncHttpClientPtr, AbstractHandler*> m_runningHttpRequests;
 
@@ -124,7 +126,7 @@ namespace ec2
             InputBinaryStream<QByteArray> inputStream( httpClient->response()->messageBody );
             OutputData outputData;
             QnBinary::deserialize( outputData, &inputStream );
-            //return handler( ErrorCode::ok, outputData );
+            return handler( ErrorCode::ok, outputData );
         }
     };
 }
