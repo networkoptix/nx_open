@@ -15,6 +15,34 @@ class QSqlDatabase;
 
 namespace ec2
 {
+    class QnDbTransactionLocker;
+
+    class QnDbTransaction
+    {
+    public:
+        QnDbTransaction(QSqlDatabase& m_sdb, QReadWriteLock& mutex);
+    private:
+        friend class QnDbTransactionLocker;
+
+        void beginTran();
+        void rollback();
+        void commit();
+    private:
+        QSqlDatabase& m_sdb;
+        QReadWriteLock& m_mutex;
+    };
+
+    class QnDbTransactionLocker
+    {
+    public:
+        QnDbTransactionLocker(QnDbTransaction* tran);
+        ~QnDbTransactionLocker();
+        void commit();
+    private:
+        bool m_committed;
+        QnDbTransaction* m_tran;
+    };
+
     class QnDbManager
     {
     public:
@@ -89,9 +117,10 @@ namespace ec2
         void mergeRuleResource(QSqlQuery& query, ApiBusinessRuleDataList& data, std::vector<qint32> ApiBusinessRuleData::*resList);
     private:
         QSqlDatabase m_sdb;
-		QMutex m_mutex;
+        QReadWriteLock m_mutex;
 		QnResourceFactory* m_resourceFactory;
         qint32 m_storageTypeId;
+        QnDbTransaction m_tran;
     };
 };
 

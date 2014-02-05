@@ -5,6 +5,53 @@
 namespace ec2
 {
 
+QnDbTransaction::QnDbTransaction(QSqlDatabase& sdb, QReadWriteLock& mutex): 
+    m_sdb(sdb),
+    m_mutex(mutex)
+{
+
+}
+
+void QnDbTransaction::beginTran()
+{
+    m_mutex.lockForWrite();
+    QSqlQuery query(m_sdb);
+    query.exec("BEGIN TRANSACTION");
+}
+
+void QnDbTransaction::rollback()
+{
+    QSqlQuery query(m_sdb);
+    query.exec("ROLLBACK");
+    m_mutex.unlock();
+}
+
+void QnDbTransaction::commit()
+{
+    QSqlQuery query(m_sdb);
+    query.exec("COMMIT");
+    m_mutex.unlock();
+}
+
+QnDbTransactionLocker::QnDbTransactionLocker(QnDbTransaction* tran): 
+    m_tran(tran), 
+    m_committed(false)
+{
+    m_tran->beginTran();
+}
+
+QnDbTransactionLocker::~QnDbTransactionLocker()
+{
+    if (!m_committed)
+        m_tran->rollback();
+}
+
+void QnDbTransactionLocker::commit()
+{
+    m_tran->commit();
+    m_committed = true;
+}
+
 static QnDbManager* globalInstance = 0;
 
 
@@ -40,7 +87,8 @@ void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subD
     }
 }
 
-QnDbManager::QnDbManager(QnResourceFactory* factory)
+QnDbManager::QnDbManager(QnResourceFactory* factory):
+    m_tran(m_sdb, m_mutex)
 {
     m_storageTypeId = 0;
     m_resourceFactory = factory;
@@ -300,7 +348,7 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data)
 
 int QnDbManager::getNextSequence()
 {
-	QMutexLocker lock(&m_mutex);
+	QWriteLocker lock(&m_mutex);
 
 	QSqlQuery query(m_sdb);
 	query.prepare("update sqlite_sequence set seq = seq + 1 where name=\"vms_resource\"");
@@ -321,7 +369,7 @@ int QnDbManager::getNextSequence()
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiSetResourceStatusData>& tran)
 {
-    QMutexLocker lock(&m_mutex);
+    QnDbTransactionLocker lock(&m_tran);
 
     QSqlQuery query(m_sdb);
     query.prepare("UPDATE vms_resource set status = :status where id = :id");
@@ -331,13 +379,13 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiSetResourceStat
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
     }
-    
+    lock.commit();
     return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tran)
 {
-    QMutexLocker lock(&m_mutex);
+    QnDbTransactionLocker lock(&m_tran);
 
 	ErrorCode result;
 	if (tran.command == ApiCommand::updateCamera) {
@@ -355,13 +403,14 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tr
 	if (result !=ErrorCode::ok)
 		return result;
 	result = updateCameraSchedule(tran.params);
-
+    if (result == ErrorCode::ok)
+        lock.commit();
     return result;
 }
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiMediaServerData>& tran)
 {
-    QMutexLocker lock(&m_mutex);
+    QnDbTransactionLocker lock(&m_tran);
 
     ErrorCode result;
     if (tran.command == ApiCommand::updateMediaServer) {
@@ -379,13 +428,15 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiMediaServerData
     if (result !=ErrorCode::ok)
         return result;
     result = updateStorages(tran.params);
+    if (result == ErrorCode::ok)
+        lock.commit();
 
     return result;
 }
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiResourceParams>& tran)
 {
-    QMutexLocker lock(&m_mutex);
+    QnDbTransactionLocker lock(&m_tran);
 
     foreach(const ApiResourceParam& param, tran.params) 
     {
@@ -396,13 +447,13 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiResourceParams>
         if (result != ErrorCode::ok)
             return result;
     }
-
+    lock.commit();
     return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraServerItemData>& tran)
 {
-    QMutexLocker lock(&m_mutex);
+    QWriteLocker lock(&m_mutex);
 
     QSqlQuery query(m_sdb);
     query.prepare("INSERT INTO vms_cameraserveritem (server_guid, timestamp, physical_id) VALUES(:serverGuid, :timestamp, :physicalId)");
@@ -417,7 +468,7 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraServerIte
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiPanicModeData>& tran)
 {
-    QMutexLocker lock(&m_mutex);
+    QWriteLocker lock(&m_mutex);
 
     QSqlQuery query(m_sdb);
     query.prepare("UPDATE vms_server SET panic_mode = :mode");
@@ -440,6 +491,8 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiPanicModeData>&
 
 ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 {
+    QReadLocker lock(&m_mutex);
+
 	QSqlQuery queryTypes(m_sdb);
 	queryTypes.prepare("	select rt.id, rt.name, m.name as manufacture \
 				  from vms_resourcetype rt \
@@ -469,6 +522,8 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 
 ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraList)
 {
+    QReadLocker lock(&m_mutex);
+
 	QSqlQuery queryCameras(m_sdb);
     QString filterStr;
 	if (mServerId.isValid()) {
@@ -533,6 +588,8 @@ ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraL
 
 ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiMediaServerDataList& serverList)
 {
+    QReadLocker lock(&m_mutex);
+
     QSqlQuery query(m_sdb);
     query.prepare(QString("select r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
                           s.api_url as apiUrl, s.auth_key as authKey, s.streaming_url as streamingUrl, s.version, s.net_addr_list as netAddrList, s.reserve, s.panic_mode as panicMode \
@@ -568,6 +625,8 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiMediaServerDataList& serv
 //getCameraServerItems
 ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiCameraServerItemDataList& historyList)
 {
+    QReadLocker lock(&m_mutex);
+
     QSqlQuery query(m_sdb);
     query.prepare(QString("select server_guid as serverGuid, timestamp, physical_id as physicalId from vms_cameraserveritem"));
     if (!query.exec()) {
@@ -583,6 +642,8 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiCameraServerItemDataList&
 //getUsers
 ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiUserDataList& userList)
 {
+    QReadLocker lock(&m_mutex);
+
     //digest = md5('%s:%s:%s' % (self.user.username.lower(), 'NetworkOptix', password)).hexdigest()
     QSqlQuery query(m_sdb);
     query.prepare(QString("select r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
@@ -603,6 +664,8 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiUserDataList& userList)
 //getBusinessRules
 ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& businessRuleList)
 {
+    QReadLocker lock(&m_mutex);
+
     QSqlQuery query(m_sdb);
     query.prepare(QString("SELECT id, event_type as eventType, event_condition as eventCondition, event_state as eventState, action_type as actionType, \
                           action_params as actionParams, aggregation_period as aggregationPeriod, disabled, comments, schedule \
@@ -638,6 +701,8 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& bus
 
 ErrorCode QnDbManager::doQuery(const QnId& resourceId, ApiResourceParams& params)
 {
+    QReadLocker lock(&m_mutex);
+
     QSqlQuery query(m_sdb);
     query.prepare(QString("SELECT kv.resource_id as resourceId, kv.value, kv.name \
                                 FROM vms_kvpair kv \
