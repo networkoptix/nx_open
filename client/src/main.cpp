@@ -307,7 +307,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool skipMediaFolderScan = false;
     bool noFullScreen = false;
     bool noVersionMismatchCheck = false;
-    int lightMode = 0;
+    QString lightMode;
+    bool noVSync = false;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -327,6 +328,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
 #endif
     commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString());
+    commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
 
     commandLineParser.parse(argc, argv, stderr);
 
@@ -337,13 +339,16 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnSettings->setDevMode(true);
     }
 
-    qnSettings->setLightMode(lightMode);
+    if (!lightMode.isEmpty())
+        qnSettings->setLightMode(lightMode.toInt());
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
     if(authentication.isValid()) {
         qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
     }
+
+    qnSettings->setVSyncEnabled(!noVSync);
 
     QScopedPointer<QnSkin> skin(new QnSkin(customizationPath));
     QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(customizationPath + lit("/customization.json"))));
@@ -632,6 +637,10 @@ int main(int argc, char **argv)
     QStringList pluginDirs = QCoreApplication::libraryPaths();
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths( pluginDirs );
+#ifdef Q_OS_LINUX
+    QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, lit("/etc/xdg"));
+    QSettings::setPath(QSettings::NativeFormat, QSettings::SystemScope, lit("/etc/xdg"));
+#endif
 
     QnClientModule client(argc, argv);
 

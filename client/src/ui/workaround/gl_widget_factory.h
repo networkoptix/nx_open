@@ -22,9 +22,11 @@ public:
         /* We cannot create QGLContext without painting device, thus we use context created by GL widget. */
         Widget *widget = new Widget(format, parent, /* shareWidget = */ NULL, windowFlags);
 
-        /* In Qt5 QGLContext uses QOpenGLContext internally. But QOpenGLContext hasn't support for
-           swap interval setting (up to and including Qt5.2). So we have to implement vsync manually. */
-        enableVSync(widget);
+        if (qnSettings->isVSyncEnabled()) {
+            /* In Qt5 QGLContext uses QOpenGLContext internally. But QOpenGLContext hasn't support for
+               swap interval setting (up to and including Qt5.2). So we have to implement vsync manually. */
+            enableVSync(widget);
+        }
 
         return widget;
     }

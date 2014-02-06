@@ -223,7 +223,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     case DEV_MODE:
     case UPDATES_ENABLED:
     case AUTO_CHECK_FOR_UPDATES:
-    case LIGHT_MODE:
+    case GL_VSYNC:
         break; /* Not to be saved to settings. */
     default:
         base_type::writeValueToSettings(settings, id, value);
