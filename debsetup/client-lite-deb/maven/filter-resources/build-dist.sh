@@ -57,6 +57,7 @@ cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/$MINORVERSION
 # Copy icons
 cp -P -Rf usr $STAGE
 cp -P -Rf $ICONS_PATH $ICONSTAGE
+for f in `find $ICONSTAGE -name *.png`; do mv $f `dirname $f`/`basename $f .png`-${customization}.png; done
 
 # Copy help
 cp -r $CLIENT_HELP_PATH/** $BINSTAGE/help
