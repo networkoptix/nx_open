@@ -580,8 +580,15 @@ void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildA
     Q_UNUSED(handle)
     m_lastRebuildReply = reply;
     ui->rebuildGroupBox->setEnabled(reply.state() != QnRebuildArchiveReply::Unknown);
+    bool wasInProgress = ui->stackedWidget->currentIndex() == ui->stackedWidget->indexOf(ui->rebuildProgressPage);
     bool inProgress = reply.state() == QnRebuildArchiveReply::Started;
     ui->rebuildProgressBar->setValue(reply.progress());
+
+    if (wasInProgress && !inProgress)
+        QMessageBox::information(this,
+                                 tr("Finished"),
+                                 tr("Rebuilding archive index is completed."));
+
     ui->stackedWidget->setCurrentIndex(inProgress 
         ? ui->stackedWidget->indexOf(ui->rebuildProgressPage)
         : ui->stackedWidget->indexOf(ui->rebuildPreparePage));
