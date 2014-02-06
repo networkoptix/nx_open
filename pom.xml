@@ -215,8 +215,9 @@
                 </property>
             </activation>
             <modules>
-                <module>common</module>
+                <module>build_variables</module>
                 <module>appserver</module>
+                <module>common</module>
                 <!--<module>plugins/axiscamplugin</module>-->
                 <module>plugins/genericrtspplugin</module>
                 <module>plugins/image_library_plugin</module>
@@ -464,29 +465,5 @@
                 <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>    
             </properties>       
         </profile>	        
-        <profile>
-            <id>lite-digitalwatchdog-client</id>
-            <activation>
-                <property>
-                    <name>customization</name>
-                    <value>digitalwatchdog</value>
-                </property>
-            </activation>
-            <modules>
-                <module>client/client_lite</module>
-            </modules>
-        </profile>     
-        <profile>
-            <id>lite-nutech-client</id>
-            <activation>
-                <property>
-                    <name>customization</name>
-                    <value>nutech</value>
-                </property>
-            </activation>
-            <modules>
-                <module>client/client_lite</module>
-            </modules>
-        </profile>          
     </profiles>	
 </project>
