@@ -29,7 +29,7 @@ CLIENT_IMAGEFORMATS_PATH=$CLIENT_BIN_PATH/imageformats
 CLIENT_VOX_PATH=$CLIENT_BIN_PATH/vox
 CLIENT_PLATFORMS_PATH=$CLIENT_BIN_PATH/platforms
 CLIENT_BG_PATH=${libdir}/backgrounds
-CLIENT_HELP_PATH=${libdir}/help
+CLIENT_HELP_PATH=${environment.dir}/help/${release.version}/${customization}
 ICONS_PATH=${customization.dir}/icons/hicolor
 CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 
@@ -39,6 +39,7 @@ CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 rm -rf $STAGEBASE
 mkdir -p $BINSTAGE/$MINORVERSION/styles
 mkdir -p $BINSTAGE/$MINORVERSION/imageformats
+mkdir -p $BINSTAGE/help
 mkdir -p $LIBSTAGE
 mkdir -p $BGSTAGE
 mkdir -p $ICONSTAGE
@@ -54,7 +55,7 @@ cp -P -Rf usr $STAGE
 cp -P -Rf $ICONS_PATH $ICONSTAGE
 
 # Copy help
-cp -r $CLIENT_HELP_PATH $BINSTAGE
+cp -r $CLIENT_HELP_PATH/** $BINSTAGE/help
 
 # Copy backgrounds
 cp -r $CLIENT_BG_PATH/* $BGSTAGE
