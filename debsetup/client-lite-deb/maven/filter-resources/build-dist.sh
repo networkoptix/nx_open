@@ -4,12 +4,12 @@ COMPANY_NAME=${deb.customization.company.name}
 FULL_COMPANY_NAME="${company.name}"
 FULL_PRODUCT_NAME="${company.name} ${product.name} Client.conf"
 
-PACKAGENAME=$COMPANY_NAME-client
+PACKAGENAME=$COMPANY_NAME-client-lite
 VERSION=${release.version}
 MINORVERSION=${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 ARCHITECTURE=${os.arch}
 
-TARGET=/opt/$COMPANY_NAME/client
+TARGET=/opt/$COMPANY_NAME/client-lite
 USRTARGET=/usr
 BINTARGET=$TARGET/bin
 BGTARGET=$TARGET/share/pictures/sample-backgrounds
@@ -41,6 +41,7 @@ CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 rm -rf $STAGEBASE
 mkdir -p $BINSTAGE/$MINORVERSION/styles
 mkdir -p $BINSTAGE/$MINORVERSION/imageformats
+mkdir -p $BINSTAGE/help
 mkdir -p $LIBSTAGE
 mkdir -p $BGSTAGE
 mkdir -p $ICONSTAGE
@@ -58,7 +59,7 @@ cp -P -Rf usr $STAGE
 cp -P -Rf $ICONS_PATH $ICONSTAGE
 
 # Copy help
-cp -r $CLIENT_HELP_PATH $BINSTAGE
+cp -r $CLIENT_HELP_PATH/** $BINSTAGE/help
 
 # Copy backgrounds
 cp -r $CLIENT_BG_PATH/* $BGSTAGE
