@@ -37,6 +37,9 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     ui->timeModeComboBox->addItem(tr("Server Time"), Qn::ServerTimeMode);
     ui->timeModeComboBox->addItem(tr("Client Time"), Qn::ClientTimeMode);
 
+    ui->skinComboBox->addItem(tr("Dark"), Qn::DarkSkin);
+    ui->skinComboBox->addItem(tr("Light"), Qn::LightSkin);
+
     if(!this->context()->instance<QnWorkbenchAutoStarter>()->isSupported()) {
         ui->autoStartCheckBox->hide();
         ui->autoStartLabel->hide();
@@ -157,7 +160,6 @@ bool QnGeneralPreferencesWidget::confirm() {
             break;
         default:
             break;
-
         }
     }
 
