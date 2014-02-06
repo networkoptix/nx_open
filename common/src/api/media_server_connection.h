@@ -216,6 +216,9 @@ public:
      */
     int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);
 
+    int uploadUpdateAsync(const QString &fileName, QObject *target, const char *slot);
+    int updateAsync(const QString &updateId, QObject *target, const char *slot);
+
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
 
