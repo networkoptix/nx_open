@@ -41,6 +41,7 @@ private slots:
     void at_timer();
     void at_connectionOpened();
 private:
+    void updateDisabledVendorsIfNeeded();
     void initTcpListener();
     QHostAddress getPublicAddress();
 private:

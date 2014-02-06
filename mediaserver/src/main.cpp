@@ -674,6 +674,20 @@ void QnMain::stopObjects()
 
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 
+void QnMain::updateDisabledVendorsIfNeeded()
+{
+    static const QString DV_PROPERTY = QLatin1String("disabledVendors");
+
+    QString disabledVendors = MSSettings::roSettings()->value(DV_PROPERTY).toString();
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+    if (admin->hasProperty(DV_PROPERTY)) {
+        MSSettings::roSettings()->setValue(DV_PROPERTY, admin->getProperty(DV_PROPERTY));
+    } else {
+        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+        appServerConnection->saveSync(admin->getId(), QnKvPair(DV_PROPERTY, disabledVendors));
+    }
+}
+
 void QnMain::loadResourcesFromECS()
 {
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
@@ -755,6 +769,13 @@ void QnMain::loadResourcesFromECS()
 
     foreach(const QnUserResourcePtr &user, users)
         qnResPool->addResource(user);
+
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+    QnKvPairList adminKvPairs;
+    appServerConnection->getKvPairs(adminKvPairs, admin);
+    foreach(const QnKvPair& kvPair, adminKvPairs) {
+        admin->setProperty(kvPair.name(), kvPair.value());
+    }
 
     //loading business rules
     QnBusinessEventRuleList rules;
@@ -1035,7 +1056,6 @@ void QnMain::run()
         QnSleep::msleep(1000);
     }
 
-
     while (!needToStop() && !initLicenses(appServerConnection))
     {
         QnSleep::msleep(1000);
@@ -1162,6 +1182,9 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
 
 
+    loadResourcesFromECS();
+    updateDisabledVendorsIfNeeded();
+
     QString disabledVendors = MSSettings::roSettings()->value("disabledVendors").toString();
     QStringList disabledVendorList;
     if (disabledVendors.contains(";"))
@@ -1237,8 +1260,6 @@ void QnMain::run()
 
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
-
-    loadResourcesFromECS();
 
     connect(QnServerMessageProcessor::instance(), SIGNAL(connectionReset()), this, SLOT(loadResourcesFromECS()));
 
