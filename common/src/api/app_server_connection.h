@@ -48,7 +48,7 @@ signals:
     void finished(int status, const QStringList &reply, int handle);
 
 private:
-    friend class QnAbstractReplyProcessor;
+    friend class QnAbstractRepqlyProcessor;
 
     QnResourceFactory &m_resourceFactory;
     QnApiSerializer &m_serializer;
@@ -67,7 +67,7 @@ public:
     // Synchronous API
     int connect(QnConnectionInfoPtr& connectInfo);
     int getResourceTypes(QnResourceTypeList& resourceTypes);
-    int getResources(QnResourceList& resources);
+    //int getResources(QnResourceList& resources);
     int getResource(const QnId& id, QnResourcePtr& resource);
     int getBusinessRules(QnBusinessEventRuleList &businessRules);
 
@@ -112,7 +112,7 @@ public:
      * @param slot                          SLOT(int status, const QByteArray& data, int handle)
      * @return                              Handle of the request
      */
-    int requestStoredFileAsync(const QString &filename, QObject *target, const char *slot);
+    //int requestStoredFileAsync(const QString &filename, QObject *target, const char *slot);
 
     /**
      * @brief addStoredFileAsync            Put new file to EC
@@ -122,7 +122,7 @@ public:
      * @param slot                          SLOT(int status, int handle)
      * @return                              Handle of the request
      */
-    int addStoredFileAsync(const QString &filename, const QByteArray &data, QObject *target, const char *slot);
+    //int addStoredFileAsync(const QString &filename, const QByteArray &data, QObject *target, const char *slot);
 
     /**
      * @brief deleteStoredFileAsync         Delete stored file from EC
@@ -131,7 +131,7 @@ public:
      * @param slot                          SLOT(int status, int handle)
      * @return                              Handle of the request
      */
-    int deleteStoredFileAsync(const QString &filename, QObject *target, const char *slot);
+    //int deleteStoredFileAsync(const QString &filename, QObject *target, const char *slot);
 
     /**
      * @brief requestDirectoryListingAsync  Get filenames for all stored files on EC in the selected directory
@@ -140,21 +140,21 @@ public:
      * @param slot                          SLOT(int status, const QStringList& filenames, int handle)
      * @return                              Handle of the request
      */
-    int requestDirectoryListingAsync(const QString &folderName, QObject *target, const char *slot);
+    //int requestDirectoryListingAsync(const QString &folderName, QObject *target, const char *slot);
 
-    int testConnectionAsync(QObject *target, const char *slot);
+    //int testConnectionAsync(QObject *target, const char *slot);
     int connectAsync(QObject *target, const char *slot);
-    int getLicensesAsync(QObject *target, const char *slot);
-    int getBusinessRulesAsync(QObject *target, const char *slot);
-    int getKvPairsAsync(const QnResourcePtr &resource, QObject *target, const char *slot);
-    int getAllKvPairsAsync(QObject *target, const char *slot);
-    int getSettingsAsync(QObject *target, const char *slot);
+    //int getLicensesAsync(QObject *target, const char *slot);
+    //int getBusinessRulesAsync(QObject *target, const char *slot);
+    //int getKvPairsAsync(const QnResourcePtr &resource, QObject *target, const char *slot);
+    //int getAllKvPairsAsync(QObject *target, const char *slot);
+    //int getSettingsAsync(QObject *target, const char *slot);
 
-    int setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot);
-    int setResourcesStatusAsync(const QnResourceList& resources, QObject *target, const char *slot);
+    //int setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot);
+    //int setResourcesStatusAsync(const QnResourceList& resources, QObject *target, const char *slot);
 
-    int dumpDatabaseAsync(QObject *target, const char *slot);
-    int restoreDatabaseAsync(const QByteArray &data, QObject *target, const char *slot);
+    //int dumpDatabaseAsync(QObject *target, const char *slot);
+    //int restoreDatabaseAsync(const QByteArray &data, QObject *target, const char *slot);
 
     int saveAsync(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
     int saveAsync(const QnVirtualCameraResourcePtr &resource, QObject *target, const char *slot);
@@ -166,7 +166,7 @@ public:
     int saveAsync(const QnVirtualCameraResourceList &cameras, QObject *target, const char *slot);
 
     int saveAsync(const QnResourcePtr &resource, QObject *target, const char *slot);
-    int addLicensesAsync(const QList<QnLicensePtr> &licenses, QObject *target, const char *slot);
+    //int addLicensesAsync(const QList<QnLicensePtr> &licenses, QObject *target, const char *slot);
 
     int saveAsync(int resourceId, const QnKvPairList &kvPairs, QObject *target = NULL, const char *slot = NULL);
     int saveSettingsAsync(const QnKvPairList& kvPairs, QObject* target, const char* slot);

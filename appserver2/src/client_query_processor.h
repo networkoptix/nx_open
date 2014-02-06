@@ -123,7 +123,8 @@ namespace ec2
                     return handler( ErrorCode::serverError, OutputData() );
             }
 
-            InputBinaryStream<QByteArray> inputStream( httpClient->response()->messageBody );
+            const QByteArray& msgBody = httpClient->fetchMessageBodyBuffer();
+            InputBinaryStream<QByteArray> inputStream( msgBody );
             OutputData outputData;
             if( !QnBinary::deserialize( outputData, &inputStream ) )
                 handler( ErrorCode::badResponse, outputData );

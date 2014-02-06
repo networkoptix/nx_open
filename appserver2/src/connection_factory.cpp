@@ -24,6 +24,7 @@ namespace ec2
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory()
     {
         qRegisterMetaType<ErrorCode>();
+        qRegisterMetaType<AbstractECConnectionPtr>();
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
@@ -154,7 +155,7 @@ namespace ec2
     {
         //TODO/IMPL
         connectionInfo->version = QnSoftwareVersion(lit(QN_APPLICATION_VERSION));
-        connectionInfo->brand = lit(QN_CUSTOMIZATION_NAME);
+        connectionInfo->brand = lit(QN_PRODUCT_NAME_SHORT);
         connectionInfo->ecsGuid = lit( "ECS_HUID" );
 
         return ErrorCode::ok;

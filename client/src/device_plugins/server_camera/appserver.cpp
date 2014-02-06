@@ -24,15 +24,14 @@ QString QnAppServerResourceSearcher::manufacture() const
 
 QnResourceList QnAppServerResourceSearcher::findResources()
 {
-
-    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+    ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection2Sync();
 
     QByteArray errorString;
     QnResourceList resources;
-
-    if (appServerConnection->getResources(resources) != 0)
+    ec2::ErrorCode errorCode = ec2::ErrorCode::ok;
+    if( (errorCode = appServerConnection->getResourceManager()->getResourcesSync(&resources)) != ec2::ErrorCode::ok)
     {
-        qWarning() << "QnAppServerResourceSearcher::findResources(): Can't get resources from appserver. Reason: " << appServerConnection->getLastError();
+        qWarning() << "QnAppServerResourceSearcher::findResources(): Can't get resources from appserver. Reason: " << ec2::toString(errorCode);
     } else
     {
         setShouldBeUsed(false);

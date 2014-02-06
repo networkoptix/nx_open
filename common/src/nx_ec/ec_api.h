@@ -37,13 +37,17 @@ namespace ec2
         }
         ErrorCode getResourceTypesSync( QnResourceTypeList* const resTypeList ) {
             using namespace std::placeholders;
-            return impl::doSyncCall<impl::GetResourceTypesHandler>( std::bind(std::mem_fn(&AbstractResourceManager::getResourceTypes), this, _1), resTypeList );
+            return impl::doSyncCall<impl::GetResourceTypesHandler>( std::bind(&AbstractResourceManager::getResourceTypes, this, _1), resTypeList );
         }
         /*!
             \param handler Functor with params: (ErrorCode, const QnResourceList&)
         */
         template<class TargetType, class HandlerType> int getResources( TargetType* target, HandlerType handler ) {
             return getResources( std::static_pointer_cast<impl::GetResourcesHandler>(std::make_shared<impl::CustomGetResourcesHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+        ErrorCode getResourcesSync( QnResourceList* resList ) {
+            using namespace std::placeholders;
+            return impl::doSyncCall<impl::GetResourcesHandler>( std::bind(&AbstractResourceManager::getResources, this, _1), resList );
         }
         /*!
             \param handler Functor with params: (ErrorCode, const QnResourcePtr&)
@@ -289,7 +293,7 @@ namespace ec2
             \param handler Functor with params: (ErrorCode, const QnBusinessEventRuleList&)
         */
         template<class TargetType, class HandlerType> int getBusinessRules( TargetType* target, HandlerType handler ) {
-            return getBusinessRules( std::static_pointer_cast<impl::GetBusinessRules>(std::make_shared<impl::CustomGetBusinessRules<TargetType, HandlerType>>(target, handler)) );
+            return getBusinessRules( std::static_pointer_cast<impl::GetBusinessRulesHandler>(std::make_shared<impl::CustomGetBusinessRulesHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         ErrorCode getBusinessRulesSync(QnBusinessEventRuleList* const businessEventList ) {
@@ -456,25 +460,25 @@ namespace ec2
             \param handler Functor with params: (ErrorCode, const QByteArray&)
         */
         template<class TargetType, class HandlerType> int getStoredFile( const QString& filename, TargetType* target, HandlerType handler ) {
-            return getStoredFile( filename, std::static_pointer_cast<impl::GetStoredFileHandler>(std::make_shared<impl::impl::CustomGetStoredFileHandler<TargetType, HandlerType>>(target, handler)) );
+            return getStoredFile( filename, std::static_pointer_cast<impl::GetStoredFileHandler>(std::make_shared<impl::CustomGetStoredFileHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int addStoredFile( const QString& filename, const QByteArray& data, TargetType* target, HandlerType handler ) {
-            return addStoredFile( filename, data, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return addStoredFile( filename, data, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int deleteStoredFile( const QString& filename, TargetType* target, HandlerType handler ) {
-            return deleteStoredFile( filename, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return deleteStoredFile( filename, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode, const QStringList& filenames)
         */
         template<class TargetType, class HandlerType> int listDirectory( const QString& folderName, TargetType* target, HandlerType handler ) {
-            return listDirectory( folderName, std::static_pointer_cast<impl::ListDirectoryHandler>(std::make_shared<impl::impl::CustomListDirectoryHandler<TargetType, HandlerType>>(target, handler)) );
+            return listDirectory( folderName, std::static_pointer_cast<impl::ListDirectoryHandler>(std::make_shared<impl::CustomListDirectoryHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
     protected:
@@ -508,7 +512,7 @@ namespace ec2
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int setPanicMode( Qn::PanicMode value, TargetType* target, HandlerType handler ) {
-            return setPanicMode( value, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return setPanicMode( value, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         ErrorCode setPanicModeSync(Qn::PanicMode value) {
             using namespace std::placeholders;
@@ -519,7 +523,7 @@ namespace ec2
             \param handler Functor with params: (ErrorCode, qint64)
         */
         template<class TargetType, class HandlerType> int getCurrentTime( TargetType* target, HandlerType handler ) {
-            return getCurrentTime( std::static_pointer_cast<impl::CurrentTimeHandler>(std::make_shared<impl::impl::CustomCurrentTimeHandler<TargetType, HandlerType>>(target, handler)) );
+            return getCurrentTime( std::static_pointer_cast<impl::CurrentTimeHandler>(std::make_shared<impl::CustomCurrentTimeHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         ErrorCode getCurrentTimeSync(qint64* const time) {
@@ -531,26 +535,26 @@ namespace ec2
             \param handler Functor with params: (ErrorCode, QByteArray dbFile)
         */
         template<class TargetType, class HandlerType> int dumpDatabaseAsync( TargetType* target, HandlerType handler ) {
-            return dumpDatabaseAsync( std::static_pointer_cast<impl::DumpDatabaseHandler>(std::make_shared<impl::impl::CustomDumpDatabaseHandler<TargetType, HandlerType>>(target, handler)) );
+            return dumpDatabaseAsync( std::static_pointer_cast<impl::DumpDatabaseHandler>(std::make_shared<impl::CustomDumpDatabaseHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int restoreDatabaseAsync( const QByteArray& dbFile, TargetType* target, HandlerType handler ) {
-            return restoreDatabaseAsync( dbFile, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return restoreDatabaseAsync( dbFile, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode, const QnKvPairList&)
             \return Request id
         */
         template<class TargetType, class HandlerType> int getSettingsAsync( TargetType* target, HandlerType handler ) {
-            return getSettingsAsync( std::static_pointer_cast<impl::GetSettingsHandler>(std::make_shared<impl::impl::CustomGetSettingsHandler<TargetType, HandlerType>>(target, handler)) );
+            return getSettingsAsync( std::static_pointer_cast<impl::GetSettingsHandler>(std::make_shared<impl::CustomGetSettingsHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int saveSettingsAsync( const QnKvPairList& kvPairs ) {
-            return saveSettingsAsync( kvPairs, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        template<class TargetType, class HandlerType> int saveSettingsAsync( const QnKvPairList& kvPairs, TargetType* target, HandlerType handler ) {
+            return saveSettingsAsync( kvPairs, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         //!Cancel running async request

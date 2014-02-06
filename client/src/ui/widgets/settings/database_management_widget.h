@@ -15,30 +15,6 @@ namespace Ui {
     class DatabaseManagementWidget;
 }
 
-// TODO: #Elric #qt5 replace with proper functor
-class QnDatabaseManagementWidgetReplyProcessor: public QObject {
-    Q_OBJECT
-public:
-    QnDatabaseManagementWidgetReplyProcessor(QObject *parent = NULL): QObject(parent), handle(-1) {}
-
-    QnHTTPRawResponse response;
-    int handle;
-
-signals:
-    void activated();
-    void activated(const QnHTTPRawResponse &response, int handle);
-
-public slots:
-    void activate(const QnHTTPRawResponse &response, int handle) {
-        this->response = response;
-        this->handle = handle;
-
-        emit activated();
-        emit activated(response, handle);
-    }
-};
-
-
 class QnDatabaseManagementWidget: public Connective<QWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
 

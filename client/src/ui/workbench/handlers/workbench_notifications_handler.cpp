@@ -48,7 +48,8 @@ void QnWorkbenchNotificationsHandler::clear() {
 
 void QnWorkbenchNotificationsHandler::requestSmtpSettings() {
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)
-        QnAppServerConnectionFactory::createConnection()->getSettingsAsync(this, SLOT(updateSmtpSettings(int,QnKvPairList,int)));
+        QnAppServerConnectionFactory::createConnection2Sync()->getSettingsAsync(
+            this, &QnWorkbenchNotificationsHandler::updateSmtpSettings );
 }
 
 void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -122,9 +123,9 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     return false;
 }
 
-void QnWorkbenchNotificationsHandler::updateSmtpSettings(int status, const QnKvPairList &settings, int handle) {
+void QnWorkbenchNotificationsHandler::updateSmtpSettings( int handle, ec2::ErrorCode errorCode, const QnKvPairList &settings ) {
     Q_UNUSED(handle)
-    if (status != 0)
+    if (errorCode != ec2::ErrorCode::ok)
         return;
 
     QnEmail::Settings email(settings);

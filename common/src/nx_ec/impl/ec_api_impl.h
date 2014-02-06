@@ -278,6 +278,7 @@ namespace ec2
     }
 
     Q_DECLARE_METATYPE( ErrorCode );
+    Q_DECLARE_METATYPE( AbstractECConnectionPtr );
     Q_ENUMS( ErrorCode );
 }
 

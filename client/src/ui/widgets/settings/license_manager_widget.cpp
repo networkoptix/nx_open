@@ -205,8 +205,11 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
     }
 
     if (!licensesToUpdate.isEmpty()) {
-        QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection();
-        int handle = connection->addLicensesAsync(licensesToUpdate, this, SLOT(at_licensesReceived(int,QnLicenseList,int)));
+        auto addLisencesHandler = [this, licensesToUpdate]( int reqID, ec2::ErrorCode errorCode ){
+            at_licensesReceived( reqID, errorCode, licensesToUpdate );
+        };
+        int handle = QnAppServerConnectionFactory::createConnection2Sync()->getLicenseManager()->addLicenses(
+            licensesToUpdate, this, addLisencesHandler );
         m_handleKeyMap[handle] = licenseKey;
     }
 
@@ -245,7 +248,7 @@ void QnLicenseManagerWidget::updateDetailsButtonEnabled() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnLicenseManagerWidget::at_licensesReceived(int status, QnLicenseList licenses, int handle)
+void QnLicenseManagerWidget::at_licensesReceived(int handle, ec2::ErrorCode errorCode, QnLicenseList licenses)
 {
     if (!m_handleKeyMap.contains(handle))
         return;
@@ -257,7 +260,7 @@ void QnLicenseManagerWidget::at_licensesReceived(int status, QnLicenseList licen
     QnLicensePtr license = licenseListHelper.getLicenseByKey(licenseKey);
         
     QString message;
-    if (!license || status)
+    if (!license || (errorCode != ec2::ErrorCode::ok))
         message = tr("There was a problem activating your license.");
     else if (license)
         message = tr("License was successfully activated.");

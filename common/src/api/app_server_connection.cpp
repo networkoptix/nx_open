@@ -387,13 +387,13 @@ int QnAppServerConnection::connectAsync_i(const QnRequestHeaderList &headers, co
     return sendAsyncGetRequest(ConnectObject, headers, params, QN_STRINGIZE_TYPE(QnConnectionInfoPtr), target, slot);
 }
 
-int QnAppServerConnection::testConnectionAsync(QObject *target, const char *slot)
-{
-    QnRequestParamList params(m_requestParams);
-    params.append(QnRequestParam("ping", "1"));
-
-    return connectAsync_i(m_requestHeaders, params, target, slot);
-}
+//int QnAppServerConnection::testConnectionAsync(QObject *target, const char *slot)
+//{
+//    QnRequestParamList params(m_requestParams);
+//    params.append(QnRequestParam("ping", "1"));
+//
+//    return connectAsync_i(m_requestHeaders, params, target, slot);
+//}
 
 int QnAppServerConnection::connectAsync(QObject *target, const char *slot)
 {
@@ -410,10 +410,10 @@ int QnAppServerConnection::getResourceTypes(QnResourceTypeList &resourceTypes)
     return sendSyncGetRequest(ResourceTypeObject, m_requestHeaders, m_requestParams, &resourceTypes);
 }
 
-int QnAppServerConnection::getResources(QnResourceList &resources)
-{
-    return sendSyncGetRequest(ResourceObject, m_requestHeaders, m_requestParams, &resources);
-}
+//int QnAppServerConnection::getResources(QnResourceList &resources)
+//{
+//    return sendSyncGetRequest(ResourceObject, m_requestHeaders, m_requestParams, &resources);
+//}
 
 int QnAppServerConnection::getResource(const QnId &id, QnResourcePtr &resource)
 {
@@ -467,13 +467,13 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr &resource, QObject *tar
     return 0;
 }
 
-int QnAppServerConnection::addLicensesAsync(const QList<QnLicensePtr> &licenses, QObject *target, const char *slot)
-{
-    QByteArray data;
-    m_serializer.serializeLicenses(licenses, data);
-
-    return addObjectAsync(LicenseObject, data, QN_STRINGIZE_TYPE(QnLicenseList), target, slot);
-}
+//int QnAppServerConnection::addLicensesAsync(const QList<QnLicensePtr> &licenses, QObject *target, const char *slot)
+//{
+//    QByteArray data;
+//    m_serializer.serializeLicenses(licenses, data);
+//
+//    return addObjectAsync(LicenseObject, data, QN_STRINGIZE_TYPE(QnLicenseList), target, slot);
+//}
 
 int QnAppServerConnection::saveAsync(int resourceId, const QnKvPairList &kvPairs, QObject *target, const char *slot)
 {
@@ -491,32 +491,32 @@ int QnAppServerConnection::saveSettingsAsync(const QnKvPairList &kvPairs, QObjec
     return addObjectAsync(SettingObject, data, QN_STRINGIZE_TYPE(QnKvPairList), target, slot);
 }
 
-int QnAppServerConnection::getLicensesAsync(QObject *target, const char *slot)
-{
-    return sendAsyncGetRequest(LicenseObject, m_requestParams, QN_STRINGIZE_TYPE(QnLicenseList), target, slot);
-}
+//int QnAppServerConnection::getLicensesAsync(QObject *target, const char *slot)
+//{
+//    return sendAsyncGetRequest(LicenseObject, m_requestParams, QN_STRINGIZE_TYPE(QnLicenseList), target, slot);
+//}
 
-int QnAppServerConnection::getBusinessRulesAsync(QObject *target, const char *slot)
-{
-    return sendAsyncGetRequest(BusinessRuleObject, m_requestParams, QN_STRINGIZE_TYPE(QnBusinessEventRuleList), target, slot);
-}
+//int QnAppServerConnection::getBusinessRulesAsync(QObject *target, const char *slot)
+//{
+//    return sendAsyncGetRequest(BusinessRuleObject, m_requestParams, QN_STRINGIZE_TYPE(QnBusinessEventRuleList), target, slot);
+//}
 
-int QnAppServerConnection::getKvPairsAsync(const QnResourcePtr &resource, QObject *target, const char *slot)
-{
-    QnRequestParamList params(m_requestParams);
-    params.append(QnRequestParam("resource_id", resource->getId().toString()));
-    return sendAsyncGetRequest(KvPairObject, params, QN_STRINGIZE_TYPE(QnKvPairListsById), target, slot);
-}
-
-int QnAppServerConnection::getAllKvPairsAsync(QObject *target, const char *slot)
-{
-    return sendAsyncGetRequest(KvPairObject, m_requestParams, QN_STRINGIZE_TYPE(QnKvPairListsById), target, slot);
-}
-
-int QnAppServerConnection::getSettingsAsync(QObject *target, const char *slot)
-{
-    return sendAsyncGetRequest(SettingObject, m_requestParams, QN_STRINGIZE_TYPE(QnKvPairList), target, slot);
-}
+//int QnAppServerConnection::getKvPairsAsync(const QnResourcePtr &resource, QObject *target, const char *slot)
+//{
+//    QnRequestParamList params(m_requestParams);
+//    params.append(QnRequestParam("resource_id", resource->getId().toString()));
+//    return sendAsyncGetRequest(KvPairObject, params, QN_STRINGIZE_TYPE(QnKvPairListsById), target, slot);
+//}
+//
+//int QnAppServerConnection::getAllKvPairsAsync(QObject *target, const char *slot)
+//{
+//    return sendAsyncGetRequest(KvPairObject, m_requestParams, QN_STRINGIZE_TYPE(QnKvPairListsById), target, slot);
+//}
+//
+//int QnAppServerConnection::getSettingsAsync(QObject *target, const char *slot)
+//{
+//    return sendAsyncGetRequest(SettingObject, m_requestParams, QN_STRINGIZE_TYPE(QnKvPairList), target, slot);
+//}
 
 int QnAppServerConnection::saveAsync(const QnUserResourcePtr &userPtr, QObject *target, const char *slot)
 {
@@ -738,101 +738,101 @@ int QnAppServerConnection::sendEmailAsync(const QStringList &to, const QString& 
     return addObjectAsync(EmailObject, data, QN_STRINGIZE_TYPE(bool), target, slot);
 }
 
-int QnAppServerConnection::requestStoredFileAsync(const QString &filename, QObject *target, const char *slot)
-{
-    QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, GetFileObject);
-    QObject::connect(processor, SIGNAL(finished(int, const QByteArray &, int)), target, slot);
+//int QnAppServerConnection::requestStoredFileAsync(const QString &filename, QObject *target, const char *slot)
+//{
+//    QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, GetFileObject);
+//    QObject::connect(processor, SIGNAL(finished(int, const QByteArray &, int)), target, slot);
+//
+//    return QnSessionManager::instance()->sendAsyncGetRequest(url(),
+//                                                             nameMapper()->name(GetFileObject) + QLatin1String("/") + filename,
+//                                                             m_requestHeaders,
+//                                                             m_requestParams,
+//                                                             processor,
+//                                                             "processReply");
+//}
 
-    return QnSessionManager::instance()->sendAsyncGetRequest(url(),
-                                                             nameMapper()->name(GetFileObject) + QLatin1String("/") + filename,
-                                                             m_requestHeaders,
-                                                             m_requestParams,
-                                                             processor,
-                                                             "processReply");
-}
+//int QnAppServerConnection::addStoredFileAsync(const QString &filename, const QByteArray &filedata, QObject *target, const char *slot)
+//{
+//    QnRequestHeaderList requestHeaders(m_requestHeaders);
+//
+//    QByteArray bound("------------------------------0d5e4fc23bba");
+//
+//    QByteArray data("--" + bound);
+//    data += "\r\n";
+//    data += "Content-Disposition: form-data; name=\"filedata\"; filename=\"" + filename.toLatin1() + "\"\r\n";
+//    data += "Content-Type: application/octet-stream\r\n\r\n";
+//    data += filedata;
+//    data += "\r\n";
+//    data += "--" + bound + "--";
+//    data += "\r\n";
+//
+//    requestHeaders.append(QnRequestHeader(QLatin1String("Content-Type"), QLatin1String("multipart/form-data; boundary=" + bound)));
+//    requestHeaders.append(QnRequestHeader(QLatin1String("Content-Length"), QString::number(data.length())));
+//
+//    QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, PutFileObject);
+//    QObject::connect(processor, SIGNAL(finished(int, int)), target, slot);
+//
+//    return QnSessionManager::instance()->sendAsyncPostRequest(url(),
+//                                                              nameMapper()->name(PutFileObject),
+//                                                              requestHeaders,
+//                                                              m_requestParams,
+//                                                              data,
+//                                                              processor,
+//                                                              "processReply");
+//}
 
-int QnAppServerConnection::addStoredFileAsync(const QString &filename, const QByteArray &filedata, QObject *target, const char *slot)
-{
-    QnRequestHeaderList requestHeaders(m_requestHeaders);
+//int QnAppServerConnection::deleteStoredFileAsync(const QString &filename, QObject *target, const char *slot)
+//{
+//    QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, DeleteFileObject);
+//    QObject::connect(processor, SIGNAL(finished(int, int)), target, slot);
+//
+//    return QnSessionManager::instance()->sendAsyncDeleteRequest(url(),
+//                                                                nameMapper()->name(DeleteFileObject) + QLatin1String("/") + filename,
+//                                                                m_requestHeaders,
+//                                                                m_requestParams,
+//                                                                processor,
+//                                                                "processReply");
+//}
 
-    QByteArray bound("------------------------------0d5e4fc23bba");
+//int QnAppServerConnection::requestDirectoryListingAsync(const QString &folderName, QObject *target, const char *slot) {
+//    QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, ListDirObject);
+//    QObject::connect(processor, SIGNAL(finished(int, const QStringList &, int)), target, slot);
+//
+//    return QnSessionManager::instance()->sendAsyncGetRequest(url(),
+//                                                             nameMapper()->name(ListDirObject) + QLatin1String("/") + folderName,
+//                                                             m_requestHeaders,
+//                                                             m_requestParams,
+//                                                             processor,
+//                                                             "processReply");
+//}
 
-    QByteArray data("--" + bound);
-    data += "\r\n";
-    data += "Content-Disposition: form-data; name=\"filedata\"; filename=\"" + filename.toLatin1() + "\"\r\n";
-    data += "Content-Type: application/octet-stream\r\n\r\n";
-    data += filedata;
-    data += "\r\n";
-    data += "--" + bound + "--";
-    data += "\r\n";
-
-    requestHeaders.append(QnRequestHeader(QLatin1String("Content-Type"), QLatin1String("multipart/form-data; boundary=" + bound)));
-    requestHeaders.append(QnRequestHeader(QLatin1String("Content-Length"), QString::number(data.length())));
-
-    QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, PutFileObject);
-    QObject::connect(processor, SIGNAL(finished(int, int)), target, slot);
-
-    return QnSessionManager::instance()->sendAsyncPostRequest(url(),
-                                                              nameMapper()->name(PutFileObject),
-                                                              requestHeaders,
-                                                              m_requestParams,
-                                                              data,
-                                                              processor,
-                                                              "processReply");
-}
-
-int QnAppServerConnection::deleteStoredFileAsync(const QString &filename, QObject *target, const char *slot)
-{
-    QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, DeleteFileObject);
-    QObject::connect(processor, SIGNAL(finished(int, int)), target, slot);
-
-    return QnSessionManager::instance()->sendAsyncDeleteRequest(url(),
-                                                                nameMapper()->name(DeleteFileObject) + QLatin1String("/") + filename,
-                                                                m_requestHeaders,
-                                                                m_requestParams,
-                                                                processor,
-                                                                "processReply");
-}
-
-int QnAppServerConnection::requestDirectoryListingAsync(const QString &folderName, QObject *target, const char *slot) {
-    QnAppServerReplyProcessor* processor = new QnAppServerReplyProcessor(m_resourceFactory, m_serializer, ListDirObject);
-    QObject::connect(processor, SIGNAL(finished(int, const QStringList &, int)), target, slot);
-
-    return QnSessionManager::instance()->sendAsyncGetRequest(url(),
-                                                             nameMapper()->name(ListDirObject) + QLatin1String("/") + folderName,
-                                                             m_requestHeaders,
-                                                             m_requestParams,
-                                                             processor,
-                                                             "processReply");
-}
-
-int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)
-{
-    QnRequestHeaderList requestHeaders(m_requestHeaders);
-    QnRequestParamList requestParams(m_requestParams);
-
-    requestParams.append(QnRequestParam("id", resourceId.toString()));
-    requestParams.append(QnRequestParam("status", QString::number(status)));
-
-    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(StatusObject), requestHeaders, requestParams, "", target, slot);
-}
-
-int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resources, QObject *target, const char *slot)
-{
-    QnRequestHeaderList requestHeaders(m_requestHeaders);
-    QnRequestParamList requestParams(m_requestParams);
-
-    int n = 1;
-    foreach (const QnResourcePtr resource, resources)
-    {
-        requestParams.append(QnRequestParam(QString(QLatin1String("id%1")).arg(n), resource->getId().toString()));
-        requestParams.append(QnRequestParam(QString(QLatin1String("status%1")).arg(n), QString::number(resource->getStatus())));
-
-        n++;
-    }
-
-    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(StatusObject), requestHeaders, requestParams, "", target, slot);
-}
+//int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)
+//{
+//    QnRequestHeaderList requestHeaders(m_requestHeaders);
+//    QnRequestParamList requestParams(m_requestParams);
+//
+//    requestParams.append(QnRequestParam("id", resourceId.toString()));
+//    requestParams.append(QnRequestParam("status", QString::number(status)));
+//
+//    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(StatusObject), requestHeaders, requestParams, "", target, slot);
+//}
+//
+//int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resources, QObject *target, const char *slot)
+//{
+//    QnRequestHeaderList requestHeaders(m_requestHeaders);
+//    QnRequestParamList requestParams(m_requestParams);
+//
+//    int n = 1;
+//    foreach (const QnResourcePtr resource, resources)
+//    {
+//        requestParams.append(QnRequestParam(QString(QLatin1String("id%1")).arg(n), resource->getId().toString()));
+//        requestParams.append(QnRequestParam(QString(QLatin1String("status%1")).arg(n), QString::number(resource->getStatus())));
+//
+//        n++;
+//    }
+//
+//    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(StatusObject), requestHeaders, requestParams, "", target, slot);
+//}
 
 int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource::Status status)
 {
@@ -862,13 +862,13 @@ void QnAppServerConnection::disconnectSync() {
     QnSessionManager::instance()->sendSyncPostRequest(url(), nameMapper()->name(DisconnectObject), m_requestHeaders, m_requestParams, "", response);
 }
 
-int QnAppServerConnection::dumpDatabaseAsync(QObject *target, const char *slot) {
-    return QnSessionManager::instance()->sendAsyncGetRequest(url(), nameMapper()->name(DumpDbObject), m_requestHeaders, m_requestParams, target, slot);
-}
-
-int QnAppServerConnection::restoreDatabaseAsync(const QByteArray &data, QObject *target, const char *slot) {
-    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(RestoreDbObject), m_requestHeaders, m_requestParams, data, target, slot);
-}
+//int QnAppServerConnection::dumpDatabaseAsync(QObject *target, const char *slot) {
+//    return QnSessionManager::instance()->sendAsyncGetRequest(url(), nameMapper()->name(DumpDbObject), m_requestHeaders, m_requestParams, target, slot);
+//}
+//
+//int QnAppServerConnection::restoreDatabaseAsync(const QByteArray &data, QObject *target, const char *slot) {
+//    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(RestoreDbObject), m_requestHeaders, m_requestParams, data, target, slot);
+//}
 
 int QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActionPtr &businessAction, QObject *target, const char *slot)
 {

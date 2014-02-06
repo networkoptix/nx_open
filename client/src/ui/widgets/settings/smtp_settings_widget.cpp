@@ -94,15 +94,21 @@ QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
 void QnSmtpSettingsWidget::updateFromSettings() {
     m_settingsReceived = false;
 
-    m_requestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
-                this, SLOT(at_settings_received(int, const QnKvPairList&, int)));
+    m_requestHandle = QnAppServerConnectionFactory::createConnection2Sync()->getSettingsAsync(
+        this, &QnSmtpSettingsWidget::at_settings_received );
 }
 
 void QnSmtpSettingsWidget::submitToSettings() {
     QnEmail::Settings result = settings();
-    QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(result.serialized(),
-                                                                        context()->instance<QnWorkbenchNotificationsHandler>(),
-                                                                        SLOT(updateSmtpSettings(int, const QnKvPairList&, int)));
+    QnWorkbenchNotificationsHandler* notificationsHandler = context()->instance<QnWorkbenchNotificationsHandler>();
+    QnKvPairList serializedSettings = result.serialized();
+    auto saveSettingsHandler = [notificationsHandler, serializedSettings]( int reqID, ec2::ErrorCode errorCode ){
+        notificationsHandler->updateSmtpSettings( reqID, errorCode, serializedSettings );
+    };
+    QnAppServerConnectionFactory::createConnection2Sync()->saveSettingsAsync(
+        serializedSettings,
+        notificationsHandler,
+        saveSettingsHandler );
 }
 
 void QnSmtpSettingsWidget::updateFocusedElement() {
@@ -316,14 +322,14 @@ void QnSmtpSettingsWidget::at_okTestButton_clicked() {
                                        : SimplePage);
 }
 
-void QnSmtpSettingsWidget::at_settings_received(int status, const QnKvPairList &values, int handle) {
+void QnSmtpSettingsWidget::at_settings_received( int handle, ec2::ErrorCode errorCode, const QnKvPairList& values ) {
     if (handle != m_requestHandle)
         return;
 
     m_requestHandle = -1;
-    context()->instance<QnWorkbenchNotificationsHandler>()->updateSmtpSettings(status, values, handle);
+    context()->instance<QnWorkbenchNotificationsHandler>()->updateSmtpSettings(handle, errorCode, values);
 
-    bool success = (status == 0);
+    bool success = (errorCode == ec2::ErrorCode::ok);
     if(!success) {
         QMessageBox::critical(this, tr("Error"), tr("Could not read settings from Enterprise Controller."));
         m_settingsReceived = true;
