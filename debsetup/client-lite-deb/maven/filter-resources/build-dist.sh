@@ -1,10 +1,8 @@
 #!/bin/bash
 
 COMPANY_NAME=${deb.customization.company.name}
-FULL_COMPANY_NAME=$(printf %q "${company.name}")
-FULL_PRODUCT_NAME=$FULL_COMPANY_NAME$(printf %q " ${product.name} Client.conf")
-
-echo $FULL_PRODUCT_NAME
+FULL_COMPANY_NAME="${company.name}"
+FULL_PRODUCT_NAME="${company.name} ${product.name} Client.conf"
 
 PACKAGENAME=$COMPANY_NAME-client
 VERSION=${release.version}
@@ -47,7 +45,7 @@ mkdir -p $LIBSTAGE
 mkdir -p $BGSTAGE
 mkdir -p $ICONSTAGE
 mkdir -p "$STAGE/etc/xdg/${company.name}"
-mv -f debian/client.conf $STAGE/etc/xdg/$FULL_COMPANY_NAME/$FULL_PRODUCT_NAME
+mv -f debian/client.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_PRODUCT_NAME"
 
 # Copy client binary, x264, old version libs
 cp -r $CLIENT_BIN_PATH/client $BINSTAGE/$MINORVERSION/client-bin
