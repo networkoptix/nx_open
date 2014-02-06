@@ -307,7 +307,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool skipMediaFolderScan = false;
     bool noFullScreen = false;
     bool noVersionMismatchCheck = false;
-    int lightMode = 0;
+    QString lightMode;
     bool noVSync = false;
 
     QnCommandLineParser commandLineParser;
@@ -339,7 +339,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnSettings->setDevMode(true);
     }
 
-    qnSettings->setLightMode(lightMode);
+    if (!lightMode.isEmpty())
+        qnSettings->setLightMode(lightMode.toInt());
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
