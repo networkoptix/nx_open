@@ -54,7 +54,7 @@ namespace ec2
             //tran.command = ;
             tran.createNewID();
             InputBinaryStream<QByteArray> stream( body );
-            tran.params.deserialize( stream );
+            QnBinary::deserialize( tran.params, &stream );
 
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;

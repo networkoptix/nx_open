@@ -32,11 +32,9 @@ struct QnCompatibilityItem
     QString ver1;
     QString comp1;
     QString ver2;
-
-    QN_DECLARE_STRUCT_SERIALIZATORS();
 };
 
-QN_DEFINE_STRUCT_SERIALIZATORS (QnCompatibilityItem, (ver1)(comp1)(ver2) )
+QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (QnCompatibilityItem, (ver1)(comp1)(ver2) )
 
 inline uint qHash(const QnCompatibilityItem &item)
 {

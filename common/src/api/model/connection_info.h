@@ -25,23 +25,6 @@ struct QnConnectionInfo {
 
 Q_DECLARE_METATYPE( QnConnectionInfo );
 
-namespace QnBinary
-{
-    template<class T>
-    void deserialize( QnSoftwareVersion& version, const InputBinaryStream<T>* const inputStream )
-    {
-        QString versionStr;
-        deserialize<T>( versionStr, inputStream );
-        version = QnSoftwareVersion(versionStr);
-    }
-
-    template<class T>
-    void serialize( const QnSoftwareVersion& version, OutputBinaryStream<T>* outputBinaryStream )  
-    {
-        serialize<T>( version.toString(), outputBinaryStream );
-    }
-}
-
 //TODO: #ak serialize version and compatibilityItems
 QN_DEFINE_STRUCT_SERIALIZATORS (QnConnectionInfo, (version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand)(allowCameraChanges) )
 

@@ -125,8 +125,10 @@ namespace ec2
 
             InputBinaryStream<QByteArray> inputStream( httpClient->response()->messageBody );
             OutputData outputData;
-            QnBinary::deserialize( outputData, &inputStream );
-            return handler( ErrorCode::ok, outputData );
+            if( !QnBinary::deserialize( outputData, &inputStream ) )
+                handler( ErrorCode::badResponse, outputData );
+            else
+                handler( ErrorCode::ok, outputData );
         }
     };
 }

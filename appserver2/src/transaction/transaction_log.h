@@ -17,7 +17,7 @@ namespace ec2
         ErrorCode saveTransaction(QnTransaction<T> tran) {
             QByteArray serializedTran;
             OutputBinaryStream<QByteArray> stream( &serializedTran );
-            tran.serialize(stream);
+            tran.serialize(&stream);
             return saveToLogInternal(serializedTran);
         }
     private:

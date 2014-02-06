@@ -94,7 +94,9 @@ namespace ec2
         ioError,
         serverError,
         unsupported,
-        unauthorized
+        unauthorized,
+        //!Response parse error
+        badResponse
     };
 
     QString toString( ErrorCode errorCode );

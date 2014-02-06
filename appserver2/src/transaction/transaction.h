@@ -97,9 +97,9 @@ namespace ec2
         T params;
 
         template <class T2>
-        void serialize(OutputBinaryStream<T2>& stream) {
+        void serialize(OutputBinaryStream<T2>* stream) {
             QnAbstractTransaction::serialize(stream);
-            QnBinary::serialize(params, &stream);
+            QnBinary::serialize(params, stream);
         }
     };
 

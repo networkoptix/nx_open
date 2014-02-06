@@ -26,7 +26,8 @@ namespace ec2
                 return QString::fromLatin1( "server error" );
             case ErrorCode::unauthorized:
                 return QString::fromLatin1( "unauthorized" );
-
+            case ErrorCode::badResponse:
+                return QString::fromLatin1( "badResponse" );
             default:
                 return QString::fromLatin1( "unknown error" );
         }

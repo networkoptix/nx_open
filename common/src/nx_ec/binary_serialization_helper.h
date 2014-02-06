@@ -46,7 +46,10 @@ public:
     {
     }
 
-    int read(void* buffer, int maxSize) const {
+    /*!
+        \return Bytes actually read
+    */
+    int read(void* buffer, int maxSize) {
         int toRead = qMin(m_data.size() - pos, maxSize);
         memcpy(buffer, m_data.constData() + pos, toRead);
         pos += toRead;
@@ -54,7 +57,7 @@ public:
     }
 private:
     const QByteArray& m_data;
-    mutable int pos;
+    int pos;
 };
 
 template<>
@@ -147,82 +150,97 @@ namespace QnBinary {
     // -------------------- deserialize ---------------------
 
     template <class T>
-    void deserialize(qint32& field, const InputBinaryStream<T>* binStream) {
+    bool deserialize(qint32& field, InputBinaryStream<T>* binStream) {
         qint32 tmp;
-        binStream->read(&tmp, sizeof(field));
+        if( binStream->read(&tmp, sizeof(field)) != sizeof(field) )
+            return false;
         field = ntohl(tmp);
+        return true;
     }
 
     template <class T>
-    void deserialize(quint32& field, const InputBinaryStream<T>* binStream) {
+    bool deserialize(quint32& field, InputBinaryStream<T>* binStream) {
         quint32 tmp;
-        binStream->read(&tmp, sizeof(field));
+        if( binStream->read(&tmp, sizeof(field)) != sizeof(field) )
+            return false;
         field = ntohl(tmp);
+        return true;
     }
 
     template <class T>
-    void deserialize(qint16& field, const InputBinaryStream<T>* binStream) {
+    bool deserialize(qint16& field, InputBinaryStream<T>* binStream) {
         qint16 tmp;
-        binStream->read(&tmp, sizeof(field));
+        if( binStream->read(&tmp, sizeof(field)) != sizeof(field) )
+            return false;
         field = ntohs(tmp);
+        return true;
     }
 
     template <class T>
-    void deserialize(quint16& field, const InputBinaryStream<T>* binStream) {
+    bool deserialize(quint16& field, InputBinaryStream<T>* binStream) {
         quint16 tmp;
-        binStream->read(&tmp, sizeof(field));
+        if( binStream->read(&tmp, sizeof(field)) != sizeof(field) )
+            return false;
         field = ntohs(tmp);
+        return true;
     }
 
     template <class T>
-    void deserialize(qint64& field, const InputBinaryStream<T>* binStream) {
+    bool deserialize(qint64& field, InputBinaryStream<T>* binStream) {
         qint64 tmp;
-        binStream->read(&tmp, sizeof(field));
+        if( binStream->read(&tmp, sizeof(field)) != sizeof(field) )
+            return false;
         field = ntohll(tmp);
+        return true;
     }
 
     template <class T>
-    void deserialize(float& field, const InputBinaryStream<T>* binStream) {
-        binStream->read(&field, sizeof(field));
+    bool deserialize(float& field, InputBinaryStream<T>* binStream) {
+        return binStream->read(&field, sizeof(field)) == sizeof(field);
     }
 
     template <class T>
-    void deserialize(double& field, const InputBinaryStream<T>* binStream) {
-        binStream->read(&field, sizeof(field));
+    bool deserialize(double& field, InputBinaryStream<T>* binStream) {
+        return binStream->read(&field, sizeof(field)) == sizeof(field);
     }
 
     template <class T>
-    void deserialize(bool& field, const InputBinaryStream<T>* binStream) {
-        binStream->read(&field, sizeof(field));
+    bool deserialize(bool& field, InputBinaryStream<T>* binStream) {
+        return binStream->read(&field, sizeof(field)) == sizeof(field);
     }
 
     typedef quint8 FixedArray[];
     template <class T>
-    void deserialize(FixedArray& field, const InputBinaryStream<T>* binStream) {
-        binStream->read(&field, sizeof(field));
+    bool deserialize(FixedArray& field, InputBinaryStream<T>* binStream) {
+        return binStream->read(&field, sizeof(field)) == sizeof(field);
     }
 
     template <class T>
-    void deserialize(QByteArray& field, const InputBinaryStream<T>* binStream) {
+    bool deserialize(QByteArray& field, InputBinaryStream<T>* binStream) {
         qint32 size;
-        deserialize(size, binStream);
+        if( !deserialize(size, binStream) )
+            return false;
         field.resize(size);
-        binStream->read(field.data(), size);
+        return binStream->read(field.data(), size) == size;
     }
 
     template <class T>
-    void deserialize(QString& field, const InputBinaryStream<T>* binStream) {
+    bool deserialize(QString& field, InputBinaryStream<T>* binStream) {
         QByteArray data;
-        deserialize(data, binStream);
+        if( !deserialize(data, binStream) )
+            return false;
         field = QString::fromUtf8(data);
+        return true;
     }
 
     template<class T, class T2>
-        void deserialize( T2& field, const InputBinaryStream<T>* binStream, typename std::enable_if<std::is_enum<T2>::value>::type* = NULL )
+        bool deserialize( T2& field, InputBinaryStream<T>* binStream, typename std::enable_if<std::is_enum<T2>::value>::type* = NULL )
     {
         qint32 tmp;
-        binStream->read(&tmp, sizeof(field));
+        if( binStream->read(&tmp, sizeof(field)) != sizeof(field) )
+            return false;
         field = (T2) ntohl(tmp);
+        return true;
     }
 
 
@@ -236,8 +254,9 @@ namespace QnBinary { \
     } \
     \
     template <class T> \
-    __VA_ARGS__ void deserialize(TYPE &value, const InputBinaryStream<T> *target) { \
+    __VA_ARGS__ bool deserialize(TYPE &value, InputBinaryStream<T> *target) { \
        BOOST_PP_SEQ_FOR_EACH(DESERIALIZE_FIELD, ~, FIELD_SEQ) \
+       return true; \
     } \
 }
 
@@ -246,7 +265,8 @@ namespace QnBinary { \
     QnBinary::serialize(value.FIELD, target); \
 
 #define DESERIALIZE_FIELD(R, D, FIELD) \
-    QnBinary::deserialize(value.FIELD, target);
+    if( !QnBinary::deserialize(value.FIELD, target) ) \
+        return false;
 
 
 namespace QnBinary
@@ -260,12 +280,16 @@ namespace QnBinary
     }
 
     template <class T, class T2>
-    void deserialize(std::vector<T2>& field, const InputBinaryStream<T>* binStream) 
+    bool deserialize(std::vector<T2>& field, InputBinaryStream<T>* binStream) 
     {
         qint32 size;
-        deserialize(size, binStream);
+        if( !deserialize(size, binStream) )
+            return false;
         field.resize(size);
-        std::for_each( field.begin(), field.end(), [binStream](T2& val){ QnBinary::deserialize(val, binStream); } );
+        for( T2& val: field )
+            if( !QnBinary::deserialize(val, binStream) )
+                return false;
+        return true;
     }
 
     template <class T, class T2>
@@ -274,55 +298,60 @@ namespace QnBinary
         QnBinary::serialize((qint32) field.size(), binStream);
         using namespace std::placeholders;
         std::for_each( field.begin(), field.end(), [binStream](const T2& val){ QnBinary::serialize(val, binStream); } );
+        for( const T2& val: field )
+            QnBinary::serialize(val, binStream);
     }
 
     template <class T, class T2>
-    void deserialize(QList<T2>& field, const InputBinaryStream<T>* binStream) 
+    bool deserialize(QList<T2>& field, InputBinaryStream<T>* binStream) 
     {
-        qint32 size;
-        deserialize(size, binStream);
+        qint32 size = 0;
+        if( !deserialize(size, binStream) )
+            return false;
         for( qint32 i = 0; i < size; ++i )
         {
             field.push_back( T2() );
-            QnBinary::deserialize(field.back(), binStream);
+            if( !QnBinary::deserialize(field.back(), binStream) )
+                return false;
         }
+        return true;
     }
 }
 
 #define QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(TYPE, BASE_TYPE, FIELD_SEQ, ... /* PREFIX */) \
     QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ); \
     template <class T> \
-    void TYPE::serialize(OutputBinaryStream<T>& stream) const \
+    void TYPE::serialize(OutputBinaryStream<T>* stream) const \
 { \
     BASE_TYPE::serialize(stream); \
-    QnBinary::serialize(*this, &stream); \
+    QnBinary::serialize(*this, stream); \
 } \
     \
     template <class T> \
-    void TYPE::deserialize(const InputBinaryStream<T>& stream) \
+    bool TYPE::deserialize(InputBinaryStream<T>* stream) \
 { \
-    BASE_TYPE::deserialize(stream); \
-    QnBinary::deserialize(*this, &stream); \
+    return BASE_TYPE::deserialize(stream) && \
+           QnBinary::deserialize(*this, stream); \
 }
 
 #define QN_DEFINE_STRUCT_SERIALIZATORS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
     QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ); \
     template <class T> \
-    void TYPE::serialize(OutputBinaryStream<T>& stream) const \
+    void TYPE::serialize(OutputBinaryStream<T>* stream) const \
 { \
-    QnBinary::serialize(*this, &stream); \
+    QnBinary::serialize(*this, stream); \
 } \
     \
     template <class T> \
-    void TYPE::deserialize(const InputBinaryStream<T>& stream) \
+    bool TYPE::deserialize(InputBinaryStream<T>* stream) \
 { \
-    QnBinary::deserialize(*this, &stream); \
+    return QnBinary::deserialize(*this, stream); \
 } \
 
 
 #define QN_DECLARE_STRUCT_SERIALIZATORS() \
-    template <class T> void serialize(OutputBinaryStream<T>& stream) const; \
-    template <class T> void deserialize(const InputBinaryStream<T>& stream); \
+    template <class T> void serialize(OutputBinaryStream<T>* stream) const; \
+    template <class T> bool deserialize(InputBinaryStream<T>* stream); \
 
 
 
