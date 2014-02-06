@@ -243,10 +243,17 @@ namespace Qn {
     Q_DECLARE_OPERATORS_FOR_FLAGS(LightModeFlags)
 
 
+    enum ClientSkin {
+        DarkSkin,
+        LightSkin
+    };
+
+
 } // namespace Qn
 
 Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(Qn::ItemRole)
 Q_DECLARE_METATYPE(Qn::TimeMode)
+Q_DECLARE_METATYPE(Qn::ClientSkin)
 
 #endif // QN_CLIENT_GLOBALS_H

@@ -502,7 +502,8 @@ QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QStri
     QString result;
     QTextStream str(&result);
 
-    str << "Authorization: Digest username=\"" << auth.user() << "\",realm=\"" << realm << "\",nonce=\"" << nonce << "\",uri=\"" << url << "\",response=\"" << response << "\"\r\n";
+    str << "Authorization: Digest username=\"" << auth.user() << "\", realm=\"" << realm << 
+                             "\", nonce=\"" << nonce << "\", uri=\"" << url << "\", response=\"" << response << "\"\r\n";
 
     return result;
 
