@@ -308,6 +308,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool noFullScreen = false;
     bool noVersionMismatchCheck = false;
     int lightMode = 0;
+    bool noVSync = false;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -327,6 +328,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
 #endif
     commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString());
+    commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
 
     commandLineParser.parse(argc, argv, stderr);
 
@@ -344,6 +346,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if(authentication.isValid()) {
         qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
     }
+
+    qnSettings->setVSyncEnabled(!noVSync);
 
     QScopedPointer<QnSkin> skin(new QnSkin(customizationPath));
     QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(customizationPath + lit("/customization.json"))));
