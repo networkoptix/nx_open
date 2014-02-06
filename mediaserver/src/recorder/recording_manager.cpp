@@ -446,7 +446,7 @@ void QnRecordingManager::at_server_resourceChanged(const QnResourcePtr &resource
     if(!server)
         return;
 
-    //qnStorageMan->removeAbsentStorages(server->getStorages());
+    qnStorageMan->removeAbsentStorages(server->getStorages());
     foreach(QnAbstractStorageResourcePtr storage, server->getStorages())
     {
         QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
