@@ -321,6 +321,7 @@
                 <!--<module>plugins/xvbadecoder</module>-->
                 <module>plugins/image_library_plugin</module>
                 <module>debsetup/client-deb</module>
+                <module>debsetup/client-lite-deb</module>
                 <module>debsetup/mediaserver-deb</module>
                 <module>debsetup/appserver-deb</module>
             </modules>            
