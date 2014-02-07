@@ -1,4 +1,5 @@
 #include "shadow_item.h"
+
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/common/geometry.h>
 
@@ -74,6 +75,7 @@ void QnShadowItem::ensureShadowShape() const {
     } else {
         m_shadowShape = QPolygonF();
     }
+    
     m_shapeValid = true;
 }
 
@@ -102,7 +104,7 @@ QPainterPath QnShadowItem::shape() const {
 }
 
 namespace {
-    void drawSoftBand(const QPointF &v, const QPointF &dt, const QPointF &dw, const QColor &normal, const QColor &transparent) {
+  /*  void drawSoftBand(const QPointF &v, const QPointF &dt, const QPointF &dw, const QColor &normal, const QColor &transparent) {
         glBegin(GL_QUADS);
         glColor(transparent);
         glVertex(v + dt);
@@ -122,7 +124,7 @@ namespace {
         glVertex(v + (dx + dy) * 0.7);
         glVertex(v + dy);
         glEnd();
-    }
+    }*/
 }
 
 void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
@@ -136,16 +138,38 @@ void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     //QColor transparent = toTransparent(color);
     
     painter->beginNativePainting();
+
     //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND); 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+    //glColor(color);
+//    glColor4f(1.0, 0.0, 0.0, 0.5);
 
     /* Draw shadowed rect. */
+
+    int size = m_shadowShape.size();
+    QVector<GLfloat> glverts;
+    for (int i = 0; i < size; i++) {
+        QPointF point = m_shadowShape[i];
+        glverts << point.x() << point.y();
+    }
+
+//    glVertexPointer(2, GL_FLOAT, 0, glverts.constData());
+//    glEnableClientState(GL_VERTEX_ARRAY);
+
+//    glEnableVertexAttribArray( attribPosition);
+//    glVertexAttribPointer( attribPosition, 3, GL_FLOAT, GL_TRUE, 0, glverts);
+
+    glDrawArrays(GL_TRIANGLE_FAN, 0, size);
+//    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisable(GL_BLEND);
+
+/*
     glBegin(GL_TRIANGLE_FAN);
     glColor(color);
     glVertices(m_shadowShape);
     glEnd();
-
+    */
     /* Draw soft band. */
     // TODO
     /*
@@ -164,7 +188,7 @@ void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
         drawSoftCorner(m_rect.bottomLeft(),  -dx,  dy, m_color, transparent);
     }*/
 
-    glDisable(GL_BLEND); 
+   
     //glPopAttrib();
     painter->endNativePainting();
 }

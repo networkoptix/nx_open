@@ -68,7 +68,7 @@ void QnLoadingProgressPainter::paint(qreal progress, qreal opacity) {
     if(!m_initialized)
         return;
 
-    glPushMatrix();
+    /*glPushMatrix();
     glRotate(360.0 * static_cast<int>(std::fmod(progress, 1.0) * m_sectorCount) / m_sectorCount, 0.0, 0.0, 1.0);
 
     m_shader->bind();
@@ -88,5 +88,5 @@ void QnLoadingProgressPainter::paint(qreal progress, qreal opacity) {
 
     m_shader->release();
 
-    glPopMatrix();
+    glPopMatrix();*/
 }

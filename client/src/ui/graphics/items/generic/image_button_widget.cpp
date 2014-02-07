@@ -69,7 +69,7 @@ namespace {
             1.0, 1.0,
             0.0, 1.0
         };
-
+/*
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
@@ -79,7 +79,7 @@ namespace {
         glDrawArrays(GL_QUADS, 0, 4);
 
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);*/
     }
 
     bool isValidElement(const QPixmap &pixmap) {
@@ -363,6 +363,8 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 }
 
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
+    return;
+
     bool isZero = qFuzzyIsNull(progress);
     bool isOne = qFuzzyCompare(progress, 1.0);
 

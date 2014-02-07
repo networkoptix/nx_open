@@ -7,19 +7,21 @@
 
 #ifdef NX_GLCONTEXT_PRESENT
 
+#pragma comment(lib,"opengl32.lib")
+
 #include <QtOpenGL/QGLContext>
 
 #include <utils/common/log.h>
 
-#ifdef Q_OS_WIN
-#define WGL_WGLEXT_PROTOTYPES
-#include <gl/wglext.h>
-#else
-#include <QtX11Extras/QX11Info>
-#include <GL/glx.h>
-#include <X11/X.h>
-#include <X11/Xlib.h>
-#endif
+//#ifdef Q_OS_WIN
+//#define WGL_WGLEXT_PROTOTYPES
+//#include <gl/wglext.h>
+//#else
+//#include <QtX11Extras/QX11Info>
+//#include <GL/glx.h>
+//#include <X11/X.h>
+//#include <X11/Xlib.h>
+//#endif
 
 
 #ifdef Q_OS_WIN
@@ -249,7 +251,7 @@ void GLContext::initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith 
         }
     }
     //TODO/IMPL no need to request function address every time
-    PFNWGLCREATECONTEXTATTRIBSARBPROC my_wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress( "wglCreateContextAttribsARB" );
+    /*PFNWGLCREATECONTEXTATTRIBSARBPROC my_wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress( "wglCreateContextAttribsARB" );
     if( my_wglCreateContextAttribsARB )
     {
         //creating OpenGL 3.0 context
@@ -260,7 +262,7 @@ void GLContext::initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith 
         }; 
         m_handle = my_wglCreateContextAttribsARB( dc, contextHandleToShareWith, contextAttribs );
     }
-    else
+    else*/
     {
         //creating Opengl 1.0 context
         m_handle = wglCreateContext( dc );

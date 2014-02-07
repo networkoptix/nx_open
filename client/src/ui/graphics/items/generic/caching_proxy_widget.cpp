@@ -2,11 +2,12 @@
 #include "caching_proxy_widget.h"
 
 #include <cassert>
-#ifdef Q_OS_MACX
-#include <Glu.h>
-#else
-#include <GL/glu.h>
-#endif
+//#ifdef Q_OS_MACX
+//#include <Glu.h>
+//#else
+//#include <GL/glu.h>
+//#endif
+#include <QtGui/qopengl.h>
 
 #include <QtCore/QEvent>
 #include <QtCore/QSysInfo>
@@ -19,13 +20,14 @@
 namespace {
 
     int checkOpenGLError() {
-        int error = glGetError();
+   /*     int error = glGetError();
         if (error != GL_NO_ERROR) {
             const char *errorString = reinterpret_cast<const char *>(gluErrorString(error));
             if (errorString)
                 qnWarning("OpenGL Error: %1.", errorString);
         }
-        return error;
+        return error;*/
+        return 0;
     }
 
 } // anonymous namespace
@@ -49,14 +51,14 @@ void CachingProxyWidget::ensureTextureAllocated() {
     glGenTextures(1, &m_texture);
 
     /* Set texture parameters. */
-    glPushAttrib(GL_ENABLE_BIT);
+//    glPushAttrib(GL_ENABLE_BIT);
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, m_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glPopAttrib();
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+//    glPopAttrib();
 }
 
 void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *) {
@@ -80,13 +82,14 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
     if (exposedWidgetRect.isEmpty())
         return;
 
+    return;
     painter->beginNativePainting();
     //glPushAttrib(GL_COLOR_BUFFER_BIT | GL_TEXTURE_BIT);
 
     ensureTextureSynchronized();
 
     glEnable(GL_TEXTURE_2D);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); /* For opacity to work. */
+//    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); /* For opacity to work. */
 
     glBindTexture(GL_TEXTURE_2D, m_texture);
     glEnable(GL_BLEND);
@@ -97,7 +100,7 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
         QPointF(0.0, 0.0),
         QnGeometry::cwiseDiv(vertexRect.size(), m_image.size())
     );
-    glBegin(GL_QUADS);
+ /*   glBegin(GL_QUADS);
     glColor(1.0, 1.0, 1.0, effectiveOpacity());
     glTexCoord(textureRect.topLeft());
     glVertex(vertexRect.topLeft());
@@ -107,7 +110,7 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
     glVertex(vertexRect.bottomRight());
     glTexCoord(textureRect.bottomLeft());
     glVertex(vertexRect.bottomLeft());
-    glEnd();
+    glEnd();*/
 
     glDisable(GL_BLEND);
     glDisable(GL_TEXTURE_2D);
@@ -171,14 +174,14 @@ void CachingProxyWidget::ensureTextureSynchronized() {
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, m_texture);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, m_image.bytesPerLine() * 8 / m_image.depth());
+//    glPixelStorei(GL_UNPACK_ROW_LENGTH, m_image.bytesPerLine() * 8 / m_image.depth());
 
     /* QImage's Format_ARGB32 corresponds to OpenGL's GL_BGRA on little endian architectures.
      * On big endian architectures, conversion is needed. */
     assert(QSysInfo::ByteOrder == QSysInfo::LittleEndian);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, m_image.bits());
 
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+//    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 
     /* No need to restore OpenGL state here, it is done by the caller. */
 

@@ -570,6 +570,9 @@ void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painte
 
     QRectF inner(offset, offset, ow, oh);
 
+    
+    if ((qnSettings->lightMode() & Qn::LightModeNoBackground)) 
+        return;
 
     /* Draw background */
     if(!m_backgroundGradientPainter)
@@ -577,7 +580,7 @@ void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painte
 
     painter->beginNativePainting();
     {
-        glEnable(GL_BLEND);
+      /*  glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glColor4f(0.0, 0.0, 0.0, painter->opacity());
@@ -592,7 +595,7 @@ void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painte
         m_backgroundGradientPainter->paint(toTransparent(qnGlobals->backgroundGradientColor(), painter->opacity()));
         glPopMatrix();
 
-        glDisable(GL_BLEND);
+        glDisable(GL_BLEND);*/
     }
     painter->endNativePainting();
 }

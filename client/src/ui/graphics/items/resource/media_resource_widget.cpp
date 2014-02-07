@@ -500,6 +500,7 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
+    return Qn::NewFrameRendered;
     painter->beginNativePainting();
 
     qreal opacity = effectiveOpacity();

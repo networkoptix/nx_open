@@ -171,9 +171,9 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             QSizeF(unit / 5, unit / 5)
         );
 
-        glPushMatrix();
-        glTranslatef(overlayRect.center().x(), overlayRect.center().y(), 1.0);
-        glScalef(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
+//        glPushMatrix();
+//        glTranslatef(overlayRect.center().x(), overlayRect.center().y(), 1.0);
+//        glScalef(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
         //glRotatef(-1.0 * m_overlayRotation, 0.0, 0.0, 1.0);
         if(m_statusOverlay == Qn::LoadingOverlay) {
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
@@ -186,7 +186,7 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         } else if(m_statusOverlay == Qn::PausedOverlay) {
             m_pausedPainter->paint(0.5 * painter->opacity());
         }
-        glPopMatrix();
+//        glPopMatrix();
 
         glDisable(GL_BLEND);
         painter->endNativePainting();

@@ -52,7 +52,7 @@ QnPausedPainter::~QnPausedPainter() {
 }
 
 void QnPausedPainter::paint(qreal opacity) {
-    if(!m_initialized)
+ /*   if(!m_initialized)
         return;
 
     m_shader->bind();
@@ -70,7 +70,7 @@ void QnPausedPainter::paint(qreal opacity) {
     glDisableVertexAttribArray(m_shader->colorLocation());
     glDisableClientState(GL_VERTEX_ARRAY);
 
-    m_shader->release();
+    m_shader->release();*/
 }
 
 void QnPausedPainter::paint() {

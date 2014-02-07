@@ -2,10 +2,10 @@
 #ifdef Q_OS_WINDOWS
 #include <QtCore/qt_windows.h>
 #endif
-#ifdef Q_OS_LINUX
-#include <GL/glx.h>
-#include <QtX11Extras/QX11Info>
-#endif
+//#ifdef Q_OS_LINUX
+//#include <GL/glx.h>
+//#include <QtX11Extras/QX11Info>
+//#endif
 #include <QtGui/QOpenGLContext>
 
 void QnGlWidgetFactory::enableVSync(QGLWidget *widget) {

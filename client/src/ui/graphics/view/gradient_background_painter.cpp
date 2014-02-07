@@ -138,11 +138,11 @@ void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & r
 #else
     painter->beginNativePainting();
     {
-        if(!m_gradientPainter)
-            m_gradientPainter.reset(new QnRadialGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), QGLContext::currentContext()));
+       /* if(!m_gradientPainter)
+            m_gradientPainter.reset(new QnRadialGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), QGLContext::currentContext()));*/
 
         //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
-        glEnable(GL_BLEND);
+      /*  glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glPushMatrix();
@@ -158,7 +158,7 @@ void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & r
         glPopMatrix();
 
         glDisable(GL_BLEND);
-        //glPopAttrib();
+        //glPopAttrib();*/
     }
     painter->endNativePainting();
 #endif

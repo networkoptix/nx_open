@@ -111,11 +111,11 @@ void QnRenderingWidget::initializeGL() {
 void QnRenderingWidget::resizeGL(int width, int height) {
     glViewport(0, 0, width, height);
 
-    glMatrixMode(GL_PROJECTION);
+    /*glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glTranslated(-1.0, 1.0, 0.0);
     glScaled(2.0 / width, -2.0 / height, 1.0);
-    glMatrixMode(GL_MODELVIEW);
+    glMatrixMode(GL_MODELVIEW);*/
 }
 
 void QnRenderingWidget::paintGL() {
@@ -130,7 +130,7 @@ void QnRenderingWidget::paintGL() {
         if(sourceSize.isEmpty())
             sourceSize = size();
 
-        glLoadIdentity();
+   //     glLoadIdentity();
         m_renderer->paint(
             0,
             QRectF(0.0, 0.0, 1.0, 1.0),

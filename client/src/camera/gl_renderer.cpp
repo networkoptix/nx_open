@@ -1,9 +1,10 @@
 #include "gl_renderer.h"
 
-#ifndef Q_OS_MACX
-#define GL_GLEXT_PROTOTYPES
-#include <GL/glext.h>
-#endif
+//#ifndef Q_OS_MACX
+//#define GL_GLEXT_PROTOTYPES
+//#include <GL/glext.h>
+//#endif
+#include <QtGui/qopengl.h>
 
 #include <cassert>
 
@@ -286,7 +287,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
     glBindTexture(GL_TEXTURE_2D, tex0ID);
     DEBUG_CODE(glCheckError("glBindTexture"));
 
-    glColor4f( 1, 1, 1, 1 );
+//    glColor4f( 1, 1, 1, 1 );
 
     drawBindedTexture( v_array, tx_array );
 }
@@ -566,7 +567,7 @@ void QnGLRenderer::drawNV12VideoTexture(
 }
 
 void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_array )
-{
+{/*
     DEBUG_CODE(glCheckError("glBindBuffer"));
     glVertexPointer(2, GL_FLOAT, 0, v_array);
     DEBUG_CODE(glCheckError("glVertexPointer"));
@@ -582,7 +583,7 @@ void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_arra
     DEBUG_CODE(glCheckError("glDisableClientState"));
     glDisableClientState(GL_VERTEX_ARRAY);
     DEBUG_CODE(glCheckError("glDisableClientState"));
-}
+*/}
 
 qint64 QnGLRenderer::lastDisplayedTime() const
 {

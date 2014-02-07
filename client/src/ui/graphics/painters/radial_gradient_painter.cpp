@@ -48,7 +48,7 @@ QnRadialGradientPainter::~QnRadialGradientPainter() {
 }
 
 void QnRadialGradientPainter::paint(const QColor &colorMultiplier) {
-    if(!m_initialized)
+   /* if(!m_initialized)
         return;
 
     m_shader->bind();
@@ -66,7 +66,7 @@ void QnRadialGradientPainter::paint(const QColor &colorMultiplier) {
     glDisableVertexAttribArray(m_shader->colorLocation());
     glDisableClientState(GL_VERTEX_ARRAY);
 
-    m_shader->release();
+    m_shader->release();*/
 }
 
 void QnRadialGradientPainter::paint() {

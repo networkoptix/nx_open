@@ -17,12 +17,12 @@ QRectF QnCurtainItem::boundingRect() const {
 }
 
 void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
-    painter->beginNativePainting();
+ /*   painter->beginNativePainting();
     glPushMatrix();
-    glLoadIdentity();
+    glLoadIdentity();*/
 
     //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
-    glEnable(GL_BLEND); 
+/*    glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
     glBegin(GL_QUADS);
@@ -34,5 +34,5 @@ void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
     glDisable(GL_BLEND); 
 
     glPopMatrix();
-    painter->endNativePainting();
+    painter->endNativePainting();*/
 }
