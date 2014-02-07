@@ -25,9 +25,4 @@ namespace ec2
     {
         return m_connectionInfo;
     }
-
-    template<> void RemoteEC2Connection::processTransaction<ApiCameraData>( const QnTransaction<ApiCameraData>& tran )
-    {
-         m_cameraManager->triggerNotification( tran );
-    }
 }

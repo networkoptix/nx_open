@@ -31,7 +31,9 @@ namespace ec2
         virtual QnConnectionInfo connectionInfo() const override;
 
         template<class T> void processTransaction( const QnTransaction<T>& tran ) {}
-        template<> void processTransaction<ApiCameraData>( const QnTransaction<ApiCameraData>& tran );
+        template<> void processTransaction<ApiCameraData>( const QnTransaction<ApiCameraData>& tran ) {
+            m_cameraManager->triggerNotification( tran );
+        }
 
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
