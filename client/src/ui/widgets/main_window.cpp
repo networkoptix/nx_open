@@ -22,7 +22,6 @@
 
 #include <api/session_manager.h>
 
-#include <ui/common/palette.h>
 #include <ui/common/frame_section.h>
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/view/graphics_view.h>
@@ -154,7 +153,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;
     setMinimumWidth(smallWindow ? minimalWindowWidth / 2 : minimalWindowWidth);
     setMinimumHeight(smallWindow ? minimalWindowHeight / 2 : minimalWindowHeight);
-    setPaletteColor(this, QPalette::Window, Qt::black);
 
     /* Set up scene & view. */
     m_scene.reset(new QnGraphicsScene(this));
@@ -164,10 +162,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);
-    setPaletteColor(m_view.data(), QPalette::Background, Qt::black);
-    setPaletteColor(m_view.data(), QPalette::Base, Qt::black);
-
-        // TODO: #Elric move to ctor^ ?
 
     if (!(qnSettings->lightMode() & Qn::LightModeNoBackground)) {
         m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
