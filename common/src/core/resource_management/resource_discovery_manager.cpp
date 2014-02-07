@@ -1,6 +1,7 @@
 
 #include "resource_discovery_manager.h"
 
+#include <QtConcurrent>
 #include <set>
 
 #include <QtConcurrent/QtConcurrentMap>
@@ -255,15 +256,19 @@ void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
     }
 }
 
+static QnResourceList ChecHostAddrAsync(const QnManualCameraInfo& input) { return input.checkHostAddr(); }
+
 void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList& resources)
 {
     m_searchersListMutex.lock();
     QnManualCameraInfoMap cameras = m_manualCameraMap;
     m_searchersListMutex.unlock();
 
-    for (QnManualCameraInfoMap::const_iterator itr = cameras.constBegin(); itr != cameras.constEnd(); ++itr)
+    QFuture<QnResourceList> results = QtConcurrent::mapped(cameras, &ChecHostAddrAsync);
+    results.waitForFinished();
+    for (QFuture<QnResourceList>::const_iterator itr = results.constBegin(); itr != results.constEnd(); ++itr)
     {
-        QList<QnResourcePtr> foundResources = itr.value().checkHostAddr();
+        QnResourceList foundResources = *itr;
         for (int i = 0; i < foundResources.size(); ++i) {
             QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(foundResources.at(i));
             if (camera)
