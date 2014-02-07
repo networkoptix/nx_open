@@ -14,13 +14,16 @@
 #include "client_query_processor.h"
 #include "fixed_url_client_query_processor.h"
 
-
 namespace ec2
 {
+    class QnTransactionMessageBus;
+
     class RemoteEC2Connection
     :
+        public QObject,
         public BaseEc2Connection<FixedUrlClientQueryProcessor>
     {
+        Q_OBJECT
     public:
         RemoteEC2Connection(
             const FixedUrlClientQueryProcessorPtr& queryProcessor,
@@ -29,10 +32,14 @@ namespace ec2
 
         virtual QnConnectionInfo connectionInfo() const override;
 
+    private slots:
+            void at_gotTransaction(QByteArray data);
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
         const QnConnectionInfo m_connectionInfo;
+        QnTransactionMessageBus* m_transactionMsg;
     };
+    
 }
 
 #endif  //REMOTE_EC_CONNECTION_H
