@@ -1202,7 +1202,7 @@ void QnTimeSlider::setColors(const QnTimeSliderColors &colors) {
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::updatePixmapCache() {
     m_pixmapCache->setFont(font());
-    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255)); // TODO: #Elric customize color
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, palette().color(QPalette::WindowText)); // TODO: #Elric customize color
 }
 
 void QnTimeSlider::updateKineticProcessor() {
@@ -1878,7 +1878,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         /* Draw label if needed. */
         qreal lineHeight = m_stepData[index].currentLineHeight;
         if(!qFuzzyIsNull(m_stepData[index].currentTextOpacity)) {
-            QPixmap pixmap = m_pixmapCache->positionShortPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
+            QPixmap pixmap = m_pixmapCache->positionShortPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index], palette().color(QPalette::WindowText));
             QRectF textRect(x - pixmap.width() / 2.0, rect.top() + lineHeight, pixmap.width(), pixmap.height());
 
             QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_stepData[index].currentTextOpacity);
@@ -1934,7 +1934,7 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
         painter->setBrush(number % 2 ? m_colors.dateOverlay : m_colors.dateOverlayAlternate);
         painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
 
-        QPixmap pixmap = m_pixmapCache->positionLongPixmap(pos0, textHeight, highlightStep);
+        QPixmap pixmap = m_pixmapCache->positionLongPixmap(pos0, textHeight, highlightStep, palette().color(QPalette::WindowText));
 
         QRectF textRect((x0 + x1) / 2.0 - pixmap.width() / 2.0, rect.top() + textTopMargin, pixmap.width(), pixmap.height());
         if(textRect.left() < rect.left())

@@ -449,16 +449,6 @@ void QnResourceDiscoveryManager::dtsAssignment()
     }
 }
 
-void QnResourceDiscoveryManager::setDisabledVendors(const QList<QString> &vendors)
-{
-    m_disabledVendorsForAutoSearch = vendors.toSet();
-}
-
-QList<QString> QnResourceDiscoveryManager::disabledVendors() const 
-{
-    return m_disabledVendorsForAutoSearch.toList();
-}
-
 QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const 
 { 
     return m_state; 
@@ -467,10 +457,11 @@ QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const
 void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher) {
     // TODO: #Elric strictly speaking, we must do this under lock.
 
+    QSet<QString> disabledVendorsForAutoSearch = QnGlobalSettings::instance()->disabledVendorsSet();
+
     searcher->setShouldBeUsed(
-        QnGlobalSettings::instance()->isCameraAutoDiscoveryEnabled() &&
-        !m_disabledVendorsForAutoSearch.contains(searcher->manufacture()) && 
-        !m_disabledVendorsForAutoSearch.contains(lit("all"))
+        !disabledVendorsForAutoSearch.contains(searcher->manufacture()) && 
+        !disabledVendorsForAutoSearch.contains(lit("all"))
     );
 }
 

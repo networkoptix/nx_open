@@ -680,11 +680,13 @@ void QnMain::updateDisabledVendorsIfNeeded()
 
     QString disabledVendors = MSSettings::roSettings()->value(DV_PROPERTY).toString();
     QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (admin->hasProperty(DV_PROPERTY)) {
-        MSSettings::roSettings()->setValue(DV_PROPERTY, admin->getProperty(DV_PROPERTY));
-    } else {
-        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-        appServerConnection->saveSync(admin->getId(), QnKvPair(DV_PROPERTY, disabledVendors));
+    if (!admin)
+        return;
+
+    if (!admin->hasProperty(DV_PROPERTY)) {
+        QnGlobalSettings *settings = QnGlobalSettings::instance();
+        settings->setDisabledVendors(disabledVendors);
+        MSSettings::roSettings()->remove(DV_PROPERTY);
     }
 }
 
@@ -1181,25 +1183,6 @@ void QnMain::run()
 
     QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
 
-
-    loadResourcesFromECS();
-    updateDisabledVendorsIfNeeded();
-
-    QString disabledVendors = MSSettings::roSettings()->value("disabledVendors").toString();
-    QStringList disabledVendorList;
-    if (disabledVendors.contains(";"))
-        disabledVendorList = disabledVendors.split(";");
-    else
-        disabledVendorList = disabledVendors.split(" ");
-    QStringList updatedVendorList;        
-    for (int i = 0; i < disabledVendorList.size(); ++i) {
-    if (!disabledVendorList[i].trimmed().isEmpty())
-            updatedVendorList << disabledVendorList[i].trimmed();
-    }
-    qWarning() << "disabled vendors amount" << updatedVendorList.size();
-    qWarning() << disabledVendorList;        
-    QnResourceDiscoveryManager::instance()->setDisabledVendors(updatedVendorList);
-
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher( &cameraDriverRestrictionList ) );
     QnResourceDiscoveryManager::instance()->addDeviceServer(ThirdPartyResourceSearcher::instance());
@@ -1260,6 +1243,12 @@ void QnMain::run()
 
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
+
+    loadResourcesFromECS();
+    updateDisabledVendorsIfNeeded();
+    QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
+    qWarning() << lit("disabled vendors amount") << disabledVendors .size();
+    qWarning() << disabledVendors;
 
     connect(QnServerMessageProcessor::instance(), SIGNAL(connectionReset()), this, SLOT(loadResourcesFromECS()));
 
