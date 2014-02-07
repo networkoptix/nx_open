@@ -327,11 +327,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Tree panel. */
     m_treeWidget = new QnResourceBrowserWidget(NULL, context());
     m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
+    
+    QPalette defaultPalette = m_treeWidget->palette();
     setPaletteColor(m_treeWidget, QPalette::Window, Qt::transparent);
     setPaletteColor(m_treeWidget, QPalette::Base, Qt::transparent);
-    setPaletteColor(m_treeWidget, QPalette::Text, Qt::white);
-    setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Window, Qt::black);
-    setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Base, Qt::black);
+    setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Base, defaultPalette.color(QPalette::Base));
     m_treeWidget->resize(qnSettings->treeWidth(), 0);
 
     m_treeBackgroundItem = new QnControlBackgroundWidget(Qn::LeftBorder, m_controlsWidget);
