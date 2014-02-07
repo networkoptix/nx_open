@@ -110,6 +110,14 @@ QColor QnStatisticsColors::networkByKey(const QString &key) const {
 }
 
 
+QnScheduleGridWidgetColors::QnScheduleGridWidgetColors() {
+    normalLabel =   QColor(255, 255, 255, 255);
+    weekendLabel =  QColor(255, 128, 128, 255);
+    selectedLabel = QColor(64,  128, 192, 255);
+    disabledLabel = QColor(183, 183, 183, 255);
+}
+
+
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QnTimeSliderColors, 
     (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)
@@ -136,3 +144,8 @@ QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QJson::Optional
 )
 
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnScheduleGridWidgetColors, 
+    (normalLabel)(weekendLabel)(selectedLabel)(disabledLabel), 
+    QJson::Optional
+)

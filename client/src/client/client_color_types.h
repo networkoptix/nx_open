@@ -87,5 +87,18 @@ struct QnStatisticsColors {
 Q_DECLARE_METATYPE(QnStatisticsColors)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStatisticsColors)
 
+struct QnScheduleGridWidgetColors {
+public:
+    QnScheduleGridWidgetColors();
+
+    QColor normalLabel;
+    QColor weekendLabel;
+    QColor selectedLabel;
+    QColor disabledLabel;
+};
+
+Q_DECLARE_METATYPE(QnScheduleGridWidgetColors)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnScheduleGridWidgetColors)
+
 
 #endif // QN_CLIENT_COLOR_TYPES
