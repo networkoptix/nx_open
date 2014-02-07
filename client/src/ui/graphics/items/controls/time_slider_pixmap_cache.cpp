@@ -35,26 +35,26 @@ void QnTimeSliderPixmapCache::setFont(const QFont &font) {
     clear();
 }
 
-const QPixmap &QnTimeSliderPixmapCache::positionShortPixmap(qint64 position, int height, const QnTimeStep &step) {
-    qint32 key = shortCacheKey(position, height, step);
+const QPixmap &QnTimeSliderPixmapCache::positionShortPixmap(qint64 position, int height, const QnTimeStep &step, const QColor &color) {
+    qint32 key = shortCacheKey(position, height, step); // TODO: #Elric #customization color is not used
 
     const QPixmap *result = m_pixmapByShortPositionKey.object(key);
     if(result)
         return *result;
 
-    result = new QPixmap(textPixmap(toShortString(position, step), height, QColor(255, 255, 255, 255)));
+    result = new QPixmap(textPixmap(toShortString(position, step), height, color));
     m_pixmapByShortPositionKey.insert(key, result, result->width() * result->height() * result->depth() / 8);
     return *result;
 }
 
-const QPixmap &QnTimeSliderPixmapCache::positionLongPixmap(qint64 position, int height, const QnTimeStep &step) {
-    QnTimeStepLongCacheKey key = longCacheKey(position, height, step);
+const QPixmap &QnTimeSliderPixmapCache::positionLongPixmap(qint64 position, int height, const QnTimeStep &step, const QColor &color) {
+    QnTimeStepLongCacheKey key = longCacheKey(position, height, step); // TODO: #Elric #customization color is not used
 
     const QPixmap *result = m_pixmapByLongPositionKey.object(key);
     if(result)
         return *result;
 
-    result = new QPixmap(textPixmap(toLongString(position, step), height, QColor(255, 255, 255, 255)));
+    result = new QPixmap(textPixmap(toLongString(position, step), height, color));
     m_pixmapByLongPositionKey.insert(key, result, result->width() * result->height() * result->depth() / 8);
     return *result;
 }
