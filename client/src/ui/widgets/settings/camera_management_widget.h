@@ -19,6 +19,9 @@ public:
     void updateFromSettings();
     void submitToSettings();
 
+private slots:
+    void at_autoDiscoveryCheckBox_clicked();
+
 private:
     QScopedPointer<Ui::CameraManagementWidget> ui;
 };
