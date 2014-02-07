@@ -38,15 +38,7 @@ namespace ec2
         public:
             CustomHandler(T* handler): m_handler(handler) {}
 
-            virtual void processByteArray(QByteArray data) override 
-            {
-                QnTransaction<ApiCameraData> tran1;
-
-                m_handler->processTransaction<ApiCameraData>(tran1);
-
-                QnTransaction<ApiResourceData> tran2;
-                m_handler->processTransaction<ApiResourceData>(tran2);
-            }
+            virtual void processByteArray(QByteArray data) override;
         private:
             T* m_handler;
         };
@@ -58,10 +50,8 @@ namespace ec2
         void removeConnectionFromPeer(const QUrl& url);
 
         template <class T>
-        void setHandler(T* handler)
-        {
-            m_handler = new CustomHandler<T>(handler);
-        }
+        void setHandler(T* handler) { m_handler = new CustomHandler<T>(handler); }
+    private:
         void gotTransaction(QByteArray data)
         {
             m_handler->processByteArray(data);
