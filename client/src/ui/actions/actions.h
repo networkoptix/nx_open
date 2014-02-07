@@ -286,6 +286,11 @@ namespace Qn {
         CheckForUpdatesAction,
 
         /**
+         * Install an update from the selected file.
+         */
+        InstallUpdateManuallyAction,
+
+        /**
          * Open Showcase page in default browser
          */
         ShowcaseAction,

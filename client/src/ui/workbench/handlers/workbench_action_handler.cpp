@@ -29,6 +29,7 @@
 #include <utils/common/email.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
+#include <utils/media_server_update_tool.h>
 
 #include <api/session_manager.h>
 
@@ -200,6 +201,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::OpenCurrentUserLayoutMenu),              SIGNAL(triggered()),    this,   SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
     connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
+    connect(action(Qn::InstallUpdateManuallyAction),            SIGNAL(triggered()),    this,   SLOT(at_installUpdateManually_triggered()));
     connect(action(Qn::ShowcaseAction),                         SIGNAL(triggered()),    this,   SLOT(at_showcaseAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
@@ -1165,6 +1167,23 @@ void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
 
 void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
     notifyAboutUpdate(true);
+}
+
+void QnWorkbenchActionHandler::at_installUpdateManually_triggered() {
+    QString filter = tr("All files (*.*)");
+
+    QString fileName = QFileDialog::getOpenFileName(mainWindow(),
+                                                    tr("Select file..."),
+                                                    QString(),
+                                                    filter,
+                                                    0,
+                                                    QnCustomFileDialog::fileDialogOptions());
+    if (fileName.isEmpty())
+        return;
+
+    QnMediaServerUpdateTool *mediaServerUpdateTool = new QnMediaServerUpdateTool(this);
+    mediaServerUpdateTool->setUpdateFile(fileName);
+    mediaServerUpdateTool->updateServers();
 }
 
 void QnWorkbenchActionHandler::at_showcaseAction_triggered() {

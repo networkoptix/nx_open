@@ -208,6 +208,7 @@ protected slots:
     void at_openLayoutAction_triggered();
     void at_openFolderAction_triggered();
     void at_checkForUpdatesAction_triggered();
+    void at_installUpdateManually_triggered();
     void at_showcaseAction_triggered();
     void at_aboutAction_triggered();
     void at_businessEventsAction_triggered();

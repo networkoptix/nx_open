@@ -704,7 +704,7 @@ int QnMediaServerConnection::doRebuildArchiveAsync(RebuildAction action, QObject
 
 int QnMediaServerConnection::uploadUpdateAsync(const QString &fileName, QObject *target, const char *slot) {
     QnRequestParamList params;
-    params << QnRequestParam("update_id", updateId);
+    params << QnRequestParam("update_id", fileName);
     return sendAsyncGetRequest(UpdateObject, params, NULL, target, slot);
 }
 

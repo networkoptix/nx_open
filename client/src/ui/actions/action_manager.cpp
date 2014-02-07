@@ -698,6 +698,10 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Check for Updates...")).
         condition(new QnCheckForUpdatesActionCondition(this));
 
+    factory(Qn::InstallUpdateManuallyAction).
+        flags(Qn::Main).
+        text(tr("Install update manually"));
+
     factory(Qn::AboutAction).
         flags(Qn::Main | Qn::GlobalHotkey).
         text(tr("About...")).
