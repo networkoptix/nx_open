@@ -18,12 +18,7 @@ namespace ec2
         m_queryProcessor( queryProcessor ),
         m_connectionInfo( connectionInfo )
     {
-        connect(m_transactionMsg, &QnTransactionMessageBus::gotTransaction, this, &RemoteEC2Connection::at_gotTransaction, Qt::DirectConnection);
-    }
-
-    void RemoteEC2Connection::at_gotTransaction(QByteArray tran)
-    {
-
+        m_transactionMsg->setHandler(this);
     }
 
     QnConnectionInfo RemoteEC2Connection::connectionInfo() const

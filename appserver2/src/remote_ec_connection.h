@@ -20,10 +20,8 @@ namespace ec2
 
     class RemoteEC2Connection
     :
-        public QObject,
         public BaseEc2Connection<FixedUrlClientQueryProcessor>
     {
-        Q_OBJECT
     public:
         RemoteEC2Connection(
             const FixedUrlClientQueryProcessorPtr& queryProcessor,
@@ -32,8 +30,6 @@ namespace ec2
 
         virtual QnConnectionInfo connectionInfo() const override;
 
-    private slots:
-            void at_gotTransaction(QByteArray data);
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
         const QnConnectionInfo m_connectionInfo;
