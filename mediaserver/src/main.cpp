@@ -680,6 +680,9 @@ void QnMain::updateDisabledVendorsIfNeeded()
 
     QString disabledVendors = MSSettings::roSettings()->value(DV_PROPERTY).toString();
     QnUserResourcePtr admin = qnResPool->getAdministrator();
+    if (!admin)
+        return;
+
     if (admin->hasProperty(DV_PROPERTY)) {
         MSSettings::roSettings()->setValue(DV_PROPERTY, admin->getProperty(DV_PROPERTY));
     } else {
@@ -1181,10 +1184,6 @@ void QnMain::run()
 
     QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
 
-
-    loadResourcesFromECS();
-    updateDisabledVendorsIfNeeded();
-
     QString disabledVendors = MSSettings::roSettings()->value("disabledVendors").toString();
     QStringList disabledVendorList;
     if (disabledVendors.contains(";"))
@@ -1261,6 +1260,9 @@ void QnMain::run()
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
+    loadResourcesFromECS();
+    updateDisabledVendorsIfNeeded();
+    QnResourceDiscoveryManager::instance()->updateSearchersUsage();
     connect(QnServerMessageProcessor::instance(), SIGNAL(connectionReset()), this, SLOT(loadResourcesFromECS()));
 
     /*
