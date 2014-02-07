@@ -133,6 +133,8 @@ private:
     void dtsAssignment();
 
     void updateSearcherUsage(QnAbstractResourceSearcher *searcher);
+
+public:
     void updateSearchersUsage();
 
 private:
