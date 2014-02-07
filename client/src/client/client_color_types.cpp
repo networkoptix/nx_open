@@ -38,6 +38,9 @@ QnTimeSliderColors::QnTimeSliderColors() {
 
     dateOverlay = QColor(255, 255, 255, 48);
     dateOverlayAlternate = withAlpha(selection, 48);
+
+    pastLastMinute = pastBackground;
+    futureLastMinute = futureBackground;
 }
 
 QnBackgroundColors::QnBackgroundColors() {
@@ -111,7 +114,7 @@ QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QnTimeSliderColors, 
     (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)
         (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)
-        (separator)(dateOverlay)(dateOverlayAlternate), 
+        (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute), 
     QJson::Optional
 )
 

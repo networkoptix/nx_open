@@ -990,30 +990,20 @@ void QnTimeSlider::generateProgressPatterns() {
     path.closeSubpath();
 
 
-    QColor pastColor = QColor::fromRgbF(m_colors.pastBackground.redF() * m_colors.pastBackground.alphaF(),
-                                        m_colors.pastBackground.greenF() * m_colors.pastBackground.alphaF(),
-                                        m_colors.pastBackground.blueF() * m_colors.pastBackground.alphaF(),
-                                        stripesAlpha);
-
     m_progressPastPattern = QPixmap(stripeWidth * 4, stripeWidth * 4);
     m_progressPastPattern.fill(Qt::transparent);
 
     QPainter pastPainter(&m_progressPastPattern);
     pastPainter.setRenderHint(QPainter::Antialiasing);
-    pastPainter.fillPath(path, pastColor);
+    pastPainter.fillPath(path, m_colors.pastLastMinute);
 
-
-    QColor futureColor = QColor::fromRgbF(m_colors.futureBackground.redF() * m_colors.futureBackground.alphaF(),
-                                          m_colors.futureBackground.greenF() * m_colors.futureBackground.alphaF(),
-                                          m_colors.futureBackground.blueF() * m_colors.futureBackground.alphaF(),
-                                          stripesAlpha);
 
     m_progressFuturePattern = QPixmap(stripeWidth * 4, stripeWidth * 4);
     m_progressFuturePattern.fill(Qt::transparent);
 
     QPainter futurePainter(&m_progressFuturePattern);
     futurePainter.setRenderHint(QPainter::Antialiasing);
-    futurePainter.fillPath(path, futureColor);
+    futurePainter.fillPath(path, m_colors.futureLastMinute);
 }
 
 bool QnTimeSlider::isAnimatingWindow() const {

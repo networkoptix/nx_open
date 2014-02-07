@@ -30,6 +30,9 @@ public:
 
     QColor dateOverlay;
     QColor dateOverlayAlternate;
+
+    QColor pastLastMinute;
+    QColor futureLastMinute;
 };
 
 Q_DECLARE_METATYPE(QnTimeSliderColors)
