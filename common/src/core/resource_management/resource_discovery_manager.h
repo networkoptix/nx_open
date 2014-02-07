@@ -92,9 +92,6 @@ public:
     bool registerManualCameras(const QnManualCameraInfoMap& cameras);
     bool containManualCamera(const QString& uniqId);
 
-    void setDisabledVendors(const QList<QString> &disabledVendors);
-    QList<QString> disabledVendors() const;
-
     ResourceSearcherList plugins() const;
 
     //!This method MUST be called from non-GUI thread, since it can block for some time
@@ -133,8 +130,6 @@ private:
     void dtsAssignment();
 
     void updateSearcherUsage(QnAbstractResourceSearcher *searcher);
-
-public:
     void updateSearchersUsage();
 
 private:
@@ -149,7 +144,6 @@ private:
     QList<QHostAddress> m_allLocalAddresses;
 
     QVector<QnAbstractDTSSearcher*> m_dstList;
-    QSet<QString> m_disabledVendorsForAutoSearch;
     static QnResourceDiscoveryManager* m_instance;
 
     std::auto_ptr<QTimer> m_timer;
