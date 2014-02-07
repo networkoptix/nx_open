@@ -55,6 +55,13 @@ public:
         pos += toRead;
         return toRead;
     }
+
+    //!Resets internal cursor position
+    void reset()
+    {
+        pos = 0;
+    }
+
 private:
     const QByteArray& m_data;
     int pos;

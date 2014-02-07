@@ -106,6 +106,8 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
+        //TODO: #ak return existing connection, if one
+
         LoginInfo loginInfo;
 #if 1
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {

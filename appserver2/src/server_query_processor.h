@@ -40,6 +40,7 @@ namespace ec2
         template<class QueryDataType, class HandlerType>
             void processUpdateAsync( const QnTransaction<QueryDataType>& tran, HandlerType handler )
         {
+            //TODO/IMPL this method must be asynchronous
             ErrorCode errorCode = ErrorCode::ok;
 
             auto scopedGuardFunc = [&errorCode, &handler]( ServerQueryProcessor* ){

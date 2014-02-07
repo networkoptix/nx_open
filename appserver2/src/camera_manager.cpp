@@ -106,6 +106,12 @@ namespace ec2
         return reqID;
     }
 
+    //template<class QueryProcessorType>
+    //template<> void QnCameraManager<QueryProcessorType>::triggerNotification<ApiCameraData>( const QnTransaction<ApiCameraData>& tran )
+    //{
+    //    //TODO/IMPL
+    //}
+
     template<class QueryProcessorType>
     QnTransaction<ApiCameraData> QnCameraManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value cmd,

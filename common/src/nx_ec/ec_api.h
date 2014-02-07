@@ -235,7 +235,8 @@ namespace ec2
         }
 
     signals:
-        void cameraHistoryChanged(QnCameraHistoryItemPtr cameraHistory);
+        void cameraAddedOrUpdated( QnVirtualCameraResourcePtr camera );
+        void cameraHistoryChanged( QnCameraHistoryItemPtr cameraHistory );
 
     protected:
         virtual int addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) = 0;

@@ -24,7 +24,8 @@ namespace ec2
             setResourceParams,
             getResourceParams,
             setPanicMode,
-
+            
+            //!ApiCameraData
             addCamera,
 		    updateCamera,
             removeCamera,
@@ -100,6 +101,12 @@ namespace ec2
         void serialize(OutputBinaryStream<T2>* stream) {
             QnAbstractTransaction::serialize(stream);
             QnBinary::serialize(params, stream);
+        }
+
+        template <class T2>
+        bool deserialize(InputBinaryStream<T2>* stream) {
+            return QnAbstractTransaction::deserialize(stream) &&
+                   QnBinary::deserialize(params, stream);
         }
     };
 

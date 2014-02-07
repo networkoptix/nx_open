@@ -5,14 +5,8 @@
 
 #include "base_ec2_connection.h"
 
-#include "camera_manager.h"
-#include "managers/license_manager.h"
-#include "media_server_manager.h"
-#include "resource_manager.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
-#include "user_manager.h"
-#include "business_event_manager.h"
 
 
 namespace ec2
@@ -53,7 +47,7 @@ namespace ec2
     template<class T>
     AbstractLicenseManagerPtr BaseEc2Connection<T>::getLicenseManager()
     {
-        return nullptr;
+        return AbstractLicenseManagerPtr();
     }
 
     template<class T>
@@ -71,13 +65,13 @@ namespace ec2
     template<class T>
     AbstractLayoutManagerPtr BaseEc2Connection<T>::getLayoutManager()
     {
-        return nullptr;
+        return AbstractLayoutManagerPtr();
     }
 
     template<class T>
     AbstractStoredFileManagerPtr BaseEc2Connection<T>::getStoredFileManager()
     {
-        return nullptr;
+        return AbstractStoredFileManagerPtr();
     }
 
     template<class T>

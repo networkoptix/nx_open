@@ -30,6 +30,9 @@ namespace ec2
 
         virtual QnConnectionInfo connectionInfo() const override;
 
+        template<class T> void processTransaction( const QnTransaction<T>& tran ) {}
+        template<> void processTransaction<ApiCameraData>( const QnTransaction<ApiCameraData>& tran );
+
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
         const QnConnectionInfo m_connectionInfo;

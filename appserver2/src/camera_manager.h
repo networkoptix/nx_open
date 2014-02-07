@@ -2,10 +2,12 @@
 #ifndef CAMERA_MANAGER_H
 #define CAMERA_MANAGER_H
 
+#include <core/resource/camera_resource.h>
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/camera_data.h"
 #include "transaction/transaction.h"
 #include "nx_ec/data/camera_server_item_data.h"
+
 
 namespace ec2
 {
@@ -29,6 +31,16 @@ namespace ec2
         virtual int save( const QnVirtualCameraResourceList& cameras, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::remove
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
+
+        template<class T> void triggerNotification( const QnTransaction<T>& tran );
+        template<> void triggerNotification<ApiCameraData>( const QnTransaction<ApiCameraData>& tran )
+        {
+            QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
+                tran.params.typeId,
+                tran.params.toHashMap() ).dynamicCast<QnVirtualCameraResource>();
+            tran.params.toResource( cameraRes );
+            emit cameraAddedOrUpdated( cameraRes );
+        }
 
     private:
         QueryProcessorType* const m_queryProcessor;
