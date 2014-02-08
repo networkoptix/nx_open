@@ -3,7 +3,7 @@
 
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
-
+#include "transaction/transaction_message_bus.h"
 
 namespace ec2
 {
@@ -14,8 +14,8 @@ namespace ec2
         void initStaticInstance(QnClusterManager* value);
 
         template <class T>
-        ErrorCode distributeAsync(const QnTransaction<T>& /*tran*/) {
-            // todo: implement me
+        ErrorCode distributeAsync(const QnTransaction<T>& tran) {
+            QnTransactionMessageBus::instance()->sendTransaction(tran);
             return ErrorCode::ok;
         }
 

@@ -102,6 +102,7 @@ namespace nx_http
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
 
+        QSharedPointer<AbstractStreamSocket> takeSocket();
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
         //!Emitted when response headers has been read

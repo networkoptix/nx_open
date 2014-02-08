@@ -5,31 +5,84 @@
 #include "nx_ec/data/camera_data.h"
 #include "nx_ec/data/ec2_resource_data.h"
 #include "transaction.h"
+#include "utils/network/http/asynchttpclient.h"
 
 namespace ec2
 {
-    class TransactionHandler
+    class QnTransactionMessageBus;
+
+    class QnTransactionTransport: public QObject, public aio::AIOEventHandler
     {
-        template <class T>
-        void processTransaction(QnTransaction<ApiCameraData> tran)
-        {
+        Q_OBJECT
+    public:
 
-        }
+        QnTransactionTransport() {}
 
-        template <class T>
-        void processTransaction(QnTransaction<ApiResourceData> tran)
-        {
+        enum State {
+            Connect,
+            ReadChunkHeader,
+            ReadChunkBody,
+            Closed
+        };
 
-        }
+        QUrl remoteAddr;
+        nx_http::AsyncHttpClientPtr httpClient;
+        State state;
+        QSharedPointer<AbstractStreamSocket> socket;
+        QQueue<QByteArray> dataToSend;
+        bool readyForSend;
+        bool readyForRead;
+        
+        std::vector<quint8> readBuffer;
+        int readBufferLen;
+        int sendOffset;
+        quint32 chunkLen;
+        bool isClientSide;
+        QnTransactionMessageBus* owner;
+    public:
+        void doClientConnect();
+    protected:
+        void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
+        void processError();
+    private:
+        static void ensureSize(std::vector<quint8>& buffer, int size);
+        int chunkHeaderEnd(quint32* size);
+    private slots:
+        void at_responseReceived( nx_http::AsyncHttpClientPtr );
+        void at_httpClientDone(nx_http::AsyncHttpClientPtr);
     };
 
-    class QnTransactionMessageBus
+    class QnTransactionMessageBus: public QThread
     {
+    public:
+        QnTransactionMessageBus();
+
+        static QnTransactionMessageBus* instance();
+        static void initStaticInstance(QnTransactionMessageBus* instance);
+
+        void addConnectionToPeer(const QUrl& url);
+        void removeConnectionFromPeer(const QUrl& url);
+        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket);
+        
+        template <class T>
+        void setHandler(T* handler) { m_handler = new CustomHandler<T>(handler); }
+
+        template <class T>
+        void sendTransaction(QnTransaction<T> tran)
+        {
+            QByteArray buffer;
+            OutputBinaryStream<QByteArray> stream(&buffer);
+            tran.serialize(&stream);
+            foreach(QnTransactionTransport* transport, m_connections)
+                transport->dataToSend.push_back(buffer);
+        }
     private:
+        friend class QnTransactionTransport;
+
         class AbstractHandler
         {
         public:
-            virtual void processByteArray(QByteArray data) = 0;
+            virtual bool processByteArray(QByteArray& data) = 0;
         };
 
         template <class T>
@@ -38,26 +91,33 @@ namespace ec2
         public:
             CustomHandler(T* handler): m_handler(handler) {}
 
-            virtual void processByteArray(QByteArray data) override;
+            virtual bool processByteArray(QByteArray& data) override;
+        private:
+            template <class T2> bool deliveryTransaction(ApiCommand::Value command, InputBinaryStream<QByteArray>& stream);
         private:
             T* m_handler;
         };
 
-    public:
-        QnTransactionMessageBus();
-
-        ErrorCode addConnectionToPeer(const QUrl& url);
-        void removeConnectionFromPeer(const QUrl& url);
-
-        template <class T>
-        void setHandler(T* handler) { m_handler = new CustomHandler<T>(handler); }
-    private:
         void gotTransaction(QByteArray data)
         {
             m_handler->processByteArray(data);
         }
+
+        virtual void run();
     private:
         AbstractHandler* m_handler;
+
+        /*
+        class QnTransactionTransport
+        {
+        public:
+            virtual void connect();
+            virtual void send();
+            virtual void receive();
+        };
+        */
+        
+        QVector<QnTransactionTransport*> m_connections;
     };
 }
 

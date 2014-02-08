@@ -68,6 +68,17 @@ namespace ec2
         static void setPeerGuid(const QnUuid& value);
         static void setStartNumber(const qint64& value);
 
+        template <class T2>
+        bool deserialize(ApiCommand::Value command, InputBinaryStream<T2>* stream) 
+        {
+            this->command = command;
+            if (!QnBinary::deserialize(id, stream))
+                return false;
+            if (!QnBinary::deserialize(persistent, stream))
+                return false;
+            return true;
+        }
+
         struct ID
         {
 			ID(): number(0) {}
@@ -104,8 +115,9 @@ namespace ec2
         }
 
         template <class T2>
-        bool deserialize(InputBinaryStream<T2>* stream) {
-            return QnAbstractTransaction::deserialize(stream) &&
+        bool deserialize(ApiCommand::Value command, InputBinaryStream<T2>* stream) 
+        {
+            return QnAbstractTransaction::deserialize(command, stream) &&
                    QnBinary::deserialize(params, stream);
         }
     };
