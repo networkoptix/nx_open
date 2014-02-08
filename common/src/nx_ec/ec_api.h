@@ -83,11 +83,12 @@ namespace ec2
         template<class TargetType, class HandlerType> int setResourceDisabled( const QnId& resourceId, bool disabled, TargetType* target, HandlerType handler ) {
             return setResourceDisabled( resourceId, disabled, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
+        //!Saves changes to common resource's properties (e.g., name). Accepts any resource
         /*!
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int save( const QnResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return save( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return save( resource, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode, const QnKvPairListsById&)
@@ -146,7 +147,7 @@ namespace ec2
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int save( const QnMediaServerResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return save( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return save( resource, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode, const QnMediaServerResourceList& servers, const QByteArray& authKey)
@@ -242,7 +243,7 @@ namespace ec2
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int save( const QnVirtualCameraResourceList& cameras, TargetType* target, HandlerType handler ) {
-            return save( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return save( cameras, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode)

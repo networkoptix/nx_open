@@ -81,8 +81,8 @@ public:
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId);
     int getServers(QnMediaServerResourceList& servers);
-    int getLayouts(QnLayoutResourceList& layouts);
-    int getUsers(QnUserResourceList& users);
+    //int getLayouts(QnLayoutResourceList& layouts);
+    //int getUsers(QnUserResourceList& users);
     int getLicenses(QnLicenseList& licenses);
     int getCameraHistoryList(QnCameraHistoryList& cameraHistoryList);
     qint64 getCurrentTime(); // TODO: #Elric this method doesn't follow the sync api guidelines

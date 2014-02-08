@@ -612,23 +612,23 @@ int QnAppServerConnection::getCameras(QnVirtualCameraResourceList &cameras, QnId
     return status;
 }
 
-int QnAppServerConnection::getLayouts(QnLayoutResourceList &layouts)
-{
-    QnResourceList reply;
-    int status = sendSyncGetRequest(LayoutObject, m_requestHeaders, m_requestParams, &reply);
-    if(status == 0)
-        layouts = reply.filtered<QnLayoutResource>();
-    return status;
-}
+//int QnAppServerConnection::getLayouts(QnLayoutResourceList &layouts)
+//{
+//    QnResourceList reply;
+//    int status = sendSyncGetRequest(LayoutObject, m_requestHeaders, m_requestParams, &reply);
+//    if(status == 0)
+//        layouts = reply.filtered<QnLayoutResource>();
+//    return status;
+//}
 
-int QnAppServerConnection::getUsers(QnUserResourceList &users)
-{
-    QnResourceList reply;
-    int status = sendSyncGetRequest(UserObject, m_requestHeaders, m_requestParams, &reply);
-    if(status == 0)
-        users = reply.filtered<QnUserResource>();
-    return status;
-}
+//int QnAppServerConnection::getUsers(QnUserResourceList &users)
+//{
+//    QnResourceList reply;
+//    int status = sendSyncGetRequest(UserObject, m_requestHeaders, m_requestParams, &reply);
+//    if(status == 0)
+//        users = reply.filtered<QnUserResource>();
+//    return status;
+//}
 
 int QnAppServerConnection::getLicenses(QnLicenseList &licenses)
 {
