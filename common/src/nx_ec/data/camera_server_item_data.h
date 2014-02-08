@@ -18,6 +18,7 @@ struct ApiCameraServerItemData: public ApiData
 
     QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
     void fromResource(const QnCameraHistoryItem& item);
+    void toResource(QnCameraHistoryItem* const item);
 };
 
 struct ApiCameraServerItemDataList: public ApiData

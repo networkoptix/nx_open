@@ -145,11 +145,11 @@ detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkben
     assert(oldDisabledFlags.size() == resources.size());
 }
 
-void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const QnResourceList &resources, int handle) {
+void detail::QnResourceStatusReplyProcessor::at_replyReceived( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources ) {
     Q_UNUSED(handle);
 
     if(m_handler)
-        m_handler.data()->at_resources_statusSaved(status, resources, m_oldDisabledFlags);
+        m_handler.data()->at_resources_statusSaved(errorCode, resources, m_oldDisabledFlags);
 
     deleteLater();
 }
@@ -337,6 +337,10 @@ QnAppServerConnectionPtr QnWorkbenchActionHandler::connection() const {
     return QnAppServerConnectionFactory::createConnection();
 }
 
+ec2::AbstractECConnectionPtr QnWorkbenchActionHandler::connection2() const {
+    return QnAppServerConnectionFactory::createConnection2Sync();
+}
+
 bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) const {
     QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
     if(!layoutResource)
@@ -505,9 +509,14 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     cameraSettingsDialog()->widget()->submitToResources();
 
     if (hasDbChanges) {
-        connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+        connection2()->getCameraManager()->save( cameras, this, 
+            [this, cameras]( int reqID, ec2::ErrorCode errorCode ) {
+                at_resources_saved( reqID, errorCode, cameras );
+            } );
         foreach(const QnResourcePtr &camera, cameras) {
-            connection()->saveAsync(camera->getId(), camera->getProperties());
+            connection2()->getResourceManager()->save(
+                camera->getId(), camera->getProperties(),
+                this, &QnWorkbenchActionHandler::at_resources_properties_saved  );
         }
     }
 
@@ -964,7 +973,10 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 
     if(!modifiedResources.empty()) {
         detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldDisabledFlags);
-        connection()->saveAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QnResourceList &, int)));
+        connection2()->getCameraManager()->save( modifiedResources, processor,\
+            [processor, modifiedResources]( int reqID, ec2::ErrorCode errorCode ) {
+                processor->at_replyReceived( reqID, errorCode, modifiedResources );
+            });
     }
 }
 
@@ -1745,7 +1757,10 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraOpenRequested() {
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras){
-    connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+    connection2()->getCameraManager()->save( cameras, this,
+        [this, cameras]( int reqID, ec2::ErrorCode errorCode ) {
+            at_resources_saved( reqID, errorCode, cameras ); 
+    } );
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_rejected() {
@@ -1827,7 +1842,10 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         return;
 
     // TODO: #Elric move submitToResources here.
-    connection()->saveAsync(server, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+    connection2()->getMediaServerManager()->save( server, this,
+        [this, server]( int reqID, ec2::ErrorCode errorCode ) {
+            at_resources_saved( reqID, errorCode, QnResourceList() << server );
+        } );
 }
 
 void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
@@ -1978,7 +1996,10 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         context()->instance<QnWorkbenchLayoutsHandler>()->renameLayout(layout, name);
     } else {
         resource->setName(name);
-        connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+        connection2()->getResourceManager()->save( resource, this,
+            [this, resource]( int reqID, ec2::ErrorCode errorCode ) {
+                at_resources_saved( reqID, errorCode, QnResourceList() << resource );
+            });
     }
 }
 
@@ -2043,7 +2064,11 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     dialog->submitToResource();
     user->setGuid(QUuid::createUuid().toString());
 
-    connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+    connection2()->getUserManager()->save(
+        user, this,
+        [this, user]( int reqID, ec2::ErrorCode errorCode ) {
+            at_resources_saved( reqID, errorCode, QnResourceList() << user );
+        } );
     user->setPassword(QString()); // forget the password now
 }
 
@@ -2147,7 +2172,11 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(permissions & Qn::SavePermission) {
         dialog->submitToResource();
 
-        connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+        connection2()->getUserManager()->save(
+            user, this,
+            [this, user]( int reqID, ec2::ErrorCode errorCode ) {
+                at_resources_saved( reqID, errorCode, QnResourceList() << user );
+            } );
 
         QString newPassword = user->getPassword();
         user->setPassword(QString());
@@ -2366,10 +2395,10 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
     layout->setBackgroundSize(QSize(w, h));
 }
 
-void QnWorkbenchActionHandler::at_resources_saved(int status, const QnResourceList &resources, int handle) {
+void QnWorkbenchActionHandler::at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources ) {
     Q_UNUSED(handle);
 
-    if(status == 0)
+    if( errorCode == ec2::ErrorCode::ok )
         return;
 
     if (resources.isEmpty())
@@ -2385,6 +2414,11 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QnResourceLi
 
 }
 
+void QnWorkbenchActionHandler::at_resources_properties_saved( int handle, ec2::ErrorCode errorCode )
+{
+    //TODO/IMPL
+}
+
 void QnWorkbenchActionHandler::at_resource_deleted(const QnHTTPRawResponse& response, int handle) {
     Q_UNUSED(handle);
 
@@ -2394,8 +2428,8 @@ void QnWorkbenchActionHandler::at_resource_deleted(const QnHTTPRawResponse& resp
     QMessageBox::critical(mainWindow(), tr("Could not delete resource"), tr("An error has occurred while trying to delete a resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(response.errorString.data())));
 }
 
-void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {
-    if(status == 0 || resources.isEmpty())
+void QnWorkbenchActionHandler::at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {
+    if(errorCode == ec2::ErrorCode::ok || resources.isEmpty())
         return;
 
     QnResourceListDialog::exec(
@@ -2444,7 +2478,10 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             if (checked)
                 val = Qn::PM_User;
             resource->setPanicMode(val);
-            connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+            connection2()->getMediaServerManager()->save( resource, this,
+                [this, resource]( int reqID, ec2::ErrorCode errorCode ) {
+                    at_resources_saved( reqID, errorCode, QnResourceList() << resource );
+                });
         }
     }
 }

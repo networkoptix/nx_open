@@ -14,7 +14,9 @@
 #include "transaction/transaction.h"
 #include "business_event_manager.h"
 #include "camera_manager.h"
+#include "managers/layout_manager.h"
 #include "managers/license_manager.h"
+#include "managers/stored_file_manager.h"
 #include "media_server_manager.h"
 #include "resource_manager.h"
 #include "user_manager.h"
@@ -56,6 +58,8 @@ namespace ec2
         std::shared_ptr<QnCameraManager<QueryProcessorType>> m_cameraManager;
         std::shared_ptr<QnUserManager<QueryProcessorType>> m_userManager;
         std::shared_ptr<QnBusinessEventManager<QueryProcessorType>> m_businessEventManager;
+        std::shared_ptr<QnLayoutManager<QueryProcessorType>> m_layoutManager;
+        std::shared_ptr<QnStoredFileManager<QueryProcessorType>> m_storedFileManager;
 
     private:
         QnTransaction<ApiPanicModeData> prepareTransaction( ApiCommand::Value cmd, const Qn::PanicMode& mode);

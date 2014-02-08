@@ -35,12 +35,32 @@ namespace ec2
         virtual int save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::remove
         virtual int remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
-    private:
-        QnTransaction<ApiSetResourceStatusData> prepareTransaction( ApiCommand::Value cmd, const QnId& id, QnResource::Status status);
-        QnTransaction<ApiResourceParams> prepareTransaction(ApiCommand::Value cmd, const QnId& id, const QnKvPairList& kvPairs);
+
+        template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
+            static_assert( false, "Specify QnResourceManager::triggerNotification<>, please" );
+        }
+
+        template<> void triggerNotification<ApiSetResourceStatusData>( const QnTransaction<ApiSetResourceStatusData>& tran ) {
+            emit statusChanged( QnId(tran.params.id), tran.params.status );
+        }
+
+        template<> void triggerNotification<ApiResourceParams>( const QnTransaction<ApiResourceParams>& tran ) {
+            QnKvPairList outData;
+
+            qint32 resourceId = 0;
+            for( const ApiResourceParam& param: tran.params )
+            {
+                outData << QnKvPair(param.name, param.value);
+                resourceId = param.resourceId;
+            }
+            emit resourceParamsChanged( QnId(resourceId), outData );
+        }
 
     private:
         QueryProcessorType* const m_queryProcessor;
+
+        QnTransaction<ApiSetResourceStatusData> prepareTransaction( ApiCommand::Value cmd, const QnId& id, QnResource::Status status);
+        QnTransaction<ApiResourceParams> prepareTransaction(ApiCommand::Value cmd, const QnId& id, const QnKvPairList& kvPairs);
     };
 }
 

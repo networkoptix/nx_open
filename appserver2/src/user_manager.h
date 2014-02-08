@@ -20,6 +20,15 @@ namespace ec2
         virtual int save( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
         virtual int remove( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
 
+        template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
+            static_assert( false, "Specify QnUserManager::triggerNotification<>, please" );
+        }
+
+        template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran )
+        {
+            assert( tran.command == ApiCommand::removeUser );
+            emit removed( QnId(tran.params.id) );
+        }
 
     private:
         QueryProcessorType* const m_queryProcessor;

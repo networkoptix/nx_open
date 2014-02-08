@@ -32,14 +32,33 @@ namespace ec2
         //!Implementation of AbstractCameraManager::remove
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
-        template<class T> void triggerNotification( const QnTransaction<T>& tran );
+        template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
+            static_assert( false, "Specify QnCameraManager::triggerNotification<>, please" );
+        }
+
         template<> void triggerNotification<ApiCameraData>( const QnTransaction<ApiCameraData>& tran )
         {
+            assert( tran.command == ApiCommand::addCamera || tran.command == ApiCommand::updateCamera );
             QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
                 tran.params.typeId,
                 tran.params.toHashMap() ).dynamicCast<QnVirtualCameraResource>();
             tran.params.toResource( cameraRes );
             emit cameraAddedOrUpdated( cameraRes );
+        }
+
+        template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran )
+        {
+            assert( tran.command == ApiCommand::removeCamera );
+            emit cameraRemoved( QnId(tran.params.id) );
+        }
+
+        template<> void triggerNotification<ApiCameraServerItemData>( const QnTransaction<ApiCameraServerItemData>& tran )
+        {
+            QnCameraHistoryItemPtr cameraHistoryItem( new QnCameraHistoryItem(
+                tran.params.physicalId,
+                tran.params.timestamp,
+                tran.params.serverGuid ) );
+            emit cameraHistoryChanged( cameraHistoryItem );
         }
 
     private:

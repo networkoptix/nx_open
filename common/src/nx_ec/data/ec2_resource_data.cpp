@@ -37,4 +37,17 @@ void ApiResourceData::toResource(QnResourcePtr resource) const
         resource->setParam(param.name, param.value, QnDomainDatabase);
 }
 
+QnResourceParameters ApiResourceData::toHashMap() const
+{
+	QnResourceParameters parameters;
+	parameters["id"] = QString::number(id);
+	parameters["name"] = name;
+	parameters["url"] = url;
+	parameters["status"] = QString::number(status);
+	parameters["disabled"] = QString::number(disabled);
+	parameters["parentId"] = QString::number(parentId);
+
+	return parameters;
+}
+
 }

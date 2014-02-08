@@ -31,8 +31,52 @@ namespace ec2
         virtual QnConnectionInfo connectionInfo() const override;
 
         template<class T> void processTransaction( const QnTransaction<T>& tran ) {}
+
         template<> void processTransaction<ApiCameraData>( const QnTransaction<ApiCameraData>& tran ) {
             m_cameraManager->triggerNotification( tran );
+        }
+
+        template<> void processTransaction<ApiIdData>( const QnTransaction<ApiIdData>& tran ) {
+            switch( tran.command )
+            {
+                case ApiCommand::removeCamera:
+                    return m_cameraManager->triggerNotification( tran );
+                case ApiCommand::removeMediaServer:
+                    return m_mediaServerManager->triggerNotification( tran );
+                case ApiCommand::removeUser:
+                    return m_userManager->triggerNotification( tran );
+                case ApiCommand::removeBusinessRule:
+                    return m_businessEventManager->triggerNotification( tran );
+                case ApiCommand::removeLayout:
+                    return m_layoutManager->triggerNotification( tran );
+                default:
+                    assert( false );
+            }
+        }
+
+        template<> void processTransaction<ApiMediaServerData>( const QnTransaction<ApiMediaServerData>& tran ) {
+            m_mediaServerManager->triggerNotification( tran );
+        }
+
+        template<> void processTransaction<ApiSetResourceStatusData>( const QnTransaction<ApiSetResourceStatusData>& tran ) {
+            m_resourceManager->triggerNotification( tran );
+        }
+
+        template<> void processTransaction<ApiResourceParams>( const QnTransaction<ApiResourceParams>& tran ) {
+            m_resourceManager->triggerNotification( tran );
+        }
+
+        template<> void processTransaction<ApiCameraServerItemData>( const QnTransaction<ApiCameraServerItemData>& tran ) {
+            return m_cameraManager->triggerNotification( tran );
+        }
+
+        template<> void processTransaction<ApiPanicModeData>( const QnTransaction<ApiPanicModeData>& tran ) {
+            //TODO/IMPL
+        }
+
+        template<> void processTransaction<QString>( const QnTransaction<QString>& tran ) {
+            if( tran.command == ApiCommand::removeStoredFile )
+                m_storedFileManager->triggerNotification( tran );
         }
 
     private:
@@ -40,7 +84,6 @@ namespace ec2
         const QnConnectionInfo m_connectionInfo;
         QnTransactionMessageBus* m_transactionMsg;
     };
-    
 }
 
 #endif  //REMOTE_EC_CONNECTION_H

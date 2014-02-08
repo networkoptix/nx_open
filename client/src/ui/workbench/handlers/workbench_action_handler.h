@@ -10,6 +10,7 @@
 #include <api/app_server_connection.h>
 
 #include <core/resource/user_resource.h>
+#include <nx_ec/ec_api.h>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
@@ -48,7 +49,7 @@ namespace detail {
         QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources, const QList<int> &oldDisabledFlags);
 
     public slots:
-        void at_replyReceived(int status, const QnResourceList &resources, int handle);
+        void at_replyReceived( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources );
 
     private:
         QPointer<QnWorkbenchActionHandler> m_handler;
@@ -105,6 +106,7 @@ public:
 
 protected:
     QnAppServerConnectionPtr connection() const;
+    ec2::AbstractECConnectionPtr connection2() const;
 
     bool canAutoDelete(const QnResourcePtr &resource) const;
 
@@ -278,9 +280,10 @@ protected slots:
     void at_setAsBackgroundAction_triggered();
     void at_backgroundImageStored(const QString &filename, bool success);
 
-    void at_resources_saved(int status, const QnResourceList &resources, int handle);
+    void at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources );
+    void at_resources_properties_saved( int handle, ec2::ErrorCode errorCode );
     void at_resource_deleted(const QnHTTPRawResponse& resource, int handle);
-    void at_resources_statusSaved(int status, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
+    void at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
 
     void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();

@@ -71,7 +71,11 @@ namespace ec2
             //!ApiIdData
             removeLayout,
             
+            //!ApiStoredFileData
             addStoredFile,
+            //!ApiStoredFileData
+            updateStoredFile,
+            //!QString
             removeStoredFile,
 
             getCurrentTime

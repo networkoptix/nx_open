@@ -18,7 +18,7 @@ struct ApiResourceParam: public ApiData
     ApiResourceParam() {}
     ApiResourceParam(qint32 resourceId, const QString& name, const QString& value): resourceId(resourceId), name(name), value(value) {}
 
-    qint32 resourceId;
+    qint32 resourceId;  //TODO this value MUST be the same for every item in the list, so it's not appropriate here
     QString name;
     QString value;
 
@@ -43,6 +43,7 @@ struct ApiResourceData: public ApiData
 
 	void fromResource(const QnResourcePtr& resource);
 	void toResource(QnResourcePtr resource) const;
+	QnResourceParameters toHashMap() const;
     QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
 };
 

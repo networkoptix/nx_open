@@ -25,7 +25,11 @@ namespace ec2
         \note All methods are asynchronous if other not specified
     */
     class AbstractResourceManager
+    :
+        public QObject
     {
+        Q_OBJECT
+
     public:
         virtual ~AbstractResourceManager() {}
 
@@ -79,11 +83,12 @@ namespace ec2
         template<class TargetType, class HandlerType> int setResourceDisabled( const QnId& resourceId, bool disabled, TargetType* target, HandlerType handler ) {
             return setResourceDisabled( resourceId, disabled, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
+        //!Saves changes to common resource's properties (e.g., name). Accepts any resource
         /*!
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int save( const QnResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return save( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return save( resource, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode, const QnKvPairListsById&)
@@ -97,6 +102,11 @@ namespace ec2
         template<class TargetType, class HandlerType> int remove( const QnResourcePtr& resource, TargetType* target, HandlerType handler ) {
             return remove( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+    signals:
+        void statusChanged( const QnId& resourceId, QnResource::Status status );
+        void disabledChanged( const QnId& resourceId, bool disabled );
+        void resourceParamsChanged( const QnId& resourceId, const QnKvPairList& kvPairs );
 
     protected:
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
@@ -113,7 +123,11 @@ namespace ec2
 
 
     class AbstractMediaServerManager
+    :
+        public QObject
     {
+        Q_OBJECT
+
     public:
         virtual ~AbstractMediaServerManager() {}
 
@@ -133,7 +147,7 @@ namespace ec2
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int save( const QnMediaServerResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return save( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return save( resource, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode, const QnMediaServerResourceList& servers, const QByteArray& authKey)
@@ -153,6 +167,10 @@ namespace ec2
         template<class TargetType, class HandlerType> int remove( const QnId& id, TargetType* target, HandlerType handler ) {
             return remove( id, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+    signals:
+        void addedOrUpdated( QnMediaServerResourcePtr camera );
+        void removed( QnId id );
 
     protected:
         virtual int getServers( impl::GetServersHandlerPtr handler ) = 0;
@@ -225,7 +243,7 @@ namespace ec2
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int save( const QnVirtualCameraResourceList& cameras, TargetType* target, HandlerType handler ) {
-            return save( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return save( cameras, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode)
@@ -237,6 +255,7 @@ namespace ec2
     signals:
         void cameraAddedOrUpdated( QnVirtualCameraResourcePtr camera );
         void cameraHistoryChanged( QnCameraHistoryItemPtr cameraHistory );
+        void cameraRemoved( QnId id );
 
     protected:
         virtual int addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) = 0;
@@ -285,8 +304,12 @@ namespace ec2
     /*!
         \note All methods are asynchronous if other not specified
     */
-    class AbstractBusinessEventManager: public QObject
+    class AbstractBusinessEventManager
+    :
+        public QObject
     {
+        Q_OBJECT
+
     public:
         virtual ~AbstractBusinessEventManager() {}
 
@@ -356,6 +379,10 @@ namespace ec2
             return resetBusinessRules( rule, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+    signals:
+        void addedOrUpdated( QnBusinessEventRulePtr camera );
+        void removed( QnId id );
+
     private:
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
         virtual int addBusinessRule( const QnBusinessEventRulePtr& businessRule, impl::SimpleHandlerPtr handler ) = 0;
@@ -378,7 +405,11 @@ namespace ec2
         \note All methods are asynchronous if other not specified
     */
     class AbstractUserManager
+    :
+        public QObject
     {
+        Q_OBJECT
+
     public:
         virtual ~AbstractUserManager() {}
 
@@ -408,6 +439,10 @@ namespace ec2
             return remove( resource, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+    signals:
+        void addedOrUpdated( QnUserResourcePtr camera );
+        void removed( QnId id );
+
     private:
         virtual int getUsers( impl::GetUsersHandlerPtr handler ) = 0;
         virtual int save( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
@@ -419,7 +454,11 @@ namespace ec2
         \note All methods are asynchronous if other not specified
     */
     class AbstractLayoutManager
+    :
+        public QObject
     {
+        Q_OBJECT
+
     public:
         virtual ~AbstractLayoutManager() {}
 
@@ -442,6 +481,10 @@ namespace ec2
             return remove( resource, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+    signals:
+        void addedOrUpdated( QnLayoutResourcePtr camera );
+        void removed( QnId id );
+
     protected:
         virtual int getLayouts( impl::GetLayoutsHandlerPtr handler ) = 0;
         virtual int save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) = 0;
@@ -453,7 +496,11 @@ namespace ec2
         \note All methods are asynchronous if other not specified
     */
     class AbstractStoredFileManager
+    :
+        public QObject
     {
+        Q_OBJECT
+
     public:
         virtual ~AbstractStoredFileManager() {}
 
@@ -481,6 +528,10 @@ namespace ec2
         template<class TargetType, class HandlerType> int listDirectory( const QString& folderName, TargetType* target, HandlerType handler ) {
             return listDirectory( folderName, std::static_pointer_cast<impl::ListDirectoryHandler>(std::make_shared<impl::CustomListDirectoryHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+    signals:
+        void addedOrUpdated( QString filename );
+        void removed( QString filename );
 
     protected:
         virtual int getStoredFile( const QString& filename, impl::GetStoredFileHandlerPtr handler ) = 0;

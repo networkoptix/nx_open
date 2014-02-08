@@ -42,10 +42,6 @@ void ApiStorageData::toResource(QnAbstractStorageResourcePtr resource) const
 QnResourceParameters ApiStorageData::toHashMap() const
 {
     QnResourceParameters parameters;
-    parameters["id"] = id;
-    parameters["parentId"] = parentId;
-    parameters["name"] = name;
-    parameters["url"] = url;
     parameters["spaceLimit"] = QString::number(spaceLimit);
     parameters["usedForWriting"] = QString::number(usedForWriting);
 
