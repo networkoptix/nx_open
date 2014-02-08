@@ -19,7 +19,7 @@ namespace ec2
 
         QnTransactionTransport(QnTransactionMessageBus* owner):
             state(NotDefined), readyForSend(false), readyForRead(false), readBufferLen(0), sendOffset(0), chunkLen(0), isClientSide(false), owner(owner) {}
-
+        ~QnTransactionTransport();
         enum State {
             NotDefined,
             Connect,
@@ -49,6 +49,7 @@ namespace ec2
         void startStreaming();
     protected:
         void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
+        void closeSocket();
         void processError();
     private:
         static void ensureSize(std::vector<quint8>& buffer, int size);
@@ -119,7 +120,7 @@ namespace ec2
         void at_timer();
     private:
         AbstractHandler* m_handler;
-        QTimer m_timer;
+        QTimer* m_timer;
         QMutex m_mutex;
 
         /*

@@ -8,6 +8,11 @@ namespace ec2
 
 // --------------------------------- QnTransactionTransport ------------------------------
 
+QnTransactionTransport::~QnTransactionTransport()
+{
+    closeSocket();
+}
+
 void QnTransactionTransport::ensureSize(std::vector<quint8>& buffer, int size)
 {
     if (buffer.size() < size)
@@ -32,10 +37,19 @@ int QnTransactionTransport::chunkHeaderEnd(quint32* size)
     return -1;
 }
 
+void QnTransactionTransport::closeSocket()
+{
+    if (socket) {
+        socket->close();
+        aio::AIOService::instance()->removeFromWatch( socket, PollSet::etRead, this );
+        aio::AIOService::instance()->removeFromWatch( socket, PollSet::etWrite, this );
+        socket.reset();
+    }
+}
+
 void QnTransactionTransport::processError()
 {
-    if (socket)
-        socket->close();
+    closeSocket();
     if (isClientSide) 
         state = State::Connect;
     else
@@ -60,6 +74,8 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                 if (readed < 1) {
                     // no more data or error
                     if(readed == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock)
+                    //SystemError::ErrorCode err = SystemError::getLastOSErrorCode();
+                    //if(err != SystemError::wouldBlock && err != SystemError::noError)
                         processError();
                     return; // no more data
                 }
@@ -105,8 +121,11 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
             const char* dataStart = data.data();
             const char* dataEnd = dataStart + data.size();
             int sended = socket->send(dataStart + sendOffset, data.size() - sendOffset);
-            if (sended < 1)
+            if (sended < 1) {
+                if(sended == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock)
+                    processError();
                 return; // can't send any more
+            }
             sendOffset + sended;
             if (sendOffset == data.size())
                 dataToSend.dequeue();
@@ -125,8 +144,8 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
 void QnTransactionTransport::doClientConnect()
 {
     httpClient = nx_http::AsyncHttpClientPtr(new nx_http::AsyncHttpClient());
-    connect(httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived);
-    connect(httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone);
+    connect(httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
+    connect(httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
     httpClient->doGet(remoteAddr);
 }
 
@@ -148,7 +167,8 @@ void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr clien
 
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
 {
-    state = QnTransactionTransport::ReadyForStreaming;
+    startStreaming();
+    state = QnTransactionTransport::ReadChunkHeader;
 }
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
@@ -165,7 +185,7 @@ void QnTransactionMessageBus::initStaticInstance(QnTransactionMessageBus* instan
     m_globalInstance = instance;
 }
 
-QnTransactionMessageBus::QnTransactionMessageBus()
+QnTransactionMessageBus::QnTransactionMessageBus(): m_timer(0)
 {
     start();
 }
@@ -174,6 +194,7 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
 {
     exit();
     wait();
+    delete m_timer;
 }
 
 template <class T>
@@ -210,8 +231,9 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
 void QnTransactionMessageBus::run()
 {
     moveToThread(QThread::currentThread());
-    connect(&m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
-    m_timer.start(1);
+    m_timer = new QTimer();
+    connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
+    m_timer->start(1);
     exec();
 }
 
