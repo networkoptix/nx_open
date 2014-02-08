@@ -217,8 +217,10 @@ namespace aio
                 if( it->socket == sock && it->eventType == eventType && it->type != taskType )
                 {
                     //TODO/IMPL if we changing socket handler or socket timeout MUST not remove task
-                    if( it->type == SocketAddRemoveTask::tRemoving )
+                    if( it->type == SocketAddRemoveTask::tRemoving )     
                     {
+                        if( eventHandler != it->eventHandler )
+                            continue;   //event handler changed, cannot ignore task
                         //cancelling remove task
                         void* userData = pollSet.getUserData( sock.data(), eventType );
                         Q_ASSERT( userData );
