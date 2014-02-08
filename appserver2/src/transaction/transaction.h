@@ -20,26 +20,59 @@ namespace ec2
             connect,
 
             getResourceTypes,
+            //!ApiSetResourceStatusData
             setResourceStatus,
+            //!ApiResourceParams
             setResourceParams,
             getResourceParams,
+            //!ApiPanicModeData
             setPanicMode,
             
             //!ApiCameraData
             addCamera,
+            //!ApiCameraData
 		    updateCamera,
+            //!ApiIdData
             removeCamera,
             getCameras,
+            //!ApiCameraServerItemData
             getCameraHistoryList,
+            //!ApiCameraServerItemData
             addCameraHistoryList,
 
             getMediaServerList,
+            //!ApiMediaServerData
             addMediaServer,
+            //!ApiMediaServerData
             updateMediaServer,
+            //!ApiIdData
             removeMediaServer,
 
+            //!ApiUserData
+            addUser,
+            //!ApiUserData
+            updateUser,
             getUserList,
+            //!ApiIdData
+            removeUser,
+
+            //!ApiBusinessRuleData
+            addBusinessRule,
+            //!ApiBusinessRuleData
+            updateBusinessRule,
             getBusinessRuleList,
+            //!ApiIdData
+            removeBusinessRule,
+
+            //!ApiLayoutData
+            addLayout,
+            //!ApiLayoutData
+            updateLayout,
+            //!ApiIdData
+            removeLayout,
+            
+            addStoredFile,
+            removeStoredFile,
 
             getCurrentTime
         };

@@ -21,6 +21,12 @@ namespace ec2
                     return "getResourceTypes";
                 case setResourceStatus:
                     return "setResourceStatus";
+                case setResourceParams:
+                    return "setResourceParams";
+                case getResourceParams:
+                    return "getResourceParams";
+                case setPanicMode:
+                    return "setPanicMode";
 
                 case addCamera:
                     return "addCamera";
@@ -32,6 +38,8 @@ namespace ec2
                     return "getCameras";
                 case getCameraHistoryList:
                     return "getCameraHistoryList";
+                case addCameraHistoryList:
+                    return "addCameraHistoryList";
 
                 case getMediaServerList:
                     return "getMediaServerList";
@@ -42,10 +50,38 @@ namespace ec2
                 case removeMediaServer:
                     return "removeMediaServer";
 
+                case addUser:
+                    return "addUser";
+                case updateUser:
+                    return "updateUser";
                 case getUserList:
                     return "getUserList";
+                case removeUser:
+                    return "removeUser";
+
+                case addBusinessRule:
+                    return "addBusinessRule";
+                case updateBusinessRule:
+                    return "updateBusinessRule";
+                case removeBusinessRule:
+                    return "removeBusinessRule";
                 case getBusinessRuleList:
                     return "getBusinessRuleList";
+
+                case addLayout:
+                    return "addLayout";
+                case updateLayout:
+                    return "updateLayout";
+                case removeLayout:
+                    return "removeLayout";
+
+                case addStoredFile:
+                    return "addStoredFile";
+                case removeStoredFile:
+                    return "removeStoredFile";
+
+                case getCurrentTime:
+                    return "getCurrentTime";
 
                 default:
                     return "unknown";
