@@ -952,11 +952,6 @@ void QnMain::run()
     // Create SessionManager
     QnSessionManager::instance()->start();
     
-    // -------------------------- test ---------------
-    ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
-    ec2::QnTransactionMessageBus::instance()->addConnectionToPeer(QUrl("http://localhost:50000/api/"));
-
-
 #ifdef ENABLE_ONVIF
     //starting soap server to accept event notifications from onvif servers
     QnSoapServer::initStaticInstance( new QnSoapServer(8083) ); //TODO/IMPL get port from settings or use any unused port?
@@ -1000,6 +995,7 @@ void QnMain::run()
     connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr, QnBusiness::EventReason)), this, SLOT(at_storageFailure(QnResourcePtr, QnBusiness::EventReason)));
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
+
     ec2::ResourceContext resCtx(
         QnResourceDiscoveryManager::instance(),
         qnResPool,
@@ -1107,6 +1103,7 @@ void QnMain::run()
     QnRestProcessorPool::initStaticInstance( &restProcessorPool );
 
     ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
+    ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 
     initTcpListener();
 

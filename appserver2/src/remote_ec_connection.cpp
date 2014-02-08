@@ -18,7 +18,17 @@ namespace ec2
         m_queryProcessor( queryProcessor ),
         m_connectionInfo( connectionInfo )
     {
-        m_transactionMsg->setHandler(this);
+        QnTransactionMessageBus::instance()->setHandler(this);
+        QUrl url(m_queryProcessor->getUrl());
+        url.setPath("ec2/events");
+        QnTransactionMessageBus::instance()->addConnectionToPeer(url);
+    }
+
+    RemoteEC2Connection::~RemoteEC2Connection()
+    {
+        QUrl url(m_queryProcessor->getUrl());
+        url.setPath("ec2/events");
+        QnTransactionMessageBus::instance()->removeConnectionFromPeer(url);
     }
 
     QnConnectionInfo RemoteEC2Connection::connectionInfo() const

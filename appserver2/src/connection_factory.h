@@ -31,6 +31,7 @@ namespace ec2
         virtual int connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler ) override;
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) override;
+        virtual void registerTransactionListener( QnUniversalTcpListener* universalTcpListener ) override;
         virtual void setContext( const ResourceContext& resCtx ) override;
 
     private:

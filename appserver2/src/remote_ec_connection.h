@@ -27,6 +27,7 @@ namespace ec2
             const FixedUrlClientQueryProcessorPtr& queryProcessor,
             const ResourceContext& resCtx,
             const QnConnectionInfo& connectionInfo );
+        virtual ~RemoteEC2Connection();
 
         virtual QnConnectionInfo connectionInfo() const override;
 

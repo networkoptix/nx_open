@@ -38,7 +38,7 @@ namespace ec2
         {
             m_clientProcessor->processQueryAsync<InputData, OutputData, HandlerType>( m_ecURL, cmdCode, input, handler );
         }
-
+        QUrl getUrl() const { return m_ecURL; }
     private:
         ClientQueryProcessor* m_clientProcessor;
         const QUrl m_ecURL;

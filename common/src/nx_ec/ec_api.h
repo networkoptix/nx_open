@@ -12,7 +12,7 @@
 #include "impl/ec_api_impl.h"
 #include "impl/sync_handler.h"
 #include "rest/server/rest_connection_processor.h"
-
+#include "network/universal_tcp_listener.h"
 
 //!Contains API classes for the new enterprise controller
 /*!
@@ -678,6 +678,7 @@ namespace ec2
         }
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
+        virtual void registerTransactionListener( QnUniversalTcpListener* universalTcpListener ) = 0;
         virtual void setContext( const ResourceContext& resCtx ) = 0;
 
     protected:

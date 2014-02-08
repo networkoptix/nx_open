@@ -19,11 +19,10 @@ void QnTransactionTransport::ensureSize(std::vector<quint8>& buffer, int size)
         buffer.resize(size);
 }
 
-int QnTransactionTransport::chunkHeaderEnd(quint32* size)
+int QnTransactionTransport::getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size)
 {
-    const quint8* data = &readBuffer[0];
-    size = 0;
-    for (int i = 0; i < readBufferLen - 1; ++i)
+    *size = 0;
+    for (int i = 0; i < dataLen - 1; ++i)
     {
         if (data[i] >= '0' && data[i] <= '9')
             *size = *size * 16 + (data[i] - '0');
@@ -54,7 +53,7 @@ void QnTransactionTransport::processError()
         state = State::Connect;
     else
         state = State::Closed;
-}
+} 
 
 void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventType eventType ) throw()
 {
@@ -68,7 +67,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
         {
             if (state == ReadChunkHeader) 
             {
-                ensureSize(readBuffer, 12);
+                ensureSize(readBuffer, readBufferLen + 4);
                 quint8* rBuffer = &readBuffer[0];
                 readed = socket->recv(rBuffer + readBufferLen, 4);
                 if (readed < 1) {
@@ -80,9 +79,9 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                     return; // no more data
                 }
                 readBufferLen += readed;
-                int chunkEnd = chunkHeaderEnd(&chunkLen);
+                int chunkEnd = getChunkHeaderEnd(rBuffer, readBufferLen, &chunkLen);
                 if (chunkEnd >= 0) {
-                    memmove(&readBuffer[0], rBuffer + chunkEnd, readBufferLen - chunkEnd); // 3 bytes max
+                    memmove(rBuffer, rBuffer + chunkEnd, readBufferLen - chunkEnd); // 3 bytes max
                     readBufferLen -= chunkEnd;
                     state = ReadChunkBody;
                 }
@@ -143,15 +142,47 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
 
 void QnTransactionTransport::doClientConnect()
 {
-    httpClient = nx_http::AsyncHttpClientPtr(new nx_http::AsyncHttpClient());
+    httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     connect(httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
     connect(httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
     httpClient->doGet(remoteAddr);
 }
 
+void QnTransactionTransport::processTransactionData( const QByteArray& data)
+{
+    state = ReadChunkHeader;
+
+    const quint8* buffer = (const quint8*) data.data();
+    int bufferLen = data.size();
+    int chunkHeaderEnd = getChunkHeaderEnd(buffer, bufferLen, &chunkLen);
+    while (chunkHeaderEnd >= 0) 
+    {
+        buffer += chunkHeaderEnd;
+        bufferLen -= chunkHeaderEnd;
+        if (bufferLen >= chunkLen + 2)
+        {
+            owner->gotTransaction(QByteArray::fromRawData((const char *) buffer, chunkLen));
+            buffer += chunkLen + 2;
+            bufferLen -= chunkLen;
+        }
+        else {
+            state = ReadChunkBody;
+            break;
+        }
+        chunkHeaderEnd = getChunkHeaderEnd(buffer, bufferLen, &chunkLen);
+    }
+
+    if (bufferLen > 0) {
+        readBuffer.resize(bufferLen);
+        memcpy(&readBuffer[0], buffer, bufferLen);
+    }
+    readBufferLen = bufferLen;
+}
+
 void QnTransactionTransport::startStreaming()
 {
     socket = httpClient->takeSocket();
+    processTransactionData(httpClient->fetchMessageBodyBuffer());
     httpClient.reset();
 
     aio::AIOService::instance()->watchSocket( socket, PollSet::etRead, this );
@@ -281,6 +312,16 @@ void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url)
     transport->remoteAddr = url;
     transport->state = QnTransactionTransport::Connect;
     m_connections.push_back(transport);
+}
+
+void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
+{
+    QMutexLocker lock(&m_mutex);
+    foreach(QnTransactionTransport* transport, m_connections)
+    {
+        if (transport->remoteAddr == url)
+            transport->state = QnTransactionTransport::Closed;
+    }
 }
 
 template class QnTransactionMessageBus::CustomHandler<RemoteEC2Connection>;

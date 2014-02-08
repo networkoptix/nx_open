@@ -15,9 +15,8 @@
 #include "rest/ec2_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
 #include "transaction/transaction.h"
+#include "http/ec2_transaction_tcp_listener.h"
 #include "version.h"
-
-
 
 namespace ec2
 {
@@ -25,10 +24,14 @@ namespace ec2
     {
         qRegisterMetaType<ErrorCode>();
         qRegisterMetaType<AbstractECConnectionPtr>();
+
+        ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     {
+        delete ec2::QnTransactionMessageBus::instance();
+        ec2::QnTransactionMessageBus::initStaticInstance(0);
     }
 
     //!Implementation of AbstractECConnectionFactory::testConnectionAsync
@@ -47,6 +50,11 @@ namespace ec2
             return establishDirectConnection( handler );
         else
             return establishConnectionToRemoteServer( addr, handler );
+    }
+
+    void Ec2DirectConnectionFactory::registerTransactionListener( QnUniversalTcpListener* universalTcpListener )
+    {
+        universalTcpListener->addHandler<QnTransactionTcpProcessor>("HTTP", "ec2/events");
     }
 
     void Ec2DirectConnectionFactory::registerRestHandlers( QnRestProcessorPool* const restProcessorPool )
