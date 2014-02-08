@@ -128,6 +128,7 @@
 #endif
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resources/acti/acti_resource.h"
+#include "transaction/transaction_message_bus.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -951,6 +952,11 @@ void QnMain::run()
     // Create SessionManager
     QnSessionManager::instance()->start();
     
+    // -------------------------- test ---------------
+    ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
+    ec2::QnTransactionMessageBus::instance()->addConnectionToPeer(QUrl("http://localhost:50000/api/"));
+
+
 #ifdef ENABLE_ONVIF
     //starting soap server to accept event notifications from onvif servers
     QnSoapServer::initStaticInstance( new QnSoapServer(8083) ); //TODO/IMPL get port from settings or use any unused port?
@@ -1145,6 +1151,7 @@ void QnMain::run()
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
     }
+
 
     syncStoragesToSettings(m_mediaServer);
 

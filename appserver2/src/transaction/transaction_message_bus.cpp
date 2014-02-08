@@ -34,7 +34,8 @@ int QnTransactionTransport::chunkHeaderEnd(quint32* size)
 
 void QnTransactionTransport::processError()
 {
-    socket->close();
+    if (socket)
+        socket->close();
     if (isClientSide) 
         state = State::Connect;
     else
@@ -126,22 +127,28 @@ void QnTransactionTransport::doClientConnect()
     httpClient = nx_http::AsyncHttpClientPtr(new nx_http::AsyncHttpClient());
     connect(httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived);
     connect(httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone);
+    httpClient->doGet(remoteAddr);
+}
+
+void QnTransactionTransport::startStreaming()
+{
+    socket = httpClient->takeSocket();
+    httpClient.reset();
+
+    aio::AIOService::instance()->watchSocket( socket, PollSet::etRead, this );
+    aio::AIOService::instance()->watchSocket( socket, PollSet::etWrite, this );
 }
 
 void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr client)
 {
-    // todo: implement me
-    int gg = 4;
+    nx_http::AsyncHttpClient::State state = client->state();
+    if (state == nx_http::AsyncHttpClient::sFailed)
+        processError();
 }
 
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
 {
-    socket = httpClient->takeSocket();
-    httpClient.reset();
-    state = QnTransactionTransport::ReadChunkHeader;
-
-    aio::AIOService::instance()->watchSocket( socket, PollSet::etRead, this );
-    aio::AIOService::instance()->watchSocket( socket, PollSet::etWrite, this );
+    state = QnTransactionTransport::ReadyForStreaming;
 }
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
@@ -156,6 +163,17 @@ void QnTransactionMessageBus::initStaticInstance(QnTransactionMessageBus* instan
 {
     Q_ASSERT(m_globalInstance == 0);
     m_globalInstance = instance;
+}
+
+QnTransactionMessageBus::QnTransactionMessageBus()
+{
+    start();
+}
+
+QnTransactionMessageBus::~QnTransactionMessageBus()
+{
+    exit();
+    wait();
 }
 
 template <class T>
@@ -181,9 +199,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
     {
         case ApiCommand::addCamera:
         case ApiCommand::updateCamera:
-            deliveryTransaction<ApiCameraData>(command, stream);
-            break;
-            
+            return deliveryTransaction<ApiCameraData>(command, stream);
         default:
             break;
     }
@@ -193,6 +209,14 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
 
 void QnTransactionMessageBus::run()
 {
+    moveToThread(QThread::currentThread());
+    connect(&m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
+    m_timer.start(1);
+    exec();
+}
+
+void QnTransactionMessageBus::at_timer()
+{
     for (int i = m_connections.size()-1; i >= 0; --i)
     {
         QnTransactionTransport* transport = m_connections[i];
@@ -200,6 +224,7 @@ void QnTransactionMessageBus::run()
         {
             case QnTransactionTransport::Connect:
             {
+                transport->state = QnTransactionTransport::Connecting;
                 transport->doClientConnect();
                 break;
             }
@@ -207,13 +232,18 @@ void QnTransactionMessageBus::run()
                 delete m_connections[i];
                 m_connections.removeAt(i);
                 break;
+            case QnTransactionTransport::ReadyForStreaming:
+                transport->state = QnTransactionTransport::ReadChunkHeader;
+                transport->startStreaming();
         }
     }
 }
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket)
 {
-    QnTransactionTransport* transport = new QnTransactionTransport();
+    QMutexLocker lock(&m_mutex);
+
+    QnTransactionTransport* transport = new QnTransactionTransport(this);
     transport->isClientSide = false;
     transport->socket = socket;
     transport->state = QnTransactionTransport::ReadChunkHeader;
@@ -222,7 +252,9 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
 
 void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url)
 {
-    QnTransactionTransport* transport = new QnTransactionTransport();
+    QMutexLocker lock(&m_mutex);
+
+    QnTransactionTransport* transport = new QnTransactionTransport(this);
     transport->isClientSide = true;
     transport->remoteAddr = url;
     transport->state = QnTransactionTransport::Connect;
