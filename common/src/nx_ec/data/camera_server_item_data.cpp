@@ -10,6 +10,13 @@ void ApiCameraServerItemData::fromResource(const QnCameraHistoryItem& item)
     timestamp = item.timestamp;
 }
 
+void ApiCameraServerItemData::toResource(QnCameraHistoryItem* const item)
+{
+    item->physicalId = physicalId;
+    item->mediaServerGuid = serverGuid;
+    item->timestamp = timestamp;
+}
+
 void ApiCameraServerItemDataList::loadFromQuery(QSqlQuery& query) 
 { 
     QN_QUERY_TO_DATA_OBJECT(query, ApiCameraServerItemData, data, ApiCameraServerItemFields) 

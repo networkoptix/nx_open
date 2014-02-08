@@ -22,7 +22,9 @@ namespace ec2
         m_mediaServerManager( new QnMediaServerManager<T>(m_queryProcessor, resCtx) ),
         m_cameraManager( new QnCameraManager<T>(m_queryProcessor, resCtx) ),
         m_userManager( new QnUserManager<T>(m_queryProcessor, resCtx) ),
-        m_businessEventManager( new QnBusinessEventManager<T>(m_queryProcessor, resCtx) )
+        m_businessEventManager( new QnBusinessEventManager<T>(m_queryProcessor, resCtx) ),
+        m_layoutManager( new QnLayoutManager<T>(m_queryProcessor, resCtx) ),
+        m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) )
     {
     }
 
@@ -65,13 +67,13 @@ namespace ec2
     template<class T>
     AbstractLayoutManagerPtr BaseEc2Connection<T>::getLayoutManager()
     {
-        return AbstractLayoutManagerPtr();
+        return m_layoutManager;
     }
 
     template<class T>
     AbstractStoredFileManagerPtr BaseEc2Connection<T>::getStoredFileManager()
     {
-        return AbstractStoredFileManagerPtr();
+        return m_storedFileManager;
     }
 
     template<class T>

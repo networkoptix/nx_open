@@ -103,17 +103,11 @@ void ScheduleTaskList::loadFromQuery(QSqlQuery& query)
 
 QnResourceParameters ApiCameraData::toHashMap() const
 {
-	QnResourceParameters parameters;
-	parameters["id"] = QString::number(id);
-	parameters["name"] = name;
-	parameters["url"] = url;
+	QnResourceParameters parameters = ApiResourceData::toHashMap();
 	parameters["mac"] = mac;
 	parameters["physicalId"] = physicalId;
 	parameters["login"] = login;
 	parameters["password"] = password;
-	parameters["status"] = QString::number(status);
-	parameters["disabled"] = QString::number(disabled);
-	parameters["parentId"] = QString::number(parentId);
 
 	return parameters;
 }

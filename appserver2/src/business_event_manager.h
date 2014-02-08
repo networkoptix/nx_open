@@ -25,6 +25,16 @@ namespace ec2
         virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) override;
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) override;
 
+        template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
+            static_assert( false, "Specify QnBusinessEventManager::triggerNotification<>, please" );
+        }
+
+        template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran )
+        {
+            assert( tran.command == ApiCommand::removeBusinessRule );
+            emit removed( QnId(tran.params.id) );
+        }
+
     private:
         QueryProcessorType* const m_queryProcessor;
         ResourceContext m_resCtx;
