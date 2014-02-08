@@ -453,7 +453,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction), 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenCurrentUserLayoutMenu)));
     m_titleRightButtonsLayout->addStretch(0x1000);
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::TogglePanicModeAction), 1.0, Qn::MainWindow_Panic_Help));
     if (QnScreenRecorder::isSupported())
         m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction), 1.0, Qn::MainWindow_ScreenRecording_Help));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));

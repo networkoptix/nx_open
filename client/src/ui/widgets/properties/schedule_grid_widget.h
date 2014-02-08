@@ -2,18 +2,21 @@
 #define QN_SCHEDULE_GRID_WIDGET_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QColor>
 #include <QtWidgets/QWidget>
+
+#include <client/client_color_types.h>
 #include <core/misc/schedule_recording_type.h>
 
+
 //TODO: #Elric omg look at these global constants =)
-static const int SEL_CELL_CLR_DELTA = 40;
 static const int COL_COUNT = 24;
 static const int ROW_COUNT = 7;
-
 
 class QnScheduleGridWidget : public QWidget {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
+    Q_PROPERTY(QnScheduleGridWidgetColors colors READ colors WRITE setColors)
 
 public:
     explicit QnScheduleGridWidget(QWidget *parent = 0);
@@ -52,6 +55,8 @@ public:
     void setMaxFps(int maxFps, int maxDualStreamFps); // todo: move this methods to camera schedule widget
     int getMaxFps(bool motionPlusLqOnly); // todo: move this methods to camera schedule widget
 
+    const QnScheduleGridWidgetColors &colors() const;
+    void setColors(const QnScheduleGridWidgetColors &colors);
 signals:
     void cellActivated(const QPoint &cell);
     void cellValueChanged(const QPoint &cell);
@@ -80,6 +85,7 @@ private:
     bool isValidRow(int row) const;
     bool isValidColumn(int column) const;
 
+    QColor disabledCellColor(const QColor &baseColor) const;
 private:
     CellParams m_defaultParams;
     CellParams m_gridParams[COL_COUNT][ROW_COUNT];
@@ -98,8 +104,9 @@ private:
     QFont m_labelsFont;
     QFont m_gridFont;
 
-    QColor m_colors[Qn::RecordingType_Count];
+    QColor m_cellColors[Qn::RecordingType_Count];
     QColor m_insideColors[Qn::RecordingType_Count];
+    QnScheduleGridWidgetColors m_colors;
 
     bool m_enabled;
     bool m_readOnly;

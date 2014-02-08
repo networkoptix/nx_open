@@ -580,7 +580,7 @@ void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painte
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glColor4f(0.0, 0.0, 0.0, painter->opacity());
+        glColor(toTransparent(palette().color(QPalette::Window), painter->opacity()));
         glBegin(GL_QUADS);
         glVertices(rect);
         glEnd();

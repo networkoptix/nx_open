@@ -518,7 +518,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
     painter->endNativePainting();
 
     if(result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
-        painter->fillRect(paintRect, Qt::black);
+        painter->fillRect(paintRect, palette().color(QPalette::Window));
 
     return result;
 }
