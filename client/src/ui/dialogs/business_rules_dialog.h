@@ -55,7 +55,7 @@ private slots:
     void at_beforeModelChanged();
     void at_afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
 
-    void at_resources_deleted(const QnHTTPRawResponse& response, int handle);
+    void at_resources_deleted( int handle, ec2::ErrorCode errorCode );
 
     void at_tableView_currentRowChanged(const QModelIndex& current, const QModelIndex& previous);
     void at_tableViewport_resizeEvent();

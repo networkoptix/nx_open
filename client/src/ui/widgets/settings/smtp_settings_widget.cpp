@@ -284,8 +284,10 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     m_timeoutTimer->setInterval(result.timeout * 1000 / ui->testProgressBar->maximum());
     m_timeoutTimer->start();
 
-    m_testHandle = QnAppServerConnectionFactory::createConnection()->testEmailSettingsAsync(result.serialized(),
-                                                                                            this, SLOT(at_finishedTestEmailSettings(int, bool, int)));
+    m_testHandle = QnAppServerConnectionFactory::createConnection2Sync()->getBusinessEventManager()->testEmailSettings(
+        result.serialized(),
+        this,
+        &QnSmtpSettingsWidget::at_finishedTestEmailSettings );
     ui->stackedWidget->setCurrentIndex(TestingPage);
 }
 
@@ -303,16 +305,13 @@ void QnSmtpSettingsWidget::at_timer_timeout() {
     stopTesting(tr("Timed out"));
 }
 
-void QnSmtpSettingsWidget::at_finishedTestEmailSettings(int status, bool result, int handle) {
+void QnSmtpSettingsWidget::at_finishedTestEmailSettings( int handle, ec2::ErrorCode errorCode ) {
     if (handle != m_testHandle)
         return;
 
-    stopTesting(status != 0
+    stopTesting(errorCode != ec2::ErrorCode::ok
             ? tr("Error while testing settings")
-            : result
-              ? tr("Success")
-              : tr("Error")
-                );
+            : tr("Success") );
 }
 
 void QnSmtpSettingsWidget::at_okTestButton_clicked() {

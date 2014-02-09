@@ -6,7 +6,7 @@
 
 #include <api/api_fwd.h>
 #include <core/resource/resource_fwd.h>
-
+#include <nx_ec/ec_api.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 
@@ -19,7 +19,7 @@ public:
     void renameLayout(const QnLayoutResourcePtr &layout, const QString &newName);
     bool closeAllLayouts(bool waitForReply = false);
 protected:
-    QnAppServerConnectionPtr connection() const;
+    ec2::AbstractECConnectionPtr connection2() const;
 
 private slots:
     void at_newUserLayoutAction_triggered();

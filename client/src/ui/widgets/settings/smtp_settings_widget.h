@@ -43,7 +43,7 @@ private slots:
 
     void at_settings_received( int handle, ec2::ErrorCode errorCode, const QnKvPairList& values );
 
-    void at_finishedTestEmailSettings(int status, bool result, int handle);
+    void at_finishedTestEmailSettings(int handle, ec2::ErrorCode errorCode);
 
     void at_advancedCheckBox_toggled(bool toggled);
     void at_simpleEmail_textChanged(const QString &value);

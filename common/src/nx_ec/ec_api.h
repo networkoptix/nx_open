@@ -96,11 +96,12 @@ namespace ec2
         template<class TargetType, class HandlerType> int save( const QnId& resourceId, const QnKvPairList& kvPairs, TargetType* target, HandlerType handler ) {
             return save(resourceId, kvPairs,  std::static_pointer_cast<impl::SaveKvPairsHandler>(std::make_shared<impl::CustomSaveKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
         }
+        //!Convenient method to remove resource of any type
         /*!
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int remove( const QnResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return remove( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return remove( resource, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
     signals:
@@ -336,7 +337,7 @@ namespace ec2
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int testEmailSettings( const QnKvPairList& settings, TargetType* target, HandlerType handler ) {
-            return testEmailSettings( rule, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return testEmailSettings( settings, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         /*!
@@ -352,7 +353,7 @@ namespace ec2
             const QnEmailAttachmentList& attachments,
             TargetType* target, HandlerType handler )
         {
-            return sendEmail( rule, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return sendEmail( to, subject, message, timeout, attachments, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode)
@@ -364,19 +365,19 @@ namespace ec2
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int deleteRule( int ruleId, TargetType* target, HandlerType handler ) {
-            return deleteRule( rule, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return deleteRule( ruleId, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, TargetType* target, HandlerType handler ) {
-            return broadcastBusinessAction( rule, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return broadcastBusinessAction( businessAction, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int resetBusinessRules( TargetType* target, HandlerType handler ) {
-            return resetBusinessRules( rule, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return resetBusinessRules( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
     signals:

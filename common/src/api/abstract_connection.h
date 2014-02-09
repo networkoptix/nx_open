@@ -17,6 +17,7 @@
 #include <utils/common/connective.h>
 #include <utils/common/enum_name_mapper.h>
 
+#include <nx_ec/ec_api.h>
 #include <rest/server/json_rest_handler.h>
 
 namespace QnStringizeTypeDetail { template<class T> void check_type() {} }
@@ -143,6 +144,15 @@ public slots:
         m_handle = handle;
 
         emit replyProcessed();
+    }
+
+    void processEc2Reply( int handle, ec2::ErrorCode errorCode, ec2::AbstractECConnectionPtr connection )
+    {
+        m_finished = true;
+        m_handle = handle;
+        m_status = (int)errorCode;
+        if( connection )
+            m_reply = QVariant::fromValue( QnConnectionInfoPtr(new QnConnectionInfo(connection->connectionInfo())) );
     }
 
 private:

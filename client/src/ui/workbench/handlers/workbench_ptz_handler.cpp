@@ -16,6 +16,8 @@
 #include <core/ptz/ptz_tour.h>
 #include <core/resource/camera_resource.h>
 
+#include <nx_ec/dummy_handler.h>
+
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
@@ -46,7 +48,11 @@ public:
     virtual void updateHotkeys(const QnHotkeysHash &value) override {
         QString serialized = QString::fromUtf8(QJson::serialized(value));
 
-        QnAppServerConnectionFactory::createConnection()->saveAsync(m_resourceId, QnKvPairList() << QnKvPair(m_adapter->key(), serialized));
+        QnAppServerConnectionFactory::createConnection2Sync()->getResourceManager()->save(
+            m_resourceId,
+            QnKvPairList() << QnKvPair(m_adapter->key(), serialized),
+            ec2::DummyHandler::instance(),
+            &ec2::DummyHandler::onRequestDone );
     }
 private:
     int m_resourceId;
