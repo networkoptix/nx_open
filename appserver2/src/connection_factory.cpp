@@ -18,6 +18,7 @@
 #include "http/ec2_transaction_tcp_listener.h"
 #include "version.h"
 
+
 namespace ec2
 {
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory()
@@ -140,13 +141,15 @@ namespace ec2
     {
         if( errorCode != ErrorCode::ok )
             return handler->done( reqID, errorCode, AbstractECConnectionPtr() );
+        QnConnectionInfo connectionInfoCopy( connectionInfo );
+        connectionInfoCopy.ecUrl = ecURL;
         return handler->done(
             reqID,
             errorCode,
             AbstractECConnectionPtr(new RemoteEC2Connection(
                 std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
                 m_resCtx,
-                connectionInfo )) );
+                connectionInfoCopy )) );
     }
 
     void Ec2DirectConnectionFactory::remoteTestConnectionFinished(

@@ -17,6 +17,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 
+#include <nx_ec/dummy_handler.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/delegates/business_rule_item_delegate.h>
@@ -235,7 +236,8 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
                              QMessageBox::Cancel) == QMessageBox::Cancel)
         return;
 
-    QnAppServerConnectionFactory::createConnection()->resetBusinessRulesAsync(/*m_rulesViewModel, SLOT(reloadData())*/ NULL, NULL);
+    QnAppServerConnectionFactory::createConnection2Sync()->getBusinessEventManager()->resetBusinessRules(
+        ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
 //  m_rulesViewModel->clear();
 //  updateControlButtons();
 }
@@ -266,12 +268,12 @@ void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChang
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& response, int handle) {
+void QnBusinessRulesDialog::at_resources_deleted( int handle, ec2::ErrorCode errorCode ) {
     if (!m_deleting.contains(handle))
         return;
 
-    if(response.status != 0) {
-        QMessageBox::critical(this, tr("Error while deleting rule"), QString::fromLatin1(response.errorString));
+    if( errorCode != ec2::ErrorCode::ok ) {
+        QMessageBox::critical(this, tr("Error while deleting rule"), ec2::toString(errorCode));
         m_pendingDeleteRules.append(m_deleting[handle]);
         return;
     }
@@ -362,8 +364,8 @@ bool QnBusinessRulesDialog::saveAll() {
         m_rulesViewModel->saveRule(idx.row());
     }
     foreach (int id, m_pendingDeleteRules) {
-        int handle = QnAppServerConnectionFactory::createConnection()->deleteRuleAsync(
-                    id, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
+        int handle = QnAppServerConnectionFactory::createConnection2Sync()->getBusinessEventManager()->deleteRule(
+            id, this, &QnBusinessRulesDialog::at_resources_deleted );
         m_deleting[handle] = id;
     }
     m_pendingDeleteRules.clear();

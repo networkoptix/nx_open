@@ -454,18 +454,18 @@ int QnAppServerConnection::addCamera(const QnVirtualCameraResourcePtr &cameraPtr
     return status;
 }
 
-int QnAppServerConnection::saveAsync(const QnResourcePtr &resource, QObject *target, const char *slot)
-{
-    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        return saveAsync(server, target, slot);
-    else if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
-        return saveAsync(camera, target, slot);
-    else if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
-        return saveAsync(user, target, slot);
-    else if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
-        return saveAsync(layout, target, slot);
-    return 0;
-}
+//int QnAppServerConnection::saveAsync(const QnResourcePtr &resource, QObject *target, const char *slot)
+//{
+//    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+//        return saveAsync(server, target, slot);
+//    else if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+//        return saveAsync(camera, target, slot);
+//    else if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+//        return saveAsync(user, target, slot);
+//    else if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+//        return saveAsync(layout, target, slot);
+//    return 0;
+//}
 
 //int QnAppServerConnection::addLicensesAsync(const QList<QnLicensePtr> &licenses, QObject *target, const char *slot)
 //{
@@ -475,21 +475,21 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr &resource, QObject *tar
 //    return addObjectAsync(LicenseObject, data, QN_STRINGIZE_TYPE(QnLicenseList), target, slot);
 //}
 
-int QnAppServerConnection::saveAsync(int resourceId, const QnKvPairList &kvPairs, QObject *target, const char *slot)
-{
-    QByteArray data;
-    m_serializer.serializeKvPairs(resourceId, kvPairs, data);
+//int QnAppServerConnection::saveAsync(int resourceId, const QnKvPairList &kvPairs, QObject *target, const char *slot)
+//{
+//    QByteArray data;
+//    m_serializer.serializeKvPairs(resourceId, kvPairs, data);
+//
+//    return addObjectAsync(KvPairObject, data, QN_STRINGIZE_TYPE(QnKvPairListsById), target, slot);
+//}
 
-    return addObjectAsync(KvPairObject, data, QN_STRINGIZE_TYPE(QnKvPairListsById), target, slot);
-}
-
-int QnAppServerConnection::saveSettingsAsync(const QnKvPairList &kvPairs, QObject *target, const char *slot)
-{
-    QByteArray data;
-    m_serializer.serializeSettings(kvPairs, data);
-
-    return addObjectAsync(SettingObject, data, QN_STRINGIZE_TYPE(QnKvPairList), target, slot);
-}
+//int QnAppServerConnection::saveSettingsAsync(const QnKvPairList &kvPairs, QObject *target, const char *slot)
+//{
+//    QByteArray data;
+//    m_serializer.serializeSettings(kvPairs, data);
+//
+//    return addObjectAsync(SettingObject, data, QN_STRINGIZE_TYPE(QnKvPairList), target, slot);
+//}
 
 //int QnAppServerConnection::getLicensesAsync(QObject *target, const char *slot)
 //{
@@ -518,61 +518,61 @@ int QnAppServerConnection::saveSettingsAsync(const QnKvPairList &kvPairs, QObjec
 //    return sendAsyncGetRequest(SettingObject, m_requestParams, QN_STRINGIZE_TYPE(QnKvPairList), target, slot);
 //}
 
-int QnAppServerConnection::saveAsync(const QnUserResourcePtr &userPtr, QObject *target, const char *slot)
-{
-    QByteArray data;
-    m_serializer.serialize(userPtr, data);
-
-    return addObjectAsync(UserObject, data, QN_STRINGIZE_TYPE(QnResourceList), target, slot);
-}
-
-int QnAppServerConnection::saveAsync(const QnMediaServerResourcePtr &serverPtr, QObject *target, const char *slot)
-{
-    QByteArray data;
-    m_serializer.serialize(serverPtr, data);
-
-    return addObjectAsync(ServerObject, data, QN_STRINGIZE_TYPE(QnResourceList), target, slot);
-}
-
-int QnAppServerConnection::saveAsync(const QnVirtualCameraResourcePtr &cameraPtr, QObject *target, const char *slot)
-{
-    QByteArray data;
-    m_serializer.serialize(cameraPtr, data);
-
-    return addObjectAsync(CameraObject, data, QN_STRINGIZE_TYPE(QnResourceList), target, slot);
-}
-
-int QnAppServerConnection::saveAsync(const QnLayoutResourcePtr &layout, QObject *target, const char *slot)
-{
-    QByteArray data;
-    m_serializer.serialize(layout, data);
-
-    return addObjectAsync(LayoutObject, data, QN_STRINGIZE_TYPE(QnResourceList), target, slot);
-}
-
-int QnAppServerConnection::saveAsync(const QnBusinessEventRulePtr &rule, QObject *target, const char *slot)
-{
-    QByteArray data;
-    m_serializer.serializeBusinessRule(rule, data);
-
-    return addObjectAsync(BusinessRuleObject, data, QN_STRINGIZE_TYPE(QnBusinessEventRuleList), target, slot);
-}
-
-int QnAppServerConnection::saveAsync(const QnLayoutResourceList &layouts, QObject *target, const char *slot)
-{
-    QByteArray data;
-    m_serializer.serializeLayouts(layouts, data);
-
-    return addObjectAsync(LayoutObject, data, QN_STRINGIZE_TYPE(QnResourceList), target, slot);
-}
-
-int QnAppServerConnection::saveAsync(const QnVirtualCameraResourceList &cameras, QObject *target, const char *slot)
-{
-    QByteArray data;
-    m_serializer.serializeCameras(cameras, data);
-
-    return addObjectAsync(CameraObject, data, QN_STRINGIZE_TYPE(QnResourceList), target, slot);
-}
+//int QnAppServerConnection::saveAsync(const QnUserResourcePtr &userPtr, QObject *target, const char *slot)
+//{
+//    QByteArray data;
+//    m_serializer.serialize(userPtr, data);
+//
+//    return addObjectAsync(UserObject, data, QN_STRINGIZE_TYPE(QnResourceList), target, slot);
+//}
+//
+//int QnAppServerConnection::saveAsync(const QnMediaServerResourcePtr &serverPtr, QObject *target, const char *slot)
+//{
+//    QByteArray data;
+//    m_serializer.serialize(serverPtr, data);
+//
+//    return addObjectAsync(ServerObject, data, QN_STRINGIZE_TYPE(QnResourceList), target, slot);
+//}
+//
+//int QnAppServerConnection::saveAsync(const QnVirtualCameraResourcePtr &cameraPtr, QObject *target, const char *slot)
+//{
+//    QByteArray data;
+//    m_serializer.serialize(cameraPtr, data);
+//
+//    return addObjectAsync(CameraObject, data, QN_STRINGIZE_TYPE(QnResourceList), target, slot);
+//}
+//
+//int QnAppServerConnection::saveAsync(const QnLayoutResourcePtr &layout, QObject *target, const char *slot)
+//{
+//    QByteArray data;
+//    m_serializer.serialize(layout, data);
+//
+//    return addObjectAsync(LayoutObject, data, QN_STRINGIZE_TYPE(QnResourceList), target, slot);
+//}
+//
+//int QnAppServerConnection::saveAsync(const QnBusinessEventRulePtr &rule, QObject *target, const char *slot)
+//{
+//    QByteArray data;
+//    m_serializer.serializeBusinessRule(rule, data);
+//
+//    return addObjectAsync(BusinessRuleObject, data, QN_STRINGIZE_TYPE(QnBusinessEventRuleList), target, slot);
+//}
+//
+//int QnAppServerConnection::saveAsync(const QnLayoutResourceList &layouts, QObject *target, const char *slot)
+//{
+//    QByteArray data;
+//    m_serializer.serializeLayouts(layouts, data);
+//
+//    return addObjectAsync(LayoutObject, data, QN_STRINGIZE_TYPE(QnResourceList), target, slot);
+//}
+//
+//int QnAppServerConnection::saveAsync(const QnVirtualCameraResourceList &cameras, QObject *target, const char *slot)
+//{
+//    QByteArray data;
+//    m_serializer.serializeCameras(cameras, data);
+//
+//    return addObjectAsync(CameraObject, data, QN_STRINGIZE_TYPE(QnResourceList), target, slot);
+//}
 
 int QnAppServerConnection::addCameraHistoryItem(const QnCameraHistoryItem &cameraHistoryItem)
 {
@@ -658,45 +658,45 @@ int QnAppServerConnection::saveSync(const QnVirtualCameraResourcePtr &camera)
     return addCamera(camera, cameras);
 }
 
-int QnAppServerConnection::deleteAsync(const QnMediaServerResourcePtr &server, QObject *target, const char *slot)
-{
-    return deleteObjectAsync(ServerObject, server->getId().toInt(), target, slot);
-}
+//int QnAppServerConnection::deleteAsync(const QnMediaServerResourcePtr &server, QObject *target, const char *slot)
+//{
+//    return deleteObjectAsync(ServerObject, server->getId().toInt(), target, slot);
+//}
+//
+//int QnAppServerConnection::deleteAsync(const QnVirtualCameraResourcePtr &camera, QObject *target, const char *slot)
+//{
+//    return deleteObjectAsync(CameraObject, camera->getId().toInt(), target, slot);
+//}
+//
+//int QnAppServerConnection::deleteAsync(const QnUserResourcePtr &user, QObject *target, const char *slot)
+//{
+//    return deleteObjectAsync(UserObject, user->getId().toInt(), target, slot);
+//}
+//
+//int QnAppServerConnection::deleteAsync(const QnLayoutResourcePtr &layout, QObject *target, const char *slot)
+//{
+//    return deleteObjectAsync(LayoutObject, layout->getId().toInt(), target, slot);
+//}
 
-int QnAppServerConnection::deleteAsync(const QnVirtualCameraResourcePtr &camera, QObject *target, const char *slot)
-{
-    return deleteObjectAsync(CameraObject, camera->getId().toInt(), target, slot);
-}
+//int QnAppServerConnection::deleteRuleAsync(int ruleId, QObject *target, const char *slot)
+//{
+//    return deleteObjectAsync(BusinessRuleObject, ruleId, target, slot);
+//}
 
-int QnAppServerConnection::deleteAsync(const QnUserResourcePtr &user, QObject *target, const char *slot)
-{
-    return deleteObjectAsync(UserObject, user->getId().toInt(), target, slot);
-}
-
-int QnAppServerConnection::deleteAsync(const QnLayoutResourcePtr &layout, QObject *target, const char *slot)
-{
-    return deleteObjectAsync(LayoutObject, layout->getId().toInt(), target, slot);
-}
-
-int QnAppServerConnection::deleteRuleAsync(int ruleId, QObject *target, const char *slot)
-{
-    return deleteObjectAsync(BusinessRuleObject, ruleId, target, slot);
-}
-
-int QnAppServerConnection::deleteAsync(const QnResourcePtr &resource, QObject *target, const char *slot) {
-    if(QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) {
-        return deleteAsync(server, target, slot);
-    } else if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
-        return deleteAsync(camera, target, slot);
-    } else if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>()) {
-        return deleteAsync(user, target, slot);
-    } else if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
-        return deleteAsync(layout, target, slot);
-    } else {
-        qWarning() << "Cannot delete resources of type" << resource->metaObject()->className();
-        return 0;
-    }
-}
+//int QnAppServerConnection::deleteAsync(const QnResourcePtr &resource, QObject *target, const char *slot) {
+//    if(QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) {
+//        return deleteAsync(server, target, slot);
+//    } else if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
+//        return deleteAsync(camera, target, slot);
+//    } else if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>()) {
+//        return deleteAsync(user, target, slot);
+//    } else if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+//        return deleteAsync(layout, target, slot);
+//    } else {
+//        qWarning() << "Cannot delete resources of type" << resource->metaObject()->className();
+//        return 0;
+//    }
+//}
 
 qint64 QnAppServerConnection::getCurrentTime()
 {
@@ -870,16 +870,16 @@ void QnAppServerConnection::disconnectSync() {
 //    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(RestoreDbObject), m_requestHeaders, m_requestParams, data, target, slot);
 //}
 
-int QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActionPtr &businessAction, QObject *target, const char *slot)
-{
-    QnRequestHeaderList requestHeaders(m_requestHeaders);
-    QnRequestParamList requestParams(m_requestParams);
-
-    QByteArray body;
-    m_serializer.serializeBusinessAction(businessAction, body);
-
-    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(BusinessActionObject), requestHeaders, requestParams, body, target, slot);
-}
+//int QnAppServerConnection::broadcastBusinessAction(const QnAbstractBusinessActionPtr &businessAction, QObject *target, const char *slot)
+//{
+//    QnRequestHeaderList requestHeaders(m_requestHeaders);
+//    QnRequestParamList requestParams(m_requestParams);
+//
+//    QByteArray body;
+//    m_serializer.serializeBusinessAction(businessAction, body);
+//
+//    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(BusinessActionObject), requestHeaders, requestParams, body, target, slot);
+//}
 
 int QnAppServerConnection::resetBusinessRulesAsync(QObject *target, const char *slot) {
     return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(ResetBusinessRulesObject), m_requestHeaders, m_requestParams, "", target, slot);
@@ -1048,26 +1048,26 @@ void QnAppServerConnectionFactory::setDefaultFactory(QnResourceFactory* resource
     }
 }
 
-QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(const QUrl& url)
-{
-    QUrl urlNoPassword (url);
-    urlNoPassword.setPassword(QString());
-
-    cl_log.log(QLatin1String("Creating connection to the Enterprise Controller ") + urlNoPassword.toString(), cl_logDEBUG2);
-
-    return QnAppServerConnectionPtr(new QnAppServerConnection(
-        url,
-        *(qn_appServerConnectionFactory_instance()->m_resourceFactory),
-        qn_appServerConnectionFactory_instance()->m_serializer,
-        qn_appServerConnectionFactory_instance()->m_clientGuid,
-        qn_appServerConnectionFactory_instance()->m_authKey)
-    );
-}
-
-QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection()
-{
-    return createConnection(defaultUrl());
-}
+//QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(const QUrl& url)
+//{
+//    QUrl urlNoPassword (url);
+//    urlNoPassword.setPassword(QString());
+//
+//    cl_log.log(QLatin1String("Creating connection to the Enterprise Controller ") + urlNoPassword.toString(), cl_logDEBUG2);
+//
+//    return QnAppServerConnectionPtr(new QnAppServerConnection(
+//        url,
+//        *(qn_appServerConnectionFactory_instance()->m_resourceFactory),
+//        qn_appServerConnectionFactory_instance()->m_serializer,
+//        qn_appServerConnectionFactory_instance()->m_clientGuid,
+//        qn_appServerConnectionFactory_instance()->m_authKey)
+//    );
+//}
+//
+//QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection()
+//{
+//    return createConnection(defaultUrl());
+//}
 
 static ec2::AbstractECConnectionFactory* ec2ConnectionFactoryInstance = nullptr;
 

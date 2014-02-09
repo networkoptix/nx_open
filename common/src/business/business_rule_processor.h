@@ -16,6 +16,7 @@
 #include <business/actions/sendmail_business_action.h>
 #include <business/actions/camera_output_business_action.h>
 
+#include <nx_ec/ec_api.h>
 #include <utils/common/request_param.h>
 
 class QnProcessorAggregationInfo {
@@ -125,8 +126,8 @@ protected slots:
     */
     virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 private slots:
-    void at_broadcastBusinessActionFinished(const QnHTTPRawResponse &response, int handle);
-    void at_sendEmailFinished(int status, bool result, int handle);
+    void at_broadcastBusinessActionFinished(int handle, ec2::ErrorCode errorCode);
+    void at_sendEmailFinished(int handle, ec2::ErrorCode errorCode);
     void at_actionDelivered(QnAbstractBusinessActionPtr action);
     void at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action);
 

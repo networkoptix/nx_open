@@ -49,6 +49,7 @@
 
 #include <network/authenticate_helper.h>
 #include <network/default_tcp_connection_processor.h>
+#include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
 
@@ -951,6 +952,8 @@ void QnMain::run()
 
     // Create SessionManager
     QnSessionManager::instance()->start();
+
+    ec2::DummyHandler dummyEcResponseHandler;
     
 #ifdef ENABLE_ONVIF
     //starting soap server to accept event notifications from onvif servers
@@ -987,7 +990,7 @@ void QnMain::run()
 
     QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool());
 
-    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
+    //QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
@@ -1108,7 +1111,7 @@ void QnMain::run()
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 
-    QUrl proxyServerUrl = appServerConnection->url();
+    QUrl proxyServerUrl = ec2Connection->connectionInfo().ecUrl;
     proxyServerUrl.setPort(connectInfo->proxyPort);
     m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid());
     m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
@@ -1393,7 +1396,7 @@ void QnMain::run()
     disconnect(QnServerMessageProcessor::instance());
 
     // This method will set flag on message channel to threat next connection close as normal
-    appServerConnection->disconnectSync();
+    //appServerConnection->disconnectSync();
     MSSettings::runTimeSettings()->setValue("lastRunningTime", 0);
 
     QnSSLSocket::releaseSSLEngine();

@@ -15,10 +15,11 @@
 
 #include <health/system_health.h>
 
-#include <ui/workbench/handlers/workbench_notifications_handler.h>
+#include <nx_ec/dummy_handler.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_context.h>
 
 //TODO: #GDM handle user changing here
@@ -81,7 +82,12 @@ void QnPopupSettingsWidget::submitToSettings() {
             }
         }
         QString serialized = QString::number(eventsShown, 16);
-        QnAppServerConnectionFactory::createConnection()->saveAsync(context()->user()->getId(), QnKvPairList() << QnKvPair(m_adapter->key(), serialized));
+
+        QnAppServerConnectionFactory::createConnection2Sync()->getResourceManager()->save(
+            context()->user()->getId(),
+            QnKvPairList() << QnKvPair(m_adapter->key(), serialized),
+            ec2::DummyHandler::instance(),
+            &ec2::DummyHandler::onRequestDone );
     }
 
     quint64 healthShown = qnSettings->popupSystemHealth();
@@ -130,4 +136,8 @@ void QnPopupSettingsWidget::at_showBusinessEvents_valueChanged(quint64 value) {
     }
 
     ui->showAllCheckBox->setChecked(all);
+}
+
+void QnPopupSettingsWidget::at_resource_save_finished()
+{
 }

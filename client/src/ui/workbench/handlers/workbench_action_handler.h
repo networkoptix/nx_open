@@ -105,7 +105,6 @@ public:
     virtual ~QnWorkbenchActionHandler();
 
 protected:
-    QnAppServerConnectionPtr connection() const;
     ec2::AbstractECConnectionPtr connection2() const;
 
     bool canAutoDelete(const QnResourcePtr &resource) const;
@@ -282,7 +281,7 @@ protected slots:
 
     void at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources );
     void at_resources_properties_saved( int handle, ec2::ErrorCode errorCode );
-    void at_resource_deleted(const QnHTTPRawResponse& resource, int handle);
+    void at_resource_deleted( int handle, ec2::ErrorCode errorCode );
     void at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
 
     void at_panicWatcher_panicModeChanged();

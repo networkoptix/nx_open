@@ -471,15 +471,14 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
 
     QString messageBody = renderTemplateFromFile(lit(":/email_templates"), lit("container.mustache"), contextMap);
 
-    const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();    
-    if (appServerConnection->sendEmailAsync(
+    if (QnAppServerConnectionFactory::createConnection2Sync()->getBusinessEventManager()->sendEmail(
                 recipients,
                 QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
                 messageBody,
-                attachments,
                 EMAIL_SEND_TIMEOUT,
+                attachments,
                 this,
-                SLOT(at_sendEmailFinished(int,bool,int))) == -1)
+                &QnBusinessRuleProcessor::at_sendEmailFinished ) == ec2::INVALID_REQ_ID)
         return false;
 
     /*
@@ -491,32 +490,31 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     return true;
 }
 
-void QnBusinessRuleProcessor::at_sendEmailFinished(int status, bool result, int handle)
+void QnBusinessRuleProcessor::at_sendEmailFinished(int handle, ec2::ErrorCode errorCode)
 {
-    Q_UNUSED(status)
     Q_UNUSED(handle)
-    if (result)
+    if (errorCode == ec2::ErrorCode::ok)
         return;
 
     QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
 
     broadcastBusinessAction(action);
 
-    cl_log.log(QString::fromLatin1("Error processing action SendMail."), cl_logWARNING);
+    cl_log.log(QString::fromLatin1("Error processing action SendMail. %1").arg(ec2::toString(errorCode)), cl_logWARNING);
 }
 
-void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished(const QnHTTPRawResponse &response, int handle)
+void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished( int handle, ec2::ErrorCode errorCode )
 {
-    if (response.status == 0)
+    if (errorCode == ec2::ErrorCode::ok)
         return;
 
-    qWarning() << "error delivering broadcast action message #" << handle << "error:" << response.errorString;
+    qWarning() << "error delivering broadcast action message #" << handle << "error:" << ec2::toString(errorCode);
 }
 
 bool QnBusinessRuleProcessor::broadcastBusinessAction(QnAbstractBusinessActionPtr action)
 {
-    const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
-    appServerConnection->broadcastBusinessAction(action, this, "at_broadcastBusinessActionFinished");
+    QnAppServerConnectionFactory::createConnection2Sync()->getBusinessEventManager()->broadcastBusinessAction(
+        action, this, &QnBusinessRuleProcessor::at_broadcastBusinessActionFinished );
     return true;
 }
 

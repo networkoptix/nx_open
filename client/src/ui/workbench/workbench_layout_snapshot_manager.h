@@ -26,7 +26,7 @@ public:
     {}
 
 public slots:
-    void processReply(int status, const QnResourceList &resources, int handle);
+    void processReply( int reqID, ec2::ErrorCode errorCode );
 
 signals:
     void finished(int status, const QnResourceList &resources, int handle);
@@ -103,7 +103,7 @@ protected:
 
     Qn::ResourceSavingFlags defaultFlags(const QnLayoutResourcePtr &resource) const;
 
-    QnAppServerConnectionPtr connection() const;
+    ec2::AbstractECConnectionPtr connection2() const;
 
 protected slots:
     void processReply(int status, const QnLayoutResourceList &resources, int handle);

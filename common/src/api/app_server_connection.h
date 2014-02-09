@@ -156,31 +156,31 @@ public:
     //int dumpDatabaseAsync(QObject *target, const char *slot);
     //int restoreDatabaseAsync(const QByteArray &data, QObject *target, const char *slot);
 
-    int saveAsync(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
-    int saveAsync(const QnVirtualCameraResourcePtr &resource, QObject *target, const char *slot);
-    int saveAsync(const QnUserResourcePtr &resource, QObject *target, const char *slot);
-    int saveAsync(const QnLayoutResourcePtr &resource, QObject *target, const char *slot);
-    int saveAsync(const QnBusinessEventRulePtr &rule, QObject *target, const char *slot);
+    //int saveAsync(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
+    //int saveAsync(const QnVirtualCameraResourcePtr &resource, QObject *target, const char *slot);
+    //int saveAsync(const QnUserResourcePtr &resource, QObject *target, const char *slot);
+    //int saveAsync(const QnLayoutResourcePtr &resource, QObject *target, const char *slot);
+    //int saveAsync(const QnBusinessEventRulePtr &rule, QObject *target, const char *slot);
 
-    int saveAsync(const QnLayoutResourceList &resources, QObject *target, const char *slot);
-    int saveAsync(const QnVirtualCameraResourceList &cameras, QObject *target, const char *slot);
+    //int saveAsync(const QnLayoutResourceList &resources, QObject *target, const char *slot);
+    //int saveAsync(const QnVirtualCameraResourceList &cameras, QObject *target, const char *slot);
 
-    int saveAsync(const QnResourcePtr &resource, QObject *target, const char *slot);
+    //int saveAsync(const QnResourcePtr &resource, QObject *target, const char *slot);
     //int addLicensesAsync(const QList<QnLicensePtr> &licenses, QObject *target, const char *slot);
 
-    int saveAsync(int resourceId, const QnKvPairList &kvPairs, QObject *target = NULL, const char *slot = NULL);
-    int saveSettingsAsync(const QnKvPairList& kvPairs, QObject* target, const char* slot);
+    //int saveAsync(int resourceId, const QnKvPairList &kvPairs, QObject *target = NULL, const char *slot = NULL);
+    //int saveSettingsAsync(const QnKvPairList& kvPairs, QObject* target, const char* slot);
 
-    int deleteAsync(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
-    int deleteAsync(const QnVirtualCameraResourcePtr &resource, QObject *target, const char *slot);
-    int deleteAsync(const QnUserResourcePtr &resource, QObject *target, const char *slot);
-    int deleteAsync(const QnLayoutResourcePtr &resource, QObject *target, const char *slot);
+    //int deleteAsync(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
+    //int deleteAsync(const QnVirtualCameraResourcePtr &resource, QObject *target, const char *slot);
+    //int deleteAsync(const QnUserResourcePtr &resource, QObject *target, const char *slot);
+    //int deleteAsync(const QnLayoutResourcePtr &resource, QObject *target, const char *slot);
 
-    int deleteRuleAsync(int ruleId, QObject *target, const char *slot);
+    //int deleteRuleAsync(int ruleId, QObject *target, const char *slot);
 
-    int deleteAsync(const QnResourcePtr &resource, QObject *target, const char *slot);
+    //int deleteAsync(const QnResourcePtr &resource, QObject *target, const char *slot);
 
-    int broadcastBusinessAction(const QnAbstractBusinessActionPtr &businessAction, QObject *target, const char *slot);
+    //int broadcastBusinessAction(const QnAbstractBusinessActionPtr &businessAction, QObject *target, const char *slot);
 
     int resetBusinessRulesAsync(QObject *target, const char *slot);
 
@@ -238,8 +238,8 @@ public:
 
     static void setSessionKey(const QByteArray& sessionKey);
 
-    static QnAppServerConnectionPtr createConnection();
-    static QnAppServerConnectionPtr createConnection(const QUrl &url);
+    //static QnAppServerConnectionPtr createConnection();
+    //static QnAppServerConnectionPtr createConnection(const QUrl &url);
 
     static void setEC2ConnectionFactory( ec2::AbstractECConnectionFactory* ec2ConnectionFactory );
     static ec2::AbstractECConnectionFactory* ec2ConnectionFactory();

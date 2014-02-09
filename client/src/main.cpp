@@ -105,6 +105,7 @@ extern "C"
 #include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
 #include "core/ptz/client_ptz_controller_pool.h"
+#include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
 
 
@@ -315,6 +316,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
 #endif
     commandLineParser.parse(argc, argv, stderr);
+
+    ec2::DummyHandler dummyEc2ResponseHandler;
 
     /* Dev mode. */
     if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */

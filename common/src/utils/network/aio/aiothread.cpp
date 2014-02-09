@@ -216,7 +216,7 @@ namespace aio
             {
                 if( it->socket == sock && it->eventType == eventType && it->type != taskType )
                 {
-                    //TODO/IMPL if we changing socket handler or socket timeout MUST not remove task
+                    //TODO/IMPL if we changing socket timeout MUST NOT remove task
                     if( it->type == SocketAddRemoveTask::tRemoving )     
                     {
                         if( eventHandler != it->eventHandler )

@@ -12,6 +12,7 @@
 struct QnConnectionInfo {
     QnConnectionInfo(): allowCameraChanges(true) {}
 
+    QUrl ecUrl;
     QnSoftwareVersion version;
     QList<QnCompatibilityItem> compatibilityItems;
     int proxyPort;

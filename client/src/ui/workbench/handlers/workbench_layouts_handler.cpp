@@ -8,6 +8,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx_ec/dummy_handler.h>
+
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
@@ -42,8 +44,8 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     connect(action(Qn::CloseAllButThisLayoutAction),        &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
 }
 
-QnAppServerConnectionPtr QnWorkbenchLayoutsHandler::connection() const {
-    return QnAppServerConnectionFactory::createConnection();
+ec2::AbstractECConnectionPtr QnWorkbenchLayoutsHandler::connection2() const {
+    return QnAppServerConnectionFactory::createConnection2Sync();
 }
 
 void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QString &newName) {
@@ -265,7 +267,7 @@ void QnWorkbenchLayoutsHandler::removeLayouts(const QnLayoutResourceList &layout
         if(snapshotManager()->isLocal(layout))
             resourcePool()->removeResource(layout); /* This one can be simply deleted from resource pool. */
         else
-            connection()->deleteAsync(layout, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
+            connection2()->getLayoutManager()->remove( layout, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
     }
 }
 

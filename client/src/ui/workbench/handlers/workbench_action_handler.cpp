@@ -333,10 +333,6 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
         delete loginDialog();
 }
 
-QnAppServerConnectionPtr QnWorkbenchActionHandler::connection() const {
-    return QnAppServerConnectionFactory::createConnection();
-}
-
 ec2::AbstractECConnectionPtr QnWorkbenchActionHandler::connection2() const {
     return QnAppServerConnectionFactory::createConnection2Sync();
 }
@@ -1372,10 +1368,10 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     QnConnectionInfoPtr connectionInfo = parameters.argument<QnConnectionInfoPtr>(Qn::ConnectionInfoRole);
     if(connectionInfo.isNull()) {
-        QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(connectionData.url);
 
         QnConnectionRequestResult result;
-        connection->connectAsync(&result, SLOT(processReply(int, const QVariant &, int)));
+        QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
+            connectionData.url, &result, &QnConnectionRequestResult::processEc2Reply );
         if(result.exec() != 0)
             return;
 
@@ -2043,7 +2039,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             }
         }
 
-        connection()->deleteAsync(resource, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
+        connection2()->getResourceManager()->remove( resource, this, &QnWorkbenchActionHandler::at_resource_deleted );
     }
 }
 
@@ -2419,13 +2415,13 @@ void QnWorkbenchActionHandler::at_resources_properties_saved( int handle, ec2::E
     //TODO/IMPL
 }
 
-void QnWorkbenchActionHandler::at_resource_deleted(const QnHTTPRawResponse& response, int handle) {
+void QnWorkbenchActionHandler::at_resource_deleted( int handle, ec2::ErrorCode errorCode ) {
     Q_UNUSED(handle);
 
-    if(response.status == 0)
+    if( errorCode == ec2::ErrorCode::ok )
         return;
 
-    QMessageBox::critical(mainWindow(), tr("Could not delete resource"), tr("An error has occurred while trying to delete a resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(response.errorString.data())));
+    QMessageBox::critical(mainWindow(), tr("Could not delete resource"), tr("An error has occurred while trying to delete a resource from Enterprise Controller. \n\nError description: '%2'").arg(ec2::toString(errorCode)));
 }
 
 void QnWorkbenchActionHandler::at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {
