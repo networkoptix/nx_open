@@ -45,9 +45,11 @@ namespace ec2
         int sendOffset;
         bool isClientSide;
         QnTransactionMessageBus* owner;
+        QMutex mutex;
     public:
         void doClientConnect();
         void startStreaming();
+        void addData(const QByteArray& data);
     protected:
         void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
         void closeSocket();
@@ -61,7 +63,7 @@ namespace ec2
         void at_httpClientDone(nx_http::AsyncHttpClientPtr);
     };
 
-    class EC2_LIB_API QnTransactionMessageBus: public QnLongRunnable
+    class QnTransactionMessageBus: public QnLongRunnable
     {
         Q_OBJECT
     public:
@@ -89,11 +91,11 @@ namespace ec2
             tran.serialize(&stream);
             buffer.append("\r\n"); // chunk end
             quint32 payloadSize = buffer.size() - 12;
-            toFormattedHex((quint8*) buffer.data() + 8, payloadSize);
+            toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
 
             QMutexLocker lock(&m_mutex);
             foreach(QnTransactionTransport* transport, m_connections)
-                transport->dataToSend.push_back(buffer);
+                transport->addData(buffer);
         }
     private:
         friend class QnTransactionTransport;

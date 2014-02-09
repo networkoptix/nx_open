@@ -367,11 +367,11 @@ namespace aio
         if( !canAcceptSocket( eventToWatch ) )
             return false;
 
-        if( QThread::currentThread() == this )
-        {
-            //adding socket to pollset right away
-            return m_impl->addSockToPollset( sock, eventToWatch, timeoutMs, eventHandler );
-        }
+        //if( QThread::currentThread() == this )
+        //{
+        //    //adding socket to pollset right away
+        //    return m_impl->addSockToPollset( sock, eventToWatch, timeoutMs, eventHandler );
+        //}
 
         m_impl->pollSetModificationQueue.push_back( SocketAddRemoveTask(sock, eventToWatch, eventHandler, SocketAddRemoveTask::tAdding, timeoutMs) );
         if( eventToWatch == PollSet::etRead )
@@ -380,7 +380,8 @@ namespace aio
             ++m_impl->newWriteMonitorTaskCount;
         else
             Q_ASSERT( false );
-        m_impl->pollSet.interrupt();
+        if( QThread::currentThread() != this )  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
+            m_impl->pollSet.interrupt();
 
         return true;
     }

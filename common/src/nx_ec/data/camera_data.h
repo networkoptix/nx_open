@@ -76,8 +76,6 @@ struct ApiCameraDataList: public ApiData
 {
 	std::vector<ApiCameraData> data;
 	
-	QN_DECLARE_STRUCT_SERIALIZATORS();
-
 	void loadFromQuery(QSqlQuery& query);
 	void toCameraList(QnVirtualCameraResourceList& outData, QnResourceFactory* factory) const;
 };
@@ -88,7 +86,7 @@ struct ApiCameraDataList: public ApiData
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ScheduleTask, apiScheduleTaskFields)
 #define apiCameraDataFields (scheduleDisabled) (motionType) (region) (mac) (login) (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) \
 							(firmware) (groupId) (groupName) (secondaryQuality) (controlDisabled) (statusFlags) (dewarpingParams) (vendor)
-QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiCameraData, ApiResourceData, apiCameraDataFields)
+QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiCameraData, ec2::ApiResourceData, apiCameraDataFields)
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiCameraDataList, (data) )
 
 #endif // __API_CAMERA_DATA_H_

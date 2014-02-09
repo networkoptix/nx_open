@@ -47,6 +47,7 @@ void QnTransactionTcpProcessor::run()
     sendResponse("HTTP", CODE_OK, "application/octet-stream");
 
     QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket);
+    int handle = d->socket->handle();
     d->socket.clear();
 }
 

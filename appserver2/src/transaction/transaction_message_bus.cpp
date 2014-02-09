@@ -6,6 +6,8 @@
 namespace ec2
 {
 
+static const int SOCKET_TIMEOUT = 1000 * 1000;
+
 // --------------------------------- QnTransactionTransport ------------------------------
 
 QnTransactionTransport::~QnTransactionTransport()
@@ -17,6 +19,14 @@ void QnTransactionTransport::ensureSize(std::vector<quint8>& buffer, int size)
 {
     if (buffer.size() < size)
         buffer.resize(size);
+}
+
+void QnTransactionTransport::addData(const QByteArray& data)
+{
+    QMutexLocker lock(&mutex);
+    if (dataToSend.isEmpty())
+        aio::AIOService::instance()->watchSocket( socket, PollSet::etWrite, this );
+    dataToSend.push_back(data);
 }
 
 int QnTransactionTransport::getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size)
@@ -97,6 +107,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
     }
     case PollSet::etWrite: 
     {
+        QMutexLocker lock(&mutex);
         while (!dataToSend.isEmpty())
         {
             QByteArray& data = dataToSend.front();
@@ -104,14 +115,20 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
             const char* dataEnd = dataStart + data.size();
             int sended = socket->send(dataStart + sendOffset, data.size() - sendOffset);
             if (sended < 1) {
-                if(sended == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock)
+                if(sended == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock) {
+                    sendOffset = 0;
+                    aio::AIOService::instance()->removeFromWatch( socket, PollSet::etWrite, this );
                     processError();
+                }
                 return; // can't send any more
             }
-            sendOffset + sended;
-            if (sendOffset == data.size())
+            sendOffset += sended;
+            if (sendOffset == data.size()) {
+                sendOffset = 0;
                 dataToSend.dequeue();
+            }
         }
+        aio::AIOService::instance()->removeFromWatch( socket, PollSet::etWrite, this );
         break;
     }
     case PollSet::etTimedOut:
@@ -163,12 +180,13 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
 
 void QnTransactionTransport::startStreaming()
 {
-    socket = httpClient->takeSocket();
-    processTransactionData(httpClient->fetchMessageBodyBuffer());
-    httpClient.reset();
-
+    socket->setRecvTimeout(SOCKET_TIMEOUT);
+    socket->setSendTimeout(SOCKET_TIMEOUT);
+    socket->setNonBlockingMode(true);
+    chunkHeaderLen = 0;
+    state = QnTransactionTransport::ReadChunks;
+    int handle = socket->handle();
     aio::AIOService::instance()->watchSocket( socket, PollSet::etRead, this );
-    aio::AIOService::instance()->watchSocket( socket, PollSet::etWrite, this );
 }
 
 void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr client)
@@ -180,9 +198,10 @@ void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr clien
 
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
 {
+    processTransactionData(httpClient->fetchMessageBodyBuffer());
+    socket = httpClient->takeSocket();
+    httpClient.reset();
     startStreaming();
-    chunkHeaderLen = 0;
-    state = QnTransactionTransport::ReadChunks;
 }
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
@@ -269,9 +288,8 @@ void QnTransactionMessageBus::at_timer()
                 m_connections.removeAt(i);
                 break;
             case QnTransactionTransport::ReadyForStreaming:
-                transport->chunkHeaderLen = 0;
-                transport->state = QnTransactionTransport::ReadChunks;
                 transport->startStreaming();
+                break;
         }
     }
 }
@@ -291,7 +309,9 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     QnTransactionTransport* transport = new QnTransactionTransport(this);
     transport->isClientSide = false;
     transport->socket = socket;
-    transport->state = QnTransactionTransport::ReadChunks;
+    int handle = socket->handle();
+
+    transport->state = QnTransactionTransport::ReadyForStreaming;
     m_connections.push_back(transport);
 }
 

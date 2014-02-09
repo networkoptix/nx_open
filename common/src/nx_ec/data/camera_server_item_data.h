@@ -25,8 +25,6 @@ struct ApiCameraServerItemDataList: public ApiData
 {
     std::vector<ApiCameraServerItemData> data;
 
-    QN_DECLARE_STRUCT_SERIALIZATORS();
-
     void loadFromQuery(QSqlQuery& query);
     void toResourceList(QnCameraHistoryList& outData) const;
 };

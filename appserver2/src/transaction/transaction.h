@@ -92,7 +92,6 @@ namespace ec2
         quint16 data3;
         qint64  data4;
 
-        QN_DECLARE_STRUCT_SERIALIZATORS();
     };
 
     class QnAbstractTransaction
@@ -123,14 +122,12 @@ namespace ec2
             QnUuid peerGUID;
             qint64 number;
 
-            QN_DECLARE_STRUCT_SERIALIZATORS();
         };
 
         ApiCommand::Value command;
         ID id;
         bool persistent;
 
-        QN_DECLARE_STRUCT_SERIALIZATORS();
     private:
         static QnUuid m_staticPeerGUID;
         static qint64 m_staticNumber;
@@ -147,7 +144,7 @@ namespace ec2
 
         template <class T2>
         void serialize(OutputBinaryStream<T2>* stream) const {
-            QnAbstractTransaction::serialize(stream);
+            QnBinary::serialize( *(QnAbstractTransaction*)this, stream);
             QnBinary::serialize(params, stream);
         }
 
@@ -155,7 +152,8 @@ namespace ec2
         bool deserialize(ApiCommand::Value command, InputBinaryStream<T2>* stream) 
         {
             return QnAbstractTransaction::deserialize(command, stream) &&
-                   QnBinary::deserialize(params, stream);
+                QnBinary::deserialize(params, stream);
+                //params.deserialize(stream);
         }
     };
 

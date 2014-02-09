@@ -26,8 +26,6 @@ struct ApiUserDataList: public ApiData
 {
     std::vector<ApiUserData> data;
 
-    QN_DECLARE_STRUCT_SERIALIZATORS();
-
     void loadFromQuery(QSqlQuery& query);
     void toResourceList(QnUserResourceList& outData) const;
 };

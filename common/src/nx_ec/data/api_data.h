@@ -13,7 +13,6 @@ struct ApiData {
 
 struct ApiIdData: public ApiData {
     qint32 id;
-    QN_DECLARE_STRUCT_SERIALIZATORS();
 };
 
 }
@@ -36,7 +35,6 @@ struct ApiIdData: public ApiData {
 }
 
 #define QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS() \
-    QN_DECLARE_STRUCT_SERIALIZATORS(); \
     QN_DECLARE_STRUCT_SQL_BINDER();
 
 #define QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS(TYPE, FIELD_SEQ, ... /* PREFIX */) \

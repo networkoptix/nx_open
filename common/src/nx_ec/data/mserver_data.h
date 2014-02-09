@@ -25,7 +25,6 @@ namespace ec2
         std::vector<ApiStorageData> data;
 
         void loadFromQuery(QSqlQuery& query);
-        QN_DECLARE_STRUCT_SERIALIZATORS();
     };
 
     struct ApiMediaServerData: public ApiResourceData
@@ -49,7 +48,6 @@ namespace ec2
     struct ApiPanicModeData: public ApiData
     {
         Qn::PanicMode mode;
-        QN_DECLARE_STRUCT_SERIALIZATORS();
     };
 
     struct ApiMediaServerDataList: public ApiData {
@@ -57,7 +55,6 @@ namespace ec2
 
         void loadFromQuery(QSqlQuery& query);
         void toResourceList(QnMediaServerResourceList& outData, QnResourceFactory* factory, const QnResourceTypePool* resTypePool) const;
-        QN_DECLARE_STRUCT_SERIALIZATORS();
     };
 }
 

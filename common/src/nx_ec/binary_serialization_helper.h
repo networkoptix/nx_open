@@ -268,6 +268,7 @@ namespace QnBinary { \
 }
 
 
+
 #define SERIALIZE_FIELD(R, D, FIELD) \
     QnBinary::serialize(value.FIELD, target); \
 
@@ -325,7 +326,8 @@ namespace QnBinary
     }
 }
 
-#define QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(TYPE, BASE_TYPE, FIELD_SEQ, ... /* PREFIX */) \
+/*
+#define QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(TYPE, BASE_TYPE, FIELD_SEQ, ... ) \
     QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ); \
     template <class T> \
     void TYPE::serialize(OutputBinaryStream<T>* stream) const \
@@ -340,26 +342,28 @@ namespace QnBinary
     return BASE_TYPE::deserialize(stream) && \
            QnBinary::deserialize(*this, stream); \
 }
+*/
 
-#define QN_DEFINE_STRUCT_SERIALIZATORS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
-    QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ); \
+#define QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(TYPE, BASE_TYPE, FIELD_SEQ, ... ) \
+    namespace QnBinary { \
     template <class T> \
-    void TYPE::serialize(OutputBinaryStream<T>* stream) const \
-{ \
-    QnBinary::serialize(*this, stream); \
+    __VA_ARGS__ void serialize(const TYPE &value, OutputBinaryStream<T> *target) { \
+    QnBinary::serialize((const BASE_TYPE&)value, target);  \
+    BOOST_PP_SEQ_FOR_EACH(SERIALIZE_FIELD, ~, FIELD_SEQ) \
 } \
     \
     template <class T> \
-    bool TYPE::deserialize(InputBinaryStream<T>* stream) \
-{ \
-    return QnBinary::deserialize(*this, stream); \
+    __VA_ARGS__ bool deserialize(TYPE &value, InputBinaryStream<T> *target) { \
+    if( !QnBinary::deserialize((BASE_TYPE&)value, target))  \
+    return false; \
+    BOOST_PP_SEQ_FOR_EACH(DESERIALIZE_FIELD, ~, FIELD_SEQ) \
+    return true; \
 } \
+}
 
 
-#define QN_DECLARE_STRUCT_SERIALIZATORS() \
-    template <class T> void serialize(OutputBinaryStream<T>* stream) const; \
-    template <class T> bool deserialize(InputBinaryStream<T>* stream); \
-
+#define QN_DEFINE_STRUCT_SERIALIZATORS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
+    QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ); 
 
 
 #endif  //SERIALIZATION_HELPER_H

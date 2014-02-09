@@ -15,7 +15,7 @@ class QnTransactionTcpProcessor: public QnTCPConnectionProcessor
 public:
     QnTransactionTcpProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnTransactionTcpProcessor();
-
+    virtual bool isTakeSockOwnership() const override { return true; }
 protected:
     virtual void run() override;
 private:

@@ -20,7 +20,6 @@ struct QnConnectionInfo {
     QString brand;
     bool allowCameraChanges;
 
-    QN_DECLARE_STRUCT_SERIALIZATORS();
 };
 
 Q_DECLARE_METATYPE( QnConnectionInfo );

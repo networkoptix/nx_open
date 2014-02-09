@@ -43,8 +43,6 @@ struct ApiBusinessRuleDataList: public ApiData
 {
     std::vector<ApiBusinessRuleData> data;
 
-    QN_DECLARE_STRUCT_SERIALIZATORS();
-
     void loadFromQuery(QSqlQuery& query);
     void toResourceList(QnBusinessEventRuleList& outData, QnResourcePool* resourcePool) const;
 };

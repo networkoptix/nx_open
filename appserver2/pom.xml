@@ -41,4 +41,19 @@
 	<buildLib>sharedlib</buildLib>
 
     </properties>	
+
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>            
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+    </profiles>
+
 </project>
