@@ -65,45 +65,28 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
     {
         while (1)
         {
-            if (state == ReadChunkHeader) 
-            {
-                ensureSize(readBuffer, readBufferLen + 4);
+            if (state == ReadChunks) {
+                int toRead = chunkHeaderLen == 0 ? 20 : (chunkHeaderLen + chunkLen + 2 - readBufferLen);
+                ensureSize(readBuffer, toRead + readBufferLen);
                 quint8* rBuffer = &readBuffer[0];
-                readed = socket->recv(rBuffer + readBufferLen, 4);
+                readed = socket->recv(rBuffer + readBufferLen, toRead);
                 if (readed < 1) {
                     // no more data or error
                     if(readed == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock)
-                    //SystemError::ErrorCode err = SystemError::getLastOSErrorCode();
-                    //if(err != SystemError::wouldBlock && err != SystemError::noError)
-                        processError();
+                        //SystemError::ErrorCode err = SystemError::getLastOSErrorCode();
+                            //if(err != SystemError::wouldBlock && err != SystemError::noError)
+                                processError();
                     return; // no more data
                 }
                 readBufferLen += readed;
-                int chunkEnd = getChunkHeaderEnd(rBuffer, readBufferLen, &chunkLen);
-                if (chunkEnd >= 0) {
-                    memmove(rBuffer, rBuffer + chunkEnd, readBufferLen - chunkEnd); // 3 bytes max
-                    readBufferLen -= chunkEnd;
-                    state = ReadChunkBody;
-                }
-            }
-            else if (state == ReadChunkBody) {
-                ensureSize(readBuffer, chunkLen+2);
-                quint8* rBuffer = &readBuffer[0];
-                readed = socket->recv(rBuffer + readBufferLen, chunkLen+2-readBufferLen);
-
-                if (readed < 1) {
-                    // no more data or error
-                    if(readed == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock)
-                        processError();
-                    return; // no more data
-                }
-
-                readBufferLen += readed;
-                if (readBufferLen == chunkLen + 2)
-                {
-                    owner->gotTransaction(QByteArray::fromRawData((const char *) rBuffer, chunkLen));
-                    state = ReadChunkHeader;
-                    readBufferLen = 0;
+                if (chunkHeaderLen == 0)
+                    chunkHeaderLen = getChunkHeaderEnd(rBuffer, readBufferLen, &chunkLen);
+                if (chunkHeaderLen) {
+                    const int fullChunkLen = chunkHeaderLen + chunkLen + 2;
+                    if (readBufferLen == fullChunkLen) {
+                        owner->gotTransaction(QByteArray::fromRawData((const char *) rBuffer + chunkHeaderLen, chunkLen));
+                        readBufferLen = chunkHeaderLen = 0;
+                    }
                 }
             }
             else {
@@ -150,26 +133,25 @@ void QnTransactionTransport::doClientConnect()
 
 void QnTransactionTransport::processTransactionData( const QByteArray& data)
 {
-    state = ReadChunkHeader;
+    state = ReadChunks;
+    chunkHeaderLen = 0;
 
     const quint8* buffer = (const quint8*) data.data();
     int bufferLen = data.size();
-    int chunkHeaderEnd = getChunkHeaderEnd(buffer, bufferLen, &chunkLen);
-    while (chunkHeaderEnd >= 0) 
+    chunkHeaderLen = getChunkHeaderEnd(buffer, bufferLen, &chunkLen);
+    while (chunkHeaderLen >= 0) 
     {
-        buffer += chunkHeaderEnd;
-        bufferLen -= chunkHeaderEnd;
-        if (bufferLen >= chunkLen + 2)
+        int fullChunkLen = chunkHeaderLen + chunkLen + 2;
+        if (bufferLen >= fullChunkLen)
         {
-            owner->gotTransaction(QByteArray::fromRawData((const char *) buffer, chunkLen));
-            buffer += chunkLen + 2;
-            bufferLen -= chunkLen;
+            owner->gotTransaction(QByteArray::fromRawData((const char *) buffer + chunkHeaderLen, chunkLen));
+            buffer += fullChunkLen;
+            bufferLen -= fullChunkLen;
         }
         else {
-            state = ReadChunkBody;
             break;
         }
-        chunkHeaderEnd = getChunkHeaderEnd(buffer, bufferLen, &chunkLen);
+        chunkHeaderLen = getChunkHeaderEnd(buffer, bufferLen, &chunkLen);
     }
 
     if (bufferLen > 0) {
@@ -199,7 +181,8 @@ void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr clien
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
 {
     startStreaming();
-    state = QnTransactionTransport::ReadChunkHeader;
+    chunkHeaderLen = 0;
+    state = QnTransactionTransport::ReadChunks;
 }
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
@@ -286,9 +269,18 @@ void QnTransactionMessageBus::at_timer()
                 m_connections.removeAt(i);
                 break;
             case QnTransactionTransport::ReadyForStreaming:
-                transport->state = QnTransactionTransport::ReadChunkHeader;
+                transport->chunkHeaderLen = 0;
+                transport->state = QnTransactionTransport::ReadChunks;
                 transport->startStreaming();
         }
+    }
+}
+
+void QnTransactionMessageBus::toFormattedHex(quint8* dst, quint32 payloadSize)
+{
+    for (;payloadSize; payloadSize >>= 4) {
+        quint8 digit = payloadSize % 16;
+        *dst-- = digit < 10 ? digit + '0': digit + 'A'-10;
     }
 }
 
@@ -299,13 +291,14 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     QnTransactionTransport* transport = new QnTransactionTransport(this);
     transport->isClientSide = false;
     transport->socket = socket;
-    transport->state = QnTransactionTransport::ReadChunkHeader;
+    transport->state = QnTransactionTransport::ReadChunks;
     m_connections.push_back(transport);
 }
 
 void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url)
 {
     QMutexLocker lock(&m_mutex);
+    QString test = url.toString();
 
     QnTransactionTransport* transport = new QnTransactionTransport(this);
     transport->isClientSide = true;

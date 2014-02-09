@@ -20,7 +20,7 @@ namespace ec2
     {
         QnTransactionMessageBus::instance()->setHandler(this);
         QUrl url(m_queryProcessor->getUrl());
-        url.setPath("ec2/events");
+        url.setPath("/ec2/events");
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);
     }
 

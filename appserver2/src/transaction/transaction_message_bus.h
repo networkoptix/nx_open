@@ -18,15 +18,14 @@ namespace ec2
     public:
 
         QnTransactionTransport(QnTransactionMessageBus* owner):
-            state(NotDefined), readyForSend(false), readyForRead(false), readBufferLen(0), sendOffset(0), chunkLen(0), isClientSide(false), owner(owner) {}
+            state(NotDefined), readyForSend(false), readyForRead(false), readBufferLen(0), chunkHeaderLen(0), sendOffset(0), chunkLen(0), isClientSide(false), owner(owner) {}
         ~QnTransactionTransport();
         enum State {
             NotDefined,
             Connect,
             Connecting,
             ReadyForStreaming,
-            ReadChunkHeader,
-            ReadChunkBody,
+            ReadChunks,
             Closed
         };
 
@@ -35,13 +34,15 @@ namespace ec2
         State state;
         QSharedPointer<AbstractStreamSocket> socket;
         QQueue<QByteArray> dataToSend;
+        
         bool readyForSend;
         bool readyForRead;
         
         std::vector<quint8> readBuffer;
         int readBufferLen;
-        int sendOffset;
+        int chunkHeaderLen;
         quint32 chunkLen;
+        int sendOffset;
         bool isClientSide;
         QnTransactionMessageBus* owner;
     public:
@@ -77,12 +78,18 @@ namespace ec2
         template <class T>
         void setHandler(T* handler) { m_handler = new CustomHandler<T>(handler); }
 
+        void toFormattedHex(quint8* dst, quint32 payloadSize);
+
         template <class T>
         void sendTransaction(const QnTransaction<T>& tran)
         {
             QByteArray buffer;
             OutputBinaryStream<QByteArray> stream(&buffer);
+            buffer.append("00000000\r\n");
             tran.serialize(&stream);
+            buffer.append("\r\n"); // chunk end
+            quint32 payloadSize = buffer.size() - 12;
+            toFormattedHex((quint8*) buffer.data() + 8, payloadSize);
 
             QMutexLocker lock(&m_mutex);
             foreach(QnTransactionTransport* transport, m_connections)
