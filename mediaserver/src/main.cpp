@@ -1103,9 +1103,10 @@ void QnMain::run()
     QnRestProcessorPool::initStaticInstance( &restProcessorPool );
 
     ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
-    ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 
     initTcpListener();
+
+    ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 
     QUrl proxyServerUrl = appServerConnection->url();
     proxyServerUrl.setPort(connectInfo->proxyPort);
