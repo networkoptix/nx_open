@@ -22,7 +22,7 @@ struct ApiResourceParam: public ApiData
     QString name;
     QString value;
 
-    QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
+    QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
 typedef std::vector<ApiResourceParam> ApiResourceParams;
@@ -44,7 +44,7 @@ struct ApiResourceData: public ApiData
 	void fromResource(const QnResourcePtr& resource);
 	void toResource(QnResourcePtr resource) const;
 	QnResourceParameters toHashMap() const;
-    QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
+    QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
 struct ApiSetResourceStatusData: public ApiData
@@ -52,7 +52,7 @@ struct ApiSetResourceStatusData: public ApiData
     qint32 id;
     QnResource::Status    status;
 
-    QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
+    QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
 }

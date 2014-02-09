@@ -16,7 +16,7 @@ struct ApiResourceTypeData: public ApiData
 
 	void fromResource(const QnResourceTypePtr& resource);
 	void toResource(QnResourceTypePtr resource) const;
-	QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
+	QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
 struct ApiResourceTypeList: public ApiData {

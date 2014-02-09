@@ -16,7 +16,7 @@ struct ApiCameraServerItemData: public ApiData
     QString  serverGuid;
     qint64   timestamp;
 
-    QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
+    QN_DECLARE_STRUCT_SQL_BINDER();
     void fromResource(const QnCameraHistoryItem& item);
     void toResource(QnCameraHistoryItem* const item);
 };

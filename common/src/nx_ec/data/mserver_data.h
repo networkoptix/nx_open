@@ -18,7 +18,7 @@ namespace ec2
         QnResourceParameters toHashMap() const;
         void fromResource(QnAbstractStorageResourcePtr resource);
         void toResource(QnAbstractStorageResourcePtr resource) const;
-        QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
+        QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
     struct ApiStorageDataList: public ApiData {
@@ -42,7 +42,7 @@ namespace ec2
         
         void fromResource(QnMediaServerResourcePtr resource);
         void toResource(QnMediaServerResourcePtr resource, QnResourceFactory* factory, const QnResourceTypePool* resTypePool) const;
-        QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
+        QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
     struct ApiPanicModeData: public ApiData

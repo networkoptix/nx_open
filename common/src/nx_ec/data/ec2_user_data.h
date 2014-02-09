@@ -19,7 +19,7 @@ struct ApiUserData: public ApiResourceData
     QString hash; 
 
     void toResource(QnUserResourcePtr resource) const;
-    QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
+    QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
 struct ApiUserDataList: public ApiData

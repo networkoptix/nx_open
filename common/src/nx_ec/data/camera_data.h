@@ -30,7 +30,7 @@ struct ScheduleTask: public ApiData
     Qn::StreamQuality  streamQuality;
     qint32   fps;
 
-    QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
+    QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
 struct ScheduleTaskList: public ApiData
@@ -69,7 +69,7 @@ struct ApiCameraData: public ApiResourceData
 	void fromResource(const QnVirtualCameraResourcePtr& resource);
 	void toResource(QnVirtualCameraResourcePtr resource) const;
 	QnResourceParameters toHashMap() const;
-    QN_DECLARE_STRUCT_SERIALIZATORS_BINDERS();
+    QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
 struct ApiCameraDataList: public ApiData
