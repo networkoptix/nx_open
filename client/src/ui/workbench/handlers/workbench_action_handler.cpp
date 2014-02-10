@@ -640,6 +640,9 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
     if(!context()->user())
         return;
 
+    if (!context()->workbench()->currentLayout()->resource())
+        return;
+
     foreach(const QnMimeData &data, m_delayedDrops) {
         QMimeData mimeData;
         data.toMimeData(&mimeData);
@@ -721,6 +724,7 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
         return;
 
     menu()->trigger(Qn::OpenNewTabAction);
+    submitDelayedDrops();
 }
 
 void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
