@@ -1,5 +1,4 @@
 #include "ec2_business_rule_data.h"
-#include "business/business_event_rule.h"
 #include "core/resource_management/resource_pool.h"
 #include "business/business_action_parameters.h"
 
@@ -45,7 +44,7 @@ void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource, QnResource
 
 void ApiBusinessRuleDataList::toResourceList(QnBusinessEventRuleList& outData, QnResourcePool* resourcePool) const
 {
-    outData.reserve(data.size());
+    outData.reserve(outData.size() + data.size());
     for(int i = 0; i < data.size(); ++i) 
     {
         QnBusinessEventRulePtr rule(new QnBusinessEventRule());

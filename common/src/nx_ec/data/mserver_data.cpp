@@ -71,7 +71,7 @@ void ApiMediaServerData::fromResource(QnMediaServerResourcePtr resource)
         storages[i].fromResource(storageList[i]);
 }
 
-void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, QnResourceFactory* factory, const QnResourceTypePool* resTypePool) const
+void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, const ResourceContext& ctx) const
 {
     ApiResourceData::toResource(resource);
 
@@ -86,13 +86,13 @@ void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, QnResourc
     resource->setVersion(QnSoftwareVersion(version));
     //resource->setAuthKey(authKey);
 
-    QnResourceTypePtr resType = resTypePool->getResourceTypeByName(QLatin1String("Storage"));
+    QnResourceTypePtr resType = ctx.resTypePool->getResourceTypeByName(QLatin1String("Storage"));
     if (!resType)
         return;
 
     QnAbstractStorageResourceList storagesRes;
     foreach(const ApiStorageData& storage, storages) {
-        QnAbstractStorageResourcePtr storageRes = factory->createResource(resType->getId(), storage.toHashMap()).dynamicCast<QnAbstractStorageResource>();
+        QnAbstractStorageResourcePtr storageRes = ctx.resFactory->createResource(resType->getId(), storage.toHashMap()).dynamicCast<QnAbstractStorageResource>();
         
         storage.toResource(storageRes);
         storagesRes.push_back(storageRes);
@@ -100,20 +100,23 @@ void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, QnResourc
     resource->setStorages(storagesRes);
 }
 
+template <class T> void ApiMediaServerDataList::toResourceList(QList<T>& outData, const ResourceContext& ctx) const
+{
+    outData.reserve(outData.size() + data.size());
+    for(int i = 0; i < data.size(); ++i) 
+    {
+        QnMediaServerResourcePtr server(new QnMediaServerResource(ctx.resTypePool));
+        data[i].toResource(server, ctx);
+        outData << server;
+    }
+}
+template void ApiMediaServerDataList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData, const ResourceContext& ctx) const;
+template void ApiMediaServerDataList::toResourceList<QnMediaServerResourcePtr>(QList<QnMediaServerResourcePtr>& outData, const ResourceContext& ctx) const;
+
+
 void ApiMediaServerDataList::loadFromQuery(QSqlQuery& query)
 {
     QN_QUERY_TO_DATA_OBJECT(query, ApiMediaServerData, data, medisServerDataFields ApiResourceDataFields)
-}
-
-void ApiMediaServerDataList::toResourceList(QnMediaServerResourceList& outData, QnResourceFactory* factory, const QnResourceTypePool* resTypePool) const
-{
-    outData.reserve(data.size());
-    for(int i = 0; i < data.size(); ++i) 
-    {
-        QnMediaServerResourcePtr server(new QnMediaServerResource(resTypePool));
-        data[i].toResource(server, factory, resTypePool);
-        outData << server;
-    }
 }
 
 }

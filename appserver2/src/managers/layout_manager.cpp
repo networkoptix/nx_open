@@ -23,7 +23,7 @@ namespace ec2
         auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiLayoutDataList& layouts) {
             QnLayoutResourceList outData;
             if( errorCode == ErrorCode::ok )
-                layouts.toLayoutList(outData);
+                layouts.toResourceList(outData);
             handler->done( reqID, errorCode, outData);
         };
         m_queryProcessor->processQueryAsync<nullptr_t, ApiLayoutDataList, decltype(queryDoneHandler)>

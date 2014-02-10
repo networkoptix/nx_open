@@ -36,9 +36,10 @@ namespace ec2
         resource->setItems(outItems);
     }
 
-    void ApiLayoutDataList::toLayoutList(QnLayoutResourceList& outData) const
+    template <class T>
+    void ApiLayoutDataList::toResourceList(QList<T>& outData) const
     {
-        outData.reserve(data.size());
+        outData.reserve(outData.size() + data.size());
         for(int i = 0; i < data.size(); ++i) 
         {
             QnLayoutResourcePtr layout(new QnLayoutResource());
@@ -46,6 +47,8 @@ namespace ec2
             outData << layout;
         }
     }
+    template void ApiLayoutDataList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData) const;
+    template void ApiLayoutDataList::toResourceList<QnLayoutResourcePtr>(QList<QnLayoutResourcePtr>& outData) const;
 
     void ApiLayoutDataList::loadFromQuery(QSqlQuery& query)
     {

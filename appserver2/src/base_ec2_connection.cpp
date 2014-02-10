@@ -18,7 +18,7 @@ namespace ec2
     :
         m_queryProcessor( queryProcessor ),
         m_licenseManager( new QnLicenseManager<T>(m_queryProcessor) ),
-        m_resourceManager( new QnResourceManager<T>(m_queryProcessor) ),
+        m_resourceManager( new QnResourceManager<T>(m_queryProcessor, resCtx) ),
         m_mediaServerManager( new QnMediaServerManager<T>(m_queryProcessor, resCtx) ),
         m_cameraManager( new QnCameraManager<T>(m_queryProcessor, resCtx) ),
         m_userManager( new QnUserManager<T>(m_queryProcessor, resCtx) ),

@@ -15,9 +15,10 @@ namespace ec2
         resource->setHash(hash);
     }
     
-    void ApiUserDataList::toResourceList(QnUserResourceList& outData) const
+    template <class T>
+    void ApiUserDataList::toResourceList(QList<T>& outData) const
     {
-        outData.reserve(data.size());
+        outData.reserve(outData.size() + data.size());
         for(int i = 0; i < data.size(); ++i) 
         {
             QnUserResourcePtr user(new QnUserResource());
@@ -25,6 +26,8 @@ namespace ec2
             outData << user;
         }
     }
+    template void ApiUserDataList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData) const;
+    template void ApiUserDataList::toResourceList<QnUserResourcePtr>(QList<QnUserResourcePtr>& outData) const;
 
     void ApiUserDataList::loadFromQuery(QSqlQuery& query)
     {

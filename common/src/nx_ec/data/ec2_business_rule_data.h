@@ -3,6 +3,7 @@
 
 #include "core/resource/resource_fwd.h"
 #include "business/business_fwd.h"
+#include "business/business_event_rule.h"
 #include "api_data.h"
 
 class QnResourcePool;

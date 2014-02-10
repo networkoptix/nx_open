@@ -655,7 +655,7 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
     QReadLocker lock(&m_mutex);
 
 	QSqlQuery queryTypes(m_sdb);
-	queryTypes.prepare("	select rt.id, rt.name, m.name as manufacture \
+	queryTypes.prepare("select rt.id, rt.name, m.name as manufacture \
 				  from vms_resourcetype rt \
 				  join vms_manufacture m on m.id = rt.manufacture_id \
 				  order by rt.id");
@@ -899,6 +899,7 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& bus
     return ErrorCode::ok;
 }
 
+// getKVPairs
 ErrorCode QnDbManager::doQuery(const QnId& resourceId, ApiResourceParams& params)
 {
     QReadLocker lock(&m_mutex);
@@ -917,10 +918,33 @@ ErrorCode QnDbManager::doQuery(const QnId& resourceId, ApiResourceParams& params
     return ErrorCode::ok;
 }
 
+// getCurrentTime
 ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, qint64& currentTime)
 {
     currentTime = QDateTime::currentMSecsSinceEpoch();
     return ErrorCode::ok;
 }
+
+// ApiFullData
+ErrorCode QnDbManager::doQuery(nullptr_t dummy, ApiFullData& resourceList)
+{
+    QReadLocker lock(&m_mutex);
+
+    ErrorCode err = doQuery(dummy, resourceList.servers);
+    if (err != ErrorCode::ok)
+        return err;
+    err = doQuery(dummy, resourceList.cameras);
+    if (err != ErrorCode::ok)
+        return err;
+    err = doQuery(dummy, resourceList.users);
+    if (err != ErrorCode::ok)
+        return err;
+    err = doQuery(dummy, resourceList.layouts);
+    if (err != ErrorCode::ok)
+        return err;
+
+    return err;
+}
+
 
 }

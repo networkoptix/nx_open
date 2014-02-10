@@ -53,7 +53,7 @@ namespace ec2
         std::vector<ApiLayoutData> data;
 
         void loadFromQuery(QSqlQuery& query);
-        void toLayoutList(QnLayoutResourceList& outData) const;
+        template <class T> void toResourceList(QList<T>& outData) const;
     };
 }
 
