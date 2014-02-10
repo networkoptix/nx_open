@@ -43,8 +43,7 @@ private:
     QnPtzControllerPtr m_controller;
 
     bool m_loaded;
-    QQueue<Qn::PtzCommand> m_commands;
-
+    QMultiHash<Qn::PtzCommand, int> m_commands;
 };
 
 #endif // ABSTRACT_PTZ_DIALOG_H

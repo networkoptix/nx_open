@@ -134,11 +134,6 @@ bool QnRemotePtzController::getData(Qn::PtzDataFields query, QnPtzData *) {
     RUN_COMMAND(Qn::GetDataPtzCommand, QVariant(), ptzGetDataAsync, query);
 }
 
-bool QnRemotePtzController::synchronize(Qn::PtzDataFields query) {
-    /* There really is nothing to synchronize, so we just run getData. */
-    RUN_COMMAND(Qn::SynchronizePtzCommand, QVariant(), ptzGetDataAsync, query);
-}
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
