@@ -460,6 +460,22 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     qnLogMsgHandler(type, ctx, msg);
 }
 
+/** Initialize log. */
+void initLog(const QString &logLevel) {
+    if(logLevel == lit("none"))
+        return;
+
+    QnLog::initLog(logLevel);
+    const QString& dataLocation = getDataDirectory();
+    const QString& logFileLocation = MSSettings::roSettings()->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
+    if (!QDir().mkpath(logFileLocation))
+        cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
+    const QString& logFileName = logFileLocation + QLatin1String("/log_file");
+    if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
+        cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
+    cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
+}
+
 int serverMain(int argc, char *argv[])
 {
     Q_UNUSED(argc)
@@ -484,21 +500,7 @@ int serverMain(int argc, char *argv[])
     }
     MSSettings::runTimeSettings()->remove("rebuild");
 
-    if( cmdLineArguments.logLevel != QString::fromLatin1("none") )
-    {
-        const QString& logDir = MSSettings::roSettings()->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
-        QDir().mkpath( logDir );
-        const QString& logFileName = logDir + QLatin1String("/log_file");
-        //MSSettings::roSettings()->setValue("logFile", logFileName);
-        if (!cl_log.create(logFileName, 1024*1024*10, 25, cl_logDEBUG1))
-        {
-            qApp->quit();
-
-            return 0;
-        }
-
-        QnLog::initLog(cmdLineArguments.logLevel);
-    }
+    initLog(cmdLineArguments.logLevel);
 
     if (cmdLineArguments.rebuildArchive == "all")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
