@@ -116,6 +116,7 @@
 #include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+#include <ui/workbench/watchers/workbench_media_widget_watcher.h>
 
 #include "version.h"
 
@@ -808,6 +809,8 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
             ? 1
             : qnSettings->maxSceneVideoItems();
 
+    bool adjustAspectRatio = layout->getItems().isEmpty();
+
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
         QHash<QUuid, QnLayoutItemData> itemDataByUuid;
@@ -832,20 +835,55 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
             layout->addItem(data);
         }
+    } else {
+        // TODO: #Elric server & media resources only!
 
-        return;
+        QnResourceList resources = parameters.resources();
+        if(!resources.isEmpty()) {
+            AddToLayoutParams addParams;
+            addParams.usePosition = !position.isNull();
+            addParams.position = position;
+            addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
+            addToLayout(layout, resources, addParams);
+        }
     }
 
-    // TODO: #Elric server & media resources only!
+    if (adjustAspectRatio) {
+        const qreal normalAspectRatio = 4.0 / 3.0;
+        const qreal wideAspectRatio = 16.0 / 9.0;
 
-    QnResourceList resources = parameters.resources();
-    if(!resources.isEmpty()) {
-        AddToLayoutParams addParams;
-        addParams.usePosition = !position.isNull();
-        addParams.position = position;
-        addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
-        addToLayout(layout, resources, addParams);
-        return;
+        qreal cellAspectRatio = -1.0;
+        qreal midAspectRatio = 0.0;
+        int count = 0;
+
+        if (!widgets.isEmpty()) {
+            foreach (QnResourceWidget *widget, widgets) {
+                if (widget->hasAspectRatio()) {
+                    midAspectRatio += widget->aspectRatio();
+                    ++count;
+                }
+            }
+        } else {
+            QnWorkbenchLayout *workbenchLayout = workbench()->currentLayout();
+            foreach (QnWorkbenchItem *item, workbenchLayout->items()) {
+                QnResourceWidget *widget = context()->display()->widget(item);
+                if (widget->hasAspectRatio()) {
+                    midAspectRatio += widget->aspectRatio();
+                    ++count;
+                }
+            }
+        }
+
+        if (count > 0) {
+            midAspectRatio /= count;
+            cellAspectRatio = (qAbs(midAspectRatio - normalAspectRatio) < qAbs(midAspectRatio - wideAspectRatio))
+                              ? normalAspectRatio : wideAspectRatio;
+        }
+
+        if (cellAspectRatio > 0)
+            layout->setCellAspectRatio(cellAspectRatio);
+        else if (layout->getItems().size() == 1)
+            context()->instance<QnWorkbenchMediaWidgetWatcher>()->adjustLayoutAspectRatio(workbenchLayout);
     }
 }
 

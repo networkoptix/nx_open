@@ -8,6 +8,7 @@
 
 QnWorkbenchMediaWidgetWatcher::QnWorkbenchMediaWidgetWatcher(QObject *parent) :
     QObject(parent),
+    QnWorkbenchContextAware(parent),
     m_renderWatcher(context()->instance<QnWorkbenchRenderWatcher>())
 {
     connect(m_renderWatcher, SIGNAL(displayingChanged(QnResourceWidget*)), this, SLOT(widgetDisplayingChanged(QnResourceWidget*)));
@@ -42,6 +43,6 @@ void QnWorkbenchMediaWidgetWatcher::setLayoutAspectRatio(QnWorkbenchLayout *layo
     if (!m_watchedLayouts.contains(layout))
         return;
 
-    layout->setCellAspectRatio(widget->aspectRatio());
+    layout->setCellAspectRatio(aspectRatio);
     m_watchedLayouts.remove(layout);
 }
