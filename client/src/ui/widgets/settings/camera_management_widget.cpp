@@ -42,7 +42,7 @@ void QnCameraManagementWidget::submitToSettings() {
     QnGlobalSettings *settings = QnGlobalSettings::instance();
     
     if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked)
-        settings->setDisabledVendors(lit(""));
+        settings->setDisabledVendors(QString());
     else if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Unchecked)
         settings->setDisabledVendors(lit("all"));
 
