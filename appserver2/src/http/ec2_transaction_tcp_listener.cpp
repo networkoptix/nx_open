@@ -1,6 +1,8 @@
 #include "ec2_transaction_tcp_listener.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "transaction/transaction_message_bus.h"
+#include "nx_ec/data/ec2_full_data.h"
+#include "database/db_manager.h"
 
 namespace ec2
 {
@@ -49,6 +51,15 @@ void QnTransactionTcpProcessor::run()
     QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket);
     int handle = d->socket->handle();
     d->socket.clear();
+
+    if (d->request.headers.find("fullsync") != d->request.headers.end()) 
+    {
+        QnTransaction<ApiFullData> data;
+        data.command = ApiCommand::getAllDataList;
+        const ErrorCode errorCode = dbManager->doQuery(nullptr, data.params);
+        if (errorCode == ErrorCode::ok)
+            QnTransactionMessageBus::instance()->sendTransaction(data);
+    }
 }
 
 }

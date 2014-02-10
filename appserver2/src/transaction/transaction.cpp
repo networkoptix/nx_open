@@ -27,7 +27,7 @@ namespace ec2
                     return "getResourceParams";
                 case setPanicMode:
                     return "setPanicMode";
-                case getResourceList:
+                case getAllDataList:
                     return "getResourceList";
 
                 case addCamera:
