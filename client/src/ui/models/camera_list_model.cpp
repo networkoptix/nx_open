@@ -8,10 +8,11 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
-QnCameraListModel::QnCameraListModel(QObject *parent, QnWorkbenchContext *context):
+QnCameraListModel::QnCameraListModel(QObject *parent):
     QnResourceListModel(parent),
-    QnWorkbenchContextAware(parent, context)
-{}
+    QnWorkbenchContextAware(parent)
+{
+}
 
 QnCameraListModel::~QnCameraListModel() {
     return;
