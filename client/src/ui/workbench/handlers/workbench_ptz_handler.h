@@ -5,7 +5,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchPtzHandler : public QObject, protected QnWorkbenchContextAware {
+class QnWorkbenchPtzHandler : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
     typedef QObject base_type;
 

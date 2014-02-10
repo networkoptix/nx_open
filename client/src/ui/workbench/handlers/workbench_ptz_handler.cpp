@@ -29,7 +29,7 @@
 
 #include <ui/workbench/workbench_context.h>
 
-class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, protected QnWorkbenchContextAware {
+class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, public QnWorkbenchContextAware {
 public:
     QnSingleCameraPtzHotkeysDelegate(const QnResourcePtr &resource, QnWorkbenchContext *context):
         QnWorkbenchContextAware(context),

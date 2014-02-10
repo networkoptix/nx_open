@@ -6,7 +6,7 @@
 
 class QnWorkbenchContext;
 
-class QnCameraListModel: public QnResourceListModel, protected QnWorkbenchContextAware {
+class QnCameraListModel: public QnResourceListModel, public QnWorkbenchContextAware {
     Q_OBJECT
     typedef QnResourceListModel base_type;
 

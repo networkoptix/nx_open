@@ -17,7 +17,7 @@ namespace Ui {
     class CameraListDialog;
 }
 
-class QnCameraListDialog: public QDialog, protected QnWorkbenchContextAware {
+class QnCameraListDialog: public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
 
 public:
