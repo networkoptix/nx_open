@@ -11,7 +11,7 @@ namespace Ui {
     class GeneralPreferencesWidget;
 }
 
-class QnGeneralPreferencesWidget : public QnAbstractPreferencesWidget, protected QnWorkbenchContextAware
+class QnGeneralPreferencesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef QnAbstractPreferencesWidget base_type;
