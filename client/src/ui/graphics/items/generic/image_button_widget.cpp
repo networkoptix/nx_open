@@ -748,6 +748,22 @@ void QnTextButtonWidget::setText(const QString &text) {
     updatePixmap();
 }
 
+QBrush QnTextButtonWidget::textBrush() const {
+    return palette().brush(QPalette::WindowText);
+}
+
+void QnTextButtonWidget::setTextBrush(const QBrush &textBrush) {
+    setPaletteBrush(this, QPalette::WindowText, textBrush);
+}
+
+QColor QnTextButtonWidget::textColor() const {
+    return palette().color(QPalette::WindowText);
+}
+
+void QnTextButtonWidget::setTextColor(const QColor &textColor) {
+    setPaletteColor(this, QPalette::WindowText, textColor);
+}
+
 qreal QnTextButtonWidget::relativeFrameWidth() const {
     return m_relativeFrameWidth;
 }

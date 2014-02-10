@@ -619,12 +619,14 @@ int QnScheduleGridWidget::getMaxFps(bool motionPlusLqOnly)
     return fps;
 }
 
-const QnScheduleGridWidgetColors &QnScheduleGridWidget::colors() const {
+const QnScheduleGridColors &QnScheduleGridWidget::colors() const {
     return m_colors;
 }
 
-void QnScheduleGridWidget::setColors(const QnScheduleGridWidgetColors &colors) {
+void QnScheduleGridWidget::setColors(const QnScheduleGridColors &colors) {
     m_colors = colors;
+
+    update();
 }
 
 QColor QnScheduleGridWidget::disabledCellColor(const QColor &baseColor) const {
