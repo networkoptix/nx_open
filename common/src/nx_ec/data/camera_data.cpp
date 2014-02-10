@@ -112,18 +112,23 @@ QnResourceParameters ApiCameraData::toHashMap() const
 	return parameters;
 }
 
-void ApiCameraDataList::toCameraList(QnVirtualCameraResourceList& outData, QnResourceFactory* factory) const
+template <class T> 
+void ApiCameraDataList::toResourceList(QList<T>& outData, QnResourceFactory* factory) const
 {
-	outData.reserve(data.size());
-	for(int i = 0; i < data.size(); ++i) 
-	{
-		QnVirtualCameraResourcePtr camera = factory->createResource(data[i].typeId, data[i].toHashMap()).dynamicCast<QnVirtualCameraResource>();
-		if (camera) {
-			data[i].toResource(camera);
-			outData << camera;
-		}
-	}
+    outData.reserve(outData.size() + data.size());
+    for(int i = 0; i < data.size(); ++i) 
+    {
+        QnVirtualCameraResourcePtr camera = factory->createResource(data[i].typeId, data[i].toHashMap()).dynamicCast<QnVirtualCameraResource>();
+        if (camera) {
+            data[i].toResource(camera);
+            outData << camera;
+        }
+    }
 }
+
+template void ApiCameraDataList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData, QnResourceFactory* factory) const;
+template void ApiCameraDataList::toResourceList<QnVirtualCameraResourcePtr>(QList<QnVirtualCameraResourcePtr>& outData, QnResourceFactory* factory) const;
+
 
 void ApiCameraDataList::loadFromQuery(QSqlQuery& query)
 {

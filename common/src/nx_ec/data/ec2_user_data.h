@@ -27,7 +27,7 @@ struct ApiUserDataList: public ApiData
     std::vector<ApiUserData> data;
 
     void loadFromQuery(QSqlQuery& query);
-    void toResourceList(QnUserResourceList& outData) const;
+    template <class T> void toResourceList(QList<T>& outData) const;
 };
 
 }

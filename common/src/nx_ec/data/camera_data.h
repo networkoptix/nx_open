@@ -6,6 +6,7 @@
 #include "core/resource/media_resource.h"
 #include "core/resource/security_cam_resource.h"
 #include "core/misc/schedule_task.h"
+#include "core/resource/camera_resource.h"
 
 namespace ec2
 {
@@ -77,7 +78,9 @@ struct ApiCameraDataList: public ApiData
 	std::vector<ApiCameraData> data;
 	
 	void loadFromQuery(QSqlQuery& query);
-	void toCameraList(QnVirtualCameraResourceList& outData, QnResourceFactory* factory) const;
+
+	template <class T> 
+    void toResourceList(QList<T>& outData, QnResourceFactory* factory) const;
 };
 
 }

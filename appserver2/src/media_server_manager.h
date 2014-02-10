@@ -36,7 +36,7 @@ namespace ec2
             QnMediaServerResourcePtr mserverRes = m_resCtx.resFactory->createResource(
                 tran.params.typeId,
                 QnResourceParameters() ).dynamicCast<QnMediaServerResource>();
-            tran.params.toResource( mserverRes, m_resCtx.resFactory, m_resCtx.resTypePool );
+            tran.params.toResource( mserverRes, m_resCtx);
             emit addedOrUpdated( mserverRes );
         }
 

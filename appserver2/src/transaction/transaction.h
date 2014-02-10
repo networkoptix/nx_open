@@ -27,6 +27,8 @@ namespace ec2
             getResourceParams,
             //!ApiPanicModeData
             setPanicMode,
+            //!ApiFullData,
+            getResourceList,
             
             //!ApiCameraData
             addCamera,
@@ -68,6 +70,7 @@ namespace ec2
             addLayout,
             //!ApiLayoutData
             updateLayout,
+            getLayoutList,
             //!ApiIdData
             removeLayout,
             

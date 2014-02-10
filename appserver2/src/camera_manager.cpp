@@ -65,7 +65,7 @@ namespace ec2
 		auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraDataList& cameras) {
 			QnVirtualCameraResourceList outData;
 			if( errorCode == ErrorCode::ok )
-				cameras.toCameraList(outData, m_resCtx.resFactory);
+				cameras.toResourceList(outData, m_resCtx.resFactory);
 			handler->done( reqID, errorCode, outData);
 		};
 		m_queryProcessor->processQueryAsync<QnId, ApiCameraDataList, decltype(queryDoneHandler)>

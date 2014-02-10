@@ -27,6 +27,8 @@ namespace ec2
                     return "getResourceParams";
                 case setPanicMode:
                     return "setPanicMode";
+                case getResourceList:
+                    return "getResourceList";
 
                 case addCamera:
                     return "addCamera";
@@ -74,6 +76,8 @@ namespace ec2
                     return "updateLayout";
                 case removeLayout:
                     return "removeLayout";
+                case getLayoutList:
+                    return "getLayoutList";
 
                 case addStoredFile:
                     return "addStoredFile";

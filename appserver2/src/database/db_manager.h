@@ -8,7 +8,9 @@
 #include "nx_ec/data/mserver_data.h"
 #include "nx_ec/data/camera_server_item_data.h"
 #include "nx_ec/data/ec2_user_data.h"
+#include "nx_ec/data/ec2_layout_data.h"
 #include "nx_ec/data/ec2_business_rule_data.h"
+#include "nx_ec/data/ec2_full_data.h"
 
 
 class QSqlDatabase;
@@ -62,11 +64,17 @@ namespace ec2
         //getBusinessRuleList
         ErrorCode doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& userList);
 
+        //getBusinessRuleList
+        ErrorCode doQuery(nullptr_t /*dummy*/, ApiLayoutDataList& userList);
+
         //getCurrentTime
         ErrorCode doQuery(nullptr_t /*dummy*/, qint64& userList);
 
         //getResourceParams
         ErrorCode doQuery(const QnId& resourceId, ApiResourceParams& params);
+
+        // ApiFullData
+        ErrorCode doQuery(nullptr_t /*dummy*/, ApiFullData& resourceList);
 
 		// --------- misc -----------------------------
 

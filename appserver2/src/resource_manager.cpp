@@ -10,9 +10,10 @@
 namespace ec2
 {
     template<class T>
-    QnResourceManager<T>::QnResourceManager( T* const queryProcessor )
+    QnResourceManager<T>::QnResourceManager( T* const queryProcessor, const ResourceContext& resCtx)
     :
-        m_queryProcessor( queryProcessor )
+        m_queryProcessor( queryProcessor ),
+        m_resCtx( resCtx )
     {
     }
 
@@ -35,8 +36,17 @@ namespace ec2
     template<class T>
     int QnResourceManager<T>::getResources( impl::GetResourcesHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const int reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiFullData& fullData) {
+            QnResourceList outData;
+            if( errorCode == ErrorCode::ok )
+                fullData.toResourceList(outData, m_resCtx);
+            handler->done( reqID, errorCode, outData);
+        };
+        m_queryProcessor->processQueryAsync<nullptr_t, ApiFullData, decltype(queryDoneHandler)> (
+            ApiCommand::getResourceList, nullptr, queryDoneHandler);
+        return reqID;
     }
 
     template<class T>

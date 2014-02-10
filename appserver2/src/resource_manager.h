@@ -15,7 +15,7 @@ namespace ec2
         public AbstractResourceManager
     {
     public:
-        QnResourceManager( QueryProcessorType* const queryProcessor );
+        QnResourceManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
 
         //!Implementation of AbstractResourceManager::getResourceTypes
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) override;
@@ -58,6 +58,7 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
+        const ResourceContext& m_resCtx;
 
         QnTransaction<ApiSetResourceStatusData> prepareTransaction( ApiCommand::Value cmd, const QnId& id, QnResource::Status status);
         QnTransaction<ApiResourceParams> prepareTransaction(ApiCommand::Value cmd, const QnId& id, const QnKvPairList& kvPairs);

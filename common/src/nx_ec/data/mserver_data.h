@@ -4,6 +4,7 @@
 #define MSERVER_DATA_H
 
 #include "ec2_resource_data.h"
+#include "nx_ec/ec_api.h"
 
 
 namespace ec2
@@ -41,7 +42,7 @@ namespace ec2
         std::vector<ApiStorageData>  storages;
         
         void fromResource(QnMediaServerResourcePtr resource);
-        void toResource(QnMediaServerResourcePtr resource, QnResourceFactory* factory, const QnResourceTypePool* resTypePool) const;
+        void toResource(QnMediaServerResourcePtr resource, const ResourceContext& ctx) const;
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
@@ -54,7 +55,7 @@ namespace ec2
         std::vector<ApiMediaServerData> data;
 
         void loadFromQuery(QSqlQuery& query);
-        void toResourceList(QnMediaServerResourceList& outData, QnResourceFactory* factory, const QnResourceTypePool* resTypePool) const;
+        template <class T> void toResourceList(QList<T>& outData, const ResourceContext& ctx) const;
     };
 }
 
@@ -62,7 +63,7 @@ namespace ec2
 #define medisServerDataFields (apiUrl) (netAddrList) (reserve) (panicMode) (streamingUrl) (version) (authKey) (storages)
 
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiStorageData, ApiStorageDataFields)
-QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiMediaServerData, ApiResourceData, medisServerDataFields)
+QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiMediaServerData, ec2::ApiResourceData, medisServerDataFields)
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiMediaServerDataList, (data))
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiStorageDataList, (data))
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiPanicModeData, (mode))
