@@ -19,7 +19,7 @@ struct QnPtzPresetHotkey {
     QnPtzPresetHotkey(const QString &id, int hotkey): id(id), hotkey(hotkey) {}
 };
 
-typedef QHash<QString, int> QnHotkeysHash;
+typedef QHash<int, QString> QnHotkeysHash;
 
 class QnAbstractPtzHotkeyDelegate {
 public:
