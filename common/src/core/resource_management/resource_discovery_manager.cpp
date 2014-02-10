@@ -74,7 +74,7 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager( const CameraDriverRestri
     m_cameraDriverRestrictionList( cameraDriverRestrictionList )
 {
     connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
-    connect(QnGlobalSettings::instance(), &QnGlobalSettings::cameraAutoDiscoveryChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
+    connect(QnGlobalSettings::instance(), &QnGlobalSettings::disabledVendorsChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
 }
 
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()

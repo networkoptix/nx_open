@@ -33,7 +33,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
 
     QList<QnCameraListModel::Column> columns;
     columns << QnCameraListModel::RecordingColumn << QnCameraListModel::NameColumn << QnCameraListModel::VendorColumn << QnCameraListModel::ModelColumn <<
-               QnCameraListModel::FirmwareColumn << QnCameraListModel::DriverColumn << QnCameraListModel::IPColumn << QnCameraListModel::UniqIdColumn << QnCameraListModel::ServerColumn;
+               QnCameraListModel::FirmwareColumn << QnCameraListModel::DriverColumn << QnCameraListModel::IpColumn << QnCameraListModel::UniqIdColumn << QnCameraListModel::ServerColumn;
 
     m_model->setColumns(columns);
     m_model->setResources(qnResPool->getAllEnabledCameras());

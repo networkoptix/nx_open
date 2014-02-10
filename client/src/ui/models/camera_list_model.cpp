@@ -79,7 +79,7 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
             case DriverColumn:
                 result = camera->getDriverName();
                 break;
-            case IPColumn:
+            case IpColumn:
                 result = camera->getHostAddress();
                 break;
             case UniqIdColumn:
@@ -111,7 +111,7 @@ QString QnCameraListModel::columnTitle(Column column) const
     case ModelColumn:     return tr("Model");
     case FirmwareColumn:  return tr("Firmware");
     case DriverColumn:    return tr("Driver");
-    case IPColumn:        return tr("IP/Name");
+    case IpColumn:        return tr("IP/Name");
     case UniqIdColumn:    return tr("ID/MAC");
     case ServerColumn:    return tr("Server");
     default:

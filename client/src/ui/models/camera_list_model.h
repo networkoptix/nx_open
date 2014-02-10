@@ -18,7 +18,7 @@ public:
         ModelColumn,
         FirmwareColumn,
         DriverColumn,
-        IPColumn,
+        IpColumn,
         UniqIdColumn,
         ServerColumn,
         ColumnCount
