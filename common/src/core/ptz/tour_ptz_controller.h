@@ -35,7 +35,6 @@ private:
     bool createTourInternal(QnPtzTour tour);
 
 private:
-    bool m_asynchronous;
     QMutex m_mutex;
     QnResourcePropertyAdaptor<QnPtzTourHash> *m_adaptor;
     QnPtzTourExecutor *m_executor;

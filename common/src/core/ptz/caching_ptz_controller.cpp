@@ -173,7 +173,7 @@ bool QnCachingPtzController::getTours(QnPtzTourList *tours) {
 }
 
 bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
-    if(!base_type::getData(query, data))
+    if(!baseController()->getData(query, data)) // TODO: #Elric should be base_type::getData => bad design =(
         return false;
 
     QMutexLocker locker(&m_mutex);

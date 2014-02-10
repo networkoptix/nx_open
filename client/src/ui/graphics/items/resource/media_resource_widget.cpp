@@ -104,7 +104,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     /* Set up PTZ controller. */
     m_ptzController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
-    m_ptzController.reset(new QnNotifyingPtzController(m_ptzController));
     m_ptzController.reset(new QnPresetPtzController(m_ptzController));
     m_ptzController.reset(new QnTourPtzController(m_ptzController));
     if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera))

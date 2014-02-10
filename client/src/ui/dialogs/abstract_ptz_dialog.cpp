@@ -125,10 +125,12 @@ void QnAbstractPtzDialog::at_controller_finished(Qn::PtzCommand command, const Q
         return;
     m_commands.erase(pos);
 
-    if (m_commands.isEmpty() && command == Qn::GetDataPtzCommand) {
+    if (command == Qn::GetDataPtzCommand){
         if (!m_loaded)
             loadData(data.value<QnPtzData>());
         m_loaded = true;
-        emit synchronized();
     }
+
+    if (m_commands.isEmpty()) 
+        emit synchronized();
 }

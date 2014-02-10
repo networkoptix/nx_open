@@ -30,7 +30,6 @@ public:
     virtual bool getPresets(QnPtzPresetList *presets) override;
 
 private:
-    bool m_asynchronous;
     QMutex m_mutex;
     QnResourcePropertyAdaptor<QnPtzPresetRecordHash> *m_adaptor;
 };
