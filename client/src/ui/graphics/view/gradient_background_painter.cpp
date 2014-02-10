@@ -92,7 +92,7 @@ const QnBackgroundColors &QnGradientBackgroundPainter::colors() {
 void QnGradientBackgroundPainter::setColors(const QnBackgroundColors &colors) {
     m_colors = colors;
     
-    updateBackgroundColor(true);
+    updateBackgroundColor(false);
 }
 
 void QnGradientBackgroundPainter::updateBackgroundColor(bool animate) {
