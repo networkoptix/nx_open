@@ -302,16 +302,25 @@ void QnTransactionMessageBus::toFormattedHex(quint8* dst, quint32 payloadSize)
     }
 }
 
-void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket)
+void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool doFullSync)
 {
-    QMutexLocker lock(&m_mutex);
-
     QnTransactionTransport* transport = new QnTransactionTransport(this);
     transport->isClientSide = false;
     transport->socket = socket;
     int handle = socket->handle();
-
     transport->state = QnTransactionTransport::ReadyForStreaming;
+
+    QMutexLocker lock(&m_mutex);
+    if (doFullSync) {
+        QnTransaction<ApiFullData> data;
+        data.command = ApiCommand::getAllDataList;
+        const ErrorCode errorCode = dbManager->doQuery(nullptr, data.params);
+        if (errorCode == ErrorCode::ok) {
+            QByteArray buffer;
+            serializeTransaction(buffer, data);
+            transport->addData(buffer);
+        }
+    }
     m_connections.push_back(transport);
 }
 

@@ -930,16 +930,35 @@ ErrorCode QnDbManager::doQuery(nullptr_t dummy, ApiFullData& resourceList)
 {
     QReadLocker lock(&m_mutex);
 
-    ErrorCode err = doQuery(dummy, resourceList.servers);
+    ErrorCode err = doQuery(dummy, resourceList.resTypes);
     if (err != ErrorCode::ok)
         return err;
+
+    err = doQuery(dummy, resourceList.servers);
+    if (err != ErrorCode::ok)
+        return err;
+
     err = doQuery(dummy, resourceList.cameras);
     if (err != ErrorCode::ok)
         return err;
+
     err = doQuery(dummy, resourceList.users);
     if (err != ErrorCode::ok)
         return err;
+
     err = doQuery(dummy, resourceList.layouts);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = doQuery(dummy, resourceList.rules);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = doQuery(dummy, resourceList.cameraHistory);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = doQuery(dummy, resourceList.kvPairs);
     if (err != ErrorCode::ok)
         return err;
 

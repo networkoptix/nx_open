@@ -48,18 +48,8 @@ void QnTransactionTcpProcessor::run()
     d->chunkedMode = true;
     sendResponse("HTTP", CODE_OK, "application/octet-stream");
 
-    QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket);
-    int handle = d->socket->handle();
+    QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, d->request.headers.find("fullsync") != d->request.headers.end());
     d->socket.clear();
-
-    if (d->request.headers.find("fullsync") != d->request.headers.end()) 
-    {
-        QnTransaction<ApiFullData> data;
-        data.command = ApiCommand::getAllDataList;
-        const ErrorCode errorCode = dbManager->doQuery(nullptr, data.params);
-        if (errorCode == ErrorCode::ok)
-            QnTransactionMessageBus::instance()->sendTransaction(data);
-    }
 }
 
 }

@@ -75,7 +75,7 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url);
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket);
+        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool doFullSync);
         
         template <class T>
         void setHandler(T* handler) { m_handler = new CustomHandler<T>(handler); }
@@ -83,16 +83,21 @@ namespace ec2
         void toFormattedHex(quint8* dst, quint32 payloadSize);
 
         template <class T>
-        void sendTransaction(const QnTransaction<T>& tran)
+        void serializeTransaction(QByteArray& buffer, const QnTransaction<T>& tran) 
         {
-            QByteArray buffer;
             OutputBinaryStream<QByteArray> stream(&buffer);
             buffer.append("00000000\r\n");
             tran.serialize(&stream);
             buffer.append("\r\n"); // chunk end
             quint32 payloadSize = buffer.size() - 12;
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
+        }
 
+        template <class T>
+        void sendTransaction(const QnTransaction<T>& tran)
+        {
+            QByteArray buffer;
+            serializeTransaction(buffer, tran);
             QMutexLocker lock(&m_mutex);
             foreach(QnTransactionTransport* transport, m_connections)
                 transport->addData(buffer);

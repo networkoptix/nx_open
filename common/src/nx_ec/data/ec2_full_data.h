@@ -9,11 +9,13 @@
 #include "ec2_layout_data.h"
 #include "nx_ec/ec_api.h"
 #include "camera_server_item_data.h"
+#include "ec2_resource_type_data.h"
 
 namespace ec2 
 {
     struct QnFullResourceData
     {
+        QnResourceTypeList resTypes;
         QnResourceList resources;
         QnBusinessEventRuleList bRules;
         QnCameraHistoryList cameraHistory;
@@ -22,6 +24,7 @@ namespace ec2
 
     struct ApiFullData: public ApiData 
     {
+        ApiResourceTypeList resTypes;
         ApiMediaServerDataList servers;
         ApiCameraDataList cameras;
         ApiUserDataList users;

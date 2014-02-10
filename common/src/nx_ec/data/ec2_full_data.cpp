@@ -5,6 +5,8 @@ namespace ec2
 {
     void ApiFullData::toResourceList(QnFullResourceData& outData, const ResourceContext& ctx) const
     {
+        resTypes.toResourceTypeList(outData.resTypes);
+
         servers.toResourceList(outData.resources, ctx);
         cameras.toResourceList(outData.resources, ctx.resFactory);
         users.toResourceList(outData.resources);
