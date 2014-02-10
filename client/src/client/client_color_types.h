@@ -101,4 +101,16 @@ Q_DECLARE_METATYPE(QnScheduleGridColors)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnScheduleGridColors)
 
 
+struct QnGridColors {
+    QnGridColors();
+
+    QColor grid;
+    QColor allowed;
+    QColor disallowed;
+};
+
+Q_DECLARE_METATYPE(QnGridColors)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnGridColors)
+
+
 #endif // QN_CLIENT_COLOR_TYPES
