@@ -112,6 +112,7 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     case QnSystemHealth::EmailSendError:
     case QnSystemHealth::StoragesNotConfigured:
     case QnSystemHealth::StoragesAreFull:
+    case QnSystemHealth::ArchiveRebuildFinished:
         return true;
 
     default:
@@ -193,6 +194,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         return;
 
     case QnSystemHealth::StoragesNotConfigured:
+    case QnSystemHealth::ArchiveRebuildFinished:
         return;
 
     default:
