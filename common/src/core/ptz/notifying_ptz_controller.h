@@ -1,17 +1,15 @@
-#ifndef QN_CACHING_PTZ_CONTROLLER_H
-#define QN_CACHING_PTZ_CONTROLLER_H
-
-#include <QtCore/QMutex>
+#ifndef QN_NOTIFYING_PTZ_CONTROLLER_H
+#define QN_NOTIFYING_PTZ_CONTROLLER_H
 
 #include "proxy_ptz_controller.h"
 
-class QnCachingPtzController: public QnProxyPtzController {
+class QnNotifyingPtzController: public QnProxyPtzController {
     Q_OBJECT
     typedef QnProxyPtzController base_type;
 
 public:
-    QnCachingPtzController(const QnPtzControllerPtr &baseController);
-    virtual ~QnCachingPtzController();
+    QnNotifyingPtzController(const QnPtzControllerPtr &baseController);
+    virtual ~QnNotifyingPtzController();
 
     static bool extends(Qn::PtzCapabilities capabilities);
 
@@ -37,19 +35,7 @@ public:
     virtual bool getTours(QnPtzTourList *tours) override;
 
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
-
-protected:
-    virtual void baseFinished(Qn::PtzCommand command, const QVariant &data) override;
-
-private:
-    bool initialize();
-    void updateCacheLocked(const QnPtzData &data);
-
-private:
-    bool m_initialized;
-    QMutex m_mutex;
-    QnPtzData m_data;
 };
 
 
-#endif // QN_CACHING_PTZ_CONTROLLER_H
+#endif // QN_NOTIFYING_PTZ_CONTROLLER_H

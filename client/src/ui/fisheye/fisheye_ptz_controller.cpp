@@ -246,6 +246,18 @@ bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QV
         m_animationMode = PositionAnimation;
         m_startPosition = getPositionInternal();
         m_endPosition = boundedPosition(position);
+
+        /* Try to place start & end closer to each other */
+        if(m_unlimitedPan) {
+            m_startPosition.setX(qMod(m_startPosition.x(), 360.0));
+            m_endPosition.setX(qMod(m_endPosition.x(), 360.0));
+            
+            if(m_endPosition.x() - 180.0 > m_startPosition.x())
+                m_endPosition.setX(m_endPosition.x() - 360.0);
+            if(m_endPosition.x() + 180.0 < m_startPosition.x())
+                m_endPosition.setX(m_endPosition.x() + 360.0);
+        }
+
         m_progress = 0.0;
         m_relativeSpeed = qBound<qreal>(0.0, speed, 1.0); // TODO: #Elric this is wrong. We need to take distance into account.
         

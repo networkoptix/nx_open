@@ -36,6 +36,7 @@ public:
     virtual ~QnPtzTourListModel();
 
     const QList<QnPtzTourItemModel> &tourModels() const;
+    const QStringList &removedTours() const;
     void setTours(const QnPtzTourList &tours);
 
     const QnPtzPresetList& presets() const;
@@ -57,6 +58,7 @@ private:
     qint64 estimatedTimeSecs(const QnPtzTour &tour) const;
 
     QList<QnPtzTourItemModel> m_tours;
+    QStringList m_removedTours;
     QnPtzPresetList m_presets;
 };
 

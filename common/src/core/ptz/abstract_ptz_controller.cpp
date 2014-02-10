@@ -68,7 +68,6 @@ bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
         return (capabilities & Qn::ToursPtzCapability);
 
     case Qn::GetDataPtzCommand:
-    case Qn::SynchronizePtzCommand:         
         return true;
 
     default:                                

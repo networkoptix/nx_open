@@ -75,6 +75,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     setAutoFillBackground(true);
 
+    setPaletteColor(this, QPalette::Window, Qt::black);
+
     /* Create buttons. */
     m_jumpBackwardButton = newActionButton(action(Qn::JumpToStartAction));
     m_jumpBackwardButton->setIcon(qnSkin->icon("slider/navigation/rewind_backward.png"));

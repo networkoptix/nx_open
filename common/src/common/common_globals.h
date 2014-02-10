@@ -105,7 +105,6 @@ public:
         GetToursPtzCommand,
 
         GetDataPtzCommand,
-        SynchronizePtzCommand,
 
         InvalidPtzCommand = -1
     };

@@ -101,6 +101,9 @@ bool QnPtzToursDialog::saveTours() {
         result &= createTour(updated);
     }
 
+    foreach (const QString &id, m_model->removedTours())
+        result &= removeTour(id);
+
     return result;
 }
 
