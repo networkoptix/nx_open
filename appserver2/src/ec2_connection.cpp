@@ -23,4 +23,9 @@ namespace ec2
     {
         return m_connectionInfo;
     }
+
+    void Ec2DirectConnection::startReceivingNotifications()
+    {
+        //TODO/IMPL
+    }
 }
