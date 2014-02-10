@@ -39,8 +39,10 @@ void QnAbstractPtzDialog::synchronize(const QString &title) {
     }
 
     if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability)) {
-        m_commands.enqueue(Qn::SynchronizePtzCommand);
-        m_controller->synchronize(requiredFields());
+        m_commands.insert(Qn::GetDataPtzCommand, 0);
+
+        QnPtzData data;
+        m_controller->getData(requiredFields(), &data);
 
         QEventLoop loop;
         connect(this,            SIGNAL(synchronized()),   &loop, SLOT(quit()));
@@ -70,12 +72,12 @@ void QnAbstractPtzDialog::synchronize(const QString &title) {
             widget->setEnabled(true);
 
     } else {
-        m_commands.clear(); //we will not wait for other commands
-        m_commands.enqueue(Qn::SynchronizePtzCommand);
+        m_commands.clear(); // we will not wait for other commands
+        m_commands.insert(Qn::GetDataPtzCommand, 0);
 
         QnPtzData data;
         m_controller->getData(requiredFields(), &data);
-        at_controller_finished(Qn::SynchronizePtzCommand, QVariant::fromValue(data));
+        at_controller_finished(Qn::GetDataPtzCommand, QVariant::fromValue(data));
     }
 }
 
@@ -84,27 +86,32 @@ bool QnAbstractPtzDialog::activatePreset(const QString &presetId, qreal speed) {
 }
 
 bool QnAbstractPtzDialog::createPreset(const QnPtzPreset &preset) {
-    m_commands.enqueue(Qn::CreatePresetPtzCommand);
+    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+        m_commands.insert(Qn::CreatePresetPtzCommand, 0);
     return m_controller->createPreset(preset);
 }
 
 bool QnAbstractPtzDialog::updatePreset(const QnPtzPreset &preset) {
-    m_commands.enqueue(Qn::UpdatePresetPtzCommand);
+    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+        m_commands.insert(Qn::UpdatePresetPtzCommand, 0);
     return m_controller->updatePreset(preset);
 }
 
 bool QnAbstractPtzDialog::removePreset(const QString &presetId) {
-    m_commands.enqueue(Qn::RemovePresetPtzCommand);
+    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+        m_commands.insert(Qn::RemovePresetPtzCommand, 0);
     return m_controller->removePreset(presetId);
 }
 
 bool QnAbstractPtzDialog::createTour(const QnPtzTour &tour) {
-    m_commands.enqueue(Qn::CreateTourPtzCommand);
+    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+        m_commands.insert(Qn::CreateTourPtzCommand, 0);
     return m_controller->createTour(tour);
 }
 
 bool QnAbstractPtzDialog::removeTour(const QString &tourId) {
-    m_commands.enqueue(Qn::RemoveTourPtzCommand);
+    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+        m_commands.insert(Qn::RemoveTourPtzCommand, 0);
     return m_controller->removeTour(tourId);
 }
 
@@ -113,11 +120,12 @@ void QnAbstractPtzDialog::at_controller_finished(Qn::PtzCommand command, const Q
         return;
 
     //TODO: #GDM PTZ check against validity of data, show error message later if not valid.
-    if (m_commands.first() != command)
+    auto pos = m_commands.find(command);
+    if (pos == m_commands.end())
         return;
-    m_commands.dequeue();
+    m_commands.erase(pos);
 
-    if (m_commands.isEmpty() && command == Qn::SynchronizePtzCommand) {
+    if (m_commands.isEmpty() && command == Qn::GetDataPtzCommand) {
         if (!m_loaded)
             loadData(data.value<QnPtzData>());
         m_loaded = true;

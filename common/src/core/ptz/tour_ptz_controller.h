@@ -33,7 +33,6 @@ public:
 
 private:
     bool createTourInternal(QnPtzTour tour);
-    Q_SIGNAL void finishedLater(Qn::PtzCommand command, const QVariant &data);
 
 private:
     bool m_asynchronous;

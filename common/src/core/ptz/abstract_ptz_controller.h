@@ -256,14 +256,6 @@ public:
      */
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data);
 
-    /**
-     * Synchronizes this controller's internal caches with the actual target values.
-     * 
-     * \param query                     Data fields to synchronize.
-     * \returns                         Whether the operation was successful.     
-     */
-    virtual bool synchronize(Qn::PtzDataFields query) = 0;
-
 signals:
     void capabilitiesChanged();
     void finished(Qn::PtzCommand command, const QVariant &data);

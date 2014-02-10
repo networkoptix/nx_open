@@ -183,10 +183,6 @@ bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
     return true;
 }
 
-bool QnCachingPtzController::synchronize(Qn::PtzDataFields query) {
-    return base_type::synchronize(query);
-}
-
 void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant &data) {
     if(data.isValid()) {
         QMutexLocker locker(&m_mutex);
@@ -256,7 +252,6 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
             m_data.tours = data.value<QnPtzTourList>();
             break;
         case Qn::GetDataPtzCommand:
-        case Qn::SynchronizePtzCommand:
             updateCacheLocked(data.value<QnPtzData>());
             break;
         default:
@@ -273,7 +268,8 @@ bool QnCachingPtzController::initialize() {
     if(m_initialized)
         return true;
 
-    return synchronize(Qn::AllPtzFields);
+    QnPtzData data;
+    return getData(Qn::AllPtzFields, &data);
 }
 
 void QnCachingPtzController::updateCacheLocked(const QnPtzData &data) {

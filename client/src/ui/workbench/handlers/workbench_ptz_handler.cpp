@@ -27,6 +27,7 @@
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
+#include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_context.h>
 
 class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, public QnWorkbenchContextAware {
@@ -128,6 +129,12 @@ void QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered() {
     }
 
     qDebug() << "goToPreset activated" << resource->getId() << id;
+
+    if (widget->dewarpingParams().enabled) {
+        QnItemDewarpingParams params = widget->item()->dewarpingParams();
+        params.enabled = true;
+        widget->item()->setDewarpingParams(params);
+    }
 
     if (widget->ptzController()->activatePreset(id, 1.0)) {
         action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?

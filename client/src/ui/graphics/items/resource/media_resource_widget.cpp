@@ -55,6 +55,7 @@
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
 #include "ui/fisheye/fisheye_ptz_controller.h"
+#include "core/ptz/notifying_ptz_controller.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -103,6 +104,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     /* Set up PTZ controller. */
     m_ptzController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
+    m_ptzController.reset(new QnNotifyingPtzController(m_ptzController));
     m_ptzController.reset(new QnPresetPtzController(m_ptzController));
     m_ptzController.reset(new QnTourPtzController(m_ptzController));
     if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera))

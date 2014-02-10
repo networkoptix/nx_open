@@ -43,7 +43,6 @@ public:
     virtual bool getTours(QnPtzTourList *tours) override;
 
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
-    virtual bool synchronize(Qn::PtzDataFields query) override;
 
 private:
     template<class Functor>

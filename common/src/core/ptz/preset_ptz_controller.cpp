@@ -42,7 +42,6 @@ QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseContr
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzPresetRecordHash>(baseController->resource(), lit("ptzPresets"), QnPtzPresetRecordHash(), this))
 {
     m_asynchronous = baseController->hasCapabilities(Qn::AsynchronousPtzCapability);
-    connect(this, &QnPresetPtzController::finishedLater, this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
 }
 
 QnPresetPtzController::~QnPresetPtzController() {
@@ -128,8 +127,6 @@ bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
 
     if(!absoluteMove(data.space, data.position, speed))
         return false;
-
-    // TODO: #Elric maybe emit finished when we get absoluteMove finished?
 
     if(m_asynchronous)
         emit finishedLater(Qn::ActivatePresetPtzCommand, QVariant::fromValue(presetId));
