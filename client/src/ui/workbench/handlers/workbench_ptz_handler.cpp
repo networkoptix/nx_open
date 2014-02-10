@@ -178,6 +178,12 @@ void QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered() {
 
     qDebug() << "startTour activated" << resource->getId() << id;
 
+    if (widget->dewarpingParams().enabled) {
+        QnItemDewarpingParams params = widget->item()->dewarpingParams();
+        params.enabled = true;
+        widget->item()->setDewarpingParams(params);
+    }
+
     if (widget->ptzController()->activateTour(id)) {
         action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
     } else {
