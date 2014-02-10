@@ -4225,7 +4225,7 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="52"/>
         <source>Downloading Database Backup</source>
-        <translation>Загружается резервную копию БД</translation>
+        <translation>Загружается резервная копия БД</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="53"/>
