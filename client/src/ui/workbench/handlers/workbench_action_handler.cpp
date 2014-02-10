@@ -1283,7 +1283,7 @@ void QnWorkbenchActionHandler::at_cameraListAction_triggered()
 
     bool newlyCreated = false;
     if(!cameraListDialog()) {
-        m_cameraListDialog = new QnCameraListDialog(mainWindow(), context());
+        m_cameraListDialog = new QnCameraListDialog(mainWindow());
         newlyCreated = true;
     }
     QRect oldGeometry = cameraListDialog()->geometry();

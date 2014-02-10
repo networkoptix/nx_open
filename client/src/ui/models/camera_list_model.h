@@ -6,7 +6,7 @@
 
 class QnWorkbenchContext;
 
-class QnCameraListModel: public QnResourceListModel, public QnWorkbenchContextAware {
+class QnCameraListModel: public QnResourceListModel, protected QnWorkbenchContextAware {
     Q_OBJECT
     typedef QnResourceListModel base_type;
 
@@ -24,7 +24,7 @@ public:
         ColumnCount
     };
 
-    QnCameraListModel(QObject *parent = NULL, QnWorkbenchContext* context = NULL);
+    QnCameraListModel(QObject *parent = NULL);
     virtual ~QnCameraListModel();
 
     const QList<Column> &columns() const;

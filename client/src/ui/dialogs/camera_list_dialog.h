@@ -17,11 +17,11 @@ namespace Ui {
     class CameraListDialog;
 }
 
-class QnCameraListDialog: public QDialog, public QnWorkbenchContextAware {
+class QnCameraListDialog: public QDialog, protected QnWorkbenchContextAware {
     Q_OBJECT
 
 public:
-    explicit QnCameraListDialog(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
+    explicit QnCameraListDialog(QWidget *parent = NULL);
     virtual ~QnCameraListDialog();
 
     void setServer(const QnMediaServerResourcePtr &server);
