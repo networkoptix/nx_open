@@ -484,14 +484,8 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         );
         break;
     case QnSystemHealth::StoragesNotConfigured:
-        item->addActionButton(
-            qnSkin->icon("events/storage.png"),
-            tr("Server settings"),
-            Qn::ServerSettingsAction,
-            QnActionParameters(resource)
-        );
-        break;
     case QnSystemHealth::StoragesAreFull:
+    case QnSystemHealth::ArchiveRebuildFinished:
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
             tr("Server settings"),
