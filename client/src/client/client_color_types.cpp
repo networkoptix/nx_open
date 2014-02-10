@@ -110,7 +110,7 @@ QColor QnStatisticsColors::networkByKey(const QString &key) const {
 }
 
 
-QnScheduleGridWidgetColors::QnScheduleGridWidgetColors() {
+QnScheduleGridColors::QnScheduleGridColors() {
     normalLabel =   QColor(255, 255, 255, 255);
     weekendLabel =  QColor(255, 128, 128, 255);
     selectedLabel = QColor(64,  128, 192, 255);
@@ -145,7 +145,7 @@ QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
 )
 
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnScheduleGridWidgetColors, 
+    QnScheduleGridColors, 
     (normalLabel)(weekendLabel)(selectedLabel)(disabledLabel), 
     QJson::Optional
 )

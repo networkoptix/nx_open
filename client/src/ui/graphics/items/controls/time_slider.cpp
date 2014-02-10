@@ -969,7 +969,6 @@ qint64 QnTimeSlider::animationEnd() {
 
 void QnTimeSlider::generateProgressPatterns() {
     const qreal stripeWidth = 8.0;
-    const qreal stripesAlpha = 0.4;
 
     QPainterPath path;
     path.moveTo(0.0, 0.0);
