@@ -68,6 +68,7 @@ namespace ec2
             addLayout,
             //!ApiLayoutData
             updateLayout,
+            getLayoutList,
             //!ApiIdData
             removeLayout,
             

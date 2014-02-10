@@ -19,7 +19,15 @@ namespace ec2
     int QnLayoutManager<QueryProcessorType>::getLayouts( impl::GetLayoutsHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        //TODO/IMPL
+
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiLayoutDataList& layouts) {
+            QnLayoutResourceList outData;
+            if( errorCode == ErrorCode::ok )
+                layouts.toLayoutList(outData);
+            handler->done( reqID, errorCode, outData);
+        };
+        m_queryProcessor->processQueryAsync<nullptr_t, ApiLayoutDataList, decltype(queryDoneHandler)>
+            ( ApiCommand::getLayoutList, nullptr, queryDoneHandler );
         return reqID;
     }
 

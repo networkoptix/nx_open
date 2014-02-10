@@ -74,6 +74,8 @@ namespace ec2
                     return "updateLayout";
                 case removeLayout:
                     return "removeLayout";
+                case getLayoutList:
+                    return "getLayoutList";
 
                 case addStoredFile:
                     return "addStoredFile";

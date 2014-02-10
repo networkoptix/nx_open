@@ -679,6 +679,45 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 	return ErrorCode::ok;
 }
 
+// ----------- getLayouts --------------------
+
+ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiLayoutDataList& layouts)
+{
+    QReadLocker lock(&m_mutex);
+
+    QSqlQuery query(m_sdb);
+    QString filter; // todo: add data filtering by user here
+    query.prepare(QString("SELECT r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
+                  l.user_can_edit as userCanEdit, l.cell_spacing_height as l.cellSpacingHeight, l.locked, \
+                  l.cell_aspect_ratio as cellAspectRatio, l.user_id as userId, l.background_width as backgroundWidth, \
+                  l.background_image_filename as backgroundImageFilename, l.background_height as backgroundHeight, \
+                  l.cell_spacing_width as cellSpacingWidth, l.background_opacity as backgroundOpacity, l.resource_ptr_id as id \
+                  FROM vms_layout l \
+                  JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.id").arg(filter));
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
+
+    QSqlQuery queryItems(m_sdb);
+    queryItems.prepare("SELECT zoom_buttom as zoomButtom, right, uuid, zoom_left as zoomLeft, resource_id as resourceId, \
+                       zoom_right as zoomRight, top, layout_id as layoutId, bottom, zoom_top as zoomTop, \
+                       zoom_target_uuid as zoomTargetUuid, flags, contrast_params as contrastParams, rotation, id, \
+                       dewarping_params as dewarpingParams, left FROM vms_layoutitem order by layout_id");
+
+    if (!queryItems.exec()) {
+        qWarning() << Q_FUNC_INFO << queryItems.lastError().text();
+        return ErrorCode::failure;
+    }
+
+    layouts.loadFromQuery(query);
+    std::vector<ApiLayoutItemData> items;
+    QN_QUERY_TO_DATA_OBJECT(queryItems, ApiLayoutItemData, items, ApiLayoutItemDataFields);
+    mergeObjectListData<ApiLayoutData, ApiLayoutItemData>(layouts.data, items, &ApiLayoutData::items, &ApiLayoutItemData::layoutId);
+
+    return ErrorCode::ok;
+}
+
 // ----------- getCameras --------------------
 
 ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraList)
