@@ -74,7 +74,7 @@ namespace ec2
         ErrorCode doQuery(const QnId& resourceId, ApiResourceParams& params);
 
         // ApiFullData
-        ErrorCode doQuery(nullptr_t /*dummy*/, ApiFullData& resourceList);
+        ErrorCode doQuery(nullptr_t /*dummy*/, ApiFullData& data);
 
 		// --------- misc -----------------------------
 

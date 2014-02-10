@@ -28,7 +28,7 @@ namespace ec2
             //!ApiPanicModeData
             setPanicMode,
             //!ApiFullData,
-            getResourceList,
+            getAllDataList,
             
             //!ApiCameraData
             addCamera,
@@ -100,7 +100,7 @@ namespace ec2
     class QnAbstractTransaction
     {
     public:
-		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(true) {}
+		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false) {}
 
         void createNewID();
         
