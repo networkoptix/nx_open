@@ -926,40 +926,33 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, qint64& currentTime)
 }
 
 // ApiFullData
-ErrorCode QnDbManager::doQuery(nullptr_t dummy, ApiFullData& resourceList)
+ErrorCode QnDbManager::doQuery(nullptr_t dummy, ApiFullData& data)
 {
     QReadLocker lock(&m_mutex);
+    ErrorCode err;
 
-    ErrorCode err = doQuery(dummy, resourceList.resTypes);
-    if (err != ErrorCode::ok)
+    if ((err = doQuery(dummy, data.resTypes)) != ErrorCode::ok)
         return err;
 
-    err = doQuery(dummy, resourceList.servers);
-    if (err != ErrorCode::ok)
+    if ((err = doQuery(dummy, data.servers)) != ErrorCode::ok)
         return err;
 
-    err = doQuery(dummy, resourceList.cameras);
-    if (err != ErrorCode::ok)
+    if ((err = doQuery(dummy, data.cameras)) != ErrorCode::ok)
         return err;
 
-    err = doQuery(dummy, resourceList.users);
-    if (err != ErrorCode::ok)
+    if ((err = doQuery(dummy, data.users)) != ErrorCode::ok)
         return err;
 
-    err = doQuery(dummy, resourceList.layouts);
-    if (err != ErrorCode::ok)
+    if ((err = doQuery(dummy, data.layouts)) != ErrorCode::ok)
         return err;
 
-    err = doQuery(dummy, resourceList.rules);
-    if (err != ErrorCode::ok)
+    if ((err = doQuery(dummy, data.rules)) != ErrorCode::ok)
         return err;
 
-    err = doQuery(dummy, resourceList.cameraHistory);
-    if (err != ErrorCode::ok)
+    if ((err = doQuery(dummy, data.cameraHistory)) != ErrorCode::ok)
         return err;
 
-    err = doQuery(dummy, resourceList.kvPairs);
-    if (err != ErrorCode::ok)
+    if ((err = doQuery(dummy, data.kvPairs)) != ErrorCode::ok)
         return err;
 
     return err;
