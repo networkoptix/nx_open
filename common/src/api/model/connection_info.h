@@ -10,7 +10,7 @@
 #include "compatibility.h"
 
 struct QnConnectionInfo {
-    QnConnectionInfo(): allowCameraChanges(true) {}
+    QnConnectionInfo(): proxyPort(0), allowCameraChanges(true) {}
 
     QUrl ecUrl;
     QnSoftwareVersion version;
