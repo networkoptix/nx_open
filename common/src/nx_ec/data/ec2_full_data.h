@@ -32,11 +32,14 @@ namespace ec2
         ApiBusinessRuleDataList rules;
         ApiCameraServerItemDataList cameraHistory;
         ApiResourceParams kvPairs;
+        ServerInfo serverInfo;
         
         void toResourceList(QnFullResourceData&, const ResourceContext&) const;
     };
 }
 
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiFullData, (servers) (cameras) (users) (layouts) (rules) (cameraHistory) )
+QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ServerInfo, (hardwareId1) (oldHardwareId) (hardwareId2) 
+    (publicIp) (systemName) (hardwareId3) (sessionKey) (allowCameraChanges) )
+QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiFullData, (servers) (cameras) (users) (layouts) (rules) (cameraHistory) (kvPairs) (serverInfo) )
 
 #endif // __EC2_FULL_DATA_H_

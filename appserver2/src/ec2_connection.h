@@ -25,7 +25,10 @@ namespace ec2
             const ResourceContext& resCtx,
             const QnConnectionInfo& connectionInfo );
 
-        virtual QnConnectionInfo connectionInfo() const;
+        //!Implementation of ec2::AbstractECConnection::connectionInfo
+        virtual QnConnectionInfo connectionInfo() const override;
+        //!Implementation of ec2::AbstractECConnection::startReceivingNotifications
+        virtual void startReceivingNotifications() override;
 
     private:
 		std::unique_ptr<QnDbManager> m_dbManager;

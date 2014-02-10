@@ -14,6 +14,7 @@
 #include "client_query_processor.h"
 #include "fixed_url_client_query_processor.h"
 
+
 namespace ec2
 {
     class QnTransactionMessageBus;
@@ -30,6 +31,7 @@ namespace ec2
         virtual ~RemoteEC2Connection();
 
         virtual QnConnectionInfo connectionInfo() const override;
+        virtual void startReceivingNotifications() override;
 
         template<class T> void processTransaction( const QnTransaction<T>& tran ) {}
 
