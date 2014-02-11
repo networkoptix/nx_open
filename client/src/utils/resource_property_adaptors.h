@@ -1,7 +1,9 @@
 #ifndef QN_RESOURCE_PROPERTY_ADAPTORS_H
 #define QN_RESOURCE_PROPERTY_ADAPTORS_H
 
-#include "resource_property_adaptor.h"
+#include <api/resource_property_adaptor.h>
+
+#include <client/client_model_types.h>
 
 #include <business/business_fwd.h>
 

@@ -1,7 +1,6 @@
 #include "workbench_notifications_handler.h"
 
 #include <api/app_server_connection.h>
-#include <api/resource_property_adaptors.h>
 
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
@@ -16,6 +15,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <utils/resource_property_adaptors.h>
 #include <utils/app_server_notification_cache.h>
 #include <utils/common/email.h>
 #include <utils/media/audio_player.h>

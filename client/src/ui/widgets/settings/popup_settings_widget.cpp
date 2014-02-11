@@ -4,7 +4,6 @@
 #include <client/client_settings.h>
 
 #include <api/app_server_connection.h>
-#include <api/resource_property_adaptors.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
@@ -19,6 +18,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
+
+#include <utils/resource_property_adaptors.h>
 
 //TODO: #GDM handle user changing here
 
