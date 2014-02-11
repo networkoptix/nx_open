@@ -202,16 +202,22 @@
         <profile>
             <id>quicksync</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>!quicksync</name>
+                    <value>true</value>
+                </property>
             </activation>
             <modules>	
-                <module>quicksyncdecoder</module>       
+                <module>plugins/quicksyncdecoder</module>       
             </modules>	
         </profile>   
 
         <profile>
             <id>main</id>
             <activation>
+                <os>
+                    <family>Windows</family>
+                </os>            
                 <property>
                     <name>!skipCommon</name>
                 </property>
@@ -266,7 +272,6 @@
                 </os>
             </activation>
             <modules>
-                <module>plugins/quicksyncdecoder</module>
                 <module>plugins/image_library_plugin</module>                
                 <module>traytool</module>
                 <module>vmaxproxy</module>	
