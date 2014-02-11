@@ -25,13 +25,17 @@
                 "IP8362", "MD8562", "IPC-HDB3200C", "N53F-F", "IP8371E",
                 "FD8363", "KCM5211", "TCM3511", "AXISP3344", "AXISP1344"
             ],
-            "brokenPtz": true
+            "ptzCapabilities": "NoPtzCapabilities"
         },
         {
             "keys": [
                 "FW3471-PS-E", "DWC-MPTZ20X", "KCM8111"
             ],
             "octagonalPtz": true
+        },
+        {
+            "keys": ["KCM3311"],
+            "ptzCapabilities": "ContinuousZoomCapability"
         },
         {
             "keys": [

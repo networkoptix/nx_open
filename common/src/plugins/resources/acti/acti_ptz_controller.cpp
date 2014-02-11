@@ -167,13 +167,7 @@ void QnActiPtzControllerPrivate::init() {
     if(!zoomData.startsWith("ZOOM_CAP_GET="))
         return;
 
-    capabilities = Qn::NoPtzCapabilities;
-    if(resource->getModel() == lit("KCM3311")) {
-        capabilities |= Qn::ContinuousZoomCapability;
-    } else {
-        capabilities |= Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability;
-    }
-    capabilities |= Qn::FlipPtzCapability;
+    capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability | Qn::FlipPtzCapability;
 
     // TODO: #PTZ
 #if 0
