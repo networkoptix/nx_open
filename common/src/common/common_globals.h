@@ -218,7 +218,7 @@ public:
         FirstItemDataRole   = Qt::UserRole,
 
         /* Tree-based. */
-        NodeTypeRole        = FirstItemDataRole,    /**< Role for node type, see <tt>Qn::NodeType</tt>. */
+        NodeTypeRole,                               /**< Role for node type, see <tt>Qn::NodeType</tt>. */
 
         /* Resource-based. */
         ResourceRole,                               /**< Role for QnResourcePtr. */
@@ -269,6 +269,7 @@ public:
         CurrentMediaServerResourcesRole,
 
         /* Arguments. */
+        ActionIdRole,
         SerializedDataRole,
         ConnectionInfoRole,
         FocusElementRole,
@@ -306,7 +307,6 @@ public:
 
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 
-        RoleCount
     };
 
 
