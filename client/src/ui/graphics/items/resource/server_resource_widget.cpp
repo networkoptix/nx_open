@@ -556,6 +556,10 @@ Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painte
 }
 
 void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painter) {
+
+    painter->fillRect(rect, palette().color(QPalette::Window));
+
+#if 0
     qreal width = rect.width();
     qreal height = rect.height();
     qreal min = qMin(width, height);
@@ -595,6 +599,7 @@ void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painte
         glDisable(GL_BLEND);
     }
     painter->endNativePainting();
+#endif
 }
 
 void QnServerResourceWidget::addOverlays() {

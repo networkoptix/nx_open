@@ -21,7 +21,7 @@ class QnCameraListDialog: public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
 
 public:
-    explicit QnCameraListDialog(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
+    explicit QnCameraListDialog(QWidget *parent = NULL);
     virtual ~QnCameraListDialog();
 
     void setServer(const QnMediaServerResourcePtr &server);

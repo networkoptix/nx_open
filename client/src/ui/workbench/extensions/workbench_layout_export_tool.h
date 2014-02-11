@@ -19,7 +19,7 @@ class QnClientVideoCamera;
  *                                              Correct behaviour while re-using is not guarantied.
  *                                              Notifies about progress of the process.
  */
-class QnLayoutExportTool : public QObject, protected QnWorkbenchContextAware
+class QnLayoutExportTool : public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:

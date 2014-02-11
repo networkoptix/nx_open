@@ -27,25 +27,25 @@ QnPtzHotkeyKvPairAdapter::QnPtzHotkeyKvPairAdapter(const QnResourcePtr &resource
 }
 
 int QnPtzHotkeyKvPairAdapter::hotkeyByPresetId(const QString &presetId) const {
-    return m_hotkeys.value(presetId, Qn::NoHotkey);
+    return m_hotkeys.key(presetId, Qn::NoHotkey);
 }
 
 int QnPtzHotkeyKvPairAdapter::hotkeyByPresetId(const QnResourcePtr &resource, const QString &presetId) {
     QnHotkeysHash hotkeys;
     if (!readHotkeys(resource, &hotkeys))
         return Qn::NoHotkey;
-    return hotkeys.value(presetId, Qn::NoHotkey);
+    return hotkeys.key(presetId, Qn::NoHotkey);
 }
 
 QString QnPtzHotkeyKvPairAdapter::presetIdByHotkey(int hotkey) const {
-    return m_hotkeys.key(hotkey);
+    return m_hotkeys.value(hotkey);
 }
 
 QString QnPtzHotkeyKvPairAdapter::presetIdByHotkey(const QnResourcePtr &resource, int hotkey) {
     QnHotkeysHash hotkeys;
     if (!readHotkeys(resource, &hotkeys))
         return QString();
-    return hotkeys.key(hotkey);
+    return hotkeys.value(hotkey);
 }
 
 QString QnPtzHotkeyKvPairAdapter::key() {

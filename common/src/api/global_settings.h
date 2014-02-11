@@ -27,7 +27,7 @@ public:
     void setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled);
 
 signals:
-    void cameraAutoDiscoveryChanged();
+    void disabledVendorsChanged();
     void cameraSettingsOptimizationChanged();
 
 private:

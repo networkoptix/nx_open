@@ -44,6 +44,7 @@
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
+        <resources.phase>generate-sources</resources.phase>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
         <protobuf.version>2.5.0-SNAPSHOT</protobuf.version>
@@ -145,7 +146,7 @@
                 <executions>
                     <execution>
                         <id>copy-project-resources</id>
-                        <phase>generate-sources</phase>
+                        <phase>${resources.phase}</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -167,6 +168,7 @@
                                     <filtering>false</filtering>
                                     <excludes>
                                         <exclude>**/_unused/**</exclude>
+                                        <exclude>**/intro.*</exclude>
                                     </excludes>
                                 </resource>	   
                                 <resource>

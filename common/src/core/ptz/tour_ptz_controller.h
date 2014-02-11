@@ -33,10 +33,8 @@ public:
 
 private:
     bool createTourInternal(QnPtzTour tour);
-    Q_SIGNAL void finishedLater(Qn::PtzCommand command, const QVariant &data);
 
 private:
-    bool m_asynchronous;
     QMutex m_mutex;
     QnResourcePropertyAdaptor<QnPtzTourHash> *m_adaptor;
     QnPtzTourExecutor *m_executor;

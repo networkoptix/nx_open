@@ -112,6 +112,7 @@ void QnStorageManager::rebuildCatalogIndexInternal()
     }
     loadFullFileCatalog(true);
     m_rebuildState = RebuildState_None;
+    emit rebuildFinished();
 }
 
 void QnStorageManager::rebuildCatalogAsync()

@@ -18,13 +18,13 @@ public:
         ModelColumn,
         FirmwareColumn,
         DriverColumn,
-        IPColumn,
+        IpColumn,
         UniqIdColumn,
         ServerColumn,
         ColumnCount
     };
 
-    QnCameraListModel(QObject *parent = NULL, QnWorkbenchContext* context = NULL);
+    QnCameraListModel(QObject *parent = NULL);
     virtual ~QnCameraListModel();
 
     const QList<Column> &columns() const;

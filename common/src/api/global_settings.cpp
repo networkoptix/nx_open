@@ -7,6 +7,25 @@
 
 #include "resource_property_adaptor.h"
 
+namespace {
+    QSet<QString> parseDisabledVendors(QString disabledVendors) {
+        QStringList disabledVendorList;
+        if (disabledVendors.contains(lit(";")))
+            disabledVendorList = disabledVendors.split(lit(";"));
+        else
+            disabledVendorList = disabledVendors.split(lit(" "));
+
+        QStringList updatedVendorList;        
+        for (int i = 0; i < disabledVendorList.size(); ++i) {
+            if (!disabledVendorList[i].trimmed().isEmpty()) {
+                updatedVendorList << disabledVendorList[i].trimmed();
+            }
+        }
+
+        return updatedVendorList.toSet();
+    }
+}
+
 QnGlobalSettings::QnGlobalSettings(QObject *parent): 
     base_type(parent),
     m_disabledVendorsAdaptor(NULL),
@@ -26,25 +45,6 @@ QnGlobalSettings::~QnGlobalSettings() {
         at_resourcePool_resourceRemoved(m_admin);
 }
 
-namespace {
-QSet<QString> parseDisabledVendors(QString disabledVendors) {
-    // QString disabledVendors = MSSettings::roSettings()->value("disabledVendors").toString();
-    QStringList disabledVendorList;
-    if (disabledVendors.contains(lit(";")))
-        disabledVendorList = disabledVendors.split(lit(";"));
-    else
-        disabledVendorList = disabledVendors.split(lit(" "));
-    QStringList updatedVendorList;        
-    for (int i = 0; i < disabledVendorList.size(); ++i) {
-        if (!disabledVendorList[i].trimmed().isEmpty()) {
-                updatedVendorList << disabledVendorList[i].trimmed();
-        }
-    }
-
-    return updatedVendorList.toSet();
-}
-}
-
 QString QnGlobalSettings::disabledVendors() const {
     QMutexLocker locker(&m_mutex);
     
@@ -58,10 +58,8 @@ QSet<QString> QnGlobalSettings::disabledVendorsSet() const {
 void QnGlobalSettings::setDisabledVendors(QString disabledVendors) {
     QMutexLocker locker(&m_mutex);
 
-    if(m_disabledVendorsAdaptor) {
+    if(m_disabledVendorsAdaptor)
         m_disabledVendorsAdaptor->setValue(disabledVendors);
-        emit cameraAutoDiscoveryChanged();
-    }
 }
 
 bool QnGlobalSettings::isCameraSettingsOptimizationEnabled() const {
@@ -85,18 +83,21 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     if(!user)
         return;
 
-    if(user->getName() != lit("admin"))
+    if(!user->isAdmin())
         return;
 
-    m_admin = user;
-    m_disabledVendorsAdaptor.reset(new QnLexicalResourcePropertyAdaptor<QString>(m_admin, lit("disabledVendors"), lit(""), this));
-    m_cameraSettingsOptimizationAdaptor.reset(new QnLexicalResourcePropertyAdaptor<bool>(m_admin, lit("cameraSettingsOptimization"), true, this));
+    {
+        QMutexLocker locker(&m_mutex);
+        m_admin = user;
+        m_disabledVendorsAdaptor.reset(new QnLexicalResourcePropertyAdaptor<QString>(m_admin, lit("disabledVendors"), lit(""), this));
+        m_cameraSettingsOptimizationAdaptor.reset(new QnLexicalResourcePropertyAdaptor<bool>(m_admin, lit("cameraSettingsOptimization"), true, this));
+    }
 
-    connect(m_disabledVendorsAdaptor,           &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraAutoDiscoveryChanged,          Qt::QueuedConnection);
+    connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
 
     /* Just fire the signals blindly, don't check for actual changes. */ 
-    emit cameraAutoDiscoveryChanged();
+    emit disabledVendorsChanged();
     emit cameraSettingsOptimizationChanged();
 }
 

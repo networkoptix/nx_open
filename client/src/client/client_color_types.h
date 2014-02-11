@@ -87,9 +87,9 @@ struct QnStatisticsColors {
 Q_DECLARE_METATYPE(QnStatisticsColors)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStatisticsColors)
 
-struct QnScheduleGridWidgetColors {
+struct QnScheduleGridColors {
 public:
-    QnScheduleGridWidgetColors();
+    QnScheduleGridColors();
 
     QColor normalLabel;
     QColor weekendLabel;
@@ -97,8 +97,20 @@ public:
     QColor disabledLabel;
 };
 
-Q_DECLARE_METATYPE(QnScheduleGridWidgetColors)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnScheduleGridWidgetColors)
+Q_DECLARE_METATYPE(QnScheduleGridColors)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnScheduleGridColors)
+
+
+struct QnGridColors {
+    QnGridColors();
+
+    QColor grid;
+    QColor allowed;
+    QColor disallowed;
+};
+
+Q_DECLARE_METATYPE(QnGridColors)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnGridColors)
 
 
 #endif // QN_CLIENT_COLOR_TYPES

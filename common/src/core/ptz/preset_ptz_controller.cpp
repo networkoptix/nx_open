@@ -41,8 +41,7 @@ QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseContr
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzPresetRecordHash>(baseController->resource(), lit("ptzPresets"), QnPtzPresetRecordHash(), this))
 {
-    m_asynchronous = baseController->hasCapabilities(Qn::AsynchronousPtzCapability);
-    connect(this, &QnPresetPtzController::finishedLater, this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
+    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 }
 
 QnPresetPtzController::~QnPresetPtzController() {
@@ -77,8 +76,6 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
     records.insert(preset.id, QnPtzPresetRecord(preset, data));
     m_adaptor->setValue(records);
     
-    if(m_asynchronous)
-        emit finishedLater(Qn::CreatePresetPtzCommand, QVariant::fromValue(preset));
     return true;
 }
 
@@ -96,8 +93,6 @@ bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset) {
     
     m_adaptor->setValue(records);
 
-    if(m_asynchronous)
-        emit finishedLater(Qn::UpdatePresetPtzCommand, QVariant::fromValue(preset));
     return true;
 }
 
@@ -110,8 +105,6 @@ bool QnPresetPtzController::removePreset(const QString &presetId) {
 
     m_adaptor->setValue(records);
 
-    if(m_asynchronous)
-        emit finishedLater(Qn::RemovePresetPtzCommand, QVariant::fromValue(presetId));
     return true;
 }
 
@@ -129,10 +122,6 @@ bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
     if(!absoluteMove(data.space, data.position, speed))
         return false;
 
-    // TODO: #Elric maybe emit finished when we get absoluteMove finished?
-
-    if(m_asynchronous)
-        emit finishedLater(Qn::ActivatePresetPtzCommand, QVariant::fromValue(presetId));
     return true;
 }
 
@@ -143,8 +132,6 @@ bool QnPresetPtzController::getPresets(QnPtzPresetList *presets) {
     foreach(const QnPtzPresetRecord &record, m_adaptor->value())
         presets->push_back(record.preset);
 
-    if(m_asynchronous)
-        emit finishedLater(Qn::GetPresetsPtzCommand, QVariant::fromValue(*presets));
     return true;
 }
 

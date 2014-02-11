@@ -16,7 +16,7 @@ static const int ROW_COUNT = 7;
 class QnScheduleGridWidget : public QWidget {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
-    Q_PROPERTY(QnScheduleGridWidgetColors colors READ colors WRITE setColors)
+    Q_PROPERTY(QnScheduleGridColors colors READ colors WRITE setColors)
 
 public:
     explicit QnScheduleGridWidget(QWidget *parent = 0);
@@ -46,6 +46,7 @@ public:
 
     virtual QSize minimumSizeHint() const override;
 
+    // TODO: #Elric implement this properly, handle ChangeEvent
     void setEnabled(bool val);
     bool isEnabled() const;
 
@@ -55,8 +56,9 @@ public:
     void setMaxFps(int maxFps, int maxDualStreamFps); // todo: move this methods to camera schedule widget
     int getMaxFps(bool motionPlusLqOnly); // todo: move this methods to camera schedule widget
 
-    const QnScheduleGridWidgetColors &colors() const;
-    void setColors(const QnScheduleGridWidgetColors &colors);
+    const QnScheduleGridColors &colors() const;
+    void setColors(const QnScheduleGridColors &colors);
+
 signals:
     void cellActivated(const QPoint &cell);
     void cellValueChanged(const QPoint &cell);
@@ -106,7 +108,7 @@ private:
 
     QColor m_cellColors[Qn::RecordingType_Count];
     QColor m_insideColors[Qn::RecordingType_Count];
-    QnScheduleGridWidgetColors m_colors;
+    QnScheduleGridColors m_colors;
 
     bool m_enabled;
     bool m_readOnly;

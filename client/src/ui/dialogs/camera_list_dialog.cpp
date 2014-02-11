@@ -18,26 +18,25 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *context):
+QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     QDialog(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
 #ifdef Q_OS_MAC
     | Qt::Tool
 #endif
     ),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::CameraListDialog)
 {
     ui->setupUi(this);
 
-    m_model = new QnCameraListModel(context);
-    connect(qnResPool,  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceRemoved(const QnResourcePtr &)));
-    connect(qnResPool,  SIGNAL(resourceAdded(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceAdded(const QnResourcePtr &)));
+    m_model = new QnCameraListModel(this);
 
     QList<QnCameraListModel::Column> columns;
     columns << QnCameraListModel::RecordingColumn << QnCameraListModel::NameColumn << QnCameraListModel::VendorColumn << QnCameraListModel::ModelColumn <<
-               QnCameraListModel::FirmwareColumn << QnCameraListModel::DriverColumn << QnCameraListModel::IPColumn << QnCameraListModel::UniqIdColumn << QnCameraListModel::ServerColumn;
+               QnCameraListModel::FirmwareColumn << QnCameraListModel::DriverColumn << QnCameraListModel::IpColumn << QnCameraListModel::UniqIdColumn << QnCameraListModel::ServerColumn;
 
     m_model->setColumns(columns);
+    m_model->setResources(qnResPool->getAllEnabledCameras());
 
     m_resourceSearch = new QnResourceSearchProxyModel(this);
     connect(m_resourceSearch,  SIGNAL(criteriaChanged()), this, SLOT(at_modelChanged()) );

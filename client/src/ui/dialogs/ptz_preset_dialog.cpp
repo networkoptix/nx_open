@@ -41,9 +41,10 @@ void QnPtzPresetDialog::loadData(const QnPtzData &data) {
 
     QnHotkeysHash usedHotkeys = m_hotkeysDelegate->hotkeys();
     foreach (const QnPtzPreset &preset, data.presets) {
-        if (!usedHotkeys.contains(preset.id))
+        int key = usedHotkeys.key(preset.id, Qn::NoHotkey);
+        if (key == Qn::NoHotkey)
             continue;
-        hotkeys.removeOne(usedHotkeys[preset.id]);
+        hotkeys.removeOne(key);
     }
 
     int currentHotkey = hotkey();
@@ -63,7 +64,7 @@ void QnPtzPresetDialog::saveData() {
         return;
 
     QnHotkeysHash hotkeys = m_hotkeysDelegate->hotkeys();
-    hotkeys[presetId] = hotkey();
+    hotkeys[hotkey()] = presetId;
     m_hotkeysDelegate->updateHotkeys(hotkeys);
     return;
 }

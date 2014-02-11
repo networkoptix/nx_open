@@ -79,7 +79,9 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     if (!context()->user())
         return;
 
-    if (!QnBusinessEventsFilterKvPairAdapter::eventAllowed(context()->user(), eventType))
+    const bool soundAction = businessAction->actionType() == BusinessActionType::PlaySoundRepeated;
+    if (!soundAction &&
+            !QnBusinessEventsFilterKvPairAdapter::eventAllowed(context()->user(), eventType))
         return;
 
     emit businessActionAdded(businessAction);
@@ -112,6 +114,7 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     case QnSystemHealth::EmailSendError:
     case QnSystemHealth::StoragesNotConfigured:
     case QnSystemHealth::StoragesAreFull:
+    case QnSystemHealth::ArchiveRebuildFinished:
         return true;
 
     default:
@@ -193,6 +196,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         return;
 
     case QnSystemHealth::StoragesNotConfigured:
+    case QnSystemHealth::ArchiveRebuildFinished:
         return;
 
     default:

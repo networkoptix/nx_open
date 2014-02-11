@@ -31,7 +31,7 @@
                     <Component Id="DefaultLanguage" Permanent="yes">
                         <RegistryKey Root="HKCU"
                                  Key="Software\[Manufacturer]\${client.name}">
-                            <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_${installer.language}.qm"/>
+                            <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_${translation1}.qm"/>
                         </RegistryKey>
                     </Component>    
 

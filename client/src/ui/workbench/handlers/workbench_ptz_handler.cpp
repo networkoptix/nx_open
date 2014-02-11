@@ -27,9 +27,10 @@
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
+#include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_context.h>
 
-class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, protected QnWorkbenchContextAware {
+class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, public QnWorkbenchContextAware {
 public:
     QnSingleCameraPtzHotkeysDelegate(const QnResourcePtr &resource, QnWorkbenchContext *context):
         QnWorkbenchContextAware(context),
@@ -129,6 +130,12 @@ void QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered() {
 
     qDebug() << "goToPreset activated" << resource->getId() << id;
 
+    if (widget->dewarpingParams().enabled) {
+        QnItemDewarpingParams params = widget->item()->dewarpingParams();
+        params.enabled = true;
+        widget->item()->setDewarpingParams(params);
+    }
+
     if (widget->ptzController()->activatePreset(id, 1.0)) {
         action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
     } else {
@@ -170,6 +177,12 @@ void QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered() {
         return;
 
     qDebug() << "startTour activated" << resource->getId() << id;
+
+    if (widget->dewarpingParams().enabled) {
+        QnItemDewarpingParams params = widget->item()->dewarpingParams();
+        params.enabled = true;
+        widget->item()->setDewarpingParams(params);
+    }
 
     if (widget->ptzController()->activateTour(id)) {
         action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
