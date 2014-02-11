@@ -118,7 +118,7 @@ namespace ec2
         virtual int setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler ) = 0;
         virtual int save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler ) = 0;
         virtual int save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
-        virtual int remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
     typedef std::shared_ptr<AbstractResourceManager> AbstractResourceManagerPtr;
 

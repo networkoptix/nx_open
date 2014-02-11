@@ -34,7 +34,7 @@ namespace ec2
         //!Implementation of AbstractResourceManager::save
         virtual int save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::remove
-        virtual int remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
+        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
         template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
             static_assert( false, "Specify QnResourceManager::triggerNotification<>, please" );

@@ -108,7 +108,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnResourceManager<T>::remove( const QnResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    int QnResourceManager<T>::remove( const QnId& resource, impl::SimpleHandlerPtr handler )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
