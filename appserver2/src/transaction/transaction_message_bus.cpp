@@ -251,6 +251,8 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
         return false; // bad data
     switch (command)
     {
+        case ApiCommand::getAllDataList:
+            return deliveryTransaction<ApiFullData>(command, stream);
         case ApiCommand::addCamera:
         case ApiCommand::updateCamera:
             return deliveryTransaction<ApiCameraData>(command, stream);

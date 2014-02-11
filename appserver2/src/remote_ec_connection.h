@@ -76,13 +76,7 @@ namespace ec2
         template<> void processTransaction<ApiFullData>( const QnTransaction<ApiFullData>& tran ) {
             QnFullResourceData fullResData;
             tran.params.toResourceList( fullResData, m_resCtx );
-            emit initNotification(
-                fullResData.resTypes,
-                fullResData.resources,
-                fullResData.licenses,
-                fullResData.cameraHistory,
-                fullResData.bRules,
-                tran.params.serverInfo );
+            emit initNotification(fullResData);
         }
 
         template<> void processTransaction<ApiPanicModeData>( const QnTransaction<ApiPanicModeData>& tran ) {

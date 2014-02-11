@@ -13,15 +13,6 @@
 
 namespace ec2 
 {
-    struct QnFullResourceData
-    {
-        QnResourceTypeList resTypes;
-        QnResourceList resources;
-        QnBusinessEventRuleList bRules;
-        QnCameraHistoryList cameraHistory;
-        QnLicenseList licenses;
-    };
-
     struct ApiFullData: public ApiData 
     {
         ApiResourceTypeList resTypes;

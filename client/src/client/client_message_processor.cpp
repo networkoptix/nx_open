@@ -7,7 +7,7 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 
-#include <api/message_source.h>
+#include "api/ec2_message_source.h"
 #include <api/app_server_connection.h>
 
 #include <core/resource_management/resource_discovery_manager.h>

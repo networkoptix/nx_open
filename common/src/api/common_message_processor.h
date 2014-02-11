@@ -12,7 +12,7 @@
 #include <utils/common/singleton.h>
 
 class QnMessage;
-class QnMessageSource;
+class QnMessageSource2;
 
 class QnCommonMessageProcessor: public QObject, public Singleton<QnCommonMessageProcessor>
 {
@@ -52,7 +52,7 @@ private slots:
     void at_messageReceived(const QnMessage &message);
 
 protected:
-    QSharedPointer<QnMessageSource> m_source;
+    QSharedPointer<QnMessageSource2> m_source;
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 };

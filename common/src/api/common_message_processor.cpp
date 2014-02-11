@@ -1,6 +1,6 @@
 #include "common_message_processor.h"
 
-#include <api/message_source.h>
+#include "api/ec2_message_source.h"
 #include <api/app_server_connection.h>
 
 #include <business/business_event_rule.h>
@@ -13,21 +13,20 @@ QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
 }
 
 void QnCommonMessageProcessor::run() {
-    m_source->startRequest();
+    //m_source->startRequest();
 }
 
 void QnCommonMessageProcessor::stop() {
-    if (m_source)
-        m_source->stop();
+    //if (m_source)
+    //    m_source->stop();
 }
 
 void QnCommonMessageProcessor::init(const QUrl &url, const QString &authKey, int reconnectTimeout) {
-    m_source = QSharedPointer<QnMessageSource>(new QnMessageSource(url, reconnectTimeout));
-    m_source->setAuthKey(authKey);
-
-    connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
-    connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
-    connect(m_source.data(), SIGNAL(connectionReset()),          this, SIGNAL(connectionReset()));
+    m_source = QSharedPointer<QnMessageSource2>(new QnMessageSource2(QnAppServerConnectionFactory::getConnection2()));
+    //m_source->setAuthKey(authKey);
+    //connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
+    //connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
+    //connect(m_source.data(), SIGNAL(connectionReset()),          this, SIGNAL(connectionReset()));
     connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
 }
 

@@ -21,6 +21,17 @@
 */
 namespace ec2
 {
+
+    struct QnFullResourceData
+    {
+        QnResourceTypeList resTypes;
+        QnResourceList resources;
+        QnBusinessEventRuleList bRules;
+        QnCameraHistoryList cameraHistory;
+        QnLicenseList licenses;
+    };
+
+
     /*!
         \note All methods are asynchronous if other not specified
     */
@@ -677,13 +688,7 @@ namespace ec2
             \param licenses
             \param cameraHistoryItems
         */
-        void initNotification(
-            QnResourceTypeList resTypes,
-            QnResourceList resList,
-            QnLicenseList licenses,
-            QnCameraHistoryList cameraHistoryItems,
-            QnBusinessEventRuleList businessRules,
-            ServerInfo serverInfo );
+        void initNotification(QnFullResourceData fullData);
 
     protected:
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
