@@ -19,7 +19,7 @@ namespace ec2
 
         virtual int getLayouts( impl::GetLayoutsHandlerPtr handler ) override;
         virtual int save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) override;
-        virtual int remove( const QnLayoutResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
+        virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) override;
 
         template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
             static_assert( false, "Specify QnLayoutManager::triggerNotification<>, please" );
@@ -30,7 +30,8 @@ namespace ec2
             assert( tran.command == ApiCommand::removeLayout );
             emit removed( QnId(tran.params.id) );
         }
-
+    private:
+        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
     private:
         QueryProcessorType* const m_queryProcessor;
         const ResourceContext m_resCtx;

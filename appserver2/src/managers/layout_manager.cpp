@@ -40,13 +40,25 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    int QnLayoutManager<QueryProcessorType>::remove( const QnLayoutResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    int QnLayoutManager<QueryProcessorType>::remove( const QnId& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        //TODO/IMPL
+        auto tran = prepareTransaction( ApiCommand::removeLayout, id );
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
         return reqID;
     }
 
+    template<class T>
+    QnTransaction<ApiIdData> QnLayoutManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
+    {
+        QnTransaction<ApiIdData> tran;
+        tran.createNewID();
+        tran.command = command;
+        tran.persistent = true;
+        tran.params.id = id;
+        return tran;
+    }
 
     template class QnLayoutManager<FixedUrlClientQueryProcessor>;
     template class QnLayoutManager<ServerQueryProcessor>;

@@ -100,7 +100,7 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int remove( const QnResourcePtr& resource, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int remove( const QnId& id, TargetType* target, HandlerType handler ) {
             return remove( resource, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
@@ -492,7 +492,7 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int remove( const QnLayoutResourcePtr& resource, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int remove( const QnId& resource, TargetType* target, HandlerType handler ) {
             return remove( resource, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -504,7 +504,7 @@ namespace ec2
     protected:
         virtual int getLayouts( impl::GetLayoutsHandlerPtr handler ) = 0;
         virtual int save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int remove( const QnLayoutResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
     typedef std::shared_ptr<AbstractLayoutManager> AbstractLayoutManagerPtr;
 

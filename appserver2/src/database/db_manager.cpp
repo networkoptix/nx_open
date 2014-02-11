@@ -627,6 +627,58 @@ ErrorCode QnDbManager::removeServer(const qint32 id)
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::deleteLayoutItems(const qint32 id)
+{
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_layoutitem where layout_id = :id");
+    delQuery.bindValue(QLatin1String(":id"), id);
+    if (delQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
+ErrorCode QnDbManager::deleteLayoutTable(const qint32 id)
+{
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_layout where resource_ptr_id = :id");
+    delQuery.bindValue(QLatin1String(":id"), id);
+    if (delQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
+ErrorCode QnDbManager::removeLayout(const qint32 id)
+{
+    QnDbTransactionLocker tran(&m_tran);
+
+    ErrorCode err = deleteAddParams(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteLayoutItems(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteLayoutTable(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteResourceTable(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    tran.commit();
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
 {
     switch (tran.command)
@@ -635,6 +687,8 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
         return removeCamera(tran.params.id);
     case ApiCommand::removeMediaServer:
         return removeServer(tran.params.id);
+    case ApiCommand::removeLayout:
+        return removeLayout(tran.params.id);
     default:
         qWarning() << "Remove operation is not implemented for command" << toString(tran.command);
         break;
