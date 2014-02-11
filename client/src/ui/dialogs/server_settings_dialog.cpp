@@ -257,7 +257,6 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
     setHelpTopic(ui->ipAddressLabel,      ui->ipAddressLineEdit,              Qn::ServerSettings_General_Help);
     setHelpTopic(ui->portLabel,           ui->portLineEdit,                   Qn::ServerSettings_General_Help);
-    setHelpTopic(ui->panicModeTextLabel,  ui->panicModeLabel,                 Qn::ServerSettings_Panic_Help);
     setHelpTopic(ui->storagesGroupBox,                                        Qn::ServerSettings_Storages_Help);
 
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
@@ -395,15 +394,6 @@ void QnServerSettingsDialog::updateFromResources()
     ui->nameLineEdit->setText(m_server->getName());
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
-
-    bool panicMode = m_server->getPanicMode() != QnMediaServerResource::PM_None;
-    ui->panicModeLabel->setText(panicMode ? tr("On") : tr("Off"));
-    {
-        QPalette palette = this->palette();
-        if(panicMode)
-            palette.setColor(QPalette::WindowText, QColor(255, 0, 0));
-        ui->panicModeLabel->setPalette(palette);
-    }
 
     m_hasStorageChanges = false;
 }

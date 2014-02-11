@@ -79,7 +79,9 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     if (!context()->user())
         return;
 
-    if (!QnBusinessEventsFilterKvPairAdapter::eventAllowed(context()->user(), eventType))
+    const bool soundAction = businessAction->actionType() == BusinessActionType::PlaySoundRepeated;
+    if (!soundAction &&
+            !QnBusinessEventsFilterKvPairAdapter::eventAllowed(context()->user(), eventType))
         return;
 
     emit businessActionAdded(businessAction);

@@ -22,6 +22,7 @@
 
 #include <api/session_manager.h>
 
+#include <ui/common/palette.h>
 #include <ui/common/frame_section.h>
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/view/graphics_view.h>
@@ -134,6 +135,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 #endif
 
     setAttribute(Qt::WA_AlwaysShowToolTips);
+    setPaletteColor(this, QPalette::Window, Qt::black);
 
     /* And file open events on Mac. */
     QnSingleEventSignalizer *fileOpenSignalizer = new QnSingleEventSignalizer(this);

@@ -18,6 +18,10 @@ const QList<QnPtzTourItemModel>& QnPtzTourListModel::tourModels() const {
     return m_tours;
 }
 
+const QStringList& QnPtzTourListModel::removedTours() const {
+    return m_removedTours;
+}
+
 void QnPtzTourListModel::setTours(const QnPtzTourList &tours) {
     beginResetModel();
     m_tours.clear();
@@ -51,6 +55,13 @@ int QnPtzTourListModel::columnCount(const QModelIndex &parent) const {
 bool QnPtzTourListModel::removeRows(int row, int count, const QModelIndex &parent) {
     if(parent.isValid() || row < 0 || count < 1 || row + count > m_tours.size())
         return false;
+
+    auto iter = m_tours.begin() + row;
+    while(iter < m_tours.begin() + row + count) {
+        if (!iter->tour.id.isEmpty())
+            m_removedTours << iter->tour.id;
+        iter++;
+    }
 
     beginRemoveRows(parent, row, row + count - 1);
     m_tours.erase(m_tours.begin() + row, m_tours.begin() + row + count);

@@ -98,7 +98,7 @@ QVariant QnPtzPresetListModel::data(const QModelIndex &index, int role) const {
         return QVariant();
 
     const QnPtzPreset &preset = m_presets[index.row()];
-    int hotkey = m_hotkeys.value(preset.id, Qn::NoHotkey);
+    int hotkey = m_hotkeys.key(preset.id, Qn::NoHotkey);
 
     Column column = m_columns[index.column()];
 
@@ -169,22 +169,34 @@ bool QnPtzPresetListModel::setData(const QModelIndex &index, const QVariant &val
         if(!ok || hotkey > 9)
             return false;
 
-        if(hotkey >= 0) {
-            int oldHotkey = m_hotkeys.value(preset.id, Qn::NoHotkey);
-            QString existing = m_hotkeys.key(hotkey, QString());
-            m_hotkeys[preset.id] = hotkey;
+        // hotkey that was assigned to this preset
+        int oldHotkey = m_hotkeys.key(preset.id, Qn::NoHotkey);
+        if (oldHotkey == hotkey)
+            return false;
 
-            if (!existing.isEmpty()) {
-                for(int i = 0; i < m_presets.size(); i++) {
-                    if (m_presets[i].id != existing)
-                        continue;
-                    m_hotkeys[existing] = oldHotkey;
-                    QModelIndex siblingIndex = index.sibling(i, index.column());
-                    emit dataChanged(siblingIndex, siblingIndex);
-                }
+        // preset that is assigned to this hotkey
+        QString existing;
+        if (hotkey != Qn::NoHotkey)
+            existing = m_hotkeys[hotkey];
+
+        // set old hotkey to an existing preset (or empty)
+        if (oldHotkey != Qn::NoHotkey)
+            m_hotkeys[oldHotkey] = existing;
+        if (!existing.isEmpty()) {
+            for(int i = 0; i < m_presets.size(); i++) {
+                if (m_presets[i].id != existing)
+                    continue;
+                QModelIndex siblingIndex = index.sibling(i, index.column());
+                emit dataChanged(siblingIndex, siblingIndex);
+                break;
             }
-            emit dataChanged(index, index);
         }
+
+        // set updated hotkey
+        if (hotkey != Qn::NoHotkey)
+            m_hotkeys[hotkey] = preset.id;
+        emit dataChanged(index, index);
+
         return true;
     }
     default:
