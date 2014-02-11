@@ -39,49 +39,49 @@ int QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandlerPt
 template<class T>
 int QnBusinessEventManager<T>::addBusinessRule( const QnBusinessEventRulePtr& businessRule, impl::SimpleHandlerPtr handler )
 {
-    Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
+    //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
 }
 
 template<class T>
 int QnBusinessEventManager<T>::testEmailSettings( const QnKvPairList& settings, impl::SimpleHandlerPtr handler )
 {
-    Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
+    //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
 }
 
 template<class T>
 int QnBusinessEventManager<T>::sendEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, const QnEmailAttachmentList& attachments, impl::SimpleHandlerPtr handler )
 {
-    Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
+    //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
 }
 
 template<class T>
 int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::SimpleHandlerPtr handler )
 {
-    Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
+    //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
 }
 
 template<class T>
 int QnBusinessEventManager<T>::deleteRule( int ruleId, impl::SimpleHandlerPtr handler )
 {
-    Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
+    //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
 }
 
 template<class T>
 int QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler )
 {
-    Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
+    //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
 }
 
 template<class T>
 int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handler )
 {
-    Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
+    //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
 }
 

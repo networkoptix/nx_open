@@ -19,8 +19,7 @@ namespace ec2
         m_connectionInfo( connectionInfo )
     {
         QnTransactionMessageBus::instance()->setHandler(this);
-        QUrl url(m_queryProcessor->getUrl());
-        url.setPath("ec2/events?fullsync");
+        startReceivingNotifications();
     }
 
     RemoteEC2Connection::~RemoteEC2Connection()
@@ -37,6 +36,11 @@ namespace ec2
 
     void RemoteEC2Connection::startReceivingNotifications()
     {
-        QnTransactionMessageBus::instance()->addConnectionToPeer(m_queryProcessor->getUrl());
+        QUrl url(m_queryProcessor->getUrl());
+        url.setPath("ec2/events");
+        QUrlQuery q;
+        q.addQueryItem("fullsync", QString());
+        url.setQuery(q);
+        QnTransactionMessageBus::instance()->addConnectionToPeer(url);
     }
 }

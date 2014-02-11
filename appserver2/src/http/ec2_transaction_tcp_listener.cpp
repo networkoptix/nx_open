@@ -47,8 +47,7 @@ void QnTransactionTcpProcessor::run()
     parseRequest();
     d->chunkedMode = true;
     sendResponse("HTTP", CODE_OK, "application/octet-stream");
-
-    QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, d->request.headers.find("fullsync") != d->request.headers.end());
+    QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, d->request.requestLine.url.query().contains("fullsync"));
     d->socket.clear();
 }
 
