@@ -729,6 +729,7 @@ void QnRotatingImageButtonWidget::tick(int deltaMSecs) {
 // -------------------------------------------------------------------------- //
 QnTextButtonWidget::QnTextButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
+    m_pixmapValid(false),
     m_relativeFrameWidth(-1.0)
 {
     setFrameShape(Qn::NoFrame);
@@ -822,11 +823,11 @@ void QnTextButtonWidget::changeEvent(QEvent *event) {
 }
 
 void QnTextButtonWidget::invalidatePixmap() {
-    setPixmap(0, QPixmap());
+    m_pixmapValid = false;
 }
 
 void QnTextButtonWidget::ensurePixmap() {
-    if(!pixmap(0).isNull())
+    if(m_pixmapValid)
         return;
 
     if(m_text.isEmpty())
@@ -855,6 +856,7 @@ void QnTextButtonWidget::ensurePixmap() {
     }
 
     setPixmap(0, pixmap);
+    m_pixmapValid = true;
 }
 
 QnTextButtonWidget::StateFlags QnTextButtonWidget::validOpacityState(StateFlags flags) const {

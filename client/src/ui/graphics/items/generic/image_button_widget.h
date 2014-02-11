@@ -227,6 +227,7 @@ protected:
 
 private:
     QString m_text;
+    bool m_pixmapValid;
     qreal m_relativeFrameWidth;
     boost::array<qreal, FLAGS_MAX + 1> m_opacities;
 };

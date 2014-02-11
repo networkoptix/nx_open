@@ -1,7 +1,4 @@
 #include "gl_widget_factory.h"
-#ifdef Q_OS_WINDOWS
-#include <QtCore/qt_windows.h>
-#endif
 #ifdef Q_OS_LINUX
 #include <GL/glx.h>
 #include <QtX11Extras/QX11Info>
