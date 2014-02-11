@@ -2039,7 +2039,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             }
         }
 
-        connection2()->getResourceManager()->remove( resource, this, &QnWorkbenchActionHandler::at_resource_deleted );
+        connection2()->getResourceManager()->remove( resource->getId(), this, &QnWorkbenchActionHandler::at_resource_deleted );
     }
 }
 
