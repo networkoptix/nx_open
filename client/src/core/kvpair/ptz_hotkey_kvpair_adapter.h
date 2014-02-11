@@ -6,7 +6,7 @@
 #include <utils/common/connective.h>
 #include <api/model/kvpair.h>
 #include <core/resource/resource_fwd.h>
-#include <core/ptz/ptz_hotkey.h>
+#include <client/client_model_types.h>
 
 class QnPtzHotkeyKvPairAdapter: public Connective<QObject> {
     Q_OBJECT
@@ -34,13 +34,13 @@ public:
     static QString presetIdByHotkey(const QnResourcePtr &resource, int hotkey);
 
     static QString key();
-    QnHotkeysHash hotkeys() const;
+    QnPtzHotkeyHash hotkeys() const;
 
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
 
 private:
-    QnHotkeysHash m_hotkeys;
+    QnPtzHotkeyHash m_hotkeys;
 };
 
 #endif // PTZ_HOTKEY_KVPAIR_ADAPTER_H

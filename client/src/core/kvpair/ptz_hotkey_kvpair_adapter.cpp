@@ -6,11 +6,11 @@
 namespace {
     const QString targetKey = lit("ptz_hotkeys");
 
-    bool readHotkeys(const QString &encoded, QnHotkeysHash* target) {
-        return QJson::deserialize<QnHotkeysHash >(encoded.toUtf8(), target);
+    bool readHotkeys(const QString &encoded, QnPtzHotkeyHash* target) {
+        return QJson::deserialize<QnPtzHotkeyHash >(encoded.toUtf8(), target);
     }
 
-    bool readHotkeys(const QnResourcePtr &resource, QnHotkeysHash* target) {
+    bool readHotkeys(const QnResourcePtr &resource, QnPtzHotkeyHash* target) {
         QString encoded = resource->getProperty(targetKey);
         if (encoded.isEmpty())
             return false;
@@ -27,14 +27,14 @@ QnPtzHotkeyKvPairAdapter::QnPtzHotkeyKvPairAdapter(const QnResourcePtr &resource
 }
 
 int QnPtzHotkeyKvPairAdapter::hotkeyByPresetId(const QString &presetId) const {
-    return m_hotkeys.key(presetId, Qn::NoHotkey);
+    return m_hotkeys.key(presetId, QnPtzHotkey::NoHotkey);
 }
 
 int QnPtzHotkeyKvPairAdapter::hotkeyByPresetId(const QnResourcePtr &resource, const QString &presetId) {
-    QnHotkeysHash hotkeys;
+    QnPtzHotkeyHash hotkeys;
     if (!readHotkeys(resource, &hotkeys))
-        return Qn::NoHotkey;
-    return hotkeys.key(presetId, Qn::NoHotkey);
+        return QnPtzHotkey::NoHotkey;
+    return hotkeys.key(presetId, QnPtzHotkey::NoHotkey);
 }
 
 QString QnPtzHotkeyKvPairAdapter::presetIdByHotkey(int hotkey) const {
@@ -42,7 +42,7 @@ QString QnPtzHotkeyKvPairAdapter::presetIdByHotkey(int hotkey) const {
 }
 
 QString QnPtzHotkeyKvPairAdapter::presetIdByHotkey(const QnResourcePtr &resource, int hotkey) {
-    QnHotkeysHash hotkeys;
+    QnPtzHotkeyHash hotkeys;
     if (!readHotkeys(resource, &hotkeys))
         return QString();
     return hotkeys.value(hotkey);
@@ -52,7 +52,7 @@ QString QnPtzHotkeyKvPairAdapter::key() {
     return targetKey;
 }
 
-QnHotkeysHash QnPtzHotkeyKvPairAdapter::hotkeys() const {
+QnPtzHotkeyHash QnPtzHotkeyKvPairAdapter::hotkeys() const {
     return m_hotkeys;
 }
 
