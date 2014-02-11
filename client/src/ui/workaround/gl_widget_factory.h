@@ -13,7 +13,7 @@ public:
         format.setOption(QGL::SampleBuffers); /* Multisampling. */
         format.setDoubleBuffer(qnSettings->isGlDoubleBuffer());
         /* Unfortunately, in Qt5 this function is broken :( */
-        // format.setSwapInterval(1);
+        format.setSwapInterval(0);
         return create<Widget>(format, parent, windowFlags);
     }
 
@@ -26,6 +26,8 @@ public:
             /* In Qt5 QGLContext uses QOpenGLContext internally. But QOpenGLContext hasn't support for
                swap interval setting (up to and including Qt5.2). So we have to implement vsync manually. */
             enableVSync(widget);
+        } else {
+            disableVSync(widget);
         }
 
         return widget;
@@ -33,6 +35,7 @@ public:
 
 private:
     static void enableVSync(QGLWidget *widget);
+    static void disableVSync(QGLWidget *widget);
 };
 
 #endif // QN_GL_WIDGET_FACTORY_H
