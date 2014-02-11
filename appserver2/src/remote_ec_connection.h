@@ -31,7 +31,7 @@ namespace ec2
         virtual ~RemoteEC2Connection();
 
         virtual QnConnectionInfo connectionInfo() const override;
-        virtual void startReceivingNotifications() override;
+        virtual void startReceivingNotifications( bool fullSyncRequired ) override;
 
         template<class T> void processTransaction( const QnTransaction<T>& tran ) {}
 
@@ -73,6 +73,19 @@ namespace ec2
             return m_cameraManager->triggerNotification( tran );
         }
 
+        template<> void processTransaction<ApiFullData>( const QnTransaction<ApiFullData>& tran ) {
+            QnFullResourceData fullResData;
+            tran.params.toResourceList( fullResData, m_resCtx );
+            emit initNotification(
+                fullResData.resTypes,
+                fullResData.resources,
+                fullResData.kvPairs,
+                fullResData.licenses,
+                fullResData.cameraHistory,
+                fullResData.bRules,
+                tran.params.serverInfo );
+        }
+
         template<> void processTransaction<ApiPanicModeData>( const QnTransaction<ApiPanicModeData>& tran ) {
             //TODO/IMPL
         }
@@ -84,8 +97,10 @@ namespace ec2
 
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
+        ResourceContext m_resCtx;
         const QnConnectionInfo m_connectionInfo;
         QnTransactionMessageBus* m_transactionMsg;
+        QUrl m_peerUrl;
     };
 }
 

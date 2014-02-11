@@ -586,12 +586,12 @@ namespace ec2
         virtual ~AbstractECConnection() {}
 
         virtual QnConnectionInfo connectionInfo() const = 0;
-        //!Calling this method starts notifications delivery by emitting corrsponding signals of corresponding manager
+        //!Calling this method starts notifications delivery by emitting corresponding signals of corresponding manager
         /*!
-            First signal after this call is always \a AbstractECConnection::initNotification.
+            \param fullSyncRequired If \a true, \a AbstractECConnection::initNotification signal is delivered before any other signal
             \note Calling entity MUST connect to all interesting signals prior to calling this method so that received data is consistent
         */
-        virtual void startReceivingNotifications() = 0;
+        virtual void startReceivingNotifications( bool fullSyncRequired ) = 0;
 
         virtual AbstractResourceManagerPtr getResourceManager() = 0;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() = 0;
@@ -669,7 +669,8 @@ namespace ec2
     signals:
         //!Delivers all resources found in EC
         /*!
-            This signal is first that emitted after starting notifications delivery by call to \a AbstractECConnection::startReceivingNotifications
+            This signal is emitted after starting notifications delivery by call to \a AbstractECConnection::startReceivingNotifications 
+                if full synchronization is requested
             \param resTypes
             \param resList All resources (servers, cameras, users, layouts)
             \param kvPairs Parameters of resources
@@ -682,6 +683,7 @@ namespace ec2
             QnKvPairListsById kvPairs,
             QnLicenseList licenses,
             QnCameraHistoryList cameraHistoryItems,
+            QnBusinessEventRuleList businessRules,
             ServerInfo serverInfo );
 
     protected:

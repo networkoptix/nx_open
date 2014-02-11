@@ -24,9 +24,7 @@ namespace ec2
 
     RemoteEC2Connection::~RemoteEC2Connection()
     {
-        QUrl url(m_queryProcessor->getUrl());
-        url.setPath("ec2/events");
-        QnTransactionMessageBus::instance()->removeConnectionFromPeer(url);
+        QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
     }
 
     QnConnectionInfo RemoteEC2Connection::connectionInfo() const
@@ -34,12 +32,13 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void RemoteEC2Connection::startReceivingNotifications()
+    void RemoteEC2Connection::startReceivingNotifications( bool fullSyncRequired )
     {
         QUrl url(m_queryProcessor->getUrl());
         url.setPath("ec2/events");
         QUrlQuery q;
-        q.addQueryItem("fullsync", QString());
+        if( fullSyncRequired )
+            q.addQueryItem("fullsync", QString());
         url.setQuery(q);
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);
     }

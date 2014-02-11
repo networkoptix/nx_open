@@ -28,7 +28,7 @@ namespace ec2
         //!Implementation of ec2::AbstractECConnection::connectionInfo
         virtual QnConnectionInfo connectionInfo() const override;
         //!Implementation of ec2::AbstractECConnection::startReceivingNotifications
-        virtual void startReceivingNotifications() override;
+        virtual void startReceivingNotifications( bool fullSyncRequired ) override;
 
     private:
 		std::unique_ptr<QnDbManager> m_dbManager;

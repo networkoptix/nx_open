@@ -19,7 +19,8 @@ namespace ec2
         QnResourceList resources;
         QnBusinessEventRuleList bRules;
         QnCameraHistoryList cameraHistory;
-        QnKvPairList kvPairs;
+        QnKvPairListsById kvPairs;
+        QnLicenseList licenses;
     };
 
     struct ApiFullData: public ApiData 
