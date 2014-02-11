@@ -78,7 +78,15 @@ namespace ec2
         void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool doFullSync);
         
         template <class T>
-        void setHandler(T* handler) { m_handler = new CustomHandler<T>(handler); }
+        void setHandler(T* handler) { 
+            QMutexLocker lock(&m_mutex);
+            m_handler = new CustomHandler<T>(handler); 
+        }
+
+        void removeHandler() { 
+            QMutexLocker lock(&m_mutex);
+            m_handler = 0;
+        }
 
         void toFormattedHex(quint8* dst, quint32 payloadSize);
 
@@ -109,6 +117,7 @@ namespace ec2
         {
         public:
             virtual bool processByteArray(QByteArray& data) = 0;
+            virtual ~AbstractHandler() {}
         };
 
         template <class T>
@@ -126,7 +135,9 @@ namespace ec2
 
         void gotTransaction(QByteArray data)
         {
-            m_handler->processByteArray(data);
+            QMutexLocker lock(&m_mutex);
+            if (m_handler)
+                m_handler->processByteArray(data);
         }
 
     protected:

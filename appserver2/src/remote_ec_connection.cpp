@@ -25,6 +25,7 @@ namespace ec2
     RemoteEC2Connection::~RemoteEC2Connection()
     {
         QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
+        QnTransactionMessageBus::instance()->removeHandler();
     }
 
     QnConnectionInfo RemoteEC2Connection::connectionInfo() const
@@ -40,6 +41,7 @@ namespace ec2
         if( fullSyncRequired )
             q.addQueryItem("fullsync", QString());
         url.setQuery(q);
+        m_peerUrl = url;
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);
     }
 }
