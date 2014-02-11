@@ -68,7 +68,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     ui(new Ui::LoginDialog),
     m_requestHandle(-1),
     m_renderingWidget(NULL),
-    m_entCtrlFinder(NULL),
+    m_moduleFinder(NULL),
     m_restartPending(false),
     m_autoConnectPending(false)
 {
@@ -124,18 +124,18 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     resetConnectionsModel();
     updateFocus();
 
-    m_entCtrlFinder = new NetworkOptixModuleFinder();
+    m_moduleFinder = new NetworkOptixModuleFinder();
     if (qnSettings->isDevMode())
-        m_entCtrlFinder->setCompatibilityMode(true);
-    connect(m_entCtrlFinder,    SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
-            this,               SLOT(at_entCtrlFinder_remoteModuleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)));
-    connect(m_entCtrlFinder,    SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
-            this,               SLOT(at_entCtrlFinder_remoteModuleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)));
-    m_entCtrlFinder->start();
+        m_moduleFinder->setCompatibilityMode(true);
+    connect(m_moduleFinder,    SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
+            this,               SLOT(at_moduleFinder_moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)));
+    connect(m_moduleFinder,    SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
+            this,               SLOT(at_moduleFinder_moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)));
+    m_moduleFinder->start();
 }
 
 QnLoginDialog::~QnLoginDialog() {
-    delete m_entCtrlFinder;
+    delete m_moduleFinder;
     return;
 }
 
@@ -614,7 +614,7 @@ void QnLoginDialog::at_deleteButton_clicked() {
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed) {
+void QnLoginDialog::at_moduleFinder_moduleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed) {
     Q_UNUSED(localInterfaceAddress)
 
     QString portId = QLatin1String("port");
@@ -644,7 +644,7 @@ void QnLoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, 
     resetAutoFoundConnectionsModel();
 }
 
-void QnLoginDialog::at_entCtrlFinder_remoteModuleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed) {
+void QnLoginDialog::at_moduleFinder_moduleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed) {
     Q_UNUSED(moduleParameters)
     Q_UNUSED(remoteHostAddress)
     Q_UNUSED(isLocal)
