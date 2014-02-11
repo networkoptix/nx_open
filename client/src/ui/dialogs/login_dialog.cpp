@@ -79,7 +79,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     /* Don't allow to save passwords, at least for now. */
     //ui->savePasswordCheckBox->hide();
 
-    QDir dir(QLatin1String(":/skin"));
+    QDir dir(qnSkin->basePath());
     QStringList introList = dir.entryList(QStringList() << QLatin1String("intro.*"));
     QString resourceName = QLatin1String(":/skin/intro");
     if (!introList.isEmpty())
