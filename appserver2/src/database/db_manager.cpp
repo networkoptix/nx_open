@@ -282,6 +282,50 @@ ErrorCode QnDbManager::updateMediaServer(const ApiMediaServerData& data)
     }
 }
 
+ErrorCode QnDbManager::insertLayout(const ApiLayoutData& data)
+{
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO vms_layout \
+                     (user_can_edit, cell_spacing_height, locked, \
+                     cell_aspect_ratio, user_id, background_width, \
+                     background_image_filename, background_height, \
+                     cell_spacing_width, background_opacity, resource_ptr_id \
+                     \
+                     VALUES (:userCanEdit, :cellSpacingHeight, :locked, \
+                     :cellAspectRatio, :userId, :backgroundWidth, \
+                     :backgroundImageFilename, :backgroundHeight, \
+                     :cellSpacingWidth, :backgroundOpacity, :id)");
+    data.autoBindValues(insQuery);
+    if (insQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
+ErrorCode QnDbManager::updateLayout(const ApiLayoutData& data)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare("UPDATE vms_layout SET\
+                  user_can_edit = :userCanEdit, \
+                  cell_spacing_height = :cellSpacingHeight, locked = :locked, \
+                  cell_aspect_ratio = :cellAspectRatio, user_id = :userId, background_width = :backgroundWidth, \
+                  background_image_filename = :backgroundImageFilename, background_height = :backgroundHeight, \
+                  cell_spacing_width = :cellSpacingWidth, background_opacity = :backgroundOpacity \
+                  WHERE resource_ptr_id = :id");
+    data.autoBindValues(query);
+
+    if (query.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
 ErrorCode QnDbManager::removeStoragesByServer(qint32 id)
 {
     QSqlQuery delQuery(m_sdb);
@@ -436,6 +480,72 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiMediaServerData
     if (result !=ErrorCode::ok)
         return result;
     result = updateStorages(tran.params);
+    if (result == ErrorCode::ok)
+        lock.commit();
+
+    return result;
+}
+
+ErrorCode QnDbManager::removeLayoutItems(qint32 id)
+{
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_layoutitem WHERE layout_id = :id");
+    delQuery.bindValue("id", id);
+    if (!delQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::updateLayoutItems(const ApiLayoutData& data)
+{
+    ErrorCode result = removeLayoutItems(data.id);
+    if (result != ErrorCode::ok)
+        return result;
+
+    foreach(const ApiLayoutItemData& item, data.items)
+    {
+        QSqlQuery insQuery(m_sdb);
+        insQuery.prepare("INSERT INTO vms_layoutitem (zoom_bottom, right, uuid, zoom_left, resource_id, \
+                         zoom_right, top, layout_id, bottom, zoom_top, \
+                         zoom_target_uuid, flags, contrast_params, rotation, \
+                         dewarping_params, left) VALUES \
+                         (:zoomBottom, :right, :uuid, :zoomLeft, :resourceId, \
+                         :zoomRight, :top, :layoutId, :bottom, :zoomTop, \
+                         :zoomTargetUuid, :flags, :contrastParams, :rotation, \
+                         :dewarpingParams, :left)");
+        item.autoBindValues(insQuery);
+
+        if (!insQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+            return ErrorCode::failure;
+        }
+    }
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiLayoutData>& tran)
+{
+    QnDbTransactionLocker lock(&m_tran);
+
+    ErrorCode result;
+    if (tran.command == ApiCommand::updateLayout) {
+        result = updateResource(tran.params);
+        if (result !=ErrorCode::ok)
+            return result;
+        result = updateLayout(tran.params);
+    }
+    else {
+        result = insertResource(tran.params);
+        if (result !=ErrorCode::ok)
+            return result;
+        result = insertLayout(tran.params);
+    }
+    if (result !=ErrorCode::ok)
+        return result;
+    result = updateLayoutItems(tran.params);
     if (result == ErrorCode::ok)
         lock.commit();
 
