@@ -21,4 +21,15 @@ public:
     }
 };
 
+
+class QnPtzHotkeysResourcePropertyAdaptor: public QnJsonResourcePropertyAdaptor<QnPtzHotkeyHash> {
+    Q_OBJECT
+    typedef QnJsonResourcePropertyAdaptor<QnPtzHotkeyHash> base_type;
+public:
+    QnPtzHotkeysResourcePropertyAdaptor(const QnResourcePtr &resource, QObject *parent = NULL):
+        base_type(resource, lit("ptzHotkeys"), QnPtzHotkeyHash(), parent)
+    {}
+};
+
+
 #endif // QN_RESOURCE_PROPERTY_ADAPTORS_H

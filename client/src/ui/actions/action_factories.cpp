@@ -3,8 +3,7 @@
 #include <QtWidgets/QAction>
 
 #include <utils/common/string.h>
-
-#include <core/kvpair/ptz_hotkey_kvpair_adapter.h>
+#include <utils/resource_property_adaptors.h>
 
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_preset.h>
@@ -78,14 +77,14 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
         return naturalStringCaseInsensitiveLessThan(l.name, r.name);
     });
 
-    QnPtzHotkeyKvPairAdapter adapter(widget->resource()->toResourcePtr());
+    QnPtzHotkeyHash idByHotkey = QnPtzHotkeysResourcePropertyAdaptor(widget->resource()->toResourcePtr()).value();
 
     foreach(const QnPtzPreset &preset, presets) {
         QAction *action = new QAction(parent);
         action->setText(preset.name);
 
-        int hotkey = adapter.hotkeyByPresetId(preset.id);
-        if(hotkey >= 0)
+        int hotkey = idByHotkey.key(preset.id, QnPtzHotkey::NoHotkey);
+        if(hotkey != QnPtzHotkey::NoHotkey)
             action->setShortcut(Qt::Key_0 + hotkey);
 
         action->setData(QVariant::fromValue(

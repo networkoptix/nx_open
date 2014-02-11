@@ -6,9 +6,9 @@
 
 #include <api/app_server_connection.h>
 
-#include <common/common_globals.h>
+#include <utils/resource_property_adaptors.h>
 
-#include <core/kvpair/ptz_hotkey_kvpair_adapter.h>
+#include <common/common_globals.h>
 
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_preset.h>
@@ -34,24 +34,24 @@ public:
     QnSingleCameraPtzHotkeysDelegate(const QnResourcePtr &resource, QnWorkbenchContext *context):
         QnWorkbenchContextAware(context),
         m_resourceId(resource->getId()),
-        m_adapter(new QnPtzHotkeyKvPairAdapter(resource))
+        m_adapter(new QnPtzHotkeysResourcePropertyAdaptor(resource))
     {}
 
     ~QnSingleCameraPtzHotkeysDelegate() {}
 
     virtual QnPtzHotkeyHash hotkeys() const override {
-        return m_adapter->hotkeys();
+        return m_adapter->value();
     }
 
     virtual void updateHotkeys(const QnPtzHotkeyHash &value) override {
-        QString serialized = QString::fromUtf8(QJson::serialized(value));
-
-        QnAppServerConnectionFactory::createConnection()->saveAsync(m_resourceId, QnKvPairList() << QnKvPair(m_adapter->key(), serialized));
+        m_adapter->setValue(value);
     }
+
 private:
     int m_resourceId;
-    QScopedPointer<QnPtzHotkeyKvPairAdapter> m_adapter;
+    QScopedPointer<QnPtzHotkeysResourcePropertyAdaptor> m_adapter;
 };
+
 
 bool getDevicePosition(const QnPtzControllerPtr &controller, QVector3D *position) {
     if(!controller->hasCapabilities(Qn::AsynchronousPtzCapability)) {
