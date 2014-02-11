@@ -16,7 +16,7 @@ QnProgressWidget::QnProgressWidget(QWidget *parent):
     layout->setSizeConstraint(QLayout::SetFixedSize);
 
     QMovie* movie = qnSkin->loadMovie("loading.gif", this);
-    connect(movie, &QMovie::updated, [=](){m_img->setPixmap(movie->currentPixmap());});
+    connect(movie, &QMovie::updated, m_img, [=](){m_img->setPixmap(movie->currentPixmap());});
     m_img->setPixmap(movie->currentPixmap());
 
     if (movie->loopCount() >= 0)
