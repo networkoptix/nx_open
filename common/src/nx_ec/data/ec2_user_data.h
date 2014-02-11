@@ -33,7 +33,7 @@ struct ApiUserDataList: public ApiData
 }
 
 #define ApiUserDataFields (password) (isAdmin) (rights) (email) (digest) (hash)
-QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiUserData, ApiUserDataFields)
+QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS(ec2::ApiUserData, ec2::ApiResourceData, ApiUserDataFields)
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiUserDataList, (data) )
 
 #endif // __EC2_USER_DATA_H_
