@@ -6,37 +6,6 @@
 
 #include "acti_resource.h"
 
-namespace {
-
-    int qSign(qreal value) {
-        return value >= 0 ? 1 : -1;
-    }
-
-    // ACTi 8111
-    /*qreal pointsData[][2] = {
-        {0, 1.0},
-        {100, 1.2},
-        {200, 1.4},
-        {300, 1.66},
-        {400, 2.0},
-        {500, 2.6},
-        {600, 3.46},
-        {666, 4.0},
-        {700, 4.86},
-        {750, 5.3},
-        {800, 7.0},
-        {850, 8.0},
-        {875, 8.3},
-        {900, 10.6},
-        {937, 11.6},
-        {950, 12.13},
-        {1000, 16.0},
-    };*/
-
-} // anonymous namespace
-
-
-// TODO: #Elric #PTZ use mutex
 
 // -------------------------------------------------------------------------- //
 // Utility
@@ -206,6 +175,7 @@ void QnActiPtzControllerPrivate::init() {
     }
     capabilities |= Qn::FlipPtzCapability;
 
+    // TODO: #PTZ
 #if 0
     if (!m_isFlipped)
         m_capabilities &= ~Qn::AbsolutePtzCapabilities; // acti 8111 has bug for absolute position if flip turned off
@@ -213,8 +183,6 @@ void QnActiPtzControllerPrivate::init() {
 }
 
 bool QnActiPtzControllerPrivate::query(const QString &request, QByteArray *body, bool keepAllData) const {
-    qDebug() << "ACTI REQUEST" << request;
-
     CLHttpStatus status;
     QByteArray data = resource->makeActiRequest(lit("encoder"), request, status, keepAllData);
     if(body)
