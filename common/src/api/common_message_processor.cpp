@@ -24,7 +24,7 @@ void QnCommonMessageProcessor::stop() {
 void QnCommonMessageProcessor::init(const QUrl &url, const QString &authKey, int reconnectTimeout) {
     m_source = QSharedPointer<QnMessageSource2>(new QnMessageSource2(QnAppServerConnectionFactory::getConnection2()));
     //m_source->setAuthKey(authKey);
-    //connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
+    connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
     //connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
     //connect(m_source.data(), SIGNAL(connectionReset()),          this, SIGNAL(connectionReset()));
     connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));

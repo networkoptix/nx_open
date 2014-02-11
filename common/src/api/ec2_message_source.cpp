@@ -15,5 +15,7 @@ void QnMessageSource2::at_gotNotification(ec2::QnFullResourceData fullData)
     message.licenses = fullData.licenses;
     message.cameraServerItems = fullData.cameraHistory;
     message.businessRules = fullData.bRules;
+
+    emit connectionOpened(message);
     emit messageReceived(message);
 }

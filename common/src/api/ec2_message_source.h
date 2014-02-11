@@ -11,6 +11,7 @@ class QnMessageSource2 : public QObject
 public:
     QnMessageSource2(ec2::AbstractECConnectionPtr connection);
 signals:
+    void connectionOpened(QnMessage message);
     void messageReceived(QnMessage message);
 private slots:
     void at_gotNotification(ec2::QnFullResourceData fullData);

@@ -78,7 +78,7 @@ void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, const Res
     QList<QHostAddress> resNetAddrList;
     deserializeNetAddrList(resNetAddrList, netAddrList);
 
-    resource->setUrl(apiUrl);
+    resource->setApiUrl(apiUrl);
     resource->setNetAddrList(resNetAddrList);
     resource->setReserve(reserve);
     resource->setPanicMode((Qn::PanicMode) panicMode);
