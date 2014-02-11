@@ -60,17 +60,17 @@ void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<
 {
     int idx = 0;
     QSqlRecord rec = query.record();
-    int idIdx = rec.indexOf("parentId");
-    int resourceIdIdx = rec.indexOf("id");
+    int idIdx = rec.indexOf("id");
+    int parentIdIdx = rec.indexOf("parentId");
     while (query.next())
     {
         int id = query.value(idIdx).toInt();
-        int resourceId = query.value(resourceIdIdx).toInt();
+        int parentId = query.value(parentIdIdx).toInt();
 
         for (; idx < data.size() && data[idx].id != id; idx++);
         if (idx == data.size())
             break;
-        (data[idx].*subList).push_back(resourceId);
+        (data[idx].*subList).push_back(parentId);
     }
 }
 
