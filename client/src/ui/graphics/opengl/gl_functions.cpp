@@ -56,7 +56,7 @@ public:
         m_initialized = true;
         locker.unlock();
 
-        GLint maxTextureSize;
+        GLint maxTextureSize = -1;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
 #ifdef Q_OS_LINUX
         maxTextureSize = qMin((int)maxTextureSize, (int)LinuxMaxTextureSize);
