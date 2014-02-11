@@ -30,11 +30,13 @@ private slots:
     void at_deleteTourButton_clicked();
 
     void at_tableViewport_resizeEvent();
+    void at_tourSpotsChanged(const QnPtzTourSpotList &spots);
 private:
     bool saveTours();
 
     QScopedPointer<Ui::PtzToursDialog> ui;
     QnPtzTourListModel *m_model;
+    QString m_currentTourId;
 };
 
 #endif // PTZ_TOURS_DIALOG_H

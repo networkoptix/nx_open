@@ -5,7 +5,7 @@
 
 #include <core/ptz/ptz_fwd.h>
 
-class QnPtzTourModel;
+class QnPtzTourSpotsModel;
 
 namespace Ui {
     class PtzTourWidget;
@@ -23,9 +23,8 @@ public:
     void setPtzTour(const QnPtzTour &tour);
     void setPtzPresets(const QnPtzPresetList &presets);
 
-    // TODO: #GDM signal is never emitted. Is it needed?
 signals:
-    void tourChanged(const QnPtzTour &tour); 
+    void tourSpotsChanged(const QnPtzTourSpotList &spots);
 
 private slots:
     void at_addSpotButton_clicked();
@@ -36,7 +35,7 @@ private slots:
     void at_tableViewport_resizeEvent();
 private:
     QScopedPointer<Ui::PtzTourWidget> ui;
-    QnPtzTourModel *m_model;
+    QnPtzTourSpotsModel *m_model;
 };
 
 #endif // PTZ_TOUR_WIDGET_H

@@ -63,7 +63,7 @@ QnPtzToursDialog::QnPtzToursDialog(const QnPtzControllerPtr &controller, QWidget
     connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_tableViewport_resizeEvent()), Qt::QueuedConnection);
 
 
-    connect(ui->tourEditWidget, SIGNAL(tourChanged(QnPtzTour)), m_model, SLOT(updateTour(QnPtzTour)));
+    connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
 
     connect(ui->addTourButton,      SIGNAL(clicked()), this, SLOT(at_addTourButton_clicked()));
     connect(ui->deleteTourButton,   SIGNAL(clicked()), this, SLOT(at_deleteTourButton_clicked()));
@@ -93,9 +93,7 @@ bool QnPtzToursDialog::saveTours() {
             continue;
 
         QnPtzTour updated(model.tour);
-        if (updated.id.isEmpty())
-            updated.id = QUuid::createUuid().toString();
-        else
+        if (!model.local)
             result &= removeTour(updated.id);
 
         result &= createTour(updated);
@@ -120,10 +118,14 @@ void QnPtzToursDialog::at_tableView_currentRowChanged(const QModelIndex &current
     if (!current.isValid()) {
         ui->stackedWidget->setCurrentWidget(ui->noTourPage);
         ui->deleteTourButton->setDisabled(true);
+        m_currentTourId = QString();
         return;
     }
 
-    ui->tourEditWidget->setPtzTour(current.data(Qn::PtzTourRole).value<QnPtzTour>());
+
+    QnPtzTour tour = current.data(Qn::PtzTourRole).value<QnPtzTour>();
+    ui->tourEditWidget->setPtzTour(tour);
+    m_currentTourId = tour.id;
     ui->stackedWidget->setCurrentWidget(ui->tourPage);
     ui->deleteTourButton->setEnabled(true);
 }
@@ -156,4 +158,10 @@ void QnPtzToursDialog::at_tableViewport_resizeEvent() {
         return;
 
     ui->tableView->scrollTo(selectedIndices.front());
+}
+
+void QnPtzToursDialog::at_tourSpotsChanged(const QnPtzTourSpotList &spots) {
+    if (m_currentTourId.isEmpty())
+        return;
+    m_model->updateTourSpots(m_currentTourId, spots);
 }
