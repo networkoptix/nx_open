@@ -18,10 +18,11 @@ public:
     explicit QnPtzTourWidget(QWidget *parent = 0);
     ~QnPtzTourWidget();
 
-    // TODO: #GDM where are getters? Symmetry breaking.
+    const QnPtzTourSpotList &spots() const;
+    void setSpots(const QnPtzTourSpotList &spots);
 
-    void setPtzTour(const QnPtzTour &tour);
-    void setPtzPresets(const QnPtzPresetList &presets);
+    const QnPtzPresetList &presets() const;
+    void setPresets(const QnPtzPresetList &presets);
 
 signals:
     void tourSpotsChanged(const QnPtzTourSpotList &spots);

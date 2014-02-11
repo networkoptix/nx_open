@@ -73,7 +73,7 @@ QnPtzToursDialog::~QnPtzToursDialog() {
 }
 
 void QnPtzToursDialog::loadData(const QnPtzData &data) {
-    ui->tourEditWidget->setPtzPresets(data.presets);
+    ui->tourEditWidget->setPresets(data.presets);
     m_model->setTours(data.tours);
     m_model->setPresets(data.presets);
 
@@ -124,7 +124,7 @@ void QnPtzToursDialog::at_tableView_currentRowChanged(const QModelIndex &current
 
 
     QnPtzTour tour = current.data(Qn::PtzTourRole).value<QnPtzTour>();
-    ui->tourEditWidget->setPtzTour(tour);
+    ui->tourEditWidget->setSpots(tour.spots);
     m_currentTourId = tour.id;
     ui->stackedWidget->setCurrentWidget(ui->tourPage);
     ui->deleteTourButton->setEnabled(true);

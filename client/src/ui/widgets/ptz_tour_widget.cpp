@@ -45,13 +45,21 @@ QnPtzTourWidget::~QnPtzTourWidget() {
 }
 
 
-void QnPtzTourWidget::setPtzTour(const QnPtzTour &tour) {
-    m_model->setSpots(tour.spots);
-    if (!tour.spots.isEmpty())
+const QnPtzTourSpotList& QnPtzTourWidget::spots() const {
+    return m_model->spots();
+}
+
+void QnPtzTourWidget::setSpots(const QnPtzTourSpotList &spots) {
+    m_model->setSpots(spots);
+    if (!spots.isEmpty())
         ui->tableView->setCurrentIndex(ui->tableView->model()->index(0, 0));
 }
 
-void QnPtzTourWidget::setPtzPresets(const QnPtzPresetList &presets) {
+const QnPtzPresetList& QnPtzTourWidget::presets() const {
+    return m_model->presets();
+}
+
+void QnPtzTourWidget::setPresets(const QnPtzPresetList &presets) {
     m_model->setPresets(presets);
 }
 
