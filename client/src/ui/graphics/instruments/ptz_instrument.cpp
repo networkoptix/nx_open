@@ -950,7 +950,6 @@ void PtzInstrument::dragMove(DragInfo *info) {
         selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
         break;
     case VirtualMovement:
-        // TODO: #PTZ for some reason uncommenting these calls makes the movement look crappy... investigate!
         if(info->mouseScreenPos() != info->mousePressScreenPos()) {
             QPointF delta = info->mouseItemPos() - info->lastMouseItemPos();
             qreal scale = target()->size().width() / 2.0;
@@ -967,7 +966,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
              * was unable to explain. This is worked around by invoking it not that frequently. 
              * Note that we don't account for screen-relative position here. */
             if((info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() > 128)
-                QCursor::setPos(info->mousePressScreenPos()); // TODO: #PTZ #Elric this still looks bad, but not as bad as it looked before.
+                QCursor::setPos(info->mousePressScreenPos()); // TODO: #PTZ #Elric this still looks bad, but not as bad as it looked without this hack.
         }
         break;
     default:

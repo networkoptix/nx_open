@@ -683,11 +683,11 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
     } else if(statusOverlay == Qn::UnauthorizedOverlay) {
         return Qn::MainWindow_MediaItem_Unauthorized_Help;
     } else if(options() & ControlPtz) {
-        /*if(m_fisheyePtz) { // TODO: #PTZ
+        if(m_dewarpingParams.enabled) {
             return Qn::MainWindow_MediaItem_Dewarping_Help;
         } else {
             return Qn::MainWindow_MediaItem_Ptz_Help;
-        }*/
+        }
         return Qn::MainWindow_MediaItem_Ptz_Help;
     } else if(!zoomRect().isNull()) {
         return Qn::MainWindow_MediaItem_ZoomWindows_Help;
@@ -930,7 +930,7 @@ void QnMediaResourceWidget::updateAspectRatio() {
 void QnMediaResourceWidget::at_camDisplay_liveChanged() {
     bool isLive = m_display->camDisplay()->isRealTimeSource();
 
-    if(!isLive) // && !m_fisheyePtz) // TODO: #PTZ
+    if(!isLive)
         buttonBar()->setButtonsChecked(PtzButton, false);
 }
 
