@@ -79,7 +79,6 @@ namespace ec2
             emit initNotification(
                 fullResData.resTypes,
                 fullResData.resources,
-                fullResData.kvPairs,
                 fullResData.licenses,
                 fullResData.cameraHistory,
                 fullResData.bRules,

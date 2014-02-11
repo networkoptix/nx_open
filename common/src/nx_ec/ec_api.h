@@ -680,7 +680,6 @@ namespace ec2
         void initNotification(
             QnResourceTypeList resTypes,
             QnResourceList resList,
-            QnKvPairListsById kvPairs,
             QnLicenseList licenses,
             QnCameraHistoryList cameraHistoryItems,
             QnBusinessEventRuleList businessRules,

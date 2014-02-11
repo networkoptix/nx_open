@@ -17,13 +17,5 @@ namespace ec2
 
         rules.toResourceList(outData.bRules, ctx.pool);
         cameraHistory.toResourceList(outData.cameraHistory);
-
-        foreach(const ApiResourceParam& param, kvPairs)
-        {
-            QnKvPairList& kvPairs = outData.kvPairs[param.resourceId];
-            if( kvPairs.empty() )
-                kvPairs.reserve( KV_RESOURCE_PARAMS_COMMON_COUNT );
-            kvPairs << QnKvPair(param.name, param.value);
-        }
     }
 }

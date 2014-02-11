@@ -952,8 +952,14 @@ ErrorCode QnDbManager::doQuery(nullptr_t dummy, ApiFullData& data)
     if ((err = doQuery(dummy, data.cameraHistory)) != ErrorCode::ok)
         return err;
 
-    if ((err = doQuery(dummy, data.kvPairs)) != ErrorCode::ok)
+    ApiResourceParams kvPairs;
+    if ((err = doQuery(dummy, kvPairs)) != ErrorCode::ok)
         return err;
+
+    mergeObjectListData<ApiMediaServerData, ApiResourceParam>(data.servers.data, kvPairs, &ApiMediaServerData::addParams, &ApiResourceParam::resourceId);
+    mergeObjectListData<ApiCameraData,      ApiResourceParam>(data.cameras.data, kvPairs, &ApiCameraData::addParams,      &ApiResourceParam::resourceId);
+    mergeObjectListData<ApiUserData,        ApiResourceParam>(data.users.data,   kvPairs, &ApiUserData::addParams,        &ApiResourceParam::resourceId);
+    mergeObjectListData<ApiLayoutData,      ApiResourceParam>(data.layouts.data, kvPairs, &ApiLayoutData::addParams,      &ApiResourceParam::resourceId);
 
     return err;
 }
