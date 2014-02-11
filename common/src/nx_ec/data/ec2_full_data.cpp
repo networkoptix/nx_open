@@ -9,6 +9,8 @@ namespace ec2
     void ApiFullData::toResourceList(QnFullResourceData& outData, const ResourceContext& ctx) const
     {
         resTypes.toResourceTypeList(outData.resTypes);
+        foreach(const QnResourceTypePtr& resType, outData.resTypes)
+            const_cast<QnResourceTypePool*>(ctx.resTypePool)->addResourceType(resType); // todo: refactor it!
 
         servers.toResourceList(outData.resources, ctx);
         cameras.toResourceList(outData.resources, ctx.resFactory);
