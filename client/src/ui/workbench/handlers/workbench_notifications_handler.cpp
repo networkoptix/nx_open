@@ -1,13 +1,12 @@
 #include "workbench_notifications_handler.h"
 
 #include <api/app_server_connection.h>
+#include <api/resource_property_adaptors.h>
 
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
 
 #include <business/business_strings_helper.h>
-
-#include <core/kvpair/business_events_filter_kvpair_adapter.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
@@ -23,7 +22,8 @@
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent) :
     QObject(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_adaptor(NULL)
 {
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
     connect(m_userEmailWatcher, &QnWorkbenchUserEmailWatcher::userEmailValidityChanged,     this,   &QnWorkbenchNotificationsHandler::at_userEmailValidityChanged);
@@ -80,8 +80,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
         return;
 
     const bool soundAction = businessAction->actionType() == BusinessActionType::PlaySoundRepeated;
-    if (!soundAction &&
-            !QnBusinessEventsFilterKvPairAdapter::eventAllowed(context()->user(), eventType))
+    if (!soundAction && !(m_adaptor && m_adaptor->isAllowed(eventType)))
         return;
 
     emit businessActionAdded(businessAction);
@@ -168,6 +167,10 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
     requestSmtpSettings();
     at_licensePool_licensesChanged();
+
+    delete m_adaptor;
+    if(context()->user())
+        m_adaptor = new QnBusinessEventsFilterResourcePropertyAdaptor(context()->user(), this);
 }
 
 void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message) {
