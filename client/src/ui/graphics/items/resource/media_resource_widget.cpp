@@ -21,6 +21,7 @@
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/preset_ptz_controller.h>
 #include <core/ptz/tour_ptz_controller.h>
+#include <core/ptz/fallback_ptz_controller.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -54,6 +55,7 @@
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
 #include "ui/fisheye/fisheye_ptz_controller.h"
+#include "core/ptz/notifying_ptz_controller.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -98,13 +100,14 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         m_sensStaticText[i].setPerformanceHint(QStaticText::AggressiveCaching);
     }
 
+    updateAspectRatio();
+
     /* Set up PTZ controller. */
-    m_ptzController = qnPtzPool->controller(m_camera);
-    if(!m_ptzController) {
-        m_ptzController.reset(new QnFisheyePtzController(this));
-        m_ptzController.reset(new QnPresetPtzController(m_ptzController));
-        m_ptzController.reset(new QnTourPtzController(m_ptzController));
-    }
+    m_ptzController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
+    m_ptzController.reset(new QnPresetPtzController(m_ptzController));
+    m_ptzController.reset(new QnTourPtzController(m_ptzController));
+    if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera))
+        m_ptzController.reset(new QnFallbackPtzController(serverController, m_ptzController));
     connect(m_ptzController.data(), SIGNAL(capabilitiesChanged()), this, SLOT(updateButtonsVisibility()));
 
     /* Set up info updates. */
@@ -193,8 +196,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     at_histogramButton_toggled(enhancementButton->isChecked());
     updateButtonsVisibility();
     updateIconButton();
-    updateAspectRatio();
+
     updateCursor();
+    updateFisheye();
     setImageEnhancement(item->imageEnhancement());
 }
 
@@ -515,7 +519,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
     painter->endNativePainting();
 
     if(result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
-        painter->fillRect(paintRect, Qt::black);
+        painter->fillRect(paintRect, palette().color(QPalette::Window));
 
     return result;
 }
@@ -892,9 +896,9 @@ void QnMediaResourceWidget::updateAspectRatio() {
 
     QSize sourceSize = m_renderer->sourceSize();
 
-    if (!sourceSize.isEmpty())
-        if (item() && item()->dewarpingParams().enabled && m_dewarpingParams.enabled)
-            sourceSize = QSize(sourceSize.width() * item()->dewarpingParams().panoFactor, sourceSize.height());
+    qreal dewarpingRatio = item() && item()->dewarpingParams().enabled && m_dewarpingParams.enabled
+            ? item()->dewarpingParams().panoFactor
+            : 1.0;
 
     QString resourceId;
     if (const QnNetworkResource *networkResource = dynamic_cast<const QnNetworkResource*>(resource()->toResource()))
@@ -902,13 +906,17 @@ void QnMediaResourceWidget::updateAspectRatio() {
 
     if(sourceSize.isEmpty()) {
         setAspectRatio(
-            resourceId.isEmpty() ? -1.0 : qnSettings->resourceAspectRatios().value(resourceId, -1.0)
-        );
+                    dewarpingRatio * (
+                        resourceId.isEmpty()
+                        ? -1.0
+                        : qnSettings->resourceAspectRatios().value(resourceId, -1.0))
+                    );
     } else {
         setAspectRatio(
-            QnGeometry::aspectRatio(sourceSize) *
-            QnGeometry::aspectRatio(channelLayout()->size()) *
-            (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()))
+                    dewarpingRatio *
+                    QnGeometry::aspectRatio(sourceSize) *
+                    QnGeometry::aspectRatio(channelLayout()->size()) *
+                    (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()))
         );
 
         if (!resourceId.isEmpty()) {

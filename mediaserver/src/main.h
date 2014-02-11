@@ -36,11 +36,13 @@ private slots:
     void at_localInterfacesChanged();
     void at_serverSaved(int, const QnResourceList&, int);
     void at_cameraIPConflict(QHostAddress host, QStringList macAddrList);
-    void at_noStorages();
-    void at_storageFailure(QnResourcePtr storage, QnBusiness::EventReason reason);
+    void at_storageManager_noStoragesAvailable();
+    void at_storageManager_storageFailure(QnResourcePtr storage, QnBusiness::EventReason reason);
+    void at_storageManager_rebuildFinished();
     void at_timer();
     void at_connectionOpened();
 private:
+    void updateDisabledVendorsIfNeeded();
     void initTcpListener();
     QHostAddress getPublicAddress();
 private:

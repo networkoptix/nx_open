@@ -5,27 +5,16 @@
 #include <core/resource/camera_resource.h>
 
 void QnClientPtzControllerPool::registerResource(const QnResourcePtr &resource) {
-    connect(resource, &QnResource::ptzCapabilitiesChanged, this, &QnClientPtzControllerPool::updateController);
     base_type::registerResource(resource);
 }
 
 void QnClientPtzControllerPool::unregisterResource(const QnResourcePtr &resource) {
     base_type::unregisterResource(resource);
-    disconnect(resource, NULL, this, NULL);
 }
 
-QnPtzControllerPtr QnClientPtzControllerPool::createController(const QnResourcePtr &resource) {
+QnPtzControllerPtr QnClientPtzControllerPool::createController(const QnResourcePtr &resource) const {
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if(!camera)
-        return QnPtzControllerPtr();
-
-    if(camera->getDewarpingParams().enabled)
-        return QnPtzControllerPtr();
-
-    if(camera->getPtzCapabilities() == Qn::NoPtzCapabilities)
-        return QnPtzControllerPtr();
-
-    if(camera->getPtzCapabilities() & Qn::VirtualPtzCapability)
         return QnPtzControllerPtr();
 
     QnPtzControllerPtr controller;

@@ -20,6 +20,18 @@ QnWorkbenchUserEmailWatcher::~QnWorkbenchUserEmailWatcher() {
         at_resourcePool_resourceRemoved(m_emailValidByUser.keys().back());
 }
 
+void QnWorkbenchUserEmailWatcher::forceCheck(const QnUserResourcePtr &user) {
+    emit userEmailValidityChanged(user, m_emailValidByUser.value(user, QnEmail::isValid(user->getEmail())));
+}
+
+void QnWorkbenchUserEmailWatcher::forceCheckAll() {
+    QHash<QnUserResourcePtr, bool>::const_iterator iter = m_emailValidByUser.constBegin();
+    while (iter != m_emailValidByUser.constEnd()) {
+        emit userEmailValidityChanged(iter.key(), iter.value());
+        ++iter;
+    }
+}
+
 void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
     if(!user)

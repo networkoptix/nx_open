@@ -2,6 +2,7 @@
 #include "ui_ptz_preset_dialog.h"
 
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QMessageBox>
 
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_data.h>
@@ -12,8 +13,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-QnPtzPresetDialog::QnPtzPresetDialog(QWidget *parent, Qt::WindowFlags windowFlags):
-    base_type(parent, windowFlags),
+QnPtzPresetDialog::QnPtzPresetDialog(const QnPtzControllerPtr &controller, QWidget *parent, Qt::WindowFlags windowFlags):
+    base_type(controller, parent, windowFlags),
     ui(new Ui::PtzPresetDialog())
 {
     ui->setupUi(this);
@@ -40,9 +41,10 @@ void QnPtzPresetDialog::loadData(const QnPtzData &data) {
 
     QnHotkeysHash usedHotkeys = m_hotkeysDelegate->hotkeys();
     foreach (const QnPtzPreset &preset, data.presets) {
-        if (!usedHotkeys.contains(preset.id))
+        int key = usedHotkeys.key(preset.id, Qn::NoHotkey);
+        if (key == Qn::NoHotkey)
             continue;
-        hotkeys.removeOne(usedHotkeys[preset.id]);
+        hotkeys.removeOne(key);
     }
 
     int currentHotkey = hotkey();
@@ -53,18 +55,18 @@ void QnPtzPresetDialog::loadData(const QnPtzData &data) {
     setHotkey(currentHotkey);
 }
 
-void QnPtzPresetDialog::saveData() const {
+void QnPtzPresetDialog::saveData() {
     //TODO: #GDM PTZ ask to replace if there is a preset with the same name?
     QString presetId = QUuid::createUuid().toString();
-    if (!ptzController()->createPreset(QnPtzPreset(presetId, ui->nameEdit->text())))
-        return;
+    createPreset(QnPtzPreset(presetId, ui->nameEdit->text()));
 
     if (!m_hotkeysDelegate || hotkey() < 0)
         return;
 
     QnHotkeysHash hotkeys = m_hotkeysDelegate->hotkeys();
-    hotkeys[presetId] = hotkey();
+    hotkeys[hotkey()] = presetId;
     m_hotkeysDelegate->updateHotkeys(hotkeys);
+    return;
 }
 
 Qn::PtzDataFields QnPtzPresetDialog::requiredFields() const {

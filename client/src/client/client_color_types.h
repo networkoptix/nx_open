@@ -30,6 +30,9 @@ public:
 
     QColor dateOverlay;
     QColor dateOverlayAlternate;
+
+    QColor pastLastMinute;
+    QColor futureLastMinute;
 };
 
 Q_DECLARE_METATYPE(QnTimeSliderColors)
@@ -83,6 +86,31 @@ struct QnStatisticsColors {
 
 Q_DECLARE_METATYPE(QnStatisticsColors)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStatisticsColors)
+
+struct QnScheduleGridColors {
+public:
+    QnScheduleGridColors();
+
+    QColor normalLabel;
+    QColor weekendLabel;
+    QColor selectedLabel;
+    QColor disabledLabel;
+};
+
+Q_DECLARE_METATYPE(QnScheduleGridColors)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnScheduleGridColors)
+
+
+struct QnGridColors {
+    QnGridColors();
+
+    QColor grid;
+    QColor allowed;
+    QColor disallowed;
+};
+
+Q_DECLARE_METATYPE(QnGridColors)
+QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnGridColors)
 
 
 #endif // QN_CLIENT_COLOR_TYPES

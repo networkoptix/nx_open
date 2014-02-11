@@ -1,6 +1,8 @@
 #ifndef ABSTRACT_PTZ_DIALOG_H
 #define ABSTRACT_PTZ_DIALOG_H
 
+#include <QtCore/QQueue>
+
 #include <common/common_globals.h>
 
 #include <core/ptz/ptz_fwd.h>
@@ -12,29 +14,36 @@ class QnAbstractPtzDialog : public QnButtonBoxDialog {
 
     typedef QnButtonBoxDialog base_type;
 public:
-    QnAbstractPtzDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnAbstractPtzDialog(const QnPtzControllerPtr &controller, QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnAbstractPtzDialog();
 
-    const QnPtzControllerPtr &ptzController() const;
-    void setPtzController(const QnPtzControllerPtr &controller);
-
     virtual void accept() override;
-
 protected:
     virtual void loadData(const QnPtzData &data) = 0;
-    virtual void saveData() const = 0;
+    virtual void saveData() = 0;
     virtual Qn::PtzDataFields requiredFields() const = 0;
 
+    bool activatePreset(const QString &presetId, qreal speed);
+    bool createPreset(const QnPtzPreset &preset);
+    bool updatePreset(const QnPtzPreset &preset);
+    bool removePreset(const QString &presetId);
+
+    bool createTour(const QnPtzTour &tour);
+    bool removeTour(const QString &tourId);
 signals:
-    void synchronizeLater();
+    void synchronizeLater(const QString &title);
+    void synchronized();
 
 private slots:
-    void synchronize();
+    void synchronize(const QString &title);
+
     void at_controller_finished(Qn::PtzCommand command, const QVariant &data);
 
 private:
     QnPtzControllerPtr m_controller;
 
+    bool m_loaded;
+    QMultiHash<Qn::PtzCommand, int> m_commands;
 };
 
 #endif // ABSTRACT_PTZ_DIALOG_H

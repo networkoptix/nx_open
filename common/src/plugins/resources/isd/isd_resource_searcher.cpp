@@ -53,9 +53,9 @@ QString QnPlISDResourceSearcher::manufacture() const
 static const QLatin1String DEFAULT_ISD_USERNAME( "root" );
 static const QLatin1String DEFAULT_ISD_PASSWORD( "admin" );
 
-QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& authOriginal, bool doMultichannelCheck)
+QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& authOriginal, bool isSearchAction)
 {
-    if( !url.scheme().isEmpty() )
+    if( !url.scheme().isEmpty() && isSearchAction )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
     QAuthenticator auth( authOriginal );
@@ -65,8 +65,6 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
     if( auth.password().isEmpty() )
         auth.setPassword( DEFAULT_ISD_PASSWORD );
 
-
-    Q_UNUSED(doMultichannelCheck)
 
     QString host = url.host();
     int port = url.port();

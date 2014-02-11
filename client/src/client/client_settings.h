@@ -110,12 +110,18 @@ public:
         /** Allow double buffering for openGL context */
         GL_DOUBLE_BUFFER,
 
+        /** Enable V-sync for OpenGL widgets */
+        GL_VSYNC,
+
         TIMESTAMP_CORNER,
 
         /** Last used aspect ratio for resource item in grid layout. */
         RESOURCE_ASPECT_RATIOS,
 
         USER_IDLE_TIMEOUT_MSECS,
+
+        /** Light client mode - no animations, no background, no opacity, no notifications, 1 camera only allowed. */
+        LIGHT_MODE,
 
         VARIABLE_COUNT
     };
@@ -198,10 +204,12 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        layoutKeepAspectRatio,  setLayoutKeepAspectRatio,   LAYOUT_KEEP_ASPECT_RATIO,   true)
         QN_DECLARE_RW_PROPERTY(QString,                     backgroundsFolder,      setBackgroundsFolder,       BACKGROUNDS_FOLDER,         QString())
         QN_DECLARE_RW_PROPERTY(bool,                        isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
+        QN_DECLARE_RW_PROPERTY(bool,                        isVSyncEnabled,         setVSyncEnabled,            GL_VSYNC,                   true)
         QN_DECLARE_RW_PROPERTY(QnAspectRatioHash,           resourceAspectRatios,   setResourceAspectRatios,    RESOURCE_ASPECT_RATIOS,     QnAspectRatioHash())
         QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)
 
         QN_DECLARE_RW_PROPERTY(Qn::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
+        QN_DECLARE_RW_PROPERTY(int,                         lightMode,              setLightMode,               LIGHT_MODE,                 0)  //int because of intended flags system
 
     QN_END_PROPERTY_STORAGE()
 

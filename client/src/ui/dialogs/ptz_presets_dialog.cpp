@@ -1,8 +1,10 @@
 #include "ptz_presets_dialog.h"
 #include "ui_ptz_presets_dialog.h"
 
-#include <QtWidgets/QPushButton>
 #include <QtGui/QStandardItem>
+
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QMessageBox>
 
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_preset.h>
@@ -11,8 +13,8 @@
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
 #include <ui/style/skin.h>
 
-QnPtzPresetsDialog::QnPtzPresetsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
-    base_type(parent, windowFlags),
+QnPtzPresetsDialog::QnPtzPresetsDialog(const QnPtzControllerPtr &controller, QWidget *parent, Qt::WindowFlags windowFlags):
+    base_type(controller, parent, windowFlags),
     ui(new Ui::PtzPresetsDialog),
     m_model(new QnPtzPresetListModel(this))
 {
@@ -45,7 +47,7 @@ void QnPtzPresetsDialog::loadData(const QnPtzData &data) {
     updateActivateButtonEnabled();
 }
 
-void QnPtzPresetsDialog::saveData() const {
+bool QnPtzPresetsDialog::savePresets() {
     auto findPresetById = [](const QnPtzPresetList &list, const QString &id, QnPtzPreset &result) {
         foreach (const QnPtzPreset &preset, list) {
             if (preset.id != id)
@@ -56,17 +58,25 @@ void QnPtzPresetsDialog::saveData() const {
         return false;
     };
 
+    bool result = true;
     // update or remove existing presets
     foreach (QnPtzPreset preset, m_oldPresets) {
         QnPtzPreset updated;
         if (!findPresetById(m_model->presets(), preset.id, updated))
-            ptzController()->removePreset(preset.id);
+            result &= removePreset(preset.id);
         else if (preset != updated)
-            ptzController()->updatePreset(updated);
+            result &= updatePreset(updated);
     }
+
+    return result;
+}
+
+void QnPtzPresetsDialog::saveData() {
+    savePresets();
 
     if (m_hotkeysDelegate)
         m_hotkeysDelegate->updateHotkeys(m_model->hotkeys());
+    return;
 }
 
 Qn::PtzDataFields QnPtzPresetsDialog::requiredFields() const {
@@ -85,13 +95,11 @@ void QnPtzPresetsDialog::setHotkeysDelegate(QnAbstractPtzHotkeyDelegate *delegat
 
 
 void QnPtzPresetsDialog::updateRemoveButtonEnabled() {
-    m_removeButton->setEnabled(ptzController()
-                               && ui->treeView->selectionModel()->selectedRows().size() > 0);
+    m_removeButton->setEnabled(ui->treeView->selectionModel()->selectedRows().size() > 0);
 }
 
 void QnPtzPresetsDialog::updateActivateButtonEnabled() {
-    m_activateButton->setEnabled(ptzController()
-                                 && ui->treeView->currentIndex().isValid() && ui->treeView->selectionModel()->selectedRows().size() <= 1);
+    m_activateButton->setEnabled(ui->treeView->currentIndex().isValid() && ui->treeView->selectionModel()->selectedRows().size() <= 1);
 }
 
 // -------------------------------------------------------------------------- //
@@ -107,11 +115,8 @@ void QnPtzPresetsDialog::at_removeButton_clicked() {
 }
 
 void QnPtzPresetsDialog::at_activateButton_clicked() {
-    if (!ptzController())
-        return;
-
     QnPtzPreset preset = ui->treeView->currentIndex().data(Qn::PtzPresetRole).value<QnPtzPreset>();
-    ptzController()->activatePreset(preset.id, 1.0);
+    activatePreset(preset.id, 1.0);
 }
 
 

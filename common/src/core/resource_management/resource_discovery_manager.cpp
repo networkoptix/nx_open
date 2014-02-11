@@ -1,12 +1,14 @@
 
 #include "resource_discovery_manager.h"
 
+#include <QtConcurrent>
 #include <set>
 
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QThreadPool>
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
 
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource/camera_resource.h>
@@ -72,6 +74,7 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager( const CameraDriverRestri
     m_cameraDriverRestrictionList( cameraDriverRestrictionList )
 {
     connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
+    connect(QnGlobalSettings::instance(), &QnGlobalSettings::disabledVendorsChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
 }
 
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
@@ -105,7 +108,7 @@ QnResourceDiscoveryManager* QnResourceDiscoveryManager::instance()
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
     QMutexLocker locker(&m_searchersListMutex);
-    serv->setShouldBeUsed(!m_disabledVendorsForAutoSearch.contains(serv->manufacture()) && !m_disabledVendorsForAutoSearch.contains(lit("all")));
+    updateSearcherUsage(serv);
     m_searchersList.push_back(serv);
 }
 
@@ -253,15 +256,19 @@ void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
     }
 }
 
+static QnResourceList ChecHostAddrAsync(const QnManualCameraInfo& input) { return input.checkHostAddr(); }
+
 void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList& resources)
 {
     m_searchersListMutex.lock();
     QnManualCameraInfoMap cameras = m_manualCameraMap;
     m_searchersListMutex.unlock();
 
-    for (QnManualCameraInfoMap::const_iterator itr = cameras.constBegin(); itr != cameras.constEnd(); ++itr)
+    QFuture<QnResourceList> results = QtConcurrent::mapped(cameras, &ChecHostAddrAsync);
+    results.waitForFinished();
+    for (QFuture<QnResourceList>::const_iterator itr = results.constBegin(); itr != results.constEnd(); ++itr)
     {
-        QList<QnResourcePtr> foundResources = itr.value().checkHostAddr();
+        QnResourceList foundResources = *itr;
         for (int i = 0; i < foundResources.size(); ++i) {
             QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(foundResources.at(i));
             if (camera)
@@ -447,12 +454,29 @@ void QnResourceDiscoveryManager::dtsAssignment()
     }
 }
 
-void QnResourceDiscoveryManager::setDisabledVendors(const QStringList& vendors)
-{
-    m_disabledVendorsForAutoSearch = vendors.toSet();
-}
-
 QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const 
 { 
     return m_state; 
+}
+
+void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher) {
+    // TODO: #Elric strictly speaking, we must do this under lock.
+
+    QSet<QString> disabledVendorsForAutoSearch = QnGlobalSettings::instance()->disabledVendorsSet();
+
+    searcher->setShouldBeUsed(
+        !disabledVendorsForAutoSearch.contains(searcher->manufacture()) && 
+        !disabledVendorsForAutoSearch.contains(lit("all"))
+    );
+}
+
+void QnResourceDiscoveryManager::updateSearchersUsage() {
+    ResourceSearcherList searchers;
+    {
+        QMutexLocker locker(&m_searchersListMutex);
+        searchers = m_searchersList;
+    }
+
+    foreach(QnAbstractResourceSearcher *searcher, searchers)
+        updateSearcherUsage(searcher);
 }

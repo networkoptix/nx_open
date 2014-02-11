@@ -130,7 +130,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setTransformOrigin(Center);
 
     /* Set up shadow. */
-    shadowItem()->setColor(qnGlobals->shadowColor());
+    if (shadowItem())
+        shadowItem()->setColor(qnGlobals->shadowColor());
     setShadowDisplacement(defaultShadowDisplacement);
 
     /* Set up frame. */
@@ -208,11 +209,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerWidget->setLayout(m_headerLayout);
     m_headerWidget->setAcceptedMouseButtons(0);
     m_headerWidget->setAutoFillBackground(true);
-    {
-        QPalette palette = m_headerWidget->palette();
-        palette.setColor(QPalette::Window, overlayBackgroundColor);
-        m_headerWidget->setPalette(palette);
-    }
+    setPaletteColor(m_headerWidget, QPalette::Window, overlayBackgroundColor);
 
     QGraphicsLinearLayout *headerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
     headerOverlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);

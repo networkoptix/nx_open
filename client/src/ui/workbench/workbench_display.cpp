@@ -410,7 +410,6 @@ void QnWorkbenchDisplay::initSceneView() {
     m_scene->addItem(m_gridItem.data());
     setLayer(m_gridItem.data(), Qn::BackLayer);
     opacityAnimator(m_gridItem.data())->setTimeLimit(300);
-    m_gridItem.data()->setColor(QColor(0, 240, 240, 128));
     m_gridItem.data()->setOpacity(0.0);
     m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
@@ -762,7 +761,11 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 }
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay) {
-    if (m_widgets.size() >= qnSettings->maxSceneVideoItems()) {
+    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
+            ? 1
+            : qnSettings->maxSceneVideoItems();
+
+    if (m_widgets.size() >= maxItems) {
         qnDeleteLater(item);
         return false;
     }
@@ -1848,6 +1851,9 @@ void QnWorkbenchDisplay::at_resource_disabledChanged(const QnResourcePtr &resour
 }
 
 void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction) {
+    if (qnSettings->lightMode() & Qn::LightModeNoNotifications)
+        return;
+
     QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().getEventResourceId(), QnResourcePool::AllResources);
     if (!resource)
         return;
@@ -1871,6 +1877,9 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QVariant &resource, 
 }
 
 void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resource, int type) {
+    if (qnSettings->lightMode() & Qn::LightModeNoNotifications)
+        return;
+
     foreach(QnResourceWidget *widget, this->widgets(resource)) {
         if(widget->zoomTargetWidget())
             continue; /* Don't draw notification on zoom widgets. */

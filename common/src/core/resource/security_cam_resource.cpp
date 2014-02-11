@@ -1,10 +1,16 @@
-
 #include "security_cam_resource.h"
+
 #include <QtCore/QMutexLocker>
 
-#include <business/business_event_connector.h>
-#include "api/app_server_connection.h"
+#include <api/global_settings.h>
 
+#include <utils/common/lexical.h>
+
+#include <core/resource_management/resource_pool.h>
+
+#include <business/business_event_connector.h>
+
+#include "user_resource.h"
 
 #define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
 
@@ -36,7 +42,7 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     addFlags(live_cam);
 
-    m_cameraControlDisabled = !QnAppServerConnectionFactory::allowCameraChanges();
+    m_cameraControlDisabled = !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
 
     connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
 

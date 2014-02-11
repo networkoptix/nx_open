@@ -39,12 +39,14 @@
 #include <camera/caching_time_period_loader.h>
 
 #include <client/client_connection_data.h>
+#include <client/client_message_processor.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_directory_browser.h>
+#include <core/resource/file_processor.h>
 
 #include <device_plugins/server_camera/appserver.h>
 
@@ -115,8 +117,6 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
-#include "client_message_processor.h"
-#include "file_processor.h"
 #include "version.h"
 
 // TODO: #Elric remove this include
@@ -184,7 +184,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_tourTimer(new QTimer())
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
-    connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
+    connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_messageProcessor_connectionClosed()));
@@ -347,7 +347,16 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const {
 
-    if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
+    if (qnSettings->lightMode() & Qn::LightModeSingleItem) {
+        while (!layout->getItems().isEmpty())
+            layout->removeItem(*(layout->getItems().begin()));
+    }
+
+    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
+            ? 1
+            : qnSettings->maxSceneVideoItems();
+
+    if (layout->getItems().size() >= maxItems)
         return;
 
     {
@@ -631,6 +640,9 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
     if(!context()->user())
         return;
 
+    if (!context()->workbench()->currentLayout()->resource())
+        return;
+
     foreach(const QnMimeData &data, m_delayedDrops) {
         QMimeData mimeData;
         data.toMimeData(&mimeData);
@@ -712,6 +724,7 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
         return;
 
     menu()->trigger(Qn::OpenNewTabAction);
+    submitDelayedDrops();
 }
 
 void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
@@ -795,6 +808,10 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
+    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
+            ? 1
+            : qnSettings->maxSceneVideoItems();
+
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
         QHash<QUuid, QnLayoutItemData> itemDataByUuid;
@@ -814,7 +831,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
         /* Add to layout. */
         foreach(const QnLayoutItemData &data, itemDataByUuid) {
-            if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
+            if (layout->getItems().size() >= maxItems)
                 return;
 
             layout->addItem(data);
@@ -1216,7 +1233,7 @@ void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
     QRect oldGeometry = businessRulesDialog()->geometry();
     businessRulesDialog()->show();
     businessRulesDialog()->raise();
-    businessRulesDialog()->activateWindow();
+    businessRulesDialog()->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
     if(!newlyCreated)
         businessRulesDialog()->setGeometry(oldGeometry);
 }
@@ -1259,7 +1276,7 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
     QRect oldGeometry = businessEventsLogDialog()->geometry();
     businessEventsLogDialog()->show();
     businessEventsLogDialog()->raise();
-    businessEventsLogDialog()->activateWindow();
+    businessEventsLogDialog()->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
     if(!newlyCreated)
         businessEventsLogDialog()->setGeometry(oldGeometry);
 }
@@ -1270,14 +1287,14 @@ void QnWorkbenchActionHandler::at_cameraListAction_triggered()
 
     bool newlyCreated = false;
     if(!cameraListDialog()) {
-        m_cameraListDialog = new QnCameraListDialog(mainWindow(), context());
+        m_cameraListDialog = new QnCameraListDialog(mainWindow());
         newlyCreated = true;
     }
     QRect oldGeometry = cameraListDialog()->geometry();
-    cameraListDialog()->setMediaServerResource(server);
+    cameraListDialog()->setServer(server);
     cameraListDialog()->show();
     cameraListDialog()->raise();
-    cameraListDialog()->activateWindow();
+    cameraListDialog()->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
     if(!newlyCreated)
         cameraListDialog()->setGeometry(oldGeometry);
 }
@@ -2429,6 +2446,8 @@ void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
         (accessController()->globalPermissions() & Qn::GlobalPanicPermission);
 
     action(Qn::TogglePanicModeAction)->setEnabled(enabled);
+    if (!enabled)
+        action(Qn::TogglePanicModeAction)->setChecked(false);
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
@@ -2504,7 +2523,7 @@ void QnWorkbenchActionHandler::at_escapeHotkeyAction_triggered() {
     if (action(Qn::ToggleTourModeAction)->isChecked())
         menu()->trigger(Qn::ToggleTourModeAction);
     else
-        menu()->trigger(Qn::FullscreenAction);
+        menu()->trigger(Qn::EffectiveMaximizeAction);
 }
 
 void QnWorkbenchActionHandler::at_clearCacheAction_triggered() {

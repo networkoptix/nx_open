@@ -8,7 +8,7 @@ class QnClockDataProvider : public QObject
 {
     Q_OBJECT
 public:
-    explicit QnClockDataProvider(QObject *parent = 0);
+    explicit QnClockDataProvider(const QString fixedFormat = QString(), QObject *parent = 0);
     ~QnClockDataProvider();
 
 signals:

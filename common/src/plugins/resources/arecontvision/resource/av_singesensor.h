@@ -10,12 +10,12 @@
 class CLArecontSingleSensorResource : public QnPlAreconVisionResource
 {
 public:
-	CLArecontSingleSensorResource(const QString& name);
-	bool getDescription();
+    CLArecontSingleSensorResource(const QString& name);
+    bool getDescription();
 
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
-	
+    
 
 };
 

@@ -12,6 +12,8 @@
 
 #include <client/client_settings.h>
 
+#include <core/resource/file_processor.h>
+
 #include <transcoding/filters/contrast_image_filter.h>
 #include <transcoding/filters/fisheye_image_filter.h>
 
@@ -24,7 +26,6 @@
 #include <utils/common/environment.h>
 #include <utils/common/warnings.h>
 
-#include "file_processor.h"
 
 namespace {
     void drawTimeStamp(QImage &image, Qn::Corner position, const QString &timestamp) {
@@ -135,10 +136,8 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
     QObject(parent), 
     QnWorkbenchContextAware(parent) 
 {
-    connect(action(Qn::TakeScreenshotAction), SIGNAL(triggered()), this, SLOT(at_takeScreenshotAction_triggered()));
+    connect(action(Qn::TakeScreenshotAction), &QAction::triggered, this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
 }
-
-
 
 QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScreenshotParameters &parameters, QnResourceDisplay *display) {
     if (!display)
@@ -208,7 +207,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
 
     QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, display.data());
     if (!imageProvider)
-        imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), parameters.time, QSize());
+        imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), parameters.time);
     QnScreenshotLoader* loader = new QnScreenshotLoader(parameters, this);
     connect(loader, &QnImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
     loader->setBaseProvider(imageProvider); // preload screenshot here

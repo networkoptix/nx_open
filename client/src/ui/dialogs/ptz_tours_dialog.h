@@ -16,23 +16,25 @@ class QnPtzToursDialog : public QnAbstractPtzDialog {
 
     typedef QnAbstractPtzDialog base_type;
 public:
-    explicit QnPtzToursDialog(QWidget *parent = 0);
+    explicit QnPtzToursDialog(const QnPtzControllerPtr &controller, QWidget *parent = 0);
     ~QnPtzToursDialog();
 
 protected:
     virtual void loadData(const QnPtzData &data) override;
-    virtual void saveData() const override;
+    virtual void saveData() override;
     virtual Qn::PtzDataFields requiredFields() const override;
 
 private slots:
-    void at_table_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
+    void at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
     void at_addTourButton_clicked();
     void at_deleteTourButton_clicked();
 
+    void at_tableViewport_resizeEvent();
 private:
+    bool saveTours();
+
     QScopedPointer<Ui::PtzToursDialog> ui;
     QnPtzTourListModel *m_model;
-    QnPtzTourList m_oldTours;
 };
 
 #endif // PTZ_TOURS_DIALOG_H

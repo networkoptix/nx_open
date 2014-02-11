@@ -92,7 +92,7 @@ public:
 
 
     enum RoundMethod { IFrameBeforeTime, Precise, IFrameAfterTime };
-	/** 
+    /** 
      * Get \a camera thumbnail for specified time. 
      * 
      * Returns immediately. On request completion \a slot of object \a target 
@@ -107,10 +107,10 @@ public:
      * \param target
      * \param slot
      * \returns                         Request handle.
-	 */
+     */
     int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot);
 
-	/** 
+    /** 
      * Get \a camera params. 
      * 
      * Returns immediately. On request completion \a slot of object \a target 
@@ -118,10 +118,10 @@ public:
      * \a status is 0 in case of success, in other cases it holds error code 
      * 
      * \returns                         Request handle.
-	 */
+     */
     int getParamsAsync(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot);
 
-	/** 
+    /** 
      * Get \a event log. 
      * 
      * Returns immediately. On request completion \a slot of object \a target 
@@ -134,7 +134,7 @@ public:
      * \param businessRuleId            Filter events by specified business rule. Optional.
      * 
      * \returns                         Request handle.
-	 */
+     */
     int getEventLogAsync(
         qint64 dateFrom, 
         qint64 dateTo, 
@@ -150,15 +150,15 @@ public:
      */
     int getParamsSync(const QnNetworkResourcePtr &camera, const QStringList &keys, QnStringVariantPairList *reply);
 
-	/** 
-	 * Set \a camera params.
-	 * 
-	 * Returns immediately. On request completion \a slot of object \a target is 
-	 * called with signature <tt>(int httpStatusCode, const QList<QPair<QString, bool> > &operationResult)</tt>
-	 * \a status is 0 in case of success, in other cases it holds error code
-	 * 
+    /** 
+     * Set \a camera params.
+     * 
+     * Returns immediately. On request completion \a slot of object \a target is 
+     * called with signature <tt>(int httpStatusCode, const QList<QPair<QString, bool> > &operationResult)</tt>
+     * \a status is 0 in case of success, in other cases it holds error code
+     * 
      * \returns                         Request handle.
-	 */
+     */
     int setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QObject *target, const char *slot);
 
     /**

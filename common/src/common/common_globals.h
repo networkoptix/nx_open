@@ -105,7 +105,6 @@ public:
         GetToursPtzCommand,
 
         GetDataPtzCommand,
-        SynchronizePtzCommand,
 
         InvalidPtzCommand = -1
     };
@@ -159,16 +158,9 @@ public:
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
-        FisheyePtzCapabilities              = ContinuousPtzCapabilities | AbsolutePtzCapabilities | LogicalPositioningPtzCapability | VirtualPtzCapability
     };
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
-
-    enum Projection {
-        RectilinearProjection,
-        Equirectangular2xProjection, // TODO: #Elric coefficients have nothing to do with projection, factor out!
-        Equirectangular4xProjection
-    };
 
     enum StreamFpsSharingMethod {
         shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
@@ -340,9 +332,10 @@ public:
  */
 #define QN_USE_QT_STRING_LITERALS
 #ifdef QN_USE_QT_STRING_LITERALS
-#   define lit QStringLiteral
+namespace QnLitDetail { template<int N> void check_string_literal(const char (&)[N]) {} }
+#   define lit(s) (QnLitDetail::check_string_literal(s), QStringLiteral(s))
 #else
-#   define lit QLatin1String
+#   define lit(s) QLatin1String(s)
 #endif
 
 

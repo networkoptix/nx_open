@@ -14,7 +14,7 @@
 #include <business/events/reasoned_business_event.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "core/datapacket/media_data_packet.h"
-#include "serverutil.h"
+#include <media_server/serverutil.h>
 
 static const int MAX_BUFFERED_SIZE = 1024*1024*20;
 static const int MOTION_PREBUFFER_SIZE = 8;

@@ -22,6 +22,7 @@
 
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
+#include <api/global_settings.h>
 
 #include <appserver/processor.h>
 
@@ -31,8 +32,6 @@
 #include <business/events/reasoned_business_event.h>
 
 #include <camera/camera_pool.h>
-
-#include <common/global_settings.h>
 
 #include <core/misc/schedule_task.h>
 #include <core/resource_management/camera_driver_restriction_list.h>
@@ -117,15 +116,16 @@
 #include <utils/network/ssl_socket.h>
 
 
-#include "server_message_processor.h"
-#include "settings.h"
-#include "serverutil.h"
+#include <media_server/server_message_processor.h>
+#include <media_server/settings.h>
+#include <media_server/serverutil.h>
 #include "version.h"
 
 #ifdef _WIN32
 #include "common/systemexcept_win32.h"
 #endif
 #include "core/ptz/server_ptz_controller_pool.h"
+#include "plugins/resources/acti/acti_resource.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -460,6 +460,22 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     qnLogMsgHandler(type, ctx, msg);
 }
 
+/** Initialize log. */
+void initLog(const QString &logLevel) {
+    if(logLevel == lit("none"))
+        return;
+
+    QnLog::initLog(logLevel);
+    const QString& dataLocation = getDataDirectory();
+    const QString& logFileLocation = MSSettings::roSettings()->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
+    if (!QDir().mkpath(logFileLocation))
+        cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
+    const QString& logFileName = logFileLocation + QLatin1String("/log_file");
+    if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
+        cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
+    cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
+}
+
 int serverMain(int argc, char *argv[])
 {
     Q_UNUSED(argc)
@@ -484,21 +500,7 @@ int serverMain(int argc, char *argv[])
     }
     MSSettings::runTimeSettings()->remove("rebuild");
 
-    if( cmdLineArguments.logLevel != QString::fromLatin1("none") )
-    {
-        const QString& logDir = MSSettings::roSettings()->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
-        QDir().mkpath( logDir );
-        const QString& logFileName = logDir + QLatin1String("/log_file");
-        //MSSettings::roSettings()->setValue("logFile", logFileName);
-        if (!cl_log.create(logFileName, 1024*1024*10, 25, cl_logDEBUG1))
-        {
-            qApp->quit();
-
-            return 0;
-        }
-
-        QnLog::initLog(cmdLineArguments.logLevel);
-    }
+    initLog(cmdLineArguments.logLevel);
 
     if (cmdLineArguments.rebuildArchive == "all")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
@@ -674,6 +676,22 @@ void QnMain::stopObjects()
 
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 
+void QnMain::updateDisabledVendorsIfNeeded()
+{
+    static const QString DV_PROPERTY = QLatin1String("disabledVendors");
+
+    QString disabledVendors = MSSettings::roSettings()->value(DV_PROPERTY).toString();
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+    if (!admin)
+        return;
+
+    if (!admin->hasProperty(DV_PROPERTY)) {
+        QnGlobalSettings *settings = QnGlobalSettings::instance();
+        settings->setDisabledVendors(disabledVendors);
+        MSSettings::roSettings()->remove(DV_PROPERTY);
+    }
+}
+
 void QnMain::loadResourcesFromECS()
 {
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
@@ -756,6 +774,13 @@ void QnMain::loadResourcesFromECS()
     foreach(const QnUserResourcePtr &user, users)
         qnResPool->addResource(user);
 
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+    QnKvPairList adminKvPairs;
+    appServerConnection->getKvPairs(adminKvPairs, admin);
+    foreach(const QnKvPair& kvPair, adminKvPairs) {
+        admin->setProperty(kvPair.name(), kvPair.value());
+    }
+
     //loading business rules
     QnBusinessEventRuleList rules;
     while( appServerConnection->getBusinessRules(rules) != 0 )
@@ -803,14 +828,16 @@ void QnMain::at_timer()
     
 }
 
-void QnMain::at_noStorages()
-{
+void QnMain::at_storageManager_noStoragesAvailable() {
     qnBusinessRuleConnector->at_NoStorages(m_mediaServer);
 }
 
-void QnMain::at_storageFailure(QnResourcePtr storage, QnBusiness::EventReason reason)
-{
+void QnMain::at_storageManager_storageFailure(QnResourcePtr storage, QnBusiness::EventReason reason) {
     qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
+}
+
+void QnMain::at_storageManager_rebuildFinished() {
+    qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer);
 }
 
 void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
@@ -826,7 +853,6 @@ void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
 void QnMain::initTcpListener()
 {
     int rtspPort = MSSettings::roSettings()->value("rtspPort", DEFAUT_RTSP_PORT).toInt();
-    Qn::GlobalSettings::instance()->setHttpPort(rtspPort);    //required for QnActiResource (which is in libcommon). #todo: make qSettings global???
 #ifdef USE_SINGLE_STREAMING_PORT
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
     QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnStorageStatusHandler());
@@ -846,6 +872,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
     QnRestConnectionProcessor::registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsHandler());
 #ifdef ENABLE_ACTI
+    QnActiResource::setEventPort(rtspPort);
     QnRestConnectionProcessor::registerHandler("api/camera_event", new QnCameraEventHandler());  //used to receive event from acti camera. TODO: remove this from api
 #endif
     QnRestConnectionProcessor::registerHandler("favicon.ico", new QnRestFavicoHandler());
@@ -953,6 +980,8 @@ void QnMain::run()
 
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
+    QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
+
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
@@ -980,8 +1009,9 @@ void QnMain::run()
 
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
-    connect(QnStorageManager::instance(), SIGNAL(noStoragesAvailable()), this, SLOT(at_noStorages()));
-    connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr, QnBusiness::EventReason)), this, SLOT(at_storageFailure(QnResourcePtr, QnBusiness::EventReason)));
+    connect(QnStorageManager::instance(), SIGNAL(noStoragesAvailable()), this, SLOT(at_storageManager_noStoragesAvailable()));
+    connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr, QnBusiness::EventReason)), this, SLOT(at_storageManager_storageFailure(QnResourcePtr, QnBusiness::EventReason)));
+    connect(QnStorageManager::instance(), SIGNAL(rebuildFinished()), this, SLOT(at_storageManager_rebuildFinished()));
 
     QnConnectionInfoPtr connectInfo(new QnConnectionInfo());
     while (!needToStop())
@@ -1002,7 +1032,6 @@ void QnMain::run()
     }
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
     QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
-    QnAppServerConnectionFactory::setAllowCameraChanges(connectInfo->allowCameraChanges);
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
@@ -1033,7 +1062,6 @@ void QnMain::run()
     {
         QnSleep::msleep(1000);
     }
-
 
     while (!needToStop() && !initLicenses(appServerConnection))
     {
@@ -1160,21 +1188,6 @@ void QnMain::run()
 
     QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
 
-    QString disabledVendors = MSSettings::roSettings()->value("disabledVendors").toString();
-    QStringList disabledVendorList;
-    if (disabledVendors.contains(";"))
-        disabledVendorList = disabledVendors.split(";");
-    else
-        disabledVendorList = disabledVendors.split(" ");
-    QStringList updatedVendorList;        
-    for (int i = 0; i < disabledVendorList.size(); ++i) {
-    if (!disabledVendorList[i].trimmed().isEmpty())
-            updatedVendorList << disabledVendorList[i].trimmed();
-    }
-    qWarning() << "disabled vendors amount" << updatedVendorList.size();
-    qWarning() << disabledVendorList;        
-    QnResourceDiscoveryManager::instance()->setDisabledVendors(updatedVendorList);
-
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher( &cameraDriverRestrictionList ) );
     QnResourceDiscoveryManager::instance()->addDeviceServer(ThirdPartyResourceSearcher::instance());
@@ -1237,6 +1250,10 @@ void QnMain::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS();
+    updateDisabledVendorsIfNeeded();
+    QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
+    qWarning() << lit("disabled vendors amount") << disabledVendors .size();
+    qWarning() << disabledVendors;
 
     connect(QnServerMessageProcessor::instance(), SIGNAL(connectionReset()), this, SLOT(loadResourcesFromECS()));
 

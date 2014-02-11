@@ -129,7 +129,7 @@ int sampleSize(AVSampleFormat value)
 
 bool QnFfmpegAudioTranscoder::existMoreData() const
 {
-    int encoderFrameSize = m_encoderCtx->frame_size*sizeof(short)*m_encoderCtx->channels;
+    int encoderFrameSize = m_encoderCtx->frame_size * sampleSize(m_encoderCtx->sample_fmt) * m_encoderCtx->channels;
     return m_decodedBufferSize >= encoderFrameSize;
 }
 
@@ -193,7 +193,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, 
     if( !result )
         return 0;
 
-    int encoderFrameSize = m_encoderCtx->frame_size*sizeof(short)*m_encoderCtx->channels;
+    int encoderFrameSize = m_encoderCtx->frame_size * sampleSize(m_encoderCtx->sample_fmt) * m_encoderCtx->channels;
     if (m_decodedBufferSize < encoderFrameSize)
         return 0;
 

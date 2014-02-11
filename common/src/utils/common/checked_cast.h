@@ -3,8 +3,10 @@
 
 #include <cassert>
 
+#ifndef Q_MOC_RUN
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/type_traits/is_reference.hpp>
+#endif
 
 #include <QtCore/QSharedPointer>
 

@@ -9,6 +9,14 @@ from main import get_environment_variable, cd
 qtlibs = ['${qtlib1}', '${qtlib2}', '${qtlib3}', '${qtlib4}', '${qtlib5}', '${qtlib6}', '${qtlib7}', '${qtlib8}', '${qtlib9}', '${qtlib10}', '${qtlib11}', '${qtlib12}']
 qtplugins = ['${qtplugin1}', '${qtplugin2}', '${qtplugin3}']
 
+def get_platform():
+    if sys.platform == 'win32':
+        return 'windows'
+    elif sys.platform == 'linux2':
+        return 'linux'
+    elif sys.platform == 'darwin':
+        return 'macosx'   
+
 def mkdir_p(path):
     try:
         os.makedirs(path)
@@ -40,7 +48,7 @@ for file in os.listdir('.'):
 
 print '+++++++++++++++++++++ COPYING QT LIBS +++++++++++++++++++++'
         
-if get_environment_variable('platform') == 'windows':        
+if get_platform() == 'windows':        
     for arch in ('x86', 'x64'):
         plugin_source_dir = '${environment.dir}/qt5/qtbase-%s/plugins' % arch
         lib_source_dir = '${environment.dir}/qt5/qtbase-%s/bin' % arch
@@ -105,7 +113,7 @@ else:
 #        shutil.rmtree(help_dir)
 #        shutil.copytree('help', help_dir)    
     
-    if get_environment_variable('platform') == 'linux':
+    if get_platform() == 'linux':
         for qtlib in qtlibs:
             if qtlib != '': 
                 for file in os.listdir(lib_source_dir):            
@@ -121,7 +129,7 @@ else:
                                 os.symlink(linkto, dstname)
                             else:
                                 shutil.copy2(srcname, dstname)       
-    elif get_environment_variable('platform') == 'macosx':
+    elif get_platform() == 'macosx':
         for qtlib in qtlibs:
             if qtlib != '': 
                 for root, dirs, files in os.walk(lib_source_dir):

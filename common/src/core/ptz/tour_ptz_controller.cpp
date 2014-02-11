@@ -9,56 +9,25 @@
 #include <api/resource_property_adaptor.h>
 
 #include "ptz_tour_executor.h"
-
-
-// -------------------------------------------------------------------------- //
-// QnPtzTourExecutorThread
-// -------------------------------------------------------------------------- //
-class QnPtzTourExecutorThread: public QnLongRunnable {
-    typedef QnLongRunnable base_type;
-public:
-    QnPtzTourExecutorThread() {
-        setObjectName(lit("QnPtzTourExecutorThread")); /* So that we see this thread's name in debug. */
-        start();
-    }
-
-    virtual ~QnPtzTourExecutorThread() {
-        stop();
-    }
-
-    virtual void pleaseStop() override {
-        base_type::pleaseStop();
-        
-        quit(); /* This call is thread-safe. */
-    }
-
-    virtual void run() override {
-        /* Default implementation is OK, but we want to see this function on 
-         * the stack when debugging. */
-        return base_type::run(); 
-    }
-};
-
-Q_GLOBAL_STATIC(QnPtzTourExecutorThread, qn_ptzTourExecutorThread_instance);
-
+#include "ptz_controller_pool.h"
 
 // -------------------------------------------------------------------------- //
 // QnTourPtzController
 // -------------------------------------------------------------------------- //
 QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(baseController->resource(), lit("ptzTours"), this)),
+    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(baseController->resource(), lit("ptzTours"), QnPtzTourHash(), this)),
     m_executor(new QnPtzTourExecutor(baseController))
 {
-    m_executor->moveToThread(qn_ptzTourExecutorThread_instance());
+    assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
 
-    m_asynchronous = baseController->hasCapabilities(Qn::AsynchronousPtzCapability);
-    connect(this, &QnTourPtzController::finishedLater, this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
+    m_executor->moveToThread(qnPtzPool->executorThread());
+
+    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 }
 
 QnTourPtzController::~QnTourPtzController() {
     m_executor->deleteLater();
-    // TODO: #Elric this may be a problem, see #2754
 }
 
 bool QnTourPtzController::extends(Qn::PtzCapabilities capabilities) {
@@ -114,10 +83,6 @@ bool QnTourPtzController::createTourInternal(QnPtzTour tour) {
     if(!getPresets(&presets))
         return false;
 
-    /* We need to check validity of the tour first. */
-    if (!tour.isValid(presets))
-        return false;
-
     /* Not so important so fix and continue. */
     tour.optimize();
 
@@ -128,8 +93,6 @@ bool QnTourPtzController::createTourInternal(QnPtzTour tour) {
     
     m_adaptor->setValue(records);
 
-    if(m_asynchronous)
-        emit finishedLater(Qn::CreateTourPtzCommand, QVariant::fromValue(tour));
     return true;
 }
 
@@ -142,8 +105,6 @@ bool QnTourPtzController::removeTour(const QString &tourId) {
     
     m_adaptor->setValue(records);
     
-    if(m_asynchronous)
-        emit finishedLater(Qn::RemoveTourPtzCommand, QVariant::fromValue(tourId));
     return true;
 }
 
@@ -159,8 +120,6 @@ bool QnTourPtzController::activateTour(const QString &tourId) {
 
     m_executor->startTour(tour);
 
-    if(m_asynchronous)
-        emit finishedLater(Qn::ActivateTourPtzCommand, QVariant::fromValue(tourId));
     return true;
 }
 
@@ -169,7 +128,6 @@ bool QnTourPtzController::getTours(QnPtzTourList *tours) {
 
     *tours = m_adaptor->value().values();
 
-    if(m_asynchronous)
-        emit finishedLater(Qn::GetToursPtzCommand, QVariant::fromValue(*tours));
     return true;
 }
+

@@ -11,7 +11,7 @@
 #ifdef Q_OS_WIN
 #include "windows.h"
 #endif
-#include "settings.h"
+#include <media_server/settings.h>
 
 static const int FFMPEG_BUFFER_SIZE = 1024*1024*4;
 

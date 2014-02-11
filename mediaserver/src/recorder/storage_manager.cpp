@@ -16,7 +16,7 @@
 #include <utils/fs/file.h>
 #include "utils/common/util.h"
 
-#include "serverutil.h"
+#include <media_server/serverutil.h>
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -112,6 +112,7 @@ void QnStorageManager::rebuildCatalogIndexInternal()
     }
     loadFullFileCatalog(true);
     m_rebuildState = RebuildState_None;
+    emit rebuildFinished();
 }
 
 void QnStorageManager::rebuildCatalogAsync()

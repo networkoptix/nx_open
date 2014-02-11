@@ -62,16 +62,16 @@ QVariant FoundEnterpriseControllersModel::data( const QModelIndex& index, int ro
 
     switch( role )
     {
-        case urlRole:
+        case UrlRole:
             return QString::fromLatin1("https://%1:%2").arg(moduleData.ipAddresses[moduleAddressIndex]).arg(moduleData.params[QString::fromLatin1("port")]);
 
-        case seedRole:
+        case SeedRole:
             return moduleData.seed;
 
-        case appServerIPRole:
+        case IpRole:
             return moduleData.ipAddresses[moduleAddressIndex];
 
-        case appServerPortRole:
+        case PortRole:
             return moduleData.params[QString::fromLatin1("port")].toInt();
 
         default:
@@ -231,13 +231,15 @@ void FoundEnterpriseControllersModel::remoteModuleLost(
 
 QString FoundEnterpriseControllersModel::getDisplayStringForEnterpriseControllerRootNode( const FoundModuleData& moduleData ) const
 {
-    QString ipString;
-    for( std::vector<QString>::size_type i = 0; i < moduleData.ipAddresses.size();++i ) {
-        if( i > 0 )
-            ipString += lit(", ");
-        ipString += moduleData.ipAddresses[i];
+    QString port = moduleData.params[lit("port")];
+
+    QString result;
+    for(int i = 0; i < moduleData.ipAddresses.size(); ++i) {
+        if(i > 0)
+            result += lit(", ");
+        result += lit("%1:%2").arg(moduleData.ipAddresses[i]).arg(port);
     }
-    return tr("Port: %1, IP: %2").arg(moduleData.params[lit("port")]).arg(ipString);
+    return result;
 }
 
 QString FoundEnterpriseControllersModel::getDisplayStringForEnterpriseControllerAddressNode( const FoundModuleData& /*moduleData*/, const QString& address ) const

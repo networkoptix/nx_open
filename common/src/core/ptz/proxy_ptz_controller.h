@@ -5,8 +5,6 @@
 
 /**
  * A simple controller that proxies all requests into another controller.
- * 
- * Note that it does not proxy <tt>finished</tt> signals.
  */
 class QnProxyPtzController: public QnAbstractPtzController {
     Q_OBJECT;
@@ -40,11 +38,12 @@ public:
     virtual bool getTours(QnPtzTourList *tours) override                                                        { return m_baseController->getTours(tours); }
 
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override                                     { return base_type::getData(query, data); /* This is important because of base implementation! */ }
-    virtual bool synchronize(Qn::PtzDataFields query) override                                                  { return m_baseController->synchronize(query); }
 
 protected:
     virtual void baseFinished(Qn::PtzCommand command, const QVariant &data)                                     { emit finished(command, data); }
     virtual void baseCapabilitiesChanged()                                                                      { emit capabilitiesChanged(); }
+
+    Q_SIGNAL void finishedLater(Qn::PtzCommand command, const QVariant &data);
 
 private:
     QnPtzControllerPtr m_baseController;

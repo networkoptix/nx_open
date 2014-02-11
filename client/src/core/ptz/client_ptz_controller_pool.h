@@ -13,7 +13,7 @@ public:
 protected:
     virtual void registerResource(const QnResourcePtr &resource) override;
     virtual void unregisterResource(const QnResourcePtr &resource) override;
-    virtual QnPtzControllerPtr createController(const QnResourcePtr &resource) override;
+    virtual QnPtzControllerPtr createController(const QnResourcePtr &resource) const override;
 };
 
 #endif // QN_CLIENT_PTZ_CONTROLLER_POOL_H

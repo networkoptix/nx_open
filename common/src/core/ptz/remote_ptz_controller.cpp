@@ -29,6 +29,12 @@ QnRemotePtzController::~QnRemotePtzController() {
 
 Qn::PtzCapabilities QnRemotePtzController::getCapabilities() {
     Qn::PtzCapabilities result = m_resource->getPtzCapabilities();
+    if(result == Qn::NoPtzCapabilities)
+        return Qn::NoPtzCapabilities;
+
+    if(result & Qn::VirtualPtzCapability)
+        return Qn::NoPtzCapabilities; /* Can't have remote virtual PTZ. */
+
     result |= Qn::AsynchronousPtzCapability;
     result &= ~(Qn::FlipPtzCapability | Qn::LimitsPtzCapability);
     return result;
@@ -126,11 +132,6 @@ bool QnRemotePtzController::getTours(QnPtzTourList *) {
 
 bool QnRemotePtzController::getData(Qn::PtzDataFields query, QnPtzData *) {
     RUN_COMMAND(Qn::GetDataPtzCommand, QVariant(), ptzGetDataAsync, query);
-}
-
-bool QnRemotePtzController::synchronize(Qn::PtzDataFields query) {
-    /* There really is nothing to synchronize, so we just run getData. */
-    RUN_COMMAND(Qn::SynchronizePtzCommand, QVariant(), ptzGetDataAsync, query);
 }
 
 // -------------------------------------------------------------------------- //

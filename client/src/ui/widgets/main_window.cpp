@@ -1,7 +1,7 @@
 #include "main_window.h"
 
 #ifdef Q_OS_MACX
-#include "mac_utils.h"
+#include <ui/workaround/mac_utils.h>
 #endif
 
 #include <QtCore/QFile>
@@ -16,18 +16,19 @@
 #include <utils/common/environment.h>
 
 #include <core/resource/media_server_resource.h>
+#include <core/resource/file_processor.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <api/session_manager.h>
 
-#include "ui/common/palette.h"
-#include "ui/common/frame_section.h"
-#include "ui/actions/action_manager.h"
-#include "ui/graphics/view/graphics_view.h"
-#include "ui/graphics/view/graphics_scene.h"
-#include "ui/graphics/view/gradient_background_painter.h"
-#include "ui/graphics/instruments/instrument_manager.h"
+#include <ui/common/palette.h>
+#include <ui/common/frame_section.h>
+#include <ui/actions/action_manager.h>
+#include <ui/graphics/view/graphics_view.h>
+#include <ui/graphics/view/graphics_scene.h>
+#include <ui/graphics/view/gradient_background_painter.h>
+#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -48,19 +49,18 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 
-#include "ui/style/skin.h"
-#include "ui/style/globals.h"
-#include "ui/style/noptix_style.h"
-#include "ui/style/proxy_style.h"
-#include "ui/workaround/qtbug_workaround.h"
+#include <ui/style/skin.h>
+#include <ui/style/globals.h>
+#include <ui/style/noptix_style.h>
+#include <ui/style/proxy_style.h>
+#include <ui/workaround/qtbug_workaround.h>
 #include <ui/screen_recording/screen_recorder.h>
 
-#include "file_processor.h"
-#include "client/client_settings.h"
+#include <client/client_settings.h>
 
 #include "resource_browser_widget.h"
-#include "dwm.h"
 #include "layout_tab_bar.h"
+#include "dwm.h"
 
 namespace {
 
@@ -135,6 +135,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 #endif
 
     setAttribute(Qt::WA_AlwaysShowToolTips);
+    setPaletteColor(this, QPalette::Window, Qt::black);
 
     /* And file open events on Mac. */
     QnSingleEventSignalizer *fileOpenSignalizer = new QnSingleEventSignalizer(this);
@@ -150,10 +151,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Set up properties. */
     setWindowTitle(QApplication::applicationName());
     setAcceptDrops(true);
-    setMinimumWidth(minimalWindowWidth);
-    setMinimumHeight(minimalWindowHeight);
-    setPaletteColor(this, QPalette::Window, Qt::black);
 
+    bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;
+    setMinimumWidth(smallWindow ? minimalWindowWidth / 2 : minimalWindowWidth);
+    setMinimumHeight(smallWindow ? minimalWindowHeight / 2 : minimalWindowHeight);
 
     /* Set up scene & view. */
     m_scene.reset(new QnGraphicsScene(this));
@@ -163,14 +164,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);
-    setPaletteColor(m_view.data(), QPalette::Background, Qt::black);
-    setPaletteColor(m_view.data(), QPalette::Base, Qt::black);
 
-        // TODO: #Elric move to ctor^ ?
-
-    m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
-    m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
-
+    if (!(qnSettings->lightMode() & Qn::LightModeNoBackground)) {
+        m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
+        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+    }
 
     /* Set up model & control machinery. */
     display()->setScene(m_scene.data());
@@ -201,7 +199,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::SaveCurrentLayoutAsAction));
     addAction(action(Qn::ExitAction));
     addAction(action(Qn::EscapeHotkeyAction));
-    addAction(action(Qn::FullscreenAction));
+    addAction(action(Qn::FullscreenMaximizeHotkeyAction));
     addAction(action(Qn::AboutAction));
     addAction(action(Qn::PreferencesGeneralTabAction));
     addAction(action(Qn::BusinessEventsLogAction));
@@ -232,6 +230,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     connect(action(Qn::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
+    connect(action(Qn::FullscreenMaximizeHotkeyAction), SIGNAL(triggered()),                action(Qn::EffectiveMaximizeAction),    SLOT(trigger()));
 
     menu()->setTargetProvider(m_ui.data());
 
@@ -274,7 +273,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
     m_titleLayout->addStretch(0x1000);
-    m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction), false, 1.0, Qn::MainWindow_Panic_Help));
     if (QnScreenRecorder::isSupported())
         m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
     m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction), false, 1.0, Qn::Login_Help));
@@ -514,8 +512,13 @@ void QnMainWindow::updateDwmState() {
         m_frameMargins = !isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);*/
 #ifdef Q_OS_LINUX
         // On linux window manager cannot disable titlebar leaving border in place. Thus we have to disable decorations completely and draw our own border.
+        if (isMaximized()) {
+            m_drawCustomFrame = false;
+            m_frameMargins = QMargins(0, 0, 0, 0);
+        } else {
         m_drawCustomFrame = true;
         m_frameMargins = QMargins(2, 2, 2, 2);
+        }
 #else
         m_drawCustomFrame = false;
         m_frameMargins = QMargins(0, 0, 0, 0);

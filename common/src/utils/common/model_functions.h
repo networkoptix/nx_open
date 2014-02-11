@@ -12,6 +12,8 @@
 #include <utils/common/json.h>
 #include <utils/math/fuzzy.h>
 
+#include "model_functions_fwd.h"
+
 #ifdef Q_MOC_RUN
 /* Qt5 moc chokes on these macros, so we provide dummy definitions. */
 #define QN_DEFINE_STRUCT_FUNCTIONS(...)

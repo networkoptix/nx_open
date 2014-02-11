@@ -10,7 +10,9 @@
 QnSingleThumbnailLoader *QnSingleThumbnailLoader::newInstance(QnResourcePtr resource,
                                                               qint64 microSecSinceEpoch,
                                                               const QSize &size,
-                                                              QObject *parent) {
+                                                              ThumbnailFormat format,
+                                                              QObject *parent)
+{
     QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!networkResource)
         return NULL;
@@ -23,19 +25,21 @@ QnSingleThumbnailLoader *QnSingleThumbnailLoader::newInstance(QnResourcePtr reso
     if (!serverConnection)
         return NULL;
 
-    return new QnSingleThumbnailLoader(serverConnection, networkResource, microSecSinceEpoch, size, parent);
+    return new QnSingleThumbnailLoader(serverConnection, networkResource, microSecSinceEpoch, size, format, parent);
 }
 
 QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnMediaServerConnectionPtr &connection,
                                                  QnNetworkResourcePtr resource,
                                                  qint64 microSecSinceEpoch,
                                                  const QSize &size,
+                                                 ThumbnailFormat format,
                                                  QObject *parent):
     base_type(parent),
     m_resource(resource),
     m_connection(connection),
     m_microSecSinceEpoch(microSecSinceEpoch),
-    m_size(size)
+    m_size(size),
+    m_format(format)
 {
     if(!connection)
         qnNullWarning(connection);
@@ -48,20 +52,30 @@ QImage QnSingleThumbnailLoader::image() const {
     return m_image;
 }
 
-void QnSingleThumbnailLoader::doLoadAsync()
-{
+void QnSingleThumbnailLoader::doLoadAsync() {
     m_connection->getThumbnailAsync(
             m_resource.dynamicCast<QnNetworkResource>(),
             m_microSecSinceEpoch,
             m_size,
-            QLatin1String("png"),
+            formatToString(m_format),
             QnMediaServerConnection::Precise,
             this,
             SLOT(at_replyReceived(int, const QImage&, int)));
 }
 
-void QnSingleThumbnailLoader::at_replyReceived(int status, const QImage &image, int requstHandle)
-{
+QString QnSingleThumbnailLoader::formatToString(ThumbnailFormat format) {
+    switch (format) {
+    case PngFormat:
+        return lit("png");
+    case JpgFormat:
+        return lit("jpg");
+    default:
+        break;
+    }
+    return QString();
+}
+
+void QnSingleThumbnailLoader::at_replyReceived(int status, const QImage &image, int requstHandle) {
     Q_UNUSED(requstHandle)
     if (status == 0)
         m_image = image;

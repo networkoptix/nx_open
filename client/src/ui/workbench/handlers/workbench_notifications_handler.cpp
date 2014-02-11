@@ -3,7 +3,7 @@
 #include <api/app_server_connection.h>
 
 #include <client/client_settings.h>
-#include <client_message_processor.h>
+#include <client/client_message_processor.h>
 
 #include <business/business_strings_helper.h>
 
@@ -26,20 +26,16 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     QnWorkbenchContextAware(parent)
 {
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
-    connect(m_userEmailWatcher, SIGNAL(userEmailValidityChanged(const QnUserResourcePtr &, bool)),
-            this,               SLOT(at_userEmailValidityChanged(const QnUserResourcePtr &, bool)));
+    connect(m_userEmailWatcher, &QnWorkbenchUserEmailWatcher::userEmailValidityChanged,     this,   &QnWorkbenchNotificationsHandler::at_userEmailValidityChanged);
+    connect(context(),          &QnWorkbenchContext::userChanged,                           this,   &QnWorkbenchNotificationsHandler::at_context_userChanged);
+    connect(qnLicensePool,      &QnLicensePool::licensesChanged,                            this,   &QnWorkbenchNotificationsHandler::at_licensePool_licensesChanged);
 
-    connect(context(),          SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged()));
-    connect(qnLicensePool,      SIGNAL(licensesChanged()), this, SLOT(at_licensePool_licensesChanged()));
+    QnCommonMessageProcessor *messageProcessor = QnCommonMessageProcessor::instance();
+    connect(messageProcessor,   &QnCommonMessageProcessor::connectionOpened,                this,   &QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened);
+    connect(messageProcessor,   &QnCommonMessageProcessor::connectionClosed,                this,   &QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed);
+    connect(messageProcessor,   &QnCommonMessageProcessor::businessActionReceived,          this,   &QnWorkbenchNotificationsHandler::at_eventManager_actionReceived);
 
-    connect(QnClientMessageProcessor::instance(), SIGNAL(connectionOpened()),
-            this, SLOT(at_eventManager_connectionOpened()));
-    connect(QnClientMessageProcessor::instance(), SIGNAL(connectionClosed()),
-            this, SLOT(at_eventManager_connectionClosed()));
-    connect(QnClientMessageProcessor::instance(), SIGNAL(businessActionReceived(QnAbstractBusinessActionPtr)),
-            this, SLOT(at_eventManager_actionReceived(QnAbstractBusinessActionPtr)));
-
-    connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), SIGNAL(valueChanged(int)), this, SLOT(at_settings_valueChanged(int)));
+    connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH), &QnPropertyNotifier::valueChanged, this, &QnWorkbenchNotificationsHandler::at_settings_valueChanged);
 }
 
 QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler() {
@@ -48,6 +44,11 @@ QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler() {
 
 void QnWorkbenchNotificationsHandler::clear() {
     emit cleared();
+}
+
+void QnWorkbenchNotificationsHandler::requestSmtpSettings() {
+    if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)
+        QnAppServerConnectionFactory::createConnection()->getSettingsAsync(this, SLOT(updateSmtpSettings(int,QnKvPairList,int)));
 }
 
 void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -78,9 +79,10 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     if (!context()->user())
         return;
 
-    if (!QnBusinessEventsFilterKvPairAdapter::eventAllowed(context()->user(), eventType))
+    const bool soundAction = businessAction->actionType() == BusinessActionType::PlaySoundRepeated;
+    if (!soundAction &&
+            !QnBusinessEventsFilterKvPairAdapter::eventAllowed(context()->user(), eventType))
         return;
-
 
     emit businessActionAdded(businessAction);
 }
@@ -95,6 +97,7 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
 
     if (!(qnSettings->popupSystemHealth() & (1ull << message)))
         return;
+
     emit systemHealthEventAdded(message, resource);
 }
 
@@ -111,6 +114,7 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     case QnSystemHealth::EmailSendError:
     case QnSystemHealth::StoragesNotConfigured:
     case QnSystemHealth::StoragesAreFull:
+    case QnSystemHealth::ArchiveRebuildFinished:
         return true;
 
     default:
@@ -162,15 +166,44 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
 }
 
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
-    if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission) {
-        QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
-                       this, SLOT(updateSmtpSettings(int,QnKvPairList,int)));
-    }
+    requestSmtpSettings();
+    at_licensePool_licensesChanged();
+}
 
-    if (qnLicensePool->isEmpty() &&
-            (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
-        addSystemHealthEvent(QnSystemHealth::NoLicenses);
+void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message) {
+
+    switch (message) {
+    case QnSystemHealth::ConnectionLost:
+    case QnSystemHealth::EmailSendError:
+    case QnSystemHealth::StoragesAreFull:
+        return;
+
+    case QnSystemHealth::EmailIsEmpty:
+        if (context()->user())
+            m_userEmailWatcher->forceCheck(context()->user());
+        return;
+
+    case QnSystemHealth::UsersEmailIsEmpty:
+        m_userEmailWatcher->forceCheckAll();
+        return;
+
+    case QnSystemHealth::NoLicenses:
+        at_licensePool_licensesChanged();
+        return;
+
+    case QnSystemHealth::SmtpIsNotSet:
+        requestSmtpSettings();
+        return;
+
+    case QnSystemHealth::StoragesNotConfigured:
+    case QnSystemHealth::ArchiveRebuildFinished:
+        return;
+
+    default:
+        break;
+
     }
+    qnWarning("Unknown system health message");
 }
 
 void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid) {
@@ -238,9 +271,10 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id) {
         return;
     quint64 visible = qnSettings->popupSystemHealth();
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
-        if (visible & (1ull << i))
-            continue;
         QnSystemHealth::MessageType message = QnSystemHealth::MessageType(i);
-        emit systemHealthEventRemoved(message, QnResourcePtr());
+        if (visible & (1ull << i))
+            checkAndAddSystemHealthMessage(message);
+        else
+            setSystemHealthEventVisible(message, false);
     }
 }

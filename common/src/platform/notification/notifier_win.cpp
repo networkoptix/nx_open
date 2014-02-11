@@ -110,6 +110,8 @@ QnWindowsNotifier::~QnWindowsNotifier() {
 }
 
 void QnWindowsNotifier::updateTime(bool notify) {
+    // TODO: #Elric actually check for zone change, not offset change.
+    
     /* Note that we compare time zone offsets, not time zones, which is not 100% correct. 
      * We will still receive update invocations even if timezone was changed without
      * changing the timezone offset (e.g. Moscow+4 -> Tbilisi+4). */

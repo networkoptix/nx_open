@@ -62,7 +62,7 @@ public:
     }
 };
 
-Q_GLOBAL_STATIC(QnPtzCommandThreadPool, qn_ptzCommandThreadPool_instance)
+Q_GLOBAL_STATIC(QnPtzCommandThreadPool, qn_ptzCommandThreadPool_instance) // TODO: #Elric potential problem, move to controllerPool
 
 
 // -------------------------------------------------------------------------- //
@@ -203,10 +203,6 @@ bool QnThreadedPtzController::getTours(QnPtzTourList *) {
 
 bool QnThreadedPtzController::getData(Qn::PtzDataFields query, QnPtzData *) {
     RUN_COMMAND(Qn::GetDataPtzCommand, QnPtzData, result, getData, query, &result);
-}
-
-bool QnThreadedPtzController::synchronize(Qn::PtzDataFields query) {
-    RUN_COMMAND(Qn::SynchronizePtzCommand, QnPtzData, (controller->getData(query, &result) ? result : QnPtzData(query, Qn::NoPtzFields)), synchronize, query);
 }
 
 

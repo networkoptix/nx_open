@@ -1,7 +1,9 @@
 #ifndef QN_CONNECTIVE_H
 #define QN_CONNECTIVE_H
 
+#ifndef Q_MOC_RUN
 #include <boost/type_traits/is_base_of.hpp>
+#endif
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
@@ -69,6 +71,10 @@ public:
         using Qn::disconnect; /* Let ADL kick in. */
 
         return disconnect(sender, signal, receiver, method);
+    }
+
+    static bool disconnect(const QMetaObject::Connection &connection) {
+        return QObject::disconnect(connection);
     }
 
 protected:

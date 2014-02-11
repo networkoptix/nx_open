@@ -4,7 +4,9 @@
 #include <QtCore/QSet>
 #include <QtCore/QtAlgorithms> /* For qDeleteAll. */
 
+#ifndef Q_MOC_RUN
 #include <boost/type_traits/is_pointer.hpp>
+#endif
 
 #include "flat_map.h"
 

@@ -31,6 +31,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/file_processor.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -82,8 +83,6 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_target_provider.h>
-
-#include <file_processor.h>
 
 #include "workbench_layout.h"
 #include "workbench_item.h"
@@ -832,9 +831,9 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
         QnWorkbenchLayout::Disposition disposition;
         widget->item()->layout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);
 
-        display()->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
-        display()->gridItem()->setCellState(disposition.free, QnGridItem::ALLOWED);
-        display()->gridItem()->setCellState(disposition.occupied, QnGridItem::DISALLOWED);
+        display()->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::Initial);
+        display()->gridItem()->setCellState(disposition.free, QnGridItem::Allowed);
+        display()->gridItem()->setCellState(disposition.occupied, QnGridItem::Disallowed);
 
         m_resizedWidgetRect = newResizingWidgetRect;
     }
@@ -866,7 +865,7 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
     }
 
     /* Clean up resizing state. */
-    display()->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::INITIAL);
+    display()->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::Initial);
     m_resizedWidgetRect = QRect();
     m_resizedWidget = NULL;
     if(m_selectionOverlayHackInstrumentDisabled) {
@@ -910,7 +909,7 @@ void QnWorkbenchController::at_move(QGraphicsView *, const QPointF &totalDelta) 
 
     QPoint newDragDelta = mapper()->mapDeltaToGridF(totalDelta).toPoint();
     if(newDragDelta != m_dragDelta) {
-        display()->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
+        display()->gridItem()->setCellState(m_dragGeometries, QnGridItem::Initial);
 
         m_dragDelta = newDragDelta;
         m_replacedWorkbenchItems.clear();
@@ -977,8 +976,8 @@ void QnWorkbenchController::at_move(QGraphicsView *, const QPointF &totalDelta) 
         QnWorkbenchLayout::Disposition disposition;
         layout->canMoveItems(m_draggedWorkbenchItems + m_replacedWorkbenchItems, m_dragGeometries, &disposition);
 
-        display()->gridItem()->setCellState(disposition.free, QnGridItem::ALLOWED);
-        display()->gridItem()->setCellState(disposition.occupied, QnGridItem::DISALLOWED);
+        display()->gridItem()->setCellState(disposition.free, QnGridItem::Allowed);
+        display()->gridItem()->setCellState(disposition.occupied, QnGridItem::Disallowed);
     }
 }
 
@@ -1017,7 +1016,7 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphi
     }
 
     /* Clean up dragging state. */
-    display()->gridItem()->setCellState(m_dragGeometries, QnGridItem::INITIAL);
+    display()->gridItem()->setCellState(m_dragGeometries, QnGridItem::Initial);
     m_dragDelta = invalidDragDelta();
     m_draggedWorkbenchItems.clear();
     m_replacedWorkbenchItems.clear();
@@ -1067,8 +1066,12 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     QnResourceWidget::Buttons buttons = widget->checkedButtons();
     delete widget;
 
+    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
+            ? 1
+            : qnSettings->maxSceneVideoItems();
+
     QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
-    if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
+    if (layout->getItems().size() >= maxItems)
         return;
     layout->addItem(data);
     display()->widget(data.uuid)->setCheckedButtons(buttons);

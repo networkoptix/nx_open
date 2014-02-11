@@ -38,9 +38,7 @@ public:
             return QValidator::Intermediate;
 
         QValidator::State result = base_type::validate(input, pos);
-        if (result == QValidator::Acceptable &&
-                (input.toInt() == 0 || input.toInt() > 65535)
-                )
+        if (result == QValidator::Acceptable && (input.toInt() == 0 || input.toInt() > 65535))
             return QValidator::Intermediate;
         return result;
     }

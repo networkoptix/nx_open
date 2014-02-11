@@ -8,10 +8,11 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
-QnCameraListModel::QnCameraListModel(QObject *parent, QnWorkbenchContext *context):
+QnCameraListModel::QnCameraListModel(QObject *parent):
     QnResourceListModel(parent),
-    QnWorkbenchContextAware(parent, context)
-{}
+    QnWorkbenchContextAware(parent)
+{
+}
 
 QnCameraListModel::~QnCameraListModel() {
     return;
@@ -75,7 +76,10 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
             case FirmwareColumn:
                 result = camera->getFirmware();
                 break;
-            case IPColumn:
+            case DriverColumn:
+                result = camera->getDriverName();
+                break;
+            case IpColumn:
                 result = camera->getHostAddress();
                 break;
             case UniqIdColumn:
@@ -103,10 +107,11 @@ QString QnCameraListModel::columnTitle(Column column) const
     switch(column) {
     case RecordingColumn: return tr("Recording");
     case NameColumn:      return tr("Name");
-    case VendorColumn:    return tr("Driver");
+    case VendorColumn:    return tr("Vendor");
     case ModelColumn:     return tr("Model");
     case FirmwareColumn:  return tr("Firmware");
-    case IPColumn:        return tr("IP/Name");
+    case DriverColumn:    return tr("Driver");
+    case IpColumn:        return tr("IP/Name");
     case UniqIdColumn:    return tr("ID/MAC");
     case ServerColumn:    return tr("Server");
     default:

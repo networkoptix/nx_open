@@ -14,6 +14,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/file_processor.h>
 #include <core/resource_management/resource_pool.h>
 
 #include "plugins/storage/file_storage/layout_storage_resource.h"
@@ -27,8 +28,6 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
-
-#include "file_processor.h"
 
 namespace {
     const char *pureTreeResourcesOnlyMimeType = "application/x-noptix-pure-tree-resources-only";
@@ -346,8 +345,7 @@ public:
             return Qt::ItemIsEnabled
                     | Qt::ItemIsSelectable
                     | Qt::ItemIsUserCheckable
-                    | Qt::ItemIsEditable
-                    | Qt::ItemIsTristate;
+                    | Qt::ItemIsEditable;
 
         Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
         
@@ -940,6 +938,8 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     assert(resource && resource->getId().isValid());
 
     connect(resource.data(), SIGNAL(parentIdChanged(const QnResourcePtr &)),                this, SLOT(at_resource_parentIdChanged(const QnResourcePtr &)));
+    connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),                this, SLOT(at_resource_parentIdChanged(const QnResourcePtr &)));
+
     connect(resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)),                    this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),                  this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(disabledChanged(const QnResourcePtr &)),                this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
@@ -1020,7 +1020,6 @@ void QnResourcePoolModel::at_resource_itemAdded(const QnLayoutResourcePtr &layou
 void QnResourcePoolModel::at_resource_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &item) {
     deleteNode(node(item.uuid));
 }
-
 
 
 

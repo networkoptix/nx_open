@@ -12,6 +12,7 @@ QnProxyPtzController::QnProxyPtzController(const QnPtzControllerPtr &baseControl
 
     connect(baseController, &QnAbstractPtzController::finished,             this, &QnProxyPtzController::baseFinished);
     connect(baseController, &QnAbstractPtzController::capabilitiesChanged,  this, &QnProxyPtzController::baseCapabilitiesChanged);
+    connect(this,           &QnProxyPtzController::finishedLater,           this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
 }
 
 QnProxyPtzController::~QnProxyPtzController() {

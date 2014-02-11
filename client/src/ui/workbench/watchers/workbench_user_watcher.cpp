@@ -10,8 +10,8 @@ QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    connect(resourcePool(), &QnResourcePool::resourceAdded,     this,   &QnWorkbenchUserWatcher::at_resourcePool_resourceAdded);
+    connect(resourcePool(), &QnResourcePool::resourceRemoved,   this,   &QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved);
     foreach(const QnResourcePtr &resource, resourcePool()->getResources())
         at_resourcePool_resourceAdded(resource);
 }
