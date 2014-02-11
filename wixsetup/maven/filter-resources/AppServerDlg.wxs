@@ -31,10 +31,10 @@
                 <Control Type="Edit" Id="Login" X="151" Y="118" Width="164" Height="15" Property="APPSERVER_LOGIN" Disabled="yes" />
                 <Control Type="Edit" Id="Password" Width="164" Height="15" X="151" Y="140" Property="APPSERVER_PASSWORD" Password="yes" />
                 <Control Type="Edit" Id="PasswordConfirm" Height="15" Width="164" X="151" Y="160" Property="APPSERVER_PASSWORD_CONFIRM" Password="yes" />
-                <Control Id="groupBox1" Type="GroupBox" Height="124" Width="346" X="9" Y="66" Text="!(loc.AppServerDlg_Network)" />
+                <Control Id="groupBox1" Type="GroupBox" Height="124" Width="346" X="9" Y="64" Text="!(loc.AppServerDlg_Network)" />
                 <Control Id="label1" Type="Text" Height="17" Width="80" X="15" Y="88" Text="!(loc.AppServerDlg_ProxyPort)" />
-                <Control Id="label2" Type="Text" Height="17" Width="100" X="15" Y="176" Text="!(loc.AppServerDlg_ConfirmPassword)" />
-                <Control Id="groupBox2" Type="GroupBox" Height="39" Width="351" X="10" Y="192" Text="!(loc.AppServerDlg_ExtraParameters)" />
+                <Control Id="label2" Type="Text" Height="17" Width="100" X="16" Y="162" Text="!(loc.AppServerDlg_ConfirmPassword)" />
+                <Control Id="groupBox2" Type="GroupBox" Height="39" Width="351" X="10" Y="193" Text="!(loc.AppServerDlg_ExtraParameters)" />
                 <Control Id="checkBox1" Type="CheckBox" Height="18" Width="340" X="16" Y="204" Text="!(loc.AppServerDlg_OptimizeCamerasSettings)" Property="ALLOW_CAMERA_CHANGES_REF1" Indirect="yes" CheckBoxValue="1" />
             </Dialog>
         </UI>

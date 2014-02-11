@@ -202,6 +202,9 @@
         <profile>
             <id>quicksync</id>
             <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
                 <property>
                     <name>!quicksync</name>
                     <value>true</value>
@@ -215,9 +218,6 @@
         <profile>
             <id>main</id>
             <activation>
-                <os>
-                    <family>Windows</family>
-                </os>            
                 <property>
                     <name>!skipCommon</name>
                 </property>

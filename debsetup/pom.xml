@@ -33,7 +33,7 @@
                 <executions>
                     <execution>
                         <id>clean</id>
-                        <phase>pre-clean</phase>
+                        <phase>validate</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
