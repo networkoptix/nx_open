@@ -40,6 +40,7 @@ namespace ec2
         AbstractECConnectionPtr m_directConnection;
         std::mutex m_mutex;
         ResourceContext m_resCtx;
+        //std::map<QUrl, AbstractECConnectionPtr> m_urlToConnection;
 
         int establishDirectConnection( impl::ConnectHandlerPtr handler );
         int establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler );

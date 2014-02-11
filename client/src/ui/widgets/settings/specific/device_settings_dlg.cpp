@@ -51,7 +51,7 @@ QnResourcePtr CLAbstractDeviceSettingsDlg::resource() const
 
 void CLAbstractDeviceSettingsDlg::accept()
 {
-    if( QnAppServerConnectionFactory::createConnection2Sync()->getResourceManager()->save(
+    if( QnAppServerConnectionFactory::getConnection2()->getResourceManager()->save(
             m_resource, this, &CLAbstractDeviceSettingsDlg::saveSuccess ) == ec2::INVALID_REQ_ID )
     {
         saveError();

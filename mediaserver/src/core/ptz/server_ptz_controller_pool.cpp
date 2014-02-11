@@ -53,7 +53,7 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
         controller.reset(new QnWorkaroundPtzController(controller));
 
     camera->setPtzCapabilities(controller->getCapabilities());
-    QnAppServerConnectionFactory::createConnection2Sync()->getCameraManager()->addCamera(camera, this, &QnServerPtzControllerPool::at_addCameraDone);
+    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addCamera(camera, this, &QnServerPtzControllerPool::at_addCameraDone);
     
     return controller;
 }

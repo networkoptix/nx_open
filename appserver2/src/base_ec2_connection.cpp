@@ -49,7 +49,7 @@ namespace ec2
     template<class T>
     AbstractLicenseManagerPtr BaseEc2Connection<T>::getLicenseManager()
     {
-        return AbstractLicenseManagerPtr();
+        return m_licenseManager;
     }
 
     template<class T>

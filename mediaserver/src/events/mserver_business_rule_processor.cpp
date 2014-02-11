@@ -71,7 +71,7 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr
     Qn::PanicMode val = Qn::PM_None;
     if (action->getToggleState() == Qn::OnState)
         val =  Qn::PM_BusinessEvents;
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::createConnection2Sync();
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     conn->setPanicModeSync(val);
     mediaServer->setPanicMode(val);
     return true;

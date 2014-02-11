@@ -115,7 +115,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        //TODO: #ak return existing connection, if one
+        ////TODO: #ak return existing connection, if one
+        //{
+        //    std::lock_guard<std::mutex> lk( m_mutex );
+        //    auto it = m_urlToConnection.find( addr );
+        //    if( it != m_urlToConnection.end() )
+        //        AbstractECConnectionPtr connection = it->second.second;
+        //}
 
         LoginInfo loginInfo;
 #if 1
@@ -146,10 +152,10 @@ namespace ec2
         return handler->done(
             reqID,
             errorCode,
-            AbstractECConnectionPtr(new RemoteEC2Connection(
+            std::make_shared<RemoteEC2Connection>(
                 std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
                 m_resCtx,
-                connectionInfoCopy )) );
+                connectionInfoCopy ) );
     }
 
     void Ec2DirectConnectionFactory::remoteTestConnectionFinished(

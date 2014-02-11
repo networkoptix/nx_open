@@ -45,7 +45,7 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
 }
 
 ec2::AbstractECConnectionPtr QnWorkbenchLayoutsHandler::connection2() const {
-    return QnAppServerConnectionFactory::createConnection2Sync();
+    return QnAppServerConnectionFactory::getConnection2();
 }
 
 void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QString &newName) {

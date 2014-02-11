@@ -25,7 +25,7 @@ void QnBusinessRulesActualModel::reloadData()
 {
     clear();
     m_isDataLoaded = false;
-    m_loadingHandle = QnAppServerConnectionFactory::createConnection2Sync()->getBusinessEventManager()->getBusinessRules(
+    m_loadingHandle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->getBusinessRules(
         this, &QnBusinessRulesActualModel::at_resources_received );
     m_savingRules.clear();
     emit beforeModelChanged();
@@ -39,7 +39,7 @@ void QnBusinessRulesActualModel::saveRule(int row) {
 
     QnBusinessEventRulePtr rule = ruleModel->createRule();
     using namespace std::placeholders;
-    int handle = QnAppServerConnectionFactory::createConnection2Sync()->getBusinessEventManager()->save(
+    int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->save(
         rule, this, [this, rule]( int handle, ec2::ErrorCode errorCode ){ at_resources_saved( handle, errorCode, rule ); } );
     m_savingRules[handle] = ruleModel;
 }

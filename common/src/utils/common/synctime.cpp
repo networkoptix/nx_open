@@ -19,9 +19,9 @@ public:
     QnSyncTimeTask(QnSyncTime* owner): m_owner(owner) {}
 
     void run() {
-        ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection2Sync();
+        ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
         qint64 time;
-        if (appServerConnection->getCurrentTimeSync(&time) == ec2::ErrorCode::ok) 
+        if (appServerConnection && appServerConnection->getCurrentTimeSync(&time) == ec2::ErrorCode::ok) 
             m_owner->updateTime(time);
     }
 

@@ -61,7 +61,7 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
             databaseData = dbData;
             dialog->reset(); 
     };
-    QnAppServerConnectionFactory::createConnection2Sync()->dumpDatabaseAsync( dialog.data(), dumpDatabaseHandler );
+    QnAppServerConnectionFactory::getConnection2()->dumpDatabaseAsync( dialog.data(), dumpDatabaseHandler );
     dialog->exec();
     if(dialog->wasCanceled())
         return;    //TODO: #ak is running request finish OK?
@@ -113,7 +113,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
             errorCode = _errorCode;
             dialog->reset(); 
     };
-    QnAppServerConnectionFactory::createConnection2Sync()->restoreDatabaseAsync( data, dialog.data(), restoreDatabaseHandler );
+    QnAppServerConnectionFactory::getConnection2()->restoreDatabaseAsync( data, dialog.data(), restoreDatabaseHandler );
     dialog->exec();
     if(dialog->wasCanceled())
         return; // TODO: #Elric make non-cancellable.   TODO: #ak is running request finish OK?

@@ -19,7 +19,6 @@ namespace ec2
         m_connectionInfo( connectionInfo )
     {
         QnTransactionMessageBus::instance()->setHandler(this);
-        startReceivingNotifications(true);
     }
 
     RemoteEC2Connection::~RemoteEC2Connection()

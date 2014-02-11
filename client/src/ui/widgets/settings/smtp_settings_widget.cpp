@@ -94,7 +94,7 @@ QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
 void QnSmtpSettingsWidget::updateFromSettings() {
     m_settingsReceived = false;
 
-    m_requestHandle = QnAppServerConnectionFactory::createConnection2Sync()->getSettingsAsync(
+    m_requestHandle = QnAppServerConnectionFactory::getConnection2()->getSettingsAsync(
         this, &QnSmtpSettingsWidget::at_settings_received );
 }
 
@@ -105,7 +105,7 @@ void QnSmtpSettingsWidget::submitToSettings() {
     auto saveSettingsHandler = [notificationsHandler, serializedSettings]( int reqID, ec2::ErrorCode errorCode ){
         notificationsHandler->updateSmtpSettings( reqID, errorCode, serializedSettings );
     };
-    QnAppServerConnectionFactory::createConnection2Sync()->saveSettingsAsync(
+    QnAppServerConnectionFactory::getConnection2()->saveSettingsAsync(
         serializedSettings,
         notificationsHandler,
         saveSettingsHandler );
@@ -284,7 +284,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     m_timeoutTimer->setInterval(result.timeout * 1000 / ui->testProgressBar->maximum());
     m_timeoutTimer->start();
 
-    m_testHandle = QnAppServerConnectionFactory::createConnection2Sync()->getBusinessEventManager()->testEmailSettings(
+    m_testHandle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->testEmailSettings(
         result.serialized(),
         this,
         &QnSmtpSettingsWidget::at_finishedTestEmailSettings );

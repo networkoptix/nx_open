@@ -48,7 +48,7 @@ void QnWorkbenchNotificationsHandler::clear() {
 
 void QnWorkbenchNotificationsHandler::requestSmtpSettings() {
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)
-        QnAppServerConnectionFactory::createConnection2Sync()->getSettingsAsync(
+        QnAppServerConnectionFactory::getConnection2()->getSettingsAsync(
             this, &QnWorkbenchNotificationsHandler::updateSmtpSettings );
 }
 

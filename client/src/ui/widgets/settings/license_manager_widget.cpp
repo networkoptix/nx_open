@@ -208,7 +208,7 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
         auto addLisencesHandler = [this, licensesToUpdate]( int reqID, ec2::ErrorCode errorCode ){
             at_licensesReceived( reqID, errorCode, licensesToUpdate );
         };
-        int handle = QnAppServerConnectionFactory::createConnection2Sync()->getLicenseManager()->addLicenses(
+        int handle = QnAppServerConnectionFactory::getConnection2()->getLicenseManager()->addLicenses(
             licensesToUpdate, this, addLisencesHandler );
         m_handleKeyMap[handle] = licenseKey;
     }

@@ -93,7 +93,7 @@ QnDbManager::QnDbManager(QnResourceFactory* factory):
     m_storageTypeId = 0;
     m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
-	m_sdb.setDatabaseName("c:/develop/netoptix_new_ec/appserver/db/ecs.db");
+	m_sdb.setDatabaseName("c:/develop/netoptix_vms/appserver/db/ecs.db");
     //m_sdb.setDatabaseName("c:/Windows/System32/config/systemprofile/AppData/Local/Network Optix/Enterprise Controller/db/ecs.db");
     
 	if (m_sdb.open())

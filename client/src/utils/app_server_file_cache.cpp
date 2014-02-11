@@ -54,7 +54,7 @@ void QnAppServerFileCache::clearLocalCache() {
 // -------------- File List loading methods -----
 
 void QnAppServerFileCache::getFileList() {
-    m_fileListHandle = QnAppServerConnectionFactory::createConnection2Sync()->getStoredFileManager()->listDirectory(
+    m_fileListHandle = QnAppServerConnectionFactory::getConnection2()->getStoredFileManager()->listDirectory(
                 m_folderName,
                 this,
                 &QnAppServerFileCache::at_fileListReceived );
@@ -89,7 +89,7 @@ void QnAppServerFileCache::downloadFile(const QString &filename) {
     if (m_loading.values().contains(filename))
       return;
 
-    int handle = QnAppServerConnectionFactory::createConnection2Sync()->getStoredFileManager()->getStoredFile(
+    int handle = QnAppServerConnectionFactory::getConnection2()->getStoredFileManager()->getStoredFile(
                 m_folderName + QLatin1Char('/') + filename,
                 this,
                 &QnAppServerFileCache::at_fileLoaded );
@@ -138,7 +138,7 @@ void QnAppServerFileCache::uploadFile(const QString &filename) {
     QByteArray data = file.readAll();
     file.close();
 
-    int handle = QnAppServerConnectionFactory::createConnection2Sync()->getStoredFileManager()->addStoredFile(
+    int handle = QnAppServerConnectionFactory::getConnection2()->getStoredFileManager()->addStoredFile(
                 m_folderName + QLatin1Char('/') +filename,
                 data,
                 this,
@@ -180,7 +180,7 @@ void QnAppServerFileCache::deleteFile(const QString &filename) {
     if (m_deleting.values().contains(filename))
       return;
 
-    int handle = QnAppServerConnectionFactory::createConnection2Sync()->getStoredFileManager()->deleteStoredFile(
+    int handle = QnAppServerConnectionFactory::getConnection2()->getStoredFileManager()->deleteStoredFile(
                     m_folderName + QLatin1Char('/') +filename,
                     this,
                     &QnAppServerFileCache::at_fileDeleted );

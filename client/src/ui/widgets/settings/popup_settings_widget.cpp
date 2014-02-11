@@ -83,7 +83,7 @@ void QnPopupSettingsWidget::submitToSettings() {
         }
         QString serialized = QString::number(eventsShown, 16);
 
-        QnAppServerConnectionFactory::createConnection2Sync()->getResourceManager()->save(
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->save(
             context()->user()->getId(),
             QnKvPairList() << QnKvPair(m_adapter->key(), serialized),
             ec2::DummyHandler::instance(),

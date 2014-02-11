@@ -48,7 +48,7 @@ public:
     virtual void updateHotkeys(const QnHotkeysHash &value) override {
         QString serialized = QString::fromUtf8(QJson::serialized(value));
 
-        QnAppServerConnectionFactory::createConnection2Sync()->getResourceManager()->save(
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->save(
             m_resourceId,
             QnKvPairList() << QnKvPair(m_adapter->key(), serialized),
             ec2::DummyHandler::instance(),

@@ -243,7 +243,8 @@ public:
 
     static void setEC2ConnectionFactory( ec2::AbstractECConnectionFactory* ec2ConnectionFactory );
     static ec2::AbstractECConnectionFactory* ec2ConnectionFactory();
-    static ec2::AbstractECConnectionPtr createConnection2Sync();
+    static void setEc2Connection( ec2::AbstractECConnectionPtr connection );
+    static ec2::AbstractECConnectionPtr getConnection2();
 
 private:
     QMutex m_mutex;

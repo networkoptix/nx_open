@@ -24,7 +24,7 @@ QString QnAppServerResourceSearcher::manufacture() const
 
 QnResourceList QnAppServerResourceSearcher::findResources()
 {
-    ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection2Sync();
+    ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
 
     QByteArray errorString;
     QnResourceList resources;

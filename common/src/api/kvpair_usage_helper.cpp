@@ -88,7 +88,7 @@ void QnAbstractKvPairUsageHelper::setInnerValue(const QString &value) {
 }
 
 void QnAbstractKvPairUsageHelper::load() {
-    d->loadHandle = QnAppServerConnectionFactory::createConnection2Sync()->getResourceManager()->getKvPairs(
+    d->loadHandle = QnAppServerConnectionFactory::getConnection2()->getResourceManager()->getKvPairs(
         d->resource->getId(),
         this,
         &QnAbstractKvPairUsageHelper::at_connection_replyReceived);
@@ -99,7 +99,7 @@ void QnAbstractKvPairUsageHelper::save() {
     QnKvPairList kvPairs;
     kvPairs.push_back(QnKvPair(d->key, d->value));
 
-    d->saveHandle = QnAppServerConnectionFactory::createConnection2Sync()->getResourceManager()->save(
+    d->saveHandle = QnAppServerConnectionFactory::getConnection2()->getResourceManager()->save(
         d->resource->getId(),
         kvPairs,
         this,

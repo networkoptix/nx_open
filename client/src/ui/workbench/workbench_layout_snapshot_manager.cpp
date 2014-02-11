@@ -53,7 +53,7 @@ QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager() {
 }
 
 ec2::AbstractECConnectionPtr QnWorkbenchLayoutSnapshotManager::connection2() const {
-    return QnAppServerConnectionFactory::createConnection2Sync();
+    return QnAppServerConnectionFactory::getConnection2();
 }
 
 bool QnWorkbenchLayoutSnapshotManager::isFile(const QnLayoutResourcePtr &resource) {

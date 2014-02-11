@@ -539,6 +539,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
         }
     }
 
+    QnAppServerConnectionFactory::setEc2Connection( connection );
     m_connectInfo = connectionInfo;
     base_type::accept();
 }

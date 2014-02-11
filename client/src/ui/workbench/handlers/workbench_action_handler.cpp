@@ -334,7 +334,7 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
 }
 
 ec2::AbstractECConnectionPtr QnWorkbenchActionHandler::connection2() const {
-    return QnAppServerConnectionFactory::createConnection2Sync();
+    return QnAppServerConnectionFactory::getConnection2();
 }
 
 bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) const {

@@ -236,7 +236,7 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
                              QMessageBox::Cancel) == QMessageBox::Cancel)
         return;
 
-    QnAppServerConnectionFactory::createConnection2Sync()->getBusinessEventManager()->resetBusinessRules(
+    QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->resetBusinessRules(
         ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
 //  m_rulesViewModel->clear();
 //  updateControlButtons();
@@ -364,7 +364,7 @@ bool QnBusinessRulesDialog::saveAll() {
         m_rulesViewModel->saveRule(idx.row());
     }
     foreach (int id, m_pendingDeleteRules) {
-        int handle = QnAppServerConnectionFactory::createConnection2Sync()->getBusinessEventManager()->deleteRule(
+        int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->deleteRule(
             id, this, &QnBusinessRulesDialog::at_resources_deleted );
         m_deleting[handle] = id;
     }

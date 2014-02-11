@@ -682,8 +682,7 @@ static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 
 void QnMain::loadResourcesFromECS()
 {
-    ec2::AbstractECConnectionPtr ec2Connection;
-    QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync( QUrl(), &ec2Connection );
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
     QnVirtualCameraResourceList cameras;
     ec2::ErrorCode rez;
@@ -780,7 +779,7 @@ void QnMain::loadResourcesFromECS()
 void QnMain::at_localInterfacesChanged()
 {
     m_mediaServer->setNetAddrList(allLocalAddresses());
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::createConnection2Sync();
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     ec2Connection->getMediaServerManager()->saveServer(m_mediaServer, this, &QnMain::at_serverSaved);
 }
 
@@ -1019,6 +1018,7 @@ void QnMain::run()
         NX_LOG( QString::fromLatin1("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)), cl_logERROR );
     }
 
+    QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
 

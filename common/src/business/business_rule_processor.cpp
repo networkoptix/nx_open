@@ -471,7 +471,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
 
     QString messageBody = renderTemplateFromFile(lit(":/email_templates"), lit("container.mustache"), contextMap);
 
-    if (QnAppServerConnectionFactory::createConnection2Sync()->getBusinessEventManager()->sendEmail(
+    if (QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->sendEmail(
                 recipients,
                 QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
                 messageBody,
@@ -513,7 +513,7 @@ void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished( int handle, ec
 
 bool QnBusinessRuleProcessor::broadcastBusinessAction(QnAbstractBusinessActionPtr action)
 {
-    QnAppServerConnectionFactory::createConnection2Sync()->getBusinessEventManager()->broadcastBusinessAction(
+    QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->broadcastBusinessAction(
         action, this, &QnBusinessRuleProcessor::at_broadcastBusinessActionFinished );
     return true;
 }
