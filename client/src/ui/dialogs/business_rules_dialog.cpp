@@ -361,9 +361,11 @@ bool QnBusinessRulesDialog::saveAll() {
     foreach (QModelIndex idx, modified) {
         m_rulesViewModel->saveRule(idx.row());
     }
+
+    //TODO: #GDM replace with QnAppServerReplyProcessor
     foreach (int id, m_pendingDeleteRules) {
         int handle = QnAppServerConnectionFactory::createConnection()->deleteRuleAsync(
-                    id, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
+                    id, this, "at_resources_deleted");
         m_deleting[handle] = id;
     }
     m_pendingDeleteRules.clear();
