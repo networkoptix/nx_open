@@ -37,6 +37,7 @@ namespace ec2
 
         ErrorCode executeTransaction(const QnTransaction<ApiCameraData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiMediaServerData>& tran);
+        ErrorCode executeTransaction(const QnTransaction<ApiLayoutData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiSetResourceStatusData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiResourceParams>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiCameraServerItemData>& tran);
@@ -135,6 +136,10 @@ namespace ec2
 
         ErrorCode deleteLayoutItems(const qint32 id);
         ErrorCode deleteLayoutTable(const qint32 id);
+        ErrorCode insertLayout(const ApiLayoutData& data);
+        ErrorCode updateLayout(const ApiLayoutData& data);
+        ErrorCode updateLayoutItems(const ApiLayoutData& data);
+        ErrorCode removeLayoutItems(qint32 id);
 
 		bool createDatabase();
         
