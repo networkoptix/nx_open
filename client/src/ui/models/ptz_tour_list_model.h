@@ -1,21 +1,31 @@
 #ifndef PTZ_TOUR_LIST_MODEL_H
 #define PTZ_TOUR_LIST_MODEL_H
 
-#include <QAbstractTableModel>
+#include <QtCore/QAbstractTableModel>
+#include <QtCore/QUuid>
 
 #include <core/ptz/ptz_fwd.h>
 #include <core/ptz/ptz_tour.h>
 
 struct QnPtzTourItemModel {
     QnPtzTourItemModel(const QnPtzTour& tour):
-        tour(tour), modified(false)
+        tour(tour),
+        modified(false),
+        local(false)
     {}
     QnPtzTourItemModel(const QString &name):
-        tour(QString(), name, QnPtzTourSpotList()), modified(true)
+        tour(QUuid::createUuid().toString(), name, QnPtzTourSpotList()),
+        modified(true),
+        local(true)
     {}
 
     QnPtzTour tour;
+
+    /** Tour is modified. */
     bool modified;
+
+    /** Tour is just created locally, does not exists on server. */
+    bool local;
 };
 
 class QnPtzTourListModel : public QAbstractTableModel
@@ -53,7 +63,7 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    Q_SLOT void updateTour(const QnPtzTour &tour);
+    Q_SLOT void updateTourSpots(const QString tourId, const QnPtzTourSpotList &spots);
 private:
     qint64 estimatedTimeSecs(const QnPtzTour &tour) const;
 

@@ -14,6 +14,9 @@ namespace Qee {
         case Minus:     return lit("MINUS");
         case Times:     return lit("TIMES");
         case Divide:    return lit("DIVIDE");
+        case BitAnd:    return lit("BITAND");
+        case BitOr:     return lit("BITOR");
+        case BitNot:    return lit("BITNOT");
         case LParen:    return lit("LPAREN");
         case RParen:    return lit("RPAREN");
         case Dot:       return lit("DOT");
@@ -33,6 +36,9 @@ namespace Qee {
         case Div:       return lit("DIV");
         case Neg:       return lit("NEG");
         case Udd:       return lit("UDD");
+        case And:       return lit("AND");
+        case Or:        return lit("OR");
+        case Not:       return lit("NOT");
         case Call:      return lit("CALL");
         case MCall:     return lit("MCALL");
         case Nop:       return lit("NOP");
@@ -70,6 +76,12 @@ namespace Qee {
                 return readSymbolToken(Times);
             case L'/':  
                 return readSymbolToken(Divide);
+            case L'&':
+                return readSymbolToken(BitAnd);
+            case L'|':
+                return readSymbolToken(BitOr);
+            case L'~':
+                return readSymbolToken(BitNot);
             case L'(':  
                 return readSymbolToken(LParen);
             case L')':  
@@ -258,7 +270,7 @@ namespace Qee {
     }
 
     void Parser::parseFactor() {
-        /* factor ::= chain | INT | '(' expr ')' | ('-' | '+') factor */
+        /* factor ::= chain | INT | '(' expr ')' | ('-' | '+' | '~') factor */
         Token token = m_lexer->peekNextToken();
         switch(token.type()) {
         case Number: {
@@ -282,10 +294,21 @@ namespace Qee {
             break;
 
         case Minus:
-        case Plus:
-            require(token.type());
+            require(Minus);
             parseFactor();
-            m_program.push_back(Instruction(token.type() == Plus ? Udd : Neg));
+            m_program.push_back(Instruction(Neg));
+            break;
+
+        case Plus:
+            require(Plus);
+            parseFactor();
+            m_program.push_back(Instruction(Udd));
+            break;
+
+        case BitNot:
+            require(BitNot);
+            parseFactor();
+            m_program.push_back(Instruction(Neg));
             break;
 
         default:
@@ -303,6 +326,7 @@ namespace Qee {
         case LParen:
         case Minus:
         case Plus:
+        case BitNot:
             parseFactor();
             break;
 
@@ -325,8 +349,8 @@ namespace Qee {
         }
     }
 
-    void Parser::parseExpr() {
-        /* expr ::= term {('+' | '-') term} */
+    void Parser::parseBitFactor() {
+        /* bitfactor ::= term {('+' | '-') term} */
         Token token = m_lexer->peekNextToken();
         switch(token.type()) {
         case Number:
@@ -335,6 +359,7 @@ namespace Qee {
         case LParen:
         case Minus:
         case Plus:
+        case BitNot:
             parseTerm();
             break;
 
@@ -352,6 +377,66 @@ namespace Qee {
                 m_program.push_back(Instruction(token.type() == Plus ? Add : Sub));
                 break;
             default:
+                return;
+            }
+        }
+    }
+
+    void Parser::parseBitTerm() {
+        /* bitterm ::= bitfactor {'&' bitfactor} */
+        Token token = m_lexer->peekNextToken();
+        switch(token.type()) {
+        case Number:
+        case Variable:
+        case Color:
+        case LParen:
+        case Minus:
+        case Plus:
+        case BitNot:
+            parseBitFactor();
+            break;
+
+        default:
+            unexpected(token);
+        }
+
+        while(true) {
+            token = m_lexer->peekNextToken();
+            if(token.type() == BitAnd) {
+                require(token.type());
+                parseBitFactor();
+                m_program.push_back(Instruction(And));
+            } else {
+                return;
+            }
+        }
+    }
+
+    void Parser::parseExpr() {
+        /* expr ::= bitterm {'|' bitterm} */
+        Token token = m_lexer->peekNextToken();
+        switch(token.type()) {
+        case Number:
+        case Variable:
+        case Color:
+        case LParen:
+        case Minus:
+        case Plus:
+        case BitNot:
+            parseBitTerm();
+            break;
+
+        default:
+            unexpected(token);
+        }
+
+        while(true) {
+            token = m_lexer->peekNextToken();
+            if(token.type() == BitOr) {
+                require(token.type());
+                parseBitTerm();
+                m_program.push_back(Instruction(Or));
+            } else {
                 return;
             }
         }
@@ -481,10 +566,13 @@ namespace Qee {
         case Sub:
         case Mul:
         case Div:
+        case Or:
+        case And:
             binop(stack, instruction.type());
             break;
         case Neg:
         case Udd:
+        case Not:
             unop(stack, instruction.type());
             break;
         case Call:
@@ -521,6 +609,8 @@ namespace Qee {
         case Sub:   return l - r;
         case Mul:   return l * r;
         case Div:   return l / r;
+        case And:   return l & r;
+        case Or:    return l | r;
         default:    assert(false); return 0;
         }
     }
@@ -531,6 +621,8 @@ namespace Qee {
         case Sub:   return l - r;
         case Mul:   return l * r;
         case Div:   return l / r;
+        case And:
+        case Or:    throw QnException(tr("Invalid parameter type for operation %1('%2', '%2')").arg(serialized(op)).arg(lit("double")));
         default:    assert(false); return 0;
         }
     }
@@ -543,17 +635,27 @@ namespace Qee {
             throw QnException(tr("Could not deduce arithmetic supertype for type '%1'.").arg(QLatin1String(a.typeName())));
 
         if(type == QMetaType::LongLong) {
-            if(op == Neg) {
-                stack.push_back(-a.toLongLong());
-            } else {
-                stack.push_back(a.toLongLong());
-            }
+            stack.push_back(unop(a.toLongLong(), op));
         } else {
-            if(op == Neg) {
-                stack.push_back(-a.toDouble());
-            } else {
-                stack.push_back(a.toDouble());
-            }
+            stack.push_back(unop(a.toDouble(), op));
+        }
+    }
+
+    long long Evaluator::unop(long long v, InstructionType op) const {
+        switch (op) {
+        case Neg:   return -v;
+        case Udd:   return v;
+        case Not:   return ~v;
+        default:    assert(false); return 0;
+        }
+    }
+
+    double Evaluator::unop(double v, InstructionType op) const {
+        switch (op) {
+        case Neg:   return -v;
+        case Udd:   return v;
+        case Not:   throw QnException(tr("Invalid parameter type for operation %1('%2')").arg(serialized(op)).arg(lit("double")));
+        default:    assert(false); return 0;
         }
     }
 

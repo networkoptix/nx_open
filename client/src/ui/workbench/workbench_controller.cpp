@@ -94,7 +94,6 @@
 #include "workbench_access_controller.h"
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
-
 #ifdef QN_WORKBENCH_CONTROLLER_DEBUG
 #   define TRACE(...) qDebug() << __VA_ARGS__;
 #else

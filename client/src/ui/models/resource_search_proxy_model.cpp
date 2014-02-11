@@ -65,6 +65,14 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIn
     if(nodeType == Qn::UsersNode)
         return false; /* We don't want users in search. */
 
+    if(nodeType == Qn::RecorderNode) {
+        for (int i = 0; i < sourceModel()->rowCount(index); i++) {
+            if (filterAcceptsRow(i, index))
+                return true;
+        }
+        return false;
+    }
+
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if(resource.isNull())
         return true;

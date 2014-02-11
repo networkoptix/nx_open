@@ -16,6 +16,9 @@ namespace Qee {
         Minus,
         Times,
         Divide,
+        BitAnd,
+        BitOr,
+        BitNot,
         LParen,
         RParen,
         Dot,
@@ -33,6 +36,9 @@ namespace Qee {
         Div,
         Neg,
         Udd,
+        And,
+        Or,
+        Not,
         Call,
         MCall,
         Nop = -1
@@ -137,6 +143,8 @@ namespace Qee {
         void parseChain();
         void parseFactor();
         void parseTerm();
+        void parseBitFactor();
+        void parseBitTerm();
         void parseExpr();
 
     private:
@@ -223,6 +231,8 @@ namespace Qee {
         long long binop(long long l, long long r, InstructionType op) const;
         double binop(double l, double r, InstructionType op) const;
         void unop(QVector<QVariant> &stack, InstructionType op) const;
+        long long unop(long long v, InstructionType op) const;
+        double unop(double v, InstructionType op) const;
         void call(QVector<QVariant> &stack, const Instruction &instruction) const;
         
         static QVariant pop_back(QVector<QVariant> &stack);
