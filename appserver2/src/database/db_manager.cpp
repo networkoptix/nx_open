@@ -657,7 +657,7 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 	QSqlQuery queryTypes(m_sdb);
 	queryTypes.prepare("select rt.id, rt.name, m.name as manufacture \
 				  from vms_resourcetype rt \
-				  join vms_manufacture m on m.id = rt.manufacture_id \
+				  left join vms_manufacture m on m.id = rt.manufacture_id \
 				  order by rt.id");
 	if (!queryTypes.exec()) {
         qWarning() << Q_FUNC_INFO << queryTypes.lastError().text();
