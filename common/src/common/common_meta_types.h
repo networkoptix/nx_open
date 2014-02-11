@@ -36,6 +36,9 @@ Q_DECLARE_METATYPE(QHostAddress);
 Q_DECLARE_METATYPE(QAuthenticator);
 Q_DECLARE_METATYPE(Qt::ConnectionType);
 Q_DECLARE_METATYPE(Qt::Orientations);
-Q_DECLARE_METATYPE(ec2::QnFullResourceData);
+
+namespace ec2{
+    Q_DECLARE_METATYPE(QnFullResourceData);
+}
 
 #endif // QN_COMMON_META_TYPES_H
