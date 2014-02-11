@@ -14,6 +14,7 @@
 #include "ptz_preset.h"
 #include "ptz_tour.h"
 #include "ptz_data.h"
+#include "ptz_math.h"
 
 /**
  * A thread-safe blocking interface for accessing camera's PTZ functions.

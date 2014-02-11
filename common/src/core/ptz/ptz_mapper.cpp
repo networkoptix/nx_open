@@ -4,6 +4,8 @@
 #include <utils/common/enum_name_mapper.h>
 #include <utils/math/math.h>
 
+#include "ptz_math.h"
+
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, ExtrapolationMode)
 QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::ExtrapolationMode)
 
@@ -12,15 +14,6 @@ QN_DEFINE_NAME_MAPPED_ENUM(AngleSpace,
     ((Mm35EquivSpace,   "35MmEquiv"))
 )
 QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(AngleSpace)
-
-
-/**
- * \param mm35Equiv                 Width-based 35mm-equivalent focal length.
- * \returns                         Width-based FOV in degrees.
- */
-static qreal mm35EquivToDegrees(qreal mm35Equiv) {
-    return qRadiansToDegrees(std::atan((36.0 / 2.0) / mm35Equiv) * 2.0);
-}
 
 typedef boost::array<QnSpaceMapperPtr<qreal>, 3> PtzMapperPart;
 
@@ -91,7 +84,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<q
 
     if(space == Mm35EquivSpace)
         for(int i = 0; i < logical.size(); i++)
-            logical[i] = mm35EquivToDegrees(logical[i]);
+            logical[i] = q35mmEquivToDegrees(logical[i]);
 
     QVector<QPair<qreal, qreal> > sourceToTarget;
     for(int i = 0; i < logical.size(); i++)
