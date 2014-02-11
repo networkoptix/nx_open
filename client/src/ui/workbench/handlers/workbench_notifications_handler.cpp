@@ -169,8 +169,7 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged() {
     at_licensePool_licensesChanged();
 
     delete m_adaptor;
-    if(context()->user())
-        m_adaptor = new QnBusinessEventsFilterResourcePropertyAdaptor(context()->user(), this);
+    m_adaptor = context()->user() ? new QnBusinessEventsFilterResourcePropertyAdaptor(context()->user(), this) : NULL;
 }
 
 void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message) {
