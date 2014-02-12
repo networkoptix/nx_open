@@ -170,14 +170,14 @@ Qt::ItemFlags QnPtzTourListModel::flags(const QModelIndex &index) const {
     return flags;
 }
 
-void QnPtzTourListModel::updateTour(const QnPtzTour &tour) {
+void QnPtzTourListModel::updateTourSpots(const QString tourId, const QnPtzTourSpotList &spots) {
     for (int i = 0; i < m_tours.size(); ++i) {
-        if (m_tours[i].tour.id != tour.id)
+        if (m_tours[i].tour.id != tourId)
             continue;
-        if (m_tours[i].tour == tour)
+        if (m_tours[i].tour.spots == spots)
             return; //no changes were made
 
-        m_tours[i].tour = tour;
+        m_tours[i].tour.spots = spots;
         m_tours[i].modified = true;
         emit dataChanged(index(i, 0), index(i, ColumnCount));
         break;

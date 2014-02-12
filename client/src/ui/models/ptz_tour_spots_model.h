@@ -6,7 +6,7 @@
 #include <core/ptz/ptz_fwd.h>
 #include <core/ptz/ptz_tour.h>
 
-class QnPtzTourModel : public QAbstractTableModel
+class QnPtzTourSpotsModel : public QAbstractTableModel
 {
     Q_OBJECT
 
@@ -20,8 +20,8 @@ public:
         ColumnCount
     };
 
-    explicit QnPtzTourModel(QObject *parent = 0);
-    virtual ~QnPtzTourModel();
+    explicit QnPtzTourSpotsModel(QObject *parent = 0);
+    virtual ~QnPtzTourSpotsModel();
 
     static QString speedToString(qreal speed);
     static QList<qreal> speedValues();
@@ -29,11 +29,8 @@ public:
     static QString timeToString(quint64 time);
     static QList<quint64> stayTimeValues();
 
-    const QnPtzTour& tour() const;
-    Q_SLOT void setTour(const QnPtzTour &tour);
-
-    const QString tourName() const;
-    Q_SLOT void setTourName(const QString &name);
+    const QnPtzTourSpotList &spots() const;
+    Q_SLOT void setSpots(const QnPtzTourSpotList &spots);
 
     QnPtzPresetList sortedPresets() const;
     const QnPtzPresetList &presets() const;
@@ -53,7 +50,7 @@ public:
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
 signals:
-    void tourChanged(const QnPtzTour &tour);
+    void spotsChanged(const QnPtzTourSpotList &spots);
 
 private slots:
     void at_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
@@ -62,7 +59,7 @@ private:
     bool isPresetValid(const QString &presetId) const;
 
 private:
-    QnPtzTour m_tour;
+    QnPtzTourSpotList m_spots;
     QnPtzPresetList m_presets;
 };
 

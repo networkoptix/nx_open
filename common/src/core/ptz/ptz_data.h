@@ -10,6 +10,7 @@
 #include "ptz_limits.h"
 #include "ptz_preset.h"
 #include "ptz_tour.h"
+#include "ptz_object.h"
 
 struct QnPtzData {
     QnPtzData() {}
@@ -25,6 +26,7 @@ struct QnPtzData {
     Qt::Orientations flip;
     QnPtzPresetList presets;
     QnPtzTourList tours;
+    QnPtzObject homePosition;
 };
 
 Q_DECLARE_METATYPE(QnPtzData)

@@ -2140,7 +2140,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="758"/>
         <source>Monitor in a New Window</source>
-        <translation>Мониторингв новом окне</translation>
+        <translation>Мониторинг в новом окне</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="763"/>
@@ -4155,7 +4155,7 @@ Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
         <translation>Соединение с  Enterprise Controller не может быть установлено.
-Неверные параметы соединения .
+Неверные параметы соединения.
 
 Попробуйте еще раз. Если ошибка повторяется, свяжитесь с администратором системы.</translation>
     </message>
@@ -4225,7 +4225,7 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="52"/>
         <source>Downloading Database Backup</source>
-        <translation>Загружается резервную копию БД</translation>
+        <translation>Загружается резервная копия БД</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="53"/>
@@ -5251,7 +5251,7 @@ Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
         <translation>Соединение с  Enterprise Controller не может быть установлено.
-Неверные параметы соединения .
+Неверные параметы соединения.
 
 Попробуйте еще раз. Если ошибка повторяется, свяжитесь с администратором системы.</translation>
     </message>

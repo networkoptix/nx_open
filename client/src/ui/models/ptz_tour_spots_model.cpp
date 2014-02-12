@@ -1,4 +1,4 @@
-#include "ptz_tour_model.h"
+#include "ptz_tour_spots_model.h"
 
 #include <common/common_globals.h>
 
@@ -6,6 +6,7 @@
 
 #include <ui/style/globals.h>
 
+#include <utils/common/container.h>
 #include <utils/common/string.h>
 
 namespace {
@@ -41,24 +42,24 @@ namespace {
     static const QnPtzTourSpot defaultSpot(QString(), second*5, speedNormal);
 }
 
-QnPtzTourModel::QnPtzTourModel(QObject *parent) :
+QnPtzTourSpotsModel::QnPtzTourSpotsModel(QObject *parent) :
     base_type(parent)
 {
     connect(this, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_dataChanged(QModelIndex,QModelIndex)));
 }
 
-QnPtzTourModel::~QnPtzTourModel() {
+QnPtzTourSpotsModel::~QnPtzTourSpotsModel() {
 }
 
-QList<qreal> QnPtzTourModel::speedValues() {
+QList<qreal> QnPtzTourSpotsModel::speedValues() {
     return allSpeedValues;
 }
 
-QList<quint64> QnPtzTourModel::stayTimeValues() {
+QList<quint64> QnPtzTourSpotsModel::stayTimeValues() {
     return allStayTimeValues;
 }
 
-QString QnPtzTourModel::speedToString(qreal speed) {
+QString QnPtzTourSpotsModel::speedToString(qreal speed) {
     static QList<QString> names(QList<QString>() << tr("Lowest") << tr("Low") << tr("Normal") << tr("High") << tr("Highest"));
     Q_ASSERT(names.size() == allSpeedValues.size());
 
@@ -79,32 +80,23 @@ QString QnPtzTourModel::speedToString(qreal speed) {
     return names[allSpeedValues.indexOf(speedNormal)];
 }
 
-QString QnPtzTourModel::timeToString(quint64 time) {
+QString QnPtzTourSpotsModel::timeToString(quint64 time) {
     if (time == 0)
         return tr("Instant");
     return tr("%n seconds", "", time / second);
 }
 
-const QnPtzTour& QnPtzTourModel::tour() const {
-    return m_tour;
+const QnPtzTourSpotList& QnPtzTourSpotsModel::spots() const {
+    return m_spots;
 }
 
-void QnPtzTourModel::setTour(const QnPtzTour &tour) {
+void QnPtzTourSpotsModel::setSpots(const QnPtzTourSpotList &spots) {
     beginResetModel();
-    m_tour = tour;
+    m_spots = spots;
     endResetModel();
 }
 
-const QString QnPtzTourModel::tourName() const {
-    return m_tour.name;
-}
-
-void QnPtzTourModel::setTourName(const QString &name) {
-    m_tour.name = name;
-    emit tourChanged(m_tour);
-}
-
-QnPtzPresetList QnPtzTourModel::sortedPresets() const {
+QnPtzPresetList QnPtzTourSpotsModel::sortedPresets() const {
     QnPtzPresetList result = m_presets;
     qSort(result.begin(), result.end(),  [](const QnPtzPreset &l, const QnPtzPreset &r) {
         return naturalStringCaseInsensitiveLessThan(l.name, r.name);
@@ -112,80 +104,93 @@ QnPtzPresetList QnPtzTourModel::sortedPresets() const {
     return result;
 }
 
-const QnPtzPresetList& QnPtzTourModel::presets() const {
+const QnPtzPresetList& QnPtzTourSpotsModel::presets() const {
     return m_presets;
 }
 
-void QnPtzTourModel::setPresets(const QnPtzPresetList &presets) {
+void QnPtzTourSpotsModel::setPresets(const QnPtzPresetList &presets) {
     beginResetModel();
     m_presets = presets;
     endResetModel();
 }
 
-int QnPtzTourModel::rowCount(const QModelIndex &parent) const {
+int QnPtzTourSpotsModel::rowCount(const QModelIndex &parent) const {
     if(!parent.isValid())
-        return m_tour.spots.size();
+        return m_spots.size();
     return 0;
 }
 
-int QnPtzTourModel::columnCount(const QModelIndex &parent) const {
+int QnPtzTourSpotsModel::columnCount(const QModelIndex &parent) const {
     if(!parent.isValid())
         return ColumnCount;
     return 0;
 }
 
-bool QnPtzTourModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild) {
+bool QnPtzTourSpotsModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild) {
     if (destinationParent == sourceParent && (destinationChild == sourceRow || destinationChild == sourceRow + 1)) // see QAbstractItemModel docs
         return true;
 
-    if (count < 0 || sourceRow < 0 || sourceRow + count > m_tour.spots.size() || destinationChild < 0 || destinationChild + count > m_tour.spots.size() + 1)
+    if (count < 0 || sourceRow < 0 || sourceRow + count > m_spots.size() || destinationChild < 0 || destinationChild + count > m_spots.size() + 1)
         return false;
 
     beginMoveRows(sourceParent, sourceRow, sourceRow + count - 1, destinationParent, destinationChild);
     int offset = sourceRow < destinationChild ? -1 : 0; // QAbstractItemModel and QList have different opinion how to move elements
     for (int i = 0; i < count; i++)
-        m_tour.spots.move(sourceRow + i, destinationChild + i + offset);
+        m_spots.move(sourceRow + i, destinationChild + i + offset);
     endMoveRows();
-    emit tourChanged(m_tour);
+    emit spotsChanged(m_spots);
     return true;
 }
 
-bool QnPtzTourModel::removeRows(int row, int count, const QModelIndex &parent) {
-    if(parent.isValid() || row < 0 || count < 1 || row + count > m_tour.spots.size())
+bool QnPtzTourSpotsModel::removeRows(int row, int count, const QModelIndex &parent) {
+    if(parent.isValid() || row < 0 || count < 1 || row + count > m_spots.size())
         return false;
 
     beginRemoveRows(parent, row, row + count - 1);
-    m_tour.spots.erase(m_tour.spots.begin() + row, m_tour.spots.begin() + row + count);
+    m_spots.erase(m_spots.begin() + row, m_spots.begin() + row + count);
     endRemoveRows();
-    emit tourChanged(m_tour);
+    emit spotsChanged(m_spots);
     return true;
 }
 
-bool QnPtzTourModel::insertRows(int row, int count, const QModelIndex &parent) {
-    if(parent.isValid() || row < 0 || row > m_tour.spots.size() || count < 1)
+bool QnPtzTourSpotsModel::insertRows(int row, int count, const QModelIndex &parent) {
+    if(parent.isValid() || row < 0 || row > m_spots.size() || count < 1)
         return false;
 
     QnPtzTourSpot sampleSpot(defaultSpot);
-    if (!m_presets.isEmpty())
-        sampleSpot.presetId = m_presets.first().id;
+    if (!m_presets.isEmpty()) {
+
+        int index = -1;
+        if (!m_spots.isEmpty()) {
+            QString lastId = m_spots.last().presetId;
+            index = qnIndexOf(m_presets, [&](const QnPtzPreset &preset) { return lastId == preset.id; });
+        }
+        index++;
+
+        if (index >= m_presets.size())
+            index = 0;
+
+        sampleSpot.presetId = m_presets[index].id;
+
+    }
 
     beginInsertRows(parent, row, row + count - 1);
     for(int i = 0; i < count; i++)
-        m_tour.spots.insert(row, sampleSpot);
+        m_spots.insert(row, sampleSpot);
     endInsertRows();
-    emit tourChanged(m_tour);
+    emit spotsChanged(m_spots);
     return true;
 }
 
-Qt::ItemFlags QnPtzTourModel::flags(const QModelIndex &index) const {
+Qt::ItemFlags QnPtzTourSpotsModel::flags(const QModelIndex &index) const {
     return base_type::flags(index) | Qt::ItemIsEditable; //TODO: #GDM PTZ drag'n'drop?
 }
 
-QVariant QnPtzTourModel::data(const QModelIndex &index, int role) const {
+QVariant QnPtzTourSpotsModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
-    const QnPtzTourSpot &spot = m_tour.spots[index.row()];
+    const QnPtzTourSpot &spot = m_spots[index.row()];
 
     switch(role) {
     case Qt::DisplayRole:
@@ -253,7 +258,7 @@ QVariant QnPtzTourModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
-QVariant QnPtzTourModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant QnPtzTourSpotsModel::headerData(int section, Qt::Orientation orientation, int role) const {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole && section >= 0 && section < ColumnCount) {
         switch (section) {
         case NameColumn:
@@ -269,7 +274,7 @@ QVariant QnPtzTourModel::headerData(int section, Qt::Orientation orientation, in
     return base_type::headerData(section, orientation, role);
 }
 
-bool QnPtzTourModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+bool QnPtzTourSpotsModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if(role != Qt::EditRole)
         return false;
 
@@ -279,7 +284,7 @@ bool QnPtzTourModel::setData(const QModelIndex &index, const QVariant &value, in
     if(!hasIndex(index.row(), index.column(), index.parent()))
         return false;
 
-    QnPtzTourSpot &spot = m_tour.spots[index.row()];
+    QnPtzTourSpot &spot = m_spots[index.row()];
 
     switch(index.column()) {
     case NameColumn: {
@@ -320,7 +325,7 @@ bool QnPtzTourModel::setData(const QModelIndex &index, const QVariant &value, in
 
 }
 
-bool QnPtzTourModel::isPresetValid(const QString &presetId) const {
+bool QnPtzTourSpotsModel::isPresetValid(const QString &presetId) const {
     foreach (const QnPtzPreset &preset, m_presets) {
         if (preset.id == presetId)
             return true;
@@ -328,8 +333,8 @@ bool QnPtzTourModel::isPresetValid(const QString &presetId) const {
     return false;
 }
 
-void QnPtzTourModel::at_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight) {
+void QnPtzTourSpotsModel::at_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight) {
     Q_UNUSED(topLeft)
     Q_UNUSED(bottomRight)
-    emit tourChanged(m_tour);
+    emit spotsChanged(m_spots);
 }

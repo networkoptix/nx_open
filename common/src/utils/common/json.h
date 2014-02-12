@@ -45,7 +45,7 @@ namespace QJsonDetail {
         return deserialize(ctx, adlWrap(value), target);
     }
 
-    // TODO: #Elric qMetaTypeId is uses atomics for custom types. Maybe introduce local cache?
+    // TODO: #Elric qMetaTypeId uses atomics for custom types. Maybe introduce local cache?
 
     template<class T>
     struct is_metatype_defined: boost::mpl::bool_<QMetaTypeId2<T>::Defined> {};

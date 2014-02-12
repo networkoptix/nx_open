@@ -8,7 +8,7 @@
 
 #include <api/resource_property_adaptor.h>
 
-#include "ptz_tour_executor.h"
+#include "tour_ptz_executor.h"
 #include "ptz_controller_pool.h"
 
 // -------------------------------------------------------------------------- //
@@ -17,7 +17,7 @@
 QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(baseController->resource(), lit("ptzTours"), QnPtzTourHash(), this)),
-    m_executor(new QnPtzTourExecutor(baseController))
+    m_executor(new QnTourPtzExecutor(baseController))
 {
     assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
 
@@ -39,7 +39,6 @@ bool QnTourPtzController::extends(Qn::PtzCapabilities capabilities) {
 }
 
 Qn::PtzCapabilities QnTourPtzController::getCapabilities() {
-    /* Note that this controller preserves both Qn::AsynchronousPtzCapability and Qn::SynchronizedPtzCapability. */
     Qn::PtzCapabilities capabilities = base_type::getCapabilities();
     return extends(capabilities) ? (capabilities | Qn::ToursPtzCapability) : capabilities;
 }

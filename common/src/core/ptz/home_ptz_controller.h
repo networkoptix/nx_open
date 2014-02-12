@@ -1,21 +1,22 @@
-#ifndef QN_TOUR_PTZ_CONTROLLER_H
-#define QN_TOUR_PTZ_CONTROLLER_H
+#ifndef QN_HOME_PTZ_CONTROLLER_H
+#define QN_HOME_PTZ_CONTROLLER_H
+
+#include <QtCore/QMutex>
 
 #include "proxy_ptz_controller.h"
 
 template<class T>
 class QnResourcePropertyAdaptor;
-class QnTourPtzExecutor;
 
-typedef QHash<QString, QnPtzTour> QnPtzTourHash;
+class QnHomePtzExecutor;
 
-class QnTourPtzController: public QnProxyPtzController {
+class QnHomePtzController: public QnProxyPtzController {
     Q_OBJECT
     typedef QnProxyPtzController base_type;
 
 public:
-    QnTourPtzController(const QnPtzControllerPtr &baseController);
-    virtual ~QnTourPtzController();
+    QnHomePtzController(const QnPtzControllerPtr &baseController);
+    virtual ~QnHomePtzController();
 
     static bool extends(Qn::PtzCapabilities capabilities);
 
@@ -24,21 +25,18 @@ public:
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
     virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) override;
+    virtual bool createPreset(const QnPtzPreset &preset) override;
     virtual bool activatePreset(const QString &presetId, qreal speed) override;
-
-    virtual bool createTour(const QnPtzTour &tour) override;
-    virtual bool removeTour(const QString &tourId) override;
     virtual bool activateTour(const QString &tourId) override;
-    virtual bool getTours(QnPtzTourList *tours) override;
 
-private:
-    bool createTourInternal(QnPtzTour tour);
+    virtual bool updateHomePosition(const QnPtzObject &homePosition) override;
+    virtual bool getHomePosition(QnPtzObject *homePosition) override;
 
-private:
+public:
     QMutex m_mutex;
-    QnResourcePropertyAdaptor<QnPtzTourHash> *m_adaptor;
-    QnTourPtzExecutor *m_executor;
+    QnResourcePropertyAdaptor<QnPtzObject> *m_adaptor;
+    QnHomePtzExecutor *m_executor;
 };
 
 
-#endif // QN_TOUR_PTZ_CONTROLLER_H
+#endif // QN_HOME_PTZ_CONTROLLER_H

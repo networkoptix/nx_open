@@ -109,6 +109,25 @@ typedef QHash<QString, qreal> QnAspectRatioHash;
 Q_DECLARE_METATYPE(QnAspectRatioHash)
 
 
+// -------------------------------------------------------------------------- //
+// QnPtzHotkey
+// -------------------------------------------------------------------------- //
+struct QnPtzHotkey {
+    enum {
+        NoHotkey = -1
+    };
+
+    QnPtzHotkey(): hotkey(NoHotkey) {}
+    QnPtzHotkey(const QString &id, int hotkey): id(id), hotkey(hotkey) {}
+
+    QString id;
+    int hotkey;
+};
+
+typedef QHash<int, QString> QnPtzHotkeyHash;
+
+Q_DECLARE_METATYPE(QnPtzHotkey);
+QN_DECLARE_FUNCTIONS(QnPtzHotkey, (json));
 
 
 #endif // QN_CLIENT_MODEL_TYPES_H

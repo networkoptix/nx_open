@@ -30,6 +30,9 @@ public:
     virtual bool removeTour(const QString &) override                                       { return false; }
     virtual bool activateTour(const QString &) override                                     { return false; }
     virtual bool getTours(QnPtzTourList *) override                                         { return false; }
+
+    virtual bool updateHomePosition(const QnPtzObject &) override                           { return false; }
+    virtual bool getHomePosition(QnPtzObject *) override                                    { return false; }
 };
 
 #endif // QN_BASIC_PTZ_CONTROLLER_H

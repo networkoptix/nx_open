@@ -38,11 +38,11 @@ void QnPtzPresetListModel::setPresets(const QnPtzPresetList &presets) {
     endResetModel();
 }
 
-QnHotkeysHash QnPtzPresetListModel::hotkeys() const {
+QnPtzHotkeyHash QnPtzPresetListModel::hotkeys() const {
     return m_hotkeys;
 }
 
-void QnPtzPresetListModel::setHotkeys(const QnHotkeysHash &value) {
+void QnPtzPresetListModel::setHotkeys(const QnPtzHotkeyHash &value) {
     beginResetModel();
     m_hotkeys = value;
     endResetModel();
@@ -98,7 +98,7 @@ QVariant QnPtzPresetListModel::data(const QModelIndex &index, int role) const {
         return QVariant();
 
     const QnPtzPreset &preset = m_presets[index.row()];
-    int hotkey = m_hotkeys.key(preset.id, Qn::NoHotkey);
+    int hotkey = m_hotkeys.key(preset.id, QnPtzHotkey::NoHotkey);
 
     Column column = m_columns[index.column()];
 
@@ -170,17 +170,17 @@ bool QnPtzPresetListModel::setData(const QModelIndex &index, const QVariant &val
             return false;
 
         // hotkey that was assigned to this preset
-        int oldHotkey = m_hotkeys.key(preset.id, Qn::NoHotkey);
+        int oldHotkey = m_hotkeys.key(preset.id, QnPtzHotkey::NoHotkey);
         if (oldHotkey == hotkey)
             return false;
 
         // preset that is assigned to this hotkey
         QString existing;
-        if (hotkey != Qn::NoHotkey)
+        if (hotkey != QnPtzHotkey::NoHotkey)
             existing = m_hotkeys[hotkey];
 
         // set old hotkey to an existing preset (or empty)
-        if (oldHotkey != Qn::NoHotkey)
+        if (oldHotkey != QnPtzHotkey::NoHotkey)
             m_hotkeys[oldHotkey] = existing;
         if (!existing.isEmpty()) {
             for(int i = 0; i < m_presets.size(); i++) {
@@ -193,7 +193,7 @@ bool QnPtzPresetListModel::setData(const QModelIndex &index, const QVariant &val
         }
 
         // set updated hotkey
-        if (hotkey != Qn::NoHotkey)
+        if (hotkey != QnPtzHotkey::NoHotkey)
             m_hotkeys[hotkey] = preset.id;
         emit dataChanged(index, index);
 

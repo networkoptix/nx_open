@@ -3,8 +3,9 @@
 
 #include <QAbstractTableModel>
 
+#include <client/client_model_types.h>
+
 #include <core/ptz/ptz_fwd.h>
-#include <core/ptz/ptz_hotkey.h>
 
 class QnPtzPresetListModel: public QAbstractTableModel {
     Q_OBJECT
@@ -26,8 +27,8 @@ public:
     const QnPtzPresetList &presets() const;
     void setPresets(const QnPtzPresetList &presets);
 
-    QnHotkeysHash hotkeys() const;
-    void setHotkeys(const QnHotkeysHash &value);
+    QnPtzHotkeyHash hotkeys() const;
+    void setHotkeys(const QnPtzHotkeyHash &value);
 
     int column(Column column) const;
     const QList<Column> &columns() const;
@@ -49,7 +50,7 @@ private:
 private:
     bool m_readOnly;
     QnPtzPresetList m_presets;
-    QnHotkeysHash m_hotkeys;
+    QnPtzHotkeyHash m_hotkeys;
     QList<Column> m_columns;
 };
 
