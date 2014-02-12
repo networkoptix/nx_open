@@ -28,7 +28,7 @@ namespace ec2
 
         template<> void triggerNotification<ApiStoredFileData>( const QnTransaction<ApiStoredFileData>& tran )
         {
-            assert( tran.command == ApiCommand::addStoredFile || tran.command == ApiCommand::updateStoredFile );
+            assert( tran.command == ApiCommand::addOrUpdateStoredFile );
             emit addedOrUpdated( tran.params.path );
         }
 

@@ -5,6 +5,7 @@
 #include "api_data.h"
 
 #include <nx_ec/binary_serialization_helper.h>
+#include <utils/common/request_param.h>
 
 
 namespace ec2

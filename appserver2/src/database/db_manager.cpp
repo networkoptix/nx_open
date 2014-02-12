@@ -462,6 +462,24 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tr
     return result;
 }
 
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiResourceData>& tran)
+{
+    if( tran.command == ApiCommand::saveResource )
+        return updateResource(tran.params);
+
+    return ErrorCode::notImplemented;
+}
+
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiBusinessRuleData>& tran)
+{
+    if( tran.command == ApiCommand::addBusinessRule )
+        return insertBusinessRule(tran.params);
+    else if( tran.command == ApiCommand::updateBusinessRule )
+        return updateBusinessRule(tran.params);
+
+    return ErrorCode::notImplemented;
+}
+
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiMediaServerData>& tran)
 {
     QnDbTransactionLocker lock(&m_tran);
@@ -528,6 +546,43 @@ ErrorCode QnDbManager::updateLayoutItems(const ApiLayoutData& data)
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::insertUser( const ApiUserData& data )
+{
+    //TODO/IMPL
+    return ErrorCode::notImplemented;
+}
+
+ErrorCode QnDbManager::updateUser( const ApiUserData& data )
+{
+    //TODO/IMPL
+    return ErrorCode::notImplemented;
+}
+
+ErrorCode QnDbManager::removeUser( qint32 id )
+{
+    //TODO/IMPL
+    return ErrorCode::notImplemented;
+}
+
+ErrorCode QnDbManager::insertBusinessRule( const ApiBusinessRuleData& /*businessRule*/ )
+{
+    //TODO/IMPL
+    return ErrorCode::notImplemented;
+}
+
+ErrorCode QnDbManager::updateBusinessRule( const ApiBusinessRuleData& /*businessRule*/ )
+{
+    //TODO/IMPL
+    return ErrorCode::notImplemented;
+}
+
+ErrorCode QnDbManager::removeBusinessRule( qint32 /*id*/ )
+{
+    //TODO/IMPL
+    return ErrorCode::notImplemented;
+}
+
+
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiLayoutData>& tran)
 {
     QnDbTransactionLocker lock(&m_tran);
@@ -552,6 +607,12 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiLayoutData>& tr
         lock.commit();
 
     return result;
+}
+
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiLayoutDataList>& tran)
+{
+    //TODO/IMPL
+    return ErrorCode::notImplemented;
 }
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiResourceParams>& tran)
@@ -793,7 +854,24 @@ ErrorCode QnDbManager::removeLayout(const qint32 id)
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiStoredFileData>& tran)
 {
-    return m_storedFileManagerImpl->saveFile( tran.params.path, tran.params.fileData );
+    assert( tran.command == ApiCommand::addOrUpdateStoredFile );
+    return m_storedFileManagerImpl->saveFile( tran.params  );
+}
+
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<StoredFilePath>& tran)
+{
+    assert( tran.command == ApiCommand::removeStoredFile );
+    return m_storedFileManagerImpl->removeFile( tran.params );
+}
+
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiUserData>& tran)
+{
+    if( tran.command == ApiCommand::addUser )
+        return insertUser( tran.params );
+    else if( tran.command == ApiCommand::updateUser )
+        return updateUser( tran.params );
+
+    return ErrorCode::notImplemented;
 }
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
@@ -806,8 +884,10 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
         return removeServer(tran.params.id);
     case ApiCommand::removeLayout:
         return removeLayout(tran.params.id);
-    case ApiCommand::deleteStoredFile:
-        return m_storedFileManagerImpl->removeFile( tran.params.id );
+    case ApiCommand::removeBusinessRule:
+        return removeBusinessRule( tran.params.id );
+    case ApiCommand::removeUser:
+        return removeUser( tran.params.id );
     default:
         qWarning() << "Remove operation is not implemented for command" << toString(tran.command);
         break;

@@ -33,18 +33,23 @@ namespace ec2
         template<class QueryDataType>
         ErrorCode executeTransaction( const QnTransaction<QueryDataType>& /*tran*/ )
         {
-            Q_ASSERT_X(1, "Not implemented", Q_FUNC_INFO);
+            static_assert( false, "You have to add QnDbManager::executeTransaction specification" );
             return ErrorCode::ok;
         }
 
         ErrorCode executeTransaction(const QnTransaction<ApiCameraData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiMediaServerData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiLayoutData>& tran);
+        ErrorCode executeTransaction(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiSetResourceStatusData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiResourceParams>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiCameraServerItemData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiPanicModeData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiStoredFileData>& tran);
+        ErrorCode executeTransaction(const QnTransaction<StoredFilePath>& tran);
+        ErrorCode executeTransaction(const QnTransaction<ApiResourceData>& tran);
+        ErrorCode executeTransaction(const QnTransaction<ApiBusinessRuleData>& tran);
+        ErrorCode executeTransaction(const QnTransaction<ApiUserData>& tran);
 
         // delete camera, server, layout t.e.c
         ErrorCode executeTransaction(const QnTransaction<ApiIdData>& tran);
@@ -72,7 +77,7 @@ namespace ec2
         ErrorCode doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& userList);
 
         //getBusinessRuleList
-        ErrorCode doQuery(nullptr_t /*dummy*/, ApiLayoutDataList& userList);
+        ErrorCode doQuery(nullptr_t /*dummy*/, ApiLayoutDataList& layoutList);
 
         //getCurrentTime
         ErrorCode doQuery(nullptr_t /*dummy*/, qint64& userList);
@@ -149,6 +154,14 @@ namespace ec2
         ErrorCode updateLayout(const ApiLayoutData& data);
         ErrorCode updateLayoutItems(const ApiLayoutData& data);
         ErrorCode removeLayoutItems(qint32 id);
+
+        ErrorCode insertUser( const ApiUserData& data );
+        ErrorCode updateUser( const ApiUserData& data );
+        ErrorCode removeUser( qint32 id );
+
+        ErrorCode insertBusinessRule( const ApiBusinessRuleData& businessRule );
+        ErrorCode updateBusinessRule( const ApiBusinessRuleData& businessRule );
+        ErrorCode removeBusinessRule( qint32 id );
 
 		bool createDatabase();
         

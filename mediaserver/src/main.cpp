@@ -426,10 +426,10 @@ QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, 
 
 QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, QnMediaServerResourcePtr serverPtr)
 {
-    QnMediaServerResourceList servers;
+    QnMediaServerResourcePtr savedServer;
     serverPtr->setStatus(QnResource::Online, true);
 
-    ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->saveSync(serverPtr, &servers);
+    ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->saveSync(serverPtr, &savedServer);
     if (rez != ec2::ErrorCode::ok)
     {
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
@@ -443,7 +443,7 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
     }
     */
 
-    return servers.at(0);
+    return savedServer;
 }
 
 #ifdef Q_OS_WIN

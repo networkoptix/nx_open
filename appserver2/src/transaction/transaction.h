@@ -76,6 +76,8 @@ namespace ec2
 
             //!ApiLayoutData
             addOrUpdateLayouts,
+            addLayout,  //TODO choose addOrUpdateLayouts or (addLayout and updateLayout)
+            updateLayout,
             //!ApiLayoutDataList
             getLayoutList,
             //!ApiIdData
