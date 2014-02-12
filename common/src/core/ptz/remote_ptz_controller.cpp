@@ -134,7 +134,7 @@ bool QnRemotePtzController::updateHomePosition(const QnPtzObject &homePosition) 
     RUN_COMMAND(Qn::UpdateHomePositionPtzCommand, homePosition, ptzUpdateHomePositionAsync, homePosition);
 }
 
-bool QnRemotePtzController::getHomePosition(QnPtzObject *homePosition) {
+bool QnRemotePtzController::getHomePosition(QnPtzObject *) {
     RUN_COMMAND(Qn::GetHomePositionPtzCommand, QVariant(), ptzGetHomePositionAsync);
 }
 
