@@ -10,7 +10,7 @@ class QnPtzTourExecutorPrivate;
  * uses event loop and timers, and thus must be run in a thread with event loop,
  * better an dedicated thread.
  * 
- * Note that public functions of this class are thread-safe. 
+ * Public functions of this class are thread-safe. 
  */
 class QnPtzTourExecutor: public QObject {
     Q_OBJECT

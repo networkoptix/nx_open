@@ -1,11 +1,17 @@
 #ifndef QN_PTZ_OBJECT_H
 #define QN_PTZ_OBJECT_H
 
-#include <common/common_globals.h>
+#include <boost/operators.hpp>
 
 #include <QtCore/QString>
 
-struct QnPtzObject {
+#include <common/common_globals.h>
+
+struct QnPtzObject: public boost::equality_comparable1<QnPtzObject> {
+    QnPtzObject(): type(Qn::InvalidPtzObject) {}
+
+    friend bool operator==(const QnPtzObject &l, const QnPtzObject &r);
+
     Qn::PtzObjectType type;
     QString id;
 };

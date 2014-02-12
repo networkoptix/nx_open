@@ -39,7 +39,6 @@ bool QnTourPtzController::extends(Qn::PtzCapabilities capabilities) {
 }
 
 Qn::PtzCapabilities QnTourPtzController::getCapabilities() {
-    /* Note that this controller preserves both Qn::AsynchronousPtzCapability and Qn::SynchronizedPtzCapability. */
     Qn::PtzCapabilities capabilities = base_type::getCapabilities();
     return extends(capabilities) ? (capabilities | Qn::ToursPtzCapability) : capabilities;
 }
