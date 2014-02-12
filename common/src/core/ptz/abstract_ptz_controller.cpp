@@ -24,6 +24,7 @@ bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) 
     if((query & Qn::FlipPtzField)              && getFlip(&data->flip))                                                 data->fields |= Qn::FlipPtzField;
     if((query & Qn::PresetsPtzField)           && getPresets(&data->presets))                                           data->fields |= Qn::PresetsPtzField;
     if((query & Qn::ToursPtzField)             && getTours(&data->tours))                                               data->fields |= Qn::ToursPtzField;
+    if((query & Qn::HomePositionPtzField)      && getHomePosition(&data->homePosition))                                 data->fields |= Qn::HomePositionPtzField;
     return true;
 }
 
@@ -66,6 +67,10 @@ bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
     case Qn::ActivateTourPtzCommand:
     case Qn::GetToursPtzCommand:            
         return (capabilities & Qn::ToursPtzCapability);
+
+    case Qn::UpdateHomePositionPtzCommand:
+    case Qn::GetHomePositionPtzCommand:
+        return (capabilities & Qn::HomePtzCapability);
 
     case Qn::GetDataPtzCommand:
         return true;

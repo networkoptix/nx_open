@@ -103,6 +103,9 @@ public:
         ActivateTourPtzCommand,
         GetToursPtzCommand,
 
+        UpdateHomePositionPtzCommand,
+        GetHomePositionPtzCommand,
+
         GetDataPtzCommand,
 
         InvalidPtzCommand = -1
@@ -116,8 +119,9 @@ public:
         FlipPtzField            = 0x10,
         PresetsPtzField         = 0x20,
         ToursPtzField           = 0x40,
+        HomePositionPtzField    = 0x80,
         NoPtzFields             = 0x00,
-        AllPtzFields            = DevicePositionPtzField | LogicalPositionPtzField| DeviceLimitsPtzField | LogicalLimitsPtzField | FlipPtzField | PresetsPtzField | ToursPtzField
+        AllPtzFields            = DevicePositionPtzField | LogicalPositionPtzField| DeviceLimitsPtzField | LogicalLimitsPtzField | FlipPtzField | PresetsPtzField | ToursPtzField | HomePositionPtzField
     };
     Q_DECLARE_FLAGS(PtzDataFields, PtzDataField)
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)

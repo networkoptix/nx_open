@@ -131,11 +131,11 @@ bool QnRemotePtzController::getTours(QnPtzTourList *) {
 }
 
 bool QnRemotePtzController::updateHomePosition(const QnPtzObject &homePosition) {
-    return false; // TODO
+    RUN_COMMAND(Qn::UpdateHomePositionPtzCommand, homePosition, ptzUpdateHomePositionAsync, homePosition);
 }
 
 bool QnRemotePtzController::getHomePosition(QnPtzObject *homePosition) {
-    return false; // TODO
+    RUN_COMMAND(Qn::GetHomePositionPtzCommand, QVariant(), ptzGetHomePositionAsync);
 }
 
 bool QnRemotePtzController::getData(Qn::PtzDataFields query, QnPtzData *) {

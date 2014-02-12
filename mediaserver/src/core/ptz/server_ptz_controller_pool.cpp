@@ -12,6 +12,7 @@
 #include <core/ptz/workaround_ptz_controller.h>
 #include <core/ptz/preset_ptz_controller.h>
 #include <core/ptz/tour_ptz_controller.h>
+#include <core/ptz/home_ptz_controller.h>
 
 
 void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) {
@@ -48,6 +49,9 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
 
     if(QnTourPtzController::extends(controller->getCapabilities()))
         controller.reset(new QnTourPtzController(controller));
+
+    if(QnHomePtzController::extends(controller->getCapabilities()))
+        controller.reset(new QnHomePtzController(controller));
 
     if(QnWorkaroundPtzController::extends(controller->getCapabilities()))
         controller.reset(new QnWorkaroundPtzController(controller));

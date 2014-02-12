@@ -45,6 +45,8 @@ namespace {
         ((PtzRemoveTourObject,      "ptz"))
         ((PtzActivateTourObject,    "ptz"))
         ((PtzGetToursObject,        "ptz"))
+        ((PtzGetHomePositionObject, "ptz"))
+        ((PtzUpdateHomePositionObject, "ptz"))
         ((PtzGetDataObject,         "ptz"))
         ((GetParamsObject,          "getCameraParam"))
         ((SetParamsObject,          "setCameraParam"))
@@ -659,6 +661,24 @@ int QnMediaServerConnection::ptzGetToursAsync(const QnNetworkResourcePtr &camera
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
 
     return sendAsyncGetRequest(PtzGetToursObject, params, QN_STRINGIZE_TYPE(QnPtzTourList), target, slot);
+}
+
+int QnMediaServerConnection::ptzUpdateHomePositionAsync(const QnNetworkResourcePtr &camera, const QnPtzObject &homePosition, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("command",         QnLexical::serialized(Qn::UpdateHomePositionPtzCommand));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("objectType",      QnLexical::serialized(homePosition.type));
+    params << QnRequestParam("objectId",        QnLexical::serialized(homePosition.id));
+
+    return sendAsyncGetRequest(PtzUpdateHomePositionObject, params, QN_STRINGIZE_TYPE(QnPtzObject), target, slot);
+}
+
+int QnMediaServerConnection::ptzGetHomePositionAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("command",         QnLexical::serialized(Qn::GetHomePositionPtzCommand));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+
+    return sendAsyncGetRequest(PtzGetHomePositionObject, params, QN_STRINGIZE_TYPE(QnPtzObject), target, slot);
 }
 
 int QnMediaServerConnection::ptzGetDataAsync(const QnNetworkResourcePtr &camera, Qn::PtzDataFields query, QObject *target, const char *slot) {

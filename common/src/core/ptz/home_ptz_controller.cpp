@@ -11,6 +11,8 @@
 #include "ptz_controller_pool.h"
 #include "home_ptz_executor.h"
 
+#define QN_NEW_PRESET_IS_HOME
+
 
 QnHomePtzController::QnHomePtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
@@ -63,6 +65,16 @@ bool QnHomePtzController::viewportMove(qreal aspectRatio, const QRectF &viewport
 
     m_executor->restart();
     return base_type::viewportMove(aspectRatio, viewport, speed);
+}
+
+bool QnHomePtzController::createPreset(const QnPtzPreset &preset) {
+    if(!base_type::createPreset(preset))
+        return false;
+
+#ifdef QN_NEW_PRESET_IS_HOME
+    updateHomePosition(QnPtzObject(Qn::PresetPtzObject, preset.id));
+#endif
+    return true;
 }
 
 bool QnHomePtzController::activatePreset(const QString &presetId, qreal speed) {
