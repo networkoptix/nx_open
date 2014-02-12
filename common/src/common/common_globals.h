@@ -155,6 +155,7 @@ public:
 
         PresetsPtzCapability                = 0x00010000,
         ToursPtzCapability                  = 0x00020000,
+        HomePtzCapability                   = 0x00040000,
 
         AsynchronousPtzCapability           = 0x00100000,
         SynchronizedPtzCapability           = 0x00200000,

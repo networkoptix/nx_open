@@ -37,6 +37,9 @@ public:
     virtual bool activateTour(const QString &tourId) override                                                   { return m_baseController->activateTour(tourId); }
     virtual bool getTours(QnPtzTourList *tours) override                                                        { return m_baseController->getTours(tours); }
 
+    virtual bool updateHomePosition(const QnPtzObject &homePosition) override                                   { return m_baseController->updateHomePosition(homePosition); }
+    virtual bool getHomePosition(QnPtzObject *homePosition) override                                            { return m_baseController->getHomePosition(homePosition); }
+
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override                                     { return base_type::getData(query, data); /* This is important because of base implementation! */ }
 
 protected:
