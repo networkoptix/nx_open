@@ -15,21 +15,23 @@ namespace ec2
         switch( errorCode )
         {
             case ErrorCode::ok:
-                return QString::fromLatin1( "ok" );
+                return lit( "ok" );
             case ErrorCode::failure:
-                return QString::fromLatin1( "failure" );
+                return lit( "failure" );
             case ErrorCode::unsupported:
-                return QString::fromLatin1( "unsupported" );
+                return lit( "unsupported" );
             case ErrorCode::ioError:
-                return QString::fromLatin1( "IO error" );
+                return lit( "IO error" );
             case ErrorCode::serverError:
-                return QString::fromLatin1( "server error" );
+                return lit( "server error" );
             case ErrorCode::unauthorized:
-                return QString::fromLatin1( "unauthorized" );
+                return lit( "unauthorized" );
             case ErrorCode::badResponse:
-                return QString::fromLatin1( "badResponse" );
+                return lit( "badResponse" );
+            case ErrorCode::notImplemented:
+                return lit( "notImplemented" );
             default:
-                return QString::fromLatin1( "unknown error" );
+                return lit( "unknown error" );
         }
     }
 }

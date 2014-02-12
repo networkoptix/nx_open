@@ -47,6 +47,13 @@ struct ApiResourceData: public ApiData
     QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
+struct ApiResourceDataList: public ApiData {
+	void loadFromQuery(QSqlQuery& query);
+	void toResourceList( QnResourceFactory* resFactory, QnResourceList& resList ) const;
+
+	std::vector<ApiResourceData> data;
+};
+
 struct ApiSetResourceStatusData: public ApiData
 {
     qint32 id;
@@ -62,6 +69,7 @@ QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiResourceParam, ApiResourceParamF
 
 #define ApiResourceDataFields (id) (guid) (typeId) (parentId) (name) (url) (status) (disabled) (addParams)
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiResourceData,  ApiResourceDataFields)
+QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ApiResourceDataList,  (data))
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiSetResourceStatusData,  (id) (status) )
 
 #endif // __RESOURCE_TRANSACTION_DATA_H__

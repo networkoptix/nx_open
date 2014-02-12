@@ -7,12 +7,12 @@
 #define SERVER_QUERY_PROCESSOR_H
 
 #include <QtConcurrent>
+#include <QDateTime>
 
 #include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
-#include <QDateTime>
 
 
 namespace ec2

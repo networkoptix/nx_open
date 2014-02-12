@@ -19,12 +19,20 @@ namespace ec2
 
                 case getResourceTypes:
                     return "getResourceTypes";
+                case getResources:
+                    return "getResources";
+                case getResource:
+                    return "getResource";
                 case setResourceStatus:
                     return "setResourceStatus";
                 case setResourceParams:
                     return "setResourceParams";
                 case getResourceParams:
                     return "getResourceParams";
+                case saveResource:
+                    return "saveResource";
+                case removeResource:
+                    return "removeResource";
                 case setPanicMode:
                     return "setPanicMode";
                 case getAllDataList:
@@ -40,8 +48,8 @@ namespace ec2
                     return "getCameras";
                 case getCameraHistoryList:
                     return "getCameraHistoryList";
-                case addCameraHistoryList:
-                    return "addCameraHistoryList";
+                case addCameraHistoryItem:
+                    return "addCameraHistoryItem";
 
                 case getMediaServerList:
                     return "getMediaServerList";
@@ -70,17 +78,19 @@ namespace ec2
                 case getBusinessRuleList:
                     return "getBusinessRuleList";
 
-                case addLayout:
-                    return "addLayout";
-                case updateLayout:
-                    return "updateLayout";
-                case removeLayout:
-                    return "removeLayout";
+                case addOrUpdateLayouts:
+                    return "addOrUpdateLayouts";
                 case getLayoutList:
                     return "getLayoutList";
+                case removeLayout:
+                    return "removeLayout";
 
-                case addStoredFile:
-                    return "addStoredFile";
+                case listDirectory:
+                    return "listDirectory";
+                case getStoredFile:
+                    return "getStoredFile";
+                case addOrUpdateStoredFile:
+                    return "addOrUpdateStoredFile";
                 case removeStoredFile:
                     return "removeStoredFile";
 
@@ -121,5 +131,10 @@ namespace ec2
     {
         static std::atomic<int> requestID;
         return ++requestID;
+    }
+
+    int generateUniqueID()
+    {
+        return QDateTime::currentMSecsSinceEpoch() - rand();
     }
 }

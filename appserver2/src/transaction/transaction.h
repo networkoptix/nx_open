@@ -19,12 +19,19 @@ namespace ec2
             testConnection,
             connect,
 
+            //!ApiResourceTypeList
             getResourceTypes,
+            //!ApiResourceDataList
+            getResources,
+            //!ApiResourceData
+            getResource,
             //!ApiSetResourceStatusData
             setResourceStatus,
             //!ApiResourceParams
             setResourceParams,
             getResourceParams,
+            saveResource,
+            removeResource,
             //!ApiPanicModeData
             setPanicMode,
             //!ApiFullData,
@@ -37,10 +44,10 @@ namespace ec2
             //!ApiIdData
             removeCamera,
             getCameras,
-            //!ApiCameraServerItemData
+            //!ApiCameraServerItemDataList
             getCameraHistoryList,
             //!ApiCameraServerItemData
-            addCameraHistoryList,
+            addCameraHistoryItem,
 
             getMediaServerList,
             //!ApiMediaServerData
@@ -58,26 +65,28 @@ namespace ec2
             //!ApiIdData
             removeUser,
 
+            //!ApiBusinessRuleDataList
+            getBusinessRuleList,
             //!ApiBusinessRuleData
             addBusinessRule,
             //!ApiBusinessRuleData
             updateBusinessRule,
-            getBusinessRuleList,
             //!ApiIdData
             removeBusinessRule,
 
             //!ApiLayoutData
-            addLayout,
-            //!ApiLayoutData
-            updateLayout,
+            addOrUpdateLayouts,
+            //!ApiLayoutDataList
             getLayoutList,
             //!ApiIdData
             removeLayout,
             
+            //!
+            listDirectory,
             //!ApiStoredFileData
-            addStoredFile,
+            getStoredFile,
             //!ApiStoredFileData
-            updateStoredFile,
+            addOrUpdateStoredFile,
             //!QString
             removeStoredFile,
 
@@ -161,6 +170,7 @@ namespace ec2
     };
 
     int generateRequestID();
+    int generateUniqueID();
 }
 
 QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnUuid, (data1) (data2) (data3) (data4) )

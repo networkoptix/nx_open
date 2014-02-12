@@ -42,29 +42,15 @@ namespace ec2
     }
 
     template<class T>
-    int QnMediaServerManager<T>::save( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    int QnMediaServerManager<T>::save( const QnMediaServerResourcePtr& resource, impl::SaveServerHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
-        //create transaction
-        const QnTransaction<ApiMediaServerData>& tran = prepareTransaction( ApiCommand::addMediaServer, resource );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
-        return reqID;
-    }
-
-    template<class T>
-    int QnMediaServerManager<T>::saveServer( const QnMediaServerResourcePtr& resource, impl::SaveServerHandlerPtr handler )
-    {
-        const int reqID = generateRequestID();
-
-        QnMediaServerResourceList serverList;
         ApiCommand::Value command = ApiCommand::updateMediaServer;
         if (!resource->getId().isValid()) {
             resource->setId(dbManager->getNextSequence());
             command = ApiCommand::addMediaServer;
         }
-        serverList.push_back( resource );
 
         QnAbstractStorageResourceList storages = resource->getStorages();
         for (int i = 0; i < storages.size(); ++i)
@@ -78,7 +64,7 @@ namespace ec2
         auto tran = prepareTransaction( command, resource );
 
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveServerHandler::done ), handler, reqID, _1, serverList ) );
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveServerHandler::done ), handler, reqID, _1, resource ) );
 
         return reqID;
     }

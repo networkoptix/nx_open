@@ -1,10 +1,12 @@
 #ifndef __DB_MANAGER_H_
 #define __DB_MANAGER_H_
 
+#include "managers/impl/stored_file_manager_impl.h"
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 #include "nx_ec/data/camera_data.h"
 #include "nx_ec/data/ec2_resource_type_data.h"
+#include "nx_ec/data/ec2_stored_file_data.h"
 #include "nx_ec/data/mserver_data.h"
 #include "nx_ec/data/camera_server_item_data.h"
 #include "nx_ec/data/ec2_user_data.h"
@@ -20,7 +22,7 @@ namespace ec2
     class QnDbManager
     {
     public:
-		QnDbManager(QnResourceFactory* factory);
+		QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* const storedFileManagerImpl);
 		virtual ~QnDbManager();
 
         static QnDbManager* instance();
@@ -42,6 +44,7 @@ namespace ec2
         ErrorCode executeTransaction(const QnTransaction<ApiResourceParams>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiCameraServerItemData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiPanicModeData>& tran);
+        ErrorCode executeTransaction(const QnTransaction<ApiStoredFileData>& tran);
 
         // delete camera, server, layout t.e.c
         ErrorCode executeTransaction(const QnTransaction<ApiIdData>& tran);
@@ -50,7 +53,10 @@ namespace ec2
         //getResourceTypes
 		ErrorCode doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& resourceTypeList);
 
-		//getCameras
+        //getResources
+		ErrorCode doQuery(nullptr_t /*dummy*/, ApiResourceDataList& resourceList);
+
+        //getCameras
         ErrorCode doQuery(const QnId& mServerId, ApiCameraDataList& cameraList);
 
         //getServers
@@ -76,6 +82,9 @@ namespace ec2
 
         // ApiFullData
         ErrorCode doQuery(nullptr_t /*dummy*/, ApiFullData& data);
+
+        ErrorCode doQuery(const StoredFilePath& path, ApiStoredDirContents& data);
+        ErrorCode doQuery(const StoredFilePath& path, ApiStoredFileData& data);
 
 		// --------- misc -----------------------------
 
@@ -148,6 +157,7 @@ namespace ec2
         QSqlDatabase m_sdb;
         QReadWriteLock m_mutex;
 		QnResourceFactory* m_resourceFactory;
+        StoredFileManagerImpl* const m_storedFileManagerImpl;
         qint32 m_storageTypeId;
         QnDbTransaction m_tran;
     };

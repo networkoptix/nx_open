@@ -634,6 +634,20 @@ namespace nx_http
     //}
 
 
+//    nx_http::Header::WWWAuthenticate wwwAuthenticateHeader;
+//    wwwAuthenticateHeader.authScheme = nx_http::Header::AuthScheme::digest;
+//    wwwAuthenticateHeader.params["realm"] = "Surveillance Server";
+//    wwwAuthenticateHeader.params["nonce"] = "06737538";
+//    nx_http::Header::DigestAuthorization digestAuthorizationHeader;
+//
+//    bool res = nx_http::calcDigestResponse(
+//        lit("DESCRIBE"),
+//        lit("admin"), lit("admin"),
+//        QUrl(lit("rtsp://192.168.1.104:554/0")),
+//        wwwAuthenticateHeader,
+//        &digestAuthorizationHeader );
+
+
     bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::HttpResponse& response )
     {
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers

@@ -20,10 +20,8 @@ namespace ec2
 
         //!Implementation of QnMediaServerManager::getServers
         virtual int getServers( impl::GetServersHandlerPtr handler ) override;
-        //!Implementation of QnMediaServerManager::save
-        virtual int save( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::saveServer
-        virtual int saveServer( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) override;
+        virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::remove
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 

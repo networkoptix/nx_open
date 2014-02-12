@@ -87,8 +87,10 @@ void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subD
     }
 }
 
-QnDbManager::QnDbManager(QnResourceFactory* factory):
-    m_tran(m_sdb, m_mutex)
+QnDbManager::QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* const storedFileManagerImpl ):
+    m_tran(m_sdb, m_mutex),
+    m_storedFileManagerImpl( storedFileManagerImpl )
+
 {
     m_storageTypeId = 0;
     m_resourceFactory = factory;
@@ -789,6 +791,11 @@ ErrorCode QnDbManager::removeLayout(const qint32 id)
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiStoredFileData>& tran)
+{
+    return m_storedFileManagerImpl->saveFile( tran.params.path, tran.params.fileData );
+}
+
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
 {
     switch (tran.command)
@@ -799,6 +806,8 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
         return removeServer(tran.params.id);
     case ApiCommand::removeLayout:
         return removeLayout(tran.params.id);
+    case ApiCommand::deleteStoredFile:
+        return m_storedFileManagerImpl->removeFile( tran.params.id );
     default:
         qWarning() << "Remove operation is not implemented for command" << toString(tran.command);
         break;
@@ -842,6 +851,13 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 
 	return ErrorCode::ok;
 }
+
+ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceDataList& resourceList)
+{
+    //TODO/IMPL
+    return ErrorCode::notImplemented;
+}
+
 
 // ----------- getLayouts --------------------
 
@@ -1126,6 +1142,16 @@ ErrorCode QnDbManager::doQuery(nullptr_t dummy, ApiFullData& data)
     mergeObjectListData<ApiLayoutData,      ApiResourceParam>(data.layouts.data, kvPairs, &ApiLayoutData::addParams,      &ApiResourceParam::resourceId);
 
     return err;
+}
+
+ErrorCode QnDbManager::doQuery(const StoredFilePath& path, ApiStoredDirContents& data)
+{
+    return m_storedFileManagerImpl->listDirectory( path, data );
+}
+
+ErrorCode QnDbManager::doQuery(const StoredFilePath& path, ApiStoredFileData& data)
+{
+    return m_storedFileManagerImpl->readFile( path, data );
 }
 
 

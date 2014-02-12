@@ -6,10 +6,10 @@
 #ifndef EC2_BASE_QUERY_HTTP_HANDLER_H
 #define EC2_BASE_QUERY_HTTP_HANDLER_H
 
-#include <condition_variable>
-#include <mutex>
-
 #include <QtCore/QByteArray>
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
+#include <QtCore/QWaitCondition>
 #include <QtConcurrent>
 
 #include <rest/server/request_handler.h>
@@ -57,9 +57,9 @@ namespace ec2
                 }
                 errorCode = _errorCode;
 
-                std::unique_lock<std::mutex> lk( m_mutex );
+                QMutexLocker lk( &m_mutex );
                 finished = true;
-                m_cond.notify_all();
+                m_cond.wakeAll();
             };
 
             static_cast<ChildType*>(this)->processQueryAsync<decltype(queryDoneHandler)>(
@@ -67,8 +67,9 @@ namespace ec2
                 inputData,
                 queryDoneHandler );
 
-            std::unique_lock<std::mutex> lk( m_mutex );
-            m_cond.wait( lk, [&finished]{ return finished; } );
+            QMutexLocker lk( &m_mutex );
+            while( !finished )
+                m_cond.wait( lk.mutex() );
 
             return errorCode == ErrorCode::ok
                 ? nx_http::StatusCode::ok
@@ -95,8 +96,8 @@ namespace ec2
 
     private:
         ApiCommand::Value m_cmdCode;
-        std::condition_variable m_cond;
-        std::mutex m_mutex;
+        QWaitCondition m_cond;
+        QMutex m_mutex;
     };
 
 

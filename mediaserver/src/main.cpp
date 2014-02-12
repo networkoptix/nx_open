@@ -429,7 +429,7 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
     QnMediaServerResourceList servers;
     serverPtr->setStatus(QnResource::Online, true);
 
-    ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->saveServerSync(serverPtr, &servers);
+    ec2::ErrorCode rez = ec2Connection->getMediaServerManager()->saveSync(serverPtr, &servers);
     if (rez != ec2::ErrorCode::ok)
     {
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
@@ -780,10 +780,10 @@ void QnMain::at_localInterfacesChanged()
 {
     m_mediaServer->setNetAddrList(allLocalAddresses());
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    ec2Connection->getMediaServerManager()->saveServer(m_mediaServer, this, &QnMain::at_serverSaved);
+    ec2Connection->getMediaServerManager()->save(m_mediaServer, this, &QnMain::at_serverSaved);
 }
 
-void QnMain::at_serverSaved(int, ec2::ErrorCode err, const QnResourceList &)
+void QnMain::at_serverSaved(int, ec2::ErrorCode err)
 {
     if (err != ec2::ErrorCode::ok)
         qWarning() << "Error saving server.";
@@ -1487,14 +1487,8 @@ static void printVersion();
 static void printHelp();
 
 
-int testDigest();
-
 int main(int argc, char* argv[])
 {
-    //return testDigest();
-
-
-
 
 #if __arm__
 #if defined(__GNUC__)
@@ -1573,56 +1567,3 @@ static void printHelp()
         "  --runtime-conf-file      Path to config file which is used to save some. By default "<<MSSettings::defaultRunTimeSettingsFilePath().toStdString()<<"\n"
         ;
 }
-
-
-namespace nx_http
-{
-extern bool calcDigestResponse(
-    const QString& method,
-    const QString& userName,
-    const QString& userPassword,
-    const QUrl& url,
-    const nx_http::Header::WWWAuthenticate& wwwAuthenticateHeader,
-    nx_http::Header::DigestAuthorization* const digestAuthorizationHeader );
-}
-
-//int testDigest()
-//{
-//    {
-//    nx_http::Header::WWWAuthenticate wwwAuthenticateHeader;
-//    wwwAuthenticateHeader.authScheme = nx_http::Header::AuthScheme::digest;
-//    wwwAuthenticateHeader.params["realm"] = "Surveillance Server";
-//    wwwAuthenticateHeader.params["nonce"] = "06737538";
-//    nx_http::Header::DigestAuthorization digestAuthorizationHeader;
-//
-//    bool res = nx_http::calcDigestResponse(
-//        lit("DESCRIBE"),
-//        lit("admin"), lit("admin"),
-//        QUrl(lit("rtsp://192.168.1.104:554/0")),
-//        wwwAuthenticateHeader,
-//        &digestAuthorizationHeader );
-//
-//    int x = 0;
-//
-//    }
-//
-//
-//    {
-//    nx_http::Header::WWWAuthenticate wwwAuthenticateHeader;
-//    wwwAuthenticateHeader.authScheme = nx_http::Header::AuthScheme::digest;
-//    wwwAuthenticateHeader.params["realm"] = "Surveillance Server";
-//    wwwAuthenticateHeader.params["nonce"] = "41261936";
-//    nx_http::Header::DigestAuthorization digestAuthorizationHeader;
-//
-//    bool res = nx_http::calcDigestResponse(
-//        lit("DESCRIBE"),
-//        lit("admin"), lit("admin"),
-//        QUrl(lit("rtsp://192.168.1.104:554/0")),
-//        wwwAuthenticateHeader,
-//        &digestAuthorizationHeader );
-//
-//    int x = 0;
-//    }
-//
-//    return 0;
-//}

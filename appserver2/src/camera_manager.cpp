@@ -50,7 +50,7 @@ namespace ec2
     int QnCameraManager<QueryProcessorType>::addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        ApiCommand::Value command = ApiCommand::addCameraHistoryList;
+        ApiCommand::Value command = ApiCommand::addCameraHistoryItem;
         auto tran = prepareTransaction( command, cameraHistoryItem );
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );

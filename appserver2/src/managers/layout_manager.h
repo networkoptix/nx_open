@@ -4,6 +4,7 @@
 
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_data.h"
+#include "nx_ec/data/ec2_layout_data.h"
 #include "transaction/transaction.h"
 
 
@@ -32,6 +33,8 @@ namespace ec2
         }
     private:
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
+        QnTransaction<ApiLayoutDataList> prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts );
+
     private:
         QueryProcessorType* const m_queryProcessor;
         const ResourceContext m_resCtx;

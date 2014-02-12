@@ -7,7 +7,8 @@
 #define EC2_CONNECTION_FACTORY_H
 
 #include <memory>
-#include <mutex>
+
+#include <QtCore/QMutex>
 
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/connection_data.h"
@@ -38,7 +39,7 @@ namespace ec2
         ServerQueryProcessor m_serverQueryProcessor;
         ClientQueryProcessor m_remoteQueryProcessor;
         AbstractECConnectionPtr m_directConnection;
-        std::mutex m_mutex;
+        QMutex m_mutex;
         ResourceContext m_resCtx;
         //std::map<QUrl, AbstractECConnectionPtr> m_urlToConnection;
 
@@ -64,6 +65,11 @@ namespace ec2
             QnConnectionInfo* const connectionInfo );
         int testDirectConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler );
         int testRemoteConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler );
+
+        template<class InputDataType>
+            void registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd );
+        template<class InputDataType, class OutputDataType>
+            void registerGetFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd );
     };
 }
 

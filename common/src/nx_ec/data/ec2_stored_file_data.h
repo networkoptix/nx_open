@@ -17,6 +17,15 @@ namespace ec2
         QString path;
         QByteArray fileData;
     };
+
+    typedef std::vector<QString> ApiStoredDirContents;
+
+    typedef QString StoredFilePath;
+
+    inline void parseHttpRequestParams( const QnRequestParamList& params, StoredFilePath* paht )
+    {
+        //TODO/IMPL
+    }
 }
 
 QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS( ec2::ApiStoredFileData, (path)(fileData) )

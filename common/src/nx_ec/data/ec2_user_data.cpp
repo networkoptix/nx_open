@@ -15,6 +15,11 @@ namespace ec2
         resource->setHash(hash);
     }
     
+    void ApiUserData::fromResource(QnUserResourcePtr resource) const
+    {
+        //TODO/IMPL
+    }
+
     template <class T>
     void ApiUserDataList::toResourceList(QList<T>& outData) const
     {

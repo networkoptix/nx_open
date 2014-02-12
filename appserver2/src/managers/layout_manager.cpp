@@ -1,6 +1,8 @@
 
 #include "layout_manager.h"
 
+#include <core/resource/layout_resource.h>
+
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 
@@ -32,10 +34,24 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    int QnLayoutManager<QueryProcessorType>::save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler )
+    int QnLayoutManager<QueryProcessorType>::save( const QnLayoutResourceList& layouts, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        //TODO/IMPL
+
+        //preparing output data
+		ApiCommand::Value command = ApiCommand::addOrUpdateLayouts;
+        for( QnLayoutResourcePtr layout: layouts )
+        {
+            if( !layout->getId().isValid() )
+			    layout->setId( generateUniqueID() );
+        }
+
+        //performing request
+        auto tran = prepareTransaction( command, layouts );
+
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+        
         return reqID;
     }
 
@@ -57,6 +73,17 @@ namespace ec2
         tran.command = command;
         tran.persistent = true;
         tran.params.id = id;
+        return tran;
+    }
+
+    template<class T>
+    QnTransaction<ApiLayoutDataList> QnLayoutManager<T>::prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts )
+    {
+        QnTransaction<ApiLayoutDataList> tran;
+        tran.createNewID();
+        tran.command = command;
+        tran.persistent = true;
+        tran.params.fromResourceList(layouts);
         return tran;
     }
 

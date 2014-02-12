@@ -19,6 +19,7 @@ struct ApiUserData: public ApiResourceData
     QString hash; 
 
     void toResource(QnUserResourcePtr resource) const;
+    void fromResource(QnUserResourcePtr resource) const;
     QN_DECLARE_STRUCT_SQL_BINDER();
 };
 

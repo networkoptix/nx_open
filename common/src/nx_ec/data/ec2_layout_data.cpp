@@ -18,6 +18,26 @@ namespace ec2
         resource.dewarpingParams = QJson::deserialized<QnItemDewarpingParams>(dewarpingParams);
     }
 
+    void ApiLayoutItemData::fromResource(const QnLayoutItemData& resource)
+    {
+        uuid = resource.uuid.toByteArray();
+        flags = resource.flags;
+        left = resource.combinedGeometry.topLeft().x();
+        top = resource.combinedGeometry.topLeft().y();
+        right = resource.combinedGeometry.bottomRight().x();
+        bottom = resource.combinedGeometry.bottomRight().y();
+        rotation = resource.rotation;
+        resourceId = resource.resource.id;
+        zoomLeft = resource.zoomRect.topLeft().x();
+        zoomTop = resource.zoomRect.topLeft().y();
+        zoomRight = resource.zoomRect.bottomRight().x();
+        zoomBottom = resource.zoomRect.bottomRight().y();
+        zoomTargetUuid = resource.zoomTargetUuid.toByteArray();
+        contrastParams = resource.contrastParams.serialize();
+        dewarpingParams = QJson::serialized(resource.dewarpingParams);
+    }
+
+
     void ApiLayoutData::toResource(QnLayoutResourcePtr resource) const
     {
         ApiResourceData::toResource(resource);
@@ -36,11 +56,34 @@ namespace ec2
         resource->setItems(outItems);
     }
 
+    void ApiLayoutData::fromResource(QnLayoutResourcePtr resource)
+    {
+        ApiResourceData::fromResource(resource);
+        cellAspectRatio = resource->cellAspectRatio();
+        cellSpacingWidth = resource->cellSpacing().width();
+        cellSpacingHeight = resource->cellSpacing().height();
+        userCanEdit = resource->userCanEdit();
+        locked = resource->locked();
+        backgroundImageFilename = resource->backgroundImageFilename();
+        backgroundWidth = resource->backgroundSize().width();
+        backgroundHeight = resource->backgroundSize().height();
+        backgroundOpacity = resource->backgroundOpacity();
+        const QnLayoutItemDataMap& layoutItems = resource->getItems();
+        items.clear();
+        items.reserve( layoutItems.size() );
+        for( const QnLayoutItemData& item: layoutItems )
+        {
+            items.push_back( ApiLayoutItemData() );
+            items.back().fromResource( item );
+        }
+    }
+
+
     template <class T>
     void ApiLayoutDataList::toResourceList(QList<T>& outData) const
     {
         outData.reserve(outData.size() + data.size());
-        for(int i = 0; i < data.size(); ++i) 
+        for(int i = 0; i < data.size(); ++i)
         {
             QnLayoutResourcePtr layout(new QnLayoutResource());
             data[i].toResource(layout);

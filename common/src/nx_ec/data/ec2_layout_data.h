@@ -27,6 +27,7 @@ namespace ec2
         QByteArray dewarpingParams;
 
         void toResource(QnLayoutItemData& resource) const;
+        void fromResource(const QnLayoutItemData& resource);
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
@@ -45,6 +46,7 @@ namespace ec2
         qint32 userId;
 
         void toResource(QnLayoutResourcePtr resource) const;
+        void fromResource(QnLayoutResourcePtr resource);
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
@@ -54,6 +56,15 @@ namespace ec2
 
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData) const;
+        template <class T> void fromResourceList(const QList<T>& srcData)
+        {
+            data.reserve( srcData.size() );
+            for( const T& layoutRes: srcData )
+            {
+                data.push_back( ApiLayoutData() );
+                data.back().fromResource( layoutRes );
+            }
+        }
     };
 }
 

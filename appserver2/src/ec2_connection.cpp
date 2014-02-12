@@ -14,7 +14,7 @@ namespace ec2
         const QnConnectionInfo& connectionInfo )
     :
         BaseEc2Connection<ServerQueryProcessor>( queryProcessor, resCtx ),
-        m_dbManager( new QnDbManager(resCtx.resFactory) ),
+        m_dbManager( new QnDbManager(resCtx.resFactory, &m_storedFileManagerImpl) ),
         m_connectionInfo( connectionInfo )
     {
     }

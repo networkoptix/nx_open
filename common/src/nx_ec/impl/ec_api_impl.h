@@ -96,7 +96,9 @@ namespace ec2
         unsupported,
         unauthorized,
         //!Response parse error
-        badResponse
+        badResponse,
+        //!Method is not implemented yet
+        notImplemented
     };
 
     QString toString( ErrorCode errorCode );
@@ -219,7 +221,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractMediaServerManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( SaveServer, ErrorCode, QnMediaServerResourceList)
+        DEFINE_TWO_ARG_HANDLER( SaveServer, ErrorCode, QnMediaServerResourcePtr)
         DEFINE_TWO_ARG_HANDLER( GetServers, ErrorCode, QnMediaServerResourceList )
 
 

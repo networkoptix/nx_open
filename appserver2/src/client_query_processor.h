@@ -7,10 +7,11 @@
 #define CLIENT_QUERY_PROCESSOR_H
 
 #include <map>
-#include <mutex>
 
 #include <QtConcurrent>
 #include <QtCore/QObject>
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
 
 #include <utils/network/http/asynchttpclient.h>
 
@@ -62,7 +63,7 @@ namespace ec2
             nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
-            std::unique_lock<std::mutex> lk( m_mutex );
+            QMutexLocker lk( &m_mutex );
             if( !httpClient->doGet( requestUrl ) )
             {
                 QtConcurrent::run( std::bind( handler, ErrorCode::failure, OutputData() ) );
@@ -77,7 +78,7 @@ namespace ec2
         {
             std::unique_ptr<AbstractHandler> handler;
             {
-                std::unique_lock<std::mutex> lk( m_mutex );
+                QMutexLocker lk( &m_mutex );
                 auto it = m_runningHttpRequests.find( httpClient );
                 assert( it != m_runningHttpRequests.end() );
                 handler.reset( it->second );
@@ -106,7 +107,7 @@ namespace ec2
             Handler m_handler;
         };
 
-        std::mutex m_mutex;
+        QMutex m_mutex;
         std::map<nx_http::AsyncHttpClientPtr, AbstractHandler*> m_runningHttpRequests;
 
         template<class OutputData, class HandlerType>

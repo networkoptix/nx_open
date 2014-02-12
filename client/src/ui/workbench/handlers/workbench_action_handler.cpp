@@ -1839,8 +1839,8 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
 
     // TODO: #Elric move submitToResources here.
     connection2()->getMediaServerManager()->save( server, this,
-        [this, server]( int reqID, ec2::ErrorCode errorCode ) {
-            at_resources_saved( reqID, errorCode, QnResourceList() << server );
+        [this]( int reqID, ec2::ErrorCode errorCode, QnMediaServerResourcePtr savedServerRes ) {
+            at_resources_saved( reqID, errorCode, QnResourceList() << savedServerRes );
         } );
 }
 

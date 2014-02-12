@@ -11,6 +11,7 @@
 #include "base_ec2_connection.h"
 #include "database/db_manager.h"
 #include "server_query_processor.h"
+#include "managers/impl/stored_file_manager_impl.h"
 
 
 namespace ec2
@@ -31,7 +32,8 @@ namespace ec2
         virtual void startReceivingNotifications( bool fullSyncRequired ) override;
 
     private:
-		std::unique_ptr<QnDbManager> m_dbManager;
+        StoredFileManagerImpl m_storedFileManagerImpl;
+		std::unique_ptr<QnDbManager> m_dbManager;   //TODO: #ak not sure this is right place for QnDbManager instance
         const QnConnectionInfo m_connectionInfo;
     };
 }

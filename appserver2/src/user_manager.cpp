@@ -59,7 +59,7 @@ namespace ec2
         tran.createNewID();
         tran.command = command;
         tran.persistent = true;
-        //TODO/IMPL
+        tran.params.fromResource( resource );
         return tran;
     }
 

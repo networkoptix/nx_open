@@ -50,4 +50,23 @@ QnResourceParameters ApiResourceData::toHashMap() const
 	return parameters;
 }
 
+
+void ApiResourceDataList::loadFromQuery(QSqlQuery& query)
+{
+    //TODO/IMPL
+    assert( false );
+}
+
+void ApiResourceDataList::toResourceList( QnResourceFactory* resFactory, QnResourceList& resList ) const
+{
+	resList.reserve(data.size());
+	for(int i = 0; i < data.size(); ++i) {
+        QnResourcePtr res = resFactory->createResource(
+            data[i].typeId,
+            data[i].toHashMap() ).dynamicCast<QnResource>();
+		data[i].toResource( res );
+		resList << res;
+	}
+}
+
 }

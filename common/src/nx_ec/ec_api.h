@@ -156,21 +156,15 @@ namespace ec2
         }
 
         /*!
-            \param handler Functor with params: (ErrorCode)
+            \param handler Functor with params: (ErrorCode, const QnMediaServerResourcePtr& servers)
         */
-        template<class TargetType, class HandlerType> int save( const QnMediaServerResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return save( resource, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        /*!
-            \param handler Functor with params: (ErrorCode, const QnMediaServerResourceList& servers, const QByteArray& authKey)
-        */
-        template<class TargetType, class HandlerType> int saveServer( const QnMediaServerResourcePtr& mserver, TargetType* target, HandlerType handler ) {
-            return saveServer( mserver, std::static_pointer_cast<impl::SaveServerHandler>(std::make_shared<impl::CustomSaveServerHandler<TargetType, HandlerType>>(target, handler)) );
+        template<class TargetType, class HandlerType> int save( const QnMediaServerResourcePtr& mserver, TargetType* target, HandlerType handler ) {
+            return save( mserver, std::static_pointer_cast<impl::SaveServerHandler>(std::make_shared<impl::CustomSaveServerHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode saveServerSync( const QnMediaServerResourcePtr& serverRes, QnMediaServerResourceList* const servers ) {
+        ErrorCode saveSync( const QnMediaServerResourcePtr& serverRes, QnMediaServerResourcePtr* const server ) {
             using namespace std::placeholders;
-            return impl::doSyncCall<impl::SaveServerHandler>( std::bind(std::mem_fn(&AbstractMediaServerManager::saveServer), this, serverRes, _1), servers );
+            return impl::doSyncCall<impl::SaveServerHandler>( std::bind(&AbstractMediaServerManager::save, this, serverRes, _1), server );
         }
 
         /*!
@@ -186,8 +180,7 @@ namespace ec2
 
     protected:
         virtual int getServers( impl::GetServersHandlerPtr handler ) = 0;
-        virtual int save( const QnMediaServerResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int saveServer( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) = 0;
+        virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) = 0;
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
     };
     typedef std::shared_ptr<AbstractMediaServerManager> AbstractMediaServerManagerPtr;
@@ -338,13 +331,6 @@ namespace ec2
             return impl::doSyncCall<impl::GetBusinessRulesHandler>( std::bind(std::mem_fn(&AbstractBusinessEventManager::getBusinessRules), this, _1), businessEventList );
         }
 
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int addBusinessRule( const QnBusinessEventRulePtr& businessRule, TargetType* target, HandlerType handler ) {
-            return addBusinessRule( rule, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
         //!Test if email settings are valid
         /*!
             \param handler Functor with params: (ErrorCode)
@@ -406,7 +392,6 @@ namespace ec2
 
     private:
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
-        virtual int addBusinessRule( const QnBusinessEventRulePtr& businessRule, impl::SimpleHandlerPtr handler ) = 0;
         virtual int testEmailSettings( const QnKvPairList& settings, impl::SimpleHandlerPtr handler ) = 0;
         virtual int sendEmail(
             const QStringList& to,
@@ -539,6 +524,7 @@ namespace ec2
                 std::make_shared<impl::CustomGetStoredFileHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
+            If file exists, it will be overwritten
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int addStoredFile( const QString& filename, const QByteArray& data, TargetType* target, HandlerType handler ) {
@@ -554,6 +540,7 @@ namespace ec2
         }
         /*!
             \param handler Functor with params: (ErrorCode, const QStringList& filenames)
+            \note Only file names are returned
         */
         template<class TargetType, class HandlerType> int listDirectory( const QString& folderName, TargetType* target, HandlerType handler ) {
             return listDirectory( folderName, std::static_pointer_cast<impl::ListDirectoryHandler>(
