@@ -1,4 +1,4 @@
-#include "ptz_tour_executor.h"
+#include "tour_ptz_executor.h"
 
 #include <cassert>
 
@@ -12,9 +12,9 @@
 
 #include "threaded_ptz_controller.h"
 
-#define QN_PTZ_EXECUTOR_DEBUG
-#ifdef QN_PTZ_EXECUTOR_DEBUG
-#   define TRACE(...) qDebug() << "QnPtzTourExecutor:" << __VA_ARGS__;
+#define QN_TOUR_PTZ_EXECUTOR_DEBUG
+#ifdef QN_TOUR_PTZ_EXECUTOR_DEBUG
+#   define TRACE(...) qDebug() << "QnTourPtzExecutor:" << __VA_ARGS__;
 #else
 #   define TRACE(...)
 #endif
@@ -47,9 +47,9 @@ struct QnPtzTourData {
 
 
 // -------------------------------------------------------------------------- //
-// QnPtzTourExecutorPrivate
+// QnTourPtzExecutorPrivate
 // -------------------------------------------------------------------------- //
-class QnPtzTourExecutorPrivate: public ConnectiveBase {
+class QnTourPtzExecutorPrivate: public ConnectiveBase {
 public:
     enum State {
         Stopped,
@@ -58,8 +58,8 @@ public:
         Moving,
     };
 
-    QnPtzTourExecutorPrivate();
-    virtual ~QnPtzTourExecutorPrivate();
+    QnTourPtzExecutorPrivate();
+    virtual ~QnTourPtzExecutorPrivate();
 
     void init(const QnPtzControllerPtr &controller);
 
@@ -79,7 +79,7 @@ public:
     QnPtzTourSpot &currentSpot() { return currentData.tour.spots[currentIndex]; }
     QnPtzTourSpotData &currentSpotData() { return currentData.spots[currentIndex]; }
 
-    QnPtzTourExecutor *q;
+    QnTourPtzExecutor *q;
 
     QnPtzControllerPtr baseController;
     bool usingThreadController;
@@ -103,19 +103,19 @@ public:
     QVector3D currentPosition;
 };
 
-QnPtzTourExecutorPrivate::QnPtzTourExecutorPrivate(): 
+QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate(): 
     currentState(Stopped),
     usingThreadController(false)
 {}
 
-QnPtzTourExecutorPrivate::~QnPtzTourExecutorPrivate() {
+QnTourPtzExecutorPrivate::~QnTourPtzExecutorPrivate() {
     /* It's important to release the QObject ownership here as thread controller 
      * is also owned by a QSharedPointer. */
     if(usingThreadController)
         baseController->setParent(NULL); 
 }
 
-void QnPtzTourExecutorPrivate::init(const QnPtzControllerPtr &controller) {
+void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller) {
     baseController = controller; 
     if(QnThreadedPtzController::extends(baseController->getCapabilities())) {
         baseController.reset(new QnThreadedPtzController(baseController));
@@ -131,17 +131,17 @@ void QnPtzTourExecutorPrivate::init(const QnPtzControllerPtr &controller) {
     defaultDataField = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::LogicalPositionPtzField : Qn::DevicePositionPtzField;
     defaultCommand = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::GetLogicalPositionPtzCommand : Qn::GetDevicePositionPtzCommand;
 
-    connect(baseController, &QnAbstractPtzController::finished, q, &QnPtzTourExecutor::at_controller_finished);
+    connect(baseController, &QnAbstractPtzController::finished, q, &QnTourPtzExecutor::at_controller_finished);
 }
 
-void QnPtzTourExecutorPrivate::stopTour() {
+void QnTourPtzExecutorPrivate::stopTour() {
     currentState = Stopped;
 
     moveTimer.stop();
     waitTimer.stop();
 }
 
-void QnPtzTourExecutorPrivate::startTour(const QnPtzTour &tour) {
+void QnTourPtzExecutorPrivate::startTour(const QnPtzTour &tour) {
     stopTour();
 
     TRACE("START TOUR" << tour.name);
@@ -155,7 +155,7 @@ void QnPtzTourExecutorPrivate::startTour(const QnPtzTour &tour) {
     startMoving();
 }
 
-void QnPtzTourExecutorPrivate::startMoving() {
+void QnTourPtzExecutorPrivate::startMoving() {
     if(currentState == Stopped) {
         currentIndex = 0;
         currentState = Entering;
@@ -196,7 +196,7 @@ void QnPtzTourExecutorPrivate::startMoving() {
     }
 }
 
-void QnPtzTourExecutorPrivate::processMoving() {
+void QnTourPtzExecutorPrivate::processMoving() {
     if(currentState != Entering && currentState != Moving)
         return;
 
@@ -216,7 +216,7 @@ void QnPtzTourExecutorPrivate::processMoving() {
     }
 }
 
-void QnPtzTourExecutorPrivate::processMoving(bool status, const QVector3D &position) {
+void QnTourPtzExecutorPrivate::processMoving(bool status, const QVector3D &position) {
     if(currentState != Entering && currentState != Moving)
         return;
 
@@ -250,7 +250,7 @@ void QnPtzTourExecutorPrivate::processMoving(bool status, const QVector3D &posit
     }
 }
 
-void QnPtzTourExecutorPrivate::startWaiting() {
+void QnTourPtzExecutorPrivate::startWaiting() {
     if(currentState != Entering && currentState != Moving)
         return;
 
@@ -266,7 +266,7 @@ void QnPtzTourExecutorPrivate::startWaiting() {
     }
 }
 
-void QnPtzTourExecutorPrivate::processWaiting() {
+void QnTourPtzExecutorPrivate::processWaiting() {
     if(currentState != Waiting)
         return;
 
@@ -274,7 +274,7 @@ void QnPtzTourExecutorPrivate::processWaiting() {
     startMoving();
 }
 
-bool QnPtzTourExecutorPrivate::handleTimer(int timerId) {
+bool QnTourPtzExecutorPrivate::handleTimer(int timerId) {
     if(timerId == moveTimer.timerId()) {
         processMoving();
         return true;
@@ -286,51 +286,51 @@ bool QnPtzTourExecutorPrivate::handleTimer(int timerId) {
     }
 }
 
-void QnPtzTourExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVariant &data) {
+void QnTourPtzExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVariant &data) {
     if(command == defaultCommand)
         processMoving(data.isValid(), data.value<QVector3D>());
 }
 
 
 // -------------------------------------------------------------------------- //
-// QnPtzTourExecutor
+// QnTourPtzExecutor
 // -------------------------------------------------------------------------- //
-QnPtzTourExecutor::QnPtzTourExecutor(const QnPtzControllerPtr &controller):
-    d(new QnPtzTourExecutorPrivate())
+QnTourPtzExecutor::QnTourPtzExecutor(const QnPtzControllerPtr &controller):
+    d(new QnTourPtzExecutorPrivate())
 {
     d->q = this;
     d->init(controller);
 
-    connect(this, &QnPtzTourExecutor::startTourRequested,   this, &QnPtzTourExecutor::at_startTourRequested, Qt::QueuedConnection);
-    connect(this, &QnPtzTourExecutor::stopTourRequested,    this, &QnPtzTourExecutor::at_stopTourRequested, Qt::QueuedConnection);
+    connect(this, &QnTourPtzExecutor::startTourRequested,   this, &QnTourPtzExecutor::at_startTourRequested, Qt::QueuedConnection);
+    connect(this, &QnTourPtzExecutor::stopTourRequested,    this, &QnTourPtzExecutor::at_stopTourRequested, Qt::QueuedConnection);
 }
 
-QnPtzTourExecutor::~QnPtzTourExecutor() {
+QnTourPtzExecutor::~QnTourPtzExecutor() {
     /* If this object is run in a separate thread, then it must be deleted with deleteLater(). */
     assert(QThread::currentThread() == thread()); 
 }
 
-void QnPtzTourExecutor::startTour(const QnPtzTour &tour) {
+void QnTourPtzExecutor::startTour(const QnPtzTour &tour) {
     emit startTourRequested(tour);
 }
 
-void QnPtzTourExecutor::stopTour() {
+void QnTourPtzExecutor::stopTour() {
     emit stopTourRequested();
 }
 
-void QnPtzTourExecutor::timerEvent(QTimerEvent *event) {
+void QnTourPtzExecutor::timerEvent(QTimerEvent *event) {
     if(!d->handleTimer(event->timerId()))
         base_type::timerEvent(event);
 }
 
-void QnPtzTourExecutor::at_controller_finished(Qn::PtzCommand command, const QVariant &data) {
+void QnTourPtzExecutor::at_controller_finished(Qn::PtzCommand command, const QVariant &data) {
     d->handleFinished(command, data);
 }
 
-void QnPtzTourExecutor::at_startTourRequested(const QnPtzTour &tour) {
+void QnTourPtzExecutor::at_startTourRequested(const QnPtzTour &tour) {
     d->startTour(tour);
 }
 
-void QnPtzTourExecutor::at_stopTourRequested() {
+void QnTourPtzExecutor::at_stopTourRequested() {
     d->stopTour();
 }
