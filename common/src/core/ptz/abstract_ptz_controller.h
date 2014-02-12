@@ -247,6 +247,10 @@ public:
      */
     virtual bool getTours(QnPtzTourList *tours) = 0;
 
+    /*virtual bool getHomePosition() = 0;
+
+    virtual bool updateHomePosition() = 0;*/
+
     /**
      * Gets all PTZ data associated with this controller in a single operation.
      * Default implementation just calls all the accessor functions one by one.
