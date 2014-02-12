@@ -12,6 +12,14 @@
 
 #include "threaded_ptz_controller.h"
 
+#define QN_PTZ_EXECUTOR_DEBUG
+#ifdef QN_PTZ_EXECUTOR_DEBUG
+#   define TRACE(...) qDebug() << "QnPtzTourExecutor:" << __VA_ARGS__;
+#else
+#   define TRACE(...)
+#endif
+
+
 namespace {
     int pingTimeout = 333;
     int samePositionTimeout = 5000;
@@ -136,6 +144,8 @@ void QnPtzTourExecutorPrivate::stopTour() {
 void QnPtzTourExecutorPrivate::startTour(const QnPtzTour &tour) {
     stopTour();
 
+    TRACE("START TOUR" << tour.name);
+
     currentData.tour = tour;
     currentData.tour.optimize();
     currentData.space = defaultSpace;
@@ -161,7 +171,7 @@ void QnPtzTourExecutorPrivate::startMoving() {
         return; /* Invalid state. */
     }
 
-    //qDebug() << "TOUR SPOT" << currentIndex;
+    TRACE("GO TO SPOT" << currentIndex);
 
     spotTimer.restart();
 
@@ -176,6 +186,8 @@ void QnPtzTourExecutorPrivate::startMoving() {
     waitingForNewPosition = true;
 
     if(currentState == Moving && spotData.moveTime > pingTimeout) {
+        TRACE("ESTIMATED MOVE TIME" << spotData.moveTime << "MS");
+
         moveTimer.start(spotData.moveTime - pingTimeout, q);
         usingDefaultMoveTimer = false;
     } else {
@@ -208,7 +220,7 @@ void QnPtzTourExecutorPrivate::processMoving(bool status, const QVector3D &posit
     if(currentState != Entering && currentState != Moving)
         return;
 
-    //qDebug() << "GOT POS" << position;
+    TRACE("GOT POS" << position);
 
     bool moved = !qFuzzyEquals(startPosition, position);
     bool stopped = qFuzzyEquals(currentPosition, position);
@@ -246,6 +258,8 @@ void QnPtzTourExecutorPrivate::startWaiting() {
 
     int waitTime = currentSpot().stayTime;
     if(waitTime != 0) {
+        TRACE("WAIT FOR" << waitTime << "MS");
+
         waitTimer.start(waitTime, q);
     } else {
         processWaiting();

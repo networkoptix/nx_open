@@ -136,13 +136,19 @@ public:
     QMutex mutex;
     QMutex queryMutex;
 
+    /* Unprotected block. */
+
     QnActiResourcePtr resource;
     Qn::PtzCapabilities capabilities;
     Qt::Orientations flip;
 
+    /* Block protected with mutex. */
+
     Qn::PtzCommand pendingCommand;
     ActiPtzVector pendingSpeed;
     ActiPtzVector pendingPosition;
+
+    /* Block protected with queryMutex. */
 
     ActiPtzVector currentSpeed;
     ActiPtzVector currentPosition;
@@ -266,13 +272,9 @@ bool QnActiPtzControllerPrivate::processQueriesLocked() {
             if(currentSpeed.pan != 0 || currentSpeed.tilt != 0)
                 status = status & continuousPanTiltQuery(0, 0);
 
-            /* Then move to a position. */
-            if(currentPosition.pan != position.pan || currentPosition.tilt != position.tilt)
-                status = status & absolutePanTiltQuery(position.pan, position.tilt, speed.pan);
-
-            /* Issue zoom command EVEN if zoom wasn't changed. 
-             * This is because acti cameras sometimes outright ignore absolute
-             * zoom commands. */
+            /* Issue commands EVEN if position wasn't changed. 
+             * This is because acti cameras sometimes outright ignore absolute move commands. */
+            status = status & absolutePanTiltQuery(position.pan, position.tilt, speed.pan);
             status = status & absoluteZoomQuery(position.zoom);
 
             if(status) {
