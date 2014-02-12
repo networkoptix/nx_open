@@ -116,7 +116,6 @@
 #include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
-#include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
 
 #include "version.h"
 
@@ -799,9 +798,6 @@ void QnWorkbenchActionHandler::at_previousLayoutAction_triggered() {
 void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    QnWorkbenchLayoutAspectRatioWatcher *mediaWidgetWatcher = context()->instance<QnWorkbenchLayoutAspectRatioWatcher>();
-    QnWorkbenchLayout *workbenchLayout = workbench()->currentLayout();
-
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
     if(!layout) {
         qnWarning("No layout provided.");
@@ -815,10 +811,6 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
             : qnSettings->maxSceneVideoItems();
 
     bool adjustAspectRatio = layout->getItems().isEmpty();
-    if (mediaWidgetWatcher->watchedLayouts().contains(workbenchLayout)) {
-        mediaWidgetWatcher->removeLayout(workbenchLayout);
-        adjustAspectRatio = true;
-    }
 
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
@@ -858,6 +850,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
     }
 
 
+    QnWorkbenchLayout *workbenchLayout = workbench()->currentLayout();
     if (adjustAspectRatio && workbenchLayout->resource() == layout) {
         const qreal normalAspectRatio = 4.0 / 3.0;
         const qreal wideAspectRatio = 16.0 / 9.0;
@@ -892,8 +885,6 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
         if (cellAspectRatio > 0)
             layout->setCellAspectRatio(cellAspectRatio);
-        else if (layout->getItems().size() == 1)
-            mediaWidgetWatcher->watchLayout(workbenchLayout);
     }
 }
 
