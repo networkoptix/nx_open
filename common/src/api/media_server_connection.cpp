@@ -332,6 +332,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case PtzCreateTourObject:
     case PtzRemoveTourObject:
     case PtzActivateTourObject:
+    case PtzUpdateHomePositionObject:
         emitFinished(this, response.status, handle);
         break;
     case PtzGetPositionObject:
@@ -342,6 +343,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case PtzGetToursObject:
         processJsonReply<QnPtzTourList>(this, response, handle);
+        break;
+    case PtzGetHomePositionObject:
+        processJsonReply<QnPtzObject>(this, response, handle);
         break;
     case PtzGetDataObject:
         processJsonReply<QnPtzData>(this, response, handle);
