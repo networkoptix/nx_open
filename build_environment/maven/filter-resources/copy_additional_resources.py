@@ -18,7 +18,7 @@ def get_platform():
         return 'macosx'   
 
 def get_build_arch():
-    if '${arch}' == 'arm':
+    if '${arch}'.startswith('arm'):
         return '${arch}'
     else:
         if platform.architecture()[0] == '64bit':
