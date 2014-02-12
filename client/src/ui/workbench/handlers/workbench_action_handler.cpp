@@ -726,6 +726,8 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
 
 void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
     qreal value = workbench()->currentLayout()->cellAspectRatio();
+    if (value <= 0)
+        value = qnGlobals->defaultLayoutCellAspectRatio();
 
     if (qFuzzyCompare(4.0 / 3.0, value))
         action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
