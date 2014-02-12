@@ -72,6 +72,19 @@ QnPtzToursDialog::QnPtzToursDialog(const QnPtzControllerPtr &controller, QWidget
 QnPtzToursDialog::~QnPtzToursDialog() {
 }
 
+void QnPtzToursDialog::keyPressEvent(QKeyEvent *event) {
+    switch (event->key()) {
+    case Qt::Key_Enter:
+    case Qt::Key_Return:
+        event->ignore();
+        return;
+    default:
+        break;
+    }
+    base_type::keyPressEvent(event);
+}
+
+
 void QnPtzToursDialog::loadData(const QnPtzData &data) {
     ui->tourEditWidget->setPresets(data.presets);
     m_model->setTours(data.tours);
