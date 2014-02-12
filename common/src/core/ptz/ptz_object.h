@@ -9,6 +9,7 @@
 
 struct QnPtzObject: public boost::equality_comparable1<QnPtzObject> {
     QnPtzObject(): type(Qn::InvalidPtzObject) {}
+    QnPtzObject(Qn::PtzObjectType type, const QString &id): type(type), id(id) {}
 
     friend bool operator==(const QnPtzObject &l, const QnPtzObject &r);
 

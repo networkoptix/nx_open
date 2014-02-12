@@ -172,6 +172,23 @@ bool QnCachingPtzController::getTours(QnPtzTourList *tours) {
     }
 }
 
+bool QnCachingPtzController::updateHomePosition(const QnPtzObject &homePosition) {
+    return base_type::updateHomePosition(homePosition); 
+}
+
+bool QnCachingPtzController::getHomePosition(QnPtzObject *homePosition) {
+    if(!base_type::getHomePosition(homePosition))
+        return false;
+
+    QMutexLocker locker(&m_mutex);
+    if(m_data.fields & Qn::HomePositionPtzField) {
+        *homePosition = m_data.homePosition;
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
     if(!baseController()->getData(query, data)) // TODO: #Elric should be base_type::getData => bad design =(
         return false;
@@ -251,6 +268,11 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
             m_data.fields |= Qn::ToursPtzField;
             m_data.tours = data.value<QnPtzTourList>();
             break;
+        case Qn::UpdateHomePositionPtzCommand:
+        case Qn::GetHomePositionPtzCommand:
+            m_data.fields |= Qn::HomePositionPtzField;
+            m_data.homePosition = data.value<QnPtzObject>();
+            break;
         case Qn::GetDataPtzCommand:
             updateCacheLocked(data.value<QnPtzData>());
             break;
@@ -285,5 +307,6 @@ void QnCachingPtzController::updateCacheLocked(const QnPtzData &data) {
     if(fields & Qn::FlipPtzField)           m_data.flip = data.flip;
     if(fields & Qn::PresetsPtzField)        m_data.presets = data.presets;
     if(fields & Qn::ToursPtzField)          m_data.tours = data.tours;
+    if(fields & Qn::HomePositionPtzField)   m_data.homePosition = data.homePosition;
     m_data.fields |= fields;
 }
