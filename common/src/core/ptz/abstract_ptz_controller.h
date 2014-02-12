@@ -248,8 +248,26 @@ public:
      */
     virtual bool getTours(QnPtzTourList *tours) = 0;
 
+    /**
+     * Updates PTZ home position for the camera.
+     * 
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::HomePtzCapability<tt>.
+     * 
+     * \param homePosition              PTZ home position.
+     * \returns                         Whether the operation was successful.
+     */
     virtual bool updateHomePosition(const QnPtzObject &homePosition) = 0;
 
+    /**
+     * Gets PTZ home position that is currently assigned for the camera.
+     * 
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::HomePtzCapability<tt>.
+     * 
+     * \param[out] homePosition         PTZ home position.
+     * \returns                         Whether the operation was successful.
+     */
     virtual bool getHomePosition(QnPtzObject *homePosition) = 0;
 
     /**

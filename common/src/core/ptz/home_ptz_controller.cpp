@@ -82,6 +82,12 @@ bool QnHomePtzController::activateTour(const QString &tourId) {
 }
 
 bool QnHomePtzController::updateHomePosition(const QnPtzObject &homePosition) {
+    Qn::PtzCapabilities capabilities = getCapabilities();
+    if(homePosition.type == Qn::PresetPtzObject && !(capabilities & Qn::PresetsPtzCapability))
+        return false;
+    if(homePosition.type == Qn::TourPtzObject && !(capabilities & Qn::ToursPtzCapability))
+        return false;
+
     QMutexLocker locker(&m_mutex);
 
     if(homePosition == m_adaptor->value())
