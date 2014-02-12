@@ -1,9 +1,13 @@
 #ifndef QN_PTZ_TOUR_EXECUTOR_H
 #define QN_PTZ_TOUR_EXECUTOR_H
 
+#include <QtCore/QObject>
+
 #include "ptz_fwd.h"
 
 class QnPtzTourExecutorPrivate;
+
+// TODO: #Elric rename QnTourPtzExecutor
 
 /**
  * A controller that runs a PTZ tour on a given PTZ controller. Note that it 
@@ -15,6 +19,7 @@ class QnPtzTourExecutorPrivate;
 class QnPtzTourExecutor: public QObject {
     Q_OBJECT
     typedef QObject base_type;
+
 public:
     QnPtzTourExecutor(const QnPtzControllerPtr &controller);
     virtual ~QnPtzTourExecutor();

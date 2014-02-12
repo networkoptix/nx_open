@@ -31,10 +31,6 @@ public:
     virtual bool updateHomePosition(const QnPtzObject &homePosition) override;
     virtual bool getHomePosition(QnPtzObject *homePosition) override;
 
-private:
-    void restartTimer();
-    void stopTimer();
-
 public:
     QMutex m_mutex;
     QnResourcePropertyAdaptor<QnPtzObject> *m_adaptor;

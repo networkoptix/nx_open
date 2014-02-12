@@ -9,67 +9,25 @@
 #include <utils/common/invocation_event.h>
 
 #include "ptz_controller_pool.h"
-
-
-class QnHomePositionResourcePropertyAdaptor: public QnJsonResourcePropertyAdaptor<QnPtzObject> {
-    typedef QnJsonResourcePropertyAdaptor<QnPtzObject> base_type;
-public:
-    QnHomePositionResourcePropertyAdaptor(const QnResourcePtr &resource, QObject *parent = NULL): 
-        base_type(resource, lit("ptzHomePosition"), QnPtzObject(), parent) 
-    {}
-};
-
-
-class QnHomePtzExecutor: public QObject {
-    typedef QObject base_type;
-public:
-    enum {
-        RestartTimerInvocation,
-        StopTimerInvocation
-    };
-
-    QnHomePtzExecutor(const QnPtzControllerPtr &controller): m_controller(controller) {}
-
-    void restartTimer() {
-        QCoreApplication::postEvent(this, new QnInvocationEvent(RestartTimerInvocation));
-    }
-
-    void stopTimer() {
-        QCoreApplication::postEvent(this, new QnInvocationEvent(StopTimerInvocation));
-    }
-
-protected:
-    virtual bool event(QEvent *event) override {
-        if(event->type() == QnEvent::Invocation) {
-            invocationEvent(static_cast<QnInvocationEvent *>(event));
-            return true;
-        } else {
-            return base_type::event(event);
-        }
-    }
-
-    void invocationEvent(QnInvocationEvent *event) {
-        if(event->type() == RestartTimerInvocation) {
-
-        }
-    }
-
-private:
-    QnPtzControllerPtr m_controller;
-};
+#include "home_ptz_executor.h"
 
 
 QnHomePtzController::QnHomePtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_adaptor(new QnHomePositionResourcePropertyAdaptor(baseController->resource(), this))
+    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzObject>(baseController->resource(), lit("ptzHomePosition"), QnPtzObject(), this)),
+    m_executor(new QnHomePtzExecutor(baseController))
 {
-    assert(qnPtzPool); /* Ptz pool must exist as we're going to use executor thread. */
+    assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
+
+    m_executor->moveToThread(qnPtzPool->executorThread());
+    m_executor->setHomePosition(m_adaptor->value());
+    m_executor->restart();
 
     assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 }
 
 QnHomePtzController::~QnHomePtzController() {
-    return;
+    m_executor->deleteLater();
 }
 
 bool QnHomePtzController::extends(Qn::PtzCapabilities capabilities) {
@@ -87,7 +45,7 @@ bool QnHomePtzController::continuousMove(const QVector3D &speed) {
     if(!supports(Qn::ContinuousMovePtzCommand))
         return false;
 
-    restartTimer();
+    m_executor->restart();
     return base_type::continuousMove(speed);
 }
 
@@ -95,7 +53,7 @@ bool QnHomePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVect
     if(!supports(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space)))
         return false;
 
-    restartTimer();
+    m_executor->restart();
     return base_type::absoluteMove(space, position, speed);
 }
 
@@ -103,7 +61,7 @@ bool QnHomePtzController::viewportMove(qreal aspectRatio, const QRectF &viewport
     if(!supports(Qn::ViewportMovePtzCommand))
         return false;
 
-    restartTimer();
+    m_executor->restart();
     return base_type::viewportMove(aspectRatio, viewport, speed);
 }
 
@@ -111,7 +69,7 @@ bool QnHomePtzController::activatePreset(const QString &presetId, qreal speed) {
     if(!supports(Qn::ActivatePresetPtzCommand))
         return false;
 
-    restartTimer();
+    m_executor->restart();
     return base_type::activatePreset(presetId, speed);
 }
 
@@ -119,17 +77,28 @@ bool QnHomePtzController::activateTour(const QString &tourId) {
     if(!supports(Qn::ActivateTourPtzCommand))
         return false;
 
-    stopTimer();
+    m_executor->stop();
     return base_type::activateTour(tourId);
 }
 
 bool QnHomePtzController::updateHomePosition(const QnPtzObject &homePosition) {
-    restartTimer();
+    QMutexLocker locker(&m_mutex);
+
+    if(homePosition == m_adaptor->value())
+        return true; /* Nothing to update. */
+    m_adaptor->setValue(homePosition);
+
+    m_executor->setHomePosition(homePosition);
+    m_executor->restart();
 
     return true;
 }
 
 bool QnHomePtzController::getHomePosition(QnPtzObject *homePosition) {
+    QMutexLocker locker(&m_mutex);
+
+    *homePosition = m_adaptor->value();
+
     return true;
 }
 
