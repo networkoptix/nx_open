@@ -224,7 +224,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     QnWorkbenchContextAware(parent),
     ui(new Ui::ServerSettingsDialog),
     m_server(server),
-    m_hasStorageChanges(false)
+    m_hasStorageChanges(false),
+    m_rebuildState(RebuildState::Invalid)
 {
     ui->setupUi(this);
 
@@ -382,7 +383,7 @@ void QnServerSettingsDialog::updateFromResources()
 {
     m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
 #ifndef Q_OS_MACX
-    at_archiveRebuildReply(0, QnRebuildArchiveReply(), 0);
+    updateRebuildUi(RebuildState::Invalid);
 
     if (m_server->getStatus() == QnResource::Online)
         sendNextArchiveRequest();
@@ -529,10 +530,14 @@ void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent
 void QnServerSettingsDialog::at_rebuildButton_clicked()
 {
     RebuildAction action;
-    if (m_lastRebuildReply.state() == QnRebuildArchiveReply::Started)
+    RebuildState newState = RebuildState::Invalid;
+    if (m_rebuildState == RebuildState::InProgress) {
         action = RebuildAction_Cancel;
-    else
+        newState = RebuildState::Stopping;
+    } else {
         action = RebuildAction_Start;
+        newState = RebuildState::Starting;
+    }
 
     if (action == RebuildAction_Start)
     {
@@ -549,6 +554,7 @@ void QnServerSettingsDialog::at_rebuildButton_clicked()
     }
 
     m_server->apiConnection()->doRebuildArchiveAsync (action, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
+    updateRebuildUi(newState);
 }
 
 void QnServerSettingsDialog::at_updateRebuildInfo()
@@ -556,7 +562,7 @@ void QnServerSettingsDialog::at_updateRebuildInfo()
     if (m_server->getStatus() == QnResource::Online)
         sendNextArchiveRequest();
     else
-        at_archiveRebuildReply(0, QnRebuildArchiveReply(), 0);
+        updateRebuildUi(RebuildState::Invalid);
 }
 
 void QnServerSettingsDialog::sendNextArchiveRequest()
@@ -564,25 +570,46 @@ void QnServerSettingsDialog::sendNextArchiveRequest()
     m_server->apiConnection()->doRebuildArchiveAsync (RebuildAction_ShowProgress, this, SLOT(at_archiveRebuildReply(int, const QnRebuildArchiveReply &, int)));
 }
 
+void QnServerSettingsDialog::updateRebuildUi(RebuildState newState, int progress) {
+     RebuildState oldState = m_rebuildState;
+     m_rebuildState = newState;
+
+     ui->rebuildGroupBox->setEnabled(newState != RebuildState::Invalid);
+     if (progress >= 0)
+        ui->rebuildProgressBar->setValue(progress);
+     ui->rebuildStartButton->setEnabled(newState == RebuildState::Ready);
+     ui->rebuildStopButton->setEnabled(newState == RebuildState::InProgress);
+
+     if (oldState == RebuildState::InProgress && newState == RebuildState::Ready)
+         QMessageBox::information(this,
+         tr("Finished"),
+         tr("Rebuilding archive index is completed."));
+
+     ui->stackedWidget->setCurrentIndex(newState == RebuildState::InProgress 
+         ? ui->stackedWidget->indexOf(ui->rebuildProgressPage)
+         : ui->stackedWidget->indexOf(ui->rebuildPreparePage));
+}
+
 void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int handle)
 {
-    Q_UNUSED(status)
     Q_UNUSED(handle)
-    m_lastRebuildReply = reply;
-    ui->rebuildGroupBox->setEnabled(reply.state() != QnRebuildArchiveReply::Unknown);
-    bool wasInProgress = ui->stackedWidget->currentIndex() == ui->stackedWidget->indexOf(ui->rebuildProgressPage);
-    bool inProgress = reply.state() == QnRebuildArchiveReply::Started;
-    ui->rebuildProgressBar->setValue(reply.progress());
+   RebuildState state = RebuildState::Invalid;
 
-    if (wasInProgress && !inProgress)
-        QMessageBox::information(this,
-                                 tr("Finished"),
-                                 tr("Rebuilding archive index is completed."));
+    if (status == 0) {
+        switch (reply.state()) {
+        case QnRebuildArchiveReply::Started:
+            state = RebuildState::InProgress;
+            break;
+        case QnRebuildArchiveReply::Stopped:
+            state = RebuildState::Ready;
+            break;
+        default:
+            break;
+        }
+    }
+    updateRebuildUi(state, reply.progress());
 
-    ui->stackedWidget->setCurrentIndex(inProgress 
-        ? ui->stackedWidget->indexOf(ui->rebuildProgressPage)
-        : ui->stackedWidget->indexOf(ui->rebuildPreparePage));
-    if (inProgress)
+    if (reply.state() == QnRebuildArchiveReply::Started)
         QTimer::singleShot(500, this, SLOT(sendNextArchiveRequest()));
 }
 #endif

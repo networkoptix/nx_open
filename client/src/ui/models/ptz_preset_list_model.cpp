@@ -152,7 +152,7 @@ bool QnPtzPresetListModel::setData(const QModelIndex &index, const QVariant &val
 
     switch(column) {
     case NameColumn: {
-        QString name = value.toString();
+        QString name = value.toString().trimmed();
         if(name.isEmpty())
             return false;
 
