@@ -24,6 +24,8 @@ protected:
     virtual void saveData() override;
     virtual Qn::PtzDataFields requiredFields() const override;
 
+    virtual void keyPressEvent(QKeyEvent *event) override;
+
 private slots:
     void at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
     void at_addTourButton_clicked();

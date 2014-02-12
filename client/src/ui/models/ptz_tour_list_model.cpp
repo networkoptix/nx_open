@@ -142,6 +142,9 @@ bool QnPtzTourListModel::setData(const QModelIndex &index, const QVariant &value
     if (model.tour.name == value.toString())
         return false;
 
+    if (value.toString().trimmed().isEmpty())
+        return false;
+
     model.tour.name = value.toString();
     model.modified = true;
     return true;
