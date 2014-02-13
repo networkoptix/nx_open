@@ -201,6 +201,10 @@ bool QnThreadedPtzController::getTours(QnPtzTourList *) {
     RUN_COMMAND(Qn::GetToursPtzCommand, QnPtzTourList, result, getTours, &result);
 }
 
+bool QnThreadedPtzController::getActiveObject(QnPtzObject *activeObject) {
+    RUN_COMMAND(Qn::GetActiveObjectPtzCommand, QnPtzObject, result, getActiveObject, &result);
+}
+
 bool QnThreadedPtzController::updateHomeObject(const QnPtzObject &homePosition) {
     RUN_COMMAND(Qn::UpdateHomeObjectPtzCommand, void *, homePosition, updateHomeObject, homePosition);
 }

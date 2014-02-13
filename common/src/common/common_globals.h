@@ -103,6 +103,7 @@ public:
         ActivateTourPtzCommand,
         GetToursPtzCommand,
 
+        GetActiveObjectPtzCommand,
         UpdateHomeObjectPtzCommand,
         GetHomeObjectPtzCommand,
 
@@ -112,16 +113,17 @@ public:
     };
 
     enum PtzDataField {
-        DevicePositionPtzField  = 0x01,
-        LogicalPositionPtzField = 0x02,
-        DeviceLimitsPtzField    = 0x04,
-        LogicalLimitsPtzField   = 0x08,
-        FlipPtzField            = 0x10,
-        PresetsPtzField         = 0x20,
-        ToursPtzField           = 0x40,
-        HomeObjectPtzField      = 0x80,
-        NoPtzFields             = 0x00,
-        AllPtzFields            = DevicePositionPtzField | LogicalPositionPtzField| DeviceLimitsPtzField | LogicalLimitsPtzField | FlipPtzField | PresetsPtzField | ToursPtzField | HomeObjectPtzField
+        DevicePositionPtzField  = 0x001,
+        LogicalPositionPtzField = 0x002,
+        DeviceLimitsPtzField    = 0x004,
+        LogicalLimitsPtzField   = 0x008,
+        FlipPtzField            = 0x010,
+        PresetsPtzField         = 0x020,
+        ToursPtzField           = 0x040,
+        ActiveObjectPtzField    = 0x080,
+        HomeObjectPtzField      = 0x100,
+        NoPtzFields             = 0x000,
+        AllPtzFields            = 0xFFF
     };
     Q_DECLARE_FLAGS(PtzDataFields, PtzDataField)
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
@@ -159,7 +161,8 @@ public:
 
         PresetsPtzCapability                = 0x00010000,
         ToursPtzCapability                  = 0x00020000,
-        HomePtzCapability                   = 0x00040000,
+        ActivityPtzCapability               = 0x00040000,
+        HomePtzCapability                   = 0x00080000,
 
         AsynchronousPtzCapability           = 0x00100000,
         SynchronizedPtzCapability           = 0x00200000,

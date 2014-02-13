@@ -36,6 +36,7 @@ public:
     virtual bool activateTour(const QString &tourId) override;
     virtual bool getTours(QnPtzTourList *tours) override;
 
+    virtual bool getActiveObject(QnPtzObject *) override;
     virtual bool updateHomeObject(const QnPtzObject &homePosition) override;
     virtual bool getHomeObject(QnPtzObject *homeObject) override;
 

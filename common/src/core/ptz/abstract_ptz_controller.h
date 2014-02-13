@@ -248,6 +248,8 @@ public:
      */
     virtual bool getTours(QnPtzTourList *tours) = 0;
 
+    virtual bool getActiveObject(QnPtzObject *activeObject) = 0;
+
     /**
      * Updates PTZ home position for the camera.
      * 
