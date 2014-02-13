@@ -131,7 +131,7 @@ bool QnRemotePtzController::getTours(QnPtzTourList *) {
 }
 
 bool QnRemotePtzController::getActiveObject(QnPtzObject *activeObject) {
-
+    return false; // TODO: #Elric #PTZ
 }
 
 bool QnRemotePtzController::updateHomeObject(const QnPtzObject &homePosition) {

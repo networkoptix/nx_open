@@ -86,7 +86,7 @@ void QnActivityPtzController::setActiveObject(const QnPtzObject &activeObject) {
     if(m_isLocal) {
         if(m_activeObject != activeObject) {
             m_activeObject = activeObject;
-            emit capabilitiesChanged(); // TODO: #Elric
+            emit capabilitiesChanged(); // TODO: #Elric #PTZ
         }
     } else {
         m_adaptor->setValue(activeObject);
@@ -94,5 +94,5 @@ void QnActivityPtzController::setActiveObject(const QnPtzObject &activeObject) {
 }
 
 void QnActivityPtzController::at_adaptor_valueChanged() {
-    emit capabilitiesChanged(); // TODO: #Elric
+    emit capabilitiesChanged(); // TODO: #Elric #PTZ
 }
