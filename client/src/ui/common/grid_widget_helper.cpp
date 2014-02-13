@@ -11,10 +11,10 @@
 
 #include <utils/common/string.h>
 
-QnGridWidgetHelper::QnGridWidgetHelper(QnWorkbenchContext *context):
-    QnWorkbenchContextAware(context)
+QnGridWidgetHelper::QnGridWidgetHelper(QObject *parent):
+    QObject(parent),
+    QnWorkbenchContextAware(parent)
 {
-
 }
 
 void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
