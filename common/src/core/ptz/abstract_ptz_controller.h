@@ -254,10 +254,10 @@ public:
      * This function is expected to be implemented only if this controller has 
      * <tt>Qn::HomePtzCapability<tt>.
      * 
-     * \param homePosition              PTZ home position.
+     * \param homeObject                PTZ home object.
      * \returns                         Whether the operation was successful.
      */
-    virtual bool updateHomePosition(const QnPtzObject &homePosition) = 0;
+    virtual bool updateHomeObject(const QnPtzObject &homeObject) = 0;
 
     /**
      * Gets PTZ home position that is currently assigned for the camera.
@@ -265,10 +265,10 @@ public:
      * This function is expected to be implemented only if this controller has 
      * <tt>Qn::HomePtzCapability<tt>.
      * 
-     * \param[out] homePosition         PTZ home position.
+     * \param[out] homePosition         PTZ home object.
      * \returns                         Whether the operation was successful.
      */
-    virtual bool getHomePosition(QnPtzObject *homePosition) = 0;
+    virtual bool getHomeObject(QnPtzObject *homeObject) = 0;
 
     /**
      * Gets all PTZ data associated with this controller in a single operation.

@@ -201,12 +201,12 @@ bool QnThreadedPtzController::getTours(QnPtzTourList *) {
     RUN_COMMAND(Qn::GetToursPtzCommand, QnPtzTourList, result, getTours, &result);
 }
 
-bool QnThreadedPtzController::updateHomePosition(const QnPtzObject &homePosition) {
-    RUN_COMMAND(Qn::UpdateHomePositionPtzCommand, void *, homePosition, updateHomePosition, homePosition);
+bool QnThreadedPtzController::updateHomeObject(const QnPtzObject &homePosition) {
+    RUN_COMMAND(Qn::UpdateHomeObjectPtzCommand, void *, homePosition, updateHomeObject, homePosition);
 }
 
-bool QnThreadedPtzController::getHomePosition(QnPtzObject *) {
-    RUN_COMMAND(Qn::GetHomePositionPtzCommand, QnPtzObject, result, getHomePosition, &result);
+bool QnThreadedPtzController::getHomeObject(QnPtzObject *) {
+    RUN_COMMAND(Qn::GetHomeObjectPtzCommand, QnPtzObject, result, getHomeObject, &result);
 }
 
 bool QnThreadedPtzController::getData(Qn::PtzDataFields query, QnPtzData *) {

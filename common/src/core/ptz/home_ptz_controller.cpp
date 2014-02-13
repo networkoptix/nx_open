@@ -72,7 +72,7 @@ bool QnHomePtzController::createPreset(const QnPtzPreset &preset) {
         return false;
 
 #ifdef QN_NEW_PRESET_IS_HOME
-    updateHomePosition(QnPtzObject(Qn::PresetPtzObject, preset.id));
+    updateHomeObject(QnPtzObject(Qn::PresetPtzObject, preset.id));
 #endif
     return true;
 }
@@ -93,29 +93,29 @@ bool QnHomePtzController::activateTour(const QString &tourId) {
     return base_type::activateTour(tourId);
 }
 
-bool QnHomePtzController::updateHomePosition(const QnPtzObject &homePosition) {
+bool QnHomePtzController::updateHomeObject(const QnPtzObject &homeObject) {
     Qn::PtzCapabilities capabilities = getCapabilities();
-    if(homePosition.type == Qn::PresetPtzObject && !(capabilities & Qn::PresetsPtzCapability))
+    if(homeObject.type == Qn::PresetPtzObject && !(capabilities & Qn::PresetsPtzCapability))
         return false;
-    if(homePosition.type == Qn::TourPtzObject && !(capabilities & Qn::ToursPtzCapability))
+    if(homeObject.type == Qn::TourPtzObject && !(capabilities & Qn::ToursPtzCapability))
         return false;
 
     QMutexLocker locker(&m_mutex);
 
-    if(homePosition == m_adaptor->value())
+    if(homeObject == m_adaptor->value())
         return true; /* Nothing to update. */
-    m_adaptor->setValue(homePosition);
+    m_adaptor->setValue(homeObject);
 
-    m_executor->setHomePosition(homePosition);
+    m_executor->setHomePosition(homeObject);
     m_executor->restart();
 
     return true;
 }
 
-bool QnHomePtzController::getHomePosition(QnPtzObject *homePosition) {
+bool QnHomePtzController::getHomeObject(QnPtzObject *homeObject) {
     QMutexLocker locker(&m_mutex);
 
-    *homePosition = m_adaptor->value();
+    *homeObject = m_adaptor->value();
 
     return true;
 }

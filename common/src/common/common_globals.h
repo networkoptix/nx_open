@@ -75,7 +75,7 @@ public:
         PrimaryStreamSoftMotionCapability   = 0x004,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
-        shareIpCapability                   = 0x020
+        ShareIpCapability                   = 0x020 
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);
@@ -103,8 +103,8 @@ public:
         ActivateTourPtzCommand,
         GetToursPtzCommand,
 
-        UpdateHomePositionPtzCommand,
-        GetHomePositionPtzCommand,
+        UpdateHomeObjectPtzCommand,
+        GetHomeObjectPtzCommand,
 
         GetDataPtzCommand,
 
@@ -119,9 +119,9 @@ public:
         FlipPtzField            = 0x10,
         PresetsPtzField         = 0x20,
         ToursPtzField           = 0x40,
-        HomePositionPtzField    = 0x80,
+        HomeObjectPtzField      = 0x80,
         NoPtzFields             = 0x00,
-        AllPtzFields            = DevicePositionPtzField | LogicalPositionPtzField| DeviceLimitsPtzField | LogicalLimitsPtzField | FlipPtzField | PresetsPtzField | ToursPtzField | HomePositionPtzField
+        AllPtzFields            = DevicePositionPtzField | LogicalPositionPtzField| DeviceLimitsPtzField | LogicalLimitsPtzField | FlipPtzField | PresetsPtzField | ToursPtzField | HomeObjectPtzField
     };
     Q_DECLARE_FLAGS(PtzDataFields, PtzDataField)
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
