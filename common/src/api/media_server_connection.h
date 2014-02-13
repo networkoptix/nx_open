@@ -62,6 +62,7 @@ signals:
     void finished(int status, const QString &reply, int handle);
     void finished(int status, const QnPtzPresetList &reply, int handle);
     void finished(int status, const QnPtzTourList &reply, int handle);
+    void finished(int status, const QnPtzObject &reply, int handle);
     void finished(int status, const QnPtzData &reply, int handle);
 
 private:
@@ -192,6 +193,10 @@ public:
     int ptzRemoveTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot);
     int ptzActivateTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot);
     int ptzGetToursAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+
+    int ptzGetActiveObjectAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+    int ptzUpdateHomeObjectAsync(const QnNetworkResourcePtr &camera, const QnPtzObject &homePosition, QObject *target, const char *slot);
+    int ptzGetHomeObjectAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
 
     int ptzGetDataAsync(const QnNetworkResourcePtr &camera, Qn::PtzDataFields query, QObject *target, const char *slot);
 

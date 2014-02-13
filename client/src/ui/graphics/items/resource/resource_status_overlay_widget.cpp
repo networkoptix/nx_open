@@ -40,10 +40,6 @@ namespace {
 
     Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_pausedPainterStorage);
 
-    const QColor textColor(255, 96, 96, 128);
-    const QColor buttonBaseColor(255, 32, 32, 160);
-    const QColor buttonBorderColor(255, 32, 32, 255);
-
 } // anonymous namespace
 
 
@@ -71,14 +67,13 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
 
     /* Init buttons. */
     m_diagnosticsButton = new QnTextButtonWidget(this);
+    m_diagnosticsButton->setObjectName(lit("diagnosticsButton"));
     m_diagnosticsButton->setText(tr("Diagnose..."));
     m_diagnosticsButton->setFrameShape(Qn::RectangularFrame);
     m_diagnosticsButton->setRelativeFrameWidth(1.0 / 16.0);
     m_diagnosticsButton->setStateOpacity(0, 0.4);
     m_diagnosticsButton->setStateOpacity(QnImageButtonWidget::HOVERED, 0.7);
     m_diagnosticsButton->setStateOpacity(QnImageButtonWidget::PRESSED, 1.0);
-    m_diagnosticsButton->setWindowColor(buttonBaseColor);
-    m_diagnosticsButton->setFrameColor(buttonBorderColor);
 
     connect(m_diagnosticsButton, SIGNAL(clicked()), this, SIGNAL(diagnosticsRequested()));
 
@@ -157,7 +152,7 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
     QRectF rect = this->rect();
 
-    painter->fillRect(rect, QColor(0, 0, 0, 128));
+    painter->fillRect(rect, palette().color(QPalette::Window));
 
     if(m_statusOverlay == Qn::LoadingOverlay || m_statusOverlay == Qn::PausedOverlay || m_statusOverlay == Qn::EmptyOverlay) {
         qreal unit = qnGlobals->workbenchUnitSize();
@@ -229,7 +224,7 @@ void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, const QStaticTe
     font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
 
     QnScopedPainterFontRollback fontRollback(painter, font);
-    QnScopedPainterPenRollback penRollback(painter, textColor);
+    QnScopedPainterPenRollback penRollback(painter, palette().color(QPalette::WindowText));
     QnScopedPainterTransformRollback transformRollback(painter);
 
     qreal opacity = painter->opacity();

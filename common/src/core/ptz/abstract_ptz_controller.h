@@ -14,6 +14,8 @@
 #include "ptz_preset.h"
 #include "ptz_tour.h"
 #include "ptz_data.h"
+#include "ptz_math.h"
+#include "ptz_object.h"
 
 /**
  * A thread-safe blocking interface for accessing camera's PTZ functions.
@@ -246,6 +248,30 @@ public:
      */
     virtual bool getTours(QnPtzTourList *tours) = 0;
 
+    virtual bool getActiveObject(QnPtzObject *activeObject) = 0;
+
+    /**
+     * Updates PTZ home position for the camera.
+     * 
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::HomePtzCapability<tt>.
+     * 
+     * \param homeObject                PTZ home object.
+     * \returns                         Whether the operation was successful.
+     */
+    virtual bool updateHomeObject(const QnPtzObject &homeObject) = 0;
+
+    /**
+     * Gets PTZ home position that is currently assigned for the camera.
+     * 
+     * This function is expected to be implemented only if this controller has 
+     * <tt>Qn::HomePtzCapability<tt>.
+     * 
+     * \param[out] homePosition         PTZ home object.
+     * \returns                         Whether the operation was successful.
+     */
+    virtual bool getHomeObject(QnPtzObject *homeObject) = 0;
+
     /**
      * Gets all PTZ data associated with this controller in a single operation.
      * Default implementation just calls all the accessor functions one by one.
@@ -256,16 +282,8 @@ public:
      */
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data);
 
-    /**
-     * Synchronizes this controller's internal caches with the actual target values.
-     * 
-     * \param query                     Data fields to synchronize.
-     * \returns                         Whether the operation was successful.     
-     */
-    virtual bool synchronize(Qn::PtzDataFields query) = 0;
-
 signals:
-    void capabilitiesChanged();
+    void changed(Qn::PtzDataFields fields);
     void finished(Qn::PtzCommand command, const QVariant &data);
 
 protected:

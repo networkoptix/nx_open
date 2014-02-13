@@ -172,8 +172,38 @@ bool QnCachingPtzController::getTours(QnPtzTourList *tours) {
     }
 }
 
+bool QnCachingPtzController::getActiveObject(QnPtzObject *activeObject) {
+    if(!base_type::getActiveObject(activeObject))
+        return false;
+
+    QMutexLocker locker(&m_mutex);
+    if(m_data.fields & Qn::ActiveObjectPtzField) {
+        *activeObject = m_data.activeObject;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool QnCachingPtzController::updateHomeObject(const QnPtzObject &homeObject) {
+    return base_type::updateHomeObject(homeObject); 
+}
+
+bool QnCachingPtzController::getHomeObject(QnPtzObject *homeObject) {
+    if(!base_type::getHomeObject(homeObject))
+        return false;
+
+    QMutexLocker locker(&m_mutex);
+    if(m_data.fields & Qn::HomeObjectPtzField) {
+        *homeObject = m_data.homeObject;
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
-    if(!base_type::getData(query, data))
+    if(!baseController()->getData(query, data)) // TODO: #Elric should be base_type::getData => bad design =(
         return false;
 
     QMutexLocker locker(&m_mutex);
@@ -181,10 +211,6 @@ bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
     data->query = query;
     data->fields &= query;
     return true;
-}
-
-bool QnCachingPtzController::synchronize(Qn::PtzDataFields query) {
-    return base_type::synchronize(query);
 }
 
 void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant &data) {
@@ -255,8 +281,16 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
             m_data.fields |= Qn::ToursPtzField;
             m_data.tours = data.value<QnPtzTourList>();
             break;
+        case Qn::GetActiveObjectPtzCommand:
+            m_data.fields |= Qn::ActiveObjectPtzField;
+            m_data.activeObject = data.value<QnPtzObject>();
+            break;
+        case Qn::UpdateHomeObjectPtzCommand:
+        case Qn::GetHomeObjectPtzCommand:
+            m_data.fields |= Qn::HomeObjectPtzField;
+            m_data.homeObject = data.value<QnPtzObject>();
+            break;
         case Qn::GetDataPtzCommand:
-        case Qn::SynchronizePtzCommand:
             updateCacheLocked(data.value<QnPtzData>());
             break;
         default:
@@ -273,7 +307,8 @@ bool QnCachingPtzController::initialize() {
     if(m_initialized)
         return true;
 
-    return synchronize(Qn::AllPtzFields);
+    QnPtzData data;
+    return getData(Qn::AllPtzFields, &data);
 }
 
 void QnCachingPtzController::updateCacheLocked(const QnPtzData &data) {
@@ -289,5 +324,7 @@ void QnCachingPtzController::updateCacheLocked(const QnPtzData &data) {
     if(fields & Qn::FlipPtzField)           m_data.flip = data.flip;
     if(fields & Qn::PresetsPtzField)        m_data.presets = data.presets;
     if(fields & Qn::ToursPtzField)          m_data.tours = data.tours;
+    if(fields & Qn::ActiveObjectPtzField)   m_data.activeObject = data.activeObject;
+    if(fields & Qn::HomeObjectPtzField)     m_data.homeObject = data.homeObject;
     m_data.fields |= fields;
 }

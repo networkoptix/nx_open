@@ -577,7 +577,7 @@ void QnSecurityCamResource::removeStatusFlags(StatusFlags value) {
 
 
 bool QnSecurityCamResource::needCheckIpConflicts() const {
-    return getChannel() == 0 && !hasCameraCapabilities(Qn::shareIpCapability);
+    return getChannel() == 0 && !hasCameraCapabilities(Qn::ShareIpCapability);
 }
 
 QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(

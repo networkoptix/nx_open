@@ -8,7 +8,7 @@
 #include <utils/common/lexical.h>
 
 
-// TODO: #Elric move out serialization after a merge with customization branch
+// TODO: #Elric move serialization out after merge with customization branch
 
 class QnAbstractResourcePropertyAdaptor: public Connective<QObject> {
     Q_OBJECT

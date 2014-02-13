@@ -19,6 +19,9 @@
      <property name="text">
       <string>Enable camera auto discovery</string>
      </property>
+     <property name="tristate">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>

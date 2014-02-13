@@ -18,6 +18,7 @@
 
 
 static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
+static const float DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN = 30.0;
 
 QnThirdPartyResource::QnThirdPartyResource(
     const nxcip::CameraInfo& camInfo,
@@ -331,7 +332,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     if( cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability )
         setCameraCapability( Qn::RelayOutputCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability )
-        setCameraCapability( Qn::shareIpCapability, true );
+        setCameraCapability( Qn::ShareIpCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::primaryStreamSoftMotionCapability )
         setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
@@ -395,6 +396,9 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         QMutexLocker lk( &m_mutex );
         m_encoderData = encoderDataTemp;
     }
+
+    if( !maxFps )
+        maxFps = DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN;
 
     if( !setParam( MAX_FPS_PARAM_NAME, maxFps, QnDomainDatabase ) )
     {

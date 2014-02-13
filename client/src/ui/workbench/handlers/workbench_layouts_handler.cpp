@@ -370,7 +370,7 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
             }
         }
 
-        QnCounter* counter = new QnCounter(0, this);
+        QnCounter *counter = new QnCounter(0, this);
         if (target && slot)
             connect(counter, SIGNAL(reachedZero()), target, slot);
         connect(counter, SIGNAL(reachedZero()), counter, SLOT(deleteLater()));
@@ -384,11 +384,7 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
         foreach(const QnLayoutResourcePtr &fileResource, fileResources) {
             bool isReadOnly = !(accessController()->permissions(fileResource) & Qn::WritePermission);
 
-            if(exportHandler->saveLocalLayout(fileResource,
-                                              isReadOnly,
-                                              false,
-                                              counter,
-                                              SLOT(decrement())))
+            if(exportHandler->saveLocalLayout(fileResource, isReadOnly, false, counter, SLOT(decrement())))
                 counter->increment();
         }
 

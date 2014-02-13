@@ -4,7 +4,6 @@
 #include <QtWidgets/QDialog>
 
 #include <core/ptz/ptz_fwd.h>
-#include <core/ptz/ptz_hotkey.h>
 
 #include <ui/dialogs/abstract_ptz_dialog.h>
 

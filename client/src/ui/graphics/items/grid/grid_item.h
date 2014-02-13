@@ -4,9 +4,12 @@
 #include <QtCore/QPointer>
 #include <QtWidgets/QGraphicsObject>
 
+#include <client/client_color_types.h>
+
 #include <utils/common/hash.h> /* For qHash(QPoint). */
 
 #include <ui/animation/animated.h>
+#include <ui/customization/customized.h>
 
 class AnimationTimer;
 
@@ -14,18 +17,19 @@ class QnWorkbenchGridMapper;
 class VariantAnimator;
 class QnGridHighlightItem;
 
-class QnGridItem: public Animated<QGraphicsObject> {
+class QnGridItem: public Customized<Animated<QGraphicsObject> > {
     Q_OBJECT
-    Q_PROPERTY(QColor color READ color WRITE setColor)
+    Q_PROPERTY(QnGridColors colors READ colors WRITE setColors)
+    Q_PROPERTY(qreal lineWidth READ lineWidth WRITE setLineWidth)
 
-    typedef Animated<QGraphicsObject> base_type;
+    typedef Customized<Animated<QGraphicsObject> > base_type;
 
 public:
     enum CellState {
-        INITIAL,
-        ALLOWED,
-        DISALLOWED,
-        CUSTOM
+        Initial,
+        Allowed,
+        Disallowed,
+        Custom
     };
 
     QnGridItem(QGraphicsItem *parent = NULL);
@@ -35,37 +39,21 @@ public:
     virtual QRectF boundingRect() const override;
 
     QnWorkbenchGridMapper *mapper() const;
-
     void setMapper(QnWorkbenchGridMapper *mapper);
 
-    const QColor &color() const {
-        return m_color;
-    }
+    const QnGridColors &colors() const;
+    void setColors(const QnGridColors &colors);
 
-    void setColor(const QColor &color) {
-        m_color = color;
-    }
-
-    qreal lineWidth() const {
-        return m_lineWidth;
-    }
-
-    void setLineWidth(qreal lineWidth) {
-        m_lineWidth = lineWidth;
-    }
+    qreal lineWidth() const;
+    void setLineWidth(qreal lineWidth);
 
     QColor stateColor(int cellState) const;
-
     void setStateColor(int cellState, const QColor &color);
 
     int cellState(const QPoint &cell) const;
-
     void setCellState(const QPoint &cell, int cellState);
-
     void setCellState(const QSet<QPoint> &cells, int cellState);
-
     void setCellState(const QRect &cells, int cellState);
-
     void setCellState(const QList<QRect> &cells, int cellState);
 
 protected:
@@ -82,7 +70,7 @@ protected slots:
 
 private:
     struct PointData {
-        PointData(): state(INITIAL), item(NULL) {}
+        PointData(): state(Initial), item(NULL) {}
 
         int state;
         QnGridHighlightItem *item;
@@ -90,7 +78,7 @@ private:
 
     QRectF m_boundingRect;
     QPointer<QnWorkbenchGridMapper> m_mapper;
-    QColor m_color;
+    QnGridColors m_colors;
     qreal m_lineWidth;
     QHash<int, QColor> m_colorByState;
     QHash<QPoint, PointData> m_dataByCell;

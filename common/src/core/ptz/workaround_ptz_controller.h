@@ -17,7 +17,8 @@ public:
 
 private:
     bool m_octagonal;
-    bool m_broken;
+    bool m_overrideCapabilities;
+    Qn::PtzCapabilities m_capabilities;
 };
 
 #endif // QN_WORKAROUND_PTZ_CONTROLLER_H

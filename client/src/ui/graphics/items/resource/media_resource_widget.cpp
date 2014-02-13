@@ -44,6 +44,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
+#include <ui/fisheye/fisheye_ptz_controller.h>
 
 #include "resource_status_overlay_widget.h"
 #include "resource_widget_renderer.h"
@@ -54,14 +55,9 @@
 #include "camera/caching_time_period_loader.h"
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
-#include "ui/fisheye/fisheye_ptz_controller.h"
+
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
-
-namespace {
-    static std::shared_ptr<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() );
-
-} // anonymous namespace
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     QnResourceWidget(context, item, parent),
@@ -424,7 +420,7 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
         updateCustomAspectRatio();
     } else {
-        setChannelLayout(qn_resourceWidget_defaultContentLayout);
+        setChannelLayout(QnConstResourceVideoLayoutPtr(new QnDefaultResourceVideoLayout()));
         m_renderer->setChannelCount(0);
     }
 
@@ -518,7 +514,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
     painter->endNativePainting();
 
     if(result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
-        painter->fillRect(paintRect, Qt::black);
+        painter->fillRect(paintRect, palette().color(QPalette::Window));
 
     return result;
 }
@@ -682,11 +678,11 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
     } else if(statusOverlay == Qn::UnauthorizedOverlay) {
         return Qn::MainWindow_MediaItem_Unauthorized_Help;
     } else if(options() & ControlPtz) {
-        /*if(m_fisheyePtz) { // TODO: #PTZ
+        if(m_dewarpingParams.enabled) {
             return Qn::MainWindow_MediaItem_Dewarping_Help;
         } else {
             return Qn::MainWindow_MediaItem_Ptz_Help;
-        }*/
+        }
         return Qn::MainWindow_MediaItem_Ptz_Help;
     } else if(!zoomRect().isNull()) {
         return Qn::MainWindow_MediaItem_ZoomWindows_Help;
@@ -929,7 +925,7 @@ void QnMediaResourceWidget::updateAspectRatio() {
 void QnMediaResourceWidget::at_camDisplay_liveChanged() {
     bool isLive = m_display->camDisplay()->isRealTimeSource();
 
-    if(!isLive) // && !m_fisheyePtz) // TODO: #PTZ
+    if(!isLive)
         buttonBar()->setButtonsChecked(PtzButton, false);
 }
 
@@ -960,6 +956,11 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
     QnItemDewarpingParams params = item()->dewarpingParams();
     params.enabled = checked;
     item()->setDewarpingParams(params);
+
+    if(!checked) {
+        /* Stop all ptz activity. */
+        ptzController()->continuousMove(QVector3D(0, 0, 0));
+    }
 }
 
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {

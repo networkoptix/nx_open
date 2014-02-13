@@ -468,9 +468,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         return CameraDiagnostics::ServerTerminatedResult();
 
     Qn::CameraCapabilities addFlags = Qn::NoCapabilities;
-    /*Qn::PtzCapabilities ptzCaps = Qn::NoPtzCapabilities; // TODO: #PTZ
-    if (m_ptzController)
-        ptzCaps = m_ptzController->getCapabilities();*/
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
         addFlags |= Qn::PrimaryStreamSoftMotionCapability;
     else if (!hasDualStreaming2())
@@ -479,8 +476,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     
     if (addFlags != Qn::NoCapabilities)
         setCameraCapabilities(getCameraCapabilities() | addFlags);
-    /*if (ptzCaps != Qn::NoPtzCapabilities)
-        setPtzCapabilities(ptzCaps);*/ // TODO: #PTZ
 
     //registering onvif event handler
     std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;

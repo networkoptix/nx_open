@@ -11,6 +11,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchUserEmailWatcher;
+class QnBusinessEventsFilterResourcePropertyAdaptor;
 
 class QnWorkbenchNotificationsHandler : public QObject, public QnWorkbenchContextAware
 {
@@ -28,6 +29,7 @@ signals:
 
     void businessActionAdded(const QnAbstractBusinessActionPtr& businessAction);
     void businessActionRemoved(const QnAbstractBusinessActionPtr& businessAction);
+    
     void cleared();
 
 public slots:
@@ -44,6 +46,7 @@ private slots:
 
     void at_licensePool_licensesChanged();
     void at_settings_valueChanged(int id);
+
 private:
     void requestSmtpSettings();
 
@@ -58,8 +61,11 @@ private:
     void setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible);
 
     void checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message);
+
 private:
-    QnWorkbenchUserEmailWatcher* m_userEmailWatcher;
+    QnWorkbenchUserEmailWatcher *m_userEmailWatcher;
+    QnBusinessEventsFilterResourcePropertyAdaptor *m_adaptor;
+    quint64 m_popupSystemHealthFilter;
 };
 
 #endif // WORKBENCH_NOTIFICATIONS_HANDLER_H

@@ -25,8 +25,8 @@ public:
     const QFont &font() const;
     void setFont(const QFont &font);
 
-    const QPixmap &positionShortPixmap(qint64 position, int height, const QnTimeStep &step);
-    const QPixmap &positionLongPixmap(qint64 position, int height, const QnTimeStep &step);
+    const QPixmap &positionShortPixmap(qint64 position, int height, const QnTimeStep &step, const QColor &color);
+    const QPixmap &positionLongPixmap(qint64 position, int height, const QnTimeStep &step, const QColor &color);
     const QPixmap &textPixmap(const QString &text, int height, const QColor &color);
 
     /**

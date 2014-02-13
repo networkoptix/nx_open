@@ -19,14 +19,15 @@ public:
     QnGlobalSettings(QObject *parent = NULL);
     virtual ~QnGlobalSettings();
 
-    bool isCameraAutoDiscoveryEnabled() const;
-    void setCameraAutoDiscoveryEnabled(bool cameraAutoDiscoveryEnabled);
+    QSet<QString> disabledVendorsSet() const;
+    QString disabledVendors() const;
+    void setDisabledVendors(QString disabledVendors);
 
     bool isCameraSettingsOptimizationEnabled() const;
     void setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled);
 
 signals:
-    void cameraAutoDiscoveryChanged();
+    void disabledVendorsChanged();
     void cameraSettingsOptimizationChanged();
 
 private:
@@ -36,7 +37,8 @@ private:
 private:
     mutable QMutex m_mutex;
     QnUserResourcePtr m_admin;
-    QScopedPointer<QnResourcePropertyAdaptor<bool> > m_cameraAutoDiscoveryAdaptor, m_cameraSettingsOptimizationAdaptor;
+    QScopedPointer<QnResourcePropertyAdaptor<bool> > m_cameraSettingsOptimizationAdaptor;
+    QScopedPointer<QnResourcePropertyAdaptor<QString> > m_disabledVendorsAdaptor;
 };
 
 

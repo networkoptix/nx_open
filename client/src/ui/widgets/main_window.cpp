@@ -22,6 +22,7 @@
 
 #include <api/session_manager.h>
 
+#include <ui/common/palette.h>
 #include <ui/common/frame_section.h>
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/view/graphics_view.h>
@@ -135,6 +136,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 #endif
 
     setAttribute(Qt::WA_AlwaysShowToolTips);
+    setPaletteColor(this, QPalette::Window, Qt::black);
 
     /* And file open events on Mac. */
     QnSingleEventSignalizer *fileOpenSignalizer = new QnSingleEventSignalizer(this);
@@ -273,7 +275,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
     m_titleLayout->addStretch(0x1000);
-    m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction), false, 1.0, Qn::MainWindow_Panic_Help));
     if (QnScreenRecorder::isSupported())
         m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
     m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction), false, 1.0, Qn::Login_Help));

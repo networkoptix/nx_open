@@ -1,23 +1,26 @@
-#ifndef QN_PTZ_TOUR_EXECUTOR_H
-#define QN_PTZ_TOUR_EXECUTOR_H
+#ifndef QN_TOUR_PTZ_EXECUTOR_H
+#define QN_TOUR_PTZ_EXECUTOR_H
+
+#include <QtCore/QObject>
 
 #include "ptz_fwd.h"
 
-class QnPtzTourExecutorPrivate;
+class QnTourPtzExecutorPrivate;
 
 /**
  * A controller that runs a PTZ tour on a given PTZ controller. Note that it 
  * uses event loop and timers, and thus must be run in a thread with event loop,
  * better an dedicated thread.
  * 
- * Note that public functions of this class are thread-safe. 
+ * Public functions of this class are thread-safe. 
  */
-class QnPtzTourExecutor: public QObject {
+class QnTourPtzExecutor: public QObject {
     Q_OBJECT
     typedef QObject base_type;
+
 public:
-    QnPtzTourExecutor(const QnPtzControllerPtr &controller);
-    virtual ~QnPtzTourExecutor();
+    QnTourPtzExecutor(const QnPtzControllerPtr &controller);
+    virtual ~QnTourPtzExecutor();
 
     void startTour(const QnPtzTour &tour);
     void stopTour();
@@ -26,7 +29,7 @@ protected:
     virtual void timerEvent(QTimerEvent *event) override;
 
 private:
-    friend class QnPtzTourExecutorPrivate;
+    friend class QnTourPtzExecutorPrivate;
 
     Q_SIGNAL void startTourRequested(const QnPtzTour &tour);
     Q_SIGNAL void stopTourRequested();
@@ -36,7 +39,7 @@ private:
     Q_SLOT void at_stopTourRequested();
 
 private:
-    QScopedPointer<QnPtzTourExecutorPrivate> d;
+    QScopedPointer<QnTourPtzExecutorPrivate> d;
 };
 
-#endif // QN_PTZ_TOUR_EXECUTOR_H
+#endif // QN_TOUR_PTZ_EXECUTOR_H
