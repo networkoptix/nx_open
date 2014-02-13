@@ -22,6 +22,7 @@
 #include <core/ptz/preset_ptz_controller.h>
 #include <core/ptz/tour_ptz_controller.h>
 #include <core/ptz/fallback_ptz_controller.h>
+#include <core/ptz/activity_ptz_controller.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -101,8 +102,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_ptzController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
     m_ptzController.reset(new QnPresetPtzController(m_ptzController));
     m_ptzController.reset(new QnTourPtzController(m_ptzController));
-    if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera))
+    m_ptzController.reset(new QnActivityPtzController(QnActivityPtzController::Local, m_ptzController));
+    if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {
+        serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
         m_ptzController.reset(new QnFallbackPtzController(serverController, m_ptzController));
+    }
     connect(m_ptzController.data(), SIGNAL(capabilitiesChanged()), this, SLOT(updateButtonsVisibility()));
 
     /* Set up info updates. */

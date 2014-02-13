@@ -1,7 +1,5 @@
 #include "activity_ptz_controller.h"
 
-#include <cassert>
-
 #include <api/resource_property_adaptor.h>
 
 QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControllerPtr &baseController):
@@ -14,8 +12,6 @@ QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControlle
         m_adaptor->setValue(QnPtzObject());
         connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });
     }
-
-    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability));
 }
 
 QnActivityPtzController::~QnActivityPtzController() {
@@ -84,6 +80,9 @@ bool QnActivityPtzController::getActiveObject(QnPtzObject *activeObject) {
     } else {
         *activeObject = m_adaptor->value();
     }
+
+    // TODO: #Elric #PTZ emit if asynchronous
+
     return true;
 }
 
