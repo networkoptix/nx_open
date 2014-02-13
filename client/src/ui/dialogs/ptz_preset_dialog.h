@@ -2,13 +2,13 @@
 #define QN_PTZ_PRESET_DIALOG_H
 
 #include <core/ptz/ptz_fwd.h>
-#include <core/ptz/ptz_hotkey.h>
 
 #include <ui/dialogs/abstract_ptz_dialog.h>
 
 namespace Ui {
     class PtzPresetDialog;
 }
+
 
 class QnPtzPresetDialog: public QnAbstractPtzDialog {
     Q_OBJECT

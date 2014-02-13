@@ -23,8 +23,7 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/toggle.h>
 #include <utils/math/color_transformations.h>
-
-#include <core/kvpair/ptz_hotkey_kvpair_adapter.h>
+#include <utils/resource_property_adaptors.h>
 
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/security_cam_resource.h>
@@ -94,7 +93,6 @@
 #include "workbench_access_controller.h"
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
-
 #ifdef QN_WORKBENCH_CONTROLLER_DEBUG
 #   define TRACE(...) qDebug() << __VA_ARGS__;
 #else
@@ -766,7 +764,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
 
         int hotkey = e->key() - Qt::Key_0;
 
-        QString presetId = QnPtzHotkeyKvPairAdapter::presetIdByHotkey(widget->resource()->toResourcePtr(), hotkey);
+        QString presetId = QnPtzHotkeysResourcePropertyAdaptor(widget->resource()->toResourcePtr()).value().value(hotkey);
         if (presetId.isEmpty())
             break;
 

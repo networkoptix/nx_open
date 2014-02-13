@@ -18,6 +18,10 @@ const QList<QnPtzTourItemModel>& QnPtzTourListModel::tourModels() const {
     return m_tours;
 }
 
+const QStringList& QnPtzTourListModel::removedTours() const {
+    return m_removedTours;
+}
+
 void QnPtzTourListModel::setTours(const QnPtzTourList &tours) {
     beginResetModel();
     m_tours.clear();
@@ -51,6 +55,13 @@ int QnPtzTourListModel::columnCount(const QModelIndex &parent) const {
 bool QnPtzTourListModel::removeRows(int row, int count, const QModelIndex &parent) {
     if(parent.isValid() || row < 0 || count < 1 || row + count > m_tours.size())
         return false;
+
+    auto iter = m_tours.begin() + row;
+    while(iter < m_tours.begin() + row + count) {
+        if (!iter->tour.id.isEmpty())
+            m_removedTours << iter->tour.id;
+        iter++;
+    }
 
     beginRemoveRows(parent, row, row + count - 1);
     m_tours.erase(m_tours.begin() + row, m_tours.begin() + row + count);
@@ -131,6 +142,9 @@ bool QnPtzTourListModel::setData(const QModelIndex &index, const QVariant &value
     if (model.tour.name == value.toString())
         return false;
 
+    if (value.toString().trimmed().isEmpty())
+        return false;
+
     model.tour.name = value.toString();
     model.modified = true;
     return true;
@@ -159,14 +173,14 @@ Qt::ItemFlags QnPtzTourListModel::flags(const QModelIndex &index) const {
     return flags;
 }
 
-void QnPtzTourListModel::updateTour(const QnPtzTour &tour) {
+void QnPtzTourListModel::updateTourSpots(const QString tourId, const QnPtzTourSpotList &spots) {
     for (int i = 0; i < m_tours.size(); ++i) {
-        if (m_tours[i].tour.id != tour.id)
+        if (m_tours[i].tour.id != tourId)
             continue;
-        if (m_tours[i].tour == tour)
+        if (m_tours[i].tour.spots == spots)
             return; //no changes were made
 
-        m_tours[i].tour = tour;
+        m_tours[i].tour.spots = spots;
         m_tours[i].modified = true;
         emit dataChanged(index(i, 0), index(i, ColumnCount));
         break;

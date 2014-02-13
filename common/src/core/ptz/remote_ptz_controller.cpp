@@ -130,13 +130,16 @@ bool QnRemotePtzController::getTours(QnPtzTourList *) {
     RUN_COMMAND(Qn::GetToursPtzCommand, QVariant(), ptzGetToursAsync);
 }
 
-bool QnRemotePtzController::getData(Qn::PtzDataFields query, QnPtzData *) {
-    RUN_COMMAND(Qn::GetDataPtzCommand, QVariant(), ptzGetDataAsync, query);
+bool QnRemotePtzController::updateHomePosition(const QnPtzObject &homePosition) {
+    RUN_COMMAND(Qn::UpdateHomePositionPtzCommand, homePosition, ptzUpdateHomePositionAsync, homePosition);
 }
 
-bool QnRemotePtzController::synchronize(Qn::PtzDataFields query) {
-    /* There really is nothing to synchronize, so we just run getData. */
-    RUN_COMMAND(Qn::SynchronizePtzCommand, QVariant(), ptzGetDataAsync, query);
+bool QnRemotePtzController::getHomePosition(QnPtzObject *) {
+    RUN_COMMAND(Qn::GetHomePositionPtzCommand, QVariant(), ptzGetHomePositionAsync);
+}
+
+bool QnRemotePtzController::getData(Qn::PtzDataFields query, QnPtzData *) {
+    RUN_COMMAND(Qn::GetDataPtzCommand, QVariant(), ptzGetDataAsync, query);
 }
 
 // -------------------------------------------------------------------------- //

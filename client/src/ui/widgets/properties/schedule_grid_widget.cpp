@@ -233,6 +233,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
 
             {
                 QColor penClr(toTransparent(m_enabled ? m_colors.normalLabel : m_colors.disabledLabel, 0.5));
+                p.setPen(penClr);
 
                 if (m_showFps && m_showQuality) {
                     QPointF p1(0.0, cellSize);
@@ -242,7 +243,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
 
                 if (colorInside.toRgb() != color.toRgb()) {
                     p.setBrush(m_enabled ? colorInside : disabledCellColor(colorInside));
-                    QColor penClr(m_enabled ? m_colors.normalLabel : m_colors.disabledLabel);
+                    QColor penClr(toTransparent(m_enabled ? m_colors.disabledLabel : m_colors.normalLabel, 0.5));
                     p.setPen(penClr);
 
                     qreal trOffset = cellSize/6;
@@ -261,7 +262,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
 
             // draw text parameters
             {
-                QColor penClr(toTransparent(m_enabled ? m_colors.normalLabel : m_colors.disabledLabel, 0.5));
+                QColor penClr(m_enabled ? m_colors.normalLabel : m_colors.disabledLabel);
 
                 p.setPen(penClr);
                 Qn::StreamQuality quality = (Qn::StreamQuality) m_gridParams[x][y][QualityParam].toInt();

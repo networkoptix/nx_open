@@ -25,7 +25,7 @@
                 "IP8362", "MD8562", "IPC-HDB3200C", "N53F-F", "IP8371E",
                 "FD8363", "KCM5211", "TCM3511", "AXISP3344", "AXISP1344"
             ],
-            "brokenPtz": true
+            "ptzCapabilities": "NoPtzCapabilities"
         },
         {
             "keys": [
@@ -34,36 +34,8 @@
             "octagonalPtz": true
         },
         {
-            "keys": [
-                "AXIS Q6035-E"
-            ],
-            "ptzMapper": {
-                "fromCamera": {
-                    "x": {
-                        "extrapolationMode": "PeriodicExtrapolation",
-                        "device":  [-1,   1],
-                        "logical": [ 0, 360]
-                    },
-                    "y": {
-                        "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [-0.5, 0.1111111111111],
-                        "logical": [ -90,              20]
-                    },
-                    "z": {
-                        "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [    0,     1],
-                        "logical": [35.25, 711.1],
-                        "space": "35MmEquiv"
-                    }
-                },
-                "toCamera": {
-                    "y": {
-                        "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [-0.5, 0.0, 1.0],
-                        "logical": [ -90, 0.0,  20]
-                    }
-                }
-            }
+            "keys": ["KCM3311"],
+            "ptzCapabilities": "ContinuousZoomCapability"
         },
         {
             "keys": [

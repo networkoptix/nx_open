@@ -469,7 +469,7 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::TogglePanicModeAction).
-        flags(Qn::GlobalHotkey).
+        flags(Qn::GlobalHotkey| Qn::DevMode).
         text(tr("Start Panic Recording")).
         toggledText(tr("Stop Panic Recording")).
         autoRepeat(false).
@@ -886,30 +886,12 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::SingleTarget).
-        childFactory(new QnPtzGoToPresetActionFactory(this)).
+        childFactory(new QnPtzPresetsToursActionFactory(this)).
         text(tr("PTZ...")).
         requiredPermissions(Qn::WritePtzPermission).
         condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
 
     factory.beginSubMenu(); {
-
-        factory().
-            flags(Qn::Scene | Qn::SingleTarget).
-            childFactory(new QnPtzStartTourActionFactory(this)).
-            text(tr("Tours...")).
-            requiredPermissions(Qn::WritePtzPermission).
-            condition(new QnPtzActionCondition(Qn::ToursPtzCapability, this));
-
-        factory.beginSubMenu(); {
-
-            factory(Qn::PtzManageToursAction).
-                flags(Qn::Scene | Qn::SingleTarget).
-                text(tr("Manage Tours...")).
-                requiredPermissions(Qn::WritePtzPermission).
-                condition(new QnPtzActionCondition(Qn::ToursPtzCapability, this));
-
-        } factory.endSubMenu();
-
 
         factory(Qn::PtzSavePresetAction).
             flags(Qn::Scene | Qn::SingleTarget).
@@ -922,6 +904,12 @@ QnActionManager::QnActionManager(QObject *parent):
             text(tr("Manage Saved Positions...")).
             requiredPermissions(Qn::WritePtzPermission).
             condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
+
+        factory(Qn::PtzManageToursAction).
+            flags(Qn::Scene | Qn::SingleTarget).
+            text(tr("Manage Tours...")).
+            requiredPermissions(Qn::WritePtzPermission).
+            condition(new QnPtzActionCondition(Qn::ToursPtzCapability, this));
 
     } factory.endSubMenu();
 

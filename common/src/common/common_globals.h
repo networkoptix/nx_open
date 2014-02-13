@@ -7,8 +7,7 @@
 
 #include <utils/math/defines.h> /* For INT64_MAX. */
 #include <utils/common/unused.h>
-#include <utils/common/lexical_fwd.h>
-#include <utils/common/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 /**
  * Same as <tt>Q_GADGET</tt>, but doesn't trigger MOC, and can be used in namespaces.
@@ -28,14 +27,14 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole)
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole)
     Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes)
 public:
 #else
     Q_NAMESPACE
 #endif
 
-        // TODO: #5.0 use Qt::Edge
+    // TODO: #Elric #5.0 use Qt::Edge
     /**
      * Generic enumeration describing borders of a rectangle.
      */
@@ -104,8 +103,10 @@ public:
         ActivateTourPtzCommand,
         GetToursPtzCommand,
 
+        UpdateHomePositionPtzCommand,
+        GetHomePositionPtzCommand,
+
         GetDataPtzCommand,
-        SynchronizePtzCommand,
 
         InvalidPtzCommand = -1
     };
@@ -118,8 +119,9 @@ public:
         FlipPtzField            = 0x10,
         PresetsPtzField         = 0x20,
         ToursPtzField           = 0x40,
+        HomePositionPtzField    = 0x80,
         NoPtzFields             = 0x00,
-        AllPtzFields            = DevicePositionPtzField | LogicalPositionPtzField| DeviceLimitsPtzField | LogicalLimitsPtzField | FlipPtzField | PresetsPtzField | ToursPtzField
+        AllPtzFields            = DevicePositionPtzField | LogicalPositionPtzField| DeviceLimitsPtzField | LogicalLimitsPtzField | FlipPtzField | PresetsPtzField | ToursPtzField | HomePositionPtzField
     };
     Q_DECLARE_FLAGS(PtzDataFields, PtzDataField)
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
@@ -127,6 +129,13 @@ public:
     enum PtzCoordinateSpace {
         DevicePtzCoordinateSpace,
         LogicalPtzCoordinateSpace
+    };
+
+    enum PtzObjectType {
+        PresetPtzObject,
+        TourPtzObject,
+
+        InvalidPtzObject = -1
     };
 
     enum PtzCapability {
@@ -150,6 +159,7 @@ public:
 
         PresetsPtzCapability                = 0x00010000,
         ToursPtzCapability                  = 0x00020000,
+        HomePtzCapability                   = 0x00040000,
 
         AsynchronousPtzCapability           = 0x00100000,
         SynchronizedPtzCapability           = 0x00200000,
@@ -219,7 +229,7 @@ public:
         FirstItemDataRole   = Qt::UserRole,
 
         /* Tree-based. */
-        NodeTypeRole        = FirstItemDataRole,    /**< Role for node type, see <tt>Qn::NodeType</tt>. */
+        NodeTypeRole,                               /**< Role for node type, see <tt>Qn::NodeType</tt>. */
 
         /* Resource-based. */
         ResourceRole,                               /**< Role for QnResourcePtr. */
@@ -270,6 +280,7 @@ public:
         CurrentMediaServerResourcesRole,
 
         /* Arguments. */
+        ActionIdRole,
         SerializedDataRole,
         ConnectionInfoRole,
         FocusElementRole,
@@ -307,7 +318,6 @@ public:
 
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 
-        RoleCount
     };
 
 
@@ -339,23 +349,9 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #   define lit(s) QLatin1String(s)
 #endif
 
+QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner), (metatype))
+QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities), (metatype)(lexical)(json))
 
-Q_DECLARE_METATYPE(Qn::PtzDataFields);
-Q_DECLARE_METATYPE(Qn::PtzCommand);
-Q_DECLARE_METATYPE(Qn::TimePeriodTypes);
-Q_DECLARE_METATYPE(Qn::TimePeriodType);
-Q_DECLARE_METATYPE(Qn::TimePeriodContent);
-Q_DECLARE_METATYPE(Qn::Corner);
-
-QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzCommand)
-QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzCoordinateSpace)
-QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzDataFields)
-QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzCapabilities)
-
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzCommand)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzCoordinateSpace)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzDataFields)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzCapabilities)
 
 
 #endif // QN_COMMON_GLOBALS_H

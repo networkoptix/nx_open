@@ -729,6 +729,7 @@ void QnRotatingImageButtonWidget::tick(int deltaMSecs) {
 // -------------------------------------------------------------------------- //
 QnTextButtonWidget::QnTextButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
+    m_pixmapValid(false),
     m_relativeFrameWidth(-1.0)
 {
     setFrameShape(Qn::NoFrame);
@@ -745,7 +746,8 @@ void QnTextButtonWidget::setText(const QString &text) {
         return;
 
     m_text = text;
-    updatePixmap();
+
+    invalidatePixmap();
 }
 
 QBrush QnTextButtonWidget::textBrush() const {
@@ -790,6 +792,8 @@ void QnTextButtonWidget::setGeometry(const QRectF &geometry) {
 }
 
 void QnTextButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    ensurePixmap();
+
     /* Skip Framed implementation. */
     QnImageButtonWidget::paint(painter, option, widget);
 }
@@ -805,8 +809,28 @@ void QnTextButtonWidget::paint(QPainter *painter, StateFlags startState, StateFl
     QnImageButtonWidget::paint(painter, startState, endState, progress, widget, rect);
 }
 
-void QnTextButtonWidget::updatePixmap() {
-    if (m_text.isEmpty())
+void QnTextButtonWidget::changeEvent(QEvent *event) {
+    base_type::changeEvent(event);
+
+    switch (event->type()) {
+    case QEvent::PaletteChange:
+    case QEvent::FontChange:
+        invalidatePixmap();
+        break;
+    default:
+        break;
+    }
+}
+
+void QnTextButtonWidget::invalidatePixmap() {
+    m_pixmapValid = false;
+}
+
+void QnTextButtonWidget::ensurePixmap() {
+    if(m_pixmapValid)
+        return;
+
+    if(m_text.isEmpty())
         return;
 
     // create caching image
@@ -825,13 +849,14 @@ void QnTextButtonWidget::updatePixmap() {
     QPixmap pixmap(imageSize);
     pixmap.fill(Qt::transparent);
     {
-        QPainter p(&pixmap);
-        p.setFont(font);
-        p.drawText(imageSize.width()*offset, imageSize.height()*offset + metrics.ascent(), m_text);
+        QPainter painter(&pixmap);
+        painter.setFont(font);
+        painter.setPen(QPen(palette().brush(QPalette::WindowText), 0));
+        painter.drawText(imageSize.width()*offset, imageSize.height()*offset + metrics.ascent(), m_text);
     }
 
     setPixmap(0, pixmap);
-    update();
+    m_pixmapValid = true;
 }
 
 QnTextButtonWidget::StateFlags QnTextButtonWidget::validOpacityState(StateFlags flags) const {

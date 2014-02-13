@@ -6,12 +6,11 @@
 
 #include <api/app_server_connection.h>
 
+#include <utils/resource_property_adaptors.h>
+
 #include <common/common_globals.h>
 
-#include <core/kvpair/ptz_hotkey_kvpair_adapter.h>
-
 #include <core/ptz/abstract_ptz_controller.h>
-#include <core/ptz/ptz_hotkey.h>
 #include <core/ptz/ptz_preset.h>
 #include <core/ptz/ptz_tour.h>
 #include <core/resource/camera_resource.h>
@@ -27,6 +26,7 @@
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
+#include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_context.h>
 
 class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, public QnWorkbenchContextAware {
@@ -34,24 +34,24 @@ public:
     QnSingleCameraPtzHotkeysDelegate(const QnResourcePtr &resource, QnWorkbenchContext *context):
         QnWorkbenchContextAware(context),
         m_resourceId(resource->getId()),
-        m_adapter(new QnPtzHotkeyKvPairAdapter(resource))
+        m_adapter(new QnPtzHotkeysResourcePropertyAdaptor(resource))
     {}
 
     ~QnSingleCameraPtzHotkeysDelegate() {}
 
-    virtual QnHotkeysHash hotkeys() const override {
-        return m_adapter->hotkeys();
+    virtual QnPtzHotkeyHash hotkeys() const override {
+        return m_adapter->value();
     }
 
-    virtual void updateHotkeys(const QnHotkeysHash &value) override {
-        QString serialized = QString::fromUtf8(QJson::serialized(value));
-
-        QnAppServerConnectionFactory::createConnection()->saveAsync(m_resourceId, QnKvPairList() << QnKvPair(m_adapter->key(), serialized));
+    virtual void updateHotkeys(const QnPtzHotkeyHash &value) override {
+        m_adapter->setValue(value);
     }
+
 private:
     int m_resourceId;
-    QScopedPointer<QnPtzHotkeyKvPairAdapter> m_adapter;
+    QScopedPointer<QnPtzHotkeysResourcePropertyAdaptor> m_adapter;
 };
+
 
 bool getDevicePosition(const QnPtzControllerPtr &controller, QVector3D *position) {
     if(!controller->hasCapabilities(Qn::AsynchronousPtzCapability)) {
@@ -129,6 +129,12 @@ void QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered() {
 
     qDebug() << "goToPreset activated" << resource->getId() << id;
 
+    if (widget->dewarpingParams().enabled) {
+        QnItemDewarpingParams params = widget->item()->dewarpingParams();
+        params.enabled = true;
+        widget->item()->setDewarpingParams(params);
+    }
+
     if (widget->ptzController()->activatePreset(id, 1.0)) {
         action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
     } else {
@@ -170,6 +176,12 @@ void QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered() {
         return;
 
     qDebug() << "startTour activated" << resource->getId() << id;
+
+    if (widget->dewarpingParams().enabled) {
+        QnItemDewarpingParams params = widget->item()->dewarpingParams();
+        params.enabled = true;
+        widget->item()->setDewarpingParams(params);
+    }
 
     if (widget->ptzController()->activateTour(id)) {
         action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?

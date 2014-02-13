@@ -3,7 +3,7 @@
 
 #include <core/ptz/ptz_tour.h>
 
-#include <ui/models/ptz_tour_model.h>
+#include <ui/models/ptz_tour_spots_model.h>
 #include <ui/delegates/ptz_tour_item_delegate.h>
 
 #include <utils/common/event_processors.h>
@@ -11,15 +11,15 @@
 QnPtzTourWidget::QnPtzTourWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PtzTourWidget),
-    m_model(new QnPtzTourModel(this))
+    m_model(new QnPtzTourSpotsModel(this))
 {
     ui->setupUi(this);
 
     ui->tableView->setModel(m_model);
     ui->tableView->horizontalHeader()->setVisible(true);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourModel::TimeColumn, QHeaderView::Fixed);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourModel::SpeedColumn, QHeaderView::Fixed);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourModel::NameColumn, QHeaderView::Stretch);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourSpotsModel::TimeColumn, QHeaderView::Fixed);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourSpotsModel::SpeedColumn, QHeaderView::Fixed);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourSpotsModel::NameColumn, QHeaderView::Stretch);
 
     ui->tableView->installEventFilter(this);
 
@@ -33,7 +33,7 @@ QnPtzTourWidget::QnPtzTourWidget(QWidget *parent) :
     connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_tableViewport_resizeEvent()), Qt::QueuedConnection);
 
 
-    connect(m_model,            SIGNAL(tourChanged(QnPtzTour)), this, SIGNAL(tourChanged(QnPtzTour)));
+    connect(m_model, &QnPtzTourSpotsModel::spotsChanged, this, &QnPtzTourWidget::tourSpotsChanged);
 
     connect(ui->addSpotButton,      SIGNAL(clicked()), this, SLOT(at_addSpotButton_clicked()));
     connect(ui->deleteSpotButton,   SIGNAL(clicked()), this, SLOT(at_deleteSpotButton_clicked()));
@@ -45,14 +45,21 @@ QnPtzTourWidget::~QnPtzTourWidget() {
 }
 
 
-void QnPtzTourWidget::setPtzTour(const QnPtzTour &tour) {
-    m_model->setTour(tour);
+const QnPtzTourSpotList& QnPtzTourWidget::spots() const {
+    return m_model->spots();
+}
 
-    if (!tour.spots.isEmpty())
+void QnPtzTourWidget::setSpots(const QnPtzTourSpotList &spots) {
+    m_model->setSpots(spots);
+    if (!spots.isEmpty())
         ui->tableView->setCurrentIndex(ui->tableView->model()->index(0, 0));
 }
 
-void QnPtzTourWidget::setPtzPresets(const QnPtzPresetList &presets) {
+const QnPtzPresetList& QnPtzTourWidget::presets() const {
+    return m_model->presets();
+}
+
+void QnPtzTourWidget::setPresets(const QnPtzPresetList &presets) {
     m_model->setPresets(presets);
 }
 
@@ -92,8 +99,8 @@ void QnPtzTourWidget::at_moveSpotDownButton_clicked() {
 
 void QnPtzTourWidget::at_tableViewport_resizeEvent() {
     const int minSize = ui->tableView->horizontalHeader()->minimumSectionSize();
-    ui->tableView->horizontalHeader()->resizeSection(QnPtzTourModel::TimeColumn, minSize);
-    ui->tableView->horizontalHeader()->resizeSection(QnPtzTourModel::SpeedColumn, minSize);
+    ui->tableView->horizontalHeader()->resizeSection(QnPtzTourSpotsModel::TimeColumn, minSize);
+    ui->tableView->horizontalHeader()->resizeSection(QnPtzTourSpotsModel::SpeedColumn, minSize);
 
     QModelIndexList selectedIndices = ui->tableView->selectionModel()->selectedRows();
     if(selectedIndices.isEmpty())

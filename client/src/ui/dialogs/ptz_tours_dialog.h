@@ -24,17 +24,21 @@ protected:
     virtual void saveData() override;
     virtual Qn::PtzDataFields requiredFields() const override;
 
+    virtual void keyPressEvent(QKeyEvent *event) override;
+
 private slots:
     void at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
     void at_addTourButton_clicked();
     void at_deleteTourButton_clicked();
 
     void at_tableViewport_resizeEvent();
+    void at_tourSpotsChanged(const QnPtzTourSpotList &spots);
 private:
     bool saveTours();
 
     QScopedPointer<Ui::PtzToursDialog> ui;
     QnPtzTourListModel *m_model;
+    QString m_currentTourId;
 };
 
 #endif // PTZ_TOURS_DIALOG_H

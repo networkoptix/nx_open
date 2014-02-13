@@ -7,8 +7,6 @@
 
 #include <business/business_strings_helper.h>
 
-#include <core/kvpair/business_events_filter_kvpair_adapter.h>
-
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -17,13 +15,15 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <utils/resource_property_adaptors.h>
 #include <utils/app_server_notification_cache.h>
 #include <utils/common/email.h>
 #include <utils/media/audio_player.h>
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent) :
     QObject(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_adaptor(NULL)
 {
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
     connect(m_userEmailWatcher, &QnWorkbenchUserEmailWatcher::userEmailValidityChanged,     this,   &QnWorkbenchNotificationsHandler::at_userEmailValidityChanged);
@@ -79,7 +79,8 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     if (!context()->user())
         return;
 
-    if (!QnBusinessEventsFilterKvPairAdapter::eventAllowed(context()->user(), eventType))
+    const bool soundAction = businessAction->actionType() == BusinessActionType::PlaySoundRepeated;
+    if (!soundAction && !(m_adaptor && m_adaptor->isAllowed(eventType)))
         return;
 
     emit businessActionAdded(businessAction);
@@ -112,6 +113,7 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     case QnSystemHealth::EmailSendError:
     case QnSystemHealth::StoragesNotConfigured:
     case QnSystemHealth::StoragesAreFull:
+    case QnSystemHealth::ArchiveRebuildFinished:
         return true;
 
     default:
@@ -165,6 +167,9 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
     requestSmtpSettings();
     at_licensePool_licensesChanged();
+
+    delete m_adaptor;
+    m_adaptor = context()->user() ? new QnBusinessEventsFilterResourcePropertyAdaptor(context()->user(), this) : NULL;
 }
 
 void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message) {
@@ -193,6 +198,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         return;
 
     case QnSystemHealth::StoragesNotConfigured:
+    case QnSystemHealth::ArchiveRebuildFinished:
         return;
 
     default:

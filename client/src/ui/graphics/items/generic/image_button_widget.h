@@ -217,13 +217,17 @@ protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
 
-    void updatePixmap();
+    virtual void changeEvent(QEvent *event) override;
+
+    void invalidatePixmap();
+    void ensurePixmap();
 
 protected:
     StateFlags validOpacityState(StateFlags flags) const;
 
 private:
     QString m_text;
+    bool m_pixmapValid;
     qreal m_relativeFrameWidth;
     boost::array<qreal, FLAGS_MAX + 1> m_opacities;
 };

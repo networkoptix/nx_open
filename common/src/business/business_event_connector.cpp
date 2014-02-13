@@ -108,3 +108,8 @@ void QnBusinessEventConnector::at_NoStorages(const QnResourcePtr& resource)
     QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::StoragesNotConfigured, resource->getId()));
     qnBusinessRuleProcessor->broadcastBusinessAction(action);
 }
+
+void QnBusinessEventConnector::at_archiveRebuildFinished(const QnResourcePtr &resource) {
+    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::ArchiveRebuildFinished, resource->getId()));
+    qnBusinessRuleProcessor->broadcastBusinessAction(action);
+}
