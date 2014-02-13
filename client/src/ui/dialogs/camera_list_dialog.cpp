@@ -132,11 +132,11 @@ void QnCameraListDialog::at_customContextMenuRequested(const QPoint &pos) {
 }
 
 void QnCameraListDialog::at_exportAction() {
-    QnGridWidgetHelper(this).exportToFile(ui->gridCameras, tr("Export selected cameras to file"));
+    QnGridWidgetHelper::exportToFile(ui->gridCameras, this, tr("Export selected cameras to file"));
 }
 
 void QnCameraListDialog::at_copyToClipboard() {
-    QnGridWidgetHelper(this).copyToClipboard(ui->gridCameras);
+    QnGridWidgetHelper::copyToClipboard(ui->gridCameras);
 }
 
 void QnCameraListDialog::at_modelChanged() {

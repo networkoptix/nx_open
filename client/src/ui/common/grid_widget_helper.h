@@ -1,22 +1,19 @@
 #ifndef __GRID_WIDGET_HELPER_H__
 #define __GRID_WIDGET_HELPER_H__
 
-#include <QtCore/QLatin1Char>
+#include <QtCore/QCoreApplication>
 
 class QTableView;
 class QWidget;
 
-class QnGridWidgetHelper: public QObject {
-    Q_OBJECT
+class QnGridWidgetHelper {
+    Q_DECLARE_TR_FUNCTIONS(QnGridWidgetHelper)
 public:
-    QnGridWidgetHelper(QWidget *widget = NULL);
+    static void exportToFile(QTableView *grid, QWidget *parent, const QString &caption);
+    static void copyToClipboard(QTableView *grid);
 
-    void exportToFile(QTableView* grid, const QString& caption);
-    void copyToClipboard(QTableView* grid);
 private:
-    void getGridData(QTableView* grid, QString& textData, QString& htmlData, const QLatin1Char& textDelimiter);
-
-    QWidget* m_widget;
+    static void getGridData(QTableView *grid, const QLatin1Char &textDelimiter, QString *textData, QString *htmlData);
 };
 
 #endif // __GRID_WIDGET_HELPER_H__

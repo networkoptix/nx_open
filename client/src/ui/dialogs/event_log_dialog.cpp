@@ -514,12 +514,12 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
 
 void QnEventLogDialog::at_exportAction()
 {
-    QnGridWidgetHelper(this).exportToFile(ui->gridEvents, tr("Export selected events to file"));
+    QnGridWidgetHelper::exportToFile(ui->gridEvents, this, tr("Export selected events to file"));
 }
 
 void QnEventLogDialog::at_copyToClipboard()
 {
-    QnGridWidgetHelper(this).copyToClipboard(ui->gridEvents);
+    QnGridWidgetHelper::copyToClipboard(ui->gridEvents);
 }
 
 void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
