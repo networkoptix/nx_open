@@ -142,7 +142,9 @@ namespace ec2
         //AbstractStoredFileManager::getStoredFile
         registerGetFuncHandler<ApiStoredFilePath, ApiStoredFileData>( restProcessorPool, ApiCommand::getStoredFile );
         //AbstractStoredFileManager::addStoredFile
-        registerUpdateFuncHandler<ApiStoredFileData>( restProcessorPool, ApiCommand::addOrUpdateStoredFile );
+        registerUpdateFuncHandler<ApiStoredFileData>( restProcessorPool, ApiCommand::addStoredFile );
+        //AbstractStoredFileManager::updateStoredFile
+        registerUpdateFuncHandler<ApiStoredFileData>( restProcessorPool, ApiCommand::updateStoredFile );
         //AbstractStoredFileManager::deleteStoredFile
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeStoredFile );
 

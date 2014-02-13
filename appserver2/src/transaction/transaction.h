@@ -89,7 +89,9 @@ namespace ec2
             //!ApiStoredFileData
             getStoredFile,
             //!ApiStoredFileData
-            addOrUpdateStoredFile,
+            addStoredFile,
+            //!ApiStoredFileData
+            updateStoredFile,
             //!QString
             removeStoredFile,
 

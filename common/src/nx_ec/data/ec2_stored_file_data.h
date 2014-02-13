@@ -23,7 +23,7 @@ namespace ec2
 
     typedef QString ApiStoredFilePath;
 
-    inline void parseHttpRequestParams( const QnRequestParamList& params, ApiStoredFilePath* paht )
+    inline void parseHttpRequestParams( const QnRequestParamList& params, ApiStoredFilePath* path )
     {
         //TODO/IMPL
     }

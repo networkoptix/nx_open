@@ -28,8 +28,12 @@ namespace ec2
 
         template<> void triggerNotification<ApiStoredFileData>( const QnTransaction<ApiStoredFileData>& tran )
         {
-            assert( tran.command == ApiCommand::addOrUpdateStoredFile );
-            emit addedOrUpdated( tran.params.path );
+            if( tran.command == ApiCommand::addStoredFile )
+                emit added( tran.params.path );
+            else if( tran.command == ApiCommand::updateStoredFile )
+                emit updated( tran.params.path );
+            else
+                assert( false );
         }
 
         template<> void triggerNotification<QString>( const QnTransaction<QString>& tran )

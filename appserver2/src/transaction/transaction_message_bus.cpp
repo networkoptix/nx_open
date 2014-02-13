@@ -300,7 +300,8 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
         case ApiCommand::removeLayout:
             return deliveryTransaction<ApiIdData>(command, stream);
             
-        case ApiCommand::addOrUpdateStoredFile:
+        case ApiCommand::addStoredFile:
+        case ApiCommand::updateStoredFile:
             return deliveryTransaction<ApiStoredFileData>(command, stream);
         case ApiCommand::removeStoredFile:
             return deliveryTransaction<ApiStoredFilePath>(command, stream);
@@ -308,6 +309,10 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
         default:
             break;
     }
+
+    //TODO/IMPL deliver businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
+    //TODO/IMPL deliver businessRuleReset( const QnBusinessEventRuleList& rules );
+    //TODO/IMPL deliver runtimeInfoChanged( const ec2::QnRuntimeInfo& runtimeInfo );
 
     return true;
 }

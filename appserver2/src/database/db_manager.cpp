@@ -854,8 +854,8 @@ ErrorCode QnDbManager::removeLayout(const qint32 id)
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiStoredFileData>& tran)
 {
-    assert( tran.command == ApiCommand::addOrUpdateStoredFile );
-    return m_storedFileManagerImpl->saveFile( tran.params  );
+    assert( tran.command == ApiCommand::addStoredFile || tran.command == ApiCommand::updateStoredFile );
+    return m_storedFileManagerImpl->saveFile( tran.params );
 }
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiStoredFilePath>& tran)

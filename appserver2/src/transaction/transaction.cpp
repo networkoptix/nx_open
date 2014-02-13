@@ -89,8 +89,10 @@ namespace ec2
                     return "listDirectory";
                 case getStoredFile:
                     return "getStoredFile";
-                case addOrUpdateStoredFile:
-                    return "addOrUpdateStoredFile";
+                case addStoredFile:
+                    return "addStoredFile";
+                case updateStoredFile:
+                    return "updateStoredFile";
                 case removeStoredFile:
                     return "removeStoredFile";
 

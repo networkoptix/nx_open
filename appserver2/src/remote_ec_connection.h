@@ -93,6 +93,10 @@ namespace ec2
             return m_layoutManager->triggerNotification( tran );
         }
 
+        template<> void processTransaction<ApiStoredFileData>( const QnTransaction<ApiStoredFileData>& tran ) {
+            return m_storedFileManager->triggerNotification( tran );
+        }
+
         template<> void processTransaction<ApiFullData>( const QnTransaction<ApiFullData>& tran ) {
             QnFullResourceData fullResData;
             tran.params.toResourceList( fullResData, m_resCtx );
