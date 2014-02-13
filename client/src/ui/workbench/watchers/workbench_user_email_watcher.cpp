@@ -1,7 +1,7 @@
 #include "workbench_user_email_watcher.h"
 
 #include <core/resource/user_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <utils/common/email.h>
 
@@ -18,6 +18,18 @@ QnWorkbenchUserEmailWatcher::QnWorkbenchUserEmailWatcher(QObject *parent) :
 QnWorkbenchUserEmailWatcher::~QnWorkbenchUserEmailWatcher() {
     while(!m_emailValidByUser.empty())
         at_resourcePool_resourceRemoved(m_emailValidByUser.keys().back());
+}
+
+void QnWorkbenchUserEmailWatcher::forceCheck(const QnUserResourcePtr &user) {
+    emit userEmailValidityChanged(user, m_emailValidByUser.value(user, QnEmail::isValid(user->getEmail())));
+}
+
+void QnWorkbenchUserEmailWatcher::forceCheckAll() {
+    QHash<QnUserResourcePtr, bool>::const_iterator iter = m_emailValidByUser.constBegin();
+    while (iter != m_emailValidByUser.constEnd()) {
+        emit userEmailValidityChanged(iter.key(), iter.value());
+        ++iter;
+    }
 }
 
 void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {

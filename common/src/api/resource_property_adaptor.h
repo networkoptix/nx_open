@@ -8,7 +8,7 @@
 #include <utils/common/lexical.h>
 
 
-// TODO: #Elric move out serialization after a merge with customization branch
+// TODO: #Elric move serialization out after merge with customization branch
 
 class QnAbstractResourcePropertyAdaptor: public Connective<QObject> {
     Q_OBJECT
@@ -62,10 +62,10 @@ template<class T>
 class QnResourcePropertyAdaptor: public QnAbstractResourcePropertyAdaptor {
     typedef QnAbstractResourcePropertyAdaptor base_type;
 public:
-    QnResourcePropertyAdaptor(const QnResourcePtr &resource, const QString &key, QObject *parent = NULL): 
+    QnResourcePropertyAdaptor(const QnResourcePtr &resource, const QString &key, const T &defaultValue = T(), QObject *parent = NULL): 
         QnAbstractResourcePropertyAdaptor(resource, key, parent),
         m_type(qMetaTypeId<T>()),
-        m_invalidValue(T())
+        m_defaultValue(defaultValue)
     {}
 
     const T &value() const {
@@ -73,7 +73,7 @@ public:
         if(baseValue.userType() == m_type) {
             return *static_cast<const T *>(baseValue.constData());
         } else {
-            return m_invalidValue;
+            return m_defaultValue;
         }
     }
 
@@ -111,7 +111,7 @@ protected:
 
 private:
     int m_type;
-    T m_invalidValue;
+    T m_defaultValue;
 };
 
 
@@ -119,8 +119,8 @@ template<class T>
 class QnJsonResourcePropertyAdaptor: public QnResourcePropertyAdaptor<T> {
     typedef QnResourcePropertyAdaptor<T> base_type;
 public:
-    QnJsonResourcePropertyAdaptor(const QnResourcePtr &resource, const QString &key, QObject *parent = NULL):
-        base_type(resource, key, parent)
+    QnJsonResourcePropertyAdaptor(const QnResourcePtr &resource, const QString &key, const T &defaultValue = T(), QObject *parent = NULL):
+        base_type(resource, key, defaultValue, parent)
     {
         base_type::loadValue();
     }
@@ -141,8 +141,8 @@ template<class T>
 class QnLexicalResourcePropertyAdaptor: public QnResourcePropertyAdaptor<T> {
     typedef QnResourcePropertyAdaptor<T> base_type;
 public:
-    QnLexicalResourcePropertyAdaptor(const QnResourcePtr &resource, const QString &key, QObject *parent = NULL):
-        base_type(resource, key, parent)
+    QnLexicalResourcePropertyAdaptor(const QnResourcePtr &resource, const QString &key, const T &defaultValue = T(), QObject *parent = NULL):
+        base_type(resource, key, defaultValue, parent)
     {
         base_type::loadValue();
     }

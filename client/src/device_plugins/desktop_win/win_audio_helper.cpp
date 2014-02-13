@@ -1,5 +1,7 @@
 #include "win_audio_helper.h"
 
+#include <QtCore/QtGlobal>
+
 #ifdef Q_OS_WIN
 
 #include <InitGuid.h>
@@ -16,6 +18,8 @@
 #include <Propvarutil.h>
 
 #include "utils/common/util.h"
+
+#pragma comment(lib, "ole32.lib")
 
 /* This one is private API, but it is exported from QtGui. */
 extern QPixmap qt_pixmapFromWinHICON(HICON icon);

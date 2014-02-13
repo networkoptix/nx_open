@@ -9,7 +9,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_value_rollback.h>
-#include <core/resource_managment/resource_criterion.h>
+#include <core/resource_management/resource_criterion.h>
 #include <core/resource/resource.h>
 
 #include <ui/workbench/workbench_context.h>
@@ -469,7 +469,7 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::TogglePanicModeAction).
-        flags(Qn::GlobalHotkey).
+        flags(Qn::GlobalHotkey| Qn::DevMode).
         text(tr("Start Panic Recording")).
         toggledText(tr("Stop Panic Recording")).
         autoRepeat(false).
@@ -582,30 +582,22 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::EscapeHotkeyAction).
         flags(Qn::GlobalHotkey).
+        autoRepeat(false).
         shortcut(tr("Esc")).
         shortcutContext(Qt::WidgetWithChildrenShortcut).
         text(tr("Stop current action"));
 
     factory(Qn::FullscreenAction).
-        flags(Qn::GlobalHotkey).
+        flags(Qn::NoTarget).
         text(tr("Go to Fullscreen")).
         toggledText(tr("Exit Fullscreen")).
-        autoRepeat(false).
-#ifdef Q_OS_MAC
-        shortcut(tr("Ctrl+F")).
-#else
-        shortcut(tr("Alt+Enter")).
-        shortcut(tr("Alt+Return")).
-#endif
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));
 
-    registerAlias(Qn::EffectiveMaximizeAction, Qn::FullscreenAction);
 
     factory(Qn::MinimizeAction).
         flags(Qn::NoTarget).
         text(tr("Minimize")).
         icon(qnSkin->icon("titlebar/minimize.png"));
-
 
     factory(Qn::MaximizeAction).
         flags(Qn::NoTarget).
@@ -613,6 +605,19 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Restore Down")).
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));
+
+
+    factory(Qn::FullscreenMaximizeHotkeyAction).
+        flags(Qn::GlobalHotkey).
+        autoRepeat(false).
+#ifdef Q_OS_MAC
+        shortcut(tr("Ctrl+F")).
+#else
+        shortcut(tr("Alt+Enter")).
+        shortcut(tr("Alt+Return")).
+#endif
+        shortcutContext(Qt::WidgetWithChildrenShortcut);
+
 
     factory(Qn::MessageBoxAction).
         flags(Qn::NoTarget).
@@ -694,9 +699,10 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnCheckForUpdatesActionCondition(this));
 
     factory(Qn::AboutAction).
-        flags(Qn::Main).
+        flags(Qn::Main | Qn::GlobalHotkey).
         text(tr("About...")).
         shortcut(tr("F1")).
+        shortcutContext(Qt::ApplicationShortcut).
         role(QAction::AboutRole).
         autoRepeat(false);
 
@@ -880,30 +886,12 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::SingleTarget).
-        childFactory(new QnPtzGoToPresetActionFactory(this)).
+        childFactory(new QnPtzPresetsToursActionFactory(this)).
         text(tr("PTZ...")).
         requiredPermissions(Qn::WritePtzPermission).
         condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
 
     factory.beginSubMenu(); {
-
-        factory().
-            flags(Qn::Scene | Qn::SingleTarget).
-            childFactory(new QnPtzStartTourActionFactory(this)).
-            text(tr("Tours...")).
-            requiredPermissions(Qn::WritePtzPermission).
-            condition(new QnPtzActionCondition(Qn::ToursPtzCapability, this));
-
-        factory.beginSubMenu(); {
-
-            factory(Qn::PtzManageToursAction).
-                flags(Qn::Scene | Qn::SingleTarget).
-                text(tr("Manage Tours...")).
-                requiredPermissions(Qn::WritePtzPermission).
-                condition(new QnPtzActionCondition(Qn::ToursPtzCapability, this));
-
-        } factory.endSubMenu();
-
 
         factory(Qn::PtzSavePresetAction).
             flags(Qn::Scene | Qn::SingleTarget).
@@ -916,6 +904,12 @@ QnActionManager::QnActionManager(QObject *parent):
             text(tr("Manage Saved Positions...")).
             requiredPermissions(Qn::WritePtzPermission).
             condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
+
+        factory(Qn::PtzManageToursAction).
+            flags(Qn::Scene | Qn::SingleTarget).
+            text(tr("Manage Tours...")).
+            requiredPermissions(Qn::WritePtzPermission).
+            condition(new QnPtzActionCondition(Qn::ToursPtzCapability, this));
 
     } factory.endSubMenu();
 
@@ -1072,11 +1066,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("User Settings...")).
         condition(hasFlags(QnResource::user));
-
-    factory().
-        flags(Qn::Scene | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        condition(hasFlags(QnResource::live_cam)).
-        text(tr("Change Camera Aspect Ratio..."));
 
     factory(Qn::CameraIssuesAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
@@ -1290,6 +1279,10 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::DebugCalibratePtzAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::DevMode).
         text(tr("Calibrate PTZ"));
+
+    factory(Qn::DebugGetPtzPositionAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::DevMode).
+        text(tr("Get PTZ Position"));
 
     factory(Qn::DebugControlPanelAction).
         flags(Qn::GlobalHotkey | Qn::DevMode).
@@ -1508,6 +1501,8 @@ QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWid
         qnWarning("No action exists for id '%1'.", static_cast<int>(rootId));
     } else {
         result = newMenuRecursive(rootAction, scope, parameters, parent);
+        if (!result)
+            result = new QMenu(parent);
     }
 
     if(result) {
@@ -1593,13 +1588,13 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
         }
     }
 
-    if (!result->isEmpty())
-        result->addSeparator();
-
     if(parent->childFactory()) {
         QList<QAction *> actions = parent->childFactory()->newActions(parameters, NULL);
 
         if(!actions.isEmpty()) {
+            if (!result->isEmpty())
+                result->addSeparator();
+
             foreach(QAction *action, actions) {
                 action->setParent(result);
                 result->addAction(action);

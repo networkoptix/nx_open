@@ -87,8 +87,12 @@ void QnSkin::init(const QString &basePath) {
         QPixmapCache::setCacheLimit(cacheLimit);
 }
 
+const QString &QnSkin::basePath() const {
+    return m_basePath;
+}
+
 QnSkin::~QnSkin() {
-    return ;
+    return;
 }
 
 QIcon QnSkin::icon(const QString &name, const QString &checkedName) {
@@ -212,3 +216,8 @@ QString QnSkin::path(const QString &name) const {
         return name;
     return m_basePath + name;
 }
+
+QMovie *QnSkin::loadMovie(const QString &name, QObject *parent) {
+    return new QMovie(path(name), QByteArray(), parent);
+}
+

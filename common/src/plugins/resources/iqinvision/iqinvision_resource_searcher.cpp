@@ -68,14 +68,13 @@ QString QnPlIqResourceSearcher::manufacture() const
 }
 
 
-QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
 {
-    if( !url.scheme().isEmpty() )
+    if( !url.scheme().isEmpty() && isSearchAction )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
     Q_UNUSED(url)
     Q_UNUSED(auth)
-    Q_UNUSED(doMultichannelCheck)
     return QList<QnResourcePtr>();
 }
 
@@ -259,7 +258,7 @@ QnResourceList QnPlIqResourceSearcher::findResources()
             QString sender;
             quint16 senderPort;
 
-            int readed = receiveSock->recvFrom(datagram.data(), datagram.size(),	sender, senderPort);
+            int readed = receiveSock->recvFrom(datagram.data(), datagram.size(), sender, senderPort);
 
             if (senderPort == NATIVE_DISCOVERY_RESPONSE_PORT && readed > 128) // minimum response size
                 processNativePacket(result, datagram.left(readed), iface.address);

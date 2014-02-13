@@ -48,7 +48,16 @@
   DEFINES += ENABLE_DESKTOP_CAMERA
 }
 
-IS_VMAX_ENABLED=${vmax}
-contains( IS_VMAX_ENABLED, true ) {
-  DEFINES += ENABLE_VMAX
+contains(NAME, mediaserver) || contains(NAME, common) {
+  IS_VMAX_ENABLED=${vmax}
+  contains( IS_VMAX_ENABLED, true ) {
+    DEFINES += ENABLE_VMAX
+  }
+}
+
+contains(NAME, client) {
+  IS_DYNAMIC_CUSTOMIZATION_ENABLED=${dynamic.customization}
+  contains( IS_DYNAMIC_CUSTOMIZATION_ENABLED, true ) {
+    DEFINES += ENABLE_DYNAMIC_CUSTOMIZATION
+  }
 }

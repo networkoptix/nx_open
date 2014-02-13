@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_ARECONT
 
-#include "core/resource_managment/resource_searcher.h"
+#include "core/resource_management/resource_searcher.h"
 
 class QnPlArecontResourceSearcher : public QnAbstractNetworkResourceSearcher
 {

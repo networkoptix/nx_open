@@ -165,7 +165,6 @@ namespace Qn {
         NoDataOverlay,
         UnauthorizedOverlay,
         OfflineOverlay,
-        AnalogWithoutLicenseOverlay,
         ServerOfflineOverlay,
 
         OverlayCount
@@ -225,10 +224,36 @@ namespace Qn {
      */
     const QString customAspectRatioKey = lit("overrideAr");
 
+    /**
+     * Flags describing the client light mode.
+     */
+    enum LightModeFlag {
+        LightModeNoAnimation    = 0x01,
+        LightModeSmallWindow    = 0x02,
+        LightModeNoBackground   = 0x04,
+        LightModeNoOpacity      = 0x08,
+        LightModeNoNotifications= 0x10,
+        LightModeSingleItem     = 0x20,
+        LightModeNoShadows      = 0x40,
+
+        LightModeFull           = 0xFF
+
+    };
+    Q_DECLARE_FLAGS(LightModeFlags, LightModeFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(LightModeFlags)
+
+
+    enum ClientSkin {
+        DarkSkin,
+        LightSkin
+    };
+
+
 } // namespace Qn
 
 Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(Qn::ItemRole)
 Q_DECLARE_METATYPE(Qn::TimeMode)
+Q_DECLARE_METATYPE(Qn::ClientSkin)
 
 #endif // QN_CLIENT_GLOBALS_H

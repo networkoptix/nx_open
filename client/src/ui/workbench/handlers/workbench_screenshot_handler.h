@@ -54,13 +54,13 @@ private:
 /**
  * @brief The QnWorkbenchScreenshotHandler class            Handler for the screenshots related actions.
  */
-class QnWorkbenchScreenshotHandler: public QObject, protected QnWorkbenchContextAware {
+class QnWorkbenchScreenshotHandler: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
     QnWorkbenchScreenshotHandler(QObject *parent = NULL);
 
 private:
-    QnImageProvider* getLocalScreenshotProvider(const QnScreenshotParameters &parameters, QnResourceDisplay* display);
+    QnImageProvider* getLocalScreenshotProvider(QnScreenshotParameters &parameters, QnResourceDisplay* display);
 private slots:
     void at_takeScreenshotAction_triggered();
     void at_imageLoaded(const QImage &image);

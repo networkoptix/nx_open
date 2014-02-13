@@ -16,4 +16,5 @@ ProductResourcesNameset::ProductResourcesNameset()
     registerResource( ProductParameters::version, "version", QVariant::String );
     registerResource( ProductParameters::mirrorUrl, "mirrorUrl", QVariant::String );
     registerResource( ProductParameters::arch, "arch", QVariant::String );
+    registerResource( ProductParameters::platform, "platform", QVariant::String );
 }

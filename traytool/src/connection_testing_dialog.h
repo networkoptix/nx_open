@@ -1,10 +1,12 @@
 #ifndef CONNECTION_TESTING_DIALOG_H
 #define CONNECTION_TESTING_DIALOG_H
 
-#include <QtWidgets/QDialog>
 #include <QtCore/QTimer>
+#include <QtCore/QUrl>
 
-#include "utils/common/request_param.h"
+#include <QtWidgets/QDialog>
+
+#include <api/model/connection_info.h>
 
 class QDataWidgetMapper;
 class QStandardItemModel;
@@ -17,31 +19,29 @@ class QnConnectionTestingDialog : public QDialog {
     Q_OBJECT
 
 public:
-    explicit QnConnectionTestingDialog(const QUrl &url, QWidget *parent = NULL);
+    explicit QnConnectionTestingDialog(QWidget *parent = NULL);
     virtual ~QnConnectionTestingDialog();
 
-public slots:
-    virtual void accept() override;
-    virtual void reject() override;
+    void testEnterpriseController(const QUrl &url);
 
-    void timeout();
+signals:
+    void resourceChecked(bool success);
 
-    void oldHttpTestResults(const QnHTTPRawResponse& response, int handle);
 private:
-    void testSettings();
+    Q_SLOT void tick();
+
+    Q_SLOT void at_ecConnection_result(int status, QnConnectionInfoPtr connectionInfo, int requestHandle);
 
     /**
      * Updates ui elements depending of the test result
-     *
-     * \param success - Status of the connection test
      */
-    void updateUi(bool success);
+    void updateUi(bool success, const QString &details = QString());
 
 private:
     Q_DISABLE_COPY(QnConnectionTestingDialog)
 
     QScopedPointer<Ui::ConnectionTestingDialog> ui;
-    QTimer m_timeoutTimer;
+    QTimer* m_timeoutTimer;
     QUrl m_url;
 };
 

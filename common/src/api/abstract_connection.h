@@ -19,10 +19,7 @@
 
 #include <rest/server/json_rest_handler.h>
 
-namespace detail {
-    template<class T>
-    const char *check_type() { return NULL; }
-}
+namespace QnStringizeTypeDetail { template<class T> void check_type() {} }
 
 /**
  * Macro that stringizes the given type name and checks at compile time that
@@ -30,7 +27,7 @@ namespace detail {
  * 
  * \param TYPE                          Type to stringize.
  */
-#define QN_STRINGIZE_TYPE(TYPE) (detail::check_type<TYPE>(), BOOST_PP_STRINGIZE(TYPE))
+#define QN_STRINGIZE_TYPE(TYPE) (QnStringizeTypeDetail::check_type<TYPE>(), BOOST_PP_STRINGIZE(TYPE))
 
 
 

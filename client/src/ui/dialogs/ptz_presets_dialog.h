@@ -4,7 +4,6 @@
 #include <QtWidgets/QDialog>
 
 #include <core/ptz/ptz_fwd.h>
-#include <core/ptz/ptz_hotkey.h>
 
 #include <ui/dialogs/abstract_ptz_dialog.h>
 
@@ -21,7 +20,7 @@ class QnPtzPresetsDialog: public QnAbstractPtzDialog {
     typedef QnAbstractPtzDialog base_type;
 
 public:
-    QnPtzPresetsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnPtzPresetsDialog(const QnPtzControllerPtr &controller, QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnPtzPresetsDialog();
 
     QnAbstractPtzHotkeyDelegate* hotkeysDelegate() const;
@@ -29,7 +28,7 @@ public:
 
 protected:
     virtual void loadData(const QnPtzData &data) override;
-    virtual void saveData() const override;
+    virtual void saveData() override;
     virtual Qn::PtzDataFields requiredFields() const override;
 
 private slots:
@@ -39,6 +38,8 @@ private slots:
     void updateRemoveButtonEnabled();
     void updateActivateButtonEnabled();
 private:
+    bool savePresets();
+
     QScopedPointer<Ui::PtzPresetsDialog> ui;
 
     QPushButton *m_removeButton;

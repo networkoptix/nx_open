@@ -13,6 +13,11 @@ class QnSingleThumbnailLoader : public QnImageProvider {
     typedef QnImageProvider base_type;
 
 public:
+    enum ThumbnailFormat {
+        PngFormat,
+        JpgFormat
+    };
+
     /**
      * Creates a new thumbnail loader for the given camera resource. Returns NULL
      * pointer in case loader cannot be created.
@@ -23,7 +28,8 @@ public:
      */
     static QnSingleThumbnailLoader *newInstance(QnResourcePtr resource,
                                                 qint64 microSecSinceEpoch,
-                                                const QSize &size,
+                                                const QSize &size = QSize(),
+                                                ThumbnailFormat format = PngFormat,
                                                 QObject *parent = NULL);
 
 
@@ -38,29 +44,14 @@ public:
                                      QnNetworkResourcePtr resource,
                                      qint64 microSecSinceEpoch,
                                      const QSize &size,
+                                     ThumbnailFormat format,
                                      QObject *parent = NULL);
 
     virtual QImage image() const override;
-signals:
-    /**
-     * This signal is emitted whenever thumbnail was successfully loaded.
-     *
-     * \param image                     Loaded thumbnail.
-     */
-    void success(const QImage& image);
-
-    /**
-     * This signal is emitted whenever the loader was unable to load thumbnail.
-     *
-     * \param status                    Error code.
-     */
-    void failed(int status);
-
-    void finished();
-
 protected:
     virtual void doLoadAsync() override;
 
+    QString formatToString(ThumbnailFormat format);
 private slots:
     void at_replyReceived(int status, const QImage& image, int requstHandle);
 
@@ -76,6 +67,8 @@ private:
     /** Time in microseconds since epoch */
     qint64 m_microSecSinceEpoch;
     QSize m_size;
+
+    ThumbnailFormat m_format;
 };
 
 #endif // SINGLE_THUMBNAIL_LOADER_H

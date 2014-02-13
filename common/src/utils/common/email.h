@@ -4,7 +4,6 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 #include <QtCore/QMetaType>
-#include <boost/preprocessor/stringize.hpp>
 
 #include <api/model/kvpair.h>
 

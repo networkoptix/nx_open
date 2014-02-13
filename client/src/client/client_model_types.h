@@ -87,11 +87,9 @@ QN_DECLARE_FUNCTIONS(QnServerStorageKey, (datastream)(eq)(hash));
 // QnLicenseWarningState
 // -------------------------------------------------------------------------- //
 struct QnLicenseWarningState {
-    QnLicenseWarningState(): lastWarningTime(0), ignore(false) {}
-    QnLicenseWarningState(qint64 lastWarningTime, bool ignore): lastWarningTime(lastWarningTime), ignore(ignore) {}
+    QnLicenseWarningState(qint64 lastWarningTime = 0): lastWarningTime(lastWarningTime) {}
 
     qint64 lastWarningTime;
-    bool ignore;
 };
 
 /**
@@ -111,6 +109,25 @@ typedef QHash<QString, qreal> QnAspectRatioHash;
 Q_DECLARE_METATYPE(QnAspectRatioHash)
 
 
+// -------------------------------------------------------------------------- //
+// QnPtzHotkey
+// -------------------------------------------------------------------------- //
+struct QnPtzHotkey {
+    enum {
+        NoHotkey = -1
+    };
+
+    QnPtzHotkey(): hotkey(NoHotkey) {}
+    QnPtzHotkey(const QString &id, int hotkey): id(id), hotkey(hotkey) {}
+
+    QString id;
+    int hotkey;
+};
+
+typedef QHash<int, QString> QnPtzHotkeyHash;
+
+Q_DECLARE_METATYPE(QnPtzHotkey);
+QN_DECLARE_FUNCTIONS(QnPtzHotkey, (json));
 
 
 #endif // QN_CLIENT_MODEL_TYPES_H

@@ -14,7 +14,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include "mustache/mustache_helper.h"
 #include "mustache/partial_info.h"
@@ -516,7 +516,7 @@ void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished(const QnHTTPRaw
 bool QnBusinessRuleProcessor::broadcastBusinessAction(QnAbstractBusinessActionPtr action)
 {
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
-    appServerConnection->broadcastBusinessAction(action, this, SLOT(at_broadcastBusinessActionFinished(QnHTTPRawResponse, int)));
+    appServerConnection->broadcastBusinessAction(action, this, "at_broadcastBusinessActionFinished");
     return true;
 }
 

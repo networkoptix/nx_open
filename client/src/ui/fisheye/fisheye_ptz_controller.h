@@ -33,12 +33,6 @@ public:
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
 
-    /*virtual bool getProjection(Qn::Projection *projection) override;
-    virtual bool setProjection(Qn::Projection projection) override;*/
-
-    ///virtual void changePanoMode() override;
-    ///virtual QString getPanoModeText() const override;
-
     QnMediaDewarpingParams mediaDewarpingParams() const;
     QnItemDewarpingParams itemDewarpingParams() const;
 
@@ -56,6 +50,7 @@ private:
     QVector3D boundedPosition(const QVector3D &position);
     QVector3D getPositionInternal();
     void absoluteMoveInternal(const QVector3D &position);
+
 private:
     enum AnimationMode {
         NoAnimation,
@@ -66,6 +61,7 @@ private:
     QPointer<QnMediaResourceWidget> m_widget;
     QPointer<QnResourceWidgetRenderer> m_renderer;
     Qn::PtzCapabilities m_capabilities;
+    QVector3D m_unitSpeed;
 
     QnPtzLimits m_limits;
     bool m_unlimitedPan;

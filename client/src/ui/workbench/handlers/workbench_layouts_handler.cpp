@@ -6,7 +6,7 @@
 
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
@@ -32,14 +32,14 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(Qn::NewUserLayoutAction),                    SIGNAL(triggered()),    this,   SLOT(at_newUserLayoutAction_triggered()));
-    connect(action(Qn::SaveLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAction_triggered()));
-    connect(action(Qn::SaveLayoutAsAction),                     SIGNAL(triggered()),    this,   SLOT(at_saveLayoutAsAction_triggered()));
-    connect(action(Qn::SaveLayoutForCurrentUserAsAction),       SIGNAL(triggered()),    this,   SLOT(at_saveLayoutForCurrentUserAsAction_triggered()));
-    connect(action(Qn::SaveCurrentLayoutAction),                SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAction_triggered()));
-    connect(action(Qn::SaveCurrentLayoutAsAction),              SIGNAL(triggered()),    this,   SLOT(at_saveCurrentLayoutAsAction_triggered()));
-    connect(action(Qn::CloseLayoutAction),                      SIGNAL(triggered()),    this,   SLOT(at_closeLayoutAction_triggered()));
-    connect(action(Qn::CloseAllButThisLayoutAction),            SIGNAL(triggered()),    this,   SLOT(at_closeAllButThisLayoutAction_triggered()));
+    connect(action(Qn::NewUserLayoutAction),                &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered);
+    connect(action(Qn::SaveLayoutAction),                   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered);
+    connect(action(Qn::SaveLayoutAsAction),                 &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAsAction_triggered);
+    connect(action(Qn::SaveLayoutForCurrentUserAsAction),   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered);
+    connect(action(Qn::SaveCurrentLayoutAction),            &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAction_triggered);
+    connect(action(Qn::SaveCurrentLayoutAsAction),          &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
+    connect(action(Qn::CloseLayoutAction),                  &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeLayoutAction_triggered);
+    connect(action(Qn::CloseAllButThisLayoutAction),        &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
 }
 
 QnAppServerConnectionPtr QnWorkbenchLayoutsHandler::connection() const {
@@ -54,8 +54,7 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
         QMessageBox::warning(
             mainWindow(),
             tr("Layout already exists"),
-            tr("Layout with the same name already exists\n"\
-               "and you do not have the rights to overwrite it.")
+            tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
         );
         return;
     }
@@ -142,8 +141,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
                 QMessageBox::warning(
                     mainWindow(),
                     tr("Layout already exists"),
-                    tr("Layout with the same name already exists\n"\
-                       "and you do not have the rights to overwrite it.")
+                    tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
                 );
                 return;
             }
@@ -164,7 +162,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
             QMessageBox::warning(
                 mainWindow(),
                 tr("Layout already exists"),
-                tr("Layout with the same name already exists\nand you do not have the rights to overwrite it.")
+                tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
             );
             return;
         }
@@ -245,7 +243,7 @@ QMessageBox::StandardButton QnWorkbenchLayoutsHandler::askOverrideLayout(QMessag
     return QMessageBox::warning(
         mainWindow(),
         tr("Layout already exists"),
-        tr("Layout with the same name already exists. Overwrite it?"),
+        tr("Layout with the same name already exists. Do you want to overwrite it?"),
         buttons,
         defaultButton
     );
@@ -372,7 +370,7 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
             }
         }
 
-        QnCounter* counter = new QnCounter(0, this);
+        QnCounter *counter = new QnCounter(0, this);
         if (target && slot)
             connect(counter, SIGNAL(reachedZero()), target, slot);
         connect(counter, SIGNAL(reachedZero()), counter, SLOT(deleteLater()));
@@ -386,11 +384,7 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
         foreach(const QnLayoutResourcePtr &fileResource, fileResources) {
             bool isReadOnly = !(accessController()->permissions(fileResource) & Qn::WritePermission);
 
-            if(exportHandler->saveLocalLayout(fileResource,
-                                              isReadOnly,
-                                              false,
-                                              counter,
-                                              SLOT(decrement())))
+            if(exportHandler->saveLocalLayout(fileResource, isReadOnly, false, counter, SLOT(decrement())))
                 counter->increment();
         }
 
@@ -446,7 +440,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
             QMessageBox::warning(
                 mainWindow(),
                 tr("Layout already exists"),
-                tr("Layout with the same name already exists\nand you do not have the rights to overwrite it.")
+                tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
             );
             return;
         }

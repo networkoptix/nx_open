@@ -4,7 +4,7 @@
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
     <Product Id="*" Name="${product.name} (Client Only)" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.clientUpgradeCode}">
-        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
         <?include BuildVars.wxi ?>
@@ -17,7 +17,7 @@
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
         <?define VmsInstallingOrChanging="($(var.VmsInstalling) OR $(var.VmsChanging))" ?>
 
-        <?define LaunchClientChecBoxText="Launch ${product.name} when setup exits." ?>
+        <?define LaunchClientChecBoxText="!(loc.Product_LaunchClient)" ?>
         
         <?if $(var.arch) = x86 ?>
         <Condition Message="This package is designed for 32-bit OS. Setup will now exit.">
@@ -133,7 +133,7 @@
             </Directory>
 
             <Directory Id="MyPicturesFolder">
-                <Directory Id="${installer.customization}BgDir" Name="${product.name} Backgrounds"/>
+                <Directory Id="${customization}BgDir" Name="${product.name} Backgrounds"/>
             </Directory>
 
             <Directory Id="$(var.ProgramFilesFolder)">

@@ -40,7 +40,11 @@ namespace boost {
 #undef Q_GLOBAL_STATIC_WITH_INITIALIZER
 #define Q_GLOBAL_STATIC_WITH_INITIALIZER Q_GLOBAL_STATIC_WITH_INITIALIZER___IS_DEPRECATED 
 
-
 #endif // __cplusplus
+
+#ifdef Q_OS_MAC
+    /* Prevent usage of custom file dialogs on mac os due to appstore limitations  */
+    #define DontUseNativeDialog YOU_SHOULD_ALWAYS_USE_NATIVE_DIALOGS_ON_MAC_OS
+#endif
 
 #endif // QN_DEPRECATION_H

@@ -1,7 +1,7 @@
 #ifndef QN_RESOURCE_DIRECTORY_BROWSER_H
 #define QN_RESOURCE_DIRECTORY_BROWSER_H
 
-#include "core/resource_managment/resource_searcher.h"
+#include "core/resource_management/resource_searcher.h"
 
 class QnResourceDirectoryBrowser : public QnAbstractFileResourceSearcher
 {

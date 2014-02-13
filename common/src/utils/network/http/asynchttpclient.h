@@ -94,6 +94,8 @@ namespace nx_http
         //!Number of total bytes read (including http request line and headers)
         quint64 totalBytesRead() const;
 
+        //!By default, entity compression is on
+        void setUseCompression( bool toggleUseEntityEncoding );
         void setSubsequentReconnectTries( int reconnectTries );
         void setTotalReconnectTries( int reconnectTries );
         void setUserAgent( const QString& userAgent );
@@ -142,6 +144,7 @@ namespace nx_http
         bool m_terminated;
         mutable QMutex m_mutex;
         quint64 m_totalBytesRead;
+        bool m_contentEncodingUsed;
 
         bool doGetPrivate( const QUrl& url );
         /*!

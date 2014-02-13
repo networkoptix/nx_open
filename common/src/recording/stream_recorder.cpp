@@ -23,24 +23,15 @@ static const int STORE_QUEUE_SIZE = 50;
 
 QString QnStreamRecorder::errorString(int errCode) {
     switch (errCode) {
-    case NoError:
-        return QString();
-    case ContainerNotFoundError:
-        return tr("Corresponding container in FFMPEG library was not found.");
-    case FileCreateError:
-        return tr("Can't create output file for video recording.");
-    case VideoStreamAllocationError:
-        return tr("Can't allocate output stream for recording.");
-    case AudioStreamAllocationError:
-        return tr("Can't allocate output audio stream.");
-    case InvalidAudioCodecError:
-        return tr("Invalid audio codec information.");
-    case IncompatibleCodecError:
-        return tr("Video or audio codec is incompatible with the selected format.");
-    default:
-        break;
+    case NoError:                       return QString();
+    case ContainerNotFoundError:        return tr("Corresponding container in FFMPEG library was not found.");
+    case FileCreateError:               return tr("Could not create output file for video recording.");
+    case VideoStreamAllocationError:    return tr("Could not allocate output stream for recording.");
+    case AudioStreamAllocationError:    return tr("Could not allocate output audio stream.");
+    case InvalidAudioCodecError:        return tr("Invalid audio codec information.");
+    case IncompatibleCodecError:        return tr("Video or audio codec is incompatible with the selected format.");
+    default:                            return QString();
     }
-    return QString();
 }
 
 QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
@@ -79,7 +70,8 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_timestampCorner(Qn::NoCorner),
     m_serverTimeZoneMs(Qn::InvalidUtcOffset),
     m_nextIFrameTime(AV_NOPTS_VALUE),
-    m_truncateIntervalEps(0)
+    m_truncateIntervalEps(0),
+    m_recordingFinished(false)
 {
     srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
@@ -147,7 +139,6 @@ void QnStreamRecorder::close()
         if (m_formatCtx) 
             avformat_close_input(&m_formatCtx);
         m_formatCtx = 0;
-
     }
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         if (m_motionFileList[i])
@@ -158,6 +149,12 @@ void QnStreamRecorder::close()
 
     markNeedKeyData();
     m_firstTime = true;
+
+    if (m_recordingFinished) {
+        // close may be called multiple times, so we have to reset flag m_recordingFinished
+        m_recordingFinished = false;
+        emit recordingFinished(m_lastError, m_fileName);
+    }
 }
 
 void QnStreamRecorder::markNeedKeyData()
@@ -212,7 +209,11 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr nonConstData)
             bool isOk = true;
             if (m_needCalcSignature && !m_firstTime)
                 isOk = addSignatureFrame();
-            emit recordingFinished(isOk ? NoError : m_lastError, m_fileName);
+
+            if (isOk)
+                m_lastError = NoError;
+
+            m_recordingFinished = true;
             m_endOfData = true;
         }
 
@@ -327,7 +328,8 @@ bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
         if (!initFfmpegContainer(vd))
         {
             if (!m_fileName.isEmpty())
-                emit recordingFinished(m_lastError, m_fileName); // ommit storageFailure because of exists separate error if no storages at all
+                m_recordingFinished = true;
+
             if (m_stopOnWriteError)
             {
                 m_needStop = true;

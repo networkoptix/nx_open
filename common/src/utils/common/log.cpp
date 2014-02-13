@@ -72,8 +72,24 @@ public:
         const std::string& str = ostr.str();
         {
             QMutexLocker mutx(&m_mutex);
-            if (!m_file.isOpen())
+            if (!m_file.isOpen()) {
+
+                switch (logLevel) {
+                case cl_logERROR:
+                case cl_logWARNING:
+                {
+                    QTextStream out(stderr);
+                    out << str.c_str();
+                    break;
+                }
+                default:
+                {
+                    QTextStream out(stdout);
+                    out << str.c_str();
+                }
+                }
                 return;
+            }
             m_file.write(str.c_str());
             m_file.flush();
             if (m_file.size() >= m_maxFileSize)
@@ -275,11 +291,11 @@ void QnLog::initLog(const QString& logLevelStr) {
     }
     cl_log.setLogLevel(logLevel);
 
-    CL_LOG(cl_logALWAYS) {
+    if (needWarnLogLevel) {
         cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
-        if (needWarnLogLevel) 
-            cl_log.log("Unknown log level specified. Using level ", QnLog::logLevelToString(logLevel), cl_logALWAYS);
+        cl_log.log("Unknown log level specified. Using level ", QnLog::logLevelToString(logLevel), cl_logALWAYS);
     }
+
 }
 
 void QnLog::initLog( QnLog* externalInstance )

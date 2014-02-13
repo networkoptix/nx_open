@@ -52,6 +52,7 @@
 #ifdef __cplusplus
 #   undef NULL
 #   define NULL nullptr
+#
 #   ifdef __GNUC__
 #       undef __null
 #       define __null nullptr

@@ -310,7 +310,7 @@ bool QnDesktopFileEncoder::EncodedAudioInfo::setupFormat(QString& errMessage)
         {
             m_audioFormat.setSampleRate(AUDIO_CAUPTURE_ALT_FREQUENCY);
             if (!m_audioDevice.isFormatSupported(m_audioFormat)) {
-                errMessage = tr("44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings");
+                errMessage = tr("44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings.");
                 return false;
             }
         }
@@ -477,7 +477,7 @@ bool QnDesktopFileEncoder::init()
     AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toLatin1().constData());
     if(videoCodec == 0)
     {
-        m_lastErrorStr = tr("Can't find video encoder ") + videoCodecName;
+        m_lastErrorStr = tr("Could not find video encoder %1.").arg(videoCodecName);
         return false;
     }
 
@@ -485,7 +485,7 @@ bool QnDesktopFileEncoder::init()
     m_device = new QFile(m_fileName);
     if (!m_device->open(QIODevice::WriteOnly))
     {
-        m_lastErrorStr = tr("Can't create temporary file in folder '%1'. Please configure 'Main Media Folder' in Screen Recording settings.").arg(QFileInfo(m_fileName).path());
+        m_lastErrorStr = tr("Could not create temporary file in folder '%1'. Please configure 'Main Media Folder' in Screen Recording settings.").arg(QFileInfo(m_fileName).path());
         return false;
     }
 
@@ -500,7 +500,7 @@ bool QnDesktopFileEncoder::init()
 
     /*
     if (av_set_parameters(m_formatCtx, NULL) < 0) {
-        m_lastErrorStr = QLatin1String("Can't initialize output format parameters");
+        m_lastErrorStr = tr("Can't initialize output format parameters.");
         return false;
     }
     */
@@ -509,12 +509,12 @@ bool QnDesktopFileEncoder::init()
     m_videoOutStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID);
     if (!m_videoOutStream)
     {
-        m_lastErrorStr = QLatin1String("Can't allocate output stream for video codec");
+        m_lastErrorStr = tr("Could not allocate output stream for video codec.");
         return false;
     }
 
     if (m_grabber->width() % 8 != 0) {
-        m_lastErrorStr = QLatin1String("Unalignment screen width. Width MUST be multipler of 8");
+        m_lastErrorStr = tr("Screen width must be a multiplier of 8.");
         return false;
     }
 
@@ -589,7 +589,7 @@ bool QnDesktopFileEncoder::init()
 
     if (avcodec_open(m_videoCodecCtx, videoCodec) < 0)
     {
-        m_lastErrorStr = QLatin1String("Can't initialize video encoder");
+        m_lastErrorStr = tr("Could not initialize video encoder.");
         return false;
     }
 
@@ -613,7 +613,7 @@ bool QnDesktopFileEncoder::init()
         m_audioOutStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID);
         if (!m_audioOutStream)
         {
-            m_lastErrorStr = QLatin1String("Can't allocate output audio stream");
+            m_lastErrorStr = tr("Could not allocate output audio stream.");
             return false;
         }
 
@@ -621,7 +621,7 @@ bool QnDesktopFileEncoder::init()
         AVCodec* audioCodec = avcodec_find_encoder_by_name(audioCodecName.toLatin1().constData());
         if(audioCodec == 0)
         {
-            m_lastErrorStr = QLatin1String("Can't find audio encoder") + audioCodecName;
+            m_lastErrorStr = tr("Could not find audio encoder '%1'.").arg(audioCodecName);
             return false;
         }
         m_outputCtx->audio_codec = audioCodec->id;
@@ -639,7 +639,7 @@ bool QnDesktopFileEncoder::init()
 
         if (avcodec_open(m_audioCodecCtx, audioCodec) < 0)
         {
-            m_lastErrorStr = QLatin1String("Can't initialize audio encoder");
+            m_lastErrorStr = tr("Could not initialize audio encoder.");
             return false;
         }
 
@@ -647,7 +647,7 @@ bool QnDesktopFileEncoder::init()
         {
             if (!audioChannel->setupPostProcess())
             {
-                m_lastErrorStr = QLatin1String("Can't initialize audio device '") + audioChannel->m_audioDevice.fullName() + QLatin1Char('\'');
+                m_lastErrorStr = tr("Could not initialize audio device '%1'.").arg(audioChannel->m_audioDevice.fullName());
                 return false;
             }
         }
@@ -670,7 +670,7 @@ bool QnDesktopFileEncoder::init()
     {
         if (!info->start())
         {
-            m_lastErrorStr = QLatin1String("Can't start primary audio device");
+            m_lastErrorStr = tr("Could not start primary audio device.");
             return false;
         }
     }

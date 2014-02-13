@@ -12,7 +12,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <client/client_settings.h>
 
@@ -44,7 +44,7 @@
 
 namespace {
     const qreal widgetHeight = 24;
-    const int thumbnailHeight = 100;
+    const QSize thumbnailSize(0, 100);
 
     /** We limit the maximal number of notification items to prevent crashes due
      * to reaching GDI resource limit. */
@@ -268,11 +268,9 @@ void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *bl
     }
 }
 
-void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
-{
-    QnSingleThumbnailLoader *loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, QSize(0, thumbnailHeight), item);
+void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item, QnResourcePtr resource, qint64 usecsSinceEpoch) {
+    QnSingleThumbnailLoader *loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, thumbnailSize, QnSingleThumbnailLoader::JpgFormat, item);
     item->setImageProvider(loader);
-    //connect(loader, SIGNAL(finished()), loader, SLOT(deleteLater()));
 }
 
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -292,7 +290,8 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     item->setText(QnBusinessStringsHelper::eventAtResource(params, qnSettings->isIpShownInTree()));
     item->setTooltipText(QnBusinessStringsHelper::eventDescription(businessAction, QnBusinessAggregationInfo(), qnSettings->isIpShownInTree(), false));
 
-    if (businessAction->actionType() == BusinessActionType::PlaySoundRepeated) {
+    const bool soundAction = businessAction->actionType() == BusinessActionType::PlaySoundRepeated;
+    if (soundAction) {
         QString soundUrl = businessAction->getParams().getSoundUrl();
         m_itemsByLoadingSound.insert(soundUrl, item);
         context()->instance<QnAppServerNotificationCache>()->downloadFile(soundUrl);
@@ -305,8 +304,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     switch (eventType) {
     case BusinessEventType::Camera_Motion: {
+        QIcon icon = soundAction ? qnSkin->icon("events/sound.png") : qnSkin->icon("events/camera.png");
         item->addActionButton(
-            qnSkin->icon("events/camera.png"),
+            icon,
             tr("Browse Archive"),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource).withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000)
@@ -315,8 +315,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case BusinessEventType::Camera_Input: {
+        QIcon icon = soundAction ? qnSkin->icon("events/sound.png") : qnSkin->icon("events/camera.png");
         item->addActionButton(
-            qnSkin->icon("events/camera.png"),
+            icon,
             tr("Open Camera"),
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
@@ -483,14 +484,8 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         );
         break;
     case QnSystemHealth::StoragesNotConfigured:
-        item->addActionButton(
-            qnSkin->icon("events/storage.png"),
-            tr("Server settings"),
-            Qn::ServerSettingsAction,
-            QnActionParameters(resource)
-        );
-        break;
     case QnSystemHealth::StoragesAreFull:
+    case QnSystemHealth::ArchiveRebuildFinished:
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
             tr("Server settings"),
@@ -623,7 +618,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
                     continue;
                 params.setEventResourceId(sampleCamera->getId());
                 params.setReasonCode(QnBusiness::NetworkIssueNoFrame);
-                params.setReasonText(lit("15"));
+                params.setReasonParamsEncoded(lit("15000"));
                 break;
             }
 
@@ -632,7 +627,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
                     continue;
                 params.setEventResourceId(sampleServer->getId());
                 params.setReasonCode(QnBusiness::StorageIssueNotEnoughSpeed);
-                params.setReasonText(lit("C: E:"));
+                params.setReasonParamsEncoded(lit("C: E:"));
                 break;
             }
 

@@ -14,7 +14,7 @@
 
 #include <utils/common/event_processors.h>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 
 #include <ui/help/help_topic_accessor.h>
@@ -25,11 +25,14 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <client/client_settings.h>
-
-#include <client_message_processor.h>
+#include <client/client_message_processor.h>
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
-    base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint | Qt::Tool),
+    base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
+#ifdef Q_OS_MAC
+    | Qt::Tool
+#endif
+    ),
     QnWorkbenchContextAware(parent),
     ui(new Ui::BusinessRulesDialog()),
     m_popupMenu(new QMenu(this)),
@@ -245,7 +248,7 @@ void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChang
     if (!ok) {
         switch (change) {
         case RulesLoaded:
-            QMessageBox::critical(this, tr("Error"), tr("Error while receiving rules"));
+            QMessageBox::critical(this, tr("Error"), tr("Error while receiving rules."));
             break;
         case RuleSaved:
             QMessageBox::critical(this, tr("Error"), tr("Error while saving rule."));
@@ -336,8 +339,8 @@ bool QnBusinessRulesDialog::saveAll() {
 
     if (!invalid_modified.isEmpty()) {
         QMessageBox::StandardButton btn =  QMessageBox::question(this,
-                          tr("Confirm save invalid rules"),
-                          tr("Some rules are not valid. Should we disable them?"),
+                          tr("Confirm save"),
+                          tr("Some rules are not valid. Should they be disabled?"),
                           QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                           QMessageBox::Cancel);
 
@@ -358,9 +361,11 @@ bool QnBusinessRulesDialog::saveAll() {
     foreach (QModelIndex idx, modified) {
         m_rulesViewModel->saveRule(idx.row());
     }
+
+    //TODO: #GDM replace with QnAppServerReplyProcessor
     foreach (int id, m_pendingDeleteRules) {
         int handle = QnAppServerConnectionFactory::createConnection()->deleteRuleAsync(
-                    id, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
+                    id, this, "at_resources_deleted");
         m_deleting[handle] = id;
     }
     m_pendingDeleteRules.clear();

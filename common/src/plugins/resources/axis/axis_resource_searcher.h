@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_AXIS
 
-#include "core/resource_managment/resource_searcher.h"
+#include "core/resource_management/resource_searcher.h"
 #include "../mdns/mdns_device_searcher.h"
 
 

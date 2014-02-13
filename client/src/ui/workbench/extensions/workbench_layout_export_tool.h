@@ -11,13 +11,15 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+class QnClientVideoCamera;
+
 /**
  * @brief The QnLayoutExportTool class          Utility class for exporting multi-video layouts.
  *                                              New instance of the class should be created for every new export process.
  *                                              Correct behaviour while re-using is not guarantied.
  *                                              Notifies about progress of the process.
  */
-class QnLayoutExportTool : public QObject, protected QnWorkbenchContextAware
+class QnLayoutExportTool : public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:
@@ -81,11 +83,6 @@ signals:
     void stageChanged(QString title);
 
     /**
-     * @brief stopped                           This signal is emitted when the process is stopped by calling the stop() method from outside.
-     */
-    void stopped();
-
-    /**
      * @brief finished                          This signal is emitted when the process is finished.
      * @param success                           True if the process is finished successfully, false otherwise.
      */
@@ -95,6 +92,7 @@ private slots:
 
     void at_camera_progressChanged(int progress);
     void at_camera_exportFinished(int status, const QString &filename);
+    void at_camera_exportStopped();
 private:
     bool exportNextCamera();
     void finishExport(bool success);
@@ -132,6 +130,8 @@ private:
 
     /** Additional flag, set to true when the process is stopped from outside. */
     bool m_stopped;
+
+    QnClientVideoCamera *m_currentCamera;
 };
 
 #endif // WORKBENCH_LAYOUT_EXPORT_TOOL_H

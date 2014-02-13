@@ -8,6 +8,8 @@
 
 #include <api/model/kvpair.h>
 
+// TODO: #Elric remove this header.
+
 struct QnKvPairUsageHelperPrivate;
 
 class QnAbstractKvPairUsageHelper: public QObject {

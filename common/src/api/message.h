@@ -40,7 +40,7 @@ namespace Qn {
         Message_Type_BusinessRuleReset = 15,
         Message_Type_KvPairChange = 16,
         Message_Type_KvPairDelete = 17,
-
+        Message_Type_Command = 18,
 
         Message_Type_Count
     };
@@ -51,7 +51,11 @@ namespace Qn {
 class QnMessage
 {
 public:
-    QnMessage(): messageType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online), allowCameraChanges(true) {}
+    QnMessage(): messageType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online), allowCameraChanges(-1) {}
+
+    enum Command {
+        Reboot = 0
+    };
 
     Qn::Message_Type messageType;
     quint32 seqNumber;
@@ -86,9 +90,13 @@ public:
 
     QString filename;
     QString publicIp;
-    bool allowCameraChanges;
+
+    // -1 if unset
+    int allowCameraChanges;
 
     QnKvPairListsById kvPairs;
+
+    Command command;
 
     bool load(const pb::Message& message);
 

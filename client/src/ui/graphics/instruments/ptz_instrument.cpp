@@ -18,7 +18,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <api/media_server_connection.h>
 
@@ -287,6 +287,7 @@ public:
 // PtzOverlayWidget
 // -------------------------------------------------------------------------- //
 class PtzOverlayWidget: public GraphicsWidget {
+    Q_DECLARE_TR_FUNCTIONS(PtzOverlayWidget);
     typedef GraphicsWidget base_type;
 
 public:
@@ -306,7 +307,7 @@ public:
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
 
         m_modeButton = new PtzImageButtonWidget(this);
-        m_modeButton->setToolTip(lit("Dewarping panoramic mode"));
+        m_modeButton->setToolTip(tr("Dewarping panoramic mode"));
 
         updateLayout();
         showCursor();
@@ -751,12 +752,11 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
             connect(widget, SIGNAL(fisheyeChanged()), this, SLOT(updateOverlayWidget()));
 
             PtzData &data = m_dataByWidget[widget];
-            // TODO: #5.2 remove executor, use context in QObject::connect
-            data.capabilitiesConnection = QObject::connect(
-                widget->ptzController().data(), 
-                &QnAbstractPtzController::capabilitiesChanged, 
-                newExecutor([=] { this->updateCapabilities(widget); }, widget),
-                &QnExecutor::execute
+            data.capabilitiesConnection = connect(widget->ptzController(), &QnAbstractPtzController::changed, this, 
+                [=](Qn::PtzDataFields fields) { 
+                    if(fields & Qn::CapabilitiesPtzField) 
+                        updateCapabilities(widget); 
+                }
             );
 
             updateCapabilities(widget);
@@ -777,7 +777,7 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     disconnect(object, NULL, this, NULL);
 
     PtzData &data = m_dataByWidget[object];
-    QObject::disconnect(data.capabilitiesConnection);
+    disconnect(data.capabilitiesConnection);
     
     m_dataByWidget.remove(object);
 }
@@ -955,10 +955,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
         selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
         break;
     case VirtualMovement:
-        // TODO: #PTZ for some reason uncommenting these calls makes the movement look crappy... investigate!
-        /*if(info->mouseScreenPos() != info->mousePressScreenPos())*/ {
-            //QCursor::setPos(info->mousePressScreenPos());
-
+        if(info->mouseScreenPos() != info->mousePressScreenPos()) {
             QPointF delta = info->mouseItemPos() - info->lastMouseItemPos();
             qreal scale = target()->size().width() / 2.0;
             QPointF shift(delta.x() / scale, -delta.y() / scale);
@@ -969,6 +966,12 @@ void PtzInstrument::dragMove(DragInfo *info) {
             qreal speed = 0.5 * position.z();
             QVector3D positionDelta(shift.x() * speed, shift.y() * speed, 0.0);
             target()->ptzController()->absoluteMove(Qn::LogicalPtzCoordinateSpace, position + positionDelta, 2.0); /* 2.0 means instant movement. */
+
+            /* Calling setPos on each move event causes serious lags which I've so far
+             * was unable to explain. This is worked around by invoking it not that frequently. 
+             * Note that we don't account for screen-relative position here. */
+            if((info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() > 128)
+                QCursor::setPos(info->mousePressScreenPos()); // TODO: #PTZ #Elric this still looks bad, but not as bad as it looked without this hack.
         }
         break;
     default:
@@ -976,7 +979,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
     }
 }
 
-void PtzInstrument::finishDrag(DragInfo *) {
+void PtzInstrument::finishDrag(DragInfo *info) {
     
     if(target()) {
         switch (m_movement) {
@@ -1000,6 +1003,7 @@ void PtzInstrument::finishDrag(DragInfo *) {
             break;
         }
         case VirtualMovement:
+            QCursor::setPos(info->mousePressScreenPos());
             target()->unsetCursor();
             break;
         default:

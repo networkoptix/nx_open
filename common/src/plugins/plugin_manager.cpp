@@ -100,7 +100,7 @@ void PluginManager::loadPlugins( PluginManager::PluginType pluginsToLoad )
 #endif
 
     //directoriesToSearchForPlugins.insert( QDir(QDir::currentPath()).absolutePath() );
-    directoriesToSearchForPlugins.insert( QDir(QCoreApplication::applicationDirPath()).absolutePath() );
+    directoriesToSearchForPlugins.insert( QDir(QCoreApplication::applicationDirPath()).absolutePath() + QString::fromLatin1("/plugins/") );
 
     for( std::set<QString>::const_iterator
         it = directoriesToSearchForPlugins.begin();

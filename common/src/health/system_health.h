@@ -17,10 +17,11 @@ namespace QnSystemHealth {
         EmailSendError,
         StoragesNotConfigured,
         StoragesAreFull,
+        ArchiveRebuildFinished,
 
         NotDefined,
 
-        MessageTypeCount = StoragesAreFull
+        MessageTypeCount = ArchiveRebuildFinished
     };
 }
 

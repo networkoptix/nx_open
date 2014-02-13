@@ -16,5 +16,7 @@
     <properties>
         <root.dir>${basedir}/../..</root.dir>
         <install.type>full</install.type>
+        <client_name>client.exe</client_name>
+        <product_name>${product.name}.exe</product_name>
     </properties>
 </project>

@@ -20,6 +20,7 @@
 
 #include <QString>
 
+// TODO: #AK what's wrong with QHostAddress? Why create a separate class?
 
 //!Represents ipv4 address. Supports conversion to QString and to uint32
 class HostAddress

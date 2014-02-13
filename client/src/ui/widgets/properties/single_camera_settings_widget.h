@@ -120,12 +120,10 @@ private slots:
     void at_motionRegionListChanged();
     void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
     void at_pingButton_clicked();
-    void at_analogViewCheckBox_clicked();
     void at_fisheyeSettingsChanged();
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();
-    void updateLicenseText();
     void updateIpAddressText();
     void updateWebPageText();
 
@@ -172,6 +170,8 @@ private:
     bool m_hasMotionControlsChanges;
 
     bool m_readOnly;
+
+    bool m_updating;
 
     QnCameraMotionMaskWidget *m_motionWidget;
     QVBoxLayout *m_motionLayout;

@@ -12,10 +12,13 @@ public:
 
     static bool extends(Qn::PtzCapabilities capabilities);
 
+    virtual Qn::PtzCapabilities getCapabilities() override;
     virtual bool continuousMove(const QVector3D &speed) override;
 
 private:
     bool m_octagonal;
+    bool m_overrideCapabilities;
+    Qn::PtzCapabilities m_capabilities;
 };
 
 #endif // QN_WORKAROUND_PTZ_CONTROLLER_H

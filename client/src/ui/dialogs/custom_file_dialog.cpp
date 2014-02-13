@@ -1,14 +1,15 @@
 #include "custom_file_dialog.h"
 
-#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
+
+#include <utils/common/string.h>
 
 QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, const QString &directory, const QString &filter):
     base_type(parent, caption, directory, filter),
     m_currentCol(0)
 {
-    setOption(QFileDialog::DontUseNativeDialog);
+    setOptions(QnCustomFileDialog::fileDialogOptions());
     connect(this, SIGNAL(accepted()), this, SLOT(at_accepted()));
 }
 
@@ -29,9 +30,9 @@ void QnCustomFileDialog::addSpinBox(const QString &text, int minValue, int maxVa
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    int index = text.indexOf(QLatin1String("%n"));
+    int index = text.indexOf(valueSpacer());
     QString prefix = text.mid(0, index).trimmed();
-    QString postfix = index >= 0 ? text.mid(index + 2).trimmed() : QString();
+    QString postfix = index >= 0 ? text.mid(index + valueSpacer().length()).trimmed() : QString();
 
     QLabel* labelPrefix = new QLabel(widget);
     labelPrefix->setText(prefix);
@@ -73,7 +74,7 @@ void QnCustomFileDialog::addLineEdit(const QString &text, QString *value) {
     m_lineEdits.insert(edit, value);
     layout->addWidget(edit);
 
-    layout->addStretch();
+//    layout->addStretch();
 
     widget->setLayout(layout);
 
@@ -82,7 +83,7 @@ void QnCustomFileDialog::addLineEdit(const QString &text, QString *value) {
 
 
 void QnCustomFileDialog::addWidget(QWidget *widget, bool newRow, QnWidgetControlAbstractDelegate* delegate) {
-    QGridLayout * gl = dynamic_cast<QGridLayout*>(layout());
+    QGridLayout * gl = customizedLayout();
     if (gl)
     {
         int r = gl->rowCount();
@@ -114,4 +115,8 @@ void QnCustomFileDialog::at_accepted() {
 
     foreach(QLineEdit* key, m_lineEdits.keys())
         *m_lineEdits[key] = key->text();
+}
+
+QString QnCustomFileDialog::selectedExtension() const {
+    return extractFileExtension(selectedNameFilter());
 }

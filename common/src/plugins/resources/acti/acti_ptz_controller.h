@@ -3,10 +3,11 @@
 
 #ifdef ENABLE_ACTI
 
-#include <QtCore/QMutex>
+#include <QtCore/QScopedPointer>
 
 #include <core/ptz/basic_ptz_controller.h>
 
+class QnActiPtzControllerPrivate;
 
 class QnActiPtzController: public QnBasicPtzController {
     Q_OBJECT
@@ -23,28 +24,8 @@ public:
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
     
 private:
-    void init();
-    bool startZoomInternal(int deviceZoomSpeed);
-    bool startMoveInternal(int devicePanSpeed, int deviceTiltSpeed);
-    bool stopZoomInternal();
-    bool stopMoveInternal();
-
-    bool query(const QString &request, QByteArray *body = NULL, bool keepAllData = false) const;
-
-    int toDeviceZoomSpeed(qreal zoomSpeed) const;
-    int toDevicePanTiltSpeed(qreal panTiltSpeed) const;
-    
-    QString zoomDirection(int deviceZoomSpeed) const;
-    QString panTiltDirection(int devicePanSpeed, int deviceTiltSpeed) const;
-
-private:
-    QMutex m_mutex;
-    QnActiResourcePtr m_resource;
-    Qn::PtzCapabilities m_capabilities;
-
-    bool m_isFlipped;
-    bool m_isMirrored;
+    QScopedPointer<QnActiPtzControllerPrivate> d;
 };
 
-#endif // #ifdef ENABLE_ACTI
+#endif // ENABLE_ACTI
 #endif // QN_ACTI_PTZ_CONTROLLER_H

@@ -11,7 +11,7 @@
 #include "transcoding/transcoder.h"
 #include "transcoding/ffmpeg_transcoder.h"
 #include "camera/video_camera.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "camera/camera_pool.h"
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
@@ -20,7 +20,7 @@
 #include "core/resource/camera_resource.h"
 #include "cached_output_stream.h"
 #include "network/authenticate_helper.h"
-#include "../settings.h"
+#include <media_server/settings.h>
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;

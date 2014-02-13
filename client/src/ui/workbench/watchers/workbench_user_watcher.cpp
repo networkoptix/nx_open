@@ -4,14 +4,14 @@
 #include <utils/common/checked_cast.h>
 
 #include <core/resource/user_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    connect(resourcePool(), &QnResourcePool::resourceAdded,     this,   &QnWorkbenchUserWatcher::at_resourcePool_resourceAdded);
+    connect(resourcePool(), &QnResourcePool::resourceRemoved,   this,   &QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved);
     foreach(const QnResourcePtr &resource, resourcePool()->getResources())
         at_resourcePool_resourceAdded(resource);
 }

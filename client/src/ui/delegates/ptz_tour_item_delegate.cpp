@@ -7,7 +7,7 @@
 
 #include <core/ptz/ptz_preset.h>
 
-#include <ui/models/ptz_tour_model.h>
+#include <ui/models/ptz_tour_spots_model.h>
 
 QnPtzTourItemDelegate::QnPtzTourItemDelegate(QObject *parent) :
     base_type(parent)
@@ -27,32 +27,32 @@ void QnPtzTourItemDelegate::initStyleOption(QStyleOptionViewItem *option, const 
 }
 
 QWidget* QnPtzTourItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const  {
-    const QnPtzTourModel* model = dynamic_cast<const QnPtzTourModel*>(index.model());
+    const QnPtzTourSpotsModel* model = dynamic_cast<const QnPtzTourSpotsModel*>(index.model());
     if (!model)
         return base_type::createEditor(parent, option, index);
 
     switch (index.column()) {
-    case QnPtzTourModel::NameColumn:
+    case QnPtzTourSpotsModel::NameColumn:
     {
         QComboBox* comboBox = new QComboBox(parent);
-        foreach (const QnPtzPreset &preset, model->presets()) {
+        foreach (const QnPtzPreset &preset, model->sortedPresets()) {
             comboBox->addItem(preset.name, preset.id);
         }
         return comboBox;
     }
-    case QnPtzTourModel::TimeColumn:
+    case QnPtzTourSpotsModel::TimeColumn:
     {
         QComboBox* comboBox = new QComboBox(parent);
-        foreach (quint64 time, QnPtzTourModel::stayTimeValues()) {
-            comboBox->addItem(QnPtzTourModel::timeToString(time), time);
+        foreach (quint64 time, QnPtzTourSpotsModel::stayTimeValues()) {
+            comboBox->addItem(QnPtzTourSpotsModel::timeToString(time), time);
         }
         return comboBox;
     }
-    case QnPtzTourModel::SpeedColumn:
+    case QnPtzTourSpotsModel::SpeedColumn:
     {
         QComboBox* comboBox = new QComboBox(parent);
-        foreach (qreal speed, QnPtzTourModel::speedValues()) {
-            comboBox->addItem(QnPtzTourModel::speedToString(speed), speed);
+        foreach (qreal speed, QnPtzTourSpotsModel::speedValues()) {
+            comboBox->addItem(QnPtzTourSpotsModel::speedToString(speed), speed);
         }
         return comboBox;
 
@@ -67,9 +67,9 @@ QWidget* QnPtzTourItemDelegate::createEditor(QWidget *parent, const QStyleOption
 
 void QnPtzTourItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
     switch (index.column()) {
-    case QnPtzTourModel::NameColumn:
-    case QnPtzTourModel::TimeColumn:
-    case QnPtzTourModel::SpeedColumn:
+    case QnPtzTourSpotsModel::NameColumn:
+    case QnPtzTourSpotsModel::TimeColumn:
+    case QnPtzTourSpotsModel::SpeedColumn:
     {
         if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
             comboBox->setCurrentIndex(comboBox->findData(index.data(Qt::EditRole)));
@@ -85,9 +85,9 @@ void QnPtzTourItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
 
 void QnPtzTourItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
     switch (index.column()) {
-    case QnPtzTourModel::NameColumn:
-    case QnPtzTourModel::TimeColumn:
-    case QnPtzTourModel::SpeedColumn:
+    case QnPtzTourSpotsModel::NameColumn:
+    case QnPtzTourSpotsModel::TimeColumn:
+    case QnPtzTourSpotsModel::SpeedColumn:
     {
         if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
             model->setData(index, comboBox->itemData(comboBox->currentIndex()));

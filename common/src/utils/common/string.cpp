@@ -252,3 +252,43 @@ QStringList naturalStringSort( const QStringList & list, Qt::CaseSensitivity cas
 	return retVal;
 }
 
+QString extractFileExtension(const QString &string) {
+    int pos = string.lastIndexOf(L'.');
+    if (pos < 0)
+        return QString();
+
+    QString result(L'.');
+    while (++pos < string.length()) {
+        QChar curr = string[pos];
+        if (!curr.isLetterOrNumber())
+            return result;
+        result.append(curr);
+    }
+
+    return result;
+}
+
+QString generateUniqueString(const QStringList &usedValues, const QString &baseValue, const QString &spacer) {
+    QStringList cleaned;
+    foreach (const QString &name, usedValues) {
+        cleaned << name.toLower();
+    }
+
+    if (!cleaned.contains(baseValue.toLower()))
+        return baseValue;
+
+    const QString nonZeroName = baseValue + spacer + QLatin1String("%1");
+    QRegExp pattern = QRegExp(baseValue.toLower() + spacer + QLatin1String("?([0-9]+)?"));
+
+    /* Prepare new name. */
+    int number = 0;
+    foreach(const QString &name, cleaned) {
+        if(!pattern.exactMatch(name))
+            continue;
+
+        number = qMax(number, pattern.cap(1).toInt());
+    }
+    number++;
+
+    return nonZeroName.arg(number);
+}

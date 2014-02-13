@@ -32,7 +32,7 @@ message Camera {
         SecondaryMedium     = 1;
         SecondaryHigh       = 2;
         SecondaryNotDefined = 3;
-		SecondaryDontUse    = 4;
+        SecondaryDontUse    = 4;
     }
 
     message ScheduleTask {

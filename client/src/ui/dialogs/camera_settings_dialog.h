@@ -15,10 +15,16 @@ class QAbstractButton;
 class QnCameraSettingsWidget;
 class QnWorkbenchContext;
 
-class QnCameraSettingsDialog: public QDialog, protected QnWorkbenchContextAware {
+class QnCameraSettingsDialog: public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
-    QnCameraSettingsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags =  Qt::Tool);
+    QnCameraSettingsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags =  
+#ifdef Q_OS_MAC
+        Qt::Tool
+#else
+        0
+#endif
+        );
     virtual ~QnCameraSettingsDialog();
 
     QnCameraSettingsWidget *widget() const {

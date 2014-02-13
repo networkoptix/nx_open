@@ -24,29 +24,39 @@ namespace {
     };
 }
 
-QValidator::State QnPortNumberValidator::validate(QString &input, int &pos) const {
-    if (input == tr("Auto"))
-        return QValidator::Acceptable;
+class QnPortNumberValidator: public QIntValidator {
+    typedef QIntValidator base_type;
+public:
+    QnPortNumberValidator(const QString &autoString, QObject* parent = 0):
+        base_type(parent), m_autoString(autoString) {}
 
-    QValidator::State result = base_type::validate(input, pos);
-    if (result == QValidator::Acceptable &&
-            (input.toInt() == 0 || input.toInt() > 65535)
-            )
-        return QValidator::Intermediate;
-    return result;
-}
+    virtual QValidator::State validate(QString &input, int &pos) const override {
+        if (m_autoString.compare(input, Qt::CaseInsensitive) == 0)
+            return QValidator::Acceptable;
 
-void QnPortNumberValidator::fixup(QString &input) const {
-    if (input == tr("Auto"))
-        return;
-    if (input.toInt() == 0 || input.toInt() > 65535)
-        input = tr("Auto");
-}
+        if (m_autoString.startsWith(input, Qt::CaseInsensitive))
+            return QValidator::Intermediate;
+
+        QValidator::State result = base_type::validate(input, pos);
+        if (result == QValidator::Acceptable && (input.toInt() == 0 || input.toInt() > 65535))
+            return QValidator::Intermediate;
+        return result;
+    }
+
+    virtual void fixup(QString &input) const override {
+        if (m_autoString.compare(input, Qt::CaseInsensitive) == 0)
+            return;
+        if (input.toInt() == 0 || input.toInt() > USHRT_MAX)
+            input = m_autoString;
+    }
+private:
+    QString m_autoString;
+};
 
 QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     QWidget(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnSmtpSettingsWidget),
+    ui(new Ui::SmtpSettingsWidget),
     m_requestHandle(-1),
     m_testHandle(-1),
     m_timeoutTimer(new QTimer(this)),
@@ -68,14 +78,13 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
 
     setWarningStyle(ui->detectErrorLabel);
 
-    ui->portComboBox->addItem(tr("Auto"), 0);
+    const QString autoPort = tr("Auto");
+    ui->portComboBox->addItem(autoPort, 0);
     for (int i = 0; i < QnEmail::ConnectionTypeCount; i++) {
         int port = QnEmail::defaultPort(static_cast<QnEmail::ConnectionType>(i));
         ui->portComboBox->addItem(QString::number(port), port);
     }
-    ui->portComboBox->setValidator(new QnPortNumberValidator(this));
-//    ui->portComboBox->setCurrentIndex(0);
-//    at_portComboBox_currentIndexChanged(ui->portComboBox->currentIndex());
+    ui->portComboBox->setValidator(new QnPortNumberValidator(autoPort, this));
 }
 
 QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
@@ -242,7 +251,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
 
     QnEmail::Settings result = settings();
     if (result.isNull()) {
-        QMessageBox::warning(this, tr("Invalid data"), tr("Cannot test such parameters"));
+        QMessageBox::warning(this, tr("Invalid data"), tr("Provided parameters are not valid. Could not perform a test."));
         return;
     }
 
@@ -275,7 +284,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
 }
 
 void QnSmtpSettingsWidget::at_cancelTestButton_clicked() {
-    stopTesting(tr("Cancelled"));
+    stopTesting(tr("Canceled"));
 }
 
 void QnSmtpSettingsWidget::at_timer_timeout() {
@@ -285,7 +294,7 @@ void QnSmtpSettingsWidget::at_timer_timeout() {
         return;
     }
 
-    stopTesting(tr("Timeout"));
+    stopTesting(tr("Timed out"));
 }
 
 void QnSmtpSettingsWidget::at_finishedTestEmailSettings(int status, bool result, int handle) {
@@ -316,7 +325,7 @@ void QnSmtpSettingsWidget::at_settings_received(int status, const QnKvPairList &
 
     bool success = (status == 0);
     if(!success) {
-        QMessageBox::critical(this, tr("Error"), tr("Error while receiving settings"));
+        QMessageBox::critical(this, tr("Error"), tr("Could not read settings from Enterprise Controller."));
         m_settingsReceived = true;
         return;
     }

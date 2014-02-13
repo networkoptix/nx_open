@@ -11,7 +11,7 @@ extern "C"
 #include "rest/server/rest_server.h"
 #include <utils/math/math.h>
 #include "core/resource/network_resource.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "core/resource/camera_resource.h"
 #include "device_plugins/server_archive/server_archive_delegate.h"
 #include "device_plugins/server_archive/server_archive_delegate.h"
@@ -99,7 +99,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
             QString val = params[i].second.toLower().trimmed(); 
             if (val == lit("before"))
                 roundMethod = IFrameBeforeTime;
-            else if (val == lit("exact"))
+            else if (val == lit("precise") || val == lit("exact"))
                 roundMethod = Precise;
             else if (val == lit("after"))
                 roundMethod = IFrameAfterTime;
@@ -178,12 +178,13 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
         serverDelegate.open(res);
         serverDelegate.seek(time, true);
         video = getNextArchiveVideoPacket(serverDelegate, roundMethod == IFrameAfterTime ? time : AV_NOPTS_VALUE);
-        if (roundMethod != Precise) {
-            if (!video)
-                video = camera->getFrameByTime(useHQ, time, roundMethod == IFrameAfterTime); // try approx frame from GOP keeper
-            if (!video)
-                video = camera->getFrameByTime(!useHQ, time, roundMethod == IFrameAfterTime); // try approx frame from GOP keeper
+
+        if (!video) {
+            video = camera->getFrameByTime(useHQ, time, roundMethod == IFrameAfterTime); // try approx frame from GOP keeper
+            time = DATETIME_NOW;
         }
+        if (!video)
+            video = camera->getFrameByTime(!useHQ, time, roundMethod == IFrameAfterTime); // try approx frame from GOP keeper
     }
     if (!video) 
         return noVideoError(result, time);
@@ -240,7 +241,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
         return CODE_INTERNAL_ERROR;
     }
 
-    PixelFormat ffmpegColorFormat = PIX_FMT_RGBA;
+    PixelFormat ffmpegColorFormat = PIX_FMT_BGRA;
     QImage::Format qtColorFormat = QImage::Format_ARGB32_Premultiplied;
     int pixelBytes = 4;
     if (colorSpace == "gray8") {

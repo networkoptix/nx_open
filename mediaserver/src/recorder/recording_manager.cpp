@@ -1,5 +1,5 @@
 #include "recording_manager.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "core/resource/security_cam_resource.h"
 #include "recording/stream_recorder.h"
 #include "core/dataprovider/media_streamdataprovider.h"
@@ -19,7 +19,7 @@
 #include <business/business_event_rule.h>
 #include <business/business_rule_processor.h>
 #include <business/business_event_connector.h>
-#include "serverutil.h"
+#include <media_server/serverutil.h>
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
@@ -446,7 +446,7 @@ void QnRecordingManager::at_server_resourceChanged(const QnResourcePtr &resource
     if(!server)
         return;
 
-    //qnStorageMan->removeAbsentStorages(server->getStorages());
+    qnStorageMan->removeAbsentStorages(server->getStorages());
     foreach(QnAbstractStorageResourcePtr storage, server->getStorages())
     {
         QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);

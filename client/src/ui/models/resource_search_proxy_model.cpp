@@ -2,7 +2,7 @@
 #include "resource_pool_model.h"
 
 #include <utils/common/delete_later.h>
-#include <core/resource_managment/resource_criterion.h>
+#include <core/resource_management/resource_criterion.h>
 #include <core/resource/resource.h>
 
 #include <client/client_globals.h>
@@ -64,6 +64,14 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIn
     Qn::NodeType nodeType = static_cast<Qn::NodeType>(index.data(Qn::NodeTypeRole).value<int>());
     if(nodeType == Qn::UsersNode)
         return false; /* We don't want users in search. */
+
+    if(nodeType == Qn::RecorderNode) {
+        for (int i = 0; i < sourceModel()->rowCount(index); i++) {
+            if (filterAcceptsRow(i, index))
+                return true;
+        }
+        return false;
+    }
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if(resource.isNull())

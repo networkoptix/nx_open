@@ -14,7 +14,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource_directory_browser.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <plugins/resources/archive/avi_files/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
@@ -47,7 +47,8 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
     m_mode(mode),
     m_readOnly(readOnly),
     m_offset(-1),
-    m_stopped(false)
+    m_stopped(false),
+    m_currentCamera(0)
 {
     m_layout.reset(new QnLayoutResource());
     m_layout->setId(layout->getId());
@@ -70,7 +71,7 @@ bool QnLayoutExportTool::start() {
     {
         if (QnNovLauncher::createLaunchingFile(m_realFilename) != 0)
         {
-            m_errorMessage = tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(m_realFilename).baseName());
+            m_errorMessage = tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(m_realFilename).completeBaseName());
             emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
             return false;
         }
@@ -164,7 +165,7 @@ bool QnLayoutExportTool::start() {
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
         QnCachingTimePeriodLoader* loader = navigator()->loader(resource->toResourcePtr());
         if (loader) {
-            QIODevice* device = m_storage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).baseName()), QIODevice::WriteOnly);
+            QIODevice* device = m_storage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).completeBaseName()), QIODevice::WriteOnly);
             QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(m_period);
             QByteArray data;
             periods.encode(data);
@@ -195,8 +196,13 @@ void QnLayoutExportTool::stop() {
     m_stopped = true;
     m_resources.clear();
     m_errorMessage = QString(); //supress error by manual cancelling
-    emit stopped();
-    finishExport(false);
+
+    if (m_currentCamera) {
+        connect(m_currentCamera, SIGNAL(exportStopped()), this, SLOT(at_camera_exportStopped()));
+        m_currentCamera->stopExport();
+    } else {
+        finishExport(false);
+    }
 }
 
 Qn::LayoutExportMode QnLayoutExportTool::mode() const {
@@ -260,20 +266,15 @@ void QnLayoutExportTool::finishExport(bool success) {
 }
 
 bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource) {
-    QnClientVideoCamera* camera = new QnClientVideoCamera(resource);
-    connect(camera,   SIGNAL(exportProgress(int)),        this, SLOT(at_camera_progressChanged(int)));
-
-    connect(camera,   &QnClientVideoCamera::exportFinished, this,   &QnLayoutExportTool::at_camera_exportFinished);
-    connect(camera,   &QnClientVideoCamera::exportFinished, camera, &QObject::deleteLater);
-
-    connect(this,     SIGNAL(stopped()),                  camera, SLOT(stopExport()));
-    connect(this,     SIGNAL(stopped()),                  camera, SLOT(deleteLater()));
+    m_currentCamera = new QnClientVideoCamera(resource);
+    connect(m_currentCamera,    SIGNAL(exportProgress(int)),            this,   SLOT(at_camera_progressChanged(int)));
+    connect(m_currentCamera,    &QnClientVideoCamera::exportFinished,   this,   &QnLayoutExportTool::at_camera_exportFinished);
 
     int numberOfChannels = resource->getVideoLayout()->channelCount();
     for (int i = 0; i < numberOfChannels; ++i) {
         QSharedPointer<QBuffer> motionFileBuffer(new QBuffer());
         motionFileBuffer->open(QIODevice::ReadWrite);
-        camera->setMotionIODevice(motionFileBuffer, i);
+        m_currentCamera->setMotionIODevice(motionFileBuffer, i);
     }
 
     QString uniqId = resource->toResource()->getUniqueId();
@@ -290,7 +291,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
     }
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
 
-    camera->exportMediaPeriodToFile(m_period.startTimeMs * 1000ll,
+    m_currentCamera->exportMediaPeriodToFile(m_period.startTimeMs * 1000ll,
                                     (m_period.startTimeMs + m_period.durationMs) * 1000ll,
                                     uniqId,
                                     QLatin1String("mkv"),
@@ -328,7 +329,7 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
                 continue;
 
             QString uniqId = camera->resource()->toResource()->getUniqueId();
-            uniqId = QFileInfo(uniqId.mid(uniqId.indexOf(L'?')+1)).baseName(); // simplify name if export from existing layout
+            uniqId = QFileInfo(uniqId.mid(uniqId.indexOf(L'?')+1)).completeBaseName(); // simplify name if export from existing layout
             QString motionFileName = QString(QLatin1String("motion%1_%2.bin")).arg(i).arg(uniqId);
             QIODevice* device = m_storage->open(motionFileName , QIODevice::WriteOnly);
 
@@ -352,6 +353,8 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
         }
     }
 
+    camera->deleteLater();
+
     if (error) {
         m_errorMessage = tr("Could not export camera %1").arg(camera->resource()->toResource()->getName());
         finishExport(false);
@@ -359,6 +362,13 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
     else {
         exportNextCamera();
     }
+}
+
+void QnLayoutExportTool::at_camera_exportStopped() {
+    if (m_currentCamera)
+        m_currentCamera->deleteLater();
+
+    finishExport(false);
 }
 
 void QnLayoutExportTool::at_camera_progressChanged(int progress) {

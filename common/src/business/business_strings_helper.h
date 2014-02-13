@@ -10,6 +10,8 @@ class QnBusinessStringsHelper: public QObject
 {
     Q_OBJECT
 public:
+    static QString actionName(BusinessActionType::Value value);
+
     /**
      * Name of the event in common, e.g. 'Motion on Camera'
      * Used primarily in lists where all event types are enumerated.

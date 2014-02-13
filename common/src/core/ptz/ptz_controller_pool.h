@@ -9,6 +9,8 @@
 #include <core/resource/resource_fwd.h>
 #include <core/ptz/ptz_fwd.h>
 
+class QnPtzControllerPoolPrivate;
+
 class QnPtzControllerPool: public Connective<QObject>, public Singleton<QnPtzControllerPool> {
     Q_OBJECT
     typedef Connective<QObject> base_type;
@@ -17,22 +19,23 @@ public:
     QnPtzControllerPool(QObject *parent = NULL);
     virtual ~QnPtzControllerPool();
 
+    QThread *executorThread() const;
+
     QnPtzControllerPtr controller(const QnResourcePtr &resource) const;
 
 signals:
     void controllerChanged(const QnResourcePtr &resource);
 
 protected:
-    void setController(const QnResourcePtr &resource, const QnPtzControllerPtr &controller);
-
     Q_SLOT virtual void registerResource(const QnResourcePtr &resource);
     Q_SLOT virtual void unregisterResource(const QnResourcePtr &resource);
-    Q_SLOT virtual QnPtzControllerPtr createController(const QnResourcePtr &resource);
+    Q_SLOT virtual QnPtzControllerPtr createController(const QnResourcePtr &resource) const;
 
     Q_SLOT void updateController(const QnResourcePtr &resource);
 
 private:
-    QHash<QnResourcePtr, QnPtzControllerPtr> m_controllerByResource;
+    friend class QnPtzControllerPoolPrivate;
+    QScopedPointer<QnPtzControllerPoolPrivate> d;
 };
 
 #define qnPtzPool (QnPtzControllerPool::instance())

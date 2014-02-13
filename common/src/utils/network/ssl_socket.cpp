@@ -1,5 +1,6 @@
 #include "ssl_socket.h"
 
+#include <openssl/ssl.h>
 #include <openssl/err.h>
 
 static const int BUFFER_SIZE = 1024;

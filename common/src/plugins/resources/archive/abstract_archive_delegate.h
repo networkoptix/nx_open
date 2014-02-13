@@ -38,7 +38,7 @@ public:
         Flag_CanSeekImmediatly   = 32,     // delegate can perform seek operation immediatly, without 'open' function call
         Flag_CanOfflineLayout    = 64,      // delegate can return audio/video layout immediatly withouht opening archive
         Flag_UnsyncTime          = 128      // delegate may provide media data with unsync time (non equal to EC time)
-	
+    
     };
     Q_DECLARE_FLAGS(Flags, Flag);
 

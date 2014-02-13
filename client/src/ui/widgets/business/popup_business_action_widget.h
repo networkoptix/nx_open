@@ -7,7 +7,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-    class QnPopupBusinessActionWidget;
+    class PopupBusinessActionWidget;
 }
 
 class QnPopupBusinessActionWidget : public QnAbstractBusinessParamsWidget, public QnWorkbenchContextAware
@@ -28,7 +28,7 @@ private slots:
     void at_settingsButton_clicked();
 
 private:
-    QScopedPointer<Ui::QnPopupBusinessActionWidget> ui;
+    QScopedPointer<Ui::PopupBusinessActionWidget> ui;
 };
 
 #endif // POPUP_BUSINESS_ACTION_WIDGET_H

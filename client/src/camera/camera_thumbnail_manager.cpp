@@ -4,7 +4,7 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/style/skin.h>
 
@@ -77,7 +77,7 @@ int QnCameraThumbnailManager::loadThumbnailForResource(const QnResourcePtr &reso
                 resource.dynamicCast<QnNetworkResource>(),
                 -1,
                 m_thumnailSize,
-                QLatin1String("png"),
+                QLatin1String("jpg"),
                 QnMediaServerConnection::IFrameAfterTime,
                 this,
                 SLOT(at_thumbnailReceived(int, const QImage&, int)));

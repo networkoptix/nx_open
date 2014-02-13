@@ -329,6 +329,8 @@ void QnAviArchiveDelegate::close()
 
 const char* QnAviArchiveDelegate::getTagValue(QnAviArchiveDelegate::Tag tag)
 {
+    if (!m_initialized)
+        return 0;
     QString format = QString(QLatin1String(m_formatContext->iformat->name)).split(QLatin1Char(','))[0];
     AVDictionaryEntry* entry = av_dict_get(m_formatContext->metadata, getTagName(tag, format), 0, 0);
     return entry ? entry->value : 0;
@@ -336,6 +338,8 @@ const char* QnAviArchiveDelegate::getTagValue(QnAviArchiveDelegate::Tag tag)
 
 const char* QnAviArchiveDelegate::getTagValue( const char* tagName )
 {
+    if (!m_initialized)
+        return 0;
     AVDictionaryEntry* entry = av_dict_get(m_formatContext->metadata, tagName, 0, 0);
     return entry ? entry->value : 0;
 }

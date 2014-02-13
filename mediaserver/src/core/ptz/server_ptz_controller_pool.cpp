@@ -4,8 +4,7 @@
 
 #include <api/app_server_connection.h>
 
-// TODO: #Elric managment? rename to managEment
-#include <core/resource_managment/resource_data_pool.h>
+#include <core/resource_management/resource_data_pool.h>
 #include <core/resource/camera_resource.h>
 
 #include <core/ptz/mapped_ptz_controller.h>
@@ -13,7 +12,8 @@
 #include <core/ptz/workaround_ptz_controller.h>
 #include <core/ptz/preset_ptz_controller.h>
 #include <core/ptz/tour_ptz_controller.h>
-
+#include <core/ptz/activity_ptz_controller.h>
+#include <core/ptz/home_ptz_controller.h>
 
 void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) {
     connect(resource, &QnResource::initialized, this, &QnServerPtzControllerPool::updateController, Qt::QueuedConnection);
@@ -25,7 +25,7 @@ void QnServerPtzControllerPool::unregisterResource(const QnResourcePtr &resource
     disconnect(resource, NULL, this, NULL);
 }
 
-QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourcePtr &resource) {
+QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourcePtr &resource) const {
     if(!resource->isInitialized())
         return QnPtzControllerPtr();
 
@@ -49,6 +49,12 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
 
     if(QnTourPtzController::extends(controller->getCapabilities()))
         controller.reset(new QnTourPtzController(controller));
+
+    if(QnActivityPtzController::extends(controller->getCapabilities()))
+        controller.reset(new QnActivityPtzController(QnActivityPtzController::Server, controller));
+
+    if(QnHomePtzController::extends(controller->getCapabilities()))
+        controller.reset(new QnHomePtzController(controller));
 
     if(QnWorkaroundPtzController::extends(controller->getCapabilities()))
         controller.reset(new QnWorkaroundPtzController(controller));

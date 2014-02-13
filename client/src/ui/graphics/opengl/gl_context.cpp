@@ -303,7 +303,7 @@ void GLContext::initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith 
         visualInfo,
         contextHandleToShareWith,
         true );
-	m_previousErrorCode = errno;
+    m_previousErrorCode = errno;
 #endif
 }
 

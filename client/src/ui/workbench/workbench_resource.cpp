@@ -1,9 +1,13 @@
 #include "workbench_resource.h"
+
 #include <QtWidgets/QApplication>
 #include <QtCore/QMimeData>
-#include <core/resource_managment/resource_pool.h>
+
 #include <utils/common/warnings.h>
-#include "file_processor.h"
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/file_processor.h>
+
 
 namespace {
     enum {

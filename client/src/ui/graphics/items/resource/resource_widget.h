@@ -463,8 +463,11 @@ private:
     qint64 m_lastNewFrameTimeMSec;
 };
 
+typedef QList<QnResourceWidget *> QnResourceWidgetList;
+
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Buttons)
 Q_DECLARE_METATYPE(QnResourceWidget *)
+Q_DECLARE_METATYPE(QnResourceWidgetList);
 
 #endif // QN_RESOURCE_WIDGET_H

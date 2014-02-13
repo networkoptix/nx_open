@@ -7,7 +7,7 @@
 #include <common/common_module.h>
 #include <utils/math/fuzzy.h>
 #include <core/resource/resource_data.h>
-#include <core/resource_managment/resource_data_pool.h>
+#include <core/resource_management/resource_data_pool.h>
 #include <plugins/resources/onvif/onvif_resource.h>
 
 #include "soap_wrapper.h"
@@ -32,14 +32,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     if(m_resource->getPtzfUrl().isEmpty())
         m_capabilities = Qn::NoPtzCapabilities;
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(resource);
-    
-    m_stopBroken = resourceData.value<bool>(lit("onvifPtzStopBroken"), false);
-
-    if(resourceData.value<bool>(lit("onvifPtzBroken"), false)) {
-        m_capabilities = Qn::NoPtzCapabilities;
-        return;
-    }
+    m_stopBroken = qnCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
 
     initCoefficients();
 
