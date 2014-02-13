@@ -1,6 +1,7 @@
 #ifndef PTZ_TOURS_DIALOG_H
 #define PTZ_TOURS_DIALOG_H
 
+#include <core/resource/resource_fwd.h>
 #include <core/ptz/ptz_fwd.h>
 
 #include <ui/dialogs/abstract_ptz_dialog.h>
@@ -19,6 +20,8 @@ public:
     explicit QnPtzToursDialog(const QnPtzControllerPtr &controller, QWidget *parent = 0);
     ~QnPtzToursDialog();
 
+    QnVirtualCameraResourcePtr camera() const;
+    void setCamera(const QnVirtualCameraResourcePtr &camera);
 protected:
     virtual void loadData(const QnPtzData &data) override;
     virtual void saveData() override;
@@ -38,6 +41,8 @@ private:
 
     QScopedPointer<Ui::PtzToursDialog> ui;
     QnPtzTourListModel *m_model;
+    QnVirtualCameraResourcePtr m_camera;
+
     QString m_currentTourId;
 };
 

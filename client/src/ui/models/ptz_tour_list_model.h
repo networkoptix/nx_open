@@ -7,6 +7,8 @@
 #include <core/ptz/ptz_fwd.h>
 #include <core/ptz/ptz_tour.h>
 
+#include <client/client_model_types.h>
+
 struct QnPtzTourItemModel {
     QnPtzTourItemModel(const QnPtzTour& tour):
         tour(tour),
@@ -26,6 +28,7 @@ struct QnPtzTourItemModel {
 
     /** Tour is just created locally, does not exists on server. */
     bool local;
+
 };
 
 class QnPtzTourListModel : public QAbstractTableModel
@@ -37,9 +40,20 @@ public:
     enum Column {
         ModifiedColumn,
         NameColumn,
+        HotkeyColumn,
+        HomeColumn,
         DetailsColumn,
 
         ColumnCount
+    };
+
+    enum Row {
+        PresetTitleRow,
+        PresetRow,
+        TourTitleRow,
+        TourRow,
+
+        InvalidRow
     };
 
     explicit QnPtzTourListModel(QObject *parent = 0);
@@ -48,15 +62,19 @@ public:
     const QList<QnPtzTourItemModel> &tourModels() const;
     const QStringList &removedTours() const;
     void setTours(const QnPtzTourList &tours);
+    void addTour();
 
     const QnPtzPresetList& presets() const;
     void setPresets(const QnPtzPresetList &presets);
+    void addPreset();
+
+    const QnPtzHotkeyHash& hotkeys() const;
+    void setHotkeys(const QnPtzHotkeyHash & hotkeys);
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
     virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
-    virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
     virtual QVariant data(const QModelIndex &index, int role) const override;
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
@@ -64,12 +82,25 @@ public:
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     Q_SLOT void updateTourSpots(const QString tourId, const QnPtzTourSpotList &spots);
+
+signals:
+    void presetsChanged(const QnPtzPresetList &presets);
 private:
     qint64 estimatedTimeSecs(const QnPtzTour &tour) const;
+    Row rowClass(int row) const;
+    QVariant titleData(Row row, int role) const;
+    QVariant presetData(int row, int column, int role) const;
+    QVariant tourData(int row, int column, int role) const;
+
+    QnPtzPresetList m_presets;
+    QStringList m_removedPresets;
 
     QList<QnPtzTourItemModel> m_tours;
     QStringList m_removedTours;
-    QnPtzPresetList m_presets;
+
+    QnPtzHotkeyHash m_hotkeys;
+
+    
 };
 
 #endif // PTZ_TOUR_LIST_MODEL_H

@@ -2,12 +2,15 @@
 #include "ui_ptz_tours_dialog.h"
 
 #include <QtCore/QUuid>
+#include <QtCore/QScopedPointer>
 
 #include <QtWidgets/QStyledItemDelegate>
 #include <QtWidgets/QMessageBox>
 
 #include <common/common_globals.h>
 
+#include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_tour.h>
 
@@ -15,6 +18,7 @@
 #include <ui/widgets/ptz_tour_widget.h>
 
 #include <utils/common/event_processors.h>
+#include "utils/resource_property_adaptors.h"
 
 class QnPtzToursDialogItemDelegate: public QStyledItemDelegate {
     typedef QStyledItemDelegate base_type;
@@ -62,7 +66,7 @@ QnPtzToursDialog::QnPtzToursDialog(const QnPtzControllerPtr &controller, QWidget
     ui->tableView->viewport()->installEventFilter(resizeSignalizer);
     connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_tableViewport_resizeEvent()), Qt::QueuedConnection);
 
-
+    connect(m_model, &QnPtzTourListModel::presetsChanged, ui->tourEditWidget, &QnPtzTourWidget::setPresets);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
 
     connect(ui->addTourButton,      SIGNAL(clicked()), this, SLOT(at_addTourButton_clicked()));
@@ -86,7 +90,9 @@ void QnPtzToursDialog::keyPressEvent(QKeyEvent *event) {
 
 
 void QnPtzToursDialog::loadData(const QnPtzData &data) {
-    ui->tourEditWidget->setPresets(data.presets);
+    ui->tableView->setColumnHidden(QnPtzTourListModel::HomeColumn, !(capabilities() & Qn::HomePtzCapability));
+
+
     m_model->setTours(data.tours);
     m_model->setPresets(data.presets);
 
@@ -129,7 +135,7 @@ Qn::PtzDataFields QnPtzToursDialog::requiredFields() const {
 void QnPtzToursDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
     Q_UNUSED(previous)
     if (!current.isValid()) {
-        ui->stackedWidget->setCurrentWidget(ui->noTourPage);
+        ui->tourStackedWidget->setCurrentWidget(ui->noTourPage);
         ui->deleteTourButton->setDisabled(true);
         m_currentTourId = QString();
         return;
@@ -139,22 +145,24 @@ void QnPtzToursDialog::at_tableView_currentRowChanged(const QModelIndex &current
     QnPtzTour tour = current.data(Qn::PtzTourRole).value<QnPtzTour>();
     ui->tourEditWidget->setSpots(tour.spots);
     m_currentTourId = tour.id;
-    ui->stackedWidget->setCurrentWidget(ui->tourPage);
+    ui->tourStackedWidget->setCurrentWidget(ui->tourPage);
     ui->deleteTourButton->setEnabled(true);
 }
 
 void QnPtzToursDialog::at_addTourButton_clicked() {
-    m_model->insertRow(m_model->rowCount());
-    ui->tableView->setCurrentIndex(m_model->index(m_model->rowCount() - 1, 0));
-    if (m_model->rowCount() == 1) {
+    //bool wasEmpty = m_model->rowCount() == 0;
+    m_model->addTour();
+    QModelIndex index = m_model->index(m_model->rowCount() - 1, 0);
+    ui->tableView->setCurrentIndex(index);
+    //if (wasEmpty) { //TODO: check if needed
         ui->tableView->resizeColumnsToContents();
         ui->tableView->horizontalHeader()->setStretchLastSection(true);
         ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
-    }
+    //}
 
     ui->tableView->selectionModel()->clear();
-    ui->tableView->selectionModel()->setCurrentIndex(m_model->index(m_model->rowCount()-1, 0), QItemSelectionModel::Select);
-    ui->tableView->selectionModel()->select(m_model->index(m_model->rowCount()-1, 0), QItemSelectionModel::Select);
+    ui->tableView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::Select);
+    ui->tableView->selectionModel()->select(index, QItemSelectionModel::Select);
 }
 
 void QnPtzToursDialog::at_deleteTourButton_clicked() {
@@ -177,4 +185,17 @@ void QnPtzToursDialog::at_tourSpotsChanged(const QnPtzTourSpotList &spots) {
     if (m_currentTourId.isEmpty())
         return;
     m_model->updateTourSpots(m_currentTourId, spots);
+}
+
+QnVirtualCameraResourcePtr QnPtzToursDialog::camera() const {
+    return m_camera;
+}
+
+void QnPtzToursDialog::setCamera(const QnVirtualCameraResourcePtr &camera) {
+    if (m_camera == camera)
+        return;
+    m_camera = camera;
+    
+    QnPtzHotkeysResourcePropertyAdaptor adaptor(m_camera);
+    m_model->setHotkeys(adaptor.value());
 }

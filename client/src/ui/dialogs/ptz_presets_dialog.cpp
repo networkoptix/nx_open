@@ -119,5 +119,3 @@ void QnPtzPresetsDialog::at_activateButton_clicked() {
     activatePreset(preset.id, 1.0);
 }
 
-
-

@@ -38,6 +38,8 @@ protected:
 
     bool createTour(const QnPtzTour &tour);
     bool removeTour(const QString &tourId);
+
+    Qn::PtzCapabilities capabilities();
 signals:
     void synchronizeLater(const QString &title);
     void synchronized();

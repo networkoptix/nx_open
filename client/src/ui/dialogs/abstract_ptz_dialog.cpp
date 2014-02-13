@@ -134,3 +134,7 @@ void QnAbstractPtzDialog::at_controller_finished(Qn::PtzCommand command, const Q
     if (m_commands.isEmpty()) 
         emit synchronized();
 }
+
+Qn::PtzCapabilities QnAbstractPtzDialog::capabilities() {
+    return m_controller->getCapabilities();
+}
