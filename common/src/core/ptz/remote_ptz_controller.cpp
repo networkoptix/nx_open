@@ -20,7 +20,7 @@ QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr &resourc
         return;
     }
 
-    connect(resource.data(), &QnResource::ptzCapabilitiesChanged, this, &QnAbstractPtzController::capabilitiesChanged);
+    connect(resource.data(), &QnResource::ptzCapabilitiesChanged, this, [this]{ emit changed(Qn::CapabilitiesPtzField); });
 }
 
 QnRemotePtzController::~QnRemotePtzController() {
@@ -130,12 +130,16 @@ bool QnRemotePtzController::getTours(QnPtzTourList *) {
     RUN_COMMAND(Qn::GetToursPtzCommand, QVariant(), ptzGetToursAsync);
 }
 
-bool QnRemotePtzController::updateHomePosition(const QnPtzObject &homePosition) {
-    RUN_COMMAND(Qn::UpdateHomePositionPtzCommand, homePosition, ptzUpdateHomePositionAsync, homePosition);
+bool QnRemotePtzController::getActiveObject(QnPtzObject *) {
+    RUN_COMMAND(Qn::GetActiveObjectPtzCommand, QVariant(), ptzGetActiveObjectAsync);
 }
 
-bool QnRemotePtzController::getHomePosition(QnPtzObject *) {
-    RUN_COMMAND(Qn::GetHomePositionPtzCommand, QVariant(), ptzGetHomePositionAsync);
+bool QnRemotePtzController::updateHomeObject(const QnPtzObject &homePosition) {
+    RUN_COMMAND(Qn::UpdateHomeObjectPtzCommand, homePosition, ptzUpdateHomeObjectAsync, homePosition);
+}
+
+bool QnRemotePtzController::getHomeObject(QnPtzObject *) {
+    RUN_COMMAND(Qn::GetHomeObjectPtzCommand, QVariant(), ptzGetHomeObjectAsync);
 }
 
 bool QnRemotePtzController::getData(Qn::PtzDataFields query, QnPtzData *) {

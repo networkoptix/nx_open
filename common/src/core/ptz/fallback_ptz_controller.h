@@ -35,14 +35,15 @@ public:
     virtual bool activateTour(const QString &tourId) override                                                   { return baseController()->activateTour(tourId); }
     virtual bool getTours(QnPtzTourList *tours) override                                                        { return baseController()->getTours(tours); }
 
-    virtual bool updateHomePosition(const QnPtzObject &homePosition) override                                   { return baseController()->updateHomePosition(homePosition); }
-    virtual bool getHomePosition(QnPtzObject *homePosition) override                                            { return baseController()->getHomePosition(homePosition); }
+    virtual bool getActiveObject(QnPtzObject *activeObject) override                                            { return baseController()->getActiveObject(activeObject); }
+    virtual bool updateHomeObject(const QnPtzObject &homeObject) override                                       { return baseController()->updateHomeObject(homeObject); }
+    virtual bool getHomeObject(QnPtzObject *homeObject) override                                                { return baseController()->getHomeObject(homeObject); }
 
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override                                     { return baseController()->getData(query, data); }
 
 protected:
     void baseFinished(Qn::PtzCommand command, const QVariant &data)                                             { emit finished(command, data); }
-    void baseCapabilitiesChanged();
+    void baseChanged(Qn::PtzDataFields fields);
 
 private:
     const QnPtzControllerPtr &baseController()                                                                  { return m_mainIsValid ? m_mainController : m_fallbackController; }

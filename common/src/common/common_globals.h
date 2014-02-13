@@ -75,7 +75,7 @@ public:
         PrimaryStreamSoftMotionCapability   = 0x004,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
-        shareIpCapability                   = 0x020
+        ShareIpCapability                   = 0x020 
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);
@@ -103,8 +103,9 @@ public:
         ActivateTourPtzCommand,
         GetToursPtzCommand,
 
-        UpdateHomePositionPtzCommand,
-        GetHomePositionPtzCommand,
+        GetActiveObjectPtzCommand,
+        UpdateHomeObjectPtzCommand,
+        GetHomeObjectPtzCommand,
 
         GetDataPtzCommand,
 
@@ -112,16 +113,18 @@ public:
     };
 
     enum PtzDataField {
-        DevicePositionPtzField  = 0x01,
-        LogicalPositionPtzField = 0x02,
-        DeviceLimitsPtzField    = 0x04,
-        LogicalLimitsPtzField   = 0x08,
-        FlipPtzField            = 0x10,
-        PresetsPtzField         = 0x20,
-        ToursPtzField           = 0x40,
-        HomePositionPtzField    = 0x80,
-        NoPtzFields             = 0x00,
-        AllPtzFields            = DevicePositionPtzField | LogicalPositionPtzField| DeviceLimitsPtzField | LogicalLimitsPtzField | FlipPtzField | PresetsPtzField | ToursPtzField | HomePositionPtzField
+        CapabilitiesPtzField    = 0x001,
+        DevicePositionPtzField  = 0x002,
+        LogicalPositionPtzField = 0x004,
+        DeviceLimitsPtzField    = 0x008,
+        LogicalLimitsPtzField   = 0x010,
+        FlipPtzField            = 0x020,
+        PresetsPtzField         = 0x040,
+        ToursPtzField           = 0x080,
+        ActiveObjectPtzField    = 0x100,
+        HomeObjectPtzField      = 0x200,
+        NoPtzFields             = 0x000,
+        AllPtzFields            = 0xFFF
     };
     Q_DECLARE_FLAGS(PtzDataFields, PtzDataField)
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
@@ -159,7 +162,8 @@ public:
 
         PresetsPtzCapability                = 0x00010000,
         ToursPtzCapability                  = 0x00020000,
-        HomePtzCapability                   = 0x00040000,
+        ActivityPtzCapability               = 0x00040000,
+        HomePtzCapability                   = 0x00080000,
 
         AsynchronousPtzCapability           = 0x00100000,
         SynchronizedPtzCapability           = 0x00200000,

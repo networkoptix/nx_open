@@ -752,7 +752,12 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
             connect(widget, SIGNAL(fisheyeChanged()), this, SLOT(updateOverlayWidget()));
 
             PtzData &data = m_dataByWidget[widget];
-            data.capabilitiesConnection = connect(widget->ptzController(), &QnAbstractPtzController::capabilitiesChanged, this, [=]{ this->updateCapabilities(widget); });
+            data.capabilitiesConnection = connect(widget->ptzController(), &QnAbstractPtzController::changed, this, 
+                [=](Qn::PtzDataFields fields) { 
+                    if(fields & Qn::CapabilitiesPtzField) 
+                        updateCapabilities(widget); 
+                }
+            );
 
             updateCapabilities(widget);
             updateOverlayWidget(widget);

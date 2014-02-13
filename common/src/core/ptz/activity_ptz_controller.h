@@ -1,22 +1,24 @@
-#ifndef QN_HOME_PTZ_CONTROLLER_H
-#define QN_HOME_PTZ_CONTROLLER_H
-
-#include <QtCore/QMutex>
+#ifndef QN_ACTIVITY_PTZ_CONTROLLER_H
+#define QN_ACTIVITY_PTZ_CONTROLLER_H
 
 #include "proxy_ptz_controller.h"
 
 template<class T>
 class QnResourcePropertyAdaptor;
 
-class QnHomePtzExecutor;
-
-class QnHomePtzController: public QnProxyPtzController {
+class QnActivityPtzController: public QnProxyPtzController {
     Q_OBJECT
     typedef QnProxyPtzController base_type;
 
 public:
-    QnHomePtzController(const QnPtzControllerPtr &baseController);
-    virtual ~QnHomePtzController();
+    enum Mode {
+        Local,
+        Client,
+        Server
+    };
+
+    QnActivityPtzController(Mode mode, const QnPtzControllerPtr &baseController);
+    virtual ~QnActivityPtzController();
 
     static bool extends(Qn::PtzCapabilities capabilities);
 
@@ -25,18 +27,19 @@ public:
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
     virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) override;
-    virtual bool createPreset(const QnPtzPreset &preset) override;
+
     virtual bool activatePreset(const QString &presetId, qreal speed) override;
     virtual bool activateTour(const QString &tourId) override;
 
-    virtual bool updateHomeObject(const QnPtzObject &homePosition) override;
-    virtual bool getHomeObject(QnPtzObject *homePosition) override;
+    virtual bool getActiveObject(QnPtzObject *activeObject) override;
 
-public:
-    QMutex m_mutex;
+private:
+    void setActiveObject(const QnPtzObject &activeObject);
+
+private:
+    Mode m_mode;
     QnResourcePropertyAdaptor<QnPtzObject> *m_adaptor;
-    QnHomePtzExecutor *m_executor;
+    QnPtzObject m_activeObject;
 };
 
-
-#endif // QN_HOME_PTZ_CONTROLLER_H
+#endif // QN_ACTIVITY_PTZ_CONTROLLER_H

@@ -25,11 +25,6 @@
         <translation>系统控制器地址</translation>
     </message>
     <message>
-        <location filename="../src/utils/network/foundenterprisecontrollersmodel.cpp" line="240"/>
-        <source>Port: %1, IP: %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Port </source>
         <translation type="obsolete">端口</translation>
     </message>
@@ -528,52 +523,62 @@ They cannot receive system notifications via E-Mail</source>
 <context>
     <name>Qee::Evaluator</name>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="470"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="555"/>
         <source>Invalid stack size after program evaluation: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="509"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="597"/>
         <source>Could not deduce result type for operation %1(&apos;%2&apos;, &apos;%3&apos;).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="543"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="625"/>
+        <source>Invalid parameter type for operation %1(&apos;%2&apos;, &apos;%2&apos;)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/common/evaluator.cpp" line="635"/>
         <source>Could not deduce arithmetic supertype for type &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="563"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="657"/>
+        <source>Invalid parameter type for operation %1(&apos;%2&apos;)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/common/evaluator.cpp" line="665"/>
         <source>Argument number for %1 instruction has invalid type &apos;%2&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="567"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="669"/>
         <source>Argument number for %1 instruction is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="572"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="674"/>
         <source>Stack underflow during execution of %1 instruction.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="576"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="678"/>
         <source>Function name for %1 instruction has invalid type &apos;%2&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="587"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="689"/>
         <source>Function or variable &apos;%1&apos; is not defined.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="593"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="695"/>
         <source>Variable &apos;%1&apos; is not a function and cannot be called.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="605"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="707"/>
         <source>Stack underflow during program evaluation.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -581,7 +586,7 @@ They cannot receive system notifications via E-Mail</source>
 <context>
     <name>Qee::Lexer</name>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="100"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="112"/>
         <source>Unexpected symbol &apos;%1&apos; at position %2.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -589,23 +594,23 @@ They cannot receive system notifications via E-Mail</source>
 <context>
     <name>Qee::ParameterPack</name>
     <message>
-        <location filename="../src/utils/common/evaluator.h" line="159"/>
-        <location filename="../src/utils/common/evaluator.h" line="166"/>
+        <location filename="../src/utils/common/evaluator.h" line="167"/>
+        <location filename="../src/utils/common/evaluator.h" line="174"/>
         <source>Parameter %2 is not specified for function &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.h" line="169"/>
+        <location filename="../src/utils/common/evaluator.h" line="177"/>
         <source>Parameter %2 of function &apos;%1&apos; is of type &apos;%3&apos;, but type &apos;%4&apos; was expected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.h" line="175"/>
+        <location filename="../src/utils/common/evaluator.h" line="183"/>
         <source>Function &apos;%1&apos; is expected to have %3 arguments, %2 provided.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.h" line="180"/>
+        <location filename="../src/utils/common/evaluator.h" line="188"/>
         <source>Function &apos;%1&apos; is expected to have %3-%4 arguments, %2 provided.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -613,17 +618,17 @@ They cannot receive system notifications via E-Mail</source>
 <context>
     <name>Qee::Parser</name>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="166"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="178"/>
         <source>Unexpected token %1 (&apos;%2&apos;) at position %3.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="223"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="235"/>
         <source>Invalid color constant &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="268"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="280"/>
         <source>Invalid number constant &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1834,7 +1839,7 @@ Parameters: </source>
         <translation type="obsolete">视频或音频编解码器与%1格式不兼容。尝试另一种格式。</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="771"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="782"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>为文件&apos;%1&apos;生成水印时发生错误。</translation>
     </message>
@@ -1890,16 +1895,27 @@ Parameters: </source>
         <translation>没有设置存储空间</translation>
     </message>
     <message>
-        <location filename="../src/health/system_health.cpp" line="31"/>
+        <location filename="../src/health/system_health.cpp" line="22"/>
+        <source>Rebuilding archive index is completed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="33"/>
         <source>E-Mail address is not set for user %1</source>
         <translation>用户 %1邮件地址没有设置。</translation>
     </message>
     <message>
-        <location filename="../src/health/system_health.cpp" line="41"/>
+        <location filename="../src/health/system_health.cpp" line="43"/>
         <source>E-Mail address is not set.
 You cannot receive system notifications via E-Mail.</source>
         <translation>邮件地址没有设定。
 无法通过邮件接收系统通知。</translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="55"/>
+        <source>Rebuilding archive index is completed on the following Media Server:
+%1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Your E-Mail address is not set.
@@ -1908,35 +1924,35 @@ You cannot receive system notifications via E-Mail.</source>
 无法通过邮件接收系统事件。</translation>
     </message>
     <message>
-        <location filename="../src/health/system_health.cpp" line="43"/>
+        <location filename="../src/health/system_health.cpp" line="45"/>
         <source>E-Mail server is not set.
 You cannot receive system notifications via E-Mail.</source>
         <translation>邮箱服务器没有设定。
 无法通过邮件接收系统通知。</translation>
     </message>
     <message>
-        <location filename="../src/health/system_health.cpp" line="45"/>
+        <location filename="../src/health/system_health.cpp" line="47"/>
         <source>Some users have not set their E-Mail addresses.
 They cannot receive system notifications via E-Mail.</source>
         <translation>一些用户没有设定邮件地址。
 他们无法通过邮件接收系统事件。</translation>
     </message>
     <message>
-        <location filename="../src/health/system_health.cpp" line="47"/>
+        <location filename="../src/health/system_health.cpp" line="49"/>
         <source>Storages are full on the following Media Server:
 %1.</source>
         <translation>以下媒体服务器存储空间已满:
 %1。</translation>
     </message>
     <message>
-        <location filename="../src/health/system_health.cpp" line="49"/>
+        <location filename="../src/health/system_health.cpp" line="51"/>
         <source>Storages are not configured on the following Media Server:
 %1.</source>
         <translation>以下媒体服务器没有设置存储空间:
 %1。</translation>
     </message>
     <message>
-        <location filename="../src/health/system_health.cpp" line="51"/>
+        <location filename="../src/health/system_health.cpp" line="53"/>
         <source>You have no licenses.
 You cannot record video from cameras.</source>
         <translation>没有软件许可。

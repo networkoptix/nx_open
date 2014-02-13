@@ -26,7 +26,8 @@ struct QnPtzData {
     Qt::Orientations flip;
     QnPtzPresetList presets;
     QnPtzTourList tours;
-    QnPtzObject homePosition;
+    QnPtzObject activeObject;
+    QnPtzObject homeObject;
 };
 
 Q_DECLARE_METATYPE(QnPtzData)

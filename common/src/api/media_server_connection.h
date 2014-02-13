@@ -194,8 +194,9 @@ public:
     int ptzActivateTourAsync(const QnNetworkResourcePtr &camera, const QString &tourId, QObject *target, const char *slot);
     int ptzGetToursAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
 
-    int ptzUpdateHomePositionAsync(const QnNetworkResourcePtr &camera, const QnPtzObject &homePosition, QObject *target, const char *slot);
-    int ptzGetHomePositionAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+    int ptzGetActiveObjectAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+    int ptzUpdateHomeObjectAsync(const QnNetworkResourcePtr &camera, const QnPtzObject &homePosition, QObject *target, const char *slot);
+    int ptzGetHomeObjectAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
 
     int ptzGetDataAsync(const QnNetworkResourcePtr &camera, Qn::PtzDataFields query, QObject *target, const char *slot);
 
