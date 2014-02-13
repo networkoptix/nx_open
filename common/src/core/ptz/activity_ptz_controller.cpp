@@ -4,12 +4,12 @@
 
 #include <api/resource_property_adaptor.h>
 
-QnActivityPtzController::QnActivityPtzController(bool isLocal, const QnPtzControllerPtr &baseController):
+QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_isLocal(isLocal),
+    m_mode(mode),
     m_adaptor(NULL)
 {
-    if(!m_isLocal) {
+    if(m_mode != Local) {
         m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(baseController->resource(), lit("ptzActiveObject"), QnPtzObject(), this);
         m_adaptor->setValue(QnPtzObject());
         connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });
@@ -36,6 +36,8 @@ Qn::PtzCapabilities QnActivityPtzController::getCapabilities() {
 bool QnActivityPtzController::continuousMove(const QVector3D &speed) {
     if(!base_type::continuousMove(speed))
         return false;
+
+    // TODO: #Elric #PTZ don't modify it in Client mode?
 
     setActiveObject(QnPtzObject());
     return true;
@@ -74,7 +76,7 @@ bool QnActivityPtzController::activateTour(const QString &tourId) {
 }
 
 bool QnActivityPtzController::getActiveObject(QnPtzObject *activeObject) {
-    if(m_isLocal) {
+    if(m_mode == Local) {
         *activeObject = m_activeObject;
     } else {
         *activeObject = m_adaptor->value();
@@ -83,7 +85,7 @@ bool QnActivityPtzController::getActiveObject(QnPtzObject *activeObject) {
 }
 
 void QnActivityPtzController::setActiveObject(const QnPtzObject &activeObject) {
-    if(m_isLocal) {
+    if(m_mode == Local) {
         if(m_activeObject != activeObject) {
             m_activeObject = activeObject;
             emit changed(Qn::ActiveObjectPtzField);
