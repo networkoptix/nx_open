@@ -180,7 +180,7 @@ void QnFisheyePtzController::absoluteMoveInternal(const QVector3D &position) {
     m_itemDewarpingParams.fov = qDegreesToRadians(position.z());
 
     /* We check for item as we can get here in a rare case when item is 
-     * destroyed, but the widget is not. */
+     * destroyed, but the widget is not (yet). */
     if (m_widget && m_widget->item()) 
         m_widget->item()->setDewarpingParams(m_itemDewarpingParams);
 }
