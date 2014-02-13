@@ -93,8 +93,6 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
             return camera->getModel();
         case FirmwareColumn:
             return camera->getFirmware();
-        case DriverColumn:
-            return camera->getDriverName();
         case IpColumn:
             return camera->getHostAddress();
         case UniqIdColumn:

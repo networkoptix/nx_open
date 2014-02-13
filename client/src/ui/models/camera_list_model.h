@@ -22,7 +22,6 @@ public:
         VendorColumn,
         ModelColumn,
         FirmwareColumn,
-        DriverColumn,
         IpColumn,
         UniqIdColumn,
         ServerColumn,
