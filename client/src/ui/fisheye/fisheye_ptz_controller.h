@@ -61,6 +61,7 @@ private:
     QPointer<QnMediaResourceWidget> m_widget;
     QPointer<QnResourceWidgetRenderer> m_renderer;
     Qn::PtzCapabilities m_capabilities;
+    QVector3D m_unitSpeed;
 
     QnPtzLimits m_limits;
     bool m_unlimitedPan;

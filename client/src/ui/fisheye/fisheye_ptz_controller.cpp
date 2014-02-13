@@ -25,6 +25,8 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     m_mediaDewarpingParams(widget->dewarpingParams()),
     m_itemDewarpingParams(widget->item()->dewarpingParams())
 {
+    m_unitSpeed = QVector3D(60.0, 60.0, -30.0);
+
     m_widget = widget;
     m_widget->registerAnimation(this);
 
@@ -187,7 +189,7 @@ void QnFisheyePtzController::absoluteMoveInternal(const QVector3D &position) {
 
 void QnFisheyePtzController::tick(int deltaMSecs) {
     if(m_animationMode == SpeedAnimation) {
-        QVector3D speed = m_speed * QVector3D(60.0, 60.0, -30.0);
+        QVector3D speed = m_speed * m_unitSpeed;
         absoluteMoveInternal(boundedPosition(getPositionInternal() + speed * deltaMSecs / 1000.0));
     } else if(m_animationMode == PositionAnimation) {
         m_progress += m_relativeSpeed * deltaMSecs / 1000.0;
@@ -261,7 +263,12 @@ bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QV
         }
 
         m_progress = 0.0;
-        m_relativeSpeed = qBound<qreal>(0.0, speed, 1.0); // TODO: #Elric this is wrong. We need to take distance into account.
+
+        /* This is not 100% correct, a better way would be to calculate combined 
+         * pan-tilt time. */ // TODO: #Elric #PTZ
+        QVector3D distance = m_endPosition - m_startPosition;
+        QVector3D times = QVector3D(qAbs(distance.x() / m_unitSpeed.x()), qAbs(distance.y() / m_unitSpeed.y()), qAbs(distance.z() / m_unitSpeed.z()));
+        m_relativeSpeed = 1.0 / qMax(qMax(times.x(), times.y()), times.z());
         
         startListening();
     }
