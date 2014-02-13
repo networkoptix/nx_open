@@ -1090,18 +1090,6 @@ void QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPt
 ec2::AbstractECConnectionPtr QnAppServerConnectionFactory::getConnection2()
 {
     return currentlyUsedEc2Connection;
-
-    //ec2::AbstractECConnectionPtr ec2Connection;
-    //const ec2::ErrorCode errorCode = ec2ConnectionFactoryInstance->connectSync( QUrl(), &ec2Connection );
-    //if( errorCode == ec2::ErrorCode::ok )
-    //{
-    //    NX_LOG( QString::fromLatin1("Connected to local EC2"), cl_logWARNING );
-    //}
-    //else
-    //{
-    //    NX_LOG( QString::fromLatin1("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)), cl_logERROR );
-    //}   
-    //return ec2Connection;
 }
 
 

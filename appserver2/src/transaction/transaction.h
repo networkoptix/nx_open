@@ -30,6 +30,7 @@ namespace ec2
             //!ApiResourceParams
             setResourceParams,
             getResourceParams,
+            //!ApiResourceData
             saveResource,
             removeResource,
             //!ApiPanicModeData

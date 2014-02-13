@@ -34,6 +34,14 @@ namespace ec2
             emit removed( QnId(tran.params.id) );
         }
 
+        template<> void triggerNotification<ApiBusinessRuleData>( const QnTransaction<ApiBusinessRuleData>& tran )
+        {
+            assert( tran.command == ApiCommand::addBusinessRule || tran.command == ApiCommand::updateBusinessRule );
+            QnBusinessEventRulePtr businessRule( new QnBusinessEventRule() );
+            tran.params.toResource( businessRule, m_resCtx.pool );
+            emit addedOrUpdated( businessRule );
+        }
+
     private:
         QueryProcessorType* const m_queryProcessor;
         ResourceContext m_resCtx;

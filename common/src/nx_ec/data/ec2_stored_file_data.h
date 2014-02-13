@@ -21,9 +21,9 @@ namespace ec2
 
     typedef std::vector<QString> ApiStoredDirContents;
 
-    typedef QString StoredFilePath;
+    typedef QString ApiStoredFilePath;
 
-    inline void parseHttpRequestParams( const QnRequestParamList& params, StoredFilePath* paht )
+    inline void parseHttpRequestParams( const QnRequestParamList& params, ApiStoredFilePath* paht )
     {
         //TODO/IMPL
     }

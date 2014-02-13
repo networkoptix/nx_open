@@ -46,7 +46,7 @@ namespace ec2
         ErrorCode executeTransaction(const QnTransaction<ApiCameraServerItemData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiPanicModeData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiStoredFileData>& tran);
-        ErrorCode executeTransaction(const QnTransaction<StoredFilePath>& tran);
+        ErrorCode executeTransaction(const QnTransaction<ApiStoredFilePath>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiResourceData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiUserData>& tran);
@@ -88,8 +88,8 @@ namespace ec2
         // ApiFullData
         ErrorCode doQuery(nullptr_t /*dummy*/, ApiFullData& data);
 
-        ErrorCode doQuery(const StoredFilePath& path, ApiStoredDirContents& data);
-        ErrorCode doQuery(const StoredFilePath& path, ApiStoredFileData& data);
+        ErrorCode doQuery(const ApiStoredFilePath& path, ApiStoredDirContents& data);
+        ErrorCode doQuery(const ApiStoredFilePath& path, ApiStoredFileData& data);
 
 		// --------- misc -----------------------------
 

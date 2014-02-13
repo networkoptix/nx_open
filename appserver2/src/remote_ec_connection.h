@@ -33,7 +33,9 @@ namespace ec2
         virtual QnConnectionInfo connectionInfo() const override;
         virtual void startReceivingNotifications( bool fullSyncRequired ) override;
 
-        template<class T> void processTransaction( const QnTransaction<T>& tran ) {}
+        template<class T> void processTransaction( const QnTransaction<T>& tran ) {
+            static_assert( false, "Missing RemoteEC2Connection::processTransaction<> specification" );
+        }
 
         template<> void processTransaction<ApiCameraData>( const QnTransaction<ApiCameraData>& tran ) {
             m_cameraManager->triggerNotification( tran );
@@ -42,6 +44,8 @@ namespace ec2
         template<> void processTransaction<ApiIdData>( const QnTransaction<ApiIdData>& tran ) {
             switch( tran.command )
             {
+                case ApiCommand::removeResource:
+                    return m_resourceManager->triggerNotification( tran );
                 case ApiCommand::removeCamera:
                     return m_cameraManager->triggerNotification( tran );
                 case ApiCommand::removeMediaServer:
@@ -61,6 +65,10 @@ namespace ec2
             m_mediaServerManager->triggerNotification( tran );
         }
 
+        template<> void processTransaction<ApiResourceData>( const QnTransaction<ApiResourceData>& tran ) {
+            m_resourceManager->triggerNotification( tran );
+        }
+
         template<> void processTransaction<ApiSetResourceStatusData>( const QnTransaction<ApiSetResourceStatusData>& tran ) {
             m_resourceManager->triggerNotification( tran );
         }
@@ -71,6 +79,18 @@ namespace ec2
 
         template<> void processTransaction<ApiCameraServerItemData>( const QnTransaction<ApiCameraServerItemData>& tran ) {
             return m_cameraManager->triggerNotification( tran );
+        }
+
+        template<> void processTransaction<ApiUserData>( const QnTransaction<ApiUserData>& tran ) {
+            return m_userManager->triggerNotification( tran );
+        }
+
+        template<> void processTransaction<ApiBusinessRuleData>( const QnTransaction<ApiBusinessRuleData>& tran ) {
+            return m_businessEventManager->triggerNotification( tran );
+        }
+
+        template<> void processTransaction<ApiLayoutData>( const QnTransaction<ApiLayoutData>& tran ) {
+            return m_layoutManager->triggerNotification( tran );
         }
 
         template<> void processTransaction<ApiFullData>( const QnTransaction<ApiFullData>& tran ) {

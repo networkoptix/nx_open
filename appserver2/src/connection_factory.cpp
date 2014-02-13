@@ -138,9 +138,9 @@ namespace ec2
 
 
         //AbstractStoredFileManager::listDirectory
-        registerGetFuncHandler<StoredFilePath, ApiStoredDirContents>( restProcessorPool, ApiCommand::listDirectory );
+        registerGetFuncHandler<ApiStoredFilePath, ApiStoredDirContents>( restProcessorPool, ApiCommand::listDirectory );
         //AbstractStoredFileManager::getStoredFile
-        registerGetFuncHandler<StoredFilePath, ApiStoredFileData>( restProcessorPool, ApiCommand::getStoredFile );
+        registerGetFuncHandler<ApiStoredFilePath, ApiStoredFileData>( restProcessorPool, ApiCommand::getStoredFile );
         //AbstractStoredFileManager::addStoredFile
         registerUpdateFuncHandler<ApiStoredFileData>( restProcessorPool, ApiCommand::addOrUpdateStoredFile );
         //AbstractStoredFileManager::deleteStoredFile
@@ -152,18 +152,10 @@ namespace ec2
 
 
         //AbstractECConnectionFactory
-        //TODO: #ak simplify following handlers
-        auto doRemoteConnectionSyncFunc = std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 );
-        restProcessorPool->registerHandler(
-            lit("ec2/%1").arg(ApiCommand::toString(ApiCommand::connect)),
-            new FlexibleQueryHttpHandler<LoginInfo, QnConnectionInfo, decltype(doRemoteConnectionSyncFunc)>
-                (ApiCommand::connect, doRemoteConnectionSyncFunc) );
-
-        auto doRemoteTestConnectionSyncFunc = std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 );
-        restProcessorPool->registerHandler(
-            lit("ec2/%1").arg(ApiCommand::toString(ApiCommand::testConnection)),
-            new FlexibleQueryHttpHandler<LoginInfo, QnConnectionInfo, decltype(doRemoteTestConnectionSyncFunc)>
-                (ApiCommand::testConnection, doRemoteTestConnectionSyncFunc) );
+        registerFunctorHandler<LoginInfo, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
+            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
+        registerFunctorHandler<LoginInfo, QnConnectionInfo>( restProcessorPool, ApiCommand::testConnection,
+            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
     }
 
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
@@ -291,5 +283,16 @@ namespace ec2
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
             new QueryHttpHandler2<InputDataType, OutputDataType>(cmd, &m_serverQueryProcessor) );
+    }
+
+    template<class InputType, class OutputType, class HandlerType>
+    void Ec2DirectConnectionFactory::registerFunctorHandler(
+        QnRestProcessorPool* const restProcessorPool,
+        ApiCommand::Value cmd,
+        HandlerType handler )
+    {
+        restProcessorPool->registerHandler(
+            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+            new FlexibleQueryHttpHandler<InputType, OutputType, decltype(handler)>(cmd, handler) );
     }
 }

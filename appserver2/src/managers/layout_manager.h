@@ -2,6 +2,8 @@
 #ifndef EC2_LAYOUT_MANAGER_H
 #define EC2_LAYOUT_MANAGER_H
 
+#include <core/resource/layout_resource.h>
+
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_data.h"
 #include "nx_ec/data/ec2_layout_data.h"
@@ -31,6 +33,19 @@ namespace ec2
             assert( tran.command == ApiCommand::removeLayout );
             emit removed( QnId(tran.params.id) );
         }
+
+        template<> void triggerNotification<ApiLayoutData>( const QnTransaction<ApiLayoutData>& tran )
+        {
+            assert( tran.command == ApiCommand::addLayout ||
+                    tran.command == ApiCommand::updateLayout ||
+                    tran.command == ApiCommand::addOrUpdateLayouts );
+            QnLayoutResourcePtr layoutResource = m_resCtx.resFactory->createResource(
+                tran.params.typeId,
+                tran.params.toHashMap() ).dynamicCast<QnLayoutResource>();
+            tran.params.toResource( layoutResource );
+            emit addedOrUpdated( layoutResource );
+        }
+
     private:
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
         QnTransaction<ApiLayoutDataList> prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts );

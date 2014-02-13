@@ -858,7 +858,7 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiStoredFileData>
     return m_storedFileManagerImpl->saveFile( tran.params  );
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<StoredFilePath>& tran)
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiStoredFilePath>& tran)
 {
     assert( tran.command == ApiCommand::removeStoredFile );
     return m_storedFileManagerImpl->removeFile( tran.params );
@@ -1224,12 +1224,12 @@ ErrorCode QnDbManager::doQuery(nullptr_t dummy, ApiFullData& data)
     return err;
 }
 
-ErrorCode QnDbManager::doQuery(const StoredFilePath& path, ApiStoredDirContents& data)
+ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& path, ApiStoredDirContents& data)
 {
     return m_storedFileManagerImpl->listDirectory( path, data );
 }
 
-ErrorCode QnDbManager::doQuery(const StoredFilePath& path, ApiStoredFileData& data)
+ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& path, ApiStoredFileData& data)
 {
     return m_storedFileManagerImpl->readFile( path, data );
 }

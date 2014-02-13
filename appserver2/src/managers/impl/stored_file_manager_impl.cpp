@@ -14,19 +14,19 @@ namespace ec2
         return ErrorCode::notImplemented;
     }
 
-    ErrorCode StoredFileManagerImpl::removeFile( const StoredFilePath& path )
+    ErrorCode StoredFileManagerImpl::removeFile( const ApiStoredFilePath& path )
     {
         //TODO/IMPL
         return ErrorCode::notImplemented;
     }
 
-    ErrorCode StoredFileManagerImpl::listDirectory( const StoredFilePath& path, ApiStoredDirContents& data )
+    ErrorCode StoredFileManagerImpl::listDirectory( const ApiStoredFilePath& path, ApiStoredDirContents& data )
     {
         //TODO/IMPL
         return ErrorCode::notImplemented;
     }
 
-    ErrorCode StoredFileManagerImpl::readFile( const StoredFilePath& path, ApiStoredFileData& data )
+    ErrorCode StoredFileManagerImpl::readFile( const ApiStoredFilePath& path, ApiStoredFileData& data )
     {
         //TODO/IMPL
         return ErrorCode::notImplemented;

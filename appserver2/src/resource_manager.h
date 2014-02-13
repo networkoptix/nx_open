@@ -40,6 +40,14 @@ namespace ec2
             static_assert( false, "Specify QnResourceManager::triggerNotification<>, please" );
         }
 
+        template<> void triggerNotification<ApiResourceData>( const QnTransaction<ApiResourceData>& tran ) {
+            QnResourcePtr resource = m_resCtx.resFactory->createResource(
+                tran.params.typeId,
+                tran.params.toHashMap() );
+            tran.params.toResource( resource );
+            emit resourceChanged( resource );
+        }
+
         template<> void triggerNotification<ApiSetResourceStatusData>( const QnTransaction<ApiSetResourceStatusData>& tran ) {
             emit statusChanged( QnId(tran.params.id), tran.params.status );
         }
@@ -54,6 +62,10 @@ namespace ec2
                 resourceId = param.resourceId;
             }
             emit resourceParamsChanged( QnId(resourceId), outData );
+        }
+
+        template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran ) {
+            emit resourceRemoved( tran.params.id );
         }
 
     private:

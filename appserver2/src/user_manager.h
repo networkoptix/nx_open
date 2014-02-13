@@ -2,9 +2,12 @@
 #ifndef __USER_MANAGER_H_
 #define __USER_MANAGER_H_
 
+#include <core/resource/user_resource.h>
+
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 #include "nx_ec/data/ec2_user_data.h"
+
 
 namespace ec2
 {
@@ -22,6 +25,16 @@ namespace ec2
 
         template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
             static_assert( false, "Specify QnUserManager::triggerNotification<>, please" );
+        }
+
+        template<> void triggerNotification<ApiUserData>( const QnTransaction<ApiUserData>& tran )
+        {
+            assert( tran.command == ApiCommand::addUser || tran.command == ApiCommand::updateUser );
+            QnUserResourcePtr userResource = m_resCtx.resFactory->createResource(
+                tran.params.typeId,
+                tran.params.toHashMap() ).dynamicCast<QnUserResource>();
+            tran.params.toResource( userResource );
+            emit addedOrUpdated( userResource );
         }
 
         template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran )

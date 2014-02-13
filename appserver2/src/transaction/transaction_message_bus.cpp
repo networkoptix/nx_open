@@ -253,9 +253,58 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
     {
         case ApiCommand::getAllDataList:
             return deliveryTransaction<ApiFullData>(command, stream);
+
+        //!ApiSetResourceStatusData
+        case ApiCommand::setResourceStatus:
+            return deliveryTransaction<ApiSetResourceStatusData>(command, stream);
+        //!ApiResourceParams
+        case ApiCommand::setResourceParams:
+            return deliveryTransaction<ApiResourceParams>(command, stream);
+        case ApiCommand::saveResource:
+            return deliveryTransaction<ApiResourceData>(command, stream);
+        case ApiCommand::removeResource:
+            return deliveryTransaction<ApiIdData>(command, stream);
+        case ApiCommand::setPanicMode:
+            return deliveryTransaction<ApiPanicModeData>(command, stream);
+            
         case ApiCommand::addCamera:
         case ApiCommand::updateCamera:
             return deliveryTransaction<ApiCameraData>(command, stream);
+        case ApiCommand::removeCamera:
+            return deliveryTransaction<ApiIdData>(command, stream);
+        case ApiCommand::addCameraHistoryItem:
+            return deliveryTransaction<ApiCameraServerItemData>(command, stream);
+
+        case ApiCommand::addMediaServer:
+        case ApiCommand::updateMediaServer:
+            return deliveryTransaction<ApiMediaServerData>(command, stream);
+        case ApiCommand::removeMediaServer:
+            return deliveryTransaction<ApiIdData>(command, stream);
+
+        case ApiCommand::addUser:
+        case ApiCommand::updateUser:
+            return deliveryTransaction<ApiUserData>(command, stream);
+        case ApiCommand::removeUser:
+            return deliveryTransaction<ApiIdData>(command, stream);
+
+        case ApiCommand::addBusinessRule:
+        case ApiCommand::updateBusinessRule:
+            return deliveryTransaction<ApiBusinessRuleData>(command, stream);
+        case ApiCommand::removeBusinessRule:
+            return deliveryTransaction<ApiIdData>(command, stream);
+
+        case ApiCommand::addOrUpdateLayouts:
+        case ApiCommand::addLayout:
+        case ApiCommand::updateLayout:
+            return deliveryTransaction<ApiLayoutData>(command, stream);
+        case ApiCommand::removeLayout:
+            return deliveryTransaction<ApiIdData>(command, stream);
+            
+        case ApiCommand::addOrUpdateStoredFile:
+            return deliveryTransaction<ApiStoredFileData>(command, stream);
+        case ApiCommand::removeStoredFile:
+            return deliveryTransaction<ApiStoredFilePath>(command, stream);
+
         default:
             break;
     }

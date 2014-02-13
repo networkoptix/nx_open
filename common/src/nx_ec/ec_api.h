@@ -9,6 +9,7 @@
 
 #include "api/model/connection_info.h"
 #include "api/model/email_attachment.h"
+#include "data/ec2_runtime_info.h"
 #include "impl/ec_api_impl.h"
 #include "impl/sync_handler.h"
 #include "rest/server/rest_connection_processor.h"
@@ -118,7 +119,9 @@ namespace ec2
     signals:
         void statusChanged( const QnId& resourceId, QnResource::Status status );
         void disabledChanged( const QnId& resourceId, bool disabled );
+        void resourceChanged( const QnResourcePtr& resource );
         void resourceParamsChanged( const QnId& resourceId, const QnKvPairList& kvPairs );
+        void resourceRemoved( const QnId& resourceId );
 
     protected:
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
@@ -387,8 +390,10 @@ namespace ec2
         }
 
     signals:
-        void addedOrUpdated( QnBusinessEventRulePtr camera );
+        void addedOrUpdated( QnBusinessEventRulePtr businessRule );
         void removed( QnId id );
+        void businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
+        void businessRuleReset( const QnBusinessEventRuleList& rules );
 
     private:
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
@@ -548,7 +553,8 @@ namespace ec2
         }
 
     signals:
-        void addedOrUpdated( QString filename );
+        void added( QString filename );
+        void updated( QString filename );
         void removed( QString filename );
 
     protected:
@@ -676,6 +682,7 @@ namespace ec2
             \param cameraHistoryItems
         */
         void initNotification(QnFullResourceData fullData);
+        void runtimeInfoChanged(const ec2::QnRuntimeInfo& runtimeInfo);
 
     protected:
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;

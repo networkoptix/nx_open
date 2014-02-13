@@ -70,6 +70,11 @@ namespace ec2
             void registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd );
         template<class InputDataType, class OutputDataType>
             void registerGetFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd );
+        template<class InputType, class OutputType, class HandlerType>
+            void registerFunctorHandler(
+                QnRestProcessorPool* const restProcessorPool,
+                ApiCommand::Value cmd,
+                HandlerType handler );
     };
 }
 

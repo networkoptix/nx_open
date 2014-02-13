@@ -20,9 +20,9 @@ namespace ec2
     {
     public:
         ErrorCode saveFile( const ApiStoredFileData& fileData );
-        ErrorCode removeFile( const StoredFilePath& path );
-        ErrorCode listDirectory( const StoredFilePath& path, ApiStoredDirContents& data );
-        ErrorCode readFile( const StoredFilePath& path, ApiStoredFileData& data );
+        ErrorCode removeFile( const ApiStoredFilePath& path );
+        ErrorCode listDirectory( const ApiStoredFilePath& path, ApiStoredDirContents& data );
+        ErrorCode readFile( const ApiStoredFilePath& path, ApiStoredFileData& data );
     };
 }
 
