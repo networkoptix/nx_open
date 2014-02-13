@@ -37,9 +37,8 @@ bool QnActivityPtzController::continuousMove(const QVector3D &speed) {
     if(!base_type::continuousMove(speed))
         return false;
 
-    // TODO: #Elric #PTZ don't modify it in Client mode?
-
-    setActiveObject(QnPtzObject());
+    if(m_mode != Client)
+        setActiveObject(QnPtzObject());
     return true;
 }
 
@@ -47,7 +46,8 @@ bool QnActivityPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const Q
     if(!base_type::absoluteMove(space, position, speed))
         return false;
 
-    setActiveObject(QnPtzObject());
+    if(m_mode != Client)
+        setActiveObject(QnPtzObject());
     return true;
 }
 
@@ -55,7 +55,8 @@ bool QnActivityPtzController::viewportMove(qreal aspectRatio, const QRectF &view
     if(!base_type::viewportMove(aspectRatio, viewport, speed))
         return false;
 
-    setActiveObject(QnPtzObject());
+    if(m_mode != Client)
+        setActiveObject(QnPtzObject());
     return true;
 }
 
@@ -63,7 +64,8 @@ bool QnActivityPtzController::activatePreset(const QString &presetId, qreal spee
     if(!base_type::activatePreset(presetId, speed))
         return false;
 
-    setActiveObject(QnPtzObject(Qn::PresetPtzObject, presetId));
+    if(m_mode != Client)
+        setActiveObject(QnPtzObject(Qn::PresetPtzObject, presetId));
     return true;
 }
 
@@ -71,7 +73,8 @@ bool QnActivityPtzController::activateTour(const QString &tourId) {
     if(!base_type::activateTour(tourId))
         return false;
 
-    setActiveObject(QnPtzObject(Qn::TourPtzObject, tourId));
+    if(m_mode != Client)
+        setActiveObject(QnPtzObject(Qn::TourPtzObject, tourId));
     return true;
 }
 
