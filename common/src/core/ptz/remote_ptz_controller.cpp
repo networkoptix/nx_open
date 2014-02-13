@@ -130,6 +130,10 @@ bool QnRemotePtzController::getTours(QnPtzTourList *) {
     RUN_COMMAND(Qn::GetToursPtzCommand, QVariant(), ptzGetToursAsync);
 }
 
+bool QnRemotePtzController::getActiveObject(QnPtzObject *activeObject) {
+
+}
+
 bool QnRemotePtzController::updateHomeObject(const QnPtzObject &homePosition) {
     RUN_COMMAND(Qn::UpdateHomeObjectPtzCommand, homePosition, ptzUpdateHomeObjectAsync, homePosition);
 }

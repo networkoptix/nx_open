@@ -113,15 +113,16 @@ public:
     };
 
     enum PtzDataField {
-        DevicePositionPtzField  = 0x001,
-        LogicalPositionPtzField = 0x002,
-        DeviceLimitsPtzField    = 0x004,
-        LogicalLimitsPtzField   = 0x008,
-        FlipPtzField            = 0x010,
-        PresetsPtzField         = 0x020,
-        ToursPtzField           = 0x040,
-        ActiveObjectPtzField    = 0x080,
-        HomeObjectPtzField      = 0x100,
+        CapabilitiesPtzField    = 0x001,
+        DevicePositionPtzField  = 0x002,
+        LogicalPositionPtzField = 0x004,
+        DeviceLimitsPtzField    = 0x008,
+        LogicalLimitsPtzField   = 0x010,
+        FlipPtzField            = 0x020,
+        PresetsPtzField         = 0x040,
+        ToursPtzField           = 0x080,
+        ActiveObjectPtzField    = 0x100,
+        HomeObjectPtzField      = 0x200,
         NoPtzFields             = 0x000,
         AllPtzFields            = 0xFFF
     };

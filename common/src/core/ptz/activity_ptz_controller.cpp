@@ -6,10 +6,12 @@
 
 QnActivityPtzController::QnActivityPtzController(bool isLocal, const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_isLocal(isLocal)
+    m_isLocal(isLocal),
+    m_adaptor(NULL)
 {
-    if(m_isLocal) {
-        m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(baseController->resource(), lit("activePtzObject"), QnPtzObject(), this);
+    if(!m_isLocal) {
+        m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(baseController->resource(), lit("ptzActiveObject"), QnPtzObject(), this);
+        m_adaptor->setValue(QnPtzObject());
         connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnActivityPtzController::at_adaptor_valueChanged);
     }
 
@@ -18,6 +20,41 @@ QnActivityPtzController::QnActivityPtzController(bool isLocal, const QnPtzContro
 
 QnActivityPtzController::~QnActivityPtzController() {
     return;
+}
+
+bool QnActivityPtzController::extends(Qn::PtzCapabilities capabilities) {
+    return 
+        (capabilities & (Qn::PresetsPtzCapability | Qn::ToursPtzCapability)) &&
+        !(capabilities & Qn::ActivityPtzCapability);
+}
+
+Qn::PtzCapabilities QnActivityPtzController::getCapabilities() {
+    Qn::PtzCapabilities capabilities = base_type::getCapabilities();
+    return extends(capabilities) ? (capabilities | Qn::ActivityPtzCapability) : capabilities;
+}
+
+bool QnActivityPtzController::continuousMove(const QVector3D &speed) {
+    if(!base_type::continuousMove(speed))
+        return false;
+
+    setActiveObject(QnPtzObject());
+    return true;
+}
+
+bool QnActivityPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
+    if(!base_type::absoluteMove(space, position, speed))
+        return false;
+
+    setActiveObject(QnPtzObject());
+    return true;
+}
+
+bool QnActivityPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
+    if(!base_type::viewportMove(aspectRatio, viewport, speed))
+        return false;
+
+    setActiveObject(QnPtzObject());
+    return true;
 }
 
 bool QnActivityPtzController::activatePreset(const QString &presetId, qreal speed) {
