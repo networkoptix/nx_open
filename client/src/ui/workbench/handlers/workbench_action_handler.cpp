@@ -724,9 +724,9 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
 }
 
 void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
-    qreal value = workbench()->currentLayout()->cellAspectRatio();
-    if (value <= 0)
-        value = qnGlobals->defaultLayoutCellAspectRatio();
+    qreal value = workbench()->currentLayout()->hasCellAspectRatio()
+                  ? workbench()->currentLayout()->cellAspectRatio()
+                  : qnGlobals->defaultLayoutCellAspectRatio();
 
     if (qFuzzyCompare(4.0 / 3.0, value))
         action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
@@ -810,7 +810,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
             ? 1
             : qnSettings->maxSceneVideoItems();
 
-    bool adjustAspectRatio = layout->getItems().isEmpty();
+    bool adjustAspectRatio = layout->getItems().isEmpty() || !layout->hasCellAspectRatio();
 
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
@@ -861,6 +861,9 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
 
         if (!widgets.isEmpty()) {
+            /* Here we don't take into account already added widgets. It's ok because
+               we can get here only if the layout doesn't have cell aspect ratio, that means
+               its widgets don't have aspect ratio too. */
             foreach (QnResourceWidget *widget, widgets) {
                 if (widget->hasAspectRatio()) {
                     midAspectRatio += widget->aspectRatio();
@@ -2389,7 +2392,7 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
     int minHeight = qMax(brect.height(), qnGlobals->layoutBackgroundMinSize().height());
 
     qreal cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
-    if (layout->cellAspectRatio() > 0) {
+    if (layout->hasCellAspectRatio()) {
         qreal cellWidth = 1.0 + layout->cellSpacing().width();
         qreal cellHeight = 1.0 / layout->cellAspectRatio() + layout->cellSpacing().height();
         cellAspectRatio = cellWidth / cellHeight;

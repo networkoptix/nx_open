@@ -56,13 +56,13 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_workbench_currentLayoutAboutToBeCha
 }
 
 void QnWorkbenchLayoutAspectRatioWatcher::at_watchedLayout_cellAspectRatioChanged() {
-    if (m_watchedLayout->cellAspectRatio() > 0)
+    if (m_watchedLayout->hasCellAspectRatio())
         unwatchCurrentLayout();
 }
 
 void QnWorkbenchLayoutAspectRatioWatcher::watchCurrentLayout() {
     QnWorkbenchLayout *layout = workbench()->currentLayout();
-    if (layout->cellAspectRatio() > 0)
+    if (layout->hasCellAspectRatio())
         return;
 
     m_watchedLayout = layout;
