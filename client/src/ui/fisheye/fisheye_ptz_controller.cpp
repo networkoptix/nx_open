@@ -138,7 +138,7 @@ void QnFisheyePtzController::updateMediaDewarpingParams() {
 
 
 void QnFisheyePtzController::updateItemDewarpingParams() {
-    if (!m_widget)
+    if (!m_widget || !m_widget->item())
         return;
 
     int oldPanoFactor = m_itemDewarpingParams. panoFactor;
@@ -179,7 +179,9 @@ void QnFisheyePtzController::absoluteMoveInternal(const QVector3D &position) {
     m_itemDewarpingParams.yAngle = qDegreesToRadians(position.y());
     m_itemDewarpingParams.fov = qDegreesToRadians(position.z());
 
-    if (m_widget)
+    /* We check for item as we can get here in a rare case when item is 
+     * destroyed, but the widget is not. */
+    if (m_widget && m_widget->item()) 
         m_widget->item()->setDewarpingParams(m_itemDewarpingParams);
 }
 
