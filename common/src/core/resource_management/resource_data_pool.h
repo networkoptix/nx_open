@@ -31,8 +31,8 @@ private:
     bool loadInternal(const QString &fileName);
 
 private:
-    mutable QMutex m_mutex;
     QHash<QString, QnResourceData> m_dataByKey;
+    QHash<QString, QString> m_shortVendorByName;
 };
 
 

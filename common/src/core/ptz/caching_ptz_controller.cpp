@@ -172,17 +172,26 @@ bool QnCachingPtzController::getTours(QnPtzTourList *tours) {
     }
 }
 
-bool QnCachingPtzController::updateHomePosition(const QnPtzObject &homePosition) {
-    return base_type::updateHomePosition(homePosition); 
+bool QnCachingPtzController::getActiveObject(QnPtzObject *activeObject) {
+    if(!base_type::getActiveObject(activeObject))
+        return false;
+
+    /* We don't take it from cache. */
+
+    return true;
 }
 
-bool QnCachingPtzController::getHomePosition(QnPtzObject *homePosition) {
-    if(!base_type::getHomePosition(homePosition))
+bool QnCachingPtzController::updateHomeObject(const QnPtzObject &homeObject) {
+    return base_type::updateHomeObject(homeObject); 
+}
+
+bool QnCachingPtzController::getHomeObject(QnPtzObject *homeObject) {
+    if(!base_type::getHomeObject(homeObject))
         return false;
 
     QMutexLocker locker(&m_mutex);
-    if(m_data.fields & Qn::HomePositionPtzField) {
-        *homePosition = m_data.homePosition;
+    if(m_data.fields & Qn::HomeObjectPtzField) {
+        *homeObject = m_data.homeObject;
         return true;
     } else {
         return false;
@@ -268,10 +277,10 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
             m_data.fields |= Qn::ToursPtzField;
             m_data.tours = data.value<QnPtzTourList>();
             break;
-        case Qn::UpdateHomePositionPtzCommand:
-        case Qn::GetHomePositionPtzCommand:
-            m_data.fields |= Qn::HomePositionPtzField;
-            m_data.homePosition = data.value<QnPtzObject>();
+        case Qn::UpdateHomeObjectPtzCommand:
+        case Qn::GetHomeObjectPtzCommand:
+            m_data.fields |= Qn::HomeObjectPtzField;
+            m_data.homeObject = data.value<QnPtzObject>();
             break;
         case Qn::GetDataPtzCommand:
             updateCacheLocked(data.value<QnPtzData>());
@@ -307,6 +316,6 @@ void QnCachingPtzController::updateCacheLocked(const QnPtzData &data) {
     if(fields & Qn::FlipPtzField)           m_data.flip = data.flip;
     if(fields & Qn::PresetsPtzField)        m_data.presets = data.presets;
     if(fields & Qn::ToursPtzField)          m_data.tours = data.tours;
-    if(fields & Qn::HomePositionPtzField)   m_data.homePosition = data.homePosition;
+    if(fields & Qn::HomeObjectPtzField)   m_data.homeObject = data.homeObject;
     m_data.fields |= fields;
 }
