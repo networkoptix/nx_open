@@ -6,6 +6,8 @@
 class QTableView;
 class QWidget;
 
+// TODO: #Elric rename into something saner
+
 class QnGridWidgetHelper {
     Q_DECLARE_TR_FUNCTIONS(QnGridWidgetHelper)
 public:
