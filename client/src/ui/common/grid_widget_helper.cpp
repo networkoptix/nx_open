@@ -11,9 +11,9 @@
 
 #include <utils/common/string.h>
 
-QnGridWidgetHelper::QnGridWidgetHelper(QObject *parent):
-    QObject(parent),
-    QnWorkbenchContextAware(parent)
+QnGridWidgetHelper::QnGridWidgetHelper(QWidget *widget):
+    QObject(widget),
+    m_widget(widget)
 {
 }
 
@@ -26,7 +26,7 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
     while (true) 
     {
         QString selectedFilter;
-        fileName = QFileDialog::getSaveFileName(mainWindow(),
+        fileName = QFileDialog::getSaveFileName(m_widget,
                                                 caption,
                                                 previousDir,
                                                 tr("HTML file (*.html);;Spread Sheet (CSV) File(*.csv)"),
@@ -41,7 +41,7 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
 
             if (QFile::exists(fileName)) {
                 QMessageBox::StandardButton button = QMessageBox::information(
-                    mainWindow(),
+                    m_widget,
                     tr("Save As"),
                     tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).completeBaseName()),
                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
@@ -54,7 +54,7 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
 
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
             QMessageBox::critical(
-                mainWindow(),
+                m_widget,
                 tr("Could not overwrite file"),
                 tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).completeBaseName()),
                 QMessageBox::Ok
