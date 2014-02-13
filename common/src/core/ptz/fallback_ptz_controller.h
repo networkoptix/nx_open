@@ -43,7 +43,7 @@ public:
 
 protected:
     void baseFinished(Qn::PtzCommand command, const QVariant &data)                                             { emit finished(command, data); }
-    void baseCapabilitiesChanged();
+    void baseChanged(Qn::PtzDataFields fields);
 
 private:
     const QnPtzControllerPtr &baseController()                                                                  { return m_mainIsValid ? m_mainController : m_fallbackController; }

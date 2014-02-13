@@ -30,8 +30,6 @@ public:
 private:
     void setActiveObject(const QnPtzObject &activeObject);
 
-    Q_SLOT void at_adaptor_valueChanged();
-
 private:
     bool m_isLocal;
     QnResourcePropertyAdaptor<QnPtzObject> *m_adaptor;

@@ -45,7 +45,7 @@ public:
 
 protected:
     virtual void baseFinished(Qn::PtzCommand command, const QVariant &data)                                     { emit finished(command, data); }
-    virtual void baseCapabilitiesChanged()                                                                      { emit capabilitiesChanged(); }
+    virtual void baseChanged(Qn::PtzDataFields fields)                                                          { emit changed(fields); }
 
     Q_SIGNAL void finishedLater(Qn::PtzCommand command, const QVariant &data);
 

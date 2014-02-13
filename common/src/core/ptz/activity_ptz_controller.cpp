@@ -12,7 +12,7 @@ QnActivityPtzController::QnActivityPtzController(bool isLocal, const QnPtzContro
     if(!m_isLocal) {
         m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(baseController->resource(), lit("ptzActiveObject"), QnPtzObject(), this);
         m_adaptor->setValue(QnPtzObject());
-        connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnActivityPtzController::at_adaptor_valueChanged);
+        connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });
     }
 
     assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability));
@@ -86,13 +86,9 @@ void QnActivityPtzController::setActiveObject(const QnPtzObject &activeObject) {
     if(m_isLocal) {
         if(m_activeObject != activeObject) {
             m_activeObject = activeObject;
-            emit capabilitiesChanged(); // TODO: #Elric #PTZ
+            emit changed(Qn::ActiveObjectPtzField);
         }
     } else {
         m_adaptor->setValue(activeObject);
     }
-}
-
-void QnActivityPtzController::at_adaptor_valueChanged() {
-    emit capabilitiesChanged(); // TODO: #Elric #PTZ
 }
