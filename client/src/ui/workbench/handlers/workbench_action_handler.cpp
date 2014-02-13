@@ -888,6 +888,8 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
         if (cellAspectRatio > 0)
             layout->setCellAspectRatio(cellAspectRatio);
+        else if (workbenchLayout->items().size() > 1)
+            layout->setCellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio());
     }
 }
 
