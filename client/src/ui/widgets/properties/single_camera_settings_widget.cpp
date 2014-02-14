@@ -17,7 +17,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_manager.h>
@@ -39,7 +39,12 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 
+#include <utils/common/scoped_value_rollback.h>
 #include <utils/license_usage_helper.h>
+
+namespace {
+    const QSize fisheyeThumbnailSize(0, 0); //unlimited size for better calibration
+}
 
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
@@ -56,6 +61,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_hasScheduleControlsChanges(false),
     m_hasMotionControlsChanges(false),
     m_readOnly(false),
+    m_updating(false),
     m_motionWidget(NULL),
     m_inUpdateMaxFps(false),
     m_widgetsRecreator(0),
@@ -393,6 +399,8 @@ bool QnSingleCameraSettingsWidget::licensedParametersModified() const
 }
 
 void QnSingleCameraSettingsWidget::updateFromResource() {
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
     loadAdvancedSettings();
 
     if(!m_camera) {
@@ -481,7 +489,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->expertSettingsWidget->updateFromResources(QnVirtualCameraResourceList() << m_camera);
 
             if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
-                m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, QSize(), this);
+                m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, fisheyeThumbnailSize, QnSingleThumbnailLoader::PngFormat, this);
             ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
     }
@@ -862,6 +870,9 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
 }
 
 void QnSingleCameraSettingsWidget::at_dbDataChanged() {
+    if (m_updating)
+        return;
+
     ui->tabWidget->setTabEnabled(Qn::FisheyeCameraSettingsTab, ui->checkBoxDewarping->isChecked());
     setHasDbChanges(true);
 }
@@ -923,8 +934,10 @@ void QnSingleCameraSettingsWidget::refreshAdvancedSettings()
     }
 }
 
-void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged()
-{
+void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged() {
+    if (m_updating)
+        return;
+
     at_dbDataChanged();
     at_cameraDataChanged();
 

@@ -9,13 +9,9 @@
 #include "client/client_settings.h"
 #include "ui/dialogs/custom_file_dialog.h"
 
-QnGridWidgetHelper::QnGridWidgetHelper(QnWorkbenchContext *context):
-    QnWorkbenchContextAware(context)
-{
+#include <utils/common/string.h>
 
-}
-
-void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
+void QnGridWidgetHelper::exportToFile(QTableView *grid, QWidget *parent, const QString &caption)
 {
     QString previousDir = qnSettings->lastExportDir();
     if (previousDir.isEmpty())
@@ -23,36 +19,27 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
     QString fileName;
     while (true) 
     {
-
-        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
-            mainWindow(),
-            caption,
-            previousDir,
-            QObject::tr("HTML file (*.html);;Spread Sheet (CSV) File(*.csv)")
-        ));
-        dialog->setFileMode(QFileDialog::AnyFile);
-        dialog->setAcceptMode(QFileDialog::AcceptSave);
-
-        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
-            return;
-
-        fileName = dialog->selectedFiles().value(0);
-        QString selectedFilter = dialog->selectedNameFilter();
-        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-
+        QString selectedFilter;
+        fileName = QFileDialog::getSaveFileName(parent,
+                                                caption,
+                                                previousDir,
+                                                tr("HTML file (*.html);;Spread Sheet (CSV) File(*.csv)"),
+                                                &selectedFilter,
+                                                QnCustomFileDialog::fileDialogOptions());
         if (fileName.isEmpty())
             return;
 
+        QString selectedExtension = extractFileExtension(selectedFilter);
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
 
             if (QFile::exists(fileName)) {
                 QMessageBox::StandardButton button = QMessageBox::information(
-                    mainWindow(),
-                    QObject::tr("Save As"),
-                    QObject::tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
+                    parent,
+                    tr("Save As"),
+                    tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).completeBaseName()),
                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
-                    );
+                );
 
                 if(button == QMessageBox::Cancel || button == QMessageBox::No)
                     return;
@@ -61,11 +48,11 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
 
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
             QMessageBox::critical(
-                mainWindow(),
-                QObject::tr("Could not overwrite file"),
-                QObject::tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
+                parent,
+                tr("Could not overwrite file"),
+                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).completeBaseName()),
                 QMessageBox::Ok
-                );
+            );
             continue;
         }
 
@@ -76,7 +63,7 @@ void QnGridWidgetHelper::exportToFile(QTableView* grid, const QString& caption)
 
     QString textData;
     QString htmlData;
-    getGridData(grid, textData, htmlData, QLatin1Char(L';'));
+    getGridData(grid, QLatin1Char(L';'), &textData, &htmlData);
 
     QFile f(fileName);
     if (f.open(QFile::WriteOnly))
@@ -92,7 +79,7 @@ void QnGridWidgetHelper::copyToClipboard(QTableView* grid)
 {
     QString textData;
     QString htmlData;
-    getGridData(grid, textData, htmlData, QLatin1Char(L'\t'));
+    getGridData(grid, QLatin1Char(L'\t'), &textData, &htmlData);
 
     QMimeData* mimeData = new QMimeData();
     mimeData->setText(textData);
@@ -100,7 +87,7 @@ void QnGridWidgetHelper::copyToClipboard(QTableView* grid)
     QApplication::clipboard()->setMimeData(mimeData);
 }
 
-void QnGridWidgetHelper::getGridData(QTableView* grid, QString& textData, QString& htmlData, const QLatin1Char& textDelimiter)
+void QnGridWidgetHelper::getGridData(QTableView *grid, const QLatin1Char &textDelimiter, QString *textData, QString *htmlData)
 {
     QAbstractItemModel *model = grid->model();
     QModelIndexList list = grid->selectionModel()->selectedIndexes();
@@ -109,46 +96,51 @@ void QnGridWidgetHelper::getGridData(QTableView* grid, QString& textData, QStrin
 
     qSort(list);
 
-    htmlData.append(lit("<html>\n"));
-    htmlData.append(lit("<body>\n"));
-    htmlData.append(lit("<table>\n"));
+    QString textResult, htmlResult;
 
-    htmlData.append(lit("<tr>"));
+    htmlResult.append(lit("<html>\n"));
+    htmlResult.append(lit("<body>\n"));
+    htmlResult.append(lit("<table>\n"));
+
+    htmlResult.append(lit("<tr>"));
     for(int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
     {
         if (i > 0)
-            textData.append(textDelimiter);
+            textResult.append(textDelimiter);
         QString header = model->headerData(list[i].column(), Qt::Horizontal).toString();
-        htmlData.append(lit("<th>"));
-        htmlData.append(header);
-        htmlData.append(lit("</th>"));
-        textData.append(header);
+        htmlResult.append(lit("<th>"));
+        htmlResult.append(header);
+        htmlResult.append(lit("</th>"));
+        textResult.append(header);
     }
-    htmlData.append(lit("</tr>"));
+    htmlResult.append(lit("</tr>"));
 
     int prevRow = -1;
     for(int i = 0; i < list.size(); ++i)
     {
         if(list[i].row() != prevRow) {
             prevRow = list[i].row();
-            textData.append(lit("\n"));
+            textResult.append(lit("\n"));
             if (i > 0)
-                htmlData.append(lit("</tr>"));
-            htmlData.append(lit("<tr>"));
+                htmlResult.append(lit("</tr>"));
+            htmlResult.append(lit("<tr>"));
         }
         else {
-            textData.append(textDelimiter);
+            textResult.append(textDelimiter);
         }
 
-        htmlData.append(lit("<td>"));
-        htmlData.append(model->data(list[i], Qn::DisplayHtmlRole).toString());
-        htmlData.append(lit("</td>"));
+        htmlResult.append(lit("<td>"));
+        htmlResult.append(model->data(list[i], Qn::DisplayHtmlRole).toString());
+        htmlResult.append(lit("</td>"));
 
-        textData.append(model->data(list[i]).toString());
+        textResult.append(model->data(list[i]).toString());
     }
-    htmlData.append(lit("</tr>\n"));
-    htmlData.append(lit("</table>\n"));
-    htmlData.append(lit("</body>\n"));
-    htmlData.append(lit("</html>\n"));
-    textData.append(lit("\n"));
+    htmlResult.append(lit("</tr>\n"));
+    htmlResult.append(lit("</table>\n"));
+    htmlResult.append(lit("</body>\n"));
+    htmlResult.append(lit("</html>\n"));
+    textResult.append(lit("\n"));
+
+    *textData = textResult;
+    *htmlData = htmlResult;
 }

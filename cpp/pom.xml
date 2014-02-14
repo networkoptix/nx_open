@@ -1,18 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<parent>
-		<artifactId>hdwitness</artifactId>
-		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.2.0-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
+    <parent>
+        <artifactId>hdwitness</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.2.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
 
-	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.2.0-SNAPSHOT</version>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>cpp</artifactId>
-	<packaging>pom</packaging>
-	<name>Common POM for cpp projects</name>
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.2.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cpp</artifactId>
+    <packaging>pom</packaging>
+    <name>Common POM for cpp projects</name>
 
     <properties>
         <!-- Change it to point relatively to the root-->
@@ -31,6 +31,27 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <delete>
+                                    <fileset dir="${project.build.outputDirectory}/resources" />
+                                </delete>
+                            </tasks>
+                            <failOnError>false</failOnError>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.5</version>
                 <executions>
@@ -46,14 +67,7 @@
                                 <resource>
                                     <directory>${root.dir}/cpp/maven/filter-resources</directory>
                                     <filtering>true</filtering>
-                                </resource>	
-                                <resource>
-                                    <directory>${root.dir}/build_environment/maven/filter-resources/include</directory>
-                                    <includes>
-                                        <include>version.h</include>
-                                    </includes>
-                                    <filtering>true</filtering>
-                                </resource>	                                
+                                </resource>	                               
                                 <resource>
                                     <directory>${root.dir}/cpp/maven/bin-resources</directory>
                                     <filtering>false</filtering>
@@ -78,7 +92,7 @@
                         <configuration>
                             <executable>${python.dir}/python</executable>
                             <arguments>
-                                <argument>${project.build.directory}/gen-resources.py</argument>
+                                <argument>${project.build.directory}/gen_resources.py</argument>
                             </arguments>
                             <workingDirectory>${project.build.directory}</workingDirectory>		
                         </configuration>
@@ -180,6 +194,15 @@
                                             <value>
                                                 <![CDATA[<RootNamespace>${project.artifactId}</RootNamespace><LocalDebuggerWorkingDirectory>$(OutputDirectory)</LocalDebuggerWorkingDirectory>]]></value>
                                         </replacement> -->
+ 
+                                        <replacement>
+                                            <token>
+                                                <![CDATA[</RootNamespace>]]></token>
+                                            <value>
+                                                <![CDATA[</RootNamespace>
+    <PlatformToolSet>v110</PlatformToolSet>
+    <TargetName>${project.artifactId}</TargetName>]]></value>
+                                        </replacement>                                        
                                         <replacement>
                                             <token>
                                                 <![CDATA[release</ProgramDataBaseFileName>]]></token>
@@ -227,8 +250,10 @@
 
                                         <!-- Enabling SEH exceptions for crash stack dump -->
                                         <replacement>
-                                            <token><![CDATA[<ExceptionHandling>Sync</ExceptionHandling>]]></token>
-                                            <value><![CDATA[<ExceptionHandling>Async</ExceptionHandling>]]></value>
+                                            <token>
+                                                <![CDATA[<ExceptionHandling>Sync</ExceptionHandling>]]></token>
+                                            <value>
+                                                <![CDATA[<ExceptionHandling>Async</ExceptionHandling>]]></value>
                                         </replacement>
 
                                         <!-- Adding "Create precompiled header option" to StdAfx.cpp compile options -->

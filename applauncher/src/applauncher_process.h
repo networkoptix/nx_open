@@ -15,18 +15,31 @@
 #include <QSettings>
 
 #include <utils/common/stoppable.h>
+#include <utils/common/timermanager.h>
 
 #include "abstract_request_processor.h"
 #include "installation_manager.h"
 #include "installation_process.h"
 #include "task_server_new.h"
+#include "version.h"
 
+
+#ifdef AK_DEBUG
+#ifdef _WIN32
+static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String("client.exe")) );
+#else
+static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String("client")) );
+#endif
+#else
+static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String(QN_CLIENT_EXECUTABLE_NAME)) );
+#endif
 
 class ApplauncherProcess
 :
     public QObject,
     public QnStoppable,
-    public AbstractRequestProcessor
+    public AbstractRequestProcessor,
+    public TimerEventHandler
 {
     Q_OBJECT
 
@@ -47,6 +60,17 @@ public:
     int run();
 
 private:
+    struct KillProcessTask
+    {
+        qint64 processID;
+
+        KillProcessTask()
+        :
+            processID( 0 )
+        {
+        }
+    };
+
     bool m_terminated;
     InstallationManager* const m_installationManager;
     const bool m_quitMode;
@@ -58,6 +82,7 @@ private:
     std::condition_variable m_cond;
     std::atomic<unsigned int> m_prevInstallationID;
     std::map<unsigned int, std::shared_ptr<InstallationProcess>> m_activeInstallations;
+    std::map<qint64, KillProcessTask> m_killProcessTasks;
 
     bool sendTaskToRunningLauncherInstance();
     bool getVersionToLaunch( QString* const versionToLaunch, QString* const appArgs );
@@ -77,6 +102,11 @@ private:
     bool cancelInstallation(
         const std::shared_ptr<applauncher::api::CancelInstallationRequest>& request,
         applauncher::api::CancelInstallationResponse* const response );
+    bool addProcessKillTimer(
+        const std::shared_ptr<applauncher::api::AddProcessKillTimerRequest>& request,
+        applauncher::api::AddProcessKillTimerResponse* const response );
+
+    virtual void onTimer( const quint64& timerID ) override;
 
 private slots:
     void onInstallationSucceeded();

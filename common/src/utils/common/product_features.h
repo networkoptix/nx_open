@@ -13,6 +13,7 @@ struct QnProductFeatures {
     bool freeLicenseIsTrial;
     int freeLicenseCount;
     QString freeLicenseKey;
+    int actionAggregationPeriod;
 };
 
 

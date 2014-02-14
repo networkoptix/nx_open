@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="zh-CN" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+    <String Id="AdvancedWelcomeEulaDlg_Title"                       Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="BrowseDlg_Title"                                    Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="CancelDlg_Title"                                    Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="CustomizeDlg_Title"                                 Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="DiskCostDlg_Title"                                  Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="ErrorDlg_Title"                                     Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="ExitDialog_Title"                                   Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="FatalError_Title"                                   Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="FeaturesDlg_Title"                                  Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="FilesInUse_Title"                                   Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="InstallScopeDlg_Title"                              Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="InvalidDirDlg_Title"                                Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="LicenseAgreementDlg_Title"                          Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="MaintenanceTypeDlg_Title"                           Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="MaintenanceWelcomeDlg_Title"                        Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="MsiRMFilesInUse_Title"                              Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="OutOfDiskDlg_Title"                                 Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="OutOfRbDiskDlg_Title"                               Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="PrepareDlg_Title"                                   Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="ProgressDlg_Title"                                  Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="ResumeDlg_Title"                                    Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="SetupTypeDlg_Title"                                 Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="UserExit_Title"                                     Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="VerifyReadyDlg_Title"                               Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="WaitForCostingDlg_Title"                            Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="WelcomeDlg_Title"                                   Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="WelcomeEulaDlg_Title"                               Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+
+    <!-- Standard Strings (Common Buttons, Labels etc) -->
+    <String Id="StdString_Ok"                                       Overridable="yes">确定</String>
+    <String Id="StdString_Warning"                                  Overridable="yes">警告</String>
+    <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] 安装</String>
+
+    <!-- AllFieldsAreMandatoryDlg -->
+    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">参数不能为空。</String>
+
+    <!-- AppServerDlg -->
+    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">系统控制器参数配置</String>
+    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">请设置系统控制器参数</String>
+    <String Id="AppServerDlg_Port"                                  Overridable="yes">端口</String>
+    <String Id="AppServerDlg_Login"                                 Overridable="yes">登录配置</String>
+    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">创建密码</String>
+    <String Id="AppServerDlg_Network"                               Overridable="yes">网络配置</String>    
+    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">代理端口</String>
+    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">确认密码</String>   
+
+    <!-- Associations -->
+    <String Id="Associations_PlayWith"                              Overridable="yes">运行 ${product.name}</String>
+
+    <!-- ClientDlg -->
+    <String Id="ClientDlg_Shortcut"                                 Overridable="yes">快捷方式</String>
+    <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">请创建桌面快捷方式。</String>    
+    
+    <!-- DowngradeWarningDlg -->
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">已经安装 [ProductName]软件的一个版本.</String> 
+
+    <!-- EmptyPasswordDlg -->
+    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">错误密码</String>
+    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">密码不能为空</String>     
+    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">警告</String>     
+
+    <!-- InstallTypeDlg -->
+    <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">快速全部安装 (安装所有组件)</String>
+    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">安装客户端(可以使用客户端访问视频和录像)</String>
+    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">高级安装</String>
+    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">请选择安装方式</String>
+    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">安装方式</String>       
+
+    <!-- InvalidPasswordDlg -->
+    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">密码必须一致且不为空</String>    
+
+    <!-- MediaDirDlg -->
+    <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">点击“下一步”软件将安装在默认路径。如果需要更改路径，请点击“浏览“选择安装路径.</String>
+    <String Id="MediaDirDlg_MediaFolder"                            Overridable="yes">媒体根目录文件夹</String>
+    <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">请选择媒体根目录文件夹：</String>
+    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">登录</String>    
+
+    <!-- MediaServerDlg -->
+    <String Id="MediaServerDlg_Host"                                Overridable="yes">主机</String>
+    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">端口</String>
+    <String Id="MediaServerDlg_Login"                               Overridable="yes">用户名</String>
+    <String Id="MediaServerDlg_Password"                            Overridable="yes">密码</String>  
+    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">媒体服务器端口</String>
+    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">系统控制器</String>
+    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">媒体服务器配置</String>
+    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">媒体服务器</String>  
+
+    <!-- MyExitDialog -->
+
+    <!-- MyFeaturesDlg -->
+    <String Id="MyFeaturesDlg_Components"                           Overridable="yes">组件</String>
+    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (客户端，可以使用它访问视频和录像)</String>
+    <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (媒体存储服务，可以使用它在进行本地录像)</String>
+    <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (数据管理控制服务. 在一个网络中只能安装一个控制服务)</String>    
+
+    <!-- PasswordDlg -->
+    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">请输入管理员密码</String>
+    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">管理员认证</String>
+    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">管理员认证</String>
+    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">用户名</String>
+    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">创建密码</String>
+    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">确认密码</String>    
+
+    <!-- PasswordShouldMatchDlg -->
+    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">设置错误</String>    
+    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">警告</String>    
+    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">请确认密码一致</String>    
+
+    <!-- PortDuplicateDlg -->
+    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">无效的指定端口</String>    
+    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">警告</String>    
+    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">两个端口不能设置成一致，请检查您的配置。</String>    
+
+    <!-- PortIsBusyDlg -->
+    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">端口[BUSYPORT] 被占用！</String>    
+    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">警告</String>    
+    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">设置的端口已经被占用，请设置正确的端口。</String>    
+
+    <!-- Product -->
+    <String Id="Product_LaunchClient"                               Overridable="yes">当 ${product.name} 安装成后自动运行.</String>    
+
+    <!-- SelectionWarningDlg -->
+    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">请选择您所需要安装的组件！</String>    
+
+    <!-- UninstallOptionsDlg -->
+    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">卸载选项</String>
+    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">保留 ${product.name} 数据库</String>
+    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">移除 ${product.name} 数据库</String>
+    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">当前版本</String>  
+    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">已安装版本:</String>   
+    
+    <!-- UpgradeDlg -->
+    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">发现已安装版本</String>    
+    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">安装方式</String>    
+    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">系统将开始更新！</String>    
+
+    <!-- WixSchedFirewallExceptions -->
+    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">不能连接到windows防火墙。  ([2]   [3]   [4]   [5])</String>    
+    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">配置windows防火墙</String>    
+    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">正在配置windows防火墙</String>    
+    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">正在回滚到windows防火墙配置</String>    
+    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">正在安装windows防火墙配置</String>    
+    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">正在回滚到windows防火墙配置</String>    
+    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">不能安装windows防火墙配置</String>        
+</WixLocalization>

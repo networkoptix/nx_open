@@ -1,30 +1,13 @@
 #include "abstract_business_action.h"
 
+#include <QtCore/QCoreApplication>
+
 #include <core/resource/resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
+
+#include <business/business_strings_helper.h>
 
 namespace BusinessActionType {
-
-    //do not use 'default' keyword: warning should be raised on unknown enumeration values
-
-    QString toString(Value val) {
-        switch(val) {
-        case NotDefined:            return QString();
-        case CameraOutput:          return QObject::tr("Camera output");
-        case CameraOutputInstant:   return QObject::tr("Camera output for 30 sec");
-        case Bookmark:              return QObject::tr("Bookmark");
-        case CameraRecording:       return QObject::tr("Camera recording");
-        case PanicRecording:        return QObject::tr("Panic recording");
-        case SendMail:              return QObject::tr("Send mail");
-        case Diagnostics:           return QObject::tr("Write to log");
-        case ShowPopup:             return QObject::tr("Show notification");
-        case PlaySound:             return QObject::tr("Play sound");
-        case PlaySoundRepeated:     return QObject::tr("Repeat sound");
-        case SayText:               return QObject::tr("Speak");
-        }
-        return QObject::tr("Unknown (%1)").arg((int)val);
-    }
-
     bool requiresCameraResource(Value val) {
         switch(val) {
         case NotDefined:
@@ -166,5 +149,5 @@ void QnAbstractBusinessAction::setAggregationCount(int value)
 
 QString QnAbstractBusinessAction::getExternalUniqKey() const
 {
-    return BusinessActionType::toString(m_actionType);
+    return lit("action_") + QString::number(static_cast<int>(m_actionType)) + L'_';
 }

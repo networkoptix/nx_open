@@ -5,82 +5,93 @@
         <?include BuildVars.wxi ?>
 
         <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>                
-        
+        <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>                        
+
         <DirectoryRef Id="INSTALLDIR">
-        <Directory Id="${customization}ClientDir" Name="Client">
-            <Directory Id="${customization}HelpDir" Name="help"/>                         
+            <Directory Id="${customization}ClientDir" Name="Client">
+                <Directory Id="${customization}HelpDir" Name="help"/>                         
 
-            <Directory Id="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir" Name="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}">
+                <Directory Id="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir" Name="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}">
 
-                <Component Id="AppLauncherExecutable">
-                    <File Id="applauncher.exe" Name="${product.name} Launcher.exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes">
-                        <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="${product.name}"
+                    <Component Id="AppLauncherExecutable">
+                        <File Id="applauncher.exe" Name="${product.name} Launcher.exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes">
+                            <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="${product.name}"
                               WorkingDirectory='${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Advertise="yes" Icon="icon_menu.exe" >
-                        </Shortcut>
-                    </File>
-                </Component>
-
-                <Component Id="AppLauncherConfiguration" Permanent="yes">
-                    <RegistryKey Root="HKCU"
-                                 Key="Software\[Manufacturer]\${applauncher.name}">
-                        <RegistryValue Type="string" Name="previousLaunchedVersion" Value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}"/>
-                    </RegistryKey>
-                </Component>                                
-
-                <Component Id="clientShortcutDesktop">
-                    <Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
-
-                    <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\${applauncher.name}" Name="clientShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
-
-                    <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
-                          WorkingDirectory='${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Target="[#applauncher.exe]" Icon="icon_desktop.exe">
-                    </Shortcut>
-                </Component>                            
-
-                <Directory Id="styles" Name="styles">
-                    <Component Id="bespin">
-                        <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="$(var.SourceDir)\styles\bespin$(var.suffix).dll" />
+                            </Shortcut>
+                        </File>
                     </Component>
-                </Directory>
 
-                <Directory Id="ImageFormats" Name="imageformats">
-                </Directory>    
+                    <Component Id="AppLauncherConfiguration" Permanent="yes">
+                        <RegistryKey Root="HKCU"
+                                 Key="Software\[Manufacturer]\${applauncher.name}">
+                            <RegistryValue Type="string" Name="previousLaunchedVersion" Value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}"/>
+                        </RegistryKey>
+                    </Component>                                
 
-                <Directory Id="Platforms" Name="platforms">
-                </Directory>                    
-
-                <Directory Id="${customization}VoxDir" Name="vox"/>                                
-
-                <Component Id="ClientExecutable">
-                    <File Id="client.exe" Name="${product.name}.exe" Source="$(var.SourceDir)/client.exe" KeyPath="yes">
-                        <fire:FirewallException Id="FirewallExceptionClient" Name="${product.name}" Scope="any" IgnoreFailure="yes"/>
-                    </File>
-                </Component>                                
-
-                <Component Id="ClientConfiguration" Permanent="yes">
-                    <Condition>
-                        NOT PREVIOUSVERSIONSINSTALLED
-                    </Condition>
-
-                    <RegistryKey Root="HKCU"
+                    <Component Id="DefaultLanguage" Permanent="yes">
+                        <RegistryKey Root="HKCU"
                                  Key="Software\[Manufacturer]\${client.name}">
-                        <RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
-                        <RegistryValue Type="string" Name="appserverHost" Value="[CLIENT_APPSERVER_HOST]"/>
-                        <RegistryValue Type="string" Name="appserverPort" Value="[CLIENT_APPSERVER_PORT]"/>
-                        <RegistryValue Type="string" Name="appserverLogin" Value="[CLIENT_APPSERVER_LOGIN]"/>
-                        <RegistryValue Type="string" Name="mediaRoot" Value="[CLIENT_DIRECTORY]"/>
-                    </RegistryKey>
-                </Component>
+                            <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_${translation1}.qm"/>
+                        </RegistryKey>
+                    </Component>    
 
-                <Component Id="ClientSigar">
-                    <File Id="ClientSigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll"/>
-                </Component>
+                    <Component Id="clientShortcutDesktop">
+                        <Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
 
-                <Component Id="ClientVsRedistributable">
-                    <File Id="VcRedistexe" Name="vcredist_${arch}.exe" Source="$(var.SourceDir)\vcredist_${arch}.exe"/>
-                </Component>
-            </Directory>                 
-        </Directory>
+                        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\${applauncher.name}" Name="clientShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
+
+                        <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
+                          WorkingDirectory='${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Target="[#applauncher.exe]" Icon="icon_desktop.exe">
+                        </Shortcut>
+                    </Component>                            
+
+                    <Directory Id="styles" Name="styles">
+                        <Component Id="bespin">
+                            <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="$(var.SourceDir)\styles\bespin$(var.suffix).dll" />
+                        </Component>
+                    </Directory>
+
+                    <Directory Id="ImageFormats" Name="imageformats">
+                    </Directory>    
+
+                    <Directory Id="Plugins" Name="plugins">
+                    </Directory>                        
+
+                    <Directory Id="Platforms" Name="platforms">
+                    </Directory>                    
+
+                    <Directory Id="${customization}VoxDir" Name="vox"/>                                
+
+                    <Component Id="ClientExecutable">
+                        <File Id="client.exe" Name="${product_name}" Source="$(var.SourceDir)/${client_name}" KeyPath="yes">
+                            <fire:FirewallException Id="FirewallExceptionClient" Name="${product.name}" Scope="any" IgnoreFailure="yes"/>
+                        </File>
+                    </Component>                                
+
+                    <Component Id="ClientConfiguration" Permanent="yes">
+                        <Condition>
+                        NOT PREVIOUSVERSIONSINSTALLED
+                        </Condition>
+
+                        <RegistryKey Root="HKCU"
+                                 Key="Software\[Manufacturer]\${client.name}">
+                            <RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
+                            <RegistryValue Type="string" Name="appserverHost" Value="[CLIENT_APPSERVER_HOST]"/>
+                            <RegistryValue Type="string" Name="appserverPort" Value="[CLIENT_APPSERVER_PORT]"/>
+                            <RegistryValue Type="string" Name="appserverLogin" Value="[CLIENT_APPSERVER_LOGIN]"/>
+                            <RegistryValue Type="string" Name="mediaRoot" Value="[CLIENT_DIRECTORY]"/>
+                        </RegistryKey>
+                    </Component>
+
+                    <Component Id="ClientSigar">
+                        <File Id="ClientSigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll"/>
+                    </Component>
+
+                    <Component Id="ClientVsRedistributable">
+                        <File Id="VcRedistexe" Name="vcredist_${arch}.exe" Source="$(var.SourceDir)\vcredist_${arch}.exe"/>
+                    </Component>
+                </Directory>                 
+            </Directory>
         </DirectoryRef>
 
         <ComponentGroup Id="ClientFFmpegLibraries" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
@@ -114,19 +125,18 @@
             <Component>
                 <File Id="ClientVorbisEncDll" Name="libvorbisenc-2.dll" Source="$(var.SourceDir)/libvorbisenc-2.dll"/>
             </Component>
-            <Component>
-                <File Id="ClientX264" Name="x264.exe" Source="$(var.SourceDir)/x264.exe"/>                                
-            </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ClientQuickSync" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <?if ${quicksync} = true ?>
+        <ComponentGroup Id="ClientQuickSync" Directory="Plugins">
             <Component>
-                <File Id="ClientQuickSyncDll" Name="quicksyncdecoder.dll" Source="$(var.SourceDir)/quicksyncdecoder.dll"/>
+                <File Id="ClientQuickSyncDll" Name="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll"/>
             </Component>
             <Component>
-                <File Id="ClientQuickSyncXml" Name="hw_decoding_conf.xml" Source="$(var.SourceDir)/hw_decoding_conf.xml"/>                               
+                <File Id="ClientQuickSyncXml" Name="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml"/>                               
             </Component>
         </ComponentGroup>                            
+        <?endif?>
 
         <ComponentGroup Id="ClientQTLibraries" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
@@ -172,7 +182,7 @@
                 <File Id="Clientssleay32.dll" Name="ssleay32.dll" Source="$(var.SourceDir)\ssleay32.dll"/>
             </Component>
         </ComponentGroup>    
-        
+
         <ComponentGroup Id="ImageFormats" Directory="ImageFormats">
             <Component>
                 <File Id="qgif$(var.suffix).dll" Name="qgif.dll" Source="$(var.SourceDir)\imageformats\qgif$(var.suffix).dll" />
@@ -184,7 +194,7 @@
                 <File Id="qtiff$(var.suffix).dll" Name="qtiff.dll" Source="$(var.SourceDir)\imageformats\qtiff$(var.suffix).dll" />
             </Component>
         </ComponentGroup>
-        
+
         <ComponentGroup Id="Platforms" Directory="Platforms">
             <Component>
                 <File Id="qminimal$(var.suffix).dll" Name="qminimal.dll" Source="$(var.SourceDir)\platforms\qminimal$(var.suffix).dll" />
@@ -204,13 +214,16 @@
 
             <ComponentRef Id="AppLauncherExecutable" />
             <ComponentRef Id="AppLauncherConfiguration" />          
+            <ComponentRef Id="DefaultLanguage" />                                         
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="clientShortcutDesktop"/>
             <ComponentGroupRef Id="ClientHelpComponent"/>
             <ComponentGroupRef Id="ClientVoxComponent"/>
             <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentRef Id="ClientConfiguration" />
+            <?if ${quicksync} = true ?>
             <ComponentGroupRef Id="ClientQuickSync"/>
+            <?endif?>
             <ComponentGroupRef Id="ClientFFmpegLibraries"/>
             <ComponentGroupRef Id="ClientQTLibraries" />
             <ComponentGroupRef Id="ImageFormats" />

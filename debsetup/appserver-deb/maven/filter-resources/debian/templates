@@ -7,8 +7,6 @@ Template: ${deb.customization.company.name}-entcontroller/port_invalid
 Type: error
 Description: The port is invalid. Please try again.
 
-Template: ${deb.customization.company.name}-entcontroller/proxyPort
-Template: ${deb.customization.company.name}-entcontroller/proxyPort_invalid
 Template: ${deb.customization.company.name}-entcontroller/password
 Type: string
 Default: 

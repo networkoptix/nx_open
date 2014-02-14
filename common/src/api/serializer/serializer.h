@@ -5,6 +5,7 @@
 
 #include <api/model/kvpair.h>
 #include <api/model/email_attachment.h>
+#include <api/model/connection_info.h>
 
 #include <business/business_fwd.h>
 
@@ -17,7 +18,6 @@
 
 #include <utils/common/exception.h>
 
-#include "connectinfo.h"
 
 /*
  * Helper serialization functions. Not related to any specific serializarion format.
@@ -63,7 +63,7 @@ public:
     virtual void deserializeResourceTypes(QnResourceTypeList& resourceTypes, const QByteArray& data) = 0;
     virtual void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data) = 0;
     virtual void deserializeCameraHistoryList(QnCameraHistoryList& cameraServerItems, const QByteArray& data) = 0;
-    virtual void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) = 0;
+    virtual void deserializeConnectInfo(QnConnectionInfoPtr& connectInfo, const QByteArray& data) = 0;
     virtual void deserializeBusinessRules(QnBusinessEventRuleList&, const QByteArray& data) = 0;
     virtual void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) = 0;
     virtual void deserializeBusinessActionVector(QnBusinessActionDataListPtr& businessActionList, const QByteArray& data) = 0;
@@ -74,7 +74,7 @@ public:
     virtual void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) = 0;
     virtual void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data) = 0;
     virtual void serializeLicense(const QnLicensePtr& license, QByteArray& data) = 0;
-	virtual void serializeLicenses(const QList<QnLicensePtr>& licenses, QByteArray& data) = 0;
+    virtual void serializeLicenses(const QList<QnLicensePtr>& licenses, QByteArray& data) = 0;
     virtual void serializeCameraServerItem(const QnCameraHistoryItem& cameraHistory, QByteArray& data) = 0;
     virtual void serializeBusinessRules(const QnBusinessEventRuleList&, QByteArray& data) = 0;
     virtual void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) = 0;

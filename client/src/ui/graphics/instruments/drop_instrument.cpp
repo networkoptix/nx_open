@@ -9,6 +9,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_processor.h>
 
 #include <utils/common/warnings.h>
 
@@ -18,7 +19,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 
-#include "file_processor.h"
 #include "destruction_guard_item.h"
 
 class DropSurfaceItem: public QGraphicsObject {

@@ -9,7 +9,7 @@
 #include <utils/common/event_processors.h>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <business/events/abstract_business_event.h>
 #include <business/business_strings_helper.h>
@@ -39,7 +39,11 @@ namespace {
 
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
-    base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint | Qt::Tool),
+    base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
+#ifdef Q_OS_MAC
+    | Qt::Tool
+#endif
+    ),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::EventLogDialog),
     m_eventTypesModel(new QStandardItemModel()),
@@ -86,7 +90,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
         for (int i = 0; i < BusinessActionType::Count; i++) {
             BusinessActionType::Value val = (BusinessActionType::Value)i;
 
-            QStandardItem *item = new QStandardItem(BusinessActionType::toString(val));
+            QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
             item->setData(val);
             item->setData(BusinessActionType::hasToggleState(val), ProlongedActionRole);
 
@@ -102,10 +106,10 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
     m_exportAction      = new QAction(tr("Export Selection to File..."), this);
     m_selectAllAction   = new QAction(tr("Select All"), this);
-    m_selectAllAction->setShortcut(Qt::CTRL + Qt::Key_A);
+    m_selectAllAction->setShortcut(QKeySequence::SelectAll);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
     m_resetFilterAction = new QAction(tr("Clear Filter"), this);
-    m_resetFilterAction->setShortcut(Qt::CTRL + Qt::Key_R);
+    m_resetFilterAction->setShortcut(Qt::CTRL + Qt::Key_R); //TODO: #Elric shouldn't we use QKeySequence::Refresh instead (evaluates to F5 on win)? --gdm
 
     QnSingleEventSignalizer *mouseSignalizer = new QnSingleEventSignalizer(this);
     mouseSignalizer->setEventType(QEvent::MouseButtonRelease);
@@ -127,7 +131,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     connect(m_resetFilterAction,    SIGNAL(triggered()),                this, SLOT(at_resetFilterAction()));
     connect(m_clipboardAction,      SIGNAL(triggered()),                this, SLOT(at_copyToClipboard()));
     connect(m_exportAction,         SIGNAL(triggered()),                this, SLOT(at_exportAction()));
-    connect(m_selectAllAction,      SIGNAL(triggered()),                this, SLOT(at_selectAllAction()));
+    connect(m_selectAllAction,      SIGNAL(triggered()),                ui->gridEvents, SLOT(selectAll()));
 
     connect(ui->dateEditFrom,       SIGNAL(dateChanged(const QDate&)),  this, SLOT(updateData()) );
     connect(ui->dateEditTo,         SIGNAL(dateChanged(const QDate&)),  this, SLOT(updateData()) );
@@ -508,19 +512,14 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
     menu->deleteLater();
 }
 
-void QnEventLogDialog::at_selectAllAction()
-{
-    ui->gridEvents->selectAll();
-}
-
 void QnEventLogDialog::at_exportAction()
 {
-    QnGridWidgetHelper(context()).exportToFile(ui->gridEvents, QObject::tr("Export selected events to file"));
+    QnGridWidgetHelper::exportToFile(ui->gridEvents, this, tr("Export selected events to file"));
 }
 
 void QnEventLogDialog::at_copyToClipboard()
 {
-    QnGridWidgetHelper(context()).copyToClipboard(ui->gridEvents);
+    QnGridWidgetHelper::copyToClipboard(ui->gridEvents);
 }
 
 void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)

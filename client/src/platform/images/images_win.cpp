@@ -1,6 +1,6 @@
 #include "images_win.h"
 
-/* This one is exported from QtGui. */
+// TODO: #Elric use public interface QtWin::imageFromHBITMAP
 extern QImage qt_imageFromWinHBITMAP(HDC hdc, HBITMAP bitmap, int w, int h);
 
 namespace {

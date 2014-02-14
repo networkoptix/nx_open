@@ -3,8 +3,8 @@ from subprocess import Popen, PIPE
 
 commands = [\
 'candle -dinstalltype="${install.type}" -dAppServerSourceDir="${AppServerDir}" -dClientHelpSourceDir="${ClientHelpSourceDir}" -dClientVoxSourceDir="${ClientVoxSourceDir}" -dClientBgSourceDir="${ClientBgSourceDir}" -arch ${arch} -out obj\${build.configuration}\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -ext wixext\WixSystemToolsExtension.dll UninstallOptionsDlg.wxs Associations.wxs MyExitDialog.wxs PasswordShouldMatchDlg.wxs UpgradeDlg.wxs PasswordDlg.wxs EmptyPasswordDlg.wxs AllFieldsAreMandatoryDlg.wxs InstallTypeDlg.wxs PortDuplicateDlg.wxs PortIsBusyDlg.wxs InvalidPasswordDlg.wxs MediaDirDlg.wxs MediaServerDlg.wxs ClientDlg.wxs MyFeaturesDlg.wxs SelectionWarning.wxs DowngradeWarningDlg.wxs Product-${install.type}.wxs AppServerFiles.wxs ClientHelp.wxs ClientVox.wxs ClientBg.wxs AppServerDlg.wxs Client.wxs',\
-'light -cultures:en-US -loc CustomStrings.wxl -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -ext wixext\WixSystemToolsExtension.dll -out bin/${project.build.finalName}-${install.type}.msi -pdbout bin\${build.configuration}\EVEMediaPlayerSetup.wixpdb obj\${build.configuration}\*.wixobj"',\
-'cscript FixExitDialog.js bin/${project.build.finalName}-${install.type}.msi'\
+'light -cultures:${installer.language} -loc CustomStrings_${installer.language}.wxl -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll -ext wixext\WixSystemToolsExtension.dll -out bin/${project.build.finalName}.msi -pdbout bin\${build.configuration}\EVEMediaPlayerSetup.wixpdb obj\${build.configuration}\*.wixobj"',\
+'cscript FixExitDialog.js bin/${project.build.finalName}.msi'\
 ]
 
 for command in commands:

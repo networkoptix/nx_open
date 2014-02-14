@@ -32,7 +32,8 @@ namespace nx_http
         m_requestBytesSent( 0 ),
         m_authorizationTried( false ),
         m_terminated( false ),
-        m_totalBytesRead( 0 )
+        m_totalBytesRead( 0 ),
+        m_contentEncodingUsed( true )
     {
         m_responseBuffer.resize(RESPONSE_BUFFER_SIZE);
     }
@@ -177,7 +178,7 @@ namespace nx_http
                     readAndParseHttp();
                     //TODO/IMPL reconnect in case of error
 
-                    if( m_state >= sFailed )
+                    if( m_state == sFailed )
                     {
                         lk.unlock();
                         emit done( sharedThis );
@@ -380,6 +381,11 @@ namespace nx_http
         return m_totalBytesRead;
     }
 
+    void AsyncHttpClient::setUseCompression( bool toggleUseEntityEncoding )
+    {
+        m_contentEncodingUsed = toggleUseEntityEncoding;
+    }
+
     void AsyncHttpClient::setSubsequentReconnectTries( int /*reconnectTries*/ )
     {
         //TODO/IMPL
@@ -505,7 +511,10 @@ namespace nx_http
         if( useHttp11 )
         {
             m_request.headers["Accept"] = "*/*";
-            m_request.headers["Accept-Encoding"] = "gzip;q=1.0, identity;q=0.5, *;q=0";
+            if( m_contentEncodingUsed )
+                m_request.headers["Accept-Encoding"] = "gzip;q=1.0, identity;q=0.5, *;q=0";
+            else
+                m_request.headers["Accept-Encoding"] = "identity;q=1.0, *;q=0";
             m_request.headers["Cache-Control"] = "max-age=0";
             //m_request.headers["Connection"] = "keep-alive";
             m_request.headers["Host"] = m_url.host().toLatin1();

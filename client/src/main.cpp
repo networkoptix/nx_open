@@ -13,6 +13,7 @@
 #include "version.h"
 #include "ui/widgets/main_window.h"
 #include "client/client_settings.h"
+#include <api/global_settings.h>
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
@@ -44,8 +45,8 @@ extern "C"
 #endif
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "core/resource_managment/resource_discovery_manager.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_discovery_manager.h"
+#include "core/resource_management/resource_pool.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
 #include "device_plugins/server_camera/server_camera.h"
@@ -76,7 +77,7 @@ extern "C"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "core/resource/camera_history.h"
-#include "client_message_processor.h"
+#include "client/client_message_processor.h"
 #include "client/client_translation_manager.h"
 
 #ifdef Q_OS_LINUX
@@ -246,6 +247,19 @@ void initAppServerConnection()
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
 }
 
+/** Initialize log. */
+void initLog(const QString &logLevel) {
+    QnLog::initLog(logLevel);
+    const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    QString logFileLocation = dataLocation + QLatin1String("/log");
+    QString logFileName = logFileLocation + QLatin1String("/log_file");
+    if (!QDir().mkpath(logFileLocation))
+        cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
+    if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
+        cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
+    cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
+}
+
 static QtMessageHandler defaultMsgHandler = 0;
 
 static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
@@ -277,7 +291,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     int result = 0;
 
-    QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     /* Parse command line. */
@@ -290,11 +303,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     int screen = -1;
     QString authenticationString, delayedDrop, instantDrop, logLevel;
     QString translationPath;
-        QString customizationPath = lit(":/skin");
-    bool devBackgroundEditable = false;
+    QString customizationPath = lit(":/skin");
     bool skipMediaFolderScan = false;
     bool noFullScreen = false;
     bool noVersionMismatchCheck = false;
+    QString lightMode;
+    bool noVSync = false;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -303,27 +317,38 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
     commandLineParser.addParameter(&instantDrop,            "--instant-drop",               NULL,   QString());
     commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
+#ifdef ENABLE_DYNAMIC_TRANSLATION
     commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
+#endif
     commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
-    commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
     commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
     commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
     commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
+#ifdef ENABLE_DYNAMIC_CUSTOMIZATION
     commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
+#endif
+    commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString());
+    commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
+
     commandLineParser.parse(argc, argv, stderr);
+
+    initLog(logLevel);
 
     /* Dev mode. */
     if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
         qnSettings->setDevMode(true);
     }
 
+    if (!lightMode.isEmpty())
+        qnSettings->setLightMode(lightMode.toInt());
+
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
     if(authentication.isValid()) {
-        // do not print password in plaintext
-        //out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
         qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
     }
+
+    qnSettings->setVSyncEnabled(!noVSync);
 
     QScopedPointer<QnSkin> skin(new QnSkin(customizationPath));
     QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(customizationPath + lit("/customization.json"))));
@@ -342,6 +367,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
+    QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
@@ -362,8 +388,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
             argsMessage += fromNativePath(QFile::decodeName(argv[i])) + QLatin1Char('\n');
 
         while (application->isRunning()) {
-            if (application->sendMessage(argsMessage))
+            if (application->sendMessage(argsMessage)) {
+                cl_log.log(lit("Another instance is already running"), cl_logALWAYS);
                 return 0;
+            }
         }
     }
 
@@ -381,19 +409,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Initialize sound. */
     QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());
 
-
-    /* Initialize log. */
-    const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
-        return 0;
-    if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
-        return 0;
-
-
     QnHelpHandler helpHandler;
     qApp->installEventFilter(&helpHandler);
 
-    QnLog::initLog(logLevel);
     cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
     cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
@@ -404,7 +422,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // Create and start SessionManager
     QnSessionManager::instance()->start();
 
-    QnResourcePool::instance(); // to initialize net state;
     ffmpegInit();
 
     //===========================================================================
@@ -474,6 +491,21 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
     context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
+
+    Qn::ActionId effectiveMaximizeActionId = Qn::FullscreenAction;
+#ifdef Q_OS_LINUX
+    /* In Ubuntu its launcher is configured to be shown when a non-fullscreen window has appeared.
+     * In our case it means that launcher overlaps our fullscreen window when the user opens any dialogs.
+     * To prevent such overlapping there was an attempt to hide unity launcher when the main window
+     * has been activated. But now we can't hide launcher window because there is no any visible window for it.
+     * Unity-3D launcher is like a 3D-effect activated by compiz window manager.
+     * We can investigate possibilities of changing the behavior of unity compiz plugin but now
+     * we just disable fullscreen for unity-3d desktop session.
+     */
+    if (QnX11LauncherWorkaround::isUnity3DSession())
+        effectiveMaximizeActionId = Qn::MaximizeAction;
+#endif
+    context->menu()->registerAlias(Qn::EffectiveMaximizeAction, effectiveMaximizeActionId);
 
     /* Create main window. */
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
@@ -569,7 +601,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         if(!autoTester.succeeded())
             result = 1;
 
-        out << autoTester.message();
+        cl_log.log(autoTester.message(), cl_logALWAYS);
     }
 
     QnCommonMessageProcessor::instance()->stop();
@@ -598,10 +630,17 @@ int main(int argc, char **argv)
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
 
+    // this is neccessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created
+    qApp->desktop();
+
     //adding exe dir to plugin search path
     QStringList pluginDirs = QCoreApplication::libraryPaths();
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths( pluginDirs );
+#ifdef Q_OS_LINUX
+    QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, lit("/etc/xdg"));
+    QSettings::setPath(QSettings::NativeFormat, QSettings::SystemScope, lit("/etc/xdg"));
+#endif
 
     QnClientModule client(argc, argv);
 

@@ -13,8 +13,6 @@
 #include <common/common_module.h>
 
 #include <core/resource/resource_directory_browser.h>
-#include <decoders/abstractvideodecoderplugin.h>
-#include <plugins/plugin_manager.h>
 #include <translation/translation_list_model.h>
 
 #include <ui/actions/actions.h>
@@ -32,12 +30,15 @@
 QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnGeneralPreferencesWidget)
+    ui(new Ui::GeneralPreferencesWidget)
 {
     ui->setupUi(this);
 
     ui->timeModeComboBox->addItem(tr("Server Time"), Qn::ServerTimeMode);
     ui->timeModeComboBox->addItem(tr("Client Time"), Qn::ClientTimeMode);
+
+    ui->skinComboBox->addItem(tr("Dark"), Qn::DarkSkin);
+    ui->skinComboBox->addItem(tr("Light"), Qn::LightSkin);
 
     if(!this->context()->instance<QnWorkbenchAutoStarter>()->isSupported()) {
         ui->autoStartCheckBox->hide();
@@ -49,21 +50,14 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
     setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
     setHelpTopic(ui->networkInterfacesGroupBox,                               Qn::SystemSettings_General_NetworkInterfaces_Help);
-    setHelpTopic(ui->hardwareDecodingLabel,   ui->hardwareDecodingCheckBox,   Qn::SystemSettings_General_HWAcceleration_Help);
 
     initTranslations();
 
-    at_pluginManager_pluginLoaded();
-
-    setWarningStyle(ui->hwAccelerationWarningLabel);
     setWarningStyle(ui->downmixWarningLabel);
     setWarningStyle(ui->languageWarningLabel);
-    ui->hwAccelerationWarningLabel->setVisible(false);
     ui->languageWarningLabel->setVisible(false);
     ui->downmixWarningLabel->setVisible(false);
     ui->idleTimeoutWidget->setEnabled(false);
-
-    connect( PluginManager::instance(), SIGNAL(pluginLoaded()), this, SLOT(at_pluginManager_pluginLoaded()) );
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
     connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this,   SLOT(at_addExtraMediaFolderButton_clicked()));
@@ -76,7 +70,6 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
 
     connect(ui->downmixAudioCheckBox,                   SIGNAL(toggled(bool)),                                      this,   SLOT(at_downmixAudioCheckBox_toggled(bool)));
     connect(ui->languageComboBox,                       SIGNAL(currentIndexChanged(int)),                           this,   SLOT(at_languageComboBox_currentIndexChanged(int)));
-    connect(ui->hardwareDecodingCheckBox,               SIGNAL(toggled(bool)),                                      ui->hwAccelerationWarningLabel, SLOT(setVisible(bool)));
     connect(ui->pauseOnInactivityCheckBox,              SIGNAL(toggled(bool)),                                      ui->idleTimeoutWidget, SLOT(setEnabled(bool)));
 }
 
@@ -89,7 +82,6 @@ void QnGeneralPreferencesWidget::submitToSettings() {
     qnSettings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
     qnSettings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
     qnSettings->setIpShownInTree(ui->showIpInTreeCheckBox->isChecked());
-    qnSettings->setUseHardwareDecoding(ui->hardwareDecodingCheckBox->isChecked());
     qnSettings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
     qnSettings->setAutoStart(ui->autoStartCheckBox->isChecked());
     qnSettings->setUserIdleTimeoutMSecs(ui->pauseOnInactivityCheckBox->isChecked()
@@ -124,9 +116,6 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     ui->tourCycleTimeSpinBox->setValue(qnSettings->tourCycleTime() / 1000);
     ui->showIpInTreeCheckBox->setChecked(qnSettings->isIpShownInTree());
 
-    m_oldHardwareAcceleration = qnSettings->isHardwareDecodingUsed();
-    ui->hardwareDecodingCheckBox->setChecked(m_oldHardwareAcceleration);
-
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(qnSettings->timeMode()));
     ui->autoStartCheckBox->setChecked(qnSettings->autoStart());
 
@@ -155,25 +144,6 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
 }
 
 bool QnGeneralPreferencesWidget::confirm() {
-    bool newHardwareAcceleration = ui->hardwareDecodingCheckBox->isChecked();
-    if(newHardwareAcceleration && m_oldHardwareAcceleration != newHardwareAcceleration) {
-        switch (QMessageBox::warning(
-            this,
-            tr("Warning"),
-            tr("Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?"),
-            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-            QMessageBox::No
-        )) {
-        case QMessageBox::Cancel:
-            return false;
-        case QMessageBox::No:
-            ui->hardwareDecodingCheckBox->setCheckState(Qt::Unchecked);
-            break;
-        default:
-            break;
-        }
-    }
-
     if (m_oldDownmix != ui->downmixAudioCheckBox->isChecked() ||
         m_oldLanguage != ui->languageComboBox->currentIndex()) {
         switch(QMessageBox::information(
@@ -190,7 +160,6 @@ bool QnGeneralPreferencesWidget::confirm() {
             break;
         default:
             break;
-
         }
     }
 
@@ -207,36 +176,32 @@ void QnGeneralPreferencesWidget::initTranslations() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked() {
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this));
-    dialog->setDirectory(ui->mainMediaFolderLabel->text());
-    dialog->setFileMode(QFileDialog::DirectoryOnly);
-    if (!dialog->exec())
+    QString dirName = QFileDialog::getExistingDirectory(this,
+                                                        tr("Select folder..."),
+                                                        ui->mainMediaFolderLabel->text(),
+                                                        QnCustomFileDialog::directoryDialogOptions());
+    if (dirName.isEmpty())
         return;
-
-    QString dir = QDir::toNativeSeparators(dialog->selectedFiles().first());
-    if (dir.isEmpty())
-        return;
-
-    ui->mainMediaFolderLabel->setText(dir);
+    ui->mainMediaFolderLabel->setText(dirName);
 }
 
 void QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked() {
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this));
-    //TODO: #Elric call setDirectory
-    dialog->setFileMode(QFileDialog::DirectoryOnly);
-    if (!dialog->exec())
+    QString initialDir = ui->extraMediaFoldersList->count() == 0
+            ? ui->mainMediaFolderLabel->text()
+            : ui->extraMediaFoldersList->item(0)->text();
+    QString dirName = QFileDialog::getExistingDirectory(this,
+                                                        tr("Select folder..."),
+                                                        initialDir,
+                                                        QnCustomFileDialog::directoryDialogOptions());
+    if (dirName.isEmpty())
         return;
 
-    QString dir = QDir::toNativeSeparators(dialog->selectedFiles().first());
-    if (dir.isEmpty())
-        return;
-
-    if(!ui->extraMediaFoldersList->findItems(dir, Qt::MatchExactly).empty()) {
+    if(!ui->extraMediaFoldersList->findItems(dirName, Qt::MatchExactly).empty()) {
         QMessageBox::information(this, tr("Folder is already added"), tr("This folder is already added."), QMessageBox::Ok);
         return;
     }
 
-    ui->extraMediaFoldersList->addItem(dir);
+    ui->extraMediaFoldersList->addItem(dirName);
 }
 
 void QnGeneralPreferencesWidget::at_removeExtraMediaFolderButton_clicked() {
@@ -254,21 +219,6 @@ void QnGeneralPreferencesWidget::at_timeModeComboBox_activated() {
     }
 }
 
-void QnGeneralPreferencesWidget::at_pluginManager_pluginLoaded()
-{
-    //checking, whether hardware decoding plugin present
-    const QList<QnAbstractVideoDecoderPlugin*>& plugins = PluginManager::instance()->findPlugins<QnAbstractVideoDecoderPlugin>();
-    foreach( QnAbstractVideoDecoderPlugin* plugin, plugins )
-    {
-        if( plugin->isHardwareAccelerated() )
-        {
-            ui->hardwareAccelerationWidget->setVisible(true);
-            return;
-        }
-    }
-    ui->hardwareAccelerationWidget->setVisible(false);
-}
-
 void QnGeneralPreferencesWidget::at_downmixAudioCheckBox_toggled(bool checked) {
     ui->downmixWarningLabel->setVisible(m_oldDownmix != checked);
 }
@@ -282,7 +232,7 @@ void QnGeneralPreferencesWidget::at_browseLogsButton_clicked() {
     if (!QDir(logsLocation).exists()) {
         QMessageBox::information(this,
                                  tr("Information"),
-                                 tr("Folder &1 not exists.").arg(logsLocation));
+                                 tr("Folder '%1' does not exist.").arg(logsLocation));
         return;
     }
     QDesktopServices::openUrl(QLatin1String("file:///") + logsLocation);

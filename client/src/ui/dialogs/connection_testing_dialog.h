@@ -4,7 +4,7 @@
 #include <QtWidgets/QDialog>
 #include <QtCore/QTimer>
 
-#include <connectinfo.h>
+#include <api/model/connection_info.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -33,7 +33,7 @@ signals:
 private:
     Q_SLOT void tick();
 
-    Q_SLOT void at_ecConnection_result(int status, QnConnectInfoPtr connectInfo, int requestHandle);
+    Q_SLOT void at_ecConnection_result(int status, QnConnectionInfoPtr connectionInfo, int requestHandle);
     Q_SLOT void at_resource_result(bool success);
 
     /**

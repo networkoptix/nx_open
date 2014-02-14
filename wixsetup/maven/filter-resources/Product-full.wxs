@@ -4,7 +4,7 @@
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
     <Product Id="*" Name="${product.name}" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.upgradeCode}">
-        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
         <?include BuildVars.wxi ?>
@@ -13,6 +13,7 @@
         <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
 
         <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>
+        <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>
 
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
@@ -20,7 +21,7 @@
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
         <?define VmsInstallingOrChanging="($(var.VmsInstalling) OR $(var.VmsChanging))" ?>
 
-        <?define LaunchClientChecBoxText="Launch ${product.name} when setup exits." ?>
+        <?define LaunchClientChecBoxText="!(loc.Product_LaunchClient)" ?>
 
         <?if $(var.arch) = x86 ?>
         <Condition Message="This package is designed for 32-bit OS. Setup will now exit.">
@@ -38,10 +39,16 @@
         <SetProperty Id="APPSERVER_PORT" Value="[APPSERVER_PORT32]" After="AppSearch">
             <![CDATA[ APPSERVER_PORT = "" ]]>
         </SetProperty>
-        <SetProperty Action="SetALLOW_CAMERA_CHANGES_DEFAULT" Id="ALLOW_CAMERA_CHANGES" Value="1" After="AppSearch" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]></SetProperty>
-        <SetProperty Action="SetALLOW_CAMERA_CHANGES_BEFORE_UI" Id="ALLOW_CAMERA_CHANGES" Value="{}" After="SetALLOW_CAMERA_CHANGES_DEFAULT" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "0" ]]></SetProperty>
-        <SetProperty Action="SetALLOW_CAMERA_CHANGES_AFTER_UI" Id="ALLOW_CAMERA_CHANGES" Value="0" Before="ExecuteAction" Sequence="ui"><![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]></SetProperty>
-        
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_DEFAULT" Id="ALLOW_CAMERA_CHANGES" Value="1" After="AppSearch" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]>
+        </SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_BEFORE_UI" Id="ALLOW_CAMERA_CHANGES" Value="{}" After="SetALLOW_CAMERA_CHANGES_DEFAULT" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "0" ]]>
+        </SetProperty>
+        <SetProperty Action="SetALLOW_CAMERA_CHANGES_AFTER_UI" Id="ALLOW_CAMERA_CHANGES" Value="0" Before="ExecuteAction" Sequence="ui">
+            <![CDATA[ ALLOW_CAMERA_CHANGES = "" ]]>
+        </SetProperty>
+
         <SetProperty Id="APPSERVER_PASSWORD_REG" Value="[APPSERVER_PASSWORD_REG32]" After="AppSearch">
             <![CDATA[ APPSERVER_PASSWORD_REG = "" ]]>
         </SetProperty>
@@ -49,7 +56,7 @@
         <Property Id="INSTALL_ECS" Secure="yes"/>
         <Property Id="INSTALL_SERVER" Secure="yes"/>
         <Property Id="INSTALL_CLIENT" Secure="yes"/>
-        
+
 
         <SetProperty Id="INSTALL_ECS" Value="1" After="ResetPreselected" Sequence="ui">
             <![CDATA[ $(var.VmsInstalling) OR &AppServerFeature = 3 OR !AppServerFeature = 3 ]]>
@@ -124,7 +131,7 @@
 
         <Property Id="ALLOW_CAMERA_CHANGES_REF1" Value="ALLOW_CAMERA_CHANGES"/>
         <Property Id="ALLOW_CAMERA_CHANGES_REF2" Value="ALLOW_CAMERA_CHANGES"/>
-        
+
         <Property Id="APPSERVER_GUID" Secure="yes">
             <RegistrySearch Id="EcsGuidReg"
                             Root="HKLM"
@@ -253,24 +260,6 @@
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
                             Name="appserverPassword"
-                            Type="raw"
-                            Win64="no"/>
-        </Property>
-
-        <Property Id="SERVER_GUID" Secure="yes">
-            <RegistrySearch Id="ServerGuidReg"
-                            Root="HKLM"
-                            Key="Software\${company.name}\${mediaserver.name}"
-                            Name="serverGuid"
-                            Type="raw"
-                            Win64="yes"/>
-        </Property>
-
-        <Property Id="SERVER_GUID32" Secure="yes">
-            <RegistrySearch Id="ServerGuidReg32"
-                            Root="HKLM"
-                            Key="Software\${company.name}\${mediaserver.name}"
-                            Name="serverGuid"
                             Type="raw"
                             Win64="no"/>
         </Property>
@@ -568,6 +557,7 @@
                             <Component Id="EcsPermanentConfiguration" Permanent="yes" NeverOverwrite="yes">
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\${appserver.name}">
+                                    <RegistryValue Type="string" Name="firstRun" Value="True"/>
                                     <RegistryValue Type="string" Name="allowCameraChanges" Value="[ALLOW_CAMERA_CHANGES]"/>
                                     <RegistryValue Type="string" Name="ecsGuid" Value="[APPSERVER_GUID]" KeyPath="yes"/>
                                 </RegistryKey>
@@ -644,13 +634,6 @@
                                 <ServiceControl Id="Stop${customization}ServerService" Name="${customization}MediaServer" Stop="both" Wait="yes" Remove="uninstall" />
                             </Component>
 
-                            <Component Id="ServerConfigurationGuid" Permanent="yes" NeverOverwrite="yes">
-                                <RegistryKey Root="HKLM"
-                                             Key="Software\[Manufacturer]\${mediaserver.name}">
-                                    <RegistryValue Type="string" Name="serverGuid" Value="[SERVER_GUID]" KeyPath="yes"/>
-                                </RegistryKey>
-                            </Component>
-
                             <Component Id="ServerConfiguration" Permanent="yes">
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\${mediaserver.name}">
@@ -663,9 +646,14 @@
                                 <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\rtspPort" Action="removeOnInstall"/>
                             </Component>
 
-                            <Component Id="ServerRtspPlugin">
-                                <File Id="ServerRtspPluginDll" Name="genericrtspplugin.dll" Source="$(var.SourceDir)\genericrtspplugin.dll" />
-                            </Component>                    
+                            <Directory Id="ServerPlugins" Name="plugins">
+                                <Component Id="ServerRtspPlugin">
+                                    <File Id="ServerRtspPluginDll" Name="genericrtspplugin.dll" Source="$(var.PluginsDir)\genericrtspplugin.dll" />
+                                </Component>                    
+                                <Component Id="ServerHttpPlugin">
+                                    <File Id="ServerHttpPluginDll" Name="mjpg_link.dll" Source="$(var.PluginsDir)\mjpg_link.dll" />
+                                </Component>                                              
+                            </Directory>
 
                             <Component Id="ServerSigar">
                                 <File Id="ServerSigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll"/>
@@ -910,11 +898,11 @@
             <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
 
             <ComponentRef Id='ServerConfiguration'/>
-            <ComponentRef Id='ServerConfigurationGuid'/>
 
             <ComponentRef Id="ServerExecutable" />
             <ComponentGroupRef Id="ServerFFmpegLibraries"/>
             <ComponentRef Id="ServerRtspPlugin"/>
+            <ComponentRef Id="ServerHttpPlugin"/>
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
             <ComponentGroupRef Id="ServerImageFormats"/>

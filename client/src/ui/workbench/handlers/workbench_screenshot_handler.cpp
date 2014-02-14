@@ -12,6 +12,8 @@
 
 #include <client/client_settings.h>
 
+#include <core/resource/file_processor.h>
+
 #include <transcoding/filters/contrast_image_filter.h>
 #include <transcoding/filters/fisheye_image_filter.h>
 
@@ -21,9 +23,9 @@
 #include <ui/workbench/workbench_item.h>
 
 #include <utils/common/string.h>
+#include <utils/common/environment.h>
 #include <utils/common/warnings.h>
 
-#include "file_processor.h"
 
 namespace {
     void drawTimeStamp(QImage &image, Qn::Corner position, const QString &timestamp) {
@@ -134,10 +136,8 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
     QObject(parent), 
     QnWorkbenchContextAware(parent) 
 {
-    connect(action(Qn::TakeScreenshotAction), SIGNAL(triggered()), this, SLOT(at_takeScreenshotAction_triggered()));
+    connect(action(Qn::TakeScreenshotAction), &QAction::triggered, this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
 }
-
-
 
 QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScreenshotParameters &parameters, QnResourceDisplay *display) {
     if (!display)
@@ -207,20 +207,21 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
 
     QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, display.data());
     if (!imageProvider)
-        imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), parameters.time, QSize());
+        imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), parameters.time);
     QnScreenshotLoader* loader = new QnScreenshotLoader(parameters, this);
     connect(loader, &QnImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
     loader->setBaseProvider(imageProvider); // preload screenshot here
 
     if(parameters.filename.isEmpty()) {
-        QString suggestion = replaceNonFileNameCharacters(widget->resource()->toResource()->getName(), QLatin1Char('_'))
-                + QLatin1Char('_') + parameters.timeString();
-
         QString previousDir = qnSettings->lastScreenshotDir();
         if (previousDir.isEmpty())
             previousDir = qnSettings->mediaFolder();
 
-        QString filterSeparator(QLatin1String(";;"));
+        QString suggestion = replaceNonFileNameCharacters(widget->resource()->toResource()->getName(), QLatin1Char('_'))
+                + QLatin1Char('_') + parameters.timeString();
+        suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
+
+        QString filterSeparator = lit(";;");
         QString pngFileFilter = tr("PNG Image (*.png)");
         QString jpegFileFilter = tr("JPEG Image (*.jpg)");
 
@@ -234,7 +235,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             mainWindow(),
             tr("Save Screenshot As..."),
-            previousDir + QDir::separator() + suggestion,
+            suggestion,
             allowedFormatFilter
         ));
 
@@ -249,18 +250,18 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         comboBox->addItem(tr("Bottom right corner"), Qn::BottomRightCorner);
         comboBox->setCurrentIndex(comboBox->findData(parameters.timestampPosition, Qt::UserRole, Qt::MatchExactly));
 
-        dialog->addWidget(new QLabel(tr("Timestamps:"), dialog.data()));
+        dialog->addWidget(new QLabel(tr("Timestamp:"), dialog.data()));
         dialog->addWidget(comboBox, false);
 
-        if (!dialog->exec() || dialog->selectedFiles().isEmpty())
+        if (!dialog->exec())
             return;
 
-        QString fileName = dialog->selectedFiles().value(0);
+        QString fileName = dialog->selectedFile();
         if (fileName.isEmpty())
             return;
 
-        QString selectedFilter = dialog->selectedNameFilter();
-        QString selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+        QString selectedExtension = dialog->selectedExtension();
+
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
 
@@ -268,7 +269,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
                 QMessageBox::StandardButton button = QMessageBox::information(
                     mainWindow(),
                     tr("Save As"),
-                    tr("File '%1' already exists. Do you want to replace it?").arg(QFileInfo(fileName).baseName()),
+                    tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).completeBaseName()),
                     QMessageBox::Ok | QMessageBox::Cancel
                 );
                 if(button == QMessageBox::Cancel)
@@ -280,7 +281,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Could not overwrite file"),
-                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()),
+                tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).completeBaseName()),
                 QMessageBox::Ok
             );
             return;
@@ -338,7 +339,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save screenshot"),
-            tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(filename).baseName())
+            tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(filename).completeBaseName())
         );
         return;
     }

@@ -11,9 +11,9 @@
 #include <QtSingleApplication>
 
 #include <utils/common/log.h>
+#include <utils/ipc/named_pipe_socket.h>
 
 #include "abstract_request_processor.h"
-#include "named_pipe_socket.h"
 
 
 TaskServerNew::TaskServerNew( AbstractRequestProcessor* const requestProcessor )
@@ -50,6 +50,12 @@ bool TaskServerNew::listen( const QString& pipeName )
         NX_LOG( QString::fromLatin1("Application instance already running. Not listening to pipe"), cl_logDEBUG1 );
         return false;
     }
+
+#ifndef _WIN32
+    //removing unix socket file in case it hanged after process crash
+    const QByteArray filePath = (QLatin1String("/tmp/")+pipeName).toLatin1();
+    unlink( filePath.constData() );
+#endif
 
     const SystemError::ErrorCode osError = m_server.listen( pipeName );
     if( osError != SystemError::noError )

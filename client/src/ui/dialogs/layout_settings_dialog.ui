@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnLayoutSettingsDialog</class>
- <widget class="QDialog" name="QnLayoutSettingsDialog">
+ <class>LayoutSettingsDialog</class>
+ <widget class="QDialog" name="LayoutSettingsDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
@@ -120,7 +120,7 @@
           <item>
            <widget class="QLabel" name="label">
             <property name="text">
-             <string>Image processing can take a lot of time. Please be patient.</string>
+             <string>Processing image... Please wait.</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -304,7 +304,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>QnLayoutSettingsDialog</receiver>
+   <receiver>LayoutSettingsDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

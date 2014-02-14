@@ -1,9 +1,32 @@
 #ifndef PTZ_TOUR_LIST_MODEL_H
 #define PTZ_TOUR_LIST_MODEL_H
 
-#include <QAbstractTableModel>
+#include <QtCore/QAbstractTableModel>
+#include <QtCore/QUuid>
 
 #include <core/ptz/ptz_fwd.h>
+#include <core/ptz/ptz_tour.h>
+
+struct QnPtzTourItemModel {
+    QnPtzTourItemModel(const QnPtzTour& tour):
+        tour(tour),
+        modified(false),
+        local(false)
+    {}
+    QnPtzTourItemModel(const QString &name):
+        tour(QUuid::createUuid().toString(), name, QnPtzTourSpotList()),
+        modified(true),
+        local(true)
+    {}
+
+    QnPtzTour tour;
+
+    /** Tour is modified. */
+    bool modified;
+
+    /** Tour is just created locally, does not exists on server. */
+    bool local;
+};
 
 class QnPtzTourListModel : public QAbstractTableModel
 {
@@ -12,7 +35,9 @@ class QnPtzTourListModel : public QAbstractTableModel
     typedef QAbstractTableModel base_type;
 public:
     enum Column {
+        ModifiedColumn,
         NameColumn,
+        DetailsColumn,
 
         ColumnCount
     };
@@ -20,7 +45,8 @@ public:
     explicit QnPtzTourListModel(QObject *parent = 0);
     virtual ~QnPtzTourListModel();
 
-    const QnPtzTourList& tours() const;
+    const QList<QnPtzTourItemModel> &tourModels() const;
+    const QStringList &removedTours() const;
     void setTours(const QnPtzTourList &tours);
 
     const QnPtzPresetList& presets() const;
@@ -33,11 +59,16 @@ public:
     virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
     virtual QVariant data(const QModelIndex &index, int role) const override;
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    Q_SLOT void updateTour(const QnPtzTour &tour);
+    Q_SLOT void updateTourSpots(const QString tourId, const QnPtzTourSpotList &spots);
 private:
-    QnPtzTourList m_tours;
+    qint64 estimatedTimeSecs(const QnPtzTour &tour) const;
+
+    QList<QnPtzTourItemModel> m_tours;
+    QStringList m_removedTours;
     QnPtzPresetList m_presets;
 };
 

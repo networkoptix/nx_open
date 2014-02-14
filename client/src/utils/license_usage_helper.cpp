@@ -2,7 +2,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 QnLicenseUsageHelper::QnLicenseUsageHelper():
     m_licenses(qnLicensePool->getLicenses()),
@@ -62,7 +62,7 @@ void QnLicenseUsageHelper::update() {
         int free = totalDigital() - m_usedDigital;
         m_required = -free;
     }
-    m_isValid = m_required < 0;
+    m_isValid = m_required <= 0;
 }
 
 int QnLicenseUsageHelper::totalDigital() const {

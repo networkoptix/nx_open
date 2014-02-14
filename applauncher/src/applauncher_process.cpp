@@ -11,8 +11,7 @@
 
 #include <api/ipc_pipe_names.h>
 #include <utils/common/log.h>
-
-#include "version.h"
+#include <utils/common/process.h>
 
 
 ApplauncherProcess::ApplauncherProcess(
@@ -32,9 +31,17 @@ ApplauncherProcess::ApplauncherProcess(
 
 void ApplauncherProcess::pleaseStop()
 {
-    std::lock_guard<std::mutex> lk( m_mutex );
-    m_terminated = true;
-    m_cond.notify_all();
+    {
+        std::lock_guard<std::mutex> lk( m_mutex );
+        m_terminated = true;
+        m_cond.notify_all();
+    }
+
+    std::for_each(
+        m_killProcessTasks.begin(),
+        m_killProcessTasks.end(),
+        []( const std::pair<qint64, KillProcessTask>& val ){ TimerManager::instance()->joinAndDeleteTimer(val.first); } );
+    m_killProcessTasks.clear();
 }
 
 void ApplauncherProcess::processRequest(
@@ -82,6 +89,13 @@ void ApplauncherProcess::processRequest(
                 static_cast<applauncher::api::CancelInstallationResponse*>(*response) );
             break;
 
+        case applauncher::api::TaskType::addProcessKillTimer:
+            *response = new applauncher::api::AddProcessKillTimerResponse();
+            addProcessKillTimer(
+                std::static_pointer_cast<applauncher::api::AddProcessKillTimerRequest>( request ),
+                static_cast<applauncher::api::AddProcessKillTimerResponse*>(*response) );
+            break;
+
         default:
             break;
     }
@@ -107,7 +121,7 @@ int ApplauncherProcess::run()
     {
         applauncher::api::Response response;
         startApplication(
-            std::shared_ptr<applauncher::api::StartApplicationTask>( new applauncher::api::StartApplicationTask(versionToLaunch, appArgs) ),
+            std::make_shared<applauncher::api::StartApplicationTask>(versionToLaunch, appArgs),
             &response );
     }
 
@@ -235,16 +249,6 @@ bool ApplauncherProcess::addTaskToThePipe( const QByteArray& serializedTask )
 #endif
 }
 
-#ifdef AK_DEBUG
-#ifdef _WIN32
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String("client.exe")) );
-#else
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String("client")) );
-#endif
-#else
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String(QN_CLIENT_EXECUTABLE_NAME)) );
-#endif
-
 static const QLatin1String NON_RECENT_VERSION_ARGS_PARAM_NAME( "nonRecentVersionArgs" );
 static const QLatin1String NON_RECENT_VERSION_ARGS_DEFAULT_VALUE( "--updates-enabled=false" );
 
@@ -313,11 +317,12 @@ bool ApplauncherProcess::startInstallation(
         return true;
     }
 
-    if( m_installationManager->isVersionInstalled(task->version) )
-    {
-        response->result = applauncher::api::ResultType::alreadyInstalled;
-        return true;
-    }
+    //if already installed, running restore
+    //if( m_installationManager->isVersionInstalled(task->version) )
+    //{
+    //    response->result = applauncher::api::ResultType::alreadyInstalled;
+    //    return true;
+    //}
 
     //detecting directory to download to 
     const QString& targetDir = m_installationManager->getInstallDirForVersion(task->version);
@@ -397,6 +402,46 @@ bool ApplauncherProcess::cancelInstallation(
     //TODO/IMPL cancelling by id request->installationID
     response->result = applauncher::api::ResultType::otherError;
     return true;
+}
+
+bool ApplauncherProcess::addProcessKillTimer(
+    const std::shared_ptr<applauncher::api::AddProcessKillTimerRequest>& request,
+    applauncher::api::AddProcessKillTimerResponse* const response )
+{
+    KillProcessTask task;
+    task.processID = request->processID;
+    {
+        std::lock_guard<std::mutex> lk( m_mutex );
+        if( m_terminated )
+        {
+            response->result = applauncher::api::ResultType::otherError;
+            return true;
+        }
+
+        m_killProcessTasks[TimerManager::instance()->addTimer( this, request->timeoutMillis )] = task;
+    }
+
+    response->result = applauncher::api::ResultType::ok;
+    return true;
+}
+
+void ApplauncherProcess::onTimer( const quint64& timerID )
+{
+    KillProcessTask task;
+    {
+        std::lock_guard<std::mutex> lk( m_mutex );
+        if( m_terminated )
+            return;
+
+        auto it = m_killProcessTasks.find( timerID );
+        if( it == m_killProcessTasks.end() )
+            return;
+        task = it->second;
+        m_killProcessTasks.erase( it );
+    }
+
+    //stopping process if needed
+    killProcessByPid( task.processID );
 }
 
 void ApplauncherProcess::onInstallationSucceeded()

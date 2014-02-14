@@ -7,14 +7,14 @@
 #include "core/resource/camera_resource.h"
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include <business/business_event_connector.h>
 #include <business/events/reasoned_business_event.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "core/datapacket/media_data_packet.h"
-#include "serverutil.h"
+#include <media_server/serverutil.h>
 
 static const int MAX_BUFFERED_SIZE = 1024*1024*20;
 static const int MOTION_PREBUFFER_SIZE = 8;

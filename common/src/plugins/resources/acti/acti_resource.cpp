@@ -14,13 +14,14 @@
 #include "utils/common/synctime.h"
 #include "acti_ptz_controller.h"
 #include "rest/server/rest_connection_processor.h"
-#include "common/global_settings.h"
 #include "business/business_event_connector.h"
 
 
 const char* QnActiResource::MANUFACTURE = "ACTI";
 static const int TCP_TIMEOUT = 3000;
 static const int DEFAULT_RTSP_PORT = 7070;
+
+static int actiEventPort = 0;
 
 QString AUDIO_SUPPORTED_PARAM_NAME = QLatin1String("isAudioSupported");
 QString DUAL_STREAMING_PARAM_NAME = QLatin1String("hasDualStreaming");
@@ -58,6 +59,14 @@ QnActiResource::~QnActiResource()
         TimerManager::instance()->joinAndDeleteTimer( taskID );
         lk.relock();
     }
+}
+
+void QnActiResource::setEventPort(int eventPort) {
+    actiEventPort = eventPort;
+}
+
+int QnActiResource::eventPort() {
+    return actiEventPort;
 }
 
 QString QnActiResource::getDriverName() const
@@ -326,7 +335,7 @@ bool QnActiResource::isResourceAccessible()
 
 bool QnActiResource::startInputPortMonitoring()
 {
-    if( Qn::GlobalSettings::instance()->httpPort() == 0 )
+    if( actiEventPort == 0 )
         return false;   //no http listener is present
 
     //considering, that we have excusive access to the camera, so rewriting existing event setup
@@ -370,7 +379,7 @@ bool QnActiResource::startInputPortMonitoring()
             //OK: HTTP_SERVER='1,1,192.168.0.101,3451,hz,hzhz,10'\n
     responseMsgBody = makeActiRequest(
         QLatin1String("encoder"),
-        QString::fromLatin1("HTTP_SERVER=%1,1,%2,%3,guest,guest,%4").arg(EVENT_HTTP_SERVER_NUMBER).arg(localInterfaceAddress).arg(Qn::GlobalSettings::instance()->httpPort()).arg(MAX_CONNECTION_TIME_SEC),
+        QString::fromLatin1("HTTP_SERVER=%1,1,%2,%3,guest,guest,%4").arg(EVENT_HTTP_SERVER_NUMBER).arg(localInterfaceAddress).arg(actiEventPort).arg(MAX_CONNECTION_TIME_SEC),
         responseStatusCode );
     if( responseStatusCode != CL_HTTP_SUCCESS )
         return false;
@@ -425,7 +434,7 @@ bool QnActiResource::startInputPortMonitoring()
 
 void QnActiResource::stopInputPortMonitoring()
 {
-    if( Qn::GlobalSettings::instance()->httpPort() == 0 )
+    if( actiEventPort == 0 )
         return;   //no http listener is present
 
         //unregistering events

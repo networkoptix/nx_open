@@ -4,10 +4,10 @@ QnReasonedBusinessEvent::QnReasonedBusinessEvent(const BusinessEventType::Value 
                                                  const QnResourcePtr &resource,
                                                  const qint64 timeStamp,
                                                  const QnBusiness::EventReason reasonCode,
-                                                 const QString &reasonText):
+                                                 const QString &reasonParamsEncoded):
     base_type(eventType, resource, timeStamp),
     m_reasonCode(reasonCode),
-    m_reasonText(reasonText)
+    m_reasonParamsEncoded(reasonParamsEncoded)
 {
 }
 
@@ -16,6 +16,6 @@ QnBusinessEventParameters QnReasonedBusinessEvent::getRuntimeParams() const
 
     QnBusinessEventParameters params = base_type::getRuntimeParams();
     params.setReasonCode(m_reasonCode);
-    params.setReasonText(m_reasonText);
+    params.setReasonParamsEncoded(m_reasonParamsEncoded);
     return params;
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh_CN" sourcelanguage="en">
+<TS version="2.1" language="zh_CN" sourcelanguage="en">
 <context>
     <name>ConnectionTestingDialog</name>
     <message>
@@ -45,12 +45,51 @@ Application will now quit.</source>
 <context>
     <name>QnConnectionTestingDialog</name>
     <message>
-        <location filename="../src/connection_testing_dialog.cpp" line="89"/>
+        <location filename="../src/connection_testing_dialog.cpp" line="70"/>
+        <source>Request timed out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="98"/>
+        <source>Login or password you have entered are incorrect, please try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="101"/>
+        <source>Connection to the Enterprise Controller could not be established.
+Connection details that you have entered are incorrect, please try again.
+
+If this error persists, please contact your VMS administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="106"/>
+        <source>You are trying to connect to incompatible Enterprise Controller.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="111"/>
+        <source>Enterprise Controller has a different version:
+ - Client version: %1.
+ - EC version: %2.
+Compatibility mode for versions lower than %3 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="120"/>
+        <source>Enterprise Controller has a different version:
+ - Client version: %1.
+ - EC version: %2.
+You will be asked to restart the client in compatibility mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="133"/>
         <source>Success</source>
         <translation>成功</translation>
     </message>
     <message>
-        <location filename="../src/connection_testing_dialog.cpp" line="89"/>
+        <location filename="../src/connection_testing_dialog.cpp" line="133"/>
         <source>Failed</source>
         <translation>失败</translation>
     </message>
@@ -58,12 +97,12 @@ Application will now quit.</source>
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <location filename="../src/systraywindow.cpp" line="592"/>
+        <location filename="../src/systraywindow.cpp" line="595"/>
         <source>Insufficient privileges to manage services</source>
         <translation>没有足够的权限来管理服务</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="592"/>
+        <location filename="../src/systraywindow.cpp" line="595"/>
         <source>UAC must be enabled to request privileges for non-admin users</source>
         <translation>必须启用UAC来请求非管理员用户的权限</translation>
     </message>
@@ -71,14 +110,12 @@ Application will now quit.</source>
 <context>
     <name>QnSystrayWindow</name>
     <message>
-        <location filename="../src/systraywindow.cpp" line="91"/>
         <source>Port</source>
-        <translation>端口</translation>
+        <translation type="obsolete">端口</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="132"/>
         <source>VMS settings</source>
-        <translation>VMS设置</translation>
+        <translation type="obsolete">VMS设置</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; version %2 (%3).&lt;br/&gt;
@@ -90,27 +127,23 @@ Built for %5-%6 with %7.&lt;br/&gt;
 以%7为 %5-%6 创建。&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="238"/>
         <source>The requested access was denied</source>
-        <translation>请求访问被拒</translation>
+        <translation type="obsolete">请求访问被拒</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="241"/>
         <source>The specified database does not exist.</source>
-        <translation>指定的数据库不存在。</translation>
+        <translation type="obsolete">指定的数据库不存在。</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="244"/>
         <source>A specified parameter is invalid.</source>
-        <translation>指定的参数无效。</translation>
+        <translation type="obsolete">指定的参数无效。</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="248"/>
         <source>Insufficient permissions to start/stop services</source>
-        <translation>没有足够的权限启动/停止服务</translation>
+        <translation type="obsolete">没有足够的权限启动/停止服务</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="266"/>
+        <location filename="../src/systraywindow.cpp" line="260"/>
         <source>No %1 services installed</source>
         <translation>没有安装 %1 服务</translation>
     </message>
@@ -127,12 +160,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">开始</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="460"/>
+        <location filename="../src/systraywindow.cpp" line="462"/>
         <source> (stopped)</source>
         <translation>(已停止)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="468"/>
+        <location filename="../src/systraywindow.cpp" line="470"/>
         <source> (starting)</source>
         <translation>(开启中)</translation>
     </message>
@@ -141,47 +174,40 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">(停止)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="476"/>
+        <location filename="../src/systraywindow.cpp" line="478"/>
         <source> (stopping)</source>
         <translation>(停止中)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="484"/>
+        <location filename="../src/systraywindow.cpp" line="486"/>
         <source> (started)</source>
         <translation>(已开启)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="492"/>
+        <location filename="../src/systraywindow.cpp" line="494"/>
         <source> (resuming)</source>
         <translation>(重新开启中)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="500"/>
+        <location filename="../src/systraywindow.cpp" line="502"/>
         <source> (paused)</source>
         <translation>(已暂停)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="508"/>
+        <location filename="../src/systraywindow.cpp" line="510"/>
         <source> (pausing)</source>
         <translation>(暂停中)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="539"/>
-        <location filename="../src/systraywindow.cpp" line="561"/>
-        <location filename="../src/systraywindow.cpp" line="875"/>
-        <location filename="../src/systraywindow.cpp" line="908"/>
-        <location filename="../src/systraywindow.cpp" line="964"/>
-        <location filename="../src/systraywindow.cpp" line="974"/>
-        <location filename="../src/systraywindow.cpp" line="981"/>
         <source>Systray</source>
-        <translation>系统拖盘</translation>
+        <translation type="obsolete">系统拖盘</translation>
     </message>
     <message>
         <source>%1 is going to be stopped. Are you sure?</source>
         <translation type="obsolete">%1 将被停止。确定？</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="632"/>
+        <location filename="../src/systraywindow.cpp" line="635"/>
         <source>&amp;Settings</source>
         <translation>&amp;设置</translation>
     </message>
@@ -190,7 +216,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">&amp;显示 %1 日志</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="648"/>
+        <location filename="../src/systraywindow.cpp" line="651"/>
         <source>&amp;Quit</source>
         <translation>&amp;退出</translation>
     </message>
@@ -203,7 +229,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">停止p %1</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="748"/>
+        <location filename="../src/systraywindow.cpp" line="771"/>
         <source>* Last used connection *</source>
         <translation>*最后使用的连接*</translation>
     </message>
@@ -216,7 +242,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">您所做的更改需要重新启动 %1 。您想现在重新启动？</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="151"/>
+        <location filename="../src/systraywindow.cpp" line="145"/>
         <source>%1 Tray Assistant version %2 (%3).&lt;br/&gt;
 Built for %5-%6 with %7.&lt;br/&gt;
 </source>
@@ -224,127 +250,167 @@ Built for %5-%6 with %7.&lt;br/&gt;
 以%7.为%5-%6 建置。&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="401"/>
+        <location filename="../src/systraywindow.cpp" line="403"/>
         <source>Enterprise controller has been stopped</source>
         <translation>系统控制器已停止</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="408"/>
+        <location filename="../src/systraywindow.cpp" line="410"/>
         <source>Enterprise controller has been started</source>
         <translation>系统控制器已启动</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="427"/>
+        <location filename="../src/systraywindow.cpp" line="429"/>
         <source>Media server has been stopped</source>
         <translation>媒体服务器已停止</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="434"/>
+        <location filename="../src/systraywindow.cpp" line="436"/>
         <source>Media server has been started</source>
         <translation>媒体服务器已启动</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="539"/>
+        <location filename="../src/systraywindow.cpp" line="541"/>
         <source>Media server is going to be stopped. Are you sure?</source>
         <translation>媒体服务器將停止。确定?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="561"/>
+        <location filename="../src/systraywindow.cpp" line="563"/>
         <source>Enterprise controller is going to be stopped. Are you sure?</source>
         <translation>系统控制器將停止。确定?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="638"/>
         <source>&amp;Show Media Server Log</source>
-        <translation>&amp;显示媒体服务器日志</translation>
+        <translation type="obsolete">&amp;显示媒体服务器日志</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="643"/>
         <source>&amp;Show Enterprise Controller Log</source>
-        <translation>&amp;显示系统控制器日志</translation>
+        <translation type="obsolete">&amp;显示系统控制器日志</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="651"/>
+        <location filename="../src/systraywindow.cpp" line="126"/>
+        <source>%1 Tray Assistant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="232"/>
+        <source>Access denied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="235"/>
+        <source>Specified database does not exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="238"/>
+        <source>Specified parameter is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="242"/>
+        <source>Could not access installed services</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="242"/>
+        <source>An error has occurred while trying to access installed services:
+ %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="641"/>
+        <source>Show &amp;Media Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="646"/>
+        <source>Show &amp;Enterprise Controller Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="654"/>
         <source>Start Media Server</source>
         <translation>启动媒体服务器</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="656"/>
+        <location filename="../src/systraywindow.cpp" line="659"/>
         <source>Stop Media Server</source>
         <translation>停止媒体服务器</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="661"/>
+        <location filename="../src/systraywindow.cpp" line="664"/>
         <source>Start Enterprise Controller</source>
         <translation>启动系统控制器</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="666"/>
+        <location filename="../src/systraywindow.cpp" line="669"/>
         <source>Stop Enterprise Controller</source>
         <translation>停止系统控制器</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="868"/>
+        <location filename="../src/systraywindow.cpp" line="892"/>
         <source>The changes you made require enterprise controller and media server to be restarted. Would you like to restart now?</source>
         <translation>您所做的更改需重新启动系统控制器和媒体服务器。现在重新启动？</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="870"/>
+        <location filename="../src/systraywindow.cpp" line="894"/>
         <source>The changes you made require enterprise controller to be restarted. Would you like to restart now?</source>
         <translation>您所做的更改需重新启动系统控制器。现在重新启动？</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="872"/>
+        <location filename="../src/systraywindow.cpp" line="896"/>
         <source>The changes you made require media server to be restarted. Would you like to restart now?</source>
         <translation>您所做的更改需重新启动媒体服务器。现在重新启动？</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="908"/>
+        <location filename="../src/systraywindow.cpp" line="932"/>
         <source>Invalid %1 port specified.</source>
         <translation>指定了无效的 %1端口。</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="941"/>
+        <location filename="../src/systraywindow.cpp" line="965"/>
         <source>enterprise controller</source>
         <translation>系统控制器</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="942"/>
+        <location filename="../src/systraywindow.cpp" line="989"/>
+        <source>%1 port is already used by another process</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>media proxy</source>
-        <translation>媒体代理</translation>
+        <translation type="obsolete">媒体代理</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="947"/>
         <source>media server RTSP</source>
-        <translation>媒体服务器RTSP</translation>
+        <translation type="obsolete">媒体服务器RTSP</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="949"/>
         <source>media server API</source>
-        <translation>媒体服务器 API</translation>
+        <translation type="obsolete">媒体服务器 API</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="964"/>
+        <location filename="../src/systraywindow.cpp" line="979"/>
         <source>%1 port is same as %2 port</source>
         <translation>%1 与%2端口相同</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="974"/>
         <source>%1 port already used by another process</source>
-        <translation>%1端口已经被另一个程序使用</translation>
+        <translation type="obsolete">%1端口已经被另一个程序使用</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="981"/>
+        <location filename="../src/systraywindow.cpp" line="996"/>
         <source>Invalid IP address specified for public IP address</source>
         <translation>无效的IP地址指定为公共IP地址</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1046"/>
+        <location filename="../src/systraywindow.cpp" line="1067"/>
         <source>Invalid parameters</source>
         <translation>无效的参数</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1046"/>
+        <location filename="../src/systraywindow.cpp" line="1067"/>
         <source>You have entered invalid URL.</source>
         <translation>您所输入的网址无效。</translation>
     </message>
@@ -352,9 +418,8 @@ Built for %5-%6 with %7.&lt;br/&gt;
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../src/settings.ui" line="20"/>
         <source>HDWitness settings</source>
-        <translation>HDWitness设置</translation>
+        <translation type="obsolete">HDWitness设置</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="36"/>
@@ -371,73 +436,98 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>系统控制器连接</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="66"/>
         <source>Login</source>
-        <translation>登录</translation>
+        <translation type="vanished">登录</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="83"/>
         <source>Password</source>
-        <translation>密码</translation>
+        <translation type="vanished">密码</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="101"/>
+        <location filename="../src/settings.ui" line="92"/>
         <source>0.0.0.0</source>
         <translation>0.0.0.0</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="117"/>
-        <location filename="../src/settings.ui" line="405"/>
         <source>Port</source>
-        <translation>端口</translation>
+        <translation type="vanished">端口</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="165"/>
+        <location filename="../src/settings.ui" line="69"/>
         <source>Find</source>
         <translation>寻找</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="211"/>
+        <location filename="../src/settings.ui" line="80"/>
+        <source>Host:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="130"/>
+        <source>Login:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="140"/>
+        <source>Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="165"/>
         <source>Test</source>
         <translation>测试</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="220"/>
-        <source>Host</source>
-        <translation>主机</translation>
+        <location filename="../src/settings.ui" line="185"/>
+        <source>Cameras RTP transport:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="232"/>
+        <location filename="../src/settings.ui" line="108"/>
+        <location filename="../src/settings.ui" line="338"/>
+        <source>Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Host</source>
+        <translation type="vanished">主机</translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="179"/>
         <source>Media server network settings</source>
         <translation>媒体服务器网络设置</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="246"/>
         <source>RTSP port</source>
-        <translation>RTSP端口</translation>
+        <translation type="obsolete">RTSP端口</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="269"/>
         <source>API port</source>
-        <translation>API端口</translation>
+        <translation type="obsolete">API端口</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="314"/>
+        <location filename="../src/settings.ui" line="231"/>
         <source>Allow access to media server via public IP address</source>
         <translation>允许通过公网IP地址存取媒体服务器</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="376"/>
+        <location filename="../src/settings.ui" line="263"/>
+        <location filename="../src/settings.ui" line="357"/>
+        <source>Use specified IP or host name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="290"/>
         <source>Enterprise Controller Settings</source>
         <translation>系统控制器设置</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="388"/>
+        <location filename="../src/settings.ui" line="302"/>
         <source>Enterprise controller network settings</source>
-        <translation>系统控制器网络设置</translation>
+        <translation type="unfinished">系统控制器网络设置</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="494"/>
+        <location filename="../src/settings.ui" line="348"/>
         <source>Allow access to enterprise controller via public IP address</source>
         <translation>允许通过公网IP地址存取系统服务器</translation>
     </message>
@@ -450,22 +540,21 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">API端口</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="286"/>
         <source>Cameras RTP transport</source>
-        <translation>摄像机RTP传输</translation>
+        <translation type="vanished">摄像机RTP传输</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="294"/>
+        <location filename="../src/settings.ui" line="195"/>
         <source>AUTO</source>
         <translation>自动</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="299"/>
+        <location filename="../src/settings.ui" line="200"/>
         <source>UDP</source>
         <translation>UDP</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="304"/>
+        <location filename="../src/settings.ui" line="205"/>
         <source>TCP</source>
         <translation>TCP</translation>
     </message>
@@ -474,14 +563,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">允许通过公共IP地址访问服务器</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="323"/>
-        <location filename="../src/settings.ui" line="503"/>
         <source>Use specified IP or host name</source>
-        <translation>使用指定的IP地址或主机名</translation>
+        <translation type="vanished">使用指定的IP地址或主机名</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="333"/>
-        <location filename="../src/settings.ui" line="513"/>
+        <location filename="../src/settings.ui" line="253"/>
+        <location filename="../src/settings.ui" line="367"/>
         <source>Auto detect public IP</source>
         <translation>自动侦测公共IP</translation>
     </message>
@@ -494,31 +581,30 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">网络设置</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="424"/>
         <source>Media proxy port</source>
-        <translation>媒体代理端口</translation>
+        <translation type="obsolete">媒体代理端口</translation>
     </message>
     <message>
         <source>Allow access to the enterprise controller via public IP address</source>
         <translation type="obsolete">允许通过公共IP地址访问系统控制器</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="553"/>
+        <location filename="../src/settings.ui" line="407"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="563"/>
+        <location filename="../src/settings.ui" line="417"/>
         <source>Language:</source>
         <translation>语言：</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="575"/>
+        <location filename="../src/settings.ui" line="429"/>
         <source>(requires restart)</source>
         <translation>(需重新启动)</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="586"/>
+        <location filename="../src/settings.ui" line="440"/>
         <source>Information</source>
         <translation>信息</translation>
     </message>

@@ -56,8 +56,12 @@ void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
         //ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
         m_backupParams = widget->imageEnhancement();
     }
-    QString name = m_widget ? m_widget->resource()->toResource()->getName() : tr("[No item selected]");
-    setWindowTitle(tr("Image Enhancement - %1").arg(name));
+    
+    if(!m_widget) {
+        setWindowTitle(tr("Image Enhancement"));
+    } else {
+        setWindowTitle(tr("Image Enhancement - %1").arg(m_widget->resource()->toResource()->getName()));
+    }
 
     ui->histogramWidget->setEnabled(m_widget != 0);
     ui->enableAdjustment->setEnabled(m_widget != 0);

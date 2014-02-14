@@ -238,5 +238,13 @@ inline double qMax(float l, double r) {
     return qMax(static_cast<double>(l), r);
 }
 
+inline float qSign(float value) {
+    return value >= 0.0f ? 1.0f : -1.0f;
+}
+
+inline double qSign(double value) {
+    return value >= 0.0 ? 1.0 : -1.0;
+}
+
 
 #endif // QN_MATH_H

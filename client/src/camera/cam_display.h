@@ -145,7 +145,7 @@ private:
     void hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
     void hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
     void hurryUpCheckForLocalFile(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
-	void hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media);
+    void hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media);
     qint64 getMinReverseTime() const;
 
     qint64 getDisplayedMax() const;
@@ -225,9 +225,9 @@ protected:
 
     mutable QMutex m_timeMutex;
     QnMediaResourcePtr m_resource;
-	QTime m_afterJumpTimer;
-	qint64 m_firstAfterJumpTime;
-	qint64 m_receivedInterval;
+    QTime m_afterJumpTimer;
+    qint64 m_firstAfterJumpTime;
+    qint64 m_receivedInterval;
     QnArchiveStreamReader* m_archiveReader;
 
     bool m_fullScreen;

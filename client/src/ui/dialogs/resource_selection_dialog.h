@@ -13,7 +13,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-    class QnResourceSelectionDialog;
+    class ResourceSelectionDialog;
 }
 
 class QnResourcePoolModel;
@@ -56,7 +56,7 @@ private:
     void init(SelectionTarget target);
 
 private:
-    QScopedPointer<Ui::QnResourceSelectionDialog> ui;
+    QScopedPointer<Ui::ResourceSelectionDialog> ui;
     QnResourcePoolModel *m_resourceModel;
     QnResourceSelectionDialogDelegate* m_delegate;
     QnCameraThumbnailManager *m_thumbnailManager;
@@ -64,6 +64,8 @@ private:
     int m_tooltipResourceId;
 
     int m_screenshotIndex;
+
+    bool m_updating;
 };
 
 #endif // SELECT_CAMERAS_DIALOG_H

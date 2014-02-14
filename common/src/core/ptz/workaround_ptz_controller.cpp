@@ -6,19 +6,40 @@
 #include <common/common_module.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource_managment/resource_data_pool.h>
+#include <core/resource_management/resource_data_pool.h>
 
 QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_octagonal(false)
+    m_octagonal(false),
+    m_overrideCapabilities(false),
+    m_capabilities(Qn::NoPtzCapabilities)
 {
     QnVirtualCameraResourcePtr camera = resource().dynamicCast<QnVirtualCameraResource>();
     if(!camera)
         return;
 
-    m_octagonal = qnCommon->dataPool()->data(camera).value<bool>(lit("octagonalPtz"), false);
+    QnResourceData resourceData = qnCommon->dataPool()->data(camera);
 
-    // TODO: #Elric propert finished handling.
+    m_octagonal = resourceData.value<bool>(lit("octagonalPtz"), false);
+    
+    QString ptzCapabilities = resourceData.value<QString>(lit("ptzCapabilities"));
+    if(!ptzCapabilities.isEmpty()) {
+        // TODO: #Elric evil. implement via enum name mapper flags.
+
+        if(ptzCapabilities == lit("NoPtzCapabilities")) {
+            m_overrideCapabilities = true;
+            m_capabilities = Qn::NoPtzCapabilities;
+        } else if(ptzCapabilities == lit("ContinuousZoomCapability")) {
+            m_overrideCapabilities = true;
+            m_capabilities = Qn::ContinuousZoomCapability;
+        } else {
+            qnWarning("Could not parse PTZ capabilities '%1'.", ptzCapabilities);
+        }
+    }
+}
+
+Qn::PtzCapabilities QnWorkaroundPtzController::getCapabilities() {
+    return m_overrideCapabilities ? m_capabilities : base_type::getCapabilities();
 }
 
 bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
@@ -40,6 +61,6 @@ bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
 }
 
 bool QnWorkaroundPtzController::extends(Qn::PtzCapabilities) {
-    return true; // TODO: #Elric
+    return true; // TODO: #Elric if no workaround is needed for a camera, we don't really have to extend.
 }
 

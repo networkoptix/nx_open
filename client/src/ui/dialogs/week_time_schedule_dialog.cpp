@@ -12,7 +12,7 @@
 
 QnWeekTimeScheduleDialog::QnWeekTimeScheduleDialog(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::QnWeekTimeScheduleDialog),
+    ui(new Ui::WeekTimeScheduleDialog),
     m_disableUpdateGridParams(false),
     m_inUpdate(0)
 {
@@ -22,10 +22,10 @@ QnWeekTimeScheduleDialog::QnWeekTimeScheduleDialog(QWidget *parent) :
 
     // init buttons
     ui->valueOnButton->setColor(qnGlobals->recordAlwaysColor());
-    ui->valueOnButton->setCheckedColor(shiftColor(qnGlobals->recordAlwaysColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
+    ui->valueOnButton->setCheckedColor(qnGlobals->recordAlwaysColor().lighter());
 
     ui->valueOffButton->setColor(qnGlobals->noRecordColor());
-    ui->valueOffButton->setCheckedColor(shiftColor(qnGlobals->noRecordColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
+    ui->valueOffButton->setCheckedColor(qnGlobals->noRecordColor().lighter());
 
     connect(ui->valueOnButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
     connect(ui->valueOffButton,          SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));

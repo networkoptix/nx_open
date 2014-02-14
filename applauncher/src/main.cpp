@@ -71,7 +71,7 @@ int main( int argc, char* argv[] )
 {
     //return testHttpClient();
 
-
+    QnLongRunnablePool runnablePool;
 
     QString logLevel = "WARN";
     QString logFilePath;
@@ -107,7 +107,7 @@ int main( int argc, char* argv[] )
     QtSingleApplication app( SERVICE_NAME, argc, argv );
     QDir::setCurrent( QCoreApplication::applicationDirPath() );
 
-    QSettings settings( QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
+    QSettings settings( QSettings::UserScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
     InstallationManager installationManager;
 
     if( displayHelp )
@@ -178,17 +178,17 @@ int syncDir( const QString& localDir, const QString& remoteUrl )
         return 1;
     }
 
-    RDirSyncher syncher( QUrl(remoteUrl), localDir, nullptr );
-    if( !syncher.startAsync() )
+    auto syncher = std::make_shared<RDirSyncher>( QUrl(remoteUrl), localDir, nullptr );
+    if( !syncher->startAsync() )
     {
         std::cerr<<"Error: Failed to start synchronizaion"<<std::endl;
         return 2;
     }
 
-    while( syncher.state() == RDirSyncher::sInProgress )
+    while( syncher->state() == RDirSyncher::sInProgress )
         QThread::msleep( 1000 );
 
-    switch( syncher.state() )
+    switch( syncher->state() )
     {
         case RDirSyncher::sSucceeded:
             std::cout<<"Synchronization finished"<<std::endl;
@@ -199,11 +199,11 @@ int syncDir( const QString& localDir, const QString& remoteUrl )
             return 3;
 
         case RDirSyncher::sFailed:
-            std::cerr<<"Synchronization has failed: "<<syncher.lastErrorText().toStdString()<<std::endl;
+            std::cerr<<"Synchronization has failed: "<<syncher->lastErrorText().toStdString()<<std::endl;
             return 3;
 
         default:
-            std::cerr<<"Synchronization ended in unknown state "<<static_cast<int>(syncher.state())<<std::endl;
+            std::cerr<<"Synchronization ended in unknown state "<<static_cast<int>(syncher->state())<<std::endl;
             return 3;
     }
 }
@@ -272,6 +272,8 @@ int doInstallation(
 #include <fstream>
 
 #include <utils/network/http/httpclient.h>
+
+//--rsync --dir=c:/temp/1 --url=http://enk.me/clients/2.1/default/windows/x64/
 
 int testHttpClient()
 {

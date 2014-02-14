@@ -300,7 +300,8 @@ PollSet::const_iterator PollSet::begin() const
 {
     const_iterator beginIter;
     beginIter.m_impl->pollSetImpl = m_impl;
-    beginIter.m_impl->currentIndex = 0;
+    beginIter.m_impl->currentIndex = -1;
+    ++beginIter;  //moving to the first element (it may have non - 0 index in case of USER_EVENT)
     return beginIter;
 }
 

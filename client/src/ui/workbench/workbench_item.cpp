@@ -4,7 +4,7 @@
 
 #include <common/common_meta_types.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/common/geometry.h>
 

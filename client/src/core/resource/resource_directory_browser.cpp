@@ -4,7 +4,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
 
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_dvd_resource.h"
 #include "plugins/resources/archive/avi_files/avi_bluray_resource.h"
 #include "plugins/resources/archive/filetypesupport.h"
@@ -241,7 +241,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
 
         for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel) {
             QString normMotionName = path.mid(path.lastIndexOf(L'?')+1);
-            QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(QFileInfo(normMotionName).baseName()), QIODevice::ReadOnly);
+            QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(QFileInfo(normMotionName).completeBaseName()), QIODevice::ReadOnly);
             if (motionIO) {
                 Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
                 QnMetaDataLightVector motionData;

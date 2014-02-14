@@ -2,9 +2,15 @@
 
 #include <QtWidgets/QGraphicsScene>
 
+#include <client/client_globals.h>
+#include <client/client_settings.h>
+
 #include "shadow_item.h"
 
 void detail::ShadedBase::initShadow(QGraphicsItem *item) {
+    if (qnSettings->lightMode() & Qn::LightModeNoShadows)
+        return;
+
     item->setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
 
     QnShadowItem *shadow = new QnShadowItem();

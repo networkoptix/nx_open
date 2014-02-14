@@ -11,18 +11,25 @@
 class QNetworkReply;
 class QNetworkAccessManager;
 
-class QnSessionManagerSyncReplyProcessor: public QObject {
-    Q_OBJECT
+struct AsyncRequestInfo {
 
+    AsyncRequestInfo(): handle(0), object(0), slot(0), connectionType(Qt::AutoConnection) {}
+
+    int handle;
+    QObject* object;
+    const char* slot;
+    Qt::ConnectionType connectionType;
+};
+Q_DECLARE_METATYPE(AsyncRequestInfo);
+
+class QnSessionManagerSyncReply
+{
 public:
-    QnSessionManagerSyncReplyProcessor(QObject *parent = NULL): QObject(parent), m_finished(false) {}
+    QnSessionManagerSyncReply(): m_finished(false) {}
 
-    int wait(QnHTTPRawResponse& response);
-
-private slots:
-    void at_finished(const QnHTTPRawResponse&, int handle);
-    void at_destroy();
-
+    int wait(QnHTTPRawResponse &response);
+    void terminate();
+    void requestFinished(const QnHTTPRawResponse& response, int handle);
 private:
     bool m_finished;
     QnHTTPRawResponse m_response;
@@ -71,21 +78,25 @@ private slots:
     void at_proxyAuthenticationRequired ( const QNetworkProxy & proxy, QAuthenticator * authenticator);
     void at_aboutToBeStopped();
     void at_aboutToBeStarted();
-    void at_asyncRequestQueued(int operation, int handle, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data);
+    void at_asyncRequestQueued(int operation, AsyncRequestInfo reqInfo, const QUrl &url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray &data);
     void at_sslErrors(QNetworkReply* reply, const QList<QSslError> &errors);
-    void at_replyReceived();
+    void at_replyReceived(QNetworkReply * reply);
+    void at_SyncRequestFinished(const QnHTTPRawResponse& response, int handle);
 signals:
     void aboutToBeStopped();
     void aboutToBeStarted();
-    void asyncRequestQueued(int operation, int handle, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data);
-    void requestFinished(const QnHTTPRawResponse& response, int handle);
+    void asyncRequestQueued(int operation, AsyncRequestInfo reqInfo, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data);
+    //void requestFinished(const QnHTTPRawResponse& response, int handle);
 private:
     QNetworkAccessManager *m_accessManager;
     mutable QMutex m_accessManagerMutex;
     static QAtomicInt s_handle;
     
     QScopedPointer<QThread> m_thread;
-    QHash<QNetworkReply*, int> m_handleInProgress;
+    QHash<QNetworkReply*, AsyncRequestInfo> m_handleInProgress;
+
+    QHash<int, QnSessionManagerSyncReply*>  m_syncReplyInProgress;
+    QMutex m_syncReplyMutex;
 };
 
 #endif // __SESSION_MANAGER_H__

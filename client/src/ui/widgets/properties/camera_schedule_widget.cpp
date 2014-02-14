@@ -6,7 +6,7 @@
 
 //TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -157,17 +157,17 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
     // init buttons
     ui->recordAlwaysButton->setColor(qnGlobals->recordAlwaysColor());
-    ui->recordAlwaysButton->setCheckedColor(shiftColor(qnGlobals->recordAlwaysColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
+    ui->recordAlwaysButton->setCheckedColor(qnGlobals->recordAlwaysColor().lighter());
 
     ui->recordMotionButton->setColor(qnGlobals->recordMotionColor());
-    ui->recordMotionButton->setCheckedColor(shiftColor(qnGlobals->recordMotionColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
+    ui->recordMotionButton->setCheckedColor(qnGlobals->recordMotionColor().lighter());
 
-    ui->recordMotionPlusLQButton->setColor(shiftColor(qnGlobals->recordMotionColor(),0,1,0));
-    ui->recordMotionPlusLQButton->setCheckedColor(shiftColor(qnGlobals->recordMotionColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
-    ui->recordMotionPlusLQButton->setInsideColor(qnGlobals->recordAlwaysColor()); // inside color
+    ui->recordMotionPlusLQButton->setColor(qnGlobals->recordMotionColor());
+    ui->recordMotionPlusLQButton->setCheckedColor(qnGlobals->recordMotionColor().lighter());
+    ui->recordMotionPlusLQButton->setInsideColor(qnGlobals->recordAlwaysColor());
 
     ui->noRecordButton->setColor(qnGlobals->noRecordColor());
-    ui->noRecordButton->setCheckedColor(shiftColor(qnGlobals->noRecordColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
+    ui->noRecordButton->setCheckedColor(qnGlobals->noRecordColor().lighter());
 
     connect(ui->recordAlwaysButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
     connect(ui->recordMotionButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
@@ -524,13 +524,13 @@ void QnCameraScheduleWidget::setMaxFps(int value, int dualStreamValue) {
     if (currentMaxFps > value)
     {
         QMessageBox::warning(this, tr("FPS value is too high"),
-            tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2").arg(currentMaxFps).arg(value));
+            tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.").arg(currentMaxFps).arg(value));
         emit scheduleTasksChanged();
     }
     if (currentMaxDualStreamingFps > dualStreamValue)
     {
         QMessageBox::warning(this, tr("FPS value is too high"),
-            tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2")
+            tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.")
                              .arg(currentMaxDualStreamingFps).arg(dualStreamValue));
         emit scheduleTasksChanged();
     }

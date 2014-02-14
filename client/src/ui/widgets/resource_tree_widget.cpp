@@ -50,6 +50,7 @@ public:
         if (index.column() == Qn::CheckColumn && role == Qt::CheckStateRole){
             Qt::CheckState checkState = (Qt::CheckState)value.toInt();
             setCheckStateRecursive(index, checkState);
+            setCheckStateRecursiveUp(index, checkState);
             return true;
         } else
             return base_type::setData(index, value, role);
@@ -93,6 +94,22 @@ protected:
         for (int i = 0; i < rowCount(root); ++i)
             setCheckStateRecursive(this->index(i, Qn::CheckColumn, root), state);
         base_type::setData(index, state, Qt::CheckStateRole);
+    }
+
+    void setCheckStateRecursiveUp(const QModelIndex &index, Qt::CheckState state) {
+        QModelIndex root = index.parent();
+        if (!root.isValid())
+            return;
+
+        for (int i = 0; (i < rowCount(root)) && (state == Qt::Checked); ++i)
+            if (this->index(i, Qn::CheckColumn, root).data(Qt::CheckStateRole).toInt() != Qt::Checked)
+                state = Qt::Unchecked;
+
+        QModelIndex checkRoot = root.sibling(root.row(), Qn::CheckColumn);
+        if (checkRoot.data(Qt::CheckStateRole) == state)
+            return;
+        base_type::setData(checkRoot, state, Qt::CheckStateRole);
+        setCheckStateRecursiveUp(root, state);
     }
 
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override {

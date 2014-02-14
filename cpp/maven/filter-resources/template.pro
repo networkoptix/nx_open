@@ -49,7 +49,12 @@ DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
 } else {
   plugin {
     win* {
-      DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION/plugins
+      contains(BUILDLIB,staticlib) {
+        DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION/plugins
+      }
+      else {
+        DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION/plugins
+      }
     }
     else {
       DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
@@ -93,7 +98,7 @@ CONFIG += ${arch}
 
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
-  ICON = ${child.customization.dir}/icons/hdw_logo.ico	
+  ICON = ${customization.dir}/icons/hdw_logo.ico	
   LIBS += ${windows.oslibs}
   DEFINES += ${windows.defines}  
   win32-msvc* {

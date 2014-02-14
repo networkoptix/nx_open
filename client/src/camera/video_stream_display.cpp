@@ -457,8 +457,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         dec = CLVideoDecoderFactory::createDecoder(
                 data,
                 enableFrameQueue,
-                widgetRenderer ? widgetRenderer->glContext() : NULL,
-                QnClientSettings::instance()->isHardwareDecodingUsed() );
+                widgetRenderer ? widgetRenderer->glContext() : NULL);
         dec->setSpeed( m_speed );
         if (dec == 0) {
             cl_log.log(QString::fromLatin1("Can't find create decoder for compression type %1").arg(data->compressionType), cl_logDEBUG2);
@@ -492,7 +491,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     //if true, decoding to tmp frame which will be later scaled/converted to supported format
     const bool useTmpFrame =
         (dec->targetMemoryType() == QnAbstractPictureDataRef::pstSysMemPic) &&
-    	(!QnGLRenderer::isPixelFormatSupported(pixFmt) ||
+        (!QnGLRenderer::isPixelFormatSupported(pixFmt) ||
          !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) ||
          scaleFactor != QnFrameScaler::factor_1);
 
@@ -617,7 +616,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         //checkig once again for need to scale, since previous check could be incorrect due to unknown pixel format (this actual for some images, e.g., jpeg)
         const bool scalingStillNeeded =
             (dec->targetMemoryType() == QnAbstractPictureDataRef::pstSysMemPic) &&
-    	    (!QnGLRenderer::isPixelFormatSupported(pixFmt) ||
+            (!QnGLRenderer::isPixelFormatSupported(pixFmt) ||
              !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) ||
              scaleFactor != QnFrameScaler::factor_1);
 

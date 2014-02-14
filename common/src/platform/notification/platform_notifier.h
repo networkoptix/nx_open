@@ -9,6 +9,8 @@ public:
     QnPlatformNotifier(QObject *parent = NULL): QObject(parent) {}
     virtual ~QnPlatformNotifier() {}
 
+    // TODO: #Elric add platform-specific notifications, and implement DWM this way.
+
 signals:
     /**
      * This signal is emitted whenever system time changes. 

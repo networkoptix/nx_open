@@ -4,7 +4,7 @@
 #include <QtWidgets/QDialog>
 
 namespace Ui {
-    class QnImagePreviewDialog;
+    class ImagePreviewDialog;
 }
 
 class QnImagePreviewDialog : public QDialog
@@ -21,7 +21,7 @@ private slots:
     void setImage(const QImage& image);
 
 private:
-    QScopedPointer<Ui::QnImagePreviewDialog> ui;
+    QScopedPointer<Ui::ImagePreviewDialog> ui;
 };
 
 #endif // IMAGE_PREVIEW_DIALOG_H

@@ -29,7 +29,7 @@ message Resource {
     required Type type = 1;
 
     optional int32        id               = 2;
-    optional int32        typeId           = 3;
+    optional int32        resourceTypeId   = 3;
     optional int32        parentId         = 4;
     optional string       name             = 5;
     optional string       url              = 6;

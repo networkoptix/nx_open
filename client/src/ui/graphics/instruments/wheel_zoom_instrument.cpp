@@ -71,6 +71,9 @@ bool WheelZoomInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent 
     if(viewport == NULL)
         return false;
 
+    if(!event->modifiers().testFlag(Qt::AltModifier))
+        return false;
+
     /* delta() returns the distance that the wheel is rotated 
      * in eighths (1/8s) of a degree. */
     qreal degrees = event->delta() / 8.0;

@@ -163,12 +163,11 @@ QString QnPlDlinkResourceSearcher::manufacture() const
 }
 
 
-QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
 {
-    if( !url.scheme().isEmpty() )
+    if( !url.scheme().isEmpty() && isSearchAction )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
-    Q_UNUSED(doMultichannelCheck)
     QString host = url.host();
     int port = url.port();
     if (host.isEmpty())

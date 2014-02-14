@@ -69,6 +69,7 @@ public:
     QString getLastError() const;
     virtual void setQuality( Qn::StreamQuality quality );
     void setSrcRect(const QRectF& srcRect);
+    virtual bool existMoreData() const { return false; }
 protected:
     QRect roundRect(const QRect& srcRect) const;
 protected:

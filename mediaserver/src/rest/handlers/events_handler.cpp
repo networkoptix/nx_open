@@ -5,7 +5,7 @@
 #include "business/actions/abstract_business_action.h"
 
 #include <core/resource/camera_resource.h>
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 
 #include "events/events_db.h"
 
@@ -13,7 +13,7 @@
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 
-#include "serverutil.h"
+#include <media_server/serverutil.h>
 
 QnRestEventsHandler::QnRestEventsHandler()
 {

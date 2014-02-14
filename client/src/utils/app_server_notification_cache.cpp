@@ -4,7 +4,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QUuid>
 
-#include <client_message_processor.h>
+#include <client/client_message_processor.h>
 
 #include <transcoding/file_transcoder.h>
 

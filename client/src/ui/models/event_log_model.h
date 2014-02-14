@@ -1,12 +1,12 @@
 #ifndef QN_EVENT_LOG_MODEL_H
 #define QN_EVENT_LOG_MODEL_H
 
-#include <QtGui/QStandardItemModel>
+#include <QtCore/QAbstractItemModel>
 #include "business/actions/abstract_business_action.h"
 
-class QnEventLogModel: public QStandardItemModel {
+class QnEventLogModel: public QAbstractItemModel {
     Q_OBJECT
-    typedef QStandardItemModel base_type;
+    typedef QAbstractItemModel base_type;
 
 public:
     enum Roles {
@@ -31,8 +31,14 @@ public:
     QList<Column> columns() const;
     void setColumns(const QList<Column> &columns);
 
+    virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    virtual QModelIndex parent(const QModelIndex &child) const override;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
+
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
     bool hasMotionUrl(const QModelIndex &index) const;
 
@@ -43,14 +49,11 @@ public:
     class DataIndex;
 public slots:
     void clear();
-    void rebuild();
 private:
     QnResourcePtr getResource(const Column &column, const QnBusinessActionData &action) const;
     QVariant fontData(const Column& column, const QnBusinessActionData &action) const;
     QVariant foregroundData(const Column& column, const QnBusinessActionData &action) const;
 
-    static QString columnTitle(Column column);
-    
     static QVariant iconData(const Column& column, const QnBusinessActionData &action);
     static QVariant mouseCursorData(const Column& column, const QnBusinessActionData &action);
     static QString textData(const Column& column, const QnBusinessActionData &action);

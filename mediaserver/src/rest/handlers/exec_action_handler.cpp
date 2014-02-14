@@ -3,7 +3,7 @@
 #include <business/actions/abstract_business_action.h>
 #include <business/business_message_bus.h>
 #include <api/serializer/pb_serializer.h>
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 
 int QnExecActionHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
 {

@@ -297,10 +297,10 @@ int QnTranscoder::setVideoCodec(
             break;
             */
         case TM_OpenCLTranscode:
-            m_lastErrMessage = tr("OpenCLTranscode is not implemented");
+            m_lastErrMessage = tr("OpenCL transcoding is not implemented.");
             return -1;
         default:
-            m_lastErrMessage = tr("Unknown Transcode Method");
+            m_lastErrMessage = tr("Unknown transcoding method.");
             return -1;
     }
     if (m_vTranscoder)

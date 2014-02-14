@@ -2,7 +2,7 @@
 
 #include <QtCore/QDir>
 
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include <core/resource/media_server_resource.h>
@@ -16,7 +16,7 @@
 #include <utils/fs/file.h>
 #include "utils/common/util.h"
 
-#include "serverutil.h"
+#include <media_server/serverutil.h>
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -112,6 +112,7 @@ void QnStorageManager::rebuildCatalogIndexInternal()
     }
     loadFullFileCatalog(true);
     m_rebuildState = RebuildState_None;
+    emit rebuildFinished();
 }
 
 void QnStorageManager::rebuildCatalogAsync()
@@ -733,7 +734,7 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
         QList<QFileInfo> list = storage->getFileList(text);
         QList<QString> baseNameList;
         foreach(const QFileInfo& info, list)
-            baseNameList << info.baseName();
+            baseNameList << info.completeBaseName();
         qSort(baseNameList.begin(), baseNameList.end());
         if (!baseNameList.isEmpty()) 
             fileNum = baseNameList.last().toInt() + 1;

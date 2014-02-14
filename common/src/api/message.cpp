@@ -95,7 +95,7 @@ bool QnMessage::load(const pb::Message &message)
         case pb::Message_Type_License:
         {
             const pb::LicenseMessage& licenseMessage = message.GetExtension(pb::LicenseMessage::message);
-			parseLicense(license, licenseMessage.license(), qnLicensePool->oldHardwareId());
+            parseLicense(license, licenseMessage.license(), qnLicensePool->oldHardwareId());
             break;
         }
         case pb::Message_Type_CameraServerItem:
@@ -115,7 +115,7 @@ bool QnMessage::load(const pb::Message &message)
             hardwareId3 = initialMessage.hardwareid3().c_str();
             publicIp = QString::fromStdString(initialMessage.publicip());
             if (initialMessage.has_allowcamerachanges())
-                allowCameraChanges = initialMessage.allowcamerachanges();
+                allowCameraChanges = initialMessage.allowcamerachanges() ? 1 : 0;
 
             parseResourceTypes(resourceTypes, initialMessage.resourcetype());
             qnResTypePool->replaceResourceTypeList(resourceTypes);
@@ -174,7 +174,7 @@ bool QnMessage::load(const pb::Message &message)
             if (runtimeInfoChangeMessage.has_sessionkey())
                 sessionKey = runtimeInfoChangeMessage.sessionkey().c_str();
             if (runtimeInfoChangeMessage.has_allowcamerachanges())
-                allowCameraChanges = runtimeInfoChangeMessage.allowcamerachanges();
+                allowCameraChanges = runtimeInfoChangeMessage.allowcamerachanges() ? 1 : 0;
             break;
         }
         case pb::Message_Type_BusinessRuleReset:
@@ -196,6 +196,12 @@ bool QnMessage::load(const pb::Message &message)
         break;
     }
 
+    case pb::Message_Type_Command:
+    {
+        const pb::CommandMessage &commandMessage = message.GetExtension(pb::CommandMessage::message);
+        command = static_cast<Command>(commandMessage.command());
+        break;
+    }
     default:
         break;
     }

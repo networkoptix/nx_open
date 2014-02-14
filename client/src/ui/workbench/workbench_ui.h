@@ -180,7 +180,9 @@ protected:
 
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
-    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsY);
+    void createNotificationsGuiElements();
+
+    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX);
     void updateViewportMargins();
 
     void updateTreeGeometry();
@@ -238,6 +240,7 @@ private slots:
     void at_controlsWidget_deactivated();
     void at_controlsWidget_geometryChanged();
 
+    void at_sliderResizerWidget_wheelEvent(QObject *target, QEvent *event);
     void at_sliderItem_geometryChanged();
     void at_sliderResizerWidget_geometryChanged();
     void at_toggleThumbnailsAction_toggled(bool checked);

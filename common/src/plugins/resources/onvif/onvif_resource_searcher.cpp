@@ -5,7 +5,7 @@
 #include "core/resource/camera_resource.h"
 #include "onvif_resource.h"
 #include "onvif_resource_information_fetcher.h"
-#include "core/resource_managment/resource_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "core/dataprovider/live_stream_provider.h"
 
 #include <QtCore/QUrlQuery>
@@ -70,9 +70,9 @@ QString OnvifResourceSearcher::manufacture() const
 }
 
 
-QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
 {
-    if( !url.scheme().isEmpty() )
+    if( !url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
     if (url.port() == -1)
@@ -81,14 +81,14 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& url, const
         {
             QUrl newUrl(url);
             newUrl.setPort(ONVIF_SERVICE_DEFAULT_PORTS[i]);
-            QList<QnResourcePtr> result = checkHostAddrInternal(newUrl, auth, doMultichannelCheck);
+            QList<QnResourcePtr> result = checkHostAddrInternal(newUrl, auth, isSearchAction);
             if (!result.isEmpty())
                 return result;
         }
         return QList<QnResourcePtr>();
     }
     else {
-        return checkHostAddrInternal(url, auth, doMultichannelCheck);
+        return checkHostAddrInternal(url, auth, isSearchAction);
     }
 }
 
@@ -165,7 +165,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 
         OnvifResourceInformationFetcher fetcher;
         QnId rt = fetcher.getOnvifResourceType(manufacturer, modelName);
-        resource->setVendorName( manufacturer );
+        resource->setVendor( manufacturer );
         resource->setName( modelName );
         //QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
         if (rt.isValid())
@@ -190,7 +190,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
                 for (int i = 1; i < resource->getMaxChannels(); ++i) 
                 {
                     QnPlOnvifResourcePtr res(new QnPlOnvifResource());
-                    res->setVendorName( manufacturer );
+                    res->setVendor( manufacturer );
                     res->setPhysicalId(resource->getPhysicalId());
                     res->update(resource, true);
                     res->updateToChannel(i);
