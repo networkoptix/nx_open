@@ -1,5 +1,5 @@
 #include "ptz_manage_dialog.h"
-#include "ui_ptz_tours_dialog.h"
+#include "ui_ptz_manage_dialog.h"
 
 #include <QtCore/QUuid>
 #include <QtCore/QScopedPointer>
@@ -63,7 +63,7 @@ private:
 //TODO:  allow to maximize dialog
 QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::PtzToursDialog),
+    ui(new Ui::PtzManageDialog),
     m_model(new QnPtzManageModel(this))
 {
     ui->setupUi(this);

@@ -8,7 +8,7 @@
 #include <utils/common/singleton.h>
 
 namespace Ui {
-    class PtzToursDialog;
+    class PtzManageDialog;
 }
 
 class QnPtzManageModel;
@@ -23,6 +23,7 @@ public:
 
     QnResourcePtr resource() const;
     void setResource(const QnResourcePtr &resource);
+
 protected:
     virtual void loadData(const QnPtzData &data) override;
     virtual void saveData() override;
@@ -47,7 +48,7 @@ private:
     bool savePresets();
     bool saveTours();
 
-    QScopedPointer<Ui::PtzToursDialog> ui;
+    QScopedPointer<Ui::PtzManageDialog> ui;
     QnPtzManageModel *m_model;
     QnResourcePtr m_resource;
 

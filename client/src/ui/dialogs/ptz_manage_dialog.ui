@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ptzManageDialog</class>
- <widget class="QDialog" name="ptzManageDialog">
+ <class>PtzManageDialog</class>
+ <widget class="QDialog" name="PtzManageDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
