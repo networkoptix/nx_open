@@ -207,7 +207,7 @@
                     <family>Windows</family>
                 </os>
                 <property>
-                    <name>!quicksync</name>
+                    <name>quicksync</name>
                     <value>true</value>
                 </property>
             </activation>
