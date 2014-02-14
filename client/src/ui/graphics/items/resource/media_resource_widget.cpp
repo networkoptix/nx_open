@@ -1048,11 +1048,8 @@ void QnMediaResourceWidget::at_zoomRectChanged() {
     updateIconButton();
 
     // TODO: #PTZ
-    if (options() & DisplayDewarped) {
-        //m_fisheyePtz->setEnabled(true);
-
-        //m_fisheyePtz->moveToRect(zoomRect());
-    }
+    if (options() & DisplayDewarped)
+        m_ptzController->absoluteMove(Qn::LogicalPtzCoordinateSpace, QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()), 2.0);
 }
 
 void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields) {

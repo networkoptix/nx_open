@@ -286,8 +286,10 @@ bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D
 }
 
 QVector3D QnFisheyePtzController::positionFromRect(const QnMediaDewarpingParams &dewarpingParams, const QRectF &rect) {
-    QPointF center = rect.center() - QPointF(0.5, 0.5);
+    // TODO: #PTZ 
+    // implement support for x/y displacement
 
+    QPointF center = rect.center() - QPointF(0.5, 0.5);
     qreal fov = rect.width() * M_PI;
 
     if (dewarpingParams.viewMode == QnMediaDewarpingParams::Horizontal) {
