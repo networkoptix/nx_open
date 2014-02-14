@@ -35,52 +35,20 @@ Qn::PtzCapabilities QnCachingPtzController::getCapabilities() {
 }
 
 bool QnCachingPtzController::continuousMove(const QVector3D &speed) {
-    if(!base_type::continuousMove(speed))
-        return false;
-
-    QMutexLocker locker(&m_mutex);
-    m_data.fields &= ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
-    return true;
+    return base_type::continuousMove(speed);
 }
 
 bool QnCachingPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
-    if(!base_type::absoluteMove(space, position, speed))
-        return false;
-
-    QMutexLocker locker(&m_mutex);
-    m_data.fields &= ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
-    return true;
+    return base_type::absoluteMove(space, position, speed);
 }
 
 bool QnCachingPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
-    if(!base_type::viewportMove(aspectRatio, viewport, speed))
-        return false;
-
-    QMutexLocker locker(&m_mutex);
-    m_data.fields &= ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
-    return true;
+    return base_type::viewportMove(aspectRatio, viewport, speed);
 }
 
 bool QnCachingPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
-    if(!base_type::getPosition(space, position))
-        return false;
-
-    QMutexLocker locker(&m_mutex);
-    if(space == Qn::DevicePtzCoordinateSpace) {
-        if(m_data.fields & Qn::DevicePositionPtzField) {
-            *position = m_data.devicePosition;
-            return true;
-        } else {
-            return false;
-        }
-    } else {
-        if(m_data.fields & Qn::LogicalPositionPtzField) {
-            *position = m_data.logicalPosition;
-            return true;
-        } else {
-            return false;
-        }
-    }
+    /* We don't cache position => no need to check cache here. */
+    return base_type::getPosition(space, position);
 }
 
 bool QnCachingPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) {
@@ -315,6 +283,7 @@ void QnCachingPtzController::updateCacheLocked(const QnPtzData &data) {
     if(data.query == Qn::AllPtzFields)
         m_initialized = true;
 
+    /* We don't cache position as it doesn't make much sense. */
     Qn::PtzDataFields fields = data.fields & ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
     if(fields == Qn::NoPtzFields)
         return;
