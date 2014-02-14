@@ -2,8 +2,6 @@
 
 #include <common/common_globals.h>
 
-#include <core/ptz/ptz_preset.h>
-
 #include <ui/style/globals.h>
 
 QnPtzTourListModel::QnPtzTourListModel(QObject *parent) :
@@ -26,7 +24,7 @@ void QnPtzTourListModel::setTours(const QnPtzTourList &tours) {
     beginResetModel();
     m_tours.clear();
     foreach (const QnPtzTour &tour, tours)
-        m_tours.append(QnPtzTourItemModel(tour));
+        m_tours << tour;
     endResetModel();
 }
 
@@ -42,18 +40,24 @@ void QnPtzTourListModel::addTour() {
 }
 
 const QnPtzPresetList& QnPtzTourListModel::presets() const {
-    return m_presets;
+    ensurePresetsCache();
+    return m_ptzPresetsCache;
 }
 
 void QnPtzTourListModel::setPresets(const QnPtzPresetList &presets) {
-    if (m_presets == presets)
+    ensurePresetsCache();
+    if (m_ptzPresetsCache == presets)
         return;
 
     beginResetModel();
-    m_presets = presets;
+    m_presets.clear();
+    m_ptzPresetsCache.clear();
+    foreach (const QnPtzPreset &preset, presets)
+        m_presets << preset;
     endResetModel();
 
-    emit presetsChanged(m_presets);
+    ensurePresetsCache();
+    emit presetsChanged(m_ptzPresetsCache);
 }
 
 void QnPtzTourListModel::addPreset() {
@@ -122,16 +126,16 @@ QVariant QnPtzTourListModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
     
-    Row row = rowClass(index.row());
+    RowData data = rowData(index.row());
 
-    switch (row) {
+    switch (data.rowType) {
     case QnPtzTourListModel::PresetTitleRow:
     case QnPtzTourListModel::TourTitleRow:
-        return titleData(row, role);
+        return titleData(data.rowType, index.column(), role);
     case QnPtzTourListModel::PresetRow:
-        return presetData(index.row(), index.column(), role);
+        return presetData(data.presetModel, index.column(), role);
     case QnPtzTourListModel::TourRow:
-        return tourData(index.row(), index.column(), role);
+        return tourData(data.tourModel, index.column(), role);
     default:
         break;
     }
@@ -184,12 +188,18 @@ QVariant QnPtzTourListModel::headerData(int section, Qt::Orientation orientation
 }
 
 Qt::ItemFlags QnPtzTourListModel::flags(const QModelIndex &index) const {
-    Qt::ItemFlags flags = base_type::flags(index);
+    Qt::ItemFlags flags = Qt::ItemNeverHasChildren;
+
     if (!index.isValid()) 
         return flags;
 
-    Row row = rowClass(index.row());
-    if (row == InvalidRow || row == PresetTitleRow || row == TourTitleRow)
+    flags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+
+    RowData data = rowData(index.row());
+
+    if (data.rowType == InvalidRow 
+        || data.rowType == PresetTitleRow 
+        || data.rowType == TourTitleRow)
         return flags;
 
     switch (index.column()) {
@@ -198,7 +208,7 @@ Qt::ItemFlags QnPtzTourListModel::flags(const QModelIndex &index) const {
         flags |= Qt::ItemIsEditable;
         break;
     case HomeColumn:
-        flags |= Qt::ItemIsEditable | Qt::ItemIsUserCheckable;
+        flags |= Qt::ItemIsEditable;// | Qt::ItemIsUserCheckable;
         break;
     default:
         break;
@@ -229,31 +239,41 @@ qint64 QnPtzTourListModel::estimatedTimeSecs(const QnPtzTour &tour) const {
     return result / 1000;
 }
 
+QnPtzTourListModel::RowData QnPtzTourListModel::rowData(int row) const {
+    RowData result;
 
-
-QnPtzTourListModel::Row QnPtzTourListModel::rowClass(int row) const {
     int presetOffset = 0;
     if (m_presets.size() > 0) {
-        if (row == 0)
-            return PresetTitleRow;
-        if (row <= m_presets.size())
-            return PresetRow;
+        if (row == 0) {
+            result.rowType = PresetTitleRow;
+            return result;
+        }
+
+        if (row <= m_presets.size()) {
+            result.rowType = PresetRow;
+            result.presetModel = m_presets[row - 1];
+            return result;
+        }
         presetOffset = m_presets.size() + 1;
     }
 
     if (m_tours.size() > 0) {
-        if (row == presetOffset)
-            return TourTitleRow;
-        if (row - presetOffset <= m_tours.size() + 1)
-            return TourRow;
+        if (row == presetOffset) {
+            result.rowType = TourTitleRow;
+            return result;
+        }
+
+        if (row - presetOffset <= m_tours.size() + 1) {
+            result.rowType = TourRow;
+            result.tourModel = m_tours[row - presetOffset - 1];
+            return result;
+        }
     }
 
-    assert(false); //TODO: remove assert in production
-    return InvalidRow;
-
+    return result;
 }
 
-QVariant QnPtzTourListModel::titleData(Row row, int role) const {
+QVariant QnPtzTourListModel::titleData(RowType rowType,  int column, int role) const {
     switch(role) {
     case Qt::DisplayRole:
     case Qt::ToolTipRole:
@@ -261,12 +281,15 @@ QVariant QnPtzTourListModel::titleData(Row row, int role) const {
     case Qt::WhatsThisRole:
     case Qt::AccessibleTextRole:
     case Qt::AccessibleDescriptionRole:
-        if (row == TourTitleRow)
+        if (column != NameColumn) 
+            return QVariant();
+
+        if (rowType == TourTitleRow)
             return tr("Tours");
-        return tr("Saved Positions");
+        return tr("Positions");
 
     case Qt::BackgroundRole:
-        return QColor(Qt::gray);    //TODO: style
+        return QColor(Qt::lightGray);    //TODO: style
     default:
         break;
     }
@@ -274,9 +297,8 @@ QVariant QnPtzTourListModel::titleData(Row row, int role) const {
     return QVariant();
 }
 
-QVariant QnPtzTourListModel::presetData(int row, int column, int role) const {
-    return tr("ololo");
- /*   switch(role) {
+QVariant QnPtzTourListModel::presetData(const QnPtzPresetItemModel &presetModel, int column, int role) const {
+    switch(role) {
     case Qt::DisplayRole:
     case Qt::ToolTipRole:
     case Qt::StatusTipRole:
@@ -284,14 +306,46 @@ QVariant QnPtzTourListModel::presetData(int row, int column, int role) const {
     case Qt::AccessibleTextRole:
     case Qt::AccessibleDescriptionRole:
     case Qt::EditRole:
-        switch (index.column()) {
+        switch (column) {
         case ModifiedColumn:
-            return model.modified ? QLatin1String("*") : QString();
+            return presetModel.modified ? QLatin1String("*") : QString();
         case NameColumn:
-            return model.tour.name;
+            return presetModel.preset.name;
         case DetailsColumn:
-            if (model.tour.isValid(m_presets)) {
-                qint64 time = estimatedTimeSecs(model.tour);
+            return QVariant();
+        default:
+            break;
+        }
+        return QVariant();
+
+    case Qn::PtzPresetRole:
+        return QVariant::fromValue<QnPtzPreset>(presetModel.preset);
+    case Qn::ValidRole:
+        return true;
+    default:
+        break;
+    }
+
+    return QVariant();
+}
+
+QVariant QnPtzTourListModel::tourData(const QnPtzTourItemModel &tourModel, int column,  int role) const {
+    switch(role) {
+    case Qt::DisplayRole:
+    case Qt::ToolTipRole:
+    case Qt::StatusTipRole:
+    case Qt::WhatsThisRole:
+    case Qt::AccessibleTextRole:
+    case Qt::AccessibleDescriptionRole:
+    case Qt::EditRole:
+        switch (column) {
+        case ModifiedColumn:
+            return tourModel.modified ? QLatin1String("*") : QString();
+        case NameColumn:
+            return tourModel.tour.name;
+        case DetailsColumn:
+            if (tourIsValid(tourModel)) {
+                qint64 time = estimatedTimeSecs(tourModel.tour);
                 return tr("Tour time: %1").arg((time < 60) ? tr("less than a minute") : tr("about %n minutes", 0, time / 60));
             }
             return tr("Invalid tour");
@@ -301,57 +355,29 @@ QVariant QnPtzTourListModel::presetData(int row, int column, int role) const {
         return QVariant();
 
     case Qt::BackgroundRole:
-        if (!model.tour.isValid(m_presets))
+        if (!tourIsValid(tourModel))
             return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
         break;
     case Qn::PtzTourRole:
-        return QVariant::fromValue<QnPtzTour>(model.tour);
+        return QVariant::fromValue<QnPtzTour>(tourModel.tour);
     case Qn::ValidRole:
-        return model.tour.isValid(m_presets);
-    default:
-        break;
-    }*/
-
-    return QVariant();
-}
-
-QVariant QnPtzTourListModel::tourData(int row, int column,  int role) const {
-    return tr("ololo");
- /*   switch(role) {
-    case Qt::DisplayRole:
-    case Qt::ToolTipRole:
-    case Qt::StatusTipRole:
-    case Qt::WhatsThisRole:
-    case Qt::AccessibleTextRole:
-    case Qt::AccessibleDescriptionRole:
-    case Qt::EditRole:
-        switch (index.column()) {
-        case ModifiedColumn:
-            return model.modified ? QLatin1String("*") : QString();
-        case NameColumn:
-            return model.tour.name;
-        case DetailsColumn:
-            if (model.tour.isValid(m_presets)) {
-                qint64 time = estimatedTimeSecs(model.tour);
-                return tr("Tour time: %1").arg((time < 60) ? tr("less than a minute") : tr("about %n minutes", 0, time / 60));
-            }
-            return tr("Invalid tour");
-        default:
-            break;
-        }
-        return QVariant();
-
-    case Qt::BackgroundRole:
-        if (!model.tour.isValid(m_presets))
-            return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
-        break;
-    case Qn::PtzTourRole:
-        return QVariant::fromValue<QnPtzTour>(model.tour);
-    case Qn::ValidRole:
-        return model.tour.isValid(m_presets);
+        return tourIsValid(tourModel);
     default:
         break;
     }
-    */
     return QVariant();
+}
+
+bool QnPtzTourListModel::tourIsValid(const QnPtzTourItemModel &tourModel) const {
+    ensurePresetsCache();
+    return tourModel.tour.isValid(m_ptzPresetsCache);
+}
+
+void QnPtzTourListModel::ensurePresetsCache() const {
+    if (!m_ptzPresetsCache.isEmpty())
+        return;
+
+    foreach (const QnPtzPresetItemModel &model, m_presets) {
+        m_ptzPresetsCache << model.preset;
+    }
 }

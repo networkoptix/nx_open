@@ -4,17 +4,21 @@
 #include <QtCore/QAbstractTableModel>
 #include <QtCore/QUuid>
 
-#include <core/ptz/ptz_fwd.h>
+//#include <core/ptz/ptz_fwd.h>
 #include <core/ptz/ptz_tour.h>
+#include <core/ptz/ptz_preset.h>
 
 #include <client/client_model_types.h>
 
 struct QnPtzTourItemModel {
+    QnPtzTourItemModel(){}
+
     QnPtzTourItemModel(const QnPtzTour& tour):
         tour(tour),
         modified(false),
         local(false)
     {}
+
     QnPtzTourItemModel(const QString &name):
         tour(QUuid::createUuid().toString(), name, QnPtzTourSpotList()),
         modified(true),
@@ -28,7 +32,25 @@ struct QnPtzTourItemModel {
 
     /** Tour is just created locally, does not exists on server. */
     bool local;
+};
 
+struct QnPtzPresetItemModel {
+    QnPtzPresetItemModel() {}
+
+    QnPtzPresetItemModel(const QnPtzPreset& preset):
+        preset(preset),
+        modified(false)
+    {}
+
+    QnPtzPresetItemModel(const QString &name):
+        preset(QUuid::createUuid().toString(), name),
+        modified(true)
+    {}
+
+    QnPtzPreset preset;
+
+    /** Preset name is modified. */
+    bool modified;
 };
 
 class QnPtzTourListModel : public QAbstractTableModel
@@ -47,7 +69,7 @@ public:
         ColumnCount
     };
 
-    enum Row {
+    enum RowType {
         PresetTitleRow,
         PresetRow,
         TourTitleRow,
@@ -87,12 +109,24 @@ signals:
     void presetsChanged(const QnPtzPresetList &presets);
 private:
     qint64 estimatedTimeSecs(const QnPtzTour &tour) const;
-    Row rowClass(int row) const;
-    QVariant titleData(Row row, int role) const;
-    QVariant presetData(int row, int column, int role) const;
-    QVariant tourData(int row, int column, int role) const;
+    bool tourIsValid(const QnPtzTourItemModel &tourModel) const;
+    void ensurePresetsCache() const;
 
-    QnPtzPresetList m_presets;
+    struct RowData {
+        RowType rowType;
+        QnPtzPresetItemModel presetModel;
+        QnPtzTourItemModel tourModel;
+
+        RowData(): rowType(InvalidRow) {}
+    };
+    
+    RowData rowData(int row) const;
+
+    QVariant titleData(RowType rowType,  int column, int role) const;
+    QVariant presetData(const QnPtzPresetItemModel &presetModel, int column, int role) const;
+    QVariant tourData(const QnPtzTourItemModel &tourModel, int column, int role) const;
+
+    QList<QnPtzPresetItemModel> m_presets;
     QStringList m_removedPresets;
 
     QList<QnPtzTourItemModel> m_tours;
@@ -100,7 +134,7 @@ private:
 
     QnPtzHotkeyHash m_hotkeys;
 
-    
+    mutable QnPtzPresetList m_ptzPresetsCache;
 };
 
 #endif // PTZ_TOUR_LIST_MODEL_H

@@ -90,8 +90,7 @@ void QnPtzToursDialog::keyPressEvent(QKeyEvent *event) {
 
 
 void QnPtzToursDialog::loadData(const QnPtzData &data) {
-    ui->tableView->setColumnHidden(QnPtzTourListModel::HomeColumn, !(capabilities() & Qn::HomePtzCapability));
-
+    // ui->tableView->setColumnHidden(QnPtzTourListModel::HomeColumn, !(capabilities() & Qn::HomePtzCapability)); //TODO: uncomment
 
     m_model->setTours(data.tours);
     m_model->setPresets(data.presets);
