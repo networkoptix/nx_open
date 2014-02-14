@@ -1570,7 +1570,7 @@ bool RTPSession::readTextResponce(QByteArray& response)
     for (int i = 0; i < 1000 && ignoreDataSize < 1024*1024*3 && m_tcpSock->isConnected(); ++i)
     {
         if (readMoreData) {
-            int readed = m_tcpSock->recv(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen));
+            int readed = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
             if (readed <= 0)
             {
                 if( readed == 0 )
