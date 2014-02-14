@@ -11,7 +11,13 @@ class QnActivityPtzController: public QnProxyPtzController {
     typedef QnProxyPtzController base_type;
 
 public:
-    QnActivityPtzController(bool isLocal, const QnPtzControllerPtr &baseController);
+    enum Mode {
+        Local,
+        Client,
+        Server
+    };
+
+    QnActivityPtzController(Mode mode, const QnPtzControllerPtr &baseController);
     virtual ~QnActivityPtzController();
 
     static bool extends(Qn::PtzCapabilities capabilities);
@@ -30,10 +36,8 @@ public:
 private:
     void setActiveObject(const QnPtzObject &activeObject);
 
-    Q_SLOT void at_adaptor_valueChanged();
-
 private:
-    bool m_isLocal;
+    Mode m_mode;
     QnResourcePropertyAdaptor<QnPtzObject> *m_adaptor;
     QnPtzObject m_activeObject;
 };

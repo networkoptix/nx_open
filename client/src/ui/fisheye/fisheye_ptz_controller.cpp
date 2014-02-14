@@ -115,7 +115,7 @@ void QnFisheyePtzController::updateCapabilities() {
         return;
 
     m_capabilities = capabilities;
-    emit capabilitiesChanged();
+    emit changed(Qn::CapabilitiesPtzField);
 }
 
 void QnFisheyePtzController::updateAspectRatio() {

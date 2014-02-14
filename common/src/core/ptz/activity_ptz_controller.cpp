@@ -1,21 +1,17 @@
 #include "activity_ptz_controller.h"
 
-#include <cassert>
-
 #include <api/resource_property_adaptor.h>
 
-QnActivityPtzController::QnActivityPtzController(bool isLocal, const QnPtzControllerPtr &baseController):
+QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_isLocal(isLocal),
+    m_mode(mode),
     m_adaptor(NULL)
 {
-    if(!m_isLocal) {
+    if(m_mode != Local) {
         m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(baseController->resource(), lit("ptzActiveObject"), QnPtzObject(), this);
         m_adaptor->setValue(QnPtzObject());
-        connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnActivityPtzController::at_adaptor_valueChanged);
+        connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });
     }
-
-    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability));
 }
 
 QnActivityPtzController::~QnActivityPtzController() {
@@ -37,7 +33,8 @@ bool QnActivityPtzController::continuousMove(const QVector3D &speed) {
     if(!base_type::continuousMove(speed))
         return false;
 
-    setActiveObject(QnPtzObject());
+    if(m_mode != Client)
+        setActiveObject(QnPtzObject());
     return true;
 }
 
@@ -45,7 +42,8 @@ bool QnActivityPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const Q
     if(!base_type::absoluteMove(space, position, speed))
         return false;
 
-    setActiveObject(QnPtzObject());
+    if(m_mode != Client)
+        setActiveObject(QnPtzObject());
     return true;
 }
 
@@ -53,7 +51,8 @@ bool QnActivityPtzController::viewportMove(qreal aspectRatio, const QRectF &view
     if(!base_type::viewportMove(aspectRatio, viewport, speed))
         return false;
 
-    setActiveObject(QnPtzObject());
+    if(m_mode != Client)
+        setActiveObject(QnPtzObject());
     return true;
 }
 
@@ -61,7 +60,8 @@ bool QnActivityPtzController::activatePreset(const QString &presetId, qreal spee
     if(!base_type::activatePreset(presetId, speed))
         return false;
 
-    setActiveObject(QnPtzObject(Qn::PresetPtzObject, presetId));
+    if(m_mode != Client)
+        setActiveObject(QnPtzObject(Qn::PresetPtzObject, presetId));
     return true;
 }
 
@@ -69,30 +69,30 @@ bool QnActivityPtzController::activateTour(const QString &tourId) {
     if(!base_type::activateTour(tourId))
         return false;
 
-    setActiveObject(QnPtzObject(Qn::TourPtzObject, tourId));
+    if(m_mode != Client)
+        setActiveObject(QnPtzObject(Qn::TourPtzObject, tourId));
     return true;
 }
 
 bool QnActivityPtzController::getActiveObject(QnPtzObject *activeObject) {
-    if(m_isLocal) {
+    if(m_mode == Local) {
         *activeObject = m_activeObject;
     } else {
         *activeObject = m_adaptor->value();
     }
+
+    // TODO: #Elric #PTZ emit if asynchronous
+
     return true;
 }
 
 void QnActivityPtzController::setActiveObject(const QnPtzObject &activeObject) {
-    if(m_isLocal) {
+    if(m_mode == Local) {
         if(m_activeObject != activeObject) {
             m_activeObject = activeObject;
-            emit capabilitiesChanged(); // TODO: #Elric #PTZ
+            emit changed(Qn::ActiveObjectPtzField);
         }
     } else {
         m_adaptor->setValue(activeObject);
     }
-}
-
-void QnActivityPtzController::at_adaptor_valueChanged() {
-    emit capabilitiesChanged(); // TODO: #Elric #PTZ
 }

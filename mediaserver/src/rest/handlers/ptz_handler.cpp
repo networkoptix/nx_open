@@ -94,6 +94,7 @@ int QnPtzHandler::executePost(const QString &path, const QnRequestParams &params
     case Qn::RemoveTourPtzCommand:          return executeRemoveTour(controller, params, result);
     case Qn::ActivateTourPtzCommand:        return executeActivateTour(controller, params, result);
     case Qn::GetToursPtzCommand:            return executeGetTours(controller, params, result);
+    case Qn::GetActiveObjectPtzCommand:     return executeGetActiveObject(controller, params, result);
     case Qn::UpdateHomeObjectPtzCommand:    return executeUpdateHomeObject(controller, params, result);
     case Qn::GetHomeObjectPtzCommand:       return executeGetHomeObject(controller, params, result);
     case Qn::GetDataPtzCommand:             return executeGetData(controller, params, result);
@@ -266,6 +267,15 @@ int QnPtzHandler::executeGetTours(const QnPtzControllerPtr &controller, const Qn
         return CODE_INTERNAL_ERROR;
 
     result.setReply(tours);
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeGetActiveObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QnPtzObject activeObject;
+    if(!controller->getActiveObject(&activeObject))
+        return CODE_INTERNAL_ERROR;
+
+    result.setReply(activeObject);
     return CODE_OK;
 }
 

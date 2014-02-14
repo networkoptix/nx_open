@@ -48,6 +48,7 @@ QImage QnFisheyeCalibrationImageWidget::image() const {
 
 void QnFisheyeCalibrationImageWidget::setImage(const QImage &image) {
     m_image = image;
+    m_cachedImage = QImage();
     repaint();
 }
 
@@ -241,7 +242,7 @@ void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent *event) {
     int halfLineWidth = m_lineWidth / 2;
     QRect targetRect = event->rect().adjusted(halfLineWidth, halfLineWidth, -halfLineWidth, -halfLineWidth);
 
-    if (targetRect != m_cachedRect) {
+    if (targetRect != m_cachedRect || m_cachedImage.isNull()) {
         m_cachedRect = targetRect;
         m_cachedImage = m_image.scaled(targetRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     }

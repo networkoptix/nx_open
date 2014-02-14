@@ -20,7 +20,7 @@ QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr &resourc
         return;
     }
 
-    connect(resource.data(), &QnResource::ptzCapabilitiesChanged, this, &QnAbstractPtzController::capabilitiesChanged);
+    connect(resource.data(), &QnResource::ptzCapabilitiesChanged, this, [this]{ emit changed(Qn::CapabilitiesPtzField); });
 }
 
 QnRemotePtzController::~QnRemotePtzController() {
@@ -130,8 +130,8 @@ bool QnRemotePtzController::getTours(QnPtzTourList *) {
     RUN_COMMAND(Qn::GetToursPtzCommand, QVariant(), ptzGetToursAsync);
 }
 
-bool QnRemotePtzController::getActiveObject(QnPtzObject *activeObject) {
-    return false; // TODO: #Elric #PTZ
+bool QnRemotePtzController::getActiveObject(QnPtzObject *) {
+    RUN_COMMAND(Qn::GetActiveObjectPtzCommand, QVariant(), ptzGetActiveObjectAsync);
 }
 
 bool QnRemotePtzController::updateHomeObject(const QnPtzObject &homePosition) {

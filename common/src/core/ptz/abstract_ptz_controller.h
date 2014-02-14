@@ -283,7 +283,7 @@ public:
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data);
 
 signals:
-    void capabilitiesChanged();
+    void changed(Qn::PtzDataFields fields);
     void finished(Qn::PtzCommand command, const QVariant &data);
 
 protected:

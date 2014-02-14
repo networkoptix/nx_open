@@ -22,6 +22,7 @@
 #include <core/ptz/preset_ptz_controller.h>
 #include <core/ptz/tour_ptz_controller.h>
 #include <core/ptz/fallback_ptz_controller.h>
+#include <core/ptz/activity_ptz_controller.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -56,8 +57,46 @@
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
 
-
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
+
+namespace {
+    bool getPtzObjectName(const QnPtzControllerPtr &controller, const QnPtzObject &object, QString *name) {
+        switch(object.type) {
+        case Qn::PresetPtzObject: {
+            QnPtzPresetList presets;
+            if(!controller->getPresets(&presets))
+                return false;
+
+            foreach(const QnPtzPreset &preset, presets) {
+                if(preset.id == object.id) {
+                    *name = preset.name;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        case Qn::TourPtzObject: {
+            QnPtzTourList tours;
+            if(!controller->getTours(&tours))
+                return false;
+
+            foreach(const QnPtzTour &tour, tours) {
+                if(tour.id == object.id) {
+                    *name = tour.name;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        default:
+            return false;
+        }
+    }
+
+} // anonymous namespace
+
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     QnResourceWidget(context, item, parent),
@@ -101,12 +140,15 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_ptzController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
     m_ptzController.reset(new QnPresetPtzController(m_ptzController));
     m_ptzController.reset(new QnTourPtzController(m_ptzController));
-    if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera))
+    m_ptzController.reset(new QnActivityPtzController(QnActivityPtzController::Local, m_ptzController));
+    if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {
+        serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
         m_ptzController.reset(new QnFallbackPtzController(serverController, m_ptzController));
-    connect(m_ptzController.data(), SIGNAL(capabilitiesChanged()), this, SLOT(updateButtonsVisibility()));
+    }
+    connect(m_ptzController, &QnAbstractPtzController::changed, this, &QnMediaResourceWidget::at_ptzController_changed);
 
     /* Set up info updates. */
-    connect(this, SIGNAL(updateInfoTextLater()), this, SLOT(updateInfoText()), Qt::QueuedConnection);
+    connect(this, &QnMediaResourceWidget::updateInfoTextLater, this, &QnMediaResourceWidget::updateInfoText, Qt::QueuedConnection);
     updateInfoText();
 
     /* Set up buttons. */
@@ -117,7 +159,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     screenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
     screenshotButton->setToolTip(tr("Screenshot"));
     setHelpTopic(screenshotButton, Qn::MainWindow_MediaItem_Screenshot_Help);
-    connect(screenshotButton, SIGNAL(clicked()), this, SLOT(at_screenshotButton_clicked()));
+    connect(screenshotButton, &QnImageButtonWidget::clicked, this, &QnMediaResourceWidget::at_screenshotButton_clicked);
 
     QnImageButtonWidget *searchButton = new QnImageButtonWidget();
     searchButton->setIcon(qnSkin->icon("item/search.png"));
@@ -125,7 +167,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     searchButton->setProperty(Qn::NoBlockMotionSelection, true);
     searchButton->setToolTip(tr("Smart Search"));
     setHelpTopic(searchButton, Qn::MainWindow_MediaItem_SmartSearch_Help);
-    connect(searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
+    connect(searchButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_searchButton_toggled);
 
     QnImageButtonWidget *ptzButton = new QnImageButtonWidget();
     ptzButton->setIcon(qnSkin->icon("item/ptz.png"));
@@ -133,7 +175,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     ptzButton->setProperty(Qn::NoBlockMotionSelection, true);
     ptzButton->setToolTip(tr("PTZ"));
     setHelpTopic(ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
-    connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(at_ptzButton_toggled(bool)));
+    connect(ptzButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_ptzButton_toggled);
 
     QnImageButtonWidget *fishEyeButton = new QnImageButtonWidget();
     fishEyeButton->setIcon(qnSkin->icon("item/fisheye.png"));
@@ -142,7 +184,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     fishEyeButton->setToolTip(tr("Dewarping"));
     fishEyeButton->setChecked(item->dewarpingParams().enabled);
     setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_Dewarping_Help);
-    connect(fishEyeButton, SIGNAL(toggled(bool)), this, SLOT(at_fishEyeButton_toggled(bool)));
+    connect(fishEyeButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_fishEyeButton_toggled);
 
     QnImageButtonWidget *zoomWindowButton = new QnImageButtonWidget();
     zoomWindowButton->setIcon(qnSkin->icon("item/zoom_window.png"));
@@ -150,7 +192,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     zoomWindowButton->setProperty(Qn::NoBlockMotionSelection, true);
     zoomWindowButton->setToolTip(tr("Create Zoom Window"));
     setHelpTopic(zoomWindowButton, Qn::MainWindow_MediaItem_ZoomWindows_Help);
-    connect(zoomWindowButton, SIGNAL(toggled(bool)), this, SLOT(at_zoomWindowButton_toggled(bool)));
+    connect(zoomWindowButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_zoomWindowButton_toggled);
 
     QnImageButtonWidget *enhancementButton = new QnImageButtonWidget();
     enhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
@@ -159,7 +201,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     enhancementButton->setToolTip(tr("Image Enhancement"));
     enhancementButton->setChecked(item->imageEnhancement().enabled);
     setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
-    connect(enhancementButton, SIGNAL(toggled(bool)), this, SLOT(at_histogramButton_toggled(bool)));
+    connect(enhancementButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_histogramButton_toggled);
 
     buttonBar()->addButton(ScreenshotButton,    screenshotButton);
     buttonBar()->addButton(MotionSearchButton,  searchButton);
@@ -171,20 +213,20 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     if(m_camera) {
         QTimer *timer = new QTimer(this);
 
-        connect(timer,              SIGNAL(timeout()),                                                  this,   SLOT(updateIconButton()));
-        connect(context->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),            this,   SLOT(updateIconButton()));
-        connect(m_camera.data(),    SIGNAL(statusChanged(const QnResourcePtr &)),                       this,   SLOT(updateIconButton()));
-        connect(m_camera.data(),    SIGNAL(scheduleTasksChanged(const QnSecurityCamResourcePtr &)),     this,   SLOT(updateIconButton()));
+        connect(timer,              &QTimer::timeout,                                   this,   &QnMediaResourceWidget::updateIconButton);
+        connect(context->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::offsetsChanged, this, &QnMediaResourceWidget::updateIconButton);
+        connect(m_camera.data(),    &QnResource::statusChanged,                         this,   &QnMediaResourceWidget::updateIconButton);
+        connect(m_camera.data(),    &QnSecurityCamResource::scheduleTasksChanged,       this,   &QnMediaResourceWidget::updateIconButton);
         timer->start(1000 * 60); /* Update icon button every minute. */
 
-        connect(statusOverlayWidget(), SIGNAL(diagnosticsRequested()),                                  this,   SLOT(at_statusOverlayWidget_diagnosticsRequested()));
+        connect(statusOverlayWidget(), &QnStatusOverlayWidget::diagnosticsRequested,    this,   &QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested);
         statusOverlayWidget()->setDiagnosticsVisible(true);
     }
 
-    connect(resource()->toResource(), SIGNAL(resourceChanged(QnResourcePtr)), this, SLOT(updateButtonsVisibility()));
+    connect(resource()->toResource(), &QnResource::resourceChanged, this, &QnMediaResourceWidget::updateButtonsVisibility);
 
-    connect(this, SIGNAL(zoomRectChanged()), this, SLOT(at_zoomRectChanged()));
-    connect(context->instance<QnWorkbenchRenderWatcher>(), SIGNAL(displayingChanged(QnResourceWidget *)), this, SLOT(at_renderWatcher_displayingChanged(QnResourceWidget *)));
+    connect(this, &QnResourceWidget::zoomRectChanged, this, &QnMediaResourceWidget::at_zoomRectChanged);
+    connect(context->instance<QnWorkbenchRenderWatcher>(), &QnWorkbenchRenderWatcher::widgetChanged, this, &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
 
     at_camDisplay_liveChanged();
     at_ptzButton_toggled(ptzButton->isChecked());
@@ -794,6 +836,16 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         .arg(timeString);
 }
 
+QString QnMediaResourceWidget::calculateTitleText() const {
+    QnPtzObject activeObject;
+    QString activeObjectName;
+    if(m_ptzController->getActiveObject(&activeObject) && getPtzObjectName(m_ptzController, activeObject, &activeObjectName)) {
+        return tr("%1 (%2)").arg(m_resource->toResourcePtr()->getName()).arg(activeObjectName);
+    } else {
+        return m_resource->toResourcePtr()->getName();
+    }
+}
+
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility();
 
@@ -802,7 +854,11 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 
     bool rgbImage = false;
     QString url = resource()->toResource()->getUrl().toLower();
-    if(((resource()->toResource()->flags() & QnResource::still_image)) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
+
+    // TODO: #Elric totally evil. Button availability should be based on actual 
+    // colorspace value, better via some function in enhancement implementation,
+    // and not on file extension checks!
+    if(((resource()->toResource()->flags() & QnResource::still_image)) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg"))) 
         rgbImage = true;
     if (!rgbImage)
         result |= EnhancementButton;
@@ -979,7 +1035,7 @@ void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) {
     setImageEnhancement(params);
 }
 
-void QnMediaResourceWidget::at_renderWatcher_displayingChanged(QnResourceWidget *widget) {
+void QnMediaResourceWidget::at_renderWatcher_widgetChanged(QnResourceWidget *widget) {
     if(widget == this)
         updateRendererEnabled();
 }
@@ -994,6 +1050,13 @@ void QnMediaResourceWidget::at_zoomRectChanged() {
         m_fisheyePtz->setEnabled(true);
         m_fisheyePtz->moveToRect(zoomRect());
     }*/
+}
+
+void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields) {
+    if(fields & Qn::CapabilitiesPtzField)
+        updateButtonsVisibility();
+    if(fields & Qn::ActiveObjectPtzField)
+        updateTitleText();
 }
 
 void QnMediaResourceWidget::updateDewarpingParams() {
