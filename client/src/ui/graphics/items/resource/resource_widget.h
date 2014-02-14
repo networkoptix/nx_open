@@ -54,7 +54,7 @@ public:
         DisplayButtons              = 0x0008,    /**< Whether item buttons are to be displayed. */
         DisplayMotionSensitivity    = 0x0010,    /**< Whether a grid with motion region sensitivity is to be displayed. */
         DisplayCrosshair            = 0x0020,    /**< Whether PTZ crosshair is to be displayed. */
-        DisplayInfo                 = 0x0040,    /** Whether info panel is to be displayed. */
+        DisplayInfo                 = 0x0040,    /**< Whether info panel is to be displayed. */
 
         ControlPtz                  = 0x0100,    /**< Whether PTZ state can be controlled with mouse. */
         ControlZoomWindow           = 0x0200,    /**< Whether zoom windows can be created by dragging the mouse. */
