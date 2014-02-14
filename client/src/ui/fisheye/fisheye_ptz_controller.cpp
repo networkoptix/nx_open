@@ -284,3 +284,33 @@ bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D
 
     return true;
 }
+
+QVector3D QnFisheyePtzController::positionFromRect(const QnMediaDewarpingParams &dewarpingParams, const QRectF &rect) {
+    QPointF center = rect.center() - QPointF(0.5, 0.5);
+
+    qreal fov = rect.width() * M_PI;
+
+    if (dewarpingParams.viewMode == QnMediaDewarpingParams::Horizontal) {
+        qreal x = center.x() * M_PI;
+        qreal y = -center.y() * M_PI;
+        return QVector3D(qRadiansToDegrees(x), qRadiansToDegrees(y), qRadiansToDegrees(fov));
+    } else {
+        qreal x = -(std::atan2(center.y(), center.x()) - M_PI / 2.0);
+        qreal y = 0;
+        
+        if (qAbs(center.x()) > qAbs(center.y())) {
+            if (center.x() > 0)
+                y = (1.0 - rect.right()) *  M_PI;
+            else
+                y = rect.left() * M_PI;
+        } else {
+            if (center.y() > 0)
+                y = (1.0 - rect.bottom()) * M_PI;
+            else
+                y = rect.top() * M_PI;
+        }
+
+        return QVector3D(qRadiansToDegrees(x), qRadiansToDegrees(y), qRadiansToDegrees(fov));
+    }
+}
+
