@@ -182,25 +182,60 @@ bool QnPtzTourListModel::setData(const QModelIndex &index, const QVariant &value
     if (!index.isValid())
         return false;
 
-    if (role != Qt::EditRole)
-        return false;
-
-    if (index.column() != NameColumn)
-        return false;
-
     RowData data = rowData(index.row());
 
+    if (role == Qt::CheckStateRole && index.column() == HomeColumn) {
+        switch (data.rowType) {
+        case QnPtzTourListModel::PresetRow:
+            m_homePosition = data.presetModel.preset.id;
+            break;
+        case QnPtzTourListModel::TourRow:
+            m_homePosition = data.tourModel.tour.id;
+            break;
+        default:
+            return false;
+        }
 
-    QnPtzTourItemModel &model = m_tours[index.row()];
-    if (model.tour.name == value.toString())
-        return false;
+        emit dataChanged(index.sibling(0, HomeColumn), index.sibling(rowCount() - 1, HomeColumn));
+        return true;
+    } 
+    
+    if (role == Qt::EditRole && index.column() == NameColumn) {
+        QString newName = value.toString().trimmed();
+        if (newName.isEmpty())
+            return false;
 
-    if (value.toString().trimmed().isEmpty())
-        return false;
+        switch (data.rowType) {
+        case QnPtzTourListModel::PresetRow: 
+            {
+                int idx = qnIndexOf(m_presets, [&](const QnPtzPresetItemModel &model) {return data.presetModel.preset.id == model.preset.id; });
+                if (idx < 0)
+                    return false;
+                QnPtzPresetItemModel &model = m_presets[idx];
+                if (model.preset.name == newName)
+                    return false;
+                model.preset.name = value.toString();
+                model.modified = true;
+                return true;
+            }
+        case QnPtzTourListModel::TourRow:
+            {
+                int idx = qnIndexOf(m_tours, [&](const QnPtzTourItemModel &model) {return data.tourModel.tour.id == model.tour.id; });
+                if (idx < 0)
+                    return false;
+                QnPtzTourItemModel &model = m_tours[idx];
+                if (model.tour.name == newName)
+                    return false;
+                model.tour.name = value.toString();
+                model.modified = true;
+                return true;
+            }
+        default:
+            return false;
+        }
+    }
 
-    model.tour.name = value.toString();
-    model.modified = true;
-    return true;
+    return false;
 }
 
 QVariant QnPtzTourListModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -244,7 +279,7 @@ Qt::ItemFlags QnPtzTourListModel::flags(const QModelIndex &index) const {
         flags |= Qt::ItemIsEditable;
         break;
     case HomeColumn:
-        flags |= (Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
+        flags |= Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
         break;
     default:
         break;
@@ -351,15 +386,16 @@ QVariant QnPtzTourListModel::presetData(const QnPtzPresetItemModel &presetModel,
             return presetModel.preset.name;
         case HotkeyColumn:
             return tr("0");
-        case HomeColumn:
-            return m_homePosition == presetModel.preset.id;
         case DetailsColumn:
             return QVariant();
         default:
             break;
         }
         return QVariant();
-
+    case Qt::CheckStateRole:
+        if (column == HomeColumn)
+            return m_homePosition == presetModel.preset.id;
+        break;
     case Qn::PtzPresetRole:
         return QVariant::fromValue<QnPtzPreset>(presetModel.preset);
     case Qn::ValidRole:
@@ -387,8 +423,6 @@ QVariant QnPtzTourListModel::tourData(const QnPtzTourItemModel &tourModel, int c
             return tourModel.tour.name;
         case HotkeyColumn:
             return tr("0");
-        case HomeColumn:
-            return m_homePosition == tourModel.tour.id;
         case DetailsColumn:
             if (tourIsValid(tourModel)) {
                 qint64 time = estimatedTimeSecs(tourModel.tour);
@@ -403,6 +437,10 @@ QVariant QnPtzTourListModel::tourData(const QnPtzTourItemModel &tourModel, int c
     case Qt::BackgroundRole:
         if (!tourIsValid(tourModel))
             return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
+        break;
+    case Qt::CheckStateRole:
+        if (column == HomeColumn)
+            return m_homePosition == tourModel.tour.id;
         break;
     case Qn::PtzTourRole:
         return QVariant::fromValue<QnPtzTour>(tourModel.tour);
