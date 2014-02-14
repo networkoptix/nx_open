@@ -182,6 +182,8 @@ bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
 }
 
 void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant &data) {
+    Qn::PtzDataFields changedFields = Qn::NoPtzFields;
+
     if(data.isValid()) {
         QMutexLocker locker(&m_mutex);
         switch (command) {
@@ -189,77 +191,82 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
             if(m_data.fields & Qn::PresetsPtzField) {
                 QnPtzPreset preset = data.value<QnPtzPreset>();
                 int idx = qnIndexOf(m_data.presets, [&](const QnPtzPreset &old) { return old.id == preset.id; });
-                if (idx < 0)
+                if (idx < 0) {
                     m_data.presets.append(preset);
-                else
+                    changedFields |= Qn::PresetsPtzField;
+                } else if(m_data.presets[idx] != preset) {
                     m_data.presets[idx] = preset;
+                    changedFields |= Qn::PresetsPtzField;
+                }
             }
             break;
         case Qn::UpdatePresetPtzCommand:
             if(m_data.fields & Qn::PresetsPtzField) {
                 QnPtzPreset preset = data.value<QnPtzPreset>();
                 int idx = qnIndexOf(m_data.presets, [&](const QnPtzPreset &old) { return old.id == preset.id; });
-                if (idx >= 0)
+                if (idx >= 0 && m_data.presets[idx] != preset) {
                     m_data.presets[idx] = preset;
+                    changedFields |= Qn::PresetsPtzField;
+                }
             }
             break;
         case Qn::RemovePresetPtzCommand:
             if(m_data.fields & Qn::PresetsPtzField) {
                 QString presetId = data.value<QString>();
                 int idx = qnIndexOf(m_data.presets, [&](const QnPtzPreset &old) { return old.id == presetId; });
-                if (idx >= 0)
+                if (idx >= 0) {
                     m_data.presets.removeAt(idx);
+                    changedFields |= Qn::PresetsPtzField;
+                }
             }
             break;
         case Qn::CreateTourPtzCommand:
             if(m_data.fields & Qn::ToursPtzField) {
                 QnPtzTour tour = data.value<QnPtzTour>();
                 int idx = qnIndexOf(m_data.tours, [&](const QnPtzTour &old) { return old.id == tour.id; });
-                if (idx < 0)
+                if (idx < 0) {
                     m_data.tours.append(tour);
-                else
+                    changedFields |= Qn::ToursPtzField;
+                } else if(m_data.tours[idx] != tour) {
                     m_data.tours[idx] = tour;
+                    changedFields |= Qn::ToursPtzField;
+                }
             }
             break;
         case Qn::RemoveTourPtzCommand:
             if(m_data.fields & Qn::PresetsPtzField) {
                 QString tourId = data.value<QString>();
                 int idx = qnIndexOf(m_data.tours, [&](const QnPtzTour &old) { return old.id == tourId; });
-                if (idx >= 0)
+                if (idx >= 0) {
                     m_data.tours.removeAt(idx);
+                    changedFields |= Qn::ToursPtzField;
+                }
             }
             break;
         case Qn::GetDeviceLimitsPtzCommand:
-            m_data.fields |= Qn::DeviceLimitsPtzField;
-            m_data.deviceLimits = data.value<QnPtzLimits>();
+            changedFields |= updateCacheLocked(Qn::DeviceLimitsPtzField, &QnPtzData::deviceLimits, data);
             break;
         case Qn::GetLogicalLimitsPtzCommand:
-            m_data.fields |= Qn::LogicalLimitsPtzField;
-            m_data.logicalLimits = data.value<QnPtzLimits>();
+            changedFields |= updateCacheLocked(Qn::LogicalLimitsPtzField, &QnPtzData::logicalLimits, data);
             break;
         case Qn::GetFlipPtzCommand:
-            m_data.fields |= Qn::FlipPtzField;
-            m_data.flip = data.value<Qt::Orientations>();
+            changedFields |= updateCacheLocked(Qn::FlipPtzField, &QnPtzData::flip, data);
             break;
         case Qn::GetPresetsPtzCommand:
-            m_data.fields |= Qn::PresetsPtzField;
-            m_data.presets = data.value<QnPtzPresetList>();
+            changedFields |= updateCacheLocked(Qn::PresetsPtzField, &QnPtzData::presets, data);
             break;
         case Qn::GetToursPtzCommand:
-            m_data.fields |= Qn::ToursPtzField;
-            m_data.tours = data.value<QnPtzTourList>();
+            changedFields |= updateCacheLocked(Qn::ToursPtzField, &QnPtzData::tours, data);
             break;
         case Qn::GetActiveObjectPtzCommand:
-            m_data.fields |= Qn::ActiveObjectPtzField;
-            m_data.activeObject = data.value<QnPtzObject>();
+            changedFields |= updateCacheLocked(Qn::ActiveObjectPtzField, &QnPtzData::activeObject, data);
             break;
         case Qn::UpdateHomeObjectPtzCommand:
         case Qn::GetHomeObjectPtzCommand:
-            m_data.fields |= Qn::HomeObjectPtzField;
-            m_data.homeObject = data.value<QnPtzObject>();
+            changedFields |= updateCacheLocked(Qn::HomeObjectPtzField, &QnPtzData::homeObject, data);
             break;
         case Qn::GetDataPtzCommand:
-            updateCacheLocked(data.value<QnPtzData>());
+            changedFields |= updateCacheLocked(data.value<QnPtzData>());
             break;
         default:
             break;
@@ -267,6 +274,9 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
     }
 
     base_type::baseFinished(command, data);
+
+    if(changedFields != Qn::NoPtzFields)
+        emit changed(changedFields);
 }
 
 bool QnCachingPtzController::initialize() {
@@ -279,21 +289,39 @@ bool QnCachingPtzController::initialize() {
     return getData(Qn::AllPtzFields, &data);
 }
 
-void QnCachingPtzController::updateCacheLocked(const QnPtzData &data) {
+template<class T>
+Qn::PtzDataFields QnCachingPtzController::updateCacheLocked(Qn::PtzDataField field, T QnPtzData::*member, const T &value) {
+    if((m_data.fields & field) != field || m_data.*member != value) {
+        m_data.fields |= field;
+        m_data.*member = value;
+        return field;
+    } else {
+        return Qn::NoPtzFields;
+    }
+}
+
+template<class T>
+Qn::PtzDataFields QnCachingPtzController::updateCacheLocked(Qn::PtzDataField field, T QnPtzData::*member, const QVariant &value) {
+    return updateCacheLocked(field, member, value.value<T>());
+}
+
+Qn::PtzDataFields QnCachingPtzController::updateCacheLocked(const QnPtzData &data) {
     if(data.query == Qn::AllPtzFields)
         m_initialized = true;
 
     /* We don't cache position as it doesn't make much sense. */
     Qn::PtzDataFields fields = data.fields & ~(Qn::DevicePositionPtzField | Qn::LogicalPositionPtzField);
     if(fields == Qn::NoPtzFields)
-        return;
+        return Qn::NoPtzFields;
+    Qn::PtzDataFields changedFields = Qn::NoPtzFields;
 
-    if(fields & Qn::DeviceLimitsPtzField)   m_data.deviceLimits = data.deviceLimits;
-    if(fields & Qn::LogicalLimitsPtzField)  m_data.logicalLimits = data.logicalLimits;
-    if(fields & Qn::FlipPtzField)           m_data.flip = data.flip;
-    if(fields & Qn::PresetsPtzField)        m_data.presets = data.presets;
-    if(fields & Qn::ToursPtzField)          m_data.tours = data.tours;
-    if(fields & Qn::ActiveObjectPtzField)   m_data.activeObject = data.activeObject;
-    if(fields & Qn::HomeObjectPtzField)     m_data.homeObject = data.homeObject;
-    m_data.fields |= fields;
+    if(fields & Qn::DeviceLimitsPtzField)   changedFields |= updateCacheLocked(Qn::DeviceLimitsPtzField,    &QnPtzData::deviceLimits,   data.deviceLimits);
+    if(fields & Qn::LogicalLimitsPtzField)  changedFields |= updateCacheLocked(Qn::LogicalLimitsPtzField,   &QnPtzData::logicalLimits,  data.logicalLimits);
+    if(fields & Qn::FlipPtzField)           changedFields |= updateCacheLocked(Qn::FlipPtzField,            &QnPtzData::flip,           data.flip);
+    if(fields & Qn::PresetsPtzField)        changedFields |= updateCacheLocked(Qn::PresetsPtzField,         &QnPtzData::presets,        data.presets);
+    if(fields & Qn::ToursPtzField)          changedFields |= updateCacheLocked(Qn::ToursPtzField,           &QnPtzData::tours,          data.tours);
+    if(fields & Qn::ActiveObjectPtzField)   changedFields |= updateCacheLocked(Qn::ActiveObjectPtzField,    &QnPtzData::activeObject,   data.activeObject);
+    if(fields & Qn::HomeObjectPtzField)     changedFields |= updateCacheLocked(Qn::HomeObjectPtzField,      &QnPtzData::homeObject,     data.homeObject);
+    
+    return changedFields;
 }
