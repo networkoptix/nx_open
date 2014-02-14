@@ -159,7 +159,7 @@
                             <executable>${virtualenv.dir}/virtualenv</executable>
                             <arguments>
                                 <argument>--python</argument>
-                                <argument>${python.dir}/python</argument>
+                                <argument>${init.python.dir}/python</argument>
                                 <argument>./${arch}/python</argument>
                             </arguments>
                             <workingDirectory>${project.build.directory}</workingDirectory>     

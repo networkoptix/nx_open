@@ -37,7 +37,6 @@
         <buildNumber>0</buildNumber>
         <beta>true</beta>
 
-        <python.dir>${project.build.directory}/${arch}/python/scripts</python.dir>
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
@@ -284,6 +283,7 @@
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
                 <virtualenv.dir>${init.python.dir}/scripts</virtualenv.dir>
+	        <python.dir>${project.build.directory}/${arch}/python/scripts</python.dir>                
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
                 <compiler>msvc2012u3</compiler>
@@ -306,6 +306,7 @@
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
                 <init.python.dir>${environment.dir}/python/bin</init.python.dir>				
+	        <python.dir>${project.build.directory}/${arch}/python/bin</python.dir>
                 <virtualenv.dir>/usr/local/bin</virtualenv.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
                 <common.platform>unix</common.platform>
