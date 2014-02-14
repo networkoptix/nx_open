@@ -29,6 +29,8 @@ public:
 
     QnPtzControllerPtr controller() const;
     void setController(const QnPtzControllerPtr &controller);
+
+    Q_SLOT void saveChanges();
 protected:
     virtual void loadData(const QnPtzData &data) = 0;
     virtual void saveData() = 0;
@@ -44,7 +46,6 @@ protected:
 
     Qn::PtzCapabilities capabilities();
 
-    Q_SLOT void saveChanges();
 signals:
     void synchronizeLater(const QString &title);
     void synchronized();
