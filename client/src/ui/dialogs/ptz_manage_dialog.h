@@ -11,15 +11,15 @@ namespace Ui {
     class PtzToursDialog;
 }
 
-class QnPtzTourListModel;
+class QnPtzManageModel;
 
-class QnPtzToursDialog : public QnAbstractPtzDialog, public Singleton<QnPtzToursDialog> {
+class QnPtzManageDialog : public QnAbstractPtzDialog, public Singleton<QnPtzManageDialog> {
     Q_OBJECT
 
     typedef QnAbstractPtzDialog base_type;
 public:
-    explicit QnPtzToursDialog(QWidget *parent = 0);
-    ~QnPtzToursDialog();
+    explicit QnPtzManageDialog(QWidget *parent = 0);
+    ~QnPtzManageDialog();
 
     QnResourcePtr resource() const;
     void setResource(const QnResourcePtr &resource);
@@ -46,7 +46,7 @@ private:
     bool saveTours();
 
     QScopedPointer<Ui::PtzToursDialog> ui;
-    QnPtzTourListModel *m_model;
+    QnPtzManageModel *m_model;
     QnResourcePtr m_resource;
 
     QString m_currentTourId;

@@ -1,4 +1,4 @@
-#include "ptz_tours_dialog.h"
+#include "ptz_manage_dialog.h"
 #include "ui_ptz_tours_dialog.h"
 
 #include <QtCore/QUuid>
@@ -15,7 +15,8 @@
 #include <core/ptz/ptz_tour.h>
 
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
-#include <ui/models/ptz_tour_list_model.h>
+#include <ui/common/ui_resource_name.h>
+#include <ui/models/ptz_manage_model.h>
 #include <ui/widgets/ptz_tour_widget.h>
 
 #include <utils/common/event_processors.h>
@@ -36,20 +37,20 @@ protected:
     }
 
     virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
-        if (index.column() == QnPtzTourListModel::HotkeyColumn)
+        if (index.column() == QnPtzManageModel::HotkeyColumn)
             return hotkeyDelegate.createEditor(parent, option, index);
         return base_type::createEditor(parent, option, index);
     }
 
     virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override {
-        if (index.column() == QnPtzTourListModel::HotkeyColumn)
+        if (index.column() == QnPtzManageModel::HotkeyColumn)
             hotkeyDelegate.setEditorData(editor, index);
         else
             base_type::setEditorData(editor, index);
     }
 
     virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
-        if (index.column() == QnPtzTourListModel::HotkeyColumn)
+        if (index.column() == QnPtzManageModel::HotkeyColumn)
             hotkeyDelegate.setModelData(editor, model, index);
         else
             base_type::setModelData(editor, model, index);
@@ -59,10 +60,10 @@ private:
     QnPtzPresetHotkeyItemDelegate hotkeyDelegate;
 };
 
-QnPtzToursDialog::QnPtzToursDialog(QWidget *parent) :
+QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     base_type(parent),
     ui(new Ui::PtzToursDialog),
-    m_model(new QnPtzTourListModel(this))
+    m_model(new QnPtzManageModel(this))
 {
     ui->setupUi(this);
 
@@ -72,8 +73,8 @@ QnPtzToursDialog::QnPtzToursDialog(QWidget *parent) :
     ui->tableView->resizeColumnsToContents();
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourListModel::NameColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourListModel::DetailsColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzManageModel::NameColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzManageModel::DetailsColumn, QHeaderView::Interactive);
 
     ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
     ui->tableView->installEventFilter(this);
@@ -90,20 +91,20 @@ QnPtzToursDialog::QnPtzToursDialog(QWidget *parent) :
     ui->tableView->viewport()->installEventFilter(resizeSignalizer);
     connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_tableViewport_resizeEvent()), Qt::QueuedConnection);
 
-    connect(m_model, &QnPtzTourListModel::presetsChanged, ui->tourEditWidget, &QnPtzTourWidget::setPresets);
+    connect(m_model, &QnPtzManageModel::presetsChanged, ui->tourEditWidget, &QnPtzTourWidget::setPresets);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
 
-    connect(ui->savePositionButton, &QPushButton::clicked,  this,   &QnPtzToursDialog::at_savePositionButton_clicked);
-    connect(ui->goToPositionButton, &QPushButton::clicked,  this,   &QnPtzToursDialog::at_goToPositionButton_clicked);
-    connect(ui->addTourButton,      &QPushButton::clicked,  this,   &QnPtzToursDialog::at_addTourButton_clicked);
-    connect(ui->startTourButton,    &QPushButton::clicked,  this,   &QnPtzToursDialog::at_startTourButton_clicked);
-    connect(ui->deleteButton,       &QPushButton::clicked,  this,   &QnPtzToursDialog::at_deleteButton_clicked);
+    connect(ui->savePositionButton, &QPushButton::clicked,  this,   &QnPtzManageDialog::at_savePositionButton_clicked);
+    connect(ui->goToPositionButton, &QPushButton::clicked,  this,   &QnPtzManageDialog::at_goToPositionButton_clicked);
+    connect(ui->addTourButton,      &QPushButton::clicked,  this,   &QnPtzManageDialog::at_addTourButton_clicked);
+    connect(ui->startTourButton,    &QPushButton::clicked,  this,   &QnPtzManageDialog::at_startTourButton_clicked);
+    connect(ui->deleteButton,       &QPushButton::clicked,  this,   &QnPtzManageDialog::at_deleteButton_clicked);
 }
 
-QnPtzToursDialog::~QnPtzToursDialog() {
+QnPtzManageDialog::~QnPtzManageDialog() {
 }
 
-void QnPtzToursDialog::keyPressEvent(QKeyEvent *event) {
+void QnPtzManageDialog::keyPressEvent(QKeyEvent *event) {
     switch (event->key()) {
     case Qt::Key_Enter:
     case Qt::Key_Return:
@@ -116,7 +117,7 @@ void QnPtzToursDialog::keyPressEvent(QKeyEvent *event) {
 }
 
 
-void QnPtzToursDialog::loadData(const QnPtzData &data) {
+void QnPtzManageDialog::loadData(const QnPtzData &data) {
     // ui->tableView->setColumnHidden(QnPtzTourListModel::HomeColumn, !(capabilities() & Qn::HomePtzCapability)); //TODO: uncomment
     m_model->setTours(data.tours);
     m_model->setPresets(data.presets);
@@ -135,7 +136,7 @@ void QnPtzToursDialog::loadData(const QnPtzData &data) {
     ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
 }
 
-bool QnPtzToursDialog::savePresets() {
+bool QnPtzManageDialog::savePresets() {
     bool result = true;
 
     foreach (const QnPtzPresetItemModel &model, m_model->presetModels()) {
@@ -152,7 +153,7 @@ bool QnPtzToursDialog::savePresets() {
     return result;
 }
 
-bool QnPtzToursDialog::saveTours() {
+bool QnPtzManageDialog::saveTours() {
     bool result = true;
 
     foreach (const QnPtzTourItemModel &model, m_model->tourModels()) {
@@ -172,7 +173,7 @@ bool QnPtzToursDialog::saveTours() {
     return result;
 }
 
-void QnPtzToursDialog::saveData() {
+void QnPtzManageDialog::saveData() {
     savePresets();
     saveTours();
     if (m_resource) {
@@ -181,23 +182,23 @@ void QnPtzToursDialog::saveData() {
     }
 }
 
-Qn::PtzDataFields QnPtzToursDialog::requiredFields() const {
+Qn::PtzDataFields QnPtzManageDialog::requiredFields() const {
     return Qn::PresetsPtzField | Qn::ToursPtzField | Qn::HomeObjectPtzField;
 }
 
-void QnPtzToursDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
+void QnPtzManageDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
     Q_UNUSED(previous)
 
     QString currentPresetId;
     m_currentTourId = QString();
     if (current.isValid()) {
-        QnPtzTourListModel::RowData data = m_model->rowData(current.row());
+        QnPtzManageModel::RowData data = m_model->rowData(current.row());
 
         switch (data.rowType) {
-        case QnPtzTourListModel::PresetRow:
+        case QnPtzManageModel::PresetRow:
             currentPresetId = data.presetModel.preset.id;
             break;
-        case QnPtzTourListModel::TourRow:
+        case QnPtzManageModel::TourRow:
             ui->tourEditWidget->setSpots(data.tourModel.tour.spots);
             m_currentTourId = data.tourModel.tour.id;
             break;
@@ -212,19 +213,19 @@ void QnPtzToursDialog::at_tableView_currentRowChanged(const QModelIndex &current
         : ui->tourPage);
 }
 
-void QnPtzToursDialog::at_savePositionButton_clicked() {
+void QnPtzManageDialog::at_savePositionButton_clicked() {
 
 }
 
-void QnPtzToursDialog::at_goToPositionButton_clicked() {
+void QnPtzManageDialog::at_goToPositionButton_clicked() {
 
 }
 
-void QnPtzToursDialog::at_startTourButton_clicked() {
+void QnPtzManageDialog::at_startTourButton_clicked() {
 
 }
 
-void QnPtzToursDialog::at_addTourButton_clicked() {
+void QnPtzManageDialog::at_addTourButton_clicked() {
     //bool wasEmpty = m_model->rowCount() == 0;
     m_model->addTour();
     QModelIndex index = m_model->index(m_model->rowCount() - 1, 0);
@@ -240,17 +241,17 @@ void QnPtzToursDialog::at_addTourButton_clicked() {
     ui->tableView->selectionModel()->select(index, QItemSelectionModel::Select);
 }
 
-void QnPtzToursDialog::at_deleteButton_clicked() {
+void QnPtzManageDialog::at_deleteButton_clicked() {
     QModelIndex index = ui->tableView->selectionModel()->currentIndex();
     if (!index.isValid())
         return;
 
-    QnPtzTourListModel::RowData data = m_model->rowData(index.row());
+    QnPtzManageModel::RowData data = m_model->rowData(index.row());
     switch (data.rowType) {
-    case QnPtzTourListModel::PresetRow:
+    case QnPtzManageModel::PresetRow:
         m_model->removePreset(data.presetModel.preset.id);
         break;
-    case QnPtzTourListModel::TourRow:
+    case QnPtzManageModel::TourRow:
         m_model->removeTour(data.tourModel.tour.id);
         break;
     default:
@@ -258,7 +259,7 @@ void QnPtzToursDialog::at_deleteButton_clicked() {
     }
 }
 
-void QnPtzToursDialog::at_tableViewport_resizeEvent() {
+void QnPtzManageDialog::at_tableViewport_resizeEvent() {
     QModelIndexList selectedIndices = ui->tableView->selectionModel()->selectedRows();
     if(selectedIndices.isEmpty())
         return;
@@ -266,18 +267,19 @@ void QnPtzToursDialog::at_tableViewport_resizeEvent() {
     ui->tableView->scrollTo(selectedIndices.front());
 }
 
-void QnPtzToursDialog::at_tourSpotsChanged(const QnPtzTourSpotList &spots) {
+void QnPtzManageDialog::at_tourSpotsChanged(const QnPtzTourSpotList &spots) {
     if (m_currentTourId.isEmpty())
         return;
     m_model->updateTourSpots(m_currentTourId, spots);
 }
 
-QnResourcePtr QnPtzToursDialog::resource() const {
+QnResourcePtr QnPtzManageDialog::resource() const {
     return m_resource;
 }
 
-void QnPtzToursDialog::setResource(const QnResourcePtr &resource) {
+void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     if (m_resource == resource)
         return;
     m_resource = resource;
+    setWindowTitle(tr("Manage PTZ for %1").arg(getResourceName(m_resource)));
 }

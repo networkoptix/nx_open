@@ -21,7 +21,7 @@
 #include <ui/actions/action_target_provider.h>
 
 #include <ui/dialogs/ptz_preset_dialog.h>
-#include <ui/dialogs/ptz_tours_dialog.h>
+#include <ui/dialogs/ptz_manage_dialog.h>
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
@@ -86,11 +86,11 @@ QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent):
     connect(action(Qn::DebugCalibratePtzAction),                &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered);
     connect(action(Qn::DebugGetPtzPositionAction),              &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered);
 
-    QnPtzToursDialog *manageDialog = new QnPtzToursDialog(mainWindow()); //initializing instance of a singleton
+    QnPtzManageDialog *manageDialog = new QnPtzManageDialog(mainWindow()); //initializing instance of a singleton
 }
 
 QnWorkbenchPtzHandler::~QnWorkbenchPtzHandler() {
-    delete QnPtzToursDialog::instance();
+    delete QnPtzManageDialog::instance();
 }
 
 void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
@@ -195,7 +195,7 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
     if(!widget || !widget->ptzController() || !widget->ptzController()->getTours(&tours))
         return;
 
-    QnPtzToursDialog* dialog = QnPtzToursDialog::instance();
+    QnPtzManageDialog* dialog = QnPtzManageDialog::instance();
     assert(dialog);
 
     dialog->setController(widget->ptzController());

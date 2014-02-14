@@ -1,27 +1,27 @@
-#include "ptz_tour_list_model.h"
+#include "ptz_manage_model.h"
 
 #include <common/common_globals.h>
 
 #include <ui/style/globals.h>
 #include <utils/common/container.h>
 
-QnPtzTourListModel::QnPtzTourListModel(QObject *parent) :
+QnPtzManageModel::QnPtzManageModel(QObject *parent) :
     base_type(parent)
 {
 }
 
-QnPtzTourListModel::~QnPtzTourListModel() {
+QnPtzManageModel::~QnPtzManageModel() {
 }
 
-const QList<QnPtzTourItemModel>& QnPtzTourListModel::tourModels() const {
+const QList<QnPtzTourItemModel>& QnPtzManageModel::tourModels() const {
     return m_tours;
 }
 
-const QStringList& QnPtzTourListModel::removedTours() const {
+const QStringList& QnPtzManageModel::removedTours() const {
     return m_removedTours;
 }
 
-void QnPtzTourListModel::setTours(const QnPtzTourList &tours) {
+void QnPtzManageModel::setTours(const QnPtzTourList &tours) {
     beginResetModel();
     m_tours.clear();
     foreach (const QnPtzTour &tour, tours)
@@ -29,7 +29,7 @@ void QnPtzTourListModel::setTours(const QnPtzTourList &tours) {
     endResetModel();
 }
 
-void QnPtzTourListModel::addTour() {
+void QnPtzManageModel::addTour() {
     int firstRow = rowCount();
     int lastRow = firstRow;
     if (m_tours.isEmpty())
@@ -40,7 +40,7 @@ void QnPtzTourListModel::addTour() {
     endInsertRows();
 }
 
-void QnPtzTourListModel::removeTour(const QString &id) {
+void QnPtzManageModel::removeTour(const QString &id) {
     int idx = qnIndexOf(m_tours, [&](const QnPtzTourItemModel &model) { return model.tour.id == id; });
     if (idx < 0)
         return;
@@ -59,20 +59,20 @@ void QnPtzTourListModel::removeTour(const QString &id) {
     endRemoveRows();
 }
 
-const QStringList & QnPtzTourListModel::removedPresets() const {
+const QStringList & QnPtzManageModel::removedPresets() const {
     return m_removedPresets;
 }
 
-const QList<QnPtzPresetItemModel> & QnPtzTourListModel::presetModels() const {
+const QList<QnPtzPresetItemModel> & QnPtzManageModel::presetModels() const {
     return m_presets;
 }
 
 
-const QnPtzPresetList& QnPtzTourListModel::presets() const {
+const QnPtzPresetList& QnPtzManageModel::presets() const {
     return m_ptzPresetsCache;
 }
 
-void QnPtzTourListModel::setPresets(const QnPtzPresetList &presets) {
+void QnPtzManageModel::setPresets(const QnPtzPresetList &presets) {
     if (m_ptzPresetsCache == presets)
         return;
 
@@ -86,7 +86,7 @@ void QnPtzTourListModel::setPresets(const QnPtzPresetList &presets) {
     updatePresetsCache();
 }
 
-void QnPtzTourListModel::addPreset() {
+void QnPtzManageModel::addPreset() {
     int firstRow = m_presets.size();
     if (firstRow > 0)
         firstRow++;  //space for caption
@@ -102,7 +102,7 @@ void QnPtzTourListModel::addPreset() {
     updatePresetsCache();
 }
 
-void QnPtzTourListModel::removePreset(const QString &id) {
+void QnPtzManageModel::removePreset(const QString &id) {
     int idx = qnIndexOf(m_presets, [&](const QnPtzPresetItemModel &model) { return model.preset.id == id; });
     if (idx < 0)
         return;
@@ -119,29 +119,29 @@ void QnPtzTourListModel::removePreset(const QString &id) {
     updatePresetsCache();
 }
 
-void QnPtzTourListModel::setHotkeys(const QnPtzHotkeyHash &hotkeys) {
+void QnPtzManageModel::setHotkeys(const QnPtzHotkeyHash &hotkeys) {
     if (m_hotkeys == hotkeys)
         return;
     m_hotkeys = hotkeys;
     emit dataChanged(index(0, HotkeyColumn), index(rowCount(), HotkeyColumn));
 }
 
-const QnPtzHotkeyHash& QnPtzTourListModel::hotkeys() const {
+const QnPtzHotkeyHash& QnPtzManageModel::hotkeys() const {
     return m_hotkeys;
 }
 
-const QString QnPtzTourListModel::homePosition() const {
+const QString QnPtzManageModel::homePosition() const {
     return m_homePosition;
 }
 
-void QnPtzTourListModel::setHomePosition(const QString &homePosition) {
+void QnPtzManageModel::setHomePosition(const QString &homePosition) {
     if (m_homePosition == homePosition)
         return;
     m_homePosition = homePosition;
     emit dataChanged(index(0, HomeColumn), index(rowCount(), HomeColumn));
 }
 
-int QnPtzTourListModel::rowCount(const QModelIndex &parent) const {
+int QnPtzManageModel::rowCount(const QModelIndex &parent) const {
     if(parent.isValid())
         return 0;
 
@@ -156,13 +156,13 @@ int QnPtzTourListModel::rowCount(const QModelIndex &parent) const {
     return presets + tours;
 }
 
-int QnPtzTourListModel::columnCount(const QModelIndex &parent) const {
+int QnPtzManageModel::columnCount(const QModelIndex &parent) const {
     if(parent.isValid())
         return 0;
     return ColumnCount;
 }
 
-bool QnPtzTourListModel::removeRows(int row, int count, const QModelIndex &parent) {
+bool QnPtzManageModel::removeRows(int row, int count, const QModelIndex &parent) {
     if(parent.isValid() || row < 0 || count < 1 || row + count > m_tours.size())
         return false;
 
@@ -179,19 +179,19 @@ bool QnPtzTourListModel::removeRows(int row, int count, const QModelIndex &paren
     return true;
 }
 
-QVariant QnPtzTourListModel::data(const QModelIndex &index, int role) const {
+QVariant QnPtzManageModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
     
     RowData data = rowData(index.row());
 
     switch (data.rowType) {
-    case QnPtzTourListModel::PresetTitleRow:
-    case QnPtzTourListModel::TourTitleRow:
+    case QnPtzManageModel::PresetTitleRow:
+    case QnPtzManageModel::TourTitleRow:
         return titleData(data.rowType, index.column(), role);
-    case QnPtzTourListModel::PresetRow:
+    case QnPtzManageModel::PresetRow:
         return presetData(data.presetModel, index.column(), role);
-    case QnPtzTourListModel::TourRow:
+    case QnPtzManageModel::TourRow:
         return tourData(data.tourModel, index.column(), role);
     default:
         break;
@@ -199,7 +199,7 @@ QVariant QnPtzTourListModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
-bool QnPtzTourListModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if (!index.isValid())
         return false;
 
@@ -208,10 +208,10 @@ bool QnPtzTourListModel::setData(const QModelIndex &index, const QVariant &value
     if (role == Qt::CheckStateRole && index.column() == HomeColumn) {
         if (value.toInt() == Qt::Checked) {
             switch (data.rowType) {
-            case QnPtzTourListModel::PresetRow:
+            case QnPtzManageModel::PresetRow:
                 m_homePosition = data.presetModel.preset.id;
                 break;
-            case QnPtzTourListModel::TourRow:
+            case QnPtzManageModel::TourRow:
                 m_homePosition = data.tourModel.tour.id;
                 break;
             default:
@@ -233,10 +233,10 @@ bool QnPtzTourListModel::setData(const QModelIndex &index, const QVariant &value
 
         QString id;
         switch (data.rowType) {
-        case QnPtzTourListModel::PresetRow:
+        case QnPtzManageModel::PresetRow:
             id = data.presetModel.preset.id;
             break;
-        case QnPtzTourListModel::TourRow:
+        case QnPtzManageModel::TourRow:
             id = data.tourModel.tour.id;
             break;
         default:
@@ -272,7 +272,7 @@ bool QnPtzTourListModel::setData(const QModelIndex &index, const QVariant &value
             return false;
 
         switch (data.rowType) {
-        case QnPtzTourListModel::PresetRow: 
+        case QnPtzManageModel::PresetRow: 
             {
                 int idx = qnIndexOf(m_presets, [&](const QnPtzPresetItemModel &model) {return data.presetModel.preset.id == model.preset.id; });
                 if (idx < 0)
@@ -284,7 +284,7 @@ bool QnPtzTourListModel::setData(const QModelIndex &index, const QVariant &value
                 model.modified = true;
                 return true;
             }
-        case QnPtzTourListModel::TourRow:
+        case QnPtzManageModel::TourRow:
             {
                 int idx = qnIndexOf(m_tours, [&](const QnPtzTourItemModel &model) {return data.tourModel.tour.id == model.tour.id; });
                 if (idx < 0)
@@ -304,7 +304,7 @@ bool QnPtzTourListModel::setData(const QModelIndex &index, const QVariant &value
     return false;
 }
 
-QVariant QnPtzTourListModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant QnPtzManageModel::headerData(int section, Qt::Orientation orientation, int role) const {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         switch (section) {
         case ModifiedColumn:
@@ -324,7 +324,7 @@ QVariant QnPtzTourListModel::headerData(int section, Qt::Orientation orientation
     return base_type::headerData(section, orientation, role);
 }
 
-Qt::ItemFlags QnPtzTourListModel::flags(const QModelIndex &index) const {
+Qt::ItemFlags QnPtzManageModel::flags(const QModelIndex &index) const {
     Qt::ItemFlags flags = Qt::ItemNeverHasChildren;
 
     if (!index.isValid()) 
@@ -356,7 +356,7 @@ Qt::ItemFlags QnPtzTourListModel::flags(const QModelIndex &index) const {
     return flags;
 }
 
-void QnPtzTourListModel::updateTourSpots(const QString tourId, const QnPtzTourSpotList &spots) {
+void QnPtzManageModel::updateTourSpots(const QString tourId, const QnPtzTourSpotList &spots) {
     int idx = qnIndexOf(m_tours, [&](const QnPtzTourItemModel &model) { return model.tour.id == tourId; });
     if (idx < 0)
         return;
@@ -371,14 +371,14 @@ void QnPtzTourListModel::updateTourSpots(const QString tourId, const QnPtzTourSp
     emit dataChanged(index(row, 0), index(row, ColumnCount));
 }
 
-qint64 QnPtzTourListModel::estimatedTimeSecs(const QnPtzTour &tour) const {
+qint64 QnPtzManageModel::estimatedTimeSecs(const QnPtzTour &tour) const {
     qint64 result = 0;
     foreach (const QnPtzTourSpot &spot, tour.spots)
         result += spot.stayTime;
     return result / 1000;
 }
 
-QnPtzTourListModel::RowData QnPtzTourListModel::rowData(int row) const {
+QnPtzManageModel::RowData QnPtzManageModel::rowData(int row) const {
     RowData result;
 
     int presetOffset = 0;
@@ -412,7 +412,7 @@ QnPtzTourListModel::RowData QnPtzTourListModel::rowData(int row) const {
     return result;
 }
 
-QVariant QnPtzTourListModel::titleData(RowType rowType,  int column, int role) const {
+QVariant QnPtzManageModel::titleData(RowType rowType,  int column, int role) const {
     switch(role) {
     case Qt::DisplayRole:
     case Qt::ToolTipRole:
@@ -438,7 +438,7 @@ QVariant QnPtzTourListModel::titleData(RowType rowType,  int column, int role) c
     return QVariant();
 }
 
-QVariant QnPtzTourListModel::presetData(const QnPtzPresetItemModel &presetModel, int column, int role) const {
+QVariant QnPtzManageModel::presetData(const QnPtzPresetItemModel &presetModel, int column, int role) const {
     switch(role) {
     case Qt::DisplayRole:
     case Qt::ToolTipRole:
@@ -480,7 +480,7 @@ QVariant QnPtzTourListModel::presetData(const QnPtzPresetItemModel &presetModel,
     return QVariant();
 }
 
-QVariant QnPtzTourListModel::tourData(const QnPtzTourItemModel &tourModel, int column,  int role) const {
+QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int column,  int role) const {
     switch(role) {
     case Qt::DisplayRole:
     case Qt::ToolTipRole:
@@ -528,11 +528,11 @@ QVariant QnPtzTourListModel::tourData(const QnPtzTourItemModel &tourModel, int c
     return QVariant();
 }
 
-bool QnPtzTourListModel::tourIsValid(const QnPtzTourItemModel &tourModel) const {
+bool QnPtzManageModel::tourIsValid(const QnPtzTourItemModel &tourModel) const {
     return tourModel.tour.isValid(m_ptzPresetsCache);
 }
 
-void QnPtzTourListModel::updatePresetsCache() {
+void QnPtzManageModel::updatePresetsCache() {
     m_ptzPresetsCache.clear();
     foreach (const QnPtzPresetItemModel &model, m_presets) {
         m_ptzPresetsCache << model.preset;

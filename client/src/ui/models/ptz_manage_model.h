@@ -4,7 +4,6 @@
 #include <QtCore/QAbstractTableModel>
 #include <QtCore/QUuid>
 
-//#include <core/ptz/ptz_fwd.h>
 #include <core/ptz/ptz_tour.h>
 #include <core/ptz/ptz_preset.h>
 
@@ -53,7 +52,7 @@ struct QnPtzPresetItemModel {
     bool modified;
 };
 
-class QnPtzTourListModel : public QAbstractTableModel
+class QnPtzManageModel : public QAbstractTableModel
 {
     Q_OBJECT
 
@@ -86,8 +85,8 @@ public:
         RowData(): rowType(InvalidRow) {}
     };
 
-    explicit QnPtzTourListModel(QObject *parent = 0);
-    virtual ~QnPtzTourListModel();
+    explicit QnPtzManageModel(QObject *parent = 0);
+    virtual ~QnPtzManageModel();
 
     const QList<QnPtzTourItemModel> &tourModels() const;
     const QStringList &removedTours() const;
