@@ -1011,7 +1011,9 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
 void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
     QnItemDewarpingParams params = item()->dewarpingParams();
     params.enabled = checked;
-    item()->setDewarpingParams(params);
+    item()->setDewarpingParams(params); // TODO: #Elric #PTZ move to instrument
+
+    setOption(DisplayDewarped, checked);
 
     if(!checked) {
         /* Stop all ptz activity. */
@@ -1045,11 +1047,9 @@ void QnMediaResourceWidget::at_zoomRectChanged() {
     updateAspectRatio();
     updateIconButton();
 
-    // TODO: #PTZ? Do we allow zoom boxes on fisheye cams? I don't think we should, at least at this point.
-    /*if (m_fisheyePtz) {
-        m_fisheyePtz->setEnabled(true);
-        m_fisheyePtz->moveToRect(zoomRect());
-    }*/
+    // TODO: #PTZ
+    if (options() & DisplayDewarped)
+        m_ptzController->absoluteMove(Qn::LogicalPtzCoordinateSpace, QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()), 2.0);
 }
 
 void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields) {
@@ -1073,8 +1073,9 @@ void QnMediaResourceWidget::updateFisheye() {
 
     bool fisheyeEnabled = enabled && m_dewarpingParams.enabled;
 
-    setOption(ControlPtz, fisheyeEnabled);
-    setOption(DisplayCrosshair, fisheyeEnabled);
+    setOption(ControlPtz, fisheyeEnabled && zoomRect().isEmpty());
+    setOption(DisplayCrosshair, fisheyeEnabled && zoomRect().isEmpty());
+    setOption(DisplayDewarped, fisheyeEnabled);
     if (fisheyeEnabled && buttonBar()->button(FishEyeButton))
         buttonBar()->button(FishEyeButton)->setChecked(fisheyeEnabled);
     if(enabled)
