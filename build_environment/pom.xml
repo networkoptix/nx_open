@@ -101,6 +101,9 @@
                                 <exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="true">
                                     <arg line="${arch} ${toolchain.version}"/> 
                                 </exec>
+                                <exec dir="${project.build.directory}" executable="${virtualenv.dir}/virtualenv" failifexecutionfails="true">
+                                    <arg line="--python ${init.python.dir}/python.exe ${arch}"/> 
+                                </exec>                                
                             </target>
                             <skip>${rsync.skip}</skip>
                         </configuration>
@@ -112,6 +115,57 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
                 <executions>        
+                    <execution>
+                        <id>virtualenv-x86</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${virtualenv.dir}/virtualenv</executable>
+                            <arguments>
+                                <argument>--python</argument>
+                                <argument>${environment.dir}/python/x86/python.exe</argument>
+                                <argument>./x86/python</argument>
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>    
+                            <skip>${unix}</skip>                            
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>virtualenv-x64</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${virtualenv.dir}/virtualenv</executable>
+                            <arguments>
+                                <argument>--python</argument>
+                                <argument>${environment.dir}/python/x64/python.exe</argument>
+                                <argument>./x64/python</argument>
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                            <skip>${unix}</skip>
+                        </configuration>
+                    </execution>       
+                    <execution>
+                        <id>virtualenv-unix</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${virtualenv.dir}/virtualenv</executable>
+                            <arguments>
+                                <argument>--python</argument>
+                                <argument>${python.dir}/python.exe</argument>
+                                <argument>./${arch}/python</argument>
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                            <skip>${windows}</skip>
+                        </configuration>
+                    </execution>                      
                     <execution>
                         <id>copy-additional-resources</id>
                         <phase>process-sources</phase>
@@ -134,9 +188,9 @@
                         </goals>
                         <configuration>
                             <environmentVariables>
-                                <PATH>${environment.dir}/python/x86;${environment.dir}/python/x86/Scripts;${env.PATH}</PATH>
+                                <PATH>${project.build.directory}/x86/python/Scripts;${env.PATH}</PATH>
                             </environmentVariables>      
-                            <executable>${environment.dir}/python/x86/python.exe</executable>
+                            <executable>${project.build.directory}/x86/python/Scripts/python.exe</executable>
                             <arguments>
                                 <argument>install_packages.py</argument>
                             </arguments>
@@ -151,9 +205,9 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${environment.dir}/python/x64/python.exe</executable>
+                            <executable>${python.dir}/python.exe</executable>
                             <environmentVariables>
-                                <PATH>${environment.dir}/python/x86;${environment.dir}/python/x86/Scripts;${env.PATH}</PATH>
+                                <PATH>${project.build.directory}/x86/python/Scripts;${env.PATH}</PATH>
                             </environmentVariables>      
                             <arguments>
                                 <argument>install_packages.py</argument>
