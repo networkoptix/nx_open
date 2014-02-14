@@ -31,6 +31,8 @@ protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
+    void updateUi();
+
     void at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
 
     void at_savePositionButton_clicked();

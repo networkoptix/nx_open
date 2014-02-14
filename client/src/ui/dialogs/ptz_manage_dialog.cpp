@@ -372,3 +372,16 @@ void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     m_resource = resource;
     setWindowTitle(tr("Manage PTZ for %1").arg(getResourceName(m_resource)));
 }
+
+//TODO: call and connect in required places
+void QnPtzManageDialog::updateUi() {
+    ui->addTourButton->setEnabled(!m_model->presetModels().isEmpty());
+
+    QnPtzManageModel::RowType selectedRow = QnPtzManageModel::InvalidRow;
+    QModelIndex index = ui->tableView->selectionModel()->currentIndex();
+    if (index.isValid())
+        selectedRow = m_model->rowData(index.row()).rowType;
+
+    ui->deleteButton->setEnabled(selectedRow == QnPtzManageModel::PresetRow || selectedRow == QnPtzManageModel::TourRow);
+    //TODO: add other buttons;
+}
