@@ -1073,8 +1073,8 @@ void QnMediaResourceWidget::updateFisheye() {
 
     bool fisheyeEnabled = enabled && m_dewarpingParams.enabled;
 
-    setOption(ControlPtz, fisheyeEnabled);
-    setOption(DisplayCrosshair, fisheyeEnabled);
+    setOption(ControlPtz, fisheyeEnabled && zoomRect().isEmpty());
+    setOption(DisplayCrosshair, fisheyeEnabled && zoomRect().isEmpty());
     setOption(DisplayDewarped, fisheyeEnabled);
     if (fisheyeEnabled && buttonBar()->button(FishEyeButton))
         buttonBar()->button(FishEyeButton)->setChecked(fisheyeEnabled);
