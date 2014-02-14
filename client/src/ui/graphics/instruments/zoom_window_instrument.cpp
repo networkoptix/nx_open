@@ -8,8 +8,6 @@
 #include <utils/common/hash.h>
 #include <utils/common/util.h>
 
-#include <core/ptz/abstract_ptz_controller.h>
-
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/animation/opacity_animator.h>
@@ -480,15 +478,12 @@ void ZoomWindowInstrument::updateOverlayMode(QnMediaResourceWidget *widget) {
     bool interactive = false;
     if(widget == display()->widget(Qn::ZoomedRole)) {
         /* Leave invisible. */
-    } else if(widget->options() & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity)) {
+    } else if(widget->options() & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity | QnResourceWidget::DisplayDewarped)) {
         /* Leave invisible. */
     } else if(widget->options() & QnResourceWidget::DisplayCrosshair) {
-        if(widget->ptzController()->getCapabilities() & Qn::VirtualPtzCapability) {
-            /* Leave invisible. */
-        } else {
-            opacity = 0.4;
-            interactive = false;
-        }
+        /* PTZ mode - transparent, non-interactive. */
+        opacity = 0.3;
+        interactive = false; 
     } else {
         opacity = 1.0;
         interactive = true;
