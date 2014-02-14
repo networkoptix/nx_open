@@ -346,7 +346,7 @@
                 <compiler>gcc</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <arch>x64</arch>
-                <qt.spec>macx-clang-libc++</qt.spec>
+                <qt.spec>macx-clang</qt.spec>
                 <qtlib11>PrintSupport</qtlib11>
             </properties>
             <modules>

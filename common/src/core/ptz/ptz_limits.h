@@ -1,12 +1,16 @@
 #ifndef QN_PTZ_LIMITS_H
 #define QN_PTZ_LIMITS_H
 
+#include <boost/operators.hpp>
+
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtGui/QVector3D>
 
-struct QnPtzLimits {
+struct QnPtzLimits: public boost::equality_comparable1<QnPtzLimits> {
     QnPtzLimits(): minPan(0), maxPan(360), minTilt(-90), maxTilt(90), minFov(0), maxFov(360) {}
+
+    friend bool operator==(const QnPtzLimits &l, const QnPtzLimits &r);
 
     qreal minPan;
     qreal maxPan;

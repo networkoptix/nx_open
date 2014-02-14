@@ -646,11 +646,6 @@ namespace Qn {
         PtzGoToPresetAction,
 
         /**
-         * Opens PTZ preset management dialog.
-         */
-        PtzManagePresetsAction,
-
-        /**
          * Starts given PTZ tour.
          *
          * Parameters:
@@ -661,7 +656,7 @@ namespace Qn {
         /**
          * Opens PTZ tours management dialog.
          */
-        PtzManageToursAction,
+        PtzManageAction,
 
         /**
          * Starts fisheye calibration for the given widget.

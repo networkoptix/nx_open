@@ -36,7 +36,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnGlobalSettings::at_resourcePool_resourceAdded);
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
     foreach(const QnResourcePtr &resource, qnResPool->getResources())
-        at_resourcePool_resourceRemoved(resource);
+        at_resourcePool_resourceAdded(resource);
 }
 
 QnGlobalSettings::~QnGlobalSettings() {

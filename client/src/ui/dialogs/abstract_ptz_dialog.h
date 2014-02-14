@@ -22,10 +22,15 @@ class QnAbstractPtzDialog : public QnButtonBoxDialog {
 
     typedef QnButtonBoxDialog base_type;
 public:
-    QnAbstractPtzDialog(const QnPtzControllerPtr &controller, QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnAbstractPtzDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnAbstractPtzDialog();
 
     virtual void accept() override;
+
+    QnPtzControllerPtr controller() const;
+    void setController(const QnPtzControllerPtr &controller);
+
+    Q_SLOT void saveChanges();
 protected:
     virtual void loadData(const QnPtzData &data) = 0;
     virtual void saveData() = 0;
@@ -38,6 +43,9 @@ protected:
 
     bool createTour(const QnPtzTour &tour);
     bool removeTour(const QString &tourId);
+
+    Qn::PtzCapabilities capabilities();
+
 signals:
     void synchronizeLater(const QString &title);
     void synchronized();
