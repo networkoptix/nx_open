@@ -37,6 +37,7 @@
         <buildNumber>0</buildNumber>
         <beta>true</beta>
 
+        <python.dir>${project.build.directory}/${arch}/python/scripts</python.dir>
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
@@ -206,7 +207,7 @@
                     <family>Windows</family>
                 </os>
                 <property>
-                    <name>!quicksync</name>
+                    <name>quicksync</name>
                     <value>true</value>
                 </property>
             </activation>
@@ -281,7 +282,8 @@
             </modules>
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
-                <python.dir>${environment.dir}/python/${arch}</python.dir>	
+                <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
+                <virtualenv.dir>${init.python.dir}/scripts</virtualenv.dir>
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
                 <compiler>msvc2012u3</compiler>
@@ -303,7 +305,8 @@
             </activation>
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
-                <python.dir>${environment.dir}/python/bin</python.dir>		
+                <init.python.dir>${environment.dir}/python/bin</init.python.dir>				
+                <virtualenv.dir>/usr/local/bin</virtualenv.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
@@ -339,11 +342,8 @@
                     <family>mac</family>
                 </os> 
             </activation>
-            <properties>
-                <environment.dir>${env.environment}</environment.dir>
-                <python.dir>${env.environment}/python/bin/</python.dir>				
+            <properties>		
                 <platform>macosx</platform>
-                <compiler>gcc</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <arch>x64</arch>
                 <qt.spec>macx-clang</qt.spec>
