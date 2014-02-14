@@ -87,6 +87,7 @@ QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent):
     connect(action(Qn::DebugGetPtzPositionAction),              &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered);
 
     QnPtzManageDialog *manageDialog = new QnPtzManageDialog(mainWindow()); //initializing instance of a singleton
+    Q_UNUSED(manageDialog)
 }
 
 QnWorkbenchPtzHandler::~QnWorkbenchPtzHandler() {

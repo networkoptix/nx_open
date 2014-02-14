@@ -38,18 +38,23 @@ struct QnPtzPresetItemModel {
 
     QnPtzPresetItemModel(const QnPtzPreset& preset):
         preset(preset),
-        modified(false)
+        modified(false),
+        local(false)
     {}
 
     QnPtzPresetItemModel(const QString &name):
         preset(QUuid::createUuid().toString(), name),
-        modified(true)
+        modified(true),
+        local(true)
     {}
 
     QnPtzPreset preset;
 
     /** Preset name is modified. */
     bool modified;
+
+    /** Preset is just created locally, does not exists on server. */
+    bool local;
 };
 
 class QnPtzManageModel : public QAbstractTableModel
@@ -121,6 +126,8 @@ public:
 
     Q_SLOT void updateTourSpots(const QString tourId, const QnPtzTourSpotList &spots);
 
+    bool synchronized() const;
+    Q_SLOT void setSynchronized();
 signals:
     void presetsChanged(const QnPtzPresetList &presets);
 private:

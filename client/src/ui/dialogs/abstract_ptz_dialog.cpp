@@ -23,8 +23,7 @@ QnAbstractPtzDialog::~QnAbstractPtzDialog() {
 }
 
 void QnAbstractPtzDialog::accept() {
-    saveData();
-    synchronize(tr("Saving..."));
+    saveChanges();
     base_type::accept();
 }
 
@@ -181,4 +180,9 @@ Qn::PtzCapabilities QnAbstractPtzDialog::capabilities() {
         return Qn::NoPtzCapabilities;
 
     return m_controller->getCapabilities();
+}
+
+void QnAbstractPtzDialog::saveChanges() {
+    saveData();
+    synchronize(tr("Saving..."));
 }

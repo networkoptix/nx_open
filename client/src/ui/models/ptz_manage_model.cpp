@@ -36,7 +36,7 @@ void QnPtzManageModel::addTour() {
         lastRow++;
 
     beginInsertRows(QModelIndex(), firstRow, lastRow);
-    m_tours << QnPtzTourItemModel(tr("New Tour %1").arg(m_tours.size() + 1));
+    m_tours << tr("New Tour %1").arg(m_tours.size() + 1);
     endInsertRows();
 }
 
@@ -96,7 +96,7 @@ void QnPtzManageModel::addPreset() {
         lastRow++;
 
     beginInsertRows(QModelIndex(), firstRow, lastRow);
-    m_presets << QnPtzPreset(QUuid::createUuid().toString(), tr("Position %1").arg(m_presets.size()));
+    m_presets << tr("Saved Position %1").arg(m_presets.size() + 1);
     endInsertRows();
 
     updatePresetsCache();
@@ -538,4 +538,36 @@ void QnPtzManageModel::updatePresetsCache() {
         m_ptzPresetsCache << model.preset;
     }
     emit presetsChanged(m_ptzPresetsCache);
+}
+
+bool QnPtzManageModel::synchronized() const {
+    foreach (const QnPtzPresetItemModel &model, m_presets) {
+        if (model.local || model.modified)
+            return false;
+    }
+
+    foreach (const QnPtzTourItemModel &model, m_tours) {
+        if (model.local || model.modified)
+            return false;
+    }
+
+    return true;
+}
+
+Q_SLOT void QnPtzManageModel::setSynchronized() {
+    beginResetModel();
+    auto presetIter = m_presets.begin();
+    while (presetIter != m_presets.end()) {
+        presetIter->local = false;
+        presetIter->modified = false;
+        presetIter++;
+    }
+
+    auto tourIter = m_tours.begin();
+    while (tourIter != m_tours.end()) {
+        tourIter->local = false;
+        tourIter->modified = false;
+        tourIter++;
+    }
+    endResetModel();
 }

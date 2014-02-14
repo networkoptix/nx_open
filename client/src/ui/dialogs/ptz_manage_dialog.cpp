@@ -91,7 +91,8 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     ui->tableView->viewport()->installEventFilter(resizeSignalizer);
     connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_tableViewport_resizeEvent()), Qt::QueuedConnection);
 
-    connect(m_model, &QnPtzManageModel::presetsChanged, ui->tourEditWidget, &QnPtzTourWidget::setPresets);
+    connect(m_model,    &QnPtzManageModel::presetsChanged,  ui->tourEditWidget, &QnPtzTourWidget::setPresets);
+    connect(this,       &QnAbstractPtzDialog::synchronized, m_model,            &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
 
     connect(ui->savePositionButton, &QPushButton::clicked,  this,   &QnPtzManageDialog::at_savePositionButton_clicked);
@@ -143,8 +144,10 @@ bool QnPtzManageDialog::savePresets() {
         if (!model.modified)
             continue;
 
-        QnPtzPreset updated(model.preset);
-        result &= updatePreset(updated);
+        if (model.local)
+            result &= createPreset(model.preset);
+        else
+            result &= updatePreset(model.preset);
     }
 
     foreach (const QString &id, m_model->removedPresets())
@@ -174,8 +177,11 @@ bool QnPtzManageDialog::saveTours() {
 }
 
 void QnPtzManageDialog::saveData() {
-    savePresets();
-    saveTours();
+    if (!m_model->synchronized()) {
+        savePresets();
+        saveTours();
+    }
+
     if (m_resource) {
         QnPtzHotkeysResourcePropertyAdaptor adaptor(m_resource);
         adaptor.setValue(m_model->hotkeys());
@@ -214,15 +220,80 @@ void QnPtzManageDialog::at_tableView_currentRowChanged(const QModelIndex &curren
 }
 
 void QnPtzManageDialog::at_savePositionButton_clicked() {
+    if (!m_resource || !controller())
+        return;
 
+    if(m_resource->getStatus() == QnResource::Offline || m_resource->getStatus() == QnResource::Unauthorized) {
+        QMessageBox::critical(
+            this,
+            tr("Could not get position from camera"),
+            tr("An error has occurred while trying to get current position from camera %1.\n\n"\
+            "Please wait for the camera to go online.").arg(m_resource->getName())
+            );
+        return;
+    }
+
+    m_model->addPreset();
+    saveChanges();
 }
 
 void QnPtzManageDialog::at_goToPositionButton_clicked() {
+    QModelIndex index = ui->tableView->selectionModel()->currentIndex();
+    if (!index.isValid())
+        return;
 
+    if (!m_resource || !controller())
+        return;
+
+    if(m_resource->getStatus() == QnResource::Offline || m_resource->getStatus() == QnResource::Unauthorized) {
+        QMessageBox::critical(
+            this,
+            tr("Could not set position for camera"),
+            tr("An error has occurred while trying to set current position for camera %1.\n\n"\
+            "Please wait for the camera to go online.").arg(m_resource->getName())
+            );
+        return;
+    }
+
+    QnPtzManageModel::RowData data = m_model->rowData(index.row());
+    switch (data.rowType) {
+    case QnPtzManageModel::PresetRow:
+        controller()->activatePreset(data.presetModel.preset.id, 1.0);
+        break;
+    case QnPtzManageModel::TourRow:
+        //TODO: get id of the selected spot
+        break;
+    default:
+        break;
+    }
 }
 
 void QnPtzManageDialog::at_startTourButton_clicked() {
+    QModelIndex index = ui->tableView->selectionModel()->currentIndex();
+    if (!index.isValid())
+        return;
 
+    if (!m_resource || !controller())
+        return;
+
+    if(m_resource->getStatus() == QnResource::Offline || m_resource->getStatus() == QnResource::Unauthorized) {
+        QMessageBox::critical(
+            this,
+            tr("Could not set position for camera"),
+            tr("An error has occurred while trying to set current position for camera %1.\n\n"\
+            "Please wait for the camera to go online.").arg(m_resource->getName())
+            );
+        return;
+    }
+
+    QnPtzManageModel::RowData data = m_model->rowData(index.row());
+    switch (data.rowType) {
+    case QnPtzManageModel::TourRow:
+        controller()->activateTour(data.tourModel.tour.id);
+        break;
+    default:
+        break;
+    }
 }
 
 void QnPtzManageDialog::at_addTourButton_clicked() {
