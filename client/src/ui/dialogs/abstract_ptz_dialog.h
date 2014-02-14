@@ -44,7 +44,7 @@ protected:
 
     Qn::PtzCapabilities capabilities();
 
-    void saveChanges();
+    Q_SLOT void saveChanges();
 signals:
     void synchronizeLater(const QString &title);
     void synchronized();

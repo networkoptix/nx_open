@@ -261,8 +261,7 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
         if (hotkey != QnPtzHotkey::NoHotkey)
             m_hotkeys[hotkey] = id;
 
-        //TODO: update only affected rows
-        //TODO: set modified flag
+        //TODO: update only affected rows? low priority
         //TODO: do not clear existing hotkey, highlight duplicated instead and do not allow to save them
         emit dataChanged(index.sibling(0, HotkeyColumn), index.sibling(rowCount() - 1, HotkeyColumn)); 
         return true;
@@ -428,9 +427,16 @@ QVariant QnPtzManageModel::titleData(RowType rowType,  int column, int role) con
         return tr("Positions");
 
     case Qt::BackgroundRole:
-        return QColor(Qt::lightGray);    //TODO: style
+        return QColor(Qt::lightGray);       //TODO: skin
     case Qt::ForegroundRole:
-        return QColor(Qt::black);
+        return QColor(Qt::black);           //TODO: skin
+    case Qt::FontRole: 
+        {
+            QFont f;
+            f.setBold(true);
+            return f;
+        }
+        
     default:
         break;
     }
@@ -504,6 +510,10 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
                 qint64 time = estimatedTimeSecs(tourModel.tour);
                 return tr("Tour time: %1").arg((time < 60) ? tr("less than a minute") : tr("about %n minutes", 0, time / 60));
             }
+                //TODO: more detailed message required: 
+            // - tour require at least two different positions
+            // - there shouldn't be two same positions in a row
+            // - etc.
             return tr("Invalid tour");
         default:
             break;
@@ -521,6 +531,7 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
     case Qn::PtzTourRole:
         return QVariant::fromValue<QnPtzTour>(tourModel.tour);
     case Qn::ValidRole:
+        //TODO: some gradations required: fully invalid, only warning (eg. hotkey duplicates)
         return tourIsValid(tourModel);
     default:
         break;
@@ -570,4 +581,7 @@ Q_SLOT void QnPtzManageModel::setSynchronized() {
         tourIter++;
     }
     endResetModel();
+
+    m_removedPresets.clear();
+    m_removedTours.clear();
 }

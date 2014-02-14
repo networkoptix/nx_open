@@ -100,6 +100,23 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(ui->addTourButton,      &QPushButton::clicked,  this,   &QnPtzManageDialog::at_addTourButton_clicked);
     connect(ui->startTourButton,    &QPushButton::clicked,  this,   &QnPtzManageDialog::at_startTourButton_clicked);
     connect(ui->deleteButton,       &QPushButton::clicked,  this,   &QnPtzManageDialog::at_deleteButton_clicked);
+
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked,   this, &QnAbstractPtzDialog::saveChanges);
+    //TODO: enable and disable various gui elements:
+    /*
+        - Apply - only if there are some changes
+        - GoToPosition - if there is a selected position or a tour spot
+        - CreateTour - if there is at least one position
+        - ActivateTour - if there is a selected tour
+    */
+
+    //TODO: implement preview receiving and displaying
+
+    //TODO: handle HomePosition
+    //TODO: handle resource switching ("Save changes? Yes/No/Cancel")
+    //TODO: Show warning if Home Position is set (ask Borya about text)
+    //TODO: handle new positions added from the context menu (controller->changed() signal, Elric will implement controller side himself)
+    //TODO: think about forced refresh in some cases or even a button - low priority
 }
 
 QnPtzManageDialog::~QnPtzManageDialog() {
@@ -320,6 +337,7 @@ void QnPtzManageDialog::at_deleteButton_clicked() {
     QnPtzManageModel::RowData data = m_model->rowData(index.row());
     switch (data.rowType) {
     case QnPtzManageModel::PresetRow:
+        //TODO: check if this preset is used in some tours and show a warning message (Ok/Cancel, optionally: "Do not show anymore", session-only)
         m_model->removePreset(data.presetModel.preset.id);
         break;
     case QnPtzManageModel::TourRow:
