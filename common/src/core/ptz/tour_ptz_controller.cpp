@@ -20,10 +20,11 @@ QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseControlle
     m_executor(new QnTourPtzExecutor(baseController))
 {
     assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
+    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
     m_executor->moveToThread(qnPtzPool->executorThread());
 
-    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
+    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChangedExternally, this, [this]{ emit changed(Qn::ToursPtzField); }, Qt::QueuedConnection);
 }
 
 QnTourPtzController::~QnTourPtzController() {
@@ -78,25 +79,33 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
     if(!getPresets(&presets))
         return false;
 
-    /* Tour is fine, save it. */
-    QMutexLocker locker(&m_mutex);
-    QnPtzTourHash records = m_adaptor->value();
-    records.insert(tour.id, tour);
+    {
+        QMutexLocker locker(&m_mutex);
+        QnPtzTourHash records = m_adaptor->value();
+        if(records.contains(tour.id) && records.value(tour.id) == tour)
+            return true; /* No need to save it. */
 
-    m_adaptor->setValue(records);
+        records.insert(tour.id, tour);
 
+        m_adaptor->setValue(records);
+    }
+
+    emit changed(Qn::ToursPtzField);
     return true;
 }
 
 bool QnTourPtzController::removeTour(const QString &tourId) {
-    QMutexLocker locker(&m_mutex);
+    {
+        QMutexLocker locker(&m_mutex);
 
-    QnPtzTourHash records = m_adaptor->value();
-    if(records.remove(tourId) == 0)
-        return false;
+        QnPtzTourHash records = m_adaptor->value();
+        if(records.remove(tourId) == 0)
+            return false;
     
-    m_adaptor->setValue(records);
+        m_adaptor->setValue(records);
+    }
     
+    emit changed(Qn::ToursPtzField);
     return true;
 }
 
