@@ -6,6 +6,8 @@
 #include <QtCore/QPointer>
 #include <QtCore/QElapsedTimer>
 
+#include <utils/common/connective.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
 
@@ -31,7 +33,7 @@ class QnImageButtonBar;
 
 class GraphicsLabel;
 
-class QnResourceWidget: public Shaded<Animated<Instrumented<GraphicsWidget> > >, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
+class QnResourceWidget: public Shaded<Animated<Instrumented<Connective<GraphicsWidget>>>>, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
@@ -42,7 +44,7 @@ class QnResourceWidget: public Shaded<Animated<Instrumented<GraphicsWidget> > >,
     Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
     Q_FLAGS(Options Option)
 
-    typedef Shaded<Animated<Instrumented<GraphicsWidget> > > base_type;
+    typedef Shaded<Animated<Instrumented<Connective<GraphicsWidget>>>> base_type;
 
 public:
     enum Option {
