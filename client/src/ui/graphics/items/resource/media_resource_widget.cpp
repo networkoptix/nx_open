@@ -1011,7 +1011,9 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
 void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
     QnItemDewarpingParams params = item()->dewarpingParams();
     params.enabled = checked;
-    item()->setDewarpingParams(params);
+    item()->setDewarpingParams(params); // TODO: #Elric #PTZ move to instrument
+
+    setOption(DisplayDewarped, checked);
 
     if(!checked) {
         /* Stop all ptz activity. */
@@ -1075,6 +1077,7 @@ void QnMediaResourceWidget::updateFisheye() {
 
     setOption(ControlPtz, fisheyeEnabled);
     setOption(DisplayCrosshair, fisheyeEnabled);
+    setOption(DisplayDewarped, fisheyeEnabled);
     if (fisheyeEnabled && buttonBar()->button(FishEyeButton))
         buttonBar()->button(FishEyeButton)->setChecked(fisheyeEnabled);
     if(enabled)
