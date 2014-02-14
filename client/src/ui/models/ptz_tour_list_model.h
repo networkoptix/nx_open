@@ -95,13 +95,18 @@ public:
     void addTour();
     void removeTour(const QString &id);
     
-    const QnPtzPresetList& presets() const;
+    const QList<QnPtzPresetItemModel> &presetModels() const;
+    const QStringList &removedPresets() const;
+    
     void setPresets(const QnPtzPresetList &presets);
     void addPreset();
     void removePreset(const QString &id);
 
     const QnPtzHotkeyHash& hotkeys() const;
     void setHotkeys(const QnPtzHotkeyHash & hotkeys);
+
+    const QString homePosition() const;
+    void setHomePosition(const QString &homePosition);
 
     RowData rowData(int row) const;
 
@@ -120,6 +125,8 @@ public:
 signals:
     void presetsChanged(const QnPtzPresetList &presets);
 private:
+    const QnPtzPresetList& presets() const;
+
     qint64 estimatedTimeSecs(const QnPtzTour &tour) const;
     bool tourIsValid(const QnPtzTourItemModel &tourModel) const;
     void updatePresetsCache();

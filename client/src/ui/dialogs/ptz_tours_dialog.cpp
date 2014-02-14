@@ -14,11 +14,12 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_tour.h>
 
+#include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
 #include <ui/models/ptz_tour_list_model.h>
 #include <ui/widgets/ptz_tour_widget.h>
 
 #include <utils/common/event_processors.h>
-#include "utils/resource_property_adaptors.h"
+#include <utils/resource_property_adaptors.h>
 
 class QnPtzToursDialogItemDelegate: public QStyledItemDelegate {
     typedef QStyledItemDelegate base_type;
@@ -33,6 +34,29 @@ protected:
             option->palette.setColor(QPalette::Highlight, clr.lighter());
         }
     }
+
+    virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        if (index.column() == QnPtzTourListModel::HotkeyColumn)
+            return hotkeyDelegate.createEditor(parent, option, index);
+        return base_type::createEditor(parent, option, index);
+    }
+
+    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override {
+        if (index.column() == QnPtzTourListModel::HotkeyColumn)
+            hotkeyDelegate.setEditorData(editor, index);
+        else
+            base_type::setEditorData(editor, index);
+    }
+
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
+        if (index.column() == QnPtzTourListModel::HotkeyColumn)
+            hotkeyDelegate.setModelData(editor, model, index);
+        else
+            base_type::setModelData(editor, model, index);
+    }
+
+private:
+    QnPtzPresetHotkeyItemDelegate hotkeyDelegate;
 };
 
 QnPtzToursDialog::QnPtzToursDialog(const QnPtzControllerPtr &controller, QWidget *parent) :
@@ -91,9 +115,12 @@ void QnPtzToursDialog::keyPressEvent(QKeyEvent *event) {
 
 void QnPtzToursDialog::loadData(const QnPtzData &data) {
     // ui->tableView->setColumnHidden(QnPtzTourListModel::HomeColumn, !(capabilities() & Qn::HomePtzCapability)); //TODO: uncomment
-
     m_model->setTours(data.tours);
     m_model->setPresets(data.presets);
+    m_model->setHomePosition(data.homeObject.id);
+
+    QnPtzHotkeysResourcePropertyAdaptor adaptor(m_resource);
+    m_model->setHotkeys(adaptor.value());
 
     if (!data.tours.isEmpty())
         ui->tableView->setCurrentIndex(ui->tableView->model()->index(0, 0));
@@ -101,6 +128,23 @@ void QnPtzToursDialog::loadData(const QnPtzData &data) {
     ui->tableView->resizeColumnsToContents();
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
     ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
+}
+
+bool QnPtzToursDialog::savePresets() {
+    bool result = true;
+
+    foreach (const QnPtzPresetItemModel &model, m_model->presetModels()) {
+        if (!model.modified)
+            continue;
+
+        QnPtzPreset updated(model.preset);
+        result &= updatePreset(updated);
+    }
+
+    foreach (const QString &id, m_model->removedPresets())
+        result &= removePreset(id);
+
+    return result;
 }
 
 bool QnPtzToursDialog::saveTours() {
@@ -124,11 +168,14 @@ bool QnPtzToursDialog::saveTours() {
 }
 
 void QnPtzToursDialog::saveData() {
+    savePresets();
     saveTours();
+    QnPtzHotkeysResourcePropertyAdaptor adaptor(m_resource);
+    adaptor.setValue(m_model->hotkeys());
 }
 
 Qn::PtzDataFields QnPtzToursDialog::requiredFields() const {
-    return Qn::PresetsPtzField | Qn::ToursPtzField;
+    return Qn::PresetsPtzField | Qn::ToursPtzField | Qn::HomeObjectPtzField;
 }
 
 void QnPtzToursDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
@@ -206,15 +253,12 @@ void QnPtzToursDialog::at_tourSpotsChanged(const QnPtzTourSpotList &spots) {
     m_model->updateTourSpots(m_currentTourId, spots);
 }
 
-QnVirtualCameraResourcePtr QnPtzToursDialog::camera() const {
-    return m_camera;
+QnResourcePtr QnPtzToursDialog::resource() const {
+    return m_resource;
 }
 
-void QnPtzToursDialog::setCamera(const QnVirtualCameraResourcePtr &camera) {
-    if (m_camera == camera)
+void QnPtzToursDialog::setResource(const QnResourcePtr &resource) {
+    if (m_resource == resource)
         return;
-    m_camera = camera;
-    
-    QnPtzHotkeysResourcePropertyAdaptor adaptor(m_camera);
-    m_model->setHotkeys(adaptor.value());
+    m_resource = resource;
 }

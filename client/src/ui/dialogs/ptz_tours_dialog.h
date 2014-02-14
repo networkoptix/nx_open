@@ -20,8 +20,8 @@ public:
     explicit QnPtzToursDialog(const QnPtzControllerPtr &controller, QWidget *parent = 0);
     ~QnPtzToursDialog();
 
-    QnVirtualCameraResourcePtr camera() const;
-    void setCamera(const QnVirtualCameraResourcePtr &camera);
+    QnResourcePtr resource() const;
+    void setResource(const QnResourcePtr &resource);
 protected:
     virtual void loadData(const QnPtzData &data) override;
     virtual void saveData() override;
@@ -37,11 +37,12 @@ private slots:
     void at_tableViewport_resizeEvent();
     void at_tourSpotsChanged(const QnPtzTourSpotList &spots);
 private:
+    bool savePresets();
     bool saveTours();
 
     QScopedPointer<Ui::PtzToursDialog> ui;
     QnPtzTourListModel *m_model;
-    QnVirtualCameraResourcePtr m_camera;
+    QnResourcePtr m_resource;
 
     QString m_currentTourId;
 };

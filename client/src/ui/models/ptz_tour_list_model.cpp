@@ -59,6 +59,15 @@ void QnPtzTourListModel::removeTour(const QString &id) {
     endRemoveRows();
 }
 
+const QStringList & QnPtzTourListModel::removedPresets() const {
+    return m_removedPresets;
+}
+
+const QList<QnPtzPresetItemModel> & QnPtzTourListModel::presetModels() const {
+    return m_presets;
+}
+
+
 const QnPtzPresetList& QnPtzTourListModel::presets() const {
     return m_ptzPresetsCache;
 }
@@ -111,14 +120,26 @@ void QnPtzTourListModel::removePreset(const QString &id) {
 }
 
 void QnPtzTourListModel::setHotkeys(const QnPtzHotkeyHash &hotkeys) {
+    if (m_hotkeys == hotkeys)
+        return;
     m_hotkeys = hotkeys;
-    //TODO: compare and update model
+    emit dataChanged(index(0, HotkeyColumn), index(rowCount(), HotkeyColumn));
 }
 
 const QnPtzHotkeyHash& QnPtzTourListModel::hotkeys() const {
     return m_hotkeys;
 }
 
+const QString QnPtzTourListModel::homePosition() const {
+    return m_homePosition;
+}
+
+void QnPtzTourListModel::setHomePosition(const QString &homePosition) {
+    if (m_homePosition == homePosition)
+        return;
+    m_homePosition = homePosition;
+    emit dataChanged(index(0, HomeColumn), index(rowCount(), HomeColumn));
+}
 
 int QnPtzTourListModel::rowCount(const QModelIndex &parent) const {
     if(parent.isValid())
@@ -202,9 +223,50 @@ bool QnPtzTourListModel::setData(const QModelIndex &index, const QVariant &value
 
         emit dataChanged(index.sibling(0, HomeColumn), index.sibling(rowCount() - 1, HomeColumn));
         return true;
-    } 
-    
-    if (role == Qt::EditRole && index.column() == NameColumn) {
+
+    } else if (role == Qt::EditRole && index.column() == HotkeyColumn) {
+
+        bool ok = false;
+        int hotkey = value.toInt(&ok);
+        if(!ok || hotkey > 9)
+            return false;
+
+        QString id;
+        switch (data.rowType) {
+        case QnPtzTourListModel::PresetRow:
+            id = data.presetModel.preset.id;
+            break;
+        case QnPtzTourListModel::TourRow:
+            id = data.tourModel.tour.id;
+            break;
+        default:
+            return false;
+        }
+
+        // hotkey that was assigned to this preset
+        int oldHotkey = m_hotkeys.key(id, QnPtzHotkey::NoHotkey);
+        if (oldHotkey == hotkey)
+            return false;
+
+        // preset that is assigned to this hotkey
+        QString existing;
+        if (hotkey != QnPtzHotkey::NoHotkey)
+            existing = m_hotkeys[hotkey];
+
+        // set old hotkey to an existing preset (or empty)
+        if (oldHotkey != QnPtzHotkey::NoHotkey)
+            m_hotkeys[oldHotkey] = existing;
+
+        // set updated hotkey
+        if (hotkey != QnPtzHotkey::NoHotkey)
+            m_hotkeys[hotkey] = id;
+
+        //TODO: update only affected rows
+        //TODO: set modified flag
+        //TODO: do not clear existing hotkey, highlight duplicated instead and do not allow to save them
+        emit dataChanged(index.sibling(0, HotkeyColumn), index.sibling(rowCount() - 1, HotkeyColumn)); 
+        return true;
+    } else if (role == Qt::EditRole && index.column() == NameColumn) {
         QString newName = value.toString().trimmed();
         if (newName.isEmpty())
             return false;
@@ -390,8 +452,11 @@ QVariant QnPtzTourListModel::presetData(const QnPtzPresetItemModel &presetModel,
             return presetModel.modified ? QLatin1String("*") : QString();
         case NameColumn:
             return presetModel.preset.name;
-        case HotkeyColumn:
-            return tr("0");
+        case HotkeyColumn: 
+            {
+                int hotkey = m_hotkeys.key(presetModel.preset.id, QnPtzHotkey::NoHotkey);
+                return hotkey < 0 ? tr("None") : QString::number(hotkey);
+            }
         case DetailsColumn:
             return QVariant();
         default:
@@ -430,7 +495,10 @@ QVariant QnPtzTourListModel::tourData(const QnPtzTourItemModel &tourModel, int c
         case NameColumn:
             return tourModel.tour.name;
         case HotkeyColumn:
-            return tr("0");
+            {
+                int hotkey = m_hotkeys.key(tourModel.tour.id, QnPtzHotkey::NoHotkey);
+                return hotkey < 0 ? tr("None") : QString::number(hotkey);
+            }
         case DetailsColumn:
             if (tourIsValid(tourModel)) {
                 qint64 time = estimatedTimeSecs(tourModel.tour);
