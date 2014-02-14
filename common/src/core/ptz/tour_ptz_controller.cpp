@@ -74,22 +74,15 @@ bool QnTourPtzController::activatePreset(const QString &presetId, qreal speed) {
 }
 
 bool QnTourPtzController::createTour(const QnPtzTour &tour) {
-    return createTourInternal(tour);
-}
-
-bool QnTourPtzController::createTourInternal(QnPtzTour tour) {
     QnPtzPresetList presets;
     if(!getPresets(&presets))
         return false;
-
-    /* Not so important so fix and continue. */
-    tour.optimize();
 
     /* Tour is fine, save it. */
     QMutexLocker locker(&m_mutex);
     QnPtzTourHash records = m_adaptor->value();
     records.insert(tour.id, tour);
-    
+
     m_adaptor->setValue(records);
 
     return true;
