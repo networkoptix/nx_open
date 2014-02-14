@@ -17,7 +17,7 @@ bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) 
     data->fields = Qn::NoPtzFields;
     data->capabilities = getCapabilities();
     
-    if((query & Qn::CapabilitiesPtzField)) {      data->capabilities = getCapabilities();                               data->fields |= Qn::CapabilitiesPtzField; }
+    if((query & Qn::CapabilitiesPtzField))       { data->capabilities = getCapabilities();                              data->fields |= Qn::CapabilitiesPtzField; }
     if((query & Qn::DevicePositionPtzField)     && getPosition(Qn::DevicePtzCoordinateSpace, &data->devicePosition))    data->fields |= Qn::DevicePositionPtzField;
     if((query & Qn::LogicalPositionPtzField)    && getPosition(Qn::LogicalPtzCoordinateSpace, &data->logicalPosition))  data->fields |= Qn::LogicalPositionPtzField;
     if((query & Qn::DeviceLimitsPtzField)       && getLimits(Qn::DevicePtzCoordinateSpace, &data->deviceLimits))        data->fields |= Qn::DeviceLimitsPtzField;

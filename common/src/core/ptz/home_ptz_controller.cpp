@@ -20,12 +20,11 @@ QnHomePtzController::QnHomePtzController(const QnPtzControllerPtr &baseControlle
     m_executor(new QnHomePtzExecutor(baseController))
 {
     assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
+    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
     m_executor->moveToThread(qnPtzPool->executorThread());
     m_executor->setHomePosition(m_adaptor->value());
     m_executor->restart();
-
-    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 }
 
 QnHomePtzController::~QnHomePtzController() {

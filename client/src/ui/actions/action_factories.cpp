@@ -120,6 +120,10 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
             action->setText(tour.name);
         }
 
+        int hotkey = idByHotkey.key(tour.id, QnPtzHotkey::NoHotkey);
+        if(hotkey != QnPtzHotkey::NoHotkey)
+            action->setShortcut(Qt::Key_0 + hotkey);
+
         action->setData(QVariant::fromValue(
             QnActionParameters(parameters)
                 .withArgument(Qn::PtzTourIdRole, tour.id)
