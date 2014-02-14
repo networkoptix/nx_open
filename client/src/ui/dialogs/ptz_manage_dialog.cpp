@@ -97,11 +97,11 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(this,       &QnAbstractPtzDialog::synchronized, m_model,            &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
 
-    connect(ui->savePositionButton, &QPushButton::clicked,  this,   &QnPtzManageDialog::at_savePositionButton_clicked);
-    connect(ui->goToPositionButton, &QPushButton::clicked,  this,   &QnPtzManageDialog::at_goToPositionButton_clicked);
+    //connect(ui->savePositionButton, &QPushButton::clicked,  this,   &QnPtzManageDialog::at_savePositionButton_clicked);
+    //connect(ui->goToPositionButton, &QPushButton::clicked,  this,   &QnPtzManageDialog::at_goToPositionButton_clicked);
     connect(ui->addTourButton,      &QPushButton::clicked,  this,   &QnPtzManageDialog::at_addTourButton_clicked);
-    connect(ui->startTourButton,    &QPushButton::clicked,  this,   &QnPtzManageDialog::at_startTourButton_clicked);
-    connect(ui->deleteButton,       &QPushButton::clicked,  this,   &QnPtzManageDialog::at_deleteButton_clicked);
+    //connect(ui->startTourButton,    &QPushButton::clicked,  this,   &QnPtzManageDialog::at_startTourButton_clicked);
+    //connect(ui->deleteButton,       &QPushButton::clicked,  this,   &QnPtzManageDialog::at_deleteButton_clicked);
 
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked,   this, &QnAbstractPtzDialog::saveChanges);
     //TODO: enable and disable various gui elements:
@@ -233,10 +233,10 @@ void QnPtzManageDialog::at_tableView_currentRowChanged(const QModelIndex &curren
         }
     }
 
-    ui->deleteButton->setDisabled(currentPresetId.isEmpty() && m_currentTourId.isEmpty());
-    ui->tourStackedWidget->setCurrentWidget(m_currentTourId.isEmpty()
-        ? ui->noTourPage
-        : ui->tourPage);
+    //ui->deleteButton->setDisabled(currentPresetId.isEmpty() && m_currentTourId.isEmpty());
+    //ui->tourStackedWidget->setCurrentWidget(m_currentTourId.isEmpty()
+        //? ui->noTourPage
+        //: ui->tourPage);
 }
 
 void QnPtzManageDialog::at_savePositionButton_clicked() {
@@ -385,6 +385,6 @@ void QnPtzManageDialog::updateUi() {
     if (index.isValid())
         selectedRow = m_model->rowData(index.row()).rowType;
 
-    ui->deleteButton->setEnabled(selectedRow == QnPtzManageModel::PresetRow || selectedRow == QnPtzManageModel::TourRow);
+    //ui->deleteButton->setEnabled(selectedRow == QnPtzManageModel::PresetRow || selectedRow == QnPtzManageModel::TourRow);
     //TODO: add other buttons;
 }
