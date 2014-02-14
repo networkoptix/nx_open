@@ -13,10 +13,11 @@ namespace Ui {
 
 class QnPtzManageModel;
 
+// TODO: #GDM remove singleton
 class QnPtzManageDialog : public QnAbstractPtzDialog, public Singleton<QnPtzManageDialog> {
     Q_OBJECT
-
     typedef QnAbstractPtzDialog base_type;
+
 public:
     explicit QnPtzManageDialog(QWidget *parent = 0);
     ~QnPtzManageDialog();
