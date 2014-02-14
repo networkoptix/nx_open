@@ -37,10 +37,10 @@
         <buildNumber>0</buildNumber>
         <beta>true</beta>
 
-        <python.dir>${project.build.directory}/${arch}/python/scripts</python.dir>
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
+        <python.dir>${libdir}/${arch}/python/scripts</python.dir>        
         <ClientHelpSourceDir>${environment.dir}/help/${release.version}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
