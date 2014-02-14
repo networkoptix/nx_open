@@ -93,8 +93,11 @@ QnPtzToursDialog::QnPtzToursDialog(QWidget *parent) :
     connect(m_model, &QnPtzTourListModel::presetsChanged, ui->tourEditWidget, &QnPtzTourWidget::setPresets);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
 
-    connect(ui->addTourButton,  &QPushButton::clicked, this, &QnPtzToursDialog::at_addTourButton_clicked);
-    connect(ui->deleteButton,   &QPushButton::clicked, this, &QnPtzToursDialog::at_deleteButton_clicked);
+    connect(ui->savePositionButton, &QPushButton::clicked,  this,   &QnPtzToursDialog::at_savePositionButton_clicked);
+    connect(ui->goToPositionButton, &QPushButton::clicked,  this,   &QnPtzToursDialog::at_goToPositionButton_clicked);
+    connect(ui->addTourButton,      &QPushButton::clicked,  this,   &QnPtzToursDialog::at_addTourButton_clicked);
+    connect(ui->startTourButton,    &QPushButton::clicked,  this,   &QnPtzToursDialog::at_startTourButton_clicked);
+    connect(ui->deleteButton,       &QPushButton::clicked,  this,   &QnPtzToursDialog::at_deleteButton_clicked);
 }
 
 QnPtzToursDialog::~QnPtzToursDialog() {
@@ -207,6 +210,18 @@ void QnPtzToursDialog::at_tableView_currentRowChanged(const QModelIndex &current
     ui->tourStackedWidget->setCurrentWidget(m_currentTourId.isEmpty()
         ? ui->noTourPage
         : ui->tourPage);
+}
+
+void QnPtzToursDialog::at_savePositionButton_clicked() {
+
+}
+
+void QnPtzToursDialog::at_goToPositionButton_clicked() {
+
+}
+
+void QnPtzToursDialog::at_startTourButton_clicked() {
+
 }
 
 void QnPtzToursDialog::at_addTourButton_clicked() {
