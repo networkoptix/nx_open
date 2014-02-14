@@ -32,7 +32,7 @@ protected:
 private slots:
     void at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
     void at_addTourButton_clicked();
-    void at_deleteTourButton_clicked();
+    void at_deleteButton_clicked();
 
     void at_tableViewport_resizeEvent();
     void at_tourSpotsChanged(const QnPtzTourSpotList &spots);

@@ -3,6 +3,7 @@
 #include <common/common_globals.h>
 
 #include <ui/style/globals.h>
+#include <utils/common/container.h>
 
 QnPtzTourListModel::QnPtzTourListModel(QObject *parent) :
     base_type(parent)
@@ -39,13 +40,30 @@ void QnPtzTourListModel::addTour() {
     endInsertRows();
 }
 
+void QnPtzTourListModel::removeTour(const QString &id) {
+    int idx = qnIndexOf(m_tours, [&](const QnPtzTourItemModel &model) { return model.tour.id == id; });
+    if (idx < 0)
+        return;
+
+    int offset = m_presets.size();
+    if (offset > 0)
+        offset++;   //presets title
+    
+    int firstRow = offset + idx;
+    if (m_tours.size() > 1)
+        firstRow++; // do not remove tour title
+    int lastRow = offset + idx + 1; // +1 for tour title
+
+    beginRemoveRows(QModelIndex(), firstRow, lastRow);
+    m_removedTours << m_tours.takeAt(idx).tour.id;
+    endRemoveRows();
+}
+
 const QnPtzPresetList& QnPtzTourListModel::presets() const {
-    ensurePresetsCache();
     return m_ptzPresetsCache;
 }
 
 void QnPtzTourListModel::setPresets(const QnPtzPresetList &presets) {
-    ensurePresetsCache();
     if (m_ptzPresetsCache == presets)
         return;
 
@@ -56,8 +74,7 @@ void QnPtzTourListModel::setPresets(const QnPtzPresetList &presets) {
         m_presets << preset;
     endResetModel();
 
-    ensurePresetsCache();
-    emit presetsChanged(m_ptzPresetsCache);
+    updatePresetsCache();
 }
 
 void QnPtzTourListModel::addPreset() {
@@ -72,6 +89,25 @@ void QnPtzTourListModel::addPreset() {
     beginInsertRows(QModelIndex(), firstRow, lastRow);
     m_presets << QnPtzPreset(QUuid::createUuid().toString(), tr("Position %1").arg(m_presets.size()));
     endInsertRows();
+
+    updatePresetsCache();
+}
+
+void QnPtzTourListModel::removePreset(const QString &id) {
+    int idx = qnIndexOf(m_presets, [&](const QnPtzPresetItemModel &model) { return model.preset.id == id; });
+    if (idx < 0)
+        return;
+
+    int firstRow = idx;
+    if (m_presets.size() > 1)
+        firstRow++; // do not remove presets title
+    int lastRow = idx + 1; // +1 for presets title
+
+    beginRemoveRows(QModelIndex(), firstRow, lastRow);
+    m_removedPresets << m_presets.takeAt(idx).preset.id;
+    endRemoveRows();
+
+    updatePresetsCache();
 }
 
 void QnPtzTourListModel::setHotkeys(const QnPtzHotkeyHash &hotkeys) {
@@ -152,8 +188,8 @@ bool QnPtzTourListModel::setData(const QModelIndex &index, const QVariant &value
     if (index.column() != NameColumn)
         return false;
 
-    if (index.row() < 0 || index.row() >= m_tours.size())
-        return false;
+    RowData data = rowData(index.row());
+
 
     QnPtzTourItemModel &model = m_tours[index.row()];
     if (model.tour.name == value.toString())
@@ -208,7 +244,7 @@ Qt::ItemFlags QnPtzTourListModel::flags(const QModelIndex &index) const {
         flags |= Qt::ItemIsEditable;
         break;
     case HomeColumn:
-        flags |= Qt::ItemIsEditable;// | Qt::ItemIsUserCheckable;
+        flags |= (Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
         break;
     default:
         break;
@@ -218,18 +254,18 @@ Qt::ItemFlags QnPtzTourListModel::flags(const QModelIndex &index) const {
 }
 
 void QnPtzTourListModel::updateTourSpots(const QString tourId, const QnPtzTourSpotList &spots) {
-    for (int i = 0; i < m_tours.size(); ++i) {
-        if (m_tours[i].tour.id != tourId)
-            continue;
-        if (m_tours[i].tour.spots == spots)
-            return; //no changes were made
+    int idx = qnIndexOf(m_tours, [&](const QnPtzTourItemModel &model) { return model.tour.id == tourId; });
+    if (idx < 0)
+        return;
 
-        m_tours[i].tour.spots = spots;
-        m_tours[i].modified = true;
-        emit dataChanged(index(i, 0), index(i, ColumnCount));
-        break;
-    }
+    if (m_tours[idx].tour.spots == spots)
+        return; //no changes were made
 
+    m_tours[idx].tour.spots = spots;
+    m_tours[idx].modified = true;
+
+    int row = m_presets.isEmpty() ? idx + 1 : m_presets.size() + idx + 2;
+    emit dataChanged(index(row, 0), index(row, ColumnCount));
 }
 
 qint64 QnPtzTourListModel::estimatedTimeSecs(const QnPtzTour &tour) const {
@@ -290,6 +326,8 @@ QVariant QnPtzTourListModel::titleData(RowType rowType,  int column, int role) c
 
     case Qt::BackgroundRole:
         return QColor(Qt::lightGray);    //TODO: style
+    case Qt::ForegroundRole:
+        return QColor(Qt::black);
     default:
         break;
     }
@@ -311,6 +349,10 @@ QVariant QnPtzTourListModel::presetData(const QnPtzPresetItemModel &presetModel,
             return presetModel.modified ? QLatin1String("*") : QString();
         case NameColumn:
             return presetModel.preset.name;
+        case HotkeyColumn:
+            return tr("0");
+        case HomeColumn:
+            return m_homePosition == presetModel.preset.id;
         case DetailsColumn:
             return QVariant();
         default:
@@ -343,6 +385,10 @@ QVariant QnPtzTourListModel::tourData(const QnPtzTourItemModel &tourModel, int c
             return tourModel.modified ? QLatin1String("*") : QString();
         case NameColumn:
             return tourModel.tour.name;
+        case HotkeyColumn:
+            return tr("0");
+        case HomeColumn:
+            return m_homePosition == tourModel.tour.id;
         case DetailsColumn:
             if (tourIsValid(tourModel)) {
                 qint64 time = estimatedTimeSecs(tourModel.tour);
@@ -369,15 +415,13 @@ QVariant QnPtzTourListModel::tourData(const QnPtzTourItemModel &tourModel, int c
 }
 
 bool QnPtzTourListModel::tourIsValid(const QnPtzTourItemModel &tourModel) const {
-    ensurePresetsCache();
     return tourModel.tour.isValid(m_ptzPresetsCache);
 }
 
-void QnPtzTourListModel::ensurePresetsCache() const {
-    if (!m_ptzPresetsCache.isEmpty())
-        return;
-
+void QnPtzTourListModel::updatePresetsCache() {
+    m_ptzPresetsCache.clear();
     foreach (const QnPtzPresetItemModel &model, m_presets) {
         m_ptzPresetsCache << model.preset;
     }
+    emit presetsChanged(m_ptzPresetsCache);
 }

@@ -69,8 +69,8 @@ QnPtzToursDialog::QnPtzToursDialog(const QnPtzControllerPtr &controller, QWidget
     connect(m_model, &QnPtzTourListModel::presetsChanged, ui->tourEditWidget, &QnPtzTourWidget::setPresets);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
 
-    connect(ui->addTourButton,      SIGNAL(clicked()), this, SLOT(at_addTourButton_clicked()));
-    connect(ui->deleteTourButton,   SIGNAL(clicked()), this, SLOT(at_deleteTourButton_clicked()));
+    connect(ui->addTourButton,  &QPushButton::clicked, this, &QnPtzToursDialog::at_addTourButton_clicked);
+    connect(ui->deleteButton,   &QPushButton::clicked, this, &QnPtzToursDialog::at_deleteButton_clicked);
 }
 
 QnPtzToursDialog::~QnPtzToursDialog() {
@@ -133,19 +133,29 @@ Qn::PtzDataFields QnPtzToursDialog::requiredFields() const {
 
 void QnPtzToursDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
     Q_UNUSED(previous)
-    if (!current.isValid()) {
-        ui->tourStackedWidget->setCurrentWidget(ui->noTourPage);
-        ui->deleteTourButton->setDisabled(true);
-        m_currentTourId = QString();
-        return;
+
+    QString currentPresetId;
+    m_currentTourId = QString();
+    if (current.isValid()) {
+        QnPtzTourListModel::RowData data = m_model->rowData(current.row());
+
+        switch (data.rowType) {
+        case QnPtzTourListModel::PresetRow:
+            currentPresetId = data.presetModel.preset.id;
+            break;
+        case QnPtzTourListModel::TourRow:
+            ui->tourEditWidget->setSpots(data.tourModel.tour.spots);
+            m_currentTourId = data.tourModel.tour.id;
+            break;
+        default:
+            break;
+        }
     }
 
-
-    QnPtzTour tour = current.data(Qn::PtzTourRole).value<QnPtzTour>();
-    ui->tourEditWidget->setSpots(tour.spots);
-    m_currentTourId = tour.id;
-    ui->tourStackedWidget->setCurrentWidget(ui->tourPage);
-    ui->deleteTourButton->setEnabled(true);
+    ui->deleteButton->setDisabled(currentPresetId.isEmpty() && m_currentTourId.isEmpty());
+    ui->tourStackedWidget->setCurrentWidget(m_currentTourId.isEmpty()
+        ? ui->noTourPage
+        : ui->tourPage);
 }
 
 void QnPtzToursDialog::at_addTourButton_clicked() {
@@ -164,12 +174,22 @@ void QnPtzToursDialog::at_addTourButton_clicked() {
     ui->tableView->selectionModel()->select(index, QItemSelectionModel::Select);
 }
 
-void QnPtzToursDialog::at_deleteTourButton_clicked() {
+void QnPtzToursDialog::at_deleteButton_clicked() {
     QModelIndex index = ui->tableView->selectionModel()->currentIndex();
     if (!index.isValid())
         return;
 
-    m_model->removeRow(index.row());
+    QnPtzTourListModel::RowData data = m_model->rowData(index.row());
+    switch (data.rowType) {
+    case QnPtzTourListModel::PresetRow:
+        m_model->removePreset(data.presetModel.preset.id);
+        break;
+    case QnPtzTourListModel::TourRow:
+        m_model->removeTour(data.tourModel.tour.id);
+        break;
+    default:
+        break;
+    }
 }
 
 void QnPtzToursDialog::at_tableViewport_resizeEvent() {

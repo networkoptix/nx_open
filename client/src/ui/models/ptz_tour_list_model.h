@@ -78,6 +78,14 @@ public:
         InvalidRow
     };
 
+    struct RowData {
+        RowType rowType;
+        QnPtzPresetItemModel presetModel;
+        QnPtzTourItemModel tourModel;
+
+        RowData(): rowType(InvalidRow) {}
+    };
+
     explicit QnPtzTourListModel(QObject *parent = 0);
     virtual ~QnPtzTourListModel();
 
@@ -85,13 +93,17 @@ public:
     const QStringList &removedTours() const;
     void setTours(const QnPtzTourList &tours);
     void addTour();
-
+    void removeTour(const QString &id);
+    
     const QnPtzPresetList& presets() const;
     void setPresets(const QnPtzPresetList &presets);
     void addPreset();
+    void removePreset(const QString &id);
 
     const QnPtzHotkeyHash& hotkeys() const;
     void setHotkeys(const QnPtzHotkeyHash & hotkeys);
+
+    RowData rowData(int row) const;
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -110,17 +122,7 @@ signals:
 private:
     qint64 estimatedTimeSecs(const QnPtzTour &tour) const;
     bool tourIsValid(const QnPtzTourItemModel &tourModel) const;
-    void ensurePresetsCache() const;
-
-    struct RowData {
-        RowType rowType;
-        QnPtzPresetItemModel presetModel;
-        QnPtzTourItemModel tourModel;
-
-        RowData(): rowType(InvalidRow) {}
-    };
-    
-    RowData rowData(int row) const;
+    void updatePresetsCache();
 
     QVariant titleData(RowType rowType,  int column, int role) const;
     QVariant presetData(const QnPtzPresetItemModel &presetModel, int column, int role) const;
@@ -133,8 +135,9 @@ private:
     QStringList m_removedTours;
 
     QnPtzHotkeyHash m_hotkeys;
+    QString m_homePosition;
 
-    mutable QnPtzPresetList m_ptzPresetsCache;
+    QnPtzPresetList m_ptzPresetsCache;
 };
 
 #endif // PTZ_TOUR_LIST_MODEL_H
