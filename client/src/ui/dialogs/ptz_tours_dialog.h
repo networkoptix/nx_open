@@ -5,6 +5,7 @@
 #include <core/ptz/ptz_fwd.h>
 
 #include <ui/dialogs/abstract_ptz_dialog.h>
+#include <utils/common/singleton.h>
 
 namespace Ui {
     class PtzToursDialog;
@@ -12,12 +13,12 @@ namespace Ui {
 
 class QnPtzTourListModel;
 
-class QnPtzToursDialog : public QnAbstractPtzDialog {
+class QnPtzToursDialog : public QnAbstractPtzDialog, public Singleton<QnPtzToursDialog> {
     Q_OBJECT
 
     typedef QnAbstractPtzDialog base_type;
 public:
-    explicit QnPtzToursDialog(const QnPtzControllerPtr &controller, QWidget *parent = 0);
+    explicit QnPtzToursDialog(QWidget *parent = 0);
     ~QnPtzToursDialog();
 
     QnResourcePtr resource() const;

@@ -59,8 +59,8 @@ private:
     QnPtzPresetHotkeyItemDelegate hotkeyDelegate;
 };
 
-QnPtzToursDialog::QnPtzToursDialog(const QnPtzControllerPtr &controller, QWidget *parent) :
-    base_type(controller, parent),
+QnPtzToursDialog::QnPtzToursDialog(QWidget *parent) :
+    base_type(parent),
     ui(new Ui::PtzToursDialog),
     m_model(new QnPtzTourListModel(this))
 {
@@ -119,8 +119,10 @@ void QnPtzToursDialog::loadData(const QnPtzData &data) {
     m_model->setPresets(data.presets);
     m_model->setHomePosition(data.homeObject.id);
 
-    QnPtzHotkeysResourcePropertyAdaptor adaptor(m_resource);
-    m_model->setHotkeys(adaptor.value());
+    if (m_resource) {
+        QnPtzHotkeysResourcePropertyAdaptor adaptor(m_resource);
+        m_model->setHotkeys(adaptor.value());
+    }
 
     if (!data.tours.isEmpty())
         ui->tableView->setCurrentIndex(ui->tableView->model()->index(0, 0));
@@ -170,8 +172,10 @@ bool QnPtzToursDialog::saveTours() {
 void QnPtzToursDialog::saveData() {
     savePresets();
     saveTours();
-    QnPtzHotkeysResourcePropertyAdaptor adaptor(m_resource);
-    adaptor.setValue(m_model->hotkeys());
+    if (m_resource) {
+        QnPtzHotkeysResourcePropertyAdaptor adaptor(m_resource);
+        adaptor.setValue(m_model->hotkeys());
+    }
 }
 
 Qn::PtzDataFields QnPtzToursDialog::requiredFields() const {

@@ -85,6 +85,12 @@ QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent):
     connect(action(Qn::PtzManageAction),                        &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzManageAction_triggered);
     connect(action(Qn::DebugCalibratePtzAction),                &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered);
     connect(action(Qn::DebugGetPtzPositionAction),              &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered);
+
+    QnPtzToursDialog *manageDialog = new QnPtzToursDialog(mainWindow()); //initializing instance of a singleton
+}
+
+QnWorkbenchPtzHandler::~QnWorkbenchPtzHandler() {
+    delete QnPtzToursDialog::instance();
 }
 
 void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
@@ -106,7 +112,8 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
 
     QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(new QnSingleCameraPtzHotkeysDelegate(resource, context()));
 
-    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(widget->ptzController(), mainWindow()));
+    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
+    dialog->setController(widget->ptzController());
     dialog->setHotkeysDelegate(hotkeysDelegate.data());
     dialog->exec();
 }
@@ -124,8 +131,6 @@ void QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered() {
         //TODO: #GDM PTZ show appropriate error message?
         return;
     }
-
-    qDebug() << "goToPreset activated" << resource->getId() << id;
 
     if (widget->dewarpingParams().enabled) {
         QnItemDewarpingParams params = widget->item()->dewarpingParams();
@@ -160,8 +165,6 @@ void QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered() {
     if(id.isEmpty())
         return;
 
-    qDebug() << "startTour activated" << resource->getId() << id;
-
     if (widget->dewarpingParams().enabled) {
         QnItemDewarpingParams params = widget->item()->dewarpingParams();
         params.enabled = true;
@@ -192,9 +195,12 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
     if(!widget || !widget->ptzController() || !widget->ptzController()->getTours(&tours))
         return;
 
-    QScopedPointer<QnPtzToursDialog> dialog(new QnPtzToursDialog(widget->ptzController(), mainWindow()));
+    QnPtzToursDialog* dialog = QnPtzToursDialog::instance();
+    assert(dialog);
+
+    dialog->setController(widget->ptzController());
     dialog->setResource(widget->resource()->toResourcePtr());
-    dialog->exec();
+    dialog->show();
 }
 
 void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered() {

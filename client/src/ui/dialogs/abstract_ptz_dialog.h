@@ -22,10 +22,13 @@ class QnAbstractPtzDialog : public QnButtonBoxDialog {
 
     typedef QnButtonBoxDialog base_type;
 public:
-    QnAbstractPtzDialog(const QnPtzControllerPtr &controller, QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnAbstractPtzDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnAbstractPtzDialog();
 
     virtual void accept() override;
+
+    QnPtzControllerPtr controller() const;
+    void setController(const QnPtzControllerPtr &controller);
 protected:
     virtual void loadData(const QnPtzData &data) = 0;
     virtual void saveData() = 0;

@@ -13,8 +13,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-QnPtzPresetDialog::QnPtzPresetDialog(const QnPtzControllerPtr &controller, QWidget *parent, Qt::WindowFlags windowFlags):
-    base_type(controller, parent, windowFlags),
+QnPtzPresetDialog::QnPtzPresetDialog(QWidget *parent, Qt::WindowFlags windowFlags):
+    base_type(parent, windowFlags),
     ui(new Ui::PtzPresetDialog())
 {
     ui->setupUi(this);

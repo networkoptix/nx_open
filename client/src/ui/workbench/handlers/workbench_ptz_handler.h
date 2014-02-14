@@ -11,6 +11,7 @@ class QnWorkbenchPtzHandler : public QObject, public QnWorkbenchContextAware {
 
 public:
     explicit QnWorkbenchPtzHandler(QObject *parent = 0);
+    ~QnWorkbenchPtzHandler();
 
 private slots:
     void at_ptzSavePresetAction_triggered();
