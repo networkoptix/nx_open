@@ -60,6 +60,7 @@ private:
     QnPtzPresetHotkeyItemDelegate hotkeyDelegate;
 };
 
+//TODO:  allow to maximize dialog
 QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     base_type(parent),
     ui(new Ui::PtzToursDialog),
@@ -71,7 +72,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     ui->tableView->horizontalHeader()->setVisible(true);
 
     ui->tableView->resizeColumnsToContents();
-
+    
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzManageModel::NameColumn, QHeaderView::Interactive);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzManageModel::DetailsColumn, QHeaderView::Interactive);
@@ -82,6 +83,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     ui->tableView->setItemDelegate(new QnPtzToursDialogItemDelegate(this));
 
     connect(ui->tableView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(at_tableView_currentRowChanged(QModelIndex,QModelIndex)));
+    connect(ui->tableView->selectionModel(), SIGNAL(currentRowChanged(QModelIndex,QModelIndex)), this, SLOT(updateUi()));
 
     ui->tableView->clearSelection();
 
@@ -108,6 +110,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
         - GoToPosition - if there is a selected position or a tour spot
         - CreateTour - if there is at least one position
         - ActivateTour - if there is a selected tour
+        - Apply
     */
 
     //TODO: implement preview receiving and displaying

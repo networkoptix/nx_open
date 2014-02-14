@@ -346,7 +346,7 @@ Qt::ItemFlags QnPtzManageModel::flags(const QModelIndex &index) const {
         flags |= Qt::ItemIsEditable;
         break;
     case HomeColumn:
-        flags |= Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
+        flags |= Qt::ItemIsUserCheckable;
         break;
     default:
         break;
