@@ -185,15 +185,19 @@ bool QnPtzTourListModel::setData(const QModelIndex &index, const QVariant &value
     RowData data = rowData(index.row());
 
     if (role == Qt::CheckStateRole && index.column() == HomeColumn) {
-        switch (data.rowType) {
-        case QnPtzTourListModel::PresetRow:
-            m_homePosition = data.presetModel.preset.id;
-            break;
-        case QnPtzTourListModel::TourRow:
-            m_homePosition = data.tourModel.tour.id;
-            break;
-        default:
-            return false;
+        if (value.toInt() == Qt::Checked) {
+            switch (data.rowType) {
+            case QnPtzTourListModel::PresetRow:
+                m_homePosition = data.presetModel.preset.id;
+                break;
+            case QnPtzTourListModel::TourRow:
+                m_homePosition = data.tourModel.tour.id;
+                break;
+            default:
+                return false;
+            }
+        } else {
+            m_homePosition = QString();
         }
 
         emit dataChanged(index.sibling(0, HomeColumn), index.sibling(rowCount() - 1, HomeColumn));
@@ -264,7 +268,7 @@ Qt::ItemFlags QnPtzTourListModel::flags(const QModelIndex &index) const {
     if (!index.isValid()) 
         return flags;
 
-    flags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    flags |= Qt::ItemIsEnabled;
 
     RowData data = rowData(index.row());
 
@@ -272,6 +276,8 @@ Qt::ItemFlags QnPtzTourListModel::flags(const QModelIndex &index) const {
         || data.rowType == PresetTitleRow 
         || data.rowType == TourTitleRow)
         return flags;
+
+    flags |= Qt::ItemIsSelectable;
 
     switch (index.column()) {
     case NameColumn:
@@ -394,7 +400,9 @@ QVariant QnPtzTourListModel::presetData(const QnPtzPresetItemModel &presetModel,
         return QVariant();
     case Qt::CheckStateRole:
         if (column == HomeColumn)
-            return m_homePosition == presetModel.preset.id;
+            return m_homePosition == presetModel.preset.id 
+            ? Qt::Checked 
+            : Qt::Unchecked;
         break;
     case Qn::PtzPresetRole:
         return QVariant::fromValue<QnPtzPreset>(presetModel.preset);
