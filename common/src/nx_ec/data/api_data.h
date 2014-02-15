@@ -71,7 +71,6 @@ void doAutoBind(QSqlQuery& , const char* , const std::vector<T>& ) {
 { \
 	QSqlRecord rec = query.record();\
 	BOOST_PP_SEQ_FOR_EACH(DECLARE_FIELD_IDX, ~, FIELD_SEQ) \
-	int idx = 0;\
 	while (query.next())\
 	{\
 		TYPE value;\

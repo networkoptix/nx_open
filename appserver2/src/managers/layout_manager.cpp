@@ -43,7 +43,7 @@ namespace ec2
         for( QnLayoutResourcePtr layout: layouts )
         {
             if( !layout->getId().isValid() )
-			    layout->setId( generateUniqueID() );
+			    layout->setId( dbManager->getNextSequence() );
         }
 
         //performing request
