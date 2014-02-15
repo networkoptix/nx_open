@@ -41,10 +41,27 @@ namespace ec2
             \param handler Functor ( ErrorCode )
         */
         template<class QueryDataType, class HandlerType>
-            void processUpdateAsync( const QUrl& ecBaseUrl, const QnTransaction<QueryDataType>& /*tran*/, HandlerType handler )
+            void processUpdateAsync( const QUrl& ecBaseUrl, const QnTransaction<QueryDataType>& tran, HandlerType handler )
         {
-            //TODO/IMPL
-            QtConcurrent::run( std::bind( handler, ErrorCode::failure ) );
+            QUrl requestUrl( ecBaseUrl );
+            requestUrl.setPath( QString::fromLatin1("ec2/%1").arg(ApiCommand::toString(tran.command)) );
+
+            QByteArray tranBuffer;
+            OutputBinaryStream<QByteArray> outputStream( &tranBuffer );
+            QnBinary::serialize( tran, &outputStream );
+
+            nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+            connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
+
+            QMutexLocker lk( &m_mutex );
+            if( !httpClient->doPost( requestUrl, "application/octet-stream", tranBuffer ) )
+            {
+                QtConcurrent::run( std::bind( handler, ErrorCode::failure ) );
+                return;
+            }
+            //auto func = std::bind( std::mem_fn( &ClientQueryProcessor::processHttpPostResponse<HandlerType> ), this, httpClient, handler );
+            auto func = [this, httpClient, handler](){ processHttpPostResponse( httpClient, handler ); };
+            m_runningHttpRequests[httpClient] = new CustomHandler<decltype(func)>(func);
         }
 
         /*!
@@ -69,7 +86,7 @@ namespace ec2
                 QtConcurrent::run( std::bind( handler, ErrorCode::failure, OutputData() ) );
                 return;
             }
-            auto func = std::bind( std::mem_fn( &ClientQueryProcessor::processHttpResponse<OutputData, HandlerType> ), this, httpClient, handler );
+            auto func = std::bind( std::mem_fn( &ClientQueryProcessor::processHttpGetResponse<OutputData, HandlerType> ), this, httpClient, handler );
             m_runningHttpRequests[httpClient] = new CustomHandler<decltype(func)>(func);
         }
 
@@ -111,7 +128,7 @@ namespace ec2
         std::map<nx_http::AsyncHttpClientPtr, AbstractHandler*> m_runningHttpRequests;
 
         template<class OutputData, class HandlerType>
-            void processHttpResponse( nx_http::AsyncHttpClientPtr httpClient, HandlerType handler )
+            void processHttpGetResponse( nx_http::AsyncHttpClientPtr httpClient, HandlerType handler )
         {
             if( httpClient->failed() || !httpClient->response() )
                 return handler( ErrorCode::ioError, OutputData() );
@@ -131,6 +148,26 @@ namespace ec2
                 handler( ErrorCode::badResponse, outputData );
             else
                 handler( ErrorCode::ok, outputData );
+        }
+
+        template<class HandlerType>
+            void processHttpPostResponse( nx_http::AsyncHttpClientPtr httpClient, HandlerType handler )
+        {
+            if( httpClient->failed() || !httpClient->response() )
+                return handler( ErrorCode::ioError );
+            switch( httpClient->response()->statusLine.statusCode )
+            {
+                case nx_http::StatusCode::ok:
+                    handler( ErrorCode::ok );
+                    break;
+
+                case nx_http::StatusCode::unauthorized:
+                    handler( ErrorCode::unauthorized );
+                    break;
+
+                default:
+                    return handler( ErrorCode::serverError );
+            }
         }
     };
 }

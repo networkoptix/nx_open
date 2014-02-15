@@ -92,7 +92,6 @@ namespace nx_http
 
                         case PollSet::etWrite:
                             //connect successful
-                            composeRequest();
                             serializeRequest();
                             m_state = sSendingRequest;
                             lk.unlock();
@@ -340,16 +339,24 @@ namespace nx_http
     */
     bool AsyncHttpClient::doGet( const QUrl& url )
     {
-        //stopping client, if it is running
-        terminate();
-        {
-            QMutexLocker lk( &m_mutex );
-            m_terminated = false;
-        }
+        resetDataBeforeNewRequest();
+        composeRequest( nx_http::Method::GET );
+        return initiateHttpMessageDelivery( url );
+    }
 
-        m_authorizationTried = false;
-        m_customHeaders.clear();
-        return doGetPrivate( url );
+    bool AsyncHttpClient::doPost(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        const nx_http::StringType& messageBody )
+    {
+        resetDataBeforeNewRequest();
+        composeRequest( nx_http::Method::POST );
+        m_request.headers["Content-Type"] = contentType;
+        m_request.headers["Content-Length"] = StringType::number(messageBody.size());
+        //TODO/IMPL support chunked encoding & compression
+        m_request.headers["Content-Encoding"] = "identity";
+        m_request.messageBody = messageBody;
+        return initiateHttpMessageDelivery( url );
     }
 
     /*!
@@ -419,7 +426,19 @@ namespace nx_http
         m_userPassword = userPassword;
     }
 
-    bool AsyncHttpClient::doGetPrivate( const QUrl& url )
+    void AsyncHttpClient::resetDataBeforeNewRequest()
+    {
+        //stopping client, if it is running
+        terminate();
+        {
+            QMutexLocker lk( &m_mutex );
+            m_terminated = false;
+        }
+
+        m_authorizationTried = false;
+    }
+
+    bool AsyncHttpClient::initiateHttpMessageDelivery( const QUrl& url )
     {
         if( m_socket )
         {
@@ -507,11 +526,11 @@ namespace nx_http
         return bytesRead;
     }
 
-    void AsyncHttpClient::composeRequest()
+    void AsyncHttpClient::composeRequest( const nx_http::StringType& httpMethod )
     {
         const bool useHttp11 = true;   //TODO/IMPL check. if we need it (e.g. we using keep-alive or requesting live capture)
 
-        m_request.requestLine.method = nx_http::Method::GET;
+        m_request.requestLine.method = httpMethod;
         m_request.requestLine.url = m_url.path() + (m_url.hasQuery() ? (QLatin1String("?") + m_url.query()) : QString());
         m_request.requestLine.version = useHttp11 ? nx_http::Version::http_1_1 : nx_http::Version::http_1_0;
         if( !m_userAgent.isEmpty() )
@@ -530,15 +549,6 @@ namespace nx_http
         //adding user credentials
         if( !m_userName.isEmpty() || !m_userPassword.isEmpty() )
             m_request.headers[Header::Authorization::NAME] = Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString();
-
-        //adding custom headers
-        for( std::map<BufferType, BufferType>::const_iterator
-            it = m_customHeaders.begin();
-            it != m_customHeaders.end();
-            ++it )
-        {
-            m_request.headers[it->first] = it->second;
-        }
     }
 
     void AsyncHttpClient::serializeRequest()
@@ -719,10 +729,10 @@ namespace nx_http
 
         BufferType authorizationStr;
         digestAuthorizationHeader.serialize( &authorizationStr );
-        m_customHeaders.insert( make_pair( Header::Authorization::NAME, authorizationStr ) );
+        m_request.headers[Header::Authorization::NAME] = authorizationStr;
 
         m_authorizationTried = true;
-        return doGetPrivate( m_url );
+        return initiateHttpMessageDelivery( m_url );
     }
 
     const char* AsyncHttpClient::toString( State state )
