@@ -372,9 +372,9 @@ ErrorCode QnDbManager::updateLayout(const ApiLayoutData& data)
 ErrorCode QnDbManager::removeStoragesByServer(qint32 id)
 {
     QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_storage WHERE resource_ptr_id in (select id from vms_resource where parent_id = :id and xtype_id=:typeId)");
-    delQuery.bindValue("id", id);
-    delQuery.bindValue("typeId", m_storageTypeId);
+    delQuery.prepare("DELETE FROM vms_storage WHERE resource_ptr_id in (select id from vms_resource where parent_id = :id and xtype_id = :typeId)");
+    delQuery.bindValue(":id", id);
+    delQuery.bindValue(":typeId", m_storageTypeId);
     if (!delQuery.exec()) {
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
         return ErrorCode::failure;
@@ -382,8 +382,8 @@ ErrorCode QnDbManager::removeStoragesByServer(qint32 id)
 
     QSqlQuery delQuery2(m_sdb);
     delQuery2.prepare("DELETE FROM vms_resource WHERE parent_id = :id and xtype_id=:typeId");
-    delQuery2.bindValue("id", id);
-    delQuery2.bindValue("typeId", m_storageTypeId);
+    delQuery2.bindValue(":id", id);
+    delQuery2.bindValue(":typeId", m_storageTypeId);
     if (!delQuery2.exec()) {
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
         return ErrorCode::failure;
@@ -420,7 +420,7 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data)
 {
 	QSqlQuery delQuery(m_sdb);
 	delQuery.prepare("DELETE FROM vms_scheduletask where source_id = :id");
-	delQuery.bindValue("id", data.id);
+	delQuery.bindValue(":id", data.id);
 	if (!delQuery.exec()) {
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
         return ErrorCode::failure;
@@ -551,7 +551,7 @@ ErrorCode QnDbManager::removeLayoutItems(qint32 id)
 {
     QSqlQuery delQuery(m_sdb);
     delQuery.prepare("DELETE FROM vms_layoutitem WHERE layout_id = :id");
-    delQuery.bindValue("id", id);
+    delQuery.bindValue(":id", id);
     if (!delQuery.exec()) {
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
         return ErrorCode::failure;
