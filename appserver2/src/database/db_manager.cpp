@@ -983,7 +983,7 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
     }
 
     QSqlQuery queryProperty(m_sdb);
-    queryProperty.prepare("SELECT * FROM vms_propertytype");
+    queryProperty.prepare("SELECT * FROM vms_propertytype order by resource_type_id");
     if (!queryProperty.exec()) {
         qWarning() << Q_FUNC_INFO << queryProperty.lastError().text();
         return ErrorCode::failure;
