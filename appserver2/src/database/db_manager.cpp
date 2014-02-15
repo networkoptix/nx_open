@@ -977,15 +977,24 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 
 	QSqlQuery queryParents(m_sdb);
 	queryParents.prepare("select from_resourcetype_id as id, to_resourcetype_id as parentId from vms_resourcetype_parents order by from_resourcetype_id, to_resourcetype_id desc");
-
 	if (!queryParents.exec()) {
         qWarning() << Q_FUNC_INFO << queryParents.lastError().text();
 		return ErrorCode::failure;
     }
 
-	data.loadFromQuery(queryTypes);
+    QSqlQuery queryProperty(m_sdb);
+    queryProperty.prepare("SELECT * FROM vms_propertytype");
+    if (!queryProperty.exec()) {
+        qWarning() << Q_FUNC_INFO << queryProperty.lastError().text();
+        return ErrorCode::failure;
+    }
 
+	data.loadFromQuery(queryTypes);
     mergeIdListData<ApiResourceTypeData>(queryParents, data.data, &ApiResourceTypeData::parentId);
+
+    std::vector<ApiPropertyType> allProperties;
+    QN_QUERY_TO_DATA_OBJECT(queryProperty, ApiPropertyType, allProperties, ApiPropertyTypeFields);
+    mergeObjectListData<ApiResourceTypeData, ApiPropertyType>(data.data, allProperties, &ApiResourceTypeData::propertyTypeList, &ApiPropertyType::resource_type_id);
 
 	return ErrorCode::ok;
 }
