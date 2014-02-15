@@ -5,15 +5,62 @@ void serialize(const bool &value, QString *target) {
 }
 
 bool deserialize(const QString &value, bool *target) {
-    /* Also support "0" & "1" during deserialization. */
+    /* We also support upper/lower case combinations and "0" & "1" 
+     * during deserialization. */
 
-    if(value == lit("0") || value == lit("false")) {
-        *target = false;
-        return true;
-    } else if(value == lit("1") || value == lit("true")) {
-        *target = true;
-        return true;
-    } else {
+    if(value.isEmpty())
+        return false;
+
+    switch (value[0].unicode()) {
+    case L'0':
+        if(value.size() != 1) {
+            return false;
+        } else {
+            *target = false;
+            return true;
+        }
+    case L'1':
+        if(value.size() != 1) {
+            return false;
+        } else {
+            *target = true;
+            return true;
+        }
+    case L't':
+    case L'T':
+        if(value.size() != 4) {
+            return false;
+        } else {
+            const qunicodechar *data = reinterpret_cast<const qunicodechar *>(value.data());
+            const qunicodechar *rueData = QT_UNICODE_LITERAL("rue");
+            if(memcmp(data + 1, rueData, sizeof(qunicodechar) * 3) == 0) {
+                *target = true;
+                return true;
+            } else if((data[1] == L'r' || data[1] == L'R') && (data[2] == L'u' || data[2] == L'U') && (data[3] == L'e' || data[3] == L'E')) {
+                *target = true;
+                return true;
+            } else {
+                return false;
+            }
+        }
+    case L'f':
+    case L'F':
+        if(value.size() != 5) {
+            return false;
+        } else {
+            const qunicodechar *data = reinterpret_cast<const qunicodechar *>(value.data());
+            const qunicodechar *alseData = QT_UNICODE_LITERAL("alse");
+            if(memcmp(data + 1, alseData, sizeof(qunicodechar) * 4) == 0) {
+                *target = false;
+                return true;
+            } else if((data[1] == L'a' || data[1] == L'A') && (data[2] == L'l' || data[2] == L'L') && (data[3] == L's' || data[3] == L'S') && (data[4] == L'e' || data[4] == L'E')) {
+                *target = false;
+                return true;
+            } else {
+                return false;
+            }
+        }
+    default:
         return false;
     }
 }

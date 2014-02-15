@@ -626,6 +626,19 @@
     </message>
 </context>
 <context>
+    <name>CameraManagementWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="20"/>
+        <source>Enable camera auto discovery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="30"/>
+        <source>Enable automatic camera settings optimization</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CameraOutputBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui" line="32"/>
@@ -1100,58 +1113,63 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="209"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="206"/>
+        <source>Skin:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="236"/>
         <source>Misc</source>
         <translation type="unfinished">杂项</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="230"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="257"/>
         <source>Language:</source>
         <translation type="unfinished">语言:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="258"/>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="308"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="285"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="335"/>
         <source>Restart required.</source>
         <translation type="unfinished">需重新启动。</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="279"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="306"/>
         <source>Downmix audio from 5.1 to 2.1:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="323"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="350"/>
         <source>Auto pause video</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="354"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="381"/>
         <source>after</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="374"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="401"/>
         <source>minutes of inactivity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="448"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="475"/>
         <source>Run application when PC boots up:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="414"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="441"/>
         <source>Browse logs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="427"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="454"/>
         <source>Clear local cache</source>
         <translation type="unfinished">清除本地快取</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="465"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="492"/>
         <source>Network Interfaces</source>
         <translation type="unfinished">网络界面</translation>
     </message>
@@ -1528,22 +1546,22 @@ p, li { white-space: pre-wrap; }
         <translation>&amp;主机:</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="160"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="237"/>
         <source>P&amp;ort:</source>
         <translation>端口:</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="188"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="127"/>
         <source>&amp;Login:</source>
         <translation>&amp;登录:</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="217"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="156"/>
         <source>&amp;Password:</source>
         <translation>&amp;密码:</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="270"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="209"/>
         <source>&amp;Test</source>
         <translation>&amp;测试</translation>
     </message>
@@ -1683,7 +1701,7 @@ Would you like to restart client in compatibility mode?</source>
 您希望在兼容模式下重新启动客户端吗？</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/login_dialog.ui" line="282"/>
+        <location filename="../src/ui/dialogs/login_dialog.ui" line="264"/>
         <source>&amp;Auto-Login</source>
         <translation>&amp;自动登录</translation>
     </message>
@@ -2016,12 +2034,12 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="obsolete">PTZ位置</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_preset_dialog.ui" line="25"/>
+        <location filename="../src/ui/dialogs/ptz_preset_dialog.ui" line="26"/>
         <source>Name:</source>
         <translation>名称:</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_preset_dialog.ui" line="35"/>
+        <location filename="../src/ui/dialogs/ptz_preset_dialog.ui" line="36"/>
         <source>Hotkey:</source>
         <translation>热键:</translation>
     </message>
@@ -2054,36 +2072,35 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="obsolete">表格</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/ptz_tour_widget.ui" line="22"/>
         <source>Name:</source>
-        <translation type="unfinished">名称:</translation>
+        <translation type="obsolete">名称:</translation>
     </message>
 </context>
 <context>
     <name>PtzToursDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/ptz_tours_dialog.ui" line="14"/>
+        <location filename="../src/ui/dialogs/ptz_tours_dialog.ui" line="20"/>
         <source>Manage PTZ Tours...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_tours_dialog.ui" line="51"/>
+        <location filename="../src/ui/dialogs/ptz_tours_dialog.ui" line="32"/>
         <source>Add</source>
         <translation type="unfinished">添加</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_tours_dialog.ui" line="78"/>
+        <location filename="../src/ui/dialogs/ptz_tours_dialog.ui" line="46"/>
         <source>Delete</source>
         <translation type="unfinished">删除</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_tours_dialog.ui" line="93"/>
+        <location filename="../src/ui/dialogs/ptz_tours_dialog.ui" line="104"/>
         <source>Details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_tours_dialog.ui" line="137"/>
-        <source>Select tour to edit...</source>
+        <location filename="../src/ui/dialogs/ptz_tours_dialog.ui" line="136"/>
+        <source>No tour selected</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2103,7 +2120,7 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="obsolete">无法覆盖文件&apos;%1&apos;。请尝试另一个名称。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="671"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="668"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
@@ -2366,8 +2383,13 @@ Built for %5-%6 with %7.&lt;br/&gt;
 <context>
     <name>QnAbstractPtzDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/abstract_ptz_dialog.cpp" line="55"/>
-        <source>Synchronizing...</source>
+        <location filename="../src/ui/dialogs/abstract_ptz_dialog.cpp" line="23"/>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/abstract_ptz_dialog.cpp" line="31"/>
+        <source>Saving...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2611,47 +2633,47 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>Alt+R</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="591"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="592"/>
         <source>Go to Fullscreen</source>
         <translation>全屏</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="592"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="593"/>
         <source>Exit Fullscreen</source>
         <translation>退出全屏</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="595"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="614"/>
         <source>Ctrl+F</source>
         <translation>Ctrl+F</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="597"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="616"/>
         <source>Alt+Enter</source>
         <translation>Alt+Enter</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="598"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="617"/>
         <source>Alt+Return</source>
         <translation>Alt+Return</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="585"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="586"/>
         <source>Esc</source>
         <translation>退出</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="606"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="599"/>
         <source>Minimize</source>
         <translation>最小化</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="612"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="604"/>
         <source>Maximize</source>
         <translation>最大化</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="636"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="641"/>
         <source>System Settings...</source>
         <translation>系统设定...</translation>
     </message>
@@ -2661,42 +2683,42 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>Ctrl+P</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="698"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="703"/>
         <source>About...</source>
         <translation>关于...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="710"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="715"/>
         <source>Exit</source>
         <translation>退出</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="711"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="716"/>
         <source>Alt+F4</source>
         <translation>Alt+F4</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="725"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="730"/>
         <source>Close</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="726"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="731"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="731"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="736"/>
         <source>Close All But This</source>
         <translation>关闭所有除了这个</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="740"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="745"/>
         <source>Open in Layout</source>
         <translation>在Layout中打开</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="745"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="750"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
@@ -2709,163 +2731,163 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">在新窗口中打开</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="787"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="792"/>
         <source>Open Containing Folder</source>
         <translation>打开包含的文件夹</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="788"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="793"/>
         <source>Ctrl+Enter</source>
         <translation>Ctrl+Enter</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="789"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="794"/>
         <source>Ctrl+Return</source>
         <translation>Ctrl+Return</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="768"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="773"/>
         <source>Open Layouts</source>
         <translation>打开Layout</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="782"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="787"/>
         <source>Open Layout(s)</source>
         <translation>打开Layout</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="801"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="806"/>
         <source>Save Layout</source>
         <translation>保存Layout</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="808"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="815"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="813"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="820"/>
         <source>Save Layout As...</source>
         <translation>Layout另存为...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="825"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="830"/>
         <source>Maximize Item</source>
         <translation>项目最大化</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="826"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="834"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="831"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="839"/>
         <source>Enter</source>
         <translation>进入</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="827"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="835"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="832"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="840"/>
         <source>Return</source>
         <translation>返回</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="833"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="838"/>
         <source>Restore Item</source>
         <translation>还原项目</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="938"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="931"/>
         <source>Show Motion/Smart Search</source>
         <translation>显示移动/智能搜索</translation>
     </message>
     <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="933"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="940"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="947"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="958"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="951"/>
         <source>Alt+G</source>
         <translation>Alt+G</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="945"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="938"/>
         <source>Hide Motion/Smart Search</source>
         <translation>隐藏移动/智能搜索</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="952"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="945"/>
         <source>Clear Motion Selection</source>
         <translation>清除移动选择</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="957"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="950"/>
         <source>Toggle Smart Search</source>
         <translation>切换智能搜索</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="963"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="956"/>
         <source>Check File Watermark</source>
         <translation>检查文件水印</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="964"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="957"/>
         <source>Alt+C</source>
         <translation>Alt+C</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="970"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="963"/>
         <source>Take Screenshot</source>
         <translation>截屏</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="971"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="964"/>
         <source>Alt+S</source>
         <translation>Alt+S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="989"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="982"/>
         <source>Rotate to...</source>
         <translation>旋转到...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="994"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="987"/>
         <source>0 degrees</source>
         <translation>0度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="998"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="991"/>
         <source>90 degrees</source>
         <translation>90度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1002"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="995"/>
         <source>180 degrees</source>
         <translation>180度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1006"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="999"/>
         <source>270 degrees</source>
         <translation>270度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1015"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1008"/>
         <source>Remove from Layout</source>
         <translation>从Layout中移除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1019"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1031"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1012"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1024"/>
         <source>Del</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1027"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1020"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1044"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1037"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1045"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1038"/>
         <source>F2</source>
         <translation>F2</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1054"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1047"/>
         <source>Upload to YouTube...</source>
         <translation>上传到YouTube...</translation>
     </message>
@@ -2874,32 +2896,32 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">编辑标签...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1214"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1207"/>
         <source>Alt+T</source>
         <translation>Alt+T</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1061"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1054"/>
         <source>Delete from Disk</source>
         <translation>从磁盘中删除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1074"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1067"/>
         <source>User Settings...</source>
         <translation>用户设定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1091"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1084"/>
         <source>Camera Settings...</source>
         <translation>摄像机设定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1108"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1101"/>
         <source>Open in Camera Settings Dialog</source>
         <translation>在摄像机设定对话框中打开</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1140"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1133"/>
         <source>Server Settings...</source>
         <translation>服务器设定...</translation>
     </message>
@@ -2908,12 +2930,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">修改长宽比</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1154"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1147"/>
         <source>4:3</source>
         <translation>4:3</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1161"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1154"/>
         <source>16:9</source>
         <translation>16:9</translation>
     </message>
@@ -2922,47 +2944,47 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">修改间距</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1178"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1171"/>
         <source>None</source>
         <translation>无</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1185"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1178"/>
         <source>Small</source>
         <translation>小</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1192"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1185"/>
         <source>Medium</source>
         <translation>中</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1199"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1192"/>
         <source>Large</source>
         <translation>大</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1230"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1223"/>
         <source>Mark Selection Start</source>
         <translation>标记开始</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1231"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1224"/>
         <source>[</source>
         <translation>[</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1237"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1230"/>
         <source>Mark Selection End</source>
         <translation>标记结束</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1238"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1231"/>
         <source>]</source>
         <translation>]</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1244"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1237"/>
         <source>Clear Selection</source>
         <translation>清除选择</translation>
     </message>
@@ -2979,47 +3001,47 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">快速搜索...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1375"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1372"/>
         <source>Show Thumbnails</source>
         <translation>显示缩图</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1376"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1373"/>
         <source>Hide Thumbnails</source>
         <translation>隐藏缩图</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1273"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1266"/>
         <source>Ctrl+Alt+Shift++</source>
         <translation>Ctrl+Alt+Shift++</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1274"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1267"/>
         <source>Increment Debug Counter</source>
         <translation>递增除错计数器</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1278"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1271"/>
         <source>Ctrl+Alt+Shift+-</source>
         <translation>Ctrl+Alt+Shift+-</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1279"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1272"/>
         <source>Decrement Debug Counter</source>
         <translation>递减调试计数器</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="746"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="751"/>
         <source>Monitor</source>
         <translation>监控</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="752"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="757"/>
         <source>Monitor in a New Tab</source>
         <translation>在新标签中监控</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="758"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="763"/>
         <source>Monitor in a New Window</source>
         <translation>在新窗口中监控</translation>
     </message>
@@ -3042,12 +3064,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>结束危机录像</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1212"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1205"/>
         <source>Start Tour</source>
         <translation>开始轮巡</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1213"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1206"/>
         <source>Stop Tour</source>
         <translation>结束轮巡</translation>
     </message>
@@ -3056,17 +3078,17 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">小图标搜索</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1380"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1377"/>
         <source>Show Calendar</source>
         <translation>显示日历</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1381"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1378"/>
         <source>Hide Calendar</source>
         <translation>隐藏日历</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1297"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1294"/>
         <source>Space</source>
         <translation>空格</translation>
     </message>
@@ -3075,107 +3097,107 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">播放／暂停</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1304"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1301"/>
         <source>Ctrl+-</source>
         <translation>Ctrl+-</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1305"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1302"/>
         <source>Speed Down</source>
         <translation>减速</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1310"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1307"/>
         <source>Ctrl++</source>
         <translation>Ctrl++</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1311"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1308"/>
         <source>Speed Up</source>
         <translation>加速</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1316"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1313"/>
         <source>Ctrl+Left</source>
         <translation>Ctrl+Left</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1317"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1314"/>
         <source>Previous Frame</source>
         <translation>前一帧</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1322"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1319"/>
         <source>Ctrl+Right</source>
         <translation>Ctrl+Right</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1323"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1320"/>
         <source>Next Frame</source>
         <translation>下一帧</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1328"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1325"/>
         <source>Z</source>
         <translation>Z</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1329"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1326"/>
         <source>To Start</source>
         <translation>到开始</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1334"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1331"/>
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1335"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1332"/>
         <source>To End</source>
         <translation>到结束</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1345"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1342"/>
         <source>Ctrl+Down</source>
         <translation>Ctrl+Down</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1341"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1338"/>
         <source>Volume Down</source>
         <translation>降低音量</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1340"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1337"/>
         <source>Ctrl+Up</source>
         <translation>Ctrl+Up</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1346"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1343"/>
         <source>Volume Up</source>
         <translation>提高音量</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1350"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1347"/>
         <source>M</source>
         <translation>M</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1351"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1348"/>
         <source>Toggle Mute</source>
         <translation>切换静音</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1356"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1353"/>
         <source>L</source>
         <translation>L</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1357"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1354"/>
         <source>Jump to Live</source>
         <translation>跳转到实时影像</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1363"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1360"/>
         <source>S</source>
         <translation>S</translation>
     </message>
@@ -3184,7 +3206,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">切换同步</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="699"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="704"/>
         <source>F1</source>
         <translation>F1</translation>
     </message>
@@ -3193,22 +3215,22 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">添加摄像机</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1298"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1295"/>
         <source>Play</source>
         <translation>播放</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1299"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1296"/>
         <source>Pause</source>
         <translation>暂停</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1364"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1361"/>
         <source>Synchronize Streams</source>
         <translation>同步码流</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1365"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1362"/>
         <source>Disable Stream Synchronization</source>
         <translation>禁用码流同步</translation>
     </message>
@@ -3233,120 +3255,125 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>打开Layout...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="613"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="605"/>
         <source>Restore Down</source>
         <translation>向下还原</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="763"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="768"/>
         <source>Open Layout in a New Tab</source>
         <translation>在新标签中打开Layout</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="773"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="778"/>
         <source>Open Layout(s) in a New Window</source>
         <translation>在新窗口中打开Layout</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="841"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="846"/>
         <source>Show Info</source>
         <translation>显示信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="842"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="848"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="854"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="932"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="847"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="853"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="859"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="925"/>
         <source>Alt+I</source>
         <translation>Alt+I</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="847"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="852"/>
         <source>Hide Info</source>
         <translation>隐藏信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="853"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="858"/>
         <source>Toggle Info</source>
         <translation>切换信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="939"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="932"/>
         <source>Show Motion</source>
         <translation>显示移动</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="946"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="939"/>
         <source>Hide Motion</source>
         <translation>隐藏移动</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1112"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1105"/>
         <source>Clear Camera Settings Dialog</source>
         <translation>清除摄像机设定对话框</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1254"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1247"/>
         <source>Export Selected Area...</source>
         <translation>输出选取的区域...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1260"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1253"/>
         <source>Export Multi-Video...</source>
         <translation>输出多个视频...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1283"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1276"/>
         <source>Ctrl+Alt+Shift+R</source>
         <translation>Ctrl+Alt+Shift+R</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1284"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1277"/>
         <source>Show Resource Pool</source>
         <translation>显示资源库</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1385"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1285"/>
+        <source>Get PTZ Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1382"/>
         <source>Show Title Bar</source>
         <translation>显示标题栏</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1386"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1383"/>
         <source>Hide Title Bar</source>
         <translation>隐藏标题栏</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1391"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1388"/>
         <source>Pin Tree</source>
         <translation>钉选树状表</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1392"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1389"/>
         <source>Unpin Tree</source>
         <translation>取消钉选树状表</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1397"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1394"/>
         <source>Show Tree</source>
         <translation>显示树状表</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1398"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1395"/>
         <source>Hide Tree</source>
         <translation>隐藏树状表</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1403"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1400"/>
         <source>Show Timeline</source>
         <translation>显示时间轴</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1404"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1401"/>
         <source>Hide Timeline</source>
         <translation>隐藏时间轴</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1266"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1259"/>
         <source>Preview Search...</source>
         <translation>预览搜索...</translation>
     </message>
@@ -3364,53 +3391,53 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">事件提醒</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="587"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="588"/>
         <source>Stop current action</source>
         <translation>停止当前动作</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="419"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="654"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="659"/>
         <source>Alarm/Event Rules...</source>
         <translation>报警/事件规则...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="655"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="660"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="693"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="698"/>
         <source>Check for Updates...</source>
         <translation>检查更新...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="859"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="864"/>
         <source>Change Resolution...</source>
         <translation>修改分辨率...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="866"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="871"/>
         <source>Auto</source>
         <translation>自动</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="872"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="877"/>
         <source>Low</source>
         <translation>低</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="877"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="882"/>
         <source>High</source>
         <translation>高</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="885"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="890"/>
         <source>PTZ...</source>
         <translation>PTZ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="911"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="898"/>
         <source>Save Current Position...</source>
         <translation>保存当前位置...</translation>
     </message>
@@ -3419,7 +3446,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">去预设位...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="917"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="904"/>
         <source>Manage Saved Positions...</source>
         <translation>管理保存的预设位...</translation>
     </message>
@@ -3429,23 +3456,23 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>去保存的预设位</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="931"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="924"/>
         <source>Toggle Resolution Mode</source>
         <translation>切换分辨率模式</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1146"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1139"/>
         <source>Change Cell Aspect Ratio...</source>
         <translation>改变宽高比...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1170"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1163"/>
         <source>Change Cell Spacing...</source>
         <translation>改变间距...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1102"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1225"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1095"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1218"/>
         <source>Layout Settings...</source>
         <translation>Layout设定...</translation>
     </message>
@@ -3468,12 +3495,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="414"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="662"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="667"/>
         <source>Alarm/Event Log...</source>
         <translation>报警/事件日志...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="663"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="668"/>
         <source>Ctrl+L</source>
         <translation>Ctrl+L</translation>
     </message>
@@ -3482,12 +3509,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">摄像机列表...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="671"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="676"/>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="678"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="683"/>
         <source>Backup/Restore Configuration...</source>
         <translation>备份/还原配置...</translation>
     </message>
@@ -3496,17 +3523,17 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">调整视频</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="978"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="971"/>
         <source>Alt+J</source>
         <translation>Alt+J</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="984"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="977"/>
         <source>Create Zoom Window</source>
         <translation>创建缩放窗口</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1068"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1061"/>
         <source>Set as Layout Background</source>
         <translation>设置为Layout背景</translation>
     </message>
@@ -3515,17 +3542,17 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">摄像机诊断...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1116"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1109"/>
         <source>Add Camera(s)...</source>
         <translation>添加摄像机...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1121"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1114"/>
         <source>Camera(s) List by Server...</source>
         <translation>依服务器摄像机列表...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1126"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1119"/>
         <source>Ping...</source>
         <translation>Ping...</translation>
     </message>
@@ -3534,27 +3561,27 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">服务器日志</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1135"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1128"/>
         <source>Server Diagnostics...</source>
         <translation>服务器诊断...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1288"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1281"/>
         <source>Calibrate PTZ</source>
         <translation>校准PTZ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1408"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1405"/>
         <source>Pin Notifications</source>
         <translation>钉选通知</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1409"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1406"/>
         <source>Unpin Notifications</source>
         <translation>取消钉选通知</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="631"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="636"/>
         <source>Open in Browser...</source>
         <translation>在浏览器中打开...</translation>
     </message>
@@ -3563,68 +3590,68 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">开启网页显示软件功能...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="751"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="756"/>
         <source>Open in New Tab</source>
         <translation>在新标签页中打开</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="757"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="762"/>
         <source>Open in New Window</source>
         <translation>在新窗口打开</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="619"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="624"/>
         <source>Show Message</source>
         <translation>显示信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="623"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="628"/>
         <source>Show Version Mismatch Message</source>
         <translation>显示版本不匹配信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="643"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="648"/>
         <source>Open Web Client...</source>
         <translation>打开Web客户端...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="670"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="675"/>
         <source>Camera List...</source>
         <translation>摄像机列表...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="977"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="970"/>
         <source>Image Enhancement...</source>
         <translation>图像增强...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1130"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1123"/>
         <source>Server Logs...</source>
         <translation>服务器日志...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="778"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="783"/>
         <source>Open Current Layout in a New Window</source>
         <translation>在新窗口打开当前Layout</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1085"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1078"/>
         <source>Camera Rules...</source>
         <translation>摄像机规则...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="408"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1079"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1072"/>
         <source>Check Camera Issues...</source>
         <translation>检查摄像机的问题...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="688"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="693"/>
         <source>How-to Videos and FAQ...</source>
         <translation>解说视频及常见问题</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="627"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="632"/>
         <source>Show Beta Version Warning Message</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3639,37 +3666,32 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="894"/>
-        <source>Tours...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="902"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="910"/>
         <source>Manage Tours...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="925"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="918"/>
         <source>Calibrate Fisheye</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1097"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1090"/>
         <source>Picture Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1249"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1242"/>
         <source>Zoom to Selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1292"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1289"/>
         <source>Ctrl+Alt+Shift+D</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1293"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1290"/>
         <source>Debug Control Panel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3912,12 +3934,12 @@ for recording at
 <context>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
-        <location filename="../src/ui/delegates/business_rule_item_delegate.cpp" line="142"/>
+        <location filename="../src/ui/delegates/business_rule_item_delegate.cpp" line="141"/>
         <source>For All Users</source>
         <translation>所有用户</translation>
     </message>
     <message>
-        <location filename="../src/ui/delegates/business_rule_item_delegate.cpp" line="143"/>
+        <location filename="../src/ui/delegates/business_rule_item_delegate.cpp" line="142"/>
         <source>For Administrators Only</source>
         <translation>仅管理员</translation>
     </message>
@@ -4218,22 +4240,22 @@ for recording at
 <context>
     <name>QnBusinessRulesDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="139"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="142"/>
         <source>Confirm exit</source>
         <translation>确认退出</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="140"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="143"/>
         <source>Unsaved changes will be lost. Save?</source>
         <translation>未保存的修改将会丢失。是否保存?</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="308"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="311"/>
         <source>Hide Advanced</source>
         <translation>隐藏进阶</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="308"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="311"/>
         <source>Show Advanced</source>
         <translation>显示进阶</translation>
     </message>
@@ -4246,22 +4268,22 @@ for recording at
         <translation type="obsolete">保存规则时发生错误</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="271"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="274"/>
         <source>Error while deleting rule</source>
         <translation>删除规则时发生错误</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="312"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="315"/>
         <source>&amp;New...</source>
         <translation>&amp;新建...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="315"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="318"/>
         <source>&amp;Delete</source>
         <translation>&amp;删除</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="322"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="325"/>
         <source>&amp;Schedule...</source>
         <translation>&amp;日程...</translation>
     </message>
@@ -4274,45 +4296,45 @@ for recording at
         <translation type="obsolete">一些规则无效。是否要禁用他们?</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="248"/>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="251"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="254"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="251"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="254"/>
         <source>Error while saving rule.</source>
         <translation>保存规则时发生错误。</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="41"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="44"/>
         <source>Reset Default Rules</source>
         <translation>重置默认规则</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="228"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="231"/>
         <source>Confirm rules reset</source>
         <translation>确认规则重置</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="229"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="232"/>
         <source>Are you sure you want to reset rules to the defaults?
 This action CANNOT be undone!</source>
         <translation>您确定要重置到默认的规则吗？
 此操作无法取消！</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="248"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="251"/>
         <source>Error while receiving rules.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="339"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="342"/>
         <source>Confirm save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="340"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="343"/>
         <source>Some rules are not valid. Should they be disabled?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4411,8 +4433,8 @@ This action CANNOT be undone!</source>
         <translation type="obsolete">IP地址区间太大，最大允许255个地址</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="754"/>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="757"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="753"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="756"/>
         <source>Finished</source>
         <translation>完成</translation>
     </message>
@@ -4421,17 +4443,17 @@ This action CANNOT be undone!</source>
         <translation type="obsolete">没有发现摄像机</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="593"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="592"/>
         <source>No cameras selected</source>
         <translation>没有选中的摄像机</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="593"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="592"/>
         <source>Please select at least one camera</source>
         <translation>请选择至少一台摄像机</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="615"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="614"/>
         <source>Success</source>
         <translation>成功</translation>
     </message>
@@ -4441,8 +4463,8 @@ This action CANNOT be undone!</source>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="371"/>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="624"/>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="722"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="623"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="721"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
@@ -4496,7 +4518,7 @@ Make sure server is available and try again.</source>
         <translation type="obsolete">无法连接到服务器。请确认服务器在线并重新尝试。</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="616"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="615"/>
         <source>%n camera(s) added successfully.
 It might take a few moments to populate them in the tree.</source>
         <translation>
@@ -4519,12 +4541,12 @@ Make sure the server is available and try again.</source>
         <translation type="obsolete">服务器回报一个错误。</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="754"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="753"/>
         <source>All cameras are already in the resource tree.</source>
         <translation>所有摄像机都已经在资源树狀表中。</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="757"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="756"/>
         <source>No cameras found.</source>
         <translation>没有找到摄像机。</translation>
     </message>
@@ -4535,66 +4557,66 @@ Make sure the server is available and try again.</source>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="221"/>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="733"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="732"/>
         <source>Initializing scan...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="568"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="567"/>
         <source>Finishing search...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="665"/>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="672"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="664"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="671"/>
         <source>Server went offline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="666"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="665"/>
         <source>Server went offline, search aborted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="673"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="672"/>
         <source>Server went offline, cameras can be added when the server will be available.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="700"/>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="706"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="699"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="705"/>
         <source>Server was removed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="701"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="700"/>
         <source>Server was removed, search aborted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="707"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="706"/>
         <source>Server was removed, cameras cannot be added anymore.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="722"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="721"/>
         <source>Error while searching cameras.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="737"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="736"/>
         <source>Scanning online hosts...</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="742"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="741"/>
         <source>Scanning hosts... (%1)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="743"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="742"/>
         <source>%n cameras found</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -4616,7 +4638,7 @@ Make sure the server is available and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="624"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="623"/>
         <source>Error while adding camera(s).</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -4711,7 +4733,7 @@ Make sure the server is available and try again.</source>
 <context>
     <name>QnCameraListDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="50"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="54"/>
         <source>Copy Selection to Clipboard</source>
         <translation>复制选择到剪贴板</translation>
     </message>
@@ -4720,7 +4742,7 @@ Make sure the server is available and try again.</source>
         <translation type="obsolete">复制选择到档案</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="55"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="59"/>
         <source>Select All</source>
         <translation>选择所有</translation>
     </message>
@@ -4733,26 +4755,26 @@ Make sure the server is available and try again.</source>
         <translation type="obsolete">依媒体服务器 &apos;%1&apos; 摄像机列表-发现%2摄像机</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="54"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="58"/>
         <source>Export Selection to File...</source>
         <translation>输出选择到档案...</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="142"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="160"/>
         <source>Camera List - %n camera(s) found</source>
         <translation>
             <numerusform>摄像机列表-找到%n台摄像机</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="144"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="162"/>
         <source>Camera List for media server &apos;%1&apos; - %n camera(s) found</source>
         <translation>
             <numerusform>依媒体服务器 &apos;%1&apos; 摄像机列表-找到%n台摄像机</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="131"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="149"/>
         <source>Export selected cameras to file</source>
         <translation type="unfinished">输出选取的摄像机至档案</translation>
     </message>
@@ -4760,12 +4782,12 @@ Make sure the server is available and try again.</source>
 <context>
     <name>QnCameraListModel</name>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="104"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="108"/>
         <source>Recording</source>
         <translation>录像</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="105"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="109"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
@@ -4774,32 +4796,37 @@ Make sure the server is available and try again.</source>
         <translation type="obsolete">制造商</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="107"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="110"/>
+        <source>Vendor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="111"/>
         <source>Model</source>
         <translation>型号</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="108"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="112"/>
         <source>Firmware</source>
         <translation>韧体</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="109"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="114"/>
         <source>IP/Name</source>
         <translation>IP/名称</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="110"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="115"/>
         <source>ID/MAC</source>
         <translation>ID/MAC</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="111"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="116"/>
         <source>Server</source>
         <translation>服务器</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/camera_list_model.cpp" line="106"/>
+        <location filename="../src/ui/models/camera_list_model.cpp" line="113"/>
         <source>Driver</source>
         <translation>驱动器</translation>
     </message>
@@ -5465,86 +5492,86 @@ You will be asked to restart the client in compatibility mode.</source>
 <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="38"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="42"/>
         <source>Save Database Backup...</source>
         <translation>保存数据库备份...</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="38"/>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="72"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="42"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="80"/>
         <source>Database Backup Files (*.db)</source>
         <translation>数据库备份文件(*.db)</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="45"/>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="79"/>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="113"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="52"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="87"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="122"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="45"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="52"/>
         <source>Could not open file &apos;%1&apos; for writing.</source>
         <translation>无法打开文件 &apos;%1&apos; 来写入。</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="52"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="59"/>
         <source>Downloading Database Backup</source>
         <translation>正在下载数据库备份</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="53"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="60"/>
         <source>Database backup is being downloaded from the server. Please wait.</source>
         <translation>数据库备份正从服务器中下载。请稍候。</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="68"/>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="109"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="76"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="118"/>
         <source>Information</source>
         <translation>信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="68"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="76"/>
         <source>Database was successfully backed up into file &apos;%1&apos;.</source>
         <translation>数据库成功备份到文件 &apos;%1&apos;。</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="72"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="80"/>
         <source>Open Database Backup...</source>
         <translation>开启数据库备份...</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="79"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="87"/>
         <source>Could not open file &apos;%1&apos; for reading.</source>
         <translation>无法开启文件 &apos;%1&apos; 来读取。</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="83"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="91"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="83"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="91"/>
         <source>Are you sure you want to start restoring database? All current data will be lost.</source>
         <translation>确认要开始还原数据库？所有当前数据将会丢失。</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="95"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="103"/>
         <source>Restoring Database Backup</source>
         <translation>正在还原数据库备份</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="96"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="104"/>
         <source>Database backup is being uploaded to the server. Please wait.</source>
         <translation>数据库备份正上传到服务器。请稍候。</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="110"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="119"/>
         <source>Database was successfully restored from file &apos;%1&apos;.</source>
         <translation>数据库从文件 &apos;%1&apos; 还原成功。</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="113"/>
+        <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="122"/>
         <source>An error has occured while restoring the database from file &apos;%1&apos;.</source>
         <translation>从文件 &apos;%1&apos;还原数据库时发生错误。</translation>
     </message>
@@ -5694,17 +5721,17 @@ You will be asked to restart the client in compatibility mode.</source>
 <context>
     <name>QnEventLogDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="80"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="84"/>
         <source>Any action</source>
         <translation>任何动作</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="100"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="104"/>
         <source>Filter Similar Rows</source>
         <translation>过滤类似行</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="102"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="106"/>
         <source>Copy Selection to Clipboard</source>
         <translation>复制选择到剪贴板</translation>
     </message>
@@ -5713,12 +5740,12 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="obsolete">输出选择到档案</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="104"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="108"/>
         <source>Select All</source>
         <translation>选择所有</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="107"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="111"/>
         <source>Clear Filter</source>
         <translation>清除过滤器</translation>
     </message>
@@ -5759,7 +5786,7 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="obsolete">&lt; %1 台摄像机&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="103"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="107"/>
         <source>Export Selection to File...</source>
         <translation>输出选择到档案...</translation>
     </message>
@@ -5768,33 +5795,33 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="obsolete">您还没有配置任何报警/事件规则以匹配当前的过滤条件。</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="362"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="366"/>
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="366"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="370"/>
         <source>Event log for %1 - %n event(s) found</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="404"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="408"/>
         <source>&lt;Any camera&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="406"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="410"/>
         <source>&lt;%n camera(s)&gt;</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="518"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="522"/>
         <source>Export selected events to file</source>
         <translation type="unfinished">输出选取的事件至档案</translation>
     </message>
@@ -5802,42 +5829,42 @@ You will be asked to restart the client in compatibility mode.</source>
 <context>
     <name>QnEventLogModel</name>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="268"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="490"/>
         <source>Date/Time</source>
         <translation>日期/时间</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="269"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="491"/>
         <source>Event</source>
         <translation>事件</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="270"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="492"/>
         <source>Source</source>
         <translation>源</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="271"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="493"/>
         <source>Action</source>
         <translation>动作</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="272"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="494"/>
         <source>Target</source>
         <translation>目标</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="273"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="495"/>
         <source>Description</source>
         <translation>描述</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="407"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="383"/>
         <source>All users</source>
         <translation>所有用户</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/event_log_model.cpp" line="409"/>
+        <location filename="../src/ui/models/event_log_model.cpp" line="385"/>
         <source>Administrators Only</source>
         <translation>仅管理员</translation>
     </message>
@@ -6034,12 +6061,22 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="unfinished">客户端时间</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="129"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="40"/>
+        <source>Dark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="41"/>
+        <source>Light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="132"/>
         <source>IP Address: %1, Network Mask: %2</source>
         <translation type="unfinished">IP地址：%1，网络遮罩：%2</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="216"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="218"/>
         <source>Warning</source>
         <translation type="unfinished">警告</translation>
     </message>
@@ -6048,40 +6085,40 @@ You will be asked to restart the client in compatibility mode.</source>
         <translation type="obsolete">硬件加速是高度实验性的，并可能在一些配置上导致死机。你确定你要启用它吗？</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="148"/>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="232"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="151"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="234"/>
         <source>Information</source>
         <translation type="unfinished">信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="149"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="152"/>
         <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="198"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="200"/>
         <source>Folder is already added</source>
         <translation type="unfinished">文件夹已添加</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="198"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="200"/>
         <source>This folder is already added.</source>
         <translation type="unfinished">这个文件夹已添加。</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="216"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="218"/>
         <source>This option will not affect Recording Schedule. 
 Recording Schedule is always based on Server Time.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="233"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="235"/>
         <source>Folder &apos;%1&apos; does not exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="178"/>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="191"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="180"/>
+        <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="193"/>
         <source>Select folder...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6162,17 +6199,17 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QnLayoutExportTool</name>
     <message>
-        <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="73"/>
+        <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="74"/>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
         <translation type="unfinished">文件&apos;%1&apos;正在被另一个程序使用。请尝试另一个名称。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="305"/>
+        <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="306"/>
         <source>Exporting %1 to &quot;%2&quot;...</source>
         <translation type="unfinished">输出%1至&quot;%2&quot;...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="356"/>
+        <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="359"/>
         <source>Could not export camera %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6490,6 +6527,11 @@ Archive Streams Allowed: %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="316"/>
+        <source>You are trying to activate an incompatible license with your software.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="117"/>
         <source>The software is licensed to %1 cameras and %2 analog cameras.
 %3 licenses and %4 analog licenses are currently in use.</source>
@@ -6499,11 +6541,6 @@ Archive Streams Allowed: %4</source>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="125"/>
         <source>The software is licensed to %1 cameras.
 %2 licenses are currently in use.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="316"/>
-        <source>There was a problem activating your license. You are trying to activate an incompatible license with your software.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6810,12 +6847,12 @@ Try to restore version %1?</source>
         <translation type="obsolete">时:分:秒.zzz</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="128"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="126"/>
         <source>Smart Search</source>
         <translation>智能搜索</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="136"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="134"/>
         <source>PTZ</source>
         <translation>PTZ</translation>
     </message>
@@ -6828,12 +6865,12 @@ Try to restore version %1?</source>
         <translation type="obsolete">缩小</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="765"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="764"/>
         <source> (%1)</source>
         <translation> (%1)</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="781"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="780"/>
         <source>	%1</source>
         <translation>	%1</translation>
     </message>
@@ -6858,22 +6895,22 @@ Try to restore version %1?</source>
         <translation type="obsolete">移动侦测和低分辨率录像</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="772"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="771"/>
         <source> Lo-Res</source>
         <translation>低分辨率</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="772"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="771"/>
         <source> Hi-Res</source>
         <translation>高分辨率</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="783"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="782"/>
         <source>LIVE</source>
         <translation>实时</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="788"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="787"/>
         <source>%1x%2 %3fps @ %4Mbps%5%6%7</source>
         <translation type="unfinished">%1x%2 %3fps @ %4Mbps%5%6%7</translation>
     </message>
@@ -6890,27 +6927,27 @@ Try to restore version %1?</source>
         <translation type="obsolete">%1x%2 %3fps @ %4Mbps%5%6%7%8</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="153"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="151"/>
         <source>Create Zoom Window</source>
         <translation>创建缩放窗口</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="161"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="159"/>
         <source>Image Enhancement</source>
         <translation>图像增强</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="448"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="447"/>
         <source>Zoom window</source>
         <translation>缩放窗口</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="144"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="142"/>
         <source>Dewarping</source>
         <translation>扭曲影像還原</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="120"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="118"/>
         <source>Screenshot</source>
         <translation>截屏</translation>
     </message>
@@ -6976,7 +7013,7 @@ Try to restore version %1?</source>
         <translation type="obsolete">空格</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="379"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="380"/>
         <source>Speed Down</source>
         <translation>减速</translation>
     </message>
@@ -6985,7 +7022,7 @@ Try to restore version %1?</source>
         <translation type="obsolete">Ctrl+-</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="380"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="381"/>
         <source>Speed Up</source>
         <translation>加速</translation>
     </message>
@@ -6994,7 +7031,7 @@ Try to restore version %1?</source>
         <translation type="obsolete">Ctrl++</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="379"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="380"/>
         <source>Previous Frame</source>
         <translation>前一帧</translation>
     </message>
@@ -7003,7 +7040,7 @@ Try to restore version %1?</source>
         <translation type="obsolete">Ctrl+Left</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="380"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="381"/>
         <source>Next Frame</source>
         <translation>下一帧</translation>
     </message>
@@ -7012,7 +7049,7 @@ Try to restore version %1?</source>
         <translation type="obsolete">Ctrl+Right</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="392"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="393"/>
         <source>To Start</source>
         <translation>到开始</translation>
     </message>
@@ -7021,7 +7058,7 @@ Try to restore version %1?</source>
         <translation type="obsolete">Z</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="393"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="394"/>
         <source>To End</source>
         <translation>到结束</translation>
     </message>
@@ -7070,12 +7107,12 @@ Try to restore version %1?</source>
         <translation type="obsolete">S</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="392"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="393"/>
         <source>Previuos Chunk</source>
         <translation>上一块</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="393"/>
+        <location filename="../src/ui/graphics/items/controls/navigation_item.cpp" line="394"/>
         <source>Next Chunk</source>
         <translation>下一块</translation>
     </message>
@@ -7270,30 +7307,29 @@ Try to restore version %1?</source>
         <translation>浏览存档</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="320"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="321"/>
         <source>Open Camera</source>
         <translation>开启摄像机</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="330"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="349"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="331"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="350"/>
         <source>Camera Settings</source>
         <translation>摄像机设定</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="340"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="488"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="496"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="341"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="491"/>
         <source>Server settings</source>
         <translation>服务器设定</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="361"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="362"/>
         <source>Open camera web page...</source>
         <translation>打开摄像机网页...</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="370"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="371"/>
         <source>Settings</source>
         <translation>设定</translation>
     </message>
@@ -7314,19 +7350,19 @@ Try to restore version %1?</source>
         <translation type="obsolete">您的网络里还有另外一个媒体服务器在观看您的摄像机。</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="444"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="466"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="445"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="467"/>
         <source>User Settings</source>
         <translation>用户设定</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="452"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="453"/>
         <source>Licenses</source>
         <translation>许可</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="459"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="481"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="460"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="482"/>
         <source>SMTP Settings</source>
         <translation>SMTP设定</translation>
     </message>
@@ -7335,7 +7371,7 @@ Try to restore version %1?</source>
         <translation type="obsolete">用户 %1 未设定邮件地址。</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="474"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="475"/>
         <source>Connect to server</source>
         <translation>连接到服务器</translation>
     </message>
@@ -7640,12 +7676,12 @@ Please close the application and start it again using the shortcut in the start 
 <context>
     <name>QnPtzPresetDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/ptz_preset_dialog.cpp" line="50"/>
+        <location filename="../src/ui/dialogs/ptz_preset_dialog.cpp" line="52"/>
         <source>None</source>
         <translation>无</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_preset_dialog.cpp" line="32"/>
+        <location filename="../src/ui/dialogs/ptz_preset_dialog.cpp" line="33"/>
         <source>Saved Position %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7666,12 +7702,12 @@ Please close the application and start it again using the shortcut in the start 
         <translation>无</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_preset_list_model.cpp" line="224"/>
+        <location filename="../src/ui/models/ptz_preset_list_model.cpp" line="236"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_preset_list_model.cpp" line="225"/>
+        <location filename="../src/ui/models/ptz_preset_list_model.cpp" line="237"/>
         <source>Hotkey</source>
         <translation>热键</translation>
     </message>
@@ -7679,12 +7715,12 @@ Please close the application and start it again using the shortcut in the start 
 <context>
     <name>QnPtzPresetsDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/ptz_presets_dialog.cpp" line="21"/>
+        <location filename="../src/ui/dialogs/ptz_presets_dialog.cpp" line="23"/>
         <source>Remove</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_presets_dialog.cpp" line="24"/>
+        <location filename="../src/ui/dialogs/ptz_presets_dialog.cpp" line="26"/>
         <source>Activate</source>
         <translation>激活</translation>
     </message>
@@ -7708,72 +7744,119 @@ Please close the application and start it again using the shortcut in the start 
 <context>
     <name>QnPtzTourListModel</name>
     <message>
-        <location filename="../src/ui/models/ptz_tour_list_model.cpp" line="67"/>
+        <location filename="../src/ui/models/ptz_tour_list_model.cpp" line="78"/>
         <source>New Tour %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_tour_list_model.cpp" line="106"/>
+        <location filename="../src/ui/models/ptz_tour_list_model.cpp" line="105"/>
+        <source>Tour time: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/models/ptz_tour_list_model.cpp" line="105"/>
+        <source>less than a minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/ui/models/ptz_tour_list_model.cpp" line="105"/>
+        <source>about %n minutes</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../src/ui/models/ptz_tour_list_model.cpp" line="107"/>
+        <source>Invalid tour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/models/ptz_tour_list_model.cpp" line="157"/>
+        <source>#</source>
+        <translation type="unfinished">#</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/models/ptz_tour_list_model.cpp" line="159"/>
         <source>Name</source>
         <translation type="unfinished">名称</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/models/ptz_tour_list_model.cpp" line="161"/>
+        <source>Details</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnPtzTourModel</name>
     <message>
-        <location filename="../src/ui/models/ptz_tour_model.cpp" line="60"/>
+        <source>Low</source>
+        <translation type="obsolete">低</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation type="obsolete">高</translation>
+    </message>
+    <message>
+        <source>Instant</source>
+        <translation type="obsolete">立即作用</translation>
+    </message>
+</context>
+<context>
+    <name>QnPtzTourSpotsModel</name>
+    <message>
+        <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="63"/>
         <source>Lowest</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_tour_model.cpp" line="60"/>
+        <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="63"/>
         <source>Low</source>
         <translation type="unfinished">低</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_tour_model.cpp" line="60"/>
+        <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="63"/>
         <source>Normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_tour_model.cpp" line="60"/>
+        <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="63"/>
         <source>High</source>
         <translation type="unfinished">高</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_tour_model.cpp" line="60"/>
+        <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="63"/>
         <source>Highest</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_tour_model.cpp" line="82"/>
+        <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="85"/>
         <source>Instant</source>
         <translation type="unfinished">立即作用</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_tour_model.cpp" line="83"/>
+        <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="86"/>
         <source>%n seconds</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_tour_model.cpp" line="177"/>
+        <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="208"/>
         <source>&lt;Invalid&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_tour_model.cpp" line="234"/>
+        <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="265"/>
         <source>Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_tour_model.cpp" line="236"/>
+        <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="267"/>
         <source>Stay Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_tour_model.cpp" line="238"/>
+        <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="269"/>
         <source>Speed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7911,22 +7994,22 @@ Please close the application and start it again using the shortcut in the start 
 <context>
     <name>QnResourcePoolModel::Node</name>
     <message>
-        <location filename="../src/ui/models/resource_pool_model.cpp" line="81"/>
+        <location filename="../src/ui/models/resource_pool_model.cpp" line="80"/>
         <source>Root</source>
         <translation type="unfinished">根</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/resource_pool_model.cpp" line="84"/>
+        <location filename="../src/ui/models/resource_pool_model.cpp" line="83"/>
         <source>Local</source>
         <translation type="unfinished">本地</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/resource_pool_model.cpp" line="88"/>
+        <location filename="../src/ui/models/resource_pool_model.cpp" line="87"/>
         <source>System</source>
         <translation type="unfinished">系统</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/resource_pool_model.cpp" line="92"/>
+        <location filename="../src/ui/models/resource_pool_model.cpp" line="91"/>
         <source>Users</source>
         <translation type="unfinished">用户</translation>
     </message>
@@ -7934,17 +8017,17 @@ Please close the application and start it again using the shortcut in the start 
 <context>
     <name>QnResourceSelectionDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="85"/>
+        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="88"/>
         <source>Select cameras...</source>
         <translation>选择摄像机...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="78"/>
+        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="81"/>
         <source>Select users...</source>
         <translation>选择用户...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="91"/>
+        <location filename="../src/ui/dialogs/resource_selection_dialog.cpp" line="94"/>
         <source>Select resources...</source>
         <translation>选择资源...</translation>
     </message>
@@ -8003,17 +8086,17 @@ Please close the application and start it again using the shortcut in the start 
         <translation type="obsolete">请在摄像机设定中检查认证信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="167"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="168"/>
         <source>Close</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="175"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="176"/>
         <source>Information</source>
         <translation>信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="182"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="183"/>
         <source>Rotate</source>
         <translation>旋转</translation>
     </message>
@@ -8105,12 +8188,12 @@ Please close the application and start it again using the shortcut in the start 
         <translation type="obsolete">%1% {1 %2 ?}</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="746"/>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="751"/>
         <source>%1 %2</source>
         <translation type="unfinished">%1% {1 %2?}</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="741"/>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="746"/>
         <source>%1 %2 (up %n days, %3)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -8162,14 +8245,12 @@ You have only %2Gb left for video archive.</source>
         <translation type="obsolete">存储&apos;%1&apos;。仅有%2视频存档空间</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="400"/>
         <source>On</source>
-        <translation>开</translation>
+        <translation type="vanished">开</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="400"/>
         <source>Off</source>
-        <translation>关</translation>
+        <translation type="vanished">关</translation>
     </message>
     <message>
         <source>No storages specified</source>
@@ -8184,7 +8265,7 @@ You have only %2Gb left for video archive.</source>
         <translation type="obsolete">无效空间限制</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="243"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="244"/>
         <source>Remove Storage</source>
         <translation>移除存储</translation>
     </message>
@@ -8199,22 +8280,32 @@ You have only %2Gb left for video archive.</source>
         <translation>加载中...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="599"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="585"/>
+        <source>Finished</source>
+        <translation type="unfinished">完成</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="586"/>
+        <source>Rebuilding archive index is completed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="623"/>
         <source>Could not load storages from server.</source>
         <translation>无法从服务器加载存储。</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="636"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="660"/>
         <source>&lt;a href=&apos;1&apos;&gt;Add external Storage...&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;1&apos;&gt;添加外部存储空间...&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="551"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="546"/>
         <source>Warning</source>
         <translation type="unfinished">警告</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="552"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="547"/>
         <source>You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours. This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8245,18 +8336,18 @@ You have only %2Gb left for video archive.</source>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="811"/>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="815"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="819"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="823"/>
         <source>&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
         <translation>&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="447"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="455"/>
         <source>Hardware (Camera built-in)</source>
         <translation>硬件（摄像机内建）</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="449"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="457"/>
         <source>Do not record motion</source>
         <translation>不录像移动视频</translation>
     </message>
@@ -8376,22 +8467,22 @@ You have only %2Gb left for video archive.</source>
         <translation type="obsolete">取消</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="83"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="81"/>
         <source>Auto</source>
         <translation>自动</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="214"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="212"/>
         <source>Email is not valid</source>
         <translation>邮箱无效</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="217"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="215"/>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
         <translation>没有找到预设位。使用&apos;进阶&apos;选项。</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="256"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="254"/>
         <source>Invalid data</source>
         <translation>无效数据</translation>
     </message>
@@ -8400,22 +8491,22 @@ You have only %2Gb left for video archive.</source>
         <translation type="obsolete">无法测试这些参数</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="268"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="266"/>
         <source>TLS</source>
         <translation>TLS</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="270"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="268"/>
         <source>SSL</source>
         <translation>SSL</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="271"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="269"/>
         <source>Unsecured</source>
         <translation>不安全的</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="278"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="276"/>
         <source>In Progress...</source>
         <translation>处理中...</translation>
     </message>
@@ -8428,12 +8519,12 @@ You have only %2Gb left for video archive.</source>
         <translation type="obsolete">超时</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="307"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="305"/>
         <source>Error while testing settings</source>
         <translation>测试设定时发生错误</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="309"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="307"/>
         <source>Success</source>
         <translation>成功</translation>
     </message>
@@ -8446,8 +8537,8 @@ You have only %2Gb left for video archive.</source>
         <translation type="obsolete">接收设定时发生错误</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="310"/>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="330"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="308"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="328"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
@@ -8464,22 +8555,22 @@ You have only %2Gb left for video archive.</source>
         <translation type="obsolete">&amp;系统签名:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="256"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="254"/>
         <source>Provided parameters are not valid. Could not perform a test.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="289"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="287"/>
         <source>Canceled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="299"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="297"/>
         <source>Timed out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="330"/>
+        <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="328"/>
         <source>Could not read settings from Enterprise Controller.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8500,27 +8591,27 @@ You have only %2Gb left for video archive.</source>
 <context>
     <name>QnStatusOverlayWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="58"/>
+        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="54"/>
         <source>NO DATA</source>
         <translation>没有数据</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="60"/>
+        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="56"/>
         <source>NO SIGNAL</source>
         <translation>没有信号</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="64"/>
+        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="60"/>
         <source>Unauthorized</source>
         <translation>未授权</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="66"/>
+        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="62"/>
         <source>Please check authentication information&lt;br/&gt;in camera settings</source>
         <translation>请在摄像机设定中检查认证信息&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="69"/>
+        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="65"/>
         <source>Loading...</source>
         <translation>加载中...</translation>
     </message>
@@ -8529,12 +8620,12 @@ You have only %2Gb left for video archive.</source>
         <translation type="obsolete">激活类比许可来移除这条信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="74"/>
+        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="71"/>
         <source>Diagnose...</source>
         <translation>诊断...</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="62"/>
+        <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="58"/>
         <source>Server offline</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8582,7 +8673,7 @@ You have only %2Gb left for video archive.</source>
 <context>
     <name>QnTimeSlider</name>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="1148"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="1194"/>
         <source>NO THUMBNAILS
 AVAILABLE</source>
         <translation>没有可用的缩图</translation>
@@ -8593,7 +8684,7 @@ AVAILABLE</source>
         <translation type="obsolete">时:分:秒</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="508"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="511"/>
         <source>ms</source>
         <extracomment>Suffix for displaying milliseconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>毫秒</translation>
@@ -8615,7 +8706,7 @@ AVAILABLE</source>
         <translation type="obsolete">500毫秒</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="511"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="514"/>
         <source>s</source>
         <extracomment>Suffix for displaying seconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>秒</translation>
@@ -8625,7 +8716,7 @@ AVAILABLE</source>
         <translation type="obsolete">59秒</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="514"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="517"/>
         <source>m</source>
         <extracomment>Suffix for displaying minutes on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>分</translation>
@@ -8635,13 +8726,13 @@ AVAILABLE</source>
         <translation type="obsolete">59分</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="543"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="546"/>
         <source>dd MMMM yyyy hh:mm ap</source>
         <extracomment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation type="unfinished">日 月 年 时:分</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="517"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="520"/>
         <source>h</source>
         <extracomment>Suffix for displaying hours on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>时</translation>
@@ -8651,7 +8742,7 @@ AVAILABLE</source>
         <translation type="obsolete">23时</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="549"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="552"/>
         <source>dd MMMM yyyy h ap</source>
         <extracomment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation type="unfinished">日 月 年 时</translation>
@@ -8665,13 +8756,13 @@ AVAILABLE</source>
         <translation type="obsolete">3月29日</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="552"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="555"/>
         <source>dd MMMM yyyy</source>
         <extracomment>Format for displaying day caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation type="unfinished">日 月 年</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="533"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="536"/>
         <source>MMMM</source>
         <extracomment>Format for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation type="unfinished">月</translation>
@@ -8681,14 +8772,14 @@ AVAILABLE</source>
         <translation type="obsolete">9月</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="555"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="558"/>
         <source>MMMM yyyy</source>
         <extracomment>Format for displaying month caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation type="unfinished">月 年</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="536"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="558"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="539"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="561"/>
         <source>yyyy</source>
         <extracomment>Format for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.
 ----------
@@ -8700,7 +8791,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <translation type="obsolete">2000</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="520"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="523"/>
         <source>d</source>
         <extracomment>Suffix for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>日</translation>
@@ -8710,7 +8801,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <translation type="obsolete">29日</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="523"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="526"/>
         <source>M</source>
         <extracomment>Suffix for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>月</translation>
@@ -8720,7 +8811,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <translation type="obsolete">11月</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="526"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="529"/>
         <source>y</source>
         <extracomment>Suffix for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation>年</translation>
@@ -8730,26 +8821,26 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <translation type="obsolete">2000年</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="496"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="499"/>
         <source>auto</source>
         <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of AM/PM usage based on user&apos;s system locale. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="530"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="533"/>
         <source>dd MMMM</source>
         <extracomment>Format for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="540"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="543"/>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>MINUTES</comment>
         <extracomment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="546"/>
+        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="549"/>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>HOURS</comment>
         <extracomment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
@@ -9012,7 +9103,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
 <context>
     <name>QnWorkbenchActionHandler</name>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="889"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="906"/>
         <source>New layout</source>
         <translation>新layout</translation>
     </message>
@@ -9065,21 +9156,21 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <translation type="obsolete">输入Layout名称:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="959"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2325"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2381"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2404"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="976"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2342"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2398"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2421"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="960"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="977"/>
         <source>Camera(s) cannot be moved to server &apos;%1&apos;. It might have been offline since the server is up.</source>
         <translation>摄像机无法移到服务器&apos;%1&apos;。摄像机于服务器启动时可能已离线。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1058"/>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1075"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1092"/>
         <source>Open file</source>
         <translation>打开文件</translation>
     </message>
@@ -9092,79 +9183,79 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <translation type="obsolete">视频(*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1053"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1070"/>
         <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
         <translation>图片(*.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1055"/>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1072"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1089"/>
         <source>All files (*.*)</source>
         <translation>所有文件(*.*)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1070"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1087"/>
         <source>All Supported (*.layout)</source>
         <translation>所有支持的(*.layout)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1071"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1088"/>
         <source>Layouts (*.layout)</source>
         <translation>Layout(*.layout)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1660"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1677"/>
         <source>Camera(s) not Saved</source>
         <translation>摄像机没有保存</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1661"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1678"/>
         <source>Save changes to the following %n camera(s)?</source>
         <translation>
             <numerusform>保存以下%n台摄像机修改?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1904"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1921"/>
         <source>Delete Files</source>
         <translation>删除文件</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1905"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1922"/>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation>
             <numerusform>确认要永久删除这%n个文件?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1922"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1939"/>
         <source>Remove Items</source>
         <translation>删除项目</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1923"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1940"/>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation>
             <numerusform>确认要从layout中删除这%n个项目?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1965"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1982"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1966"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1983"/>
         <source>Enter new name for the selected item:</source>
         <translation>为选择的项目输入新名称:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2007"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2024"/>
         <source>Delete Resources</source>
         <translation>删除资源</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2008"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2025"/>
         <source>Do you really want to delete the following %n item(s)?</source>
         <translation>
             <numerusform>确认要删除这%n个项目?</numerusform>
@@ -9191,7 +9282,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <translation type="obsolete">无法保存截屏&apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2097"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2114"/>
         <source>User Settings</source>
         <translation>用户设定</translation>
     </message>
@@ -9306,7 +9397,7 @@ Do you want to continue?</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2382"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2399"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
         <translation>
             <numerusform>无法保存下列%n个项目到系统控制器。</numerusform>
@@ -9324,7 +9415,7 @@ Error description: &apos;%2&apos;</source>
         <translation type="obsolete">无法从系统控制器中删除资源。错误描述：&apos;%2&apos;</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2405"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2422"/>
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation>
             <numerusform>无法保存以下 %n 个资源的修改。</numerusform>
@@ -9340,8 +9431,8 @@ Error description: &apos;%2&apos;</source>
         <translation type="obsolete">当前参数无法保存</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="547"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2195"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="556"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2212"/>
         <source>Failed to save the following parameters (%1):
 %2</source>
         <translation>以下参数(%1):%2保存失败</translation>
@@ -9363,28 +9454,28 @@ Error description: &apos;%2&apos;</source>
         <translation type="obsolete">录像修改没有保存。选择录像方式，FPS和质量并将此标记在日程中。点击应用保存。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="462"/>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="471"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="480"/>
         <source>Changes are not applied</source>
         <translation>修改不适用</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="746"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="759"/>
         <source>Connect to Server...</source>
         <translation>连接到服务器...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="758"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="771"/>
         <source>Connect to Another Server...</source>
         <translation>连接到另一台服务器...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1051"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1068"/>
         <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
         <translation>所有支持的(*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1052"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1069"/>
         <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
         <translation>视频(*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
     </message>
@@ -9469,22 +9560,22 @@ Error description: &apos;%2&apos;</source>
         <translation type="obsolete">软件更新可用</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1113"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1130"/>
         <source>Version %1 is available for download at &lt;a href=&quot;%2&quot;&gt;%2&lt;/a&gt;.</source>
         <translation>版本 %1可在&lt;a href=&quot;%2&quot;&gt;%2&lt;/a&gt;下载。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1520"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1537"/>
         <source>Could not perform preview search</source>
         <translation>无法执行预览搜索</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1520"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1537"/>
         <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
         <translation>选择的时间区間太短无法执行预览搜索。请选择一个较长的时间区間。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1604"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1621"/>
         <source>Preview Search for %1</source>
         <translation>预览搜索 %1</translation>
     </message>
@@ -9493,33 +9584,33 @@ Error description: &apos;%2&apos;</source>
         <translation type="obsolete">超过许可限制。您的修改将会保存，但不会生效。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="499"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="508"/>
         <source>Could not apply changes</source>
         <translation>无法适用修改</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="546"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2194"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="555"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2211"/>
         <source>Could not save parameters</source>
         <translation>无法保存参数</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1099"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1116"/>
         <source>Information</source>
         <translation>信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1099"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1116"/>
         <source>No updates available.</source>
         <translation>没有可用更新。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1112"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1129"/>
         <source>Software update is available</source>
         <translation>有可用的软件更新</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1114"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1131"/>
         <source>Don&apos;t notify again about this update.</source>
         <translation>不再提醒这个更新。</translation>
     </message>
@@ -9593,12 +9684,12 @@ Please wait for the camera to go online.</source>
 请等待摄像机上线。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2394"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2411"/>
         <source>Could not delete resource</source>
         <translation>无法删除资源</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2394"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2411"/>
         <source>An error has occurred while trying to delete a resource from Enterprise Controller. 
 
 Error description: &apos;%2&apos;</source>
@@ -9611,7 +9702,7 @@ and you do not have the rights to overwrite it.</source>
         <translation type="obsolete">相同名称的Layout已经存在而您没有权利覆盖。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1133"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1150"/>
         <source>Layout Settings</source>
         <translation>Layout设定</translation>
     </message>
@@ -9620,7 +9711,7 @@ and you do not have the rights to overwrite it.</source>
         <translation type="obsolete">您的录像修改尚未保存。請选择录像方式，FPS和质量并将此修改标记在日程中。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="470"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="479"/>
         <source>Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.</source>
         <translation>移动侦测敏感度未修改。欲修改请在在图像中绘制矩形。</translation>
     </message>
@@ -9629,17 +9720,17 @@ and you do not have the rights to overwrite it.</source>
         <translation type="obsolete">PTZ_校准_%1.jpg</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="982"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="999"/>
         <source>Layout is locked and cannot be changed.</source>
         <translation>Layout已被锁定无法修改。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1003"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1020"/>
         <source>Cannot add item</source>
         <translation>无法添加项目</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1004"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1021"/>
         <source>Cannot add a local file to Multi-Video</source>
         <translation>无法添加本地文件成多视频</translation>
     </message>
@@ -9668,47 +9759,47 @@ and you do not have the rights to overwrite it.</source>
         <translation type="obsolete">带音频的摄像机不建议使用AVI格式因其存在一些记录漏洞。点击&apos;是&apos;继续输出或&apos;否&apos;选择其他格式</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2290"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2307"/>
         <source>Updating background</source>
         <translation>更新背景</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2291"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2308"/>
         <source>Image processing can take a lot of time. Please be patient.</source>
         <translation>图像处理需要很多时间。请耐心等待。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2325"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2342"/>
         <source>Image cannot be uploaded</source>
         <translation>图像无法上传</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2548"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2567"/>
         <source>Client v%1&lt;br/&gt;</source>
         <translation>客户端版本%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2551"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2570"/>
         <source>Enterprise Controller v%1&lt;br/&gt;</source>
         <translation>系统控制器版本%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2556"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2575"/>
         <source>Media Server v%1 at %2&lt;br/&gt;</source>
         <translation>在 %2的媒体服务器版本%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2558"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2577"/>
         <source>Media Server v%1&lt;br/&gt;</source>
         <translation>媒体服务器版本%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2587"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2606"/>
         <source>Some components of the system are not upgraded:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please upgrade all components to the latest version %2.</source>
         <translation>一些系统组件尚未升级:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;请升级所有组件至最新版本 %2。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2595"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2614"/>
         <source>Version Mismatch</source>
         <translation>版本不匹配</translation>
     </message>
@@ -9737,49 +9828,49 @@ and you do not have the rights to overwrite it.</source>
         <translation type="obsolete">开启新窗口</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="461"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="470"/>
         <source> Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
         <translation>您的录像修改尚未保存。請选择录像方式，FPS和画质并将此修改标记在日程中。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="498"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="507"/>
         <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
         <translation>超过许可限制。您的修改将会保存，但不会生效。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1801"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1818"/>
         <source>Process is in progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1802"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1819"/>
         <source>Camera addition is already in progress.Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2604"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2623"/>
         <source>Beta version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2647"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2666"/>
         <source>Launcher process is not found</source>
         <translation type="unfinished">未发现启动过程</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2648"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2667"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished">无法重新启动客户端。
 请关闭应用程序并使用开始菜单中的快捷方式重新启动它。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1087"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1104"/>
         <source>Select folder...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2605"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2624"/>
         <source>You are running beta version of %1.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9787,8 +9878,8 @@ Please close the application and start it again using the shortcut in the start 
 <context>
     <name>QnWorkbenchController</name>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="591"/>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="632"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="588"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="629"/>
         <source>Recording in...</source>
         <translation>录像在...</translation>
     </message>
@@ -9797,7 +9888,7 @@ Please close the application and start it again using the shortcut in the start 
         <translation type="obsolete">取消</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="643"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="640"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
@@ -9806,17 +9897,17 @@ Please close the application and start it again using the shortcut in the start 
         <translation type="obsolete">录像_视频</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="656"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="653"/>
         <source>Save Recording As...</source>
         <translation>录像保存为...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="658"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="655"/>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
         <translation>AVI (音频/视频交错) (*.avi)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="643"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="640"/>
         <source>Can&apos;t start recording due to the following error: %1</source>
         <translation>由于以下错误无法开始录像：%1</translation>
     </message>
@@ -9825,22 +9916,22 @@ Please close the application and start it again using the shortcut in the start 
         <translation type="obsolete">按任意键停止轮巡</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1393"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1394"/>
         <source>Press any key to stop the tour</source>
         <translation>按任意键停止轮巡</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="626"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="623"/>
         <source>Canceled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="649"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="646"/>
         <source>Recorded Video</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="669"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="666"/>
         <source>Could not overwrite file &apos;%1&apos;. Please try another name.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10162,7 +10253,7 @@ Do you want to continue?</source>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="143"/>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="164"/>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="245"/>
-        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="446"/>
+        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="442"/>
         <source>Layout already exists</source>
         <translation type="unfinished">Layout已经存在</translation>
     </message>
@@ -10215,34 +10306,34 @@ and you do not have the rights to overwrite it.</source>
         <translation type="unfinished">请稍等。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="430"/>
+        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="426"/>
         <source>New Layout</source>
         <translation type="unfinished">新Layout</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="431"/>
+        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="427"/>
         <source>Enter the name of the layout to create:</source>
         <translation type="unfinished">输入创建的layout名称:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="432"/>
+        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="428"/>
         <source>New layout</source>
         <translation type="unfinished">新layout</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="544"/>
+        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="540"/>
         <source>Error</source>
         <translation type="unfinished">错误</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="545"/>
+        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="541"/>
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
         <translation type="unfinished">
             <numerusform>无法保存下列%n个layout到系统控制器。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="546"/>
+        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="542"/>
         <source>Do you want to restore these %n layout(s)?</source>
         <translation type="unfinished">
             <numerusform>要还原这%n个layout吗?</numerusform>
@@ -10252,7 +10343,7 @@ and you do not have the rights to overwrite it.</source>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="57"/>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="144"/>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="165"/>
-        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="447"/>
+        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="443"/>
         <source>Layout with the same name already exists and you do not have the rights to overwrite it.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10321,12 +10412,12 @@ hh:mm:ss</source>
 <context>
     <name>QnWorkbenchPtzHandler</name>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="79"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="102"/>
         <source>Could not get position from camera</source>
         <translation type="unfinished">无法从摄像机取得预设位</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="80"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="103"/>
         <source>An error has occurred while trying to get current position from camera %1.
 
 Please wait for the camera to go online.</source>
@@ -10334,13 +10425,13 @@ Please wait for the camera to go online.</source>
 请等待摄像机上线。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="159"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="192"/>
         <source>Could not set position to camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="117"/>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="160"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="145"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="193"/>
         <source>An error has occurred while trying to set current position for camera %1.
 
 Please wait for the camera to go online.</source>
@@ -10348,12 +10439,12 @@ Please wait for the camera to go online.</source>
 请等待摄像机上线。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="207"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="243"/>
         <source>PTZ_CALIBRATION_%1.jpg</source>
         <translation type="unfinished">PTZ_校准_%1.jpg</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="116"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="144"/>
         <source>Could not set position for camera</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10361,7 +10452,7 @@ Please wait for the camera to go online.</source>
 <context>
     <name>QnWorkbenchScreenshotHandler</name>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="226"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="225"/>
         <source>PNG Image (*.png)</source>
         <translation>PNG图片(*.png)</translation>
     </message>
@@ -10370,7 +10461,7 @@ Please wait for the camera to go online.</source>
         <translation type="obsolete">JPEG图片(*.jpg)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="238"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="237"/>
         <source>Save Screenshot As...</source>
         <translation>保存屏幕截屏为...</translation>
     </message>
@@ -10379,7 +10470,7 @@ Please wait for the camera to go online.</source>
         <translation type="obsolete">带时间戳</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="272"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="271"/>
         <source>Save As</source>
         <translation>另存为</translation>
     </message>
@@ -10388,7 +10479,7 @@ Please wait for the camera to go online.</source>
         <translation type="obsolete">文件&apos;%1&apos;已经存在，要覆盖吗?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="284"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="283"/>
         <source>Could not overwrite file</source>
         <translation>无法覆盖文件</translation>
     </message>
@@ -10397,57 +10488,57 @@ Please wait for the camera to go online.</source>
         <translation type="obsolete">文件&apos;%1&apos;正在被另一个程序使用。请尝试另一个名称。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="342"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="341"/>
         <source>Could not save screenshot</source>
         <translation>无法保存截屏</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="343"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="342"/>
         <source>An error has occurred while saving screenshot &apos;%1&apos;.</source>
         <translation>保存截屏&apos;%1&apos;时发生错误。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="227"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="226"/>
         <source>JPEG Image (*.jpg)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="247"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="246"/>
         <source>No timestamp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="248"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="247"/>
         <source>Top left corner</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="249"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="248"/>
         <source>Top right corner</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="250"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="249"/>
         <source>Bottom left corner</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="251"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="250"/>
         <source>Bottom right corner</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="254"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="253"/>
         <source>Timestamp:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="273"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="272"/>
         <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="285"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="284"/>
         <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10784,7 +10875,7 @@ Please wait for the camera to go online.</source>
         <translation type="obsolete">RTSP端口：</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="55"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="79"/>
         <source>9000</source>
         <translation>9000</translation>
     </message>
@@ -10802,12 +10893,12 @@ Please wait for the camera to go online.</source>
         <translation>名称:</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="105"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="91"/>
         <source>Storages</source>
         <translation>存储空间</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="147"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="133"/>
         <source>Path</source>
         <translation>路径</translation>
     </message>
@@ -10824,52 +10915,51 @@ Please wait for the camera to go online.</source>
         <translation type="obsolete">删除</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="65"/>
         <source>Panic mode:</source>
-        <translation>危机模式:</translation>
+        <translation type="vanished">危机模式:</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="45"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="69"/>
         <source>Port:</source>
         <translation>端口:</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="142"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="128"/>
         <source>In Use</source>
         <translation>使用中</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="152"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="138"/>
         <source>Capacity</source>
         <translation>容量</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="157"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="143"/>
         <source>Video Storage</source>
         <translation>视频存储</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="94"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="60"/>
         <source>Ping</source>
         <translation>Ping</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="168"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="154"/>
         <source>Rebuild archive index</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="200"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="195"/>
         <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="227"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="222"/>
         <source>Rebuild progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="244"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="239"/>
         <source>Cancel</source>
         <translation type="unfinished">取消</translation>
     </message>
@@ -10883,6 +10973,11 @@ Please wait for the camera to go online.</source>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/server_settings_widget.ui" line="39"/>
+        <source>Camera Management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/settings/server_settings_widget.ui" line="58"/>
         <source>System Configuration Backup and Restore</source>
         <translation>系统配置备份和还原</translation>
     </message>
@@ -10923,7 +11018,7 @@ Please wait for the camera to go online.</source>
         <translation>名称:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="244"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="226"/>
         <source>Enable audio</source>
         <translation>启用音频</translation>
     </message>
@@ -10937,62 +11032,62 @@ Please wait for the camera to go online.</source>
         <translation>地址</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="119"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="110"/>
         <source>IP Address:</source>
         <translation>IP地址:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="173"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="164"/>
         <source>MAC Address:</source>
         <translation>MAC地址:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="156"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="147"/>
         <source>Web Page:</source>
         <translation>网页:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="192"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="183"/>
         <source>Authentication</source>
         <translation>验证</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="215"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="197"/>
         <source>Login:</source>
         <translation>登录:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="225"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="207"/>
         <source>Password:</source>
         <translation>密码:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="272"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="254"/>
         <source>Recording</source>
         <translation>录像</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="294"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="267"/>
         <source>Motion</source>
         <translation>移动侦测</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="305"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="278"/>
         <source>Motion is not available for this camera</source>
         <translation>此摄像机不支持移动侦测</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="318"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="291"/>
         <source>Motion settings</source>
         <translation>移动侦测设定</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="324"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="297"/>
         <source>Motion detection:</source>
         <translation>移动侦测:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="333"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="306"/>
         <source>Hardware (Camera built-in)</source>
         <translation>硬件（摄像机内建）</translation>
     </message>
@@ -11001,37 +11096,37 @@ Please wait for the camera to go online.</source>
         <translation type="obsolete">软件（在媒体服务器，最大每秒帧数可能会稍微降低）</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="355"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="328"/>
         <source>Sensitivity:</source>
         <translation>敏感度:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="392"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="365"/>
         <source>Motion mask (0)</source>
         <translation>移动侦测遮罩(0)</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="402"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="375"/>
         <source>Maximum sensitivity (9)</source>
         <translation>最大敏感度(9)</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="420"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="416"/>
         <source>Camera motion web page:</source>
         <translation>摄像机移动侦测网页:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="436"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="432"/>
         <source>URL</source>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="475"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="457"/>
         <source>Reset motion regions</source>
         <translation>重置移动侦测区域</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="507"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="480"/>
         <source>Advanced</source>
         <translation>进阶</translation>
     </message>
@@ -11041,7 +11136,7 @@ Please wait for the camera to go online.</source>
         <translation>型号:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="147"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="138"/>
         <source>Ping</source>
         <translation>Ping</translation>
     </message>
@@ -11063,7 +11158,7 @@ Please wait for the camera to go online.</source>
         <translation>韧体:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="512"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="485"/>
         <source>Expert</source>
         <translation>专家</translation>
     </message>
@@ -11072,12 +11167,12 @@ Please wait for the camera to go online.</source>
         <translation type="obsolete">这是鱼眼镜头摄像机</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="485"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="467"/>
         <source>Dewarping</source>
         <translation>扭曲影像還原</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="251"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="233"/>
         <source>This is a fish-eye lens camera</source>
         <translation>这是鱼眼镜头摄像机</translation>
     </message>
@@ -11091,7 +11186,7 @@ Please wait for the camera to go online.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="343"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="316"/>
         <source>Software (Max FPS may be slightly decreased on media server)</source>
         <translation type="unfinished"></translation>
     </message>

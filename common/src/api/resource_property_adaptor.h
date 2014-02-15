@@ -38,6 +38,7 @@ public:
 
 signals:
     void valueChanged();
+    void valueChangedExternally();
 
 protected:
     virtual bool serialize(const QVariant &value, QString *target) const = 0;

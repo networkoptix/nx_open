@@ -79,7 +79,7 @@ signals:
 protected slots:
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
-    void at_renderWatcher_displayingChanged(QnResourceDisplay *display);
+    void at_renderWatcher_displayChanged(QnResourceDisplay *display);
 
     void at_workbench_currentLayoutChanged();
 

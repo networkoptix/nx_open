@@ -67,8 +67,10 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
 
     QnPtzPresetList presets;
     QnPtzTourList tours;
+    QnPtzObject activeObject;
     widget->ptzController()->getPresets(&presets);
     widget->ptzController()->getTours(&tours);
+    widget->ptzController()->getActiveObject(&activeObject);
 
     qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
         return naturalStringCaseInsensitiveLessThan(l.name, r.name);
@@ -81,7 +83,11 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
 
     foreach(const QnPtzPreset &preset, presets) {
         QAction *action = new QAction(parent);
-        action->setText(preset.name);
+        if(activeObject.type == Qn::PresetPtzObject && activeObject.id == preset.id) {
+            action->setText(tr("%1 (active)", "Template for active PTZ preset").arg(preset.name));
+        } else {
+            action->setText(preset.name);
+        }
 
         int hotkey = idByHotkey.key(preset.id, QnPtzHotkey::NoHotkey);
         if(hotkey != QnPtzHotkey::NoHotkey)
@@ -108,7 +114,15 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
             continue;
 
         QAction *action = new QAction(parent);
-        action->setText(tour.name);
+        if(activeObject.type == Qn::TourPtzObject && activeObject.id == tour.id) {
+            action->setText(tr("%1 (active)", "Template for active PTZ tour").arg(tour.name));
+        } else {
+            action->setText(tour.name);
+        }
+
+        int hotkey = idByHotkey.key(tour.id, QnPtzHotkey::NoHotkey);
+        if(hotkey != QnPtzHotkey::NoHotkey)
+            action->setShortcut(Qt::Key_0 + hotkey);
 
         action->setData(QVariant::fromValue(
             QnActionParameters(parameters)

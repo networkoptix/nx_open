@@ -37,14 +37,15 @@ public:
     virtual bool activateTour(const QString &tourId) override                                                   { return m_baseController->activateTour(tourId); }
     virtual bool getTours(QnPtzTourList *tours) override                                                        { return m_baseController->getTours(tours); }
 
-    virtual bool updateHomePosition(const QnPtzObject &homePosition) override                                   { return m_baseController->updateHomePosition(homePosition); }
-    virtual bool getHomePosition(QnPtzObject *homePosition) override                                            { return m_baseController->getHomePosition(homePosition); }
+    virtual bool getActiveObject(QnPtzObject *activeObject) override                                            { return m_baseController->getActiveObject(activeObject); }
+    virtual bool updateHomeObject(const QnPtzObject &homeObject) override                                       { return m_baseController->updateHomeObject(homeObject); }
+    virtual bool getHomeObject(QnPtzObject *homeObject) override                                                { return m_baseController->getHomeObject(homeObject); }
 
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override                                     { return base_type::getData(query, data); /* This is important because of base implementation! */ }
 
 protected:
     virtual void baseFinished(Qn::PtzCommand command, const QVariant &data)                                     { emit finished(command, data); }
-    virtual void baseCapabilitiesChanged()                                                                      { emit capabilitiesChanged(); }
+    virtual void baseChanged(Qn::PtzDataFields fields)                                                          { emit changed(fields); }
 
     Q_SIGNAL void finishedLater(Qn::PtzCommand command, const QVariant &data);
 

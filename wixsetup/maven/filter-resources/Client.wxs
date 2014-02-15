@@ -125,9 +125,6 @@
             <Component>
                 <File Id="ClientVorbisEncDll" Name="libvorbisenc-2.dll" Source="$(var.SourceDir)/libvorbisenc-2.dll"/>
             </Component>
-            <Component>
-                <File Id="ClientX264" Name="x264.exe" Source="$(var.SourceDir)/x264.exe"/>                                
-            </Component>
         </ComponentGroup>
 
         <?if ${quicksync} = true ?>

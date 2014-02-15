@@ -13,7 +13,7 @@ QString getIdSuffixByModel(const QString& cameraModel)
     QString tmp = cameraModel.toLower();
     tmp = tmp.replace(QLatin1String(" "), QLatin1String(""));
 
-    if (tmp.contains(QLatin1String("mpa20m")) || tmp.contains(QLatin1String("mc421"))) {
+    if (tmp.contains(QLatin1String("fd20")) || tmp.contains(QLatin1String("mpa20m")) || tmp.contains(QLatin1String("mc421"))) {
         //without focus
         return QString::fromLatin1("-WOFOCUS");
     }

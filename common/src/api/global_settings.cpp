@@ -36,7 +36,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnGlobalSettings::at_resourcePool_resourceAdded);
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
     foreach(const QnResourcePtr &resource, qnResPool->getResources())
-        at_resourcePool_resourceRemoved(resource);
+        at_resourcePool_resourceAdded(resource);
 }
 
 QnGlobalSettings::~QnGlobalSettings() {
@@ -93,6 +93,7 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
         m_cameraSettingsOptimizationAdaptor.reset(new QnLexicalResourcePropertyAdaptor<bool>(m_admin, lit("cameraSettingsOptimization"), true, this));
     }
 
+    // TODO: #Elric use valueChangedExternally!
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
 

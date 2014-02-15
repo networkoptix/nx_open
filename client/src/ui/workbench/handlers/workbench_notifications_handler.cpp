@@ -23,7 +23,8 @@
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_adaptor(NULL)
+    m_adaptor(NULL),
+    m_popupSystemHealthFilter(qnSettings->popupSystemHealth())
 {
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
     connect(m_userEmailWatcher, &QnWorkbenchUserEmailWatcher::userEmailValidityChanged,     this,   &QnWorkbenchNotificationsHandler::at_userEmailValidityChanged);
@@ -271,12 +272,18 @@ void QnWorkbenchNotificationsHandler::at_licensePool_licensesChanged() {
 void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id) {
     if (id != QnClientSettings::POPUP_SYSTEM_HEALTH)
         return;
-    quint64 visible = qnSettings->popupSystemHealth();
+    quint64 filter = qnSettings->popupSystemHealth();
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+        bool oldVisible = (m_popupSystemHealthFilter &  (1ull << i));
+        bool newVisible = (filter &  (1ull << i));
+        if (oldVisible == newVisible)
+            continue;
+
         QnSystemHealth::MessageType message = QnSystemHealth::MessageType(i);
-        if (visible & (1ull << i))
+        if (newVisible)
             checkAndAddSystemHealthMessage(message);
         else
             setSystemHealthEventVisible(message, false);
     }
+    m_popupSystemHealthFilter = filter;
 }

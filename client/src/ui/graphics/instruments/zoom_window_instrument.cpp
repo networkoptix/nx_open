@@ -478,15 +478,12 @@ void ZoomWindowInstrument::updateOverlayMode(QnMediaResourceWidget *widget) {
     bool interactive = false;
     if(widget == display()->widget(Qn::ZoomedRole)) {
         /* Leave invisible. */
-    } else if(widget->options() & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity)) {
+    } else if(widget->options() & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity | QnResourceWidget::DisplayDewarped)) {
         /* Leave invisible. */
     } else if(widget->options() & QnResourceWidget::DisplayCrosshair) {
-        //if(widget->virtualPtzController()) {
-            ///* Leave invisible. */
-        //} else {
-            opacity = 0.4;
-            interactive = false;
-        //} // TODO: #PTZ
+        /* PTZ mode - transparent, non-interactive. */
+        opacity = 0.3;
+        interactive = false; 
     } else {
         opacity = 1.0;
         interactive = true;

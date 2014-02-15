@@ -16,16 +16,15 @@
 
 QnHomePtzController::QnHomePtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzObject>(baseController->resource(), lit("ptzHomePosition"), QnPtzObject(), this)),
+    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzObject>(baseController->resource(), lit("ptzHomeObject"), QnPtzObject(), this)),
     m_executor(new QnHomePtzExecutor(baseController))
 {
     assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
+    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
     m_executor->moveToThread(qnPtzPool->executorThread());
     m_executor->setHomePosition(m_adaptor->value());
     m_executor->restart();
-
-    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 }
 
 QnHomePtzController::~QnHomePtzController() {
@@ -44,27 +43,27 @@ Qn::PtzCapabilities QnHomePtzController::getCapabilities() {
 }
 
 bool QnHomePtzController::continuousMove(const QVector3D &speed) {
-    if(!supports(Qn::ContinuousMovePtzCommand))
+    if(!base_type::continuousMove(speed))
         return false;
 
     m_executor->restart();
-    return base_type::continuousMove(speed);
+    return true;
 }
 
 bool QnHomePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
-    if(!supports(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space)))
+    if(!base_type::absoluteMove(space, position, speed))
         return false;
 
     m_executor->restart();
-    return base_type::absoluteMove(space, position, speed);
+    return true;
 }
 
 bool QnHomePtzController::viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) {
-    if(!supports(Qn::ViewportMovePtzCommand))
+    if(!base_type::viewportMove(aspectRatio, viewport, speed))
         return false;
 
     m_executor->restart();
-    return base_type::viewportMove(aspectRatio, viewport, speed);
+    return true;
 }
 
 bool QnHomePtzController::createPreset(const QnPtzPreset &preset) {
@@ -72,50 +71,50 @@ bool QnHomePtzController::createPreset(const QnPtzPreset &preset) {
         return false;
 
 #ifdef QN_NEW_PRESET_IS_HOME
-    updateHomePosition(QnPtzObject(Qn::PresetPtzObject, preset.id));
+    updateHomeObject(QnPtzObject(Qn::PresetPtzObject, preset.id));
 #endif
     return true;
 }
 
 bool QnHomePtzController::activatePreset(const QString &presetId, qreal speed) {
-    if(!supports(Qn::ActivatePresetPtzCommand))
+    if(!base_type::activatePreset(presetId, speed))
         return false;
 
     m_executor->restart();
-    return base_type::activatePreset(presetId, speed);
+    return true;
 }
 
 bool QnHomePtzController::activateTour(const QString &tourId) {
-    if(!supports(Qn::ActivateTourPtzCommand))
+    if(!base_type::activateTour(tourId))
         return false;
 
     m_executor->stop();
-    return base_type::activateTour(tourId);
+    return true;
 }
 
-bool QnHomePtzController::updateHomePosition(const QnPtzObject &homePosition) {
+bool QnHomePtzController::updateHomeObject(const QnPtzObject &homeObject) {
     Qn::PtzCapabilities capabilities = getCapabilities();
-    if(homePosition.type == Qn::PresetPtzObject && !(capabilities & Qn::PresetsPtzCapability))
+    if(homeObject.type == Qn::PresetPtzObject && !(capabilities & Qn::PresetsPtzCapability))
         return false;
-    if(homePosition.type == Qn::TourPtzObject && !(capabilities & Qn::ToursPtzCapability))
+    if(homeObject.type == Qn::TourPtzObject && !(capabilities & Qn::ToursPtzCapability))
         return false;
 
     QMutexLocker locker(&m_mutex);
 
-    if(homePosition == m_adaptor->value())
+    if(homeObject == m_adaptor->value())
         return true; /* Nothing to update. */
-    m_adaptor->setValue(homePosition);
+    m_adaptor->setValue(homeObject);
 
-    m_executor->setHomePosition(homePosition);
+    m_executor->setHomePosition(homeObject);
     m_executor->restart();
 
     return true;
 }
 
-bool QnHomePtzController::getHomePosition(QnPtzObject *homePosition) {
+bool QnHomePtzController::getHomeObject(QnPtzObject *homeObject) {
     QMutexLocker locker(&m_mutex);
 
-    *homePosition = m_adaptor->value();
+    *homeObject = m_adaptor->value();
 
     return true;
 }
