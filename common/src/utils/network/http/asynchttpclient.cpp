@@ -340,6 +340,7 @@ namespace nx_http
     bool AsyncHttpClient::doGet( const QUrl& url )
     {
         resetDataBeforeNewRequest();
+        m_url = url;
         composeRequest( nx_http::Method::GET );
         return initiateHttpMessageDelivery( url );
     }
@@ -350,6 +351,7 @@ namespace nx_http
         const nx_http::StringType& messageBody )
     {
         resetDataBeforeNewRequest();
+        m_url = url;
         composeRequest( nx_http::Method::POST );
         m_request.headers["Content-Type"] = contentType;
         m_request.headers["Content-Length"] = StringType::number(messageBody.size());

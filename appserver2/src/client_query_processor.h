@@ -72,7 +72,7 @@ namespace ec2
             void processQueryAsync( const QUrl& ecBaseUrl, ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
             QUrl requestUrl( ecBaseUrl );
-            requestUrl.setPath( QString::fromLatin1("ec2/%1").arg(ApiCommand::toString(cmdCode)) );
+            requestUrl.setPath( QString::fromLatin1("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;
             toUrlParams( input, &query );
             requestUrl.setQuery( query );
