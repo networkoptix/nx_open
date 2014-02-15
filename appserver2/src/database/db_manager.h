@@ -126,6 +126,7 @@ namespace ec2
 
         ErrorCode updateResource(const ApiResourceData& data);
 		ErrorCode insertResource(const ApiResourceData& data);
+        ErrorCode insertOrReplaceResource(const ApiResourceData& data);
         ErrorCode deleteResourceTable(const qint32 id);
 
         ErrorCode insertAddParam(const ApiResourceParam& param);
@@ -151,6 +152,7 @@ namespace ec2
         ErrorCode deleteLayoutItems(const qint32 id);
         ErrorCode deleteLayoutTable(const qint32 id);
         ErrorCode insertLayout(const ApiLayoutData& data);
+        ErrorCode insertOrReplaceLayout(const ApiLayoutData& data);
         ErrorCode updateLayout(const ApiLayoutData& data);
         ErrorCode updateLayoutItems(const ApiLayoutData& data);
         ErrorCode removeLayoutItems(qint32 id);

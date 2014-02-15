@@ -294,6 +294,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
             return deliveryTransaction<ApiIdData>(command, stream);
 
         case ApiCommand::addOrUpdateLayouts:
+            return deliveryTransaction<ApiLayoutDataList>(command, stream);
         case ApiCommand::addLayout:
         case ApiCommand::updateLayout:
             return deliveryTransaction<ApiLayoutData>(command, stream);

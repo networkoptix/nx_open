@@ -37,13 +37,25 @@ namespace ec2
         template<> void triggerNotification<ApiLayoutData>( const QnTransaction<ApiLayoutData>& tran )
         {
             assert( tran.command == ApiCommand::addLayout ||
-                    tran.command == ApiCommand::updateLayout ||
-                    tran.command == ApiCommand::addOrUpdateLayouts );
+                    tran.command == ApiCommand::updateLayout);
             QnLayoutResourcePtr layoutResource = m_resCtx.resFactory->createResource(
                 tran.params.typeId,
                 tran.params.toHashMap() ).dynamicCast<QnLayoutResource>();
             tran.params.toResource( layoutResource );
             emit addedOrUpdated( layoutResource );
+        }
+
+        template<> void triggerNotification<ApiLayoutDataList>( const QnTransaction<ApiLayoutDataList>& tran )
+        {
+            assert(tran.command == ApiCommand::addOrUpdateLayouts );
+            foreach(const ApiLayoutData& layout, tran.params.data) 
+            {
+                QnLayoutResourcePtr layoutResource = m_resCtx.resFactory->createResource(
+                    layout.typeId,
+                    layout.toHashMap() ).dynamicCast<QnLayoutResource>();
+                layout.toResource( layoutResource );
+                emit addedOrUpdated( layoutResource );
+            }
         }
 
     private:

@@ -193,6 +193,24 @@ ErrorCode QnDbManager::insertResource(const ApiResourceData& data)
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data)
+{
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT OR REPLACE INTO vms_resource (id, guid, xtype_id, parent_id, name, url, status, disabled) VALUES(:id, :guid, :typeId, :parentId, :name, :url, :status, :disabled)");
+    data.autoBindValues(insQuery);
+    if (!insQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+    foreach(const ApiResourceParam& param, data.addParams) {
+        ErrorCode result = insertAddParam(param);
+        if (result != ErrorCode::ok)
+            return result;
+    }
+
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::updateResource(const ApiResourceData& data)
 {
 	QSqlQuery insQuery(m_sdb);
@@ -288,6 +306,29 @@ ErrorCode QnDbManager::insertLayout(const ApiLayoutData& data)
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT INTO vms_layout \
+                     (user_can_edit, cell_spacing_height, locked, \
+                     cell_aspect_ratio, user_id, background_width, \
+                     background_image_filename, background_height, \
+                     cell_spacing_width, background_opacity, resource_ptr_id \
+                     \
+                     VALUES (:userCanEdit, :cellSpacingHeight, :locked, \
+                     :cellAspectRatio, :userId, :backgroundWidth, \
+                     :backgroundImageFilename, :backgroundHeight, \
+                     :cellSpacingWidth, :backgroundOpacity, :id)");
+    data.autoBindValues(insQuery);
+    if (insQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
+ErrorCode QnDbManager::insertOrReplaceLayout(const ApiLayoutData& data)
+{
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT OR REPLACE INTO vms_layout \
                      (user_can_edit, cell_spacing_height, locked, \
                      cell_aspect_ratio, user_id, background_width, \
                      background_image_filename, background_height, \
@@ -611,8 +652,25 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiLayoutData>& tr
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiLayoutDataList>& tran)
 {
-    //TODO/IMPL
-    return ErrorCode::notImplemented;
+    QnDbTransactionLocker lock(&m_tran);
+
+    foreach(const ApiLayoutData& layout, tran.params.data)
+    {
+        ErrorCode err = insertOrReplaceResource(layout);
+        if (err != ErrorCode::ok)
+            return err;
+
+        err = insertOrReplaceLayout(layout);
+        if (err != ErrorCode::ok)
+            return err;
+
+        err = updateLayoutItems(layout);
+        if (err != ErrorCode::ok)
+            return err;
+    }
+
+    lock.commit();
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiResourceParams>& tran)
