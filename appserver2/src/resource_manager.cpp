@@ -34,20 +34,6 @@ namespace ec2
     }
 
     template<class T>
-    int QnResourceManager<T>::getResources( impl::GetResourcesHandlerPtr handler )
-    {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
-    }
-
-    template<class T>
-    int QnResourceManager<T>::getResource( const QnId& id, impl::GetResourceHandlerPtr handler )
-    {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
-    }
-
-    template<class T>
     int QnResourceManager<T>::setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler )
     {
         const int reqID = generateRequestID();

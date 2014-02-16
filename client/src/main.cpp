@@ -50,7 +50,6 @@ extern "C"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
 #include "device_plugins/server_camera/server_camera.h"
-#include "device_plugins/server_camera/appserver.h"
 
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE

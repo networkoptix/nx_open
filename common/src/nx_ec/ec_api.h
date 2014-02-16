@@ -56,22 +56,6 @@ namespace ec2
             return impl::doSyncCall<impl::GetResourceTypesHandler>( std::bind(&AbstractResourceManager::getResourceTypes, this, _1), resTypeList );
         }
         /*!
-            \param handler Functor with params: (ErrorCode, const QnResourceList&)
-        */
-        template<class TargetType, class HandlerType> int getResources( TargetType* target, HandlerType handler ) {
-            return getResources( std::static_pointer_cast<impl::GetResourcesHandler>(std::make_shared<impl::CustomGetResourcesHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        ErrorCode getResourcesSync( QnResourceList* resList ) {
-            using namespace std::placeholders;
-            return impl::doSyncCall<impl::GetResourcesHandler>( std::bind(&AbstractResourceManager::getResources, this, _1), resList );
-        }
-        /*!
-            \param handler Functor with params: (ErrorCode, const QnResourcePtr&)
-        */
-        template<class TargetType, class HandlerType> int getResource( const QnId& id, TargetType* target, HandlerType handler ) {
-            return getResource( std::static_pointer_cast<impl::GetResourceHandler>(std::make_shared<impl::CustomGetResourceHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        /*!
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int setResourceStatus( const QnId& resourceId, QnResource::Status status, TargetType* target, HandlerType handler ) {
@@ -125,8 +109,6 @@ namespace ec2
 
     protected:
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
-        virtual int getResources( impl::GetResourcesHandlerPtr handler ) = 0;
-        virtual int getResource( const QnId& id, impl::GetResourceHandlerPtr handler ) = 0;
         virtual int setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler ) = 0;
         virtual int getKvPairs( const QnId &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
         virtual int setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler ) = 0;

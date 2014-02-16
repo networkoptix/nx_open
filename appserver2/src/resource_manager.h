@@ -19,10 +19,6 @@ namespace ec2
 
         //!Implementation of AbstractResourceManager::getResourceTypes
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) override;
-        //!Implementation of AbstractResourceManager::getResources
-        virtual int getResources( impl::GetResourcesHandlerPtr handler ) override;
-        //!Implementation of AbstractResourceManager::getResource
-        virtual int getResource( const QnId& id, impl::GetResourceHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::setResourceStatus
         virtual int setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::getKvPairs

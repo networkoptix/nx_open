@@ -48,8 +48,6 @@
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/file_processor.h>
 
-#include <device_plugins/server_camera/appserver.h>
-
 #include <plugins/resources/archive/archive_stream_reader.h>
 #include <plugins/resources/archive/avi_files/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
