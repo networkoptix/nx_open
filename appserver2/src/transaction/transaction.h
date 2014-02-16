@@ -27,6 +27,8 @@ namespace ec2
             getResource,
             //!ApiSetResourceStatusData
             setResourceStatus,
+            //!ApiSetResourceDisabledData
+            setResourceDisabled,
             //!ApiResourceParams
             setResourceParams,
             getResourceParams,

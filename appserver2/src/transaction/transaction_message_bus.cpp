@@ -257,6 +257,9 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
         //!ApiSetResourceStatusData
         case ApiCommand::setResourceStatus:
             return deliveryTransaction<ApiSetResourceStatusData>(command, stream);
+        //!ApiSetResourceDisabledData
+        case ApiCommand::setResourceDisabled:
+            return deliveryTransaction<ApiSetResourceDisabledData>(command, stream);
         //!ApiResourceParams
         case ApiCommand::setResourceParams:
             return deliveryTransaction<ApiResourceParams>(command, stream);

@@ -66,10 +66,15 @@ namespace ec2
     }
 
     template<class T>
-    int QnResourceManager<T>::setResourceDisabled( const QnId& resourceId, bool disabled, impl::SimpleHandlerPtr handler )
+    int QnResourceManager<T>::setResourceDisabled( const QnId& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const int reqID = generateRequestID();
+
+        //performing request
+        auto tran = prepareTransaction( ApiCommand::setResourceDisabled, resourceId, disabled );
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SetResourceDisabledHandler::done ), handler, reqID, _1, resourceId));
+        return reqID;
     }
 
     template<class T>
@@ -140,6 +145,18 @@ namespace ec2
         tran.command = command;
         tran.persistent = true;
         tran.params.id = id;
+        return tran;
+    }
+
+    template<class T>
+    QnTransaction<ApiSetResourceDisabledData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id, bool disabled )
+    {
+        QnTransaction<ApiSetResourceDisabledData> tran;
+        tran.createNewID();
+        tran.command = command;
+        tran.persistent = true;
+        tran.params.id = id;
+        tran.params.disabled = disabled;
         return tran;
     }
 

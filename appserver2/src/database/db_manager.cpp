@@ -478,6 +478,22 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiSetResourceStat
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiSetResourceDisabledData>& tran)
+{
+    QnDbTransactionLocker lock(&m_tran);
+
+    QSqlQuery query(m_sdb);
+    query.prepare("UPDATE vms_resource set disabled = :disabled where id = :id");
+    query.bindValue(":disabled", tran.params.disabled);
+    query.bindValue(":id", tran.params.id);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
+    lock.commit();
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tran)
 {
     QnDbTransactionLocker lock(&m_tran);

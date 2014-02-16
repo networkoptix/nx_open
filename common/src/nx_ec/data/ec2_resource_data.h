@@ -62,6 +62,11 @@ struct ApiSetResourceStatusData: public ApiData
     QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
+struct ApiSetResourceDisabledData: public ApiData {
+    qint32 id;
+    bool disabled;
+};
+
 }
 
 #define ApiResourceParamFields (resourceId) (name) (value)
@@ -71,5 +76,6 @@ QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiResourceParam, ApiResourceParamF
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiResourceData,  ApiResourceDataFields)
 QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ApiResourceDataList,  (data))
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiSetResourceStatusData,  (id) (status) )
+QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiSetResourceDisabledData,  (id) (disabled) )
 
 #endif // __RESOURCE_TRANSACTION_DATA_H__
