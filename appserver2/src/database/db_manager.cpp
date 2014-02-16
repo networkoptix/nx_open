@@ -541,10 +541,14 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraDataList>
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiResourceData>& tran)
 {
-    if( tran.command == ApiCommand::saveResource )
-        return updateResource(tran.params);
+    QnDbTransactionLocker lock(&m_tran);
+    
+    ErrorCode err = updateResource(tran.params);
+    if (err != ErrorCode::ok)
+        return err;
 
-    return ErrorCode::notImplemented;
+    lock.commit();
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiBusinessRuleData>& tran)

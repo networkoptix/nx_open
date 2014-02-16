@@ -78,10 +78,22 @@ namespace ec2
     }
 
     template<class T>
-    int QnResourceManager<T>::save( const QnResourcePtr &resource, impl::SimpleHandlerPtr handler )
+    int QnResourceManager<T>::save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const int reqID = generateRequestID();
+
+        if (!resource->getId().isValid()) {
+            Q_ASSERT_X(0, "Only UPDATE operation is supported for saving resource!", Q_FUNC_INFO);
+            return INVALID_REQ_ID;
+        }
+
+        //performing request
+        auto tran = prepareTransaction( ApiCommand::saveResource, resource );
+
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveResourceHandler::done ), handler, reqID, _1, resource ) );
+
+        return reqID;
     }
 
     template<class T>
@@ -157,6 +169,17 @@ namespace ec2
         tran.persistent = true;
         tran.params.id = id;
         tran.params.disabled = disabled;
+        return tran;
+    }
+
+    template<class T>
+    QnTransaction<ApiResourceData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource )
+    {
+        QnTransaction<ApiResourceData> tran;
+        tran.createNewID();
+        tran.command = command;
+        tran.persistent = true;
+        tran.params.fromResource(resource);
         return tran;
     }
 

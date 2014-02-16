@@ -225,6 +225,7 @@ namespace ec2
         ///////// Handlers for AbstractMediaServerManager
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER( SaveServer, ErrorCode, QnMediaServerResourcePtr)
+        DEFINE_TWO_ARG_HANDLER( SaveResource, ErrorCode, QnResourcePtr)
         DEFINE_TWO_ARG_HANDLER( GetServers, ErrorCode, QnMediaServerResourceList )
 
 
