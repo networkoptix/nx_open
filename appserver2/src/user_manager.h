@@ -21,7 +21,7 @@ namespace ec2
 
         virtual int getUsers( impl::GetUsersHandlerPtr handler ) override;
         virtual int save( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
-        virtual int remove( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
+        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
         template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
             static_assert( false, "Specify QnUserManager::triggerNotification<>, please" );
@@ -48,6 +48,7 @@ namespace ec2
         ResourceContext m_resCtx;
 
         QnTransaction<ApiUserData> prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource );
+        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& resource );
     };
 }
 

@@ -148,6 +148,7 @@ namespace ec2
         ErrorCode updateStorages(const ApiMediaServerData&);
         ErrorCode removeServer(const qint32 id);
         ErrorCode removeLayout(const qint32 id);
+        ErrorCode removeLayoutNoLock(const qint32 id);
         ErrorCode deleteServerTable(const qint32 id);
         ErrorCode removeStoragesByServer(qint32 id);
 
@@ -161,6 +162,8 @@ namespace ec2
 
         ErrorCode insertUser( const ApiUserData& data );
         ErrorCode updateUser( const ApiUserData& data );
+        ErrorCode deleteUserProfileTable(const qint32 id);
+        ErrorCode deleteUserTable(const qint32 id);
         ErrorCode removeUser( qint32 id );
 
         ErrorCode insertBusinessRule( const ApiBusinessRuleData& businessRule );

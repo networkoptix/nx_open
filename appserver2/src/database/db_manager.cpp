@@ -619,10 +619,69 @@ ErrorCode QnDbManager::updateUser( const ApiUserData& data )
     return ErrorCode::notImplemented;
 }
 
+ErrorCode QnDbManager::deleteUserProfileTable(const qint32 id)
+{
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_userprofile where user_id = :id");
+    delQuery.bindValue(QLatin1String(":id"), id);
+    if (delQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
+ErrorCode QnDbManager::deleteUserTable(const qint32 id)
+{
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM auth_user where id = :id");
+    delQuery.bindValue(QLatin1String(":id"), id);
+    if (delQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
 ErrorCode QnDbManager::removeUser( qint32 id )
 {
-    //TODO/IMPL
-    return ErrorCode::notImplemented;
+    QnDbTransactionLocker tran(&m_tran);
+
+    QSqlQuery query(m_sdb);
+    query.prepare("SELECT resource_ptr_id FROM vms_layout where user_id = :id");
+    query.bindValue(":id", id);
+    if (!query.exec())
+        return ErrorCode::failure;
+
+    ErrorCode err;
+    while (query.next()) {
+        err = removeLayoutNoLock(query.value("resource_ptr_id").toInt());
+        if (err != ErrorCode::ok)
+            return err;
+    }
+
+    err = deleteAddParams(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteUserProfileTable(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteUserTable(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteResourceTable(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    tran.commit();
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::insertBusinessRule( const ApiBusinessRuleData& /*businessRule*/ )
@@ -909,7 +968,14 @@ ErrorCode QnDbManager::deleteLayoutTable(const qint32 id)
 ErrorCode QnDbManager::removeLayout(const qint32 id)
 {
     QnDbTransactionLocker tran(&m_tran);
+    ErrorCode err = removeLayoutNoLock(id);
+    if (err == ErrorCode::ok)
+        tran.commit();
+    return err;
+}
 
+ErrorCode QnDbManager::removeLayoutNoLock(const qint32 id)
+{
     ErrorCode err = deleteAddParams(id);
     if (err != ErrorCode::ok)
         return err;
@@ -923,11 +989,7 @@ ErrorCode QnDbManager::removeLayout(const qint32 id)
         return err;
 
     err = deleteResourceTable(id);
-    if (err != ErrorCode::ok)
-        return err;
-
-    tran.commit();
-    return ErrorCode::ok;
+    return err;
 }
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiStoredFileData>& tran)

@@ -430,8 +430,8 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int remove( const QnUserResourcePtr& resource, TargetType* target, HandlerType handler ) {
-            return remove( resource, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int remove( const QnId& id, TargetType* target, HandlerType handler ) {
+            return remove( id, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
@@ -442,7 +442,7 @@ namespace ec2
     private:
         virtual int getUsers( impl::GetUsersHandlerPtr handler ) = 0;
         virtual int save( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int remove( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
     };
     typedef std::shared_ptr<AbstractUserManager> AbstractUserManagerPtr;
 

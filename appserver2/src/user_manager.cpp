@@ -46,10 +46,13 @@ namespace ec2
     }
 
     template<class T>
-    int QnUserManager<T>::remove( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    int QnUserManager<T>::remove( const QnId& id, impl::SimpleHandlerPtr handler )
     {
-        Q_ASSERT_X(0, Q_FUNC_INFO, "Implement me!!!");
-        return INVALID_REQ_ID;
+        const int reqID = generateRequestID();
+        auto tran = prepareTransaction( ApiCommand::removeUser, id );
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        return reqID;
     }
 
     template<class T>
@@ -60,6 +63,17 @@ namespace ec2
         tran.command = command;
         tran.persistent = true;
         tran.params.fromResource( resource );
+        return tran;
+    }
+
+    template<class T>
+    QnTransaction<ApiIdData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
+    {
+        QnTransaction<ApiIdData> tran;
+        tran.createNewID();
+        tran.command = command;
+        tran.persistent = true;
+        tran.params.id = id;
         return tran;
     }
 
