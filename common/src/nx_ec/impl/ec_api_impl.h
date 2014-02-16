@@ -151,6 +151,7 @@ namespace ec2
             void emitSimpleDone( int reqID, const ErrorCode p1 ) { emit onSimpleDone( reqID, p1 ); }
             void emitGetResourceTypesDone( int reqID, const ErrorCode p1, const QnResourceTypeList& p2 ) { emit onGetResourceTypesDone( reqID, p1, p2 ); }
             void emitSetResourceStatusDone( int reqID, const ErrorCode p1, const QnId& p2 ) { emit onSetResourceStatusDone( reqID, p1, p2 ); }
+            void emitSaveResourceDone( int reqID, const ErrorCode p1, const QnResourcePtr& p2 ) { emit onSaveResourceDone( reqID, p1, p2 ); }
             void emitSetResourceDisabledDone( int reqID, const ErrorCode p1, const QnId& p2 ) { emit onSetResourceDisabledDone( reqID, p1, p2 ); }
             void emitGetResourcesDone( int reqID, const ErrorCode p1, const QnResourceList& p2 ) { emit onGetResourcesDone( reqID, p1, p2 ); }
             void emitGetResourceDone( int reqID, const ErrorCode p1, const QnResourcePtr& p2 ) { emit onGetResourceDone( reqID, p1, p2 ); }
@@ -177,6 +178,7 @@ namespace ec2
             void onSimpleDone( int reqID, const ErrorCode );
             void onGetResourceTypesDone( int reqID, const ErrorCode, const QnResourceTypeList& );
             void onSetResourceStatusDone( int reqID, const ErrorCode, const QnId& );
+            void onSaveResourceDone( int reqID, const ErrorCode, const QnResourcePtr& );
             void onSetResourceDisabledDone( int reqID, const ErrorCode, const QnId& );
             void onGetResourcesDone( int reqID, const ErrorCode, const QnResourceList& );
             void onGetResourceDone( int reqID, const ErrorCode, const QnResourcePtr& );
