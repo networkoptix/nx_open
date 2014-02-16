@@ -503,6 +503,26 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tr
     return result;
 }
 
+ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraDataList>& tran)
+{
+    QnDbTransactionLocker lock(&m_tran);
+    ErrorCode result;
+    foreach(const ApiCameraData& camera, tran.params.data)
+    {
+        result = updateResource(camera);
+        if (result !=ErrorCode::ok)
+            return result;
+        result = updateCamera(camera);
+        if (result !=ErrorCode::ok)
+            return result;
+        result = updateCameraSchedule(camera);
+        if (result != ErrorCode::ok)
+            return result;
+    }
+    lock.commit();
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiResourceData>& tran)
 {
     if( tran.command == ApiCommand::saveResource )

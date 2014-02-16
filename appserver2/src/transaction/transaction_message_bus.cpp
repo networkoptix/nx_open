@@ -270,6 +270,8 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
         case ApiCommand::addCamera:
         case ApiCommand::updateCamera:
             return deliveryTransaction<ApiCameraData>(command, stream);
+        case ApiCommand::updateCameras:
+            return deliveryTransaction<ApiCameraDataList>(command, stream);
         case ApiCommand::removeCamera:
             return deliveryTransaction<ApiIdData>(command, stream);
         case ApiCommand::addCameraHistoryItem:

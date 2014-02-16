@@ -42,6 +42,8 @@ namespace ec2
                     return "addCamera";
                 case updateCamera:
                     return "updateCamera";
+                case updateCameras:
+                    return "updateCameras";
                 case removeCamera:
                     return "removeCamera";
                 case getCameras:

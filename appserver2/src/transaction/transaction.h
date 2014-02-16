@@ -42,6 +42,8 @@ namespace ec2
             addCamera,
             //!ApiCameraData
 		    updateCamera,
+            //!ApiCameraDataList
+            updateCameras,
             //!ApiIdData
             removeCamera,
             getCameras,

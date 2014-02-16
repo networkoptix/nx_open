@@ -38,6 +38,7 @@ namespace ec2
         }
 
         ErrorCode executeTransaction(const QnTransaction<ApiCameraData>& tran);
+        ErrorCode executeTransaction(const QnTransaction<ApiCameraDataList>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiMediaServerData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiLayoutData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiLayoutDataList>& tran);

@@ -79,8 +79,8 @@ struct ApiCameraDataList: public ApiData
 	
 	void loadFromQuery(QSqlQuery& query);
 
-	template <class T> 
-    void toResourceList(QList<T>& outData, QnResourceFactory* factory) const;
+	template <class T> void toResourceList(QList<T>& outData, QnResourceFactory* factory) const;
+    void fromResourceList(const QList<QnVirtualCameraResourcePtr>& cameras);
 };
 
 }

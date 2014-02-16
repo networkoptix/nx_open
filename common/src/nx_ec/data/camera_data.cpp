@@ -126,6 +126,14 @@ void ApiCameraDataList::toResourceList(QList<T>& outData, QnResourceFactory* fac
     }
 }
 
+void ApiCameraDataList::fromResourceList(const QList<QnVirtualCameraResourcePtr>& cameras)
+{
+    data.reserve(cameras.size());
+    for(int i = 0; i < cameras.size(); ++i)
+        data[i].fromResource(cameras[i]);
+}
+
+
 template void ApiCameraDataList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData, QnResourceFactory* factory) const;
 template void ApiCameraDataList::toResourceList<QnVirtualCameraResourcePtr>(QList<QnVirtualCameraResourcePtr>& outData, QnResourceFactory* factory) const;
 

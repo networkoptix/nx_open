@@ -28,7 +28,7 @@ namespace ec2
         //!Implementation of AbstractCameraManager::getCameraHistoryList
         virtual int getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::save
-        virtual int save( const QnVirtualCameraResourceList& cameras, impl::SimpleHandlerPtr handler ) override;
+        virtual int save( const QnVirtualCameraResourceList& cameras, impl::AddCameraHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::remove
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
@@ -44,6 +44,19 @@ namespace ec2
                 tran.params.toHashMap() ).dynamicCast<QnVirtualCameraResource>();
             tran.params.toResource( cameraRes );
             emit cameraAddedOrUpdated( cameraRes );
+        }
+
+        template<> void triggerNotification<ApiCameraDataList>( const QnTransaction<ApiCameraDataList>& tran )
+        {
+            assert( tran.command == ApiCommand::updateCameras );
+            foreach(const ApiCameraData& camera, tran.params.data) 
+            {
+                QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
+                    camera.typeId,
+                    camera.toHashMap() ).dynamicCast<QnVirtualCameraResource>();
+                camera.toResource( cameraRes );
+                emit cameraAddedOrUpdated( cameraRes );
+            }
         }
 
         template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran )
@@ -66,6 +79,7 @@ namespace ec2
 		ResourceContext m_resCtx;
 
         QnTransaction<ApiCameraData> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourcePtr& resource );
+        QnTransaction<ApiCameraDataList> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourceList& cameras );
         QnTransaction<ApiCameraServerItemData> prepareTransaction( ApiCommand::Value cmd, const QnCameraHistoryItem& historyItem );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
     };

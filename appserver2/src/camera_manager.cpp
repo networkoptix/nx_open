@@ -90,10 +90,28 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::save( const QnVirtualCameraResourceList& cameras, impl::SimpleHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::save( const QnVirtualCameraResourceList& cameras, impl::AddCameraHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const int reqID = generateRequestID();
+
+        //preparing output data
+        QnVirtualCameraResourceList cameraList;
+        foreach(const QnVirtualCameraResourcePtr& camera, cameras)
+        {
+            if (!camera->getId().isValid()) {
+                Q_ASSERT_X(0, "Only update operation is supported", Q_FUNC_INFO);
+                return INVALID_REQ_ID;
+            }
+            cameraList.push_back( camera );
+        }
+
+        //performing request
+        auto tran = prepareTransaction( ApiCommand::updateCameras, cameras );
+
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::AddCameraHandler::done ), handler, reqID, _1, cameraList ) );
+
+        return reqID;
     }
 
     template<class QueryProcessorType>
@@ -122,6 +140,19 @@ namespace ec2
 		result.createNewID();
 		result.persistent = true;
 		result.params.fromResource(resource);
+        return result;
+    }
+
+    template<class QueryProcessorType>
+    QnTransaction<ApiCameraDataList> QnCameraManager<QueryProcessorType>::prepareTransaction(
+        ApiCommand::Value cmd,
+        const QnVirtualCameraResourceList& cameras )
+    {
+        QnTransaction<ApiCameraDataList> result;
+        result.command = cmd;
+        result.createNewID();
+        result.persistent = true;
+        result.params.fromResourceList(cameras);
         return result;
     }
 
