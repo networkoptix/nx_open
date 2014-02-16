@@ -352,7 +352,7 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int deleteRule( int ruleId, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int deleteRule( QnId ruleId, TargetType* target, HandlerType handler ) {
             return deleteRule( ruleId, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -388,7 +388,7 @@ namespace ec2
             const QnEmailAttachmentList& attachments,
             impl::SimpleHandlerPtr handler ) = 0;
         virtual int save( const QnBusinessEventRulePtr& rule, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int deleteRule( int ruleId, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int deleteRule( QnId ruleId, impl::SimpleHandlerPtr handler ) = 0;
         virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) = 0;
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) = 0;
     };

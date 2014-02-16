@@ -633,20 +633,6 @@ ErrorCode QnDbManager::deleteUserProfileTable(const qint32 id)
     }
 }
 
-ErrorCode QnDbManager::deleteUserTable(const qint32 id)
-{
-    QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM auth_user where id = :id");
-    delQuery.bindValue(QLatin1String(":id"), id);
-    if (delQuery.exec()) {
-        return ErrorCode::ok;
-    }
-    else {
-        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
-        return ErrorCode::failure;
-    }
-}
-
 ErrorCode QnDbManager::removeUser( qint32 id )
 {
     QnDbTransactionLocker tran(&m_tran);
@@ -672,7 +658,7 @@ ErrorCode QnDbManager::removeUser( qint32 id )
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteUserTable(id);
+    err = deleteTableRecord(id, "auth_user", "id");
     if (err != ErrorCode::ok)
         return err;
 
@@ -696,10 +682,21 @@ ErrorCode QnDbManager::updateBusinessRule( const ApiBusinessRuleData& /*business
     return ErrorCode::notImplemented;
 }
 
-ErrorCode QnDbManager::removeBusinessRule( qint32 /*id*/ )
+ErrorCode QnDbManager::removeBusinessRule( qint32 id )
 {
-    //TODO/IMPL
-    return ErrorCode::notImplemented;
+    ErrorCode err = deleteTableRecord(id, "vms_businessrule_action_resources", "businessrule_id");
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteTableRecord(id, "vms_businessrule_event_resources", "businessrule_id");
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteTableRecord(id, "vms_businessrule", "id");
+    if (err != ErrorCode::ok)
+        return err;
+
+    return ErrorCode::ok;
 }
 
 
@@ -813,34 +810,6 @@ ErrorCode QnDbManager::deleteResourceTable(const qint32 id)
     }
 }
 
-ErrorCode QnDbManager::deleteCameraTable(const qint32 id)
-{
-    QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_camera where resource_ptr_id = :id");
-    delQuery.bindValue(QLatin1String(":id"), id);
-    if (delQuery.exec()) {
-        return ErrorCode::ok;
-    }
-    else {
-        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
-        return ErrorCode::failure;
-    }
-}
-
-ErrorCode QnDbManager::deleteServerTable(const qint32 id)
-{
-    QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_server where resource_ptr_id = :id");
-    delQuery.bindValue(QLatin1String(":id"), id);
-    if (delQuery.exec()) {
-        return ErrorCode::ok;
-    }
-    else {
-        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
-        return ErrorCode::failure;
-    }
-}
-
 ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 id)
 {
     QSqlQuery query(m_sdb);
@@ -867,10 +836,10 @@ ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 id)
     }
 }
 
-ErrorCode QnDbManager::deleteBusinessRuleResourceTable(qint32 id, const QString& tableName)
+ErrorCode QnDbManager::deleteTableRecord(qint32 id, const QString& tableName, const QString& fieldName)
 {
     QSqlQuery delQuery(m_sdb);
-    delQuery.prepare(QString("DELETE FROM %1 where resource_id = :id").arg(tableName));
+    delQuery.prepare(QString("DELETE FROM %1 where %2 = :id").arg(tableName).arg(fieldName));
     delQuery.bindValue(QLatin1String(":id"), id);
     if (delQuery.exec()) {
         return ErrorCode::ok;
@@ -889,11 +858,11 @@ ErrorCode QnDbManager::removeCamera(const qint32 id)
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteBusinessRuleResourceTable(id, "vms_businessrule_action_resources");
+    err = deleteTableRecord(id, "vms_businessrule_action_resources", "resource_id");
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteBusinessRuleResourceTable(id, "vms_businessrule_event_resources");
+    err = deleteTableRecord(id, "vms_businessrule_event_resources", "resource_id");
     if (err != ErrorCode::ok)
         return err;
 
@@ -901,7 +870,7 @@ ErrorCode QnDbManager::removeCamera(const qint32 id)
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteCameraTable(id);
+    err = deleteTableRecord(id, "vms_camera", "resource_ptr_id");
     if (err != ErrorCode::ok)
         return err;
 
@@ -925,7 +894,7 @@ ErrorCode QnDbManager::removeServer(const qint32 id)
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteServerTable(id);
+    err = deleteTableRecord(id, "vms_server", "resource_ptr_id");
     if (err != ErrorCode::ok)
         return err;
 
@@ -941,20 +910,6 @@ ErrorCode QnDbManager::deleteLayoutItems(const qint32 id)
 {
     QSqlQuery delQuery(m_sdb);
     delQuery.prepare("DELETE FROM vms_layoutitem where layout_id = :id");
-    delQuery.bindValue(QLatin1String(":id"), id);
-    if (delQuery.exec()) {
-        return ErrorCode::ok;
-    }
-    else {
-        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
-        return ErrorCode::failure;
-    }
-}
-
-ErrorCode QnDbManager::deleteLayoutTable(const qint32 id)
-{
-    QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_layout where resource_ptr_id = :id");
     delQuery.bindValue(QLatin1String(":id"), id);
     if (delQuery.exec()) {
         return ErrorCode::ok;
@@ -984,7 +939,7 @@ ErrorCode QnDbManager::removeLayoutNoLock(const qint32 id)
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteLayoutTable(id);
+    err = deleteTableRecord(id, "vms_layout", "resource_ptr_id");
     if (err != ErrorCode::ok)
         return err;
 

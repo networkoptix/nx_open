@@ -125,6 +125,8 @@ namespace ec2
             QnDbTransaction* m_tran;
         };
 
+        ErrorCode deleteTableRecord(qint32 id, const QString& tableName, const QString& fieldName);
+
         ErrorCode updateResource(const ApiResourceData& data);
 		ErrorCode insertResource(const ApiResourceData& data);
         ErrorCode insertOrReplaceResource(const ApiResourceData& data);
@@ -139,9 +141,7 @@ namespace ec2
 		ErrorCode insertCamera(const ApiCameraData& data);
         ErrorCode updateCameraSchedule(const ApiCameraData& data);
         ErrorCode removeCamera(const qint32 id);
-        ErrorCode deleteCameraTable(const qint32 id);
         ErrorCode deleteCameraServerItemTable(qint32 id);
-        ErrorCode deleteBusinessRuleResourceTable(qint32 id, const QString& tableName);
 
         ErrorCode updateMediaServer(const ApiMediaServerData& data);
         ErrorCode insertMediaServer(const ApiMediaServerData& data);
@@ -149,11 +149,9 @@ namespace ec2
         ErrorCode removeServer(const qint32 id);
         ErrorCode removeLayout(const qint32 id);
         ErrorCode removeLayoutNoLock(const qint32 id);
-        ErrorCode deleteServerTable(const qint32 id);
         ErrorCode removeStoragesByServer(qint32 id);
 
         ErrorCode deleteLayoutItems(const qint32 id);
-        ErrorCode deleteLayoutTable(const qint32 id);
         ErrorCode insertLayout(const ApiLayoutData& data);
         ErrorCode insertOrReplaceLayout(const ApiLayoutData& data);
         ErrorCode updateLayout(const ApiLayoutData& data);
@@ -163,7 +161,6 @@ namespace ec2
         ErrorCode insertUser( const ApiUserData& data );
         ErrorCode updateUser( const ApiUserData& data );
         ErrorCode deleteUserProfileTable(const qint32 id);
-        ErrorCode deleteUserTable(const qint32 id);
         ErrorCode removeUser( qint32 id );
 
         ErrorCode insertBusinessRule( const ApiBusinessRuleData& businessRule );

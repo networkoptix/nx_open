@@ -58,10 +58,13 @@ int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::S
 }
 
 template<class T>
-int QnBusinessEventManager<T>::deleteRule( int ruleId, impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::deleteRule( QnId ruleId, impl::SimpleHandlerPtr handler )
 {
-    //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
-    return INVALID_REQ_ID;
+    const int reqID = generateRequestID();
+    auto tran = prepareTransaction( ApiCommand::removeBusinessRule, ruleId );
+    using namespace std::placeholders;
+    m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+    return reqID;
 }
 
 template<class T>
@@ -86,6 +89,17 @@ QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction
     tran.command = command;
     tran.persistent = true;
     //TODO/IMPL
+    return tran;
+}
+
+template<class T>
+QnTransaction<ApiIdData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
+{
+    QnTransaction<ApiIdData> tran;
+    tran.createNewID();
+    tran.command = command;
+    tran.persistent = true;
+    tran.params.id = id;
     return tran;
 }
 
