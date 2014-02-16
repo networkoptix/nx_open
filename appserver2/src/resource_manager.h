@@ -70,6 +70,7 @@ namespace ec2
 
         QnTransaction<ApiSetResourceStatusData> prepareTransaction( ApiCommand::Value cmd, const QnId& id, QnResource::Status status);
         QnTransaction<ApiResourceParams> prepareTransaction(ApiCommand::Value cmd, const QnId& id, const QnKvPairList& kvPairs);
+        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value cmd, const QnId& id);
     };
 }
 

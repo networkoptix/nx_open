@@ -52,7 +52,7 @@ namespace ec2
         ErrorCode executeTransaction(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransaction(const QnTransaction<ApiUserData>& tran);
 
-        // delete camera, server, layout t.e.c
+        // delete camera, server, layout, any resource t.e.c
         ErrorCode executeTransaction(const QnTransaction<ApiIdData>& tran);
 		
 		// --------- get methods ---------------------
@@ -129,6 +129,7 @@ namespace ec2
 		ErrorCode insertResource(const ApiResourceData& data);
         ErrorCode insertOrReplaceResource(const ApiResourceData& data);
         ErrorCode deleteResourceTable(const qint32 id);
+        ErrorCode removeResource(const qint32 id);
 
         ErrorCode insertAddParam(const ApiResourceParam& param);
         ErrorCode removeAddParam(const ApiResourceParam& param);

@@ -952,6 +952,36 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiUserData>& tran
     return ErrorCode::notImplemented;
 }
 
+ErrorCode QnDbManager::removeResource(const qint32 id)
+{
+    QnDbTransactionLocker tran(&m_tran);
+
+    QSqlQuery query(m_sdb);
+    query.prepare("SELECT \
+                    (CASE WHEN c.resource_ptr_id is null then rt.name else 'Camera' end) as name,\
+                    FROM vms_resource r\
+                    JOIN vms_resourcetype rt on rt.id = r.xtype_id\
+                    LEFT JOIN vms_camera c on c.resource_ptr_id = r.id\
+                    WHERE r.id = :id");
+    query.bindValue(":id", id);
+    if (!query.exec())
+        return ErrorCode::failure;
+    query.next();
+    QString objectType = query.value("name").toString();
+    if (objectType == "Camera")
+        return removeCamera(id);
+    else if (objectType == "Server")
+        return removeServer(id);
+    else if (objectType == "User")
+        return removeUser(id);
+    else if (objectType == "Layout")
+        return removeLayout(id);
+    else {
+        Q_ASSERT_X(0, "Unknown object type", Q_FUNC_INFO);
+        return ErrorCode::notImplemented;
+    }
+}
+
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
 {
     switch (tran.command)
@@ -966,8 +996,11 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
         return removeBusinessRule( tran.params.id );
     case ApiCommand::removeUser:
         return removeUser( tran.params.id );
+    case ApiCommand::removeResource:
+        return removeResource( tran.params.id );
     default:
         qWarning() << "Remove operation is not implemented for command" << toString(tran.command);
+        Q_ASSERT_X(0, "Remove operation is not implemented for command" << toString(tran.command), Q_FUNC_INFO);
         break;
     }
     return ErrorCode::unsupported;
