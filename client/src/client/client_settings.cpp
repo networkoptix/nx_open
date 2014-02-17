@@ -224,6 +224,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     case UPDATES_ENABLED:
     case AUTO_CHECK_FOR_UPDATES:
     case GL_VSYNC:
+    case PTZ_PRESET_IN_USE_WARNING_DISABLED:
         break; /* Not to be saved to settings. */
     default:
         base_type::writeValueToSettings(settings, id, value);

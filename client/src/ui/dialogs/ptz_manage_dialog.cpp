@@ -8,6 +8,7 @@
 #include <QtWidgets/QMessageBox>
 
 #include <common/common_globals.h>
+#include <client/client_settings.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -18,6 +19,7 @@
 #include <ui/common/ui_resource_name.h>
 #include <ui/models/ptz_manage_model.h>
 #include <ui/widgets/ptz_tour_widget.h>
+#include <ui/dialogs/checkable_message_box.h>
 
 #include <utils/common/event_processors.h>
 #include <utils/resource_property_adaptors.h>
@@ -93,6 +95,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_tableViewport_resizeEvent()), Qt::QueuedConnection);
 
     connect(m_model,    &QnPtzManageModel::presetsChanged,  ui->tourEditWidget, &QnPtzTourWidget::setPresets);
+    connect(m_model,    &QnPtzManageModel::presetsChanged,  this,               &QnPtzManageDialog::updateUi);
     connect(this,       &QnAbstractPtzDialog::synchronized, m_model,            &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
 
@@ -106,10 +109,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     //TODO: enable and disable various gui elements:
     /*
         - Apply - only if there are some changes
-        - GoToPosition - if there is a selected position or a tour spot
         - CreateTour - if there is at least one position
-        - ActivateTour - if there is a selected tour
-        - Apply
     */
 
     //TODO: implement preview receiving and displaying
@@ -342,10 +342,44 @@ void QnPtzManageDialog::at_deleteButton_clicked() {
 
     QnPtzManageModel::RowData data = m_model->rowData(index.row());
     switch (data.rowType) {
-    case QnPtzManageModel::PresetRow:
-        //TODO: check if this preset is used in some tours and show a warning message (Ok/Cancel, optionally: "Do not show anymore", session-only)
+    case QnPtzManageModel::PresetRow: {
+        bool presetIsInUse = false;
+
+        foreach (const QnPtzTourItemModel &tourModel, m_model->tourModels()) {
+            foreach (const QnPtzTourSpot &spot, tourModel.tour.spots) {
+                if (spot.presetId == data.presetModel.preset.id) {
+                    presetIsInUse = true;
+                    break;
+                }
+            }
+
+            if (presetIsInUse)
+                break;
+        }
+
+        if (presetIsInUse) {
+            bool ignorePresetIsInUse = qnSettings->isPtzPresetInUseWarningDisabled();
+            if (!ignorePresetIsInUse) {
+                QDialogButtonBox::StandardButton button = QnCheckableMessageBox::warning(
+                    this,
+                    tr("Remove preset"),
+                    tr("This preset is used in some tours.\nIf you remove it some tours will become invalid."),
+                    tr("Do not show again."),
+                    &ignorePresetIsInUse,
+                    QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                    QDialogButtonBox::Cancel
+                );
+
+                qnSettings->setPtzPresetInUseWarningDisabled(ignorePresetIsInUse);
+
+                if (button == QDialogButtonBox::Cancel)
+                    break;
+            }
+        }
+
         m_model->removePreset(data.presetModel.preset.id);
         break;
+    }
     case QnPtzManageModel::TourRow:
         m_model->removeTour(data.tourModel.tour.id);
         break;

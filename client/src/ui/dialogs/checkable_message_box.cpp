@@ -195,3 +195,24 @@ QDialogButtonBox::StandardButton
 QnCheckableMessageBox::question(QWidget *parent, const QString &title, const QString &question, const QString &checkBoxText, bool *checkBoxSetting, QDialogButtonBox::StandardButtons buttons, QDialogButtonBox::StandardButton defaultButton) {
     return QnCheckableMessageBox::question(parent, -1, title, question, checkBoxText, checkBoxSetting, buttons, defaultButton);
 }
+
+QDialogButtonBox::StandardButton
+QnCheckableMessageBox::warning(QWidget *parent, int helpTopicId, const QString &title, const QString &warning, const QString &checkBoxText, bool *checkBoxSetting, QDialogButtonBox::StandardButtons buttons, QDialogButtonBox::StandardButton defaultButton) {
+    QnCheckableMessageBox mb(parent);
+    mb.setWindowTitle(title);
+    mb.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Warning));
+    mb.setText(warning);
+    mb.setCheckBoxText(checkBoxText);
+    mb.setChecked(*checkBoxSetting);
+    mb.setStandardButtons(buttons);
+    mb.setDefaultButton(defaultButton);
+    setHelpTopic(&mb, helpTopicId);
+    mb.exec();
+    *checkBoxSetting = mb.isChecked();
+    return mb.clickedStandardButton();
+}
+
+QDialogButtonBox::StandardButton
+QnCheckableMessageBox::warning(QWidget *parent, const QString &title, const QString &warning, const QString &checkBoxText, bool *checkBoxSetting, QDialogButtonBox::StandardButtons buttons, QDialogButtonBox::StandardButton defaultButton) {
+    return QnCheckableMessageBox::warning(parent, -1, title, warning, checkBoxText, checkBoxSetting, buttons, defaultButton);
+}
