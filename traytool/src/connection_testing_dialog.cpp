@@ -53,7 +53,8 @@ void QnConnectionTestingDialog::testEnterpriseController(const QUrl &url) {
     urlNoPassword.setPassword(QString());
     qnDebug("Testing connectivity for URL '%1'.", urlNoPassword.toString());
 
-    QnAppServerConnectionFactory::createConnection(url)->testConnectionAsync(this, SLOT(at_ecConnection_result(int, QnConnectionInfoPtr, int)));
+    // TODO: #EC2 #Elric
+    //QnAppServerConnectionFactory::createConnection(url)->testConnectionAsync(this, SLOT(at_ecConnection_result(int, QnConnectionInfoPtr, int)));
 
     m_timeoutTimer->start();
 }

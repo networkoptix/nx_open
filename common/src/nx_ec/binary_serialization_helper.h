@@ -250,35 +250,6 @@ namespace QnBinary {
         return true;
     }
 
-
-};
-
-#define QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
-namespace QnBinary { \
-    template <class T> \
-    __VA_ARGS__ void serialize(const TYPE &value, OutputBinaryStream<T> *target) { \
-       BOOST_PP_SEQ_FOR_EACH(SERIALIZE_FIELD, ~, FIELD_SEQ) \
-    } \
-    \
-    template <class T> \
-    __VA_ARGS__ bool deserialize(TYPE &value, InputBinaryStream<T> *target) { \
-       BOOST_PP_SEQ_FOR_EACH(DESERIALIZE_FIELD, ~, FIELD_SEQ) \
-       return true; \
-    } \
-}
-
-
-
-#define SERIALIZE_FIELD(R, D, FIELD) \
-    QnBinary::serialize(value.FIELD, target); \
-
-#define DESERIALIZE_FIELD(R, D, FIELD) \
-    if( !QnBinary::deserialize(value.FIELD, target) ) \
-        return false;
-
-
-namespace QnBinary
-{
     template <class T, class T2>
     void serialize(const std::vector<T2>& field, OutputBinaryStream<T>* binStream) 
     {
@@ -326,6 +297,30 @@ namespace QnBinary
     }
 }
 
+#ifndef Q_MOC_RUN
+
+#define QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
+namespace QnBinary { \
+    template <class T> \
+    __VA_ARGS__ void serialize(const TYPE &value, OutputBinaryStream<T> *target) { \
+       BOOST_PP_SEQ_FOR_EACH(SERIALIZE_FIELD, ~, FIELD_SEQ) \
+    } \
+    \
+    template <class T> \
+    __VA_ARGS__ bool deserialize(TYPE &value, InputBinaryStream<T> *target) { \
+       BOOST_PP_SEQ_FOR_EACH(DESERIALIZE_FIELD, ~, FIELD_SEQ) \
+       return true; \
+    } \
+}
+
+#define SERIALIZE_FIELD(R, D, FIELD) \
+    QnBinary::serialize(value.FIELD, target); \
+
+#define DESERIALIZE_FIELD(R, D, FIELD) \
+    if( !QnBinary::deserialize(value.FIELD, target) ) \
+        return false;
+
+
 /*
 #define QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(TYPE, BASE_TYPE, FIELD_SEQ, ... ) \
     QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ); \
@@ -365,5 +360,13 @@ namespace QnBinary
 #define QN_DEFINE_STRUCT_SERIALIZATORS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
     QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ); 
 
+#else // Q_MOC_RUN
+
+/* Qt moc chokes on our macro hell, so we make things easier for it. */
+#define QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(...)
+#define QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(...)
+#define QN_DEFINE_STRUCT_SERIALIZATORS(...)
+
+#endif // Q_MOC_RUN
 
 #endif  //SERIALIZATION_HELPER_H
