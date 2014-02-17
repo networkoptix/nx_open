@@ -606,9 +606,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         QnMessageBox::warning(
             mainWindow.data(),
             0,
-            QCoreApplication::translate("main.cpp", "Warning"),
-            QCoreApplication::translate("main.cpp", "The performance of this computer allows running %1 in configuration mode only. "
-                                                    "For full featured mode use another computer.").
+            QCoreApplication::translate("QnPerformance", "Warning"),
+            QCoreApplication::translate("QnPerformance", "Performance of this computer allows running %1 in configuration mode only. "
+                                                         "For full-featured mode please use another computer.").
                     arg(QLatin1String(QN_PRODUCT_NAME_LONG)),
             QMessageBox::StandardButtons(QMessageBox::Ok),
             QMessageBox::Ok
