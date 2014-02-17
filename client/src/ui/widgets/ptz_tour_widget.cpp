@@ -7,6 +7,7 @@
 #include <ui/delegates/ptz_tour_item_delegate.h>
 
 #include <utils/common/event_processors.h>
+#include <common/common_globals.h>
 
 QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
     QWidget(parent),
@@ -61,6 +62,14 @@ const QnPtzPresetList& QnPtzTourWidget::presets() const {
 
 void QnPtzTourWidget::setPresets(const QnPtzPresetList &presets) {
     m_model->setPresets(presets);
+}
+
+QnPtzTourSpot QnPtzTourWidget::currentTourSpot() const {
+    QModelIndex index = ui->tableView->currentIndex();
+    if (!index.isValid())
+        return QnPtzTourSpot();
+
+    return m_model->data(index, Qn::PtzTourSpotRole).value<QnPtzTourSpot>();
 }
 
 void QnPtzTourWidget::at_addSpotButton_clicked() {

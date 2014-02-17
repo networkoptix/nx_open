@@ -24,6 +24,8 @@ public:
     const QnPtzPresetList &presets() const;
     Q_SLOT void setPresets(const QnPtzPresetList &presets);
 
+    QnPtzTourSpot currentTourSpot() const;
+
 signals:
     void tourSpotsChanged(const QnPtzTourSpotList &spots);
 
