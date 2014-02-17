@@ -28,18 +28,6 @@ public:
             enableVSync(widget);
         }
 
-        /**
-         * Workaround against bug #2828
-         * Uniform matrix should be saved by QT but it does not for OpenGL v4
-         * Setting CompatibilityProfile in constructor is skipped (as almost all values there)
-         * @see qtbase\src\opengl\gl2paintengineex\qpaintengineex_opengl2.cpp:543
-         */ 
-        // TODO: #GDM this results in black client window on some machines => we cannot use this fix.
-        /*QGLFormat fmt = widget->format();
-        if (fmt.majorVersion() > 3) {
-            fmt.setProfile(QGLFormat::CompatibilityProfile);
-            widget->setFormat(fmt);
-        }*/
         return widget;
     }
 

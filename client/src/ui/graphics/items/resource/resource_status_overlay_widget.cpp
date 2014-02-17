@@ -7,13 +7,13 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 
+#include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
 #include <ui/graphics/opengl/gl_context_data.h>
-
-#include <ui/animation/opacity_animator.h>
 #include <ui/style/globals.h>
+#include <ui/workaround/gl_native_painting.h>
 
 
 /** @def QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
@@ -157,7 +157,7 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     if(m_statusOverlay == Qn::LoadingOverlay || m_statusOverlay == Qn::PausedOverlay || m_statusOverlay == Qn::EmptyOverlay) {
         qreal unit = qnGlobals->workbenchUnitSize();
 
-        painter->beginNativePainting();
+        QnGlNativePainting::begin(painter);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -184,7 +184,7 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         glPopMatrix();
 
         glDisable(GL_BLEND);
-        painter->endNativePainting();
+        QnGlNativePainting::end(painter);
 
         if(m_statusOverlay == Qn::LoadingOverlay) {
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY

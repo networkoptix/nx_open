@@ -101,9 +101,6 @@
                                 <exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="true">
                                     <arg line="${arch} ${toolchain.version}"/> 
                                 </exec>
-                                <exec dir="${project.build.directory}" executable="${virtualenv.dir}/virtualenv" failifexecutionfails="true">
-                                    <arg line="--python ${init.python.dir}/python.exe ${arch}"/> 
-                                </exec>                                
                             </target>
                             <skip>${rsync.skip}</skip>
                         </configuration>
