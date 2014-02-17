@@ -41,8 +41,9 @@ QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseContr
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzPresetRecordHash>(baseController->resource(), lit("ptzPresets"), QnPtzPresetRecordHash(), this))
 {
-    m_asynchronous = baseController->hasCapabilities(Qn::AsynchronousPtzCapability);
-    connect(this, &QnPresetPtzController::finishedLater, this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
+    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
+
+    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChangedExternally, this, [this]{ emit changed(Qn::PresetsPtzField); }, Qt::QueuedConnection);
 }
 
 QnPresetPtzController::~QnPresetPtzController() {
@@ -71,47 +72,50 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
     if(!getPosition(data.space, &data.position)) // TODO: #Elric this won't work for async base controller.
         return false;
 
-    QMutexLocker locker(&m_mutex);
-    
-    QnPtzPresetRecordHash records = m_adaptor->value();
-    records.insert(preset.id, QnPtzPresetRecord(preset, data));
-    m_adaptor->setValue(records);
-    
-    if(m_asynchronous)
-        emit finishedLater(Qn::CreatePresetPtzCommand, QVariant::fromValue(preset));
+    {
+        QMutexLocker locker(&m_mutex);
+        QnPtzPresetRecordHash records = m_adaptor->value();
+        records.insert(preset.id, QnPtzPresetRecord(preset, data));
+
+        m_adaptor->setValue(records);
+    }
+
+    emit changed(Qn::PresetsPtzField);
     return true;
 }
 
 bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset) {
-    QMutexLocker locker(&m_mutex);
+    {
+        QMutexLocker locker(&m_mutex);
 
-    QnPtzPresetRecordHash records = m_adaptor->value();
-    if(!records.contains(preset.id))
-        return false;
+        QnPtzPresetRecordHash records = m_adaptor->value();
+        if(!records.contains(preset.id))
+            return false;
 
-    QnPtzPresetRecord &record = records[preset.id];
-    if(record.preset == preset)
-        return true; /* No need to save it. */
-    record.preset = preset;
+        QnPtzPresetRecord &record = records[preset.id];
+        if(record.preset == preset)
+            return true; /* No need to save it. */
+        record.preset = preset;
     
-    m_adaptor->setValue(records);
+        m_adaptor->setValue(records);
+    }
 
-    if(m_asynchronous)
-        emit finishedLater(Qn::UpdatePresetPtzCommand, QVariant::fromValue(preset));
+    emit changed(Qn::PresetsPtzField);
     return true;
 }
 
 bool QnPresetPtzController::removePreset(const QString &presetId) {
-    QMutexLocker locker(&m_mutex);
+    {
+        QMutexLocker locker(&m_mutex);
 
-    QnPtzPresetRecordHash records = m_adaptor->value();
-    if(records.remove(presetId) == 0)
-        return false;
+        QnPtzPresetRecordHash records = m_adaptor->value();
+        if(records.remove(presetId) == 0)
+            return false;
 
-    m_adaptor->setValue(records);
+        m_adaptor->setValue(records);
+    }
 
-    if(m_asynchronous)
-        emit finishedLater(Qn::RemovePresetPtzCommand, QVariant::fromValue(presetId));
+    emit changed(Qn::PresetsPtzField);
     return true;
 }
 
@@ -129,10 +133,6 @@ bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
     if(!absoluteMove(data.space, data.position, speed))
         return false;
 
-    // TODO: #Elric maybe emit finished when we get absoluteMove finished?
-
-    if(m_asynchronous)
-        emit finishedLater(Qn::ActivatePresetPtzCommand, QVariant::fromValue(presetId));
     return true;
 }
 
@@ -143,8 +143,6 @@ bool QnPresetPtzController::getPresets(QnPtzPresetList *presets) {
     foreach(const QnPtzPresetRecord &record, m_adaptor->value())
         presets->push_back(record.preset);
 
-    if(m_asynchronous)
-        emit finishedLater(Qn::GetPresetsPtzCommand, QVariant::fromValue(*presets));
     return true;
 }
 

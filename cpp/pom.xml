@@ -67,14 +67,7 @@
                                 <resource>
                                     <directory>${root.dir}/cpp/maven/filter-resources</directory>
                                     <filtering>true</filtering>
-                                </resource>	
-                                <resource>
-                                    <directory>${root.dir}/build_environment/maven/filter-resources/include</directory>
-                                    <includes>
-                                        <include>version.h</include>
-                                    </includes>
-                                    <filtering>true</filtering>
-                                </resource>	                                
+                                </resource>	                               
                                 <resource>
                                     <directory>${root.dir}/cpp/maven/bin-resources</directory>
                                     <filtering>false</filtering>
@@ -99,7 +92,7 @@
                         <configuration>
                             <executable>${python.dir}/python</executable>
                             <arguments>
-                                <argument>${project.build.directory}/gen-resources.py</argument>
+                                <argument>${project.build.directory}/gen_resources.py</argument>
                             </arguments>
                             <workingDirectory>${project.build.directory}</workingDirectory>		
                         </configuration>

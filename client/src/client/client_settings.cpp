@@ -62,6 +62,7 @@ QnClientSettings::QnClientSettings(QObject *parent):
     setMediaFolder(getMoviesDirectory());
     setBackgroundsFolder(getBackgroundsDirectory());
     setMaxSceneVideoItems(sizeof(void *) == sizeof(qint32) ? 24 : 64);
+
 #ifdef Q_OS_DARWIN
     setAudioDownmixed(true); /* Mac version uses SPDIF by default for multichannel audio. */
 #endif
@@ -222,6 +223,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     case DEV_MODE:
     case UPDATES_ENABLED:
     case AUTO_CHECK_FOR_UPDATES:
+    case GL_VSYNC:
         break; /* Not to be saved to settings. */
     default:
         base_type::writeValueToSettings(settings, id, value);

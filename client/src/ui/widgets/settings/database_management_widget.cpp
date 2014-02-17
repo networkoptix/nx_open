@@ -17,6 +17,10 @@
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
+namespace {
+    const QLatin1String dbExtension(".db");
+}
+
 QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
     QnWorkbenchContextAware(parent),
@@ -38,7 +42,10 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QnCustomFileDialog::fileDialogOptions());
     if(fileName.isEmpty())
         return;
+
     qnSettings->setLastDatabaseBackupDir(QFileInfo(fileName).absolutePath());
+    if (!fileName.endsWith(dbExtension))
+        fileName += dbExtension;
 
     QFile file(fileName);
     if(!file.open(QIODevice::WriteOnly)) {

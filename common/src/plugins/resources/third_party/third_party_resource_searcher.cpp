@@ -108,7 +108,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
     if (camManager->getCameraCapabilities(&caps) == 0) 
     {
         if( caps & nxcip::BaseCameraManager::shareIpCapability )
-            result->setCameraCapability( Qn::shareIpCapability, true );
+            result->setCameraCapability( Qn::ShareIpCapability, true );
     }
 
     NX_LOG( QString::fromLatin1("Created third party resource (manufacturer %1, res type id %2)").
@@ -298,7 +298,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     if (camManager->getCameraCapabilities(&caps) == 0) 
     {
         if( caps & nxcip::BaseCameraManager::shareIpCapability )
-            resource->setCameraCapability( Qn::shareIpCapability, true );
+            resource->setCameraCapability( Qn::ShareIpCapability, true );
     }
 
     QString groupName = QString(lit("%1-%2")).arg(discoveryManager->getVendorName()).arg(resource->getHostAddress());

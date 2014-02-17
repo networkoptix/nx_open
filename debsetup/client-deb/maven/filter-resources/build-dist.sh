@@ -1,6 +1,8 @@
 #!/bin/bash
 
 COMPANY_NAME=${deb.customization.company.name}
+FULL_COMPANY_NAME="${company.name}"
+FULL_PRODUCT_NAME="${company.name} ${product.name} Client.conf"
 
 PACKAGENAME=$COMPANY_NAME-client
 VERSION=${release.version}
@@ -11,7 +13,7 @@ TARGET=/opt/$COMPANY_NAME/client
 USRTARGET=/usr
 BINTARGET=$TARGET/bin
 BGTARGET=$TARGET/share/pictures/sample-backgrounds
-ICONTARGET=$USRTARGET/icons
+ICONTARGET=$USRTARGET/share/icons
 LIBTARGET=$TARGET/lib
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
@@ -29,7 +31,7 @@ CLIENT_IMAGEFORMATS_PATH=$CLIENT_BIN_PATH/imageformats
 CLIENT_VOX_PATH=$CLIENT_BIN_PATH/vox
 CLIENT_PLATFORMS_PATH=$CLIENT_BIN_PATH/platforms
 CLIENT_BG_PATH=${libdir}/backgrounds
-CLIENT_HELP_PATH=${libdir}/help
+CLIENT_HELP_PATH=${environment.dir}/help/${release.version}/${customization}
 ICONS_PATH=${customization.dir}/icons/hicolor
 CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 
@@ -39,22 +41,26 @@ CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 rm -rf $STAGEBASE
 mkdir -p $BINSTAGE/$MINORVERSION/styles
 mkdir -p $BINSTAGE/$MINORVERSION/imageformats
+mkdir -p $BINSTAGE/help
 mkdir -p $LIBSTAGE
 mkdir -p $BGSTAGE
 mkdir -p $ICONSTAGE
+mkdir -p "$STAGE/etc/xdg/$FULL_COMPANY_NAME"
+mv -f debian/client.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_PRODUCT_NAME"
+mv -f usr/share/applications/icon.desktop usr/share/applications/${namespace.additional}.desktop
 
-# Copy client binary, x264, old version libs
+# Copy client binary, old version libs
 cp -r $CLIENT_BIN_PATH/client $BINSTAGE/$MINORVERSION/client-bin
 cp -r $CLIENT_BIN_PATH/applauncher $BINSTAGE/$MINORVERSION/applauncher-bin
 cp -r bin/applauncher $BINSTAGE/$MINORVERSION
-cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/$MINORVERSION
 
 # Copy icons
 cp -P -Rf usr $STAGE
 cp -P -Rf $ICONS_PATH $ICONSTAGE
+for f in `find $ICONSTAGE -name *.png`; do mv $f `dirname $f`/`basename $f .png`-${customization}.png; done
 
 # Copy help
-cp -r $CLIENT_HELP_PATH $BINSTAGE
+cp -r $CLIENT_HELP_PATH/** $BINSTAGE/help
 
 # Copy backgrounds
 cp -r $CLIENT_BG_PATH/* $BGSTAGE

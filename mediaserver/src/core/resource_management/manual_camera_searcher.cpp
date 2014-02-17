@@ -25,22 +25,34 @@ namespace {
      * @return                              True if resource is already in resource pool, false otherwise.
      */
     bool resourceExistsInPool(const QnResourcePtr &resource) {
-        if (qnResPool->hasSuchResource(resource->getUniqueId()))
-            return true; // already in resource pool
-
-        // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition check for IP address
-        if (QnNetworkResourcePtr netRes = resource.dynamicCast<QnNetworkResource>()) {
-            QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
-            foreach(QnNetworkResourcePtr existRes, existResList) {
-                if (existRes->getTypeId() != netRes->getTypeId())
-                    return true; // camera found by different drivers
-
-                QnVirtualCameraResourcePtr existCam = existRes.dynamicCast<QnVirtualCameraResource>();
-                if (!existCam->isManuallyAdded())
-                    return true; // block manual and auto add in same time
+        bool existResource = false;
+        if (qnResPool->hasSuchResource(resource->getUniqueId())) { 
+            existResource = true; // already in resource pool 
+        }
+        else {
+            // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition cheking for IP address
+            QnNetworkResourcePtr netRes = resource.dynamicCast<QnNetworkResource>();
+            if (netRes) {
+                QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
+                foreach(QnNetworkResourcePtr existRes, existResList) 
+                {
+                    QnVirtualCameraResourcePtr existCam = existRes.dynamicCast<QnVirtualCameraResource>();
+                    if (!existCam)
+                        continue;
+                    if (!existCam->isManuallyAdded())
+                        existResource = true; // block manual and auto add in same time
+                    else if (existRes->getTypeId() != netRes->getTypeId()) 
+                    {
+                        // allow several manual cameras on the same IP if cameras have different ports
+                        QUrl url1(existRes->getUrl());
+                        QUrl url2(netRes->getUrl());
+                        if (url1.port() == url2.port())
+                            existResource = true; // camera found by different drivers on the same port
+                    }
+                }
             }
         }
-        return false;
+        return existResource;
     }
 
     QnManualCameraSearchSingleCamera fromResource(const QnResourcePtr &resource) 

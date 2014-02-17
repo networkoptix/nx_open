@@ -345,7 +345,16 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const {
 
-    if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
+    if (qnSettings->lightMode() & Qn::LightModeSingleItem) {
+        while (!layout->getItems().isEmpty())
+            layout->removeItem(*(layout->getItems().begin()));
+    }
+
+    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
+            ? 1
+            : qnSettings->maxSceneVideoItems();
+
+    if (layout->getItems().size() >= maxItems)
         return;
 
     {
@@ -636,6 +645,9 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
     if(!context()->user())
         return;
 
+    if (!context()->workbench()->currentLayout()->resource())
+        return;
+
     foreach(const QnMimeData &data, m_delayedDrops) {
         QMimeData mimeData;
         data.toMimeData(&mimeData);
@@ -717,6 +729,7 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
         return;
 
     menu()->trigger(Qn::OpenNewTabAction);
+    submitDelayedDrops();
 }
 
 void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
@@ -800,6 +813,10 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
+    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
+            ? 1
+            : qnSettings->maxSceneVideoItems();
+
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
         QHash<QUuid, QnLayoutItemData> itemDataByUuid;
@@ -819,7 +836,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
         /* Add to layout. */
         foreach(const QnLayoutItemData &data, itemDataByUuid) {
-            if (layout->getItems().size() >= qnSettings->maxSceneVideoItems())
+            if (layout->getItems().size() >= maxItems)
                 return;
 
             layout->addItem(data);
@@ -1278,7 +1295,7 @@ void QnWorkbenchActionHandler::at_cameraListAction_triggered()
 
     bool newlyCreated = false;
     if(!cameraListDialog()) {
-        m_cameraListDialog = new QnCameraListDialog(mainWindow(), context());
+        m_cameraListDialog = new QnCameraListDialog(mainWindow());
         newlyCreated = true;
     }
     QRect oldGeometry = cameraListDialog()->geometry();
@@ -2257,7 +2274,7 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered(
 void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     QnActionParameters params = menu()->currentParameters(sender());
 
-    QnResourceWidget *widget = params.widget();
+    QnMediaResourceWidget *widget = params.widget<QnMediaResourceWidget>();
     if(!widget)
         return;
 
@@ -2266,11 +2283,12 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     addParams.usePosition = true;
     addParams.position = widget->item()->combinedGeometry().center();
     addParams.zoomWindow = rect;
+    addParams.dewarpingParams.enabled = widget->dewarpingParams().enabled;
     addParams.zoomUuid = widget->item()->uuid();
     addParams.frameColor = params.argument<QColor>(Qn::ItemFrameColorRole);
     addParams.rotation = widget->item()->rotation();
 
-    addToLayout(workbench()->currentLayout()->resource(), widget->resource(), addParams);
+    addToLayout(workbench()->currentLayout()->resource(), widget->resource()->toResourcePtr(), addParams);
 }
 
 void QnWorkbenchActionHandler::at_rotate0Action_triggered(){

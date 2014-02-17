@@ -62,7 +62,7 @@ void QnLicenseUsageHelper::update() {
         int free = totalDigital() - m_usedDigital;
         m_required = -free;
     }
-    m_isValid = m_required < 0;
+    m_isValid = m_required <= 0;
 }
 
 int QnLicenseUsageHelper::totalDigital() const {

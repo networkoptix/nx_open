@@ -266,9 +266,9 @@ int extractChannelCount(const QByteArray& model)
     return num.toInt();
 }
 
-QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
 {
-    if( !url.scheme().isEmpty() )
+    if( !url.scheme().isEmpty() && isSearchAction )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
     QList<QnResourcePtr> result;
@@ -296,7 +296,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
     }
 
 
-    if (!doMultichannelCheck)
+    if (!isSearchAction)
     {
         // it is a fast discovery mode used by resource searcher
         QnPlVmax480ResourcePtr existsRes;
@@ -358,7 +358,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
 
     int minCh = 0;
     int maxCh = channels;
-    if (!doMultichannelCheck)
+    if (!isSearchAction)
     {
         minCh = channelNum-1;
         maxCh = channelNum;

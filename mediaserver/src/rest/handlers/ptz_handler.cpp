@@ -94,6 +94,9 @@ int QnPtzHandler::executePost(const QString &path, const QnRequestParams &params
     case Qn::RemoveTourPtzCommand:          return executeRemoveTour(controller, params, result);
     case Qn::ActivateTourPtzCommand:        return executeActivateTour(controller, params, result);
     case Qn::GetToursPtzCommand:            return executeGetTours(controller, params, result);
+    case Qn::GetActiveObjectPtzCommand:     return executeGetActiveObject(controller, params, result);
+    case Qn::UpdateHomeObjectPtzCommand:    return executeUpdateHomeObject(controller, params, result);
+    case Qn::GetHomeObjectPtzCommand:       return executeGetHomeObject(controller, params, result);
     case Qn::GetDataPtzCommand:             return executeGetData(controller, params, result);
     default:                                return CODE_INVALID_PARAMETER;
     }
@@ -264,6 +267,36 @@ int QnPtzHandler::executeGetTours(const QnPtzControllerPtr &controller, const Qn
         return CODE_INTERNAL_ERROR;
 
     result.setReply(tours);
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeGetActiveObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QnPtzObject activeObject;
+    if(!controller->getActiveObject(&activeObject))
+        return CODE_INTERNAL_ERROR;
+
+    result.setReply(activeObject);
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeUpdateHomeObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    Qn::PtzObjectType objectType;
+    QString objectId;
+    if(!requireParameter(params, lit("objectType"), result, &objectType) || !requireParameter(params, lit("objectId"), result, &objectId))
+        return CODE_INVALID_PARAMETER;
+
+    if(!controller->updateHomeObject(QnPtzObject(objectType, objectId)))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzHandler::executeGetHomeObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QnPtzObject homeObject;
+    if(!controller->getHomeObject(&homeObject))
+        return CODE_INTERNAL_ERROR;
+
+    result.setReply(homeObject);
     return CODE_OK;
 }
 

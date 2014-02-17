@@ -19,6 +19,7 @@ class QnCommonMessageProcessor: public QObject, public Singleton<QnCommonMessage
     Q_OBJECT
 public:
     explicit QnCommonMessageProcessor(QObject *parent = 0);
+    virtual ~QnCommonMessageProcessor() {}
 
     virtual void run();
     virtual void stop();

@@ -98,6 +98,9 @@ client/client.mak*
 client/x86
 client/x64
 client/arm
+client/client_lite/x86
+client/client_lite/x64
+client/client_lite/arm
 
 client/contrib/bespin/debug
 client/contrib/bespin/release
@@ -219,7 +222,7 @@ android-client/.metadata/*
 android-client/**/bin/**
 android-client/**/*.prefs
 android-client/**/gen/*
-android-client/android-main/libs/protobuf-classes*.jar
+android-client/android-main/libs/*.jar
 
 ios-client/build
 ios-client/dist
@@ -260,10 +263,12 @@ image_library_plugin/x64
 image_library_plugin/arm
 
 
-nx_sdk/nx_sdk 
+nx_sdk/nx_sdk
 
 
 libonvif/.build/
 
 .vagrant
 **/Makefile
+android-client/android-main/AndroidManifest.xml
+android-client/android-main/res/**

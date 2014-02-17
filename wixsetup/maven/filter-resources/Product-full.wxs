@@ -4,7 +4,7 @@
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
     <Product Id="*" Name="${product.name}" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.upgradeCode}">
-        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
         <?include BuildVars.wxi ?>
@@ -650,6 +650,9 @@
                                 <Component Id="ServerRtspPlugin">
                                     <File Id="ServerRtspPluginDll" Name="genericrtspplugin.dll" Source="$(var.PluginsDir)\genericrtspplugin.dll" />
                                 </Component>                    
+                                <Component Id="ServerHttpPlugin">
+                                    <File Id="ServerHttpPluginDll" Name="mjpg_link.dll" Source="$(var.PluginsDir)\mjpg_link.dll" />
+                                </Component>                                              
                             </Directory>
 
                             <Component Id="ServerSigar">
@@ -899,6 +902,7 @@
             <ComponentRef Id="ServerExecutable" />
             <ComponentGroupRef Id="ServerFFmpegLibraries"/>
             <ComponentRef Id="ServerRtspPlugin"/>
+            <ComponentRef Id="ServerHttpPlugin"/>
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
             <ComponentGroupRef Id="ServerImageFormats"/>

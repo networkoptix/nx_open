@@ -6,37 +6,6 @@
 
 #include "acti_resource.h"
 
-namespace {
-
-    int qSign(qreal value) {
-        return value >= 0 ? 1 : -1;
-    }
-
-    // ACTi 8111
-    /*qreal pointsData[][2] = {
-        {0, 1.0},
-        {100, 1.2},
-        {200, 1.4},
-        {300, 1.66},
-        {400, 2.0},
-        {500, 2.6},
-        {600, 3.46},
-        {666, 4.0},
-        {700, 4.86},
-        {750, 5.3},
-        {800, 7.0},
-        {850, 8.0},
-        {875, 8.3},
-        {900, 10.6},
-        {937, 11.6},
-        {950, 12.13},
-        {1000, 16.0},
-    };*/
-
-} // anonymous namespace
-
-
-// TODO: #Elric #PTZ use mutex
 
 // -------------------------------------------------------------------------- //
 // Utility
@@ -167,13 +136,19 @@ public:
     QMutex mutex;
     QMutex queryMutex;
 
+    /* Unprotected block. */
+
     QnActiResourcePtr resource;
     Qn::PtzCapabilities capabilities;
     Qt::Orientations flip;
 
+    /* Block protected with mutex. */
+
     Qn::PtzCommand pendingCommand;
     ActiPtzVector pendingSpeed;
     ActiPtzVector pendingPosition;
+
+    /* Block protected with queryMutex. */
 
     ActiPtzVector currentSpeed;
     ActiPtzVector currentPosition;
@@ -198,14 +173,9 @@ void QnActiPtzControllerPrivate::init() {
     if(!zoomData.startsWith("ZOOM_CAP_GET="))
         return;
 
-    capabilities = Qn::NoPtzCapabilities;
-    if(resource->getModel() == lit("KCM3311")) {
-        capabilities |= Qn::ContinuousZoomCapability;
-    } else {
-        capabilities |= Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability;
-    }
-    capabilities |= Qn::FlipPtzCapability;
+    capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability | Qn::FlipPtzCapability;
 
+    // TODO: #PTZ
 #if 0
     if (!m_isFlipped)
         m_capabilities &= ~Qn::AbsolutePtzCapabilities; // acti 8111 has bug for absolute position if flip turned off
@@ -213,8 +183,6 @@ void QnActiPtzControllerPrivate::init() {
 }
 
 bool QnActiPtzControllerPrivate::query(const QString &request, QByteArray *body, bool keepAllData) const {
-    qDebug() << "ACTI REQUEST" << request;
-
     CLHttpStatus status;
     QByteArray data = resource->makeActiRequest(lit("encoder"), request, status, keepAllData);
     if(body)
@@ -304,13 +272,9 @@ bool QnActiPtzControllerPrivate::processQueriesLocked() {
             if(currentSpeed.pan != 0 || currentSpeed.tilt != 0)
                 status = status & continuousPanTiltQuery(0, 0);
 
-            /* Then move to a position. */
-            if(currentPosition.pan != position.pan || currentPosition.tilt != position.tilt)
-                status = status & absolutePanTiltQuery(position.pan, position.tilt, speed.pan);
-
-            /* Issue zoom command EVEN if zoom wasn't changed. 
-             * This is because acti cameras sometimes outright ignore absolute
-             * zoom commands. */
+            /* Issue commands EVEN if position wasn't changed. 
+             * This is because acti cameras sometimes outright ignore absolute move commands. */
+            status = status & absolutePanTiltQuery(position.pan, position.tilt, speed.pan);
             status = status & absoluteZoomQuery(position.zoom);
 
             if(status) {

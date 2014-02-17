@@ -126,6 +126,7 @@ protected:
     virtual void optionsChangedNotify(Options changedFlags) override;
 
     virtual QString calculateInfoText() const override;
+    virtual QString calculateTitleText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
     virtual QCursor calculateCursor() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
@@ -163,8 +164,9 @@ private slots:
     void at_histogramButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
     void at_statusOverlayWidget_diagnosticsRequested();
-    void at_renderWatcher_displayingChanged(QnResourceWidget *widget);
+    void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
+    void at_ptzController_changed(Qn::PtzDataFields fields);
 
 private:
     void setDisplay(const QnResourceDisplayPtr &display);

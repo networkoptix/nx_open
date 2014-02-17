@@ -51,12 +51,10 @@ QString QnPlAxisResourceSearcher::manufacture() const
 }
 
 
-QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
 {
-    if( !url.scheme().isEmpty() )
+    if( !url.scheme().isEmpty() && isSearchAction )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
-
-    Q_UNUSED(doMultichannelCheck)
 
     QString host = url.host();
     int port = url.port();
@@ -104,7 +102,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
         return QList<QnResourcePtr>();
 
 
-    QnId typeId = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnId typeId = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (!typeId.isValid())
         return QList<QnResourcePtr>();
 
@@ -200,7 +198,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
 
     QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (!rt.isValid())
         return local_results;
 
@@ -234,7 +232,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
         {
             QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
-            QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+            QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
             if (!rt.isValid())
                 return local_results;
 

@@ -10,7 +10,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 
-class QnWorkbenchLayoutsHandler : public QObject, protected QnWorkbenchContextAware
+class QnWorkbenchLayoutsHandler : public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:
