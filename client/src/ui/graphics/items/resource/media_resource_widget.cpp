@@ -45,6 +45,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
+#include <ui/workaround/gl_native_painting.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 
 #include "resource_status_overlay_widget.h"
@@ -538,7 +539,7 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
-    painter->beginNativePainting();
+    QnGlNativePainting::begin(painter);
 
     qreal opacity = effectiveOpacity();
     bool opaque = qFuzzyCompare(opacity, 1.0);
@@ -553,7 +554,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
     m_paintedChannels[channel] = true;
 
     /* There is no need to restore blending state before invoking endNativePainting. */
-    painter->endNativePainting();
+    QnGlNativePainting::end(painter);
 
     if(result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
         painter->fillRect(paintRect, palette().color(QPalette::Window));
