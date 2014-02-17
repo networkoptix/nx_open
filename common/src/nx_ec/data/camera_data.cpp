@@ -128,7 +128,7 @@ void ApiCameraDataList::toResourceList(QList<T>& outData, QnResourceFactory* fac
 
 void ApiCameraDataList::fromResourceList(const QList<QnVirtualCameraResourcePtr>& cameras)
 {
-    data.reserve(cameras.size());
+    data.resize(cameras.size());
     for(int i = 0; i < cameras.size(); ++i)
         data[i].fromResource(cameras[i]);
 }
