@@ -222,6 +222,13 @@ public:
     }
 
     /**
+     * \returns                         True if the correct cell aspect ratio (> 0.0) has been set
+     */
+    bool hasCellAspectRatio() const {
+        return m_cellAspectRatio > 0.0;
+    }
+
+    /**
      * \param cellAspectRatio           New aspect ratio for cells of this layout.
      */
     void setCellAspectRatio(qreal cellAspectRatio);
