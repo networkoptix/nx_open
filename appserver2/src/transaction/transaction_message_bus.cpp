@@ -216,6 +216,7 @@ QnTransactionMessageBus* QnTransactionMessageBus::instance()
 void QnTransactionMessageBus::initStaticInstance(QnTransactionMessageBus* instance)
 {
     Q_ASSERT(m_globalInstance == 0 || instance == 0);
+    delete m_globalInstance;
     m_globalInstance = instance;
 }
 

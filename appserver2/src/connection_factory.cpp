@@ -35,7 +35,6 @@ namespace ec2
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     {
-        delete ec2::QnTransactionMessageBus::instance();
         ec2::QnTransactionMessageBus::initStaticInstance(0);
     }
 

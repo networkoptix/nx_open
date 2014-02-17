@@ -622,6 +622,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance()->stop();
 
+    QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );
+
     /* Write out settings. */
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
     av_lockmgr_register(NULL);

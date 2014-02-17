@@ -1399,6 +1399,8 @@ void QnMain::run()
     QnSoapServer::initStaticInstance( NULL );
 #endif //ENABLE_ONVIF
 
+    QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );
+
     av_lockmgr_register(NULL);
 
     // First disconnect eventManager from all slots, to not try to reconnect on connection close
