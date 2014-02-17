@@ -579,7 +579,7 @@ void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painte
     if(!m_backgroundGradientPainter)
         m_backgroundGradientPainter = qn_serverResourceWidget_backgroundGradientPainterStorage()->get(QGLContext::currentContext());
 
-    painter->beginNativePainting();
+    QnGlNativePainting::begin(painter);
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -598,7 +598,7 @@ void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painte
 
         glDisable(GL_BLEND);
     }
-    painter->endNativePainting();
+    QnGlNativePainting::begin(end);
 #endif
 }
 
