@@ -6,7 +6,6 @@
 #include "nx_ec/data/ec2_resource_data.h"
 #include "transaction.h"
 #include "utils/network/http/asynchttpclient.h"
-#include "utils/common/long_runnable.h"
 
 namespace ec2
 {
@@ -18,7 +17,7 @@ namespace ec2
     public:
 
         QnTransactionTransport(QnTransactionMessageBus* owner):
-            state(NotDefined), readyForSend(false), readyForRead(false), readBufferLen(0), chunkHeaderLen(0), sendOffset(0), chunkLen(0), isClientSide(false), owner(owner) {}
+            state(NotDefined), lastConnectTime(0), readyForSend(false), readyForRead(false), readBufferLen(0), chunkHeaderLen(0), sendOffset(0), chunkLen(0), isClientSide(false), owner(owner) {}
         ~QnTransactionTransport();
         enum State {
             NotDefined,
@@ -32,6 +31,7 @@ namespace ec2
         QUrl remoteAddr;
         nx_http::AsyncHttpClientPtr httpClient;
         State state;
+        qint64 lastConnectTime;
         QSharedPointer<AbstractStreamSocket> socket;
         QQueue<QByteArray> dataToSend;
         
@@ -63,7 +63,7 @@ namespace ec2
         void at_httpClientDone(nx_http::AsyncHttpClientPtr);
     };
 
-    class QnTransactionMessageBus: public QnLongRunnable
+    class QnTransactionMessageBus: public QObject
     {
         Q_OBJECT
     public:
@@ -140,14 +140,13 @@ namespace ec2
                 m_handler->processByteArray(data);
         }
 
-    protected:
-        virtual void run() override;
     private slots:
         void at_timer();
     private:
         AbstractHandler* m_handler;
         QTimer* m_timer;
         QMutex m_mutex;
+        QThread *m_thread;
 
         /*
         class QnTransactionTransport

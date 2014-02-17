@@ -7,6 +7,7 @@ namespace ec2
 {
 
 static const int SOCKET_TIMEOUT = 1000 * 1000;
+static const int RECONNECT_TIMEOUT = 1000 * 5;
 
 // --------------------------------- QnTransactionTransport ------------------------------
 
@@ -218,15 +219,25 @@ void QnTransactionMessageBus::initStaticInstance(QnTransactionMessageBus* instan
     m_globalInstance = instance;
 }
 
-QnTransactionMessageBus::QnTransactionMessageBus(): m_timer(0)
+QnTransactionMessageBus::QnTransactionMessageBus(): m_timer(0), m_thread(0)
 {
-    start();
+    m_thread = new QThread();
+    m_thread->setObjectName("QnTransactionMessageBusThread");
+    m_thread->start();
+    moveToThread(m_thread);
+
+    m_timer = new QTimer();
+    connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
+    m_timer->start(1);
 }
 
 QnTransactionMessageBus::~QnTransactionMessageBus()
 {
-    exit();
-    wait();
+    if (m_thread) {
+        m_thread->exit();
+        m_thread->wait();
+    }
+    delete m_thread;
     delete m_timer;
 }
 
@@ -323,15 +334,6 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
     return true;
 }
 
-void QnTransactionMessageBus::run()
-{
-    moveToThread(QThread::currentThread());
-    m_timer = new QTimer();
-    connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
-    m_timer->start(1);
-    exec();
-}
-
 void QnTransactionMessageBus::at_timer()
 {
     for (int i = m_connections.size()-1; i >= 0; --i)
@@ -341,8 +343,12 @@ void QnTransactionMessageBus::at_timer()
         {
             case QnTransactionTransport::Connect:
             {
-                transport->state = QnTransactionTransport::Connecting;
-                transport->doClientConnect();
+                qint64 ct = QDateTime::currentDateTime().toMSecsSinceEpoch();
+                if (ct - transport->lastConnectTime >= RECONNECT_TIMEOUT) {
+                    transport->lastConnectTime = ct;
+                    transport->state = QnTransactionTransport::Connecting;
+                    transport->doClientConnect();
+                }
                 break;
             }
             case QnTransactionTransport::Closed:
