@@ -11,6 +11,7 @@
 
 #include <client/client_settings.h>
 
+#include <ui/workaround/gl_native_painting.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -377,7 +378,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         return;
     }
 
-    painter->beginNativePainting();
+    QnGlNativePainting::begin(painter);
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -409,7 +410,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
 
     glDisable(GL_BLEND);
     glDisable(GL_TEXTURE_2D);
-    painter->endNativePainting();
+    QnGlNativePainting::end(painter);
 }
 
 void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {

@@ -196,7 +196,7 @@ public:
 
     bool detectVideoSourceCount();
 
-    CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder) const;
+    CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
     bool secondaryResolutionIsLarge() const;
     virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
 
@@ -251,7 +251,7 @@ private:
 
 
     void updateVideoSource(VideoSource* source, const QRect& maxRect) const;
-    CameraDiagnostics::Result sendVideoSourceToCamera(VideoSource* source) const;
+    CameraDiagnostics::Result sendVideoSourceToCamera(VideoSource* source);
 
     QRect getVideoSourceMaxSize(const QString& configToken);
 

@@ -9,6 +9,7 @@
 #include "camera/sync_dialog_display.h"
 
 #include "ui/workaround/gl_widget_factory.h"
+#include "ui/workaround/gl_native_painting.h"
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/help/help_topic_accessor.h"
@@ -55,10 +56,10 @@ public:
     virtual void paintEvent(QPaintEvent *) override
     {
         QPainter painter(this);
-        painter.beginNativePainting();
+        QnGlNativePainting::begin(&painter);
         if (m_renderer)
             m_renderer->paint(0, QRectF(0.0, 0.0, 1.0, 1.0), m_videoRect, 1.0);
-        painter.endNativePainting();
+        QnGlNativePainting::end(&painter);
     }
     
 private:

@@ -34,7 +34,7 @@ struct QnCompatibilityItem
     QString ver2;
 };
 
-QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (QnCompatibilityItem, (ver1)(comp1)(ver2) )
+QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(QnCompatibilityItem, (ver1)(comp1)(ver2))
 
 inline uint qHash(const QnCompatibilityItem &item)
 {

@@ -733,7 +733,9 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
 }
 
 void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
-    qreal value = workbench()->currentLayout()->cellAspectRatio();
+    qreal value = workbench()->currentLayout()->hasCellAspectRatio()
+                  ? workbench()->currentLayout()->cellAspectRatio()
+                  : qnGlobals->defaultLayoutCellAspectRatio();
 
     if (qFuzzyCompare(4.0 / 3.0, value))
         action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
@@ -817,6 +819,8 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
             ? 1
             : qnSettings->maxSceneVideoItems();
 
+    bool adjustAspectRatio = layout->getItems().isEmpty() || !layout->hasCellAspectRatio();
+
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
         QHash<QUuid, QnLayoutItemData> itemDataByUuid;
@@ -841,20 +845,60 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
             layout->addItem(data);
         }
+    } else {
+        // TODO: #Elric server & media resources only!
 
-        return;
+        QnResourceList resources = parameters.resources();
+        if(!resources.isEmpty()) {
+            AddToLayoutParams addParams;
+            addParams.usePosition = !position.isNull();
+            addParams.position = position;
+            addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
+            addToLayout(layout, resources, addParams);
+        }
     }
 
-    // TODO: #Elric server & media resources only!
 
-    QnResourceList resources = parameters.resources();
-    if(!resources.isEmpty()) {
-        AddToLayoutParams addParams;
-        addParams.usePosition = !position.isNull();
-        addParams.position = position;
-        addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
-        addToLayout(layout, resources, addParams);
-        return;
+    QnWorkbenchLayout *workbenchLayout = workbench()->currentLayout();
+    if (adjustAspectRatio && workbenchLayout->resource() == layout) {
+        const qreal normalAspectRatio = 4.0 / 3.0;
+        const qreal wideAspectRatio = 16.0 / 9.0;
+
+        qreal cellAspectRatio = -1.0;
+        qreal midAspectRatio = 0.0;
+        int count = 0;
+
+
+        if (!widgets.isEmpty()) {
+            /* Here we don't take into account already added widgets. It's ok because
+               we can get here only if the layout doesn't have cell aspect ratio, that means
+               its widgets don't have aspect ratio too. */
+            foreach (QnResourceWidget *widget, widgets) {
+                if (widget->hasAspectRatio()) {
+                    midAspectRatio += widget->aspectRatio();
+                    ++count;
+                }
+            }
+        } else {
+            foreach (QnWorkbenchItem *item, workbenchLayout->items()) {
+                QnResourceWidget *widget = context()->display()->widget(item);
+                if (widget && widget->hasAspectRatio()) {
+                    midAspectRatio += widget->aspectRatio();
+                    ++count;
+                }
+            }
+        }
+
+        if (count > 0) {
+            midAspectRatio /= count;
+            cellAspectRatio = (qAbs(midAspectRatio - normalAspectRatio) < qAbs(midAspectRatio - wideAspectRatio))
+                              ? normalAspectRatio : wideAspectRatio;
+        }
+
+        if (cellAspectRatio > 0)
+            layout->setCellAspectRatio(cellAspectRatio);
+        else if (workbenchLayout->items().size() > 1)
+            layout->setCellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio());
     }
 }
 
@@ -2380,7 +2424,7 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
     int minHeight = qMax(brect.height(), qnGlobals->layoutBackgroundMinSize().height());
 
     qreal cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
-    if (layout->cellAspectRatio() > 0) {
+    if (layout->hasCellAspectRatio()) {
         qreal cellWidth = 1.0 + layout->cellSpacing().width();
         qreal cellHeight = 1.0 / layout->cellAspectRatio() + layout->cellSpacing().height();
         cellAspectRatio = cellWidth / cellHeight;
