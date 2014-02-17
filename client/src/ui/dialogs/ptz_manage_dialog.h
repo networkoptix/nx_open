@@ -29,6 +29,7 @@ protected:
     virtual void loadData(const QnPtzData &data) override;
     virtual void saveData() override;
     virtual Qn::PtzDataFields requiredFields() const override;
+    virtual void updateFields(Qn::PtzDataFields fields) override;
 
     virtual void keyPressEvent(QKeyEvent *event) override;
 
@@ -45,6 +46,7 @@ private slots:
 
     void at_tableViewport_resizeEvent();
     void at_tourSpotsChanged(const QnPtzTourSpotList &spots);
+
 private:
     bool savePresets();
     bool saveTours();

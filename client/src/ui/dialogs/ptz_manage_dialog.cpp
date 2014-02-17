@@ -211,6 +211,26 @@ Qn::PtzDataFields QnPtzManageDialog::requiredFields() const {
     return Qn::PresetsPtzField | Qn::ToursPtzField | Qn::HomeObjectPtzField;
 }
 
+void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
+    if (fields.testFlag(Qn::PresetsPtzField)) {
+        QnPtzPresetList presets;
+        if (controller()->getPresets(&presets))
+            m_model->setPresets(presets);
+    }
+
+    if (fields.testFlag(Qn::ToursPtzField)) {
+        QnPtzTourList tours;
+        if (controller()->getTours(&tours))
+            m_model->setTours(tours);
+    }
+
+    if (fields.testFlag(Qn::HomeObjectPtzField)) {
+        QnPtzObject homeObject;
+        if (controller()->getHomeObject(&homeObject))
+            m_model->setHomePosition(homeObject.id);
+    }
+}
+
 void QnPtzManageDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
     Q_UNUSED(previous)
 

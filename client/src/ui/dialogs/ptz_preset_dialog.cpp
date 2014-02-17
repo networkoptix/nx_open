@@ -73,6 +73,10 @@ Qn::PtzDataFields QnPtzPresetDialog::requiredFields() const {
     return Qn::PresetsPtzField;
 }
 
+void QnPtzPresetDialog::updateFields(Qn::PtzDataFields fields) {
+
+}
+
 QnAbstractPtzHotkeyDelegate* QnPtzPresetDialog::hotkeysDelegate() const {
     return m_hotkeysDelegate;
 }
