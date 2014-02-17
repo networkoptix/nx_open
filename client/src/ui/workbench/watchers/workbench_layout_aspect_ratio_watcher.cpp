@@ -13,14 +13,14 @@ QnWorkbenchLayoutAspectRatioWatcher::QnWorkbenchLayoutAspectRatioWatcher(QObject
     m_renderWatcher(context()->instance<QnWorkbenchRenderWatcher>()),
     m_watchedLayout(workbench()->currentLayout())
 {
-    connect(m_renderWatcher,    SIGNAL(displayingChanged(QnResourceWidget*)),   this,   SLOT(at_renderWatcher_displayingChanged(QnResourceWidget*)));
+    connect(m_renderWatcher,    SIGNAL(widgetChanged(QnResourceWidget*)),       this,   SLOT(at_renderWatcher_widgetChanged(QnResourceWidget*)));
     connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),        this,   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                 this,   SLOT(at_workbench_currentLayoutChanged()));
 }
 
 QnWorkbenchLayoutAspectRatioWatcher::~QnWorkbenchLayoutAspectRatioWatcher() {}
 
-void QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_displayingChanged(QnResourceWidget *widget) {
+void QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_widgetChanged(QnResourceWidget *widget) {
     if (!m_renderWatcher->isDisplaying(widget))
         return;
 
