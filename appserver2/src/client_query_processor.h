@@ -44,11 +44,11 @@ namespace ec2
             void processUpdateAsync( const QUrl& ecBaseUrl, const QnTransaction<QueryDataType>& tran, HandlerType handler )
         {
             QUrl requestUrl( ecBaseUrl );
-            requestUrl.setPath( QString::fromLatin1("ec2/%1").arg(ApiCommand::toString(tran.command)) );
+            requestUrl.setPath( QString::fromLatin1("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
 
             QByteArray tranBuffer;
             OutputBinaryStream<QByteArray> outputStream( &tranBuffer );
-            QnBinary::serialize( tran, &outputStream );
+            tran.serialize(&outputStream);
 
             nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );

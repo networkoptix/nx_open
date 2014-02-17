@@ -52,9 +52,11 @@ namespace ec2
         {
             QnTransaction<RequestDataType> tran;
             //tran.command = ;
-            tran.createNewID();
             InputBinaryStream<QByteArray> stream( body );
-            QnBinary::deserialize( tran.params, &stream );
+            ApiCommand::Value command;
+            if (!QnBinary::deserialize(command, &stream) || !tran.deserialize(command, &stream))
+                return nx_http::StatusCode::badRequest;
+
 
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;
