@@ -42,6 +42,7 @@ private slots:
     void on_businessEventRemoved( QnId id );
     void on_businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
     void on_businessRuleReset( const QnBusinessEventRuleList& rules );
+    void on_broadcastBusinessAction( const QnAbstractBusinessActionPtr& action );
 
     void on_userAddedOrUpdated( QnUserResourcePtr camera );
     void on_userRemoved( QnId id );

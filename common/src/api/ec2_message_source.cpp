@@ -48,6 +48,8 @@ QnMessageSource2::QnMessageSource2(ec2::AbstractECConnectionPtr connection)
              this, &QnMessageSource2::on_businessActionBroadcasted );
     connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::businessRuleReset,
              this, &QnMessageSource2::on_businessRuleReset );
+    connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::gotBroadcastAction,
+             this, &QnMessageSource2::on_broadcastBusinessAction );
 
     connect( connection->getUserManager().get(), &ec2::AbstractUserManager::addedOrUpdated,
              this, &QnMessageSource2::on_userAddedOrUpdated );
@@ -229,6 +231,16 @@ void QnMessageSource2::on_businessRuleReset( const QnBusinessEventRuleList& rule
     message.seqNumber = ++m_seqNumber;
     message.messageType = Qn::Message_Type_BusinessRuleReset;
     message.businessRules = rules;
+
+    emit messageReceived(message);
+}
+
+void QnMessageSource2::on_broadcastBusinessAction( const QnAbstractBusinessActionPtr& action )
+{
+    QnMessage message;
+    message.seqNumber = ++m_seqNumber;
+    message.messageType = Qn::Message_Type_BroadcastBusinessAction;
+    message.businessAction = action;
 
     emit messageReceived(message);
 }
