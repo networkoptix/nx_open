@@ -57,38 +57,54 @@ namespace ec2
         ErrorCode executeTransaction(const QnTransaction<ApiIdData>& tran);
 		
 		// --------- get methods ---------------------
-        //getResourceTypes
-		ErrorCode doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& resourceTypeList);
 
-        //getCameras
-        ErrorCode doQuery(const QnId& mServerId, ApiCameraDataList& cameraList);
+        template <class T1, class T2>
+        ErrorCode doQuery(const T1& t1, T2& t2)
+        {
+            QReadLocker lock(&m_mutex);
+            return doQueryNoLock(t1, t2);
+        }
 
-        //getServers
-        ErrorCode doQuery(nullptr_t /*dummy*/, ApiMediaServerDataList& serverList);
-
-        //getCameraServerItems
-        ErrorCode doQuery(nullptr_t /*dummy*/, ApiCameraServerItemDataList& historyList);
-
-        //getUserList
-        ErrorCode doQuery(nullptr_t /*dummy*/, ApiUserDataList& userList);
-
-        //getBusinessRuleList
-        ErrorCode doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& userList);
-
-        //getBusinessRuleList
-        ErrorCode doQuery(nullptr_t /*dummy*/, ApiLayoutDataList& layoutList);
+        template <class T1, class T2>
+        ErrorCode doQueryNoLock(const T1& t1, T2& t2)
+        {
+            static_assert( false, "You have to add QnDbManager::doQueryNoLock specification" );
+            return ErrorCode::ok;
+        }
 
         //getCurrentTime
-        ErrorCode doQuery(nullptr_t /*dummy*/, qint64& userList);
-
-        //getResourceParams
-        ErrorCode doQuery(const QnId& resourceId, ApiResourceParams& params);
-
-        // ApiFullData
-        ErrorCode doQuery(nullptr_t /*dummy*/, ApiFullData& data);
-
+        ErrorCode doQuery(const nullptr_t& /*dummy*/, qint64& currentTime);
+        //getStoragePath
         ErrorCode doQuery(const ApiStoredFilePath& path, ApiStoredDirContents& data);
         ErrorCode doQuery(const ApiStoredFilePath& path, ApiStoredFileData& data);
+
+
+        //getResourceTypes
+		ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeList& resourceTypeList);
+
+        //getCameras
+        ErrorCode doQueryNoLock(const QnId& mServerId, ApiCameraDataList& cameraList);
+
+        //getServers
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
+
+        //getCameraServerItems
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
+
+        //getUserList
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList);
+
+        //getBusinessRuleList
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
+
+        //getBusinessRuleList
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
+
+        //getResourceParams
+        ErrorCode doQueryNoLock(const QnId& resourceId, ApiResourceParams& params);
+
+        // ApiFullData
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiFullData& data);
 
 		// --------- misc -----------------------------
 

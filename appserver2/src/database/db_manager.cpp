@@ -119,7 +119,7 @@ QnDbManager::QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* cons
 
 bool QnDbManager::createDatabase()
 {
-    //TODO/IMPL
+    //TODO`/IMPL
 	return true;
 }
 
@@ -1051,10 +1051,8 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
 
 // ----------- getResourceTypes --------------------
 
-ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeList& data)
 {
-    QReadLocker lock(&m_mutex);
-
 	QSqlQuery queryTypes(m_sdb);
 	queryTypes.prepare("select rt.id, rt.name, m.name as manufacture \
 				  from vms_resourcetype rt \
@@ -1091,10 +1089,8 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 
 // ----------- getLayouts --------------------
 
-ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiLayoutDataList& layouts)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataList& layouts)
 {
-    QReadLocker lock(&m_mutex);
-
     QSqlQuery query(m_sdb);
     QString filter; // todo: add data filtering by user here
     query.prepare(QString("SELECT r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
@@ -1130,10 +1126,8 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiLayoutDataList& layouts)
 
 // ----------- getCameras --------------------
 
-ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraList)
+ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraDataList& cameraList)
 {
-    QReadLocker lock(&m_mutex);
-
 	QSqlQuery queryCameras(m_sdb);
     QString filterStr;
 	if (mServerId.isValid()) {
@@ -1196,10 +1190,8 @@ ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraL
 // ----------- getServers --------------------
 
 
-ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiMediaServerDataList& serverList)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList)
 {
-    QReadLocker lock(&m_mutex);
-
     QSqlQuery query(m_sdb);
     query.prepare(QString("select r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
                           s.api_url as apiUrl, s.auth_key as authKey, s.streaming_url as streamingUrl, s.version, s.net_addr_list as netAddrList, s.reserve, s.panic_mode as panicMode \
@@ -1233,10 +1225,8 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiMediaServerDataList& serv
 }
 
 //getCameraServerItems
-ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiCameraServerItemDataList& historyList)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList)
 {
-    QReadLocker lock(&m_mutex);
-
     QSqlQuery query(m_sdb);
     query.prepare(QString("select server_guid as serverGuid, timestamp, physical_id as physicalId from vms_cameraserveritem"));
     if (!query.exec()) {
@@ -1250,10 +1240,8 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiCameraServerItemDataList&
 }
 
 //getUsers
-ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiUserDataList& userList)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList)
 {
-    QReadLocker lock(&m_mutex);
-
     //digest = md5('%s:%s:%s' % (self.user.username.lower(), 'NetworkOptix', password)).hexdigest()
     QSqlQuery query(m_sdb);
     query.prepare(QString("select r.id, r.guid, r.xtype_id as typeId, r.parent_id as parentId, r.name, r.url, r.status,r. disabled, \
@@ -1287,10 +1275,8 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiUserDataList& userList)
 }
 
 //getBusinessRules
-ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& businessRuleList)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& businessRuleList)
 {
-    QReadLocker lock(&m_mutex);
-
     QSqlQuery query(m_sdb);
     query.prepare(QString("SELECT id, event_type as eventType, event_condition as eventCondition, event_state as eventState, action_type as actionType, \
                           action_params as actionParams, aggregation_period as aggregationPeriod, disabled, comments, schedule \
@@ -1325,10 +1311,8 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiBusinessRuleDataList& bus
 }
 
 // getKVPairs
-ErrorCode QnDbManager::doQuery(const QnId& resourceId, ApiResourceParams& params)
+ErrorCode QnDbManager::doQueryNoLock(const QnId& resourceId, ApiResourceParams& params)
 {
-    QReadLocker lock(&m_mutex);
-
     QSqlQuery query(m_sdb);
     query.prepare(QString("SELECT kv.resource_id as resourceId, kv.value, kv.name \
                                 FROM vms_kvpair kv \
@@ -1344,41 +1328,40 @@ ErrorCode QnDbManager::doQuery(const QnId& resourceId, ApiResourceParams& params
 }
 
 // getCurrentTime
-ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, qint64& currentTime)
+ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, qint64& currentTime)
 {
     currentTime = QDateTime::currentMSecsSinceEpoch();
     return ErrorCode::ok;
 }
 
 // ApiFullData
-ErrorCode QnDbManager::doQuery(nullptr_t dummy, ApiFullData& data)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullData& data)
 {
-    QReadLocker lock(&m_mutex);
     ErrorCode err;
 
-    if ((err = doQuery(dummy, data.resTypes)) != ErrorCode::ok)
+    if ((err = doQueryNoLock(dummy, data.resTypes)) != ErrorCode::ok)
         return err;
 
-    if ((err = doQuery(dummy, data.servers)) != ErrorCode::ok)
+    if ((err = doQueryNoLock(dummy, data.servers)) != ErrorCode::ok)
         return err;
 
-    if ((err = doQuery(dummy, data.cameras)) != ErrorCode::ok)
+    if ((err = doQueryNoLock(QnId(), data.cameras)) != ErrorCode::ok)
         return err;
 
-    if ((err = doQuery(dummy, data.users)) != ErrorCode::ok)
+    if ((err = doQueryNoLock(dummy, data.users)) != ErrorCode::ok)
         return err;
 
-    if ((err = doQuery(dummy, data.layouts)) != ErrorCode::ok)
+    if ((err = doQueryNoLock(dummy, data.layouts)) != ErrorCode::ok)
         return err;
 
-    if ((err = doQuery(dummy, data.rules)) != ErrorCode::ok)
+    if ((err = doQueryNoLock(dummy, data.rules)) != ErrorCode::ok)
         return err;
 
-    if ((err = doQuery(dummy, data.cameraHistory)) != ErrorCode::ok)
+    if ((err = doQueryNoLock(dummy, data.cameraHistory)) != ErrorCode::ok)
         return err;
 
     ApiResourceParams kvPairs;
-    if ((err = doQuery(dummy, kvPairs)) != ErrorCode::ok)
+    if ((err = doQueryNoLock(QnId(), kvPairs)) != ErrorCode::ok)
         return err;
 
     mergeObjectListData<ApiMediaServerData, ApiResourceParam>(data.servers.data, kvPairs, &ApiMediaServerData::addParams, &ApiResourceParam::resourceId);
