@@ -1163,7 +1163,7 @@ ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraL
     queryParams.prepare(QString("SELECT kv.resource_id as resourceId, kv.value, kv.name \
                                  FROM vms_kvpair kv \
                                  JOIN vms_camera c on c.resource_ptr_id = kv.resource_id \
-                                 %1 ORDER BY r.id").arg(filterStr2));
+                                 %1 ORDER BY kv.resource_id").arg(filterStr2));
 
 	if (!queryCameras.exec()) {
         qWarning() << Q_FUNC_INFO << queryCameras.lastError().text();
@@ -1270,7 +1270,7 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiUserDataList& userList)
     queryParams.prepare(QString("SELECT kv.resource_id as resourceId, kv.value, kv.name \
                                 FROM vms_kvpair kv \
                                 JOIN auth_user u on u.id = kv.resource_id \
-                                ORDER BY r.id"));
+                                ORDER BY kv.resource_id"));
 
     if (!queryParams.exec()) {
         qWarning() << Q_FUNC_INFO << queryParams.lastError().text();
