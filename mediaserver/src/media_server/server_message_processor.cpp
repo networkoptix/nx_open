@@ -22,11 +22,32 @@
 
 QnServerMessageProcessor::QnServerMessageProcessor():
     base_type() {
-    m_tryDirectConnect = true;
 }
 
 void QnServerMessageProcessor::handleConnectionOpened(const QnMessage &message) {
-    m_tryDirectConnect = true;
+    foreach (QnResourcePtr resource, message.resources) {
+        updateResource(resource);
+    }
+
+    QUrl url = QnAppServerConnectionFactory::defaultUrl();
+
+    // check if it proxy connection and direct EC access is available
+    QAuthenticator auth;
+    auth.setUser(url.userName());
+    auth.setPassword(url.password());
+    static const int TEST_DIRECT_CONNECT_TIMEOUT = 2000;
+    CLSimpleHTTPClient testClient(url.host(), url.port(), TEST_DIRECT_CONNECT_TIMEOUT, auth);
+    CLHttpStatus result = testClient.doGET(lit("proxy_api/ec_port"));
+    if (result == CL_HTTP_SUCCESS)
+    {
+        QUrl directURL;
+        QByteArray data;
+        testClient.readAll(data);
+        directURL = url;
+        directURL.setPort(data.toInt());
+        QnAppServerConnectionFactory::setDefaultUrl(directURL);
+    }
+
     base_type::handleConnectionOpened(message);
 }
 
@@ -38,30 +59,43 @@ void QnServerMessageProcessor::handleConnectionClosed(const QString &errorString
     url.setPort(port);
     QnAppServerConnectionFactory::setDefaultUrl(url);
 
-    // check if it proxy connection and direct EC access is available
-    if (m_tryDirectConnect) {
-        m_tryDirectConnect = false;
-        QAuthenticator auth;
-        auth.setUser(url.userName());
-        auth.setPassword(url.password());
-        static const int TEST_DIRECT_CONNECT_TIMEOUT = 2000;
-        CLSimpleHTTPClient testClient(url.host(), port, TEST_DIRECT_CONNECT_TIMEOUT, auth);
-        CLHttpStatus result = testClient.doGET(lit("proxy_api/ec_port"));
-        if (result == CL_HTTP_SUCCESS)
-        {
-            QUrl directURL;
-            QByteArray data;
-            testClient.readAll(data);
-            directURL = url;
-            directURL.setPort(data.toInt());
-            QnAppServerConnectionFactory::setDefaultUrl(directURL);
-        }
-    }
     base_type::handleConnectionClosed(errorString);
 }
 
 void QnServerMessageProcessor::loadRuntimeInfo(const QnMessage &message) {
     base_type::loadRuntimeInfo(message);
+}
+
+void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource) {
+    QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>();
+
+    bool isServer = resource.dynamicCast<QnMediaServerResource>();
+    bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
+    bool isUser = resource.dynamicCast<QnUserResource>();
+
+    if (!isServer && !isCamera && !isUser)
+        return;
+
+    // If the resource is mediaServer then ignore if not this server
+    if (isServer && resource->getGuid() != serverGuid())
+        return;
+
+    //storing all servers' cameras too
+    // If camera from other server - marking it
+    if (isCamera && resource->getParentId() != ownMediaServer->getId())
+        resource->addFlags( QnResource::foreigner );
+
+    // We are always online
+    if (isServer)
+        resource->setStatus(QnResource::Online);
+
+    if (QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId(), QnResourcePool::AllResources))
+        ownResource->update(resource);
+    else
+        qnResPool->addResource(resource);
+
+    if (isServer)
+        syncStoragesToSettings(ownMediaServer);
 }
 
 void QnServerMessageProcessor::handleMessage(const QnMessage &message) {
@@ -89,37 +123,8 @@ void QnServerMessageProcessor::handleMessage(const QnMessage &message) {
         break;
     }
     case Qn::Message_Type_ResourceChange: {
-        QnResourcePtr resource = message.resource;
+        updateResource(message.resource);
 
-        QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>();
-
-        bool isServer = resource.dynamicCast<QnMediaServerResource>();
-        bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
-        bool isUser = resource.dynamicCast<QnUserResource>();
-
-        if (!isServer && !isCamera && !isUser)
-            return;
-
-        // If the resource is mediaServer then ignore if not this server
-        if (isServer && resource->getGuid() != serverGuid())
-            return;
-
-        //storing all servers' cameras too
-        // If camera from other server - marking it
-        if (isCamera && resource->getParentId() != ownMediaServer->getId())
-            resource->addFlags( QnResource::foreigner );
-
-        // We are always online
-        if (isServer)
-            resource->setStatus(QnResource::Online);
-
-        if (QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId(), QnResourcePool::AllResources))
-            ownResource->update(resource);
-        else
-            qnResPool->addResource(resource);
-
-        if (isServer)
-            syncStoragesToSettings(ownMediaServer);
         break;
     }
     case Qn::Message_Type_ResourceDisabledChange: {
