@@ -21,8 +21,6 @@ namespace ec2
 
             //!ApiResourceTypeList
             getResourceTypes,
-            //!ApiResourceDataList
-            getResources,
             //!ApiResourceData
             getResource,
             //!ApiSetResourceStatusData

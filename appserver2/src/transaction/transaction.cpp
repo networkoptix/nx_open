@@ -19,8 +19,6 @@ namespace ec2
 
                 case getResourceTypes:
                     return "getResourceTypes";
-                case getResources:
-                    return "getResources";
                 case getResource:
                     return "getResource";
                 case setResourceStatus:

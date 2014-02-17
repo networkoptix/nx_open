@@ -60,9 +60,6 @@ namespace ec2
         //getResourceTypes
 		ErrorCode doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& resourceTypeList);
 
-        //getResources
-		ErrorCode doQuery(nullptr_t /*dummy*/, ApiResourceDataList& resourceList);
-
         //getCameras
         ErrorCode doQuery(const QnId& mServerId, ApiCameraDataList& cameraList);
 

@@ -68,8 +68,6 @@ namespace ec2
 
         //AbstractResourceManager::getResourceTypes
         registerGetFuncHandler<nullptr_t, ApiResourceTypeList>( restProcessorPool, ApiCommand::getResourceTypes );
-        //AbstractResourceManager::getResources
-        registerGetFuncHandler<nullptr_t, ApiResourceDataList>( restProcessorPool, ApiCommand::getResources );
         //AbstractResourceManager::getResource
         //registerGetFuncHandler<nullptr_t, ApiResourceData>( restProcessorPool, ApiCommand::getResource );
         //AbstractResourceManager::setResourceStatus

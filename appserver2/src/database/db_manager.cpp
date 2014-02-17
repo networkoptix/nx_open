@@ -1089,13 +1089,6 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceTypeList& data)
 	return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiResourceDataList& resourceList)
-{
-    //TODO/IMPL
-    return ErrorCode::notImplemented;
-}
-
-
 // ----------- getLayouts --------------------
 
 ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiLayoutDataList& layouts)
@@ -1170,7 +1163,7 @@ ErrorCode QnDbManager::doQuery(const QnId& mServerId, ApiCameraDataList& cameraL
     queryParams.prepare(QString("SELECT kv.resource_id as resourceId, kv.value, kv.name \
                                  FROM vms_kvpair kv \
                                  JOIN vms_camera c on c.resource_ptr_id = kv.resource_id \
-                                 JOIN vms_resource r on r.id = kv.resource_id %1 ORDER BY r.id").arg(filterStr2));
+                                 %1 ORDER BY r.id").arg(filterStr2));
 
 	if (!queryCameras.exec()) {
         qWarning() << Q_FUNC_INFO << queryCameras.lastError().text();
@@ -1273,8 +1266,23 @@ ErrorCode QnDbManager::doQuery(nullptr_t /*dummy*/, ApiUserDataList& userList)
         return ErrorCode::failure;
     }
 
-    userList.loadFromQuery(query);
+    QSqlQuery queryParams(m_sdb);
+    queryParams.prepare(QString("SELECT kv.resource_id as resourceId, kv.value, kv.name \
+                                FROM vms_kvpair kv \
+                                JOIN auth_user u on u.id = kv.resource_id \
+                                ORDER BY r.id"));
 
+    if (!queryParams.exec()) {
+        qWarning() << Q_FUNC_INFO << queryParams.lastError().text();
+        return ErrorCode::failure;
+    }
+
+    userList.loadFromQuery(query);
+    
+    std::vector<ApiResourceParam> params;
+    QN_QUERY_TO_DATA_OBJECT(queryParams, ApiResourceParam, params, ApiResourceParamFields);
+    mergeObjectListData<ApiUserData, ApiResourceParam>(userList.data, params, &ApiCameraData::addParams, &ApiResourceParam::resourceId);
+    
     return ErrorCode::ok;
 }
 

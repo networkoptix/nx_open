@@ -28,7 +28,6 @@ public:
 private slots:
     void at_showAllCheckBox_toggled(bool checked);
     void at_showBusinessEvents_valueChanged();
-    void at_resource_save_finished();
 
 private:
     QScopedPointer<Ui::PopupSettingsWidget> ui;

@@ -783,13 +783,6 @@ void QnMain::loadResourcesFromECS()
     foreach(const QnUserResourcePtr &user, users)
         qnResPool->addResource(user);
 
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    QnKvPairList adminKvPairs;
-    appServerConnection->getKvPairs(adminKvPairs, admin);
-    foreach(const QnKvPair& kvPair, adminKvPairs) {
-        admin->setProperty(kvPair.name(), kvPair.value());
-    }
-
     //loading business rules
     QnBusinessEventRuleList rules;
     while( (rez = ec2Connection->getBusinessEventManager()->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )
