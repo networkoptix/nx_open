@@ -507,11 +507,13 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
             [this, cameras]( int reqID, ec2::ErrorCode errorCode ) {
                 at_resources_saved( reqID, errorCode, cameras );
             } );
+        /*
         foreach(const QnResourcePtr &camera, cameras) {
             connection2()->getResourceManager()->save(
                 camera->getId(), camera->getProperties(),
                 this, &QnWorkbenchActionHandler::at_resources_properties_saved  );
         }
+        */
     }
 
     if (hasCameraChanges) {
