@@ -12,5 +12,6 @@ if not [%2] == [] set ARCH=-Darch=%INPUT_ARCH%
 echo ARCH=%INPUT_ARCH%
 
 @echo on
-call mvn compile -T 4 --projects build_environment %CUSTOMIZATION% %ARCH%
+call mvn compile --projects build_environment %CUSTOMIZATION% %ARCH%
+call mvn compile --projects build_variables %CUSTOMIZATION% %ARCH%
 call mvn compile -T 4 -rf common %CUSTOMIZATION% %ARCH%
