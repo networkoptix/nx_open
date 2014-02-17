@@ -60,9 +60,8 @@ private:
     QnPtzPresetHotkeyItemDelegate hotkeyDelegate;
 };
 
-//TODO:  allow to maximize dialog
 QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
-    base_type(parent),
+    base_type(parent, Qt::Dialog | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint),
     ui(new Ui::PtzManageDialog),
     m_model(new QnPtzManageModel(this))
 {
