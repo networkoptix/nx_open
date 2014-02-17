@@ -654,7 +654,7 @@ QnId QnResource::getId() const
     return m_id;
 }
 
-void QnResource::setId(QnId id) {
+void QnResource::setId(const QnId& id) {
     QMutexLocker mutexLocker(&m_mutex);
 
     if(m_id == id)

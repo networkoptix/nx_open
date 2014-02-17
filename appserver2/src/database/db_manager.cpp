@@ -551,14 +551,51 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiResourceData>& 
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::insertBRuleResource(const QString& tableName, const qint32& ruleId, const qint32& resourceId)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare(QString("INSERT INTO %1 (businessrule_id, resource_id) VALUES (:ruleId, :resId)").arg(tableName));
+    query.bindValue(":ruleId", ruleId);
+    query.bindValue(":resId", resourceId);
+    if (query.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiBusinessRuleData>& tran)
 {
-    if( tran.command == ApiCommand::addBusinessRule )
-        return insertBusinessRule(tran.params);
-    else if( tran.command == ApiCommand::updateBusinessRule )
-        return updateBusinessRule(tran.params);
+    QnDbTransactionLocker lock(&m_tran);
 
-    return ErrorCode::notImplemented;
+    ErrorCode rez = insertOrReplaceBusinessRuleTable(tran.params);
+    if (rez != ErrorCode::ok)
+        return rez;
+
+    ErrorCode err = deleteTableRecord(tran.params.id, "vms_businessrule_action_resources", "businessrule_id");
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteTableRecord(tran.params.id, "vms_businessrule_event_resources", "businessrule_id");
+    if (err != ErrorCode::ok)
+        return err;
+
+    foreach(const qint32& id, tran.params.eventResource) {
+        err = insertBRuleResource("vms_businessrule_event_resources", tran.params.id, id);
+        if (err != ErrorCode::ok)
+            return err;
+    }
+
+    foreach(const qint32& id, tran.params.actionResource) {
+        err = insertBRuleResource("vms_businessrule_action_resources", tran.params.id, id);
+        if (err != ErrorCode::ok)
+            return err;
+    }
+
+    lock.commit();
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiMediaServerData>& tran)
@@ -690,16 +727,21 @@ ErrorCode QnDbManager::removeUser( qint32 id )
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertBusinessRule( const ApiBusinessRuleData& /*businessRule*/ )
+ErrorCode QnDbManager::insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule )
 {
-    //TODO/IMPL
-    return ErrorCode::notImplemented;
-}
-
-ErrorCode QnDbManager::updateBusinessRule( const ApiBusinessRuleData& /*businessRule*/ )
-{
-    //TODO/IMPL
-    return ErrorCode::notImplemented;
+    QSqlQuery query(m_sdb);
+    query.prepare(QString("INSERT OR REPLACE vms_businessrule (id, event_type, event_condition, event_state, action_type, \
+                          action_params, aggregation_period, disabled, comments, schedule) VALUES \
+                          (:id, :eventType, :eventCondition, :eventState, :actionType, \
+                          :actionParams, :aggregationPeriod, :disabled, :comments, :schedule)"));
+    businessRule.autoBindValues(query);
+    if (query.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
 }
 
 ErrorCode QnDbManager::removeBusinessRule( qint32 id )

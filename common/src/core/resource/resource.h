@@ -136,7 +136,7 @@ public:
     virtual void deserialize(const QnResourceParameters& parameters);
 
     QnId getId() const;
-    void setId(QnId id);
+    void setId(const QnId& id);
 
     QnId getParentId() const;
     void setParentId(QnId parent);

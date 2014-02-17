@@ -42,6 +42,28 @@ void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource, QnResource
     resource->setSystem(system);
 }
 
+void ApiBusinessRuleData::fromResource(const QnBusinessEventRulePtr& resource)
+{
+    id = resource->id();
+    eventType = resource->eventType();
+
+    foreach(const QnResourcePtr& res,  resource->eventResources())
+        eventResource.push_back(res->getId());
+    foreach(const QnResourcePtr& res,  resource->actionResources())
+        actionResource.push_back(res->getId());
+
+    eventCondition = serializeBusinessParams(resource->eventParams().toBusinessParams());
+    actionParams = serializeBusinessParams(resource->actionParams().toBusinessParams());
+
+    eventState = resource->eventState();
+    actionType = resource->actionType();
+    aggregationPeriod = resource->aggregationPeriod();
+    disabled = resource->disabled();
+    comments = resource->comments();
+    schedule = resource->schedule();
+    system = resource->system();
+}
+
 void ApiBusinessRuleDataList::toResourceList(QnBusinessEventRuleList& outData, QnResourcePool* resourcePool) const
 {
     outData.reserve(outData.size() + data.size());

@@ -36,6 +36,7 @@ struct ApiBusinessRuleData: public ApiData
     bool system; // system rule cannot be deleted 
 
     void toResource(QnBusinessEventRulePtr resource, QnResourcePool* resourcePool) const;
+    void fromResource(const QnBusinessEventRulePtr& resource);
     QN_DECLARE_STRUCT_SQL_BINDER();
 
 };

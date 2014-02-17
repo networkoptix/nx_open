@@ -22,7 +22,7 @@ public:
     //QnResourceType(const QString& name);
     virtual ~QnResourceType();
 
-    void setId(QnId value) { m_id = value; }
+    void setId(const QnId& value) { m_id = value; }
     QnId getId() const { return m_id;}
 
     void setParentId(QnId value) { m_parentId = value; }

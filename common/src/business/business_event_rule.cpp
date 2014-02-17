@@ -6,7 +6,7 @@
 
 QnBusinessEventRule::QnBusinessEventRule()
 :
-    m_id(0),
+    m_id(),
     m_eventType(BusinessEventType::NotDefined),
     m_eventState(Qn::OnState), //by default, rule triggers on toggle event start. for example: if motion start/stop, send alert on start only
     m_actionType(BusinessActionType::NotDefined),
@@ -20,11 +20,11 @@ QnBusinessEventRule::~QnBusinessEventRule() {
 
 }
 
-int QnBusinessEventRule::id() const {
+QnId QnBusinessEventRule::id() const {
     return m_id;
 }
 
-void QnBusinessEventRule::setId(int value) {
+void QnBusinessEventRule::setId(const QnId& value) {
     m_id = value;
 }
 

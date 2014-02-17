@@ -21,8 +21,8 @@ public:
 
     QString getUniqueId() const;
 
-    int id() const;
-    void setId(int value);
+    QnId id() const;
+    void setId(const QnId& value);
 
     BusinessEventType::Value eventType() const;
     void setEventType(const BusinessEventType::Value value);
@@ -64,7 +64,7 @@ public:
     /* Check if current time allowed in schedule */
     bool isScheduleMatchTime(const QDateTime& datetime) const;
 private:
-    int m_id;
+    QnId m_id;
 
     BusinessEventType::Value m_eventType;
     QnResourceList m_eventResources;

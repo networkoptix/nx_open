@@ -158,6 +158,7 @@ namespace ec2
             void emitGetKvPairsDone( int reqID, const ErrorCode p1, const QnKvPairListsById& p2 ) { emit onGetKvPairsDone( reqID, p1, p2 ); }
             void emitSaveKvPairsDone( int reqID, const ErrorCode p1, const QnKvPairListsById& p2 ) { emit onSaveKvPairsDone( reqID, p1, p2 ); }
             void emitSaveServerDone( int reqID, const ErrorCode p1, const QnMediaServerResourcePtr& p2) { emit onSaveServerDone( reqID, p1, p2 ); }
+            void emitSaveBusinessRuleDone( int reqID, const ErrorCode p1, const QnBusinessEventRulePtr& p2) { emit onSaveBusinessRuleDone( reqID, p1, p2 ); }
             void emitGetServersDone( int reqID, const ErrorCode p1, const QnMediaServerResourceList& p2 ) { emit onGetServersDone( reqID, p1, p2 ); }
             void emitAddCameraDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( reqID, p1, p2 ); }
             void emitGetCamerasDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( reqID, p1, p2 ); }
@@ -185,6 +186,7 @@ namespace ec2
             void onGetKvPairsDone( int reqID, const ErrorCode, const QnKvPairListsById& );
             void onSaveKvPairsDone( int reqID, const ErrorCode, const QnKvPairListsById& );
             void onSaveServerDone( int reqID, const ErrorCode, const QnMediaServerResourcePtr&);
+            void onSaveBusinessRuleDone( int reqID, const ErrorCode, const QnBusinessEventRulePtr&);
             void onGetServersDone( int reqID, const ErrorCode, const QnMediaServerResourceList& );
             void onAddCameraDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
             void onGetCamerasDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
@@ -249,7 +251,7 @@ namespace ec2
         ///////// Handlers for AbstractBusinessEventManager
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER( GetBusinessRules, ErrorCode, QnBusinessEventRuleList )
-
+        DEFINE_TWO_ARG_HANDLER( SaveBusinessRule, ErrorCode, QnBusinessEventRulePtr)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractLicenseManager

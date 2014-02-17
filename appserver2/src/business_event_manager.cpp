@@ -51,10 +51,22 @@ int QnBusinessEventManager<T>::sendEmail(const QStringList& to, const QString& s
 }
 
 template<class T>
-int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler )
 {
-    //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
-    return INVALID_REQ_ID;
+    const int reqID = generateRequestID();
+
+    ApiCommand::Value command = ApiCommand::updateBusinessRule;
+    if (!rule->id().isValid()) {
+        rule->setId(dbManager->getNextSequence());
+        command = ApiCommand::addBusinessRule;
+    }
+
+    auto tran = prepareTransaction( command, rule );
+
+    using namespace std::placeholders;
+    m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveBusinessRuleHandler::done ), handler, reqID, _1, rule ) );
+
+    return reqID;
 }
 
 template<class T>
@@ -88,7 +100,7 @@ QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction
     tran.createNewID();
     tran.command = command;
     tran.persistent = true;
-    //TODO/IMPL
+    tran.params.fromResource(resource);
     return tran;
 }
 
