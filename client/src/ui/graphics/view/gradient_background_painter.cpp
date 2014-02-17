@@ -14,6 +14,7 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
+#include <ui/workaround/gl_native_painting.h>
 
 
 QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent):
@@ -136,7 +137,7 @@ void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & r
         painter->fillRect(rect, radialGrad);
     }
 #else
-    painter->beginNativePainting();
+    QnGlNativePainting::begin(painter);
     {
         if(!m_gradientPainter)
             m_gradientPainter.reset(new QnRadialGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), QGLContext::currentContext()));
@@ -160,6 +161,6 @@ void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & r
         glDisable(GL_BLEND);
         //glPopAttrib();
     }
-    painter->endNativePainting();
+    QnGlNativePainting::end(painter);
 #endif
 }
