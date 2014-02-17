@@ -1199,6 +1199,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraDataList& c
     queryParams.prepare(QString("SELECT kv.resource_id as resourceId, kv.value, kv.name \
                                  FROM vms_kvpair kv \
                                  JOIN vms_camera c on c.resource_ptr_id = kv.resource_id \
+                                 JOIN vms_resource r on r.id = kv.resource_id \
                                  %1 ORDER BY kv.resource_id").arg(filterStr2));
 
 	if (!queryCameras.exec()) {
