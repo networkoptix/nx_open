@@ -1037,7 +1037,7 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
         return removeResource( tran.params.id );
     default:
         qWarning() << "Remove operation is not implemented for command" << toString(tran.command);
-        Q_ASSERT_X(0, "Remove operation is not implemented for command" << toString(tran.command), Q_FUNC_INFO);
+        Q_ASSERT_X(0, "Remove operation is not implemented for command", Q_FUNC_INFO);
         break;
     }
     return ErrorCode::unsupported;
