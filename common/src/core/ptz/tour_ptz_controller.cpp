@@ -8,7 +8,7 @@
 
 #include <api/resource_property_adaptor.h>
 
-#include "ptz_tour_executor.h"
+#include "tour_ptz_executor.h"
 #include "ptz_controller_pool.h"
 
 // -------------------------------------------------------------------------- //
@@ -17,14 +17,14 @@
 QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(baseController->resource(), lit("ptzTours"), QnPtzTourHash(), this)),
-    m_executor(new QnPtzTourExecutor(baseController))
+    m_executor(new QnTourPtzExecutor(baseController))
 {
     assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
+    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
     m_executor->moveToThread(qnPtzPool->executorThread());
 
-    m_asynchronous = baseController->hasCapabilities(Qn::AsynchronousPtzCapability);
-    connect(this, &QnTourPtzController::finishedLater, this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
+    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChangedExternally, this, [this]{ emit changed(Qn::ToursPtzField); }, Qt::QueuedConnection);
 }
 
 QnTourPtzController::~QnTourPtzController() {
@@ -40,7 +40,6 @@ bool QnTourPtzController::extends(Qn::PtzCapabilities capabilities) {
 }
 
 Qn::PtzCapabilities QnTourPtzController::getCapabilities() {
-    /* Note that this controller preserves both Qn::AsynchronousPtzCapability and Qn::SynchronizedPtzCapability. */
     Qn::PtzCapabilities capabilities = base_type::getCapabilities();
     return extends(capabilities) ? (capabilities | Qn::ToursPtzCapability) : capabilities;
 }
@@ -76,40 +75,37 @@ bool QnTourPtzController::activatePreset(const QString &presetId, qreal speed) {
 }
 
 bool QnTourPtzController::createTour(const QnPtzTour &tour) {
-    return createTourInternal(tour);
-}
-
-bool QnTourPtzController::createTourInternal(QnPtzTour tour) {
     QnPtzPresetList presets;
     if(!getPresets(&presets))
         return false;
 
-    /* Not so important so fix and continue. */
-    tour.optimize();
+    {
+        QMutexLocker locker(&m_mutex);
+        QnPtzTourHash records = m_adaptor->value();
+        if(records.contains(tour.id) && records.value(tour.id) == tour)
+            return true; /* No need to save it. */
 
-    /* Tour is fine, save it. */
-    QMutexLocker locker(&m_mutex);
-    QnPtzTourHash records = m_adaptor->value();
-    records.insert(tour.id, tour);
-    
-    m_adaptor->setValue(records);
+        records.insert(tour.id, tour);
 
-    if(m_asynchronous)
-        emit finishedLater(Qn::CreateTourPtzCommand, QVariant::fromValue(tour));
+        m_adaptor->setValue(records);
+    }
+
+    emit changed(Qn::ToursPtzField);
     return true;
 }
 
 bool QnTourPtzController::removeTour(const QString &tourId) {
-    QMutexLocker locker(&m_mutex);
+    {
+        QMutexLocker locker(&m_mutex);
 
-    QnPtzTourHash records = m_adaptor->value();
-    if(records.remove(tourId) == 0)
-        return false;
+        QnPtzTourHash records = m_adaptor->value();
+        if(records.remove(tourId) == 0)
+            return false;
     
-    m_adaptor->setValue(records);
+        m_adaptor->setValue(records);
+    }
     
-    if(m_asynchronous)
-        emit finishedLater(Qn::RemoveTourPtzCommand, QVariant::fromValue(tourId));
+    emit changed(Qn::ToursPtzField);
     return true;
 }
 
@@ -125,8 +121,6 @@ bool QnTourPtzController::activateTour(const QString &tourId) {
 
     m_executor->startTour(tour);
 
-    if(m_asynchronous)
-        emit finishedLater(Qn::ActivateTourPtzCommand, QVariant::fromValue(tourId));
     return true;
 }
 
@@ -135,7 +129,6 @@ bool QnTourPtzController::getTours(QnPtzTourList *tours) {
 
     *tours = m_adaptor->value().values();
 
-    if(m_asynchronous)
-        emit finishedLater(Qn::GetToursPtzCommand, QVariant::fromValue(*tours));
     return true;
 }
+

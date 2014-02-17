@@ -17,13 +17,17 @@ bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) 
     data->fields = Qn::NoPtzFields;
     data->capabilities = getCapabilities();
     
-    if((query & Qn::DevicePositionPtzField)    && getPosition(Qn::DevicePtzCoordinateSpace, &data->devicePosition))     data->fields |= Qn::DevicePositionPtzField;
-    if((query & Qn::LogicalPositionPtzField)   && getPosition(Qn::LogicalPtzCoordinateSpace, &data->logicalPosition))   data->fields |= Qn::LogicalPositionPtzField;
-    if((query & Qn::DeviceLimitsPtzField)      && getLimits(Qn::DevicePtzCoordinateSpace, &data->deviceLimits))         data->fields |= Qn::DeviceLimitsPtzField;
-    if((query & Qn::LogicalLimitsPtzField)     && getLimits(Qn::LogicalPtzCoordinateSpace, &data->logicalLimits))       data->fields |= Qn::LogicalLimitsPtzField;
-    if((query & Qn::FlipPtzField)              && getFlip(&data->flip))                                                 data->fields |= Qn::FlipPtzField;
-    if((query & Qn::PresetsPtzField)           && getPresets(&data->presets))                                           data->fields |= Qn::PresetsPtzField;
-    if((query & Qn::ToursPtzField)             && getTours(&data->tours))                                               data->fields |= Qn::ToursPtzField;
+    if((query & Qn::CapabilitiesPtzField))       { data->capabilities = getCapabilities();                              data->fields |= Qn::CapabilitiesPtzField; }
+    if((query & Qn::DevicePositionPtzField)     && getPosition(Qn::DevicePtzCoordinateSpace, &data->devicePosition))    data->fields |= Qn::DevicePositionPtzField;
+    if((query & Qn::LogicalPositionPtzField)    && getPosition(Qn::LogicalPtzCoordinateSpace, &data->logicalPosition))  data->fields |= Qn::LogicalPositionPtzField;
+    if((query & Qn::DeviceLimitsPtzField)       && getLimits(Qn::DevicePtzCoordinateSpace, &data->deviceLimits))        data->fields |= Qn::DeviceLimitsPtzField;
+    if((query & Qn::LogicalLimitsPtzField)      && getLimits(Qn::LogicalPtzCoordinateSpace, &data->logicalLimits))      data->fields |= Qn::LogicalLimitsPtzField;
+    if((query & Qn::FlipPtzField)               && getFlip(&data->flip))                                                data->fields |= Qn::FlipPtzField;
+    if((query & Qn::PresetsPtzField)            && getPresets(&data->presets))                                          data->fields |= Qn::PresetsPtzField;
+    if((query & Qn::ToursPtzField)              && getTours(&data->tours))                                              data->fields |= Qn::ToursPtzField;
+    if((query & Qn::ActiveObjectPtzField)       && getActiveObject(&data->activeObject))                                data->fields |= Qn::ActiveObjectPtzField;
+    if((query & Qn::HomeObjectPtzField)         && getHomeObject(&data->homeObject))                                    data->fields |= Qn::HomeObjectPtzField;
+
     return true;
 }
 
@@ -67,8 +71,11 @@ bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
     case Qn::GetToursPtzCommand:            
         return (capabilities & Qn::ToursPtzCapability);
 
+    case Qn::UpdateHomeObjectPtzCommand:
+    case Qn::GetHomeObjectPtzCommand:
+        return (capabilities & Qn::HomePtzCapability);
+
     case Qn::GetDataPtzCommand:
-    case Qn::SynchronizePtzCommand:         
         return true;
 
     default:                                

@@ -133,7 +133,7 @@ QString QnActiResourceSearcher::manufacture() const
 
 QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
 {
-    if( !url.scheme().isEmpty() )
+    if( !url.scheme().isEmpty() && doMultichannelCheck )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
     Q_UNUSED(doMultichannelCheck)

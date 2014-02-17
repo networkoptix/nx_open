@@ -180,7 +180,9 @@ protected:
 
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
-    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsY);
+    void createNotificationsGuiElements();
+
+    QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX);
     void updateViewportMargins();
 
     void updateTreeGeometry();

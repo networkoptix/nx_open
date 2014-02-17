@@ -9,7 +9,7 @@
 #include "nx_ec/impl/ec_api_impl.h"
 
 
-// TODO: #Elric move out serialization after a merge with customization branch
+// TODO: #Elric move serialization out after merge with customization branch
 
 class QnAbstractResourcePropertyAdaptor: public Connective<QObject> {
     Q_OBJECT
@@ -39,6 +39,7 @@ public:
 
 signals:
     void valueChanged();
+    void valueChangedExternally();
 
 protected:
     virtual bool serialize(const QVariant &value, QString *target) const = 0;

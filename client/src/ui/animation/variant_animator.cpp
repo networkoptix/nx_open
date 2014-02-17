@@ -1,6 +1,9 @@
 #include "variant_animator.h"
 #include <cassert>
 #include <limits>
+
+#include <client/client_settings.h>
+
 #include <utils/common/warnings.h>
 #include <utils/math/linear_combination.h>
 #include <utils/math/magnitude.h>
@@ -175,11 +178,18 @@ qreal VariantAnimator::easingCurveValue(qreal progress) const {
 }
 
 void VariantAnimator::updateCurrentTime(int currentTime) {
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation) {
+        updateCurrentValue(internalTargetValue());
+        stop();
+        return;
+    }
+
     updateCurrentValue(interpolated(
         internalStartValue(), 
         internalTargetValue(), 
         easingCurveValue(easingCurveProgress(currentTime))
     ));
+
 }
 
 QVariant VariantAnimator::interpolated(const QVariant &from, const QVariant &to, qreal progress) const {

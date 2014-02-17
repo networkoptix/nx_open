@@ -45,6 +45,7 @@
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
+        <resources.phase>generate-sources</resources.phase>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
         <protobuf.version>2.5.0-SNAPSHOT</protobuf.version>
@@ -146,7 +147,7 @@
                 <executions>
                     <execution>
                         <id>copy-project-resources</id>
-                        <phase>generate-sources</phase>
+                        <phase>${resources.phase}</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -168,6 +169,7 @@
                                     <filtering>false</filtering>
                                     <excludes>
                                         <exclude>**/_unused/**</exclude>
+                                        <exclude>**/intro.*</exclude>
                                     </excludes>
                                 </resource>	   
                                 <resource>
@@ -201,10 +203,16 @@
         <profile>
             <id>quicksync</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>quicksync</name>
+                    <value>true</value>
+                </property>
             </activation>
             <modules>	
-                <module>quicksyncdecoder</module>       
+                <module>plugins/quicksyncdecoder</module>       
             </modules>	
         </profile>   
 
@@ -216,9 +224,10 @@
                 </property>
             </activation>
             <modules>
-                <module>common</module>
+                <module>build_variables</module>
                 <module>appserver</module>
                 <module>appserver2</module>
+                <module>common</module>
                 <!--<module>plugins/axiscamplugin</module>-->
                 <module>plugins/genericrtspplugin</module>
                 <module>plugins/image_library_plugin</module>
@@ -265,7 +274,6 @@
                 </os>
             </activation>
             <modules>
-                <module>plugins/quicksyncdecoder</module>
                 <module>plugins/image_library_plugin</module>                
                 <module>traytool</module>
                 <module>vmaxproxy</module>	
@@ -275,7 +283,9 @@
             </modules>
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
-                <python.dir>${environment.dir}/python/${arch}</python.dir>	
+                <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
+                <virtualenv.dir>${init.python.dir}/scripts</virtualenv.dir>
+                <python.dir>${libdir}/${arch}/python/scripts</python.dir>                
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
                 <compiler>msvc2012u3</compiler>
@@ -297,7 +307,9 @@
             </activation>
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
-                <python.dir>${environment.dir}/python/bin</python.dir>		
+                <init.python.dir>${environment.dir}/python/bin</init.python.dir>				
+                <python.dir>${libdir}/${arch}/python/bin</python.dir>
+                <virtualenv.dir>/usr/local/bin</virtualenv.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
@@ -333,11 +345,8 @@
                     <family>mac</family>
                 </os> 
             </activation>
-            <properties>
-                <environment.dir>${env.environment}</environment.dir>
-                <python.dir>${env.environment}/python/bin/</python.dir>				
+            <properties>		
                 <platform>macosx</platform>
-                <compiler>gcc</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <arch>x64</arch>
                 <qt.spec>macx-clang-libc++</qt.spec>

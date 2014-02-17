@@ -74,6 +74,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setCursor(Qt::ArrowCursor);
 
     setAutoFillBackground(true);
+
     setPaletteColor(this, QPalette::Window, Qt::black);
 
     /* Create buttons. */

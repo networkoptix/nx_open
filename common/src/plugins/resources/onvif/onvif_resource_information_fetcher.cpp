@@ -167,7 +167,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             qDebug() << "OnvifResourceInformationFetcher::findResources: SOAP to endpoint '" << endpoint
                      << "' failed. Camera name will be set to 'Unknown'. GSoap error code: " << soapRes
                      << ". " << soapWrapper.getLastError();
-            return; // non onvif device
+            if (!soapWrapper.isNotAuthenticated())
+                return; // non onvif device
         } 
         else {
             if (!response.Manufacturer.empty())

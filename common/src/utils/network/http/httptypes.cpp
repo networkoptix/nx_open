@@ -539,7 +539,7 @@ namespace nx_http
                 ++it )
             {
                 if( it != params.begin() )
-                    dstBuffer->append( "," );
+                    dstBuffer->append( ", " );
                 dstBuffer->append( it.key());
                 dstBuffer->append( "=\"" );
                 dstBuffer->append( it.value() );

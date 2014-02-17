@@ -5,7 +5,7 @@
 #include <QtWidgets/QMenu>
 #include <QtCore/QMimeData>
 
-#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -18,28 +18,28 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *context):
+QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     QDialog(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
 #ifdef Q_OS_MAC
     | Qt::Tool
 #endif
     ),
-    QnWorkbenchContextAware(parent, context),
-    ui(new Ui::CameraListDialog)
+    QnWorkbenchContextAware(parent),
+    ui(new Ui::CameraListDialog),
+    m_model(new QnCameraListModel(this)),
+    m_resourceSearch(new QnResourceSearchProxyModel(this))
 {
     ui->setupUi(this);
 
-    m_model = new QnCameraListModel(context);
-    connect(qnResPool,  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceRemoved(const QnResourcePtr &)));
-    connect(qnResPool,  SIGNAL(resourceAdded(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceAdded(const QnResourcePtr &)));
-
-    QList<QnCameraListModel::Column> columns;
+  /*  QList<QnCameraListModel::Column> columns;
     columns << QnCameraListModel::RecordingColumn << QnCameraListModel::NameColumn << QnCameraListModel::VendorColumn << QnCameraListModel::ModelColumn <<
-               QnCameraListModel::FirmwareColumn << QnCameraListModel::DriverColumn << QnCameraListModel::IPColumn << QnCameraListModel::UniqIdColumn << QnCameraListModel::ServerColumn;
+               QnCameraListModel::FirmwareColumn << QnCameraListModel::DriverColumn << QnCameraListModel::IpColumn << QnCameraListModel::UniqIdColumn << QnCameraListModel::ServerColumn;
 
     m_model->setColumns(columns);
+    m_model->setResources(qnResPool->getAllEnabledCameras());
+    */
 
-    m_resourceSearch = new QnResourceSearchProxyModel(this);
+    connect(m_model,  &QnCameraListModel::serverChanged, this, &QnCameraListDialog::at_modelChanged);
     connect(m_resourceSearch,  SIGNAL(criteriaChanged()), this, SLOT(at_modelChanged()) );
     connect(m_resourceSearch,  SIGNAL(modelReset()), this, SLOT(at_modelChanged()) );
     m_resourceSearch->setSourceModel(m_model);
@@ -58,54 +58,45 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent, QnWorkbenchContext *cont
 
     m_exportAction      = new QAction(tr("Export Selection to File..."), this);
     m_selectAllAction   = new QAction(tr("Select All"), this);
-    m_selectAllAction->setShortcut(Qt::CTRL + Qt::Key_A);
+    m_selectAllAction->setShortcut(QKeySequence::SelectAll);
 
     connect(m_clipboardAction,      SIGNAL(triggered()),                this, SLOT(at_copyToClipboard()));
     connect(m_exportAction,         SIGNAL(triggered()),                this, SLOT(at_exportAction()));
-    connect(m_selectAllAction,      SIGNAL(triggered()),                this, SLOT(at_selectAllAction()));
+    connect(m_selectAllAction,      SIGNAL(triggered()),                ui->gridCameras, SLOT(selectAll()));
 
     ui->gridCameras->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     setHelpTopic(this, Qn::CameraList_Help);
 }
 
-QnCameraListDialog::~QnCameraListDialog()
-{
+QnCameraListDialog::~QnCameraListDialog() { }
+
+void QnCameraListDialog::setServer(const QnMediaServerResourcePtr &server) {
+    m_model->setServer(server);
 }
 
-void QnCameraListDialog::setServer(const QnMediaServerResourcePtr &server)
-{
-    if(m_server == server)
-        return;
-
-    m_server = server;
-    m_model->setResources(qnResPool->getAllEnabledCameras(m_server));
+QnMediaServerResourcePtr QnCameraListDialog::server() const {
+    return m_model->server();
 }
 
-const QnMediaServerResourcePtr &QnCameraListDialog::server() const 
-{
-    return m_server;
-}
-
-void QnCameraListDialog::at_searchStringChanged(const QString& text)
-{
+void QnCameraListDialog::at_searchStringChanged(const QString& text) {
     QString searchString = QString(lit("*%1*")).arg(text);
     m_resourceSearch->clearCriteria();
     m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(searchString, Qt::CaseInsensitive, QRegExp::Wildcard)));
 }
 
-void QnCameraListDialog::at_gridDoubleClicked(const QModelIndex &index)
-{
-    if (index.isValid())
-    {
-        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if (resource)
-            context()->menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnActionParameters(resource));
-    }
+void QnCameraListDialog::at_gridDoubleClicked(const QModelIndex &index) {
+    if (!index.isValid())
+        return;
+
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    if (resource)
+        context()->menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnActionParameters(resource));
 }
 
-void QnCameraListDialog::at_customContextMenuRequested(const QPoint &)
-{
+void QnCameraListDialog::at_customContextMenuRequested(const QPoint &pos) {
+    Q_UNUSED(pos);
+
     QModelIndexList list = ui->gridCameras->selectionModel()->selectedRows();
     QnResourceList resList;
     foreach(QModelIndex idx, list)
@@ -115,7 +106,7 @@ void QnCameraListDialog::at_customContextMenuRequested(const QPoint &)
             resList << resource;
     }
 
-    QMenu* menu = 0;
+    QMenu* menu = NULL;
     QnActionManager* manager = context()->menu();
 
     if (!resList.isEmpty()) {
@@ -140,38 +131,18 @@ void QnCameraListDialog::at_customContextMenuRequested(const QPoint &)
     menu->deleteLater();
 }
 
-void QnCameraListDialog::at_selectAllAction()
-{
-    ui->gridCameras->selectAll();
+void QnCameraListDialog::at_exportAction() {
+    QnGridWidgetHelper::exportToFile(ui->gridCameras, this, tr("Export selected cameras to file"));
 }
 
-void QnCameraListDialog::at_exportAction()
-{
-    QnGridWidgetHelper(context()).exportToFile(ui->gridCameras, tr("Export selected cameras to file"));
+void QnCameraListDialog::at_copyToClipboard() {
+    QnGridWidgetHelper::copyToClipboard(ui->gridCameras);
 }
 
-void QnCameraListDialog::at_copyToClipboard()
-{
-    QnGridWidgetHelper(context()).copyToClipboard(ui->gridCameras);
-}
-
-void QnCameraListDialog::at_modelChanged()
-{
-    if (!m_server)
+void QnCameraListDialog::at_modelChanged() {
+    if (!m_model->server())
         setWindowTitle(tr("Camera List - %n camera(s) found", "", m_resourceSearch->rowCount()));
     else
-        setWindowTitle(tr("Camera List for media server '%1' - %n camera(s) found", "", m_resourceSearch->rowCount()).arg(QUrl(m_server->getUrl()).host()));
-}
-
-void QnCameraListDialog::at_resPool_resourceRemoved(const QnResourcePtr & resource)
-{
-    m_model->removeResource(resource);
-}
-
-void QnCameraListDialog::at_resPool_resourceAdded(const QnResourcePtr & resource)
-{
-    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (camera && (!m_server || camera->getParentId() == m_server->getId()))
-        m_model->addResource(camera);
+        setWindowTitle(tr("Camera List for '%1' - %n camera(s) found", "", m_resourceSearch->rowCount()).arg(getFullResourceName(m_model->server(), true)));
 }
 

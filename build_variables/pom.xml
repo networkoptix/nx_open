@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <!--
+    Example pom for delegating maven goals to msbuild so it builds the "solution"
+ 
+    A solution can be a group of projects, but here we only have one.
+    It should also be possible to have one maven project per solution project, 
+    and have a parent pom to deletegate the build.
+  -->
+    <parent>
+        <artifactId>hdwitness</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.2.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.2.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>build_variables</artifactId>
+    <packaging>pom</packaging>
+    <name>HD Witness Build Variables</name>  
+
+    <properties>
+        <root.dir>${basedir}/..</root.dir>
+    </properties>
+
+    <build>
+        <plugins>      
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <id>configure</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${python.dir}/python</executable>
+                            <arguments>
+                                <argument>configure.py</argument>
+                                <argument>--cst</argument>
+                                <argument>${customization}</argument>
+                                <argument>--cfg</argument>
+                                <argument>${build.configuration}</argument>                                
+                            </arguments>
+                            <workingDirectory>${root.dir}</workingDirectory>		
+                        </configuration>
+                    </execution>                                         
+                </executions>
+            </plugin>
+        </plugins>
+    </build> 
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>           
+            </activation>
+            <properties>
+                <path>${python.dir};${python.dir}\Lib\site-packages\pywin32_system32;${env.PATH}</path>
+            </properties>           
+        </profile>
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>           
+            </activation> 
+            <properties>
+                <path>${env.PATH}</path>
+            </properties>               
+        </profile>          
+    </profiles> 
+</project>

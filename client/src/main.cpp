@@ -248,6 +248,19 @@ void initAppServerConnection()
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
 }
 
+/** Initialize log. */
+void initLog(const QString &logLevel) {
+    QnLog::initLog(logLevel);
+    const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    QString logFileLocation = dataLocation + QLatin1String("/log");
+    QString logFileName = logFileLocation + QLatin1String("/log_file");
+    if (!QDir().mkpath(logFileLocation))
+        cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
+    if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
+        cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
+    cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
+}
+
 static QtMessageHandler defaultMsgHandler = 0;
 
 static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
@@ -279,7 +292,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     int result = 0;
 
-    QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     /* Parse command line. */
@@ -296,6 +308,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool skipMediaFolderScan = false;
     bool noFullScreen = false;
     bool noVersionMismatchCheck = false;
+    QString lightMode;
+    bool noVSync = false;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -314,22 +328,30 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
     commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
 #endif
+    commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString());
+    commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
+
     commandLineParser.parse(argc, argv, stderr);
 
     ec2::DummyHandler dummyEc2ResponseHandler;
+    
+    initLog(logLevel);
 
     /* Dev mode. */
     if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
         qnSettings->setDevMode(true);
     }
 
+    if (!lightMode.isEmpty())
+        qnSettings->setLightMode(lightMode.toInt());
+
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
     if(authentication.isValid()) {
-        // do not print password in plaintext
-        //out << QObject::tr("Using authentication parameters from command line: %1.").arg(authentication.toString()) << endl;
         qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
     }
+
+    qnSettings->setVSyncEnabled(!noVSync);
 
     QScopedPointer<QnSkin> skin(new QnSkin(customizationPath));
     QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(customizationPath + lit("/customization.json"))));
@@ -370,7 +392,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
         while (application->isRunning()) {
             if (application->sendMessage(argsMessage)) {
-                out << "Another instance is already running";
+                cl_log.log(lit("Another instance is already running"), cl_logALWAYS);
                 return 0;
             }
         }
@@ -399,24 +421,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Initialize sound. */
     QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());
 
-
-    /* Initialize log. */
-    const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    //TODO: #GDM should not close application because of this shit, just send cl_log to stdout/stderr
-    if (!QDir().mkpath(dataLocation + QLatin1String("/log"))) {
-        out << "Could not create log folder" << dataLocation + QLatin1String("/log");
-        return 0;
-    }
-    if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1)) {
-        out << "Could not create log file" << dataLocation + QLatin1String("/log/log_file");
-        return 0;
-    }
-
-
     QnHelpHandler helpHandler;
     qApp->installEventFilter(&helpHandler);
 
-    QnLog::initLog(logLevel);
     cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
     cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
@@ -606,7 +613,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         if(!autoTester.succeeded())
             result = 1;
 
-        out << autoTester.message();
+        cl_log.log(autoTester.message(), cl_logALWAYS);
     }
 
     QnCommonMessageProcessor::instance()->stop();
@@ -642,6 +649,10 @@ int main(int argc, char **argv)
     QStringList pluginDirs = QCoreApplication::libraryPaths();
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths( pluginDirs );
+#ifdef Q_OS_LINUX
+    QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, lit("/etc/xdg"));
+    QSettings::setPath(QSettings::NativeFormat, QSettings::SystemScope, lit("/etc/xdg"));
+#endif
 
     QnClientModule client(argc, argv);
 

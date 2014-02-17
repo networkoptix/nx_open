@@ -79,6 +79,7 @@ public:
     bool setPanicMode(int value);
     void disconnectSync();
 
+    int getKvPairs(QnKvPairList& kvPairs, const QnResourcePtr &resource);
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId);
     int getServers(QnMediaServerResourceList& servers);
     //int getLayouts(QnLayoutResourceList& layouts);
@@ -87,6 +88,8 @@ public:
     int getCameraHistoryList(QnCameraHistoryList& cameraHistoryList);
     qint64 getCurrentTime(); // TODO: #Elric this method doesn't follow the sync api guidelines
 
+    int saveSync(int resourceId, const QnKvPair &kvPair);
+    int saveSync(int resourceId, const QnKvPairList &kvPairs);
     int saveSync(const QnMediaServerResourcePtr &resource);
     int saveSync(const QnVirtualCameraResourcePtr &resource);
 

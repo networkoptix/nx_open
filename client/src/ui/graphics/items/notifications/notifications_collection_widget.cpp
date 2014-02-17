@@ -44,7 +44,7 @@
 
 namespace {
     const qreal widgetHeight = 24;
-    const int thumbnailHeight = 100;
+    const QSize thumbnailSize(0, 100);
 
     /** We limit the maximal number of notification items to prevent crashes due
      * to reaching GDI resource limit. */
@@ -268,11 +268,9 @@ void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *bl
     }
 }
 
-void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item, QnResourcePtr resource, qint64 usecsSinceEpoch)
-{
-    QnSingleThumbnailLoader *loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, QSize(0, thumbnailHeight), item);
+void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item, QnResourcePtr resource, qint64 usecsSinceEpoch) {
+    QnSingleThumbnailLoader *loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, thumbnailSize, QnSingleThumbnailLoader::JpgFormat, item);
     item->setImageProvider(loader);
-    //connect(loader, SIGNAL(finished()), loader, SLOT(deleteLater()));
 }
 
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -486,14 +484,8 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         );
         break;
     case QnSystemHealth::StoragesNotConfigured:
-        item->addActionButton(
-            qnSkin->icon("events/storage.png"),
-            tr("Server settings"),
-            Qn::ServerSettingsAction,
-            QnActionParameters(resource)
-        );
-        break;
     case QnSystemHealth::StoragesAreFull:
+    case QnSystemHealth::ArchiveRebuildFinished:
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
             tr("Server settings"),
