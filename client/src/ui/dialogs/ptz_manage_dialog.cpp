@@ -96,6 +96,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
 
     connect(m_model,    &QnPtzManageModel::presetsChanged,  ui->tourEditWidget, &QnPtzTourWidget::setPresets);
     connect(m_model,    &QnPtzManageModel::presetsChanged,  this,               &QnPtzManageDialog::updateUi);
+    connect(m_model,    &QnPtzManageModel::dataChanged,     this,               &QnPtzManageDialog::updateUi);
     connect(this,       &QnAbstractPtzDialog::synchronized, m_model,            &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
 
@@ -117,7 +118,6 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     //TODO: handle HomePosition
     //TODO: handle resource switching ("Save changes? Yes/No/Cancel")
     //TODO: Show warning if Home Position is set (ask Borya about text)
-    //TODO: handle new positions added from the context menu (controller->changed() signal, Elric will implement controller side himself)
     //TODO: think about forced refresh in some cases or even a button - low priority
 }
 
@@ -212,6 +212,8 @@ Qn::PtzDataFields QnPtzManageDialog::requiredFields() const {
 }
 
 void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
+    // TODO: #dklychkov make incremental changes instead of resetting the model (low priority)
+
     if (fields.testFlag(Qn::PresetsPtzField)) {
         QnPtzPresetList presets;
         if (controller()->getPresets(&presets))
@@ -441,6 +443,8 @@ void QnPtzManageDialog::updateUi() {
     QModelIndex index = ui->tableView->selectionModel()->currentIndex();
     if (index.isValid())
         selectedRow = m_model->rowData(index.row()).rowType;
+
+    ui->previewGroupBox->setEnabled(index.isValid());
 
     ui->deleteButton->setEnabled(selectedRow == QnPtzManageModel::PresetRow || selectedRow == QnPtzManageModel::TourRow);
     ui->goToPositionButton->setEnabled(selectedRow == QnPtzManageModel::PresetRow || selectedRow == QnPtzManageModel::TourRow);

@@ -261,9 +261,36 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
         if (hotkey != QnPtzHotkey::NoHotkey)
             m_hotkeys[hotkey] = id;
 
+
+        int currentIndex = -1;
+        int existingIndex = -1;
+        switch (data.rowType) {
+        case QnPtzManageModel::PresetRow:
+            currentIndex = qnIndexOf(m_presets, [&](const QnPtzPresetItemModel &model) {return id == model.preset.id; });
+            existingIndex = qnIndexOf(m_presets, [&](const QnPtzPresetItemModel &model) {return existing == model.preset.id; });
+            if (currentIndex >= 0)
+                m_presets[currentIndex].modified = true;
+            if (existingIndex >= 0)
+                m_presets[existingIndex].modified = true;
+            break;
+        case QnPtzManageModel::TourRow:
+            currentIndex = qnIndexOf(m_tours, [&](const QnPtzTourItemModel &model) {return id == model.tour.id; });
+            existingIndex = qnIndexOf(m_tours, [&](const QnPtzTourItemModel &model) {return existing == model.tour.id; });
+            if (currentIndex >= 0)
+                m_tours[currentIndex].modified = true;
+            if (existingIndex >= 0)
+                m_tours[existingIndex].modified = true;
+            break;
+        default:
+            return false;
+        }
+
         //TODO: update only affected rows? low priority
         //TODO: do not clear existing hotkey, highlight duplicated instead and do not allow to save them
-        emit dataChanged(index.sibling(0, HotkeyColumn), index.sibling(rowCount() - 1, HotkeyColumn)); 
+        emit dataChanged(index, index);
+        emit dataChanged(index.sibling(currentIndex, ModifiedColumn), index.sibling(currentIndex, ModifiedColumn));
+        emit dataChanged(index.sibling(existingIndex, HotkeyColumn), index.sibling(existingIndex, HotkeyColumn));
+        emit dataChanged(index.sibling(existingIndex, ModifiedColumn), index.sibling(existingIndex, ModifiedColumn));
         return true;
     } else if (role == Qt::EditRole && index.column() == NameColumn) {
         QString newName = value.toString().trimmed();
