@@ -82,7 +82,8 @@ int QnBusinessEventManager<T>::deleteRule( QnId ruleId, impl::SimpleHandlerPtr h
 template<class T>
 int QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler )
 {
-    //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
+    auto tran = prepareTransaction( ApiCommand::broadcastBusinessAction, businessAction );
+    QnTransactionMessageBus::instance()->sendTransaction(tran);
     return INVALID_REQ_ID;
 }
 
@@ -92,6 +93,18 @@ int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handle
     //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
 }
+
+template<class T>
+QnTransaction<ApiBusinessActionData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource )
+{
+    QnTransaction<ApiBusinessActionData> tran;
+    tran.createNewID();
+    tran.command = command;
+    tran.persistent = false;
+    tran.params.fromResource(resource);
+    return tran;
+}
+
 
 template<class T>
 QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource )

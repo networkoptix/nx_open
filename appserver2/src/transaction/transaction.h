@@ -76,6 +76,8 @@ namespace ec2
             updateBusinessRule,
             //!ApiIdData
             removeBusinessRule,
+            //!ApiBusinessActionData
+            broadcastBusinessAction,
 
             //!ApiLayoutData
             addOrUpdateLayouts,

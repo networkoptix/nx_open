@@ -1,6 +1,7 @@
 #include "ec2_business_rule_data.h"
 #include "core/resource_management/resource_pool.h"
 #include "business/business_action_parameters.h"
+#include "business/business_action_factory.h"
 
 namespace ec2
 {
@@ -78,6 +79,46 @@ void ApiBusinessRuleDataList::toResourceList(QnBusinessEventRuleList& outData, Q
 void ApiBusinessRuleDataList::loadFromQuery(QSqlQuery& query)
 {
     QN_QUERY_TO_DATA_OBJECT(query, ApiBusinessRuleData, data, ApiBusinessRuleFields)
+}
+
+void ApiBusinessActionData::fromResource(const QnAbstractBusinessActionPtr& resource)
+{
+    actionType = resource->actionType();
+    toggleState = resource->getToggleState();
+    receivedFromRemoteHost = resource->isReceivedFromRemoteHost();
+    foreach(const QnResourcePtr& res, resource->getResources())
+        resources.push_back(res->getId());
+
+    params = serializeBusinessParams(resource->getParams().toBusinessParams());
+    runtimeParams = serializeBusinessParams(resource->getRuntimeParams().toBusinessParams());
+
+    businessRuleId = resource->getBusinessRuleId();
+    aggregationCount = resource->getAggregationCount();
+}
+
+QnAbstractBusinessActionPtr  ApiBusinessActionData::toResource(QnResourcePool* resourcePool) const
+{
+    QnBusinessParams bParams = deserializeBusinessParams(runtimeParams);
+    QnAbstractBusinessActionPtr resource = QnBusinessActionFactory::createAction((BusinessActionType::Value) actionType, QnBusinessEventParameters::fromBusinessParams(bParams));
+
+    resource->setToggleState(toggleState);
+    resource->setReceivedFromRemoteHost(receivedFromRemoteHost);
+
+    QnResourceList resList;
+    foreach(const qint32& resId, resources) {
+        QnResourcePtr res = resourcePool->getResourceById(resId);
+        if (res)
+            resList << res;
+    }
+    resource->setResources(resList);
+
+    bParams = deserializeBusinessParams(params);
+    resource->setParams(QnBusinessActionParameters::fromBusinessParams(bParams));
+
+    resource->setBusinessRuleId(businessRuleId);
+    resource->setAggregationCount(aggregationCount);
+
+    return resource;
 }
 
 }

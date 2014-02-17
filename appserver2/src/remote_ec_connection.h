@@ -45,6 +45,10 @@ namespace ec2
             m_cameraManager->triggerNotification( tran );
         }
 
+        template<> void processTransaction<ApiBusinessActionData>( const QnTransaction<ApiBusinessActionData>& tran ) {
+            m_businessEventManager->triggerNotification( tran );
+        }
+
         template<> void processTransaction<ApiIdData>( const QnTransaction<ApiIdData>& tran ) {
             switch( tran.command )
             {

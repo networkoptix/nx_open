@@ -49,11 +49,28 @@ struct ApiBusinessRuleDataList: public ApiData
     void toResourceList(QnBusinessEventRuleList& outData, QnResourcePool* resourcePool) const;
 };
 
+struct ApiBusinessActionData: public ApiData
+{
+    qint32 actionType;
+    Qn::ToggleState toggleState;
+    bool receivedFromRemoteHost;
+    std::vector<qint32> resources;
+    QByteArray params;
+    QByteArray runtimeParams;
+    qint32 businessRuleId;
+    qint32 aggregationCount;
+    
+    void fromResource(const QnAbstractBusinessActionPtr& resource);
+    QnAbstractBusinessActionPtr toResource(QnResourcePool* resourcePool) const;
+};
+
 }
 
 #define ApiBusinessRuleFields (id) (eventType) (eventResource) (eventCondition) (eventState) (actionType) (actionResource) (actionParams) (aggregationPeriod) (disabled) (comments) (schedule) (system)
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiBusinessRuleData, ApiBusinessRuleFields)
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiBusinessRuleDataList, (data) )
+#define ApiBusinessActionDataFields (actionType) (toggleState) (receivedFromRemoteHost) (resources) (params) (runtimeParams) (businessRuleId) (aggregationCount)
+QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiBusinessActionData, ApiBusinessActionDataFields )
 
 
 #endif // __EC2__BUSINESS_RULE_DATA_H_

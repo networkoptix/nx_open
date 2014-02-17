@@ -323,6 +323,9 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
         case ApiCommand::removeStoredFile:
             return deliveryTransaction<ApiStoredFilePath>(command, stream);
 
+        case ApiCommand::broadcastBusinessAction:
+            return deliveryTransaction<ApiBusinessActionData>(command, stream);
+
         default:
             break;
     }

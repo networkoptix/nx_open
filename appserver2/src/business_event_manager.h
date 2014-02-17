@@ -28,6 +28,13 @@ namespace ec2
             static_assert( false, "Specify QnBusinessEventManager::triggerNotification<>, please" );
         }
 
+        template<> void triggerNotification<ApiBusinessActionData>( const QnTransaction<ApiBusinessActionData>& tran )
+        {
+            assert( tran.command == ApiCommand::broadcastBusinessAction );
+            QnAbstractBusinessActionPtr businessAction = tran.params.toResource( m_resCtx.pool );
+            emit gotBroadcastAction( businessAction );
+        }
+
         template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran )
         {
             assert( tran.command == ApiCommand::removeBusinessRule );
@@ -48,6 +55,7 @@ namespace ec2
 
         QnTransaction<ApiBusinessRuleData> prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
+        QnTransaction<ApiBusinessActionData> prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource );
     };
 }
 

@@ -376,6 +376,7 @@ namespace ec2
         void removed( QnId id );
         void businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
         void businessRuleReset( const QnBusinessEventRuleList& rules );
+        void gotBroadcastAction(const QnAbstractBusinessActionPtr& action);
 
     private:
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
