@@ -306,7 +306,7 @@
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
                 <init.python.dir>${environment.dir}/python/bin</init.python.dir>				
-                <python.dir>${project.build.directory}/${arch}/python/bin</python.dir>
+                <python.dir>${libdir}/${arch}/python/bin</python.dir>
                 <virtualenv.dir>/usr/local/bin</virtualenv.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
                 <common.platform>unix</common.platform>
