@@ -51,7 +51,7 @@ QnResourceParameters ApiResourceData::toHashMap() const
 }
 
 
-void ApiResourceDataList::loadFromQuery(QSqlQuery& query)
+void ApiResourceDataList::loadFromQuery(QSqlQuery& /*query*/)
 {
     //TODO/IMPL
     assert( false );

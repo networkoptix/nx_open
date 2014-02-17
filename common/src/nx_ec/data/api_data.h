@@ -4,18 +4,19 @@
 #include <QtSql/QtSql>
 #include "nx_ec/binary_serialization_helper.h"
 
-namespace ec2
-{
+namespace ec2 {
 
-struct ApiData {
-    virtual ~ApiData() {}
-};
+    struct ApiData {
+        virtual ~ApiData() {}
+    };
 
-struct ApiIdData: public ApiData {
-    qint32 id;
-};
+    struct ApiIdData: public ApiData {
+        qint32 id;
+    };
 
 }
+
+#ifndef Q_MOC_RUN
 
 #define QN_DECLARE_STRUCT_SQL_BINDER() \
     inline void autoBindValues(QSqlQuery& query) const;
@@ -58,13 +59,12 @@ void doAutoBind(QSqlQuery& , const char* , const std::vector<T>& ) {
 	//
 }
 
-#define TO_STRING(x) #x
-#define BIND_FIELD(R, D, FIELD) doAutoBind(query, ":" TO_STRING(FIELD), FIELD);
+#define BIND_FIELD(R, D, FIELD) doAutoBind(query, ":" BOOST_PP_STRINGIZE(FIELD), FIELD);
 
 // ----------------- load query data to a object
 #define TO_IDX_VAR(x) x ## idx
 
-#define DECLARE_FIELD_IDX(R, D, FIELD) int TO_IDX_VAR(FIELD) = rec.indexOf(QLatin1String(TO_STRING(FIELD)));
+#define DECLARE_FIELD_IDX(R, D, FIELD) int TO_IDX_VAR(FIELD) = rec.indexOf(QLatin1String(BOOST_PP_STRINGIZE(FIELD)));
 #define ASSIGN_FIELD(R, query, FIELD) if (TO_IDX_VAR(FIELD) >= 0) queryFieldToDataObj(query, TO_IDX_VAR(FIELD), value.FIELD);
 
 #define QN_QUERY_TO_DATA_OBJECT(query, TYPE, data, FIELD_SEQ, ...) \
@@ -78,6 +78,17 @@ void doAutoBind(QSqlQuery& , const char* , const std::vector<T>& ) {
 		data.push_back(value);\
 	}\
 }
+
+#else // Q_MOC_RUN
+
+#define QN_QUERY_TO_DATA_OBJECT(...)
+#define QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS(...)
+#define QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS(...)
+#define QN_DEFINE_STRUCT_SQL_BINDER(...)
+#define QN_DEFINE_STRUCT_SQL_BINDER(...)
+#define QN_DECLARE_STRUCT_SQL_BINDER(...)
+
+#endif // Q_MOC_RUN
 
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, bool& field) { field = query.value(idx).toBool(); }
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, qint32& field) { field = query.value(idx).toInt(); }
