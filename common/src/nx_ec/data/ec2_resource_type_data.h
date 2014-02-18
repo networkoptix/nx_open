@@ -10,7 +10,7 @@ namespace ec2
 struct ApiPropertyType: public ApiData
 {
     QnId id;
-    qint32 resource_type_id;
+    QnId resource_type_id;
 
     QString name;
     int type;

@@ -18,7 +18,7 @@ struct ApiBusinessRuleData: public ApiData
         eventType(BusinessEventType::NotDefined), eventState(Qn::UndefinedState), actionType(BusinessActionType::NotDefined), 
         aggregationPeriod(0), disabled(false), system(false) {}
 
-    QnId guid;
+    QnId id;
 
     BusinessEventType::Value eventType;
     std::vector<QnId>  eventResource;
@@ -67,7 +67,7 @@ struct ApiBusinessActionData: public ApiData
 
 }
 
-#define ApiBusinessRuleFields (guid) (eventType) (eventResource) (eventCondition) (eventState) (actionType) (actionResource) (actionParams) (aggregationPeriod) (disabled) (comments) (schedule) (system)
+#define ApiBusinessRuleFields (id) (eventType) (eventResource) (eventCondition) (eventState) (actionType) (actionResource) (actionParams) (aggregationPeriod) (disabled) (comments) (schedule) (system)
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiBusinessRuleData, ApiBusinessRuleFields)
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiBusinessRuleDataList, (data) )
 #define ApiBusinessActionDataFields (actionType) (toggleState) (receivedFromRemoteHost) (resources) (params) (runtimeParams) (businessRuleId) (aggregationCount)

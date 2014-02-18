@@ -25,6 +25,11 @@ struct ApiResourceParam: public ApiData
     QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
+struct ApiResourceParamWithRef: public ApiResourceParam
+{
+    QnId resourceId;
+};
+
 struct ApiResourceParams
 {
     QnId id;
@@ -35,9 +40,9 @@ struct ApiResourceData: public ApiData
 {
     ApiResourceData(): status(QnResource::Offline), disabled(false) {}
 
-    QnId          guid;
+    QnId          id;
     QnId          typeId;
-    QnId          parentId;
+    QnId          parentGuid;
     QString       name;
     QString       url;
     QnResource::Status    status;
@@ -75,7 +80,7 @@ struct ApiSetResourceDisabledData: public ApiData {
 #define ApiResourceParamFields (name) (value)
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiResourceParam, ApiResourceParamFields)
 
-#define ApiResourceDataFields (guid) (typeId) (parentId) (name) (url) (status) (disabled) (addParams)
+#define ApiResourceDataFields (id) (typeId) (parentGuid) (name) (url) (status) (disabled) (addParams)
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiResourceData,  ApiResourceDataFields)
 QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ec2::ApiResourceDataList,  (data))
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiSetResourceStatusData,  (id) (status) )

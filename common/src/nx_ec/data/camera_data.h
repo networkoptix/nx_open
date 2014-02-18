@@ -7,6 +7,7 @@
 #include "core/resource/security_cam_resource.h"
 #include "core/misc/schedule_task.h"
 #include "core/resource/camera_resource.h"
+#include "utils/common/id.h"
 
 namespace ec2
 {
@@ -34,11 +35,9 @@ struct ScheduleTask: public ApiData
     QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
-struct ScheduleTaskList: public ApiData
+struct ScheduleTaskWithRef: public ScheduleTask
 {
-    std::vector<ScheduleTask> data;
-
-    void loadFromQuery(QSqlQuery& query);
+    QnId sourceId;
 };
 
 

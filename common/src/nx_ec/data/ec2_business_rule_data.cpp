@@ -8,7 +8,7 @@ namespace ec2
 
 void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource, QnResourcePool* resourcePool) const
 {
-    resource->setId(guid);
+    resource->setId(id);
     resource->setEventType(eventType);
     
     QnResourceList resList;
@@ -45,7 +45,7 @@ void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource, QnResource
 
 void ApiBusinessRuleData::fromResource(const QnBusinessEventRulePtr& resource)
 {
-    guid = resource->id();
+    id = resource->id();
     eventType = resource->eventType();
 
     foreach(const QnResourcePtr& res,  resource->eventResources())

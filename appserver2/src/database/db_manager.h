@@ -139,7 +139,8 @@ namespace ec2
             QnDbTransaction* m_tran;
         };
 
-        ErrorCode deleteTableRecord(qint32 internalId, const QString& tableName, const QString& fieldName);
+        ErrorCode deleteTableRecord(const QString& id, const QString& tableName, const QString& fieldName);
+        ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
         ErrorCode updateResource(const ApiResourceData& data, qint32 internalId);
 		ErrorCode insertResource(const ApiResourceData& data, qint32* internalId);
@@ -159,11 +160,11 @@ namespace ec2
 
         ErrorCode updateMediaServer(const ApiMediaServerData& data, qint32 internalId);
         ErrorCode insertMediaServer(const ApiMediaServerData& data, qint32 internalId);
-        ErrorCode updateStorages(const ApiMediaServerData&, qint32);
+        ErrorCode updateStorages(const ApiMediaServerData&);
         ErrorCode removeServer(const QnId& guid);
         ErrorCode removeLayout(const QnId& guid);
         ErrorCode removeLayoutNoLock(qint32 internalId);
-        ErrorCode removeStoragesByServer(qint32 id);
+        ErrorCode removeStoragesByServer(const QnId& serverGUID);
 
         ErrorCode deleteLayoutItems(const qint32 id);
         ErrorCode insertLayout(const ApiLayoutData& data, qint32 internalId);
@@ -178,11 +179,12 @@ namespace ec2
         ErrorCode removeUser( const QnId& guid );
 
         ErrorCode insertBusinessRuleTable( const ApiBusinessRuleData& businessRule, qint32* internalId );
-        ErrorCode updateBusinessRuleTable( const ApiBusinessRuleData& businessRule, qint32 internalId );
-        ErrorCode insertBRuleResource(const QString& tableName, const qint32 ruleId, const QnId& resourceGuid);
+        ErrorCode updateBusinessRuleTable( const ApiBusinessRuleData& businessRule);
+        ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);
         ErrorCode removeBusinessRule( const QnId& id );
 
 		bool createDatabase();
+        bool execSQLFile(const QString& fileName);
         
         void mergeRuleResource(QSqlQuery& query, ApiBusinessRuleDataList& data, std::vector<qint32> ApiBusinessRuleData::*resList);
 

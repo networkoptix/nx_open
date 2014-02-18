@@ -49,7 +49,7 @@ void ApiCameraData::toResource(QnVirtualCameraResourcePtr resource) const
 
 	QnScheduleTaskList tasks;
 	foreach(ScheduleTask task, scheduleTask)
-		tasks.push_back(task.toResource(guid));
+		tasks.push_back(task.toResource(id));
 	resource->setScheduleTasks(tasks);
 
 	resource->setAudioEnabled(audioEnabled);
@@ -94,11 +94,6 @@ void ApiCameraData::fromResource(const QnVirtualCameraResourcePtr& resource)
 	statusFlags = resource->statusFlags();
 	dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(resource->getDewarpingParams());
 	vendor = resource->getVendor();
-}
-
-void ScheduleTaskList::loadFromQuery(QSqlQuery& query)
-{
-	QN_QUERY_TO_DATA_OBJECT(query, ScheduleTask, data, apiScheduleTaskFields)
 }
 
 QnResourceParameters ApiCameraData::toHashMap() const
