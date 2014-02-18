@@ -11,10 +11,11 @@ namespace ec2
     Ec2DirectConnection::Ec2DirectConnection(
         ServerQueryProcessor* queryProcessor,
         const ResourceContext& resCtx,
-        const QnConnectionInfo& connectionInfo )
+        const QnConnectionInfo& connectionInfo,
+        const QString& dbFileName)
     :
         BaseEc2Connection<ServerQueryProcessor>( queryProcessor, resCtx ),
-        m_dbManager( new QnDbManager(resCtx.resFactory, &m_storedFileManagerImpl) ),
+        m_dbManager( new QnDbManager(resCtx.resFactory, &m_storedFileManagerImpl, dbFileName) ),
         m_connectionInfo( connectionInfo )
     {
     }

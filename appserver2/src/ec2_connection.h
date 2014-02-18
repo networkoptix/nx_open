@@ -24,7 +24,8 @@ namespace ec2
         Ec2DirectConnection(
             ServerQueryProcessor* queryProcessor,
             const ResourceContext& resCtx,
-            const QnConnectionInfo& connectionInfo );
+            const QnConnectionInfo& connectionInfo,
+            const QString& dbFileName);
 
         //!Implementation of ec2::AbstractECConnection::connectionInfo
         virtual QnConnectionInfo connectionInfo() const override;

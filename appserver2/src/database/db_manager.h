@@ -22,7 +22,7 @@ namespace ec2
     class QnDbManager
     {
     public:
-		QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* const storedFileManagerImpl);
+		QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* const storedFileManagerImpl, const QString& dbFileName);
 		virtual ~QnDbManager();
 
         static QnDbManager* instance();
@@ -184,6 +184,8 @@ namespace ec2
 		bool createDatabase();
         
         void mergeRuleResource(QSqlQuery& query, ApiBusinessRuleDataList& data, std::vector<qint32> ApiBusinessRuleData::*resList);
+
+        bool isObjectExists(const QString& objectType, const QString& objectName);
     private:
         QSqlDatabase m_sdb;
         QReadWriteLock m_mutex;

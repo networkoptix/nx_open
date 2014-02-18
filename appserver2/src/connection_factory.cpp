@@ -50,8 +50,8 @@ namespace ec2
     //!Implementation of AbstractECConnectionFactory::connectAsync
     int Ec2DirectConnectionFactory::connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler )
     {
-        if( addr.isEmpty() )
-            return establishDirectConnection( handler );
+        if( addr.scheme() == "file" )
+            return establishDirectConnection(addr.path(), handler );
         else
             return establishConnectionToRemoteServer( addr, handler );
     }
@@ -166,7 +166,7 @@ namespace ec2
         m_resCtx = resCtx;
     }
 
-    int Ec2DirectConnectionFactory::establishDirectConnection( impl::ConnectHandlerPtr handler )
+    int Ec2DirectConnectionFactory::establishDirectConnection( const QString& dbFileName, impl::ConnectHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
@@ -176,7 +176,7 @@ namespace ec2
         {
             QMutexLocker lk( &m_mutex );
             if( !m_directConnection )
-                m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo ) );
+                m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, dbFileName ) );
         }
         QtConcurrent::run( std::bind( std::mem_fn( &impl::ConnectHandler::done ), handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
         return reqID;

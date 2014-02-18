@@ -87,15 +87,15 @@ void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subD
     }
 }
 
-QnDbManager::QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* const storedFileManagerImpl ):
+QnDbManager::QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* const storedFileManagerImpl, const QString& dbFileName ):
     m_tran(m_sdb, m_mutex),
     m_storedFileManagerImpl( storedFileManagerImpl )
-
 {
     m_storageTypeId = 0;
     m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
-	m_sdb.setDatabaseName("c:/develop/netoptix_trunk/appserver/db/ecs.db");
+    m_sdb.setDatabaseName( dbFileName );
+	//m_sdb.setDatabaseName("c:/develop/netoptix_trunk/appserver/db/ecs.db");
     //m_sdb.setDatabaseName("d:/Projects/Serious/NetworkOptix/netoptix_vms/appserver/db/ecs.db");
     //m_sdb.setDatabaseName("c:/Windows/System32/config/systemprofile/AppData/Local/Network Optix/Enterprise Controller/db/ecs.db");
     
@@ -118,10 +118,65 @@ QnDbManager::QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* cons
 	globalInstance = this;
 }
 
+bool QnDbManager::isObjectExists(const QString& objectType, const QString& objectName)
+{
+    QSqlQuery tableList(m_sdb);
+    QString request;
+    request = QString(lit("SELECT * FROM sqlite_master WHERE type='%1' and name='%2'")).arg(objectType).arg(objectName);
+    tableList.prepare(request);
+    if (!tableList.exec())
+        return false;
+    int fieldNo = tableList.record().indexOf(lit("name"));
+    if (!tableList.next())
+        return false;
+    QString value = tableList.value(fieldNo).toString();
+    return !value.isEmpty();
+}
+
+QList<QByteArray> quotedSplit(const QByteArray& data)
+{
+    QList<QByteArray> result;
+    const char* curPtr = data.data();
+    const char* prevPtr = curPtr;
+    const char* end = curPtr + data.size();
+    bool inQuote1 = false;
+    bool inQuote2 = false;
+    for (;curPtr < end; ++curPtr) {
+        if (*curPtr == '\'')
+            inQuote1 = !inQuote1;
+        else if (*curPtr == '\"')
+            inQuote2 = !inQuote2;
+        else if (*curPtr == ';' && !inQuote1 && !inQuote2)
+        {
+            //*curPtr = 0;
+            result << QByteArray::fromRawData(prevPtr, curPtr - prevPtr);
+            prevPtr = curPtr+1;
+        }
+    }
+
+    return result;
+}
+
 bool QnDbManager::createDatabase()
 {
-    //TODO`/IMPL
-	return true;
+    if (!isObjectExists(lit("table"), lit("vms_resource")))
+    {
+        QFile file(QLatin1String(":/createdb.sql"));
+        if (!file.open(QFile::ReadOnly))
+            return false;
+        QByteArray data = file.readAll();
+        foreach(const QByteArray& singleCommand, quotedSplit(data))
+        {
+            QSqlQuery ddlQuery(m_sdb);
+            ddlQuery.prepare(singleCommand);
+            if (!ddlQuery.exec()) {
+                qWarning() << "can't create tables for sqlLite database:" << ddlQuery.lastError().text();;
+                return false;
+            }
+        }
+    }
+    
+    return true;
 }
 
 QnDbManager::~QnDbManager()
