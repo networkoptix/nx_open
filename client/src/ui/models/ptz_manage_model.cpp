@@ -532,24 +532,26 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
                 int hotkey = m_hotkeys.key(tourModel.tour.id, QnPtzHotkey::NoHotkey);
                 return hotkey < 0 ? tr("None") : QString::number(hotkey);
             }
-        case DetailsColumn:
-            if (tourIsValid(tourModel)) {
-                qint64 time = estimatedTimeSecs(tourModel.tour);
-                return tr("Tour time: %1").arg((time < 60) ? tr("less than a minute") : tr("about %n minutes", 0, time / 60));
-            }
-                //TODO: more detailed message required: 
-            // - tour require at least two different positions
-            // - there shouldn't be two same positions in a row
-            // - etc.
-            return tr("Invalid tour");
+        case DetailsColumn: {
+            QString tourStateString;
+            tourState(tourModel, &tourStateString);
+            return tourStateString;
+        }
         default:
             break;
         }
         return QVariant();
 
     case Qt::BackgroundRole:
-        if (!tourIsValid(tourModel))
+        switch (tourState(tourModel)) {
+        case IncompleteTour:
+        case OtherInvalidTour:
             return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
+        case DuplicatedLinesTour:
+            return QBrush(Qt::yellow);
+        default:
+            break;
+        }
         break;
     case Qt::CheckStateRole:
         if (column == HomeColumn)
@@ -568,6 +570,38 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
 
 bool QnPtzManageModel::tourIsValid(const QnPtzTourItemModel &tourModel) const {
     return tourModel.tour.isValid(m_ptzPresetsCache);
+}
+
+QnPtzManageModel::TourState QnPtzManageModel::tourState(const QnPtzTourItemModel &tourModel, QString *stateString) const {
+    if (tourModel.tour.spots.size() < 2) {
+        if (stateString)
+            *stateString = tr("Tour should contain at least 2 positions");
+        return IncompleteTour;
+    } else {
+        for (int i = 1; i < tourModel.tour.spots.size(); ++i) {
+            if (tourModel.tour.spots[i].presetId == tourModel.tour.spots[i - 1].presetId) {
+                int startPos = i++;
+                while (i < tourModel.tour.spots.size() && tourModel.tour.spots[i].presetId == tourModel.tour.spots[i - 1].presetId) {
+                    ++i;
+                }
+                if (stateString)
+                    *stateString = tr("Tour has %n same positions in a row at %1", 0, i - startPos + 1).arg(startPos);
+                return DuplicatedLinesTour;
+            }
+        }
+    }
+
+    if (tourIsValid(tourModel)) {
+        if (stateString) {
+            qint64 time = estimatedTimeSecs(tourModel.tour);
+            *stateString = tr("Tour time: %1").arg((time < 60) ? tr("less than a minute") : tr("about %n minutes", 0, time / 60));
+        }
+        return ValidTour;
+    } else {
+        if (stateString)
+            *stateString = tr("Inalid tour");
+        return OtherInvalidTour;
+    }
 }
 
 void QnPtzManageModel::updatePresetsCache() {

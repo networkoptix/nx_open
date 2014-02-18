@@ -128,13 +128,23 @@ public:
 
     bool synchronized() const;
     Q_SLOT void setSynchronized();
+
 signals:
     void presetsChanged(const QnPtzPresetList &presets);
+
 private:
+    enum TourState {
+        ValidTour,
+        IncompleteTour,
+        DuplicatedLinesTour,
+        OtherInvalidTour
+    };
+
     const QnPtzPresetList& presets() const;
 
     qint64 estimatedTimeSecs(const QnPtzTour &tour) const;
     bool tourIsValid(const QnPtzTourItemModel &tourModel) const;
+    TourState tourState(const QnPtzTourItemModel &tourModel, QString *stateString = NULL) const;
     void updatePresetsCache();
 
     QVariant titleData(RowType rowType,  int column, int role) const;
