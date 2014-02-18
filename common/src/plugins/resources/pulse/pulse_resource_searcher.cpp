@@ -95,7 +95,7 @@ QnNetworkResourcePtr QnPlPulseSearcher::createResource(const QString& manufactur
     QnNetworkResourcePtr result = QnNetworkResourcePtr(0);
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture, name);
-    if (!rt.isValid())
+    if (rt.isNull())
         return result;
 
     if (manufacture == QLatin1String(QnPlPulseResource::MANUFACTURE))

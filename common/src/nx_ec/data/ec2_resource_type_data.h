@@ -9,7 +9,7 @@ namespace ec2
 
 struct ApiPropertyType: public ApiData
 {
-    qint32 id;
+    QnId id;
     qint32 resource_type_id;
 
     QString name;
@@ -41,10 +41,10 @@ struct ApiPropertyType: public ApiData
 
 struct ApiResourceTypeData: public ApiData
 {
-	qint32 id;
+	QnId id;
 	QString name;
 	QString manufacture;
-	std::vector<qint32> parentId;
+	std::vector<QnId> parentId;
     std::vector<ApiPropertyType> propertyTypeList;
 
 	void fromResource(const QnResourceTypePtr& resource);

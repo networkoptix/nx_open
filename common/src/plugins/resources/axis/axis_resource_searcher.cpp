@@ -103,7 +103,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
 
 
     QnId typeId = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
-    if (!typeId.isValid())
+    if (typeId.isNull())
         return QList<QnResourcePtr>();
 
     QnPlAxisResourcePtr resource(new QnPlAxisResource());
@@ -199,7 +199,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
     QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
     QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
         return local_results;
 
     resource->setTypeId(rt);
@@ -233,7 +233,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
             QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
             QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
-            if (!rt.isValid())
+            if (rt.isNull())
                 return local_results;
 
             resource->setTypeId(rt);

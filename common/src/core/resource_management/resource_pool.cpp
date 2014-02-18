@@ -74,7 +74,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         if(resource->resourcePool() != NULL)
             qnWarning("Given resource '%1' is already in the pool.", resource->metaObject()->className());
             
-        if (!resource->getId().isValid())
+        if (resource->getId().isNull())
         {
             // must be just found local resource; => shold not be in the pool already
 
@@ -86,7 +86,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             }
             else
             {
-                resource->setId(QnId::generateSpecialId());
+                resource->setId(QnId::createUuid());
             }
         }
 
@@ -295,7 +295,7 @@ QnResourceList QnResourcePool::getAllEnabledCameras(QnResourcePtr mServer) const
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if (camResource != 0 && !camResource->isDisabled() && !camResource->hasFlags(QnResource::foreigner))
         {
-            if (!parentId.isValid() || camResource->getParentId() == parentId)
+            if (parentId.isNull() || camResource->getParentId() == parentId)
             result << camResource;
         }
     }

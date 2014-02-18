@@ -55,7 +55,7 @@ namespace ec2
             outData.insert(resourceId, QnKvPairList());
             if( errorCode == ErrorCode::ok ) {
                 QnKvPairList& outParams = outData.begin().value();
-                foreach(const ApiResourceParam& param, params)
+                foreach(const ApiResourceParam& param, params.params)
                     outParams << QnKvPair(param.name, param.value);
             }
             handler->done( reqID, errorCode, outData);
@@ -82,7 +82,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        if (!resource->getId().isValid()) {
+        if (resource->getId().isNull()) {
             Q_ASSERT_X(0, "Only UPDATE operation is supported for saving resource!", Q_FUNC_INFO);
             return INVALID_REQ_ID;
         }
@@ -143,9 +143,10 @@ namespace ec2
         result.command = cmd;
         result.createNewID();
         result.persistent = true;
-        result.params.reserve(kvPairs.size());
+        result.params.params.reserve(kvPairs.size());
         foreach(const QnKvPair& pair, kvPairs)
-            result.params.push_back(ApiResourceParam(id, pair.name(), pair.value()));
+            result.params.params.push_back(ApiResourceParam(pair.name(), pair.value()));
+        result.params.id = id;
         return result;
     }
 

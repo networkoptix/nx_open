@@ -8,7 +8,6 @@ namespace ec2
 {
     struct ApiLayoutItemData: public ApiData
     {
-        qint32 id;
         QByteArray uuid;
         qint32 flags;
         float left;
@@ -17,7 +16,7 @@ namespace ec2
         float bottom;
         float rotation;
         qint32 layoutId;
-        qint32 resourceId;
+        QnId resourceId;
         float zoomLeft;
         float zoomTop;
         float zoomRight;
@@ -68,7 +67,7 @@ namespace ec2
     };
 }
 
-#define ApiLayoutItemDataFields (id) (uuid) (flags) (left) (top) (right) (bottom) (rotation) (layoutId) (resourceId) (zoomLeft) (zoomTop) (zoomRight) (zoomBottom) (zoomTargetUuid) (contrastParams) (dewarpingParams)
+#define ApiLayoutItemDataFields (uuid) (flags) (left) (top) (right) (bottom) (rotation) (layoutId) (resourceId) (zoomLeft) (zoomTop) (zoomRight) (zoomBottom) (zoomTargetUuid) (contrastParams) (dewarpingParams)
 #define ApiLayoutDataFields (cellAspectRatio) (cellSpacingWidth) (cellSpacingHeight) (items) (userCanEdit) (locked) (backgroundImageFilename) (backgroundWidth) (backgroundHeight) (backgroundOpacity) (userId)
 
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiLayoutItemData, ApiLayoutItemDataFields)

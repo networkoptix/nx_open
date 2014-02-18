@@ -137,7 +137,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             QnPlDlinkResourcePtr resource ( new QnPlDlinkResource() );
 
             QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-            if (!rt.isValid())
+            if (rt.isNull())
                 continue;
 
             resource->setTypeId(rt);
@@ -210,7 +210,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, c
 
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
         return QList<QnResourcePtr>();
 
     QnNetworkResourcePtr resource ( new QnPlDlinkResource() );

@@ -8,11 +8,11 @@ namespace ec2
 
 void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource, QnResourcePool* resourcePool) const
 {
-    resource->setId(id);
+    resource->setId(guid);
     resource->setEventType(eventType);
     
     QnResourceList resList;
-    foreach(qint32 resId, eventResource) {
+    foreach(const QnId& resId, eventResource) {
         QnResourcePtr res = resourcePool->getResourceById(resId);
         if (res)
             resList << res;
@@ -26,7 +26,7 @@ void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource, QnResource
     resource->setActionType(actionType);
 
     resList.clear();
-    foreach(qint32 resId, actionResource) {
+    foreach(const QnId& resId, actionResource) {
         QnResourcePtr res = resourcePool->getResourceById(resId);
         if (res)
             resList << res;
@@ -45,7 +45,7 @@ void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource, QnResource
 
 void ApiBusinessRuleData::fromResource(const QnBusinessEventRulePtr& resource)
 {
-    id = resource->id();
+    guid = resource->id();
     eventType = resource->eventType();
 
     foreach(const QnResourcePtr& res,  resource->eventResources())
@@ -105,7 +105,7 @@ QnAbstractBusinessActionPtr  ApiBusinessActionData::toResource(QnResourcePool* r
     resource->setReceivedFromRemoteHost(receivedFromRemoteHost);
 
     QnResourceList resList;
-    foreach(const qint32& resId, resources) {
+    foreach(const QnId& resId, resources) {
         QnResourcePtr res = resourcePool->getResourceById(resId);
         if (res)
             resList << res;

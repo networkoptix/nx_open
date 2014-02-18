@@ -92,8 +92,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->deleteRuleButton,                           SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
     connect(ui->advancedButton,                             SIGNAL(clicked()), this, SLOT(toggleAdvancedMode()));
 
-    connect(m_rulesViewModel,                               SIGNAL(businessRuleDeleted(int)),
-            this, SLOT(at_message_ruleDeleted(int)));
+    connect(m_rulesViewModel,                               SIGNAL(businessRuleDeleted(QnId)),
+            this, SLOT(at_message_ruleDeleted(QnId)));
 
     connect(ui->eventLogButton,   SIGNAL(clicked(bool)),              
             context()->action(Qn::BusinessEventsLogAction), SIGNAL(triggered()));
@@ -194,7 +194,7 @@ void QnBusinessRulesDialog::at_beforeModelChanged() {
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_message_ruleDeleted(int id) {
+void QnBusinessRulesDialog::at_message_ruleDeleted(QnId id) {
     m_pendingDeleteRules.removeOne(id); //TODO: #GDM ask user
 }
 
@@ -365,7 +365,7 @@ bool QnBusinessRulesDialog::saveAll() {
     }
 
     //TODO: #GDM replace with QnAppServerReplyProcessor
-    foreach (int id, m_pendingDeleteRules) {
+    foreach (const QnId& id, m_pendingDeleteRules) {
         int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->deleteRule(
             id, this, &QnBusinessRulesDialog::at_resources_deleted );
         m_deleting[handle] = id;

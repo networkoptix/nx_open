@@ -935,7 +935,7 @@ Qt::DropActions QnResourcePoolModel::supportedDropActions() const {
 // QnResourcePoolModel :: handlers
 // -------------------------------------------------------------------------- //
 void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
-    assert(resource && resource->getId().isValid());
+    assert(resource && !resource->getId().isNull());
 
     connect(resource.data(), SIGNAL(parentIdChanged(const QnResourcePtr &)),                this, SLOT(at_resource_parentIdChanged(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),                this, SLOT(at_resource_parentIdChanged(const QnResourcePtr &)));
@@ -1007,7 +1007,7 @@ void QnResourcePoolModel::at_resource_itemAdded(const QnLayoutResourcePtr &layou
     Node *node = this->node(item.uuid);
 
     QnResourcePtr resource;
-    if(item.resource.id.isValid()) {
+    if(!item.resource.id.isNull()) {
         resource = resourcePool()->getResourceById(item.resource.id);
     } else {
         resource = resourcePool()->getResourceByUniqId(item.resource.path);

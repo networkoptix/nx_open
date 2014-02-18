@@ -11,7 +11,7 @@ namespace ec2 {
     };
 
     struct ApiIdData: public ApiData {
-        qint32 id;
+        QnId id;
     };
 
 }
@@ -32,7 +32,6 @@ namespace ec2 {
     void TYPE::autoBindValues(QSqlQuery& query)  const\
 { \
     BOOST_PP_SEQ_FOR_EACH(BIND_FIELD, ~, FIELD_SEQ) \
-    query.bindValue(QLatin1String(":id"), id); \
 }
 
 #define QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
@@ -52,6 +51,10 @@ void doAutoBind(QSqlQuery& query, const char* fieldName, const T& field) {
 
 inline void doAutoBind(QSqlQuery& query, const char* fieldName, const QString& field) {
 	query.bindValue(QString::fromLatin1(fieldName), field.isNull() ? QString(QLatin1String("")) : field);
+}
+
+inline void doAutoBind(QSqlQuery& query, const char* fieldName, const QnId& field) {
+    query.bindValue(QString::fromLatin1(fieldName), field.toString());
 }
 
 template <class T>
@@ -96,6 +99,7 @@ inline void queryFieldToDataObj(QSqlQuery& query, int idx, qint64& field) { fiel
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, QByteArray& field) { field = query.value(idx).toByteArray(); }
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, QString& field) { field = query.value(idx).toString(); }
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, float& field) { field = query.value(idx).toFloat(); }
+inline void queryFieldToDataObj(QSqlQuery& query, int idx, QnId& field) { field = QnId(query.value(idx).toString()); }
 template <class T> void queryFieldToDataObj(QSqlQuery&, int, std::vector<T>&) { ; } // TODO: #Elric wtf?
 template <class T> void queryFieldToDataObj(QSqlQuery& query, int idx, T& field, typename std::enable_if<std::is_enum<T>::value>::type* = NULL ) { field = (T) query.value(idx).toInt(); }
 

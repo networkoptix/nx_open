@@ -277,7 +277,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     const nxcip::CameraInfo& cameraInfo )
 {
     QnId typeId = qnResTypePool->getResourceTypeId(manufacture(), THIRD_PARTY_MODEL_NAME);
-    if( !typeId.isValid() )
+    if( typeId.isNull() )
         return QnThirdPartyResourcePtr();
 
     nxcip::BaseCameraManager* camManager = discoveryManager->createCameraManager( cameraInfo );

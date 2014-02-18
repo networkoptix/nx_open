@@ -72,7 +72,7 @@ void QnCommonMessageProcessor::handleMessage(const QnMessage &message) {
         break;
     }
     case Qn::Message_Type_BusinessRuleDelete: {
-        emit businessRuleDeleted(message.resourceId.toInt());
+        emit businessRuleDeleted(message.resourceId);
         break;
     }
     case Qn::Message_Type_BroadcastBusinessAction: {
@@ -96,7 +96,7 @@ void QnCommonMessageProcessor::handleMessage(const QnMessage &message) {
         break;
     }
     case Qn::Message_Type_KvPairDelete: {
-        foreach (int resourceId, message.kvPairs.keys()) {
+        foreach (QnId resourceId, message.kvPairs.keys()) {
             QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
             if (!resource)
                 continue;
@@ -112,7 +112,7 @@ void QnCommonMessageProcessor::handleMessage(const QnMessage &message) {
 }
 
 void QnCommonMessageProcessor::updateKvPairs(const QnKvPairListsById &kvPairs) {
-    foreach (int resourceId, kvPairs.keys()) {
+    foreach (const QnId& resourceId, kvPairs.keys()) {
         QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
         if (!resource)
             continue;

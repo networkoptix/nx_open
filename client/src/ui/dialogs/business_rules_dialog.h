@@ -44,7 +44,7 @@ public Q_SLOTS:
     virtual void reject() override;
 
 private slots:
-    void at_message_ruleDeleted(int id);
+    void at_message_ruleDeleted(QnId id);
 
     void at_newRuleButton_clicked();
     void at_saveAllButton_clicked();
@@ -83,12 +83,12 @@ private:
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
     QnBusinessRulesActualModel* m_rulesViewModel;
-    QList<int> m_pendingDeleteRules;
+    QList<QnId> m_pendingDeleteRules;
 
     QnBusinessRuleWidget* m_currentDetailsWidget;
 
 
-    QMap<int, int> m_deleting;
+    QMap<int, QnId> m_deleting;
 
     QMenu* m_popupMenu;
 

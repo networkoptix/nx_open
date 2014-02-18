@@ -188,7 +188,7 @@ void QnActiResourceSearcher::processPacket(
         return;
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
-    if (!rt.isValid())
+    if (rt.isNull())
         return;
 
     QnActiResourcePtr resource ( new QnActiResource() );

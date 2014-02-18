@@ -31,8 +31,8 @@ namespace ec2
         //preparing output data
         QnVirtualCameraResourceList cameraList;
 		ApiCommand::Value command = ApiCommand::updateCamera;
-		if (!resource->getId().isValid()) {
-			resource->setId(dbManager->getNextSequence());
+		if (resource->getId().isNull()) {
+			resource->setId(QnId::createUuid());
 			command = ApiCommand::addCamera;
 		}
         cameraList.push_back( resource );
@@ -98,7 +98,7 @@ namespace ec2
         QnVirtualCameraResourceList cameraList;
         foreach(const QnVirtualCameraResourcePtr& camera, cameras)
         {
-            if (!camera->getId().isValid()) {
+            if (camera->getId().isNull()) {
                 Q_ASSERT_X(0, "Only update operation is supported", Q_FUNC_INFO);
                 return INVALID_REQ_ID;
             }

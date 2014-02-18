@@ -1,5 +1,7 @@
 #include "version.h"
 
+#if 0
+
 #undef PlaySound // TODO: #Elric wtf??????
 
 #include "camera.pb.h"
@@ -1462,3 +1464,5 @@ void parseKvPairs(QnKvPairListsById& kvPairs, const PbKvPairList& pb_kvPairs)
         kvPairs[ci->resourceid()].append(kvPair);
     }
 }
+
+#endif

@@ -110,11 +110,11 @@ void QnResourceBrowserToolTipWidget::setThumbnailVisible(bool visible) {
         layout->removeItem(m_thumbnailLabel);
 }
 
-void QnResourceBrowserToolTipWidget::setResourceId(int id) {
+void QnResourceBrowserToolTipWidget::setResourceId(const QnId& id) {
     m_resourceId = id;
 }
 
-int QnResourceBrowserToolTipWidget::resourceId() const {
+QnId QnResourceBrowserToolTipWidget::resourceId() const {
     return m_resourceId;
 }
 
@@ -203,7 +203,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     connect(ui->tabWidget,          SIGNAL(currentChanged(int)),        this,               SLOT(at_tabWidget_currentChanged(int)));
     connect(ui->resourceTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()));
 
-    connect(m_thumbnailManager,     SIGNAL(thumbnailReady(int,QPixmap)), this,              SLOT(at_thumbnailReady(int,QPixmap)));
+    connect(m_thumbnailManager,     SIGNAL(thumbnailReady(QnId,QPixmap)), this,              SLOT(at_thumbnailReady(QnId,QPixmap)));
 
     /* Connect to context. */
     ui->resourceTreeWidget->setWorkbench(workbench());
@@ -713,7 +713,7 @@ void QnResourceBrowserWidget::at_showUrlsInTree_changed() {
     m_resourceModel->setUrlsShown(urlsShown);
 }
 
-void QnResourceBrowserWidget::at_thumbnailReady(int resourceId, const QPixmap &pixmap) {
+void QnResourceBrowserWidget::at_thumbnailReady(QnId resourceId, const QPixmap &pixmap) {
     if (m_tooltipWidget && m_tooltipWidget->resourceId() != resourceId)
         return;
     m_tooltipWidget->setPixmap(pixmap);

@@ -132,7 +132,7 @@ void QnBusinessEventRule::setSystem(bool value) {
 
 QString QnBusinessEventRule::getUniqueId() const
 {
-    return QString(QLatin1String("QnBusinessEventRule_%1_")).arg(QString::number(m_id));
+    return QString(QLatin1String("QnBusinessEventRule_%1_")).arg(m_id.toString());
 }
 
 bool QnBusinessEventRule::isScheduleMatchTime(const QDateTime& datetime) const

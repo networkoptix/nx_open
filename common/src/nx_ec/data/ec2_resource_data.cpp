@@ -5,7 +5,7 @@ namespace ec2 {
 
 void ApiResourceData::fromResource(const QnResourcePtr& resource)
 {
-	id = resource->getId();
+	//id = resource->getId();
 	guid = resource->getGuid();
 	typeId = resource->getTypeId();
 	parentId = resource->getParentId();
@@ -18,14 +18,14 @@ void ApiResourceData::fromResource(const QnResourcePtr& resource)
     foreach(const QnParam& param, resource->getResourceParamList().list())
     {
         if (param.domain() == QnDomainDatabase)
-            addParams.push_back(ApiResourceParam(id, param.name(), param.value().toString()));
+            addParams.push_back(ApiResourceParam(param.name(), param.value().toString()));
     }
 }
 
 void ApiResourceData::toResource(QnResourcePtr resource) const
 {
-	resource->setId(id);
-	resource->setGuid(guid);
+	resource->setId(guid);
+	//resource->setGuid(guid);
 	resource->setTypeId(typeId);
 	resource->setParentId(parentId);
 	resource->setName(name);
@@ -40,12 +40,12 @@ void ApiResourceData::toResource(QnResourcePtr resource) const
 QnResourceParameters ApiResourceData::toHashMap() const
 {
 	QnResourceParameters parameters;
-	parameters["id"] = QString::number(id);
+	parameters["id"] = guid.toString();
 	parameters["name"] = name;
 	parameters["url"] = url;
 	parameters["status"] = QString::number(status);
 	parameters["disabled"] = QString::number(disabled);
-	parameters["parentId"] = QString::number(parentId);
+	parameters["parentId"] = parentId.toString();
 
 	return parameters;
 }

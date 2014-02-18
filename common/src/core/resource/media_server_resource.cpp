@@ -37,8 +37,8 @@ QString QnMediaServerResource::getUniqueId() const
 {
     QMutexLocker mutexLocker(&m_mutex); // needed here !!!
     QnMediaServerResource* nonConstThis = const_cast<QnMediaServerResource*> (this);
-    if (!getId().isValid())
-        nonConstThis->setId(QnId::generateSpecialId());
+    if (getId().isNull())
+        nonConstThis->setId(QnId::createUuid());
     return QLatin1String("Server ") + getId().toString();
 }
 

@@ -66,7 +66,7 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
                     errStr = QString("Invalid action type %1. Valid range is [0..%2]").arg(params[i].second).arg(BusinessActionType::NotDefined-1);
             }
             else if (params[i].first == "brule_id") {
-                businessRuleId = params[i].second.toInt();
+                businessRuleId = params[i].second;
             }
         }
     }

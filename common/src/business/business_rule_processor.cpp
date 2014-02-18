@@ -53,8 +53,8 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
 
     connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
-    connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleDeleted(int)),
-            this, SLOT(at_businessRuleDeleted(int)));
+    connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleDeleted(QnId)),
+            this, SLOT(at_businessRuleDeleted(QnId)));
     connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleReset(QnBusinessEventRuleList)),
             this, SLOT(at_businessRuleReset(QnBusinessEventRuleList)));
 
@@ -433,7 +433,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
 
     if( recipients.isEmpty() )
     {
-        cl_log.log( QString::fromLatin1("Action SendMail (rule %1) missing valid recipients. Ignoring...").arg(action->getBusinessRuleId()), cl_logWARNING );
+        cl_log.log( QString::fromLatin1("Action SendMail (rule %1) missing valid recipients. Ignoring...").arg(action->getBusinessRuleId().toString()), cl_logWARNING );
         cl_log.log( QString::fromLatin1("All recipients: ") + log.join(QLatin1String("; ")), cl_logWARNING );
         return false;
     }
@@ -575,7 +575,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
         {
             // terminate all actions. If instant action, terminate all resources on which it was started
             QnAbstractBusinessEventPtr bEvent;
-            if (resId.isValid())
+            if (!resId.isNull())
                 bEvent = runtimeRule.resources.value(resId);
             else
                 bEvent = runtimeRule.resources.begin().value(); // for continues action resourceID is not specified and only one record is used
@@ -598,7 +598,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
     }
 }
 
-void QnBusinessRuleProcessor::at_businessRuleDeleted(int id)
+void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
 {
     QMutexLocker lock(&m_mutex);
 

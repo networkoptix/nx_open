@@ -198,7 +198,7 @@ void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr 
 Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::defaultFlags(const QnLayoutResourcePtr &resource) const {
     Qn::ResourceSavingFlags result;
 
-    if(resource->getId().isSpecial())
+    if(resource->flags() & QnResource::local)
         result |= Qn::ResourceIsLocal;
 
     return result;

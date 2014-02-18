@@ -111,7 +111,7 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
     if( !securityCam )
     {
         cl_log.log( QString::fromLatin1("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
-            arg(resource->getId()), cl_logWARNING );
+            arg(resource->getId().toString()), cl_logWARNING );
         return false;
     }
     QString relayOutputId = action->getRelayOutputId();

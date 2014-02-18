@@ -47,16 +47,16 @@ namespace ec2
         const int reqID = generateRequestID();
 
         ApiCommand::Value command = ApiCommand::updateMediaServer;
-        if (!resource->getId().isValid()) {
-            resource->setId(dbManager->getNextSequence());
+        if (resource->getId().isNull()) {
+            resource->setId(QnId::createUuid());
             command = ApiCommand::addMediaServer;
         }
 
         QnAbstractStorageResourceList storages = resource->getStorages();
         for (int i = 0; i < storages.size(); ++i)
         {
-            if (!storages[i]->getId().isValid())
-                storages[i]->setId(dbManager->getNextSequence());
+            if (storages[i]->getId().isNull())
+                storages[i]->setId(QnId::createUuid());
         }
         resource->setStorages(storages);
 

@@ -56,8 +56,8 @@ int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::S
     const int reqID = generateRequestID();
 
     ApiCommand::Value command = ApiCommand::updateBusinessRule;
-    if (!rule->id().isValid()) {
-        rule->setId(dbManager->getNextSequence());
+    if (rule->id().isNull()) {
+        rule->setId(QnId::createUuid());
         command = ApiCommand::addBusinessRule;
     }
 

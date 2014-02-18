@@ -5,6 +5,7 @@
 #include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QtCore/QMetaType>
+#include "utils/common/id.h"
 
 
 class QnKvPair {
@@ -28,7 +29,7 @@ private:
 
 // TODO: #Elric bad naming
 typedef QList<QnKvPair> QnKvPairList;
-typedef QMap<int, QnKvPairList> QnKvPairListsById;
+typedef QMap<QnId, QnKvPairList> QnKvPairListsById;
 
 Q_DECLARE_METATYPE(QnKvPair)
 Q_DECLARE_METATYPE(QnKvPairList)

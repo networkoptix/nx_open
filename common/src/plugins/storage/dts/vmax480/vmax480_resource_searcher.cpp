@@ -68,7 +68,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
     auth.setUser(QLatin1String("admin"));
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
         return;
 
 
@@ -350,7 +350,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
     QString baseName = QString(QLatin1String("DW-VF")) + QString::number(channels);
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), baseName);
-    if (!rt.isValid())
+    if (rt.isNull())
         return result;
 
     QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(url.host()).arg(apiPort);

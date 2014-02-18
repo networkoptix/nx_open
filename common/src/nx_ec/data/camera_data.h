@@ -13,14 +13,14 @@ namespace ec2
 
 struct ScheduleTask: public ApiData 
 {
-	ScheduleTask(): id(0), sourceId(0), startTime(0), endTime(0), doRecordAudio(false), recordType(Qn::RecordingType_Run), dayOfWeek(1), 
+	ScheduleTask(): startTime(0), endTime(0), doRecordAudio(false), recordType(Qn::RecordingType_Run), dayOfWeek(1), 
 					beforeThreshold(0), afterThreshold(0), streamQuality(Qn::QualityNotDefined), fps(0.0) {}
 
 	static ScheduleTask fromResource(const QnResourcePtr& cameraRes, const QnScheduleTask& resScheduleTask);
-	QnScheduleTask toResource() const;
+	QnScheduleTask toResource(const QnId& resourceId) const;
 
-    qint32   id;
-    qint32   sourceId;
+    //qint32   id;
+    //qint32   sourceId;
     qint32   startTime;
     qint32   endTime;
     bool     doRecordAudio;
@@ -85,7 +85,7 @@ struct ApiCameraDataList: public ApiData
 
 }
 
-#define apiScheduleTaskFields (id) (sourceId) (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) (beforeThreshold) (afterThreshold) (streamQuality) (fps) 
+#define apiScheduleTaskFields (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) (beforeThreshold) (afterThreshold) (streamQuality) (fps) 
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ScheduleTask, apiScheduleTaskFields)
 #define apiCameraDataFields (scheduleDisabled) (motionType) (region) (mac) (login) (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) \
 							(firmware) (groupId) (groupName) (secondaryQuality) (controlDisabled) (statusFlags) (dewarpingParams) (vendor)
