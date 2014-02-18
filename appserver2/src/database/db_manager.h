@@ -139,7 +139,7 @@ namespace ec2
             QnDbTransaction* m_tran;
         };
 
-        ErrorCode deleteTableRecord(const QString& id, const QString& tableName, const QString& fieldName);
+        ErrorCode deleteTableRecord(const QnId& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
         ErrorCode updateResource(const ApiResourceData& data, qint32 internalId);

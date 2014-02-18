@@ -471,8 +471,8 @@ ErrorCode QnDbManager::updateLayout(const ApiLayoutData& data, qint32 internalId
 ErrorCode QnDbManager::removeStoragesByServer(const QnId& serverGuid)
 {
     QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_storage WHERE resource_ptr_id in (select id from vms_resource where parent_guid = :id and xtype_id = :typeId)");
-    delQuery.bindValue(":id", serverGuid.toString());
+    delQuery.prepare("DELETE FROM vms_storage WHERE resource_ptr_id in (select id from vms_resource where parent_guid = :guid and xtype_id = :typeId)");
+    delQuery.bindValue(":guid", serverGuid.toRfc4122());
     delQuery.bindValue(":typeId", m_storageTypeId);
     if (!delQuery.exec()) {
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
@@ -480,8 +480,8 @@ ErrorCode QnDbManager::removeStoragesByServer(const QnId& serverGuid)
     }
 
     QSqlQuery delQuery2(m_sdb);
-    delQuery2.prepare("DELETE FROM vms_resource WHERE parent_guid = :id and xtype_id=:typeId");
-    delQuery2.bindValue(":id", serverGuid.toString());
+    delQuery2.prepare("DELETE FROM vms_resource WHERE parent_guid = :guid and xtype_id=:typeId");
+    delQuery2.bindValue(":guid", serverGuid.toRfc4122());
     delQuery2.bindValue(":typeId", m_storageTypeId);
     if (!delQuery2.exec()) {
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
@@ -571,7 +571,7 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiSetResourceStat
     QSqlQuery query(m_sdb);
     query.prepare("UPDATE vms_resource set status = :status where guid = :id");
     query.bindValue(":status", tran.params.status);
-    query.bindValue(":guid", tran.params.id.toString());
+    query.bindValue(":guid", tran.params.id.toRfc4122());
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
@@ -585,9 +585,9 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiSetResourceDisa
     QnDbTransactionLocker lock(&m_tran);
 
     QSqlQuery query(m_sdb);
-    query.prepare("UPDATE vms_resource set disabled = :disabled where guid = :id");
+    query.prepare("UPDATE vms_resource set disabled = :disabled where guid = :guid");
     query.bindValue(":disabled", tran.params.disabled);
-    query.bindValue(":id", tran.params.id.toString());
+    query.bindValue(":guid", tran.params.id.toRfc4122());
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
@@ -660,8 +660,8 @@ ErrorCode QnDbManager::insertBRuleResource(const QString& tableName, const QnId&
 {
     QSqlQuery query(m_sdb);
     query.prepare(QString("INSERT INTO %1 (businessrule_guid, resource_guid) VALUES (:ruleGuid, :resourceGuid)").arg(tableName));
-    query.bindValue(":ruleGuid", ruleGuid.toString());
-    query.bindValue(":resGuid", resourceGuid.toString());
+    query.bindValue(":ruleGuid", ruleGuid.toRfc4122());
+    query.bindValue(":resGuid", resourceGuid.toRfc4122());
     if (query.exec()) {
         return ErrorCode::ok;
     }
@@ -807,7 +807,7 @@ qint32 QnDbManager::getResourceInternalId( const QnId& guid )
 {
     QSqlQuery query(m_sdb);
     query.prepare("SELECT id from vms_resource where guid = :guid");
-    query.bindValue(":guid", guid.toString());
+    query.bindValue(":guid", guid.toRfc4122());
     if (!query.exec() || !query.next())
         return 0;
     return query.value("id").toInt();
@@ -817,7 +817,7 @@ qint32 QnDbManager::getBusinessRuleInternalId( const QnId& guid )
 {
     QSqlQuery query(m_sdb);
     query.prepare("SELECT id from vms_businessrule where guid = :guid");
-    query.bindValue(":guid", guid.toString());
+    query.bindValue(":guid", guid.toRfc4122());
     if (!query.exec() || !query.next())
         return 0;
     return query.value("id").toInt();
@@ -1063,14 +1063,23 @@ ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 id)
 
 ErrorCode QnDbManager::deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName)
 {
-    return deleteTableRecord(QString::number(internalId), tableName, fieldName);
-}
-
-ErrorCode QnDbManager::deleteTableRecord(const QString& id, const QString& tableName, const QString& fieldName)
-{
     QSqlQuery delQuery(m_sdb);
     delQuery.prepare(QString("DELETE FROM %1 where %2 = :id").arg(tableName).arg(fieldName));
-    delQuery.bindValue(QLatin1String(":id"), id);
+    delQuery.bindValue(QLatin1String(":id"), internalId);
+    if (delQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
+ErrorCode QnDbManager::deleteTableRecord(const QnId& id, const QString& tableName, const QString& fieldName)
+{
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare(QString("DELETE FROM %1 where %2 = :guid").arg(tableName).arg(fieldName));
+    delQuery.bindValue(QLatin1String(":guid"), id.toRfc4122());
     if (delQuery.exec()) {
         return ErrorCode::ok;
     }
@@ -1213,8 +1222,8 @@ ErrorCode QnDbManager::removeResource(const QnId& id)
                     FROM vms_resource r\
                     JOIN vms_resourcetype rt on rt.id = r.xtype_id\
                     LEFT JOIN vms_camera c on c.resource_ptr_id = r.id\
-                    WHERE r.guid = :id");
-    query.bindValue(":id", id.toString());
+                    WHERE r.guid = :guid");
+    query.bindValue(":guid", id.toRfc4122());
     if (!query.exec())
         return ErrorCode::failure;
     query.next();
@@ -1534,8 +1543,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& resourceId, ApiResourceParams& 
     QSqlQuery query(m_sdb);
     query.prepare(QString("SELECT kv.value, kv.name \
                                 FROM vms_kvpair kv \
-                                JOIN vms_resource r on r.id = kv.resource_id WHERE r.guid = :id"));
-    query.bindValue(QLatin1String(":id"), resourceId.toString());
+                                JOIN vms_resource r on r.id = kv.resource_id WHERE r.guid = :guid"));
+    query.bindValue(QLatin1String(":guid"), resourceId.toRfc4122());
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;

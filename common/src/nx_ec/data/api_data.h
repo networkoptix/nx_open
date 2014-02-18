@@ -54,7 +54,7 @@ inline void doAutoBind(QSqlQuery& query, const char* fieldName, const QString& f
 }
 
 inline void doAutoBind(QSqlQuery& query, const char* fieldName, const QnId& field) {
-    query.bindValue(QString::fromLatin1(fieldName), field.toString());
+    query.bindValue(QString::fromLatin1(fieldName), field.toRfc4122());
 }
 
 template <class T>
@@ -99,7 +99,7 @@ inline void queryFieldToDataObj(QSqlQuery& query, int idx, qint64& field) { fiel
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, QByteArray& field) { field = query.value(idx).toByteArray(); }
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, QString& field) { field = query.value(idx).toString(); }
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, float& field) { field = query.value(idx).toFloat(); }
-inline void queryFieldToDataObj(QSqlQuery& query, int idx, QnId& field) { field = QnId(query.value(idx).toString()); }
+inline void queryFieldToDataObj(QSqlQuery& query, int idx, QnId& field) { field = QnId::fromRfc4122(query.value(idx).toByteArray()); }
 template <class T> void queryFieldToDataObj(QSqlQuery&, int, std::vector<T>&) { ; } // TODO: #Elric wtf?
 template <class T> void queryFieldToDataObj(QSqlQuery& query, int idx, T& field, typename std::enable_if<std::is_enum<T>::value>::type* = NULL ) { field = (T) query.value(idx).toInt(); }
 
