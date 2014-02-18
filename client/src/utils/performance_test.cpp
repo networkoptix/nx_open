@@ -14,12 +14,12 @@ int QnPerformanceTest::getOptimalLightMode() {
     bool poorGpu = false;
 
     QString cpuName = QnPerformance::cpuName();
-    QRegExp atomCpuRegExp("Intel\\(R\\) Atom\\(TM\\) CPU .*");
+    QRegExp atomCpuRegExp(lit("Intel\\(R\\) Atom\\(TM\\) CPU .*"));
     if (atomCpuRegExp.exactMatch(cpuName))
         poorCpu = true;
 
-    QString renderer = glGetString(GL_RENDERER);
-    QRegExp slowRendererRegExp("Gallium .* on llvmpipe .*");
+    QString renderer = QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)));
+    QRegExp slowRendererRegExp(lit("Gallium .* on llvmpipe .*"));
     if (slowRendererRegExp.exactMatch(renderer))
         poorGpu = true;
 
