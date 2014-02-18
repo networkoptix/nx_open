@@ -84,6 +84,7 @@ extern "C"
     #include "ui/workaround/x11_launcher_workaround.h"
 #endif
 #include "utils/common/cryptographic_hash.h"
+#include "utils/performance_test.h"
 #include "ui/style/globals.h"
 #include "openal/qtvaudiodevice.h"
 #include "ui/workaround/fglrx_full_screen.h"
@@ -105,6 +106,7 @@ extern "C"
 #include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
 #include "core/ptz/client_ptz_controller_pool.h"
+#include "ui/dialogs/message_box.h"
 
 
 
@@ -339,8 +341,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnSettings->setDevMode(true);
     }
 
-    if (!lightMode.isEmpty())
+    bool lightModeWarning = false;
+    if (lightMode.isEmpty()) {
+        qnSettings->setLightMode(QnPerformanceTest::getOptimalLightMode());
+        lightModeWarning |= qnSettings->lightMode();
+    } else {
         qnSettings->setLightMode(lightMode.toInt());
+    }
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
@@ -594,6 +601,19 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Show FPS in debug. */
     context->menu()->trigger(Qn::ShowFpsAction);
 #endif
+
+    if (lightModeWarning) {
+        QnMessageBox::warning(
+            mainWindow.data(),
+            0,
+            QCoreApplication::translate("QnPerformance", "Warning"),
+            QCoreApplication::translate("QnPerformance", "Performance of this computer allows running %1 in configuration mode only. "
+                                                         "For full-featured mode please use another computer.").
+                    arg(QLatin1String(QN_PRODUCT_NAME_LONG)),
+            QMessageBox::StandardButtons(QMessageBox::Ok),
+            QMessageBox::Ok
+        );
+    }
 
     result = application->exec();
 

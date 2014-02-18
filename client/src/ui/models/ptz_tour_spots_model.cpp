@@ -183,7 +183,12 @@ bool QnPtzTourSpotsModel::insertRows(int row, int count, const QModelIndex &pare
 }
 
 Qt::ItemFlags QnPtzTourSpotsModel::flags(const QModelIndex &index) const {
-    return base_type::flags(index) | Qt::ItemIsEditable; //TODO: #GDM PTZ drag'n'drop?
+    switch (index.column()) {
+    case NumberColumn:
+        return base_type::flags(index);
+    default:
+        return base_type::flags(index) | Qt::ItemIsEditable; //TODO: #GDM PTZ drag'n'drop?
+    }
 }
 
 QVariant QnPtzTourSpotsModel::data(const QModelIndex &index, int role) const {
@@ -200,6 +205,8 @@ QVariant QnPtzTourSpotsModel::data(const QModelIndex &index, int role) const {
     case Qt::AccessibleTextRole:
     case Qt::AccessibleDescriptionRole:
         switch (index.column()) {
+        case NumberColumn:
+            return index.row() + 1;
         case NameColumn:
             foreach (const QnPtzPreset &preset, m_presets) {
                 if (preset.id == spot.presetId)
@@ -261,6 +268,8 @@ QVariant QnPtzTourSpotsModel::data(const QModelIndex &index, int role) const {
 QVariant QnPtzTourSpotsModel::headerData(int section, Qt::Orientation orientation, int role) const {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole && section >= 0 && section < ColumnCount) {
         switch (section) {
+        case NumberColumn:
+            return QString();
         case NameColumn:
             return tr("Position");
         case TimeColumn:
