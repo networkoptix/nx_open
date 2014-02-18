@@ -285,7 +285,6 @@
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
-                <virtualenv.dir>${init.python.dir}/scripts</virtualenv.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>                
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
@@ -310,7 +309,6 @@
                 <environment.dir>${env.environment}</environment.dir>
                 <init.python.dir>${environment.dir}/python/bin</init.python.dir>				
                 <python.dir>${libdir}/${arch}/python/bin</python.dir>
-                <virtualenv.dir>/usr/local/bin</virtualenv.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>

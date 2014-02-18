@@ -1,5 +1,5 @@
 # Create new python virtualenv
-${virtualenv.dir}/virtualenv ./${arch}/python
+virtualenv ./${arch}/python
 
 # Replace distutils for cx_Freeze to work
 rm -rf ./${arch}/python/lib/python2.7/distutils
