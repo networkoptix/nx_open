@@ -217,7 +217,7 @@ static void serializeStringParam(QByteArray& result, const QString& value, const
 static void serializeQnIdParam(QByteArray& result, const QnId& value)
 {
     if (value != QnId()) {
-        QByteArray data = value.toRfc4122();
+        QByteArray data = value.toByteArray();
         result += data;
     }
     result += DELIMITER;

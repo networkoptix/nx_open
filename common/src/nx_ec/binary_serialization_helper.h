@@ -168,7 +168,7 @@ namespace QnBinary {
         data.resize(16);
         if( binStream->read(data.data(), 16) != 16 )
             return false;
-        field = QnId(data);
+        field = QUuid::fromRfc4122(data);
         return true;
     }
 
