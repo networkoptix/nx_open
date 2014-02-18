@@ -79,6 +79,8 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
     if(!getPresets(&presets))
         return false;
 
+    bool restartTour = false;
+    QnPtzTour activeTour;
     {
         QMutexLocker locker(&m_mutex);
         QnPtzTourHash records = m_adaptor->value();
@@ -87,7 +89,22 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
 
         records.insert(tour.id, tour);
 
+        if(m_activeTour.id == tour.id) {
+            activeTour = tour;
+            activeTour.optimize();
+            
+            if(activeTour != m_activeTour) {
+                restartTour = true;
+                m_activeTour = activeTour;
+            }
+        }
+
         m_adaptor->setValue(records);
+    }
+
+    if(restartTour) {
+        m_executor->stopTour();
+        m_executor->startTour(activeTour);
     }
 
     emit changed(Qn::ToursPtzField);
@@ -95,6 +112,7 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
 }
 
 bool QnTourPtzController::removeTour(const QString &tourId) {
+    bool stopTour = false;
     {
         QMutexLocker locker(&m_mutex);
 
@@ -102,24 +120,36 @@ bool QnTourPtzController::removeTour(const QString &tourId) {
         if(records.remove(tourId) == 0)
             return false;
     
+        if(m_activeTour.id == tourId) {
+            m_activeTour = QnPtzTour(); // TODO: #Elric this won't be registered by activity controller.
+            stopTour = true;
+        }
+
         m_adaptor->setValue(records);
     }
+
+    if(stopTour)
+        m_executor->stopTour();
     
     emit changed(Qn::ToursPtzField);
     return true;
 }
 
 bool QnTourPtzController::activateTour(const QString &tourId) {
-    QnPtzTour tour;
+    QnPtzTour activeTour;
     {
         QMutexLocker locker(&m_mutex);
         const QnPtzTourHash &records = m_adaptor->value();
         if(!records.contains(tourId))
             return false;
-        tour = records.value(tourId);
+
+        activeTour = records.value(tourId);
+        activeTour.optimize();
+
+        m_activeTour = activeTour;
     }
 
-    m_executor->startTour(tour);
+    m_executor->startTour(activeTour);
 
     return true;
 }
