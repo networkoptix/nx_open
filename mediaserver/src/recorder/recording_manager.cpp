@@ -217,7 +217,7 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
     QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
 
-    if (!cameraRes->isInitialized() && !cameraRes->isDisabled())
+    if (!cameraRes->isInitialized() && !cameraRes->isDisabled() && !cameraRes->isScheduleDisabled())
         cameraRes->initAsync(true);
 
     bool someRecordingIsPresent = false;
