@@ -1,9 +1,8 @@
 #include "performance_test.h"
 
-#include <GL/gl.h>
-
 #include <QtCore/QFile>
 #include <QtCore/QRegExp>
+#include <QtOpenGL/QGLContext>
 
 #include <utils/common/performance.h>
 #include <client/client_globals.h>
