@@ -20,6 +20,7 @@
 #include <ui/models/ptz_manage_model.h>
 #include <ui/widgets/ptz_tour_widget.h>
 #include <ui/dialogs/checkable_message_box.h>
+#include <ui/dialogs/message_box.h>
 
 #include <utils/common/event_processors.h>
 #include <utils/resource_property_adaptors.h>
@@ -97,6 +98,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(m_model,    &QnPtzManageModel::presetsChanged,  ui->tourEditWidget, &QnPtzTourWidget::setPresets);
     connect(m_model,    &QnPtzManageModel::presetsChanged,  this,               &QnPtzManageDialog::updateUi);
     connect(m_model,    &QnPtzManageModel::dataChanged,     this,               &QnPtzManageDialog::updateUi);
+    connect(m_model,    &QnPtzManageModel::modelReset,      this,               &QnPtzManageDialog::updateUi);
     connect(this,       &QnAbstractPtzDialog::synchronized, m_model,            &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
 
@@ -107,11 +109,6 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(ui->deleteButton,       &QPushButton::clicked,  this,   &QnPtzManageDialog::at_deleteButton_clicked);
 
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked,   this, &QnAbstractPtzDialog::saveChanges);
-    //TODO: enable and disable various gui elements:
-    /*
-        - Apply - only if there are some changes
-        - CreateTour - if there is at least one position
-    */
 
     //TODO: implement preview receiving and displaying
 
@@ -433,19 +430,55 @@ void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     setWindowTitle(tr("Manage PTZ for %1").arg(getResourceName(m_resource)));
 }
 
-//TODO: call and connect in required places
+bool QnPtzManageDialog::isModified() const {
+    foreach (const QnPtzTourItemModel &tourModel, m_model->tourModels()) {
+        if (tourModel.modified)
+            return true;
+    }
+    foreach (const QnPtzPresetItemModel &presetModel, m_model->presetModels()) {
+        if (presetModel.modified)
+            return true;
+    }
+    if (!m_model->removedPresets().isEmpty())
+        return true;
+    if (!m_model->removedTours().isEmpty())
+        return true;
+
+    return false;
+}
+
+void QnPtzManageDialog::chechForUnsavedChanges() {
+    // TODO: #dklychkov finish implementation
+    if (isModified()) {
+        show();
+        QnMessageBox::StandardButton button = QnMessageBox::question(this, 0, tr("PTZ configuration is not saved"), tr("Changes are not saved. Save them?"),
+                                                                     QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, QnMessageBox::Yes);
+        switch (button) {
+        case QnMessageBox::Ok:
+            saveChanges();
+            break;
+        case QnMessageBox::Cancel:
+            return;
+        default:
+            break;
+        }
+    }
+}
+
 void QnPtzManageDialog::updateUi() {
     ui->addTourButton->setEnabled(!m_model->presetModels().isEmpty());
 
-    QnPtzManageModel::RowType selectedRow = QnPtzManageModel::InvalidRow;
     QModelIndex index = ui->tableView->selectionModel()->currentIndex();
+    QnPtzManageModel::RowData selectedRow;
     if (index.isValid())
-        selectedRow = m_model->rowData(index.row()).rowType;
+        selectedRow = m_model->rowData(index.row());
 
-    ui->previewGroupBox->setEnabled(index.isValid());
+    bool isPreset = selectedRow.rowType == QnPtzManageModel::PresetRow;
+    bool isTour = selectedRow.rowType == QnPtzManageModel::TourRow;
 
-    ui->deleteButton->setEnabled(selectedRow == QnPtzManageModel::PresetRow || selectedRow == QnPtzManageModel::TourRow);
-    ui->goToPositionButton->setEnabled(selectedRow == QnPtzManageModel::PresetRow || selectedRow == QnPtzManageModel::TourRow);
-    ui->startTourButton->setEnabled(selectedRow == QnPtzManageModel::TourRow);
-    //TODO: add other buttons;
+    ui->previewGroupBox->setEnabled(isPreset || isTour);
+    ui->deleteButton->setEnabled(isPreset || isTour);
+    ui->goToPositionButton->setEnabled(isPreset || isTour);
+    ui->startTourButton->setEnabled(isTour);
+    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(isModified());
 }
