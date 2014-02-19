@@ -235,6 +235,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateButtonsVisibility();
     updateIconButton();
 
+    updateTitleText();
     updateCursor();
     updateFisheye();
     setImageEnhancement(item->imageEnhancement());
@@ -840,8 +841,8 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 QString QnMediaResourceWidget::calculateTitleText() const {
     QnPtzObject activeObject;
     QString activeObjectName;
-    if(m_ptzController->getActiveObject(&activeObject) && getPtzObjectName(m_ptzController, activeObject, &activeObjectName)) {
-        return tr("%1 (%2)").arg(m_resource->toResourcePtr()->getName()).arg(activeObjectName);
+    if(m_ptzController->getActiveObject(&activeObject) && activeObject.type == Qn::TourPtzObject && getPtzObjectName(m_ptzController, activeObject, &activeObjectName)) {
+        return tr("%1 (Tour \"%2\" is active)").arg(m_resource->toResourcePtr()->getName()).arg(activeObjectName);
     } else {
         return m_resource->toResourcePtr()->getName();
     }
@@ -1056,7 +1057,7 @@ void QnMediaResourceWidget::at_zoomRectChanged() {
 void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields) {
     if(fields & Qn::CapabilitiesPtzField)
         updateButtonsVisibility();
-    if(fields & Qn::ActiveObjectPtzField)
+    if(fields & (Qn::ActiveObjectPtzField | Qn::ToursPtzField))
         updateTitleText();
 }
 
