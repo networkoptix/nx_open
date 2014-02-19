@@ -334,8 +334,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     commandLineParser.parse(argc, argv, stderr);
 
-    ec2::DummyHandler dummyEc2ResponseHandler;
-    
     initLog(logLevel);
 
     /* Dev mode. */
