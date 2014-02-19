@@ -29,6 +29,11 @@ public:
      */
     static qint64 currentCpuFrequency();
 
+    /**
+     * \return                          CPU name.
+     */
+    static QString cpuName();
+
 };
 
 

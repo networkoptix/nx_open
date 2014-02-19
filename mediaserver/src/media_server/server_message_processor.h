@@ -3,6 +3,8 @@
 
 #include <api/common_message_processor.h>
 
+#include <core/resource/resource.h>
+
 class QnServerMessageProcessor : public QnCommonMessageProcessor
 {
     Q_OBJECT
@@ -10,13 +12,18 @@ class QnServerMessageProcessor : public QnCommonMessageProcessor
     typedef QnCommonMessageProcessor base_type;
 public:
     QnServerMessageProcessor();
+
 protected:
     virtual void loadRuntimeInfo(const QnMessage &message) override;
     virtual void handleConnectionOpened(const QnMessage &message) override;
     virtual void handleConnectionClosed(const QString &errorString) override;
     virtual void handleMessage(const QnMessage &message) override;
+
 private:
-    bool m_tryDirectConnect;
+    void updateResource(const QnResourcePtr& resource);
+
+private slots:
+    void at_serverSaved(int status, const QnResourceList &, int);
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H

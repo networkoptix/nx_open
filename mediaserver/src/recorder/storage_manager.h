@@ -150,6 +150,7 @@ private:
     QMap<QnId, bool> m_diskFullWarned;
     RebuildState m_rebuildState;
     double m_rebuildProgress;
+    bool m_rebuildCancelled;
 
     friend class RebuildAsyncTask;
     RebuildAsyncTask* m_asyncRebuildTask;

@@ -12,6 +12,8 @@ QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControlle
         m_adaptor->setValue(QnPtzObject());
         connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });
     }
+
+    // TODO: #Elric #PTZ better async support?
 }
 
 QnActivityPtzController::~QnActivityPtzController() {
@@ -56,12 +58,47 @@ bool QnActivityPtzController::viewportMove(qreal aspectRatio, const QRectF &view
     return true;
 }
 
+bool QnActivityPtzController::removePreset(const QString &presetId) {
+    if(!base_type::removePreset(presetId))
+        return false;
+
+    bool activeObjectChanged = false;
+    {
+        QMutexLocker locker(&m_mutex);
+        if(getActiveObjectLocked() == QnPtzObject(Qn::PresetPtzObject, presetId))
+            activeObjectChanged = setActiveObjectLocked(QnPtzObject());
+    }
+    
+    if(activeObjectChanged)
+        emit changed(Qn::ActiveObjectPtzField);
+
+    return true;
+}
+
 bool QnActivityPtzController::activatePreset(const QString &presetId, qreal speed) {
     if(!base_type::activatePreset(presetId, speed))
         return false;
 
     if(m_mode != Client)
         setActiveObject(QnPtzObject(Qn::PresetPtzObject, presetId));
+
+    return true;
+}
+
+bool QnActivityPtzController::removeTour(const QString &tourId) {
+    if(!base_type::removeTour(tourId))
+        return false;
+
+    bool activeObjectChanged = false;
+    {
+        QMutexLocker locker(&m_mutex);
+        if(getActiveObjectLocked() == QnPtzObject(Qn::TourPtzObject, tourId))
+            activeObjectChanged = setActiveObjectLocked(QnPtzObject());
+    }
+
+    if(activeObjectChanged)
+        emit changed(Qn::ActiveObjectPtzField);
+
     return true;
 }
 
@@ -75,24 +112,46 @@ bool QnActivityPtzController::activateTour(const QString &tourId) {
 }
 
 bool QnActivityPtzController::getActiveObject(QnPtzObject *activeObject) {
-    if(m_mode == Local) {
-        *activeObject = m_activeObject;
-    } else {
-        *activeObject = m_adaptor->value();
-    }
-
-    // TODO: #Elric #PTZ emit if asynchronous
-
+    *activeObject = getActiveObject();
+    
     return true;
 }
 
+QnPtzObject QnActivityPtzController::getActiveObject() {
+    QMutexLocker locker(&m_mutex);
+    return getActiveObjectLocked();
+}
+
 void QnActivityPtzController::setActiveObject(const QnPtzObject &activeObject) {
+    bool activeObjectChanged = false;
+    {
+        QMutexLocker locker(&m_mutex);
+        activeObjectChanged = setActiveObjectLocked(activeObject);
+    }
+    if(activeObjectChanged)
+        emit changed(Qn::ActiveObjectPtzField);
+}
+
+QnPtzObject QnActivityPtzController::getActiveObjectLocked() const {
+    if(m_mode == Local) {
+        return m_activeObject;
+    } else {
+        return m_adaptor->value();
+    }
+}
+
+bool QnActivityPtzController::setActiveObjectLocked(const QnPtzObject &activeObject) {
     if(m_mode == Local) {
         if(m_activeObject != activeObject) {
             m_activeObject = activeObject;
-            emit changed(Qn::ActiveObjectPtzField);
+            return true;
         }
     } else {
-        m_adaptor->setValue(activeObject);
+        if(m_adaptor->value() != activeObject) {
+            m_adaptor->setValue(activeObject);
+            return true;
+        }
     }
+
+    return false;
 }

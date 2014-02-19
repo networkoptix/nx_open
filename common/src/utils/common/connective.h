@@ -12,6 +12,11 @@
 
 #include "forward.h"
 
+/* Properly defined NULL is required for this class to work, so we just redefine 
+ * it here. Defining it only in config.h doesn't work for some compilers. */
+#undef NULL
+#define NULL nullptr
+
 namespace Qn {
     template<class T>
     inline const T *connector(const T *object) {

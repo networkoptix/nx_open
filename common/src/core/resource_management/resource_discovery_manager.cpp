@@ -465,8 +465,8 @@ void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher 
     QSet<QString> disabledVendorsForAutoSearch = QnGlobalSettings::instance()->disabledVendorsSet();
 
     searcher->setShouldBeUsed(
-        !disabledVendorsForAutoSearch.contains(searcher->manufacture()) && 
-        !disabledVendorsForAutoSearch.contains(lit("all"))
+        searcher->isLocal() ||
+        (!disabledVendorsForAutoSearch.contains(searcher->manufacture()) && !disabledVendorsForAutoSearch.contains(lit("all")))
     );
 }
 

@@ -199,8 +199,11 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
     QnPtzManageDialog* dialog = QnPtzManageDialog::instance();
     assert(dialog);
 
-    dialog->setController(widget->ptzController());
-    dialog->setResource(widget->resource()->toResourcePtr());
+    if (dialog->controller() != widget->ptzController() || dialog->resource() != widget->resource()->toResourcePtr()) {
+        dialog->chechForUnsavedChanges();
+        dialog->setController(widget->ptzController());
+        dialog->setResource(widget->resource()->toResourcePtr());
+    }
     dialog->show();
 }
 

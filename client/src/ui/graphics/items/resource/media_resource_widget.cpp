@@ -122,9 +122,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_resource->toResource(),   &QnResource::resourceChanged,                   this, &QnMediaResourceWidget::at_resource_resourceChanged);
     connect(m_resource->toResource(),   &QnResource::propertyChanged,                   this, &QnMediaResourceWidget::at_resource_propertyChanged);
     connect(m_resource->toResource(),   &QnResource::mediaDewarpingParamsChanged,       this, &QnMediaResourceWidget::updateDewarpingParams);
-    connect(item,                       &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnMediaResourceWidget::updateFisheye);
     connect(this,                       &QnResourceWidget::zoomTargetWidgetChanged,     this, &QnMediaResourceWidget::updateDisplay);
+    connect(item,                       &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnMediaResourceWidget::updateFisheye);
     connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateFisheye);
+    connect(this,                       &QnResourceWidget::zoomRectChanged,             this, &QnMediaResourceWidget::updateFisheye);
     connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateButtonsVisibility);
     updateDewarpingParams();
     updateDisplay();
@@ -138,13 +139,17 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateAspectRatio();
 
     /* Set up PTZ controller. */
-    m_ptzController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
-    m_ptzController.reset(new QnPresetPtzController(m_ptzController));
-    m_ptzController.reset(new QnTourPtzController(m_ptzController));
-    m_ptzController.reset(new QnActivityPtzController(QnActivityPtzController::Local, m_ptzController));
+    QnPtzControllerPtr fisheyeController;
+    fisheyeController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
+    fisheyeController.reset(new QnPresetPtzController(fisheyeController));
+    fisheyeController.reset(new QnTourPtzController(fisheyeController));
+    fisheyeController.reset(new QnActivityPtzController(QnActivityPtzController::Local, fisheyeController));
+
     if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {
         serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
-        m_ptzController.reset(new QnFallbackPtzController(serverController, m_ptzController));
+        m_ptzController.reset(new QnFallbackPtzController(fisheyeController, serverController));
+    } else {
+        m_ptzController = fisheyeController;
     }
     connect(m_ptzController, &QnAbstractPtzController::changed, this, &QnMediaResourceWidget::at_ptzController_changed);
 
@@ -235,6 +240,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateButtonsVisibility();
     updateIconButton();
 
+    updateTitleText();
     updateCursor();
     updateFisheye();
     setImageEnhancement(item->imageEnhancement());
@@ -840,8 +846,8 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 QString QnMediaResourceWidget::calculateTitleText() const {
     QnPtzObject activeObject;
     QString activeObjectName;
-    if(m_ptzController->getActiveObject(&activeObject) && getPtzObjectName(m_ptzController, activeObject, &activeObjectName)) {
-        return tr("%1 (%2)").arg(m_resource->toResourcePtr()->getName()).arg(activeObjectName);
+    if(m_ptzController->getActiveObject(&activeObject) && activeObject.type == Qn::TourPtzObject && getPtzObjectName(m_ptzController, activeObject, &activeObjectName)) {
+        return tr("%1 (Tour \"%2\" is active)").arg(m_resource->toResourcePtr()->getName()).arg(activeObjectName);
     } else {
         return m_resource->toResourcePtr()->getName();
     }
@@ -1056,7 +1062,7 @@ void QnMediaResourceWidget::at_zoomRectChanged() {
 void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields) {
     if(fields & Qn::CapabilitiesPtzField)
         updateButtonsVisibility();
-    if(fields & Qn::ActiveObjectPtzField)
+    if(fields & (Qn::ActiveObjectPtzField | Qn::ToursPtzField))
         updateTitleText();
 }
 

@@ -47,6 +47,7 @@ void QnAbstractPtzDialog::setController(const QnPtzControllerPtr &controller) {
 
     if (m_controller) {
         connect(m_controller, &QnAbstractPtzController::finished, this, &QnAbstractPtzDialog::at_controller_finished);
+        connect(m_controller, &QnAbstractPtzController::changed,  this, &QnAbstractPtzDialog::at_controller_changed);
         synchronize(tr("Loading..."));
     }
 }
@@ -155,6 +156,15 @@ bool QnAbstractPtzDialog::removeTour(const QString &tourId) {
     return m_controller->removeTour(tourId);
 }
 
+bool QnAbstractPtzDialog::updateHomePosition(const QnPtzObject &homePosition) {
+    if (!m_controller)
+        return false;
+
+    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+        m_commands.insert(Qn::UpdateHomeObjectPtzCommand, 0);
+    return m_controller->updateHomeObject(homePosition);
+}
+
 void QnAbstractPtzDialog::at_controller_finished(Qn::PtzCommand command, const QVariant &data) {
     if (m_commands.isEmpty())
         return;
@@ -173,6 +183,10 @@ void QnAbstractPtzDialog::at_controller_finished(Qn::PtzCommand command, const Q
 
     if (m_commands.isEmpty()) 
         emit synchronized();
+}
+
+void QnAbstractPtzDialog::at_controller_changed(Qn::PtzDataFields fields) {
+    updateFields(fields);
 }
 
 Qn::PtzCapabilities QnAbstractPtzDialog::capabilities() {

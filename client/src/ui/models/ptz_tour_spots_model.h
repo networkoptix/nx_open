@@ -13,6 +13,7 @@ class QnPtzTourSpotsModel : public QAbstractTableModel
     typedef QAbstractTableModel base_type;
 public:
     enum Column {
+        NumberColumn,
         NameColumn,
         TimeColumn,
         SpeedColumn,

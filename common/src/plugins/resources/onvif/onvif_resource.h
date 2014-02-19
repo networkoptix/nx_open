@@ -159,8 +159,8 @@ public:
     QString getImagingUrl() const;
     void setImagingUrl(const QString& src);
 
-    QString getPtzfUrl() const;
-    void setPtzfUrl(const QString& src);
+    QString getPtzUrl() const;
+    void setPtzUrl(const QString& src);
 
     QString getPtzConfigurationToken() const;
     void setPtzConfigurationToken(const QString &src);

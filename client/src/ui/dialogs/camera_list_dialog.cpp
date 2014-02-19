@@ -39,15 +39,15 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     m_model->setResources(qnResPool->getAllEnabledCameras());
     */
 
-    connect(m_model,  &QnCameraListModel::serverChanged, this, &QnCameraListDialog::at_modelChanged);
-    connect(m_resourceSearch,  SIGNAL(criteriaChanged()), this, SLOT(at_modelChanged()) );
-    connect(m_resourceSearch,  SIGNAL(modelReset()), this, SLOT(at_modelChanged()) );
+    connect(m_model,            &QnCameraListModel::serverChanged,              this, &QnCameraListDialog::at_modelChanged);
+    connect(m_resourceSearch,   &QnResourceSearchProxyModel::criteriaChanged,   this, &QnCameraListDialog::at_modelChanged);
+    connect(m_resourceSearch,   &QnResourceSearchProxyModel::modelReset,        this, &QnCameraListDialog::at_modelChanged);
     m_resourceSearch->setSourceModel(m_model);
     m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(lit("*"),Qt::CaseInsensitive, QRegExp::Wildcard)));
 
-    connect(ui->SearchString, SIGNAL(textChanged(const QString &)), this, SLOT(at_searchStringChanged(const QString &)));
-    connect(ui->gridCameras,  SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(at_customContextMenuRequested(const QPoint &)));
-    connect(ui->gridCameras,  SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(at_gridDoubleClicked(const QModelIndex &)));
+    connect(ui->SearchString,   &QLineEdit::textChanged,                    this,   &QnCameraListDialog::at_searchStringChanged);
+    connect(ui->gridCameras,    &QTableView::customContextMenuRequested,    this,   &QnCameraListDialog::at_customContextMenuRequested);
+    connect(ui->gridCameras,    &QTableView::doubleClicked,                 this,   &QnCameraListDialog::at_gridDoubleClicked);
 
     ui->gridCameras->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->gridCameras->setModel(m_resourceSearch);
@@ -60,9 +60,9 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     m_selectAllAction   = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(QKeySequence::SelectAll);
 
-    connect(m_clipboardAction,      SIGNAL(triggered()),                this, SLOT(at_copyToClipboard()));
-    connect(m_exportAction,         SIGNAL(triggered()),                this, SLOT(at_exportAction()));
-    connect(m_selectAllAction,      SIGNAL(triggered()),                ui->gridCameras, SLOT(selectAll()));
+    connect(m_clipboardAction,  &QAction::triggered,                        this,   &QnCameraListDialog::at_copyToClipboard);
+    connect(m_exportAction,     &QAction::triggered,                        this,   &QnCameraListDialog::at_exportAction);
+    connect(m_selectAllAction,  &QAction::triggered,                        ui->gridCameras, &QTableView::selectAll);
 
     ui->gridCameras->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 

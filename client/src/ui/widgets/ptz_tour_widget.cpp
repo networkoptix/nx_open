@@ -18,8 +18,7 @@ QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
 
     ui->tableView->setModel(m_model);
     ui->tableView->horizontalHeader()->setVisible(true);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourSpotsModel::TimeColumn, QHeaderView::Fixed);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourSpotsModel::SpeedColumn, QHeaderView::Fixed);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourSpotsModel::NameColumn, QHeaderView::Stretch);
 
     ui->tableView->installEventFilter(this);

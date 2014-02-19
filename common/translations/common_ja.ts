@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt_BR" sourcelanguage="en">
+<TS version="2.1" language="ja" sourcelanguage="en">
 <context>
     <name>CommunicatingSocket</name>
     <message>
@@ -23,13 +23,13 @@
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>Português do Brasil</translation>
+        <translation>日本語</translation>
     </message>
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="156"/>
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>pt-BR</translation>
+        <translation>ja</translation>
     </message>
 </context>
 <context>
@@ -475,7 +475,6 @@
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -490,14 +489,12 @@
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_strings_helper.cpp" line="312"/>
         <source>No video frame received during last %n seconds.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>

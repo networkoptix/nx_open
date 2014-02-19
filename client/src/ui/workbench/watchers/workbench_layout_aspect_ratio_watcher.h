@@ -14,8 +14,9 @@ public:
     ~QnWorkbenchLayoutAspectRatioWatcher();
 
 private slots:
-    void at_renderWatcher_displayingChanged(QnResourceWidget *widget);
+    void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_resourceWidget_aspectRatioChanged();
+    void at_resourceWidget_destroyed();
     void at_workbench_currentLayoutChanged();
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_watchedLayout_cellAspectRatioChanged();

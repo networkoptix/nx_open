@@ -37,6 +37,16 @@ protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
+    enum OverlayText {
+        NoDataText,
+        OfflineText,
+        ServerOfflineText,
+        UnauthorizedText,
+        UnauthorizedSubText,
+        LoadingText,
+        TextCount
+    };
+
     void paintFlashingText(QPainter *painter, const QStaticText &text, qreal textSize, const QPointF &offset = QPointF());
 
     void updateLayout();
@@ -45,16 +55,10 @@ private:
 private:
     QSharedPointer<QnPausedPainter> m_pausedPainter;
     QSharedPointer<QnLoadingProgressPainter> m_loadingProgressPainter;
-
-    // TODO: #Elric share these.
-    QStaticText m_noDataStaticText;
-    QStaticText m_offlineStaticText;
-    QStaticText m_serverOfflineStaticText;
-    QStaticText m_unauthorizedStaticText;
-    QStaticText m_unauthorizedStaticSubText;
-    QStaticText m_loadingStaticText;
-
     Qn::ResourceStatusOverlay m_statusOverlay;
+
+    boost::array<QStaticText, TextCount> m_staticTexts;
+    QFont m_staticFont;
 
     bool m_diagnosticsVisible;
     QnTextButtonWidget *m_diagnosticsButton;

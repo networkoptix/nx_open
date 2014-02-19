@@ -3,10 +3,12 @@
 #include <common/common_globals.h>
 
 #include <ui/style/globals.h>
+#include <ui/dialogs/message_box.h>
 #include <utils/common/container.h>
 
 QnPtzManageModel::QnPtzManageModel(QObject *parent) :
-    base_type(parent)
+    base_type(parent),
+    m_homePositionChanged(false)
 {
 }
 
@@ -37,11 +39,12 @@ void QnPtzManageModel::addTour() {
 
     beginInsertRows(QModelIndex(), firstRow, lastRow);
     m_tours << tr("New Tour %1").arg(m_tours.size() + 1);
+    m_tours.last().modified = true;
     endInsertRows();
 }
 
 void QnPtzManageModel::removeTour(const QString &id) {
-    int idx = qnIndexOf(m_tours, [&](const QnPtzTourItemModel &model) { return model.tour.id == id; });
+    int idx = tourIndex(id);
     if (idx < 0)
         return;
 
@@ -97,13 +100,14 @@ void QnPtzManageModel::addPreset() {
 
     beginInsertRows(QModelIndex(), firstRow, lastRow);
     m_presets << tr("Saved Position %1").arg(m_presets.size() + 1);
+    m_presets.last().modified = true;
     endInsertRows();
 
     updatePresetsCache();
 }
 
 void QnPtzManageModel::removePreset(const QString &id) {
-    int idx = qnIndexOf(m_presets, [&](const QnPtzPresetItemModel &model) { return model.preset.id == id; });
+    int idx = presetIndex(id);
     if (idx < 0)
         return;
 
@@ -135,10 +139,28 @@ const QString QnPtzManageModel::homePosition() const {
 }
 
 void QnPtzManageModel::setHomePosition(const QString &homePosition) {
+    setHomePositionInternal(homePosition, false);
+}
+
+bool QnPtzManageModel::isHomePositionChanged() const {
+    return m_homePositionChanged;
+}
+
+void QnPtzManageModel::setHomePositionInternal(const QString &homePosition, bool setChanged) {
     if (m_homePosition == homePosition)
         return;
+
+    int oldPos = rowNumber(rowData(m_homePosition));
+
     m_homePosition = homePosition;
-    emit dataChanged(index(0, HomeColumn), index(rowCount(), HomeColumn));
+    m_homePositionChanged = setChanged;
+
+    int newPos = rowNumber(rowData(m_homePosition));
+
+    if (oldPos >= 0)
+        emit dataChanged(index(oldPos, HomeColumn), index(oldPos, HomeColumn));
+    if (newPos >= 0)
+        emit dataChanged(index(newPos, HomeColumn), index(newPos, HomeColumn));
 }
 
 int QnPtzManageModel::rowCount(const QModelIndex &parent) const {
@@ -206,24 +228,9 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
     RowData data = rowData(index.row());
 
     if (role == Qt::CheckStateRole && index.column() == HomeColumn) {
-        if (value.toInt() == Qt::Checked) {
-            switch (data.rowType) {
-            case QnPtzManageModel::PresetRow:
-                m_homePosition = data.presetModel.preset.id;
-                break;
-            case QnPtzManageModel::TourRow:
-                m_homePosition = data.tourModel.tour.id;
-                break;
-            default:
-                return false;
-            }
-        } else {
-            m_homePosition = QString();
-        }
-
-        emit dataChanged(index.sibling(0, HomeColumn), index.sibling(rowCount() - 1, HomeColumn));
+        bool checked = (value.toInt() == Qt::Checked);
+        setHomePositionInternal(checked ? data.id() : QString(), true);
         return true;
-
     } else if (role == Qt::EditRole && index.column() == HotkeyColumn) {
 
         bool ok = false;
@@ -231,39 +238,82 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
         if(!ok || hotkey > 9)
             return false;
 
-        QString id;
-        switch (data.rowType) {
-        case QnPtzManageModel::PresetRow:
-            id = data.presetModel.preset.id;
-            break;
-        case QnPtzManageModel::TourRow:
-            id = data.tourModel.tour.id;
-            break;
-        default:
-            return false;
+        // preset that is assigned to this hotkey
+        QnPtzManageModel::RowData existing;
+        int existingIndex = -1;
+        if (hotkey != QnPtzHotkey::NoHotkey) {
+            QString id = m_hotkeys[hotkey];
+            existingIndex = presetIndex(id);
+            if (existingIndex == -1) {
+                existingIndex = tourIndex(id);
+                if (existingIndex != -1) {
+                    existing.rowType = TourRow;
+                    existing.tourModel = m_tours[existingIndex];
+                }
+            } else {
+                existing.rowType = PresetRow;
+                existing.presetModel = m_presets[existingIndex];
+            }
         }
 
-        // hotkey that was assigned to this preset
-        int oldHotkey = m_hotkeys.key(id, QnPtzHotkey::NoHotkey);
-        if (oldHotkey == hotkey)
-            return false;
+        if (existing.rowType != InvalidRow) {
+            QString message = (existing.rowType == PresetRow)
+                              ? tr("This hotkey is used by preset \"%1\"").arg(existing.presetModel.preset.name)
+                              : tr("This hotkey is used by tour \"%1\"").arg(existing.tourModel.tour.name);
 
-        // preset that is assigned to this hotkey
-        QString existing;
-        if (hotkey != QnPtzHotkey::NoHotkey)
-            existing = m_hotkeys[hotkey];
+            QnMessageBox messageBox(QnMessageBox::Question, 0, tr("Change hotkey"), message, QnMessageBox::Cancel);
+            messageBox.addButton(tr("Reassign"), QnMessageBox::AcceptRole);
 
-        // set old hotkey to an existing preset (or empty)
-        if (oldHotkey != QnPtzHotkey::NoHotkey)
-            m_hotkeys[oldHotkey] = existing;
+            if (messageBox.exec() == QnMessageBox::Cancel)
+                return false;
+        }
+
+        // we are removing hotkey from the old location. Mark it modified
+        switch (existing.rowType) {
+        case PresetRow:
+            if (existingIndex >= 0)
+                m_presets[existingIndex].modified = true;
+            break;
+        case TourRow:
+            if (existingIndex >= 0)
+                m_tours[existingIndex].modified = true;
+            break;
+        default:
+            break;
+        }
+
+        // mark the new location as modified
+        QString id;
+        switch (data.rowType) {
+        case PresetRow: {
+            int currentIndex = presetIndex(data.presetModel.preset.id);
+            if (currentIndex >= 0)
+                m_presets[currentIndex].modified = true;
+            id = data.presetModel.preset.id;
+            break;
+        }
+        case TourRow: {
+            int currentIndex = tourIndex(data.tourModel.tour.id);
+            if (currentIndex >= 0)
+                m_tours[currentIndex].modified = true;
+            id = data.tourModel.tour.id;
+            break;
+        }
+        default:
+            break;
+        }
 
         // set updated hotkey
         if (hotkey != QnPtzHotkey::NoHotkey)
             m_hotkeys[hotkey] = id;
 
-        //TODO: update only affected rows? low priority
-        //TODO: do not clear existing hotkey, highlight duplicated instead and do not allow to save them
-        emit dataChanged(index.sibling(0, HotkeyColumn), index.sibling(rowCount() - 1, HotkeyColumn)); 
+        emit dataChanged(index, index);
+        emit dataChanged(index.sibling(index.row(), ModifiedColumn), index.sibling(index.row(), ModifiedColumn));
+
+        int existingRow = rowNumber(existing);
+        emit dataChanged(index.sibling(existingRow, HotkeyColumn), index.sibling(existingRow, HotkeyColumn));
+        emit dataChanged(index.sibling(existingRow, ModifiedColumn), index.sibling(existingRow, ModifiedColumn));
+
         return true;
     } else if (role == Qt::EditRole && index.column() == NameColumn) {
         QString newName = value.toString().trimmed();
@@ -273,7 +323,7 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
         switch (data.rowType) {
         case QnPtzManageModel::PresetRow: 
             {
-                int idx = qnIndexOf(m_presets, [&](const QnPtzPresetItemModel &model) {return data.presetModel.preset.id == model.preset.id; });
+                int idx = presetIndex(data.presetModel.preset.id);
                 if (idx < 0)
                     return false;
                 QnPtzPresetItemModel &model = m_presets[idx];
@@ -285,7 +335,7 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
             }
         case QnPtzManageModel::TourRow:
             {
-                int idx = qnIndexOf(m_tours, [&](const QnPtzTourItemModel &model) {return data.tourModel.tour.id == model.tour.id; });
+                int idx = tourIndex(data.tourModel.tour.id);
                 if (idx < 0)
                     return false;
                 QnPtzTourItemModel &model = m_tours[idx];
@@ -411,6 +461,54 @@ QnPtzManageModel::RowData QnPtzManageModel::rowData(int row) const {
     return result;
 }
 
+QnPtzManageModel::RowData QnPtzManageModel::rowData(const QString &id, int *index) const {
+    RowData rowData;
+
+    int idx = presetIndex(id);
+    if (idx >= 0) {
+        rowData.rowType = PresetRow;
+        rowData.presetModel = m_presets[idx];
+    } else {
+        idx = tourIndex(id);
+        if (idx >= 0) {
+            rowData.rowType = TourRow;
+            rowData.tourModel = m_tours[idx];
+        }
+    }
+    if (idx >= 0 && index)
+        *index = idx;
+
+    return rowData;
+}
+
+int QnPtzManageModel::rowNumber(const QnPtzManageModel::RowData &rowData) const {
+    if (rowData.rowType == PresetTitleRow)
+        return 0;
+
+    int offset = 1;
+    if (rowData.rowType == PresetRow) {
+        int idx = presetIndex(rowData.presetModel.preset.id);
+        if (idx < 0)
+            return -1;
+        return offset + idx;
+    }
+
+    offset += m_presets.size();
+
+    if (rowData.rowType == TourRow)
+        return offset;
+
+    ++offset;
+    if (rowData.rowType == TourRow) {
+        int idx = tourIndex(rowData.tourModel.tour.id);
+        if (idx < 0)
+            return -1;
+        return offset + idx;
+    }
+
+    return -1;
+}
+
 QVariant QnPtzManageModel::titleData(RowType rowType,  int column, int role) const {
     switch(role) {
     case Qt::DisplayRole:
@@ -458,11 +556,14 @@ QVariant QnPtzManageModel::presetData(const QnPtzPresetItemModel &presetModel, i
             return presetModel.modified ? QLatin1String("*") : QString();
         case NameColumn:
             return presetModel.preset.name;
-        case HotkeyColumn: 
-            {
-                int hotkey = m_hotkeys.key(presetModel.preset.id, QnPtzHotkey::NoHotkey);
-                return hotkey < 0 ? tr("None") : QString::number(hotkey);
-            }
+        case HotkeyColumn: {
+            int hotkey = m_hotkeys.key(presetModel.preset.id, QnPtzHotkey::NoHotkey);
+            return hotkey < 0 ? tr("None") : QString::number(hotkey);
+        }
+        case HomeColumn:
+            if (role == Qt::ToolTipRole)
+                return tr("This preset will be activated if PTZ is not changed for %n minutes", 0, 5); // TODO: #Elric #PTZ use value from PTZ
+            break;
         case DetailsColumn:
             return QVariant();
         default:
@@ -505,24 +606,26 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
                 int hotkey = m_hotkeys.key(tourModel.tour.id, QnPtzHotkey::NoHotkey);
                 return hotkey < 0 ? tr("None") : QString::number(hotkey);
             }
-        case DetailsColumn:
-            if (tourIsValid(tourModel)) {
-                qint64 time = estimatedTimeSecs(tourModel.tour);
-                return tr("Tour time: %1").arg((time < 60) ? tr("less than a minute") : tr("about %n minutes", 0, time / 60));
-            }
-                //TODO: more detailed message required: 
-            // - tour require at least two different positions
-            // - there shouldn't be two same positions in a row
-            // - etc.
-            return tr("Invalid tour");
+        case DetailsColumn: {
+            QString tourStateString;
+            tourState(tourModel, &tourStateString);
+            return tourStateString;
+        }
         default:
             break;
         }
         return QVariant();
 
     case Qt::BackgroundRole:
-        if (!tourIsValid(tourModel))
+        switch (tourState(tourModel)) {
+        case IncompleteTour:
+        case OtherInvalidTour:
             return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
+        case DuplicatedLinesTour:
+            return QBrush(Qt::yellow);
+        default:
+            break;
+        }
         break;
     case Qt::CheckStateRole:
         if (column == HomeColumn)
@@ -539,8 +642,48 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
     return QVariant();
 }
 
+int QnPtzManageModel::presetIndex(const QString &id) const {
+    return qnIndexOf(m_presets, [&](const QnPtzPresetItemModel &model) {return id == model.preset.id; });
+}
+
+int QnPtzManageModel::tourIndex(const QString &id) const {
+    return qnIndexOf(m_tours, [&](const QnPtzTourItemModel &model) {return id == model.tour.id; });
+}
+
 bool QnPtzManageModel::tourIsValid(const QnPtzTourItemModel &tourModel) const {
     return tourModel.tour.isValid(m_ptzPresetsCache);
+}
+
+QnPtzManageModel::TourState QnPtzManageModel::tourState(const QnPtzTourItemModel &tourModel, QString *stateString) const {
+    if (tourModel.tour.spots.size() < 2) {
+        if (stateString)
+            *stateString = tr("Tour should contain at least 2 positions");
+        return IncompleteTour;
+    } else {
+        for (int i = 1; i < tourModel.tour.spots.size(); ++i) {
+            if (tourModel.tour.spots[i].presetId == tourModel.tour.spots[i - 1].presetId) {
+                int startPos = i++;
+                while (i < tourModel.tour.spots.size() && tourModel.tour.spots[i].presetId == tourModel.tour.spots[i - 1].presetId) {
+                    ++i;
+                }
+                if (stateString)
+                    *stateString = tr("Tour has %n same positions in a row at %1", 0, i - startPos + 1).arg(startPos);
+                return DuplicatedLinesTour;
+            }
+        }
+    }
+
+    if (tourIsValid(tourModel)) {
+        if (stateString) {
+            qint64 time = estimatedTimeSecs(tourModel.tour);
+            *stateString = tr("Tour time: %1").arg((time < 60) ? tr("less than a minute") : tr("about %n minutes", 0, time / 60));
+        }
+        return ValidTour;
+    } else {
+        if (stateString)
+            *stateString = tr("Inalid tour");
+        return OtherInvalidTour;
+    }
 }
 
 void QnPtzManageModel::updatePresetsCache() {
@@ -562,7 +705,7 @@ bool QnPtzManageModel::synchronized() const {
             return false;
     }
 
-    return true;
+    return m_removedPresets.isEmpty() && m_removedTours.isEmpty() && !m_homePositionChanged;
 }
 
 Q_SLOT void QnPtzManageModel::setSynchronized() {
@@ -584,4 +727,49 @@ Q_SLOT void QnPtzManageModel::setSynchronized() {
 
     m_removedPresets.clear();
     m_removedTours.clear();
+}
+
+
+QString QnPtzManageModel::RowData::id() const {
+    switch (rowType) {
+    case PresetRow:
+        return presetModel.preset.id;
+    case TourRow:
+        return tourModel.tour.id;
+    default:
+        return QString();
+    }
+}
+
+QString QnPtzManageModel::RowData::name() const {
+    switch (rowType) {
+    case PresetRow:
+        return presetModel.preset.name;
+    case TourRow:
+        return tourModel.tour.name;
+    default:
+        return QString();
+    }
+}
+
+bool QnPtzManageModel::RowData::modified() const {
+    switch (rowType) {
+    case PresetRow:
+        return presetModel.modified;
+    case TourRow:
+        return tourModel.modified;
+    default:
+        return false;
+    }
+}
+
+bool QnPtzManageModel::RowData::local() const {
+    switch (rowType) {
+    case PresetRow:
+        return presetModel.local;
+    case TourRow:
+        return tourModel.local;
+    default:
+        return false;
+    }
 }

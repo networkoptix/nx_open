@@ -8,6 +8,7 @@
 #include <QtWidgets/QMessageBox>
 
 #include <common/common_globals.h>
+#include <client/client_settings.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -18,6 +19,8 @@
 #include <ui/common/ui_resource_name.h>
 #include <ui/models/ptz_manage_model.h>
 #include <ui/widgets/ptz_tour_widget.h>
+#include <ui/dialogs/checkable_message_box.h>
+#include <ui/dialogs/message_box.h>
 
 #include <utils/common/event_processors.h>
 #include <utils/resource_property_adaptors.h>
@@ -93,6 +96,9 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_tableViewport_resizeEvent()), Qt::QueuedConnection);
 
     connect(m_model,    &QnPtzManageModel::presetsChanged,  ui->tourEditWidget, &QnPtzTourWidget::setPresets);
+    connect(m_model,    &QnPtzManageModel::presetsChanged,  this,               &QnPtzManageDialog::updateUi);
+    connect(m_model,    &QnPtzManageModel::dataChanged,     this,               &QnPtzManageDialog::updateUi);
+    connect(m_model,    &QnPtzManageModel::modelReset,      this,               &QnPtzManageDialog::updateUi);
     connect(this,       &QnAbstractPtzDialog::synchronized, m_model,            &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
 
@@ -103,21 +109,10 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(ui->deleteButton,       &QPushButton::clicked,  this,   &QnPtzManageDialog::at_deleteButton_clicked);
 
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked,   this, &QnAbstractPtzDialog::saveChanges);
-    //TODO: enable and disable various gui elements:
-    /*
-        - Apply - only if there are some changes
-        - GoToPosition - if there is a selected position or a tour spot
-        - CreateTour - if there is at least one position
-        - ActivateTour - if there is a selected tour
-        - Apply
-    */
 
     //TODO: implement preview receiving and displaying
 
     //TODO: handle HomePosition
-    //TODO: handle resource switching ("Save changes? Yes/No/Cancel")
-    //TODO: Show warning if Home Position is set (ask Borya about text)
-    //TODO: handle new positions added from the context menu (controller->changed() signal, Elric will implement controller side himself)
     //TODO: think about forced refresh in some cases or even a button - low priority
 }
 
@@ -182,11 +177,9 @@ bool QnPtzManageDialog::saveTours() {
         if (!model.modified)
             continue;
 
-        QnPtzTour updated(model.tour);
-        if (!model.local)
-            result &= removeTour(updated.id);
-
-        result &= createTour(updated);
+        /* There is no need to remove the tour first as it will be updated 
+         * in-place if it already exists. */
+        result &= createTour(model.tour);
     }
 
     foreach (const QString &id, m_model->removedTours())
@@ -195,10 +188,31 @@ bool QnPtzManageDialog::saveTours() {
     return result;
 }
 
+bool QnPtzManageDialog::saveHomePosition() {
+    if (!m_model->isHomePositionChanged())
+        return false;
+
+    QnPtzManageModel::RowData rowData = m_model->rowData(m_model->homePosition());
+    QnPtzObject homePosition;
+    switch (rowData.rowType) {
+    case QnPtzManageModel::PresetRow:
+        homePosition = QnPtzObject(Qn::PresetPtzObject, rowData.id());
+        break;
+    case QnPtzManageModel::TourRow:
+        homePosition = QnPtzObject(Qn::TourPtzObject, rowData.id());
+        break;
+    default:
+        return false;
+    }
+
+    return updateHomePosition(homePosition);
+}
+
 void QnPtzManageDialog::saveData() {
     if (!m_model->synchronized()) {
         savePresets();
         saveTours();
+        saveHomePosition();
     }
 
     if (m_resource) {
@@ -209,6 +223,28 @@ void QnPtzManageDialog::saveData() {
 
 Qn::PtzDataFields QnPtzManageDialog::requiredFields() const {
     return Qn::PresetsPtzField | Qn::ToursPtzField | Qn::HomeObjectPtzField;
+}
+
+void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
+    // TODO: #dklychkov make incremental changes instead of resetting the model (low priority)
+
+    if (fields.testFlag(Qn::PresetsPtzField)) {
+        QnPtzPresetList presets;
+        if (controller()->getPresets(&presets))
+            m_model->setPresets(presets);
+    }
+
+    if (fields.testFlag(Qn::ToursPtzField)) {
+        QnPtzTourList tours;
+        if (controller()->getTours(&tours))
+            m_model->setTours(tours);
+    }
+
+    if (fields.testFlag(Qn::HomeObjectPtzField)) {
+        QnPtzObject homeObject;
+        if (controller()->getHomeObject(&homeObject))
+            m_model->setHomePosition(homeObject.id);
+    }
 }
 
 void QnPtzManageDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
@@ -250,7 +286,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked() {
     }
 
     m_model->addPreset();
-    saveChanges();
+    saveChanges(); // TODO: #dklychkov remove it from here and implement presets creation in some other way
 }
 
 void QnPtzManageDialog::at_goToPositionButton_clicked() {
@@ -342,10 +378,44 @@ void QnPtzManageDialog::at_deleteButton_clicked() {
 
     QnPtzManageModel::RowData data = m_model->rowData(index.row());
     switch (data.rowType) {
-    case QnPtzManageModel::PresetRow:
-        //TODO: check if this preset is used in some tours and show a warning message (Ok/Cancel, optionally: "Do not show anymore", session-only)
+    case QnPtzManageModel::PresetRow: {
+        bool presetIsInUse = false;
+
+        foreach (const QnPtzTourItemModel &tourModel, m_model->tourModels()) {
+            foreach (const QnPtzTourSpot &spot, tourModel.tour.spots) {
+                if (spot.presetId == data.presetModel.preset.id) {
+                    presetIsInUse = true;
+                    break;
+                }
+            }
+
+            if (presetIsInUse)
+                break;
+        }
+
+        if (presetIsInUse) {
+            bool ignorePresetIsInUse = qnSettings->isPtzPresetInUseWarningDisabled();
+            if (!ignorePresetIsInUse) {
+                QDialogButtonBox::StandardButton button = QnCheckableMessageBox::warning(
+                    this,
+                    tr("Remove preset"),
+                    tr("This preset is used in some tours.\nIf you remove it some tours will become invalid."),
+                    tr("Do not show again."),
+                    &ignorePresetIsInUse,
+                    QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                    QDialogButtonBox::Cancel
+                );
+
+                qnSettings->setPtzPresetInUseWarningDisabled(ignorePresetIsInUse);
+
+                if (button == QDialogButtonBox::Cancel)
+                    break;
+            }
+        }
+
         m_model->removePreset(data.presetModel.preset.id);
         break;
+    }
     case QnPtzManageModel::TourRow:
         m_model->removeTour(data.tourModel.tour.id);
         break;
@@ -379,17 +449,42 @@ void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     setWindowTitle(tr("Manage PTZ for %1").arg(getResourceName(m_resource)));
 }
 
-//TODO: call and connect in required places
+bool QnPtzManageDialog::isModified() const {
+    return !m_model->synchronized();
+}
+
+void QnPtzManageDialog::chechForUnsavedChanges() {
+    // TODO: #dklychkov finish implementation
+    if (isModified()) {
+        show();
+        QnMessageBox::StandardButton button = QnMessageBox::question(this, 0, tr("PTZ configuration is not saved"), tr("Changes are not saved. Save them?"),
+                                                                     QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, QnMessageBox::Yes);
+        switch (button) {
+        case QnMessageBox::Ok:
+            saveChanges();
+            break;
+        case QnMessageBox::Cancel:
+            return;
+        default:
+            break;
+        }
+    }
+}
+
 void QnPtzManageDialog::updateUi() {
     ui->addTourButton->setEnabled(!m_model->presetModels().isEmpty());
 
-    QnPtzManageModel::RowType selectedRow = QnPtzManageModel::InvalidRow;
     QModelIndex index = ui->tableView->selectionModel()->currentIndex();
+    QnPtzManageModel::RowData selectedRow;
     if (index.isValid())
-        selectedRow = m_model->rowData(index.row()).rowType;
+        selectedRow = m_model->rowData(index.row());
 
-    ui->deleteButton->setEnabled(selectedRow == QnPtzManageModel::PresetRow || selectedRow == QnPtzManageModel::TourRow);
-    ui->goToPositionButton->setEnabled(selectedRow == QnPtzManageModel::PresetRow || selectedRow == QnPtzManageModel::TourRow);
-    ui->startTourButton->setEnabled(selectedRow == QnPtzManageModel::TourRow);
-    //TODO: add other buttons;
+    bool isPreset = selectedRow.rowType == QnPtzManageModel::PresetRow;
+    bool isTour = selectedRow.rowType == QnPtzManageModel::TourRow;
+
+    ui->previewGroupBox->setEnabled(isPreset || isTour);
+    ui->deleteButton->setEnabled(isPreset || isTour);
+    ui->goToPositionButton->setEnabled(isPreset || isTour);
+    ui->startTourButton->setEnabled(isTour);
+    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(isModified());
 }
