@@ -412,22 +412,16 @@ void QnNotificationsCollectionWidget::hideBusinessAction(const QnAbstractBusines
 }
 
 QnNotificationWidget* QnNotificationsCollectionWidget::findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
-    QList<QnNotificationWidget*> items = m_itemsByMessageType.values(message);
-    foreach (QnNotificationWidget* item, items) {
-        if (resource != item->property(itemResourcePropertyName).value<QnResourcePtr>())
-            continue;
-        return item;
-    }
+    foreach (QnNotificationWidget *item, m_itemsByMessageType.values(message))
+        if (!resource || resource == item->property(itemResourcePropertyName).value<QnResourcePtr>())
+            return item;
     return NULL;
 }
 
 QnNotificationWidget* QnNotificationsCollectionWidget::findItem(int businessRuleId, const QnResourcePtr &resource) {
-    QList<QnNotificationWidget*> items = m_itemsByBusinessRuleId.values(businessRuleId);
-    foreach (QnNotificationWidget* item, items) {
-        if (resource != item->property(itemResourcePropertyName).value<QnResourcePtr>())
-            continue;
-        return item;
-    }
+    foreach (QnNotificationWidget *item, m_itemsByBusinessRuleId.values(businessRuleId))
+        if (!resource || resource == item->property(itemResourcePropertyName).value<QnResourcePtr>())
+            return item;
     return NULL;
 }
 
