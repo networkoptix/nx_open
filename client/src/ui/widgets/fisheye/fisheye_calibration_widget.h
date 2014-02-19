@@ -45,6 +45,8 @@ private slots:
 
     void at_imageProvider_imageChanged();
 
+    void at_updateTimer_timeout();
+
     void at_xCenterSlider_valueChanged(int value);
     void at_yCenterSlider_valueChanged(int value);
     void at_radiusSlider_valueChanged(int value);
