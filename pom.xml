@@ -229,12 +229,6 @@
                 <module>build_variables</module>
                 <module>appserver</module>
                 <module>common</module>
-                <!--<module>plugins/axiscamplugin</module>-->
-                <module>plugins/genericrtspplugin</module>
-                <module>plugins/image_library_plugin</module>
-                <module>plugins/mjpg_link</module>
-                <module>mediaserver</module>
-                <module>mediaproxy</module>
                 <!-- <module>testcamera</module> -->
             </modules>
         </profile> 
@@ -246,6 +240,15 @@
                     <family>!mac</family>
                 </os> 
             </activation>
+            <modules>
+                <!--<module>plugins/axiscamplugin</module>-->
+                <module>plugins/genericrtspplugin</module>
+                <module>plugins/image_library_plugin</module>
+                <module>plugins/mjpg_link</module>
+                <module>mediaserver</module>
+                <module>mediaproxy</module>
+                <!-- <module>testcamera</module> -->
+            </modules>            
             <properties>
                 <additional.compiler>${compiler}</additional.compiler>         
             </properties>
