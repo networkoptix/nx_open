@@ -20,6 +20,7 @@
 #include <ui/models/ptz_manage_model.h>
 #include <ui/widgets/ptz_tour_widget.h>
 #include <ui/dialogs/checkable_message_box.h>
+#include <ui/dialogs/message_box.h>
 
 #include <utils/common/event_processors.h>
 #include <utils/resource_property_adaptors.h>
@@ -108,11 +109,6 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(ui->deleteButton,       &QPushButton::clicked,  this,   &QnPtzManageDialog::at_deleteButton_clicked);
 
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked,   this, &QnAbstractPtzDialog::saveChanges);
-    //TODO: enable and disable various gui elements:
-    /*
-        - Apply - only if there are some changes
-        - CreateTour - if there is at least one position
-    */
 
     //TODO: implement preview receiving and displaying
 
@@ -443,7 +439,30 @@ bool QnPtzManageDialog::isModified() const {
         if (presetModel.modified)
             return true;
     }
+    if (!m_model->removedPresets().isEmpty())
+        return true;
+    if (!m_model->removedTours().isEmpty())
+        return true;
+
     return false;
+}
+
+void QnPtzManageDialog::chechForUnsavedChanges() {
+    // TODO: #dklychkov finish implementation
+    if (isModified()) {
+        show();
+        QnMessageBox::StandardButton button = QnMessageBox::question(this, 0, tr("PTZ configuration is not saved"), tr("Changes are not saved. Save them?"),
+                                                                     QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, QnMessageBox::Yes);
+        switch (button) {
+        case QnMessageBox::Ok:
+            saveChanges();
+            break;
+        case QnMessageBox::Cancel:
+            return;
+        default:
+            break;
+        }
+    }
 }
 
 void QnPtzManageDialog::updateUi() {

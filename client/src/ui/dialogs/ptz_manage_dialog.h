@@ -26,6 +26,7 @@ public:
     void setResource(const QnResourcePtr &resource);
 
     bool isModified() const;
+    void chechForUnsavedChanges();
 
 protected:
     virtual void loadData(const QnPtzData &data) override;

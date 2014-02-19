@@ -38,6 +38,7 @@ void QnPtzManageModel::addTour() {
 
     beginInsertRows(QModelIndex(), firstRow, lastRow);
     m_tours << tr("New Tour %1").arg(m_tours.size() + 1);
+    m_tours.last().modified = true;
     endInsertRows();
 }
 
@@ -98,6 +99,7 @@ void QnPtzManageModel::addPreset() {
 
     beginInsertRows(QModelIndex(), firstRow, lastRow);
     m_presets << tr("Saved Position %1").arg(m_presets.size() + 1);
+    m_presets.last().modified = true;
     endInsertRows();
 
     updatePresetsCache();
@@ -529,6 +531,8 @@ QVariant QnPtzManageModel::presetData(const QnPtzPresetItemModel &presetModel, i
         case ModifiedColumn:
             return presetModel.modified ? QLatin1String("*") : QString();
         case NameColumn:
+            if (role == Qt::ToolTipRole)
+                return tr("This preset will be activated if PTZ is not changed for %n minutes", 0, 1); // TODO: #dklychkov Insert proper number here
             return presetModel.preset.name;
         case HotkeyColumn: 
             {
