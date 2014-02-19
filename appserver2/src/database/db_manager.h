@@ -192,6 +192,10 @@ namespace ec2
         qint32 getResourceInternalId( const QnId& guid );
         qint32 getBusinessRuleInternalId( const QnId& guid );
     private:
+        QMap<int, QnId> getGuidList(const QString& request);
+        bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
+        bool updateGuids();
+    private:
         QSqlDatabase m_sdb;
         QReadWriteLock m_mutex;
 		QnResourceFactory* m_resourceFactory;

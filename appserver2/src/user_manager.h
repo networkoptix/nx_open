@@ -31,7 +31,7 @@ namespace ec2
         {
             assert( tran.command == ApiCommand::addUser || tran.command == ApiCommand::updateUser );
             QnUserResourcePtr userResource = m_resCtx.resFactory->createResource(
-                tran.params.typeId,
+                intToGuid(tran.params.typeId),
                 tran.params.toHashMap() ).dynamicCast<QnUserResource>();
             tran.params.toResource( userResource );
             emit addedOrUpdated( userResource );

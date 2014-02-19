@@ -7,7 +7,7 @@ void ApiResourceData::fromResource(const QnResourcePtr& resource)
 {
 	//id = resource->getId();
 	id = resource->getGuid();
-	typeId = resource->getTypeId();
+	typeId = guidToInt(resource->getTypeId());
 	parentGuid = resource->getParentId();
 	name = resource->getName();
 	url = resource->getUrl();
@@ -26,7 +26,7 @@ void ApiResourceData::toResource(QnResourcePtr resource) const
 {
 	resource->setId(id);
 	//resource->setGuid(guid);
-	resource->setTypeId(typeId);
+	resource->setTypeId(intToGuid(typeId));
 	resource->setParentId(parentGuid);
 	resource->setName(name);
 	resource->setUrl(url);
@@ -62,7 +62,7 @@ void ApiResourceDataList::toResourceList( QnResourceFactory* resFactory, QnResou
 	resList.reserve(data.size());
 	for(int i = 0; i < data.size(); ++i) {
         QnResourcePtr res = resFactory->createResource(
-            data[i].typeId,
+            intToGuid(data[i].typeId),
             data[i].toHashMap() ).dynamicCast<QnResource>();
 		data[i].toResource( res );
 		resList << res;

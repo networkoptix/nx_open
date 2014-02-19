@@ -93,8 +93,8 @@ void mergeQnIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vecto
     }
 }
 
-template <class MainData, class SubData, class MainSubData>
-void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subDataList, std::vector<MainSubData> MainData::*subDataListField, QnId SubData::*parentIdField)
+template <class MainData, class SubData, class MainSubData, class IdType>
+void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subDataList, std::vector<MainSubData> MainData::*subDataListField, IdType SubData::*parentIdField)
 {
     int idx = 0;
     foreach(const SubData& subData, subDataList)
@@ -196,16 +196,76 @@ bool QnDbManager::execSQLFile(const QString& fileName)
     return true;
 }
 
+QMap<int, QnId> QnDbManager::getGuidList(const QString& request)
+{
+    QMap<int, QnId>  result;
+    QSqlQuery query(m_sdb);
+    query.prepare(request);
+    if (!query.exec())
+        return result;
+
+    while (query.next())
+    {
+        qint32 id = query.value(0).toInt();
+        QVariant data = query.value(1);
+        if (data.toInt())
+            result.insert(id, intToGuid(data.toInt()));
+        else
+            result.insert(id, QnId(data.toString()));
+    }
+
+    return result;
+}
+
+bool QnDbManager::updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids)
+{
+    for(QMap<int, QnId>::const_iterator itr = guids.begin(); itr != guids.end(); ++itr)
+    {
+        QSqlQuery query(m_sdb);
+        query.prepare(QString("UPDATE %1 SET %2 = :guid WHERE id = :id").arg(tableName).arg(fieldName));
+        query.bindValue(":id", itr.key());
+        query.bindValue(":guid", itr.value().toRfc4122());
+        if (!query.exec())
+            return false;
+    }
+    return true;
+}
+
+bool QnDbManager::updateGuids()
+{
+    QSqlQuery query();
+    QMap<int, QnId> guids = getGuidList("SELECT id, guid from vms_resource_tmp order by id");
+    if (!updateTableGuids("vms_resource", "guid", guids))
+        return false;
+
+    guids = getGuidList("SELECT r.id, r2.guid from vms_resource_tmp r JOIN vms_resource_tmp r2 on r2.id = r.parent_id order by r.id");
+    if (!updateTableGuids("vms_resource", "parent_guid", guids))
+        return false;
+
+    guids = getGuidList("SELECT id, id from vms_businessrule ORDER BY id");
+    if (!updateTableGuids("vms_businessrule", "guid", guids))
+        return false;
+
+    return true;
+}
+
 bool QnDbManager::createDatabase()
 {
+    QnDbTransactionLocker lock(&m_tran);
+
     if (!isObjectExists(lit("table"), lit("vms_resource")))
     {
         if (!execSQLFile(QLatin1String(":/createdb.sql")))
             return false;
-        if (!execSQLFile(QLatin1String(":/update_2.2.sql")))
+        
+        if (!execSQLFile(QLatin1String(":/update_2.2_stage1.sql")))
+            return false;
+        if (!updateGuids())
+            return false;
+        if (!execSQLFile(QLatin1String(":/update_2.2_stage2.sql")))
             return false;
     }
-    
+    lock.commit();
     return true;
 }
 
@@ -1301,7 +1361,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
     }
 
 	data.loadFromQuery(queryTypes);
-    mergeQnIdListData<ApiResourceTypeData>(queryParents, data.data, &ApiResourceTypeData::parentId);
+    mergeIdListData(queryParents, data.data, &ApiResourceTypeData::parentId);
 
     std::vector<ApiPropertyType> allProperties;
     QN_QUERY_TO_DATA_OBJECT(queryProperty, ApiPropertyType, allProperties, ApiPropertyTypeFields);
