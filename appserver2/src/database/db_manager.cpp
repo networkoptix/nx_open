@@ -1314,7 +1314,7 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeList& data)
 {
 	QSqlQuery queryTypes(m_sdb);
-	queryTypes.prepare("select rt.id, rt.name, m.name as manufacture \
+	queryTypes.prepare("select rt.guid as id, rt.name, m.name as manufacture \
 				  from vms_resourcetype rt \
 				  left join vms_manufacture m on m.id = rt.manufacture_id \
 				  order by rt.id");
@@ -1324,14 +1324,21 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
     }
 
 	QSqlQuery queryParents(m_sdb);
-	queryParents.prepare("select from_resourcetype_id as id, to_resourcetype_id as parentId from vms_resourcetype_parents order by from_resourcetype_id, to_resourcetype_id desc");
+	queryParents.prepare("select t1.guid as id, t2.guid as parentId \
+                         from vms_resourcetype_parents p \
+                         JOIN vms_resourcetype t1 on t1.id = p.from_resourcetype_id \
+                         JOIN vms_resourcetype t2 on t2.id = p.to_resourcetype_id \
+                         order by p.from_resourcetype_id, p.to_resourcetype_id desc");
 	if (!queryParents.exec()) {
         qWarning() << Q_FUNC_INFO << queryParents.lastError().text();
 		return ErrorCode::failure;
     }
 
     QSqlQuery queryProperty(m_sdb);
-    queryProperty.prepare("SELECT * FROM vms_propertytype order by resource_type_id");
+    queryProperty.prepare("SELECT rt.guid as resource_type_id, pt.name, pt.type, pt.min, pt.max, pt.step, pt.values, pt.ui_values, pt.default_value, \
+                          pt.netHelper, pt.group, pt.sub_group, pt.description, pt.ui, pt.readonly \
+                          FROM vms_propertytype pt \
+                          JOIN vms_resourcetype rt on rt.id = pt.resource_type_id ORDER BY pt.resource_type_id");
     if (!queryProperty.exec()) {
         qWarning() << Q_FUNC_INFO << queryProperty.lastError().text();
         return ErrorCode::failure;
