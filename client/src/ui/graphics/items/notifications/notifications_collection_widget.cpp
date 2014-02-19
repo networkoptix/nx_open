@@ -500,6 +500,10 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
     setHelpTopic(item, QnBusiness::healthHelpId(message));
 
+    // TODO: #GDM please implement this properly. This code fixes #2892, but in a terribly wrong way =).
+    if(message == QnSystemHealth::ArchiveRebuildFinished)
+        item->setNotificationLevel(Qn::SoundNotification);
+
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)), Qt::QueuedConnection);
 
