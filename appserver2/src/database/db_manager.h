@@ -176,8 +176,7 @@ namespace ec2
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnId& guid );
 
-        ErrorCode insertBusinessRuleTable( const ApiBusinessRuleData& businessRule, qint32* internalId );
-        ErrorCode updateBusinessRuleTable( const ApiBusinessRuleData& businessRule);
+        ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);
         ErrorCode removeBusinessRule( const QnId& id );
 

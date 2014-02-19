@@ -48,7 +48,7 @@ namespace ec2
 
         template<> void triggerNotification<ApiCameraDataList>( const QnTransaction<ApiCameraDataList>& tran )
         {
-            assert( tran.command == ApiCommand::updateCameras );
+            assert( tran.command == ApiCommand::saveCameras );
             foreach(const ApiCameraData& camera, tran.params.data) 
             {
                 QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(

@@ -284,7 +284,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
             
         case ApiCommand::saveCamera:
             return deliveryTransaction<ApiCameraData>(command, stream);
-        case ApiCommand::updateCameras:
+        case ApiCommand::saveCameras:
             return deliveryTransaction<ApiCameraDataList>(command, stream);
         case ApiCommand::removeCamera:
             return deliveryTransaction<ApiIdData>(command, stream);
@@ -301,13 +301,12 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
         case ApiCommand::removeUser:
             return deliveryTransaction<ApiIdData>(command, stream);
 
-        case ApiCommand::addBusinessRule:
-        case ApiCommand::updateBusinessRule:
+        case ApiCommand::saveBusinessRule:
             return deliveryTransaction<ApiBusinessRuleData>(command, stream);
         case ApiCommand::removeBusinessRule:
             return deliveryTransaction<ApiIdData>(command, stream);
 
-        case ApiCommand::addOrUpdateLayouts:
+        case ApiCommand::saveLayouts:
             return deliveryTransaction<ApiLayoutDataList>(command, stream);
         case ApiCommand::saveLayout:
             return deliveryTransaction<ApiLayoutData>(command, stream);

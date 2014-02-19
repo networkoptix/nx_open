@@ -39,7 +39,7 @@ namespace ec2
                     return "getResourceList";
                 case saveCamera:
                     return "saveCamera";
-                case updateCameras:
+                case saveCameras:
                     return "updateCameras";
                 case removeCamera:
                     return "removeCamera";
@@ -64,10 +64,8 @@ namespace ec2
                 case removeUser:
                     return "removeUser";
 
-                case addBusinessRule:
-                    return "addBusinessRule";
-                case updateBusinessRule:
-                    return "updateBusinessRule";
+                case saveBusinessRule:
+                    return "saveBusinessRule";
                 case removeBusinessRule:
                     return "removeBusinessRule";
                 case broadcastBusinessAction:
@@ -75,7 +73,7 @@ namespace ec2
                 case getBusinessRuleList:
                     return "getBusinessRuleList";
 
-                case addOrUpdateLayouts:
+                case saveLayouts:
                     return "addOrUpdateLayouts";
                 case getLayoutList:
                     return "getLayoutList";

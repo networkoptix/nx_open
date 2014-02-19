@@ -43,7 +43,7 @@ namespace ec2
 
         template<> void triggerNotification<ApiBusinessRuleData>( const QnTransaction<ApiBusinessRuleData>& tran )
         {
-            assert( tran.command == ApiCommand::addBusinessRule || tran.command == ApiCommand::updateBusinessRule );
+            assert( tran.command == ApiCommand::saveBusinessRule);
             QnBusinessEventRulePtr businessRule( new QnBusinessEventRule() );
             tran.params.toResource( businessRule, m_resCtx.pool );
             emit addedOrUpdated( businessRule );

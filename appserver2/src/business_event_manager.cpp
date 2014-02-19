@@ -55,13 +55,10 @@ int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::S
 {
     const int reqID = generateRequestID();
 
-    ApiCommand::Value command = ApiCommand::updateBusinessRule;
-    if (rule->id().isNull()) {
+    if (rule->id().isNull())
         rule->setId(QnId::createUuid());
-        command = ApiCommand::addBusinessRule;
-    }
 
-    auto tran = prepareTransaction( command, rule );
+    auto tran = prepareTransaction( ApiCommand::saveBusinessRule, rule );
 
     using namespace std::placeholders;
     m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveBusinessRuleHandler::done ), handler, reqID, _1, rule ) );

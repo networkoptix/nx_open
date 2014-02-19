@@ -94,7 +94,7 @@ namespace ec2
         //AbstractCameraManager::addCamera
         registerUpdateFuncHandler<ApiCameraData>( restProcessorPool, ApiCommand::saveCamera );
         //AbstractCameraManager::save
-        registerUpdateFuncHandler<ApiCameraDataList>( restProcessorPool, ApiCommand::updateCameras );
+        registerUpdateFuncHandler<ApiCameraDataList>( restProcessorPool, ApiCommand::saveCameras );
         //AbstractCameraManager::getCameras
         registerGetFuncHandler<QnId, ApiCameraDataList>( restProcessorPool, ApiCommand::getCameras );
         //AbstractCameraManager::addCameraHistoryItem
@@ -109,8 +109,7 @@ namespace ec2
         //AbstractBusinessEventManager::getBusinessRules
         registerGetFuncHandler<nullptr_t, ApiBusinessRuleDataList>( restProcessorPool, ApiCommand::getBusinessRuleList );
         //AbstractBusinessEventManager::save
-        registerUpdateFuncHandler<ApiBusinessRuleData>( restProcessorPool, ApiCommand::addBusinessRule );
-        registerUpdateFuncHandler<ApiBusinessRuleData>( restProcessorPool, ApiCommand::updateBusinessRule );
+        registerUpdateFuncHandler<ApiBusinessRuleData>( restProcessorPool, ApiCommand::saveBusinessRule );
         //AbstractBusinessEventManager::deleteRule
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeBusinessRule );
         //TODO AbstractBusinessEventManager::testEmailSettings
@@ -130,7 +129,7 @@ namespace ec2
         //AbstractLayoutManager::getLayouts
         registerGetFuncHandler<nullptr_t, ApiLayoutDataList>( restProcessorPool, ApiCommand::getLayoutList );
         //AbstractLayoutManager::save
-        registerUpdateFuncHandler<ApiLayoutDataList>( restProcessorPool, ApiCommand::addOrUpdateLayouts );
+        registerUpdateFuncHandler<ApiLayoutDataList>( restProcessorPool, ApiCommand::saveLayouts );
         //AbstractLayoutManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeLayout );
 

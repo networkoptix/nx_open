@@ -39,7 +39,7 @@ namespace ec2
         const int reqID = generateRequestID();
 
         //preparing output data
-		ApiCommand::Value command = ApiCommand::addOrUpdateLayouts;
+		ApiCommand::Value command = ApiCommand::saveLayouts;
         for( QnLayoutResourcePtr layout: layouts )
         {
             if( layout->getId().isNull() )

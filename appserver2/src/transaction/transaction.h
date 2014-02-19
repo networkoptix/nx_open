@@ -41,7 +41,7 @@ namespace ec2
             //!ApiCameraData
             saveCamera,
             //!ApiCameraDataList
-            updateCameras,
+            saveCameras,
             //!ApiIdData
             removeCamera,
             getCameras,
@@ -65,16 +65,15 @@ namespace ec2
             //!ApiBusinessRuleDataList
             getBusinessRuleList,
             //!ApiBusinessRuleData
-            addBusinessRule,
-            //!ApiBusinessRuleData
-            updateBusinessRule,
+            saveBusinessRule,
             //!ApiIdData
             removeBusinessRule,
             //!ApiBusinessActionData
             broadcastBusinessAction,
 
             //!ApiLayoutData
-            addOrUpdateLayouts,
+            saveLayouts,
+            //!ApiLayoutDataList
             saveLayout,
             //!ApiLayoutDataList
             getLayoutList,

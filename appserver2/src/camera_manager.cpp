@@ -104,7 +104,7 @@ namespace ec2
         }
 
         //performing request
-        auto tran = prepareTransaction( ApiCommand::updateCameras, cameras );
+        auto tran = prepareTransaction( ApiCommand::saveCameras, cameras );
 
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::AddCameraHandler::done ), handler, reqID, _1, cameraList ) );

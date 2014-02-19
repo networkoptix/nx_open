@@ -647,13 +647,7 @@ ErrorCode QnDbManager::insertBRuleResource(const QString& tableName, const QnId&
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiBusinessRuleData>& tran)
 {
     QnDbTransactionLocker lock(&m_tran);
-    ErrorCode rez;
-    if (tran.command == ApiCommand::updateBusinessRule)
-        rez = updateBusinessRuleTable(tran.params);
-    else {
-        qint32 internalId;
-        rez = insertBusinessRuleTable(tran.params, &internalId);
-    }
+    ErrorCode rez = insertOrReplaceBusinessRuleTable(tran.params);
     if (rez != ErrorCode::ok)
         return rez;
 
@@ -825,30 +819,13 @@ ErrorCode QnDbManager::removeUser( const QnId& guid )
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertBusinessRuleTable( const ApiBusinessRuleData& businessRule , qint32 *internalId)
+ErrorCode QnDbManager::insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule)
 {
     QSqlQuery query(m_sdb);
-    query.prepare(QString("INSERT INTO vms_businessrule (event_type, event_condition, event_state, action_type, \
+    query.prepare(QString("INSERT OR REPLACE INTO vms_businessrule (guid, event_type, event_condition, event_state, action_type, \
                           action_params, aggregation_period, disabled, comments, schedule) VALUES \
-                          (:eventType, :eventCondition, :eventState, :actionType, \
+                          (:id, :eventType, :eventCondition, :eventState, :actionType, \
                           :actionParams, :aggregationPeriod, :disabled, :comments, :schedule)"));
-    businessRule.autoBindValues(query);
-    if (query.exec()) {
-        *internalId = query.lastInsertId().toInt();
-        return ErrorCode::ok;
-    }
-    else {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::failure;
-    }
-}
-
-ErrorCode QnDbManager::updateBusinessRuleTable( const ApiBusinessRuleData& businessRule)
-{
-    QSqlQuery query(m_sdb);
-    query.prepare(QString("UPDATE vms_businessrule SET event_type = :eventType, event_condition = :eventCondition, event_state = :eventState, action_type = :actionType, \
-                          action_params = :actionParams, aggregation_period = :aggregationPeriod, disabled = :disabled, comments = :comments, schedule = :schedule \
-                          WHERE guid = :guid"));
     businessRule.autoBindValues(query);
     if (query.exec()) {
         return ErrorCode::ok;
@@ -861,17 +838,15 @@ ErrorCode QnDbManager::updateBusinessRuleTable( const ApiBusinessRuleData& busin
 
 ErrorCode QnDbManager::removeBusinessRule( const QnId& guid )
 {
-    qint32 id = getBusinessRuleInternalId(guid);
-
-    ErrorCode err = deleteTableRecord(id, "vms_businessrule_action_resources", "businessrule_id");
+    ErrorCode err = deleteTableRecord(guid, "vms_businessrule_action_resources", "businessrule_guid");
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteTableRecord(id, "vms_businessrule_event_resources", "businessrule_id");
+    err = deleteTableRecord(guid, "vms_businessrule_event_resources", "businessrule_guid");
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteTableRecord(id, "vms_businessrule", "id");
+    err = deleteTableRecord(guid, "vms_businessrule", "guid");
     if (err != ErrorCode::ok)
         return err;
 
