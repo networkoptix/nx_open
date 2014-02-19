@@ -220,24 +220,21 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
         port = 80;
 
     CLHttpStatus status;
-    QString model = QString(QLatin1String(downloadFileWithRetry(status, QLatin1String("get?model"), host, port, timeout, auth)));
+    QString model = QLatin1String(downloadFileWithRetry(status, QLatin1String("get?model"), host, port, timeout, auth));
 
-    if (model.length()==0)
+    if (model.isEmpty())
         return QList<QnResourcePtr>();
 
-    QString modelRelease = QString(QLatin1String(downloadFileWithRetry(status, QLatin1String("get?model=releasename"), host, port, timeout, auth)));
-
-
-    if (modelRelease!=model)
+    QString modelRelease = QLatin1String(downloadFileWithRetry(status, QLatin1String("get?model=releasename"), host, port, timeout, auth));
+    if (!modelRelease.isEmpty() && modelRelease != model)
     {
-        //this camera supports release name
+        // this camera supports release name
         model = modelRelease;
     }
     else
     {
-        QString modelFull = QString(QLatin1String(downloadFileWithRetry(status, QLatin1String("get?model=fullname"), host, port, timeout, auth)));
-
-        if (modelFull.length())        
+        QString modelFull = QLatin1String(downloadFileWithRetry(status, QLatin1String("get?model=fullname"), host, port, timeout, auth));
+        if (!modelFull.isEmpty())        
             model = modelFull;
     }
 
