@@ -210,8 +210,16 @@ QMap<int, QnId> QnDbManager::getGuidList(const QString& request)
         QVariant data = query.value(1);
         if (data.toInt())
             result.insert(id, intToGuid(data.toInt()));
-        else
-            result.insert(id, QnId(data.toString()));
+        else {
+            QnId guid(data.toString());
+            if (guid.isNull()) {
+                QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+                md5Hash.addData(data.toString().toUtf8());
+                QByteArray ha2 = md5Hash.result();
+                guid = QnId::fromRfc4122(ha2);
+            }
+            result.insert(id, guid);
+        }
     }
 
     return result;
@@ -244,6 +252,10 @@ bool QnDbManager::updateGuids()
 
     guids = getGuidList("SELECT id, id from vms_businessrule ORDER BY id");
     if (!updateTableGuids("vms_businessrule", "guid", guids))
+        return false;
+
+    guids = getGuidList("SELECT rt.id, rt.name || m.name as guid from vms_resourcetype rt JOIN vms_manufacture m on m.id = rt.manufacture_id");
+    if (!updateTableGuids("vms_resourcetype", "guid", guids))
         return false;
 
     return true;
