@@ -221,8 +221,6 @@ void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, const QStaticTe
     QRectF rect = this->rect();
     qreal unit = qMin(rect.width(), rect.height());
 
-    qDebug() << "TEXT SIZE" << text.size();
-
     QnScopedPainterFontRollback fontRollback(painter, m_staticFont);
     QnScopedPainterPenRollback penRollback(painter, palette().color(QPalette::WindowText));
     QnScopedPainterTransformRollback transformRollback(painter);
