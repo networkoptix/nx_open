@@ -122,9 +122,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_resource->toResource(),   &QnResource::resourceChanged,                   this, &QnMediaResourceWidget::at_resource_resourceChanged);
     connect(m_resource->toResource(),   &QnResource::propertyChanged,                   this, &QnMediaResourceWidget::at_resource_propertyChanged);
     connect(m_resource->toResource(),   &QnResource::mediaDewarpingParamsChanged,       this, &QnMediaResourceWidget::updateDewarpingParams);
-    connect(item,                       &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnMediaResourceWidget::updateFisheye);
     connect(this,                       &QnResourceWidget::zoomTargetWidgetChanged,     this, &QnMediaResourceWidget::updateDisplay);
+    connect(item,                       &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnMediaResourceWidget::updateFisheye);
     connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateFisheye);
+    connect(this,                       &QnResourceWidget::zoomRectChanged,             this, &QnMediaResourceWidget::updateFisheye);
     connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateButtonsVisibility);
     updateDewarpingParams();
     updateDisplay();
