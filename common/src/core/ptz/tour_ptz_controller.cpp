@@ -48,7 +48,7 @@ bool QnTourPtzController::continuousMove(const QVector3D &speed) {
     if(!supports(Qn::ContinuousMovePtzCommand))
         return false;
 
-    m_executor->stopTour();
+    clearActiveTour();
     return base_type::continuousMove(speed);
 }
 
@@ -56,7 +56,7 @@ bool QnTourPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVect
     if(!supports(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space)))
         return false;
     
-    m_executor->stopTour();
+    clearActiveTour();
     return base_type::absoluteMove(space, position, speed);
 }
 
@@ -64,13 +64,14 @@ bool QnTourPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport
     if(!supports(Qn::ViewportMovePtzCommand))
         return false;
 
-    m_executor->stopTour();
+    clearActiveTour();
     return base_type::viewportMove(aspectRatio, viewport, speed);
 }
 
 bool QnTourPtzController::activatePreset(const QString &presetId, qreal speed) {
     /* This one is 100% supported, no need to check. */
-    m_executor->stopTour();
+
+    clearActiveTour();
     return base_type::activatePreset(presetId, speed);
 }
 
@@ -121,7 +122,7 @@ bool QnTourPtzController::removeTour(const QString &tourId) {
             return false;
     
         if(m_activeTour.id == tourId) {
-            m_activeTour = QnPtzTour(); // TODO: #Elric this won't be registered by activity controller.
+            m_activeTour = QnPtzTour();
             stopTour = true;
         }
 
@@ -139,13 +140,16 @@ bool QnTourPtzController::activateTour(const QString &tourId) {
     QnPtzTour activeTour;
     {
         QMutexLocker locker(&m_mutex);
+        if(m_activeTour.id == tourId)
+            return true; /* Already activated. */
+
         const QnPtzTourHash &records = m_adaptor->value();
         if(!records.contains(tourId))
             return false;
 
         activeTour = records.value(tourId);
         activeTour.optimize();
-
+        
         m_activeTour = activeTour;
     }
 
@@ -162,3 +166,9 @@ bool QnTourPtzController::getTours(QnPtzTourList *tours) {
     return true;
 }
 
+void QnTourPtzController::clearActiveTour() {
+    m_executor->stopTour();
+
+    QMutexLocker locker(&m_mutex);
+    m_activeTour = QnPtzTour();
+}
