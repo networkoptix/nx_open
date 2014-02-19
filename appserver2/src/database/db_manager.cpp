@@ -188,7 +188,7 @@ QMap<int, QnId> QnDbManager::getGuidList(const QString& request)
     {
         qint32 id = query.value(0).toInt();
         QVariant data = query.value(1);
-        if (data.toInt())
+        if (data.toString().length() <= 10 && data.toInt())
             result.insert(id, intToGuid(data.toInt()));
         else {
             QnId guid(data.toString());
