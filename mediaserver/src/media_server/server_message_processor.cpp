@@ -85,17 +85,31 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource) {
     if (isCamera && resource->getParentId() != ownMediaServer->getId())
         resource->addFlags( QnResource::foreigner );
 
+    bool needUpdateServer = false;
     // We are always online
-    if (isServer)
-        resource->setStatus(QnResource::Online);
+    if (isServer) {
+        if (resource->getStatus() != QnResource::Online) {
+            resource->setStatus(QnResource::Online);
+            needUpdateServer = true;
+        }
+    }
 
     if (QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId(), QnResourcePool::AllResources))
         ownResource->update(resource);
     else
         qnResPool->addResource(resource);
 
+    const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
+    if (needUpdateServer)
+        appServerConnection->saveAsync(resource.dynamicCast<QnMediaServerResource>(), this, SLOT(at_serverSaved(int, const QnResourceList&, int)));
     if (isServer)
         syncStoragesToSettings(ownMediaServer);
+}
+
+void QnServerMessageProcessor::at_serverSaved(int status, const QnResourceList &, int)
+{
+    if (status != 0)
+        qWarning() << "QnServerMessageProcessor::at_serverSaved(): Error saving server. Status: " << status;
 }
 
 void QnServerMessageProcessor::handleMessage(const QnMessage &message) {
