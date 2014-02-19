@@ -182,11 +182,9 @@ bool QnPtzManageDialog::saveTours() {
         if (!model.modified)
             continue;
 
-        QnPtzTour updated(model.tour);
-        if (!model.local)
-            result &= removeTour(updated.id);
-
-        result &= createTour(updated);
+        /* There is no need to remove the tour first as it will be updated 
+         * in-place if it already exists. */
+        result &= createTour(model.tour);
     }
 
     foreach (const QString &id, m_model->removedTours())
