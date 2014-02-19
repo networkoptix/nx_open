@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es">
+<TS version="2.0" language="pt_PT">
 <context>
     <name>MAC_APPLICATION_MENU</name>
     <message>
         <location filename="../src/gui/kernel/qapplication.cpp" line="+2316"/>
         <source>Services</source>
-        <translation>Servicios</translation>
+        <translation>Serviços</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -16,27 +16,27 @@
     <message>
         <location line="+1"/>
         <source>Hide Others</source>
-        <translation>Ocultar otros</translation>
+        <translation>Ocultar Outros</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show All</source>
-        <translation>Mostrar todo</translation>
+        <translation>Mostrar Tudo</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Preferences...</source>
-        <translation>Preferencias…</translation>
+        <translation>Preferências…</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Quit %1</source>
-        <translation>Salir de %1</translation>
+        <translation>Encerrar %1</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>About %1</source>
-        <translation>Acerca de %1</translation>
+        <translation>Sobre o %1</translation>
     </message>
 </context>
 <context>
@@ -69,7 +69,7 @@
     <name>PPDOptionsModel</name>
     <message>
         <source>Name</source>
-        <translation type="obsolete">Nombre</translation>
+        <translation type="obsolete">Nome</translation>
     </message>
     <message>
         <source>Value</source>
@@ -193,12 +193,12 @@ have libgstreamer-plugins-base installed.</source>
     <message>
         <location filename="../src/qt3support/other/q3accel.cpp" line="+481"/>
         <source>%1, %2 not defined</source>
-        <translation>La secuencia %1, %2 no está definida</translation>
+        <translation>%1, %2 indefinido</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Ambiguous %1 not handled</source>
-        <translation>Secuencia ambigua %1 no tratada</translation>
+        <translation>%1 ambíguo não tratado</translation>
     </message>
 </context>
 <context>
@@ -206,7 +206,7 @@ have libgstreamer-plugins-base installed.</source>
     <message>
         <location filename="../src/qt3support/sql/q3datatable.cpp" line="+285"/>
         <source>True</source>
-        <translation>Verdadero</translation>
+        <translation>Verdadeiro</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -216,7 +216,7 @@ have libgstreamer-plugins-base installed.</source>
     <message>
         <location line="+505"/>
         <source>Insert</source>
-        <translation>Insertar</translation>
+        <translation>Inserir</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -226,7 +226,7 @@ have libgstreamer-plugins-base installed.</source>
     <message>
         <location line="+1"/>
         <source>Delete</source>
-        <translation>Borrar</translation>
+        <translation>Remover</translation>
     </message>
 </context>
 <context>
@@ -234,18 +234,18 @@ have libgstreamer-plugins-base installed.</source>
     <message>
         <location filename="../src/qt3support/dialogs/q3filedialog.cpp" line="+864"/>
         <source>Copy or Move a File</source>
-        <translation>Copiar o mover un fichero</translation>
+        <translation>Copiar ou Mover um Ficheiro</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Read: %1</source>
-        <translation>Lectura: %1</translation>
+        <translation>Ler: %1</translation>
     </message>
     <message>
         <location line="+6"/>
         <location line="+30"/>
         <source>Write: %1</source>
-        <translation>Escritura: %1</translation>
+        <translation>Escrever: %1</translation>
     </message>
     <message>
         <location line="-22"/>
@@ -259,17 +259,17 @@ have libgstreamer-plugins-base installed.</source>
         <location line="+2153"/>
         <location filename="../src/qt3support/dialogs/q3filedialog_mac.cpp" line="+110"/>
         <source>All Files (*)</source>
-        <translation>Todos los ficheros (*)</translation>
+        <translation>Todos os Ficheiros (*)</translation>
     </message>
     <message>
         <location line="-2089"/>
         <source>Name</source>
-        <translation>Nombre</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Size</source>
-        <translation>Tamaño</translation>
+        <translation>Tamanho</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -279,7 +279,7 @@ have libgstreamer-plugins-base installed.</source>
     <message>
         <location line="+1"/>
         <source>Date</source>
-        <translation>Fecha</translation>
+        <translation>Data</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -290,109 +290,109 @@ have libgstreamer-plugins-base installed.</source>
         <location line="+35"/>
         <location line="+2031"/>
         <source>&amp;OK</source>
-        <translation>&amp;Aceptar</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <location line="-1991"/>
         <source>Look &amp;in:</source>
-        <translation>Buscar &amp;en:</translation>
+        <translation>Ver &amp;em:</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+1981"/>
         <location line="+16"/>
         <source>File &amp;name:</source>
-        <translation>&amp;Nombre de fichero:</translation>
+        <translation>&amp;Nome do Ficheiro:</translation>
     </message>
     <message>
         <location line="-1996"/>
         <source>File &amp;type:</source>
-        <translation>&amp;Tipo de fichero:</translation>
+        <translation>&amp;Tipo de Ficheiro:</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Back</source>
-        <translation>Precedente (histórico)</translation>
+        <translation>Recuar</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>One directory up</source>
-        <translation>Ir al directorio superior</translation>
+        <translation>Pasta Mãe</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Create New Folder</source>
-        <translation>Crear una nueva carpeta</translation>
+        <translation>Criar Nova Pasta</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>List View</source>
-        <translation>Vista de lista</translation>
+        <translation>Vista Abreviada</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Detail View</source>
-        <translation>Vista detallada</translation>
+        <translation>Vista Detalhada</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Preview File Info</source>
-        <translation>Información del fichero previsualizado</translation>
+        <translation>Antever Informação do Ficheiro</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Preview File Contents</source>
-        <translation>Contenido del fichero previsualizado</translation>
+        <translation>Antever Conteúdo do Ficheiro</translation>
     </message>
     <message>
         <location line="+88"/>
         <source>Read-write</source>
-        <translation>Lectura-escritura</translation>
+        <translation>Leitura e escrita</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Read-only</source>
-        <translation>Sólo lectura</translation>
+        <translation>Apenas Leitura</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Write-only</source>
-        <translation>Sólo escritura</translation>
+        <translation>Apenas Escrita</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Inaccessible</source>
-        <translation>Inaccesible</translation>
+        <translation>Inacessível</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Symlink to File</source>
-        <translation>Enlace simbólico a un fichero</translation>
+        <translation>Ligação para Ficheiro</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Symlink to Directory</source>
-        <translation>Enlace simbólico a un directorio</translation>
+        <translation>Ligação para Pasta</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Symlink to Special</source>
-        <translation>Enlace simbólico a un fichero especial</translation>
+        <translation>Ligação para Especial</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>File</source>
-        <translation>Fichero</translation>
+        <translation>Ficheiro</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Dir</source>
-        <translation>Directorio</translation>
+        <translation>Pasta</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Special</source>
-        <translation>Fichero especial</translation>
+        <translation>Especial</translation>
     </message>
     <message>
         <location line="+704"/>
@@ -405,7 +405,7 @@ have libgstreamer-plugins-base installed.</source>
         <location line="-1990"/>
         <location filename="../src/qt3support/dialogs/q3filedialog_win.cpp" line="+84"/>
         <source>Save As</source>
-        <translation>Guardar como</translation>
+        <translation>Guardar Como</translation>
     </message>
     <message>
         <location line="+642"/>
@@ -418,42 +418,42 @@ have libgstreamer-plugins-base installed.</source>
         <location line="-357"/>
         <location line="+341"/>
         <source>&amp;Save</source>
-        <translation>&amp;Guardar</translation>
+        <translation>&amp;Gravar</translation>
     </message>
     <message>
         <location line="-334"/>
         <source>&amp;Rename</source>
-        <translation>Cambia&amp;r de nombre</translation>
+        <translation>&amp;Mudar Nome</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Delete</source>
-        <translation>&amp;Borrar</translation>
+        <translation>&amp;Apagar</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>R&amp;eload</source>
-        <translation>R&amp;ecargar</translation>
+        <translation>&amp;Recarregar</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Sort by &amp;Name</source>
-        <translation>Ordenar por &amp;nombre</translation>
+        <translation>Ordenar pelo &amp;Nome</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Sort by &amp;Size</source>
-        <translation>Ordenar por &amp;tamaño</translation>
+        <translation>Ordenar pelo &amp;Tamanho</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Sort by &amp;Date</source>
-        <translation>Ordenar por &amp;fecha</translation>
+        <translation>Ordenar pela &amp;Data</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>&amp;Unsorted</source>
-        <translation>&amp;Sin ordenar</translation>
+        <translation>Não &amp;Ordenado</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -463,79 +463,79 @@ have libgstreamer-plugins-base installed.</source>
     <message>
         <location line="+4"/>
         <source>Show &amp;hidden files</source>
-        <translation>Mostrar los fic&amp;heros ocultos</translation>
+        <translation>Mostrar ficheiros &amp;escondidos</translation>
     </message>
     <message>
         <location line="+31"/>
         <source>the file</source>
-        <translation>el fichero</translation>
+        <translation>o ficheiro</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>the directory</source>
-        <translation>el directorio</translation>
+        <translation>a pasta</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>the symlink</source>
-        <translation>el enlace simbólico</translation>
+        <translation>a ligação</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Delete %1</source>
-        <translation>Borrar %1</translation>
+        <translation>Apagar %1</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;qt&gt;Are you sure you wish to delete %1 &quot;%2&quot;?&lt;/qt&gt;</source>
-        <translation>&lt;qt&gt;¿Seguro que desea borrar %1 «%2»?&lt;/qt&gt;</translation>
+        <translation>&lt;qt&gt;Deseja mesmo apagar %1 &quot;%2&quot;?&lt;/qt&gt;</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>&amp;Yes</source>
-        <translation>&amp;Sí</translation>
+        <translation>&amp;Sim</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>&amp;No</source>
-        <translation>&amp;No</translation>
+        <translation>&amp;Não</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>New Folder 1</source>
-        <translation>Nueva carpeta 1</translation>
+        <translation>Nova Pasta 1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>New Folder</source>
-        <translation>Nueva carpeta</translation>
+        <translation>Nova Pasta</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>New Folder %1</source>
-        <translation>Nueva carpeta %1</translation>
+        <translation>Nova Pasta %1</translation>
     </message>
     <message>
         <location line="+98"/>
         <source>Find Directory</source>
-        <translation>Buscar en el directorio</translation>
+        <translation>Procurar Pasta</translation>
     </message>
     <message>
         <location line="+5"/>
         <location line="+108"/>
         <source>Directories</source>
-        <translation>Directorios</translation>
+        <translation>Pastas</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>Directory:</source>
-        <translation>Directorio:</translation>
+        <translation>Pasta:</translation>
     </message>
     <message>
         <location line="+40"/>
         <location line="+1110"/>
         <source>Error</source>
-        <translation>Error</translation>
+        <translation>Erro</translation>
     </message>
     <message>
         <location line="-1109"/>
@@ -543,13 +543,13 @@ have libgstreamer-plugins-base installed.</source>
 File not found.
 Check path and filename.</source>
         <translation>%1
-Fichero no encontrado.
-Compruebe la ruta y el nombre del fichero.</translation>
+Ficheiro não encontrado.
+Verifique a localização e o nome.</translation>
     </message>
     <message>
         <location filename="../src/qt3support/dialogs/q3filedialog_win.cpp" line="-289"/>
         <source>All Files (*.*)</source>
-        <translation>Todos los ficheros (*.*)</translation>
+        <translation>Todos os Ficheiros (*.*)</translation>
     </message>
     <message>
         <location line="+375"/>
@@ -559,7 +559,7 @@ Compruebe la ruta y el nombre del fichero.</translation>
     <message>
         <location line="+155"/>
         <source>Select a Directory</source>
-        <translation>Seleccionar un directorio</translation>
+        <translation>Seleccione uma Pasta</translation>
     </message>
 </context>
 <context>
@@ -569,21 +569,21 @@ Compruebe la ruta y el nombre del fichero.</translation>
         <location line="+10"/>
         <source>Could not read directory
 %1</source>
-        <translation>No fue posible leer el directorio
+        <translation>Não foi possível ler a pasta
 %1</translation>
     </message>
     <message>
         <location line="+45"/>
         <source>Could not create directory
 %1</source>
-        <translation>No fue posible crear el directorio
+        <translation>Não foi possível criar a pasta
 %1</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Could not remove file or directory
 %1</source>
-        <translation type="unfinished">No fue posible eliminar el fichero o directorio
+        <translation>Não foi possível apagar o ficheiro ou a pasta
 %1</translation>
     </message>
     <message>
@@ -592,23 +592,23 @@ Compruebe la ruta y el nombre del fichero.</translation>
 %1
 to
 %2</source>
-        <translation>No fue posible cambiar el nombre
+        <translation>Não foi  possível mudar o nome
 %1
-a
+para
 %2</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Could not open
 %1</source>
-        <translation>No fue posible abrir
+        <translation>Não foi possível abrir
 %1</translation>
     </message>
     <message>
         <location line="+68"/>
         <source>Could not write
 %1</source>
-        <translation>No fue posible escribir
+        <translation>Nao foi possível escrever
 %1</translation>
     </message>
 </context>
@@ -617,12 +617,12 @@ a
     <message>
         <location filename="../src/qt3support/widgets/q3mainwindow.cpp" line="+2051"/>
         <source>Line up</source>
-        <translation>Alinear</translation>
+        <translation>Alinhar</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Customize...</source>
-        <translation>Personalizar...</translation>
+        <translation>Configurar...</translation>
     </message>
 </context>
 <context>
@@ -630,7 +630,7 @@ a
     <message>
         <location filename="../src/qt3support/network/q3networkprotocol.cpp" line="+854"/>
         <source>Operation stopped by the user</source>
-        <translation>Operación detenida por el usuario</translation>
+        <translation>Operação interrompida pelo utilizador</translation>
     </message>
 </context>
 <context>
@@ -648,7 +648,7 @@ a
         <location filename="../src/qt3support/dialogs/q3tabdialog.cpp" line="+189"/>
         <location line="+814"/>
         <source>OK</source>
-        <translation>Aceptar</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="-356"/>
@@ -658,12 +658,12 @@ a
     <message>
         <location line="+43"/>
         <source>Help</source>
-        <translation>Ayuda</translation>
+        <translation>Ajuda</translation>
     </message>
     <message>
         <location line="+45"/>
         <source>Defaults</source>
-        <translation>Valores por omisión</translation>
+        <translation>Predefinições</translation>
     </message>
     <message>
         <location line="+50"/>
@@ -676,12 +676,12 @@ a
     <message>
         <location filename="../src/qt3support/text/q3textedit.cpp" line="+5429"/>
         <source>&amp;Undo</source>
-        <translation>&amp;Deshacer</translation>
+        <translation>&amp;Desfazer</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Redo</source>
-        <translation>&amp;Rehacer</translation>
+        <translation>&amp;Refazer</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -696,18 +696,18 @@ a
     <message>
         <location line="+2"/>
         <source>&amp;Paste</source>
-        <translation>&amp;Pegar</translation>
+        <translation>Co&amp;lar</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Clear</source>
-        <translation>Limpiar</translation>
+        <translation>Limpar</translation>
     </message>
     <message>
         <location line="+4"/>
         <location line="+2"/>
         <source>Select All</source>
-        <translation>Seleccionar todo</translation>
+        <translation>Seleccionar Tudo</translation>
     </message>
 </context>
 <context>
@@ -720,7 +720,7 @@ a
     <message>
         <location line="+3"/>
         <source>Restore up</source>
-        <translation>Restaurar arriba</translation>
+        <translation>Restaurar acima</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -730,7 +730,7 @@ a
     <message>
         <location line="+3"/>
         <source>Restore down</source>
-        <translation>Restaurar abajo</translation>
+        <translation>Restaurar abaixo</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -740,42 +740,42 @@ a
     <message>
         <location line="+2"/>
         <source>Close</source>
-        <translation>Cerrar</translation>
+        <translation>Fechar</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Contains commands to manipulate the window</source>
-        <translation>Contiene órdenes para manipular la ventana</translation>
+        <translation>Contém comandos para manipular a janela</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Puts a minimized back to normal</source>
-        <translation>Devuelve una ventana minimizada a su aspecto normal</translation>
+        <translation>Coloca uma janela minimizada no estado normal</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Moves the window out of the way</source>
-        <translation>Aparta la ventana</translation>
+        <translation>Tira a janela da frente</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Puts a maximized window back to normal</source>
-        <translation>Devuelve una ventana maximizada a su aspecto normal</translation>
+        <translation>Coloca uma janela maximizada no estado normal</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Makes the window full screen</source>
-        <translation>Muestra la ventana en pantalla completa</translation>
+        <translation>Coloca a janela em ecrã completo</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Closes the window</source>
-        <translation>Cierra la ventana</translation>
+        <translation>Fecha a janela</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Displays the name of the window and contains controls to manipulate it</source>
-        <translation>Muestra el nombre de la ventana y contiene controles para manipularla</translation>
+        <translation>Mostra o nome da janela e contém controlos para a manipular</translation>
     </message>
 </context>
 <context>
@@ -783,7 +783,7 @@ a
     <message>
         <location filename="../src/qt3support/widgets/q3toolbar.cpp" line="+692"/>
         <source>More...</source>
-        <translation>Más...</translation>
+        <translation>Mais...</translation>
     </message>
 </context>
 <context>
@@ -793,49 +793,49 @@ a
         <location line="+260"/>
         <location line="+4"/>
         <source>The protocol `%1&apos; is not supported</source>
-        <translation>El protocolo «%1» no está contemplado</translation>
+        <translation>O protocolo &apos;%1&apos; não é suportado</translation>
     </message>
     <message>
         <location line="-260"/>
         <source>The protocol `%1&apos; does not support listing directories</source>
-        <translation>El protocolo «%1» no permite listar los ficheros de un directorio</translation>
+        <translation>O protocolo &apos;%1&apos; não suporta listagem de pastas</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The protocol `%1&apos; does not support creating new directories</source>
-        <translation>El protocolo «%1» no permite crear nuevos directorios</translation>
+        <translation>O protocolo &apos;%1&apos; não suporta criação de novas pastas</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The protocol `%1&apos; does not support removing files or directories</source>
-        <translation>El protocolo «%1» no permite eliminar ficheros o directorios</translation>
+        <translation>O protocolo &apos;%1&apos; não suporta eliminação de ficheiros ou pastas</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The protocol `%1&apos; does not support renaming files or directories</source>
-        <translation>El protocolo «%1» no permite cambiar de nombre ficheros o directorios</translation>
+        <translation>O protocolo &apos;%1&apos; não suporta mudança de nome de ficheiros ou pastas</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The protocol `%1&apos; does not support getting files</source>
-        <translation>El protocolo «%1» no permite recibir ficheros</translation>
+        <translation>O protocolo &apos;%1&apos; não suporta obtenção de ficheiros</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The protocol `%1&apos; does not support putting files</source>
-        <translation>El protocolo «%1» no permite enviar ficheros</translation>
+        <translation>O protocolo &apos;%1&apos; não suporta colocação de ficheiros</translation>
     </message>
     <message>
         <location line="+243"/>
         <location line="+4"/>
         <source>The protocol `%1&apos; does not support copying or moving files or directories</source>
-        <translation>El protocolo «%1» no permite copiar o mover ficheros o directorios</translation>
+        <translation>O protocolo &apos;%1&apos; não suporta copiar ou mover ficheiros ou pastas</translation>
     </message>
     <message>
         <location line="+237"/>
         <location line="+1"/>
         <source>(unknown)</source>
-        <translation>(desconocido)</translation>
+        <translation>(desconhecido)</translation>
     </message>
 </context>
 <context>
@@ -848,12 +848,12 @@ a
     <message>
         <location line="+1"/>
         <source>&lt; &amp;Back</source>
-        <translation>&lt; &amp;Anterior</translation>
+        <translation>&lt; &amp;Recuar</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Next &gt;</source>
-        <translation>Siguie&amp;nte &gt;</translation>
+        <translation>&amp;Avançar &gt;</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -863,7 +863,7 @@ a
     <message>
         <location line="+1"/>
         <source>&amp;Help</source>
-        <translation>&amp;Ayuda</translation>
+        <translation>&amp;Ajuda</translation>
     </message>
 </context>
 <context>
@@ -874,19 +874,19 @@ a
         <location filename="../src/network/socket/qsocks5socketengine.cpp" line="+657"/>
         <location line="+26"/>
         <source>Host not found</source>
-        <translation>Equipo no encontrado</translation>
+        <translation>Máquina desconhecida</translation>
     </message>
     <message>
         <location line="+50"/>
         <location filename="../src/network/socket/qhttpsocketengine.cpp" line="+3"/>
         <location filename="../src/network/socket/qsocks5socketengine.cpp" line="+4"/>
         <source>Connection refused</source>
-        <translation>Conexión rechazada</translation>
+        <translation>Ligação recusada</translation>
     </message>
     <message>
         <location line="+141"/>
         <source>Connection timed out</source>
-        <translation type="unfinished">Conexión expirada</translation>
+        <translation type="unfinished">Ligação expirada</translation>
     </message>
     <message>
         <location line="-547"/>
@@ -898,17 +898,17 @@ a
     <message>
         <location line="+137"/>
         <source>Socket operation timed out</source>
-        <translation>Operación socket expirada</translation>
+        <translation>Operação de &apos;socket&apos; expirada</translation>
     </message>
     <message>
         <location line="+380"/>
         <source>Socket is not connected</source>
-        <translation>El socket no está conectado</translation>
+        <translation>&apos;Socket&apos; desligado</translation>
     </message>
     <message>
         <location filename="../src/network/socket/qsocks5socketengine.cpp" line="-8"/>
         <source>Network unreachable</source>
-        <translation type="unfinished">Red inalcanzable</translation>
+        <translation type="unfinished">Rede inalcançável</translation>
     </message>
 </context>
 <context>
@@ -916,17 +916,17 @@ a
     <message>
         <location filename="../src/gui/widgets/qabstractspinbox.cpp" line="+1199"/>
         <source>&amp;Step up</source>
-        <translation>&amp;Aumentar</translation>
+        <translation>&amp;Passo acima</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Step &amp;down</source>
-        <translation>Re&amp;ducir</translation>
+        <translation>Passo &amp;abaixo</translation>
     </message>
     <message>
         <location line="-8"/>
         <source>&amp;Select All</source>
-        <translation>&amp;Seleccionar todo</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -939,12 +939,12 @@ a
     <message>
         <location filename="../src/gui/dialogs/qmessagebox.h" line="+352"/>
         <source>Executable &apos;%1&apos; requires Qt %2, found Qt %3.</source>
-        <translation>El ejecutable «%1» requiere Qt %2 (se encontró Qt %3).</translation>
+        <translation>O executável &apos;%1&apos; requere Qt %2, Qt %3 encontrado.</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Incompatible Qt Library Error</source>
-        <translation>Error: biblioteca Qt incompatible</translation>
+        <translation>Erro de Incompatibilidade da Biblioteca Qt</translation>
     </message>
     <message>
         <location filename="../src/gui/kernel/qapplication.cpp" line="+2248"/>
@@ -955,7 +955,7 @@ a
     <message>
         <location filename="../src/gui/accessible/qaccessibleobject.cpp" line="+2"/>
         <source>Activates the program&apos;s main window</source>
-        <translation>Activa la ventana principal del programa</translation>
+        <translation>Activa a janela principal do programa</translation>
     </message>
 </context>
 <context>
@@ -963,12 +963,12 @@ a
     <message>
         <location filename="../src/activeqt/container/qaxselect.ui"/>
         <source>Select ActiveX Control</source>
-        <translation>Seleccionar un control ActiveX</translation>
+        <translation>Seleccionar Controlo ActiveX</translation>
     </message>
     <message>
         <location/>
         <source>OK</source>
-        <translation>Aceptar</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location/>
@@ -978,7 +978,7 @@ a
     <message>
         <location/>
         <source>COM &amp;Object:</source>
-        <translation>&amp;Objeto COM:</translation>
+        <translation>&amp;Objecto COM:</translation>
     </message>
 </context>
 <context>
@@ -986,17 +986,17 @@ a
     <message>
         <location filename="../src/plugins/accessible/widgets/simplewidgets.cpp" line="+114"/>
         <source>Uncheck</source>
-        <translation>Desmarcar</translation>
+        <translation>Desactivar</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Check</source>
-        <translation>Marcar</translation>
+        <translation>Activar</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Toggle</source>
-        <translation>Conmutar</translation>
+        <translation>Comutar</translation>
     </message>
 </context>
 <context>
@@ -1004,12 +1004,12 @@ a
     <message>
         <location filename="../src/gui/dialogs/qcolordialog.cpp" line="+1253"/>
         <source>Hu&amp;e:</source>
-        <translation>&amp;Tono:</translation>
+        <translation>C&amp;or:</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Sat:</source>
-        <translation>&amp;Saturación:</translation>
+        <translation>&amp;Saturação:</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1019,22 +1019,22 @@ a
     <message>
         <location line="+1"/>
         <source>&amp;Red:</source>
-        <translation>&amp;Rojo:</translation>
+        <translation>&amp;Vermelho:</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Green:</source>
-        <translation>&amp;Verde:</translation>
+        <translation>V&amp;erde:</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Bl&amp;ue:</source>
-        <translation>Az&amp;ul:</translation>
+        <translation>&amp;Azul:</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>A&amp;lpha channel:</source>
-        <translation>Canal a&amp;lfa:</translation>
+        <translation>Canal &amp;transparência:</translation>
     </message>
     <message>
         <location line="+101"/>
@@ -1044,20 +1044,20 @@ a
     <message>
         <location line="+137"/>
         <source>&amp;Basic colors</source>
-        <translation>Colores &amp;básicos</translation>
+        <translation>Cores &amp;básicas</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Custom colors</source>
-        <translation>&amp;Colores personalizados</translation>
+        <translation>Cores c&amp;ustomizadas</translation>
     </message>
     <message>
         <source>&amp;Define Custom Colors &gt;&gt;</source>
-        <translation type="obsolete">&amp;Definir colores personalizados &gt;&gt;</translation>
+        <translation type="obsolete">&amp;Definir Cores Customizadas &gt;&gt;</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="obsolete">Aceptar</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1066,11 +1066,11 @@ a
     <message>
         <location line="+1"/>
         <source>&amp;Add to Custom Colors</source>
-        <translation>&amp;Añadir a los colores personalizados</translation>
+        <translation>&amp;Adicionar às Cores Customizadas</translation>
     </message>
     <message>
         <source>Select color</source>
-        <translation type="obsolete">Seleccionar color</translation>
+        <translation type="obsolete">Seleccionar cor</translation>
     </message>
 </context>
 <context>
@@ -1084,17 +1084,17 @@ a
     <message>
         <location filename="../src/gui/itemviews/qitemeditorfactory.cpp" line="+544"/>
         <source>False</source>
-        <translation>Falso</translation>
+        <translation type="unfinished">Falso</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>True</source>
-        <translation>Verdadero</translation>
+        <translation type="unfinished">Verdadeiro</translation>
     </message>
     <message>
         <location filename="../src/plugins/accessible/widgets/complexwidgets.cpp" line="+0"/>
         <source>Close</source>
-        <translation>Cerrar</translation>
+        <translation type="unfinished">Fechar</translation>
     </message>
 </context>
 <context>
@@ -1123,22 +1123,22 @@ a
     <message>
         <location filename="../src/sql/drivers/db2/qsql_db2.cpp" line="+1276"/>
         <source>Unable to connect</source>
-        <translation>Imposible establecer una conexión</translation>
+        <translation>Ligação não possível</translation>
     </message>
     <message>
         <location line="+303"/>
         <source>Unable to commit transaction</source>
-        <translation>Incapaz de enviar la transacción</translation>
+        <translation>Finalização de transacção não possível</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Unable to rollback transaction</source>
-        <translation>Incapaz de anular la transacción</translation>
+        <translation>Anulação de transacção não possível</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Unable to set autocommit</source>
-        <translation>Incapaz de activar el envío automático</translation>
+        <translation>Finalização automática não possível</translation>
     </message>
 </context>
 <context>
@@ -1147,32 +1147,32 @@ a
         <location line="-1043"/>
         <location line="+243"/>
         <source>Unable to execute statement</source>
-        <translation>Imposible ejecutar la instrucción</translation>
+        <translation>Execução não possível</translation>
     </message>
     <message>
         <location line="-206"/>
         <source>Unable to prepare statement</source>
-        <translation>Imposible preparar la instrucción</translation>
+        <translation>Preparação não possível</translation>
     </message>
     <message>
         <location line="+196"/>
         <source>Unable to bind variable</source>
-        <translation>No es posible ligar la variable</translation>
+        <translation>Ligação de variável não possível</translation>
     </message>
     <message>
         <location line="+92"/>
         <source>Unable to fetch record %1</source>
-        <translation>Imposible obtener el registro %1</translation>
+        <translation>Obtenção do registo %1 não possível</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Unable to fetch next</source>
-        <translation>Imposible recuperar el siguiente</translation>
+        <translation>Obtenção do seguinte não possível</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Unable to fetch first</source>
-        <translation>Imposible recuperar el primero</translation>
+        <translation>Obtenção do primeiro não possível</translation>
     </message>
 </context>
 <context>
@@ -1203,17 +1203,17 @@ a
     <message>
         <location filename="../src/plugins/accessible/widgets/rangecontrols.cpp" line="+951"/>
         <source>QDial</source>
-        <translation>QDial</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>SpeedoMeter</source>
-        <translation>Velocímetro</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>SliderHandle</source>
-        <translation>Asa del deslizador</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1221,12 +1221,12 @@ a
     <message>
         <location filename="../src/gui/dialogs/qdialog.cpp" line="+597"/>
         <source>What&apos;s This?</source>
-        <translation>¿Qué es esto?</translation>
+        <translation>O Que é Isto?</translation>
     </message>
     <message>
         <location line="-115"/>
         <source>Done</source>
-        <translation type="unfinished">Terminar</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1236,17 +1236,17 @@ a
         <location line="+464"/>
         <location filename="../src/gui/widgets/qdialogbuttonbox.cpp" line="+561"/>
         <source>OK</source>
-        <translation>Aceptar</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../src/gui/widgets/qdialogbuttonbox.cpp" line="+3"/>
         <source>Save</source>
-        <translation type="unfinished">Guardar</translation>
+        <translation type="unfinished">Gravar</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>&amp;Save</source>
-        <translation type="unfinished">&amp;Guardar</translation>
+        <translation type="unfinished">&amp;Gravar</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1266,12 +1266,12 @@ a
     <message>
         <location line="+3"/>
         <source>Close</source>
-        <translation type="unfinished">Cerrar</translation>
+        <translation type="unfinished">Fechar</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>&amp;Close</source>
-        <translation type="unfinished">&amp;Cerrar</translation>
+        <translation type="unfinished">&amp;Fechar</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1281,17 +1281,17 @@ a
     <message>
         <location line="+3"/>
         <source>Reset</source>
-        <translation>Reinicializar</translation>
+        <translation>Restaurar</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Help</source>
-        <translation>Ayuda</translation>
+        <translation>Ajuda</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Don&apos;t Save</source>
-        <translation>No guardar</translation>
+        <translation>Não Gravar</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1301,37 +1301,37 @@ a
     <message>
         <location line="+3"/>
         <source>&amp;Yes</source>
-        <translation>&amp;Sí</translation>
+        <translation>&amp;Sim</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Yes to &amp;All</source>
-        <translation>Sí a &amp;todo</translation>
+        <translation>Sim para &amp;Todos</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>&amp;No</source>
-        <translation>&amp;No</translation>
+        <translation>&amp;Não</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>N&amp;o to All</source>
-        <translation>N&amp;o a todo</translation>
+        <translation>N&amp;ão para Todos</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Save All</source>
-        <translation>Guardar todo</translation>
+        <translation>Gravar Todos</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Abort</source>
-        <translation>Interrumpir</translation>
+        <translation>Abortar</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Retry</source>
-        <translation>Reintentar</translation>
+        <translation>Tentar Novamente</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1341,17 +1341,17 @@ a
     <message>
         <location line="+3"/>
         <source>Restore Defaults</source>
-        <translation>Restaurar los valores predeterminados</translation>
+        <translation>Restaurar Predefinições</translation>
     </message>
     <message>
         <location line="-29"/>
         <source>Close without Saving</source>
-        <translation>Cerrar sin guardar</translation>
+        <translation>Fechar sem Gravar</translation>
     </message>
     <message>
         <location line="-27"/>
         <source>&amp;OK</source>
-        <translation type="unfinished">&amp;Aceptar</translation>
+        <translation type="unfinished">&amp;OK</translation>
     </message>
 </context>
 <context>
@@ -1359,21 +1359,21 @@ a
     <message>
         <location filename="../src/gui/itemviews/qdirmodel.cpp" line="+453"/>
         <source>Name</source>
-        <translation>Nombre</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Size</source>
-        <translation>Tamaño</translation>
+        <translation>Tamanho</translation>
     </message>
     <message>
+        <location line="+3"/>
         <source>Kind</source>
-        <comment>Match OS X Finder
-</comment>
-        <translation type="obsolete">Clase</translation>
+        <comment>Match OS X Finder</comment>
+        <translation>Tipo</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+2"/>
         <source>Type</source>
         <comment>All other platforms</comment>
         <translation>Tipo</translation>
@@ -1381,13 +1381,7 @@ a
     <message>
         <location line="+6"/>
         <source>Date Modified</source>
-        <translation>Última modificación</translation>
-    </message>
-    <message>
-        <location line="-8"/>
-        <source>Kind</source>
-        <comment>Match OS X Finder</comment>
-        <translation type="unfinished">Clase</translation>
+        <translation>Data de Modificação</translation>
     </message>
 </context>
 <context>
@@ -1395,17 +1389,17 @@ a
     <message>
         <location filename="../src/plugins/accessible/widgets/qaccessiblewidgets.cpp" line="+1239"/>
         <source>Close</source>
-        <translation>Cerrar</translation>
+        <translation type="unfinished">Fechar</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Dock</source>
-        <translation>Anclada</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Float</source>
-        <translation>Flotante</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1413,12 +1407,12 @@ a
     <message>
         <location filename="../src/plugins/accessible/widgets/rangecontrols.cpp" line="-537"/>
         <source>More</source>
-        <translation>Más</translation>
+        <translation type="unfinished">Mais</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Less</source>
-        <translation>Menos</translation>
+        <translation type="unfinished">Menos</translation>
     </message>
 </context>
 <context>
@@ -1426,7 +1420,7 @@ a
     <message>
         <location filename="../src/gui/dialogs/qerrormessage.cpp" line="+192"/>
         <source>Debug Message:</source>
-        <translation>Mensaje de depuración:</translation>
+        <translation>Mensagem Depuração:</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1436,17 +1430,17 @@ a
     <message>
         <location line="+3"/>
         <source>Fatal Error:</source>
-        <translation>Error fatal:</translation>
+        <translation>Erro Fatal:</translation>
     </message>
     <message>
         <location line="+193"/>
         <source>&amp;Show this message again</source>
-        <translation>Mo&amp;strar este mensaje de nuevo</translation>
+        <translation>&amp;Mostrar esta mensagem novamente</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;OK</source>
-        <translation>&amp;Aceptar</translation>
+        <translation>&amp;OK</translation>
     </message>
 </context>
 <context>
@@ -1489,12 +1483,12 @@ a
         <location filename="../src/gui/dialogs/qfiledialog.cpp" line="+515"/>
         <location line="+444"/>
         <source>All Files (*)</source>
-        <translation>Todos los ficheros (*)</translation>
+        <translation>Todos os Ficheiros (*)</translation>
     </message>
     <message>
         <location line="+222"/>
         <source>Directories</source>
-        <translation>Directorios</translation>
+        <translation>Pastas</translation>
     </message>
     <message>
         <location line="-3"/>
@@ -1508,7 +1502,7 @@ a
         <location line="-1596"/>
         <location line="+50"/>
         <source>&amp;Save</source>
-        <translation>&amp;Guardar</translation>
+        <translation>&amp;Gravar</translation>
     </message>
     <message>
         <location line="-730"/>
@@ -1519,8 +1513,8 @@ a
         <location line="+1515"/>
         <source>%1 already exists.
 Do you want to replace it?</source>
-        <translation>El fichero %1 ya existe.
-¿Desea reemplazarlo?</translation>
+        <translation>%1 já existe.
+Deseja substituir?</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -1528,72 +1522,72 @@ Do you want to replace it?</source>
 File not found.
 Please verify the correct file name was given.</source>
         <translation>%1
-Fichero no encontrado.
-Verifique que el nombre del fichero es correcto.</translation>
+Ficheiro não encontrado.
+Por favor verifique o nome do ficheiro.</translation>
     </message>
     <message>
-        <location filename="../src/gui/itemviews/qdirmodel.cpp" line="+410"/>
+        <location filename="../src/gui/itemviews/qdirmodel.cpp" line="+402"/>
         <source>My Computer</source>
-        <translation>Mi equipo</translation>
+        <translation>O Meu Computador</translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qfiledialog.cpp" line="-1504"/>
         <source>&amp;Rename</source>
-        <translation>Cambia&amp;r de nombre</translation>
+        <translation>&amp;Mudar o Nome</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Delete</source>
-        <translation>&amp;Borrar</translation>
+        <translation>&amp;Apagar</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show &amp;hidden files</source>
-        <translation>Mostrar los fic&amp;heros ocultos</translation>
+        <translation>Mostrar ficheiros &amp;escondidos</translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qfiledialog.ui"/>
         <location filename="../src/gui/dialogs/qfiledialog_wince.ui"/>
         <source>Back</source>
-        <translation>Anterior (histórico)</translation>
+        <translation>Recuar</translation>
     </message>
     <message>
         <location/>
         <location filename="../src/gui/dialogs/qfiledialog_wince.ui"/>
         <source>Parent Directory</source>
-        <translation>Directorio superior</translation>
+        <translation>Pasta Mãe</translation>
     </message>
     <message>
         <location/>
         <location filename="../src/gui/dialogs/qfiledialog_wince.ui"/>
         <source>List View</source>
-        <translation>Vista de lista</translation>
+        <translation>Vista Abreviada</translation>
     </message>
     <message>
         <location/>
         <location filename="../src/gui/dialogs/qfiledialog_wince.ui"/>
         <source>Detail View</source>
-        <translation>Vista detallada</translation>
+        <translation>Vista Detalhada</translation>
     </message>
     <message>
         <location/>
         <location filename="../src/gui/dialogs/qfiledialog_wince.ui"/>
         <source>Files of type:</source>
-        <translation>Ficheros de tipo:</translation>
+        <translation>FIcheiros do tipo:</translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qfiledialog.cpp" line="+6"/>
         <location line="+648"/>
         <source>Directory:</source>
-        <translation>Directorio:</translation>
+        <translation>Pasta:</translation>
     </message>
     <message>
         <source>
 File not found.
 Please verify the correct file name was given</source>
         <translation type="obsolete">
-Fichero no encontrado. 
-Compruebe que el nombre del fichero es correcto</translation>
+Ficheiro não encontrado.
+Por favor verifique o nome do ficheiro</translation>
     </message>
     <message>
         <location line="+794"/>
@@ -1602,25 +1596,25 @@ Compruebe que el nombre del fichero es correcto</translation>
 Directory not found.
 Please verify the correct directory name was given.</source>
         <translation>%1
-Directorio no encontrado.
-Verique que el nombre del directorio es correcto.</translation>
+Pasta não encontrada.
+Por favor verifique o nome da pasta.</translation>
     </message>
     <message>
         <location line="-218"/>
         <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-        <translation>«%1» está protegido contra escritura. 
-¿Desea borrarlo de todas formas?</translation>
+        <translation>&apos;%1&apos; está protegido contra escrita.
+Deseja apagar de qualquer forma?</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Are sure you want to delete &apos;%1&apos;?</source>
-        <translation>¿Seguro que desea borrar «%1»?</translation>
+        <translation>Deseja mesmo apagar &apos;%1&apos;?</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Could not delete directory.</source>
-        <translation>No fue posible borrar el directorio.</translation>
+        <translation>Não foi possível apagar a pasta.</translation>
     </message>
     <message>
         <location line="+407"/>
@@ -1630,83 +1624,83 @@ Do you want to delete it anyway?</source>
     <message>
         <location filename="../src/gui/dialogs/qfiledialog_win.cpp" line="+160"/>
         <source>All Files (*.*)</source>
-        <translation>Todos los ficheros (*.*)</translation>
+        <translation>Todos os Ficheiros (*.*)</translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qfiledialog.cpp" line="-2550"/>
         <source>Save As</source>
-        <translation>Guardar como</translation>
+        <translation>Gravar Como</translation>
     </message>
     <message>
         <location filename="../src/gui/itemviews/qfileiconprovider.cpp" line="+411"/>
         <source>Drive</source>
-        <translation>Unidad</translation>
+        <translation>Unidade</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+1"/>
         <source>File</source>
-        <translation>Fichero</translation>
+        <translation>Ficheiro</translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Unknown</source>
-        <translation>Desconocido</translation>
+        <translation>Desconhecido</translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qfiledialog.cpp" line="-4"/>
         <source>Find Directory</source>
-        <translation>Buscar en el directorio</translation>
+        <translation type="unfinished">Procurar Pasta</translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Show </source>
-        <translation>Mostrar </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qfiledialog.ui"/>
         <location filename="../src/gui/dialogs/qfiledialog_wince.ui"/>
         <source>Forward</source>
-        <translation>Siguiente (histórico)</translation>
+        <translation type="unfinished">Seguinte</translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qfiledialog.cpp" line="+1970"/>
         <source>New Folder</source>
-        <translation>Nueva carpeta</translation>
+        <translation type="unfinished">Nova Pasta</translation>
     </message>
     <message>
         <location line="-1963"/>
         <source>&amp;New Folder</source>
-        <translation>&amp;Nueva carpeta</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+656"/>
         <location line="+38"/>
         <source>&amp;Choose</source>
-        <translation>&amp;Seleccionar</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qsidebar.cpp" line="+418"/>
         <source>Remove</source>
-        <translation>Eliminar</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qfiledialog.cpp" line="-687"/>
         <location line="+652"/>
         <source>File &amp;name:</source>
-        <translation>&amp;Nombre de fichero:</translation>
+        <translation type="unfinished">&amp;Nome do Ficheiro:</translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qfiledialog.ui"/>
         <location filename="../src/gui/dialogs/qfiledialog_wince.ui"/>
         <source>Look in:</source>
-        <translation>Ver en:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <location filename="../src/gui/dialogs/qfiledialog_wince.ui"/>
         <source>Create New Folder</source>
-        <translation>Crear una nueva carpeta</translation>
+        <translation type="unfinished">Criar Nova Pasta</translation>
     </message>
 </context>
 <context>
@@ -1714,80 +1708,74 @@ Do you want to delete it anyway?</source>
     <message>
         <location filename="../src/gui/dialogs/qfilesystemmodel.cpp" line="+744"/>
         <source>%1 TB</source>
-        <translation>%1 TiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1 GB</source>
-        <translation>%1 GiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1 MB</source>
-        <translation>%1 MiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1 KB</source>
-        <translation>%1 KiB</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>%1 bytes</source>
-        <translation>%1 bytes</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+77"/>
         <source>Invalid filename</source>
-        <translation>Nombre de fichero no válido</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-        <translation>&lt;b&gt;No se puede utilizar el nombre «%1».&lt;/b&gt;&lt;p&gt;Intente usar otro nombre con menos caracteres o sin signos de puntuación.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+63"/>
         <source>Name</source>
-        <translation>Nombre</translation>
+        <translation type="unfinished">Nome</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Size</source>
-        <translation>Tamaño</translation>
+        <translation type="unfinished">Tamanho</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Kind</source>
         <comment>Match OS X Finder</comment>
-        <translation>Clase</translation>
+        <translation type="unfinished">Tipo</translation>
     </message>
     <message>
+        <location line="+2"/>
         <source>Type</source>
-        <comment>
-All other platforms</comment>
-        <translation type="obsolete">Tipo</translation>
+        <comment>All other platforms</comment>
+        <translation type="unfinished">Tipo</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+7"/>
         <source>Date Modified</source>
-        <translation>Última modificación</translation>
+        <translation type="unfinished">Data de Modificação</translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qfilesystemmodel_p.h" line="+234"/>
         <source>My Computer</source>
-        <translation>Mi equipo</translation>
+        <translation type="unfinished">O Meu Computador</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Computer</source>
-        <translation>Equipo</translation>
-    </message>
-    <message>
-        <location filename="../src/gui/dialogs/qfilesystemmodel.cpp" line="-7"/>
-        <source>Type</source>
-        <comment>All other platforms</comment>
-        <translation type="unfinished">Tipo</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2012,48 +2000,48 @@ All other platforms</comment>
     <message>
         <location filename="../src/gui/dialogs/qfontdialog.cpp" line="+772"/>
         <source>&amp;Font</source>
-        <translation>&amp;Tipo de letra</translation>
+        <translation>&amp;Tipo de Letra</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Font st&amp;yle</source>
-        <translation>&amp;Estilo del tipo de letra</translation>
+        <translation>&amp;Estilo Tipo de Letra</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Size</source>
-        <translation>&amp;Tamaño</translation>
+        <translation>&amp;Tamanho</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Effects</source>
-        <translation>Efectos</translation>
+        <translation>Efeitos</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stri&amp;keout</source>
-        <translation>&amp;Tachado</translation>
+        <translation>&amp;Riscar</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Underline</source>
-        <translation>S&amp;ubrayado</translation>
+        <translation>&amp;Sublinhar</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Sample</source>
-        <translation>Muestra</translation>
+        <translation>Amostra</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Wr&amp;iting System</source>
-        <translation>Sistema de escr&amp;itura</translation>
+        <translation>&amp;Sistema de Escrita</translation>
     </message>
     <message>
         <location line="-604"/>
         <location line="+247"/>
         <source>Select Font</source>
-        <translation>Seleccionar un tipo de letra</translation>
+        <translation>Seleccione Tipo de Letra</translation>
     </message>
 </context>
 <context>
@@ -2062,19 +2050,19 @@ All other platforms</comment>
         <location filename="../src/network/access/qftp.cpp" line="+826"/>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+683"/>
         <source>Not connected</source>
-        <translation>No conectado</translation>
+        <translation>Desligado</translation>
     </message>
     <message>
         <location line="+65"/>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+65"/>
         <source>Host %1 not found</source>
-        <translation>Equipo %1 no encontrado</translation>
+        <translation>Servidor %1 não encontrado</translation>
     </message>
     <message>
         <location line="+4"/>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+4"/>
         <source>Connection refused to host %1</source>
-        <translation>Conexión rechazada al equipo %1</translation>
+        <translation>Ligação ao servidor %1 recusada</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2086,13 +2074,13 @@ All other platforms</comment>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+102"/>
         <location line="+1451"/>
         <source>Connected to host %1</source>
-        <translation>Conectado al equipo %1</translation>
+        <translation>Ligado ao servidor %1</translation>
     </message>
     <message>
         <location line="+219"/>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="-1290"/>
         <source>Connection refused for data connection</source>
-        <translation>Conexión para conexión de datos rechazada</translation>
+        <translation>Ligação de dados recusada</translation>
     </message>
     <message>
         <location line="+178"/>
@@ -2100,14 +2088,14 @@ All other platforms</comment>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+195"/>
         <location line="+728"/>
         <source>Unknown error</source>
-        <translation>Error desconocido</translation>
+        <translation>Erro desconhecido</translation>
     </message>
     <message>
         <location line="+889"/>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+77"/>
         <source>Connecting to host failed:
 %1</source>
-        <translation>La conexión con el equipo ha fallado:
+        <translation>A ligação ao servidor falhou:
 %1</translation>
     </message>
     <message>
@@ -2115,7 +2103,7 @@ All other platforms</comment>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+3"/>
         <source>Login failed:
 %1</source>
-        <translation>Identificación fallida:
+        <translation>A autenticação falhou:
 %1</translation>
     </message>
     <message>
@@ -2123,7 +2111,7 @@ All other platforms</comment>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+3"/>
         <source>Listing directory failed:
 %1</source>
-        <translation>El listado del directorio ha fallado:
+        <translation>A listagem da pasta falhou:
 %1</translation>
     </message>
     <message>
@@ -2131,7 +2119,7 @@ All other platforms</comment>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+3"/>
         <source>Changing directory failed:
 %1</source>
-        <translation>Fallo del cambio de directorio:
+        <translation>A mudança de pasta falhou:
 %1</translation>
     </message>
     <message>
@@ -2139,7 +2127,7 @@ All other platforms</comment>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+3"/>
         <source>Downloading file failed:
 %1</source>
-        <translation>Fallo de la descarga del fichero:
+        <translation>A descarga do ficheiro falhou:
 %1</translation>
     </message>
     <message>
@@ -2147,7 +2135,7 @@ All other platforms</comment>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+3"/>
         <source>Uploading file failed:
 %1</source>
-        <translation>El envío del fichero ha fallado:
+        <translation>O carregamento do ficheiro falhou:
 %1</translation>
     </message>
     <message>
@@ -2155,7 +2143,7 @@ All other platforms</comment>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+3"/>
         <source>Removing file failed:
 %1</source>
-        <translation>Eliminación de fichero fallida:
+        <translation>A remoção do ficheiro falhou:
 %1</translation>
     </message>
     <message>
@@ -2163,7 +2151,7 @@ All other platforms</comment>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+3"/>
         <source>Creating directory failed:
 %1</source>
-        <translation>Fallo de la creación de un directorio:
+        <translation>A criação da pasta falhou:
 %1</translation>
     </message>
     <message>
@@ -2171,7 +2159,7 @@ All other platforms</comment>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+3"/>
         <source>Removing directory failed:
 %1</source>
-        <translation>Eliminación de directorio fallida:
+        <translation>A remoção da pasta falhou:
 %1</translation>
     </message>
     <message>
@@ -2179,27 +2167,27 @@ All other platforms</comment>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="+25"/>
         <location line="+250"/>
         <source>Connection closed</source>
-        <translation>Conexión cerrada</translation>
+        <translation>Ligação fechada</translation>
     </message>
     <message>
         <location filename="../src/qt3support/network/q3ftp.cpp" line="-11"/>
         <source>Host %1 found</source>
-        <translation>Equipo %1 encontrado</translation>
+        <translation>Servidor %1 encontrado</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Connection to %1 closed</source>
-        <translation>Conexión a %1 cerrada</translation>
+        <translation>Ligação a %1 fechada</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Host found</source>
-        <translation>Equipo encontrado</translation>
+        <translation>Servidor encontrado</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Connected to host</source>
-        <translation>Conectado al equipo</translation>
+        <translation>Ligado ao servidor</translation>
     </message>
 </context>
 <context>
@@ -2207,7 +2195,7 @@ All other platforms</comment>
     <message>
         <location filename="../src/network/kernel/qhostinfo_p.h" line="+183"/>
         <source>Unknown error</source>
-        <translation>Error desconocido</translation>
+        <translation>Erro desconhecido</translation>
     </message>
 </context>
 <context>
@@ -2222,7 +2210,7 @@ All other platforms</comment>
         <location line="+40"/>
         <location line="+27"/>
         <source>Host not found</source>
-        <translation>Equipo no encontrado</translation>
+        <translation>Servidor Não encontrado</translation>
     </message>
     <message>
         <location line="-44"/>
@@ -2230,14 +2218,14 @@ All other platforms</comment>
         <location filename="../src/network/kernel/qhostinfo_win.cpp" line="-34"/>
         <location line="+29"/>
         <source>Unknown address type</source>
-        <translation>Dirección de tipo desconocido</translation>
+        <translation>Tipo de endereço desconhecido</translation>
     </message>
     <message>
         <location line="+8"/>
         <location filename="../src/network/kernel/qhostinfo_win.cpp" line="-19"/>
         <location line="+27"/>
         <source>Unknown error</source>
-        <translation>Error desconocido</translation>
+        <translation>Erro desconhecido</translation>
     </message>
 </context>
 <context>
@@ -2253,31 +2241,31 @@ All other platforms</comment>
         <location filename="../src/qt3support/network/q3http.cpp" line="+1160"/>
         <location line="+567"/>
         <source>Unknown error</source>
-        <translation>Error desconocido</translation>
+        <translation>Erro desconhecido</translation>
     </message>
     <message>
         <location line="-568"/>
         <location filename="../src/qt3support/network/q3http.cpp" line="-370"/>
         <source>Request aborted</source>
-        <translation>Solicitud interrumpida</translation>
+        <translation>Pedido abortado</translation>
     </message>
     <message>
         <location line="+579"/>
         <location filename="../src/qt3support/network/q3http.cpp" line="+381"/>
         <source>No server set to connect to</source>
-        <translation>No se ha indicado ningún servidor al que conectarse</translation>
+        <translation>Nenhum servidor para ligar</translation>
     </message>
     <message>
         <location line="+164"/>
         <location filename="../src/qt3support/network/q3http.cpp" line="+56"/>
         <source>Wrong content length</source>
-        <translation>Longitud del contenido errónea</translation>
+        <translation>Tamanho de conteúdo errado</translation>
     </message>
     <message>
         <location line="+4"/>
         <location filename="../src/qt3support/network/q3http.cpp" line="+4"/>
         <source>Server closed connection unexpectedly</source>
-        <translation>El servidor cerró la conexión inesperadamente</translation>
+        <translation>O servidor fechou a ligação inesperadamente</translation>
     </message>
     <message>
         <location line="+179"/>
@@ -2293,14 +2281,14 @@ All other platforms</comment>
         <location filename="../src/network/access/qhttpnetworkconnection.cpp" line="+876"/>
         <location filename="../src/qt3support/network/q3http.cpp" line="+38"/>
         <source>Connection refused</source>
-        <translation>Conexión rechazada</translation>
+        <translation>Ligação recusada</translation>
     </message>
     <message>
         <location filename="../src/network/access/qhttp.cpp" line="-304"/>
         <location filename="../src/network/access/qhttpnetworkconnection.cpp" line="-4"/>
         <location filename="../src/qt3support/network/q3http.cpp" line="+3"/>
         <source>Host %1 not found</source>
-        <translation>Equipo %1 no encontrado</translation>
+        <translation>Servidor %1 não encontrado</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -2308,13 +2296,13 @@ All other platforms</comment>
         <location line="+19"/>
         <location filename="../src/qt3support/network/q3http.cpp" line="+3"/>
         <source>HTTP request failed</source>
-        <translation>Solicitud HTTP fallida</translation>
+        <translation>O pedido HTTP falhou</translation>
     </message>
     <message>
         <location line="+73"/>
         <location filename="../src/qt3support/network/q3http.cpp" line="+69"/>
         <source>Invalid HTTP response header</source>
-        <translation>Cabecera de respuesta HTTP no válida</translation>
+        <translation>Cabeçalho de resposta HTTP inválido</translation>
     </message>
     <message>
         <location line="+125"/>
@@ -2322,48 +2310,48 @@ All other platforms</comment>
         <location filename="../src/qt3support/network/q3http.cpp" line="+40"/>
         <location line="+47"/>
         <source>Invalid HTTP chunked body</source>
-        <translation>Fragmento HTTP no válido</translation>
+        <translation>Corpo parcial HTTP inválido</translation>
     </message>
     <message>
         <location filename="../src/qt3support/network/q3http.cpp" line="+294"/>
         <source>Host %1 found</source>
-        <translation>Equipo %1 encontrado</translation>
+        <translation>Servidor %1 encontrado</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Connected to host %1</source>
-        <translation>Conectado al equipo %1</translation>
+        <translation>Ligado ao servidor %1</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Connection to %1 closed</source>
-        <translation>Conexión a %1 cerrada</translation>
+        <translation>Ligação a %1 fechada</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Host found</source>
-        <translation>Equipo encontrado</translation>
+        <translation>Servidor encontrado</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Connected to host</source>
-        <translation>Conectado al equipo</translation>
+        <translation>Ligado ao servidor</translation>
     </message>
     <message>
         <location filename="../src/network/access/qhttpnetworkconnection.cpp" line="-22"/>
         <location filename="../src/qt3support/network/q3http.cpp" line="+3"/>
         <source>Connection closed</source>
-        <translation>Conexión cerrada</translation>
+        <translation>Ligação fechada</translation>
     </message>
     <message>
         <location filename="../src/network/access/qhttp.cpp" line="-135"/>
         <source>Proxy authentication required</source>
-        <translation>El proxy requiere autenticación</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Authentication required</source>
-        <translation>Se precisa autenticación</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-138"/>
@@ -2411,7 +2399,7 @@ All other platforms</comment>
     <message>
         <location line="+31"/>
         <source>Authentication required</source>
-        <translation>Se precisa autenticación</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
@@ -2449,22 +2437,22 @@ All other platforms</comment>
     <message>
         <location filename="../src/sql/drivers/ibase/qsql_ibase.cpp" line="+1428"/>
         <source>Error opening database</source>
-        <translation>Error al abrir la base de datos</translation>
+        <translation>Erro ao abrir a base de dados</translation>
     </message>
     <message>
         <location line="+54"/>
         <source>Could not start transaction</source>
-        <translation>No fue posible iniciar la transacción</translation>
+        <translation>Não foi possível iniciar a transacção</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Unable to commit transaction</source>
-        <translation>Incapaz de enviar la transacción</translation>
+        <translation>Não foi possível finalizar a transacção</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Unable to rollback transaction</source>
-        <translation>Incapaz de anular la transacción</translation>
+        <translation>Não foi possível anular a transacção</translation>
     </message>
 </context>
 <context>
@@ -2472,89 +2460,89 @@ All other platforms</comment>
     <message>
         <location line="-1097"/>
         <source>Unable to create BLOB</source>
-        <translation>Imposible crear un BLOB</translation>
+        <translation>Não foi possível criar o BLOB</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Unable to write BLOB</source>
-        <translation>Imposible escribir el BLOB</translation>
+        <translation>Não foi possível escrever o BLOB</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Unable to open BLOB</source>
-        <translation>Imposible abrir el BLOB</translation>
+        <translation>Não foi possível abrir o BLOB</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Unable to read BLOB</source>
-        <translation>Imposible leer el BLOB</translation>
+        <translation>Não foi possível ler o BLOB</translation>
     </message>
     <message>
         <location line="+125"/>
         <location line="+189"/>
         <source>Could not find array</source>
-        <translation>No fue posible encontrar la tabla</translation>
+        <translation>Não foi possível encontrar o array</translation>
     </message>
     <message>
         <location line="-157"/>
         <source>Could not get array data</source>
-        <translation>No fue posible obtener los datos de la tabla</translation>
+        <translation>Não foi possível obter os dados do array</translation>
     </message>
     <message>
         <location line="+212"/>
         <source>Could not get query info</source>
-        <translation>No fue posible obtener información sobre la consulta</translation>
+        <translation>Não foi possível obter informação da query</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Could not start transaction</source>
-        <translation>No fue posible iniciar la transacción</translation>
+        <translation>Não foi possível iniciar a transacção</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Unable to commit transaction</source>
-        <translation>Incapaz de enviar la transacción</translation>
+        <translation>Não foi possível finalizar a transacção</translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Could not allocate statement</source>
-        <translation>No fue posible asignar la instrucción</translation>
+        <translation>Não foi possível alocar a expressão</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Could not prepare statement</source>
-        <translation>No fue posible preparar la instrucción</translation>
+        <translation>Não foi possível preparar a expressão</translation>
     </message>
     <message>
         <location line="+5"/>
         <location line="+7"/>
         <source>Could not describe input statement</source>
-        <translation>No fue posible describir la instrucción de entrada</translation>
+        <translation>Não foi possível descrever a expressão de entrada</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Could not describe statement</source>
-        <translation>No fue posible describir la instrucción</translation>
+        <translation>Não foi possível descrever a expressão</translation>
     </message>
     <message>
         <location line="+115"/>
         <source>Unable to close statement</source>
-        <translation>No fue posible cerrar la instrucción</translation>
+        <translation>Não foi possível fechar a expressão</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Unable to execute query</source>
-        <translation>No fue posible ejecutar la consulta</translation>
+        <translation>Não foi possível executar a query</translation>
     </message>
     <message>
         <location line="+46"/>
         <source>Could not fetch next item</source>
-        <translation>No fue posible obtener el elemento siguiente</translation>
+        <translation>Não foi possível obter o elemento seguinte</translation>
     </message>
     <message>
         <location line="+160"/>
         <source>Could not get statement info</source>
-        <translation>No fue posible obtener información sobre la instrucción</translation>
+        <translation>Não foi possível obter informação da expressão</translation>
     </message>
 </context>
 <context>
@@ -2562,27 +2550,27 @@ All other platforms</comment>
     <message>
         <location filename="../src/corelib/global/qglobal.cpp" line="+1869"/>
         <source>Permission denied</source>
-        <translation>Permiso denegado</translation>
+        <translation>Permissão negada</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Too many open files</source>
-        <translation>Demasiados ficheros abiertos simultáneamente</translation>
+        <translation>Demasiados ficheiros abertos</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>No such file or directory</source>
-        <translation>No hay ningún fichero o directorio con ese nombre</translation>
+        <translation>Ficheiro ou pasta inexistente</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>No space left on device</source>
-        <translation>No queda espacio en el dispositivo</translation>
+        <translation>Dispositivo sem espaço livre</translation>
     </message>
     <message>
         <location filename="../src/corelib/io/qiodevice.cpp" line="+1536"/>
         <source>Unknown error</source>
-        <translation>Error desconocido</translation>
+        <translation>Erro desconhecido</translation>
     </message>
 </context>
 <context>
@@ -2605,7 +2593,7 @@ All other platforms</comment>
     <message>
         <location line="+4"/>
         <source>Mac OS X input method</source>
-        <translation>Método de entrada Mac OS X</translation>
+        <translation>Método de entrada Max OS X</translation>
     </message>
 </context>
 <context>
@@ -2620,61 +2608,61 @@ All other platforms</comment>
     <name>QLibrary</name>
     <message>
         <source>QLibrary::load_sys: Cannot load %1 (%2)</source>
-        <translation type="obsolete">QLibrary::load_sys: No se puede cargar %1 (%2)</translation>
+        <translation type="obsolete">QLibrary::load_sys: Não foi possível carregar %1 (%2)</translation>
     </message>
     <message>
         <source>QLibrary::unload_sys: Cannot unload %1 (%2)</source>
-        <translation type="obsolete">QLibrary::unload_sys: No se puede cargar %1 (%2)</translation>
+        <translation type="obsolete">QLibrary::unload_sys: Não foi possível descarregar %1 (%2)</translation>
     </message>
     <message>
         <source>QLibrary::resolve_sys: Symbol &quot;%1&quot; undefined in %2 (%3)</source>
-        <translation type="obsolete">QLibrary::resolve_sys: Símbolo «%1» no definido en %2 (%3)</translation>
+        <translation type="obsolete">QLibrary::resolve_sys: Símbolo &quot;%1&quot; indefinido em %2 (%3)</translation>
     </message>
     <message>
         <location filename="../src/corelib/plugin/qlibrary.cpp" line="+378"/>
         <source>Could not mmap &apos;%1&apos;: %2</source>
-        <translation>No fu posible establecer la proyección en memoria de «%1»: %2</translation>
+        <translation>Não foi possivel mapear &apos;%1&apos;: %2</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Plugin verification data mismatch in &apos;%1&apos;</source>
-        <translation>Los datos de verificación del complemento no coinciden en «%1»</translation>
+        <translation>Dados de verificação do plugin incorrectos em &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Could not unmap &apos;%1&apos;: %2</source>
-        <translation>No fue posible suprimir la proyección en memoria de «%1»: %2</translation>
+        <translation>Não foi possível desmapear &apos;%1&apos;: %2</translation>
     </message>
     <message>
         <location line="+302"/>
         <source>The plugin &apos;%1&apos; uses incompatible Qt library. (%2.%3.%4) [%5]</source>
-        <translation>El complemento «%1» usa una biblioteca Qt incompatible. (%2.%3.%4) [%5]</translation>
+        <translation>O plugin  &apos;%1&apos; usa uma biblioteca Qt incompatível. (%2.%3.%4) [%5]</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>The plugin &apos;%1&apos; uses incompatible Qt library. Expected build key &quot;%2&quot;, got &quot;%3&quot;</source>
-        <translation>El complemento «%1» usa una biblioteca Qt incompatible. Se esperaba la clave «%2», pero se ha recibido «%3»</translation>
+        <translation>O plugin &apos;%1&apos; usa uma biblioteca Qt incompatível. A chave de compilação esperada &quot;%2&quot;, ficou  &quot;%3&quot;</translation>
     </message>
     <message>
         <location line="+340"/>
         <source>Unknown error</source>
-        <translation>Error desconocido</translation>
+        <translation>Erro desconhecido</translation>
     </message>
     <message>
         <location line="-377"/>
         <location filename="../src/corelib/plugin/qpluginloader.cpp" line="+280"/>
         <source>The shared library was not found.</source>
-        <translation>No se ha encontrado la biblioteca compartida.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>The file &apos;%1&apos; is not a valid Qt plugin.</source>
-        <translation>El fichero «%1» no es un complemento de Qt válido.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+43"/>
         <source>The plugin &apos;%1&apos; uses incompatible Qt library. (Cannot mix debug and release libraries.)</source>
-        <translation>El complemento «%1» usa una biblioteca Qt incompatible. (No se pueden mezclar las bibliotecas «debug» y «release».)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/corelib/plugin/qlibrary_unix.cpp" line="+209"/>
@@ -2700,12 +2688,12 @@ All other platforms</comment>
     <message>
         <location filename="../src/gui/widgets/qlineedit.cpp" line="+2680"/>
         <source>&amp;Undo</source>
-        <translation>&amp;Deshacer</translation>
+        <translation>&amp;Desfazer</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>&amp;Redo</source>
-        <translation>&amp;Rehacer</translation>
+        <translation>&amp;Refazer</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2720,17 +2708,17 @@ All other platforms</comment>
     <message>
         <location line="+4"/>
         <source>&amp;Paste</source>
-        <translation>&amp;Pegar</translation>
+        <translation>Co&amp;lar</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Delete</source>
-        <translation>Borrar</translation>
+        <translation>Apagar</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Select All</source>
-        <translation>Seleccionar todo</translation>
+        <translation>Seleccionar Tudo</translation>
     </message>
 </context>
 <context>
@@ -2834,27 +2822,27 @@ All other platforms</comment>
     <message>
         <location filename="../src/sql/drivers/mysql/qsql_mysql.cpp" line="+1231"/>
         <source>Unable to open database &apos;</source>
-        <translation>Imposible abrir la base de datos &apos;</translation>
+        <translation>Não foi possível abrir a base de dados &apos;</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Unable to connect</source>
-        <translation>No es posible establecer una conexión</translation>
+        <translation>Não foi possível estabelecer a ligação</translation>
     </message>
     <message>
         <location line="+127"/>
         <source>Unable to begin transaction</source>
-        <translation>No es posible iniciar la transacción</translation>
+        <translation>Não foi possível iniciar a transacção</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Unable to commit transaction</source>
-        <translation>No es posible enviar la transacción</translation>
+        <translation>Não foi possível finalizar a transacção</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Unable to rollback transaction</source>
-        <translation>No es posible anular la transacción</translation>
+        <translation>Não foi possível anular a transacção</translation>
     </message>
 </context>
 <context>
@@ -2862,49 +2850,49 @@ All other platforms</comment>
     <message>
         <location line="-922"/>
         <source>Unable to fetch data</source>
-        <translation>No es posible obtener los datos</translation>
+        <translation>Não foi possível obter dados</translation>
     </message>
     <message>
         <location line="+176"/>
         <source>Unable to execute query</source>
-        <translation>No es posible ejecutar la consulta</translation>
+        <translation>Não foi possível executar a query</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Unable to store result</source>
-        <translation>No es posible almacenar el resultado</translation>
+        <translation>Não foi possível guardar o resultado</translation>
     </message>
     <message>
         <location line="+190"/>
         <location line="+8"/>
         <source>Unable to prepare statement</source>
-        <translation>No es posible preparar la instrucción</translation>
+        <translation>Não foi possível preparar a expressão</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Unable to reset statement</source>
-        <translation>No es posible reinicializar la instrucción</translation>
+        <translation>Não foi possível restaurar a expressão</translation>
     </message>
     <message>
         <location line="+87"/>
         <source>Unable to bind value</source>
-        <translation>No es posible ligar el valor</translation>
+        <translation>Não foi possível fazer a ligação do valor</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Unable to execute statement</source>
-        <translation>No es posible ejecutar la instrucción</translation>
+        <translation>Não foi possível executar a expressão</translation>
     </message>
     <message>
         <location line="+14"/>
         <location line="+21"/>
         <source>Unable to bind outvalues</source>
-        <translation>No es posible ligar los valores de salida</translation>
+        <translation>Não foi possível fazer a ligação dos valores externos</translation>
     </message>
     <message>
         <location line="-12"/>
         <source>Unable to store statement results</source>
-        <translation>No es posible almacenar los resultados de la instrucción</translation>
+        <translation>Não foi possível guardar os resultados da expressão</translation>
     </message>
     <message>
         <location line="-253"/>
@@ -2930,57 +2918,57 @@ All other platforms</comment>
     <message>
         <location filename="../src/gui/widgets/qmdisubwindow.cpp" line="+280"/>
         <source>%1 - [%2]</source>
-        <translation>%1 - [%2]</translation>
+        <translation type="unfinished">%1 - [%2]</translation>
     </message>
     <message>
         <location line="+72"/>
         <source>Close</source>
-        <translation>Cerrar</translation>
+        <translation type="unfinished">Fechar</translation>
     </message>
     <message>
         <location line="-18"/>
         <source>Minimize</source>
-        <translation>Minimizar</translation>
+        <translation type="unfinished">Minimizar</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Restore Down</source>
-        <translation>Restaurar abajo</translation>
+        <translation type="unfinished">Restaurar Baixo</translation>
     </message>
     <message>
         <location line="+707"/>
         <source>&amp;Restore</source>
-        <translation>&amp;Restaurar</translation>
+        <translation type="unfinished">&amp;Restaurar</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>&amp;Move</source>
-        <translation>&amp;Mover</translation>
+        <translation type="unfinished">&amp;Mover</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Size</source>
-        <translation>Redimen&amp;sionar</translation>
+        <translation type="unfinished">&amp;Tamanho</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mi&amp;nimize</source>
-        <translation>Mi&amp;nimizar</translation>
+        <translation type="unfinished">Mi&amp;nimizar</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Ma&amp;ximize</source>
-        <translation>Ma&amp;ximizar</translation>
+        <translation type="unfinished">Ma&amp;ximizar</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Stay on &amp;Top</source>
-        <translation>Permanecer en &amp;primer plano</translation>
+        <translation type="unfinished">Permanecer no &amp;Topo</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>&amp;Close</source>
-        <translation>&amp;Cerrar</translation>
+        <translation type="unfinished">&amp;Fechar</translation>
     </message>
     <message>
         <location line="-787"/>
@@ -3010,12 +2998,12 @@ All other platforms</comment>
     <message>
         <location line="+6"/>
         <source>Help</source>
-        <translation type="unfinished">Ayuda</translation>
+        <translation type="unfinished">Ajuda</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Menu</source>
-        <translation type="unfinished">Menú</translation>
+        <translation type="unfinished">Menu</translation>
     </message>
 </context>
 <context>
@@ -3024,7 +3012,7 @@ All other platforms</comment>
         <location filename="../src/plugins/accessible/widgets/qaccessiblemenu.cpp" line="+157"/>
         <location line="+225"/>
         <source>Close</source>
-        <translation>Cerrar</translation>
+        <translation>Fechar</translation>
     </message>
     <message>
         <location line="-224"/>
@@ -3037,58 +3025,58 @@ All other platforms</comment>
         <location line="+225"/>
         <location line="+51"/>
         <source>Execute</source>
-        <translation>Ejecutar</translation>
+        <translation>Executar</translation>
     </message>
 </context>
 <context>
     <name>QMenuBar</name>
     <message>
         <source>About</source>
-        <translation type="obsolete">Acerca de</translation>
+        <translation type="obsolete">Sobre</translation>
     </message>
     <message>
         <source>Config</source>
-        <translation type="obsolete">Configuración</translation>
+        <translation type="obsolete">Configurar</translation>
     </message>
     <message>
         <source>Preference</source>
-        <translation type="obsolete">Preferencia</translation>
+        <translation type="obsolete">Preferências</translation>
     </message>
     <message>
         <source>Options</source>
-        <translation type="obsolete">Opciones</translation>
+        <translation type="obsolete">Opções</translation>
     </message>
     <message>
         <source>Setting</source>
-        <translation type="obsolete">Parámetro</translation>
+        <translation type="obsolete">Alteração</translation>
     </message>
     <message>
         <source>Setup</source>
-        <translation type="obsolete">Configuración</translation>
+        <translation type="obsolete">Configuração</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation type="obsolete">Salir</translation>
+        <translation type="obsolete">Sair</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="obsolete">Salir</translation>
+        <translation type="obsolete">Sair</translation>
     </message>
     <message>
         <source>About %1</source>
-        <translation type="obsolete">Acerca de %1</translation>
+        <translation type="obsolete">Sobre %1</translation>
     </message>
     <message>
         <source>About Qt</source>
-        <translation type="obsolete">Acerca de Qt</translation>
+        <translation type="obsolete">Acerca do Qt</translation>
     </message>
     <message>
         <source>Preferences</source>
-        <translation type="obsolete">Preferencias</translation>
+        <translation type="obsolete">Preferências</translation>
     </message>
     <message>
         <source>Quit %1</source>
-        <translation type="obsolete">Salir de %1</translation>
+        <translation type="obsolete">Sair de %1</translation>
     </message>
 </context>
 <context>
@@ -3096,7 +3084,7 @@ All other platforms</comment>
     <message>
         <location filename="../src/gui/dialogs/qmessagebox.cpp" line="-1111"/>
         <source>Help</source>
-        <translation>Ayuda</translation>
+        <translation>Ajuda</translation>
     </message>
     <message>
         <location line="-853"/>
@@ -3104,30 +3092,30 @@ All other platforms</comment>
         <location filename="../src/gui/dialogs/qmessagebox.h" line="-52"/>
         <location line="+8"/>
         <source>OK</source>
-        <translation>Aceptar</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+509"/>
         <source>About Qt</source>
-        <translation>Acerca de Qt</translation>
+        <translation>Acerca do Qt</translation>
     </message>
     <message>
         <source>&lt;p&gt;This program uses Qt version %1.&lt;/p&gt;</source>
-        <translation type="obsolete">&lt;p&gt;Este programa utiliza la versión %1 de Qt.&lt;/p&gt;</translation>
+        <translation type="obsolete">&lt;p&gt;Este programa usa Qt versão %1.&lt;/p&gt;</translation>
     </message>
     <message>
-        <source>&lt;h3&gt;About Qt&lt;/h3&gt;%1&lt;p&gt;Qt is a C++ toolkit for cross-platform application development.&lt;/p&gt;&lt;p&gt;Qt provides single-source portability across MS&amp;nbsp;Windows, Mac&amp;nbsp;OS&amp;nbsp;X, Linux, and all major commercial Unix variants. Qt is also available for embedded devices as Qtopia Core.&lt;/p&gt;&lt;p&gt;Qt is a Trolltech product. See &lt;a href=&quot;http://qt.nokia.com/&quot;&gt;qt.nokia.com&lt;/a&gt; for more information.&lt;/p&gt;</source>
-        <translation type="obsolete">&lt;h3&gt;Acerca de Qt&lt;/h3&gt;%1&lt;p&gt;Qt es un toolkit en C++ para desarrollo de aplicaciones multiplataforma.&lt;/p&gt;&lt;p&gt;Qt proporciona portabilidad del código entre MS&amp;nbsp;Windows, Mac&amp;nbsp;OS&amp;nbsp;X, Linux y todas las variantes comerciales de Unix importantes. Qt también está disponible para sistemas empotrados bajo el nombre Qtopia Core.&lt;/p&gt;&lt;p&gt;Qt es un producto de Trolltech. Visite &lt;a href=&quot;http://qt.nokia.com/&quot;&gt;qt.nokia.com&lt;/a&gt; para obtener más información.&lt;/p&gt;</translation>
+        <source>&lt;h3&gt;About Qt&lt;/h3&gt;%1&lt;p&gt;Qt is a C++ toolkit for cross-platform application development.&lt;/p&gt;&lt;p&gt;Qt provides single-source portability across MS&amp;nbsp;Windows, Mac&amp;nbsp;OS&amp;nbsp;X, Linux, and all major commercial Unix variants. Qt is also available for embedded devices as Qtopia Core.&lt;/p&gt;&lt;p&gt;Qt is a Trolltech product. See &lt;a href=&quot;http://qt.nokia.com/qt/&quot;&gt;qt.nokia.com/qt/&lt;/a&gt; for more information.&lt;/p&gt;</source>
+        <translation type="obsolete">&lt;h3&gt;Acerca do Qt&lt;/h3&gt;%1&lt;p&gt;Qt é um conjunto de ferramentas para desenvolvimento de aplicações multiplataforma.&lt;/p&gt;O Qt oferece portabilidade de código fonte único em MS&amp;nbsp;Windows, Mac&amp;nbsp;OS&amp;nbsp;X, Linux e todas as principais variantes comerciais de Unix. O Qt está igualmente disponível para dispositivos embebidos como Qtopia Core.&lt;/p&gt;&lt;p&gt;O Qt é um produto Trolltech. Veja &lt;a href=&quot;http://qt.nokia.com/qt/&quot;&gt;qt.nokia.com/qt/&lt;/a&gt; para mais informação.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="-1605"/>
         <source>Show Details...</source>
-        <translation>Mostrar los detalles...</translation>
+        <translation>Mostrar Detalhes...</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Hide Details...</source>
-        <translation>Ocultar los detalles...</translation>
+        <translation>Não Mostrar Detalhes...</translation>
     </message>
     <message>
         <location line="+1570"/>
@@ -3136,7 +3124,7 @@ All other platforms</comment>
     </message>
     <message>
         <source>&lt;p&gt;This program uses Qt Open Source Edition version %1.&lt;/p&gt;&lt;p&gt;Qt Open Source Edition is intended for the development of Open Source applications. You need a commercial Qt license for development of proprietary (closed source) applications.&lt;/p&gt;&lt;p&gt;Please see &lt;a href=&quot;http://qt.nokia.com/company/model/&quot;&gt;qt.nokia.com/company/model/&lt;/a&gt; for an overview of Qt licensing.&lt;/p&gt;</source>
-        <translation type="obsolete">&lt;p&gt;Este programa utiliza Qt Open Source Edition versión %1.&lt;/p&gt;&lt;p&gt;Qt Open Source Edition está dirigida al desarrollo de aplicaciones libres. Para desarrollar aplicaciones privativas (de código cerrado) necesita una licencia comercial de Qt.&lt;/p&gt;&lt;p&gt;Visite &lt;a href=&quot;http://qt.nokia.com/company/model/&quot;&gt;qt.nokia.com/company/model/&lt;/a&gt; para obtener una visión global de las licencias de Qt.&lt;/p&gt;</translation>
+        <translation type="obsolete">&lt;p&gt;Este programa usa Qt Open Source Edition versão %1.&lt;/p&gt;&lt;p&gt;Qt Open Source Edition é indicado para o desenvolvimento de aplicações/programas open source. Se pretender desenvolver aplicações sem disponibilizar o codigo fonte, então precisará de obter uma licença comercial.&lt;/p&gt;&lt;p&gt;Por favor consulte &lt;a href=&quot;http://qt.nokia.com/company/model/&quot;&gt;qt.nokia.com/company/model/&lt;/a&gt;para obter mais informação acerca de licenças Qt.&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -3144,7 +3132,7 @@ All other platforms</comment>
     <message>
         <location filename="../src/plugins/inputmethods/imsw-multi/qmultiinputcontext.cpp" line="+88"/>
         <source>Select IM</source>
-        <translation>Seleccionar IM</translation>
+        <translation>Seleccione Método de Entrada</translation>
     </message>
 </context>
 <context>
@@ -3152,12 +3140,12 @@ All other platforms</comment>
     <message>
         <location filename="../src/plugins/inputmethods/imsw-multi/qmultiinputcontextplugin.cpp" line="+95"/>
         <source>Multiple input method switcher</source>
-        <translation>Seleccionador de varios métodos de entrada</translation>
+        <translation>Seleccionador de método de entrada</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Multiple input method switcher that uses the context menu of the text widgets</source>
-        <translation>Seleccionador de varios métodos de entrada que usa el menú contextual de los elementos de texto</translation>
+        <translation>Seleccionador de método de entrada que utiliza o menu de contexto dos elementos de texto</translation>
     </message>
 </context>
 <context>
@@ -3165,127 +3153,127 @@ All other platforms</comment>
     <message>
         <location filename="../src/network/socket/qnativesocketengine.cpp" line="+206"/>
         <source>The remote host closed the connection</source>
-        <translation>El equipo remoto ha cerrado la conexión</translation>
+        <translation>A máquina remota fechou a ligação</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Network operation timed out</source>
-        <translation>La operación de red ha expirado</translation>
+        <translation>Operação de rede expirada</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Out of resources</source>
-        <translation>Insuficientes recursos</translation>
+        <translation>Sem recursos</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Unsupported socket operation</source>
-        <translation>Operación socket no admitida</translation>
+        <translation>Operação de &apos;socket&apos; não suportada</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Protocol type not supported</source>
-        <translation>Tipo de protocolo no admitido</translation>
+        <translation>Tipo de protocolo não suportado</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Invalid socket descriptor</source>
-        <translation>Descriptor de socket no válido</translation>
+        <translation>Descritor de &apos;socket&apos; inválido</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Network unreachable</source>
-        <translation>Red inalcanzable</translation>
+        <translation>Rede inalcançável</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Permission denied</source>
-        <translation>Permiso denegado</translation>
+        <translation>Permissão negada</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Connection timed out</source>
-        <translation>Conexión expirada</translation>
+        <translation>Ligação expirada</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Connection refused</source>
-        <translation>Conexión rechazada</translation>
+        <translation>Ligação recusada</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The bound address is already in use</source>
-        <translation>La dirección enlazada ya está en uso</translation>
+        <translation>O endereço de ligação já está em uso</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The address is not available</source>
-        <translation>La dirección no está disponible</translation>
+        <translation>O endereço não está disponível</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The address is protected</source>
-        <translation>La dirección está protegida</translation>
+        <translation>O endereço está protegido</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Unable to send a message</source>
-        <translation>Imposible enviar un mensaje</translation>
+        <translation>Não foi possível enviar uma mensagem</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Unable to receive a message</source>
-        <translation>Imposible recibir un mensaje</translation>
+        <translation>Não foi possível receber uma mensagem</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Unable to write</source>
-        <translation>Imposible escribir</translation>
+        <translation>Não foi possível escrever</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Network error</source>
-        <translation>Error de red</translation>
+        <translation>Erro de rede</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Another socket is already listening on the same port</source>
-        <translation>Ya hay otro socket escuchando por el mismo puerto</translation>
+        <translation>Outro &apos;socket&apos; já está à escuta no mesmo porto</translation>
     </message>
     <message>
         <location line="-66"/>
         <source>Unable to initialize non-blocking socket</source>
-        <translation>Imposible inicializar el socket no bloqueante</translation>
+        <translation>Não foi possível inicializar &apos;socket&apos; não bloqueante</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Unable to initialize broadcast socket</source>
-        <translation>Imposible inicializar el socket de difusión</translation>
+        <translation>Não foi possível inicializar &apos;socket&apos; de transmissão</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Attempt to use IPv6 socket on a platform with no IPv6 support</source>
-        <translation>Intento de usar un socket IPv6 sobre una plataforma que no contempla IPv6</translation>
+        <translation>Tentativa de utilização de &apos;socket&apos; IPv6 numa plataforma sem suporte IPv6</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Host unreachable</source>
-        <translation>Equipo inaccesible</translation>
+        <translation>Máquina inalcançável</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Datagram was too large to send</source>
-        <translation>El datagrama era demasiado grande para poder ser enviado</translation>
+        <translation>Datagrama demasiado grande para enviar</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Operation on non-socket</source>
-        <translation>Operación sobre un no-socket</translation>
+        <translation>Operação em não &apos;socket&apos;</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Unknown error</source>
-        <translation>Error desconocido</translation>
+        <translation>Erro desconhecido</translation>
     </message>
     <message>
         <location line="-3"/>
@@ -3392,18 +3380,18 @@ All other platforms</comment>
     <message>
         <location filename="../src/sql/drivers/oci/qsql_oci.cpp" line="+2069"/>
         <source>Unable to logon</source>
-        <translation>No es posible abrir sesión</translation>
+        <translation>Não foi possível autenticar</translation>
     </message>
     <message>
         <location line="-144"/>
         <source>Unable to initialize</source>
         <comment>QOCIDriver</comment>
-        <translation>La inicialización ha fallado</translation>
+        <translation>Não foi possível inicializar</translation>
     </message>
     <message>
         <location line="+215"/>
         <source>Unable to begin transaction</source>
-        <translation type="unfinished">No es posible iniciar la transacción</translation>
+        <translation type="unfinished">Não foi possível iniciar a transacção</translation>
     </message>
     <message>
         <location line="+19"/>
@@ -3423,41 +3411,41 @@ All other platforms</comment>
         <location line="+161"/>
         <location line="+15"/>
         <source>Unable to bind column for batch execute</source>
-        <translation>No es posible ligar la columna para una ejecución por lotes</translation>
+        <translation>Não foi possível fazer a licação da coluna para execução &apos;batch&apos;</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Unable to execute batch statement</source>
-        <translation>No es posible ejecutar la instrucción por lotes</translation>
+        <translation>Não foi possível executar a expressão de &apos;batch&apos;</translation>
     </message>
     <message>
         <location line="+302"/>
         <source>Unable to goto next</source>
-        <translation>No es posible pasar al siguiente</translation>
+        <translation>Não foi possível passar ao seguinte</translation>
     </message>
     <message>
         <location line="+59"/>
         <source>Unable to alloc statement</source>
-        <translation>No es posible asignar la instrucción</translation>
+        <translation>Não foi possível alocar a expressão</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Unable to prepare statement</source>
-        <translation>No es posible preparar la instrucción</translation>
+        <translation>Não foi possível preparar a expressão</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Unable to bind value</source>
-        <translation>No es posible ligar el valor</translation>
+        <translation>Não foi possível fazer o ligamento do valor</translation>
     </message>
     <message>
         <source>Unable to execute select statement</source>
-        <translation type="obsolete">No es posible ejecutar la instrucción select</translation>
+        <translation type="obsolete">Não foi possível executar a expressão select</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Unable to execute statement</source>
-        <translation>No es posible ejecutar la instrucción</translation>
+        <translation>Não foi possível executar a expressão</translation>
     </message>
 </context>
 <context>
@@ -3465,32 +3453,32 @@ All other platforms</comment>
     <message>
         <location filename="../src/sql/drivers/odbc/qsql_odbc.cpp" line="+1785"/>
         <source>Unable to connect</source>
-        <translation>No es posible establecer una conexión</translation>
+        <translation>Não foi possível ligar</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Unable to connect - Driver doesn&apos;t support all needed functionality</source>
-        <translation>No es posible conectarse - El controlador no ofrece todas las funciones necesarias</translation>
+        <translation>Não foi possível ligar - O &apos;driver&apos; não suporta todas as funcionalidades necessárias</translation>
     </message>
     <message>
         <location line="+242"/>
         <source>Unable to disable autocommit</source>
-        <translation>No es posible inhabilitar el envío automático</translation>
+        <translation>Não foi possível  desactivar finalização automática</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Unable to commit transaction</source>
-        <translation>No es posible enviar la transacción</translation>
+        <translation>Não foi possível finalizar a transacção</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Unable to rollback transaction</source>
-        <translation>No es posible anular la transacción</translation>
+        <translation>Não foi possível anular a transacção</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Unable to enable autocommit</source>
-        <translation>No es posible habilitar el envío automático</translation>
+        <translation>Não foi possível activar finalização automática</translation>
     </message>
 </context>
 <context>
@@ -3499,28 +3487,28 @@ All other platforms</comment>
         <location line="-1218"/>
         <location line="+349"/>
         <source>QODBCResult::reset: Unable to set &apos;SQL_CURSOR_STATIC&apos; as statement attribute. Please check your ODBC driver configuration</source>
-        <translation>QODBCResult::reset: No es posible establecer «SQL_CURSOR_STATIC» como atributo de instrucción. Compruebe la configuración de su controlador ODBC</translation>
+        <translation>QODBCResult::reset: Não foi possível definir &apos;SQL_CURSOR_STATIC&apos; como atributo da expressão. Por favor verifique a configuração do seu &apos;driver&apos; ODBC</translation>
     </message>
     <message>
         <location line="-332"/>
         <location line="+626"/>
         <source>Unable to execute statement</source>
-        <translation>No es posible ejecutar la instrucción</translation>
+        <translation>Não foi possível executar a expressão</translation>
     </message>
     <message>
         <location line="-555"/>
         <source>Unable to fetch next</source>
-        <translation>No es posible obtener el siguiente</translation>
+        <translation>Não foi possível obter o seguinte</translation>
     </message>
     <message>
         <location line="+279"/>
         <source>Unable to prepare statement</source>
-        <translation>No es posible preparar la instrucción</translation>
+        <translation>Não foi possível preparar a expressão</translation>
     </message>
     <message>
         <location line="+268"/>
         <source>Unable to bind variable</source>
-        <translation>No es posible ligar la variable</translation>
+        <translation>Não foi possível fazer o ligamento da variável</translation>
     </message>
     <message>
         <location filename="../src/sql/drivers/db2/qsql_db2.cpp" line="+194"/>
@@ -3537,7 +3525,7 @@ All other platforms</comment>
     <message>
         <location line="+44"/>
         <source>Unable to fetch first</source>
-        <translation type="unfinished">Imposible recuperar el primero</translation>
+        <translation type="unfinished">Obtenção do primeiro não possível</translation>
     </message>
     <message>
         <location line="+19"/>
@@ -3550,7 +3538,7 @@ All other platforms</comment>
     <message>
         <location filename="../src/gui/util/qdesktopservices_mac.cpp" line="+165"/>
         <source>Home</source>
-        <translation>Inicio</translation>
+        <translation>Início</translation>
     </message>
     <message>
         <location filename="../src/network/access/qnetworkaccessdatabackend.cpp" line="+74"/>
@@ -3599,7 +3587,7 @@ All other platforms</comment>
     <message>
         <location filename="../src/gui/dialogs/qprintdialog_unix.cpp" line="+1195"/>
         <source>Name</source>
-        <translation type="unfinished">Nombre</translation>
+        <translation type="unfinished">Nome</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3612,22 +3600,22 @@ All other platforms</comment>
     <message>
         <location filename="../src/sql/drivers/psql/qsql_psql.cpp" line="+763"/>
         <source>Unable to connect</source>
-        <translation>No es posible establecer conexión</translation>
+        <translation>Não foi possível ligar</translation>
     </message>
     <message>
         <location line="+49"/>
         <source>Could not begin transaction</source>
-        <translation>No fue posible iniciar la transacción</translation>
+        <translation>Não foi possível iniciar a transacção</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Could not commit transaction</source>
-        <translation>No fue posible enviar la transacción</translation>
+        <translation>Não foi possível finalizar a transacção</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Could not rollback transaction</source>
-        <translation>No fue posible anular la transacción</translation>
+        <translation>Não foi possível anular a transacção</translation>
     </message>
     <message>
         <location line="+358"/>
@@ -3645,7 +3633,7 @@ All other platforms</comment>
     <message>
         <location line="-1058"/>
         <source>Unable to create query</source>
-        <translation>No es posible crear la consulta</translation>
+        <translation>Não foi possível criar a &apos;query&apos;</translation>
     </message>
     <message>
         <location line="+374"/>
@@ -3688,7 +3676,7 @@ All other platforms</comment>
     <message>
         <location/>
         <source>Page size:</source>
-        <translation type="unfinished">Tamaño de página:</translation>
+        <translation type="unfinished">Tamanho página:</translation>
     </message>
     <message>
         <location/>
@@ -3703,7 +3691,7 @@ All other platforms</comment>
     <message>
         <location/>
         <source>Paper source:</source>
-        <translation type="unfinished">Fuente del papel:</translation>
+        <translation type="unfinished">Fonte papel:</translation>
     </message>
     <message>
         <location/>
@@ -3713,12 +3701,12 @@ All other platforms</comment>
     <message>
         <location/>
         <source>Portrait</source>
-        <translation type="unfinished">Vertical</translation>
+        <translation type="unfinished">Retrato</translation>
     </message>
     <message>
         <location/>
         <source>Landscape</source>
-        <translation type="unfinished">Apaisado</translation>
+        <translation type="unfinished">Paisagem</translation>
     </message>
     <message>
         <location/>
@@ -3761,12 +3749,12 @@ All other platforms</comment>
     <message>
         <location filename="../src/corelib/plugin/qpluginloader.cpp" line="+24"/>
         <source>Unknown error</source>
-        <translation>Error desconocido</translation>
+        <translation>Erro desconhecido</translation>
     </message>
     <message>
         <location line="-68"/>
         <source>The plugin was not loaded.</source>
-        <translation>El complemento no fue cargado.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3774,61 +3762,30 @@ All other platforms</comment>
     <message>
         <location filename="../src/gui/painting/qprinterinfo_unix.cpp" line="+98"/>
         <source>locally connected</source>
-        <translation>conectado localmente</translation>
+        <translation>ligado localmente</translation>
     </message>
     <message>
         <location line="+23"/>
         <location line="+225"/>
         <source>Aliases: %1</source>
-        <translation>Alias: %1</translation>
+        <translation>Nomes Alternativos: %1</translation>
     </message>
     <message>
         <location line="+223"/>
         <location line="+199"/>
         <source>unknown</source>
-        <translation>desconocido</translation>
-    </message>
-    <message>
-        <source>Print in color if available</source>
-        <translation type="obsolete">Imprimir en color si es posible</translation>
-    </message>
-    <message>
-        <location filename="../src/gui/dialogs/qprintdialog_qws.cpp" line="+375"/>
-        <source>Print all</source>
-        <translation>Imprimir todo</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Print selection</source>
-        <translation>Imprimir la selección</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Print range</source>
-        <translation>Imprimir el intervalo</translation>
-    </message>
-    <message>
-        <source>Print last page first</source>
-        <translation type="obsolete">Imprimir primero la última página</translation>
-    </message>
-    <message>
-        <source>Number of copies:</source>
-        <translation type="obsolete">Número de copias:</translation>
-    </message>
-    <message>
-        <source>Paper format</source>
-        <translation type="obsolete">Formato del papel</translation>
+        <translation>desconhecido</translation>
     </message>
     <message>
         <source>Portrait</source>
-        <translation type="obsolete">Vertical</translation>
+        <translation type="obsolete">Retrato</translation>
     </message>
     <message>
         <source>Landscape</source>
-        <translation type="obsolete">Apaisado</translation>
+        <translation type="obsolete">Paisagem</translation>
     </message>
     <message>
-        <location line="-48"/>
+        <location filename="../src/gui/dialogs/qprintdialog_qws.cpp" line="+329"/>
         <source>A0 (841 x 1189 mm)</source>
         <translation>A0 (841 x 1189 mm)</translation>
     </message>
@@ -3850,7 +3807,7 @@ All other platforms</comment>
     <message>
         <location line="+1"/>
         <source>A4 (210 x 297 mm, 8.26 x 11.7 inches)</source>
-        <translation>A4 (210 x 297 mm, 8,26 x 11,7 pulgadas)</translation>
+        <translation>A4 (210 x 297 mm, 8.26 x 11.7 polegadas)</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3905,7 +3862,7 @@ All other platforms</comment>
     <message>
         <location line="+1"/>
         <source>B5 (176 x 250 mm, 6.93 x 9.84 inches)</source>
-        <translation>B5 (176 x 250 mm, 6,93 x 9,84 pulgadas)</translation>
+        <translation>B5 (176 x 250 mm, 6.93 x 9.84 polegadas)</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3945,7 +3902,7 @@ All other platforms</comment>
     <message>
         <location line="+1"/>
         <source>Executive (7.5 x 10 inches, 191 x 254 mm)</source>
-        <translation>Ejecutivo (7,5 x 10 pulgadas, 191 x 254 mm)</translation>
+        <translation>Executivo (7.5 x 10 polegadas, 191 x 254 mm)</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3960,27 +3917,27 @@ All other platforms</comment>
     <message>
         <location line="+1"/>
         <source>Legal (8.5 x 14 inches, 216 x 356 mm)</source>
-        <translation>Legal (8,5 x 14 pulgadas, 216 x 356 mm)</translation>
+        <translation>Legal (8.5 x 14 polegadas, 216 x 356 mm)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Letter (8.5 x 11 inches, 216 x 279 mm)</source>
-        <translation>Carta (8,5 x 11 pulgadas, 216 x 279 mm)</translation>
+        <translation>Carta (8.5 x 11 polegadas, 216 x 279 mm)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Tabloid (279 x 432 mm)</source>
-        <translation>Tabloide (279 x 432 mm)</translation>
+        <translation>Tablóide (279 x 432 mm)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>US Common #10 Envelope (105 x 241 mm)</source>
-        <translation>Sobre US Common #10 (105 x 241 mm)</translation>
+        <translation>Envelope #10 Comum EUA (105 x 241 mm)</translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qprintdialog_win.cpp" line="+268"/>
         <source>OK</source>
-        <translation>Aceptar</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -3988,15 +3945,15 @@ All other platforms</comment>
     </message>
     <message>
         <source>Page size:</source>
-        <translation type="obsolete">Tamaño de página:</translation>
+        <translation type="obsolete">Tamanho página:</translation>
     </message>
     <message>
         <source>Orientation:</source>
-        <translation type="obsolete">Orientación:</translation>
+        <translation type="obsolete">Orientação:</translation>
     </message>
     <message>
         <source>Paper source:</source>
-        <translation type="obsolete">Fuente del papel:</translation>
+        <translation type="obsolete">Fonte papel:</translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qabstractprintdialog.cpp" line="+110"/>
@@ -4007,44 +3964,58 @@ All other platforms</comment>
     </message>
     <message>
         <source>File</source>
-        <translation type="obsolete">Fichero</translation>
+        <translation type="obsolete">Ficheiro</translation>
     </message>
     <message>
         <source>Printer</source>
-        <translation type="obsolete">Impresora</translation>
+        <translation type="obsolete">Impressora</translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qprintdialog_unix.cpp" line="-357"/>
         <source>Print To File ...</source>
-        <translation>Imprimir a fichero...</translation>
+        <translation>Imprimir Para Ficheiro ...</translation>
     </message>
     <message>
         <source>Print dialog</source>
-        <translation type="obsolete">Ventana de impresión</translation>
+        <translation type="obsolete">Diálogo de impressão</translation>
+    </message>
+    <message>
+        <source>Paper format</source>
+        <translation type="obsolete">Formato do papel</translation>
     </message>
     <message>
         <source>Size:</source>
-        <translation type="obsolete">Tamaño:</translation>
+        <translation type="obsolete">Tamanho:</translation>
     </message>
     <message>
         <source>Properties</source>
-        <translation type="obsolete">Propiedades</translation>
+        <translation type="obsolete">Propriedades</translation>
     </message>
     <message>
         <source>Printer info:</source>
-        <translation type="obsolete">Información de la impresora:</translation>
+        <translation type="obsolete">Informação da impressora:</translation>
     </message>
     <message>
         <source>Browse</source>
-        <translation type="obsolete">Explorar</translation>
+        <translation type="obsolete">Navegar</translation>
     </message>
     <message>
         <source>Print to file</source>
-        <translation type="obsolete">Imprimir a fichero</translation>
+        <translation type="obsolete">Imprimir para um ficheiro</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/dialogs/qprintdialog_qws.cpp" line="+19"/>
+        <source>Print range</source>
+        <translation>Selecção de páginas</translation>
+    </message>
+    <message>
+        <location line="-2"/>
+        <source>Print all</source>
+        <translation>Imprimir todas</translation>
     </message>
     <message>
         <source>Pages from</source>
-        <translation type="obsolete">Páginas</translation>
+        <translation type="obsolete">Páginas de</translation>
     </message>
     <message>
         <source>to</source>
@@ -4052,54 +4023,70 @@ All other platforms</comment>
     </message>
     <message>
         <source>Selection</source>
-        <translation type="obsolete">Selección</translation>
+        <translation type="obsolete">Selecção</translation>
     </message>
     <message>
         <source>Copies</source>
-        <translation type="obsolete">Copias</translation>
+        <translation type="obsolete">Cópias</translation>
+    </message>
+    <message>
+        <source>Number of copies:</source>
+        <translation type="obsolete">Número de cópias:</translation>
     </message>
     <message>
         <source>Collate</source>
-        <translation type="obsolete">Recopilar</translation>
+        <translation type="obsolete">Juntar</translation>
+    </message>
+    <message>
+        <source>Print last page first</source>
+        <translation type="obsolete">Imprimir a última página primeiro</translation>
     </message>
     <message>
         <source>Other</source>
-        <translation type="obsolete">Otro</translation>
+        <translation type="obsolete">Outro</translation>
+    </message>
+    <message>
+        <source>Print in color if available</source>
+        <translation type="obsolete">Imprimir a cores se disponível</translation>
     </message>
     <message>
         <source>Double side printing</source>
-        <translation type="obsolete">Impresión a doble cara</translation>
+        <translation type="obsolete">Imprimir nos dois lados do papel</translation>
     </message>
     <message>
-        <location line="+80"/>
+        <location filename="../src/gui/dialogs/qprintdialog_unix.cpp" line="+80"/>
         <source>File %1 is not writable.
 Please choose a different file name.</source>
-        <translation>No se puede escribir en el fichero %1. 
-Elija un nombre de fichero diferente.</translation>
+        <translation>Não é possível escrever no ficheiro %1.
+Por favor escolha um nome diferente.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>%1 already exists.
 Do you want to overwrite it?</source>
-        <translation>%1 ya existe. 
-¿Desea sobrescribirlo?</translation>
+        <translation>%1 já existe.
+Deseja substituir?</translation>
     </message>
     <message>
-        <location filename="../src/gui/dialogs/qprintdialog_qws.cpp" line="-210"/>
+        <location filename="../src/gui/dialogs/qprintdialog_qws.cpp" line="-227"/>
         <source>File exists</source>
-        <translation>El fichero existe</translation>
+        <translation>O ficheiro existe</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;qt&gt;Do you want to overwrite it?&lt;/qt&gt;</source>
-        <translation>&lt;qt&gt;¿Desea sobrescribirlo?&lt;/qt&gt;</translation>
+        <translation>&lt;qt&gt;Deseja gravar por cima?&lt;/qt&gt;</translation>
+    </message>
+    <message>
+        <location line="+227"/>
+        <source>Print selection</source>
+        <translation>Selecção de Impressão</translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qprintdialog_unix.cpp" line="-8"/>
         <source>%1 is a directory.
 Please choose a different file name.</source>
-        <translation>%1 es un directorio. 
-Elija un nombre de fichero diferente.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/gui/dialogs/qpagesetupdialog_unix.cpp" line="-232"/>
@@ -4359,12 +4346,12 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+6"/>
         <source>Portrait</source>
-        <translation type="unfinished">Vertical</translation>
+        <translation type="unfinished">Retrato</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Landscape</source>
-        <translation type="unfinished">Apaisado</translation>
+        <translation type="unfinished">Paisagem</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -4394,7 +4381,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+1"/>
         <source>Close</source>
-        <translation type="unfinished">Cerrar</translation>
+        <translation type="unfinished">Fechar</translation>
     </message>
     <message>
         <location line="+151"/>
@@ -4411,15 +4398,15 @@ Elija un nombre de fichero diferente.</translation>
     <name>QPrintPropertiesDialog</name>
     <message>
         <source>PPD Properties</source>
-        <translation type="obsolete">Propiedades PPD</translation>
+        <translation type="obsolete">Propriedades PPD</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="obsolete">Guardar</translation>
+        <translation type="obsolete">Gravar</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="obsolete">Aceptar</translation>
+        <translation type="obsolete">OK</translation>
     </message>
 </context>
 <context>
@@ -4450,22 +4437,22 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location/>
         <source>Copies</source>
-        <translation type="unfinished">Copias</translation>
+        <translation type="unfinished">Cópias</translation>
     </message>
     <message>
         <location/>
         <source>Print range</source>
-        <translation type="unfinished">Imprimir el intervalo</translation>
+        <translation type="unfinished">Selecção de páginas</translation>
     </message>
     <message>
         <location/>
         <source>Print all</source>
-        <translation type="unfinished">Imprimir todo</translation>
+        <translation type="unfinished">Imprimir todas</translation>
     </message>
     <message>
         <location/>
         <source>Pages from</source>
-        <translation type="unfinished">Páginas</translation>
+        <translation type="unfinished">Páginas de</translation>
     </message>
     <message>
         <location/>
@@ -4475,7 +4462,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location/>
         <source>Selection</source>
-        <translation type="unfinished">Selección</translation>
+        <translation type="unfinished">Selecção</translation>
     </message>
     <message>
         <location/>
@@ -4490,7 +4477,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location/>
         <source>Collate</source>
-        <translation type="unfinished">Recopilar</translation>
+        <translation type="unfinished">Juntar</translation>
     </message>
     <message>
         <location/>
@@ -4500,7 +4487,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location/>
         <source>Options</source>
-        <translation type="unfinished">Opciones</translation>
+        <translation type="unfinished">Opções</translation>
     </message>
     <message>
         <location/>
@@ -4548,7 +4535,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location/>
         <source>Printer</source>
-        <translation type="unfinished">Impresora</translation>
+        <translation type="unfinished">Impressora</translation>
     </message>
     <message>
         <location/>
@@ -4670,7 +4657,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+12"/>
         <source>Check</source>
-        <translation>Marcar</translation>
+        <translation>Activar</translation>
     </message>
 </context>
 <context>
@@ -4678,47 +4665,47 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/corelib/tools/qregexp.cpp" line="+64"/>
         <source>no error occurred</source>
-        <translation>no se ha producido ningún error</translation>
+        <translation>sem erros</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>disabled feature used</source>
-        <translation>se ha usado una característica no habilitada</translation>
+        <translation>funcionalidade desactivada está a ser utilizada</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>bad char class syntax</source>
-        <translation>sintaxis no válida para clase de caracteres</translation>
+        <translation>má sintaxe de classe de caracteres</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>bad lookahead syntax</source>
-        <translation>sintaxis no válida para lookahead</translation>
+        <translation>má sintaxe de antecipação</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>bad repetition syntax</source>
-        <translation>sintaxis no válida para repetición</translation>
+        <translation>má sintaxe de repetição</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>invalid octal value</source>
-        <translation>valor octal no válido</translation>
+        <translation>valor octal inválido</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>missing left delim</source>
-        <translation>falta el delimitador izquierdo</translation>
+        <translation>delimitador esquerdo em falta</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>unexpected end</source>
-        <translation>fin inesperado</translation>
+        <translation>fim inesperado</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>met internal limit</source>
-        <translation>se alcanzó el límite interno</translation>
+        <translation>limite interno alcançado</translation>
     </message>
 </context>
 <context>
@@ -4726,22 +4713,22 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/sql/drivers/sqlite2/qsql_sqlite2.cpp" line="+396"/>
         <source>Error to open database</source>
-        <translation>Error al abrir la base de datos</translation>
+        <translation>Erro ao abrir base de dados</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>Unable to begin transaction</source>
-        <translation>No es posible iniciar la transacción</translation>
+        <translation>Não foi possível iniciar a transacção</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Unable to commit transaction</source>
-        <translation>No es posible enviar la transacción</translation>
+        <translation>Não foi possível finalizar a transacção</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Unable to rollback Transaction</source>
-        <translation>No es posible anular la transacción</translation>
+        <translation>Não foi possível anular a transacção</translation>
     </message>
 </context>
 <context>
@@ -4749,12 +4736,12 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="-323"/>
         <source>Unable to fetch results</source>
-        <translation>No es posible obtener los resultados</translation>
+        <translation>Não foi possível obter os resultados</translation>
     </message>
     <message>
         <location line="+147"/>
         <source>Unable to execute statement</source>
-        <translation>No es posible ejecutar la instrucción</translation>
+        <translation>Não foi possível executar a expressão</translation>
     </message>
 </context>
 <context>
@@ -4762,26 +4749,26 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/sql/drivers/sqlite/qsql_sqlite.cpp" line="+528"/>
         <source>Error opening database</source>
-        <translation>Error al abrir la base de datos</translation>
+        <translation>Erro ao abrir a base de dados</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Error closing database</source>
-        <translation>Error al cerrar la base de datos</translation>
+        <translation>Erro ao fechar a base de dados</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Unable to begin transaction</source>
-        <translation>No es posible iniciar la transacción</translation>
+        <translation>Não foi possível iniciar a transacção</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Unable to commit transaction</source>
-        <translation>No es posible enviar la transacción</translation>
+        <translation>Não foi possível finalizar a transacção</translation>
     </message>
     <message>
         <source>Unable to roll back transaction</source>
-        <translation type="obsolete">No es posible anular la transacción</translation>
+        <translation type="obsolete">Não foi possível anular a transacção</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -4796,27 +4783,27 @@ Elija un nombre de fichero diferente.</translation>
         <location line="+66"/>
         <location line="+8"/>
         <source>Unable to fetch row</source>
-        <translation>No es posible obtener la fila</translation>
+        <translation>Não foi possível obter a linha</translation>
     </message>
     <message>
         <location line="+63"/>
         <source>Unable to execute statement</source>
-        <translation>No es posible ejecutar la instrucción</translation>
+        <translation>Não foi possível executar a expressão</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Unable to reset statement</source>
-        <translation>No es posible reinicializar la instrucción</translation>
+        <translation>Não foi possível restaurar a expressão</translation>
     </message>
     <message>
         <location line="+45"/>
         <source>Unable to bind parameters</source>
-        <translation>No es posible ligar los parámetros</translation>
+        <translation>Não foi possível fazer a ligação dos parametros</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Parameter count mismatch</source>
-        <translation>Número de parámetros incorrecto</translation>
+        <translation>Incorrespondência de contagem de parâmetros</translation>
     </message>
     <message>
         <location line="-208"/>
@@ -4829,84 +4816,84 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/gui/widgets/qscrollbar.cpp" line="+448"/>
         <source>Scroll here</source>
-        <translation>Desplazar hasta aquí</translation>
+        <translation>Deslizar aqui</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Left edge</source>
-        <translation>Borde izquierdo</translation>
+        <translation>Borda esquerda</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Top</source>
-        <translation>Parte superior</translation>
+        <translation>Topo</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Right edge</source>
-        <translation>Borde derecho</translation>
+        <translation>Borda direita</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Bottom</source>
-        <translation>Parte inferior</translation>
+        <translation>Fundo</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Page left</source>
-        <translation>Una página a la izquierda</translation>
+        <translation>Página para esquerda</translation>
     </message>
     <message>
         <location line="+0"/>
         <location filename="../src/plugins/accessible/widgets/rangecontrols.cpp" line="+143"/>
         <source>Page up</source>
-        <translation>Una página hacia arriba</translation>
+        <translation>Página para cima</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Page right</source>
-        <translation>Una página a la derecha</translation>
+        <translation>Página para direita</translation>
     </message>
     <message>
         <location line="+0"/>
         <location filename="../src/plugins/accessible/widgets/rangecontrols.cpp" line="+4"/>
         <source>Page down</source>
-        <translation>Una página hacia abajo</translation>
+        <translation>Página para baixo</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Scroll left</source>
-        <translation>Desplazar hacia la izquierda</translation>
+        <translation>Deslizar para esquerda</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Scroll up</source>
-        <translation>Desplazar hacia arriba</translation>
+        <translation>Deslizar para cima</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Scroll right</source>
-        <translation>Desplazar hacia la derecha</translation>
+        <translation>Deslizar para a direita</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Scroll down</source>
-        <translation>Desplazar hacia abajo</translation>
+        <translation>Deslizar para baixo</translation>
     </message>
     <message>
         <location filename="../src/plugins/accessible/widgets/rangecontrols.cpp" line="-6"/>
         <source>Line up</source>
-        <translation>Alinear</translation>
+        <translation>Linha acima</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Position</source>
-        <translation>Posición</translation>
+        <translation>Posição</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Line down</source>
-        <translation>Alinear por abajo</translation>
+        <translation>Linha abaixo</translation>
     </message>
 </context>
 <context>
@@ -5014,7 +5001,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/gui/kernel/qkeysequence.cpp" line="+373"/>
         <source>Space</source>
-        <translation>Espacio</translation>
+        <translation>Space</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -5024,202 +5011,202 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+1"/>
         <source>Tab</source>
-        <translation>Tabulador</translation>
+        <translation>Tab</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Backtab</source>
-        <translation>Tabulador hacia atrás</translation>
+        <translation>Backtab</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Backspace</source>
-        <translation>Borrar</translation>
+        <translation>Backspace</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Return</source>
-        <translation>Retorno</translation>
+        <translation>Return</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter</source>
-        <translation>Intro</translation>
+        <translation>Enter</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Ins</source>
-        <translation>Ins</translation>
+        <translation>Insert</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Del</source>
-        <translation>Supr</translation>
+        <translation>Delete</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Pause</source>
-        <translation>Pausa</translation>
+        <translation>Pause</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Print</source>
-        <translation>Impr Pant</translation>
+        <translation>Print</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>SysReq</source>
-        <translation>PetSis</translation>
+        <translation>SysReq</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Home</source>
-        <translation>Inicio</translation>
+        <translation>Home</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>End</source>
-        <translation>Fin</translation>
+        <translation>End</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Left</source>
-        <translation>Izquierda</translation>
+        <translation>Esquerda</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Up</source>
-        <translation>Arriba</translation>
+        <translation>Cima</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Right</source>
-        <translation>Derecha</translation>
+        <translation>Direita</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Down</source>
-        <translation>Abajo</translation>
+        <translation>Baixo</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>PgUp</source>
-        <translation>Re Pág</translation>
+        <translation>PgUp</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>PgDown</source>
-        <translation>Av Pág</translation>
+        <translation>PgDown</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>CapsLock</source>
-        <translation>Bloq Mayús</translation>
+        <translation>CapsLock</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>NumLock</source>
-        <translation>Bloq Num</translation>
+        <translation>Num Lock</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>ScrollLock</source>
-        <translation>Bloq Despl</translation>
+        <translation>ScrollLock</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Menu</source>
-        <translation>Menú</translation>
+        <translation>Menu</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Help</source>
-        <translation>Ayuda</translation>
+        <translation>Ajuda</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Back</source>
-        <translation>Anterior (histórico)</translation>
+        <translation>Anterior</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Forward</source>
-        <translation>Siguiente (histórico)</translation>
+        <translation>Seguinte</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop</source>
-        <translation>Detener</translation>
+        <translation>Parar</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Refresh</source>
-        <translation>Actualizar</translation>
+        <translation>Refrescar</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Volume Down</source>
-        <translation>Bajar el volumen</translation>
+        <translation>Volume Cima</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Volume Mute</source>
-        <translation>Silenciar</translation>
+        <translation>Volume Mute</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Volume Up</source>
-        <translation>Subir el volumen</translation>
+        <translation>Volume Baixo</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Bass Boost</source>
-        <translation>Potenciar los graves</translation>
+        <translation>Bass Boost</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Bass Up</source>
-        <translation>Subir los graves</translation>
+        <translation>Bass Cima</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Bass Down</source>
-        <translation>Bajar los graves</translation>
+        <translation>Bass Baixo</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Treble Up</source>
-        <translation>Subir los agudos</translation>
+        <translation>Treble Cima</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Treble Down</source>
-        <translation>Bajar los agudos</translation>
+        <translation>Treble Baixo</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Media Play</source>
-        <translation>Reproducir el medio</translation>
+        <translation>Tocar Média</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Media Stop</source>
-        <translation>Detener el medio</translation>
+        <translation>Parar Média</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Media Previous</source>
-        <translation>Medio anterior</translation>
+        <translation>Média Anterior</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Media Next</source>
-        <translation>Siguiente medio</translation>
+        <translation>Média Seguinte</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Media Record</source>
-        <translation>Grabar medio</translation>
+        <translation>Gravação Média</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5229,152 +5216,152 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+1"/>
         <source>Search</source>
-        <translation>Búsqueda</translation>
+        <translation>Procurar</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Standby</source>
-        <translation>Reposo</translation>
+        <translation>Hibernação</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Open URL</source>
-        <translation>Abrir URL</translation>
+        <translation>Abrir Endereço</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch Mail</source>
-        <translation>Lanzar correo</translation>
+        <translation>Correio Electrónico</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch Media</source>
-        <translation>Lanzar medio</translation>
+        <translation>Média</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (0)</source>
-        <translation>Lanzar (0)</translation>
+        <translation>Executar (0)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (1)</source>
-        <translation>Lanzar (1)</translation>
+        <translation>Executar (1)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (2)</source>
-        <translation>Lanzar (2)</translation>
+        <translation>Executar (2)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (3)</source>
-        <translation>Lanzar (3)</translation>
+        <translation>Executar (3)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (4)</source>
-        <translation>Lanzar (4)</translation>
+        <translation>Executar (4)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (5)</source>
-        <translation>Lanzar (5)</translation>
+        <translation>Executar (5)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (6)</source>
-        <translation>Lanzar (6)</translation>
+        <translation>Executar (6)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (7)</source>
-        <translation>Lanzar (7)</translation>
+        <translation>Executar (7)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (8)</source>
-        <translation>Lanzar (8)</translation>
+        <translation>Executar (8)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (9)</source>
-        <translation>Lanzar (9)</translation>
+        <translation>Executar (9)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (A)</source>
-        <translation>Lanzar (A)</translation>
+        <translation>Executar (A)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (B)</source>
-        <translation>Lanzar (B)</translation>
+        <translation>Executar (B)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (C)</source>
-        <translation>Lanzar (C)</translation>
+        <translation>Executar (C)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (D)</source>
-        <translation>Lanzar (D)</translation>
+        <translation>Executar (D)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (E)</source>
-        <translation>Lanzar (E)</translation>
+        <translation>Executar (E)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Launch (F)</source>
-        <translation>Lanzar (F)</translation>
+        <translation>Executar (F)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Print Screen</source>
-        <translation>Imprimir pantalla</translation>
+        <translation>Print Screen</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Page Up</source>
-        <translation>Retroceder página</translation>
+        <translation>Page Up</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Page Down</source>
-        <translation>Avanzar página</translation>
+        <translation>Page Down</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Caps Lock</source>
-        <translation>Bloqueo de mayúsculas</translation>
+        <translation>Caps Lock</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Num Lock</source>
-        <translation>Bloq num</translation>
+        <translation>Num Lock</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Number Lock</source>
-        <translation>Bloqueo numérico</translation>
+        <translation>Number Lock</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Scroll Lock</source>
-        <translation>Bloqueo del desplazamiento</translation>
+        <translation>Scroll Lock</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Insert</source>
-        <translation>Insertar</translation>
+        <translation>Insert</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete</source>
-        <translation>Borrar</translation>
+        <translation>Delete</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -5384,22 +5371,22 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+1"/>
         <source>System Request</source>
-        <translation>Petición del sistema</translation>
+        <translation>System Request</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Select</source>
-        <translation>Seleccionar</translation>
+        <translation>Select</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Yes</source>
-        <translation>Sí</translation>
+        <translation>Sim</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>No</source>
-        <translation>No</translation>
+        <translation>Não</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -5424,17 +5411,17 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+1"/>
         <source>Call</source>
-        <translation>Llamar</translation>
+        <translation>Chamar</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Hangup</source>
-        <translation>Descolgar</translation>
+        <translation>Desligar</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Flip</source>
-        <translation>Voltear</translation>
+        <translation>Inverter</translation>
     </message>
     <message>
         <location line="+527"/>
@@ -5446,7 +5433,7 @@ Elija un nombre de fichero diferente.</translation>
         <location line="-121"/>
         <location line="+125"/>
         <source>Shift</source>
-        <translation>May</translation>
+        <translation>Shift</translation>
     </message>
     <message>
         <location line="-124"/>
@@ -5473,7 +5460,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="-720"/>
         <source>Home Page</source>
-        <translation>Página de inicio</translation>
+        <translation>Página Principal</translation>
     </message>
 </context>
 <context>
@@ -5481,27 +5468,27 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/plugins/accessible/widgets/rangecontrols.cpp" line="+151"/>
         <source>Page left</source>
-        <translation>Una página a la izquierda</translation>
+        <translation>Página para esquerda</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Page up</source>
-        <translation>Una página hacia arriba</translation>
+        <translation>Página para cima</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Position</source>
-        <translation>Posición</translation>
+        <translation>Posição</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Page right</source>
-        <translation>Una página a la derecha</translation>
+        <translation>Página para direita</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Page down</source>
-        <translation>Una página hacia abajo</translation>
+        <translation>Página para baixo</translation>
     </message>
 </context>
 <context>
@@ -5573,12 +5560,12 @@ Elija un nombre de fichero diferente.</translation>
     </message>
     <message>
         <source>Socks5 timeout error connecting to socks server</source>
-        <translation type="obsolete">Error de expiración socks5 mientras se establecía una conexión al servidor socks</translation>
+        <translation type="obsolete">Socks5 expirado ao ligar ao servidor socks</translation>
     </message>
     <message>
         <location line="+685"/>
         <source>Network operation timed out</source>
-        <translation type="unfinished">La operación de red ha expirado</translation>
+        <translation type="unfinished">Operação de rede expirada</translation>
     </message>
 </context>
 <context>
@@ -5586,7 +5573,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/plugins/accessible/widgets/rangecontrols.cpp" line="-574"/>
         <source>More</source>
-        <translation>Más</translation>
+        <translation>Mais</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5599,31 +5586,31 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/qt3support/sql/q3sqlmanager_p.cpp" line="+890"/>
         <source>Delete</source>
-        <translation>Borrar</translation>
+        <translation>Apagar</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete this record?</source>
-        <translation>¿Borrar este registro?</translation>
+        <translation>Apagar este registo?</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+16"/>
         <location line="+36"/>
         <source>Yes</source>
-        <translation>Sí</translation>
+        <translation>Sim</translation>
     </message>
     <message>
         <location line="-51"/>
         <location line="+16"/>
         <location line="+36"/>
         <source>No</source>
-        <translation>No</translation>
+        <translation>Não</translation>
     </message>
     <message>
         <location line="-44"/>
         <source>Insert</source>
-        <translation>Insertar</translation>
+        <translation>Inserir</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5633,7 +5620,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+4"/>
         <source>Save edits?</source>
-        <translation>¿Guardar las modificaciones?</translation>
+        <translation>Gravar as alterações?</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -5648,7 +5635,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+1"/>
         <source>Cancel your edits?</source>
-        <translation>¿Cancelar sus modificaciones?</translation>
+        <translation>Cancelar as alterações?</translation>
     </message>
 </context>
 <context>
@@ -5656,56 +5643,52 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/network/ssl/qsslsocket_openssl.cpp" line="+569"/>
         <source>Unable to write data: %1</source>
-        <translation>No es posible escribir los datos: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+119"/>
         <source>Error while reading: %1</source>
-        <translation>Error al leer: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+96"/>
         <source>Error during SSL handshake: %1</source>
-        <translation>Error durante el saludo SSL: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-524"/>
         <source>Error creating SSL context (%1)</source>
-        <translation>Error al crear el contexto SSL (%1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Invalid or empty cipher list (%1)</source>
-        <translation>Lista de cifras vacía o no válida (%1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+62"/>
         <source>Error creating SSL session, %1</source>
-        <translation>Error al crear la sesión SSL, %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Error creating SSL session: %1</source>
-        <translation>Error al crear la sesión SSL: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-61"/>
         <source>Cannot provide a certificate with no key, %1</source>
-        <translation>No se puede proporcionar un certificado sin clave, %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Error loading local certificate, %1</source>
-        <translation>Error al cargar el certificado local, %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Error loading private key, %1</source>
-        <translation>Error al cargar la clave privada, %1</translation>
-    </message>
-    <message>
-        <source>Private key do not certificate public key, %1</source>
-        <translation type="obsolete">La clave privada no certifica la clave pública, %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
@@ -5749,12 +5732,12 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/sql/drivers/tds/qsql_tds.cpp" line="+584"/>
         <source>Unable to open connection</source>
-        <translation>No es posible abrir la conexión</translation>
+        <translation>Não foi possível estabelecer a ligação</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Unable to use database</source>
-        <translation>No es posible utilizar la base de datos</translation>
+        <translation>Não foi possível utilizar a base de dados</translation>
     </message>
 </context>
 <context>
@@ -5762,19 +5745,19 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/plugins/accessible/widgets/complexwidgets.cpp" line="-326"/>
         <source>Scroll Left</source>
-        <translation>Desplazar hacia la izquierda</translation>
+        <translation>Deslizar para Esquerda</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Scroll Right</source>
-        <translation>Desplazar hacia la derecha</translation>
+        <translation>Deslizar para Direita</translation>
     </message>
 </context>
 <context>
     <name>QTcpServer</name>
     <message>
         <source>Socket operation unsupported</source>
-        <translation type="obsolete">Operación socket no admitida</translation>
+        <translation type="obsolete">Operação de &apos;socket&apos; não suportada</translation>
     </message>
     <message>
         <location filename="../src/network/socket/qtcpserver.cpp" line="+282"/>
@@ -5787,12 +5770,12 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/gui/text/qtextcontrol.cpp" line="+1973"/>
         <source>&amp;Undo</source>
-        <translation>&amp;Deshacer</translation>
+        <translation>&amp;Desfazer</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>&amp;Redo</source>
-        <translation>&amp;Rehacer</translation>
+        <translation>&amp;Refazer</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -5807,22 +5790,22 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+7"/>
         <source>Copy &amp;Link Location</source>
-        <translation>Copiar la ubicación del en&amp;lace</translation>
+        <translation>Copiar &amp;Localização da Ligação</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>&amp;Paste</source>
-        <translation>&amp;Pegar</translation>
+        <translation>Co&amp;lar</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Delete</source>
-        <translation>Borrar</translation>
+        <translation>Apagar</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Select All</source>
-        <translation>Seleccionar todo</translation>
+        <translation>Seleccionar Tudo</translation>
     </message>
 </context>
 <context>
@@ -5831,7 +5814,7 @@ Elija un nombre de fichero diferente.</translation>
         <location filename="../src/plugins/accessible/widgets/simplewidgets.cpp" line="+254"/>
         <location line="+6"/>
         <source>Press</source>
-        <translation>Pulsar</translation>
+        <translation>Pressionar</translation>
     </message>
     <message>
         <location line="-4"/>
@@ -5845,7 +5828,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/network/socket/qudpsocket.cpp" line="+169"/>
         <source>This platform does not support IPv6</source>
-        <translation>La plataforma no contempla IPv6</translation>
+        <translation>Esta plataforma não suporta IPv6</translation>
     </message>
 </context>
 <context>
@@ -5853,12 +5836,12 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/gui/util/qundogroup.cpp" line="+386"/>
         <source>Undo</source>
-        <translation>Deshacer</translation>
+        <translation>Desfazer</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Redo</source>
-        <translation>Rehacer</translation>
+        <translation>Refazer</translation>
     </message>
 </context>
 <context>
@@ -5866,7 +5849,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/gui/util/qundoview.cpp" line="+101"/>
         <source>&lt;empty&gt;</source>
-        <translation>&lt;vacío&gt;</translation>
+        <translation>&lt;vazio&gt;</translation>
     </message>
 </context>
 <context>
@@ -5874,12 +5857,12 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/gui/util/qundostack.cpp" line="+834"/>
         <source>Undo</source>
-        <translation>Deshacer</translation>
+        <translation>Desfazer</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Redo</source>
-        <translation>Rehacer</translation>
+        <translation>Refazer</translation>
     </message>
 </context>
 <context>
@@ -5887,57 +5870,57 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/gui/text/qtextcontrol.cpp" line="+884"/>
         <source>LRM Left-to-right mark</source>
-        <translation>LRM Left-to-right mark</translation>
+        <translation>LRM Marca esquerda-para-direita</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>RLM Right-to-left mark</source>
-        <translation>RLM Right-to-left mark</translation>
+        <translation>RLM Marca direita-para-esquerda</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>ZWJ Zero width joiner</source>
-        <translation>ZWJ Zero width joiner</translation>
+        <translation>ZWJ Ligador de comprimento zero</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>ZWNJ Zero width non-joiner</source>
-        <translation>ZWNJ Zero width non-joiner</translation>
+        <translation>ZWNJ Não-ligador de comprimento zero</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>ZWSP Zero width space</source>
-        <translation>ZWSP Zero width space</translation>
+        <translation>ZWSP Espaço de comprimento zero</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>LRE Start of left-to-right embedding</source>
-        <translation>LRE Start of left-to-right embedding</translation>
+        <translation>LRE Início de encaixe esquerda-para-direita</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>RLE Start of right-to-left embedding</source>
-        <translation>RLE Start of right-to-left embedding</translation>
+        <translation>RLE Início de encaixe direita-para-esquerda</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>LRO Start of left-to-right override</source>
-        <translation>LRO Start of left-to-right override</translation>
+        <translation>LRO Início de sobreposição esquerda-para-direita</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>RLO Start of right-to-left override</source>
-        <translation>RLO Start of right-to-left override</translation>
+        <translation>RLO Início de sobreposição direita-para-esquerda</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>PDF Pop directional formatting</source>
-        <translation>PDF Pop directional formatting</translation>
+        <translation>PDF Formatação pop direccional</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Insert Unicode control character</source>
-        <translation>Insertar carácter de control Unicode</translation>
+        <translation>Inserir carácter de controlo Unicode</translation>
     </message>
 </context>
 <context>
@@ -5996,7 +5979,7 @@ Elija un nombre de fichero diferente.</translation>
         <location line="+5"/>
         <source>Reset</source>
         <comment>default label for Reset buttons in forms on web pages</comment>
-        <translation type="unfinished">Reinicializar</translation>
+        <translation type="unfinished">Restaurar</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -6068,7 +6051,7 @@ Elija un nombre de fichero diferente.</translation>
         <location line="+5"/>
         <source>Go Back</source>
         <comment>Back context menu item</comment>
-        <translation type="unfinished">Precedente</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
@@ -6080,7 +6063,7 @@ Elija un nombre de fichero diferente.</translation>
         <location line="+5"/>
         <source>Stop</source>
         <comment>Stop context menu item</comment>
-        <translation type="unfinished">Detener</translation>
+        <translation type="unfinished">Parar</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -6266,7 +6249,7 @@ Elija un nombre de fichero diferente.</translation>
         <location line="+75"/>
         <source>Unknown</source>
         <comment>Unknown filesize FTP directory listing item</comment>
-        <translation type="unfinished">Desconocido</translation>
+        <translation type="unfinished">Desconhecido</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -6282,67 +6265,67 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/3rdparty/webkit/WebCore/platform/qt/ScrollbarQt.cpp" line="+58"/>
         <source>Scroll here</source>
-        <translation type="unfinished">Desplazar hasta aquí</translation>
+        <translation type="unfinished">Deslizar aqui</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Left edge</source>
-        <translation type="unfinished">Borde izquierdo</translation>
+        <translation type="unfinished">Borda esquerda</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Top</source>
-        <translation type="unfinished">Parte superior</translation>
+        <translation type="unfinished">Topo</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Right edge</source>
-        <translation type="unfinished">Borde derecho</translation>
+        <translation type="unfinished">Borda direita</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Bottom</source>
-        <translation type="unfinished">Parte inferior</translation>
+        <translation type="unfinished">Fundo</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Page left</source>
-        <translation type="unfinished">Una página a la izquierda</translation>
+        <translation type="unfinished">Página para esquerda</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Page up</source>
-        <translation type="unfinished">Una página hacia arriba</translation>
+        <translation type="unfinished">Página para cima</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Page right</source>
-        <translation type="unfinished">Una página a la derecha</translation>
+        <translation type="unfinished">Página para direita</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Page down</source>
-        <translation type="unfinished">Una página hacia abajo</translation>
+        <translation type="unfinished">Página para baixo</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Scroll left</source>
-        <translation type="unfinished">Desplazar hacia la izquierda</translation>
+        <translation type="unfinished">Deslizar para esquerda</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Scroll up</source>
-        <translation type="unfinished">Desplazar hacia arriba</translation>
+        <translation type="unfinished">Deslizar para cima</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Scroll right</source>
-        <translation type="unfinished">Desplazar hacia la derecha</translation>
+        <translation type="unfinished">Deslizar para a direita</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Scroll down</source>
-        <translation type="unfinished">Desplazar hacia abajo</translation>
+        <translation type="unfinished">Deslizar para baixo</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/3rdparty/webkit/WebCore/platform/qt/FileChooserQt.cpp" line="+45"/>
@@ -6519,7 +6502,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/gui/kernel/qwhatsthis.cpp" line="+522"/>
         <source>What&apos;s This?</source>
-        <translation>¿Qué es esto?</translation>
+        <translation>O Que é Isto?</translation>
     </message>
 </context>
 <context>
@@ -6535,51 +6518,51 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/gui/dialogs/qwizard.cpp" line="+637"/>
         <source>Go Back</source>
-        <translation>Precedente</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Continue</source>
-        <translation>Siguiente</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Commit</source>
-        <translation>Enviar</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Done</source>
-        <translation>Terminar</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation type="obsolete">Salir</translation>
+        <translation type="obsolete">Sair</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Help</source>
-        <translation>Ayuda</translation>
+        <translation type="unfinished">Ajuda</translation>
     </message>
     <message>
         <location line="-14"/>
         <source>&lt; &amp;Back</source>
-        <translation>&lt; &amp;Anterior</translation>
+        <translation type="unfinished">&lt; &amp;Recuar</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>&amp;Finish</source>
-        <translation>&amp;Terminar</translation>
+        <translation type="unfinished">&amp;Terminar</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Cancel</source>
-        <translation>Cancelar</translation>
+        <translation type="unfinished">Cancelar</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>&amp;Help</source>
-        <translation>&amp;Ayuda</translation>
+        <translation type="unfinished">&amp;Ajuda</translation>
     </message>
     <message>
         <location line="-8"/>
@@ -6589,7 +6572,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+0"/>
         <source>&amp;Next &gt;</source>
-        <translation type="unfinished">Siguie&amp;nte &gt;</translation>
+        <translation type="unfinished">&amp;Avançar &gt;</translation>
     </message>
 </context>
 <context>
@@ -6607,7 +6590,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+1"/>
         <source>&amp;Size</source>
-        <translation>&amp;Tamaño</translation>
+        <translation>&amp;Tamanho</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -6622,18 +6605,18 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+2"/>
         <source>&amp;Close</source>
-        <translation>&amp;Cerrar</translation>
+        <translation>&amp;Fechar</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Stay on &amp;Top</source>
-        <translation>Permanecer en &amp;primer plano</translation>
+        <translation>Permanecer no &amp;Topo</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+1059"/>
         <source>Sh&amp;ade</source>
-        <translation>Sombre&amp;ar</translation>
+        <translation>Sombr&amp;a</translation>
     </message>
     <message>
         <location line="-278"/>
@@ -6649,17 +6632,17 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+2"/>
         <source>Restore Down</source>
-        <translation>Restaurar abajo</translation>
+        <translation>Restaurar Baixo</translation>
     </message>
     <message>
         <location line="-4"/>
         <source>Close</source>
-        <translation>Cerrar</translation>
+        <translation>Fechar</translation>
     </message>
     <message>
         <location line="+2053"/>
         <source>&amp;Unshade</source>
-        <translation>Q&amp;uitar sombra</translation>
+        <translation>&amp;Sair Sombra</translation>
     </message>
 </context>
 <context>
@@ -6667,37 +6650,37 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location filename="../src/xml/sax/qxml.cpp" line="+58"/>
         <source>no error occurred</source>
-        <translation>no se ha producido ningún error</translation>
+        <translation>não ocorreu nenhum erro</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>error triggered by consumer</source>
-        <translation>error debido al consumidor</translation>
+        <translation>erro disparado pelo consumidor</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>unexpected end of file</source>
-        <translation>fin de fichero inesperado</translation>
+        <translation>fim de ficheiro inesperado</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>more than one document type definition</source>
-        <translation>más de una definición de tipo de documento</translation>
+        <translation>mais de uma definição de tipo de documento</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>error occurred while parsing element</source>
-        <translation>se ha producido un error durante el análisis de un elemento</translation>
+        <translation>erro ao analisar elemento</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>tag mismatch</source>
-        <translation>etiqueta desequilibrada</translation>
+        <translation>má combinação de etiqueta</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>error occurred while parsing content</source>
-        <translation>se ha producido un error durante el análisis del contenido</translation>
+        <translation>erro ao analisar o conteúdo</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -6707,67 +6690,67 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+1"/>
         <source>invalid name for processing instruction</source>
-        <translation>nombre de instrucción de tratamiento no válido</translation>
+        <translation>nome inválido de instrução de processamento</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>version expected while reading the XML declaration</source>
-        <translation>se esperaba la versión al leer la declaración XML</translation>
+        <translation>versão esperada ao ler a declaração XML</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>wrong value for standalone declaration</source>
-        <translation>valor erróneo para la declaración independiente</translation>
+        <translation>valor errado para declaração única</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>encoding declaration or standalone declaration expected while reading the XML declaration</source>
-        <translation>se esperaba una declaración de codificación o declaración autónoma al leer la declaración XML</translation>
+        <translation>declaração de codificação ou declaração única esperada ao ler a declaração XML</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>standalone declaration expected while reading the XML declaration</source>
-        <translation>se esperaba una declaración independiente al leer la declaración XML</translation>
+        <translation>declaração única esperada ao ler a declaração XML</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>error occurred while parsing document type definition</source>
-        <translation>se ha producido un error durante el análisis de la definición de tipo de documento</translation>
+        <translation>erro ao analisar a definição de tipo de documento</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>letter is expected</source>
-        <translation>se esperaba una letra</translation>
+        <translation>uma letra é esperada</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>error occurred while parsing comment</source>
-        <translation>se ha producido un error durante el análisis de un comentario</translation>
+        <translation>erro ao analisar comentário</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>error occurred while parsing reference</source>
-        <translation>se ha producido un error durante el análisis de una referencia</translation>
+        <translation>erro ao analisar referência</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>internal general entity reference not allowed in DTD</source>
-        <translation>no se permiten referencias a entidades internas generales en la DTD</translation>
+        <translation>referência de entidade geral interna não permitida na DTD</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>external parsed general entity reference not allowed in attribute value</source>
-        <translation>no se permiten referencias a entidades externas generales ya analizadas en el valor de un atributo</translation>
+        <translation>referência de entidade geral analisada externa não permitida no valor do atributo</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>external parsed general entity reference not allowed in DTD</source>
-        <translation>no se permiten referencias a entidades externas generales ya analizadas en la DTD</translation>
+        <translation>referência de entidade geral analisada externa não permitida na DTD</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>unparsed entity reference in wrong context</source>
-        <translation>referencia a entidad no analizada en un contexto no válido</translation>
+        <translation>referência de entidade não analisada em contexto errado</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -6777,7 +6760,7 @@ Elija un nombre de fichero diferente.</translation>
     <message>
         <location line="+1"/>
         <source>error in the text declaration of an external entity</source>
-        <translation>error en la declaración de texto de una entidad externa</translation>
+        <translation>erro na declaração de uma entidade externa</translation>
     </message>
 </context>
 <context>
@@ -6786,131 +6769,127 @@ Elija un nombre de fichero diferente.</translation>
         <location filename="../src/corelib/xml/qxmlstream.cpp" line="+592"/>
         <location filename="../src/corelib/xml/qxmlstream_p.h" line="+1769"/>
         <source>Extra content at end of document.</source>
-        <translation>Contenido extra al final del documento.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+222"/>
         <source>Invalid entity value.</source>
-        <translation>Valor de la entidad no válido.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+107"/>
         <source>Invalid XML character.</source>
-        <translation>Carácter XML no válido.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+259"/>
         <source>Sequence &apos;]]&gt;&apos; not allowed in content.</source>
-        <translation>Secuencia «]]&gt;» no permitida en el contenido.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+309"/>
         <source>Namespace prefix &apos;%1&apos; not declared</source>
-        <translation>Prefijo de espacio de nombres «%1» no declarado</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+78"/>
         <source>Attribute redefined.</source>
-        <translation>Atributo redefinido.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+115"/>
         <source>Unexpected character &apos;%1&apos; in public id literal.</source>
-        <translation>Carácter «%1» inesperado en un literal de identificación público.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Invalid XML version string.</source>
-        <translation>Cadena de versión XML no válida.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Unsupported XML version.</source>
-        <translation>Versión XML no admitida.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
         <source>%1 is an invalid encoding name.</source>
-        <translation>%1 es un nombre de codificación no válido.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Encoding %1 is unsupported</source>
-        <translation>No se admite la codificación %1</translation>
-    </message>
-    <message>
-        <source>Invalid XML encoding name.</source>
-        <translation type="obsolete">Nombre de codificación XML no válido.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Standalone accepts only yes or no.</source>
-        <translation>«Standalone» sólo acepta «sí» o «no».</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Invalid attribute in XML declaration.</source>
-        <translation>Atributo no válido en la declaración XML.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Premature end of document.</source>
-        <translation>Final prematuro del documento.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Invalid document.</source>
-        <translation>Documento no válido.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Expected </source>
-        <translation>Se esperaba </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>, but got &apos;</source>
-        <translation>, pero se ha recibido &apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Unexpected &apos;</source>
-        <translation>No se esperaba &apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+210"/>
         <source>Expected character data.</source>
-        <translation>Se esperaban datos de carácter.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/corelib/xml/qxmlstream_p.h" line="-995"/>
         <source>Recursive entity detected.</source>
-        <translation>Detectada entidad recursiva.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+516"/>
         <source>Start tag expected.</source>
-        <translation>Se esperaba etiqueta de inicio.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+222"/>
         <source>XML declaration not at start of document.</source>
-        <translation>La declaración XML no está al principio del documento.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-31"/>
         <source>NDATA in parameter entity declaration.</source>
-        <translation>NDATA en una declaración de entidad parámetro.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+34"/>
         <source>%1 is an invalid processing instruction name.</source>
-        <translation>%1 es un nombre de instrucción de procesamiento no válido.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Invalid processing instruction name.</source>
-        <translation>Nombre de instrucción de procesamiento no válido.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/corelib/xml/qxmlstream.cpp" line="-521"/>
@@ -6918,55 +6897,55 @@ Elija un nombre de fichero diferente.</translation>
         <location filename="../src/corelib/xml/qxmlstream_p.h" line="+164"/>
         <location line="+53"/>
         <source>Illegal namespace declaration.</source>
-        <translation>Declaración de espacio de nombres ilegal.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/corelib/xml/qxmlstream_p.h" line="+15"/>
         <source>Invalid XML name.</source>
-        <translation>Nombre XML no válido.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Opening and ending tag mismatch.</source>
-        <translation>Las etiquetas de apertura y cierre no coinciden.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Reference to unparsed entity &apos;%1&apos;.</source>
-        <translation>Referencia a una entidad no analizada «%1».</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-13"/>
         <location line="+61"/>
         <location line="+40"/>
         <source>Entity &apos;%1&apos; not declared.</source>
-        <translation>Entidad «%1» no declarada.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-26"/>
         <source>Reference to external entity &apos;%1&apos; in attribute value.</source>
-        <translation>Referencia a una entidad externa «%1» en el valor del atributo.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Invalid character reference.</source>
-        <translation>Referencia un carácter no válido.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/corelib/xml/qxmlstream.cpp" line="-75"/>
         <location filename="../src/corelib/xml/qxmlstream_p.h" line="-823"/>
         <source>Encountered incorrectly encoded content.</source>
-        <translation>Encontrado contenido codificado incorrectamente.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+274"/>
         <source>The standalone pseudo attribute must appear after the encoding.</source>
-        <translation>El pseudoatributo «standalone» debe aparece después de la codificación.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/corelib/xml/qxmlstream_p.h" line="+562"/>
         <source>%1 is an invalid PUBLIC identifier.</source>
-        <translation>%1 no es un identificador PUBLIC válido.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8022,61 +8001,6 @@ Elija un nombre de fichero diferente.</translation>
         <location line="+15"/>
         <source>Volume: %1%</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>WebCore::PlatformScrollbar</name>
-    <message>
-        <source>Scroll here</source>
-        <translation type="obsolete">Desplazar hasta aquí</translation>
-    </message>
-    <message>
-        <source>Left edge</source>
-        <translation type="obsolete">Borde izquierdo</translation>
-    </message>
-    <message>
-        <source>Top</source>
-        <translation type="obsolete">Parte superior</translation>
-    </message>
-    <message>
-        <source>Right edge</source>
-        <translation type="obsolete">Borde derecho</translation>
-    </message>
-    <message>
-        <source>Bottom</source>
-        <translation type="obsolete">Parte inferior</translation>
-    </message>
-    <message>
-        <source>Page left</source>
-        <translation type="obsolete">Una página a la izquierda</translation>
-    </message>
-    <message>
-        <source>Page up</source>
-        <translation type="obsolete">Una página hacia arriba</translation>
-    </message>
-    <message>
-        <source>Page right</source>
-        <translation type="obsolete">Una página a la derecha</translation>
-    </message>
-    <message>
-        <source>Page down</source>
-        <translation type="obsolete">Una página hacia abajo</translation>
-    </message>
-    <message>
-        <source>Scroll left</source>
-        <translation type="obsolete">Desplazar hacia la izquierda</translation>
-    </message>
-    <message>
-        <source>Scroll up</source>
-        <translation type="obsolete">Desplazar hacia arriba</translation>
-    </message>
-    <message>
-        <source>Scroll right</source>
-        <translation type="obsolete">Desplazar hacia la derecha</translation>
-    </message>
-    <message>
-        <source>Scroll down</source>
-        <translation type="obsolete">Desplazar hacia abajo</translation>
     </message>
 </context>
 </TS>
