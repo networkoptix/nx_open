@@ -97,6 +97,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(m_model,    &QnPtzManageModel::presetsChanged,  ui->tourEditWidget, &QnPtzTourWidget::setPresets);
     connect(m_model,    &QnPtzManageModel::presetsChanged,  this,               &QnPtzManageDialog::updateUi);
     connect(m_model,    &QnPtzManageModel::dataChanged,     this,               &QnPtzManageDialog::updateUi);
+    connect(m_model,    &QnPtzManageModel::modelReset,      this,               &QnPtzManageDialog::updateUi);
     connect(this,       &QnAbstractPtzDialog::synchronized, m_model,            &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
 
@@ -433,19 +434,32 @@ void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     setWindowTitle(tr("Manage PTZ for %1").arg(getResourceName(m_resource)));
 }
 
-//TODO: call and connect in required places
+bool QnPtzManageDialog::isModified() const {
+    foreach (const QnPtzTourItemModel &tourModel, m_model->tourModels()) {
+        if (tourModel.modified)
+            return true;
+    }
+    foreach (const QnPtzPresetItemModel &presetModel, m_model->presetModels()) {
+        if (presetModel.modified)
+            return true;
+    }
+    return false;
+}
+
 void QnPtzManageDialog::updateUi() {
     ui->addTourButton->setEnabled(!m_model->presetModels().isEmpty());
 
-    QnPtzManageModel::RowType selectedRow = QnPtzManageModel::InvalidRow;
     QModelIndex index = ui->tableView->selectionModel()->currentIndex();
+    QnPtzManageModel::RowData selectedRow;
     if (index.isValid())
-        selectedRow = m_model->rowData(index.row()).rowType;
+        selectedRow = m_model->rowData(index.row());
 
-    ui->previewGroupBox->setEnabled(index.isValid());
+    bool isPreset = selectedRow.rowType == QnPtzManageModel::PresetRow;
+    bool isTour = selectedRow.rowType == QnPtzManageModel::TourRow;
 
-    ui->deleteButton->setEnabled(selectedRow == QnPtzManageModel::PresetRow || selectedRow == QnPtzManageModel::TourRow);
-    ui->goToPositionButton->setEnabled(selectedRow == QnPtzManageModel::PresetRow || selectedRow == QnPtzManageModel::TourRow);
-    ui->startTourButton->setEnabled(selectedRow == QnPtzManageModel::TourRow);
-    //TODO: add other buttons;
+    ui->previewGroupBox->setEnabled(isPreset || isTour);
+    ui->deleteButton->setEnabled(isPreset || isTour);
+    ui->goToPositionButton->setEnabled(isPreset || isTour);
+    ui->startTourButton->setEnabled(isTour);
+    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(isModified());
 }
