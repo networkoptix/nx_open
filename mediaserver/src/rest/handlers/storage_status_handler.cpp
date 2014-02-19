@@ -26,7 +26,7 @@ int QnStorageStatusHandler::executeGet(const QString &, const QnRequestParams &p
     
     QnStorageStatusReply reply;
     reply.pluginExists = storage;
-    reply.storage.storageId = exists ? storage->getId().toInt() : -1;
+    reply.storage.storageId = exists ? storage->getId() : QnId();
     reply.storage.path = storageUrl;
     reply.storage.freeSpace = storage ? storage->getFreeSpace() : -1;
     reply.storage.reservedSpace = storage ? storage->getSpaceLimit() : -1;

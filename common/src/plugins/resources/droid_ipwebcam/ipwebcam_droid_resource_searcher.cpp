@@ -168,7 +168,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
                 QnNetworkResourcePtr resource ( new QnPlDriodIpWebCamResource() );
 
                 QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-                if (!rt.isValid())
+                if (rt.isNull())
                     continue;
 
                 static int n = 0;

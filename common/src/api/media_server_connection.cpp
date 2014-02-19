@@ -760,8 +760,8 @@ int QnMediaServerConnection::getEventLogAsync(
         if (camera)
             params << QnRequestParam( "res_id", camera->getPhysicalId() );
     }
-    if (businessRuleId.isValid())
-        params << QnRequestParam( "brule_id", businessRuleId.toInt() );
+    if (!businessRuleId.isNull())
+        params << QnRequestParam( "brule_id", businessRuleId );
     if (eventType != BusinessEventType::NotDefined)
         params << QnRequestParam( "event", (int) eventType);
     if (actionType != BusinessActionType::NotDefined)

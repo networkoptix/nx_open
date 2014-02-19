@@ -57,6 +57,7 @@ namespace Qn {
 
 bool QnMessage::load(const pb::Message &message)
 {
+#if 0
     messageType = (Qn::Message_Type)message.type();
     pb::Message_Type msgType = message.type();
     seqNumber = message.seqnumber();
@@ -205,7 +206,7 @@ bool QnMessage::load(const pb::Message &message)
     default:
         break;
     }
-
+#endif
     return true;
 }
 

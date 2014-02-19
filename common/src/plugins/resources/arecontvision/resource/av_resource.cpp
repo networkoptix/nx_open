@@ -384,7 +384,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const Q
 {
     QnId rt = qnResTypePool->getLikeResourceTypeId(QLatin1String(MANUFACTURE), name);
 
-    if (!rt.isValid())
+    if (rt.isNull())
     {
         cl_log.log("Unsupported resource found(!!!): ", name, cl_logERROR);
         return 0;

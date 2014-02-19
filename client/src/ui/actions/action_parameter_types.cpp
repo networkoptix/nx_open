@@ -174,7 +174,7 @@ QnResourceList QnActionParameterTypes::resources(const QnLayoutItemIndexList &la
         QnLayoutItemData data = index.layout()->getItem(index.uuid());
         
         QnResourcePtr resource;
-        if(data.resource.id.isValid()) {
+        if(!data.resource.id.isNull()) {
             resource = qnResPool->getResourceById(data.resource.id);
         } else {
             resource = qnResPool->getResourceByUniqId(data.resource.path);

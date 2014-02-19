@@ -191,8 +191,9 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
 
 
     layout->setParentId(0);
-    layout->setId(QnId::generateSpecialId());
+    layout->setId(QnId::createUuid());
     layout->setName(QFileInfo(xfile).fileName());
+    layout->addFlags(QnResource::local);
 
     layout->addFlags(QnResource::url);
     layout->setUrl(xfile);

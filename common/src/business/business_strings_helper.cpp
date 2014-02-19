@@ -13,6 +13,7 @@
 #include <core/resource/resource_name.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include "utils/common/id.h"
 
 namespace {
     static const QString plainTextDelimiter(lit("\n"));
@@ -295,8 +296,8 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
 }
 
 QString QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params, bool useIp) {
-    int id = params.getEventResourceId();
-    QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::AllResources) : QnResourcePtr();
+    QnId id = params.getEventResourceId();
+    QnResourcePtr res = !id.isNull() ? qnResPool->getResourceById(id, QnResourcePool::AllResources) : QnResourcePtr();
     return getFullResourceName(res, useIp);
 }
 
@@ -388,8 +389,8 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(const QnAbstract
 }
 
 QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool isPublic) {
-    int id = params.getEventResourceId();
-    QnNetworkResourcePtr res = id > 0 ? 
+    QnId id = params.getEventResourceId();
+    QnNetworkResourcePtr res = !id.isNull() ? 
                             qnResPool->getResourceById(id, QnResourcePool::AllResources).dynamicCast<QnNetworkResource>() : 
                             QnNetworkResourcePtr();
     if (!res)

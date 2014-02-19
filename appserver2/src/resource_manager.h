@@ -55,13 +55,9 @@ namespace ec2
         template<> void triggerNotification<ApiResourceParams>( const QnTransaction<ApiResourceParams>& tran ) {
             QnKvPairList outData;
 
-            qint32 resourceId = 0;
-            for( const ApiResourceParam& param: tran.params )
-            {
+            for( const ApiResourceParam& param: tran.params.params )
                 outData << QnKvPair(param.name, param.value);
-                resourceId = param.resourceId;
-            }
-            emit resourceParamsChanged( QnId(resourceId), outData );
+            emit resourceParamsChanged( tran.params.id, outData );
         }
 
         template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran ) {

@@ -14,8 +14,8 @@ QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent):
             this, SLOT(reloadData()));
     connect(QnCommonMessageProcessor::instance(),           SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_message_ruleChanged(QnBusinessEventRulePtr)));
-    connect(QnCommonMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(int)),
-            this, SLOT(at_message_ruleDeleted(int)));
+    connect(QnCommonMessageProcessor::instance(),           SIGNAL(businessRuleDeleted(QnId)),
+            this, SLOT(at_message_ruleDeleted(QnId)));
     connect(QnCommonMessageProcessor::instance(),           SIGNAL(businessRuleReset(QnBusinessEventRuleList)),
             this, SLOT(at_message_ruleReset(QnBusinessEventRuleList)));
 
@@ -74,7 +74,7 @@ void QnBusinessRulesActualModel::at_message_ruleChanged(const QnBusinessEventRul
     emit businessRuleChanged(rule->id());
 }
 
-void QnBusinessRulesActualModel::at_message_ruleDeleted(int id) {
+void QnBusinessRulesActualModel::at_message_ruleDeleted(QnId id) {
     deleteRule(id);  //TODO: #GDM ask user
     emit businessRuleDeleted(id);
 }

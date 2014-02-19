@@ -5,7 +5,7 @@ namespace ec2
 
 void ApiPropertyType::toResource(QnParamTypePtr resource) const
 {
-    resource->id = id;
+    //resource->id = id;
     resource->name = name;
     resource->type = (QnParamType::DataType) type;
     resource->min_val = min;

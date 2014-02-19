@@ -99,7 +99,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 QnStardotResourcePtr resource( new QnStardotResource() );
                 //resource->setName("AVUNKNOWN");
                 QnId typeId = qnResTypePool->getResourceTypeId(QLatin1String(QnStardotResource::MANUFACTURE), lit("STARDOT_COMMON"));
-                if (!typeId.isValid())
+                if (typeId.isNull())
                     continue;
                 resource->setTypeId(typeId);
 
@@ -230,7 +230,7 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
         return QList<QnResourcePtr>();
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), model);
-    if (!rt.isValid())
+    if (rt.isNull())
         return QList<QnResourcePtr>();
 
 

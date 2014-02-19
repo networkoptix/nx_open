@@ -38,11 +38,11 @@ public:
     qint64 getEventTimestamp() const;
     void setEventTimestamp(qint64 value);
 
-    int getEventResourceId() const;
-    void setEventResourceId(int value);
+    QnId getEventResourceId() const;
+    void setEventResourceId(const QnId& value);
 
-    int getActionResourceId() const;
-    void setActionResourceId(int value);
+    QnId getActionResourceId() const;
+    void setActionResourceId(const QnId& value);
 
     QnBusiness::EventReason getReasonCode() const;
     void setReasonCode(QnBusiness::EventReason value);

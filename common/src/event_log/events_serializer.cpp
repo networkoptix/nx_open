@@ -11,6 +11,13 @@ inline int readInt(quint8* &curPtr)
     return val;
 }
 
+inline QnId readQnId(quint8* &curPtr)
+{
+    const QByteArray uuid = QByteArray::fromRawData((const char*) curPtr, 16);
+    curPtr += 8;
+    return QnId(uuid);
+}
+
 void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, const QByteArray& data)
 {
     QElapsedTimer t;
@@ -34,7 +41,7 @@ void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, cons
         QnBusinessActionData& action = events[i];
         action.setFlags(readInt(curPtr));
         action.setActionType((BusinessActionType::Value) readInt(curPtr));
-        action.setBusinessRuleId(readInt(curPtr));
+        action.setBusinessRuleId(readQnId(curPtr));
         action.setAggregationCount(readInt(curPtr));
         
         int runTimeParamsLen = readInt(curPtr);

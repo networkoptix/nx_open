@@ -72,7 +72,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
 
     int healthMessage = eventType - BusinessEventType::SystemHealthMessage;
     if (healthMessage >= 0) {
-        int resourceId = params.getEventResourceId();
+        QnId resourceId = params.getEventResourceId();
         QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
         addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resource);
         return;

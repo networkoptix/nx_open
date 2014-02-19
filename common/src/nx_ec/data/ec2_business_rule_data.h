@@ -5,6 +5,7 @@
 #include "business/business_fwd.h"
 #include "business/business_event_rule.h"
 #include "api_data.h"
+#include "utils/common/id.h"
 
 class QnResourcePool;
 
@@ -14,18 +15,18 @@ namespace ec2
 struct ApiBusinessRuleData: public ApiData
 {
     ApiBusinessRuleData(): 
-        id(0), eventType(BusinessEventType::NotDefined), eventState(Qn::UndefinedState), actionType(BusinessActionType::NotDefined), 
+        eventType(BusinessEventType::NotDefined), eventState(Qn::UndefinedState), actionType(BusinessActionType::NotDefined), 
         aggregationPeriod(0), disabled(false), system(false) {}
 
-    qint32 id;
+    QnId id;
 
     BusinessEventType::Value eventType;
-    std::vector<qint32>  eventResource;
+    std::vector<QnId>  eventResource;
     QByteArray eventCondition;
     Qn::ToggleState eventState;
     
     BusinessActionType::Value actionType;
-    std::vector<qint32> actionResource;
+    std::vector<QnId> actionResource;
     QByteArray actionParams;
 
     qint32 aggregationPeriod; // msecs
@@ -54,10 +55,10 @@ struct ApiBusinessActionData: public ApiData
     qint32 actionType;
     Qn::ToggleState toggleState;
     bool receivedFromRemoteHost;
-    std::vector<qint32> resources;
+    std::vector<QnId> resources;
     QByteArray params;
     QByteArray runtimeParams;
-    qint32 businessRuleId;
+    QnId businessRuleId;
     qint32 aggregationCount;
     
     void fromResource(const QnAbstractBusinessActionPtr& resource);

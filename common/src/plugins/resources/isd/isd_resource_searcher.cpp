@@ -123,7 +123,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
 
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
         return QList<QnResourcePtr>();
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
@@ -216,7 +216,7 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceLis
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
     {
         return local_result;
     }

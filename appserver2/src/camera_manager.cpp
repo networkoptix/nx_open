@@ -30,15 +30,13 @@ namespace ec2
 
         //preparing output data
         QnVirtualCameraResourceList cameraList;
-		ApiCommand::Value command = ApiCommand::updateCamera;
-		if (!resource->getId().isValid()) {
-			resource->setId(dbManager->getNextSequence());
-			command = ApiCommand::addCamera;
+		if (resource->getId().isNull()) {
+			resource->setId(QnId::createUuid());
 		}
         cameraList.push_back( resource );
 
         //performing request
-        auto tran = prepareTransaction( command, resource );
+        auto tran = prepareTransaction( ApiCommand::saveCamera, resource );
 
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::AddCameraHandler::done ), handler, reqID, _1, cameraList ) );
@@ -98,7 +96,7 @@ namespace ec2
         QnVirtualCameraResourceList cameraList;
         foreach(const QnVirtualCameraResourcePtr& camera, cameras)
         {
-            if (!camera->getId().isValid()) {
+            if (camera->getId().isNull()) {
                 Q_ASSERT_X(0, "Only update operation is supported", Q_FUNC_INFO);
                 return INVALID_REQ_ID;
             }

@@ -33,6 +33,11 @@ namespace ec2
             [data]( const QnRequestParamList::value_type& val ){ data->insert(val.first.toLatin1(), val.second); } );
     }
 
+    void toUrlParams( const std::nullptr_t& , QUrlQuery* const query )
+    {
+        // nothing to do
+    }
+
     void toUrlParams( const QnId& id, QUrlQuery* const query )
     {
         query->addQueryItem( ID_PARAM_NAME, id.toString() );

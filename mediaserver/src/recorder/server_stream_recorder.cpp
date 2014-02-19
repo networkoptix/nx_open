@@ -376,7 +376,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 
     m_usedSpecialRecordingMode = m_usedPanicMode = false;
-    QnScheduleTask noRecordTask(0, m_device->getId(), 1, 0, 0, Qn::RecordingType_Never, 0, 0);
+    QnScheduleTask noRecordTask(QnId(), 1, 0, 0, Qn::RecordingType_Never, 0, 0);
 
     if (!m_schedule.isEmpty())
     {

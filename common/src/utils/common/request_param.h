@@ -6,6 +6,7 @@
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
 #include <QtNetwork/QNetworkReply>
+#include "id.h"
 
 class QnRequestParam: public QPair<QString, QString> {
     typedef QPair<QString, QString> base_type;
@@ -14,6 +15,7 @@ public:
     QnRequestParam(const QString &first, const QString &second): base_type(first, second) {}
     QnRequestParam(const char *first, const char *second): base_type(QLatin1String(first), QLatin1String(second)) {}
     QnRequestParam(const char *first, const QString &second): base_type(QLatin1String(first), second) {}
+    QnRequestParam(const char *first, const QnId &second): base_type(QLatin1String(first), second.toString()) {}
     QnRequestParam(const QString &first, const char *second): base_type(first, QLatin1String(second)) {}
     QnRequestParam(const char *first, qint64 second): base_type(QLatin1String(first), QString::number(second)) {}
 };

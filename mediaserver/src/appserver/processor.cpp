@@ -76,7 +76,7 @@ void QnAppserverResourceProcessor::updateResourceStatusAsync(const QnResourcePtr
 void QnAppserverResourceProcessor::requestFinished2(int /*reqID*/, ec2::ErrorCode errCode, const QnId& id)
 {
     if (errCode != ec2::ErrorCode::ok)
-        qCritical() << "Failed to update resource status" << id;
+        qCritical() << "Failed to update resource status" << id.toString();
 
     m_setStatusInProgress.remove(id);
     if (m_awaitingSetStatus.contains(id)) {

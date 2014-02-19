@@ -46,22 +46,19 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        ApiCommand::Value command = ApiCommand::updateMediaServer;
-        if (!resource->getId().isValid()) {
-            resource->setId(dbManager->getNextSequence());
-            command = ApiCommand::addMediaServer;
-        }
+        if (resource->getId().isNull())
+            resource->setId( QnId::createUuid());
 
         QnAbstractStorageResourceList storages = resource->getStorages();
         for (int i = 0; i < storages.size(); ++i)
         {
-            if (!storages[i]->getId().isValid())
-                storages[i]->setId(dbManager->getNextSequence());
+            if (storages[i]->getId().isNull())
+                storages[i]->setId(QnId::createUuid());
         }
         resource->setStorages(storages);
 
         //performing request
-        auto tran = prepareTransaction( command, resource );
+        auto tran = prepareTransaction( ApiCommand::saveMediaServer, resource );
 
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveServerHandler::done ), handler, reqID, _1, resource ) );

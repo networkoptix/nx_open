@@ -36,7 +36,7 @@ signals:
     void fileRemoved(const QString &filename);
 
     void businessRuleChanged(const QnBusinessEventRulePtr &rule);
-    void businessRuleDeleted(int id);
+    void businessRuleDeleted(QnId id);
     void businessRuleReset(QnBusinessEventRuleList rules);
 
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);

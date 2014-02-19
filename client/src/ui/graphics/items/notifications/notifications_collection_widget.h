@@ -117,14 +117,14 @@ private:
 
 private:
     QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
-    QnNotificationWidget* findItem(int businessRuleId, const QnResourcePtr &resource);
+    QnNotificationWidget* findItem(const QnId& businessRuleId, const QnResourcePtr &resource);
 
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
 
     QMultiHash<QnSystemHealth::MessageType, QnNotificationWidget*> m_itemsByMessageType;
     QMultiHash<QString, QnNotificationWidget*> m_itemsByLoadingSound;
-    QMultiHash<int, QnNotificationWidget*> m_itemsByBusinessRuleId;
+    QMultiHash<QnId, QnNotificationWidget*> m_itemsByBusinessRuleId;
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
 };
 

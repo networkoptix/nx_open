@@ -17,7 +17,7 @@ QnCameraThumbnailManager::QnCameraThumbnailManager(QObject *parent) :
     m_thumnailSize(0, 0)
 {
     connect(qnResPool,  SIGNAL(resourceRemoved(QnResourcePtr)),         this,   SLOT(at_resPool_resourceRemoved(QnResourcePtr)));
-    connect(this,       SIGNAL(thumbnailReadyDelayed(int,QPixmap)),     this,   SIGNAL(thumbnailReady(int,QPixmap)), Qt::QueuedConnection);
+    connect(this,       SIGNAL(thumbnailReadyDelayed(QnId,QPixmap)),     this,   SIGNAL(thumbnailReady(QnId,QPixmap)), Qt::QueuedConnection);
     setThumbnailSize(defaultThumbnailSize);
 }
 

@@ -606,7 +606,7 @@ int QnAppServerConnection::getKvPairs(QnKvPairList& kvPairs, const QnResourcePtr
     QnRequestParamList params(m_requestParams);
     params.append(QnRequestParam("resource_id", resource->getId().toString()));
     int status = sendSyncGetRequest(KvPairObject, m_requestHeaders, m_requestParams, &reply);
-    QnKvPairListsById::const_iterator citer = reply.constFind(resource->getId().toInt());
+    QnKvPairListsById::const_iterator citer = reply.constFind(resource->getId());
     if (citer != reply.cend())
         kvPairs = citer.value();
 

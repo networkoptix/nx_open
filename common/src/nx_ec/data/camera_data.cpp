@@ -11,7 +11,7 @@ namespace ec2 {
 ScheduleTask ScheduleTask::fromResource(const QnResourcePtr& cameraRes, const QnScheduleTask& resScheduleTask)
 {
 	ScheduleTask result;
-	result.sourceId = cameraRes->getId();
+	//result.sourceId = cameraRes->getId();
 	result.startTime = resScheduleTask.getStartTime();
 	result.endTime = resScheduleTask.getEndTime();
 	result.doRecordAudio = resScheduleTask.getDoRecordAudio();
@@ -25,9 +25,9 @@ ScheduleTask ScheduleTask::fromResource(const QnResourcePtr& cameraRes, const Qn
 	return result;
 }
 
-QnScheduleTask ScheduleTask::toResource() const
+QnScheduleTask ScheduleTask::toResource(const QnId& resourceId) const
 {
-	return QnScheduleTask(id, sourceId, dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio);
+	return QnScheduleTask(resourceId, dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio);
 }
 
 void ApiCameraData::toResource(QnVirtualCameraResourcePtr resource) const
@@ -49,7 +49,7 @@ void ApiCameraData::toResource(QnVirtualCameraResourcePtr resource) const
 
 	QnScheduleTaskList tasks;
 	foreach(ScheduleTask task, scheduleTask)
-		tasks.push_back(task.toResource());
+		tasks.push_back(task.toResource(id));
 	resource->setScheduleTasks(tasks);
 
 	resource->setAudioEnabled(audioEnabled);
@@ -94,11 +94,6 @@ void ApiCameraData::fromResource(const QnVirtualCameraResourcePtr& resource)
 	statusFlags = resource->statusFlags();
 	dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(resource->getDewarpingParams());
 	vendor = resource->getVendor();
-}
-
-void ScheduleTaskList::loadFromQuery(QSqlQuery& query)
-{
-	QN_QUERY_TO_DATA_OBJECT(query, ScheduleTask, data, apiScheduleTaskFields)
 }
 
 QnResourceParameters ApiCameraData::toHashMap() const

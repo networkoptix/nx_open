@@ -18,6 +18,7 @@
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
+#include "utils/common/id.h"
 
 
 //!Stream providing read operation
@@ -88,6 +89,11 @@ private:
 
 namespace QnBinary {
     template <class T>
+    void serialize(const QnId& field, OutputBinaryStream<T>* binStream) {
+        QByteArray data = field.toRfc4122();
+        binStream->write(data.data(), data.size());
+    }
+    template <class T>
     void serialize(qint32 field, OutputBinaryStream<T>* binStream) {
         qint32 tmp = htonl(field);
         binStream->write(&tmp, sizeof(tmp));
@@ -155,6 +161,16 @@ namespace QnBinary {
     void serialize(const QList<T2>& field, OutputBinaryStream<T>* binStream);
 
     // -------------------- deserialize ---------------------
+
+    template <class T>
+    bool deserialize(QnId& field, InputBinaryStream<T>* binStream) {
+        QByteArray data;
+        data.resize(16);
+        if( binStream->read(data.data(), 16) != 16 )
+            return false;
+        field = QUuid::fromRfc4122(data);
+        return true;
+    }
 
     template <class T>
     bool deserialize(qint32& field, InputBinaryStream<T>* binStream) {

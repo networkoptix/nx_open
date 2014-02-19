@@ -87,7 +87,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
             QnDroidResourcePtr resource ( new QnDroidResource() );
 
             QnId rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("DroidLive"));
-            if (!rt.isValid())
+            if (rt.isNull())
                 continue;
 
             resource->setTypeId(rt);

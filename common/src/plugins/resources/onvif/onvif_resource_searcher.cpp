@@ -168,7 +168,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         resource->setVendor( manufacturer );
         resource->setName( modelName );
         //QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
-        if (rt.isValid())
+        if (!rt.isNull())
             resource->setTypeId(rt);
 
         if(!resource->getUniqueId().isEmpty())

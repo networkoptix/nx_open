@@ -95,7 +95,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                 QnTestCameraResourcePtr resource ( new QnTestCameraResource() );
 
                 QnId rt = qnResTypePool->getResourceTypeId(manufacture(), resName);
-                if (!rt.isValid())
+                if (rt.isNull())
                     continue;
 
                 QLatin1String s(params[j]);

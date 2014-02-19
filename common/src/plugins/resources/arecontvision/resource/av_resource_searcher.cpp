@@ -248,7 +248,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
 
 
     QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), model);
-    if (!rt.isValid())
+    if (rt.isNull())
         return QList<QnResourcePtr>();
 
 

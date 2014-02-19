@@ -384,9 +384,6 @@ private:
     /** Identifier of this resource. */
     QnId m_id;
 
-    /** Globally unique identifier ot this resource. */
-    QString m_guid;
-
     /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
     QnId m_parentId;
 

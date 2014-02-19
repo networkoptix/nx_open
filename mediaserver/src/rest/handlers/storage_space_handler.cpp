@@ -85,7 +85,7 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParams &, 
 
         QnStorageSpaceData data;
         data.path = partition.path + lit(QN_MEDIA_FOLDER_NAME) + QDir::separator();
-        data.storageId = -1;
+        data.storageId = QnId();
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
         data.reservedSpace = -1;

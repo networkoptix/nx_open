@@ -149,13 +149,13 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList
     QnPlIqResourcePtr resource ( new QnPlIqResource() );
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
     {
         // try with default camera name
         name = QLatin1String("IQA32N");
         rt = qnResTypePool->getResourceTypeId(manufacture(), name);
 
-        if (!rt.isValid())
+        if (rt.isNull())
             return local_results;
     }
 
@@ -209,7 +209,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const Q
 
     QString nameStr = QString::fromLatin1(name);
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr);
-    if (!rt.isValid()) {
+    if (rt.isNull()) {
         qWarning() << "Unregistered IQvision camera type:" << name;
         return;
     }

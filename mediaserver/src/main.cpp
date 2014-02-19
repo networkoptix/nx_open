@@ -303,6 +303,11 @@ QnStorageResourcePtr createStorage(const QString& path)
     storage->setUrl(path);
     storage->setSpaceLimit( QnStorageManager::DEFAULT_SPACE_LIMIT );
     storage->setUsedForWriting(storage->isStorageAvailableForWriting());
+    QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
+    Q_ASSERT(resType);
+    if (resType)
+        storage->setTypeId(resType->getId());
+    storage->setParentId(serverGuid());
 
     return storage;
 }
@@ -750,7 +755,7 @@ void QnMain::loadResourcesFromECS()
         while (ec2Connection->getCameraManager()->getCamerasSync(mediaServer->getId(), &cameras) != ec2::ErrorCode::ok)
         {
             NX_LOG( QString::fromLatin1("QnMain::run(). Error retreiving server %1(%2) cameras from enterprise controller. %3").
-                arg(mediaServer->getId()).arg(mediaServer->getGuid()).arg(QLatin1String("" /*appServerConnection->getLastError()*/)), cl_logERROR );
+                arg(mediaServer->getId().toString()).arg(mediaServer->getGuid()).arg(QLatin1String("" /*appServerConnection->getLastError()*/)), cl_logERROR );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
         }
         foreach( const QnVirtualCameraResourcePtr &camera, cameras )
@@ -1202,7 +1207,7 @@ void QnMain::run()
         if (usedPathList.contains(path))
             continue;
         QnStorageResourcePtr newStorage = QnStorageResourcePtr(new QnFileStorageResource());
-        newStorage->setId(QnId::generateSpecialId());
+        newStorage->setId(QnId::createUuid());
         newStorage->setUrl(path);
         newStorage->setSpaceLimit(QnStorageManager::DEFAULT_SPACE_LIMIT);
         newStorage->setUsedForWriting(false);
@@ -1299,8 +1304,8 @@ void QnMain::run()
     loadResourcesFromECS();
     updateDisabledVendorsIfNeeded();
     QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
-    qWarning() << lit("disabled vendors amount") << disabledVendors .size();
-    qWarning() << disabledVendors;
+    if (disabledVendors .size() > 0)
+        qWarning() << "Some autodiscovery is disabled: " << disabledVendors;
 
     connect(QnServerMessageProcessor::instance(), SIGNAL(connectionReset()), this, SLOT(loadResourcesFromECS()));
 

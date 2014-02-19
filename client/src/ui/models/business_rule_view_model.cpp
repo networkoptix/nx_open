@@ -35,7 +35,6 @@ namespace {
 QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_id(0),
     m_modified(false),
     m_eventType(BusinessEventType::Camera_Disconnect),
     m_eventState(Qn::UndefinedState),
@@ -312,7 +311,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
 // setters and getters
 
 
-int QnBusinessRuleViewModel::id() const {
+QnId QnBusinessRuleViewModel::id() const {
     return m_id;
 }
 

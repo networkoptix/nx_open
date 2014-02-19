@@ -43,7 +43,7 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
 
     QnResourceList result;
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("SERVER_DESKTOP_CAMERA"));
-    if (!rt.isValid())
+    if (rt.isNull())
         return result;
 
     QMutexLocker lock(&m_mutex);

@@ -139,59 +139,66 @@ namespace ec2
             QnDbTransaction* m_tran;
         };
 
-        ErrorCode deleteTableRecord(qint32 id, const QString& tableName, const QString& fieldName);
+        ErrorCode deleteTableRecord(const QnId& id, const QString& tableName, const QString& fieldName);
+        ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
-        ErrorCode updateResource(const ApiResourceData& data);
-		ErrorCode insertResource(const ApiResourceData& data);
-        ErrorCode insertOrReplaceResource(const ApiResourceData& data);
+        ErrorCode updateResource(const ApiResourceData& data, qint32 internalId);
+		ErrorCode insertResource(const ApiResourceData& data, qint32* internalId);
+        ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
+        //ErrorCode insertOrReplaceResource(const ApiResourceData& data);
         ErrorCode deleteResourceTable(const qint32 id);
-        ErrorCode removeResource(const qint32 id);
+        ErrorCode removeResource(const QnId& id);
 
-        ErrorCode insertAddParam(const ApiResourceParam& param);
+        ErrorCode insertAddParam(const ApiResourceParam& param, qint32 internalId);
         ErrorCode removeAddParam(const ApiResourceParam& param);
         ErrorCode deleteAddParams(qint32 resourceId);
 
-		ErrorCode updateCamera(const ApiCameraData& data);
-		ErrorCode insertCamera(const ApiCameraData& data);
-        ErrorCode updateCameraSchedule(const ApiCameraData& data);
-        ErrorCode removeCamera(const qint32 id);
+        ErrorCode saveCamera(const ApiCameraData& params);
+        ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
+        ErrorCode updateCameraSchedule(const ApiCameraData& data, qint32 internalId);
+        ErrorCode removeCamera(const QnId& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
-        ErrorCode updateMediaServer(const ApiMediaServerData& data);
-        ErrorCode insertMediaServer(const ApiMediaServerData& data);
+        ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
         ErrorCode updateStorages(const ApiMediaServerData&);
-        ErrorCode removeServer(const qint32 id);
-        ErrorCode removeLayout(const qint32 id);
-        ErrorCode removeLayoutNoLock(const qint32 id);
-        ErrorCode removeStoragesByServer(qint32 id);
+        ErrorCode removeServer(const QnId& guid);
+        ErrorCode removeLayout(const QnId& guid);
+        ErrorCode removeLayoutNoLock(qint32 internalId);
+        ErrorCode removeStoragesByServer(const QnId& serverGUID);
 
         ErrorCode deleteLayoutItems(const qint32 id);
-        ErrorCode insertLayout(const ApiLayoutData& data);
-        ErrorCode insertOrReplaceLayout(const ApiLayoutData& data);
-        ErrorCode updateLayout(const ApiLayoutData& data);
-        ErrorCode updateLayoutItems(const ApiLayoutData& data);
+        ErrorCode saveLayout(const ApiLayoutData& params);
+        ErrorCode insertOrReplaceLayout(const ApiLayoutData& data, qint32 internalId);
+        ErrorCode updateLayoutItems(const ApiLayoutData& data, qint32 internalLayoutId);
         ErrorCode removeLayoutItems(qint32 id);
 
-        ErrorCode insertUser( const ApiUserData& data );
-        ErrorCode updateUser( const ApiUserData& data );
+        ErrorCode saveUser( const ApiUserData& data );
         ErrorCode deleteUserProfileTable(const qint32 id);
-        ErrorCode removeUser( qint32 id );
+        ErrorCode removeUser( const QnId& guid );
 
-        ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule );
-        ErrorCode insertBRuleResource(const QString& tableName, const qint32& ruleId, const qint32& resourceId);
-        ErrorCode removeBusinessRule( qint32 id );
+        ErrorCode insertBusinessRuleTable( const ApiBusinessRuleData& businessRule, qint32* internalId );
+        ErrorCode updateBusinessRuleTable( const ApiBusinessRuleData& businessRule);
+        ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);
+        ErrorCode removeBusinessRule( const QnId& id );
 
 		bool createDatabase();
+        bool execSQLFile(const QString& fileName);
         
         void mergeRuleResource(QSqlQuery& query, ApiBusinessRuleDataList& data, std::vector<qint32> ApiBusinessRuleData::*resList);
 
         bool isObjectExists(const QString& objectType, const QString& objectName);
+        qint32 getResourceInternalId( const QnId& guid );
+        qint32 getBusinessRuleInternalId( const QnId& guid );
+    private:
+        QMap<int, QnId> getGuidList(const QString& request);
+        bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
+        bool updateGuids();
     private:
         QSqlDatabase m_sdb;
         QReadWriteLock m_mutex;
 		QnResourceFactory* m_resourceFactory;
         StoredFileManagerImpl* const m_storedFileManagerImpl;
-        qint32 m_storageTypeId;
+        QnId m_storageTypeId;
         QnDbTransaction m_tran;
     };
 };

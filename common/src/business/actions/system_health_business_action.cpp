@@ -6,7 +6,7 @@
 #include <utils/common/synctime.h>
 
 
-QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::MessageType message, int eventResourceId):
+QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::MessageType message, const QnId& eventResourceId):
     base_type(BusinessActionType::ShowPopup, QnBusinessEventParameters())
 {
     QnBusinessEventParameters runtimeParams;

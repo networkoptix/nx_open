@@ -38,7 +38,7 @@ namespace ec2
 
         template<> void triggerNotification<ApiCameraData>( const QnTransaction<ApiCameraData>& tran )
         {
-            assert( tran.command == ApiCommand::addCamera || tran.command == ApiCommand::updateCamera );
+            assert( tran.command == ApiCommand::saveCamera);
             QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
                 tran.params.typeId,
                 tran.params.toHashMap() ).dynamicCast<QnVirtualCameraResource>();

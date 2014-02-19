@@ -275,7 +275,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget 
 
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
-    int resourceId = params.getEventResourceId();
+    QnId resourceId = params.getEventResourceId();
     QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
     if (!resource)
         return;
@@ -421,7 +421,7 @@ QnNotificationWidget* QnNotificationsCollectionWidget::findItem(QnSystemHealth::
     return NULL;
 }
 
-QnNotificationWidget* QnNotificationsCollectionWidget::findItem(int businessRuleId, const QnResourcePtr &resource) {
+QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QnId& businessRuleId, const QnResourcePtr &resource) {
     QList<QnNotificationWidget*> items = m_itemsByBusinessRuleId.values(businessRuleId);
     foreach (QnNotificationWidget* item, items) {
         if (resource != item->property(itemResourcePropertyName).value<QnResourcePtr>())
@@ -682,7 +682,7 @@ void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationWidget *
     foreach (QnSystemHealth::MessageType messageType, m_itemsByMessageType.keys(item))
         m_itemsByMessageType.remove(messageType, item);
 
-    foreach (int ruleId, m_itemsByBusinessRuleId.keys(item))
+    foreach (const QnId& ruleId, m_itemsByBusinessRuleId.keys(item))
         m_itemsByBusinessRuleId.remove(ruleId, item);
 
     foreach (QString soundPath, m_itemsByLoadingSound.keys(item))

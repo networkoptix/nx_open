@@ -42,8 +42,8 @@ namespace ec2
 		ApiCommand::Value command = ApiCommand::addOrUpdateLayouts;
         for( QnLayoutResourcePtr layout: layouts )
         {
-            if( !layout->getId().isValid() )
-			    layout->setId( dbManager->getNextSequence() );
+            if( layout->getId().isNull() )
+			    layout->setId( QnId::createUuid() );
         }
 
         //performing request
