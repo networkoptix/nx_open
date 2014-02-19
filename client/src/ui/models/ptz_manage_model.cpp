@@ -531,14 +531,15 @@ QVariant QnPtzManageModel::presetData(const QnPtzPresetItemModel &presetModel, i
         case ModifiedColumn:
             return presetModel.modified ? QLatin1String("*") : QString();
         case NameColumn:
-            if (role == Qt::ToolTipRole)
-                return tr("This preset will be activated if PTZ is not changed for %n minutes", 0, 1); // TODO: #dklychkov Insert proper number here
             return presetModel.preset.name;
-        case HotkeyColumn: 
-            {
-                int hotkey = m_hotkeys.key(presetModel.preset.id, QnPtzHotkey::NoHotkey);
-                return hotkey < 0 ? tr("None") : QString::number(hotkey);
-            }
+        case HotkeyColumn: {
+            int hotkey = m_hotkeys.key(presetModel.preset.id, QnPtzHotkey::NoHotkey);
+            return hotkey < 0 ? tr("None") : QString::number(hotkey);
+        }
+        case HomeColumn:
+            if (role == Qt::ToolTipRole)
+                return tr("This preset will be activated if PTZ is not changed for %n minutes", 0, 5); // TODO: #Elric use value from PTZ
+            break;
         case DetailsColumn:
             return QVariant();
         default:
