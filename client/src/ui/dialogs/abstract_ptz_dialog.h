@@ -45,6 +45,8 @@ protected:
     bool createTour(const QnPtzTour &tour);
     bool removeTour(const QString &tourId);
 
+    bool updateHomePosition(const QnPtzObject &homePosition);
+
     Qn::PtzCapabilities capabilities();
 
 signals:

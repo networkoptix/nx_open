@@ -156,6 +156,15 @@ bool QnAbstractPtzDialog::removeTour(const QString &tourId) {
     return m_controller->removeTour(tourId);
 }
 
+bool QnAbstractPtzDialog::updateHomePosition(const QnPtzObject &homePosition) {
+    if (!m_controller)
+        return false;
+
+    if(m_controller->hasCapabilities(Qn::AsynchronousPtzCapability))
+        m_commands.insert(Qn::UpdateHomeObjectPtzCommand, 0);
+    return m_controller->updateHomeObject(homePosition);
+}
+
 void QnAbstractPtzDialog::at_controller_finished(Qn::PtzCommand command, const QVariant &data) {
     if (m_commands.isEmpty())
         return;

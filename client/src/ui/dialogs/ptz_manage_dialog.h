@@ -53,6 +53,7 @@ private slots:
 private:
     bool savePresets();
     bool saveTours();
+    bool saveHomePosition();
 
     QScopedPointer<Ui::PtzManageDialog> ui;
     QnPtzManageModel *m_model;

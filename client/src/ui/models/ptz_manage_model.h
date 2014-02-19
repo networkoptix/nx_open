@@ -88,6 +88,13 @@ public:
         QnPtzTourItemModel tourModel;
 
         RowData(): rowType(InvalidRow) {}
+        RowData(const QnPtzPresetItemModel &presetModel): rowType(PresetRow), presetModel(presetModel) {}
+        RowData(const QnPtzTourItemModel &tourModel): rowType(TourRow), tourModel(tourModel) {}
+
+        QString id() const;
+        QString name() const;
+        bool modified() const;
+        bool local() const;
     };
 
     explicit QnPtzManageModel(QObject *parent = 0);
@@ -111,8 +118,10 @@ public:
 
     const QString homePosition() const;
     void setHomePosition(const QString &homePosition);
+    bool isHomePositionChanged() const;
 
     RowData rowData(int row) const;
+    RowData rowData(const QString &id, int *index = NULL) const;
     int rowNumber(const RowData &rowData) const;
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -152,6 +161,11 @@ private:
     QVariant presetData(const QnPtzPresetItemModel &presetModel, int column, int role) const;
     QVariant tourData(const QnPtzTourItemModel &tourModel, int column, int role) const;
 
+    int presetIndex(const QString &id) const;
+    int tourIndex(const QString &id) const;
+
+    void setHomePositionInternal(const QString &homePosition, bool setChanged);
+
     QList<QnPtzPresetItemModel> m_presets;
     QStringList m_removedPresets;
 
@@ -160,6 +174,7 @@ private:
 
     QnPtzHotkeyHash m_hotkeys;
     QString m_homePosition;
+    bool m_homePositionChanged;
 
     QnPtzPresetList m_ptzPresetsCache;
 };

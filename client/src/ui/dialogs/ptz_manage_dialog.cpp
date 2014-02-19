@@ -188,10 +188,31 @@ bool QnPtzManageDialog::saveTours() {
     return result;
 }
 
+bool QnPtzManageDialog::saveHomePosition() {
+    if (!m_model->isHomePositionChanged())
+        return false;
+
+    QnPtzManageModel::RowData rowData = m_model->rowData(m_model->homePosition());
+    QnPtzObject homePosition;
+    switch (rowData.rowType) {
+    case QnPtzManageModel::PresetRow:
+        homePosition = QnPtzObject(Qn::PresetPtzObject, rowData.id());
+        break;
+    case QnPtzManageModel::TourRow:
+        homePosition = QnPtzObject(Qn::TourPtzObject, rowData.id());
+        break;
+    default:
+        return false;
+    }
+
+    return updateHomePosition(homePosition);
+}
+
 void QnPtzManageDialog::saveData() {
     if (!m_model->synchronized()) {
         savePresets();
         saveTours();
+        saveHomePosition();
     }
 
     if (m_resource) {
@@ -429,20 +450,7 @@ void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
 }
 
 bool QnPtzManageDialog::isModified() const {
-    foreach (const QnPtzTourItemModel &tourModel, m_model->tourModels()) {
-        if (tourModel.modified)
-            return true;
-    }
-    foreach (const QnPtzPresetItemModel &presetModel, m_model->presetModels()) {
-        if (presetModel.modified)
-            return true;
-    }
-    if (!m_model->removedPresets().isEmpty())
-        return true;
-    if (!m_model->removedTours().isEmpty())
-        return true;
-
-    return false;
+    return !m_model->synchronized();
 }
 
 void QnPtzManageDialog::chechForUnsavedChanges() {
