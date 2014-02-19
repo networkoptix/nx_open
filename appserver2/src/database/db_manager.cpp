@@ -1335,8 +1335,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
     }
 
     QSqlQuery queryProperty(m_sdb);
-    queryProperty.prepare("SELECT rt.guid as resource_type_id, pt.name, pt.type, pt.min, pt.max, pt.step, pt.values, pt.ui_values, pt.default_value, \
-                          pt.netHelper, pt.group, pt.sub_group, pt.description, pt.ui, pt.readonly \
+    queryProperty.prepare("SELECT rt.guid as resource_type_id, pt.name, pt.type, pt.min, pt.max, pt.step, pt.[values], pt.ui_values, pt.default_value, \
+                          pt.netHelper, pt.[group], pt.sub_group, pt.description, pt.ui, pt.readonly \
                           FROM vms_propertytype pt \
                           JOIN vms_resourcetype rt on rt.id = pt.resource_type_id ORDER BY pt.resource_type_id");
     if (!queryProperty.exec()) {
