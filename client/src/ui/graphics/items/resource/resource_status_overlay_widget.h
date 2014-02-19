@@ -52,10 +52,6 @@ private:
     void updateLayout();
     void updateDiagnosticsButtonOpacity(bool animate = true);
 
-
-
-
-
 private:
     QSharedPointer<QnPausedPainter> m_pausedPainter;
     QSharedPointer<QnLoadingProgressPainter> m_loadingProgressPainter;
