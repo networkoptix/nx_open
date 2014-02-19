@@ -40,7 +40,7 @@ namespace ec2
         {
             assert( tran.command == ApiCommand::addCamera || tran.command == ApiCommand::updateCamera );
             QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
-                intToGuid(tran.params.typeId),
+                tran.params.typeId,
                 tran.params.toHashMap() ).dynamicCast<QnVirtualCameraResource>();
             tran.params.toResource( cameraRes );
             emit cameraAddedOrUpdated( cameraRes );
@@ -52,7 +52,7 @@ namespace ec2
             foreach(const ApiCameraData& camera, tran.params.data) 
             {
                 QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
-                    intToGuid(camera.typeId),
+                    camera.typeId,
                     camera.toHashMap() ).dynamicCast<QnVirtualCameraResource>();
                 camera.toResource( cameraRes );
                 emit cameraAddedOrUpdated( cameraRes );

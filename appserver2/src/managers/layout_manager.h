@@ -39,7 +39,7 @@ namespace ec2
             assert( tran.command == ApiCommand::addLayout ||
                     tran.command == ApiCommand::updateLayout);
             QnLayoutResourcePtr layoutResource = m_resCtx.resFactory->createResource(
-                intToGuid(tran.params.typeId),
+                tran.params.typeId,
                 tran.params.toHashMap() ).dynamicCast<QnLayoutResource>();
             tran.params.toResource( layoutResource );
             emit addedOrUpdated( layoutResource );
@@ -51,7 +51,7 @@ namespace ec2
             foreach(const ApiLayoutData& layout, tran.params.data) 
             {
                 QnLayoutResourcePtr layoutResource = m_resCtx.resFactory->createResource(
-                    intToGuid(layout.typeId),
+                    layout.typeId,
                     layout.toHashMap() ).dynamicCast<QnLayoutResource>();
                 layout.toResource( layoutResource );
                 emit addedOrUpdated( layoutResource );

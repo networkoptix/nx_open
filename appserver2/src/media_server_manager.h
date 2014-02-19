@@ -32,7 +32,7 @@ namespace ec2
         template<> void triggerNotification<ApiMediaServerData>( const QnTransaction<ApiMediaServerData>& tran ) {
             assert( tran.command == ApiCommand::addMediaServer || tran.command == ApiCommand::updateMediaServer );
             QnMediaServerResourcePtr mserverRes = m_resCtx.resFactory->createResource(
-                intToGuid(tran.params.typeId),
+                tran.params.typeId,
                 QnResourceParameters() ).dynamicCast<QnMediaServerResource>();
             tran.params.toResource( mserverRes, m_resCtx);
             emit addedOrUpdated( mserverRes );

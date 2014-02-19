@@ -27,14 +27,14 @@ void ApiPropertyType::toResource(QnParamTypePtr resource) const
 
 void ApiResourceTypeData::toResource(QnResourceTypePtr resource) const
 {
-	resource->setId(intToGuid(id));
+	resource->setId(id);
 	resource->setName(name);
 	resource->setManufacture(manufacture);
 	
 	if (!parentId.empty())
-		resource->setParentId(intToGuid(parentId[0]));
+		resource->setParentId(parentId[0]);
 	for (int i = 1; i < parentId.size(); ++i)
-		resource->addAdditionalParent(intToGuid(parentId[0]));
+		resource->addAdditionalParent(parentId[0]);
     foreach(const ApiPropertyType& p, propertyTypeList) {
         QnParamTypePtr param(new QnParamType());
         p.toResource(param);

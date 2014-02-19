@@ -41,7 +41,7 @@ struct ApiResourceData: public ApiData
     ApiResourceData(): status(QnResource::Offline), disabled(false) {}
 
     QnId          id;
-    qint32        typeId;
+    QnId          typeId;
     QnId          parentGuid;
     QString       name;
     QString       url;
