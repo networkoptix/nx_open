@@ -36,8 +36,7 @@ namespace ec2
 
         template<> void triggerNotification<ApiLayoutData>( const QnTransaction<ApiLayoutData>& tran )
         {
-            assert( tran.command == ApiCommand::addLayout ||
-                    tran.command == ApiCommand::updateLayout);
+            assert( tran.command == ApiCommand::saveLayout);
             QnLayoutResourcePtr layoutResource = m_resCtx.resFactory->createResource(
                 tran.params.typeId,
                 tran.params.toHashMap() ).dynamicCast<QnLayoutResource>();

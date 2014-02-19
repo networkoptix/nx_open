@@ -35,12 +35,12 @@ private:
 };
 
 inline uint qHash(const QnId &t) { return qHash(t.m_id); }
-
 Q_DECLARE_TYPEINFO(QnId, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(QnId);
 
 QN_DECLARE_FUNCTIONS_FOR_TYPES((QnId), (json))
 */
+
 
 inline QnId intToGuid(qint32 value)
 {

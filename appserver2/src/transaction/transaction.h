@@ -39,9 +39,7 @@ namespace ec2
             getAllDataList,
             
             //!ApiCameraData
-            addCamera,
-            //!ApiCameraData
-		    updateCamera,
+            saveCamera,
             //!ApiCameraDataList
             updateCameras,
             //!ApiIdData
@@ -54,16 +52,12 @@ namespace ec2
 
             getMediaServerList,
             //!ApiMediaServerData
-            addMediaServer,
-            //!ApiMediaServerData
-            updateMediaServer,
+            saveMediaServer,
             //!ApiIdData
             removeMediaServer,
 
             //!ApiUserData
-            addUser,
-            //!ApiUserData
-            updateUser,
+            saveUser,
             getUserList,
             //!ApiIdData
             removeUser,
@@ -81,8 +75,7 @@ namespace ec2
 
             //!ApiLayoutData
             addOrUpdateLayouts,
-            addLayout,  //TODO choose addOrUpdateLayouts or (addLayout and updateLayout)
-            updateLayout,
+            saveLayout,
             //!ApiLayoutDataList
             getLayoutList,
             //!ApiIdData
@@ -105,16 +98,6 @@ namespace ec2
         QString toString( Value val );
     }
 
-    struct QnUuid {
-		QnUuid(): data1(0), data2(0), data3(0), data4(0) {}
-
-        quint32 data1;
-        quint16 data2;
-        quint16 data3;
-        qint64  data4;
-
-    };
-
     class QnAbstractTransaction
     {
     public:
@@ -122,7 +105,7 @@ namespace ec2
 
         void createNewID();
         
-        static void setPeerGuid(const QnUuid& value);
+        static void setPeerGuid(const QUuid& value);
         static void setStartNumber(const qint64& value);
 
         template <class T2>
@@ -140,7 +123,7 @@ namespace ec2
         {
 			ID(): number(0) {}
 
-            QnUuid peerGUID;
+            QUuid peerGUID;
             qint64 number;
 
         };
@@ -150,7 +133,7 @@ namespace ec2
         bool persistent;
 
     private:
-        static QnUuid m_staticPeerGUID;
+        static QUuid m_staticPeerGUID;
         static qint64 m_staticNumber;
         static QMutex m_mutex;
     };
@@ -182,7 +165,6 @@ namespace ec2
     int generateUniqueID();
 }
 
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnUuid, (data1) (data2) (data3) (data4) )
 QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (number) )
 QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent))
 

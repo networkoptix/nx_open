@@ -30,15 +30,13 @@ namespace ec2
 
         //preparing output data
         QnVirtualCameraResourceList cameraList;
-		ApiCommand::Value command = ApiCommand::updateCamera;
 		if (resource->getId().isNull()) {
 			resource->setId(QnId::createUuid());
-			command = ApiCommand::addCamera;
 		}
         cameraList.push_back( resource );
 
         //performing request
-        auto tran = prepareTransaction( command, resource );
+        auto tran = prepareTransaction( ApiCommand::saveCamera, resource );
 
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::AddCameraHandler::done ), handler, reqID, _1, cameraList ) );

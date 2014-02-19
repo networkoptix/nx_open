@@ -46,11 +46,8 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        ApiCommand::Value command = ApiCommand::updateMediaServer;
-        if (resource->getId().isNull()) {
-            resource->setId(QnId::createUuid());
-            command = ApiCommand::addMediaServer;
-        }
+        if (resource->getId().isNull())
+            resource->setId( QnId::createUuid());
 
         QnAbstractStorageResourceList storages = resource->getStorages();
         for (int i = 0; i < storages.size(); ++i)
@@ -61,7 +58,7 @@ namespace ec2
         resource->setStorages(storages);
 
         //performing request
-        auto tran = prepareTransaction( command, resource );
+        auto tran = prepareTransaction( ApiCommand::saveMediaServer, resource );
 
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveServerHandler::done ), handler, reqID, _1, resource ) );

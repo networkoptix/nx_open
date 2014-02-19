@@ -4,7 +4,7 @@ where guid = "";
 ALTER TABLE "vms_resource" RENAME TO vms_resource_tmp;
 
 CREATE TABLE "vms_resource" (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                             guid BLOB(16),
+                             guid BLOB(16) NULL UNIQUE,
 			     parent_guid BLOB(16),
                              status SMALLINT NOT NULL, 
 			     disabled BOOL NOT NULL DEFAULT 0, 

@@ -282,8 +282,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
         case ApiCommand::setPanicMode:
             return deliveryTransaction<ApiPanicModeData>(command, stream);
             
-        case ApiCommand::addCamera:
-        case ApiCommand::updateCamera:
+        case ApiCommand::saveCamera:
             return deliveryTransaction<ApiCameraData>(command, stream);
         case ApiCommand::updateCameras:
             return deliveryTransaction<ApiCameraDataList>(command, stream);
@@ -292,14 +291,12 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
         case ApiCommand::addCameraHistoryItem:
             return deliveryTransaction<ApiCameraServerItemData>(command, stream);
 
-        case ApiCommand::addMediaServer:
-        case ApiCommand::updateMediaServer:
+        case ApiCommand::saveMediaServer:
             return deliveryTransaction<ApiMediaServerData>(command, stream);
         case ApiCommand::removeMediaServer:
             return deliveryTransaction<ApiIdData>(command, stream);
 
-        case ApiCommand::addUser:
-        case ApiCommand::updateUser:
+        case ApiCommand::saveUser:
             return deliveryTransaction<ApiUserData>(command, stream);
         case ApiCommand::removeUser:
             return deliveryTransaction<ApiIdData>(command, stream);
@@ -312,8 +309,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& dat
 
         case ApiCommand::addOrUpdateLayouts:
             return deliveryTransaction<ApiLayoutDataList>(command, stream);
-        case ApiCommand::addLayout:
-        case ApiCommand::updateLayout:
+        case ApiCommand::saveLayout:
             return deliveryTransaction<ApiLayoutData>(command, stream);
         case ApiCommand::removeLayout:
             return deliveryTransaction<ApiIdData>(command, stream);

@@ -58,6 +58,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnConnectionInfoPtr>();
 
     qRegisterMetaType<QUuid>();
+    qRegisterMetaType<QnId>("QnId");
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
     qRegisterMetaType<Qt::ConnectionType>();

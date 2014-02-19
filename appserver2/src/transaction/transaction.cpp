@@ -37,11 +37,8 @@ namespace ec2
                     return "setPanicMode";
                 case getAllDataList:
                     return "getResourceList";
-
-                case addCamera:
-                    return "addCamera";
-                case updateCamera:
-                    return "updateCamera";
+                case saveCamera:
+                    return "saveCamera";
                 case updateCameras:
                     return "updateCameras";
                 case removeCamera:
@@ -55,17 +52,13 @@ namespace ec2
 
                 case getMediaServerList:
                     return "getMediaServerList";
-                case addMediaServer:
-                    return "addMediaServer";
-                case updateMediaServer:
-                    return "updateMediaServer";
+                case saveMediaServer:
+                    return "saveMediaServer";
                 case removeMediaServer:
                     return "removeMediaServer";
 
-                case addUser:
-                    return "addUser";
-                case updateUser:
-                    return "updateUser";
+                case saveUser:
+                    return "saveUser";
                 case getUserList:
                     return "getUserList";
                 case removeUser:
@@ -111,11 +104,11 @@ namespace ec2
 
 
 
-    QnUuid QnAbstractTransaction::m_staticPeerGUID;
+    QUuid QnAbstractTransaction::m_staticPeerGUID;
     qint64 QnAbstractTransaction::m_staticNumber;
     QMutex QnAbstractTransaction::m_mutex;
 
-    void QnAbstractTransaction::setPeerGuid(const QnUuid& value)
+    void QnAbstractTransaction::setPeerGuid(const QUuid& value)
     {
         m_staticPeerGUID = value;
     }

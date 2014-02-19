@@ -144,6 +144,7 @@ namespace ec2
 
         ErrorCode updateResource(const ApiResourceData& data, qint32 internalId);
 		ErrorCode insertResource(const ApiResourceData& data, qint32* internalId);
+        ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
         //ErrorCode insertOrReplaceResource(const ApiResourceData& data);
         ErrorCode deleteResourceTable(const qint32 id);
         ErrorCode removeResource(const QnId& id);
@@ -152,14 +153,13 @@ namespace ec2
         ErrorCode removeAddParam(const ApiResourceParam& param);
         ErrorCode deleteAddParams(qint32 resourceId);
 
-		ErrorCode updateCamera(const ApiCameraData& data, qint32 internalId);
-		ErrorCode insertCamera(const ApiCameraData& data, qint32 internalId);
+        ErrorCode saveCamera(const ApiCameraData& params);
+        ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
         ErrorCode updateCameraSchedule(const ApiCameraData& data, qint32 internalId);
         ErrorCode removeCamera(const QnId& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
-        ErrorCode updateMediaServer(const ApiMediaServerData& data, qint32 internalId);
-        ErrorCode insertMediaServer(const ApiMediaServerData& data, qint32 internalId);
+        ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
         ErrorCode updateStorages(const ApiMediaServerData&);
         ErrorCode removeServer(const QnId& guid);
         ErrorCode removeLayout(const QnId& guid);
@@ -167,14 +167,12 @@ namespace ec2
         ErrorCode removeStoragesByServer(const QnId& serverGUID);
 
         ErrorCode deleteLayoutItems(const qint32 id);
-        ErrorCode insertLayout(const ApiLayoutData& data, qint32 internalId);
+        ErrorCode saveLayout(const ApiLayoutData& params);
         ErrorCode insertOrReplaceLayout(const ApiLayoutData& data, qint32 internalId);
-        ErrorCode updateLayout(const ApiLayoutData& data, qint32 internalId);
         ErrorCode updateLayoutItems(const ApiLayoutData& data, qint32 internalLayoutId);
         ErrorCode removeLayoutItems(qint32 id);
 
-        ErrorCode insertUser( const ApiUserData& data );
-        ErrorCode updateUser( const ApiUserData& data );
+        ErrorCode saveUser( const ApiUserData& data );
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnId& guid );
 
@@ -200,7 +198,7 @@ namespace ec2
         QReadWriteLock m_mutex;
 		QnResourceFactory* m_resourceFactory;
         StoredFileManagerImpl* const m_storedFileManagerImpl;
-        qint32 m_storageTypeId;
+        QnId m_storageTypeId;
         QnDbTransaction m_tran;
     };
 };

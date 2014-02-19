@@ -29,7 +29,7 @@ namespace ec2
 
         template<> void triggerNotification<ApiUserData>( const QnTransaction<ApiUserData>& tran )
         {
-            assert( tran.command == ApiCommand::addUser || tran.command == ApiCommand::updateUser );
+            assert( tran.command == ApiCommand::saveUser);
             QnUserResourcePtr userResource = m_resCtx.resFactory->createResource(
                 tran.params.typeId,
                 tran.params.toHashMap() ).dynamicCast<QnUserResource>();

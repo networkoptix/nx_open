@@ -303,6 +303,11 @@ QnStorageResourcePtr createStorage(const QString& path)
     storage->setUrl(path);
     storage->setSpaceLimit( QnStorageManager::DEFAULT_SPACE_LIMIT );
     storage->setUsedForWriting(storage->isStorageAvailableForWriting());
+    QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
+    Q_ASSERT(resType);
+    if (resType)
+        storage->setTypeId(resType->getId());
+    storage->setParentId(serverGuid());
 
     return storage;
 }
@@ -1299,8 +1304,8 @@ void QnMain::run()
     loadResourcesFromECS();
     updateDisabledVendorsIfNeeded();
     QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
-    qWarning() << lit("disabled vendors amount") << disabledVendors .size();
-    qWarning() << disabledVendors;
+    if (disabledVendors .size() > 0)
+        qWarning() << "Some autodiscovery is disabled: " << disabledVendors;
 
     connect(QnServerMessageProcessor::instance(), SIGNAL(connectionReset()), this, SLOT(loadResourcesFromECS()));
 

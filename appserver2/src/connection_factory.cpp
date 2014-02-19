@@ -86,14 +86,13 @@ namespace ec2
         //AbstractMediaServerManager::getServers
         registerGetFuncHandler<nullptr_t, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServerList );
         //AbstractMediaServerManager::save
-        registerUpdateFuncHandler<ApiMediaServerData>( restProcessorPool, ApiCommand::addMediaServer );
-        registerUpdateFuncHandler<ApiMediaServerData>( restProcessorPool, ApiCommand::updateMediaServer );
+        registerUpdateFuncHandler<ApiMediaServerData>( restProcessorPool, ApiCommand::saveMediaServer );
         //AbstractMediaServerManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeMediaServer );
 
 
         //AbstractCameraManager::addCamera
-        registerUpdateFuncHandler<ApiCameraData>( restProcessorPool, ApiCommand::addCamera );
+        registerUpdateFuncHandler<ApiCameraData>( restProcessorPool, ApiCommand::saveCamera );
         //AbstractCameraManager::save
         registerUpdateFuncHandler<ApiCameraDataList>( restProcessorPool, ApiCommand::updateCameras );
         //AbstractCameraManager::getCameras
@@ -123,9 +122,7 @@ namespace ec2
         //AbstractUserManager::getUsers
         registerGetFuncHandler<nullptr_t, ApiUserDataList>( restProcessorPool, ApiCommand::getUserList );
         //AbstractUserManager::save
-        registerUpdateFuncHandler<ApiUserData>( restProcessorPool, ApiCommand::addUser );
-        //AbstractUserManager::save
-        registerUpdateFuncHandler<ApiUserData>( restProcessorPool, ApiCommand::updateUser );
+        registerUpdateFuncHandler<ApiUserData>( restProcessorPool, ApiCommand::saveUser );
         //AbstractUserManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeUser );
 
