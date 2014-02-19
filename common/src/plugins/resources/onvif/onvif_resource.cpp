@@ -1063,13 +1063,13 @@ void QnPlOnvifResource::setImagingUrl(const QString& src)
     m_imagingUrl = src;
 }
 
-QString QnPlOnvifResource::getPtzfUrl() const
+QString QnPlOnvifResource::getPtzUrl() const
 {
     QMutexLocker lock(&m_mutex);
     return m_ptzUrl;
 }
 
-void QnPlOnvifResource::setPtzfUrl(const QString& src) 
+void QnPlOnvifResource::setPtzUrl(const QString& src) 
 {
     QMutexLocker lock(&m_mutex);
     m_ptzUrl = src;
@@ -1241,7 +1241,7 @@ bool QnPlOnvifResource::fetchPtzInfo() {
         return false;
 
     QAuthenticator auth(getAuth());
-    PtzSoapWrapper ptz (getPtzfUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
+    PtzSoapWrapper ptz (getPtzUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
 
     _onvifPtz__GetConfigurations request;
     _onvifPtz__GetConfigurationsResponse response;
@@ -2225,7 +2225,7 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
 
 QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal()
 {
-    if(getPtzfUrl().isEmpty() || getPtzConfigurationToken().isEmpty())
+    if(getPtzUrl().isEmpty() || getPtzConfigurationToken().isEmpty())
         return NULL;
 
     QScopedPointer<QnOnvifPtzController> result(new QnOnvifPtzController(toSharedPointer(this)));
@@ -2941,7 +2941,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( b
             }
             if (response.Capabilities->PTZ) 
             {
-                setPtzfUrl(fromOnvifDiscoveredUrl(response.Capabilities->PTZ->XAddr));
+                setPtzUrl(fromOnvifDiscoveredUrl(response.Capabilities->PTZ->XAddr));
             }
             m_deviceIOUrl = response.Capabilities->Extension && response.Capabilities->Extension->DeviceIO
                 ? response.Capabilities->Extension->DeviceIO->XAddr
