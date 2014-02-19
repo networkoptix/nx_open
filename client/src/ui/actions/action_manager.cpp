@@ -39,6 +39,19 @@ namespace {
         return dynamic_cast<QnAction *>(action);
     }
 
+    class QnMenu: public QMenu {
+        typedef QMenu base_type;
+    public:
+        explicit QnMenu(QWidget *parent = 0): base_type(parent) {}
+
+    protected:
+        virtual void mousePressEvent(QMouseEvent *event) override {
+            /* This prevents the click from propagating to the underlying widget. */
+            setAttribute(Qt::WA_NoMouseReplay);
+            base_type::mousePressEvent(event);
+        }
+    };
+
 } // anonymous namespace
 
 
@@ -1496,7 +1509,7 @@ QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWid
     } else {
         result = newMenuRecursive(rootAction, scope, parameters, parent);
         if (!result)
-            result = new QMenu(parent);
+            result = new QnMenu(parent);
     }
 
     if(result) {
@@ -1528,7 +1541,7 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
 }
 
 QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget) {
-    QMenu *result = new QMenu(parentWidget);
+    QMenu *result = new QnMenu(parentWidget);
 
     if(!parent->children().isEmpty()) {
         foreach(QnAction *action, parent->children()) {
@@ -1542,7 +1555,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
                 continue;
 
             QMenu *menu = newMenuRecursive(action, scope, parameters, parentWidget);
-            if((!menu || menu->isEmpty())  && (action->flags() & Qn::RequiresChildren))
+            if((!menu || menu->isEmpty()) && (action->flags() & Qn::RequiresChildren))
                 continue;
 
             QString replacedText;
