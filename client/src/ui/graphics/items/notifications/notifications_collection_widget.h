@@ -115,10 +115,10 @@ private:
      */
     void loadThumbnailForItem(QnNotificationWidget *item, QnResourcePtr resource, qint64 usecsSinceEpoch = -1);
 
-private:
-    QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
-    QnNotificationWidget* findItem(int businessRuleId, const QnResourcePtr &resource);
+    QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool useResource = true);
+    QnNotificationWidget* findItem(int businessRuleId, const QnResourcePtr &resource, bool useResource = true);
 
+private:
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
 

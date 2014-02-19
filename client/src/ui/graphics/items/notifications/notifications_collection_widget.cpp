@@ -404,23 +404,25 @@ void QnNotificationsCollectionWidget::hideBusinessAction(const QnAbstractBusines
     if (!resource)
         return;
 
-    QnNotificationWidget* item = findItem(ruleId, resource);
+    // TODO: #GDM please review, there must be a better way to do this. 
+    // Probably PlaySoundRepeated is not the only action type. See #2812.
+    QnNotificationWidget* item = findItem(ruleId, resource, businessAction->actionType() != BusinessActionType::PlaySoundRepeated); /* Ignore resource for repeated sound actions. */
     if (!item)
         return;
     m_list->removeItem(item);
     m_itemsByBusinessRuleId.remove(ruleId, item);
 }
 
-QnNotificationWidget* QnNotificationsCollectionWidget::findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
+QnNotificationWidget* QnNotificationsCollectionWidget::findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool useResource) {
     foreach (QnNotificationWidget *item, m_itemsByMessageType.values(message))
-        if (!resource || resource == item->property(itemResourcePropertyName).value<QnResourcePtr>())
+        if (!useResource || resource == item->property(itemResourcePropertyName).value<QnResourcePtr>())
             return item;
     return NULL;
 }
 
-QnNotificationWidget* QnNotificationsCollectionWidget::findItem(int businessRuleId, const QnResourcePtr &resource) {
+QnNotificationWidget* QnNotificationsCollectionWidget::findItem(int businessRuleId, const QnResourcePtr &resource, bool useResource) {
     foreach (QnNotificationWidget *item, m_itemsByBusinessRuleId.values(businessRuleId))
-        if (!resource || resource == item->property(itemResourcePropertyName).value<QnResourcePtr>())
+        if (!useResource || resource == item->property(itemResourcePropertyName).value<QnResourcePtr>())
             return item;
     return NULL;
 }
