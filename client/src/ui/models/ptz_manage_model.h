@@ -113,6 +113,7 @@ public:
     void setHomePosition(const QString &homePosition);
 
     RowData rowData(int row) const;
+    int rowNumber(const RowData &rowData) const;
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
