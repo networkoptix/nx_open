@@ -538,7 +538,7 @@ QVariant QnPtzManageModel::presetData(const QnPtzPresetItemModel &presetModel, i
         }
         case HomeColumn:
             if (role == Qt::ToolTipRole)
-                return tr("This preset will be activated if PTZ is not changed for %n minutes", 0, 5); // TODO: #Elric use value from PTZ
+                return tr("This preset will be activated if PTZ is not changed for %n minutes", 0, 5); // TODO: #Elric #PTZ use value from PTZ
             break;
         case DetailsColumn:
             return QVariant();
@@ -673,7 +673,7 @@ bool QnPtzManageModel::synchronized() const {
             return false;
     }
 
-    return true;
+    return m_removedPresets.isEmpty() && m_removedTours.isEmpty();
 }
 
 Q_SLOT void QnPtzManageModel::setSynchronized() {

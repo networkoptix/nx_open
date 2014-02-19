@@ -113,8 +113,6 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     //TODO: implement preview receiving and displaying
 
     //TODO: handle HomePosition
-    //TODO: handle resource switching ("Save changes? Yes/No/Cancel")
-    //TODO: Show warning if Home Position is set (ask Borya about text)
     //TODO: think about forced refresh in some cases or even a button - low priority
 }
 
@@ -267,7 +265,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked() {
     }
 
     m_model->addPreset();
-    saveChanges();
+    saveChanges(); // TODO: #dklychkov remove it from here and implement presets creation in some other way
 }
 
 void QnPtzManageDialog::at_goToPositionButton_clicked() {
