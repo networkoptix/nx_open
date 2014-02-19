@@ -21,6 +21,9 @@ protected:
 
 private:
     void updateResource(const QnResourcePtr& resource);
+
+private slots:
+    void at_serverSaved(int status, const QnResourceList &, int);
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H
