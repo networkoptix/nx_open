@@ -864,6 +864,7 @@ void QnApiPbSerializer::serializeServer(const QnMediaServerResourcePtr& serverPt
     pb_server.set_apiurl(serverPtr->getApiUrl().toUtf8().constData());
     pb_server.set_streamingurl(serverPtr->getStreamingUrl().toUtf8().constData());
     pb_serverResource.set_status(static_cast<pb::Resource_Status>(serverPtr->getStatus()));
+    pb_server.set_version(serverPtr->getVersion().toString().toUtf8().constData());
 
     if (!serverPtr->getNetAddrList().isEmpty())
         pb_server.set_netaddrlist(serializeNetAddrList(serverPtr->getNetAddrList()).toUtf8().constData());

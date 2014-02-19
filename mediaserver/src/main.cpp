@@ -1077,6 +1077,7 @@ void QnMain::run()
             server->setGuid(serverGuid());
             server->setPanicMode(pm);
         }
+        server->setVersion(QnSoftwareVersion(QN_ENGINE_VERSION));
 
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost), m_universalTcpListener->getPort());
 
