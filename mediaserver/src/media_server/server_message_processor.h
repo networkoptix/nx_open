@@ -4,6 +4,7 @@
 #include <api/common_message_processor.h>
 
 #include <core/resource/resource.h>
+#include "nx_ec/impl/ec_api_impl.h"
 
 class QnServerMessageProcessor : public QnCommonMessageProcessor
 {
@@ -21,9 +22,6 @@ protected:
 
 private:
     void updateResource(const QnResourcePtr& resource);
-
-private slots:
-    void at_serverSaved(int status, const QnResourceList &, int);
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H
