@@ -31,6 +31,7 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_widgetChanged(QnResou
         m_watchedLayout->setCellAspectRatio(widget->aspectRatio());
     } else {
         connect(widget, SIGNAL(aspectRatioChanged()), this, SLOT(at_resourceWidget_aspectRatioChanged()));
+        connect(widget, SIGNAL(destroyed()),          this, SLOT(at_resourceWidget_destroyed()));
         m_watchedWidgets.insert(widget);
     }
 }
@@ -45,6 +46,10 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_resourceWidget_aspectRatioChanged()
 
     m_watchedLayout->setCellAspectRatio(widget->aspectRatio());
     disconnect(widget, SIGNAL(aspectRatioChanged()), this, SLOT(at_resourceWidget_aspectRatioChanged()));
+}
+
+void QnWorkbenchLayoutAspectRatioWatcher::at_resourceWidget_destroyed() {
+    m_watchedWidgets.remove(static_cast<QnResourceWidget *>(sender()));
 }
 
 void QnWorkbenchLayoutAspectRatioWatcher::at_workbench_currentLayoutChanged() {
