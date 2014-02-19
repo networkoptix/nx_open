@@ -139,13 +139,17 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateAspectRatio();
 
     /* Set up PTZ controller. */
-    m_ptzController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
-    m_ptzController.reset(new QnPresetPtzController(m_ptzController));
-    m_ptzController.reset(new QnTourPtzController(m_ptzController));
-    m_ptzController.reset(new QnActivityPtzController(QnActivityPtzController::Local, m_ptzController));
+    QnPtzControllerPtr fisheyeController;
+    fisheyeController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
+    fisheyeController.reset(new QnPresetPtzController(fisheyeController));
+    fisheyeController.reset(new QnTourPtzController(fisheyeController));
+    fisheyeController.reset(new QnActivityPtzController(QnActivityPtzController::Local, fisheyeController));
+
     if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {
         serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
-        m_ptzController.reset(new QnFallbackPtzController(serverController, m_ptzController));
+        m_ptzController.reset(new QnFallbackPtzController(fisheyeController, serverController));
+    } else {
+        m_ptzController = fisheyeController;
     }
     connect(m_ptzController, &QnAbstractPtzController::changed, this, &QnMediaResourceWidget::at_ptzController_changed);
 
