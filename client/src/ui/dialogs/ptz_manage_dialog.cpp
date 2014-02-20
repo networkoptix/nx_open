@@ -75,6 +75,8 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->previewGroupBox->hide(); // TODO: #dklychkov implement preview fetching and remove this line
+
     ui->tableView->setModel(m_model);
     ui->tableView->horizontalHeader()->setVisible(true);
 
