@@ -147,13 +147,14 @@ bool QnPtzManageModel::isHomePositionChanged() const {
 }
 
 void QnPtzManageModel::setHomePositionInternal(const QString &homePosition, bool setChanged) {
+    m_homePositionChanged = setChanged;
+
     if (m_homePosition == homePosition)
         return;
 
     int oldPos = rowNumber(rowData(m_homePosition));
 
     m_homePosition = homePosition;
-    m_homePositionChanged = setChanged;
 
     int newPos = rowNumber(rowData(m_homePosition));
 
