@@ -65,6 +65,7 @@ private:
     bool saveTours();
     bool saveHomePosition();
 
+private:
     QScopedPointer<Ui::PtzManageDialog> ui;
     QnPtzManageModel *m_model;
     QnPtzHotkeysResourcePropertyAdaptor *m_adaptor;
@@ -74,6 +75,7 @@ private:
     QSet<QString> m_pendingPreviews;
 
     QString m_currentTourId;
+    bool m_submitting;
 };
 
 #endif // PTZ_TOURS_DIALOG_H

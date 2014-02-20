@@ -10,6 +10,13 @@
 #include <common/common_globals.h>
 #include <client/client_settings.h>
 
+#include <utils/common/event_processors.h>
+#include <utils/common/string.h>
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/resource_property_adaptors.h>
+#include <utils/local_file_cache.h>
+#include <utils/threaded_image_loader.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/ptz/abstract_ptz_controller.h>
@@ -24,11 +31,6 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
-#include <utils/common/event_processors.h>
-#include <utils/common/string.h>
-#include <utils/resource_property_adaptors.h>
-#include <utils/local_file_cache.h>
-#include <utils/threaded_image_loader.h>
 
 class QnPtzToursDialogItemDelegate: public QStyledItemDelegate {
     typedef QStyledItemDelegate base_type;
@@ -81,7 +83,8 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     base_type(parent, Qt::Dialog | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint),
     ui(new Ui::PtzManageDialog),
     m_model(new QnPtzManageModel(this)),
-    m_cache(new QnLocalFileCache(this))
+    m_cache(new QnLocalFileCache(this)),
+    m_submitting(false)
 {
     ui->setupUi(this);
 
@@ -242,6 +245,8 @@ bool QnPtzManageDialog::saveHomePosition() {
 }
 
 void QnPtzManageDialog::saveData() {
+    QN_SCOPED_VALUE_ROLLBACK(&m_submitting, true);
+
     if (!m_model->synchronized()) {
         savePresets();
         saveTours();
@@ -258,6 +263,9 @@ Qn::PtzDataFields QnPtzManageDialog::requiredFields() const {
 
 void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
     // TODO: #dklychkov make incremental changes instead of resetting the model (low priority)
+
+    if(m_submitting)
+        return;
 
     if (fields & Qn::PresetsPtzField) {
         QnPtzPresetList presets;
