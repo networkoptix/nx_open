@@ -18,4 +18,6 @@ int CopyDirectory(const CAtlString &refcstrSourceDirectory,
 UINT CopyProfile(MSIHANDLE hInstall, const char* actionName, BOOL verifyDestFolderExists = TRUE);
 void fixPath(CString& path);
 
+void QuitExecAndWarn(const LPWSTR commandLine, int status, const LPWSTR warningMsg);
+
 #endif // _CUSTOM_ACTIONS_UTILS_H_

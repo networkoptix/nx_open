@@ -337,15 +337,16 @@ UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
         versionName = params.Tokenize(_T(";"), curPos);
 
         CRegKey key;
-        LPTSTR szBuffer = new TCHAR[50];
-        ULONG cchBuffer = 257;
+        static const int MAX_VERSION_SIZE = 50;
+        TCHAR szBuffer[MAX_VERSION_SIZE + 1];
         if (key.Open(HKEY_LOCAL_MACHINE, versionPath, KEY_READ | KEY_WRITE) == ERROR_SUCCESS) {
             ULONG chars;
             CAtlString version;
 
             if (key.QueryStringValue(versionName, 0, &chars) == ERROR_SUCCESS) {
-                key.QueryStringValue(versionName, version.GetBuffer(chars), &chars);
-                version.ReleaseBuffer();
+                chars = min(chars, MAX_VERSION_SIZE);
+                key.QueryStringValue(versionName, szBuffer, &chars);
+                version = szBuffer;
             }
 
             key.DeleteValue(versionName);
@@ -457,3 +458,33 @@ LExit:
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
+
+UINT __stdcall CAQuitExecAndWarn(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    CAtlString params, commandLine, warningMsg;
+
+    hr = WcaInitialize(hInstall, "CAQuitExecAndWarn");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    int warningStatus;
+    params = GetProperty(hInstall, L"CustomActionData");
+
+    // Extract commandLine, status and warningMsg
+    int curPos = 0;
+    commandLine = params.Tokenize(_T(";"), curPos);
+    warningStatus = _wtoi(params.Tokenize(_T(";"), curPos));
+    warningMsg = params.Tokenize(_T(";"), curPos);
+
+    QuitExecAndWarn((const LPWSTR&)commandLine, warningStatus, (const LPWSTR&)warningMsg);
+
+LExit:
+
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
