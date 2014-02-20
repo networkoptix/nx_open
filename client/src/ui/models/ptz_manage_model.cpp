@@ -48,7 +48,7 @@ void QnPtzManageModel::addTour() {
     if (m_tours.isEmpty())
         lastRow++;
 
-    QString name = generateUniqueString(collectTourNames(), tr("New tour"), tr("New tour %1"));
+    QString name = generateUniqueString(collectTourNames(), QString(), tr("New tour %1"));
 
     beginInsertRows(QModelIndex(), firstRow, lastRow);
     m_tours << name;
@@ -111,7 +111,7 @@ void QnPtzManageModel::addPreset() {
     if (m_presets.isEmpty())
         lastRow++;
 
-    QString name = generateUniqueString(collectPresetNames(), tr("Saved position"), tr("Saved position %1"));
+    QString name = generateUniqueString(collectPresetNames(), QString(), tr("Saved position %1"));
 
     beginInsertRows(QModelIndex(), firstRow, lastRow);
     m_presets << name;

@@ -86,6 +86,55 @@ QString xorDecrypt(const QString &crypted, const QString &key) {
 }
 
 
+QString extractFileExtension(const QString &string) {
+    int pos = string.lastIndexOf(L'.');
+    if (pos < 0)
+        return QString();
+
+    QString result(L'.');
+    while (++pos < string.length()) {
+        QChar curr = string[pos];
+        if (!curr.isLetterOrNumber())
+            return result;
+        result.append(curr);
+    }
+
+    return result;
+}
+
+
+QString generateUniqueString(const QStringList &usedStrings, const QString &defaultString, const QString &templateString) {
+    QStringList lowerStrings;
+    foreach (const QString &string, usedStrings)
+        lowerStrings << string.toLower();
+
+    QRegExp pattern = QRegExp(templateString.arg(lit("?([0-9]+)?")).toLower());
+
+    /* Prepare new name. */
+    int number = 0;
+    foreach(const QString &string, lowerStrings) {
+        if(!pattern.exactMatch(string))
+            continue;
+
+        number = qMax(number, pattern.cap(1).toInt());
+    }
+
+    if (number == 0) {
+        if(defaultString.isEmpty()) {
+            number = 1;
+        } else if(!lowerStrings.contains(defaultString.toLower())) {
+            return defaultString;
+        } else {
+            number = 2;
+        }
+    } else {
+        number++;
+    }
+
+    return templateString.arg(number);
+}
+
+
 
 // -------------------------------------------------------------------------- //
 // String comparison
@@ -252,47 +301,3 @@ QStringList naturalStringSort( const QStringList & list, Qt::CaseSensitivity cas
 	return retVal;
 }
 
-QString extractFileExtension(const QString &string) {
-    int pos = string.lastIndexOf(L'.');
-    if (pos < 0)
-        return QString();
-
-    QString result(L'.');
-    while (++pos < string.length()) {
-        QChar curr = string[pos];
-        if (!curr.isLetterOrNumber())
-            return result;
-        result.append(curr);
-    }
-
-    return result;
-}
-
-QString generateUniqueString(const QStringList &usedStrings, const QString &defaultString, const QString &templateString) {
-    QStringList lowerStrings;
-    foreach (const QString &string, usedStrings)
-        lowerStrings << string.toLower();
-
-    QRegExp pattern = QRegExp(templateString.arg(lit("?([0-9]+)?")).toLower());
-
-    /* Prepare new name. */
-    int number = 0;
-    foreach(const QString &string, lowerStrings) {
-        if(!pattern.exactMatch(string))
-            continue;
-
-        number = qMax(number, pattern.cap(1).toInt());
-    }
-    
-    if (number == 0) {
-        if(!defaultString.isEmpty() && !lowerStrings.contains(defaultString.toLower())) {
-            return defaultString;
-        } else {
-            number = 2;
-        }
-    } else {
-        number++;
-    }
-
-    return templateString.arg(number);
-}
