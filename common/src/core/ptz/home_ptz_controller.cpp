@@ -11,9 +11,6 @@
 #include "ptz_controller_pool.h"
 #include "home_ptz_executor.h"
 
-#define QN_NEW_PRESET_IS_HOME
-
-
 QnHomePtzController::QnHomePtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzObject>(baseController->resource(), lit("ptzHomeObject"), QnPtzObject(), this)),
@@ -63,16 +60,6 @@ bool QnHomePtzController::viewportMove(qreal aspectRatio, const QRectF &viewport
         return false;
 
     m_executor->restart();
-    return true;
-}
-
-bool QnHomePtzController::createPreset(const QnPtzPreset &preset) {
-    if(!base_type::createPreset(preset))
-        return false;
-
-#ifdef QN_NEW_PRESET_IS_HOME
-    updateHomeObject(QnPtzObject(Qn::PresetPtzObject, preset.id));
-#endif
     return true;
 }
 

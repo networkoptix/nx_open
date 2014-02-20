@@ -36,6 +36,8 @@ public:
 
     virtual bool getActiveObject(QnPtzObject *activeObject) override;
 
+    virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
+
 private:
     QnPtzObject getActiveObject();
     void setActiveObject(const QnPtzObject &activeObject);
@@ -44,6 +46,7 @@ private:
     bool setActiveObjectLocked(const QnPtzObject &activeObject);
 
 private:
+    bool m_asynchronous;
     Mode m_mode;
     QMutex m_mutex;
     QnResourcePropertyAdaptor<QnPtzObject> *m_adaptor;

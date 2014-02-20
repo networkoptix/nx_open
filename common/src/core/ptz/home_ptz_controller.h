@@ -25,7 +25,6 @@ public:
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
     virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) override;
-    virtual bool createPreset(const QnPtzPreset &preset) override;
     virtual bool activatePreset(const QString &presetId, qreal speed) override;
     virtual bool activateTour(const QString &tourId) override;
 
