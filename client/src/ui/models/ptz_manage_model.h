@@ -1,5 +1,5 @@
-#ifndef PTZ_TOUR_LIST_MODEL_H
-#define PTZ_TOUR_LIST_MODEL_H
+#ifndef QN_PTZ_MANAGE_MODEL_H
+#define QN_PTZ_MANAGE_MODEL_H
 
 #include <QtCore/QAbstractTableModel>
 #include <QtCore/QUuid>
@@ -8,7 +8,9 @@
 #include <core/ptz/ptz_preset.h>
 
 #include <client/client_model_types.h>
-#include "client/client_color_types.h"
+#include <client/client_color_types.h>
+
+#include <ui/customization/customized.h>
 
 struct QnPtzTourItemModel {
     QnPtzTourItemModel(){}
@@ -59,10 +61,10 @@ struct QnPtzPresetItemModel {
 };
 
 
-class QnPtzManageModel : public QAbstractTableModel {
+class QnPtzManageModel : public Customized<QAbstractTableModel> {
     Q_OBJECT
     Q_PROPERTY(QnPtzManageModelColors colors READ colors WRITE setColors)
-    typedef QAbstractTableModel base_type;
+    typedef Customized<QAbstractTableModel> base_type;
 
 public:
     enum Column {
@@ -189,5 +191,5 @@ private:
     QnPtzPresetList m_ptzPresetsCache;
 };
 
-#endif // PTZ_TOUR_LIST_MODEL_H
+#endif // QN_PTZ_MANAGE_MODEL_H
 
