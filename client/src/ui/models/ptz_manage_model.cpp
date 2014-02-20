@@ -5,6 +5,7 @@
 #include <ui/style/globals.h>
 #include <ui/dialogs/message_box.h>
 #include <utils/common/container.h>
+#include "utils/common/string.h"
 
 QnPtzManageModel::QnPtzManageModel(QObject *parent) :
     base_type(parent),
@@ -47,13 +48,10 @@ void QnPtzManageModel::addTour() {
     if (m_tours.isEmpty())
         lastRow++;
 
-    //QString name = generateUniqueString(, )
-
-    tr("New tour"); // TODO: #Elric #PTZ
-    tr("New tour %1");
+    QString name = generateUniqueString(collectTourNames(), tr("New tour"), tr("New tour %1"));
 
     beginInsertRows(QModelIndex(), firstRow, lastRow);
-    m_tours << tr("New tour %1").arg(m_tours.size() + 1);
+    m_tours << name;
     m_tours.last().modified = true;
     endInsertRows();
 }
@@ -113,11 +111,10 @@ void QnPtzManageModel::addPreset() {
     if (m_presets.isEmpty())
         lastRow++;
 
-    tr("Saved position"); // TODO: #Elric #PTZ
-    tr("Saved position %1");
+    QString name = generateUniqueString(collectPresetNames(), tr("Saved position"), tr("Saved position %1"));
 
     beginInsertRows(QModelIndex(), firstRow, lastRow);
-    m_presets << tr("Saved position %1").arg(m_presets.size() + 1);
+    m_presets << name;
     m_presets.last().modified = true;
     endInsertRows();
 
@@ -732,7 +729,7 @@ bool QnPtzManageModel::synchronized() const {
     return m_removedPresets.isEmpty() && m_removedTours.isEmpty() && !m_homePositionChanged;
 }
 
-Q_SLOT void QnPtzManageModel::setSynchronized() {
+void QnPtzManageModel::setSynchronized() {
     beginResetModel();
     auto presetIter = m_presets.begin();
     while (presetIter != m_presets.end()) {
@@ -754,6 +751,20 @@ Q_SLOT void QnPtzManageModel::setSynchronized() {
     m_homePositionChanged = false;
 
     endResetModel();
+}
+
+QStringList QnPtzManageModel::collectTourNames() const {
+    QStringList result;
+    foreach(const QnPtzTourItemModel &tour, m_tours)
+        result.push_back(tour.tour.name);
+    return result;
+}
+
+QStringList QnPtzManageModel::collectPresetNames() const {
+    QStringList result;
+    foreach(const QnPtzPresetItemModel &preset, m_presets)
+        result.push_back(preset.preset.name);
+    return result;
 }
 
 

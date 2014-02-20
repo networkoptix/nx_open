@@ -175,6 +175,9 @@ private:
 
     void setHomePositionInternal(const QString &homePosition, bool setChanged);
 
+    QStringList collectTourNames() const;
+    QStringList collectPresetNames() const;
+
 private:
     QnPtzManageModelColors m_colors;
 
