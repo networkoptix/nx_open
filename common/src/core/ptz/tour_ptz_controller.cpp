@@ -22,7 +22,8 @@ QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseControlle
     assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
     assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
-    m_executor->moveToThread(qnPtzPool->executorThread());
+    if(!baseController->hasCapabilities(Qn::VirtualPtzCapability)) // TODO: #Elric implement it in a saner way
+        m_executor->moveToThread(qnPtzPool->executorThread()); 
 
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChangedExternally, this, [this]{ emit changed(Qn::ToursPtzField); }, Qt::QueuedConnection);
 }

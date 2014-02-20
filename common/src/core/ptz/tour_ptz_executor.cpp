@@ -89,6 +89,7 @@ public:
 
     QnPtzControllerPtr baseController;
     bool usingThreadController;
+    bool usingBlockingController;
     Qn::PtzCoordinateSpace defaultSpace;
     Qn::PtzDataField defaultDataField;
     Qn::PtzCommand defaultCommand;
@@ -113,19 +114,23 @@ public:
 
 QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate(): 
     state(Stopped),
-    usingThreadController(false)
+    usingThreadController(false),
+    usingBlockingController(false)
 {}
 
 QnTourPtzExecutorPrivate::~QnTourPtzExecutorPrivate() {
-    /* It's important to release the QObject ownership here as thread controller 
-     * is also owned by a QSharedPointer. */
+    /* Release ownership, just to feel safe. */
     if(usingThreadController)
         baseController->setParent(NULL); 
 }
 
 void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller) {
     baseController = controller; 
-    if(QnThreadedPtzController::extends(baseController->getCapabilities())) { // TODO: #Elric #PTZ no threading for fisheye
+    if(baseController->hasCapabilities(Qn::AsynchronousPtzCapability)) {
+        /* Just use it as is. */
+    } else if(baseController->hasCapabilities(Qn::VirtualPtzCapability)) {
+        usingBlockingController = true;
+    } else {
         baseController.reset(new QnThreadedPtzController(baseController));
         usingThreadController = true;
 
@@ -282,13 +287,16 @@ void QnTourPtzExecutorPrivate::activateCurrentSpot() {
 }
 
 void QnTourPtzExecutorPrivate::requestPosition() {
-    QVector3D tmp;
-    baseController->getPosition(defaultSpace, &tmp);
+    QVector3D position;
+    baseController->getPosition(defaultSpace, &position);
 
     needPositionUpdate = false;
     waitingForNewPosition = true;
 
     newPositionRequestTime = spotTimer.elapsed();
+
+    if(usingBlockingController)
+        q->controllerFinishedLater(defaultCommand, position);
 }
 
 bool QnTourPtzExecutorPrivate::handleTimer(int timerId) {
@@ -318,8 +326,9 @@ QnTourPtzExecutor::QnTourPtzExecutor(const QnPtzControllerPtr &controller):
     d->q = this;
     d->init(controller);
 
-    connect(this, &QnTourPtzExecutor::startTourRequested,   this, &QnTourPtzExecutor::at_startTourRequested, Qt::QueuedConnection);
-    connect(this, &QnTourPtzExecutor::stopTourRequested,    this, &QnTourPtzExecutor::at_stopTourRequested, Qt::QueuedConnection);
+    connect(this, &QnTourPtzExecutor::startTourRequested,       this,   &QnTourPtzExecutor::at_startTourRequested,  Qt::QueuedConnection);
+    connect(this, &QnTourPtzExecutor::stopTourRequested,        this,   &QnTourPtzExecutor::at_stopTourRequested,   Qt::QueuedConnection);
+    connect(this, &QnTourPtzExecutor::controllerFinishedLater,  this,   &QnTourPtzExecutor::at_controller_finished, Qt::QueuedConnection);
 }
 
 QnTourPtzExecutor::~QnTourPtzExecutor() {
