@@ -3,6 +3,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+// TODO: #Elric rename, ui_ prefix is for UI generated files.
+
 QString getResourceName(const QnResourcePtr& resource);
 
 QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &baseName);

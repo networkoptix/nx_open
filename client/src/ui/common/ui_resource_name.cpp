@@ -19,5 +19,5 @@ QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &b
     QnId parentId = user ? user->getId() : QnId();
     foreach(const QnLayoutResourcePtr &resource, qnResPool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>())
         usedNames.push_back(resource->getName().toLower());
-    return generateUniqueString(usedNames, baseName);
+    return generateUniqueString(usedNames, baseName, L' ');
 }
