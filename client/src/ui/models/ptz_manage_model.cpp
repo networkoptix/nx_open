@@ -510,7 +510,7 @@ int QnPtzManageModel::rowNumber(const QnPtzManageModel::RowData &rowData) const 
 
     offset += m_presets.size();
 
-    if (rowData.rowType == TourRow)
+    if (rowData.rowType == TourTitleRow)
         return offset;
 
     ++offset;
