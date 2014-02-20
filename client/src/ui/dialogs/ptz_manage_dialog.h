@@ -12,6 +12,7 @@ namespace Ui {
 }
 
 class QnPtzManageModel;
+class QnPtzHotkeysResourcePropertyAdaptor;
 class QnLocalFileCache;
 
 // TODO: #GDM remove singleton
@@ -40,6 +41,7 @@ protected:
 
 private slots:
     void updateUi();
+    void updateHotkeys();
 
     void at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
 
@@ -65,6 +67,7 @@ private:
 
     QScopedPointer<Ui::PtzManageDialog> ui;
     QnPtzManageModel *m_model;
+    QnPtzHotkeysResourcePropertyAdaptor *m_adaptor;
     QnResourcePtr m_resource;
 
     QnLocalFileCache *m_cache;

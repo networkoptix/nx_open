@@ -170,13 +170,10 @@ void QnPtzManageDialog::loadData(const QnPtzData &data) {
     m_model->setPresets(presets);
     m_model->setHomePosition(data.homeObject.id);
 
-    if (m_resource) {
-        QnPtzHotkeysResourcePropertyAdaptor adaptor(m_resource);
-        m_model->setHotkeys(adaptor.value());
-    }
-
     if (!data.tours.isEmpty())
         ui->tableView->setCurrentIndex(ui->tableView->model()->index(0, 0));
+
+    updateHotkeys();
 
     ui->tableView->resizeColumnsToContents();
     ui->tableView->horizontalHeader()->setStretchLastSection(true);
@@ -251,10 +248,8 @@ void QnPtzManageDialog::saveData() {
         saveHomePosition();
     }
 
-    if (m_resource) {
-        QnPtzHotkeysResourcePropertyAdaptor adaptor(m_resource);
-        adaptor.setValue(m_model->hotkeys());
-    }
+    if (m_adaptor)
+        m_adaptor->setValue(m_model->hotkeys());
 }
 
 Qn::PtzDataFields QnPtzManageDialog::requiredFields() const {
@@ -561,7 +556,19 @@ QnResourcePtr QnPtzManageDialog::resource() const {
 void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     if (m_resource == resource)
         return;
+    
+    if(m_resource) {
+        delete m_adaptor;
+        m_adaptor = NULL;
+    }
+
     m_resource = resource;
+    
+    if(m_resource) {
+        m_adaptor = new QnPtzHotkeysResourcePropertyAdaptor(m_resource, this);
+        connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnPtzManageDialog::updateHotkeys);
+    }
+
     setWindowTitle(tr("Manage PTZ for %1").arg(getResourceName(m_resource)));
 }
 
@@ -606,4 +613,9 @@ void QnPtzManageDialog::updateUi() {
     ui->goToPositionButton->setEnabled(isPreset || isTour);
     ui->startTourButton->setEnabled(isValidTour);
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(isModified());
+}
+
+void QnPtzManageDialog::updateHotkeys() {
+    if (m_adaptor)
+        m_model->setHotkeys(m_adaptor->value());
 }
