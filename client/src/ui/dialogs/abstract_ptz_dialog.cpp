@@ -68,7 +68,7 @@ void QnAbstractPtzDialog::synchronize(const QString &title) {
         m_controller->getData(requiredFields(), &data);
 
         QEventLoop loop;
-        connect(this,            SIGNAL(synchronized()),   &loop, SLOT(quit()));
+        connect(this, &QnAbstractPtzDialog::synchronized, &loop, &QEventLoop::quit);
 
         QList<QWidget*> disabled;
         QLayout* dialogLayout = this->layout();
@@ -80,9 +80,9 @@ void QnAbstractPtzDialog::synchronize(const QString &title) {
             if (QnDialogButtonBox* buttonBox = dynamic_cast<QnDialogButtonBox*>(widget)) {
                 buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
                 disabled << buttonBox->button(QDialogButtonBox::Ok);
-                connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked), &loop, SLOT(quit()));
+                connect(buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, &loop, &QEventLoop::quit);
                 buttonBox->showProgress(title);
-                connect(this, SIGNAL(synchronized()), buttonBox, SLOT(hideProgress()));
+                connect(this, &QnAbstractPtzDialog::synchronized, buttonBox, &QnDialogButtonBox::hideProgress);
             } else
                 disabled << widget;
         }
