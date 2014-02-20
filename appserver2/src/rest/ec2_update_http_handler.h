@@ -26,9 +26,9 @@ namespace ec2
         public QnRestRequestHandler
     {
     public:
-        UpdateHttpHandler( ServerQueryProcessor* const queryProcessor )
+        UpdateHttpHandler( Ec2DirectConnectionPtr  connection )
         :
-            m_queryProcessor( queryProcessor )
+            m_connection( connection )
         {
         }
 
@@ -68,11 +68,15 @@ namespace ec2
                 finished = true;
                 m_cond.wakeAll();
             };
-            m_queryProcessor->processUpdateAsync( tran, queryDoneHandler );
+            m_connection->queryProcessor()->processUpdateAsync( tran, queryDoneHandler );
 
             QMutexLocker lk( &m_mutex );
             while( !finished )
                 m_cond.wait( lk.mutex() );
+
+             // update local data
+            if (errorCode == ErrorCode::ok)
+                m_connection->processTransaction(tran);
 
             return errorCode == ErrorCode::ok
                 ? nx_http::StatusCode::ok
@@ -87,7 +91,7 @@ namespace ec2
         }
 
     private:
-        ServerQueryProcessor* const m_queryProcessor;
+        Ec2DirectConnectionPtr m_connection;
         QWaitCondition m_cond;
         QMutex m_mutex;
     };

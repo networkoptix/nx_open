@@ -37,6 +37,7 @@ namespace ec2
 		std::unique_ptr<QnDbManager> m_dbManager;   //TODO: #ak not sure this is right place for QnDbManager instance
         const QnConnectionInfo m_connectionInfo;
     };
+    typedef std::shared_ptr<Ec2DirectConnection> Ec2DirectConnectionPtr;
 }
 
 #endif  //EC2_CONNECTION_H

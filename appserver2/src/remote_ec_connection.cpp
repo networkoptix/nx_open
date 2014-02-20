@@ -16,8 +16,7 @@ namespace ec2
     :
         BaseEc2Connection<FixedUrlClientQueryProcessor>( queryProcessor.get(), resCtx ),
         m_queryProcessor( queryProcessor ),
-        m_connectionInfo( connectionInfo ),
-        m_resCtx(resCtx)
+        m_connectionInfo( connectionInfo )
     {
         QnTransactionMessageBus::instance()->setHandler(this);
     }

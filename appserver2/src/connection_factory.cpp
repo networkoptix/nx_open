@@ -273,7 +273,7 @@ namespace ec2
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new UpdateHttpHandler<InputDataType>(&m_serverQueryProcessor) );
+            new UpdateHttpHandler<InputDataType>(m_directConnection) );
     }
 
     template<class InputDataType, class OutputDataType>

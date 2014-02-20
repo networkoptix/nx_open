@@ -58,7 +58,8 @@ namespace ec2
                 return;
 
             // delivering transaction to remote peers
-            clusterManager->distributeAsync( tran );
+            QnTransactionMessageBus::instance()->sendTransaction(tran);
+
         }
 
         /*!

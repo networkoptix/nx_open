@@ -14,6 +14,7 @@
 #include "nx_ec/data/connection_data.h"
 #include "client_query_processor.h"
 #include "server_query_processor.h"
+#include "ec2_connection.h"
 
 
 namespace ec2
@@ -38,7 +39,7 @@ namespace ec2
     private:
         ServerQueryProcessor m_serverQueryProcessor;
         ClientQueryProcessor m_remoteQueryProcessor;
-        AbstractECConnectionPtr m_directConnection;
+        Ec2DirectConnectionPtr m_directConnection;
         QMutex m_mutex;
         ResourceContext m_resCtx;
         //std::map<QUrl, AbstractECConnectionPtr> m_urlToConnection;
