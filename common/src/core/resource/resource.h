@@ -153,6 +153,7 @@ public:
     // in other words TypeId can be used instantiate the right resource
     QnId getTypeId() const;
     void setTypeId(QnId id);
+    void setTypeByName(const QString& resTypeName);
 
     bool isDisabled() const;
     void setDisabled(bool disabled = true);

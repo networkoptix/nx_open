@@ -49,9 +49,7 @@ namespace ec2
             assert(tran.command == ApiCommand::saveLayouts );
             foreach(const ApiLayoutData& layout, tran.params.data) 
             {
-                QnLayoutResourcePtr layoutResource = m_resCtx.resFactory->createResource(
-                    layout.typeId,
-                    layout.toHashMap() ).dynamicCast<QnLayoutResource>();
+                QnLayoutResourcePtr layoutResource(new QnLayoutResource());
                 layout.toResource( layoutResource );
                 emit addedOrUpdated( layoutResource );
             }

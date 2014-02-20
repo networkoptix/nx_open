@@ -585,6 +585,13 @@ void QnResource::setTypeId(QnId id)
     m_typeId = id;
 }
 
+void QnResource::setTypeByName(const QString& resTypeName)
+{
+    QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(resTypeName);
+    if (resType)
+        setTypeId(resType->getId());
+}
+
 QnResource::Status QnResource::getStatus() const
 {
     QMutexLocker mutexLocker(&m_mutex);

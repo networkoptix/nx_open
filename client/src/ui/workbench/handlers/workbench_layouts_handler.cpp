@@ -180,6 +180,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
 
     newLayout = QnLayoutResourcePtr(new QnLayoutResource());
     newLayout->setGuid(QUuid::createUuid().toString());
+    newLayout->setTypeByName(lit("Layout"));
     newLayout->setName(name);
     newLayout->setParentId(user->getId());
     newLayout->setCellSpacing(layout->cellSpacing());
@@ -467,6 +468,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid().toString());
+    layout->setTypeByName(lit("Layout"));
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
     layout->setUserCanEdit(context()->user() == user);

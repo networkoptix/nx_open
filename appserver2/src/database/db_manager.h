@@ -163,7 +163,7 @@ namespace ec2
         ErrorCode updateStorages(const ApiMediaServerData&);
         ErrorCode removeServer(const QnId& guid);
         ErrorCode removeLayout(const QnId& guid);
-        ErrorCode removeLayoutNoLock(qint32 internalId);
+        ErrorCode removeLayout(qint32 id);
         ErrorCode removeStoragesByServer(const QnId& serverGUID);
 
         ErrorCode deleteLayoutItems(const qint32 id);

@@ -369,9 +369,9 @@ ErrorCode QnDbManager::updateResource(const ApiResourceData& data, qint32 intern
 {
 	QSqlQuery insQuery(m_sdb);
 
-	insQuery.prepare("UPDATE vms_resource SET xtype_guid = :typeId, parent_guid = :parentGuid, name = :name, url = :url, status = :status, disabled = :disabled WHERE id = :id");
+	insQuery.prepare("UPDATE vms_resource SET xtype_guid = :typeId, parent_guid = :parentGuid, name = :name, url = :url, status = :status, disabled = :disabled WHERE id = :internalId");
 	data.autoBindValues(insQuery);
-    insQuery.bindValue(":id", internalId);
+    insQuery.bindValue(":internalId", internalId);
 
     if (!insQuery.exec()) {
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
@@ -399,9 +399,9 @@ ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 i
     insQuery.prepare("INSERT OR REPLACE INTO vms_camera (audio_enabled, control_disabled, firmware, vendor, manually_added, resource_ptr_id, region, schedule_disabled, motion_type, group_name, group_id,\
                      mac, model, secondary_quality, status_flags, physical_id, password, login, dewarping_params, resource_ptr_id) VALUES\
                      (:audioEnabled, :controlDisabled, :firmware, :vendor, :manuallyAdded, :id, :region, :scheduleDisabled, :motionType, :groupName, :groupId,\
-                     :mac, :model, :secondaryQuality, :statusFlags, :physicalId, :password, :login, :dewarpingParams, :id)");
+                     :mac, :model, :secondaryQuality, :statusFlags, :physicalId, :password, :login, :dewarpingParams, :internalId)");
     data.autoBindValues(insQuery);
-    insQuery.bindValue(":id", internalId);
+    insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
         return ErrorCode::ok;
     }
@@ -415,9 +415,9 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT INTO vms_server (api_url, auth_key, streaming_url, version, net_addr_list, reserve, panic_mode, resource_ptr_id) VALUES\
-                     (:apiUrl, :authKey, :streamingUrl, :version, :netAddrList, :reserve, :panicMode, :id)");
+                     (:apiUrl, :authKey, :streamingUrl, :version, :netAddrList, :reserve, :panicMode, :internalId)");
     data.autoBindValues(insQuery);
-    insQuery.bindValue(":id", internalId);
+    insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
         return ErrorCode::ok;
     }
@@ -435,14 +435,14 @@ ErrorCode QnDbManager::insertOrReplaceLayout(const ApiLayoutData& data, qint32 i
                      (user_can_edit, cell_spacing_height, locked, \
                      cell_aspect_ratio, user_id, background_width, \
                      background_image_filename, background_height, \
-                     cell_spacing_width, background_opacity, resource_ptr_id \
+                     cell_spacing_width, background_opacity, resource_ptr_id) \
                      \
                      VALUES (:userCanEdit, :cellSpacingHeight, :locked, \
                      :cellAspectRatio, :userId, :backgroundWidth, \
                      :backgroundImageFilename, :backgroundHeight, \
-                     :cellSpacingWidth, :backgroundOpacity, :id)");
+                     :cellSpacingWidth, :backgroundOpacity, :internalId)");
     data.autoBindValues(insQuery);
-    insQuery.bindValue(":id", internalId);
+    insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
         return ErrorCode::ok;
     }
@@ -489,9 +489,9 @@ ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
 
         QSqlQuery insQuery(m_sdb);
         insQuery.prepare("INSERT INTO vms_storage (space_limit, used_for_writing, resource_ptr_id) VALUES\
-                         (:spaceLimit, :usedForWriting, :id)");
+                         (:spaceLimit, :usedForWriting, :internalId)");
         storage.autoBindValues(insQuery);
-        insQuery.bindValue(":id", internalId);
+        insQuery.bindValue(":internalId", internalId);
 
         if (!insQuery.exec()) {
             qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
@@ -782,8 +782,6 @@ qint32 QnDbManager::getBusinessRuleInternalId( const QnId& guid )
 
 ErrorCode QnDbManager::removeUser( const QnId& guid )
 {
-    QnDbTransactionLocker tran(&m_tran);
-
     qint32 internalId = getResourceInternalId(guid);
 
     QSqlQuery query(m_sdb);
@@ -794,7 +792,7 @@ ErrorCode QnDbManager::removeUser( const QnId& guid )
 
     ErrorCode err;
     while (query.next()) {
-        err = removeLayoutNoLock(query.value("resource_ptr_id").toInt());
+        err = removeLayout(query.value("resource_ptr_id").toInt());
         if (err != ErrorCode::ok)
             return err;
     }
@@ -815,7 +813,6 @@ ErrorCode QnDbManager::removeUser( const QnId& guid )
     if (err != ErrorCode::ok)
         return err;
 
-    tran.commit();
     return ErrorCode::ok;
 }
 
@@ -1011,8 +1008,6 @@ ErrorCode QnDbManager::deleteTableRecord(const QnId& id, const QString& tableNam
 
 ErrorCode QnDbManager::removeCamera(const QnId& guid)
 {
-    QnDbTransactionLocker tran(&m_tran);
-
     qint32 id = getResourceInternalId(guid);
 
     ErrorCode err = deleteAddParams(id);
@@ -1039,14 +1034,11 @@ ErrorCode QnDbManager::removeCamera(const QnId& guid)
     if (err != ErrorCode::ok)
         return err;
 
-    tran.commit();
     return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::removeServer(const QnId& guid)
 {
-    QnDbTransactionLocker tran(&m_tran);
-
     qint32 id = getResourceInternalId(guid);
 
     ErrorCode err = deleteAddParams(id);
@@ -1065,7 +1057,6 @@ ErrorCode QnDbManager::removeServer(const QnId& guid)
     if (err != ErrorCode::ok)
         return err;
 
-    tran.commit();
     return ErrorCode::ok;
 }
 
@@ -1083,16 +1074,12 @@ ErrorCode QnDbManager::deleteLayoutItems(const qint32 id)
     }
 }
 
-ErrorCode QnDbManager::removeLayout(const QnId& guid)
+ErrorCode QnDbManager::removeLayout(const QnId& id)
 {
-    QnDbTransactionLocker tran(&m_tran);
-    ErrorCode err = removeLayoutNoLock(getResourceInternalId(guid));
-    if (err == ErrorCode::ok)
-        tran.commit();
-    return err;
+    return removeLayout(getResourceInternalId(id));
 }
 
-ErrorCode QnDbManager::removeLayoutNoLock(qint32 internalId)
+ErrorCode QnDbManager::removeLayout(qint32 internalId)
 {
     ErrorCode err = deleteAddParams(internalId);
     if (err != ErrorCode::ok)
@@ -1135,11 +1122,9 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiUserData>& tran
 
 ErrorCode QnDbManager::removeResource(const QnId& id)
 {
-    QnDbTransactionLocker tran(&m_tran);
-
     QSqlQuery query(m_sdb);
     query.prepare("SELECT \
-                    (CASE WHEN c.resource_ptr_id is null then rt.name else 'Camera' end) as name,\
+                    (CASE WHEN c.resource_ptr_id is null then rt.name else 'Camera' end) as name\
                     FROM vms_resource r\
                     JOIN vms_resourcetype rt on rt.guid = r.xtype_guid\
                     LEFT JOIN vms_camera c on c.resource_ptr_id = r.id\
@@ -1149,42 +1134,57 @@ ErrorCode QnDbManager::removeResource(const QnId& id)
         return ErrorCode::failure;
     query.next();
     QString objectType = query.value("name").toString();
+    ErrorCode result;
     if (objectType == "Camera")
-        return removeCamera(id);
+        result = removeCamera(id);
     else if (objectType == "Server")
-        return removeServer(id);
+        result = removeServer(id);
     else if (objectType == "User")
-        return removeUser(id);
+        result = removeUser(id);
     else if (objectType == "Layout")
-        return removeLayout(id);
+        result = removeLayout(id);
     else {
         Q_ASSERT_X(0, "Unknown object type", Q_FUNC_INFO);
         return ErrorCode::notImplemented;
     }
+
+    return result;
 }
 
 ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
 {
+    QnDbTransactionLocker lock(&m_tran);
+
+    ErrorCode result;
     switch (tran.command)
     {
     case ApiCommand::removeCamera:
-        return removeCamera(tran.params.id);
+        result = removeCamera(tran.params.id);
+        break;
     case ApiCommand::removeMediaServer:
-        return removeServer(tran.params.id);
+        result = removeServer(tran.params.id);
+        break;
     case ApiCommand::removeLayout:
-        return removeLayout(tran.params.id);
+        result = removeLayout(tran.params.id);
+        break;
     case ApiCommand::removeBusinessRule:
-        return removeBusinessRule( tran.params.id );
+        result = removeBusinessRule( tran.params.id );
+        break;
     case ApiCommand::removeUser:
-        return removeUser( tran.params.id );
+        result = removeUser( tran.params.id );
+        break;
     case ApiCommand::removeResource:
-        return removeResource( tran.params.id );
+        result = removeResource( tran.params.id );
+        break;
     default:
         qWarning() << "Remove operation is not implemented for command" << toString(tran.command);
         Q_ASSERT_X(0, "Remove operation is not implemented for command", Q_FUNC_INFO);
-        break;
+        return ErrorCode::unsupported;
     }
-    return ErrorCode::unsupported;
+
+    if (result == ErrorCode::ok)
+        lock.commit();
+    return result;
 }
 
 /* 
@@ -1257,8 +1257,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataLi
     }
 
     QSqlQuery queryItems(m_sdb);
-    queryItems.prepare("SELECT li.zoom_bottom as zoomBottom, li.right, li.uuid, li.zoom_left as zoomLeft, li.resource_id as resourceId, \
-                       li.zoom_right as zoomRight, li.top, layout_id as layoutId, li.bottom, li.zoom_top as zoomTop, \
+    queryItems.prepare("SELECT r.guid as layoutId, li.zoom_bottom as zoomBottom, li.right, li.uuid, li.zoom_left as zoomLeft, li.resource_id as resourceId, \
+                       li.zoom_right as zoomRight, li.top, li.bottom, li.zoom_top as zoomTop, \
                        li.zoom_target_uuid as zoomTargetUuid, li.flags, li.contrast_params as contrastParams, li.rotation, li.id, \
                        li.dewarping_params as dewarpingParams, li.left FROM vms_layoutitem li \
                        JOIN vms_resource r on r.id = li.layout_id order by li.layout_id");
