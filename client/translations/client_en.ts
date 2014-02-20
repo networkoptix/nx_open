@@ -178,7 +178,7 @@ It might take a few moments to populate them in the tree.</numerusform>
 <context>
     <name>QnCameraListDialog</name>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="144"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="97"/>
         <source>Camera List - %n camera(s) found</source>
         <translation>
             <numerusform>Camera List - %n camera found</numerusform>
@@ -186,7 +186,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="146"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="99"/>
         <source>Camera List for &apos;%1&apos; - %n camera(s) found</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -431,7 +431,7 @@ It might take a few moments to populate them in the tree.</numerusform>
 <context>
     <name>QnPtzManageModel</name>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="535"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="570"/>
         <source>This preset will be activated if PTZ is not changed for %n minutes</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -439,7 +439,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="637"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="675"/>
         <source>Tour has %n same positions in a row at %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -447,7 +447,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="646"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="684"/>
         <source>about %n minutes</source>
         <translation type="unfinished">
             <numerusform></numerusform>
