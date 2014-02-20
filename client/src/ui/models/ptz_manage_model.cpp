@@ -332,6 +332,8 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
                     return false;
                 model.preset.name = value.toString();
                 model.modified = true;
+
+                emit dataChanged(index, index);
                 return true;
             }
         case QnPtzManageModel::TourRow:
@@ -344,6 +346,8 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
                     return false;
                 model.tour.name = value.toString();
                 model.modified = true;
+
+                emit dataChanged(index, index);
                 return true;
             }
         default:
@@ -724,10 +728,13 @@ Q_SLOT void QnPtzManageModel::setSynchronized() {
         tourIter->modified = false;
         tourIter++;
     }
-    endResetModel();
 
+    // synchronized() should be true after the model has been reset
     m_removedPresets.clear();
     m_removedTours.clear();
+    m_homePositionChanged = false;
+
+    endResetModel();
 }
 
 

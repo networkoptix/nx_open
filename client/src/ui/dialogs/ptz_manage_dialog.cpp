@@ -162,6 +162,8 @@ void QnPtzManageDialog::loadData(const QnPtzData &data) {
 bool QnPtzManageDialog::savePresets() {
     bool result = true;
 
+    QStringList removedPresets = m_model->removedPresets();
+
     foreach (const QnPtzPresetItemModel &model, m_model->presetModels()) {
         if (!model.modified)
             continue;
@@ -172,7 +174,7 @@ bool QnPtzManageDialog::savePresets() {
             result &= updatePreset(model.preset);
     }
 
-    foreach (const QString &id, m_model->removedPresets())
+    foreach (const QString &id, removedPresets)
         result &= removePreset(id);
 
     return result;
@@ -181,16 +183,18 @@ bool QnPtzManageDialog::savePresets() {
 bool QnPtzManageDialog::saveTours() {
     bool result = true;
 
+    QStringList removedTours = m_model->removedTours();
+
     foreach (const QnPtzTourItemModel &model, m_model->tourModels()) {
         if (!model.modified)
             continue;
 
-        /* There is no need to remove the tour first as it will be updated 
+        /* There is no need to remove the tour first as it will be updated
          * in-place if it already exists. */
         result &= createTour(model.tour);
     }
 
-    foreach (const QString &id, m_model->removedTours())
+    foreach (const QString &id, removedTours)
         result &= removeTour(id);
 
     return result;
