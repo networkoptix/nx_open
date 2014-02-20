@@ -21,9 +21,13 @@
 #include <ui/widgets/ptz_tour_widget.h>
 #include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/message_box.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include <utils/common/event_processors.h>
 #include <utils/resource_property_adaptors.h>
+#include <utils/local_file_cache.h>
+#include <utils/threaded_image_loader.h>
 
 class QnPtzToursDialogItemDelegate: public QStyledItemDelegate {
     typedef QStyledItemDelegate base_type;
@@ -66,7 +70,8 @@ private:
 QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     base_type(parent, Qt::Dialog | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint),
     ui(new Ui::PtzManageDialog),
-    m_model(new QnPtzManageModel(this))
+    m_model(new QnPtzManageModel(this)),
+    m_cache(new QnLocalFileCache(this))
 {
     ui->setupUi(this);
 
@@ -101,18 +106,19 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(m_model,    &QnPtzManageModel::modelReset,      this,               &QnPtzManageDialog::updateUi);
     connect(this,       &QnAbstractPtzDialog::synchronized, m_model,            &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
+    connect(m_cache,    &QnLocalFileCache::fileDownloaded,  this,               &QnPtzManageDialog::at_cache_imageLoaded);
 
     connect(ui->savePositionButton, &QPushButton::clicked,  this,   &QnPtzManageDialog::at_savePositionButton_clicked);
     connect(ui->goToPositionButton, &QPushButton::clicked,  this,   &QnPtzManageDialog::at_goToPositionButton_clicked);
     connect(ui->addTourButton,      &QPushButton::clicked,  this,   &QnPtzManageDialog::at_addTourButton_clicked);
     connect(ui->startTourButton,    &QPushButton::clicked,  this,   &QnPtzManageDialog::at_startTourButton_clicked);
     connect(ui->deleteButton,       &QPushButton::clicked,  this,   &QnPtzManageDialog::at_deleteButton_clicked);
+    connect(ui->getPreviewButton,   &QPushButton::clicked,  this,   &QnPtzManageDialog::at_getPreviewButton_clicked);
 
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked,   this, &QnAbstractPtzDialog::saveChanges);
 
     //TODO: implement preview receiving and displaying
 
-    //TODO: handle HomePosition
     //TODO: think about forced refresh in some cases or even a button - low priority
 }
 
@@ -244,6 +250,14 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
         QnPtzObject homeObject;
         if (controller()->getHomeObject(&homeObject))
             m_model->setHomePosition(homeObject.id);
+    }
+
+    if (fields.testFlag(Qn::ActiveObjectPtzField) && m_resource) {
+        QnPtzObject ptzObject;
+        if (controller()->getActiveObject(&ptzObject) && m_pendingPreviews.contains(ptzObject.id)) {
+            m_pendingPreviews.remove(ptzObject.id);
+            storePreview(ptzObject.id);
+        }
     }
 }
 
@@ -424,6 +438,27 @@ void QnPtzManageDialog::at_deleteButton_clicked() {
     }
 }
 
+void QnPtzManageDialog::at_getPreviewButton_clicked() {
+    if (!controller() || !m_resource)
+        return;
+
+    QnPtzManageModel::RowData rowData = m_model->rowData(ui->tableView->currentIndex().row());
+    if (rowData.rowType != QnPtzManageModel::PresetRow)
+        return;
+
+    QnPtzObject currentPosition;
+    if (!controller()->getActiveObject(&currentPosition))
+        return;
+
+    if (currentPosition.id != rowData.presetModel.preset.id) {
+        m_pendingPreviews.insert(rowData.presetModel.preset.id);
+        controller()->activatePreset(rowData.presetModel.preset.id, 1.0);
+        // when the preset will be activated a preview will be taken in updateFields()
+    } else {
+        storePreview(rowData.presetModel.preset.id);
+    }
+}
+
 void QnPtzManageDialog::at_tableViewport_resizeEvent() {
     QModelIndexList selectedIndices = ui->tableView->selectionModel()->selectedRows();
     if(selectedIndices.isEmpty())
@@ -436,6 +471,48 @@ void QnPtzManageDialog::at_tourSpotsChanged(const QnPtzTourSpotList &spots) {
     if (m_currentTourId.isEmpty())
         return;
     m_model->updateTourSpots(m_currentTourId, spots);
+}
+
+void QnPtzManageDialog::at_cache_imageLoaded(const QString &fileName, bool ok) {
+    if (!ok)
+        return;
+
+    QnPtzManageModel::RowData rowData = m_model->rowData(ui->tableView->currentIndex().row());
+    if (rowData.id() != fileName)
+        return;
+
+    QnThreadedImageLoader *loader = new QnThreadedImageLoader(this);
+    loader->setInput(m_cache->getFullPath(fileName));
+    loader->setTransformationMode(Qt::FastTransformation);
+    loader->setSize(ui->previewLabel->size());
+    loader->setFlags(Qn::TouchSizeFromOutside);
+    // TODO: #dklychkov rename QnThreadedImageLoader::finished() and use the new syntax
+    connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
+    loader->start();
+}
+
+void QnPtzManageDialog::storePreview(const QString &id) {
+    QList<QnResourceWidget *> widgets = display()->widgets(m_resource);
+    if (widgets.isEmpty())
+        return;
+
+    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets.first());
+    if (!widget)
+        return;
+
+    // TODO: #dklychkov get image from the resource
+//    widget->display()->mediaResource()->getImage(...);
+    QImage image;
+    m_cache->storeImage(id, image);
+}
+
+void QnPtzManageDialog::setPreview(const QImage &image) {
+    if (image.isNull()) {
+        ui->previewStackedWidget->setCurrentWidget(ui->noPreviewPage);
+    } else {
+        ui->previewStackedWidget->setCurrentWidget(ui->previewPage);
+        ui->previewLabel->setPixmap(QPixmap::fromImage(image));
+    }
 }
 
 QnResourcePtr QnPtzManageDialog::resource() const {
@@ -483,6 +560,8 @@ void QnPtzManageDialog::updateUi() {
     bool isTour = selectedRow.rowType == QnPtzManageModel::TourRow;
 
     ui->previewGroupBox->setEnabled(isPreset || isTour);
+    if (ui->previewGroupBox->isEnabled())
+        m_cache->downloadFile(selectedRow.id());
     ui->deleteButton->setEnabled(isPreset || isTour);
     ui->goToPositionButton->setEnabled(isPreset || isTour);
     ui->startTourButton->setEnabled(isTour);

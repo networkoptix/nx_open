@@ -12,6 +12,7 @@ namespace Ui {
 }
 
 class QnPtzManageModel;
+class QnLocalFileCache;
 
 // TODO: #GDM remove singleton
 class QnPtzManageDialog : public QnAbstractPtzDialog, public Singleton<QnPtzManageDialog> {
@@ -46,9 +47,15 @@ private slots:
     void at_addTourButton_clicked();
     void at_startTourButton_clicked();
     void at_deleteButton_clicked();
+    void at_getPreviewButton_clicked();
 
     void at_tableViewport_resizeEvent();
     void at_tourSpotsChanged(const QnPtzTourSpotList &spots);
+
+    void at_cache_imageLoaded(const QString &fileName, bool ok);
+
+    void storePreview(const QString &id);
+    void setPreview(const QImage &image);
 
 private:
     bool savePresets();
@@ -58,6 +65,9 @@ private:
     QScopedPointer<Ui::PtzManageDialog> ui;
     QnPtzManageModel *m_model;
     QnResourcePtr m_resource;
+
+    QnLocalFileCache *m_cache;
+    QSet<QString> m_pendingPreviews;
 
     QString m_currentTourId;
 };
