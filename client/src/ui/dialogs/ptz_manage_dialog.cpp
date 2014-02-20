@@ -139,6 +139,16 @@ void QnPtzManageDialog::keyPressEvent(QKeyEvent *event) {
     base_type::keyPressEvent(event);
 }
 
+void QnPtzManageDialog::reject() {
+    if (!checkForUnsavedChanges())
+        return;
+
+    // ensure that no old data will stay in dialog
+    setController(QnPtzControllerPtr());
+    m_model->setPresets(QnPtzPresetList());
+    m_model->setTours(QnPtzTourList());
+    base_type::reject();
+}
 
 void QnPtzManageDialog::loadData(const QnPtzData &data) {
     // ui->tableView->setColumnHidden(QnPtzTourListModel::HomeColumn, !(capabilities() & Qn::HomePtzCapability)); //TODO: uncomment
@@ -536,21 +546,21 @@ bool QnPtzManageDialog::isModified() const {
     return !m_model->synchronized();
 }
 
-void QnPtzManageDialog::chechForUnsavedChanges() {
-    // TODO: #dklychkov finish implementation
-    if (isModified()) {
-        show();
-        QnMessageBox::StandardButton button = QnMessageBox::question(this, 0, tr("PTZ configuration is not saved"), tr("Changes are not saved. Save them?"),
-                                                                     QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, QnMessageBox::Yes);
-        switch (button) {
-        case QnMessageBox::Ok:
-            saveChanges();
-            break;
-        case QnMessageBox::Cancel:
-            return;
-        default:
-            break;
-        }
+bool QnPtzManageDialog::checkForUnsavedChanges() {
+    if (!isModified())
+        return true;
+
+    show();
+    QnMessageBox::StandardButton button = QnMessageBox::question(this, 0, tr("PTZ configuration is not saved"), tr("Changes are not saved. Save them?"),
+                                                                 QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, QnMessageBox::Yes);
+    switch (button) {
+    case QnMessageBox::Ok:
+        saveChanges();
+        return true;
+    case QnMessageBox::Cancel:
+        return false;
+    default:
+        return true;
     }
 }
 
