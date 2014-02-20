@@ -65,7 +65,7 @@ void QnGlobalSettings::setDisabledVendors(QString disabledVendors) {
 bool QnGlobalSettings::isCameraSettingsOptimizationEnabled() const {
     QMutexLocker locker(&m_mutex);
 
-    return m_cameraSettingsOptimizationAdaptor ? m_cameraSettingsOptimizationAdaptor->value() : true;
+    return m_cameraSettingsOptimizationAdaptor ? m_cameraSettingsOptimizationAdaptor->value() : false;
 }
 
 void QnGlobalSettings::setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled) {
@@ -90,7 +90,7 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
         QMutexLocker locker(&m_mutex);
         m_admin = user;
         m_disabledVendorsAdaptor.reset(new QnLexicalResourcePropertyAdaptor<QString>(m_admin, lit("disabledVendors"), lit(""), this));
-        m_cameraSettingsOptimizationAdaptor.reset(new QnLexicalResourcePropertyAdaptor<bool>(m_admin, lit("cameraSettingsOptimization"), true, this));
+        m_cameraSettingsOptimizationAdaptor.reset(new QnLexicalResourcePropertyAdaptor<bool>(m_admin, lit("cameraSettingsOptimization"), false, this));
     }
 
     // TODO: #Elric use valueChangedExternally!
