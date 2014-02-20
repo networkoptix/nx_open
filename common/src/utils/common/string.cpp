@@ -268,11 +268,10 @@ QString extractFileExtension(const QString &string) {
     return result;
 }
 
-QString generateUniqueString(const QStringList &usedValues, const QString &baseValue, const QString &spacer) {
+QString generateUniqueString(const QStringList &usedValues, const QString &baseValue, const QChar &spacer) {
     QStringList cleaned;
-    foreach (const QString &name, usedValues) {
+    foreach (const QString &name, usedValues)
         cleaned << name.toLower();
-    }
 
     if (!cleaned.contains(baseValue.toLower()))
         return baseValue;

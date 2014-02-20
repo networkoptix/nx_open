@@ -47,8 +47,13 @@ void QnPtzManageModel::addTour() {
     if (m_tours.isEmpty())
         lastRow++;
 
+    //QString name = generateUniqueString(, )
+
+    tr("New tour"); // TODO: #Elric #PTZ
+    tr("New tour %1");
+
     beginInsertRows(QModelIndex(), firstRow, lastRow);
-    m_tours << tr("New Tour %1").arg(m_tours.size() + 1);
+    m_tours << tr("New tour %1").arg(m_tours.size() + 1);
     m_tours.last().modified = true;
     endInsertRows();
 }
@@ -108,8 +113,11 @@ void QnPtzManageModel::addPreset() {
     if (m_presets.isEmpty())
         lastRow++;
 
+    tr("Saved position"); // TODO: #Elric #PTZ
+    tr("Saved position %1");
+
     beginInsertRows(QModelIndex(), firstRow, lastRow);
-    m_presets << tr("Saved Position %1").arg(m_presets.size() + 1);
+    m_presets << tr("Saved position %1").arg(m_presets.size() + 1);
     m_presets.last().modified = true;
     endInsertRows();
 
