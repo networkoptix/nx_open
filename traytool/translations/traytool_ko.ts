@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ko" sourcelanguage="en">
+<TS version="2.1" language="ko" sourcelanguage="en">
 <context>
     <name>ConnectionTestingDialog</name>
     <message>
@@ -30,12 +30,12 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/main.cpp" line="39"/>
+        <location filename="../src/main.cpp" line="41"/>
         <source>System Tray</source>
         <translation>시스템 트레이</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="40"/>
+        <location filename="../src/main.cpp" line="42"/>
         <source>There is no system tray on this system.
 Application will now quit.</source>
         <translation>해당 시스템에는 시스템 트레이가 없습니다.
@@ -46,12 +46,51 @@ Application will now quit.</source>
 <context>
     <name>QnConnectionTestingDialog</name>
     <message>
-        <location filename="../src/connection_testing_dialog.cpp" line="89"/>
+        <location filename="../src/connection_testing_dialog.cpp" line="70"/>
+        <source>Request timed out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="98"/>
+        <source>Login or password you have entered are incorrect, please try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="101"/>
+        <source>Connection to the Enterprise Controller could not be established.
+Connection details that you have entered are incorrect, please try again.
+
+If this error persists, please contact your VMS administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="106"/>
+        <source>You are trying to connect to incompatible Enterprise Controller.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="111"/>
+        <source>Enterprise Controller has a different version:
+ - Client version: %1.
+ - EC version: %2.
+Compatibility mode for versions lower than %3 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="120"/>
+        <source>Enterprise Controller has a different version:
+ - Client version: %1.
+ - EC version: %2.
+You will be asked to restart the client in compatibility mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="133"/>
         <source>Success</source>
         <translation>성공</translation>
     </message>
     <message>
-        <location filename="../src/connection_testing_dialog.cpp" line="89"/>
+        <location filename="../src/connection_testing_dialog.cpp" line="133"/>
         <source>Failed</source>
         <translation>실패</translation>
     </message>
@@ -59,12 +98,12 @@ Application will now quit.</source>
 <context>
     <name>QnElevationChecker</name>
     <message>
-        <location filename="../src/systraywindow.cpp" line="587"/>
+        <location filename="../src/systraywindow.cpp" line="595"/>
         <source>Insufficient privileges to manage services</source>
         <translation>서비스를 관리할 수 있는 권한이 불충분함</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="587"/>
+        <location filename="../src/systraywindow.cpp" line="595"/>
         <source>UAC must be enabled to request privileges for non-admin users</source>
         <translation>UAC 기능은 관리자가 아닌 일반 사용자에 대한 권한의 요청에 의해 사용되어야 함</translation>
     </message>
@@ -72,230 +111,257 @@ Application will now quit.</source>
 <context>
     <name>QnSystrayWindow</name>
     <message>
-        <location filename="../src/systraywindow.cpp" line="86"/>
         <source>Port</source>
-        <translation>포트</translation>
+        <translation type="vanished">포트</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="127"/>
         <source>VMS settings</source>
-        <translation>VMS 설정</translation>
+        <translation type="vanished">VMS 설정</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="146"/>
+        <location filename="../src/systraywindow.cpp" line="145"/>
         <source>%1 Tray Assistant version %2 (%3).&lt;br/&gt;
 Built for %5-%6 with %7.&lt;br/&gt;
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="233"/>
         <source>The requested access was denied</source>
-        <translation>요청된 접근이 거부됨</translation>
+        <translation type="vanished">요청된 접근이 거부됨</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="236"/>
         <source>The specified database does not exist.</source>
-        <translation>지정한 데이터베이스가 존재하지 않습니다.</translation>
+        <translation type="vanished">지정한 데이터베이스가 존재하지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="239"/>
         <source>A specified parameter is invalid.</source>
-        <translation>지정된 변수가 유효하지 않습니다.</translation>
+        <translation type="vanished">지정된 변수가 유효하지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="243"/>
         <source>Insufficient permissions to start/stop services</source>
-        <translation>시작/정지 서비스를 위한 권한이 부족</translation>
+        <translation type="vanished">시작/정지 서비스를 위한 권한이 부족</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="261"/>
+        <location filename="../src/systraywindow.cpp" line="126"/>
+        <source>%1 Tray Assistant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="232"/>
+        <source>Access denied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="235"/>
+        <source>Specified database does not exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="238"/>
+        <source>Specified parameter is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="242"/>
+        <source>Could not access installed services</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="242"/>
+        <source>An error has occurred while trying to access installed services:
+ %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="260"/>
         <source>No %1 services installed</source>
         <translation>%1 서비스 설치 안됨</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="396"/>
+        <location filename="../src/systraywindow.cpp" line="403"/>
         <source>Enterprise controller has been stopped</source>
         <translation>제어 서버 정지</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="403"/>
+        <location filename="../src/systraywindow.cpp" line="410"/>
         <source>Enterprise controller has been started</source>
         <translation>제어 서버 시작</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="422"/>
+        <location filename="../src/systraywindow.cpp" line="429"/>
         <source>Media server has been stopped</source>
         <translation>저장 서버 정지</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="429"/>
+        <location filename="../src/systraywindow.cpp" line="436"/>
         <source>Media server has been started</source>
         <translation>저장 서버 시작</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="455"/>
+        <location filename="../src/systraywindow.cpp" line="462"/>
         <source> (stopped)</source>
         <translation>(정지)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="463"/>
+        <location filename="../src/systraywindow.cpp" line="470"/>
         <source> (starting)</source>
         <translation>(시작중)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="471"/>
+        <location filename="../src/systraywindow.cpp" line="478"/>
         <source> (stopping)</source>
         <translation>(정지중)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="479"/>
+        <location filename="../src/systraywindow.cpp" line="486"/>
         <source> (started)</source>
         <translation>(시작)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="487"/>
+        <location filename="../src/systraywindow.cpp" line="494"/>
         <source> (resuming)</source>
         <translation>(재시작중)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="495"/>
+        <location filename="../src/systraywindow.cpp" line="502"/>
         <source> (paused)</source>
         <translation>(일시정지)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="503"/>
+        <location filename="../src/systraywindow.cpp" line="510"/>
         <source> (pausing)</source>
         <translation>(정지중)</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="534"/>
-        <location filename="../src/systraywindow.cpp" line="556"/>
-        <location filename="../src/systraywindow.cpp" line="870"/>
-        <location filename="../src/systraywindow.cpp" line="903"/>
-        <location filename="../src/systraywindow.cpp" line="959"/>
-        <location filename="../src/systraywindow.cpp" line="969"/>
-        <location filename="../src/systraywindow.cpp" line="976"/>
-        <source>Systray</source>
-        <translation>트레이</translation>
+        <location filename="../src/systraywindow.cpp" line="641"/>
+        <source>Show &amp;Media Server Log</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="534"/>
+        <location filename="../src/systraywindow.cpp" line="646"/>
+        <source>Show &amp;Enterprise Controller Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="989"/>
+        <source>%1 port is already used by another process</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Systray</source>
+        <translation type="vanished">트레이</translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="541"/>
         <source>Media server is going to be stopped. Are you sure?</source>
         <translation>저장 서버를 정지합니다. 진행하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="556"/>
+        <location filename="../src/systraywindow.cpp" line="563"/>
         <source>Enterprise controller is going to be stopped. Are you sure?</source>
         <translation>제어서버를 정지합니다. 진행하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="627"/>
+        <location filename="../src/systraywindow.cpp" line="635"/>
         <source>&amp;Settings</source>
         <translation>&amp;설정</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="633"/>
         <source>&amp;Show Media Server Log</source>
-        <translation>&amp;저장 서버 로그 보기</translation>
+        <translation type="vanished">&amp;저장 서버 로그 보기</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="638"/>
         <source>&amp;Show Enterprise Controller Log</source>
-        <translation>&amp;제어 서버 로그 보기</translation>
+        <translation type="vanished">&amp;제어 서버 로그 보기</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="643"/>
+        <location filename="../src/systraywindow.cpp" line="651"/>
         <source>&amp;Quit</source>
         <translation>&amp;나가기</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="646"/>
+        <location filename="../src/systraywindow.cpp" line="654"/>
         <source>Start Media Server</source>
         <translation>저장 서버 시작</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="651"/>
+        <location filename="../src/systraywindow.cpp" line="659"/>
         <source>Stop Media Server</source>
         <translation>저장서버 정지</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="656"/>
+        <location filename="../src/systraywindow.cpp" line="664"/>
         <source>Start Enterprise Controller</source>
         <translation>제어 서버 시작</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="661"/>
+        <location filename="../src/systraywindow.cpp" line="669"/>
         <source>Stop Enterprise Controller</source>
         <translation>제어 서버 정지</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="743"/>
+        <location filename="../src/systraywindow.cpp" line="771"/>
         <source>* Last used connection *</source>
         <translation>* 마지막 사용 서버 연결*</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="863"/>
+        <location filename="../src/systraywindow.cpp" line="892"/>
         <source>The changes you made require enterprise controller and media server to be restarted. Would you like to restart now?</source>
         <translation>변경값 적용을 위해 제어 서버와 저장 서버의 재시작이 필요합니다. 지금 다시 시작하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="865"/>
+        <location filename="../src/systraywindow.cpp" line="894"/>
         <source>The changes you made require enterprise controller to be restarted. Would you like to restart now?</source>
         <translation>변경값 적용을 위해 제어 서버의 재시작이 필요합니다. 지금 다시 시작하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="867"/>
+        <location filename="../src/systraywindow.cpp" line="896"/>
         <source>The changes you made require media server to be restarted. Would you like to restart now?</source>
         <translation>변경값 적용을 위해 저장 서버의 재시작이 필요합니다. 지금 다시 시작하시겠습니까?</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="903"/>
+        <location filename="../src/systraywindow.cpp" line="932"/>
         <source>Invalid %1 port specified.</source>
         <translation>%1 포트 지정이 유효하지 않습니다.</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="936"/>
+        <location filename="../src/systraywindow.cpp" line="965"/>
         <source>enterprise controller</source>
         <translation>제어 서버</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="937"/>
         <source>media proxy</source>
-        <translation>저장 중계</translation>
+        <translation type="vanished">저장 중계</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="942"/>
         <source>media server RTSP</source>
-        <translation>저장 서버 RTSP</translation>
+        <translation type="vanished">저장 서버 RTSP</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="944"/>
         <source>media server API</source>
-        <translation>저장 서버 API</translation>
+        <translation type="vanished">저장 서버 API</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="959"/>
+        <location filename="../src/systraywindow.cpp" line="979"/>
         <source>%1 port is same as %2 port</source>
         <translation>%1포트는 %2 포트와 동일</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="969"/>
         <source>%1 port already used by another process</source>
-        <translation>%1 포트는 다른 프로세서에 의해 사용 중임</translation>
+        <translation type="vanished">%1 포트는 다른 프로세서에 의해 사용 중임</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="976"/>
+        <location filename="../src/systraywindow.cpp" line="996"/>
         <source>Invalid IP address specified for public IP address</source>
         <translation>공인 IP 주소에 대한 지정 IP가 유효하지 않음</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1041"/>
+        <location filename="../src/systraywindow.cpp" line="1067"/>
         <source>Invalid parameters</source>
         <translation>유효하지 않은 변수</translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="1041"/>
+        <location filename="../src/systraywindow.cpp" line="1067"/>
         <source>You have entered invalid URL.</source>
         <translation>잘못된 URL을 입력하였습니다.</translation>
     </message>
@@ -303,9 +369,8 @@ Built for %5-%6 with %7.&lt;br/&gt;
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../src/settings.ui" line="20"/>
         <source>HDWitness settings</source>
-        <translation>TriumN Spectrum 설정</translation>
+        <translation type="vanished">TriumN Spectrum 설정</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="36"/>
@@ -318,130 +383,151 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>제어 서버 연결</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="66"/>
         <source>Login</source>
-        <translation>로그인</translation>
+        <translation type="vanished">로그인</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="83"/>
         <source>Password</source>
-        <translation>비밀번호</translation>
+        <translation type="vanished">비밀번호</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="101"/>
+        <location filename="../src/settings.ui" line="92"/>
         <source>0.0.0.0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="117"/>
-        <location filename="../src/settings.ui" line="405"/>
         <source>Port</source>
-        <translation>포트</translation>
+        <translation type="vanished">포트</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="165"/>
+        <location filename="../src/settings.ui" line="69"/>
         <source>Find</source>
         <translation>찾기</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="211"/>
+        <location filename="../src/settings.ui" line="80"/>
+        <source>Host:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="108"/>
+        <location filename="../src/settings.ui" line="338"/>
+        <source>Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="130"/>
+        <source>Login:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="140"/>
+        <source>Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="165"/>
         <source>Test</source>
         <translation>테스트</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="220"/>
-        <source>Host</source>
-        <translation>호스트</translation>
+        <location filename="../src/settings.ui" line="185"/>
+        <source>Cameras RTP transport:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="232"/>
+        <source>Host</source>
+        <translation type="vanished">호스트</translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="179"/>
         <source>Media server network settings</source>
         <translation>저장서버 네트워크 설정</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="246"/>
         <source>RTSP port</source>
-        <translation>RTSP 포트</translation>
+        <translation type="vanished">RTSP 포트</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="269"/>
         <source>API port</source>
-        <translation>API 포트</translation>
+        <translation type="vanished">API 포트</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="286"/>
         <source>Cameras RTP transport</source>
-        <translation>카메라 RTP 전송</translation>
+        <translation type="vanished">카메라 RTP 전송</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="294"/>
+        <location filename="../src/settings.ui" line="195"/>
         <source>AUTO</source>
         <translation>자동</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="299"/>
+        <location filename="../src/settings.ui" line="200"/>
         <source>UDP</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="304"/>
+        <location filename="../src/settings.ui" line="205"/>
         <source>TCP</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="314"/>
+        <location filename="../src/settings.ui" line="231"/>
         <source>Allow access to media server via public IP address</source>
         <translation>공인 IP를 통한 저장 서버 접근 허용</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="323"/>
-        <location filename="../src/settings.ui" line="503"/>
         <source>Use specified IP or host name</source>
-        <translation>지정된 IP 또는 호스트 이름 사용</translation>
+        <translation type="vanished">지정된 IP 또는 호스트 이름 사용</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="333"/>
-        <location filename="../src/settings.ui" line="513"/>
+        <location filename="../src/settings.ui" line="253"/>
+        <location filename="../src/settings.ui" line="367"/>
         <source>Auto detect public IP</source>
         <translation>공인 IP 자동 검출</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="376"/>
+        <location filename="../src/settings.ui" line="263"/>
+        <location filename="../src/settings.ui" line="357"/>
+        <source>Use specified IP or host name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="290"/>
         <source>Enterprise Controller Settings</source>
         <translation>제어 서버 설정</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="388"/>
+        <location filename="../src/settings.ui" line="302"/>
         <source>Enterprise controller network settings</source>
         <translation>제어 서버 네트워크 설정</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="424"/>
         <source>Media proxy port</source>
-        <translation>중계 서버 포트</translation>
+        <translation type="vanished">중계 서버 포트</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="494"/>
+        <location filename="../src/settings.ui" line="348"/>
         <source>Allow access to enterprise controller via public IP address</source>
         <translation>공인 IP를 통한 제어 서버 접근 허용</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="553"/>
+        <location filename="../src/settings.ui" line="407"/>
         <source>About</source>
         <translation>상세</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="563"/>
+        <location filename="../src/settings.ui" line="417"/>
         <source>Language:</source>
         <translation>언어:</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="575"/>
+        <location filename="../src/settings.ui" line="429"/>
         <source>(requires restart)</source>
         <translation>(재시작 요청)</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="586"/>
+        <location filename="../src/settings.ui" line="440"/>
         <source>Information</source>
         <translation>정보</translation>
     </message>
