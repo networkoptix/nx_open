@@ -27,7 +27,7 @@ public:
     void setResource(const QnResourcePtr &resource);
 
     bool isModified() const;
-    void chechForUnsavedChanges();
+    bool checkForUnsavedChanges();
 
 protected:
     virtual void loadData(const QnPtzData &data) override;
@@ -36,6 +36,7 @@ protected:
     virtual void updateFields(Qn::PtzDataFields fields) override;
 
     virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void reject() override;
 
 private slots:
     void updateUi();
