@@ -331,7 +331,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked() {
         QMessageBox::critical(
             this,
             tr("Could not get position from camera"),
-            tr("An error has occurred while trying to get current position from camera %1.\n\n"\
+            tr("An error has occurred while trying to get current position from camera %1.\n\n"
             "Please wait for the camera to go online.").arg(m_resource->getName())
             );
         return;
@@ -452,7 +452,7 @@ void QnPtzManageDialog::at_deleteButton_clicked() {
                 QDialogButtonBox::StandardButton button = QnCheckableMessageBox::warning(
                     this,
                     tr("Remove preset"),
-                    tr("This preset is used in some tours.\nIf you remove it some tours will become invalid."),
+                    tr("This preset is used in some tours.\nThese tours will become invalid if you remove it."),
                     tr("Do not show again."),
                     &ignorePresetIsInUse,
                     QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
@@ -574,7 +574,7 @@ bool QnPtzManageDialog::checkForUnsavedChanges() {
         return true;
 
     show();
-    QnMessageBox::StandardButton button = QnMessageBox::question(this, 0, tr("PTZ configuration is not saved"), tr("Changes are not saved. Save them?"),
+    QnMessageBox::StandardButton button = QnMessageBox::question(this, 0, tr("PTZ configuration is not saved"), tr("Changes are not saved. Do you want to save them?"),
                                                                  QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, QnMessageBox::Yes);
     switch (button) {
     case QnMessageBox::Ok:
