@@ -55,8 +55,10 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
 
     setWarningStyle(ui->downmixWarningLabel);
     setWarningStyle(ui->languageWarningLabel);
+    setWarningStyle(ui->skinWarningLabel);
     ui->languageWarningLabel->setVisible(false);
     ui->downmixWarningLabel->setVisible(false);
+    ui->skinWarningLabel->setVisible(false);
     ui->idleTimeoutWidget->setEnabled(false);
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
@@ -70,6 +72,7 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
 
     connect(ui->downmixAudioCheckBox,                   SIGNAL(toggled(bool)),                                      this,   SLOT(at_downmixAudioCheckBox_toggled(bool)));
     connect(ui->languageComboBox,                       SIGNAL(currentIndexChanged(int)),                           this,   SLOT(at_languageComboBox_currentIndexChanged(int)));
+    connect(ui->skinComboBox,                           SIGNAL(currentIndexChanged(int)),                           this,   SLOT(at_skinComboBox_currentIndexChanged(int)));
     connect(ui->pauseOnInactivityCheckBox,              SIGNAL(toggled(bool)),                                      ui->idleTimeoutWidget, SLOT(setEnabled(bool)));
 }
 
@@ -84,9 +87,8 @@ void QnGeneralPreferencesWidget::submitToSettings() {
     qnSettings->setIpShownInTree(ui->showIpInTreeCheckBox->isChecked());
     qnSettings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
     qnSettings->setAutoStart(ui->autoStartCheckBox->isChecked());
-    qnSettings->setUserIdleTimeoutMSecs(ui->pauseOnInactivityCheckBox->isChecked()
-                                         ? ui->idleTimeoutSpinBox->value() * 60 * 1000 // convert to milliseconds
-                                         : 0);
+    qnSettings->setUserIdleTimeoutMSecs(ui->pauseOnInactivityCheckBox->isChecked() ? ui->idleTimeoutSpinBox->value() * 60 * 1000 : 0);
+    qnSettings->setClientSkin(static_cast<Qn::ClientSkin>(ui->skinComboBox->itemData(ui->skinComboBox->currentIndex()).toInt()));
 
     QStringList extraMediaFolders;
     for(int i = 0; i < ui->extraMediaFoldersList->count(); i++)
@@ -112,6 +114,9 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
 
     m_oldDownmix = qnSettings->isAudioDownmixed();
     ui->downmixAudioCheckBox->setChecked(m_oldDownmix);
+
+    m_oldSkin = ui->skinComboBox->findData(qnSettings->clientSkin());
+    ui->skinComboBox->setCurrentIndex(m_oldSkin);
 
     ui->tourCycleTimeSpinBox->setValue(qnSettings->tourCycleTime() / 1000);
     ui->showIpInTreeCheckBox->setChecked(qnSettings->isIpShownInTree());
@@ -225,6 +230,10 @@ void QnGeneralPreferencesWidget::at_downmixAudioCheckBox_toggled(bool checked) {
 
 void QnGeneralPreferencesWidget::at_languageComboBox_currentIndexChanged(int index) {
     ui->languageWarningLabel->setVisible(m_oldLanguage != index);
+}
+
+void QnGeneralPreferencesWidget::at_skinComboBox_currentIndexChanged(int index) {
+    ui->skinWarningLabel->setVisible(m_oldSkin != index);
 }
 
 void QnGeneralPreferencesWidget::at_browseLogsButton_clicked() {
