@@ -41,8 +41,6 @@ void QnAbstractResourcePropertyAdaptor::loadValue() {
     if(!deserialize(m_serializedValue, &m_value))
         m_value = QVariant();
 
-    qDebug() << "KVPAIR" << m_key << "CHANGED EXTERNALLY TO" << m_serializedValue;
-
     emit valueChanged();
     emit valueChangedExternally();
 }
