@@ -38,7 +38,7 @@ public:
 
 signals:
     void valueChanged();
-    void valueChangedExternally();
+    void valueChangedExternally(); // TODO: #Elric make this class thread-safe and get rid of this signal
 
 protected:
     virtual bool serialize(const QVariant &value, QString *target) const = 0;

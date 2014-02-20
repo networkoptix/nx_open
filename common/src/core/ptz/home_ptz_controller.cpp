@@ -22,6 +22,8 @@ QnHomePtzController::QnHomePtzController(const QnPtzControllerPtr &baseControlle
     m_executor->moveToThread(qnPtzPool->executorThread());
     m_executor->setHomePosition(m_adaptor->value());
     m_executor->restart();
+
+    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChangedExternally, this, [this]{ emit changed(Qn::HomeObjectPtzField); });
 }
 
 QnHomePtzController::~QnHomePtzController() {
@@ -86,15 +88,17 @@ bool QnHomePtzController::updateHomeObject(const QnPtzObject &homeObject) {
     if(homeObject.type == Qn::TourPtzObject && !(capabilities & Qn::ToursPtzCapability))
         return false;
 
-    QMutexLocker locker(&m_mutex);
-
-    if(homeObject == m_adaptor->value())
-        return true; /* Nothing to update. */
-    m_adaptor->setValue(homeObject);
+    {
+        QMutexLocker locker(&m_mutex);
+        if(homeObject == m_adaptor->value())
+            return true; /* Nothing to update. */
+        m_adaptor->setValue(homeObject);
+    }
 
     m_executor->setHomePosition(homeObject);
     m_executor->restart();
 
+    emit changed(Qn::HomeObjectPtzField);
     return true;
 }
 

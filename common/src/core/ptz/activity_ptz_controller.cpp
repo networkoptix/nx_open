@@ -12,7 +12,7 @@ QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControlle
     if(m_mode != Local) {
         m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(baseController->resource(), lit("ptzActiveObject"), QnPtzObject(), this);
         m_adaptor->setValue(QnPtzObject());
-        connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });
+        connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChangedExternally, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });
     }
 
     // TODO: #Elric #PTZ better async support
