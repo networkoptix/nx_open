@@ -150,7 +150,7 @@ QUrl QnLoginDialog::currentUrl() const {
     url.setHost(ui->hostnameLineEdit->text().trimmed());
     url.setPort(ui->portSpinBox->value());
     url.setUserName(ui->loginLineEdit->text().trimmed());
-    url.setPassword(ui->passwordLineEdit->text().trimmed());
+    url.setPassword(ui->passwordLineEdit->text());
     return url;
 }
 
@@ -211,13 +211,13 @@ void QnLoginDialog::changeEvent(QEvent *event) {
 
 void QnLoginDialog::showEvent(QShowEvent *event) {
     base_type::showEvent(event);
-    if (m_autoConnectPending
-            && ui->rememberPasswordCheckBox->isChecked()
-            && !ui->passwordLineEdit->text().isEmpty()
-            && currentUrl().isValid())
+
+    if (m_autoConnectPending && ui->rememberPasswordCheckBox->isChecked() && !ui->passwordLineEdit->text().isEmpty() && currentUrl().isValid()) {
         accept();
-    else
+    } else {
         resetConnectionsModel();
+    }
+
 #ifdef Q_OS_MAC
     if (focusWidget())
         focusWidget()->activateWindow();
