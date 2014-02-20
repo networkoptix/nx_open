@@ -14,7 +14,7 @@ QString extractHost(const QString &url)
     int endPos = url.indexOf(L':', startPos);
     if (endPos == -1)
         endPos = url.indexOf(L'/', startPos); /* No port, but we may still get '/' after address. */
-    endPos = endPos == -1 ? url.size() : endPos + 1;
+    endPos = endPos == -1 ? url.size() : endPos;
 
     return url.mid(startPos, endPos - startPos);
 }
