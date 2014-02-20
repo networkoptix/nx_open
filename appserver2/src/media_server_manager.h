@@ -31,9 +31,7 @@ namespace ec2
 
         template<> void triggerNotification<ApiMediaServerData>( const QnTransaction<ApiMediaServerData>& tran ) {
             assert( tran.command == ApiCommand::saveMediaServer);
-            QnMediaServerResourcePtr mserverRes = m_resCtx.resFactory->createResource(
-                tran.params.typeId,
-                QnResourceParameters() ).dynamicCast<QnMediaServerResource>();
+            QnMediaServerResourcePtr mserverRes(new QnMediaServerResource(m_resCtx.resTypePool));
             tran.params.toResource( mserverRes, m_resCtx);
             emit addedOrUpdated( mserverRes );
         }

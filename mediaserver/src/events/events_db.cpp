@@ -318,7 +318,6 @@ void QnEventsDB::getAndSerializeActions(
 
         appendIntToBA(result, flags);
         appendIntToBA(result, actionsQuery.value(actionTypeIdx).toInt());
-        //appendQnIdToBA(result, actionsQuery.value(businessRuleIdx).toByteArray());
         result.append(actionsQuery.value(businessRuleIdx).toByteArray());
         appendIntToBA(result, actionsQuery.value(aggregationCntIdx).toInt());
         //appendIntToBA(result, actionsQuery.value(toggleStateIdx).toInt());
