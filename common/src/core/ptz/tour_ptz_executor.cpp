@@ -64,6 +64,7 @@ public:
     virtual ~QnTourPtzExecutorPrivate();
 
     void init(const QnPtzControllerPtr &controller);
+    void updateDefaults();
 
     void stopTour();
     void startTour(const QnPtzTour &tour);
@@ -124,7 +125,7 @@ QnTourPtzExecutorPrivate::~QnTourPtzExecutorPrivate() {
 
 void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller) {
     baseController = controller; 
-    if(QnThreadedPtzController::extends(baseController->getCapabilities())) {
+    if(QnThreadedPtzController::extends(baseController->getCapabilities())) { // TODO: #Elric #PTZ no threading for fisheye
         baseController.reset(new QnThreadedPtzController(baseController));
         usingThreadController = true;
 
@@ -134,11 +135,13 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller) {
         baseController->setParent(q); 
     }
 
+    connect(baseController, &QnAbstractPtzController::finished, q, &QnTourPtzExecutor::at_controller_finished);
+}
+
+void QnTourPtzExecutorPrivate::updateDefaults() {
     defaultSpace = baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
     defaultDataField = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::LogicalPositionPtzField : Qn::DevicePositionPtzField;
     defaultCommand = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::GetLogicalPositionPtzCommand : Qn::GetDevicePositionPtzCommand;
-
-    connect(baseController, &QnAbstractPtzController::finished, q, &QnTourPtzExecutor::at_controller_finished);
 }
 
 void QnTourPtzExecutorPrivate::stopTour() {
@@ -157,6 +160,10 @@ void QnTourPtzExecutorPrivate::startTour(const QnPtzTour &tour) {
     data.tour.optimize();
     data.space = defaultSpace;
     qnResizeList(data.spots, data.size());
+    
+    /* Capabilities of the underlying controller may have changed, 
+     * and we don't listen to changes, so defaults must be updated. */
+    updateDefaults(); 
 
     startMoving();
 }

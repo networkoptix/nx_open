@@ -258,20 +258,26 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
         int existingIndex = -1;
         if (hotkey != QnPtzHotkey::NoHotkey) {
             QString id = m_hotkeys[hotkey];
-            existingIndex = presetIndex(id);
-            if (existingIndex == -1) {
-                existingIndex = tourIndex(id);
+            if(!id.isEmpty() && id != data.id()) {
+                existingIndex = presetIndex(id);
                 if (existingIndex != -1) {
-                    existing.rowType = TourRow;
-                    existing.tourModel = m_tours[existingIndex];
+                    existing.rowType = PresetRow;
+                    existing.presetModel = m_presets[existingIndex];
+                } else {
+                    existingIndex = tourIndex(id);
+                    if (existingIndex != -1) {
+                        existing.rowType = TourRow;
+                        existing.tourModel = m_tours[existingIndex];
+                    }
                 }
-            } else {
-                existing.rowType = PresetRow;
-                existing.presetModel = m_presets[existingIndex];
             }
         }
 
         if (existing.rowType != InvalidRow) {
+            // TODO: #GDM _OH_ _MY_ _FUCKING_ _GOD_
+            // Popping up a dialog in model class is a really bad idea. 
+            // Please implement properly.
+
             QString message = (existing.rowType == PresetRow)
                               ? tr("This hotkey is used by preset \"%1\"").arg(existing.presetModel.preset.name)
                               : tr("This hotkey is used by tour \"%1\"").arg(existing.tourModel.tour.name);
@@ -319,8 +325,16 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
         }
 
         // set updated hotkey
-        if (hotkey != QnPtzHotkey::NoHotkey)
-            m_hotkeys[hotkey] = id;
+        int oldHotkey = m_hotkeys.key(data.id(), QnPtzHotkey::NoHotkey);
+        if(oldHotkey != QnPtzHotkey::NoHotkey) {
+            if(existingIndex != -1) {
+                m_hotkeys.insert(oldHotkey, existing.id());
+            } else {
+                m_hotkeys.remove(oldHotkey);
+            }
+        }
+        if(hotkey != QnPtzHotkey::NoHotkey)
+            m_hotkeys.insert(hotkey, id);
 
         emit dataChanged(index, index);
         emit dataChanged(index.sibling(index.row(), ModifiedColumn), index.sibling(index.row(), ModifiedColumn));

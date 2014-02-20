@@ -768,7 +768,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
         if (objectId.isEmpty())
             break;
 
-        menu()->trigger(Qn::PtzActivateObjectAction, QnActionParameters(widget).withArgument(Qn::PtzObjectIdRole, presetId));
+        menu()->trigger(Qn::PtzActivateObjectAction, QnActionParameters(widget).withArgument(Qn::PtzObjectIdRole, objectId));
         break;
     }
     default:
@@ -777,8 +777,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     }
 }
 
-void QnWorkbenchController::at_scene_focusIn(QGraphicsScene *scene, QEvent *event) {
-    Q_UNUSED(scene)
+void QnWorkbenchController::at_scene_focusIn(QGraphicsScene *, QEvent *event) {
     // TODO: #Elric evil hack to prevent focus jumps when scene is focused.
     QFocusEvent *focusEvent = static_cast<QFocusEvent *>(event);
     *focusEvent = QFocusEvent(focusEvent->type(), Qt::OtherFocusReason);
