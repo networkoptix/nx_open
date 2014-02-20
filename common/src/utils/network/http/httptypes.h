@@ -160,6 +160,7 @@ namespace nx_http
             badRequest = 400,
             unauthorized = 401,
             notFound = 404,
+            notAllowed = 405,
             internalServerError = 500,
             serviceUnavailable = 503,
             notImplemented = 501
