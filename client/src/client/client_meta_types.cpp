@@ -22,6 +22,7 @@ namespace {
 }
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
+QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientSkin)
 
 void QnClientMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK, 
@@ -50,6 +51,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnServerStorageStateHash>();
     qRegisterMetaType<Qn::TimeMode>();
     qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
+    qRegisterMetaType<Qn::ClientSkin>();
+    qRegisterMetaTypeStreamOperators<Qn::ClientSkin>();
     qRegisterMetaType<ImageCorrectionParams>();
     qRegisterMetaType<Qn::ActionId>();
     qRegisterMetaType<QnActionParameters>();
