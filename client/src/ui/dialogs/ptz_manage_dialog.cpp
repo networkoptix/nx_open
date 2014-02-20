@@ -264,7 +264,7 @@ Qn::PtzDataFields QnPtzManageDialog::requiredFields() const {
 void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
     // TODO: #dklychkov make incremental changes instead of resetting the model (low priority)
 
-    if (fields.testFlag(Qn::PresetsPtzField)) {
+    if (fields & Qn::PresetsPtzField) {
         QnPtzPresetList presets;
         if (controller()->getPresets(&presets)) {
             qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
@@ -274,7 +274,7 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
         }
     }
 
-    if (fields.testFlag(Qn::ToursPtzField)) {
+    if (fields & Qn::ToursPtzField) {
         QnPtzTourList tours;
         if (controller()->getTours(&tours)) {
             qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
@@ -284,13 +284,13 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
         }
     }
 
-    if (fields.testFlag(Qn::HomeObjectPtzField)) {
+    if (fields & Qn::HomeObjectPtzField) {
         QnPtzObject homeObject;
         if (controller()->getHomeObject(&homeObject))
             m_model->setHomePosition(homeObject.id);
     }
 
-    if (fields.testFlag(Qn::ActiveObjectPtzField) && m_resource) {
+    if (fields & Qn::ActiveObjectPtzField) {
         QnPtzObject ptzObject;
         if (controller()->getActiveObject(&ptzObject) && m_pendingPreviews.contains(ptzObject.id)) {
             m_pendingPreviews.remove(ptzObject.id);

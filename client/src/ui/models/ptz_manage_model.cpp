@@ -248,7 +248,6 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
         setHomePositionInternal(checked ? data.id() : QString(), true);
         return true;
     } else if (role == Qt::EditRole && index.column() == HotkeyColumn) {
-
         bool ok = false;
         int hotkey = value.toInt(&ok);
         if(!ok || hotkey > 9)
