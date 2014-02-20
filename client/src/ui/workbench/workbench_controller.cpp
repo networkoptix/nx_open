@@ -764,11 +764,11 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
 
         int hotkey = e->key() - Qt::Key_0;
 
-        QString presetId = QnPtzHotkeysResourcePropertyAdaptor(widget->resource()->toResourcePtr()).value().value(hotkey);
-        if (presetId.isEmpty())
+        QString objectId = QnPtzHotkeysResourcePropertyAdaptor(widget->resource()->toResourcePtr()).value().value(hotkey);
+        if (objectId.isEmpty())
             break;
 
-        menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(widget).withArgument(Qn::PtzPresetIdRole, presetId));
+        menu()->trigger(Qn::PtzActivateObjectAction, QnActionParameters(widget).withArgument(Qn::PtzObjectIdRole, presetId));
         break;
     }
     default:

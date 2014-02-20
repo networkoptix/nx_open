@@ -435,17 +435,22 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Restart application"));
 
-    factory(Qn::PtzGoToPresetAction).
+    factory(Qn::PtzActivatePresetAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
         text(tr("Go To Saved Position")).
         requiredPermissions(Qn::WritePtzPermission).
         condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
 
-    factory(Qn::PtzStartTourAction).
+    factory(Qn::PtzActivateTourAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
         text(tr("Activate PTZ Tour")).
         requiredPermissions(Qn::WritePtzPermission).
         condition(new QnPtzActionCondition(Qn::ToursPtzCapability, this));
+
+    factory(Qn::PtzActivateObjectAction).
+        flags(Qn::SingleTarget | Qn::WidgetTarget).
+        text(tr("Activate PTZ object")).
+        requiredPermissions(Qn::WritePtzPermission);
 
     /* Context menu actions. */
 

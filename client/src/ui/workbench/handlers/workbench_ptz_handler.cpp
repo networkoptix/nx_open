@@ -6,6 +6,7 @@
 
 #include <api/app_server_connection.h>
 
+#include <utils/common/container.h>
 #include <utils/resource_property_adaptors.h>
 
 #include <common/common_globals.h>
@@ -80,8 +81,9 @@ QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent):
     QnWorkbenchContextAware(parent)
 {
     connect(action(Qn::PtzSavePresetAction),                    &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered);
-    connect(action(Qn::PtzGoToPresetAction),                    &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered);
-    connect(action(Qn::PtzStartTourAction),                     &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered);
+    connect(action(Qn::PtzActivatePresetAction),                &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered);
+    connect(action(Qn::PtzActivateTourAction),                  &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered);
+    connect(action(Qn::PtzActivateObjectAction),                &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered);
     connect(action(Qn::PtzManageAction),                        &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzManageAction_triggered);
     connect(action(Qn::DebugCalibratePtzAction),                &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered);
     connect(action(Qn::DebugGetPtzPositionAction),              &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered);
@@ -116,10 +118,10 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
     dialog->exec();
 }
 
-void QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered() {
+void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
-    QString id = parameters.argument<QString>(Qn::PtzPresetIdRole).trimmed();
+    QString id = parameters.argument<QString>(Qn::PtzObjectIdRole).trimmed();
 
     if(!widget || !widget->ptzController() || id.isEmpty())
         return;
@@ -152,14 +154,14 @@ void QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered() {
     }
 }
 
-void QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered() {
+void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
     if(!widget || !widget->ptzController())
         return;
     QnResourcePtr resource = widget->resource()->toResourcePtr();
 
-    QString id = parameters.argument<QString>(Qn::PtzTourIdRole).trimmed();
+    QString id = parameters.argument<QString>(Qn::PtzObjectIdRole).trimmed();
     if(id.isEmpty())
         return;
 
@@ -184,6 +186,29 @@ void QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered() {
         //TODO: #GDM PTZ check other cases
     }
 }
+
+void QnWorkbenchPtzHandler::at_ptzActivateObjectAction_triggered() {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
+    if(!widget || !widget->ptzController())
+        return;
+
+    QString id = parameters.argument<QString>(Qn::PtzObjectIdRole).trimmed();
+    if(id.isEmpty())
+        return;
+
+    QnPtzPresetList presets;
+    if(!widget->ptzController()->getPresets(&presets))
+        return;
+
+    int index = qnIndexOf(presets, [&](const QnPtzPreset &preset) { return preset.id == id; });
+    if(index == -1) {
+        menu()->trigger(Qn::PtzActivateTourAction, parameters);
+    } else {
+        menu()->trigger(Qn::PtzActivatePresetAction, parameters);
+    }
+}
+
 
 void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());

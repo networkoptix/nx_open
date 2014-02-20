@@ -95,8 +95,8 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
 
         action->setData(QVariant::fromValue(
             QnActionParameters(parameters)
-                .withArgument(Qn::PtzPresetIdRole, preset.id)
-                .withArgument(Qn::ActionIdRole, static_cast<int>(Qn::PtzGoToPresetAction))
+                .withArgument(Qn::PtzObjectIdRole, preset.id)
+                .withArgument(Qn::ActionIdRole, static_cast<int>(Qn::PtzActivatePresetAction))
         ));
         connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
 
@@ -126,8 +126,8 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
 
         action->setData(QVariant::fromValue(
             QnActionParameters(parameters)
-                .withArgument(Qn::PtzTourIdRole, tour.id)
-                .withArgument(Qn::ActionIdRole, static_cast<int>(Qn::PtzStartTourAction))
+                .withArgument(Qn::PtzObjectIdRole, tour.id)
+                .withArgument(Qn::ActionIdRole, static_cast<int>(Qn::PtzActivateTourAction))
         ));
         connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
 
