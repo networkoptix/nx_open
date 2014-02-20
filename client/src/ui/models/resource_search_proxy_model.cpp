@@ -10,7 +10,10 @@
 QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject *parent): 
     QSortFilterProxyModel(parent),
     m_invalidating(false)
-{}
+{
+    // TODO: #Elric use natural string comparison instead.
+    setSortCaseSensitivity(Qt::CaseInsensitive);
+}
 
 QnResourceSearchProxyModel::~QnResourceSearchProxyModel() {
     return;
