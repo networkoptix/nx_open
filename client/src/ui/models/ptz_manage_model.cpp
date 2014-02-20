@@ -575,7 +575,7 @@ QVariant QnPtzManageModel::presetData(const QnPtzPresetItemModel &presetModel, i
         }
         case HomeColumn:
             if (role == Qt::ToolTipRole)
-                return tr("This preset will be activated if PTZ is not changed for %n minutes", 0, 5); // TODO: #Elric #PTZ use value from PTZ
+                return tr("This preset will be activated after %n minutes of inactivity", 0, 5); // TODO: #Elric #PTZ use value from PTZ
             break;
         case DetailsColumn:
             return QVariant();
@@ -673,14 +673,17 @@ QnPtzManageModel::TourState QnPtzManageModel::tourState(const QnPtzTourItemModel
             *stateString = tr("Tour should contain at least 2 positions");
         return IncompleteTour;
     } else {
-        for (int i = 1; i < tourModel.tour.spots.size(); ++i) {
-            if (tourModel.tour.spots[i].presetId == tourModel.tour.spots[i - 1].presetId) {
-                int startPos = i++;
-                while (i < tourModel.tour.spots.size() && tourModel.tour.spots[i].presetId == tourModel.tour.spots[i - 1].presetId) {
-                    ++i;
-                }
+        const QnPtzTourSpotList &spots = tourModel.tour.spots;
+        for (int i = 0; i < spots.size(); ++i) {
+            int j;
+            for(j = (i + 1) % spots.size(); j != i; j = (j + 1) % spots.size())
+                if(spots[i].presetId != spots[j].presetId)
+                    break;
+
+            int count = i < j ? j - i : j - i + spots.size();
+            if(count >= 2) {
                 if (stateString)
-                    *stateString = tr("Tour has %n same positions in a row at %1", 0, i - startPos + 1).arg(startPos);
+                    *stateString = tr("Tour has %n identical positions", 0, count).arg(i);
                 return DuplicatedLinesTour;
             }
         }
@@ -689,12 +692,12 @@ QnPtzManageModel::TourState QnPtzManageModel::tourState(const QnPtzTourItemModel
     if (tourIsValid(tourModel)) {
         if (stateString) {
             qint64 time = estimatedTimeSecs(tourModel.tour);
-            *stateString = tr("Tour time: %1").arg((time < 60) ? tr("less than a minute") : tr("about %n minutes", 0, time / 60));
+            *stateString = tr("Tour time: %1").arg((time < 60) ? tr("less than a minute") : tr("about %n minute(s)", 0, time / 60));
         }
         return ValidTour;
     } else {
         if (stateString)
-            *stateString = tr("Inalid tour"); // TODO: #Elric #TR typo
+            *stateString = tr("Invalid tour");
         return OtherInvalidTour;
     }
 }
