@@ -8,14 +8,14 @@ inline int readInt(quint8* &curPtr)
 {
     int val = *((int*)curPtr);
     curPtr += 4;
-    return val;
+    return ntohl(val);
 }
 
 inline QnId readQnId(quint8* &curPtr)
 {
     const QByteArray uuid = QByteArray::fromRawData((const char*) curPtr, 16);
-    curPtr += 8;
-    return QnId(uuid);
+    curPtr += 16;
+    return QnId::fromRfc4122(uuid);
 }
 
 void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, const QByteArray& data)
@@ -43,7 +43,6 @@ void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, cons
         action.setActionType((BusinessActionType::Value) readInt(curPtr));
         action.setBusinessRuleId(readQnId(curPtr));
         action.setAggregationCount(readInt(curPtr));
-        
         int runTimeParamsLen = readInt(curPtr);
         QByteArray ba = QByteArray::fromRawData((const char*)curPtr, runTimeParamsLen);
         action.setRuntimeParams(QnBusinessEventParameters::deserialize(ba));

@@ -1278,12 +1278,6 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataLi
 
 // ----------- getCameras --------------------
 
-QString guidToSqlString(const QnId& guid)
-{
-    QByteArray data = guid.toRfc4122().toHex();
-    return QString("x'%1'").arg(QString::fromLocal8Bit(data));
-}
-
 ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraDataList& cameraList)
 {
 	QSqlQuery queryCameras(m_sdb);

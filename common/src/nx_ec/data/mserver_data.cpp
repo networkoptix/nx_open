@@ -58,7 +58,7 @@ void ApiMediaServerData::fromResource(QnMediaServerResourcePtr resource)
     ApiResourceData::fromResource(resource);
 
     netAddrList = serializeNetAddrList(resource->getNetAddrList());
-    apiUrl = resource->getUrl();
+    apiUrl = resource->getApiUrl();
     reserve = resource->getReserve();
     panicMode = resource->getPanicMode();
     streamingUrl = resource->getStreamingUrl();

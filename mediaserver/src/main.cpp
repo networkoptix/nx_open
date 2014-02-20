@@ -1321,7 +1321,7 @@ void QnMain::run()
     at_timer();
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
-    connect(QnServerMessageProcessor::instance(), SIGNAL(connectionOpened()), this, SLOT(at_connectionOpened()), Qt::DirectConnection);
+    at_connectionOpened();
     timer.start(60 * 1000);
 
 

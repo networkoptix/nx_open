@@ -19,7 +19,7 @@ protected:
     virtual void handleConnectionOpened(const QnMessage &message) override;
     virtual void handleConnectionClosed(const QString &errorString) override;
     virtual void handleMessage(const QnMessage &message) override;
-
+    virtual void init(const QUrl &url, const QString &authKey, int reconnectTimeout) override;
 private:
     void updateResource(const QnResourcePtr& resource);
 };
