@@ -24,12 +24,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="SearchString"/>
+      <widget class="QLineEdit" name="filterEdit"/>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QnTableView" name="gridCameras">
+    <widget class="QnTableView" name="camerasView">
      <property name="mouseTracking">
       <bool>true</bool>
      </property>

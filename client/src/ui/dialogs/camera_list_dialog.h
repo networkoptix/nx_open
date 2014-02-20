@@ -27,22 +27,27 @@ public:
     void setServer(const QnMediaServerResourcePtr &server);
     QnMediaServerResourcePtr server() const;
 
-private slots:
-    void at_searchStringChanged(const QString &text);
-    void at_customContextMenuRequested(const QPoint &pos);
-    void at_exportAction();
-    void at_copyToClipboard();
-    void at_gridDoubleClicked(const QModelIndex &index);
-    void at_modelChanged();
+private:
+    Q_SIGNAL void updateWindowTitleQueued();
+    void updateWindowTitleLater();
+    void updateWindowTitle();
+    void updateCriterion(const QString &text);
+
+    void at_camerasView_customContextMenuRequested(const QPoint &pos);
+    void at_exportAction_triggered();
+    void at_clipboardAction_triggered();
+    void at_camerasView_doubleClicked(const QModelIndex &index);
+
 private:
     Q_DISABLE_COPY(QnCameraListDialog)
 
     QScopedPointer<Ui::CameraListDialog> ui;
     QnCameraListModel *m_model;
-    QnResourceSearchProxyModel* m_resourceSearch;
-    QAction* m_selectAllAction;
-    QAction* m_exportAction;
-    QAction* m_clipboardAction;
+    QnResourceSearchProxyModel *m_resourceSearch;
+    QAction *m_selectAllAction;
+    QAction *m_exportAction;
+    QAction *m_clipboardAction;
+    bool m_pendingWindowTitleUpdate;
 };
 
 #endif // QN_CAMERA_LIST_DIALOG_H

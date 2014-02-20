@@ -1496,18 +1496,18 @@ void QnActionManager::trigger(Qn::ActionId id, const QnActionParameters &paramet
     action->trigger();
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters) {
-    return newMenu(Qn::NoAction, scope, parent, parameters);
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options) {
+    return newMenu(Qn::NoAction, scope, parent, parameters, options);
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters) {
+QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options) {
     QnAction *rootAction = rootId == Qn::NoAction ? m_root : action(rootId);
 
     QMenu *result = NULL;
     if(!rootAction) {
         qnWarning("No action exists for id '%1'.", static_cast<int>(rootId));
     } else {
-        result = newMenuRecursive(rootAction, scope, parameters, parent);
+        result = newMenuRecursive(rootAction, scope, parameters, parent, options);
         if (!result)
             result = new QnMenu(parent);
     }
@@ -1529,6 +1529,7 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
     dst->setChecked(src->isChecked());
     dst->setFont(src->font());
     dst->setIconText(src->iconText());
+    dst->setSeparator(src->isSeparator());
 
     dst->setProperty(sourceActionPropertyName, QVariant::fromValue<QnAction *>(src));
     foreach(const QByteArray &name, src->dynamicPropertyNames())
@@ -1540,7 +1541,7 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
     }
 }
 
-QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget) {
+QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options) {
     QMenu *result = new QnMenu(parentWidget);
 
     if(!parent->children().isEmpty()) {
@@ -1554,7 +1555,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
             if(visibility == Qn::InvisibleAction)
                 continue;
 
-            QMenu *menu = newMenuRecursive(action, scope, parameters, parentWidget);
+            QMenu *menu = newMenuRecursive(action, scope, parameters, parentWidget, options);
             if((!menu || menu->isEmpty()) && (action->flags() & Qn::RequiresChildren))
                 continue;
 
@@ -1578,7 +1579,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
                 replacedText = action->checkConditionalText(parameters);
 
             QAction *newAction = NULL;
-            if(!replacedText.isEmpty() || visibility == Qn::DisabledAction || menu != NULL) {
+            if(!replacedText.isEmpty() || visibility == Qn::DisabledAction || menu != NULL || (options & DontReuseActions)) {
                 newAction = new QAction(result);
                 copyAction(newAction, action);
 
