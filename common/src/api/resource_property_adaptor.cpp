@@ -10,9 +10,11 @@
 QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(const QnResourcePtr &resource, const QString &key, QObject *parent):
     base_type(parent),
     m_resource(resource),
-    m_key(key)
+    m_key(key),
+    m_pendingSave(false)
 {
-    connect(resource, &QnResource::propertyChanged, this, &QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged);
+    connect(resource,   &QnResource::propertyChanged,                           this,   &QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged);
+    connect(this,       &QnAbstractResourcePropertyAdaptor::saveValueQueued,    this,   &QnAbstractResourcePropertyAdaptor::saveValue, Qt::QueuedConnection);
 }
 
 QnAbstractResourcePropertyAdaptor::~QnAbstractResourcePropertyAdaptor() {
@@ -25,7 +27,7 @@ void QnAbstractResourcePropertyAdaptor::setValue(const QVariant &value) {
 
     m_value = value;
     
-    saveValue();
+    saveValueLater();
 
     emit valueChanged();
 }
@@ -38,6 +40,8 @@ void QnAbstractResourcePropertyAdaptor::loadValue() {
     m_serializedValue = serializedValue;
     if(!deserialize(m_serializedValue, &m_value))
         m_value = QVariant();
+
+    qDebug() << "KVPAIR" << m_key << "CHANGED EXTERNALLY TO" << m_serializedValue;
 
     emit valueChanged();
     emit valueChangedExternally();
@@ -55,6 +59,16 @@ void QnAbstractResourcePropertyAdaptor::saveValue() {
 
     m_resource->setProperty(m_key, m_serializedValue);
     QnAppServerConnectionFactory::createConnection()->saveAsync(resource()->getId(), QnKvPairList() << QnKvPair(m_key, m_serializedValue));
+
+    m_pendingSave = false;
+}
+
+void QnAbstractResourcePropertyAdaptor::saveValueLater() {
+    if(m_pendingSave)
+        return;
+
+    m_pendingSave = true;
+    saveValueQueued();
 }
 
 void QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged(const QnResourcePtr &, const QString &key) {

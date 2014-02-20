@@ -47,8 +47,10 @@ protected:
 
     void loadValue();
     void saveValue();
+    void saveValueLater();
 
 private:
+    Q_SIGNAL void saveValueQueued();
     Q_SLOT void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
 
 private:
@@ -56,6 +58,7 @@ private:
     QString m_key;
     QString m_serializedValue;
     QVariant m_value;
+    bool m_pendingSave;
 };
 
 
