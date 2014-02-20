@@ -584,7 +584,7 @@ void QnServerSettingsDialog::updateRebuildUi(RebuildState newState, int progress
 void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int handle)
 {
     Q_UNUSED(handle)
-   RebuildState state = RebuildState::Invalid;
+    RebuildState state = RebuildState::Invalid;
 
     if (status == 0) {
         switch (reply.state()) {
