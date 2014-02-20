@@ -25,6 +25,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include <utils/common/event_processors.h>
+#include <utils/common/string.h>
 #include <utils/resource_property_adaptors.h>
 #include <utils/local_file_cache.h>
 #include <utils/threaded_image_loader.h>
@@ -63,6 +64,15 @@ protected:
             base_type::setModelData(editor, model, index);
     }
 
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        QSize result = base_type::sizeHint(option, index);
+
+        if(index.column() == QnPtzManageModel::HotkeyColumn)
+            result += QSize(48, 0); /* Some sane expansion to accommodate combo box contents. */
+
+        return result;
+    }
+
 private:
     QnPtzPresetHotkeyItemDelegate hotkeyDelegate;
 };
@@ -83,11 +93,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     ui->tableView->resizeColumnsToContents();
     
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzManageModel::NameColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzManageModel::DetailsColumn, QHeaderView::Interactive);
-
-    ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
-    ui->tableView->installEventFilter(this);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzManageModel::DetailsColumn, QHeaderView::Stretch);
 
     ui->tableView->setItemDelegate(new QnPtzToursDialogItemDelegate(this));
 
@@ -151,9 +157,17 @@ void QnPtzManageDialog::reject() {
 }
 
 void QnPtzManageDialog::loadData(const QnPtzData &data) {
-    // ui->tableView->setColumnHidden(QnPtzTourListModel::HomeColumn, !(capabilities() & Qn::HomePtzCapability)); //TODO: uncomment
-    m_model->setTours(data.tours);
-    m_model->setPresets(data.presets);
+    QnPtzPresetList presets = data.presets;
+    QnPtzTourList tours = data.tours;
+    qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
+        return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+    });
+    qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
+        return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+    });
+
+    m_model->setTours(tours);
+    m_model->setPresets(presets);
     m_model->setHomePosition(data.homeObject.id);
 
     if (m_resource) {
@@ -252,14 +266,22 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
 
     if (fields.testFlag(Qn::PresetsPtzField)) {
         QnPtzPresetList presets;
-        if (controller()->getPresets(&presets))
+        if (controller()->getPresets(&presets)) {
+            qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
+                return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+            });
             m_model->setPresets(presets);
+        }
     }
 
     if (fields.testFlag(Qn::ToursPtzField)) {
         QnPtzTourList tours;
-        if (controller()->getTours(&tours))
+        if (controller()->getTours(&tours)) {
+            qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
+                return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+            });
             m_model->setTours(tours);
+        }
     }
 
     if (fields.testFlag(Qn::HomeObjectPtzField)) {
@@ -391,9 +413,10 @@ void QnPtzManageDialog::at_addTourButton_clicked() {
     QModelIndex index = m_model->index(m_model->rowCount() - 1, 0);
     ui->tableView->setCurrentIndex(index);
     //if (wasEmpty) { //TODO: check if needed
-        ui->tableView->resizeColumnsToContents();
-        ui->tableView->horizontalHeader()->setStretchLastSection(true);
-        ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
+        // TODO: #Elric duplicate code with QnPtzTourWidget
+        for(int i = 0; i < ui->tableView->horizontalHeader()->count(); i++)
+            if(ui->tableView->horizontalHeader()->sectionResizeMode(i) == QHeaderView::ResizeToContents)
+                ui->tableView->resizeColumnToContents(i);
     //}
 
     ui->tableView->selectionModel()->clear();
@@ -574,12 +597,13 @@ void QnPtzManageDialog::updateUi() {
 
     bool isPreset = selectedRow.rowType == QnPtzManageModel::PresetRow;
     bool isTour = selectedRow.rowType == QnPtzManageModel::TourRow;
+    bool isValidTour = isTour && m_model->tourIsValid(selectedRow.tourModel);
 
     ui->previewGroupBox->setEnabled(isPreset || isTour);
     if (ui->previewGroupBox->isEnabled())
         m_cache->downloadFile(selectedRow.id());
     ui->deleteButton->setEnabled(isPreset || isTour);
     ui->goToPositionButton->setEnabled(isPreset || isTour);
-    ui->startTourButton->setEnabled(isTour);
+    ui->startTourButton->setEnabled(isValidTour);
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(isModified());
 }

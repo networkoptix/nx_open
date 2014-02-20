@@ -20,8 +20,8 @@ public:
 
 class QnAbstractPtzDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware {
     Q_OBJECT
-
     typedef QnButtonBoxDialog base_type;
+
 public:
     QnAbstractPtzDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnAbstractPtzDialog();
@@ -32,6 +32,7 @@ public:
     void setController(const QnPtzControllerPtr &controller);
 
     Q_SLOT void saveChanges();
+
 protected:
     virtual void loadData(const QnPtzData &data) = 0;
     virtual void saveData() = 0;

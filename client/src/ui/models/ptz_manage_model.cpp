@@ -15,7 +15,17 @@ QnPtzManageModel::QnPtzManageModel(QObject *parent) :
 QnPtzManageModel::~QnPtzManageModel() {
 }
 
-const QList<QnPtzTourItemModel>& QnPtzManageModel::tourModels() const {
+const QnPtzManageModelColors QnPtzManageModel::colors() const {
+    return m_colors;
+}
+
+void QnPtzManageModel::setColors(const QnPtzManageModelColors &colors) {
+    m_colors = colors;
+
+    // TODO: #Elric emit data change
+}
+
+const QList<QnPtzTourItemModel> &QnPtzManageModel::tourModels() const {
     return m_tours;
 }
 
@@ -530,9 +540,7 @@ QVariant QnPtzManageModel::titleData(RowType rowType,  int column, int role) con
         return tr("Positions");
 
     case Qt::BackgroundRole:
-        return QColor(Qt::lightGray);       //TODO: skin
-    case Qt::ForegroundRole:
-        return QColor(Qt::black);           //TODO: skin
+        return m_colors.title;
     case Qt::FontRole: 
         {
             QFont f;
@@ -625,9 +633,9 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
         switch (tourState(tourModel)) {
         case IncompleteTour:
         case OtherInvalidTour:
-            return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
+            return m_colors.invalid;
         case DuplicatedLinesTour:
-            return QBrush(Qt::yellow);
+            return m_colors.warning;
         default:
             break;
         }
@@ -686,7 +694,7 @@ QnPtzManageModel::TourState QnPtzManageModel::tourState(const QnPtzTourItemModel
         return ValidTour;
     } else {
         if (stateString)
-            *stateString = tr("Inalid tour");
+            *stateString = tr("Inalid tour"); // TODO: #Elric #TR typo
         return OtherInvalidTour;
     }
 }

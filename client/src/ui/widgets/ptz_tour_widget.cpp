@@ -21,8 +21,6 @@ QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourSpotsModel::NameColumn, QHeaderView::Stretch);
 
-    ui->tableView->installEventFilter(this);
-
     ui->tableView->setItemDelegate(new QnPtzTourItemDelegate(this));
     ui->tableView->clearSelection();
 
@@ -75,10 +73,13 @@ void QnPtzTourWidget::at_addSpotButton_clicked() {
     m_model->insertRow(m_model->rowCount());
 
     ui->tableView->setCurrentIndex(m_model->index(m_model->rowCount() - 1, 0));
-
     ui->tableView->selectionModel()->clear();
     ui->tableView->selectionModel()->setCurrentIndex(m_model->index(m_model->rowCount()-1, 0), QItemSelectionModel::Select);
     ui->tableView->selectionModel()->select(m_model->index(m_model->rowCount()-1, 0), QItemSelectionModel::Select);
+    
+    for(int i = 0; i < ui->tableView->horizontalHeader()->count(); i++)
+        if(ui->tableView->horizontalHeader()->sectionResizeMode(i) == QHeaderView::ResizeToContents)
+            ui->tableView->resizeColumnToContents(i);
 }
 
 void QnPtzTourWidget::at_deleteSpotButton_clicked() {
@@ -106,10 +107,6 @@ void QnPtzTourWidget::at_moveSpotDownButton_clicked() {
 }
 
 void QnPtzTourWidget::at_tableViewport_resizeEvent() {
-    const int minSize = ui->tableView->horizontalHeader()->minimumSectionSize();
-    ui->tableView->horizontalHeader()->resizeSection(QnPtzTourSpotsModel::TimeColumn, minSize);
-    ui->tableView->horizontalHeader()->resizeSection(QnPtzTourSpotsModel::SpeedColumn, minSize);
-
     QModelIndexList selectedIndices = ui->tableView->selectionModel()->selectedRows();
     if(selectedIndices.isEmpty())
         return;

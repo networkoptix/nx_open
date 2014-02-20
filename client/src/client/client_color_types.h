@@ -4,7 +4,7 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QColor>
 
-#include <utils/common/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 struct QnTimeSliderColors {
 public:
@@ -35,20 +35,12 @@ public:
     QColor futureLastMinute;
 };
 
-Q_DECLARE_METATYPE(QnTimeSliderColors)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnTimeSliderColors)
-
-
 struct QnBackgroundColors {
     QnBackgroundColors();
 
     QColor normal;
     QColor panic;
 };
-
-Q_DECLARE_METATYPE(QnBackgroundColors)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnBackgroundColors)
-
 
 struct QnCalendarColors {
     QnCalendarColors();
@@ -65,10 +57,6 @@ struct QnCalendarColors {
     QColor secondary(int fillType) const;
 };
 
-Q_DECLARE_METATYPE(QnCalendarColors)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnCalendarColors)
-
-
 struct QnStatisticsColors {
     QnStatisticsColors();
 
@@ -84,9 +72,6 @@ struct QnStatisticsColors {
     QColor networkByKey(const QString &key) const;
 };
 
-Q_DECLARE_METATYPE(QnStatisticsColors)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStatisticsColors)
-
 struct QnScheduleGridColors {
 public:
     QnScheduleGridColors();
@@ -97,10 +82,6 @@ public:
     QColor disabledLabel;
 };
 
-Q_DECLARE_METATYPE(QnScheduleGridColors)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnScheduleGridColors)
-
-
 struct QnGridColors {
     QnGridColors();
 
@@ -109,8 +90,17 @@ struct QnGridColors {
     QColor disallowed;
 };
 
-Q_DECLARE_METATYPE(QnGridColors)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnGridColors)
+struct QnPtzManageModelColors {
+    QnPtzManageModelColors();
 
+    QColor title;
+    QColor invalid;
+    QColor warning;
+};
+
+QN_DECLARE_FUNCTIONS_FOR_TYPES(
+    (QnTimeSliderColors)(QnBackgroundColors)(QnCalendarColors)(QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors), 
+    (metatype)(json)
+);
 
 #endif // QN_CLIENT_COLOR_TYPES

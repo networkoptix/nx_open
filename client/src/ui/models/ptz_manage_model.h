@@ -8,6 +8,7 @@
 #include <core/ptz/ptz_preset.h>
 
 #include <client/client_model_types.h>
+#include "client/client_color_types.h"
 
 struct QnPtzTourItemModel {
     QnPtzTourItemModel(){}
@@ -57,11 +58,12 @@ struct QnPtzPresetItemModel {
     bool local;
 };
 
-class QnPtzManageModel : public QAbstractTableModel
-{
-    Q_OBJECT
 
+class QnPtzManageModel : public QAbstractTableModel {
+    Q_OBJECT
+    Q_PROPERTY(QnPtzManageModelColors colors READ colors WRITE setColors)
     typedef QAbstractTableModel base_type;
+
 public:
     enum Column {
         ModifiedColumn,
@@ -99,6 +101,9 @@ public:
 
     explicit QnPtzManageModel(QObject *parent = 0);
     virtual ~QnPtzManageModel();
+
+    const QnPtzManageModelColors colors() const;
+    void setColors(const QnPtzManageModelColors &colors);
 
     const QList<QnPtzTourItemModel> &tourModels() const;
     const QStringList &removedTours() const;
@@ -139,6 +144,9 @@ public:
     bool synchronized() const;
     Q_SLOT void setSynchronized();
 
+    // TODO: #GDM I've moved this one to public. Implement properly.
+    bool tourIsValid(const QnPtzTourItemModel &tourModel) const;
+
 signals:
     void presetsChanged(const QnPtzPresetList &presets);
 
@@ -153,7 +161,6 @@ private:
     const QnPtzPresetList& presets() const;
 
     qint64 estimatedTimeSecs(const QnPtzTour &tour) const;
-    bool tourIsValid(const QnPtzTourItemModel &tourModel) const;
     TourState tourState(const QnPtzTourItemModel &tourModel, QString *stateString = NULL) const;
     void updatePresetsCache();
 
@@ -165,6 +172,9 @@ private:
     int tourIndex(const QString &id) const;
 
     void setHomePositionInternal(const QString &homePosition, bool setChanged);
+
+private:
+    QnPtzManageModelColors m_colors;
 
     QList<QnPtzPresetItemModel> m_presets;
     QStringList m_removedPresets;
@@ -180,3 +190,4 @@ private:
 };
 
 #endif // PTZ_TOUR_LIST_MODEL_H
+
