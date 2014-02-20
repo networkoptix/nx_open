@@ -85,9 +85,6 @@ QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent):
     connect(action(Qn::PtzManageAction),                        &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzManageAction_triggered);
     connect(action(Qn::DebugCalibratePtzAction),                &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered);
     connect(action(Qn::DebugGetPtzPositionAction),              &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered);
-
-    QnPtzManageDialog *manageDialog = new QnPtzManageDialog(mainWindow()); //initializing instance of a singleton
-    Q_UNUSED(manageDialog)
 }
 
 QnWorkbenchPtzHandler::~QnWorkbenchPtzHandler() {
@@ -191,9 +188,8 @@ void QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered() {
 void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
-    QnPtzTourList tours;
 
-    if(!widget || !widget->ptzController() || !widget->ptzController()->getTours(&tours))
+    if (!widget || !widget->ptzController())
         return;
 
     QnPtzManageDialog* dialog = QnPtzManageDialog::instance();
