@@ -5854,12 +5854,12 @@ Download version %3?</source>
 <context>
     <name>QnPerformance</name>
     <message>
-        <location filename="../src/main.cpp" line="609"/>
+        <location filename="../src/utils/performance_test.cpp" line="47"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="610"/>
+        <location filename="../src/utils/performance_test.cpp" line="48"/>
         <source>Performance of this computer allows running %1 in configuration mode only. For full-featured mode please use another computer.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6049,12 +6049,12 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QnPtzManageDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="301"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="333"/>
         <source>Could not get position from camera</source>
         <translation type="unfinished">Невозможно получить положение камеры</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="302"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="334"/>
         <source>An error has occurred while trying to get current position from camera %1.
 
 Please wait for the camera to go online.</source>
@@ -6063,14 +6063,14 @@ Please wait for the camera to go online.</source>
 Пожалуйста, подождите, пока камера включится.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="323"/>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="361"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="355"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="393"/>
         <source>Could not set position for camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="324"/>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="362"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="356"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="394"/>
         <source>An error has occurred while trying to set current position for camera %1.
 
 Please wait for the camera to go online.</source>
@@ -6079,107 +6079,116 @@ Please wait for the camera to go online.</source>
 Пожалуйста, подождите, пока камера включится.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="421"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="454"/>
         <source>Remove preset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="422"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="455"/>
         <source>This preset is used in some tours.
-If you remove it some tours will become invalid.</source>
+These tours will become invalid if you remove it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="423"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="577"/>
+        <source>Changes are not saved. Do you want to save them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="456"/>
         <source>Do not show again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="532"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="565"/>
         <source>Manage PTZ for %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="543"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="577"/>
         <source>PTZ configuration is not saved</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="543"/>
-        <source>Changes are not saved. Save them?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnPtzManageModel</name>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="41"/>
-        <source>New Tour %1</source>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="51"/>
+        <source>New tour %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="102"/>
-        <source>Saved Position %1</source>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="114"/>
+        <source>Saved position %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="262"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="276"/>
         <source>This hotkey is used by preset &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="263"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="277"/>
         <source>This hotkey is used by tour &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="265"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="279"/>
         <source>Change hotkey</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="266"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="280"/>
         <source>Reassign</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="365"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="379"/>
         <source>#</source>
         <translation type="unfinished">#</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="367"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="381"/>
         <source>Name</source>
         <translation type="unfinished">Имя</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="369"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="383"/>
         <source>Hotkey</source>
         <translation type="unfinished">Горячая клавиша</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="371"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="385"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="373"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="387"/>
         <source>Details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="529"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="543"/>
         <source>Tours</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="530"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="544"/>
         <source>Positions</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="570"/>
-        <source>This preset will be activated if PTZ is not changed for %n minutes</source>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="690"/>
+        <source>Tour has %n identical positions</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="699"/>
+        <source>about %n minute(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -6187,19 +6196,19 @@ If you remove it some tours will become invalid.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="566"/>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="612"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="704"/>
+        <source>Invalid tour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="578"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="624"/>
         <source>None</source>
         <translation type="unfinished">Нет</translation>
     </message>
-    <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="665"/>
-        <source>Tour should contain at least 2 positions</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="675"/>
-        <source>Tour has %n same positions in a row at %1</source>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="582"/>
+        <source>This preset will be activated after %n minutes of inactivity</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -6207,27 +6216,18 @@ If you remove it some tours will become invalid.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="684"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="677"/>
+        <source>Tour should contain at least 2 positions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="699"/>
         <source>Tour time: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="684"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="699"/>
         <source>less than a minute</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="684"/>
-        <source>about %n minutes</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="689"/>
-        <source>Inalid tour</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7396,7 +7396,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
 <context>
     <name>QnWorkbenchActionHandler</name>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="950"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="951"/>
         <source>New layout</source>
         <translation>Новая раскладка</translation>
     </message>
@@ -7451,7 +7451,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="556"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2256"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2257"/>
         <source>Failed to save the following parameters (%1):
 %2</source>
         <translation>Ошибка сохранения параметров (%1):
@@ -7480,112 +7480,117 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <translation type="obsolete">Введите имя раскладки:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1020"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2387"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2443"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2466"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1021"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2388"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2444"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2467"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1021"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1022"/>
         <source>Camera(s) cannot be moved to server &apos;%1&apos;. It might have been offline since the server is up.</source>
         <translation>Камеры не могут быть перемещены на сервер &apos;%1&apos;. Они могли быть отключены, когда сервер был запущен.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1043"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1044"/>
         <source>Layout is locked and cannot be changed.</source>
         <translation>Раскладка заблокирована и не может быть изменена.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1064"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1065"/>
         <source>Cannot add item</source>
         <translation>Невозможно добавить элемент</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1065"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1066"/>
         <source>Cannot add a local file to Multi-Video</source>
         <translation>Невозможно добавить локальный файл к мультивидео</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1119"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1136"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1120"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1137"/>
         <source>Open file</source>
         <translation>Открыть файл</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1112"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1113"/>
         <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
         <translation>Все поддерживаемые (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1113"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="951"/>
+        <source>New layout %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1114"/>
         <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
         <translation>Видео (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1114"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1115"/>
         <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
         <translation>Изображения (*.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1116"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1133"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1117"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1134"/>
         <source>All files (*.*)</source>
         <translation>Все файлы (*.*)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1131"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1132"/>
         <source>All Supported (*.layout)</source>
         <translation>Все поддерживаемые (*.layout)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1132"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1133"/>
         <source>Layouts (*.layout)</source>
         <translation>Раскладки (*.layout)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1148"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1149"/>
         <source>Select folder...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1160"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1161"/>
         <source>Information</source>
         <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1160"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1161"/>
         <source>No updates available.</source>
         <translation>Нет доступных обновлений.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1173"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1174"/>
         <source>Software update is available</source>
         <translation>Доступно обновление</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1175"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1176"/>
         <source>Don&apos;t notify again about this update.</source>
         <translation>Не уведомлять больше об этом обновлении.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2668"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2669"/>
         <source>Beta version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2669"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2670"/>
         <source>You are running beta version of %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2711"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2712"/>
         <source>Launcher process is not found</source>
         <translation type="unfinished">Процесс Launcher не найден</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2712"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2713"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished">Невозможно перезапустить клиент.
@@ -7600,13 +7605,13 @@ Please close the application and start it again using the shortcut in the start 
         <translation type="obsolete">Раскладка с таким именем уже существует. Перезаписать?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1721"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1722"/>
         <source>Camera(s) not Saved</source>
         <translatorcomment>здесь бы тоже plural forms</translatorcomment>
         <translation>Камера(ы) не сохранена</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1722"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1723"/>
         <source>Save changes to the following %n camera(s)?</source>
         <translation>
             <numerusform>Сохранить изменения для камеры?</numerusform>
@@ -7615,22 +7620,22 @@ Please close the application and start it again using the shortcut in the start 
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1862"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1863"/>
         <source>Process is in progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1863"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1864"/>
         <source>Camera addition is already in progress.Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1965"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1966"/>
         <source>Delete Files</source>
         <translation>Удалить файлы</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1966"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1967"/>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation>
             <numerusform>Вы уверены, что хотите навсегда удалить %n файл?</numerusform>
@@ -7639,12 +7644,12 @@ Please close the application and start it again using the shortcut in the start 
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1983"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1984"/>
         <source>Remove Items</source>
         <translation>Удалить элементы</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1984"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1985"/>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation>
             <numerusform>Вы уверены, что хотите удалить этот элемент из раскладки?</numerusform>
@@ -7653,22 +7658,22 @@ Please close the application and start it again using the shortcut in the start 
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2026"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2027"/>
         <source>Rename</source>
         <translation>Переименовать</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2027"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2028"/>
         <source>Enter new name for the selected item:</source>
         <translation>Введите новое имя для выбранного элемента:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2068"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2069"/>
         <source>Delete Resources</source>
         <translation>Удалить ресурсы</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2069"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2070"/>
         <source>Do you really want to delete the following %n item(s)?</source>
         <translation>
             <numerusform>Вы уверены, что хотите удалить этот  элемент из раскладки?</numerusform>
@@ -7685,12 +7690,12 @@ Please close the application and start it again using the shortcut in the start 
         <translation type="obsolete">Введите имя создаваемой раскладки:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2456"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2457"/>
         <source>Could not delete resource</source>
         <translation>Невозможно удалить ресурс</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2456"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2457"/>
         <source>An error has occurred while trying to delete a resource from Enterprise Controller. 
 
 Error description: &apos;%2&apos;</source>
@@ -7699,7 +7704,7 @@ Error description: &apos;%2&apos;</source>
 Описание ошибки: &apos;%2&apos;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2158"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2159"/>
         <source>User Settings</source>
         <translation>Настройки пользователя</translation>
     </message>
@@ -7760,7 +7765,7 @@ Do you want to continue?</source>
         <translation type="obsolete">Не рекомендуется использовать формат AVI</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1174"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1175"/>
         <source>Version %1 is available for download at &lt;a href=&quot;%2&quot;&gt;%2&lt;/a&gt;.</source>
         <translation>Версия %1 доступна для скачивания по адресу &lt;a href=&quot;%2&quot;&gt;%2&lt;/a&gt;.</translation>
     </message>
@@ -7769,7 +7774,7 @@ Do you want to continue?</source>
         <translation type="obsolete">Сохранить как</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1581"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1582"/>
         <source>Could not perform preview search</source>
         <translation>Невозможно выполнить поиск по фрагментам</translation>
     </message>
@@ -7780,7 +7785,7 @@ Do you want to continue?</source>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="555"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2255"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2256"/>
         <source>Could not save parameters</source>
         <translation>Невозможно сохранить настройки</translation>
     </message>
@@ -7791,17 +7796,17 @@ and you do not have the rights to overwrite it.</source>
 и у Вас нет прав на её изменение.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1194"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1195"/>
         <source>Layout Settings</source>
         <translation>Настройки раскладок</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1581"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1582"/>
         <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
         <translation>Выбранный интервал слишком короток, чтобы произвести поиск по миниатюрам. Пожалуйста, выберите более длинный интервал.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1665"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1666"/>
         <source>Preview Search for %1</source>
         <translation>Поиск по фрагментам для %1</translation>
     </message>
@@ -7950,17 +7955,17 @@ Please wait for the camera to go online.</source>
 Пожалуйста, подождите, пока камера включится.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2352"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2353"/>
         <source>Updating background</source>
         <translation>Обновление заднего фона</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2353"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2354"/>
         <source>Image processing can take a lot of time. Please be patient.</source>
         <translation>Обработка изображения может занять длительное время. Наберитесь терпения.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2387"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2388"/>
         <source>Image cannot be uploaded</source>
         <translation>Невозможно загрузить изображение</translation>
     </message>
@@ -7981,7 +7986,7 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2444"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2445"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
         <translation>
             <numerusform>Невозможно сохранить  элемент на Enterprise Controller&apos;е.</numerusform>
@@ -7990,7 +7995,7 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2467"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2468"/>
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation>
             <numerusform>Невозможно сохранить изменения для ресурса.</numerusform>
@@ -7999,32 +8004,32 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2612"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2613"/>
         <source>Client v%1&lt;br/&gt;</source>
         <translation>Клиент v%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2615"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2616"/>
         <source>Enterprise Controller v%1&lt;br/&gt;</source>
         <translation>Enterprise Controller v%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2620"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2621"/>
         <source>Media Server v%1 at %2&lt;br/&gt;</source>
         <translation>Медиа Сервер v%1 на %2&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2622"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2623"/>
         <source>Media Server v%1&lt;br/&gt;</source>
         <translation>Медиа Сервер v%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2651"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2652"/>
         <source>Some components of the system are not upgraded:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please upgrade all components to the latest version %2.</source>
         <translation>Некоторые компоненты системы устарели: &lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Пожалуйста, обновите все компоненты до последней версии: %2.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2659"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2660"/>
         <source>Version Mismatch</source>
         <translation>Несоответствие версий</translation>
     </message>
@@ -8486,6 +8491,11 @@ and you do not have the rights to overwrite it.</source>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="428"/>
         <source>New layout</source>
         <translation type="unfinished">Новая раскладка</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="428"/>
+        <source>New layout %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="540"/>
