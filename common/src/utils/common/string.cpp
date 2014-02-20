@@ -268,26 +268,25 @@ QString extractFileExtension(const QString &string) {
     return result;
 }
 
-QString generateUniqueString(const QStringList &usedValues, const QString &baseValue, const QChar &spacer) {
-    QStringList cleaned;
-    foreach (const QString &name, usedValues)
-        cleaned << name.toLower();
+QString generateUniqueString(const QStringList &usedStrings, const QString &defaultString, const QString &templateString) {
+    QStringList lowerStrings;
+    foreach (const QString &string, usedStrings)
+        lowerStrings << string.toLower();
 
-    if (!cleaned.contains(baseValue.toLower()))
-        return baseValue;
+    if (!defaultString.isEmpty() && !lowerStrings.contains(defaultString.toLower()))
+        return defaultString;
 
-    const QString nonZeroName = baseValue + spacer + QLatin1String("%1");
-    QRegExp pattern = QRegExp(baseValue.toLower() + spacer + QLatin1String("?([0-9]+)?"));
+    QRegExp pattern = QRegExp(templateString.arg(lit("?([0-9]+)?")).toLower());
 
     /* Prepare new name. */
     int number = 0;
-    foreach(const QString &name, cleaned) {
-        if(!pattern.exactMatch(name))
+    foreach(const QString &string, lowerStrings) {
+        if(!pattern.exactMatch(string))
             continue;
 
         number = qMax(number, pattern.cap(1).toInt());
     }
     number++;
 
-    return nonZeroName.arg(number);
+    return templateString.arg(number);
 }

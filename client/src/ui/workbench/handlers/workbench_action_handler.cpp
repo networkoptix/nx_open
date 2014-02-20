@@ -948,10 +948,7 @@ void QnWorkbenchActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
 
-    tr("New layout"); // TODO: #Elric #PTZ
-    tr("New layout %1");
-
-    layout->setName(generateUniqueLayoutName(context()->user(), tr("New layout")));
+    layout->setName(generateUniqueLayoutName(context()->user(), tr("New layout"), tr("New layout %1")));
 
     workbench()->addLayout(layout);
     workbench()->setCurrentLayout(layout);
