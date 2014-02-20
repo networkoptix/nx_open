@@ -32,6 +32,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <ui/dialogs/ptz_manage_dialog.h>
+
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
@@ -311,6 +313,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     //initialize system-wide menu
     menu()->newMenu(Qn::MainScope);
 #endif
+
+    QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
+    Q_UNUSED(manageDialog)
 }
 
 QnMainWindow::~QnMainWindow() {
