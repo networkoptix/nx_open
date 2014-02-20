@@ -2,30 +2,54 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QRegExp>
-#include <QtOpenGL/QGLContext>
+#include <QtCore/QCoreApplication>
+#include <QtOpenGL/QGLWidget>
 
+#include <version.h>
 #include <utils/common/performance.h>
 #include <client/client_globals.h>
+#include <client/client_settings.h>
+#include <ui/dialogs/message_box.h>
 
-int QnPerformanceTest::getOptimalLightMode() {
-#ifdef Q_OS_LINUX
+void QnPerformanceTest::detectLightMode() {
+    if (qnSettings->lightModeOverride() != -1) {
+        qnSettings->setLightMode(qnSettings->lightModeOverride());
+        return;
+    }
+
     bool poorCpu = false;
     bool poorGpu = false;
 
+#ifdef Q_OS_LINUX
     QString cpuName = QnPerformance::cpuName();
     QRegExp atomCpuRegExp(lit("Intel\\(R\\) Atom\\(TM\\) CPU .*"));
     if (atomCpuRegExp.exactMatch(cpuName))
         poorCpu = true;
 
-    QString renderer = QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)));
-    QRegExp slowRendererRegExp(lit("Gallium .* on llvmpipe .*"));
-    if (slowRendererRegExp.exactMatch(renderer))
-        poorGpu = true;
+    {
+        // It creates OpenGL context
+        QGLWidget openGlDummy;
+        openGlDummy.show();
 
-    if (poorCpu && poorGpu)
-        return Qn::LightModeFull;
-    else
-        return 0;
+        QString renderer = QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)));
+        QRegExp slowRendererRegExp(lit("Gallium .* on llvmpipe .*"));
+        if (slowRendererRegExp.exactMatch(renderer))
+            poorGpu = true;
+    }
 #endif
-    return 0;
+
+    if (poorCpu && poorGpu) {
+         qnSettings->setLightMode(Qn::LightModeFull);
+        // TODO: #dklychkov change context in translate()
+        QnMessageBox::warning(
+            NULL,
+            0,
+            QCoreApplication::translate("QnPerformance", "Warning"),
+            QCoreApplication::translate("QnPerformance", "Performance of this computer allows running %1 in configuration mode only. "
+                                                         "For full-featured mode please use another computer.").
+                    arg(QLatin1String(QN_PRODUCT_NAME_LONG)),
+            QMessageBox::StandardButtons(QMessageBox::Ok),
+            QMessageBox::Ok
+        );
+    }
 }

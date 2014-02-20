@@ -341,13 +341,14 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnSettings->setDevMode(true);
     }
 
-    bool lightModeWarning = false;
-    if (lightMode.isEmpty()) {
-        qnSettings->setLightMode(QnPerformanceTest::getOptimalLightMode());
-        lightModeWarning |= qnSettings->lightMode();
-    } else {
-        qnSettings->setLightMode(lightMode.toInt());
+    if (!lightMode.isEmpty()) {
+        bool ok;
+        int lightModeOverride = lightMode.toInt(&ok);
+        if (ok)
+            qnSettings->setLightModeOverride(lightModeOverride);
     }
+
+    QnPerformanceTest::detectLightMode();
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
@@ -601,19 +602,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Show FPS in debug. */
     context->menu()->trigger(Qn::ShowFpsAction);
 #endif
-
-    if (lightModeWarning) {
-        QnMessageBox::warning(
-            mainWindow.data(),
-            0,
-            QCoreApplication::translate("QnPerformance", "Warning"),
-            QCoreApplication::translate("QnPerformance", "Performance of this computer allows running %1 in configuration mode only. "
-                                                         "For full-featured mode please use another computer.").
-                    arg(QLatin1String(QN_PRODUCT_NAME_LONG)),
-            QMessageBox::StandardButtons(QMessageBox::Ok),
-            QMessageBox::Ok
-        );
-    }
 
     result = application->exec();
 
