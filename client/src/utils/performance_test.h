@@ -3,7 +3,7 @@
 
 class QnPerformanceTest {
 public:
-    static int getOptimalLightMode();
+    static void detectLightMode();
 };
 
 #endif // PERFORMANCE_TEST_H
