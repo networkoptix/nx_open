@@ -273,9 +273,6 @@ QString generateUniqueString(const QStringList &usedStrings, const QString &defa
     foreach (const QString &string, usedStrings)
         lowerStrings << string.toLower();
 
-    if (!defaultString.isEmpty() && !lowerStrings.contains(defaultString.toLower()))
-        return defaultString;
-
     QRegExp pattern = QRegExp(templateString.arg(lit("?([0-9]+)?")).toLower());
 
     /* Prepare new name. */
@@ -286,7 +283,16 @@ QString generateUniqueString(const QStringList &usedStrings, const QString &defa
 
         number = qMax(number, pattern.cap(1).toInt());
     }
-    number++;
+    
+    if (number == 0) {
+        if(!defaultString.isEmpty() && !lowerStrings.contains(defaultString.toLower())) {
+            return defaultString;
+        } else {
+            number = 2;
+        }
+    } else {
+        number++;
+    }
 
     return templateString.arg(number);
 }
