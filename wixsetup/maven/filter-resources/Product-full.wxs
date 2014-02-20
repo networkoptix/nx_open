@@ -332,7 +332,7 @@
         <CustomAction Id="SyncDatabaseAction_Cmd_WithWarning" Property="SyncDatabaseAction"
                       Value="&quot;[#dbsync.exe]&quot;;1;!(loc.UpgradeDlg_DatabaseRecovery)" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="SyncDatabaseAction_Cmd_WithoutWarning" Property="SyncDatabaseAction"
-                      Value="&quot;[#dbsync.exe]&quot;;100500;!(loc.UpgradeDlg_DatabaseRecovery)" Execute="immediate" Impersonate="yes"/>
+                      Value="&quot;[#dbsync.exe]&quot;;100500;" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="SyncDatabaseAction" BinaryKey="CustomActions.dll" DllEntry="CAQuitExecAndWarn"
                       Execute="deferred" Return="check" Impersonate="no" />
 
@@ -473,7 +473,7 @@
 
             <Custom Action="SyncDatabaseAction_Cmd_WithWarning" Before="SyncDatabaseAction">
                 <![CDATA[ $(var.VmsUpgrading) AND $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="SyncDatabaseAction_Cmd_WithoutWarning" After="SyncDatabaseAction">
+            <Custom Action="SyncDatabaseAction_Cmd_WithoutWarning" Before="SyncDatabaseAction">
                 <![CDATA[ (NOT $(var.VmsUpgrading)) AND $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
             <Custom Action="SyncDatabaseAction" After="BackupDatabaseFile">
