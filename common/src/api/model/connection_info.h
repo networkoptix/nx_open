@@ -9,7 +9,7 @@
 #include "compatibility.h"
 
 struct QnConnectionInfo {
-    QnConnectionInfo(): allowCameraChanges(true) {}
+    QnConnectionInfo() {}
 
     QnSoftwareVersion version;
     QList<QnCompatibilityItem> compatibilityItems;
@@ -17,7 +17,6 @@ struct QnConnectionInfo {
     QString ecsGuid;
     QString publicIp;
     QString brand;
-    bool allowCameraChanges;
 };
 
 // TODO: #Elric remove shared pointer?

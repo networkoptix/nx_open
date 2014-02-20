@@ -155,6 +155,12 @@ void QnServerMessageProcessor::handleMessage(const QnMessage &message) {
             qnResPool->removeResource(resource);
         break;
     }
+
+    case Qn::Message_Type_KvPairChange: {
+        updateKvPairs(message.kvPairs);
+        break;
+    }
+
     default:
         break;
     }
