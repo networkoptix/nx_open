@@ -136,7 +136,8 @@
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">发现已安装版本</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">安装方式</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">系统将开始更新！</String>    
-
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Your database has been corrupted and cannot be recovered. The fresh database has been installed. To access the system use login "admin" and password "admin". Please change the credentials after the first login.</String>    
+    
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">不能连接到windows防火墙。  ([2]   [3]   [4]   [5])</String>    
     <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">配置windows防火墙</String>    
