@@ -23,7 +23,7 @@ rm -rf "$AS_SRC"
 mkdir "$AS_SRC"
 cp -a "$SRC/${product.name}.app" "$AS_SRC"
 codesign -f -v --deep --entitlements entitlements.plist -s "${mac.app.sign.identity}" "$AS_SRC/${product.name}.app"
-productbuild --component "$AS_SRC/${product.name}.app" /Applications --sign "${mac.pkg.sign.identity}" --product "${product.name}/Contents/Info.plist" "$PKG_FILE"
+productbuild --component "$AS_SRC/${product.name}.app" /Applications --sign "${mac.pkg.sign.identity}" --product "$AS_SRC/${product.name}.app/Contents/Info.plist" "$PKG_FILE"
 # End
 
 SetFile -c icnC $SRC/.VolumeIcon.icns
