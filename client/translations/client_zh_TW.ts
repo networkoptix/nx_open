@@ -1734,12 +1734,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
 <context>
     <name>QnAbstractPtzDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/abstract_ptz_dialog.cpp" line="52"/>
+        <location filename="../src/ui/dialogs/abstract_ptz_dialog.cpp" line="53"/>
         <source>Loading...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/abstract_ptz_dialog.cpp" line="202"/>
+        <location filename="../src/ui/dialogs/abstract_ptz_dialog.cpp" line="203"/>
         <source>Saving...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1871,19 +1871,19 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="421"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1079"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1084"/>
         <source>Check Camera Issues...</source>
         <translation>檢查攝影機問題…</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="427"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="680"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="685"/>
         <source>Alarm/Event Log...</source>
         <translation>警報 / 事件記錄…</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="432"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="672"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="677"/>
         <source>Alarm/Event Rules...</source>
         <translation>警報 / 事件規則...</translation>
     </message>
@@ -1893,463 +1893,463 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="454"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="459"/>
         <source>Fit in View</source>
         <translation>填滿視圖</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="462"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="467"/>
         <source>Main Menu</source>
         <translation>主選單</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="464"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="469"/>
         <source>Alt+Space</source>
         <translation>Alt+Space</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="476"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="481"/>
         <source>Logout</source>
         <translation>佈局</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="486"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="491"/>
         <source>Start Panic Recording</source>
         <translation>開始緊急錄影</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="487"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="492"/>
         <source>Stop Panic Recording</source>
         <translation>停止緊急錄影</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="489"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="494"/>
         <source>Ctrl+P</source>
         <translation>Ctrl+P</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="500"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="505"/>
         <source>New...</source>
         <translation>新增...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="506"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="511"/>
         <source>Layout...</source>
         <translation>佈局...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="507"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="512"/>
         <source>New Layout...</source>
         <translation>新佈局...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="512"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="517"/>
         <source>Tab</source>
         <translation>頁籤</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="513"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="518"/>
         <source>New Tab</source>
         <translation>新增頁籤</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="514"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="519"/>
         <source>Ctrl+T</source>
         <translation>Ctrl+T</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="520"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="525"/>
         <source>Window</source>
         <translation>視窗</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="521"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="526"/>
         <source>New Window</source>
         <translation>新開視窗</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="522"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="527"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="528"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="533"/>
         <source>User...</source>
         <translation>使用者…</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="529"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="534"/>
         <source>New User...</source>
         <translation>新增使用者…</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="534"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="539"/>
         <source>Open Layout...</source>
         <translation>開啟佈局…</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="540"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="545"/>
         <source>Open...</source>
         <translation>開啟...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="546"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="551"/>
         <source>File(s)...</source>
         <translation>檔案...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="547"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="552"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="554"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="559"/>
         <source>Layout(s)...</source>
         <translation>佈局...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="560"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="565"/>
         <source>Folder...</source>
         <translation>目錄...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="566"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="571"/>
         <source>Save Current Layout</source>
         <translation>儲存目前佈局</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="567"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="572"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="575"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="580"/>
         <source>Save Current Layout As...</source>
         <translation>另存目前佈局為…</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="576"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="581"/>
         <source>Ctrl+Alt+S</source>
         <translation>Ctrl + Alt + S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="586"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="591"/>
         <source>Start Screen Recording</source>
         <translation>開始螢幕擷取錄影</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="587"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="592"/>
         <source>Stop Screen Recording</source>
         <translation>停止螢幕擷取錄影</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="588"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="593"/>
         <source>Alt+R</source>
         <translation>Alt+R</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="599"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="604"/>
         <source>Esc</source>
         <translation>Esc</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="601"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="606"/>
         <source>Stop current action</source>
         <translation>停止目前動作</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="605"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="610"/>
         <source>Go to Fullscreen</source>
         <translation>切換為全螢幕</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="606"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="611"/>
         <source>Exit Fullscreen</source>
         <translation>離開全螢幕</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="627"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="632"/>
         <source>Ctrl+F</source>
         <translation>Ctrl+F</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="629"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="634"/>
         <source>Alt+Enter</source>
         <translation>Alt+Enter</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="630"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="635"/>
         <source>Alt+Return</source>
         <translation>Alt+Return</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="612"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="617"/>
         <source>Minimize</source>
         <translation>最小化</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="617"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="622"/>
         <source>Maximize</source>
         <translation>最大化</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="618"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="623"/>
         <source>Restore Down</source>
         <translation>恢復視窗化</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="637"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="642"/>
         <source>Show Message</source>
         <translation>顯示訊息</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="641"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="646"/>
         <source>Show Version Mismatch Message</source>
         <translation>顯示版本不匹配訊息</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="649"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="654"/>
         <source>Open in Browser...</source>
         <translation>在瀏覽器開啟…</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="654"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="659"/>
         <source>System Settings...</source>
         <translation>系統設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="661"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="666"/>
         <source>Open Web Client...</source>
         <translation>開啟網頁用戶端…</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="673"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="678"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="681"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="686"/>
         <source>Ctrl+L</source>
         <translation>Ctrl+L</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="688"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="693"/>
         <source>Camera List...</source>
         <translation>攝影機列表...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="689"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="694"/>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="696"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="701"/>
         <source>Backup/Restore Configuration...</source>
         <translation>備份 / 還原 設定值...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="706"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="711"/>
         <source>How-to Videos and FAQ...</source>
         <translation>教學影片及常見問題...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="711"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="716"/>
         <source>Check for Updates...</source>
         <translation>軟體更新檢查...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="716"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="721"/>
         <source>About...</source>
         <translation>關於...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="717"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="722"/>
         <source>F1</source>
         <translation>F1</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="728"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="733"/>
         <source>Exit</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="729"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="734"/>
         <source>Alt+F4</source>
         <translation>Alt+F4</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="743"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="748"/>
         <source>Close</source>
         <translation>關閉</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="744"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="749"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="749"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="754"/>
         <source>Close All But This</source>
         <translation>關閉其他全部</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="758"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="763"/>
         <source>Open in Layout</source>
         <translation>在佈局內開啟</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="763"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="768"/>
         <source>Open</source>
         <translation>開啟</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="764"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="769"/>
         <source>Monitor</source>
         <translation>顯示器</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="769"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="774"/>
         <source>Open in New Tab</source>
         <translation>在新頁籤中開啟</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="770"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="775"/>
         <source>Monitor in a New Tab</source>
         <translation>顯示在新頁籤</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="775"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="780"/>
         <source>Open in New Window</source>
         <translation>在新視窗中開啟</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="776"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="781"/>
         <source>Monitor in a New Window</source>
         <translation>顯示在新視窗</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="781"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="786"/>
         <source>Open Layout in a New Tab</source>
         <translation>開啟新頁籤中的佈局</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="786"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="791"/>
         <source>Open Layouts</source>
         <translation>開啟佈局</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="791"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="796"/>
         <source>Open Layout(s) in a New Window</source>
         <translation>在新視窗中開啟佈局</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="796"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="801"/>
         <source>Open Current Layout in a New Window</source>
         <translation>在新視窗中開啟目前佈局</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="800"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="805"/>
         <source>Open Layout(s)</source>
         <translation>開啟佈局</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="805"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="810"/>
         <source>Open Containing Folder</source>
         <translation>開啟檔案所在目錄</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="806"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="811"/>
         <source>Ctrl+Enter</source>
         <translation>Ctrl+Enter</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="807"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="812"/>
         <source>Ctrl+Return</source>
         <translation>Ctrl+Return</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="819"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="824"/>
         <source>Save Layout</source>
         <translation>儲存佈局</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="826"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="833"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="831"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="838"/>
         <source>Save Layout As...</source>
         <translation>另存佈局為…</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="843"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="848"/>
         <source>Maximize Item</source>
         <translation>最大化項目</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="844"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="852"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="849"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="857"/>
         <source>Enter</source>
         <translation>進入</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="845"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="853"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="850"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="858"/>
         <source>Return</source>
         <translation>返回</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="851"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="856"/>
         <source>Restore Item</source>
         <translation>返回項目</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="859"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="864"/>
         <source>Show Info</source>
         <translation>顯示資訊</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="860"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="866"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="872"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="932"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="865"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="871"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="877"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="937"/>
         <source>Alt+I</source>
         <translation>Alt+I</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="865"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="870"/>
         <source>Hide Info</source>
         <translation>隱藏資訊</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="871"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="876"/>
         <source>Toggle Info</source>
         <translation>切換資訊</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="877"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="882"/>
         <source>Change Resolution...</source>
         <translation>變更解析度...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="884"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="889"/>
         <source>Auto</source>
         <translation>自動</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="890"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="895"/>
         <source>Low</source>
         <translation>低</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="895"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="900"/>
         <source>High</source>
         <translation>高</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="903"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="908"/>
         <source>PTZ...</source>
         <translation>PTZ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="911"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="916"/>
         <source>Save Current Position...</source>
         <translation>儲存目前位置...</translation>
     </message>
@@ -2372,576 +2372,581 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="645"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="452"/>
+        <source>Activate PTZ object</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="650"/>
         <source>Show Beta Version Warning Message</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="917"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="922"/>
         <source>Manage...</source>
         <translation type="unfinished">管理...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="925"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="930"/>
         <source>Calibrate Fisheye</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="931"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="936"/>
         <source>Toggle Resolution Mode</source>
         <translation>切換解析度模式</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="938"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="943"/>
         <source>Show Motion/Smart Search</source>
         <translation>隱藏位移 / 智慧搜尋</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="939"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="944"/>
         <source>Show Motion</source>
         <translation>顯示位移</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="940"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="947"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="958"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="945"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="952"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="963"/>
         <source>Alt+G</source>
         <translation>Alt+G</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="945"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="950"/>
         <source>Hide Motion/Smart Search</source>
         <translation>隱藏位移 / 智慧搜尋</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="946"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="951"/>
         <source>Hide Motion</source>
         <translation>隱藏位移</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="952"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="957"/>
         <source>Clear Motion Selection</source>
         <translation>清除位移偵測選擇</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="957"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="962"/>
         <source>Toggle Smart Search</source>
         <translation>切換智慧搜尋</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="963"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="968"/>
         <source>Check File Watermark</source>
         <translation>檢查檔案浮水印</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="964"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="969"/>
         <source>Alt+C</source>
         <translation>Alt+C</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="970"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="975"/>
         <source>Take Screenshot</source>
         <translation>螢幕擷取</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="971"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="976"/>
         <source>Alt+S</source>
         <translation>Alt+S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="977"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="982"/>
         <source>Image Enhancement...</source>
         <translation>影像強化...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="978"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="983"/>
         <source>Alt+J</source>
         <translation>Alt+J</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="984"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="989"/>
         <source>Create Zoom Window</source>
         <translation>建立放大窗格</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="989"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="994"/>
         <source>Rotate to...</source>
         <translation>旋轉視角...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="994"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="999"/>
         <source>0 degrees</source>
         <translation>0 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="998"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1003"/>
         <source>90 degrees</source>
         <translation>90 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1002"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1007"/>
         <source>180 degrees</source>
         <translation>180 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1006"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1011"/>
         <source>270 degrees</source>
         <translation>270 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1015"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1020"/>
         <source>Remove from Layout</source>
         <translation>從佈局移除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1019"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1031"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1024"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1036"/>
         <source>Del</source>
         <translation>刪</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1027"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1032"/>
         <source>Delete</source>
         <translation>刪除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1044"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1049"/>
         <source>Rename</source>
         <translation>重新命名</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1045"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1050"/>
         <source>F2</source>
         <translation>F2</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1054"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1059"/>
         <source>Upload to YouTube...</source>
         <translation>上傳至 YouTube…</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1061"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1066"/>
         <source>Delete from Disk</source>
         <translation>從硬碟上刪除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1068"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1073"/>
         <source>Set as Layout Background</source>
         <translation>設為佈局背景 (電子地圖)</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1074"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1079"/>
         <source>User Settings...</source>
         <translation>使用者設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1085"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1090"/>
         <source>Camera Rules...</source>
         <translation>攝影機規則...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1091"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1096"/>
         <source>Camera Settings...</source>
         <translation>攝影機設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1097"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1102"/>
         <source>Picture Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1102"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1225"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1107"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1230"/>
         <source>Layout Settings...</source>
         <translation>佈局設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1108"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1113"/>
         <source>Open in Camera Settings Dialog</source>
         <translation>開啟攝影機設定對話框</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1112"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1117"/>
         <source>Clear Camera Settings Dialog</source>
         <translation>清除攝影機設定對話框</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1116"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1121"/>
         <source>Add Camera(s)...</source>
         <translation>新增攝影機...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1121"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1126"/>
         <source>Camera(s) List by Server...</source>
         <translation>列出伺服器上的攝影機...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1126"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1131"/>
         <source>Ping...</source>
         <translation>Ping...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1130"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1135"/>
         <source>Server Logs...</source>
         <translation>伺服器記錄...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1135"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1140"/>
         <source>Server Diagnostics...</source>
         <translation>伺服器診斷...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1140"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1145"/>
         <source>Server Settings...</source>
         <translation>伺服器設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1146"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1151"/>
         <source>Change Cell Aspect Ratio...</source>
         <translation>變更 Cell 長寬比...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1154"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1159"/>
         <source>4:3</source>
         <translation>4:3</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1161"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1166"/>
         <source>16:9</source>
         <translation>16:9</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1170"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1175"/>
         <source>Change Cell Spacing...</source>
         <translation>變更 Cell 間距...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1178"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1183"/>
         <source>None</source>
         <translation>無</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1185"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1190"/>
         <source>Small</source>
         <translation>小</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1192"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1197"/>
         <source>Medium</source>
         <translation>中</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1199"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1204"/>
         <source>Large</source>
         <translation>大</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1212"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1217"/>
         <source>Start Tour</source>
         <translation>開始輪跳</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1213"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1218"/>
         <source>Stop Tour</source>
         <translation>停止輪跳</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1214"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1219"/>
         <source>Alt+T</source>
         <translation>Alt+T</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1230"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1235"/>
         <source>Mark Selection Start</source>
         <translation>選擇標記開始</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1231"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1236"/>
         <source>[</source>
         <translation>[</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1237"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1242"/>
         <source>Mark Selection End</source>
         <translation>選擇標記結束</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1238"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1243"/>
         <source>]</source>
         <translation>]</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1244"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1249"/>
         <source>Clear Selection</source>
         <translation>清除選擇</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1249"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1254"/>
         <source>Zoom to Selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1254"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1259"/>
         <source>Export Selected Area...</source>
         <translation>匯出選擇區段...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1260"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1265"/>
         <source>Export Multi-Video...</source>
         <translation>匯出多個影像...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1266"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1271"/>
         <source>Preview Search...</source>
         <translation>預覽搜尋...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1273"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1278"/>
         <source>Ctrl+Alt+Shift++</source>
         <translation>Ctrl+Alt+Shift+ +</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1274"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1279"/>
         <source>Increment Debug Counter</source>
         <translation>增量除錯計數器</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1278"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1283"/>
         <source>Ctrl+Alt+Shift+-</source>
         <translation>Ctrl+Alt+Shift+ -</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1279"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1284"/>
         <source>Decrement Debug Counter</source>
         <translation>減量除錯計數器</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1283"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1288"/>
         <source>Ctrl+Alt+Shift+R</source>
         <translation>Ctrl+Alt+Shift+ R</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1284"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1289"/>
         <source>Show Resource Pool</source>
         <translation>顯示資源集區</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1288"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1293"/>
         <source>Calibrate PTZ</source>
         <translation>校正 PTZ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1292"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1297"/>
         <source>Get PTZ Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1296"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1301"/>
         <source>Ctrl+Alt+Shift+D</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1297"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1302"/>
         <source>Debug Control Panel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1301"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1306"/>
         <source>Space</source>
         <translation>空白鍵</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1302"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1307"/>
         <source>Play</source>
         <translation>播放</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1303"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1308"/>
         <source>Pause</source>
         <translation>暫停</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1308"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1313"/>
         <source>Ctrl+-</source>
         <translation>Ctrl+-</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1309"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1314"/>
         <source>Speed Down</source>
         <translation>降速</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1314"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1319"/>
         <source>Ctrl++</source>
         <translation>Ctrl++</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1315"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1320"/>
         <source>Speed Up</source>
         <translation>升速</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1320"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1325"/>
         <source>Ctrl+Left</source>
         <translation>Ctrl+Left</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1321"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1326"/>
         <source>Previous Frame</source>
         <translation>上一圖框</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1326"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1331"/>
         <source>Ctrl+Right</source>
         <translation>Ctrl+Righ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1327"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1332"/>
         <source>Next Frame</source>
         <translation>下一圖框</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1332"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1337"/>
         <source>Z</source>
         <translation>Z</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1333"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1338"/>
         <source>To Start</source>
         <translation>到起始點</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1338"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1343"/>
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1339"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1344"/>
         <source>To End</source>
         <translation>到結束點</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1344"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1349"/>
         <source>Ctrl+Up</source>
         <translation>Ctrl+Up</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1345"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1350"/>
         <source>Volume Down</source>
         <translation>降低音量</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1349"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1354"/>
         <source>Ctrl+Down</source>
         <translation>Ctrl+Down</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1350"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1355"/>
         <source>Volume Up</source>
         <translation>提升音量</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1354"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1359"/>
         <source>M</source>
         <translation>M</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1355"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1360"/>
         <source>Toggle Mute</source>
         <translation>靜音模式切換</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1360"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1365"/>
         <source>L</source>
         <translation>L</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1361"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1366"/>
         <source>Jump to Live</source>
         <translation>切換為即時畫面</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1367"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1372"/>
         <source>S</source>
         <translation>S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1368"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1373"/>
         <source>Synchronize Streams</source>
         <translation>同步所有串流</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1369"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1374"/>
         <source>Disable Stream Synchronization</source>
         <translation>同步所有串流</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1379"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1384"/>
         <source>Show Thumbnails</source>
         <translation>顯示縮圖</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1380"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1385"/>
         <source>Hide Thumbnails</source>
         <translation>不顯示縮圖</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1384"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1389"/>
         <source>Show Calendar</source>
         <translation>顯示日曆</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1385"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1390"/>
         <source>Hide Calendar</source>
         <translation>不顯示日曆</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1389"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1394"/>
         <source>Show Title Bar</source>
         <translation>顯示標題列</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1390"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1395"/>
         <source>Hide Title Bar</source>
         <translation>隱藏標題列</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1395"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1400"/>
         <source>Pin Tree</source>
         <translation>固定顯示樹</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1396"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1401"/>
         <source>Unpin Tree</source>
         <translation>不固定顯示樹</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1401"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1406"/>
         <source>Show Tree</source>
         <translation>顯示樹</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1402"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1407"/>
         <source>Hide Tree</source>
         <translation>不顯示樹</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1407"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1412"/>
         <source>Show Timeline</source>
         <translation>顯示時間列</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1408"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1413"/>
         <source>Hide Timeline</source>
         <translation>不顯示時間列</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1412"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1417"/>
         <source>Pin Notifications</source>
         <translation>固定顯示通知</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1413"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1418"/>
         <source>Unpin Notifications</source>
         <translation>不固定顯示通知</translation>
     </message>
@@ -5889,59 +5894,59 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QnPtzManageDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="333"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="336"/>
         <source>Could not get position from camera</source>
         <translation type="unfinished">無法從攝影機取得位置</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="334"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="337"/>
         <source>An error has occurred while trying to get current position from camera %1.
 
 Please wait for the camera to go online.</source>
         <translation type="unfinished">當嘗試從攝影機 %1 取得目前位置時發生錯誤。請等待攝影機上線。</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="355"/>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="393"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="358"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="396"/>
         <source>Could not set position for camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="356"/>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="394"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="359"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="397"/>
         <source>An error has occurred while trying to set current position for camera %1.
 
 Please wait for the camera to go online.</source>
         <translation type="unfinished">當嘗試從攝影機 %1 設定目前位置時發生錯誤。請等待攝影機上線。</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="454"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="457"/>
         <source>Remove preset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="455"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="458"/>
         <source>This preset is used in some tours.
 These tours will become invalid if you remove it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="456"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="459"/>
         <source>Do not show again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="565"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="580"/>
         <source>Manage PTZ for %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="577"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="592"/>
         <source>PTZ configuration is not saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="577"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="592"/>
         <source>Changes are not saved. Do you want to save them?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5959,104 +5964,104 @@ These tours will become invalid if you remove it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="276"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="282"/>
         <source>This hotkey is used by preset &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="277"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="283"/>
         <source>This hotkey is used by tour &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="279"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="285"/>
         <source>Change hotkey</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="280"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="286"/>
         <source>Reassign</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="379"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="393"/>
         <source>#</source>
         <translation type="unfinished">#</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="381"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="395"/>
         <source>Name</source>
         <translation type="unfinished">名稱</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="383"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="397"/>
         <source>Hotkey</source>
         <translation type="unfinished">熱鍵</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="385"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="399"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="387"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="401"/>
         <source>Details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="543"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="557"/>
         <source>Tours</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="544"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="558"/>
         <source>Positions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="578"/>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="624"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="592"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="638"/>
         <source>None</source>
         <translation type="unfinished">無</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="582"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="596"/>
         <source>This preset will be activated after %n minutes of inactivity</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="677"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="691"/>
         <source>Tour should contain at least 2 positions</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="690"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="704"/>
         <source>Tour has %n identical positions</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="699"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="713"/>
         <source>Tour time: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="699"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="713"/>
         <source>less than a minute</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="699"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="713"/>
         <source>about %n minute(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="704"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="718"/>
         <source>Invalid tour</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6466,32 +6471,32 @@ These tours will become invalid if you remove it.</source>
         <translation>移除儲存裝置</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="316"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="310"/>
         <source>Not available</source>
         <translation>不允許</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="393"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="385"/>
         <source>Loading...</source>
         <translation>載入...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="546"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="537"/>
         <source>Warning</source>
         <translation type="unfinished">警告</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="547"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="538"/>
         <source>You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours. This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="585"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="576"/>
         <source>Finished</source>
         <translation type="unfinished">已結束</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="586"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="577"/>
         <source>Rebuilding archive index is completed.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6504,12 +6509,12 @@ These tours will become invalid if you remove it.</source>
         <translation type="vanished">關</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="623"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="613"/>
         <source>Could not load storages from server.</source>
         <translation>無法從伺服器載入儲存裝置.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="660"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="650"/>
         <source>&lt;a href=&apos;1&apos;&gt;Add external Storage...&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;1&apos;&gt;新增外接儲存裝置...&lt;/a&gt;</translation>
     </message>
@@ -7207,13 +7212,13 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="555"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2256"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2266"/>
         <source>Could not save parameters</source>
         <translation>無法儲存參數</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="556"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2257"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2267"/>
         <source>Failed to save the following parameters (%1):
 %2</source>
         <translation>儲存參數 (%1)：%2 失敗</translation>
@@ -7251,9 +7256,9 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1021"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2388"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2444"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2467"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2398"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2454"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2477"/>
         <source>Error</source>
         <translation>錯誤</translation>
     </message>
@@ -7396,68 +7401,68 @@ and you do not have the rights to overwrite it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1966"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1976"/>
         <source>Delete Files</source>
         <translation>刪除檔案</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1967"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1977"/>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation>
             <numerusform>您確定要永久刪除這 %n 個檔案嗎?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1984"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1994"/>
         <source>Remove Items</source>
         <translation>移除項目</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1985"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1995"/>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation>
             <numerusform>您確定要從佈局移除這 %n 個項目嗎?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2027"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2037"/>
         <source>Rename</source>
         <translation>重新命名</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2028"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2038"/>
         <source>Enter new name for the selected item:</source>
         <translation>輸入新名稱給選擇的項目:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2069"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2079"/>
         <source>Delete Resources</source>
         <translation>刪除資源</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2070"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2080"/>
         <source>Do you really want to delete the following %n item(s)?</source>
         <translation>
             <numerusform>您確定要刪除以下 %n 個項目嗎?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2669"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2679"/>
         <source>Beta version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2670"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2680"/>
         <source>You are running beta version of %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2712"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2722"/>
         <source>Launcher process is not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2713"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2723"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
         <translation type="unfinished">客戶端無法啟動。請關閉程式並從程式集列表裡的捷徑啟動。</translation>
@@ -7471,7 +7476,7 @@ Please close the application and start it again using the shortcut in the start 
         <translation type="vanished">輸入要建立的佈局名稱:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2159"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2169"/>
         <source>User Settings</source>
         <translation>使用者設定</translation>
     </message>
@@ -7669,17 +7674,17 @@ Please wait for the camera to go online.</source>
         <translation type="vanished">當嘗試從攝影機 %1 設定目前位置時發生錯誤。請等待攝影機上線。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2353"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2363"/>
         <source>Updating background</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2354"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2364"/>
         <source>Image processing can take a lot of time. Please be patient.</source>
         <translation>影像處理會消耗一些時間。請稍待。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2388"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2398"/>
         <source>Image cannot be uploaded</source>
         <translation>影像無法上傳</translation>
     </message>
@@ -7696,58 +7701,58 @@ Please wait for the camera to go online.</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2445"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2455"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
         <translation>
             <numerusform>無法儲存以下 %n 個項目到企業控制器。</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2457"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2467"/>
         <source>Could not delete resource</source>
         <translation>無法刪除資源</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2457"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2467"/>
         <source>An error has occurred while trying to delete a resource from Enterprise Controller. 
 
 Error description: &apos;%2&apos;</source>
         <translation>當嘗試從企業控制器刪除資源時發生錯誤。錯誤描述：&apos;%2&apos;</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2468"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2478"/>
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation>
             <numerusform>無法儲存變更至以下 %n 個資源。</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2613"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2623"/>
         <source>Client v%1&lt;br/&gt;</source>
         <translation>客戶端 v%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2616"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2626"/>
         <source>Enterprise Controller v%1&lt;br/&gt;</source>
         <translation>企業控制器 v%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2621"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2631"/>
         <source>Media Server v%1 at %2&lt;br/&gt;</source>
         <translation>媒體伺服器 v%1 於 %2&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2623"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2633"/>
         <source>Media Server v%1&lt;br/&gt;</source>
         <translation>媒體伺服器 v%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2652"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2662"/>
         <source>Some components of the system are not upgraded:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please upgrade all components to the latest version %2.</source>
         <translation>部分系統元件未更新：&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;請更新所有原件為最新版本 %2。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2660"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2670"/>
         <source>Version Mismatch</source>
         <translation>版本不匹配</translation>
     </message>
@@ -7809,7 +7814,7 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1394"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1393"/>
         <source>Press any key to stop the tour</source>
         <translation>請按任何鍵停止輪跳</translation>
     </message>
@@ -8235,37 +8240,37 @@ hh:mm:ss</source>
 <context>
     <name>QnWorkbenchPtzHandler</name>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="104"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="106"/>
         <source>Could not get position from camera</source>
         <translation type="unfinished">無法從攝影機取得位置</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="105"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="107"/>
         <source>An error has occurred while trying to get current position from camera %1.
 
 Please wait for the camera to go online.</source>
         <translation type="unfinished">當嘗試從攝影機 %1 取得目前位置時發生錯誤。請等待攝影機上線。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="145"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="147"/>
         <source>Could not set position for camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="146"/>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="179"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="148"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="181"/>
         <source>An error has occurred while trying to set current position for camera %1.
 
 Please wait for the camera to go online.</source>
         <translation type="unfinished">當嘗試從攝影機 %1 設定目前位置時發生錯誤。請等待攝影機上線。</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="178"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="180"/>
         <source>Could not set position to camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="235"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="260"/>
         <source>PTZ_CALIBRATION_%1.jpg</source>
         <translation type="unfinished">PTZ_CALIBRATION_%1.jpg</translation>
     </message>

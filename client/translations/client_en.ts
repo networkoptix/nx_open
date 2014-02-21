@@ -431,7 +431,7 @@ It might take a few moments to populate them in the tree.</numerusform>
 <context>
     <name>QnPtzManageModel</name>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="582"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="596"/>
         <source>This preset will be activated after %n minutes of inactivity</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -439,7 +439,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="690"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="704"/>
         <source>Tour has %n identical positions</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -447,7 +447,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="699"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="713"/>
         <source>about %n minute(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -554,7 +554,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1967"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1977"/>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation>
             <numerusform>Are you sure you want to permanently delete this file?</numerusform>
@@ -562,7 +562,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1985"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1995"/>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation>
             <numerusform>Are you sure you want to remove this item from layout?</numerusform>
@@ -570,7 +570,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2070"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2080"/>
         <source>Do you really want to delete the following %n item(s)?</source>
         <translation>
             <numerusform>Do you really want to delete the following item?</numerusform>
@@ -599,7 +599,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2445"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2455"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
         <translation>
             <numerusform>Could not save the following item to Enterprise Controller.</numerusform>
@@ -607,7 +607,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2468"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2478"/>
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation>
             <numerusform>Could not save changes made to the following resource.</numerusform>
