@@ -22,7 +22,7 @@ QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnPtzTourSpotsModel::NameColumn, QHeaderView::Stretch);
 
     ui->tableView->setItemDelegate(new QnPtzTourItemDelegate(this));
-    ui->tableView->clearSelection();
+    ui->tableView->setCurrentIndex(QModelIndex());
 
     // TODO: #Elric replace with a single connect call
     QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
@@ -73,9 +73,6 @@ void QnPtzTourWidget::at_addSpotButton_clicked() {
     m_model->insertRow(m_model->rowCount());
 
     ui->tableView->setCurrentIndex(m_model->index(m_model->rowCount() - 1, 0));
-    ui->tableView->selectionModel()->clear();
-    ui->tableView->selectionModel()->setCurrentIndex(m_model->index(m_model->rowCount()-1, 0), QItemSelectionModel::Select);
-    ui->tableView->selectionModel()->select(m_model->index(m_model->rowCount()-1, 0), QItemSelectionModel::Select);
     
     for(int i = 0; i < ui->tableView->horizontalHeader()->count(); i++)
         if(ui->tableView->horizontalHeader()->sectionResizeMode(i) == QHeaderView::ResizeToContents)
@@ -83,7 +80,7 @@ void QnPtzTourWidget::at_addSpotButton_clicked() {
 }
 
 void QnPtzTourWidget::at_deleteSpotButton_clicked() {
-    QModelIndex index = ui->tableView->selectionModel()->currentIndex();
+    QModelIndex index = ui->tableView->currentIndex();
     if (!index.isValid())
         return;
 
@@ -91,7 +88,7 @@ void QnPtzTourWidget::at_deleteSpotButton_clicked() {
 }
 
 void QnPtzTourWidget::at_moveSpotUpButton_clicked() {
-    QModelIndex index = ui->tableView->selectionModel()->currentIndex();
+    QModelIndex index = ui->tableView->currentIndex();
     if (!index.isValid() || index.row() == 0)
         return;
 
@@ -99,7 +96,7 @@ void QnPtzTourWidget::at_moveSpotUpButton_clicked() {
 }
 
 void QnPtzTourWidget::at_moveSpotDownButton_clicked() {
-    QModelIndex index = ui->tableView->selectionModel()->currentIndex();
+    QModelIndex index = ui->tableView->currentIndex();
     if (!index.isValid() || index.row() == m_model->rowCount() - 1)
         return;
 
