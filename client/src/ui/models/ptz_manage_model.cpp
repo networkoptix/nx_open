@@ -258,19 +258,11 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
         int existingIndex = -1;
         if (hotkey != QnPtzHotkey::NoHotkey) {
             QString id = m_hotkeys[hotkey];
-            if(!id.isEmpty() && id != data.id()) {
-                existingIndex = presetIndex(id);
-                if (existingIndex != -1) {
-                    existing.rowType = PresetRow;
-                    existing.presetModel = m_presets[existingIndex];
-                } else {
-                    existingIndex = tourIndex(id);
-                    if (existingIndex != -1) {
-                        existing.rowType = TourRow;
-                        existing.tourModel = m_tours[existingIndex];
-                    }
-                }
-            }
+            if (id == data.id())
+                return false;
+
+            if (!id.isEmpty())
+                existing = rowData(id, &existingIndex);
         }
 
         if (existing.rowType != InvalidRow) {
