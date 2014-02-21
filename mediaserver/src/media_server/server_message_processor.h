@@ -13,15 +13,11 @@ class QnServerMessageProcessor : public QnCommonMessageProcessor
     typedef QnCommonMessageProcessor base_type;
 public:
     QnServerMessageProcessor();
-
 protected:
-    virtual void loadRuntimeInfo(const QnMessage &message) override;
-    virtual void handleConnectionOpened(const QnMessage &message) override;
-    virtual void handleConnectionClosed(const QString &errorString) override;
-    virtual void handleMessage(const QnMessage &message) override;
-    virtual void init(const QUrl &url, const QString &authKey, int reconnectTimeout) override;
-private:
-    void updateResource(const QnResourcePtr& resource);
+    virtual void onResourceStatusChanged(QnResourcePtr , QnResource::Status ) override {}
+    virtual void updateResource(QnResourcePtr resource) override;
+    virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
+protected:
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H

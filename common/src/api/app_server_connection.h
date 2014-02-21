@@ -238,6 +238,8 @@ public:
     static void setCurrentVersion(const QnSoftwareVersion &version);
     static void setPublicIp(const QString &publicIp);
     static void setSystemName(const QString& systemName);
+    static void setAllowCameraCHanges(bool value);
+    static bool isAllowCameraCHanges();
 
     static void setSessionKey(const QByteArray& sessionKey);
 

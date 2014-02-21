@@ -1,58 +1,19 @@
 #include "server_message_processor.h"
-
-#include <QtCore/QTimer>
-#include <QtCore/QDebug>
-#include <qglobal.h>
-
-#include <api/message_source.h>
-#include <api/app_server_connection.h>
-
+#include "core/resource_management/resource_pool.h"
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource_management/resource_discovery_manager.h>
-#include <core/resource_management/resource_pool.h>
+#include "serverutil.h"
 
-#include <recorder/recording_manager.h>
-
-#include <media_server/serverutil.h>
-#include <media_server/settings.h>
-
-#include "utils/network/simple_http_client.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor():
-    base_type() {
-}
-
-void QnServerMessageProcessor::init(const QUrl &url, const QString &authKey, int reconnectTimeout)
+        base_type()
 {
-    QnCommonMessageProcessor::init(url, authKey, reconnectTimeout);
+
 }
 
-void QnServerMessageProcessor::handleConnectionOpened(const QnMessage &message) {
-    foreach (QnResourcePtr resource, message.resources) {
-        updateResource(resource);
-    }
-
-    base_type::handleConnectionOpened(message);
-}
-
-void QnServerMessageProcessor::handleConnectionClosed(const QString &errorString) {
-    // update EC port
-    int port = MSSettings::roSettings()->value("appserverPort", DEFAULT_APPSERVER_PORT).toInt(); // defaulting to proxy
-
-    QUrl url = QnAppServerConnectionFactory::defaultUrl();
-    url.setPort(port);
-    QnAppServerConnectionFactory::setDefaultUrl(url);
-
-    base_type::handleConnectionClosed(errorString);
-}
-
-void QnServerMessageProcessor::loadRuntimeInfo(const QnMessage &message) {
-    base_type::loadRuntimeInfo(message);
-}
-
-void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource) {
+void QnServerMessageProcessor::updateResource(QnResourcePtr resource)
+{
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>();
 
     bool isServer = resource.dynamicCast<QnMediaServerResource>();
@@ -71,6 +32,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource) {
     if (isCamera && resource->getParentId() != ownMediaServer->getId())
         resource->addFlags( QnResource::foreigner );
 
+    bool needUpdateServer = false;
     // We are always online
     if (isServer) {
         if (resource->getStatus() != QnResource::Online) {
@@ -87,52 +49,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource) {
         syncStoragesToSettings(ownMediaServer);
 }
 
-void QnServerMessageProcessor::handleMessage(const QnMessage &message) {
-    base_type::handleMessage(message);
-
-    NX_LOG( lit("Received message %1, resourceId %2, resource %3").
-            arg(Qn::toString(message.messageType)).arg(message.resourceId.toString()).arg(message.resource ? message.resource->getName() : QString("NULL")), cl_logDEBUG1 );
-
-    switch (message.messageType) {
-    case Qn::Message_Type_Command: {
-        switch (message.command) {
-            case QnMessage::Command::Reboot: {
-                exit(0);
-            }
-        }
-        break;
-    }
-    case Qn::Message_Type_License: {
-        // New license added. LicensePool verifies it.
-        qnLicensePool->addLicense(message.license);
-        break;
-    }
-    case Qn::Message_Type_CameraServerItem: {
-        QnCameraHistoryPool::instance()->addCameraHistoryItem(*message.cameraServerItem);
-        break;
-    }
-    case Qn::Message_Type_ResourceChange: {
-        updateResource(message.resource);
-
-        break;
-    }
-    case Qn::Message_Type_ResourceDisabledChange: {
-        //ignoring messages for foreign resources
-        if (QnResourcePtr resource = qnResPool->getResourceById(message.resourceId)) {
-            resource->setDisabled(message.resourceDisabled);
-            if (message.resourceDisabled) // we always ignore status changes
-                resource->setStatus(QnResource::Offline);
-        }
-        break;
-    }
-    case Qn::Message_Type_ResourceDelete: {
-        if (QnResourcePtr resource = qnResPool->getResourceById(message.resourceId, QnResourcePool::AllResources))
-            qnResPool->removeResource(resource);
-        break;
-    }
-    default:
-        break;
-    }
-
-
+void QnServerMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
+{
+    // TODO: implement me
 }

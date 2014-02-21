@@ -587,7 +587,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     appServerEventsUrlQuery.addQueryItem("format", "pb");
     appServerEventsUrl.setQuery( appServerEventsUrlQuery );
 
-    QnServerMessageProcessor::instance()->init(appServerEventsUrl, settings.value("authKey").toString());
+    //QnServerMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
 }
 
 
@@ -1201,7 +1201,6 @@ void QnMain::run()
     qnStorageMan->loadFullFileCatalog();
 
     initAppServerEventConnection(*MSSettings::roSettings(), m_mediaServer);
-    QnServerMessageProcessor::instance()->run();
 
     std::auto_ptr<QnAppserverResourceProcessor> m_processor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
 

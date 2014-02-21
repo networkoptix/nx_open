@@ -6,8 +6,6 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
 
-#include <licensing/license.h>
-
 class QnClientMessageProcessor : public QnCommonMessageProcessor
 {
     Q_OBJECT
@@ -16,27 +14,16 @@ class QnClientMessageProcessor : public QnCommonMessageProcessor
 public:
     QnClientMessageProcessor();
 
-    virtual void run() override;
 protected:
-    virtual void loadRuntimeInfo(const QnMessage &message) override;
-    virtual void handleConnectionOpened(const QnMessage &message) override;
-    virtual void handleMessage(const QnMessage &message) override;
-
-private slots:
-
-    void at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url, const QString& origApiUrl);
-
+    virtual void onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status) override;
+    virtual void updateResource(QnResourcePtr resource) override;
+    virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
 private:
-    void init();
     void determineOptimalIF(const QnMediaServerResourcePtr &resource);
-    bool updateResource(QnResourcePtr resource, bool insert = true);
-    void processResources(const QnResourceList& resources);
     void processLicenses(const QnLicenseList& licenses);
+    void processResources(const QnResourceList& resources);
+    void updateHardwareIds(const ec2::QnFullResourceData& fullData);
     void processCameraServerItems(const QnCameraHistoryList& cameraHistoryList);
-    void updateHardwareIds(const QnMessage& message);
-
-private:
-    quint32 m_seqNumber;
 };
 
 #endif // _client_event_manager_h

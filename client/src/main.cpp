@@ -372,7 +372,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-    QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
@@ -412,6 +411,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnResTypePool );
 	ec2ConnectionFactory->setContext( resCtx );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
+
+    QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
+    //clientMessageProcessor->init(QnAppServerConnectionFactory::getConnection2());
 
     qnSettings->save();
     if (!QDir(qnSettings->mediaFolder()).exists())
@@ -633,7 +635,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         cl_log.log(autoTester.message(), cl_logALWAYS);
     }
 
-    QnCommonMessageProcessor::instance()->stop();
     QnSessionManager::instance()->stop();
 
     QnResource::stopCommandProc();

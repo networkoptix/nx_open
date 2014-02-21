@@ -19,7 +19,8 @@
 
 QnResourcePool::QnResourcePool() : QObject(),
     m_resourcesMtx(QMutex::Recursive),
-    m_updateLayouts(true)
+    m_updateLayouts(true),
+    m_tranInProgress(false)
 {}
 
 QnResourcePool::~QnResourcePool()
@@ -57,6 +58,26 @@ void QnResourcePool::setLayoutsUpdated(bool updateLayouts) {
     QMutexLocker locker(&m_resourcesMtx);
 
     m_updateLayouts = updateLayouts;
+}
+
+void QnResourcePool::beginTran()
+{
+    m_tranInProgress = true;
+}
+
+void QnResourcePool::commit()
+{
+    m_tranInProgress = false;
+    addResources(m_tmpResources);
+    m_tmpResources.clear();
+}
+
+void QnResourcePool::addResource(const QnResourcePtr &resource)
+{
+    if (m_tranInProgress)
+        m_tmpResources << resource;
+    else
+        addResources(QnResourceList() << resource); 
 }
 
 void QnResourcePool::addResources(const QnResourceList &resources)

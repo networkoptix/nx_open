@@ -48,8 +48,10 @@ public:
     // keeps database ID ( if possible )
     void addResources(const QnResourceList &resources);
 
-    inline void addResource(const QnResourcePtr &resource)
-    { addResources(QnResourceList() << resource); }
+    void addResource(const QnResourcePtr &resource);
+
+    void beginTran();
+    void commit();
 
     void removeResources(const QnResourceList &resources);
     inline void removeResource(const QnResourcePtr &resource)
@@ -117,6 +119,8 @@ signals:
 private:
     mutable QMutex m_resourcesMtx;
     bool m_updateLayouts;
+    bool m_tranInProgress;
+    QnResourceList m_tmpResources;
     QHash<QString, QnResourcePtr> m_resources;
     //!Resources with flag \a QnResource::foreign set
     /*!

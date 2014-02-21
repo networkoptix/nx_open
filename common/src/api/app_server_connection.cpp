@@ -18,6 +18,7 @@
 #include "utils/common/synctime.h"
 #include "session_manager.h"
 #include "message.pb.h"
+#include "common_message_processor.h"
 
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(RequestObject, 
@@ -973,6 +974,17 @@ void QnAppServerConnectionFactory::setSessionKey(const QByteArray& sessionKey)
     }
 }
 
+void QnAppServerConnectionFactory::setAllowCameraCHanges(bool value)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
+            factory->m_allowCameraChanges = value;
+}
+
+bool QnAppServerConnectionFactory::isAllowCameraCHanges()
+{
+    return qn_appServerConnectionFactory_instance()->m_allowCameraChanges;
+}
+
 void QnAppServerConnectionFactory::setPublicIp(const QString &publicIp)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
@@ -1112,6 +1124,7 @@ static ec2::AbstractECConnectionPtr currentlyUsedEc2Connection;
 void QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr ec2Connection )
 {
     currentlyUsedEc2Connection = ec2Connection;
+    QnCommonMessageProcessor::instance()->init(ec2Connection);
 }
 
 ec2::AbstractECConnectionPtr QnAppServerConnectionFactory::getConnection2()

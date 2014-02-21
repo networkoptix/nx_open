@@ -1463,7 +1463,6 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectionInfo->proxyPort);
 
-    QnClientMessageProcessor::instance()->stop(); // TODO: #Elric blocks gui thread.
     QnSessionManager::instance()->stop();
 
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo->version);
@@ -1496,7 +1495,6 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     notificationsHandler()->clear();
 
     QnSessionManager::instance()->start();
-    QnClientMessageProcessor::instance()->run();
 
     QnResourceDiscoveryManager::instance()->start();
 
@@ -1515,7 +1513,6 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
 
     menu()->trigger(Qn::ClearCameraSettingsAction);
 
-    QnClientMessageProcessor::instance()->stop(); // TODO: #Elric blocks gui thread.
 //    QnSessionManager::instance()->stop(); // omfg... logic sucks
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance()->stop();
@@ -2473,7 +2470,7 @@ void QnWorkbenchActionHandler::at_resources_saved( int handle, ec2::ErrorCode er
 
 }
 
-void QnWorkbenchActionHandler::at_resources_properties_saved( int handle, ec2::ErrorCode errorCode )
+void QnWorkbenchActionHandler::at_resources_properties_saved( int /*handle*/, ec2::ErrorCode /*errorCode */)
 {
     //TODO/IMPL
 }
