@@ -126,7 +126,7 @@ extern "C" {
 #endif
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
-    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint),
+    base_type(parent, flags | Qt::Window),
     QnWorkbenchContextAware(context),
     m_controller(0),
     m_titleVisible(true),
@@ -685,8 +685,12 @@ Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) con
         return Qt::NoSection;
 
     Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(Qn::calculateRectangularFrameSections(rect(), QnGeometry::eroded(rect(), m_frameMargins), QRect(pos, pos)));
+
     if((m_options & TitleBarDraggable) && result == Qt::NoSection && pos.y() <= m_tabBar->mapTo(const_cast<QnMainWindow *>(this), m_tabBar->rect().bottomRight()).y())
         result = Qt::TitleBarArea;
+
+    qDebug() << "FRAME SECTION AT" << pos << "=" << result;
+
     return result;
 }
 
