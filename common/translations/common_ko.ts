@@ -311,17 +311,17 @@
         <translation>연속된 연결 정보를 분석할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="793"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="792"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation>연속된 이벤트/동작 정책을 분석할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="802"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="801"/>
         <source>Cannot parse serialized action.</source>
         <translation>연속된 동작을 분석할 수 없습니다.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="811"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="810"/>
         <source>Cannot parse serialized actions.</source>
         <translation>연속된 동작들을 분석할 수 없습니다.</translation>
     </message>

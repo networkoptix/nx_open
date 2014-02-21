@@ -315,17 +315,17 @@
         <translation>シリアル化された接続情報を解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="793"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="792"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation>シリアル化されたイベント／アクション:ルールを解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="802"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="801"/>
         <source>Cannot parse serialized action.</source>
         <translation>シリアル化されたアクションを解析できません.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="811"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="810"/>
         <source>Cannot parse serialized actions.</source>
         <translation>シリアル化されたアクションを解析できません.</translation>
     </message>

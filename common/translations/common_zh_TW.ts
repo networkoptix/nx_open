@@ -315,17 +315,17 @@
         <translation>無法解析串聯化的連線資訊。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="793"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="792"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation>無法解析串聯化的事件/動作規則。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="802"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="801"/>
         <source>Cannot parse serialized action.</source>
         <translation>無法解析串聯化的動作。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="811"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="810"/>
         <source>Cannot parse serialized actions.</source>
         <translation>無法解析串聯化的行動。</translation>
     </message>
