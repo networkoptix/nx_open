@@ -965,12 +965,12 @@ void QnMediaResourceWidget::updateAspectRatio() {
         resourceId = networkResource->getPhysicalId();
 
     if(sourceSize.isEmpty()) {
-        setAspectRatio(-1.0);/*
+        setAspectRatio(
                     dewarpingRatio * (
                         resourceId.isEmpty()
                         ? -1.0
                         : qnSettings->resourceAspectRatios().value(resourceId, -1.0))
-                    );*/
+                    );
     } else {
         setAspectRatio(
                     dewarpingRatio *
