@@ -4,6 +4,26 @@
 
 #include "app_server_connection.h"
 
+// TODO: #Elric
+// Right now we have a problem in case resource property is changed very often.
+// Changes are pushed to EC and then we get them back as notifications, not
+// necessarily in the original order. This way property value gets changed
+// in totally unexpected ways.
+#if 0
+namespace {
+    QString createAdaptorKey() {
+        return lit("id%1|").arg(qrand() % 100000, 5, 10, QChar(L'0'));
+    }
+
+    bool hasAdaptorKey(const QString &string) {
+        return string.size() >= 8 && string[0] == L'i' && string[1] == L'd' && string[7] == L'|';
+    }
+
+    Q_GLOBAL_STATIC_WITH_ARGS(QString, qn_resourcePropertyAdaptor_uniqueKey, createAdaptorKey())
+}
+#endif 
+
+
 // -------------------------------------------------------------------------- //
 // QnAbstractResourcePropertyAdaptor
 // -------------------------------------------------------------------------- //
