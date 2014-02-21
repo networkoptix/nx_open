@@ -164,8 +164,8 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem *parent, Qt::WindowFlag
     m_color = QnNotificationLevels::notificationColor(m_notificationLevel);
 
     setClickableButtons(Qt::RightButton | Qt::LeftButton);
-    setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
-    setFrameWidth(0.5);
+    setFrameColor(QColor(110, 110, 110, 128)); // TODO: Same as in workbench_ui. Unify?
+    setFrameWidth(1.0);
     setWindowBrush(Qt::transparent);
 
     m_overlayWidget = new QnFramedWidget(this);
