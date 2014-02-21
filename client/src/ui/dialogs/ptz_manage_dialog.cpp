@@ -28,6 +28,7 @@
 #include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/message_box.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_item.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
 
@@ -247,6 +248,22 @@ bool QnPtzManageDialog::saveHomePosition() {
     return updateHomePosition(homePosition);
 }
 
+void QnPtzManageDialog::enableDewarping() {
+    QList<QnResourceWidget *> widgets = display()->widgets(m_resource);
+    if (widgets.isEmpty())
+        return;
+
+    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets.first());
+    if (!widget)
+        return;
+
+    if (widget->dewarpingParams().enabled) {
+        QnItemDewarpingParams params = widget->item()->dewarpingParams();
+        params.enabled = true;
+        widget->item()->setDewarpingParams(params);
+    }
+}
+
 void QnPtzManageDialog::saveData() {
     QN_SCOPED_VALUE_ROLLBACK(&m_submitting, true);
 
@@ -367,6 +384,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked() {
     QnPtzManageModel::RowData data = m_model->rowData(index.row());
     switch (data.rowType) {
     case QnPtzManageModel::PresetRow:
+        enableDewarping();
         controller()->activatePreset(data.presetModel.preset.id, 1.0);
         break;
     case QnPtzManageModel::TourRow: {
@@ -374,8 +392,10 @@ void QnPtzManageDialog::at_goToPositionButton_clicked() {
             break;
 
         QnPtzTourSpot spot = ui->tourEditWidget->currentTourSpot();
-        if (!spot.presetId.isEmpty())
+        if (!spot.presetId.isEmpty()) {
+            enableDewarping();
             controller()->activatePreset(spot.presetId, 1.0);
+        }
 
         break;
     }
@@ -403,12 +423,9 @@ void QnPtzManageDialog::at_startTourButton_clicked() {
     }
 
     QnPtzManageModel::RowData data = m_model->rowData(index.row());
-    switch (data.rowType) {
-    case QnPtzManageModel::TourRow:
+    if (data.rowType == QnPtzManageModel::TourRow) {
+        enableDewarping();
         controller()->activateTour(data.tourModel.tour.id);
-        break;
-    default:
-        break;
     }
 }
 
