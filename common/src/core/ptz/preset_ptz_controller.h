@@ -32,7 +32,6 @@ public:
 private:
     QMutex m_mutex;
     QnResourcePropertyAdaptor<QnPtzPresetRecordHash> *m_adaptor;
-    QAtomicInt m_changing;
 };
 
 #endif // QN_PRESET_PTZ_CONTROLLER_H

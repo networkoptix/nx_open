@@ -79,7 +79,9 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
         return naturalStringCaseInsensitiveLessThan(l.name, r.name);
     });
 
-    QnPtzHotkeyHash idByHotkey = QnPtzHotkeysResourcePropertyAdaptor(widget->resource()->toResourcePtr()).value();
+    QnPtzHotkeysResourcePropertyAdaptor adaptor;
+    adaptor.setResource(widget->resource()->toResourcePtr());
+    QnPtzHotkeyHash idByHotkey = adaptor.value();
 
     foreach(const QnPtzPreset &preset, presets) {
         QAction *action = new QAction(parent);

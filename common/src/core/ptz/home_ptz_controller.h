@@ -31,8 +31,10 @@ public:
     virtual bool updateHomeObject(const QnPtzObject &homePosition) override;
     virtual bool getHomeObject(QnPtzObject *homePosition) override;
 
+private:
+    void at_adaptor_valueChanged();
+
 public:
-    QMutex m_mutex;
     QnResourcePropertyAdaptor<QnPtzObject> *m_adaptor;
     QnHomePtzExecutor *m_executor;
 };

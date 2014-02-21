@@ -83,6 +83,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     base_type(parent, Qt::Dialog | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint),
     ui(new Ui::PtzManageDialog),
     m_model(new QnPtzManageModel(this)),
+    m_adaptor(new QnPtzHotkeysResourcePropertyAdaptor(this)),
     m_cache(new QnLocalFileCache(this)),
     m_submitting(false)
 {
@@ -118,6 +119,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(this,       &QnAbstractPtzDialog::synchronized, m_model,            &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
     connect(m_cache,    &QnLocalFileCache::fileDownloaded,  this,               &QnPtzManageDialog::at_cache_imageLoaded);
+    connect(m_adaptor,  &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnPtzManageDialog::updateHotkeys);
 
     connect(ui->savePositionButton, &QPushButton::clicked,  this,   &QnPtzManageDialog::at_savePositionButton_clicked);
     connect(ui->goToPositionButton, &QPushButton::clicked,  this,   &QnPtzManageDialog::at_goToPositionButton_clicked);
@@ -253,8 +255,7 @@ void QnPtzManageDialog::saveData() {
         saveHomePosition();
     }
 
-    if (m_adaptor)
-        m_adaptor->setValue(m_model->hotkeys());
+    m_adaptor->setValue(m_model->hotkeys());
 }
 
 Qn::PtzDataFields QnPtzManageDialog::requiredFields() const {
@@ -565,17 +566,8 @@ void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     if (m_resource == resource)
         return;
     
-    if(m_resource) {
-        delete m_adaptor;
-        m_adaptor = NULL;
-    }
-
     m_resource = resource;
-    
-    if(m_resource) {
-        m_adaptor = new QnPtzHotkeysResourcePropertyAdaptor(m_resource, this);
-        connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnPtzManageDialog::updateHotkeys);
-    }
+    m_adaptor->setResource(resource);
 
     setWindowTitle(tr("Manage PTZ for %1").arg(getResourceName(m_resource)));
 }
@@ -624,6 +616,5 @@ void QnPtzManageDialog::updateUi() {
 }
 
 void QnPtzManageDialog::updateHotkeys() {
-    if (m_adaptor)
-        m_model->setHotkeys(m_adaptor->value());
+    m_model->setHotkeys(m_adaptor->value());
 }

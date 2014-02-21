@@ -764,7 +764,10 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
 
         int hotkey = e->key() - Qt::Key_0;
 
-        QString objectId = QnPtzHotkeysResourcePropertyAdaptor(widget->resource()->toResourcePtr()).value().value(hotkey);
+        QnPtzHotkeysResourcePropertyAdaptor adaptor;
+        adaptor.setResource(widget->resource()->toResourcePtr());
+
+        QString objectId = adaptor.value().value(hotkey);
         if (objectId.isEmpty())
             break;
 

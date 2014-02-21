@@ -34,22 +34,24 @@ public:
     QnSingleCameraPtzHotkeysDelegate(const QnResourcePtr &resource, QnWorkbenchContext *context):
         QnWorkbenchContextAware(context),
         m_resourceId(resource->getId()),
-        m_adapter(new QnPtzHotkeysResourcePropertyAdaptor(resource))
-    {}
+        m_adaptor(new QnPtzHotkeysResourcePropertyAdaptor())
+    {
+        m_adaptor->setResource(resource);
+    }
 
     ~QnSingleCameraPtzHotkeysDelegate() {}
 
     virtual QnPtzHotkeyHash hotkeys() const override {
-        return m_adapter->value();
+        return m_adaptor->value();
     }
 
     virtual void updateHotkeys(const QnPtzHotkeyHash &value) override {
-        m_adapter->setValue(value);
+        m_adaptor->setValue(value);
     }
 
 private:
     int m_resourceId;
-    QScopedPointer<QnPtzHotkeysResourcePropertyAdaptor> m_adapter;
+    QScopedPointer<QnPtzHotkeysResourcePropertyAdaptor> m_adaptor;
 };
 
 

@@ -35,10 +35,11 @@ private:
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
 private:
+    QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
+
     mutable QMutex m_mutex;
     QnUserResourcePtr m_admin;
-    QScopedPointer<QnResourcePropertyAdaptor<bool> > m_cameraSettingsOptimizationAdaptor;
-    QScopedPointer<QnResourcePropertyAdaptor<QString> > m_disabledVendorsAdaptor;
 };
 
 
