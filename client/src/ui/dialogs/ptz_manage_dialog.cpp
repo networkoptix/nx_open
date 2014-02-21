@@ -238,7 +238,7 @@ bool QnPtzManageDialog::saveHomePosition() {
         homePosition = QnPtzObject(Qn::TourPtzObject, rowData.id());
         break;
     default:
-        return false;
+        break; /* Still need to update it. */
     }
 
     return updateHomePosition(homePosition);
