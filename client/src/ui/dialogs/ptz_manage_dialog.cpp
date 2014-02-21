@@ -24,7 +24,6 @@
 
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
 #include <ui/common/ui_resource_name.h>
-#include <ui/models/ptz_manage_model.h>
 #include <ui/widgets/ptz_tour_widget.h>
 #include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/message_box.h>
@@ -116,6 +115,8 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(m_model,    &QnPtzManageModel::presetsChanged,  this,               &QnPtzManageDialog::updateUi);
     connect(m_model,    &QnPtzManageModel::dataChanged,     this,               &QnPtzManageDialog::updateUi);
     connect(m_model,    &QnPtzManageModel::modelReset,      this,               &QnPtzManageDialog::updateUi);
+    connect(m_model,    &QnPtzManageModel::modelAboutToBeReset, this,           &QnPtzManageDialog::at_model_modelAboutToBeReset);
+    connect(m_model,    &QnPtzManageModel::modelReset,      this,               &QnPtzManageDialog::at_model_modelReset);
     connect(this,       &QnAbstractPtzDialog::synchronized, m_model,            &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
     connect(m_cache,    &QnLocalFileCache::fileDownloaded,  this,               &QnPtzManageDialog::at_cache_imageLoaded);
@@ -555,6 +556,28 @@ void QnPtzManageDialog::setPreview(const QImage &image) {
     } else {
         ui->previewStackedWidget->setCurrentWidget(ui->previewPage);
         ui->previewLabel->setPixmap(QPixmap::fromImage(image));
+    }
+}
+
+void QnPtzManageDialog::at_model_modelAboutToBeReset() {
+    QModelIndex index = ui->tableView->currentIndex();
+    if (index.isValid()) {
+        m_lastColumn = index.column();
+        m_lastRowData = m_model->rowData(index.row());
+    } else {
+        m_lastColumn = -1;
+        m_lastRowData.rowType = QnPtzManageModel::InvalidRow;
+    }
+}
+
+void QnPtzManageDialog::at_model_modelReset() {
+    if (!m_lastRowData.id().isEmpty()) {
+        int row = m_model->rowNumber(m_lastRowData);
+        if (row != -1) {
+            QModelIndex index = m_model->index(row, m_lastColumn);
+            ui->tableView->setCurrentIndex(index);
+            ui->tableView->closePersistentEditor(index);
+        }
     }
 }
 

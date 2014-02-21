@@ -5,6 +5,7 @@
 #include <core/ptz/ptz_fwd.h>
 
 #include <ui/dialogs/abstract_ptz_dialog.h>
+#include <ui/models/ptz_manage_model.h>
 #include <utils/common/singleton.h>
 
 namespace Ui {
@@ -60,6 +61,9 @@ private slots:
     void storePreview(const QString &id);
     void setPreview(const QImage &image);
 
+    void at_model_modelAboutToBeReset();
+    void at_model_modelReset();
+
 private:
     bool savePresets();
     bool saveTours();
@@ -73,6 +77,9 @@ private:
 
     QnLocalFileCache *m_cache;
     QSet<QString> m_pendingPreviews;
+
+    QnPtzManageModel::RowData m_lastRowData;
+    int m_lastColumn;
 
     QString m_currentTourId;
     bool m_submitting;
