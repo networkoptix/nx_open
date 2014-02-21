@@ -347,7 +347,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked() {
 }
 
 void QnPtzManageDialog::at_goToPositionButton_clicked() {
-    QModelIndex index = ui->tableView->selectionModel()->currentIndex();
+    QModelIndex index = ui->tableView->currentIndex();
     if (!index.isValid())
         return;
 
@@ -385,7 +385,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked() {
 }
 
 void QnPtzManageDialog::at_startTourButton_clicked() {
-    QModelIndex index = ui->tableView->selectionModel()->currentIndex();
+    QModelIndex index = ui->tableView->currentIndex();
     if (!index.isValid())
         return;
 
@@ -416,7 +416,6 @@ void QnPtzManageDialog::at_addTourButton_clicked() {
     //bool wasEmpty = m_model->rowCount() == 0;
     m_model->addTour();
     QModelIndex index = m_model->index(m_model->rowCount() - 1, 0);
-    ui->tableView->setCurrentIndex(index);
     //if (wasEmpty) { //TODO: check if needed
         // TODO: #Elric duplicate code with QnPtzTourWidget
         for(int i = 0; i < ui->tableView->horizontalHeader()->count(); i++)
@@ -424,13 +423,11 @@ void QnPtzManageDialog::at_addTourButton_clicked() {
                 ui->tableView->resizeColumnToContents(i);
     //}
 
-    ui->tableView->selectionModel()->clear();
-    ui->tableView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::Select);
-    ui->tableView->selectionModel()->select(index, QItemSelectionModel::Select);
+    ui->tableView->setCurrentIndex(index);
 }
 
 void QnPtzManageDialog::at_deleteButton_clicked() {
-    QModelIndex index = ui->tableView->selectionModel()->currentIndex();
+    QModelIndex index = ui->tableView->currentIndex();
     if (!index.isValid())
         return;
 
@@ -620,7 +617,7 @@ bool QnPtzManageDialog::checkForUnsavedChanges() {
 void QnPtzManageDialog::updateUi() {
     ui->addTourButton->setEnabled(!m_model->presetModels().isEmpty());
 
-    QModelIndex index = ui->tableView->selectionModel()->currentIndex();
+    QModelIndex index = ui->tableView->currentIndex();
     QnPtzManageModel::RowData selectedRow;
     if (index.isValid())
         selectedRow = m_model->rowData(index.row());
