@@ -519,6 +519,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
     context->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
+    application->setActivationWindow(mainWindow.data());
 
     if(screen != -1) {
         QDesktopWidget *desktop = qApp->desktop();
