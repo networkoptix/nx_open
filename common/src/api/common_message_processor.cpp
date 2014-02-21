@@ -1,6 +1,5 @@
 #include "common_message_processor.h"
 
-#include "api/ec2_message_source.h"
 #include <api/app_server_connection.h>
 #include "core/resource/media_server_resource.h"
 #include "core/resource/user_resource.h"
@@ -20,6 +19,9 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 {
     disconnect();
     m_connection = connection;
+
+    if (!connection)
+        return;
 
     connect( connection.get(), &ec2::AbstractECConnection::initNotification,
         this, &QnCommonMessageProcessor::on_gotInitialNotification );
