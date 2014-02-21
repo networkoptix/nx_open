@@ -68,6 +68,7 @@ private:
     bool savePresets();
     bool saveTours();
     bool saveHomePosition();
+    void enableDewarping();
 
 private:
     QScopedPointer<Ui::PtzManageDialog> ui;

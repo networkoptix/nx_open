@@ -125,7 +125,7 @@ PollSet::const_iterator& PollSet::const_iterator::operator++()       //++it
     while( m_impl->currentIndex < m_impl->pollSetImpl->receivedEventCount && 
            m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].filter == EVFILT_USER )
     {
-        continue;
+        m_impl->currentIndex++;
     }
     return *this;
 }
