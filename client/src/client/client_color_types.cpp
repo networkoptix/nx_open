@@ -43,6 +43,12 @@ QnTimeSliderColors::QnTimeSliderColors() {
     futureLastMinute = futureBackground;
 }
 
+QnTimeScrollBarColors::QnTimeScrollBarColors() {
+    indicator = QColor(255, 255, 255, 255);
+    border = QColor(255, 255, 255, 64);
+    handle = QColor(255, 255, 255, 48);
+}
+
 QnBackgroundColors::QnBackgroundColors() {
     normal = QColor(26, 26, 240, 40);
     panic = QColor(255, 0, 0, 255);
@@ -133,6 +139,12 @@ QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)
         (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)
         (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute), 
+    QJson::Optional
+)
+
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnTimeScrollBarColors, 
+    (indicator)(border)(handle), 
     QJson::Optional
 )
 

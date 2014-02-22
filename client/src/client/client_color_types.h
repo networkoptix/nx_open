@@ -35,6 +35,14 @@ public:
     QColor futureLastMinute;
 };
 
+struct QnTimeScrollBarColors {
+    QnTimeScrollBarColors();
+
+    QColor indicator;
+    QColor border;
+    QColor handle;
+};
+
 struct QnBackgroundColors {
     QnBackgroundColors();
 
@@ -99,7 +107,7 @@ struct QnPtzManageModelColors {
 };
 
 QN_DECLARE_FUNCTIONS_FOR_TYPES(
-    (QnTimeSliderColors)(QnBackgroundColors)(QnCalendarColors)(QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors), 
+    (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors)(QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors), 
     (metatype)(json)
 );
 

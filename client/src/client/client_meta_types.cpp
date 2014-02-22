@@ -63,6 +63,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnCustomization>();
 
     qRegisterMetaType<QnTimeSliderColors>();
+    qRegisterMetaType<QnTimeScrollBarColors>();
     qRegisterMetaType<QnBackgroundColors>();
     qRegisterMetaType<QnCalendarColors>();
     qRegisterMetaType<QnStatisticsColors>();
@@ -70,6 +71,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnGridColors>();
 
     QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
+    QnJsonSerializer::registerSerializer<QnTimeScrollBarColors>();
     QnJsonSerializer::registerSerializer<QnBackgroundColors>();
     QnJsonSerializer::registerSerializer<QnCalendarColors>();
     QnJsonSerializer::registerSerializer<QnStatisticsColors>();
