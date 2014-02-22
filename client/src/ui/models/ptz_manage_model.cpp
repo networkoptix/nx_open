@@ -595,9 +595,7 @@ QVariant QnPtzManageModel::presetData(const QnPtzPresetItemModel &presetModel, i
         return QVariant();
     case Qt::CheckStateRole:
         if (column == HomeColumn)
-            return m_homePosition == presetModel.preset.id 
-            ? Qt::Checked 
-            : Qt::Unchecked;
+            return m_homePosition == presetModel.preset.id ? Qt::Checked : Qt::Unchecked;
         break;
     case Qn::PtzPresetRole:
         return QVariant::fromValue<QnPtzPreset>(presetModel.preset);
@@ -652,7 +650,7 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
         break;
     case Qt::CheckStateRole:
         if (column == HomeColumn)
-            return m_homePosition == tourModel.tour.id;
+            return m_homePosition == tourModel.tour.id ? Qt::Checked : Qt::Unchecked;
         break;
     case Qn::PtzTourRole:
         return QVariant::fromValue<QnPtzTour>(tourModel.tour);
