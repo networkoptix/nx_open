@@ -578,7 +578,7 @@ namespace ec2
             \param fullSyncRequired If \a true, \a AbstractECConnection::initNotification signal is delivered before any other signal
             \note Calling entity MUST connect to all interesting signals prior to calling this method so that received data is consistent
         */
-        virtual void startReceivingNotifications( bool fullSyncRequired ) = 0;
+        virtual void startReceivingNotifications( bool fullSyncRequired, const QUuid& guid ) = 0;
 
         virtual AbstractResourceManagerPtr getResourceManager() = 0;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() = 0;

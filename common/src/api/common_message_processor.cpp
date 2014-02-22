@@ -9,6 +9,7 @@
 #include <business/business_event_rule.h>
 
 #include <core/resource_management/resource_pool.h>
+#include "common/common_module.h"
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     QObject(parent)
@@ -82,7 +83,7 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection->getStoredFileManager().get(), &ec2::AbstractStoredFileManager::removed,
         this, &QnCommonMessageProcessor::on_storedFileRemoved );
 
-    connection->startReceivingNotifications(true);
+    connection->startReceivingNotifications(true, qnCommon->moduleGUID());
 }
 
 

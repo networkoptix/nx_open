@@ -130,6 +130,8 @@
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resources/acti/acti_resource.h"
 #include "transaction/transaction_message_bus.h"
+#include "common/common_module.h"
+#include "utils/network/networkoptixmodulefinder.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -595,6 +597,7 @@ QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
     m_firstRunningTime(0),
+    m_moduleFinder(0),
     m_rtspListener(0),
     m_restServer(0),
     m_progressiveDownloadingServer(0),
@@ -663,6 +666,12 @@ void QnMain::stopObjects()
     {
         delete m_rtspListener;
         m_rtspListener = 0;
+    }
+
+    if (m_moduleFinder)
+    {
+        delete m_moduleFinder;
+        m_moduleFinder = 0;
     }
 
 }
@@ -835,6 +844,34 @@ void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
         qnSyncTime->currentUSecsSinceEpoch());
 }
 
+void QnMain::at_peerFound(
+    const QString& moduleType,
+    const QString& moduleVersion,
+    const QString& systemName,
+    const TypeSpecificParamMap& moduleParameters,
+    const QString& localInterfaceAddress,
+    const QString& remoteHostAddress,
+    bool isLocal,
+    const QString& moduleSeed )
+{
+    if (moduleVersion == QN_APPLICATION_VERSION && systemName == qnCommon->systemName()) 
+    {
+        int port = moduleParameters.value("port").toInt();
+        QString url = QString(lit("http://%1:%2/ec2/events?guid=%3")).arg(remoteHostAddress).arg(port).arg(qnCommon->moduleGUID().toString());
+        //QnTransactionMessageBus::instance()->addConnectionToPeer(url);
+    }
+}
+void QnMain::at_peerLost(
+    const QString& moduleType,
+    const TypeSpecificParamMap& moduleParameters,
+    const QString& remoteHostAddress,
+    bool isLocal,
+    const QString& moduleSeed )
+{
+    int port = moduleParameters.value("port").toInt();
+    QString url = QString(lit("http://%1:%2/ec2/events?guid=%3")).arg(remoteHostAddress).arg(port).arg(qnCommon->moduleGUID().toString());
+    //QnTransactionMessageBus::instance()->removeConnectionFromPeer(url);
+}
 
 void QnMain::initTcpListener()
 {
@@ -988,8 +1025,10 @@ void QnMain::run()
 
     CameraDriverRestrictionList cameraDriverRestrictionList;
 
+    QSettings* settings = MSSettings::roSettings();
+
     QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList));
-    initAppServerConnection(*MSSettings::roSettings());
+    initAppServerConnection(*settings);
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
@@ -1123,7 +1162,12 @@ void QnMain::run()
     m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid());
     m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
 
+    qnCommon->setModuleGUID(serverGuid());
+    qnCommon->setSystemName(settings->value("systemName").toString());
+
     QHostAddress publicAddress = getPublicAddress();
+
+    qnCommon->setModuleUlr(QString("http://%1:%2").arg(publicAddress.toString()).arg(m_universalTcpListener->getPort()));
 
     Qn::PanicMode pm;
     while (m_mediaServer.isNull())
@@ -1207,6 +1251,19 @@ void QnMain::run()
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
+
+    QObject::connect(
+        m_moduleFinder,
+        SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
+        this,
+        SLOT(at_peerFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
+        Qt::DirectConnection );
+    QObject::connect(
+        m_moduleFinder,
+        SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
+        this,
+        SLOT(at_peerLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
+        Qt::DirectConnection );
 
     // ------------------------------------------
 

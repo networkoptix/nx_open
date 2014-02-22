@@ -25,7 +25,7 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void Ec2DirectConnection::startReceivingNotifications( bool /*fullSyncRequired*/ )
+    void Ec2DirectConnection::startReceivingNotifications( bool /*fullSyncRequired*/, const QUuid& )
     {
         //TODO/IMPL
     }

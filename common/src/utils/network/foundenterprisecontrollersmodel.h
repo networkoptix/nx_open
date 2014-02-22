@@ -52,6 +52,7 @@ public slots:
     void remoteModuleFound(
         const QString& moduleID,
         const QString& moduleVersion,
+        const QString& systemName,
         const TypeSpecificParamMap& moduleParameters,
         const QString& localInterfaceAddress,
         const QString& remoteHostAddress,

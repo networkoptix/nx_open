@@ -86,7 +86,8 @@ private slots:
     void at_ec2ConnectFinished( int, ec2::ErrorCode, ec2::AbstractECConnectionPtr );
 #endif
 
-    void at_moduleFinder_moduleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed);
+    void at_moduleFinder_moduleFound(const QString& moduleID, const QString& moduleVersion, const QString& systemName, 
+                                     const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed);
     void at_moduleFinder_moduleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed );
 
 private:

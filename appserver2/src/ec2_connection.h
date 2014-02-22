@@ -30,7 +30,7 @@ namespace ec2
         //!Implementation of ec2::AbstractECConnection::connectionInfo
         virtual QnConnectionInfo connectionInfo() const override;
         //!Implementation of ec2::AbstractECConnection::startReceivingNotifications
-        virtual void startReceivingNotifications( bool fullSyncRequired ) override;
+        virtual void startReceivingNotifications( bool fullSyncRequired, const QUuid& guid ) override;
 
     private:
         StoredFileManagerImpl m_storedFileManagerImpl;

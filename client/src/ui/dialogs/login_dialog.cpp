@@ -124,11 +124,11 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     resetConnectionsModel();
     updateFocus();
 
-    m_moduleFinder = new NetworkOptixModuleFinder();
+    m_moduleFinder = new NetworkOptixModuleFinder(true);
     if (qnSettings->isDevMode())
         m_moduleFinder->setCompatibilityMode(true);
-    connect(m_moduleFinder,    SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
-            this,               SLOT(at_moduleFinder_moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)));
+    connect(m_moduleFinder,    SIGNAL(moduleFound(const QString&, const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
+            this,               SLOT(at_moduleFinder_moduleFound(const QString&, const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)));
     connect(m_moduleFinder,    SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
             this,               SLOT(at_moduleFinder_moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)));
     m_moduleFinder->start();
@@ -644,13 +644,14 @@ void QnLoginDialog::at_deleteButton_clicked() {
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed) {
+void QnLoginDialog::at_moduleFinder_moduleFound(const QString& moduleID, const QString& moduleVersion, const QString& systemName,
+                                                const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed) {
     Q_UNUSED(localInterfaceAddress)
 
     QString portId = QLatin1String("port");
 
-    if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
-        return;
+    //if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
+    //    return;
 
     QString host = isLocal ? QString::fromLatin1("127.0.0.1") : remoteHostAddress;
     QUrl url;
@@ -679,7 +680,7 @@ void QnLoginDialog::at_moduleFinder_moduleLost(const QString& moduleID, const Ty
     Q_UNUSED(remoteHostAddress)
     Q_UNUSED(isLocal)
 
-    if( moduleID != nxEntControllerId )
+    if( moduleID != nxMediaServerId )
         return;
     m_foundEcs.remove(seed);
 

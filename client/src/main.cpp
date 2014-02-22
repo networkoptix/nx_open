@@ -442,6 +442,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     ffmpegInit();
 
+    qnCommon->setModuleGUID(QUuid::createUuid());
+
     //===========================================================================
 
     CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );

@@ -12,12 +12,14 @@
 
 #include "utils/common/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
+#include "utils/network/networkoptixmodulerevealcommon.h"
 
 
 class QnAppserverResourceProcessor;
 class QnRtspListener;
 class QnRestServer;
 class QNetworkReply;
+class NetworkOptixModuleFinder;
 
 class QnMain : public QnLongRunnable
 {
@@ -42,6 +44,23 @@ private slots:
     void at_storageManager_rebuildFinished();
     void at_timer();
     void at_connectionOpened();
+
+    void at_peerFound(
+        const QString& moduleType,
+        const QString& moduleVersion,
+        const QString& systemName,
+        const TypeSpecificParamMap& moduleParameters,
+        const QString& localInterfaceAddress,
+        const QString& remoteHostAddress,
+        bool isLocal,
+        const QString& moduleSeed );
+    void at_peerLost(
+        const QString& moduleType,
+        const TypeSpecificParamMap& moduleParameters,
+        const QString& remoteHostAddress,
+        bool isLocal,
+        const QString& moduleSeed );
+
 private:
     void updateDisabledVendorsIfNeeded();
     void initTcpListener();
@@ -51,6 +70,7 @@ private:
     char** m_argv;
     qint64 m_firstRunningTime;
 
+    NetworkOptixModuleFinder* m_moduleFinder;
     QnRtspListener* m_rtspListener;
     QnRestServer* m_restServer;
     QnProgressiveDownloadingServer* m_progressiveDownloadingServer;
