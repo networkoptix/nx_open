@@ -28,6 +28,8 @@ public:
         return m_data;
     }
 
+    void add(const QnCustomization &data);
+
 private:
     QJsonObject m_data;
 };
