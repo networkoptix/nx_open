@@ -305,7 +305,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     int screen = -1;
     QString authenticationString, delayedDrop, instantDrop, logLevel;
     QString translationPath;
-    QString customizationPath = lit(":/skin_dark");
+    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
     bool skipMediaFolderScan = false;
     bool noFullScreen = false;
     bool noVersionMismatchCheck = false;
