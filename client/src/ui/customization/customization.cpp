@@ -3,6 +3,34 @@
 #include <utils/common/json.h>
 #include <utils/common/warnings.h>
 
+namespace {
+    QJsonObject mergeObjects(const QJsonObject &l, const QJsonObject &r) {
+        if(l.size() < r.size())
+            return mergeObjects(r, l); /* This will be faster. */
+
+        if(r.isEmpty())
+            return l;
+
+        QJsonObject result = l;
+
+        for(auto rPos = r.begin(); rPos != r.end(); rPos++) {
+            auto lPos = result.find(rPos.key());
+            if(lPos == result.end()) {
+                result.insert(rPos.key(), rPos.value());
+                continue;
+            }
+
+            if(rPos.value().type() == QJsonValue::Object && lPos.value().type() == QJsonValue::Object) {
+                *lPos = mergeObjects(lPos.value().toObject(), rPos.value().toObject());
+            } else {
+                *lPos = *rPos;
+            }
+        }
+
+        return result;
+    }
+} // anonymous namespace
+
 QnCustomization::QnCustomization() {
     return;
 }
@@ -16,3 +44,6 @@ QnCustomization::QnCustomization(const QString &fileName) {
         qnWarning("Customization file '%1' has invalid format.", fileName);
 }
 
+void QnCustomization::add(const QnCustomization &other) {
+    m_data = mergeObjects(m_data, other.m_data);
+}
