@@ -167,8 +167,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
 
     m_view.reset(new QnGraphicsView(m_scene.data()));
-    m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
-    m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);
 
     if (!(qnSettings->lightMode() & Qn::LightModeNoBackground)) {
@@ -292,8 +290,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_viewLayout->addWidget(m_view.data());
 
     m_globalLayout = new QVBoxLayout();
-    // set 1px border to make custom window border visible
-    m_globalLayout->setContentsMargins(1, 1, 1, 1);
+    m_globalLayout->setContentsMargins(0, 0, 0, 0);
     m_globalLayout->setSpacing(0);
     m_globalLayout->addLayout(m_titleLayout);
     m_globalLayout->addLayout(m_viewLayout);
