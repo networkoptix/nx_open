@@ -142,7 +142,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 #endif
 
     setAttribute(Qt::WA_AlwaysShowToolTips);
-    setPaletteColor(this, QPalette::Window, Qt::black);
 
     /* And file open events on Mac. */
     QnSingleEventSignalizer *fileOpenSignalizer = new QnSingleEventSignalizer(this);
