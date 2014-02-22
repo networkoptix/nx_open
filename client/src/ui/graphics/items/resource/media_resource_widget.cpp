@@ -965,23 +965,21 @@ void QnMediaResourceWidget::updateAspectRatio() {
         resourceId = networkResource->getPhysicalId();
 
     if(sourceSize.isEmpty()) {
-        setAspectRatio(
-                    dewarpingRatio * (
-                        resourceId.isEmpty()
-                        ? -1.0
-                        : qnSettings->resourceAspectRatios().value(resourceId, -1.0))
-                    );
+        qreal aspectRatio = resourceId.isEmpty()
+                            ? -1.0
+                            : qnSettings->resourceAspectRatios().value(resourceId, -1.0);
+
+        setAspectRatio(dewarpingRatio * aspectRatio);
     } else {
-        setAspectRatio(
-                    dewarpingRatio *
-                    QnGeometry::aspectRatio(sourceSize) *
-                    QnGeometry::aspectRatio(channelLayout()->size()) *
-                    (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()))
-        );
+        qreal aspectRatio = QnGeometry::aspectRatio(sourceSize) *
+                            QnGeometry::aspectRatio(channelLayout()->size()) *
+                            (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()));
+
+        setAspectRatio(dewarpingRatio * aspectRatio);
 
         if (!resourceId.isEmpty()) {
             QnAspectRatioHash aspectRatios = qnSettings->resourceAspectRatios();
-            aspectRatios.insert(resourceId, aspectRatio());
+            aspectRatios.insert(resourceId, aspectRatio);
             qnSettings->setResourceAspectRatios(aspectRatios);
         }
     }
