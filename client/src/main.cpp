@@ -358,11 +358,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     qnSettings->setVSyncEnabled(!noVSync);
 
-    QnCustomization customization;
-    customization.add(QnCustomization(customizationPath + lit("/customization.json")));
-    customization.add(QnCustomization(customizationPath + lit("/customization_child.json")));
+    QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 
-    QScopedPointer<QnSkin> skin(new QnSkin(customizationPath));
+    QnCustomization customization;
+    customization.add(QnCustomization(skin->path("customization.json")));
+    customization.add(QnCustomization(skin->path("customization_child.json")));
+
     QScopedPointer<QnCustomizer> customizer(new QnCustomizer(customization));
     customizer->customize(qnGlobals);
 
@@ -370,7 +371,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
     application->setStartDragDistance(20);
-    application->setStyle(skin->style()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
+    application->setStyle(skin->newStyle()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
 #ifdef Q_OS_MACX
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
