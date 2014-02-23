@@ -358,8 +358,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     qnSettings->setVSyncEnabled(!noVSync);
 
+    QnCustomization customization;
+    customization.add(QnCustomization(customizationPath + lit("/customization.json")));
+    customization.add(QnCustomization(customizationPath + lit("/customization_child.json")));
+
     QScopedPointer<QnSkin> skin(new QnSkin(customizationPath));
-    QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(customizationPath + lit("/customization.json"))));
+    QScopedPointer<QnCustomizer> customizer(new QnCustomizer(customization));
     customizer->customize(qnGlobals);
 
     /* Initialize application instance. */

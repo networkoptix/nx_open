@@ -2,18 +2,7 @@
 #define QN_CUSTOMIZATION_H
 
 #include <QtCore/QMetaType>
-#include <QtCore/QVariant>
-
-class QApplication;
-
-// TODO: #Elric:
-// use three customization files:
-// 
-// customization_common
-// customization_base
-// customization_child
-// 
-// Add QnCustomization::add(const QnCustomization &other) method that would merge'em.
+#include <QtCore/QJsonObject>
 
 class QnCustomization {
 public:
