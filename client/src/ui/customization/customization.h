@@ -6,8 +6,7 @@
 
 class QnCustomization {
 public:
-    QnCustomization();
-    explicit QnCustomization(const QString &fileName);
+    explicit QnCustomization(const QString &fileName = QString());
 
     bool isNull() const {
         return m_data.isEmpty();

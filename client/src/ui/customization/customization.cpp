@@ -31,11 +31,10 @@ namespace {
     }
 } // anonymous namespace
 
-QnCustomization::QnCustomization() {
-    return;
-}
-
 QnCustomization::QnCustomization(const QString &fileName) {
+    if(fileName.isEmpty())
+        return;
+
     QFile file(fileName);
     if(!file.open(QFile::ReadOnly))
         return;
