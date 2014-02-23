@@ -361,7 +361,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 
     QnCustomization customization;
-    customization.add(QnCustomization(skin->path("customization.json")));
+    customization.add(QnCustomization(skin->path("customization_common.json")));
+    customization.add(QnCustomization(skin->path("customization_base.json")));
     customization.add(QnCustomization(skin->path("customization_child.json")));
 
     QScopedPointer<QnCustomizer> customizer(new QnCustomizer(customization));
