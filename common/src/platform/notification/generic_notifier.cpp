@@ -42,10 +42,10 @@ void QnGenericNotifier::updateTimes(bool notify) {
     if(notify) {
         qint64 delta = elapsedTime - m_lastElapsedTime;
         if(isChanged(m_lastLocalTime, localTime, delta) || isChanged(m_lastUtcTime, utcTime, delta))
-            emit timeChanged();
+            this->notify(TimeValue);
 
         if(m_lastTimeZoneOffset != timeZoneOffset)
-            emit timeZoneChanged();
+            this->notify(TimeZoneValue);
     }
 
     m_lastElapsedTime = elapsedTime;

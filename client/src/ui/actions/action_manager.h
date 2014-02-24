@@ -28,6 +28,11 @@ class QnWorkbenchContext;
 class QnActionManager: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
+    enum CreationOption {
+        DontReuseActions = 0x1
+    };
+    Q_DECLARE_FLAGS(CreationOptions, CreationOption)
+
     /**
      * Default constructor.
      * 
@@ -88,9 +93,9 @@ public:
      *                                  Ownership of the created menu is passed to
      *                                  the caller.
      */
-    QMenu *newMenu(Qn::ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters());
+    QMenu *newMenu(Qn::ActionScope scope, QWidget *parent = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
 
-    QMenu *newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWidget *parent  = NULL, const QnActionParameters &parameters = QnActionParameters());
+    QMenu *newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWidget *parent  = NULL, const QnActionParameters &parameters = QnActionParameters(), CreationOptions options = 0);
 
     /**
      * \returns                         Action target provider that is assigned to this
@@ -136,7 +141,7 @@ protected:
 
     void copyAction(QAction *dst, QnAction *src, bool forwardSignals = true);
 
-    QMenu *newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget = NULL);
+    QMenu *newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options);
 
     bool redirectActionRecursive(QMenu *menu, Qn::ActionId targetId, QAction *targetAction);
 
@@ -170,6 +175,8 @@ private:
     /** Last menu that was shown to the user. */
     QObject *m_lastShownMenu;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnActionManager::CreationOptions)
 
 
 #endif // QN_ACTION_MANAGER_H

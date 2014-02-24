@@ -178,7 +178,7 @@ It might take a few moments to populate them in the tree.</numerusform>
 <context>
     <name>QnCameraListDialog</name>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="144"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="97"/>
         <source>Camera List - %n camera(s) found</source>
         <translation>
             <numerusform>Camera List - %n camera found</numerusform>
@@ -186,7 +186,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="146"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="99"/>
         <source>Camera List for &apos;%1&apos; - %n camera(s) found</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -431,24 +431,24 @@ It might take a few moments to populate them in the tree.</numerusform>
 <context>
     <name>QnPtzManageModel</name>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="535"/>
-        <source>This preset will be activated if PTZ is not changed for %n minutes</source>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="596"/>
+        <source>This preset will be activated after %n minutes of inactivity</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="637"/>
-        <source>Tour has %n same positions in a row at %1</source>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="704"/>
+        <source>Tour has %n identical positions</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="646"/>
-        <source>about %n minutes</source>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="713"/>
+        <source>about %n minute(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -546,7 +546,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1722"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1723"/>
         <source>Save changes to the following %n camera(s)?</source>
         <translation>
             <numerusform>Save changes to the following camera?</numerusform>
@@ -554,7 +554,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1966"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1977"/>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation>
             <numerusform>Are you sure you want to permanently delete this file?</numerusform>
@@ -562,7 +562,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1984"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1995"/>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation>
             <numerusform>Are you sure you want to remove this item from layout?</numerusform>
@@ -570,7 +570,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2069"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2080"/>
         <source>Do you really want to delete the following %n item(s)?</source>
         <translation>
             <numerusform>Do you really want to delete the following item?</numerusform>
@@ -599,7 +599,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2444"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2455"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
         <translation>
             <numerusform>Could not save the following item to Enterprise Controller.</numerusform>
@@ -607,7 +607,7 @@ It might take a few moments to populate them in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2467"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2478"/>
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation>
             <numerusform>Could not save changes made to the following resource.</numerusform>

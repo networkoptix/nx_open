@@ -79,7 +79,9 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
         return naturalStringCaseInsensitiveLessThan(l.name, r.name);
     });
 
-    QnPtzHotkeyHash idByHotkey = QnPtzHotkeysResourcePropertyAdaptor(widget->resource()->toResourcePtr()).value();
+    QnPtzHotkeysResourcePropertyAdaptor adaptor;
+    adaptor.setResource(widget->resource()->toResourcePtr());
+    QnPtzHotkeyHash idByHotkey = adaptor.value();
 
     foreach(const QnPtzPreset &preset, presets) {
         QAction *action = new QAction(parent);
@@ -95,8 +97,8 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
 
         action->setData(QVariant::fromValue(
             QnActionParameters(parameters)
-                .withArgument(Qn::PtzPresetIdRole, preset.id)
-                .withArgument(Qn::ActionIdRole, static_cast<int>(Qn::PtzGoToPresetAction))
+                .withArgument(Qn::PtzObjectIdRole, preset.id)
+                .withArgument(Qn::ActionIdRole, static_cast<int>(Qn::PtzActivatePresetAction))
         ));
         connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
 
@@ -126,8 +128,8 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
 
         action->setData(QVariant::fromValue(
             QnActionParameters(parameters)
-                .withArgument(Qn::PtzTourIdRole, tour.id)
-                .withArgument(Qn::ActionIdRole, static_cast<int>(Qn::PtzStartTourAction))
+                .withArgument(Qn::PtzObjectIdRole, tour.id)
+                .withArgument(Qn::ActionIdRole, static_cast<int>(Qn::PtzActivateTourAction))
         ));
         connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
 

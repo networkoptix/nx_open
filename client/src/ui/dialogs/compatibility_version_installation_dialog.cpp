@@ -88,7 +88,7 @@ void CompatibilityVersionInstallationDialog::onTimer( const quint64& /*timerID*/
             else if( status == api::InstallationStatus::success )
             {
                 m_state = State::succeeded;
-                QMetaObject::invokeMethod( this, "updateInstallationProgress", Qt::QueuedConnection, Q_ARG(float, installationProgress) );
+                QMetaObject::invokeMethod( this, "updateInstallationProgress", Qt::QueuedConnection, Q_ARG(float, 100.0) );
                 QMetaObject::invokeMethod( this, "onInstallationSucceeded", Qt::QueuedConnection );
             }
             else if( status == api::InstallationStatus::cancelled )

@@ -39,11 +39,12 @@ Q_DECLARE_METATYPE(QnPtzPresetRecordHash)
 // -------------------------------------------------------------------------- //
 QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseController): 
     base_type(baseController),
-    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzPresetRecordHash>(baseController->resource(), lit("ptzPresets"), QnPtzPresetRecordHash(), this))
+    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzPresetRecordHash>(lit("ptzPresets"), QnPtzPresetRecordHash(), this))
 {
     assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
-    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChangedExternally, this, [this]{ emit changed(Qn::PresetsPtzField); }, Qt::QueuedConnection);
+    m_adaptor->setResource(baseController->resource());
+    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::PresetsPtzField); }, Qt::QueuedConnection);
 }
 
 QnPresetPtzController::~QnPresetPtzController() {
@@ -120,15 +121,10 @@ bool QnPresetPtzController::removePreset(const QString &presetId) {
 }
 
 bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed) {
-    QnPtzPresetData data;
-    {
-        QMutexLocker locker(&m_mutex);
-
-        const QnPtzPresetRecordHash &records = m_adaptor->value();
-        if(!records.contains(presetId))
-            return false;
-        data = records.value(presetId).data;
-    }
+    const QnPtzPresetRecordHash &records = m_adaptor->value();
+    if(!records.contains(presetId))
+        return false;
+    QnPtzPresetData data = records.value(presetId).data;
 
     if(!absoluteMove(data.space, data.position, speed))
         return false;
@@ -137,12 +133,9 @@ bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
 }
 
 bool QnPresetPtzController::getPresets(QnPtzPresetList *presets) {
-    QMutexLocker locker(&m_mutex);
-
     presets->clear();
     foreach(const QnPtzPresetRecord &record, m_adaptor->value())
         presets->push_back(record.preset);
-
     return true;
 }
 

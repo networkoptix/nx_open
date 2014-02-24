@@ -24,14 +24,12 @@ QnTransactionTcpProcessor::QnTransactionTcpProcessor(QSharedPointer<AbstractStre
     QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket)
 {
     Q_UNUSED(_owner)
-    Q_D(QnTransactionTcpProcessor);
 
     setObjectName( "QnTransactionTcpProcessor" );
 }
 
 QnTransactionTcpProcessor::~QnTransactionTcpProcessor()
 {
-    Q_D(QnTransactionTcpProcessor);
     stop();
 }
 

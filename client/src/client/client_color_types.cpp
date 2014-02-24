@@ -43,6 +43,12 @@ QnTimeSliderColors::QnTimeSliderColors() {
     futureLastMinute = futureBackground;
 }
 
+QnTimeScrollBarColors::QnTimeScrollBarColors() {
+    indicator = QColor(255, 255, 255, 255);
+    border = QColor(255, 255, 255, 64);
+    handle = QColor(255, 255, 255, 48);
+}
+
 QnBackgroundColors::QnBackgroundColors() {
     normal = QColor(26, 26, 240, 40);
     panic = QColor(255, 0, 0, 255);
@@ -109,7 +115,6 @@ QColor QnStatisticsColors::networkByKey(const QString &key) const {
     return network[qMod(id, network.size())];
 }
 
-
 QnScheduleGridColors::QnScheduleGridColors() {
     normalLabel =   QColor(255, 255, 255, 255);
     weekendLabel =  QColor(255, 128, 128, 255);
@@ -117,19 +122,29 @@ QnScheduleGridColors::QnScheduleGridColors() {
     disabledLabel = QColor(183, 183, 183, 255);
 }
 
-
 QnGridColors::QnGridColors() {
     grid = QColor(0, 240, 240, 128);
     allowed = QColor(0, 255, 0, 64);
     disallowed = QColor(255, 0, 0, 64);
 }
 
+QnPtzManageModelColors::QnPtzManageModelColors() {
+    title = QColor(64, 64, 64);
+    invalid = QColor(64, 16, 16);
+    warning = QColor(64, 64, 16);
+}
 
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QnTimeSliderColors, 
     (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)
         (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)
         (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute), 
+    QJson::Optional
+)
+
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnTimeScrollBarColors, 
+    (indicator)(border)(handle), 
     QJson::Optional
 )
 
@@ -160,6 +175,12 @@ QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QnGridColors, 
     (grid)(allowed)(disallowed), 
+    QJson::Optional
+)
+
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnPtzManageModelColors, 
+    (title)(invalid)(warning), 
     QJson::Optional
 )
 

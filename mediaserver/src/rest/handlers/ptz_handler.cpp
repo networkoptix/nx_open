@@ -44,7 +44,7 @@ bool QnPtzHandler::checkSequence(const QString& id, int sequence)
     return true;
 }
 
-int QnPtzHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
+int QnPtzHandler::executePost(const QString &, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
     QString sequenceId;
     int sequenceNumber = -1;
     Qn::PtzCommand command;
@@ -228,10 +228,12 @@ int QnPtzHandler::executeGetPresets(const QnPtzControllerPtr &controller, const 
     return CODE_OK;
 }
 
-int QnPtzHandler::executeCreateTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
+int QnPtzHandler::executeCreateTour(const QnPtzControllerPtr &controller, const QnRequestParams &, const QByteArray &body, QnJsonRestResult &result) {
     QnPtzTour tour;
     if(!QJson::deserialize(body, &tour))
         return CODE_INVALID_PARAMETER;
+
+    // TODO: #Elric use result.
 
     if(!controller->createTour(tour))
         return CODE_INTERNAL_ERROR;
@@ -270,7 +272,7 @@ int QnPtzHandler::executeGetTours(const QnPtzControllerPtr &controller, const Qn
     return CODE_OK;
 }
 
-int QnPtzHandler::executeGetActiveObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzHandler::executeGetActiveObject(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result) {
     QnPtzObject activeObject;
     if(!controller->getActiveObject(&activeObject))
         return CODE_INTERNAL_ERROR;
@@ -291,7 +293,7 @@ int QnPtzHandler::executeUpdateHomeObject(const QnPtzControllerPtr &controller, 
     return CODE_OK;
 }
 
-int QnPtzHandler::executeGetHomeObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzHandler::executeGetHomeObject(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result) {
     QnPtzObject homeObject;
     if(!controller->getHomeObject(&homeObject))
         return CODE_INTERNAL_ERROR;

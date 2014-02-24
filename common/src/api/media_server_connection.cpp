@@ -21,7 +21,6 @@
 #include <utils/common/enum_name_mapper.h>
 
 #include <api/serializer/serializer.h>
-#include <api/serializer/pb_serializer.h>
 #include <event_log/events_serializer.h>
 
 #include "session_manager.h"

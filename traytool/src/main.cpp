@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    NetworkOptixModuleFinder nxModuleFinder;
+    NetworkOptixModuleFinder nxModuleFinder(false); // TODO: #EC2 why false?
     FoundEnterpriseControllersModel foundEnterpriseControllersModel( &nxModuleFinder );
     nxModuleFinder.start();
 

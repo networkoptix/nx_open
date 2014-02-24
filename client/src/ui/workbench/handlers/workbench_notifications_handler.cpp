@@ -23,7 +23,7 @@
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_adaptor(NULL),
+    m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this)),
     m_popupSystemHealthFilter(qnSettings->popupSystemHealth())
 {
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
@@ -82,7 +82,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
         return;
 
     const bool soundAction = businessAction->actionType() == BusinessActionType::PlaySoundRepeated;
-    if (!soundAction && !(m_adaptor && m_adaptor->isAllowed(eventType)))
+    if (!soundAction && !m_adaptor->isAllowed(eventType))
         return;
 
     emit businessActionAdded(businessAction);
@@ -170,8 +170,7 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged() {
     requestSmtpSettings();
     at_licensePool_licensesChanged();
 
-    delete m_adaptor;
-    m_adaptor = context()->user() ? new QnBusinessEventsFilterResourcePropertyAdaptor(context()->user(), this) : NULL;
+    m_adaptor->setResource(context()->user());
 }
 
 void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message) {

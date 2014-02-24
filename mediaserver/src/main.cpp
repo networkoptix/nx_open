@@ -1056,7 +1056,7 @@ void QnMain::run()
     while (!needToStop())
     {
         QString dbFileName = MSSettings::roSettings()->value( "eventsDBFilePath", closeDirPath(getDataDirectory()) + QString(lit("ecs.sqlite"))).toString();
-        QString urlString = QString("file://%1").arg(dbFileName);
+        QString urlString = QString("file:///%1").arg(dbFileName);
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QUrl(urlString), &ec2Connection );
         if( errorCode == ec2::ErrorCode::ok )
         {

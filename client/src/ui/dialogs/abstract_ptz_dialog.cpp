@@ -11,9 +11,11 @@
 #include <core/ptz/ptz_data.h>
 
 #include <ui/widgets/dialog_button_box.h>
+#include "utils/common/lexical.h"
 
 QnAbstractPtzDialog::QnAbstractPtzDialog(QWidget *parent, Qt::WindowFlags windowFlags) :
     base_type(parent, windowFlags),
+    QnWorkbenchContextAware(parent),
     m_loaded(false)
 {
     connect(this, &QnAbstractPtzDialog::synchronizeLater, this, &QnAbstractPtzDialog::synchronize, Qt::QueuedConnection);
@@ -68,7 +70,7 @@ void QnAbstractPtzDialog::synchronize(const QString &title) {
         m_controller->getData(requiredFields(), &data);
 
         QEventLoop loop;
-        connect(this,            SIGNAL(synchronized()),   &loop, SLOT(quit()));
+        connect(this, &QnAbstractPtzDialog::synchronized, &loop, &QEventLoop::quit);
 
         QList<QWidget*> disabled;
         QLayout* dialogLayout = this->layout();
@@ -80,9 +82,9 @@ void QnAbstractPtzDialog::synchronize(const QString &title) {
             if (QnDialogButtonBox* buttonBox = dynamic_cast<QnDialogButtonBox*>(widget)) {
                 buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
                 disabled << buttonBox->button(QDialogButtonBox::Ok);
-                connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked), &loop, SLOT(quit()));
+                connect(buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, &loop, &QEventLoop::quit);
                 buttonBox->showProgress(title);
-                connect(this, SIGNAL(synchronized()), buttonBox, SLOT(hideProgress()));
+                connect(this, &QnAbstractPtzDialog::synchronized, buttonBox, &QnDialogButtonBox::hideProgress);
             } else
                 disabled << widget;
         }

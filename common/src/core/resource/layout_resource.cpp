@@ -5,7 +5,6 @@
 
 #include <utils/common/warnings.h>
 #include "plugins/storage/file_storage/layout_storage_resource.h"
-#include "api/serializer/pb_serializer.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource_management/resource_pool.h"
 

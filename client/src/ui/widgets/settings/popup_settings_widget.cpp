@@ -27,7 +27,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::PopupSettingsWidget),
-    m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(context()->user(), this))
+    m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this))
 {
     ui->setupUi(this);
 
@@ -46,6 +46,8 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
         ui->systemHealthLayout->addWidget(checkbox);
         m_systemHealthCheckBoxes << checkbox;
     }
+
+    m_adaptor->setResource(context()->user()); // TODO: #Elric listen to changes?
 
     connect(ui->showAllCheckBox,    &QCheckBox::toggled,                                this,   &QnPopupSettingsWidget::at_showAllCheckBox_toggled);
     connect(m_adaptor,              &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnPopupSettingsWidget::at_showBusinessEvents_valueChanged);

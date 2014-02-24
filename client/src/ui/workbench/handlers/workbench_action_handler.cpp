@@ -952,7 +952,8 @@ void QnWorkbenchActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
-    layout->setName(generateUniqueLayoutName(context()->user(), tr("New layout")));
+
+    layout->setName(generateUniqueLayoutName(context()->user(), tr("New layout"), tr("New layout %1")));
 
     workbench()->addLayout(layout);
     workbench()->setCurrentLayout(layout);
@@ -1054,9 +1055,9 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
 
     if (!resources.empty()) {
         parameters.setResources(resources);
-        if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters))
+        if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters)) {
             menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
-        else {
+        } else {
             QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
             if (layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout)) {
                 bool hasLocal = false;
@@ -1068,7 +1069,7 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
                         break;
                 }
                 if (hasLocal)
-                    QMessageBox::warning(mainWindow(),
+                    QMessageBox::warning(mainWindow(), 
                                          tr("Cannot add item"),
                                          tr("Cannot add a local file to Multi-Video"));
             }
@@ -1908,14 +1909,24 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     if(!server)
         return;
 
+    QUrl serverUrl = server->getApiUrl();
+    
     // TODO: #Elric total encapsulation failure, there should be no proxy-related logic here.
-    QString url;
+    QUrl url;
     if(!server->getProxyHost().isEmpty()) {
-        QUrl apiUrl(server->getApiUrl());
-        url = QString(lit("http://%1:%2/proxy/%3:%4/api/showLog?lines=1000")).arg(server->getProxyHost()).arg(server->getProxyPort()).arg(apiUrl.host()).arg(apiUrl.port());
+        url.setScheme(lit("http"));
+        url.setHost(server->getProxyHost());
+        url.setPort(server->getProxyPort());
+        url.setPath(lit("/proxy/%4:%5/api/showLog").arg(serverUrl.host()).arg(serverUrl.port()));
     } else {
-        url = server->getApiUrl() + lit("/api/showLog?lines=1000");
+        url = serverUrl;
+        url.setPath(lit("/api/showLog"));
     }
+    url.setQuery(lit("lines=1000"));
+
+    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
+    url.setUserName(lastUsedConnection.url.userName());
+    url.setPassword(lastUsedConnection.url.password());
     
     QDesktopServices::openUrl(url);
 }

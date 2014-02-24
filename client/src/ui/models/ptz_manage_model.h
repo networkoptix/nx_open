@@ -1,5 +1,5 @@
-#ifndef PTZ_TOUR_LIST_MODEL_H
-#define PTZ_TOUR_LIST_MODEL_H
+#ifndef QN_PTZ_MANAGE_MODEL_H
+#define QN_PTZ_MANAGE_MODEL_H
 
 #include <QtCore/QAbstractTableModel>
 #include <QtCore/QUuid>
@@ -8,6 +8,9 @@
 #include <core/ptz/ptz_preset.h>
 
 #include <client/client_model_types.h>
+#include <client/client_color_types.h>
+
+#include <ui/customization/customized.h>
 
 struct QnPtzTourItemModel {
     QnPtzTourItemModel(){}
@@ -57,11 +60,12 @@ struct QnPtzPresetItemModel {
     bool local;
 };
 
-class QnPtzManageModel : public QAbstractTableModel
-{
-    Q_OBJECT
 
-    typedef QAbstractTableModel base_type;
+class QnPtzManageModel : public Customized<QAbstractTableModel> {
+    Q_OBJECT
+    Q_PROPERTY(QnPtzManageModelColors colors READ colors WRITE setColors)
+    typedef Customized<QAbstractTableModel> base_type;
+
 public:
     enum Column {
         ModifiedColumn,
@@ -99,6 +103,9 @@ public:
 
     explicit QnPtzManageModel(QObject *parent = 0);
     virtual ~QnPtzManageModel();
+
+    const QnPtzManageModelColors colors() const;
+    void setColors(const QnPtzManageModelColors &colors);
 
     const QList<QnPtzTourItemModel> &tourModels() const;
     const QStringList &removedTours() const;
@@ -139,6 +146,9 @@ public:
     bool synchronized() const;
     Q_SLOT void setSynchronized();
 
+    // TODO: #GDM I've moved this one to public. Implement properly.
+    bool tourIsValid(const QnPtzTourItemModel &tourModel) const;
+
 signals:
     void presetsChanged(const QnPtzPresetList &presets);
 
@@ -153,7 +163,6 @@ private:
     const QnPtzPresetList& presets() const;
 
     qint64 estimatedTimeSecs(const QnPtzTour &tour) const;
-    bool tourIsValid(const QnPtzTourItemModel &tourModel) const;
     TourState tourState(const QnPtzTourItemModel &tourModel, QString *stateString = NULL) const;
     void updatePresetsCache();
 
@@ -165,6 +174,12 @@ private:
     int tourIndex(const QString &id) const;
 
     void setHomePositionInternal(const QString &homePosition, bool setChanged);
+
+    QStringList collectTourNames() const;
+    QStringList collectPresetNames() const;
+
+private:
+    QnPtzManageModelColors m_colors;
 
     QList<QnPtzPresetItemModel> m_presets;
     QStringList m_removedPresets;
@@ -179,4 +194,5 @@ private:
     QnPtzPresetList m_ptzPresetsCache;
 };
 
-#endif // PTZ_TOUR_LIST_MODEL_H
+#endif // QN_PTZ_MANAGE_MODEL_H
+

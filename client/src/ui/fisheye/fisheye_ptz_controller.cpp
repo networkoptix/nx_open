@@ -264,11 +264,10 @@ bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QV
 
         m_progress = 0.0;
 
-        /* This is not 100% correct, a better way would be to calculate combined 
-         * pan-tilt time. */ // TODO: #Elric #PTZ
         QVector3D distance = m_endPosition - m_startPosition;
-        QVector3D times = QVector3D(qAbs(distance.x() / m_unitSpeed.x()), qAbs(distance.y() / m_unitSpeed.y()), qAbs(distance.z() / m_unitSpeed.z()));
-        m_relativeSpeed = 1.0 / qMax(qMax(times.x(), times.y()), times.z());
+        qreal panTiltTime = QVector2D(distance.x() / m_unitSpeed.x(), distance.y() / m_unitSpeed.y()).length();
+        qreal zoomTime = distance.z() / m_unitSpeed.z();
+        m_relativeSpeed = 1.0 / qMax(panTiltTime, zoomTime);
         
         startListening();
     }

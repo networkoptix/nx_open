@@ -23,6 +23,7 @@
 #include <core/ptz/tour_ptz_controller.h>
 #include <core/ptz/fallback_ptz_controller.h>
 #include <core/ptz/activity_ptz_controller.h>
+#include <core/ptz/home_ptz_controller.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -143,6 +144,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     fisheyeController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
     fisheyeController.reset(new QnPresetPtzController(fisheyeController));
     fisheyeController.reset(new QnTourPtzController(fisheyeController));
+    fisheyeController.reset(new QnHomePtzController(fisheyeController));
     fisheyeController.reset(new QnActivityPtzController(QnActivityPtzController::Local, fisheyeController));
 
     if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {
@@ -963,23 +965,21 @@ void QnMediaResourceWidget::updateAspectRatio() {
         resourceId = networkResource->getPhysicalId();
 
     if(sourceSize.isEmpty()) {
-        setAspectRatio(
-                    dewarpingRatio * (
-                        resourceId.isEmpty()
-                        ? -1.0
-                        : qnSettings->resourceAspectRatios().value(resourceId, -1.0))
-                    );
+        qreal aspectRatio = resourceId.isEmpty()
+                            ? -1.0
+                            : qnSettings->resourceAspectRatios().value(resourceId, -1.0);
+
+        setAspectRatio(dewarpingRatio * aspectRatio);
     } else {
-        setAspectRatio(
-                    dewarpingRatio *
-                    QnGeometry::aspectRatio(sourceSize) *
-                    QnGeometry::aspectRatio(channelLayout()->size()) *
-                    (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()))
-        );
+        qreal aspectRatio = QnGeometry::aspectRatio(sourceSize) *
+                            QnGeometry::aspectRatio(channelLayout()->size()) *
+                            (zoomRect().isNull() ? 1.0 : QnGeometry::aspectRatio(zoomRect()));
+
+        setAspectRatio(dewarpingRatio * aspectRatio);
 
         if (!resourceId.isEmpty()) {
             QnAspectRatioHash aspectRatios = qnSettings->resourceAspectRatios();
-            aspectRatios.insert(resourceId, aspectRatio());
+            aspectRatios.insert(resourceId, aspectRatio);
             qnSettings->setResourceAspectRatios(aspectRatios);
         }
     }
@@ -1054,7 +1054,7 @@ void QnMediaResourceWidget::at_zoomRectChanged() {
     updateAspectRatio();
     updateIconButton();
 
-    // TODO: #PTZ
+    // TODO: #PTZ probably belongs to instrument.
     if (options() & DisplayDewarped)
         m_ptzController->absoluteMove(Qn::LogicalPtzCoordinateSpace, QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()), 2.0);
 }

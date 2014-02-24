@@ -10,7 +10,7 @@
 #include "compatibility.h"
 
 struct QnConnectionInfo {
-    QnConnectionInfo(): proxyPort(0), allowCameraChanges(true) {}
+    QnConnectionInfo(): proxyPort(0) {}
 
     QUrl ecUrl;
     QnSoftwareVersion version;
@@ -19,14 +19,13 @@ struct QnConnectionInfo {
     QString ecsGuid;
     QString publicIp;
     QString brand;
-    bool allowCameraChanges;
 
 };
 
 Q_DECLARE_METATYPE( QnConnectionInfo );
 
 //TODO: #ak serialize version and compatibilityItems
-QN_DEFINE_STRUCT_SERIALIZATORS (QnConnectionInfo, (version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand)(allowCameraChanges) )
+QN_DEFINE_STRUCT_SERIALIZATORS (QnConnectionInfo, (version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand))
 
 // TODO: #Elric remove shared pointer?
 typedef QSharedPointer<QnConnectionInfo> QnConnectionInfoPtr;

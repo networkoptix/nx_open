@@ -3,6 +3,8 @@
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
 
+#include <api/serializer/pb_serializer.h>
+
 #include <business/business_event_rule.h>
 
 #include "core/resource/resource_type.h"
@@ -918,6 +920,15 @@ int QnAppServerConnection::resetBusinessRulesAsync(QObject *target, const char *
 // -------------------------------------------------------------------------- //
 Q_GLOBAL_STATIC(QnAppServerConnectionFactory, qn_appServerConnectionFactory_instance)
 
+QnAppServerConnectionFactory::QnAppServerConnectionFactory(): 
+    m_defaultMediaProxyPort(0), 
+    m_serializer(new QnApiPbSerializer())
+{}
+
+QnAppServerConnectionFactory::~QnAppServerConnectionFactory() {
+    return;
+}
+
 void QnAppServerConnectionFactory::setDefaultMediaProxyPort(int port)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
@@ -972,17 +983,6 @@ void QnAppServerConnectionFactory::setSessionKey(const QByteArray& sessionKey)
             factory->m_sessionKey = sessionKey.trimmed();
         }
     }
-}
-
-void QnAppServerConnectionFactory::setAllowCameraCHanges(bool value)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
-            factory->m_allowCameraChanges = value;
-}
-
-bool QnAppServerConnectionFactory::isAllowCameraCHanges()
-{
-    return qn_appServerConnectionFactory_instance()->m_allowCameraChanges;
 }
 
 void QnAppServerConnectionFactory::setPublicIp(const QString &publicIp)
