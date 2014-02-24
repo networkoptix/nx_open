@@ -19,8 +19,8 @@ class QnWorkbenchLayoutSnapshotManager;
 
 class QnResourcePoolModel : public QAbstractItemModel, public QnWorkbenchContextAware {
     Q_OBJECT
-
     typedef QAbstractItemModel base_type;
+
 public:
     explicit QnResourcePoolModel(Qn::NodeType rootNodeType = Qn::RootNode, bool isFlat = false, QObject *parent = NULL);
     virtual ~QnResourcePoolModel();
@@ -48,6 +48,7 @@ public:
     void setUrlsShown(bool urlsShown);
 
     Qn::NodeType rootNodeType() const;
+
 private:
     class Node;
 

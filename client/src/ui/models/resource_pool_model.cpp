@@ -68,12 +68,7 @@ public:
         m_modified(false),
         m_checked(Qt::Unchecked)
     {
-        assert(type == Qn::LocalNode ||
-               type == Qn::ServersNode ||
-               type == Qn::UsersNode ||
-               type == Qn::RootNode ||
-               type == Qn::BastardNode ||
-               type == Qn::RecorderNode);
+        assert(type != Qn::ResourceNode && type != Qn::ItemNode);
 
         switch(type) {
         case Qn::RootNode:
@@ -342,10 +337,7 @@ public:
 
     Qt::ItemFlags flags(int column) const {
         if (column == Qn::CheckColumn)
-            return Qt::ItemIsEnabled
-                    | Qt::ItemIsSelectable
-                    | Qt::ItemIsUserCheckable
-                    | Qt::ItemIsEditable;
+            return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
 
         Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
         
@@ -554,6 +546,7 @@ private:
 
     /** Recorder children of this node by group id. */
     QHash<QString, Node *> m_recorders;
+
 
     /* Resource-related state. */
 
