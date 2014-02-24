@@ -138,7 +138,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_drawCustomFrame(false)
 {
 #ifdef Q_OS_MACX
-    mac_initFullScreen((void*)winId(), (void*)this);
+    // TODO: #GDM check the neccesarity of this line. In Maveric fullscreen animation works fine without it.
+    // But with this line Mac OS shows white background in place of QGraphicsView when application enters or
+    // exits fullscreen mode.
+//    mac_initFullScreen((void*)winId(), (void*)this);
 #endif
 
     setAttribute(Qt::WA_AlwaysShowToolTips);
