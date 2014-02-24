@@ -34,10 +34,12 @@ signals:
     void businessRuleDeleted(QnId id);
     void businessRuleReset(QnBusinessEventRuleList rules);
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
+
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) = 0;
     virtual void onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status) = 0;
     virtual void updateResource(QnResourcePtr resource) = 0;
+
 private slots:
     void on_gotInitialNotification( ec2::QnFullResourceData fullData );
     void on_runtimeInfoChanged( const ec2::QnRuntimeInfo& runtimeInfo );

@@ -1,7 +1,5 @@
 #include "events_handler.h"
 
-#include "api/serializer/pb_serializer.h"
-
 #include "business/actions/abstract_business_action.h"
 
 #include <core/resource/camera_resource.h>

@@ -12,7 +12,7 @@
 #include <business/events/abstract_business_event.h>
 #include <business/actions/abstract_business_action.h>
 
-#include <api/serializer/pb_serializer.h>
+class QnApiSerializer;
 
 /*
 * High level business message transport.
@@ -33,6 +33,7 @@ public:
 
     /** Delivery action to other module */
     int deliveryBusinessAction(const QnAbstractBusinessActionPtr &bAction, const QnResourcePtr &res, const QUrl& url);
+
 signals:
     /** Action successfully delivered to other module*/
     void actionDelivered(const QnAbstractBusinessActionPtr &action);
@@ -42,17 +43,20 @@ signals:
 
     /** Action received from other module */
     void actionReceived(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &res);
+
 public slots:
     /** Action received from other module */
     void at_actionReceived(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &res);
+
 private slots:
     void at_replyFinished(QNetworkReply* reply);
+
 private:
     QNetworkAccessManager m_transport;
     typedef QMap<QNetworkReply*, QnAbstractBusinessActionPtr> ActionMap;
     ActionMap m_actionsInProgress;
     mutable QMutex m_mutex;
-    QnApiPbSerializer m_serializer;
+    QScopedPointer<QnApiSerializer> m_serializer;
 };
 
 #define qnBusinessMessageBus QnBusinessMessageBus::instance()

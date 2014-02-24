@@ -3,6 +3,8 @@
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
 
+#include <api/serializer/pb_serializer.h>
+
 #include <business/business_event_rule.h>
 
 #include "core/resource/resource_type.h"
@@ -917,6 +919,16 @@ int QnAppServerConnection::resetBusinessRulesAsync(QObject *target, const char *
 // QnAppServerConnectionFactory
 // -------------------------------------------------------------------------- //
 Q_GLOBAL_STATIC(QnAppServerConnectionFactory, qn_appServerConnectionFactory_instance)
+
+QnAppServerConnectionFactory::QnAppServerConnectionFactory(): 
+    m_defaultMediaProxyPort(0), 
+    m_allowCameraChanges(true),
+    m_serializer(new QnApiPbSerializer())
+{}
+
+QnAppServerConnectionFactory::~QnAppServerConnectionFactory() {
+    return;
+}
 
 void QnAppServerConnectionFactory::setDefaultMediaProxyPort(int port)
 {

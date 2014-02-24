@@ -13,7 +13,6 @@
 
 #include <api/model/servers_reply.h>
 #include <api/model/connection_info.h>
-#include <api/serializer/pb_serializer.h>
 
 #include "api_fwd.h"
 #include "abstract_connection.h"
@@ -217,7 +216,8 @@ private:
 class QN_EXPORT QnAppServerConnectionFactory 
 {
 public:
-    QnAppServerConnectionFactory(): m_defaultMediaProxyPort(0), m_allowCameraChanges(true) {}
+    QnAppServerConnectionFactory();
+    virtual ~QnAppServerConnectionFactory();
 
     static QString authKey();
     static QString clientGuid();
@@ -264,7 +264,7 @@ private:
     int m_defaultMediaProxyPort;
     QnSoftwareVersion m_currentVersion;
     QnResourceFactory *m_resourceFactory;
-    QnApiPbSerializer m_serializer;
+    QScopedPointer<QnApiSerializer> m_serializer;
     bool m_allowCameraChanges;
 };
 
