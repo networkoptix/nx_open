@@ -3,6 +3,7 @@
 #include "transaction/transaction_message_bus.h"
 #include "nx_ec/data/ec2_full_data.h"
 #include "database/db_manager.h"
+#include "common/common_module.h"
 
 namespace ec2
 {
@@ -44,8 +45,12 @@ void QnTransactionTcpProcessor::run()
     }
     parseRequest();
     d->chunkedMode = true;
+    d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
     sendResponse("HTTP", CODE_OK, "application/octet-stream");
-    QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, d->request.requestLine.url.query().contains("fullsync"));
+
+    bool needFullSync = d->request.requestLine.url.query().contains("fullsync");
+    QUuid remoteGuid  = QUrlQuery(d->request.requestLine.url.query()).queryItemValue(lit("guid"));
+    QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, remoteGuid, needFullSync);
     d->socket.clear();
 }
 

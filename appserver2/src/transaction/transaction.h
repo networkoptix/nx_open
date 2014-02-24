@@ -127,6 +127,8 @@ namespace ec2
         ApiCommand::Value command;
         ID id;
         bool persistent;
+        
+        QUuid originGuid; // this field doesn't serializable and uses local only. 
     };
 
     template <class T>

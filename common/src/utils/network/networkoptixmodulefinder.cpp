@@ -34,7 +34,7 @@ NetworkOptixModuleFinder::NetworkOptixModuleFinder(
     m_pingTimeoutMillis( pingTimeoutMillis == 0 ? defaultPingTimeoutMillis : pingTimeoutMillis ),
     m_keepAliveMultiply( keepAliveMultiply == 0 ? keepAliveMultiply : defaultKeepAliveMultiply ),
     m_prevPingClock( 0 ),
-    m_compatibilityMode(false),
+    m_compatibilityMode(true),
     m_serverSocket(0)
 {
     if (!clientOnly)

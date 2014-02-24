@@ -25,7 +25,7 @@ void QnTransactionTransport::ensureSize(std::vector<quint8>& buffer, int size)
 void QnTransactionTransport::addData(const QByteArray& data)
 {
     QMutexLocker lock(&mutex);
-    if (dataToSend.isEmpty())
+    if (dataToSend.isEmpty() && socket)
         aio::AIOService::instance()->watchSocket( socket, PollSet::etWrite, this );
     dataToSend.push_back(data);
 }
@@ -195,6 +195,11 @@ void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr clien
     nx_http::AsyncHttpClient::State state = client->state();
     if (state == nx_http::AsyncHttpClient::sFailed)
         processError();
+    else {
+        nx_http::HttpHeaders::const_iterator itr = client->response()->headers.find("guid");
+        if (itr != client->response()->headers.end())
+            remoteGuid = itr->second;
+    }
 }
 
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
@@ -249,12 +254,15 @@ bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(ApiCommand::
     QnTransaction<T2> tran;
     if (!tran.deserialize(command, &stream))
         return false;
-    m_handler->processTransaction<T2>(tran);
+    
+    // trigger notification
+    m_handler->processTransaction<T2>(tran); 
+
     return true;
 }
 
 template <class T>
-bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QByteArray& data)
+bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(const QByteArray& data)
 {
     Q_ASSERT(data.size() > 4);
     InputBinaryStream<QByteArray> stream(data);
@@ -369,9 +377,10 @@ void QnTransactionMessageBus::toFormattedHex(quint8* dst, quint32 payloadSize)
     }
 }
 
-void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool doFullSync)
+void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QUuid& remoteGuid, bool doFullSync)
 {
     QnTransactionTransport* transport = new QnTransactionTransport(this);
+    transport->remoteGuid = remoteGuid;
     transport->isClientSide = false;
     transport->socket = socket;
     int handle = socket->handle();

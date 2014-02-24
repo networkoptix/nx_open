@@ -15,6 +15,7 @@
 #include <utils/network/http/httptypes.h>
 
 #include "server_query_processor.h"
+#include "common/common_module.h"
 
 
 namespace ec2
@@ -56,6 +57,10 @@ namespace ec2
             ApiCommand::Value command;
             if (!QnBinary::deserialize(command, &stream) || !tran.deserialize(command, &stream))
                 return nx_http::StatusCode::badRequest;
+            
+            // replace client GUID to own GUID (take transaction ownership).
+            tran.originGuid = tran.id.peerGUID;
+            tran.id.peerGUID = qnCommon->moduleGUID();
 
 
             ErrorCode errorCode = ErrorCode::ok;

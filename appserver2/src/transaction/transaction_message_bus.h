@@ -29,6 +29,7 @@ namespace ec2
         };
 
         QUrl remoteAddr;
+        QUuid remoteGuid;
         nx_http::AsyncHttpClientPtr httpClient;
         State state;
         qint64 lastConnectTime;
@@ -75,7 +76,7 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url);
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool doFullSync);
+        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QUuid& remoteGuid, bool doFullSync);
         
         template <class T>
         void setHandler(T* handler) { 
@@ -107,8 +108,11 @@ namespace ec2
             QByteArray buffer;
             serializeTransaction(buffer, tran);
             QMutexLocker lock(&m_mutex);
-            foreach(QnTransactionTransport* transport, m_connections)
-                transport->addData(buffer);
+            foreach(QnTransactionTransport* transport, m_connections) 
+            {
+                if (transport->remoteGuid != tran.id.peerGUID && transport->remoteGuid != tran.originGuid)
+                    transport->addData(buffer); // do not send transaction to originator
+            }
         }
     private:
         friend class QnTransactionTransport;
@@ -116,7 +120,7 @@ namespace ec2
         class AbstractHandler
         {
         public:
-            virtual bool processByteArray(QByteArray& data) = 0;
+            virtual bool processByteArray(const QByteArray& data) = 0;
             virtual ~AbstractHandler() {}
         };
 
@@ -126,14 +130,14 @@ namespace ec2
         public:
             CustomHandler(T* handler): m_handler(handler) {}
 
-            virtual bool processByteArray(QByteArray& data) override;
+            virtual bool processByteArray(const QByteArray& data) override;
         private:
             template <class T2> bool deliveryTransaction(ApiCommand::Value command, InputBinaryStream<QByteArray>& stream);
         private:
             T* m_handler;
         };
 
-        void gotTransaction(QByteArray data)
+        void gotTransaction(const QByteArray& data)
         {
             QMutexLocker lock(&m_mutex);
             if (m_handler)
@@ -148,16 +152,6 @@ namespace ec2
         QMutex m_mutex;
         QThread *m_thread;
 
-        /*
-        class QnTransactionTransport
-        {
-        public:
-            virtual void connect();
-            virtual void send();
-            virtual void receive();
-        };
-        */
-        
         QVector<QnTransactionTransport*> m_connections;
     };
 }
