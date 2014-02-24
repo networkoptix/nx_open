@@ -1069,7 +1069,7 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
                         break;
                 }
                 if (hasLocal)
-                    QMessageBox::warning(mainWindow(),
+                    QMessageBox::warning(mainWindow(), 
                                          tr("Cannot add item"),
                                          tr("Cannot add a local file to Multi-Video"));
             }
