@@ -10,12 +10,11 @@
 #include <vector>
 
 #include <QtNetwork/QHostAddress>
-#include <QtCore/QThread>
+
+#include <utils/common/long_runnable.h>
 
 #include "networkoptixmodulerevealcommon.h"
 #include "aio/pollset.h"
-#include "../common/long_runnable.h"
-
 
 class AbstractDatagramSocket;
 
@@ -39,7 +38,7 @@ public:
 
     //!Creates socket and binds it to random unused udp port
     /*!
-        One must call \a isValid after object instanciation to check wthether it has been initialized successfully
+        One must call \a isValid after object instantiation to check whether it has been initialized successfully
 
         \param multicastGroupAddress
         \param multicastGroupPort
@@ -53,25 +52,27 @@ public:
         const unsigned int keepAliveMultiply = defaultKeepAliveMultiply );
     virtual ~NetworkOptixModuleFinder();
 
-    //!Returns true, if object has been succesfully initialized (socket is created and binded to local address)
+    //!Returns true, if object has been successfully initialized (socket is created and binded to local address)
     bool isValid() const;
 
     /**
-     * Returns true if compatibility mode is ON.
-     * In this mode all EC are supported regardless of its customization.
-     * Default value is OFF.
+     * \returns                         Whether this module finder is working in compatibility mode.
+     *                                  In this mode all EC are supported regardless of customization.
      */
     bool isCompatibilityMode() const;
 
     /**
-     * Set compatibility mode. In this mode all EC are supported regardless of its customization.
+     * \param compatibilityMode         New compatibility mode state.
      */
-    void setCompatibilityMode(bool value);
+    void setCompatibilityMode(bool compatibilityMode);
+
 public slots:
     virtual void pleaseStop() override;
 
 signals:
-    //!Emmited when new enterprise controller has been found
+    // TODO: #Elric deal with +inf number of args here
+
+    //!Emitted when new enterprise controller has been found
     /*!
         \param moduleType type, reported by module
         \param moduleVersion

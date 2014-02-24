@@ -46,6 +46,9 @@ bool QnX11LauncherWorkaround::isUnity3DSession() {
     if (qgetenv("XDG_CURRENT_DESKTOP") != "Unity")
         return false;
 
+    /* There is appeared case to disable fullscreen in Unity-2D too. We'll enable it later. */
+    return true;
+
     bool hasUnityPanelService = false;
 
     QDir procDir(lit("/proc"));

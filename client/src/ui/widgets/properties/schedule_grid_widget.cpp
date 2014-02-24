@@ -10,14 +10,10 @@
 #include "ui/style/globals.h"
 #include "client/client_settings.h"
 #include "utils/math/color_transformations.h"
+#include <utils/math/linear_combination.h>
 #include "core/resource/media_resource.h"
 
 namespace {
-
-    const QColor NORMAL_LABEL_COLOR(255,255,255);
-    const QColor WEEKEND_LABEL_COLOR(255,128,128);
-    QColor SELECTED_LABEL_COLOR(64,128, 192);
-    const int DISABLED_COLOR_SHIFT = -72;
 
     const int WEEK_SIZE = 7;
     const int TEXT_SPACING = 4;
@@ -41,11 +37,11 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     m_defaultParams[QualityParam] = Qn::QualityNormal;
     m_defaultParams[RecordTypeParam] = Qn::RecordingType_Run;
 
-    m_insideColors[Qn::RecordingType_Never] = m_colors[Qn::RecordingType_Never] = qnGlobals->noRecordColor();
-    m_insideColors[Qn::RecordingType_MotionOnly] = m_colors[Qn::RecordingType_MotionOnly] = qnGlobals->recordMotionColor();
-    m_insideColors[Qn::RecordingType_Run] = m_colors[Qn::RecordingType_Run] = qnGlobals->recordAlwaysColor();
+    m_insideColors[Qn::RecordingType_Never] = m_cellColors[Qn::RecordingType_Never] = qnGlobals->noRecordColor();
+    m_insideColors[Qn::RecordingType_MotionOnly] = m_cellColors[Qn::RecordingType_MotionOnly] = qnGlobals->recordMotionColor();
+    m_insideColors[Qn::RecordingType_Run] = m_cellColors[Qn::RecordingType_Run] = qnGlobals->recordAlwaysColor();
 
-    m_colors[Qn::RecordingType_MotionPlusLQ] = shiftColor(qnGlobals->recordMotionColor(),0,1,0);
+    m_cellColors[Qn::RecordingType_MotionPlusLQ] = qnGlobals->recordMotionColor(); 
     m_insideColors[Qn::RecordingType_MotionPlusLQ] = qnGlobals->recordAlwaysColor();
 
     resetCellValues();
@@ -166,12 +162,12 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
 
     if(!m_cornerText.isEmpty()) {
         QColor penClr;
-        if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == -1)
-            penClr = m_enabled ? SELECTED_LABEL_COLOR : NORMAL_LABEL_COLOR;
-        else 
-            penClr = NORMAL_LABEL_COLOR;
         if (!m_enabled)
-            penClr = shiftColor(toGrayscale(penClr), DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
+            penClr = m_colors.disabledLabel;
+        else if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == -1)
+            penClr = m_enabled ? m_colors.selectedLabel : m_colors.normalLabel;
+        else 
+            penClr = m_colors.normalLabel;
         p.setPen(penClr);
         p.drawText(QRect(0, 0, m_gridLeftOffset-TEXT_SPACING, m_gridTopOffset), Qt::AlignRight | Qt::AlignVCenter, m_cornerText);
     }
@@ -179,26 +175,26 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
     for (int y = 0; y < rowCount(); ++y) 
     {
         QColor penClr;
-        if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == y)
-            penClr = m_enabled ? SELECTED_LABEL_COLOR : NORMAL_LABEL_COLOR;
-        else if (y < 5)
-            penClr = NORMAL_LABEL_COLOR;
-        else
-            penClr = WEEKEND_LABEL_COLOR;
         if (!m_enabled)
-            penClr = shiftColor(toGrayscale(penClr), DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
+            penClr = m_colors.disabledLabel;
+        else if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == y)
+            penClr = m_enabled ? m_colors.selectedLabel : m_colors.normalLabel;
+        else if (y < 5)
+            penClr = m_colors.normalLabel;
+        else
+            penClr = m_colors.weekendLabel;
         p.setPen(penClr);
         p.drawText(QRect(0, cellSize*y+m_gridTopOffset, m_gridLeftOffset-TEXT_SPACING, cellSize), Qt::AlignRight | Qt::AlignVCenter, m_weekDays[y]);
     }
     for (int x = 0; x < columnCount(); ++x) 
     {
         QColor penClr;
-        if (m_mouseMoveCell.y() == -1 && m_mouseMoveCell.x() == x)
-            penClr = m_enabled ? SELECTED_LABEL_COLOR : NORMAL_LABEL_COLOR;
-        else
-            penClr = NORMAL_LABEL_COLOR;
         if (!m_enabled)
-            penClr = shiftColor(toGrayscale(penClr), DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT, DISABLED_COLOR_SHIFT);
+            penClr = m_colors.disabledLabel;
+        else if (m_mouseMoveCell.y() == -1 && m_mouseMoveCell.x() == x)
+            penClr = m_enabled ? m_colors.selectedLabel : m_colors.normalLabel;
+        else
+            penClr = m_colors.normalLabel;
         p.setPen(penClr);
         p.drawText(QRect(m_gridLeftOffset + cellSize*x, 0, cellSize, m_gridTopOffset), Qt::AlignCenter | Qt::AlignVCenter, QString::number(x));
     }
@@ -213,7 +209,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
         for (int y = 0; y < rowCount(); ++y)
         {
             uint recordTypeIdx(m_gridParams[x][y][RecordTypeParam].toUInt());
-            QColor color(m_colors[recordTypeIdx]);
+            QColor color(m_cellColors[recordTypeIdx]);
             QColor colorInside(m_insideColors[recordTypeIdx]);
             if (!m_mousePressed) {
                 if ((y == m_mouseMoveCell.y()  && x == m_mouseMoveCell.x()) ||
@@ -221,13 +217,13 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
                     (m_mouseMoveCell.x() == -1 && y == m_mouseMoveCell.y()) ||
                     (m_mouseMoveCell.y() == -1 && m_mouseMoveCell.x() == -1))
                 {
-                    color = shiftColor(color, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA);
-                    colorInside = shiftColor(colorInside, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA);
+                    color = color.lighter();
+                    colorInside = colorInside.lighter();
                 }
             }
             if (!m_enabled) {
-                color = toGrayscale(color);
-                colorInside = toGrayscale(colorInside);
+                color = disabledCellColor(color);
+                colorInside = disabledCellColor(colorInside);
             }
 
             QPointF leftTop(cellSize*x, cellSize*y);
@@ -235,55 +231,53 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
 
             p.fillRect(QRectF(0.0, 0.0, cellSize, cellSize), color);
 
-            QColor penClr(255, 255, 255, 128);
-            if (!m_enabled)
-                penClr = toGrayscale(penClr);
-
-            if (m_showFps && m_showQuality) {
-                QPointF p1(0.0, cellSize);
-                QPointF p2(cellSize, 0.0);
-                p.drawLine(p1, p2);
-            }
-
-            if (colorInside.toRgb() != color.toRgb()) {
-                p.setBrush(m_enabled ? colorInside : toGrayscale(colorInside));
-                QColor penClr(shiftColor(color, -32,-32,-32));
-                if (!m_enabled)
-                    penClr = toGrayscale(penClr);
+            {
+                QColor penClr(toTransparent(m_enabled ? m_colors.normalLabel : m_colors.disabledLabel, 0.5));
                 p.setPen(penClr);
 
-                qreal trOffset = cellSize/6;
-                qreal trSize = cellSize/10;
+                if (m_showFps && m_showQuality) {
+                    QPointF p1(0.0, cellSize);
+                    QPointF p2(cellSize, 0.0);
+                    p.drawLine(p1, p2);
+                }
 
-                QPointF points[6];
-                points[0] = QPointF(cellSize - trOffset - trSize, trOffset);
-                points[1] = QPointF(cellSize - trOffset, trOffset);
-                points[2] = QPointF(cellSize - trOffset, trOffset + trSize);
-                points[3] = QPointF(trOffset + trSize, cellSize - trOffset);
-                points[4] = QPointF(trOffset, cellSize - trOffset);
-                points[5] = QPointF(trOffset, cellSize - trSize - trOffset);
-                p.drawPolygon(points, 6);
+                if (colorInside.toRgb() != color.toRgb()) {
+                    p.setBrush(m_enabled ? colorInside : disabledCellColor(colorInside));
+                    QColor penClr(toTransparent(m_enabled ? m_colors.disabledLabel : m_colors.normalLabel, 0.5));
+                    p.setPen(penClr);
+
+                    qreal trOffset = cellSize/6;
+                    qreal trSize = cellSize/10;
+
+                    QPointF points[6];
+                    points[0] = QPointF(cellSize - trOffset - trSize, trOffset);
+                    points[1] = QPointF(cellSize - trOffset, trOffset);
+                    points[2] = QPointF(cellSize - trOffset, trOffset + trSize);
+                    points[3] = QPointF(trOffset + trSize, cellSize - trOffset);
+                    points[4] = QPointF(trOffset, cellSize - trOffset);
+                    points[5] = QPointF(trOffset, cellSize - trSize - trOffset);
+                    p.drawPolygon(points, 6);
+                }
             }
 
             // draw text parameters
-            penClr = QColor(255, 255, 255, 128);
-            if (!m_enabled)
-                penClr = toGrayscale(penClr);
-
-            p.setPen(penClr);
-            Qn::StreamQuality quality = (Qn::StreamQuality) m_gridParams[x][y][QualityParam].toInt();
-            if (m_showFps && m_showQuality)
             {
-                p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize * 0.75, cellSize *0.5)), Qt::AlignCenter, m_gridParams[x][y][FpsParam].toString());
-                p.drawText(QRectF(QPointF(cellSize * 0.25, cellSize * 0.5), QPointF(cellSize, cellSize)), Qt::AlignCenter, toShortDisplayString(quality));
+                QColor penClr(m_enabled ? m_colors.normalLabel : m_colors.disabledLabel);
+
+                p.setPen(penClr);
+                Qn::StreamQuality quality = (Qn::StreamQuality) m_gridParams[x][y][QualityParam].toInt();
+                if (m_showFps && m_showQuality)
+                {
+                    p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize * 0.75, cellSize *0.5)), Qt::AlignCenter, m_gridParams[x][y][FpsParam].toString());
+                    p.drawText(QRectF(QPointF(cellSize * 0.25, cellSize * 0.5), QPointF(cellSize, cellSize)), Qt::AlignCenter, toShortDisplayString(quality));
+                }
+                else if (m_showFps)
+                    p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize, cellSize)), Qt::AlignCenter, m_gridParams[x][y][FpsParam].toString());
+                else if (m_showQuality)
+                    p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize, cellSize)), Qt::AlignCenter, toShortDisplayString(quality));
             }
-            else if (m_showFps)
-                p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize, cellSize)), Qt::AlignCenter, m_gridParams[x][y][FpsParam].toString());
-            else if (m_showQuality)
-                p.drawText(QRectF(QPointF(0.0, 0.0), QPointF(cellSize, cellSize)), Qt::AlignCenter, toShortDisplayString(quality));
 
-
-            p.setPen(QColor(255, 255, 255));
+            p.setPen(m_colors.normalLabel);
 
             p.translate(-leftTop.x(),-leftTop.y());
 
@@ -291,9 +285,9 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
     }
 
     // draw grid lines
-    QColor penClr(255, 255, 255);
+    QColor penClr(m_colors.normalLabel);
     if (!m_enabled)
-        penClr = toGrayscale(penClr);
+        penClr = m_colors.disabledLabel;
 
     p.setPen(penClr);
     for (int x = 0; x <= columnCount(); ++x)
@@ -313,7 +307,7 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
 
     penClr = QColor(255, 255, 255, 128);
     if (!m_enabled)
-        penClr = toGrayscale(penClr);
+        penClr = m_colors.disabledLabel;
     p.setPen(penClr);
     p.drawLine(QPoint(spacing.width(), m_gridTopOffset), QPoint(m_gridLeftOffset, m_gridTopOffset));
     p.drawLine(QPoint(m_gridLeftOffset, spacing.height()), QPoint(m_gridLeftOffset, m_gridTopOffset));
@@ -322,19 +316,19 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
         if (m_mouseMoveCell.x() == -1 && m_mouseMoveCell.y() == -1)
             p.fillRect(QRectF(QPointF(spacing.width(), spacing.height()),
                               QPointF(m_gridLeftOffset - TEXT_SPACING, m_gridTopOffset - TEXT_SPACING)),
-                       SELECTED_LABEL_COLOR);
+                       m_colors.selectedLabel);
 
 
     // draw selection
-    QColor defColor = m_colors[m_defaultParams[RecordTypeParam].toUInt()];
+    QColor defColor = m_cellColors[m_defaultParams[RecordTypeParam].toUInt()];
     penClr = subColor(defColor, qnGlobals->selectionBorderDelta());
     if (!m_enabled)
-        penClr = toGrayscale(penClr);
+        penClr = m_colors.disabledLabel;
 
     p.setPen(penClr);
     QColor brushClr = subColor(defColor, qnGlobals->selectionOpacityDelta());
     if (!m_enabled)
-        brushClr = toGrayscale(brushClr);
+        brushClr = disabledCellColor(brushClr);
 
     p.setBrush(brushClr);
     if (!m_selectedRect.isEmpty())
@@ -624,4 +618,18 @@ int QnScheduleGridWidget::getMaxFps(bool motionPlusLqOnly)
         }
     }
     return fps;
+}
+
+const QnScheduleGridColors &QnScheduleGridWidget::colors() const {
+    return m_colors;
+}
+
+void QnScheduleGridWidget::setColors(const QnScheduleGridColors &colors) {
+    m_colors = colors;
+
+    update();
+}
+
+QColor QnScheduleGridWidget::disabledCellColor(const QColor &baseColor) const {
+    return toGrayscale(linearCombine(0.5, baseColor, 0.5, palette().color(QPalette::Disabled, QPalette::Background)));
 }

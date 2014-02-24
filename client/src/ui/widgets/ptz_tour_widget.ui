@@ -38,7 +38,7 @@
       <number>200</number>
      </attribute>
      <attribute name="horizontalHeaderMinimumSectionSize">
-      <number>150</number>
+      <number>32</number>
      </attribute>
      <attribute name="verticalHeaderVisible">
       <bool>false</bool>

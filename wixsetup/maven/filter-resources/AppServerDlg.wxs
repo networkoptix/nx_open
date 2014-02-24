@@ -14,9 +14,9 @@
     <Fragment>
         <UI>
             <Dialog Id="AppServerDlg" Width="370" Height="270" Title="!(loc.InstallDirDlg_Title)">
-                <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
+                <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="no" Text="!(loc.WixUINext)" />
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
-                <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+                <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="no" Text="!(loc.WixUICancel)">
                     <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
                 </Control>
                 <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" />
@@ -25,17 +25,17 @@
                 <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="2" />
                 <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
                 <Control Id="FolderLabel" Type="Text" X="14" Y="46" Width="290" Height="18" NoPrefix="yes" Text="!(loc.AppServerDlg_EntcontrollerParameters)" />
-				<Control Type="Text" Id="LoginLabel" Width="131" Height="17" X="15" Y="137" Text="!(loc.AppServerDlg_Login)" />
-				<Control Type="Text" Id="PasswordLabel" Width="131" Height="17" X="15" Y="157" Text="!(loc.AppServerDlg_CreatePassword)" />
-				<Control Type="Edit" Id="Port" Width="164" Height="15" X="151" Y="96" Property="APPSERVER_PORT" />
-				<Control Type="Edit" Id="Login" X="151" Y="135" Width="164" Height="15" Property="APPSERVER_LOGIN" Disabled="yes" />
-				<Control Type="Edit" Id="Password" Width="164" Height="15" X="151" Y="154" Property="APPSERVER_PASSWORD" Password="yes" />
-				<Control Type="Edit" Id="PasswordConfirm" Height="15" Width="164" X="151" Y="174" Property="APPSERVER_PASSWORD_CONFIRM" Password="yes" />
-				<Control Id="groupBox1" Type="GroupBox" Height="124" Width="351" X="9" Y="80" Text="!(loc.AppServerDlg_Network)" />
-				<Control Id="label1" Type="Text" Height="17" Width="80" X="15" Y="116" Text="!(loc.AppServerDlg_ProxyPort)" />
-				<Control Id="label2" Type="Text" Height="17" Width="100" X="15" Y="176" Text="!(loc.AppServerDlg_ConfirmPassword)" />
-                <Control Id="groupBox2" Type="GroupBox" Height="39" Width="351" X="10" Y="173" Text="!(loc.AppServerDlg_ExtraParameters)" />
-                <Control Id="checkBox1" Type="CheckBox" Height="18" Width="340" X="16" Y="188" Text="!(loc.AppServerDlg_OptimizeCamerasSettings)" Property="ALLOW_CAMERA_CHANGES_REF1" Indirect="yes" CheckBoxValue="1"/>
+                <Control Type="Text" Id="LoginLabel" Width="131" Height="17" X="15" Y="120" Text="!(loc.AppServerDlg_Login)" />
+                <Control Type="Text" Id="PasswordLabel" Width="131" Height="17" X="15" Y="142" Text="!(loc.AppServerDlg_CreatePassword)" />
+                <Control Type="Edit" Id="Port" Width="164" Height="15" X="151" Y="86" Property="APPSERVER_PORT" />
+                <Control Type="Edit" Id="Login" X="151" Y="118" Width="164" Height="15" Property="APPSERVER_LOGIN" Disabled="yes" />
+                <Control Type="Edit" Id="Password" Width="164" Height="15" X="151" Y="140" Property="APPSERVER_PASSWORD" Password="yes" />
+                <Control Type="Edit" Id="PasswordConfirm" Height="15" Width="164" X="151" Y="160" Property="APPSERVER_PASSWORD_CONFIRM" Password="yes" />
+                <Control Id="groupBox1" Type="GroupBox" Height="124" Width="346" X="9" Y="64" Text="!(loc.AppServerDlg_Network)" />
+                <Control Id="label1" Type="Text" Height="17" Width="80" X="15" Y="88" Text="!(loc.AppServerDlg_ProxyPort)" />
+                <Control Id="label2" Type="Text" Height="17" Width="100" X="16" Y="162" Text="!(loc.AppServerDlg_ConfirmPassword)" />
+                <Control Id="groupBox2" Type="GroupBox" Height="39" Width="351" X="10" Y="193" Text="!(loc.AppServerDlg_ExtraParameters)" />
+                <Control Id="checkBox1" Type="CheckBox" Height="18" Width="340" X="16" Y="204" Text="!(loc.AppServerDlg_OptimizeCamerasSettings)" Property="ALLOW_CAMERA_CHANGES_REF1" Indirect="yes" CheckBoxValue="1" />
             </Dialog>
         </UI>
     </Fragment>

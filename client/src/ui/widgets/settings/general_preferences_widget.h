@@ -11,7 +11,7 @@ namespace Ui {
     class GeneralPreferencesWidget;
 }
 
-class QnGeneralPreferencesWidget : public QnAbstractPreferencesWidget, protected QnWorkbenchContextAware
+class QnGeneralPreferencesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef QnAbstractPreferencesWidget base_type;
@@ -36,6 +36,7 @@ private slots:
     void at_timeModeComboBox_activated();
     void at_downmixAudioCheckBox_toggled(bool checked);
     void at_languageComboBox_currentIndexChanged(int index);
+    void at_skinComboBox_currentIndexChanged(int index);
     void at_browseLogsButton_clicked();
 
 private:
@@ -43,6 +44,7 @@ private:
 
     bool m_oldDownmix;
     int m_oldLanguage;
+    int m_oldSkin;
 };
 
 #endif // GENERAL_PREFERENCES_WIDGET_H

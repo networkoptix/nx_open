@@ -144,8 +144,10 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
         /* Logical space should work now that we know logical limits. */
         m_capabilities |= Qn::LogicalPositioningPtzCapability | Qn::LimitsPtzCapability;
         m_limits = limits;
-        m_logicalToCameraZoom = QnLinearFunction(limits.minFov, 9999, limits.maxFov, 1);
-        m_cameraToLogicalZoom = m_logicalToCameraZoom.inversed();
+
+        /* Axis's zoom scale is linear in 35mm-equiv space. */
+        m_35mmEquivToCameraZoom = QnLinearFunction(qDegreesTo35mmEquiv(limits.minFov), 9999, qDegreesTo35mmEquiv(limits.maxFov), 1);
+        m_cameraTo35mmEquivZoom = m_35mmEquivToCameraZoom.inversed();
     } else {
         m_capabilities &= ~Qn::AbsolutePtzCapabilities;
     }
@@ -160,13 +162,24 @@ CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const {
     );
 }
 
-bool QnAxisPtzController::query(const QString &request, QByteArray *body) const {
+QByteArray QnAxisPtzController::getCookie() const {
+    QMutexLocker locker(&m_mutex);
+    return m_cookie;
+}
+
+void QnAxisPtzController::setCookie(const QByteArray &cookie) {
+    QMutexLocker locker(&m_mutex);
+    m_cookie = cookie;
+}
+
+bool QnAxisPtzController::queryInternal(const QString &request, QByteArray *body) {
     QScopedPointer<CLSimpleHTTPClient> http(newHttpClient());
 
-    for (int i = 0; i < 2; ++i)
-    {
-        if (!ptz_ctl_id.isEmpty())
-            http->addHeader("Cookie", ptz_ctl_id);
+    QByteArray cookie = getCookie();
+
+    for (int i = 0; i < 2; ++i) {
+        if (!cookie.isEmpty())
+            http->addHeader("Cookie", cookie);
         CLHttpStatus status = http->doGET(lit("axis-cgi/%1").arg(request).toLatin1());
 
         if(status == CL_HTTP_SUCCESS) {
@@ -182,24 +195,33 @@ bool QnAxisPtzController::query(const QString &request, QByteArray *body) const 
                 }
             }
             return true;
-        } 
-        else if (status == CL_HTTP_REDIRECT && ptz_ctl_id.isEmpty())
-        {
-            ptz_ctl_id = http->header().value("Set-Cookie");
-            ptz_ctl_id = ptz_ctl_id.split(';')[0];
-            if (ptz_ctl_id.isEmpty())
+        } else if (status == CL_HTTP_REDIRECT && cookie.isEmpty()) {
+            cookie = http->header().value("Set-Cookie");
+            cookie = cookie.split(';')[0];
+            if (cookie.isEmpty())
                 return false;
-        }
-        else {
+            setCookie(cookie);
+        } else {
             qnWarning("Failed to execute request '%1' for camera %2. Result: %3.", request, m_resource->getName(), ::toString(status));
             return false;
         }
-        // if we do not returns, repeat request with cookie on the second loop step
+        
+        /* If we do not return, repeat request with cookie on the second loop step. */
     }
+
     return false;
 }
 
-bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *params) const {
+bool QnAxisPtzController::query(const QString &request, QByteArray *body) {
+    int channel = this->channel();
+    if(channel < 0) {
+        return queryInternal(request, body);
+    } else {
+        return queryInternal(request + lit("&camera=%1").arg(channel), body);
+    }
+}
+
+bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *params) {
     QByteArray body;
     if(!query(request, &body))
         return false;
@@ -230,15 +252,14 @@ bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *para
     return true;
 }
 
-QString QnAxisPtzController::getCameraNum()
-{
-    // TODO: #PTZ actually use this parameter.
-    QString camNum;
-    QVariant val;
-    m_resource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
-    if (val.toInt() > 1)
-        camNum = QString(lit("camera=%1&")).arg(m_resource->getChannelNumAxis());
-    return camNum;
+int QnAxisPtzController::channel() {
+    QVariant channelCount;
+    m_resource->getParam(QLatin1String("channelsAmount"), channelCount, QnDomainMemory);
+    if (channelCount.toInt() > 1) {
+        return m_resource->getChannelNumAxis();
+    } else {
+        return -1;
+    }
 }
 
 Qn::PtzCapabilities QnAxisPtzController::getCapabilities() {
@@ -253,7 +274,7 @@ bool QnAxisPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVect
     if(space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
-    return query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3&speed=%4").arg(position.x()).arg(position.y()).arg(m_logicalToCameraZoom(position.z())).arg(speed * 100));
+    return query(lit("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3&speed=%4").arg(position.x()).arg(position.y()).arg(m_35mmEquivToCameraZoom(qDegreesTo35mmEquiv(position.z()))).arg(speed * 100));
 }
 
 bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
@@ -268,7 +289,7 @@ bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *p
     if(params.value("pan", &pan) && params.value("tilt", &tilt) && params.value("zoom", &zoom)) {
         position->setX(pan);
         position->setY(tilt);
-        position->setZ(m_cameraToLogicalZoom(zoom));
+        position->setZ(q35mmEquivToDegrees(m_cameraTo35mmEquivZoom(zoom)));
         return true;
     } else {
         qnWarning("Failed to get PTZ position from camera %1. Malformed response.", m_resource->getName());
@@ -287,10 +308,6 @@ bool QnAxisPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *l
 bool QnAxisPtzController::getFlip(Qt::Orientations *flip) {
     *flip = m_flip;
     return true;
-}
-
-bool QnAxisPtzController::synchronize(Qn::PtzDataFields fields) {
-    return base_type::synchronize(fields); // TODO
 }
 
 #endif // #ifdef ENABLE_AXIS

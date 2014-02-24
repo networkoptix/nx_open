@@ -4,7 +4,7 @@
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
     <Product Id="*" Name="${product.name}" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.upgradeCode}">
-        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
         <?include BuildVars.wxi ?>
@@ -19,7 +19,6 @@
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
         <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
-        <?define VmsInstallingOrChanging="($(var.VmsInstalling) OR $(var.VmsChanging))" ?>
 
         <?define LaunchClientChecBoxText="!(loc.Product_LaunchClient)" ?>
 
@@ -330,9 +329,11 @@
         <CustomAction Id="InitDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
 
-        <CustomAction Id="SyncDatabaseAction_Cmd" Property="SyncDatabaseAction"
-                      Value="&quot;[#dbsync.exe]&quot;" Execute="immediate" Impersonate="yes"/>
-        <CustomAction Id="SyncDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+        <CustomAction Id="SyncDatabaseAction_Cmd_WithWarning" Property="SyncDatabaseAction"
+                      Value="&quot;[#dbsync.exe]&quot;;1;!(loc.UpgradeDlg_DatabaseRecovery)" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="SyncDatabaseAction_Cmd_WithoutWarning" Property="SyncDatabaseAction"
+                      Value="&quot;[#dbsync.exe]&quot;;100500;" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="SyncDatabaseAction" BinaryKey="CustomActions.dll" DllEntry="CAQuitExecAndWarn"
                       Execute="deferred" Return="check" Impersonate="no" />
 
         <CustomAction Id="SaveLastDatabaseVersion_Cmd" Property="SaveLastDatabaseVersion"
@@ -470,16 +471,19 @@
             <Custom Action="BackupDatabaseFile" After="BackupDatabaseFile_Cmd">
                 <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="SyncDatabaseAction_Cmd" After="BackupDatabaseFile">
-                <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd">
+            <Custom Action="SyncDatabaseAction_Cmd_WithWarning" Before="SyncDatabaseAction">
+                <![CDATA[ $(var.VmsUpgrading) AND $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SyncDatabaseAction_Cmd_WithoutWarning" Before="SyncDatabaseAction">
+                <![CDATA[ (NOT $(var.VmsUpgrading)) AND $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="SyncDatabaseAction" After="BackupDatabaseFile">
                 <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
 
             <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction">
-                <![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) AND APPSERVER_PASSWORD <> "" ]]>
+                <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]>
             </Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd">
-                <![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) AND APPSERVER_PASSWORD <> "" ]]>
+                <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]>
             </Custom>
 
             <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
@@ -650,6 +654,9 @@
                                 <Component Id="ServerRtspPlugin">
                                     <File Id="ServerRtspPluginDll" Name="genericrtspplugin.dll" Source="$(var.PluginsDir)\genericrtspplugin.dll" />
                                 </Component>                    
+                                <Component Id="ServerHttpPlugin">
+                                    <File Id="ServerHttpPluginDll" Name="mjpg_link.dll" Source="$(var.PluginsDir)\mjpg_link.dll" />
+                                </Component>                                              
                             </Directory>
 
                             <Component Id="ServerSigar">
@@ -899,6 +906,7 @@
             <ComponentRef Id="ServerExecutable" />
             <ComponentGroupRef Id="ServerFFmpegLibraries"/>
             <ComponentRef Id="ServerRtspPlugin"/>
+            <ComponentRef Id="ServerHttpPlugin"/>
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
             <ComponentGroupRef Id="ServerImageFormats"/>
@@ -1294,7 +1302,6 @@
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">
                 <![CDATA[$(var.VmsUpgrading)]]>
             </Publish>
-            <!--            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg" Order="2"><![CDATA[ NOT $(var.VmsUpgrading) AND ((Installed AND WixUI_InstallMode <> "Repair") OR (NOT $(var.VmsInstallingOrChanging) AND NOT INSTALL_SERVER)) ]]></Publish>-->
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">
                 <![CDATA[ ($(var.VmsRemoving) AND !AppServerFeature <> 3) OR WixUI_InstallMode = "Repair" ]]>
             </Publish>

@@ -47,7 +47,6 @@ private slots:
     void at_cameraButtonClicked();
     void at_filterAction();
     void at_resetFilterAction();
-    void at_selectAllAction();
     void at_copyToClipboard();
     void at_exportAction();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);

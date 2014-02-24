@@ -91,6 +91,6 @@ QString QnEnvironment::getUniqueFileName(const QString &dirName, const QString &
         existingFiles << info.completeBaseName();
     }
 
-    QString name = generateUniqueString(existingFiles, baseName, lit("_"));
+    QString name = generateUniqueString(existingFiles, baseName, baseName + lit("_%1"));
     return QFileInfo(dirName, name).absoluteFilePath();
 }

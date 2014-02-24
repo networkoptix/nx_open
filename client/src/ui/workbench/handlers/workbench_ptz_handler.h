@@ -5,20 +5,21 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchPtzHandler : public QObject, protected QnWorkbenchContextAware {
+class QnWorkbenchPtzHandler : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
     typedef QObject base_type;
 
 public:
     explicit QnWorkbenchPtzHandler(QObject *parent = 0);
+    ~QnWorkbenchPtzHandler();
 
 private slots:
-    void at_ptzSavePresetAction_triggered();
-    void at_ptzGoToPresetAction_triggered();
-    void at_ptzManagePresetsAction_triggered();
+    void at_ptzActivatePresetAction_triggered();
+    void at_ptzActivateTourAction_triggered();
+    void at_ptzActivateObjectAction_triggered();
 
-    void at_ptzStartTourAction_triggered();
-    void at_ptzManageToursAction_triggered();
+    void at_ptzSavePresetAction_triggered();
+    void at_ptzManageAction_triggered();
 
     void at_debugCalibratePtzAction_triggered();
     void at_debugGetPtzPositionAction_triggered();

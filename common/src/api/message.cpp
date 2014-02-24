@@ -114,8 +114,6 @@ bool QnMessage::load(const pb::Message &message)
             hardwareId2 = initialMessage.hardwareid2().c_str();
             hardwareId3 = initialMessage.hardwareid3().c_str();
             publicIp = QString::fromStdString(initialMessage.publicip());
-            if (initialMessage.has_allowcamerachanges())
-                allowCameraChanges = initialMessage.allowcamerachanges() ? 1 : 0;
 
             parseResourceTypes(resourceTypes, initialMessage.resourcetype());
             qnResTypePool->replaceResourceTypeList(resourceTypes);
@@ -173,8 +171,6 @@ bool QnMessage::load(const pb::Message &message)
                 systemName = QString::fromStdString(runtimeInfoChangeMessage.systemname());
             if (runtimeInfoChangeMessage.has_sessionkey())
                 sessionKey = runtimeInfoChangeMessage.sessionkey().c_str();
-            if (runtimeInfoChangeMessage.has_allowcamerachanges())
-                allowCameraChanges = runtimeInfoChangeMessage.allowcamerachanges() ? 1 : 0;
             break;
         }
         case pb::Message_Type_BusinessRuleReset:

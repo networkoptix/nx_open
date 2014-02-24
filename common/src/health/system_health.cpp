@@ -18,6 +18,8 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         return tr("Storages are full");
     case QnSystemHealth::StoragesNotConfigured:
         return tr("Storages are not configured");
+    case QnSystemHealth::ArchiveRebuildFinished:
+        return tr("Rebuilding archive index is completed.");
     default:
         break;
     }
@@ -49,6 +51,8 @@ QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageT
         return tr("Storages are not configured on the following Media Server:\n%1.").arg(resourceName);
     case QnSystemHealth::NoLicenses:
         return tr("You have no licenses.\nYou cannot record video from cameras.");
+    case QnSystemHealth::ArchiveRebuildFinished:
+        return tr("Rebuilding archive index is completed on the following Media Server:\n%1.").arg(resourceName);
     default:
         break;
     }

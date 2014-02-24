@@ -600,6 +600,19 @@ int QnAppServerConnection::getServers(QnMediaServerResourceList &servers)
     return status;
 }
 
+int QnAppServerConnection::getKvPairs(QnKvPairList& kvPairs, const QnResourcePtr &resource)
+{
+    QnKvPairListsById reply;
+    QnRequestParamList params(m_requestParams);
+    params.append(QnRequestParam("resource_id", resource->getId().toString()));
+    int status = sendSyncGetRequest(KvPairObject, m_requestHeaders, m_requestParams, &reply);
+    QnKvPairListsById::const_iterator citer = reply.constFind(resource->getId().toInt());
+    if (citer != reply.cend())
+        kvPairs = citer.value();
+
+    return status;
+}
+
 int QnAppServerConnection::getCameras(QnVirtualCameraResourceList &cameras, QnId mediaServerId)
 {
     QnRequestParamList params = m_requestParams;
@@ -643,6 +656,20 @@ int QnAppServerConnection::getCameraHistoryList(QnCameraHistoryList &cameraHisto
 int QnAppServerConnection::getBusinessRules(QnBusinessEventRuleList &businessRules)
 {
     return sendSyncGetRequest(BusinessRuleObject, m_requestHeaders, m_requestParams, &businessRules);
+}
+
+
+int QnAppServerConnection::saveSync(int resourceId, const QnKvPair &kvPair)
+{
+    return saveSync(resourceId, QnKvPairList() << kvPair);
+}
+
+int QnAppServerConnection::saveSync(int resourceId, const QnKvPairList &kvPairs)
+{
+    QByteArray data;
+    m_serializer.serializeKvPairs(resourceId, kvPairs, data);
+
+    return addObject(KvPairObject, data, 0);
 }
 
 int QnAppServerConnection::saveSync(const QnMediaServerResourcePtr &server)

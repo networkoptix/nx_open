@@ -34,51 +34,16 @@ class QnEnumNameMapper {
 public:
     QnEnumNameMapper() {}
 
-    QnEnumNameMapper(const QMetaObject *metaObject, const char *enumName) {
-        assert(metaObject && enumName);
+    QnEnumNameMapper(const QMetaObject *metaObject, const char *enumName);
 
-        int index = metaObject->indexOfEnumerator(enumName);
-        if(index == -1) {
-            qnWarning("Class '%1' has no enum '%2'.", metaObject->className(), enumName);
-            return;
-        }
+    void insert(int value, const char *name);
+    void insert(int value, const QString &name);
 
-        QMetaEnum enumerator = metaObject->enumerator(index);
-        for(int i = 0; i < enumerator.keyCount(); i++)
-            addValue(enumerator.value(i), QLatin1String(enumerator.key(i)));
-    }
+    int value(const QString &name, int defaultValue) const;
+    int value(const QString &name, bool *ok) const;
+    QString name(int value, const QString &defaultValue = QString()) const;
 
-    void addValue(int value, const char *name) {
-        addValue(value, QLatin1String(name));
-    }
-
-    void addValue(int value, const QString &name) {
-        if(!m_valueByName.contains(name))
-            m_valueByName[name] = value;
-        if(!m_nameByValue.contains(value))
-            m_nameByValue[value] = name;
-    }
-
-    int value(const QString &name, int defaultValue) const {
-        return m_valueByName.value(name, defaultValue);
-    }
-
-    int value(const QString &name, bool *ok) const {
-        auto pos = m_valueByName.find(name);
-        if(pos == m_valueByName.end()) {
-            if(ok)
-                *ok = false;
-            return -1;
-        } else {
-            if(ok)
-                *ok = true;
-            return *pos;
-        }
-    }
-
-    QString name(int value, const QString &defaultValue = QString()) const {
-        return m_nameByValue.value(value, defaultValue);
-    }
+    // TODO: #Elric support Qt-style flags
 
     template<class Enum>
     static QnTypedEnumNameMapper<Enum> create() {
@@ -97,12 +62,12 @@ class QnTypedEnumNameMapper: public QnEnumNameMapper {
 public:
     QN_FORWARD_CONSTRUCTOR(QnTypedEnumNameMapper, QnEnumNameMapper, {})
 
-    void addValue(Enum value, const char *name) {
-        base_type::addValue(value, name);
+    void insert(Enum value, const char *name) {
+        base_type::insert(value, name);
     }
 
-    void addValue(Enum value, const QString &name) {
-        base_type::addValue(value, name);
+    void insert(Enum value, const QString &name) {
+        base_type::insert(value, name);
     }
 
     Enum value(const QString &name, Enum defaultValue) const {
@@ -158,7 +123,7 @@ __VA_ARGS__ QnTypedEnumNameMapper<ENUM> createEnumNameMapper(ENUM *) {          
 
 #define QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING_VALUE_I(R, DATA, ELEMENT)          \
     if(!QnEnumDetail::isNullString(BOOST_PP_TUPLE_ELEM(1, ELEMENT)))            \
-        result.addValue ELEMENT;
+        result.insert ELEMENT;
 
 
 /**

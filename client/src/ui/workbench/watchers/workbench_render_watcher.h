@@ -48,9 +48,9 @@ signals:
      * 
      * \param widget                    Widget.
      */
-    void displayingChanged(QnResourceWidget *widget);
+    void widgetChanged(QnResourceWidget *widget);
 
-    void displayingChanged(QnResourceDisplay *display);
+    void displayChanged(QnResourceDisplay *display);
 
 private:
     Q_SLOT void registerWidget(QnResourceWidget *widget);

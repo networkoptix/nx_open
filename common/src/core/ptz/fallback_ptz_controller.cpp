@@ -20,18 +20,19 @@ QnFallbackPtzController::QnFallbackPtzController(const QnPtzControllerPtr &mainC
 
     connect(mainController,     &QnAbstractPtzController::finished,             this, &QnFallbackPtzController::baseFinished);
     connect(fallbackController, &QnAbstractPtzController::finished,             this, &QnFallbackPtzController::baseFinished);
-    connect(mainController,     &QnAbstractPtzController::capabilitiesChanged,  this, &QnFallbackPtzController::baseCapabilitiesChanged);
-    connect(fallbackController, &QnAbstractPtzController::capabilitiesChanged,  this, &QnFallbackPtzController::baseCapabilitiesChanged);
+    connect(mainController,     &QnAbstractPtzController::changed,              this, &QnFallbackPtzController::baseChanged);
+    connect(fallbackController, &QnAbstractPtzController::changed,              this, &QnFallbackPtzController::baseChanged);
 
-    baseCapabilitiesChanged();
+    baseChanged(Qn::CapabilitiesPtzField);
 }
 
 QnFallbackPtzController::~QnFallbackPtzController() {
     return;
 }
 
-void QnFallbackPtzController::baseCapabilitiesChanged() {
-    m_mainIsValid = m_mainController->getCapabilities() != Qn::NoPtzCapabilities;
+void QnFallbackPtzController::baseChanged(Qn::PtzDataFields fields) {
+    if(fields & Qn::CapabilitiesPtzField)
+        m_mainIsValid = m_mainController->getCapabilities() != Qn::NoPtzCapabilities;
 
-    emit capabilitiesChanged();
+    emit changed(fields);
 }

@@ -7,8 +7,7 @@
 
 #include <utils/math/defines.h> /* For INT64_MAX. */
 #include <utils/common/unused.h>
-#include <utils/common/lexical_fwd.h>
-#include <utils/common/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 /**
  * Same as <tt>Q_GADGET</tt>, but doesn't trigger MOC, and can be used in namespaces.
@@ -28,14 +27,14 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole)
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole)
     Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes)
 public:
 #else
     Q_NAMESPACE
 #endif
 
-        // TODO: #5.0 use Qt::Edge
+    // TODO: #Elric #5.0 use Qt::Edge
     /**
      * Generic enumeration describing borders of a rectangle.
      */
@@ -76,7 +75,7 @@ public:
         PrimaryStreamSoftMotionCapability   = 0x004,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
-        shareIpCapability                   = 0x020
+        ShareIpCapability                   = 0x020 
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);
@@ -104,22 +103,28 @@ public:
         ActivateTourPtzCommand,
         GetToursPtzCommand,
 
+        GetActiveObjectPtzCommand,
+        UpdateHomeObjectPtzCommand,
+        GetHomeObjectPtzCommand,
+
         GetDataPtzCommand,
-        SynchronizePtzCommand,
 
         InvalidPtzCommand = -1
     };
 
     enum PtzDataField {
-        DevicePositionPtzField  = 0x01,
-        LogicalPositionPtzField = 0x02,
-        DeviceLimitsPtzField    = 0x04,
-        LogicalLimitsPtzField   = 0x08,
-        FlipPtzField            = 0x10,
-        PresetsPtzField         = 0x20,
-        ToursPtzField           = 0x40,
-        NoPtzFields             = 0x00,
-        AllPtzFields            = DevicePositionPtzField | LogicalPositionPtzField| DeviceLimitsPtzField | LogicalLimitsPtzField | FlipPtzField | PresetsPtzField | ToursPtzField
+        CapabilitiesPtzField    = 0x001,
+        DevicePositionPtzField  = 0x002,
+        LogicalPositionPtzField = 0x004,
+        DeviceLimitsPtzField    = 0x008,
+        LogicalLimitsPtzField   = 0x010,
+        FlipPtzField            = 0x020,
+        PresetsPtzField         = 0x040,
+        ToursPtzField           = 0x080,
+        ActiveObjectPtzField    = 0x100,
+        HomeObjectPtzField      = 0x200,
+        NoPtzFields             = 0x000,
+        AllPtzFields            = 0xFFF
     };
     Q_DECLARE_FLAGS(PtzDataFields, PtzDataField)
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
@@ -127,6 +132,13 @@ public:
     enum PtzCoordinateSpace {
         DevicePtzCoordinateSpace,
         LogicalPtzCoordinateSpace
+    };
+
+    enum PtzObjectType {
+        PresetPtzObject,
+        TourPtzObject,
+
+        InvalidPtzObject = -1
     };
 
     enum PtzCapability {
@@ -150,6 +162,8 @@ public:
 
         PresetsPtzCapability                = 0x00010000,
         ToursPtzCapability                  = 0x00020000,
+        ActivityPtzCapability               = 0x00040000,
+        HomePtzCapability                   = 0x00080000,
 
         AsynchronousPtzCapability           = 0x00100000,
         SynchronizedPtzCapability           = 0x00200000,
@@ -219,7 +233,7 @@ public:
         FirstItemDataRole   = Qt::UserRole,
 
         /* Tree-based. */
-        NodeTypeRole        = FirstItemDataRole,    /**< Role for node type, see <tt>Qn::NodeType</tt>. */
+        NodeTypeRole,                               /**< Role for node type, see <tt>Qn::NodeType</tt>. */
 
         /* Resource-based. */
         ResourceRole,                               /**< Role for QnResourcePtr. */
@@ -263,6 +277,13 @@ public:
         ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
         ItemCheckedButtonsRole,                     /**< Role for buttons that a checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
 
+        /* Ptz-based. */
+        PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
+        PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */
+        PtzObjectIdRole,                            /**< Role for PTZ tour/preset id. Value of type QString. */
+        PtzObjectNameRole,                          /**< Role for PTZ tour/preset name. Value of type QString. */
+        PtzTourSpotRole,                            /**< Role for PTZ tour spot. Value of type QnPtzTourSpot. */
+
         /* Context-based. */
         CurrentLayoutResourceRole,
         CurrentUserResourceRole,
@@ -270,6 +291,7 @@ public:
         CurrentMediaServerResourcesRole,
 
         /* Arguments. */
+        ActionIdRole,
         SerializedDataRole,
         ConnectionInfoRole,
         FocusElementRole,
@@ -284,11 +306,7 @@ public:
 
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
-        PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
-        PtzPresetIdRole,                            /**< Role for PTZ preset id. Value of type QString. */
-        PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */
-        PtzTourIdRole,                              /**< Role for PTZ tour id. Value of type QString. */
-        PtzTourSpotRole,                            /**< Role for PTZ tour spot. Value of type QnPtzTourSpot. */
+        
         TranslationRole,                            /**< Role for translations. Value of type QnTranslation. */
 
         ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */
@@ -307,7 +325,6 @@ public:
 
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 
-        RoleCount
     };
 
 
@@ -339,23 +356,9 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #   define lit(s) QLatin1String(s)
 #endif
 
+QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner), (metatype))
+QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities), (metatype)(lexical)(json))
 
-Q_DECLARE_METATYPE(Qn::PtzDataFields);
-Q_DECLARE_METATYPE(Qn::PtzCommand);
-Q_DECLARE_METATYPE(Qn::TimePeriodTypes);
-Q_DECLARE_METATYPE(Qn::TimePeriodType);
-Q_DECLARE_METATYPE(Qn::TimePeriodContent);
-Q_DECLARE_METATYPE(Qn::Corner);
-
-QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzCommand)
-QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzCoordinateSpace)
-QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzDataFields)
-QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(Qn::PtzCapabilities)
-
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzCommand)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzCoordinateSpace)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzDataFields)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzCapabilities)
 
 
 #endif // QN_COMMON_GLOBALS_H

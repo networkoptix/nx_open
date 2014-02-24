@@ -410,7 +410,6 @@ void QnWorkbenchDisplay::initSceneView() {
     m_scene->addItem(m_gridItem.data());
     setLayer(m_gridItem.data(), Qn::BackLayer);
     opacityAnimator(m_gridItem.data())->setTimeLimit(300);
-    m_gridItem.data()->setColor(QColor(0, 240, 240, 128));
     m_gridItem.data()->setOpacity(0.0);
     m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(workbench()->mapper());

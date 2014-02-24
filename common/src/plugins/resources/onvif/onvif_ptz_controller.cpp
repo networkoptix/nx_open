@@ -29,7 +29,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     m_limits.maxFov = 1.0;
 
     m_capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability | Qn::LimitsPtzCapability | Qn::FlipPtzCapability;
-    if(m_resource->getPtzfUrl().isEmpty())
+    if(m_resource->getPtzUrl().isEmpty())
         m_capabilities = Qn::NoPtzCapabilities;
 
     m_stopBroken = qnCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
@@ -44,7 +44,7 @@ QnOnvifPtzController::~QnOnvifPtzController() {
 }
 
 void QnOnvifPtzController::initCoefficients() {
-    QString ptzUrl = m_resource->getPtzfUrl();
+    QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
         return;
 
@@ -103,7 +103,7 @@ double QnOnvifPtzController::normalizeSpeed(qreal inputVelocity, const QPair<qre
 }
 
 bool QnOnvifPtzController::stopInternal() {
-    QString ptzUrl = m_resource->getPtzfUrl();
+    QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
         return false;
 
@@ -127,7 +127,7 @@ bool QnOnvifPtzController::stopInternal() {
 }
 
 bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
-    QString ptzUrl = m_resource->getPtzfUrl();
+    QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
         return false;
 
@@ -172,7 +172,7 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
-    QString ptzUrl = m_resource->getPtzfUrl();
+    QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
         return false;
 
@@ -219,7 +219,7 @@ bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
-    QString ptzUrl = m_resource->getPtzfUrl();
+    QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
         return false;
 

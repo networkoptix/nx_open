@@ -27,21 +27,32 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceDataPool
 
 QnResourceDataPool::QnResourceDataPool(QObject *parent): 
     QObject(parent) 
-{}
+{
+    m_shortVendorByName.insert(lit("digital watchdog"), lit("dw"));
+}
 
 QnResourceDataPool::~QnResourceDataPool() {
     return;
 }
 
 QnResourceData QnResourceDataPool::data(const QString &key) const {
-    QMutexLocker locker(&m_mutex);
-
     return m_dataByKey.value(key.toLower());
 }
 
 QnResourceData QnResourceDataPool::data(const QnVirtualCameraResourcePtr &camera) const {
-    /* No need to lock here. */
-    return data(/*camera->getVendorName() + lit('.') +*/ camera->getModel()); // TODO: #Elric use vendor here!
+    QString vendor = camera->getVendor().toLower();
+    vendor = m_shortVendorByName.value(vendor, vendor);
+    QString model = camera->getModel().toLower();
+
+    QString key0 = lit("*|") + model;
+    QString key1 = vendor + lit("|") + model;
+    QString key2 = key1 + lit("|") + camera->getFirmware().toLower();
+
+    QnResourceData result;
+    result.add(m_dataByKey.value(key0));
+    result.add(m_dataByKey.value(key1));
+    result.add(m_dataByKey.value(key2));
+    return result;
 }
 
 bool QnResourceDataPool::load(const QString &fileName) {
@@ -84,7 +95,6 @@ bool QnResourceDataPool::loadInternal(const QString &fileName) {
     if(!QJson::deserialize(map, lit("data"), &chunks))
         return false;
 
-    QMutexLocker locker(&m_mutex);
     foreach(const QnResourceDataPoolChunk &chunk, chunks)
         foreach(const QString &key, chunk.keys)
             m_dataByKey[key.toLower()].add(chunk.data);

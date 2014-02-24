@@ -802,6 +802,11 @@ void QnResource::initializationDone()
 {
 }
 
+bool QnResource::hasProperty(const QString &key) const {
+    QMutexLocker mutexLocker(&m_mutex);
+    return m_propertyByKey.contains(key);
+}
+
 QString QnResource::getProperty(const QString &key, const QString &defaultValue) const {
     QMutexLocker mutexLocker(&m_mutex);
     return m_propertyByKey.value(key, defaultValue);
@@ -810,7 +815,7 @@ QString QnResource::getProperty(const QString &key, const QString &defaultValue)
 void QnResource::setProperty(const QString &key, const QString &value) {
     {
         QMutexLocker mutexLocker(&m_mutex);
-        if (m_propertyByKey.value(key) == value)
+        if (m_propertyByKey.contains(key) && m_propertyByKey.value(key) == value)
             return;
         m_propertyByKey[key] = value;
     }

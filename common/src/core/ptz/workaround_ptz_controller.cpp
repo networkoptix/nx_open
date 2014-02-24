@@ -11,7 +11,8 @@
 QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
     m_octagonal(false),
-    m_broken(false)
+    m_overrideCapabilities(false),
+    m_capabilities(Qn::NoPtzCapabilities)
 {
     QnVirtualCameraResourcePtr camera = resource().dynamicCast<QnVirtualCameraResource>();
     if(!camera)
@@ -20,11 +21,25 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     QnResourceData resourceData = qnCommon->dataPool()->data(camera);
 
     m_octagonal = resourceData.value<bool>(lit("octagonalPtz"), false);
-    m_broken = resourceData.value<bool>(lit("brokenPtz"), false);
+    
+    QString ptzCapabilities = resourceData.value<QString>(lit("ptzCapabilities"));
+    if(!ptzCapabilities.isEmpty()) {
+        // TODO: #Elric evil. implement via enum name mapper flags.
+
+        if(ptzCapabilities == lit("NoPtzCapabilities")) {
+            m_overrideCapabilities = true;
+            m_capabilities = Qn::NoPtzCapabilities;
+        } else if(ptzCapabilities == lit("ContinuousZoomCapability")) {
+            m_overrideCapabilities = true;
+            m_capabilities = Qn::ContinuousZoomCapability;
+        } else {
+            qnWarning("Could not parse PTZ capabilities '%1'.", ptzCapabilities);
+        }
+    }
 }
 
 Qn::PtzCapabilities QnWorkaroundPtzController::getCapabilities() {
-    return m_broken ? Qn::NoPtzCapabilities : base_type::getCapabilities();
+    return m_overrideCapabilities ? m_capabilities : base_type::getCapabilities();
 }
 
 bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {

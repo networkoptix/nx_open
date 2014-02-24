@@ -11,6 +11,7 @@
 
 #include <client/client_settings.h>
 
+#include <ui/workaround/gl_native_painting.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -377,7 +378,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         return;
     }
 
-    painter->beginNativePainting();
+    QnGlNativePainting::begin(painter);
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -409,7 +410,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
 
     glDisable(GL_BLEND);
     glDisable(GL_TEXTURE_2D);
-    painter->endNativePainting();
+    QnGlNativePainting::end(painter);
 }
 
 void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
@@ -729,6 +730,7 @@ void QnRotatingImageButtonWidget::tick(int deltaMSecs) {
 // -------------------------------------------------------------------------- //
 QnTextButtonWidget::QnTextButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
+    m_pixmapValid(false),
     m_relativeFrameWidth(-1.0)
 {
     setFrameShape(Qn::NoFrame);
@@ -745,7 +747,24 @@ void QnTextButtonWidget::setText(const QString &text) {
         return;
 
     m_text = text;
-    updatePixmap();
+
+    invalidatePixmap();
+}
+
+QBrush QnTextButtonWidget::textBrush() const {
+    return palette().brush(QPalette::WindowText);
+}
+
+void QnTextButtonWidget::setTextBrush(const QBrush &textBrush) {
+    setPaletteBrush(this, QPalette::WindowText, textBrush);
+}
+
+QColor QnTextButtonWidget::textColor() const {
+    return palette().color(QPalette::WindowText);
+}
+
+void QnTextButtonWidget::setTextColor(const QColor &textColor) {
+    setPaletteColor(this, QPalette::WindowText, textColor);
 }
 
 qreal QnTextButtonWidget::relativeFrameWidth() const {
@@ -774,6 +793,8 @@ void QnTextButtonWidget::setGeometry(const QRectF &geometry) {
 }
 
 void QnTextButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    ensurePixmap();
+
     /* Skip Framed implementation. */
     QnImageButtonWidget::paint(painter, option, widget);
 }
@@ -789,8 +810,28 @@ void QnTextButtonWidget::paint(QPainter *painter, StateFlags startState, StateFl
     QnImageButtonWidget::paint(painter, startState, endState, progress, widget, rect);
 }
 
-void QnTextButtonWidget::updatePixmap() {
-    if (m_text.isEmpty())
+void QnTextButtonWidget::changeEvent(QEvent *event) {
+    base_type::changeEvent(event);
+
+    switch (event->type()) {
+    case QEvent::PaletteChange:
+    case QEvent::FontChange:
+        invalidatePixmap();
+        break;
+    default:
+        break;
+    }
+}
+
+void QnTextButtonWidget::invalidatePixmap() {
+    m_pixmapValid = false;
+}
+
+void QnTextButtonWidget::ensurePixmap() {
+    if(m_pixmapValid)
+        return;
+
+    if(m_text.isEmpty())
         return;
 
     // create caching image
@@ -809,13 +850,14 @@ void QnTextButtonWidget::updatePixmap() {
     QPixmap pixmap(imageSize);
     pixmap.fill(Qt::transparent);
     {
-        QPainter p(&pixmap);
-        p.setFont(font);
-        p.drawText(imageSize.width()*offset, imageSize.height()*offset + metrics.ascent(), m_text);
+        QPainter painter(&pixmap);
+        painter.setFont(font);
+        painter.setPen(QPen(palette().brush(QPalette::WindowText), 0));
+        painter.drawText(imageSize.width()*offset, imageSize.height()*offset + metrics.ascent(), m_text);
     }
 
     setPixmap(0, pixmap);
-    update();
+    m_pixmapValid = true;
 }
 
 QnTextButtonWidget::StateFlags QnTextButtonWidget::validOpacityState(StateFlags flags) const {

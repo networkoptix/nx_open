@@ -11,7 +11,7 @@ namespace Ui {
 class QnPictureSettingsDialog;
 }
 
-class QnPictureSettingsDialog : public QnButtonBoxDialog, protected QnWorkbenchContextAware
+class QnPictureSettingsDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware
 {
     Q_OBJECT
 

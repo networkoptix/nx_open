@@ -4,6 +4,7 @@
 #include <QtGui/QPainter>
 
 #include "utils/math/color_transformations.h"
+#include <utils/math/linear_combination.h>
 
 QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QColor &insideColor, bool hovered, bool checked) 
 {
@@ -15,7 +16,8 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
     
     QColor brushClr(hovered ? color.lighter() : color);
     if (!isEnabled())
-        brushClr = shiftColor(brushClr, -64, -64, -64);
+        brushClr = toGrayscale(linearCombine(0.5, brushClr, 0.5, palette().color(QPalette::Disabled, QPalette::Background)));
+        //brushClr = shiftColor(brushClr, -64, -64, -64);
     painter.setBrush(brushClr);
     int offset = checked ? 4 : 0;
     painter.drawRect(offset, offset, result.width() - offset * 2, result.height() - offset * 2);
@@ -24,7 +26,8 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
     {
         brushClr = QColor(hovered ? insideColor.lighter() : insideColor);
         if (!isEnabled())
-            brushClr = shiftColor(brushClr, -64, -64, -64);
+            brushClr = toGrayscale(linearCombine(0.5, brushClr, 0.5, palette().color(QPalette::Disabled, QPalette::Background)));
+            //brushClr = shiftColor(brushClr, -64, -64, -64);
         painter.setBrush(brushClr);
         //offset = result.width()/3;
         //painter.drawRect(offset, offset, result.width() - offset * 2, result.height() - offset * 2);

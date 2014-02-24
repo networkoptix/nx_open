@@ -17,6 +17,10 @@
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
+namespace {
+    const QLatin1String dbExtension(".db");
+}
+
 QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
     QnWorkbenchContextAware(parent),
@@ -38,7 +42,10 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QnCustomFileDialog::fileDialogOptions());
     if(fileName.isEmpty())
         return;
+
     qnSettings->setLastDatabaseBackupDir(QFileInfo(fileName).absolutePath());
+    if (!fileName.endsWith(dbExtension))
+        fileName += dbExtension;
 
     QFile file(fileName);
     if(!file.open(QIODevice::WriteOnly)) {
@@ -53,10 +60,11 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
     dialog->setLabelText(tr("Database backup is being downloaded from the server. Please wait."));
     dialog->setModal(true);
 
+    //TODO: #GDM replace with QnAppServerReplyProcessor
     QScopedPointer<QnDatabaseManagementWidgetReplyProcessor> processor(new QnDatabaseManagementWidgetReplyProcessor());
     connect(processor, SIGNAL(activated()), dialog, SLOT(reset()));
     
-    QnAppServerConnectionFactory::createConnection()->dumpDatabaseAsync(processor.data(), SLOT(activate(const QnHTTPRawResponse &, int)));
+    QnAppServerConnectionFactory::createConnection()->dumpDatabaseAsync(processor.data(), "activate");
     dialog->exec();
     if(dialog->wasCanceled())
         return;
@@ -96,10 +104,11 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     dialog->setLabelText(tr("Database backup is being uploaded to the server. Please wait."));
     dialog->setModal(true);
 
+    //TODO: #GDM replace with QnAppServerReplyProcessor
     QScopedPointer<QnDatabaseManagementWidgetReplyProcessor> processor(new QnDatabaseManagementWidgetReplyProcessor());
     connect(processor, SIGNAL(activated()), dialog, SLOT(reset()));
 
-    QnAppServerConnectionFactory::createConnection()->restoreDatabaseAsync(data, processor.data(), SLOT(activate(const QnHTTPRawResponse &, int)));
+    QnAppServerConnectionFactory::createConnection()->restoreDatabaseAsync(data, processor.data(), "activate");
     dialog->exec();
     if(dialog->wasCanceled())
         return; // TODO: #Elric make non-cancellable.

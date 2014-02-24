@@ -47,6 +47,10 @@ const char* PasswordHelper::VIVOTEK_MANUFACTURER = "vivotek";
 const char* PasswordHelper::UBIQUITI_MANUFACTURER = "ubiquiti";
 const char* PasswordHelper::CAMERA_MANUFACTURER = "camera";
 
+const char* PasswordHelper::DVTEL_MANUFACTURER = "dvtel";
+const char* PasswordHelper::FLIR_MANUFACTURER = "flir";
+const char* PasswordHelper::SENTRY_MANUFACTURER = "sentry360";
+
 const char* ADMIN1 = "admin";
 const char* ADMIN2 = "Admin";
 const char* ADMIN3 = "administrator";
@@ -124,6 +128,7 @@ PasswordHelper::PasswordHelper()
 
     setPasswordInfo(AVIGILON_MANUFACTURER, ADMIN1, ADMIN1);
 
+    setPasswordInfo(AXIS_MANUFACTURER, ROOT, ROOT);
     setPasswordInfo(AXIS_MANUFACTURER, ROOT, PASSWD2);
 
     setPasswordInfo(BASLER_MANUFACTURER, ADMIN1, ADMIN1);
@@ -180,6 +185,10 @@ PasswordHelper::PasswordHelper()
     setPasswordInfo(UBIQUITI_MANUFACTURER, MAIN_USER1, MAIN_USER1);
 
     setPasswordInfo(CAMERA_MANUFACTURER, ROOT, PASSWD_CAMERA);
+
+    setPasswordInfo(DVTEL_MANUFACTURER,  ADMIN1, PASSWD4);
+    setPasswordInfo(FLIR_MANUFACTURER,   ADMIN1, "fliradmin");
+    setPasswordInfo(SENTRY_MANUFACTURER, ADMIN1, PASSWD4);
 
     //if (cl_log.logLevel() >= cl_logDEBUG1) {
     //    printPasswords();

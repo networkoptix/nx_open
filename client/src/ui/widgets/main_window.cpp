@@ -32,6 +32,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <ui/dialogs/ptz_manage_dialog.h>
+
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
@@ -40,6 +42,7 @@
 #include <ui/workbench/handlers/workbench_ptz_handler.h>
 #include <ui/workbench/handlers/workbench_debug_handler.h>
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
+#include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
 #include <ui/workbench/workbench_controller.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
@@ -123,7 +126,11 @@ extern "C" {
 #endif
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
-    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint),
+    base_type(parent, flags | Qt::Window
+#ifndef Q_OS_MACX
+    | Qt::CustomizeWindowHint
+#endif
+    ),
     QnWorkbenchContextAware(context),
     m_controller(0),
     m_titleVisible(true),
@@ -131,7 +138,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_drawCustomFrame(false)
 {
 #ifdef Q_OS_MACX
-    mac_initFullScreen((void*)winId(), (void*)this);
+    // TODO: #GDM check the neccesarity of this line. In Maveric fullscreen animation works fine without it.
+    // But with this line Mac OS shows white background in place of QGraphicsView when application enters or
+    // exits fullscreen mode.
+//    mac_initFullScreen((void*)winId(), (void*)this);
 #endif
 
     setAttribute(Qt::WA_AlwaysShowToolTips);
@@ -154,20 +164,13 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;
     setMinimumWidth(smallWindow ? minimalWindowWidth / 2 : minimalWindowWidth);
     setMinimumHeight(smallWindow ? minimalWindowHeight / 2 : minimalWindowHeight);
-    setPaletteColor(this, QPalette::Window, Qt::black);
 
     /* Set up scene & view. */
     m_scene.reset(new QnGraphicsScene(this));
     setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
 
     m_view.reset(new QnGraphicsView(m_scene.data()));
-    m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
-    m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);
-    setPaletteColor(m_view.data(), QPalette::Background, Qt::black);
-    setPaletteColor(m_view.data(), QPalette::Base, Qt::black);
-
-        // TODO: #Elric move to ctor^ ?
 
     if (!(qnSettings->lightMode() & Qn::LightModeNoBackground)) {
         m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
@@ -192,6 +195,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchLayoutsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
+    context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
@@ -277,7 +281,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
     m_titleLayout->addStretch(0x1000);
-    m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction), false, 1.0, Qn::MainWindow_Panic_Help));
     if (QnScreenRecorder::isSupported())
         m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
     m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction), false, 1.0, Qn::Login_Help));
@@ -290,8 +293,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_viewLayout->addWidget(m_view.data());
 
     m_globalLayout = new QVBoxLayout();
-    // set 1px border to make custom window border visible
-    m_globalLayout->setContentsMargins(1, 1, 1, 1);
+    m_globalLayout->setContentsMargins(0, 0, 0, 0);
     m_globalLayout->setSpacing(0);
     m_globalLayout->addLayout(m_titleLayout);
     m_globalLayout->addLayout(m_viewLayout);
@@ -314,6 +316,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     //initialize system-wide menu
     menu()->newMenu(Qn::MainScope);
 #endif
+
+    QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
+    Q_UNUSED(manageDialog)
 }
 
 QnMainWindow::~QnMainWindow() {
@@ -408,13 +413,7 @@ void QnMainWindow::showNormal() {
 }
 
 void QnMainWindow::minimize() {
-    setWindowState(windowState() | Qt::WindowMinimized);
-
-    // workaround against QTBUG-25727
-#ifdef Q_OS_LINUX
-    QApplication::processEvents();
-    setWindowState(windowState() &~ Qt::WindowMinimized);
-#endif
+    showMinimized();
 }
 
 void QnMainWindow::toggleTitleVisibility() {
@@ -689,8 +688,10 @@ Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) con
         return Qt::NoSection;
 
     Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(Qn::calculateRectangularFrameSections(rect(), QnGeometry::eroded(rect(), m_frameMargins), QRect(pos, pos)));
+
     if((m_options & TitleBarDraggable) && result == Qt::NoSection && pos.y() <= m_tabBar->mapTo(const_cast<QnMainWindow *>(this), m_tabBar->rect().bottomRight()).y())
         result = Qt::TitleBarArea;
+
     return result;
 }
 

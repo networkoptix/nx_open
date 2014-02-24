@@ -96,6 +96,7 @@ public:
 signals:
     void noStoragesAvailable();
     void storageFailure(QnResourcePtr storageRes, QnBusiness::EventReason reason);
+    void rebuildFinished();
 public slots:
     void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
@@ -149,6 +150,7 @@ private:
     QMap<QnId, bool> m_diskFullWarned;
     RebuildState m_rebuildState;
     double m_rebuildProgress;
+    bool m_rebuildCancelled;
 
     friend class RebuildAsyncTask;
     RebuildAsyncTask* m_asyncRebuildTask;

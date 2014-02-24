@@ -370,7 +370,7 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
             }
         }
 
-        QnCounter* counter = new QnCounter(0, this);
+        QnCounter *counter = new QnCounter(0, this);
         if (target && slot)
             connect(counter, SIGNAL(reachedZero()), target, slot);
         connect(counter, SIGNAL(reachedZero()), counter, SLOT(deleteLater()));
@@ -384,11 +384,7 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
         foreach(const QnLayoutResourcePtr &fileResource, fileResources) {
             bool isReadOnly = !(accessController()->permissions(fileResource) & Qn::WritePermission);
 
-            if(exportHandler->saveLocalLayout(fileResource,
-                                              isReadOnly,
-                                              false,
-                                              counter,
-                                              SLOT(decrement())))
+            if(exportHandler->saveLocalLayout(fileResource, isReadOnly, false, counter, SLOT(decrement())))
                 counter->increment();
         }
 
@@ -429,7 +425,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Layout"));
     dialog->setText(tr("Enter the name of the layout to create:"));
-    dialog->setName(generateUniqueLayoutName(user, tr("New layout")));
+    dialog->setName(generateUniqueLayoutName(user, tr("New layout"), tr("New layout %1")));
     dialog->setWindowModality(Qt::ApplicationModal);
 
     QMessageBox::Button button;

@@ -642,6 +642,9 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
     if(!context()->user())
         return;
 
+    if (!context()->workbench()->currentLayout()->resource())
+        return;
+
     foreach(const QnMimeData &data, m_delayedDrops) {
         QMimeData mimeData;
         data.toMimeData(&mimeData);
@@ -723,10 +726,13 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
         return;
 
     menu()->trigger(Qn::OpenNewTabAction);
+    submitDelayedDrops();
 }
 
 void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
-    qreal value = workbench()->currentLayout()->cellAspectRatio();
+    qreal value = workbench()->currentLayout()->hasCellAspectRatio()
+                  ? workbench()->currentLayout()->cellAspectRatio()
+                  : qnGlobals->defaultLayoutCellAspectRatio();
 
     if (qFuzzyCompare(4.0 / 3.0, value))
         action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
@@ -810,6 +816,8 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
             ? 1
             : qnSettings->maxSceneVideoItems();
 
+    bool adjustAspectRatio = layout->getItems().isEmpty() || !layout->hasCellAspectRatio();
+
     QnResourceWidgetList widgets = parameters.widgets();
     if(!widgets.empty() && position.isNull() && layout->getItems().empty()) {
         QHash<QUuid, QnLayoutItemData> itemDataByUuid;
@@ -834,20 +842,60 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
             layout->addItem(data);
         }
+    } else {
+        // TODO: #Elric server & media resources only!
 
-        return;
+        QnResourceList resources = parameters.resources();
+        if(!resources.isEmpty()) {
+            AddToLayoutParams addParams;
+            addParams.usePosition = !position.isNull();
+            addParams.position = position;
+            addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
+            addToLayout(layout, resources, addParams);
+        }
     }
 
-    // TODO: #Elric server & media resources only!
 
-    QnResourceList resources = parameters.resources();
-    if(!resources.isEmpty()) {
-        AddToLayoutParams addParams;
-        addParams.usePosition = !position.isNull();
-        addParams.position = position;
-        addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
-        addToLayout(layout, resources, addParams);
-        return;
+    QnWorkbenchLayout *workbenchLayout = workbench()->currentLayout();
+    if (adjustAspectRatio && workbenchLayout->resource() == layout) {
+        const qreal normalAspectRatio = 4.0 / 3.0;
+        const qreal wideAspectRatio = 16.0 / 9.0;
+
+        qreal cellAspectRatio = -1.0;
+        qreal midAspectRatio = 0.0;
+        int count = 0;
+
+
+        if (!widgets.isEmpty()) {
+            /* Here we don't take into account already added widgets. It's ok because
+               we can get here only if the layout doesn't have cell aspect ratio, that means
+               its widgets don't have aspect ratio too. */
+            foreach (QnResourceWidget *widget, widgets) {
+                if (widget->hasAspectRatio()) {
+                    midAspectRatio += widget->aspectRatio();
+                    ++count;
+                }
+            }
+        } else {
+            foreach (QnWorkbenchItem *item, workbenchLayout->items()) {
+                QnResourceWidget *widget = context()->display()->widget(item);
+                if (widget && widget->hasAspectRatio()) {
+                    midAspectRatio += widget->aspectRatio();
+                    ++count;
+                }
+            }
+        }
+
+        if (count > 0) {
+            midAspectRatio /= count;
+            cellAspectRatio = (qAbs(midAspectRatio - normalAspectRatio) < qAbs(midAspectRatio - wideAspectRatio))
+                              ? normalAspectRatio : wideAspectRatio;
+        }
+
+        if (cellAspectRatio > 0)
+            layout->setCellAspectRatio(cellAspectRatio);
+        else if (workbenchLayout->items().size() > 1)
+            layout->setCellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio());
     }
 }
 
@@ -901,7 +949,8 @@ void QnWorkbenchActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
-    layout->setName(generateUniqueLayoutName(context()->user(), tr("New layout")));
+
+    layout->setName(generateUniqueLayoutName(context()->user(), tr("New layout"), tr("New layout %1")));
 
     workbench()->addLayout(layout);
     workbench()->setCurrentLayout(layout);
@@ -1302,7 +1351,7 @@ void QnWorkbenchActionHandler::at_cameraListAction_triggered()
 
     bool newlyCreated = false;
     if(!cameraListDialog()) {
-        m_cameraListDialog = new QnCameraListDialog(mainWindow(), context());
+        m_cameraListDialog = new QnCameraListDialog(mainWindow());
         newlyCreated = true;
     }
     QRect oldGeometry = cameraListDialog()->geometry();
@@ -1867,14 +1916,24 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     if(!server)
         return;
 
+    QUrl serverUrl = server->getApiUrl();
+    
     // TODO: #Elric total encapsulation failure, there should be no proxy-related logic here.
-    QString url;
+    QUrl url;
     if(!server->getProxyHost().isEmpty()) {
-        QUrl apiUrl(server->getApiUrl());
-        url = QString(lit("http://%1:%2/proxy/%3:%4/api/showLog?lines=1000")).arg(server->getProxyHost()).arg(server->getProxyPort()).arg(apiUrl.host()).arg(apiUrl.port());
+        url.setScheme(lit("http"));
+        url.setHost(server->getProxyHost());
+        url.setPort(server->getProxyPort());
+        url.setPath(lit("/proxy/%4:%5/api/showLog").arg(serverUrl.host()).arg(serverUrl.port()));
     } else {
-        url = server->getApiUrl() + lit("/api/showLog?lines=1000");
+        url = serverUrl;
+        url.setPath(lit("/api/showLog"));
     }
+    url.setQuery(lit("lines=1000"));
+
+    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
+    url.setUserName(lastUsedConnection.url.userName());
+    url.setPassword(lastUsedConnection.url.password());
     
     QDesktopServices::openUrl(url);
 }
@@ -2264,7 +2323,7 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered(
 void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     QnActionParameters params = menu()->currentParameters(sender());
 
-    QnResourceWidget *widget = params.widget();
+    QnMediaResourceWidget *widget = params.widget<QnMediaResourceWidget>();
     if(!widget)
         return;
 
@@ -2273,11 +2332,12 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     addParams.usePosition = true;
     addParams.position = widget->item()->combinedGeometry().center();
     addParams.zoomWindow = rect;
+    addParams.dewarpingParams.enabled = widget->dewarpingParams().enabled;
     addParams.zoomUuid = widget->item()->uuid();
     addParams.frameColor = params.argument<QColor>(Qn::ItemFrameColorRole);
     addParams.rotation = widget->item()->rotation();
 
-    addToLayout(workbench()->currentLayout()->resource(), widget->resource(), addParams);
+    addToLayout(workbench()->currentLayout()->resource(), widget->resource()->toResourcePtr(), addParams);
 }
 
 void QnWorkbenchActionHandler::at_rotate0Action_triggered(){
@@ -2369,7 +2429,7 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
     int minHeight = qMax(brect.height(), qnGlobals->layoutBackgroundMinSize().height());
 
     qreal cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
-    if (layout->cellAspectRatio() > 0) {
+    if (layout->hasCellAspectRatio()) {
         qreal cellWidth = 1.0 + layout->cellSpacing().width();
         qreal cellHeight = 1.0 / layout->cellAspectRatio() + layout->cellSpacing().height();
         cellAspectRatio = cellWidth / cellHeight;

@@ -100,6 +100,7 @@ void QnStorageManager::rebuildCatalogIndexInternal()
         QMutexLocker lock(&m_mutexCatalog);
         m_rebuildProgress = 0;
         m_catalogLoaded = false;
+        m_rebuildCancelled = false;
         /*
         foreach(DeviceFileCatalogPtr catalog,  m_devFileCatalogHi)
             catalog->beforeRebuildArchive();
@@ -112,6 +113,9 @@ void QnStorageManager::rebuildCatalogIndexInternal()
     }
     loadFullFileCatalog(true);
     m_rebuildState = RebuildState_None;
+
+    if(!m_rebuildCancelled)
+        emit rebuildFinished();
 }
 
 void QnStorageManager::rebuildCatalogAsync()
@@ -128,6 +132,7 @@ void QnStorageManager::cancelRebuildCatalogAsync()
     if (m_rebuildState != RebuildState_None) 
     {
         cl_log.log("Catalog rebuild operation is canceled", cl_logINFO);
+        m_rebuildCancelled = true;
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_None);
         setRebuildState(RebuildState_None);
     }

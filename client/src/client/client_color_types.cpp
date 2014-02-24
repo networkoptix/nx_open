@@ -38,6 +38,15 @@ QnTimeSliderColors::QnTimeSliderColors() {
 
     dateOverlay = QColor(255, 255, 255, 48);
     dateOverlayAlternate = withAlpha(selection, 48);
+
+    pastLastMinute = pastBackground;
+    futureLastMinute = futureBackground;
+}
+
+QnTimeScrollBarColors::QnTimeScrollBarColors() {
+    indicator = QColor(255, 255, 255, 255);
+    border = QColor(255, 255, 255, 64);
+    handle = QColor(255, 255, 255, 48);
 }
 
 QnBackgroundColors::QnBackgroundColors() {
@@ -106,12 +115,36 @@ QColor QnStatisticsColors::networkByKey(const QString &key) const {
     return network[qMod(id, network.size())];
 }
 
+QnScheduleGridColors::QnScheduleGridColors() {
+    normalLabel =   QColor(255, 255, 255, 255);
+    weekendLabel =  QColor(255, 128, 128, 255);
+    selectedLabel = QColor(64,  128, 192, 255);
+    disabledLabel = QColor(183, 183, 183, 255);
+}
+
+QnGridColors::QnGridColors() {
+    grid = QColor(0, 240, 240, 128);
+    allowed = QColor(0, 255, 0, 64);
+    disallowed = QColor(255, 0, 0, 64);
+}
+
+QnPtzManageModelColors::QnPtzManageModelColors() {
+    title = QColor(64, 64, 64);
+    invalid = QColor(64, 16, 16);
+    warning = QColor(64, 64, 16);
+}
 
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QnTimeSliderColors, 
     (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)
         (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)
-        (separator)(dateOverlay)(dateOverlayAlternate), 
+        (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute), 
+    QJson::Optional
+)
+
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnTimeScrollBarColors, 
+    (indicator)(border)(handle), 
     QJson::Optional
 )
 
@@ -132,4 +165,25 @@ QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     (grid)(frame)(cpu)(ram)(hdds), 
     QJson::Optional
 )
+
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnScheduleGridColors, 
+    (normalLabel)(weekendLabel)(selectedLabel)(disabledLabel), 
+    QJson::Optional
+)
+
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnGridColors, 
+    (grid)(allowed)(disallowed), 
+    QJson::Optional
+)
+
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnPtzManageModelColors, 
+    (title)(invalid)(warning), 
+    QJson::Optional
+)
+
+
+
 

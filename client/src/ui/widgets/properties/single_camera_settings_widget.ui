@@ -246,7 +246,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBoxDewarping">
+        <widget class="QCheckBox" name="fisheyeCheckBox">
          <property name="text">
           <string>This is a fish-eye lens camera</string>
          </property>
@@ -293,7 +293,7 @@
       <attribute name="title">
        <string>Motion</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,1,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,1,0,0,0">
        <item>
         <widget class="QLabel" name="motionAvailableLabel">
          <property name="font">
@@ -408,7 +408,39 @@
             </item>
            </layout>
           </item>
-          <item row="4" column="0">
+          <item row="3" column="1">
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="Line" name="line_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
            <widget class="QLabel" name="label_5">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -424,7 +456,7 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item>
            <widget class="QLabel" name="motionWebPageLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -434,20 +466,6 @@
             </property>
             <property name="text">
              <string>URL</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="Line" name="line_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="Line" name="line_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </item>

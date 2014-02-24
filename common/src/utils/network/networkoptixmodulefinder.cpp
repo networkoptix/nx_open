@@ -2,7 +2,6 @@
 * 30 oct 2012
 * a.kolesnikov
 ***********************************************************/
-
 #include "networkoptixmodulefinder.h"
 
 #include <memory>
@@ -24,13 +23,6 @@ const unsigned int NetworkOptixModuleFinder::defaultPingTimeoutMillis;
 const unsigned int NetworkOptixModuleFinder::defaultKeepAliveMultiply;
 #endif
 
-//!Creates socket and binds it to random unused udp port
-/*!
-    One must call \a isValid after object instanciation to check wthether it has been initialized successfully
-
-    \param multicastGroupAddress
-    \param localIntfIP IP of local interface used to send multicast packets. If empty, default interface is used
-*/
 NetworkOptixModuleFinder::NetworkOptixModuleFinder(
     const QHostAddress& multicastGroupAddress,
     const unsigned int multicastGroupPort,
@@ -73,17 +65,11 @@ NetworkOptixModuleFinder::NetworkOptixModuleFinder(
 NetworkOptixModuleFinder::~NetworkOptixModuleFinder()
 {
     stop();
-    for( std::vector<UDPSocket*>::size_type
-        i = 0;
-        i < m_sockets.size();
-        ++i )
-    {
-        delete m_sockets[i];
-    }
+    
+    qDeleteAll(m_sockets);
     m_sockets.clear();
 }
 
-//!Returns true, if object has been succesfully initialized (socket is created and binded to local address)
 bool NetworkOptixModuleFinder::isValid() const
 {
     return !m_sockets.empty();
@@ -93,8 +79,8 @@ bool NetworkOptixModuleFinder::isCompatibilityMode() const {
     return m_compatibilityMode;
 }
 
-void NetworkOptixModuleFinder::setCompatibilityMode(bool value) {
-    m_compatibilityMode = value;
+void NetworkOptixModuleFinder::setCompatibilityMode(bool compatibilityMode) {
+    m_compatibilityMode = compatibilityMode;
 }
 
 void NetworkOptixModuleFinder::pleaseStop()

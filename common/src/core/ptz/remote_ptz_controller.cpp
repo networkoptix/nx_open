@@ -20,7 +20,7 @@ QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr &resourc
         return;
     }
 
-    connect(resource.data(), &QnResource::ptzCapabilitiesChanged, this, &QnAbstractPtzController::capabilitiesChanged);
+    connect(resource.data(), &QnResource::ptzCapabilitiesChanged, this, [this]{ emit changed(Qn::CapabilitiesPtzField); });
 }
 
 QnRemotePtzController::~QnRemotePtzController() {
@@ -130,13 +130,20 @@ bool QnRemotePtzController::getTours(QnPtzTourList *) {
     RUN_COMMAND(Qn::GetToursPtzCommand, QVariant(), ptzGetToursAsync);
 }
 
-bool QnRemotePtzController::getData(Qn::PtzDataFields query, QnPtzData *) {
-    RUN_COMMAND(Qn::GetDataPtzCommand, QVariant(), ptzGetDataAsync, query);
+bool QnRemotePtzController::getActiveObject(QnPtzObject *) {
+    RUN_COMMAND(Qn::GetActiveObjectPtzCommand, QVariant(), ptzGetActiveObjectAsync);
 }
 
-bool QnRemotePtzController::synchronize(Qn::PtzDataFields query) {
-    /* There really is nothing to synchronize, so we just run getData. */
-    RUN_COMMAND(Qn::SynchronizePtzCommand, QVariant(), ptzGetDataAsync, query);
+bool QnRemotePtzController::updateHomeObject(const QnPtzObject &homePosition) {
+    RUN_COMMAND(Qn::UpdateHomeObjectPtzCommand, homePosition, ptzUpdateHomeObjectAsync, homePosition);
+}
+
+bool QnRemotePtzController::getHomeObject(QnPtzObject *) {
+    RUN_COMMAND(Qn::GetHomeObjectPtzCommand, QVariant(), ptzGetHomeObjectAsync);
+}
+
+bool QnRemotePtzController::getData(Qn::PtzDataFields query, QnPtzData *) {
+    RUN_COMMAND(Qn::GetDataPtzCommand, QVariant(), ptzGetDataAsync, query);
 }
 
 // -------------------------------------------------------------------------- //

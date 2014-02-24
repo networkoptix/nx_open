@@ -969,7 +969,6 @@ qint64 QnTimeSlider::animationEnd() {
 
 void QnTimeSlider::generateProgressPatterns() {
     const qreal stripeWidth = 8.0;
-    const qreal stripesAlpha = 0.4;
 
     QPainterPath path;
     path.moveTo(0.0, 0.0);
@@ -990,30 +989,20 @@ void QnTimeSlider::generateProgressPatterns() {
     path.closeSubpath();
 
 
-    QColor pastColor = QColor::fromRgbF(m_colors.pastBackground.redF() * m_colors.pastBackground.alphaF(),
-                                        m_colors.pastBackground.greenF() * m_colors.pastBackground.alphaF(),
-                                        m_colors.pastBackground.blueF() * m_colors.pastBackground.alphaF(),
-                                        stripesAlpha);
-
     m_progressPastPattern = QPixmap(stripeWidth * 4, stripeWidth * 4);
     m_progressPastPattern.fill(Qt::transparent);
 
     QPainter pastPainter(&m_progressPastPattern);
     pastPainter.setRenderHint(QPainter::Antialiasing);
-    pastPainter.fillPath(path, pastColor);
+    pastPainter.fillPath(path, m_colors.pastLastMinute);
 
-
-    QColor futureColor = QColor::fromRgbF(m_colors.futureBackground.redF() * m_colors.futureBackground.alphaF(),
-                                          m_colors.futureBackground.greenF() * m_colors.futureBackground.alphaF(),
-                                          m_colors.futureBackground.blueF() * m_colors.futureBackground.alphaF(),
-                                          stripesAlpha);
 
     m_progressFuturePattern = QPixmap(stripeWidth * 4, stripeWidth * 4);
     m_progressFuturePattern.fill(Qt::transparent);
 
     QPainter futurePainter(&m_progressFuturePattern);
     futurePainter.setRenderHint(QPainter::Antialiasing);
-    futurePainter.fillPath(path, futureColor);
+    futurePainter.fillPath(path, m_colors.futureLastMinute);
 }
 
 bool QnTimeSlider::isAnimatingWindow() const {
@@ -1202,7 +1191,7 @@ void QnTimeSlider::setColors(const QnTimeSliderColors &colors) {
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::updatePixmapCache() {
     m_pixmapCache->setFont(font());
-    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255)); // TODO: #Elric customize color
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, palette().color(QPalette::WindowText)); // TODO: #Elric customize color
 }
 
 void QnTimeSlider::updateKineticProcessor() {
@@ -1686,7 +1675,7 @@ void QnTimeSlider::drawLastMinute(QPainter *painter, const QRectF &rect) {
     const qreal moveSpeed = 0.05;
 
     qint64 startTime = QDateTime::currentDateTime().addSecs(-60).toMSecsSinceEpoch();
-    int startPos = quickPositionFromValue(startTime);
+    qreal startPos = quickPositionFromValue(startTime);
     if (startPos >= rect.right())
         return;
 
@@ -1694,17 +1683,17 @@ void QnTimeSlider::drawLastMinute(QPainter *painter, const QRectF &rect) {
     m_lastMinuteAnimationDelta = shift / moveSpeed;
     QTransform brushTransform = QTransform::fromTranslate(-shift, 0.0);
 
-    int sliderPos = quickPositionFromValue(sliderPosition());
+    qreal sliderPos = quickPositionFromValue(sliderPosition());
 
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
 
-    if (sliderPos > startPos && !qFuzzyIsNull(startPos - sliderPos)) {
+    if (sliderPos > startPos && !qFuzzyEquals(startPos, sliderPos)) {
         QBrush brush(m_progressPastPattern);
         brush.setTransform(brushTransform);
         painter->fillRect(QRectF(QPointF(startPos, rect.top()), rect.bottomRight()), brush);
     }
 
-    if (!qFuzzyIsNull(rect.right() - sliderPos)) {
+    if (!qFuzzyEquals(rect.right(), sliderPos)) {
         QBrush brush(m_progressFuturePattern);
         brush.setTransform(brushTransform);
         painter->fillRect(QRectF(QPointF(startPos, rect.top()), rect.bottomRight()), brush);
@@ -1878,7 +1867,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         /* Draw label if needed. */
         qreal lineHeight = m_stepData[index].currentLineHeight;
         if(!qFuzzyIsNull(m_stepData[index].currentTextOpacity)) {
-            QPixmap pixmap = m_pixmapCache->positionShortPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
+            QPixmap pixmap = m_pixmapCache->positionShortPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index], palette().color(QPalette::WindowText));
             QRectF textRect(x - pixmap.width() / 2.0, rect.top() + lineHeight, pixmap.width(), pixmap.height());
 
             QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_stepData[index].currentTextOpacity);
@@ -1934,7 +1923,7 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
         painter->setBrush(number % 2 ? m_colors.dateOverlay : m_colors.dateOverlayAlternate);
         painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
 
-        QPixmap pixmap = m_pixmapCache->positionLongPixmap(pos0, textHeight, highlightStep);
+        QPixmap pixmap = m_pixmapCache->positionLongPixmap(pos0, textHeight, highlightStep, palette().color(QPalette::WindowText));
 
         QRectF textRect((x0 + x1) / 2.0 - pixmap.width() / 2.0, rect.top() + textTopMargin, pixmap.width(), pixmap.height());
         if(textRect.left() < rect.left())

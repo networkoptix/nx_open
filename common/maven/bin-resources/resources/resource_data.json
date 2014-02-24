@@ -14,28 +14,40 @@
     "data": [
         {
             "keys": [
-                "SD8362", "SD83X3", "SD81X1", "SD83X1"
+                "VIVOTEK|SD8362", "VIVOTEK|SD83X3", "VIVOTEK|SD81X1", "VIVOTEK|SD83X1"
             ],
             "onvifPtzStopBroken": true
         },
         {
             "keys": [
-                "DM368", "FD8161", "FD8362E", "FD8361", "FD8136", 
-                "FD8162", "FD8372", "FD8135H", "IP8151", "IP8335H", 
-                "IP8362", "MD8562", "IPC-HDB3200C", "N53F-F", "IP8371E",
-                "FD8363", "KCM5211", "TCM3511", "AXISP3344", "AXISP1344"
+                "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136", 
+                "VIVOTEK|FD8162", "VIVOTEK|FD8372", "VIVOTEK|FD8135H", "VIVOTEK|IP8151", "VIVOTEK|IP8335H", 
+                "VIVOTEK|IP8362", "VIVOTEK|MD8562", "VIVOTEK|IP8371E", "VIVOTEK|FD8363",
+                "ACTI|KCM5211", "ACTI|TCM3511", 
+                "AXIS|AXISP3344", "AXIS|AXISP1344",
+                "*|IPC-HDB3200C", "*|N53F-F",
+                "IPC|LR01", "hs0130|LR01", "H18A2|IPCAM_M1", "H18A3|IPCAM_M1", "H18A4|RL01", "H18A5|IPCAM_M1", "HI9712_51ÊÒÍâ|LR01"
+                
             ],
-            "brokenPtz": true
+            "ptzCapabilities": "NoPtzCapabilities"
         },
         {
             "keys": [
-                "FW3471-PS-E", "DWC-MPTZ20X", "KCM8111"
+                "DW|DWC-MPTZ20X",
+                "ACTI|KCM8111",
+                "*|FW3471-PS-E"
             ],
             "octagonalPtz": true
         },
         {
             "keys": [
-                "AXIS Q6035-E"
+                "ACTI|KCM3311"
+            ],
+            "ptzCapabilities": "ContinuousZoomCapability"
+        },
+        {
+            "keys": [
+                "DW|DWC-MPTZ20X"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -46,28 +58,22 @@
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [-0.5, 0.1111111111111],
-                        "logical": [ -90,              20]
+                        "device":  [  0,    1],
+                        "logical": [  0,  -90]
                     },
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [    0,     1],
-                        "logical": [35.25, 711.1],
+                        "device":  [0.004167,   0.083333],
+                        "logical": [1.0,        20.0],
+                        "logicalMultiplier": 35.25,
                         "space": "35MmEquiv"
-                    }
-                },
-                "toCamera": {
-                    "y": {
-                        "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [-0.5, 0.0, 1.0],
-                        "logical": [ -90, 0.0,  20]
                     }
                 }
             }
         },
         {
             "keys": [
-                "DWC-MPTZ20X"
+                "DW|DWC-MPTZ20X|unknown_beta"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -93,7 +99,7 @@
         },
         {
             "keys": [
-                "VB-H41"
+                "*|VB-H41"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -109,7 +115,7 @@
                     },
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
-                        "comment": "L = 1 - 1/t, P = 32.0 * t",
+                        "comment": "D = 1 - 1/t, L = 32.0 * t",
                         "device":  [0, 0.333333, 0.5, 0.6, 0.666667, 0.714286, 0.75, 0.777778, 0.8, 0.818182, 0.833333, 0.846154, 0.857143, 0.866667, 0.875, 0.882353, 0.888889, 0.894737, 0.9, 0.904762, 0.909091, 0.913043, 0.916667, 0.92, 0.923077, 0.925926, 0.928571, 0.931034, 0.933333, 0.935484, 0.9375, 0.939394, 0.941176, 0.942857, 0.944444, 0.945946, 0.947368, 0.948718, 0.95],
                         "logical": [1,      1.5,   2, 2.5,        3,      3.5,    4,      4.5,   5,      5.5,        6,      6.5,        7,      7.5,     8,      8.5,        9,      9.5,  10,     10.5,       11,     11.5,       12, 12.5,       13,     13.5,       14,     14.5,       15,     15.5,     16,     16.5,       17,     17.5,       18,     18.5,       19,     19.5,   20],
                         "logicalMultiplier": 32.0,
@@ -120,7 +126,7 @@
         },
         {
             "keys": [
-                "SD83X3"
+                "VIVOTEK|SD83X3"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -146,7 +152,7 @@
         },
         {
             "keys": [
-                "SD8362"
+                "VIVOTEK|SD8362"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -172,7 +178,7 @@
         },
         {
             "keys": [
-                "SNC-RH124"
+                "*|SNC-RH124"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -205,7 +211,7 @@
         },
         {
             "keys": [
-                "KCM8111"
+                "ACTI|KCM8111"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -237,32 +243,7 @@
                     }
                 }
             }
-        },
-		{	"keys": [
-				"LR01"
-			],
-            "ptzMapper": {
-                "fromCamera": {
-                    "x": {
-                        "extrapolationMode": "PeriodicExtrapolation",
-                        "device":  [ -1,    1],
-                        "logical": [-180, 180]
-                    },
-                    "y": {
-                        "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [1,  -1],
-                        "logical": [0, -90]
-                    },
-                    "z": {
-                        "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [0, 1],
-                        "logical": [1, 18],
-                        "logicalMultiplier": 35.25,
-                        "space": "35MmEquiv"
-                    }
-                }
-            }
-		}
+        }
     ]
 }
 

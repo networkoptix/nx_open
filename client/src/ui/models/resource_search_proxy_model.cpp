@@ -10,7 +10,10 @@
 QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject *parent): 
     QSortFilterProxyModel(parent),
     m_invalidating(false)
-{}
+{
+    // TODO: #Elric use natural string comparison instead.
+    setSortCaseSensitivity(Qt::CaseInsensitive);
+}
 
 QnResourceSearchProxyModel::~QnResourceSearchProxyModel() {
     return;
@@ -64,6 +67,14 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIn
     Qn::NodeType nodeType = static_cast<Qn::NodeType>(index.data(Qn::NodeTypeRole).value<int>());
     if(nodeType == Qn::UsersNode)
         return false; /* We don't want users in search. */
+
+    if(nodeType == Qn::RecorderNode) {
+        for (int i = 0; i < sourceModel()->rowCount(index); i++) {
+            if (filterAcceptsRow(i, index))
+                return true;
+        }
+        return false;
+    }
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if(resource.isNull())

@@ -646,27 +646,30 @@ namespace Qn {
          * Moves camera to the given PTZ preset.
          *
          * Parameters:
-         * <tt>QString PtzPresetIdRole</tt> --- id of the PTZ preset.
+         * <tt>QString PtzObjectIdRole</tt> --- id of the PTZ preset.
          */
-        PtzGoToPresetAction,
-
-        /**
-         * Opens PTZ preset management dialog.
-         */
-        PtzManagePresetsAction,
+        PtzActivatePresetAction,
 
         /**
          * Starts given PTZ tour.
          *
          * Parameters:
-         * <tt>QString PtzTourIdRole</tt> --- id of the PTZ tour.
+         * <tt>QString PtzObjectIdRole</tt> --- id of the PTZ tour.
          */
-        PtzStartTourAction,
+        PtzActivateTourAction,
+
+        /**
+         * Activates given PTZ object.
+         *
+         * Parameters:
+         * <tt>QString PtzObjectIdRole</tt> --- id of the PTZ preset/tour.
+         */
+        PtzActivateObjectAction,
 
         /**
          * Opens PTZ tours management dialog.
          */
-        PtzManageToursAction,
+        PtzManageAction,
 
         /**
          * Starts fisheye calibration for the given widget.

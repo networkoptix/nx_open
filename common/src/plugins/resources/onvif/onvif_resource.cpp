@@ -468,9 +468,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         return CameraDiagnostics::ServerTerminatedResult();
 
     Qn::CameraCapabilities addFlags = Qn::NoCapabilities;
-    /*Qn::PtzCapabilities ptzCaps = Qn::NoPtzCapabilities; // TODO: #PTZ
-    if (m_ptzController)
-        ptzCaps = m_ptzController->getCapabilities();*/
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
         addFlags |= Qn::PrimaryStreamSoftMotionCapability;
     else if (!hasDualStreaming2())
@@ -479,8 +476,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     
     if (addFlags != Qn::NoCapabilities)
         setCameraCapabilities(getCameraCapabilities() | addFlags);
-    /*if (ptzCaps != Qn::NoPtzCapabilities)
-        setPtzCapabilities(ptzCaps);*/ // TODO: #PTZ
 
     //registering onvif event handler
     std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;
@@ -1068,13 +1063,13 @@ void QnPlOnvifResource::setImagingUrl(const QString& src)
     m_imagingUrl = src;
 }
 
-QString QnPlOnvifResource::getPtzfUrl() const
+QString QnPlOnvifResource::getPtzUrl() const
 {
     QMutexLocker lock(&m_mutex);
     return m_ptzUrl;
 }
 
-void QnPlOnvifResource::setPtzfUrl(const QString& src) 
+void QnPlOnvifResource::setPtzUrl(const QString& src) 
 {
     QMutexLocker lock(&m_mutex);
     m_ptzUrl = src;
@@ -1246,7 +1241,7 @@ bool QnPlOnvifResource::fetchPtzInfo() {
         return false;
 
     QAuthenticator auth(getAuth());
-    PtzSoapWrapper ptz (getPtzfUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
+    PtzSoapWrapper ptz (getPtzUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
 
     _onvifPtz__GetConfigurations request;
     _onvifPtz__GetConfigurationsResponse response;
@@ -1705,7 +1700,7 @@ void QnPlOnvifResource::updateVideoSource(VideoSource* source, const QRect& maxR
     source->Bounds->height = maxRect.height();
 }
 
-CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource* source) const
+CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource* source)
 {
     QAuthenticator auth(getAuth());
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), getTimeDrift());
@@ -1720,6 +1715,10 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource
         qWarning() << "QnOnvifStreamReader::setVideoSourceConfiguration: can't set required values into ONVIF physical device (URL: " 
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() 
             << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+
+        if (soapWrapper.isNotAuthenticated())
+            setStatus(QnResource::Unauthorized);
+
         return CameraDiagnostics::NoErrorResult(); // ignore error because of some cameras is not ONVIF profile S compatible and doesn't support this request
         //return CameraDiagnostics::RequestFailedResult(QLatin1String("setVideoSourceConfiguration"), soapWrapper.getLastError());
     }
@@ -2075,7 +2074,7 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     m_onvifAdditionalSettings = std::move(settings);
 }
 
-CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder) const
+CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder)
 {
     QAuthenticator auth(getAuth());
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
@@ -2087,6 +2086,10 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncod
 
     int soapRes = soapWrapper.setVideoEncoderConfiguration(request, response);
     if (soapRes != SOAP_OK) {
+
+        if (soapWrapper.isNotAuthenticated())
+            setStatus(QnResource::Unauthorized);
+
         qCritical() << "QnOnvifStreamReader::sendVideoEncoderToCamera: can't set required values into ONVIF physical device (URL: " 
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() 
             << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
@@ -2222,7 +2225,7 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
 
 QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal()
 {
-    if(getPtzfUrl().isEmpty() || getPtzConfigurationToken().isEmpty())
+    if(getPtzUrl().isEmpty() || getPtzConfigurationToken().isEmpty())
         return NULL;
 
     QScopedPointer<QnOnvifPtzController> result(new QnOnvifPtzController(toSharedPointer(this)));
@@ -2938,7 +2941,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( b
             }
             if (response.Capabilities->PTZ) 
             {
-                setPtzfUrl(fromOnvifDiscoveredUrl(response.Capabilities->PTZ->XAddr));
+                setPtzUrl(fromOnvifDiscoveredUrl(response.Capabilities->PTZ->XAddr));
             }
             m_deviceIOUrl = response.Capabilities->Extension && response.Capabilities->Extension->DeviceIO
                 ? response.Capabilities->Extension->DeviceIO->XAddr

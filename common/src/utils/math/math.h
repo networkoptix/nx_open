@@ -18,6 +18,23 @@
 #include "fuzzy.h"
 #include "defines.h"
 
+namespace QnMathDetail {
+    using ::qFuzzyIsNull;
+
+#define QN_DEFINE_INTEGER_FUZZY_IS_NULL(TYPE)                                   \
+    inline bool qFuzzyIsNull(TYPE p) { return p == 0; }
+
+    QN_DEFINE_INTEGER_FUZZY_IS_NULL(short)
+    QN_DEFINE_INTEGER_FUZZY_IS_NULL(unsigned short)
+    QN_DEFINE_INTEGER_FUZZY_IS_NULL(int)
+    QN_DEFINE_INTEGER_FUZZY_IS_NULL(unsigned int)
+    QN_DEFINE_INTEGER_FUZZY_IS_NULL(long)
+    QN_DEFINE_INTEGER_FUZZY_IS_NULL(unsigned long)
+    QN_DEFINE_INTEGER_FUZZY_IS_NULL(long long)
+    QN_DEFINE_INTEGER_FUZZY_IS_NULL(unsigned long long)
+#undef QN_DEFINE_INTEGER_FUZZY_IS_NULL
+} // namespace QnMathDetail
+
 inline bool qIsNaN(const QVector2D &vector) {
     return qIsNaN(vector.x()) || qIsNaN(vector.y());
 }
@@ -140,7 +157,7 @@ template<class T, class Step>
 T qCeil(T value, Step step) {
     DEBUG_CODE(assert(step > 0));
     T mod = qMod(value, static_cast<T>(step));
-    return qFuzzyIsNull(mod) ? value : static_cast<T>(value - mod + step);
+    return QnMathDetail::qFuzzyIsNull(mod) ? value : static_cast<T>(value - mod + step);
 }
 
 /**
@@ -236,6 +253,14 @@ inline double qMax(double l, float r) {
 
 inline double qMax(float l, double r) {
     return qMax(static_cast<double>(l), r);
+}
+
+inline float qSign(float value) {
+    return value >= 0.0f ? 1.0f : -1.0f;
+}
+
+inline double qSign(double value) {
+    return value >= 0.0 ? 1.0 : -1.0;
 }
 
 

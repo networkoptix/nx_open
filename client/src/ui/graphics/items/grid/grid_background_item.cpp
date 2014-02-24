@@ -2,17 +2,19 @@
 
 #include <QtGui/QPainter>
 
-#include <core/resource/user_resource.h>
-#include <core/resource/layout_resource.h>
-
-#include <ui/workbench/workbench_grid_mapper.h>
-#include <ui/workbench/workbench_context.h>
-
 #include <utils/math/math.h>
 #include <utils/color_space/yuvconvert.h>
 #include <utils/threaded_image_loader.h>
 #include <utils/local_file_cache.h>
 #include <utils/app_server_image_cache.h>
+
+#include <core/resource/user_resource.h>
+#include <core/resource/layout_resource.h>
+
+#include <ui/workaround/gl_native_painting.h>
+#include <ui/workbench/workbench_grid_mapper.h>
+#include <ui/workbench/workbench_context.h>
+
 
 #ifdef _WIN32
 //if defined, background is drawn with native API (as gl texture), else - QPainter::drawImage is used
@@ -338,7 +340,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
         d->imgUploaded = true;
     }
 
-    painter->beginNativePainting();
+    QnGlNativePainting::begin(painter);
 
     if( m_imgAsFrame->format == PIX_FMT_YUVA420P || m_imgAsFrame->format == PIX_FMT_RGBA )
     {
@@ -352,7 +354,8 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     if( m_imgAsFrame->format == PIX_FMT_YUVA420P || m_imgAsFrame->format == PIX_FMT_RGBA )
         glDisable(GL_BLEND);
 
-    painter->endNativePainting();
+    QnGlNativePainting::end(painter);
+
 #else
     if (!d->image.isNull())
         painter->drawImage(d->rect, d->image);

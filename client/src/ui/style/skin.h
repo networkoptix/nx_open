@@ -25,49 +25,38 @@ public:
     static const QIcon::State Off = QIcon::Off;
 
     QnSkin(QObject *parent = NULL);
-    QnSkin(const QString &basePath, QObject *parent = NULL);
+    QnSkin(const QStringList &paths, QObject *parent = NULL);
     virtual ~QnSkin();
 
+    const QStringList &paths() const;
+
+    QString path(const QString &name) const;
+    QString path(const char *name) const;
+
+    bool hasFile(const QString &name) const;
+    bool hasFile(const char *name) const;
+
     QIcon icon(const QString &name, const QString &checkedName = QString());
-    
-    QIcon icon(const char *name, const char *checkedName = NULL) { 
-        return icon(QLatin1String(name), QLatin1String(checkedName)); 
-    }
+    QIcon icon(const char *name, const char *checkedName = NULL);
 
     QPixmap pixmap(const QString &name, const QSize &size = QSize(), Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, Qt::TransformationMode mode = Qt::FastTransformation);
-    
-    QPixmap pixmap(const char *name, const QSize &size = QSize(), Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, Qt::TransformationMode mode = Qt::FastTransformation) { 
-        return pixmap(QLatin1String(name), size, aspectMode, mode); 
-    }
-
-    bool hasPixmap(const QString &name) const;
-
-    bool hasPixmap(const char *name) const {
-        return hasPixmap(QLatin1String(name));
-    }
-
+    QPixmap pixmap(const char *name, const QSize &size = QSize(), Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, Qt::TransformationMode mode = Qt::FastTransformation);
     QPixmap pixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
     QPixmap pixmap(const QIcon &icon, int w, int h, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
     QPixmap pixmap(const QIcon &icon, int extent, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
 
-    QMovie* loadMovie(const QString &name, QObject* parent = 0);
+    QMovie *newMovie(const QString &name, QObject* parent = NULL);
+    QMovie *newMovie(const char *name, QObject* parent = NULL);
 
-    QMovie* loadMovie(const char *name, QObject* parent = 0) {
-        return loadMovie(QLatin1String(name), parent);
-    }
-
-    // TODO: #Elric this one creates NEW style => naming is evil. Remove?
-    QStyle *style();
+    QStyle *newStyle();
 
 private:
-    void init(const QString &basePath);
-
-    QString path(const QString &name) const;
+    void init(const QStringList &paths);
 
 private:
-    QString m_basePath;
-    QHash<QString, QIcon> m_iconByNames;
-    QHash<qint64, QIcon> m_pressedIconByKey;
+    QStringList m_paths;
+    QHash<QString, QIcon> m_iconByKey;
+    QHash<qint64, QIcon> m_pressedIconByCacheKey;
 };
 
 #define qnSkin (QnSkin::instance())

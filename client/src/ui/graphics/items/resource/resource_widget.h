@@ -6,6 +6,8 @@
 #include <QtCore/QPointer>
 #include <QtCore/QElapsedTimer>
 
+#include <utils/common/connective.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
 
@@ -31,7 +33,7 @@ class QnImageButtonBar;
 
 class GraphicsLabel;
 
-class QnResourceWidget: public Shaded<Animated<Instrumented<GraphicsWidget> > >, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
+class QnResourceWidget: public Shaded<Animated<Instrumented<Connective<GraphicsWidget>>>>, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
@@ -42,21 +44,21 @@ class QnResourceWidget: public Shaded<Animated<Instrumented<GraphicsWidget> > >,
     Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
     Q_FLAGS(Options Option)
 
-    typedef Shaded<Animated<Instrumented<GraphicsWidget> > > base_type;
+    typedef Shaded<Animated<Instrumented<Connective<GraphicsWidget>>>> base_type;
 
 public:
     enum Option {
-        DisplayActivity             = 0x0001,    /**< Whether the paused overlay icon should be displayed. */
-        DisplaySelection            = 0x0002,    /**< Whether selected / not selected state should be displayed. */
-        DisplayMotion               = 0x0004,    /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
-        DisplayButtons              = 0x0008,    /**< Whether item buttons are to be displayed. */
-        DisplayMotionSensitivity    = 0x0010,    /**< Whether a grid with motion region sensitivity is to be displayed. */
-        DisplayCrosshair            = 0x0020,    /**< Whether PTZ crosshair is to be displayed. */
-        DisplayInfo                 = 0x0040,    /** Whether info panel is to be displayed. */
+        DisplayActivity             = 0x0001,   /**< Whether the paused overlay icon should be displayed. */
+        DisplaySelection            = 0x0002,   /**< Whether selected / not selected state should be displayed. */
+        DisplayMotion               = 0x0004,   /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
+        DisplayButtons              = 0x0008,   /**< Whether item buttons are to be displayed. */
+        DisplayMotionSensitivity    = 0x0010,   /**< Whether a grid with motion region sensitivity is to be displayed. */
+        DisplayCrosshair            = 0x0020,   /**< Whether PTZ crosshair is to be displayed. */
+        DisplayInfo                 = 0x0040,   /**< Whether info panel is to be displayed. */
+        DisplayDewarped             = 0x0080,   /**< Whether the video is to be dewarped. */
 
-        ControlPtz                  = 0x0100,    /**< Whether PTZ state can be controlled with mouse. */
-        ControlZoomWindow           = 0x0200,    /**< Whether zoom windows can be created by dragging the mouse. */
-        VirtualZoomWindow           = 0x0400,    /**< Whether zoom windows is fisheye shader. */
+        ControlPtz                  = 0x0100,   /**< Whether PTZ state can be controlled with mouse. */
+        ControlZoomWindow           = 0x0200,   /**< Whether zoom windows can be created by dragging the mouse. */
 
         WindowRotationForbidden     = 0x1000
     };

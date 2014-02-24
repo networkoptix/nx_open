@@ -327,11 +327,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Tree panel. */
     m_treeWidget = new QnResourceBrowserWidget(NULL, context());
     m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
+    
+    QPalette defaultPalette = m_treeWidget->palette();
     setPaletteColor(m_treeWidget, QPalette::Window, Qt::transparent);
     setPaletteColor(m_treeWidget, QPalette::Base, Qt::transparent);
-    setPaletteColor(m_treeWidget, QPalette::Text, Qt::white);
-    setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Window, Qt::black);
-    setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Base, Qt::black);
+    setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Base, defaultPalette.color(QPalette::Base));
     m_treeWidget->resize(qnSettings->treeWidth(), 0);
 
     m_treeBackgroundItem = new QnControlBackgroundWidget(Qn::LeftBorder, m_controlsWidget);
@@ -453,7 +453,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction), 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenCurrentUserLayoutMenu)));
     m_titleRightButtonsLayout->addStretch(0x1000);
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::TogglePanicModeAction), 1.0, Qn::MainWindow_Panic_Help));
     if (QnScreenRecorder::isSupported())
         m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction), 1.0, Qn::MainWindow_ScreenRecording_Help));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));
@@ -586,8 +585,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderResizerWidget->setProperty(Qn::NoHandScrollOver, true);
 
     m_sliderItem = new QnNavigationItem(m_controlsWidget);
-    m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
-    m_sliderItem->setFrameWidth(0.5);
+    m_sliderItem->setFrameColor(QColor(110, 110, 110, 128));
+    m_sliderItem->setFrameWidth(1.0);
     m_sliderItem->timeSlider()->toolTipItem()->setParentItem(m_controlsWidget);
 
     m_sliderItem->setProperty(Qn::NoHandScrollOver, true);

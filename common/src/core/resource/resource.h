@@ -273,6 +273,7 @@ public:
      * This is intended as this API cannot be used with QnResource anyway 
      * because of threading issues. */
 
+    bool hasProperty(const QString &key) const;
     QString getProperty(const QString &key, const QString &defaultValue = QString()) const;
     void setProperty(const QString &key, const QString &value);
     QnKvPairList getProperties() const;

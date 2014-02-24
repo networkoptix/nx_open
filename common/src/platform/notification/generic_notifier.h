@@ -7,8 +7,7 @@
 #include <QtCore/QElapsedTimer>
 
 class QnGenericNotifier: public QnPlatformNotifier {
-    Q_OBJECT;
-
+    Q_OBJECT
     typedef QnPlatformNotifier base_type;
 
 public:

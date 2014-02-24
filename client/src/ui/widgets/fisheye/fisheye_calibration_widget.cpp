@@ -21,31 +21,33 @@ QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
     ui(new Ui::QnFisheyeCalibrationWidget),
     m_calibrator(new QnFisheyeCalibrator()),
     m_imageProvider(NULL),
-    m_updateTimer(new QTimer(this)),
     m_updating(false),
     m_lastError(QnFisheyeCalibrator::NoError)
 {
     ui->setupUi(this);
+    
+    m_updateTimer = new QTimer(this);
     m_updateTimer->setInterval(refreshInterval);
+    connect(m_updateTimer,      &QTimer::timeout,                       this,               &QnFisheyeCalibrationWidget::at_updateTimer_timeout);
 
-    connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,  ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setCenter);
-    connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,  ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setRadius);
-    connect(m_calibrator,       &QnFisheyeCalibrator::finished,       this,   &QnFisheyeCalibrationWidget::at_calibrator_finished);
+    connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,    ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setCenter);
+    connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,    ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setRadius);
+    connect(m_calibrator,       &QnFisheyeCalibrator::finished,         this,               &QnFisheyeCalibrationWidget::at_calibrator_finished);
 
-    connect(ui->autoButton,     &QPushButton::clicked,  this, &QnFisheyeCalibrationWidget::at_autoButton_clicked);
+    connect(ui->autoButton,     &QPushButton::clicked,                  this,               &QnFisheyeCalibrationWidget::at_autoButton_clicked);
 
-    connect(ui->xCenterSlider,  &QSlider::valueChanged, this, &QnFisheyeCalibrationWidget::at_xCenterSlider_valueChanged);
-    connect(ui->yCenterSlider,  &QSlider::valueChanged, this, &QnFisheyeCalibrationWidget::at_yCenterSlider_valueChanged);
-    connect(ui->radiusSlider,   &QSlider::valueChanged, this, &QnFisheyeCalibrationWidget::at_radiusSlider_valueChanged);
-    connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,  this,    &QnFisheyeCalibrationWidget::at_calibrator_centerChanged);
-    connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,  this,    &QnFisheyeCalibrationWidget::at_calibrator_radiusChanged);
+    connect(ui->xCenterSlider,  &QSlider::valueChanged,                 this,               &QnFisheyeCalibrationWidget::at_xCenterSlider_valueChanged);
+    connect(ui->yCenterSlider,  &QSlider::valueChanged,                 this,               &QnFisheyeCalibrationWidget::at_yCenterSlider_valueChanged);
+    connect(ui->radiusSlider,   &QSlider::valueChanged,                 this,               &QnFisheyeCalibrationWidget::at_radiusSlider_valueChanged);
+    connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,    this,               &QnFisheyeCalibrationWidget::at_calibrator_centerChanged);
+    connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,    this,               &QnFisheyeCalibrationWidget::at_calibrator_radiusChanged);
 
-    connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,  this,    &QnFisheyeCalibrationWidget::dataChanged);
-    connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,  this,    &QnFisheyeCalibrationWidget::dataChanged);
+    connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,    this,               &QnFisheyeCalibrationWidget::dataChanged);
+    connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,    this,               &QnFisheyeCalibrationWidget::dataChanged);
 
-    connect(ui->imageWidget,    &QnFisheyeCalibrationImageWidget::centerModified, this, &QnFisheyeCalibrationWidget::setCenter);
-    connect(ui->imageWidget,    &QnFisheyeCalibrationImageWidget::radiusModified, this, &QnFisheyeCalibrationWidget::setRadius);
-    connect(ui->imageWidget,    &QnFisheyeCalibrationImageWidget::animationFinished, this, &QnFisheyeCalibrationWidget::at_image_animationFinished);
+    connect(ui->imageWidget,    &QnFisheyeCalibrationImageWidget::centerModified, this,     &QnFisheyeCalibrationWidget::setCenter);
+    connect(ui->imageWidget,    &QnFisheyeCalibrationImageWidget::radiusModified, this,     &QnFisheyeCalibrationWidget::setRadius);
+    connect(ui->imageWidget,    &QnFisheyeCalibrationImageWidget::animationFinished, this,  &QnFisheyeCalibrationWidget::at_image_animationFinished);
 
     init();
 }
@@ -61,8 +63,12 @@ void QnFisheyeCalibrationWidget::init() {
 }
 
 void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider *provider) {
+    // TODO: #GDM ownership is not clear. Does this object claim ownership of provider?
+    // If not, then it should not rely on destruction order => need to store provider in 
+    // QPointer and check that it's alive before usage.
+
     if (m_imageProvider) {
-        disconnect(m_updateTimer, &QTimer::timeout, m_imageProvider, NULL);
+        disconnect(m_updateTimer, NULL, m_imageProvider, NULL);
         disconnect(m_imageProvider, NULL, ui->imageWidget, NULL);
         disconnect(m_imageProvider, NULL, this, NULL);
     }
@@ -73,10 +79,9 @@ void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider *provider) {
     if (!m_imageProvider)
         return;
 
-    connect(m_imageProvider, &QnImageProvider::imageChanged, ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setImage);
-    connect(m_imageProvider, &QnImageProvider::imageChanged, this,    &QnFisheyeCalibrationWidget::at_imageProvider_imageChanged);
+    connect(m_imageProvider, &QnImageProvider::imageChanged, ui->imageWidget,   &QnFisheyeCalibrationImageWidget::setImage);
+    connect(m_imageProvider, &QnImageProvider::imageChanged, this,              &QnFisheyeCalibrationWidget::at_imageProvider_imageChanged);
 
-    connect(m_updateTimer, &QTimer::timeout, m_imageProvider, &QnImageProvider::loadAsync);
     m_updateTimer->start();
 
     if (!m_imageProvider->image().isNull())
@@ -174,4 +179,9 @@ void QnFisheyeCalibrationWidget::at_calibrator_radiusChanged(qreal radius) {
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     ui->radiusSlider->setValue(radius * 100);
+}
+
+void QnFisheyeCalibrationWidget::at_updateTimer_timeout() {
+    if(m_imageProvider && isVisible())
+        m_imageProvider->loadAsync();
 }

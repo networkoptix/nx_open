@@ -54,3 +54,10 @@ contains(NAME, mediaserver) || contains(NAME, common) {
     DEFINES += ENABLE_VMAX
   }
 }
+
+contains(NAME, client) {
+  IS_DYNAMIC_CUSTOMIZATION_ENABLED=${dynamic.customization}
+  contains( IS_DYNAMIC_CUSTOMIZATION_ENABLED, true ) {
+    DEFINES += ENABLE_DYNAMIC_CUSTOMIZATION
+  }
+}

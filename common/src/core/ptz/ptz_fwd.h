@@ -4,7 +4,7 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QList>
 
-#include <utils/common/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 class QnPtzMapper;
 typedef QSharedPointer<QnPtzMapper> QnPtzMapperPtr;
@@ -25,12 +25,9 @@ struct QnPtzLimits;
 
 struct QnPtzData;
 
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzMapperPtr)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzPreset)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzTourSpot)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzTour)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzLimits)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPtzData)
+struct QnPtzObject;
+
+QN_DECLARE_FUNCTIONS_FOR_TYPES((QnPtzMapperPtr)(QnPtzPreset)(QnPtzTourSpot)(QnPtzTour)(QnPtzLimits)(QnPtzData)(QnPtzObject), (json))
 
 #endif // QN_PTZ_FWD_H
 

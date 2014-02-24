@@ -40,6 +40,8 @@ public:
 
     void setCellAspectRatio(qreal cellAspectRatio);
 
+    bool hasCellAspectRatio() const;
+
     QSizeF cellSpacing() const;
 
     void setCellSpacing(const QSizeF &cellSpacing);

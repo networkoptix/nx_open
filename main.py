@@ -18,11 +18,6 @@ def cd(xdir):
     
 def get_environment_variable(variable):
     #print (os.path.abspath(__file__))
-    try:
-        with open(join(dirname(os.path.abspath(__file__)),'configure_settings_tmp.py')): from configure_settings_tmp import customization, configuration
-    except IOError:
-        print 'Please run configure.py first'
-        sys.exit(1)
     
     if variable == 'platform':
         if sys.platform == 'win32':
@@ -48,6 +43,11 @@ def get_environment_variable(variable):
         if os.getenv(variable):
             return os.getenv(variable)
         else:
+            try:
+                with open(join(dirname(os.path.abspath(__file__)),'configure_settings_tmp.py')): from configure_settings_tmp import customization, configuration, build_arch
+            except IOError:
+                print 'Please run configure.py first'
+                sys.exit(1)            
             config = ConfigParser.RawConfigParser(allow_no_value=True)
             config.readfp(open(os.path.dirname(os.path.abspath(__file__)) + '/customization/' + '/default-values.properties'))
 #            config.readfp(open(os.path.dirname(os.path.abspath(__file__)) + '/customization/' + customization + '/build.properties'))

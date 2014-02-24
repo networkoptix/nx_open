@@ -5,8 +5,6 @@
 
 #include <api/app_server_connection.h>
 
-#include <core/kvpair/business_events_filter_kvpair_adapter.h>
-
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 
@@ -21,13 +19,15 @@
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <utils/resource_property_adaptors.h>
+
 //TODO: #GDM handle user changing here
 
 QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::PopupSettingsWidget),
-    m_adapter(new QnBusinessEventsFilterKvPairAdapter(context()->user()))
+    m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this))
 {
     ui->setupUi(this);
 
@@ -47,8 +47,10 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
         m_systemHealthCheckBoxes << checkbox;
     }
 
-    connect(ui->showAllCheckBox,    SIGNAL(toggled(bool)),          this,   SLOT(at_showAllCheckBox_toggled(bool)));
-    connect(m_adapter.data(),       SIGNAL(valueChanged(quint64)),  this,   SLOT(at_showBusinessEvents_valueChanged(quint64)));
+    m_adaptor->setResource(context()->user()); // TODO: #Elric listen to changes?
+
+    connect(ui->showAllCheckBox,    &QCheckBox::toggled,                                this,   &QnPopupSettingsWidget::at_showAllCheckBox_toggled);
+    connect(m_adaptor,              &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnPopupSettingsWidget::at_showBusinessEvents_valueChanged);
 }
 
 QnPopupSettingsWidget::~QnPopupSettingsWidget()
@@ -56,8 +58,6 @@ QnPopupSettingsWidget::~QnPopupSettingsWidget()
 }
 
 void QnPopupSettingsWidget::updateFromSettings() {
-    quint64 value = m_adapter->value();
-
     quint64 healthShown = qnSettings->popupSystemHealth();
     quint64 healthFlag = 1;
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
@@ -66,12 +66,12 @@ void QnPopupSettingsWidget::updateFromSettings() {
         healthFlag = healthFlag << 1;
     }
 
-    at_showBusinessEvents_valueChanged(value);
+    at_showBusinessEvents_valueChanged();
 }
 
 void QnPopupSettingsWidget::submitToSettings() {
     if (context()->user()) {
-        quint64 eventsShown = m_adapter->defaultValue();
+        quint64 eventsShown = 0xFFFFFFFFFFFFFFFFull;
         if (!ui->showAllCheckBox->isChecked()) {
             quint64 eventsFlag = 1;
             for (int i = 0; i < BusinessEventType::Count; i++) {
@@ -80,8 +80,8 @@ void QnPopupSettingsWidget::submitToSettings() {
                 eventsFlag = eventsFlag << 1;
             }
         }
-        QString serialized = QString::number(eventsShown, 16);
-        QnAppServerConnectionFactory::createConnection()->saveAsync(context()->user()->getId(), QnKvPairList() << QnKvPair(m_adapter->key(), serialized));
+
+        m_adaptor->setValue(eventsShown);
     }
 
     quint64 healthShown = qnSettings->popupSystemHealth();
@@ -94,6 +94,7 @@ void QnPopupSettingsWidget::submitToSettings() {
         }
         healthFlag = healthFlag << 1;
     }
+
     qnSettings->setPopupSystemHealth(healthShown);
 }
 
@@ -109,7 +110,7 @@ void QnPopupSettingsWidget::at_showAllCheckBox_toggled(bool checked) {
     }
 }
 
-void QnPopupSettingsWidget::at_showBusinessEvents_valueChanged(quint64 value) {
+void QnPopupSettingsWidget::at_showBusinessEvents_valueChanged() {
     bool all = true;
     if (!ui->showAllCheckBox->isChecked()) {
         foreach (QCheckBox* systemHealthCheckbox, m_systemHealthCheckBoxes) {
@@ -120,7 +121,7 @@ void QnPopupSettingsWidget::at_showBusinessEvents_valueChanged(quint64 value) {
         }
     }
 
-    quint64 eventsShown = value;
+    quint64 eventsShown = m_adaptor->value();
     quint64 eventsFlag = 1;
     for (int i = 0; i < BusinessEventType::Count; i++) {
         bool checked = eventsShown & eventsFlag;

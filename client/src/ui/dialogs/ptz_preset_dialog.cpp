@@ -13,8 +13,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-QnPtzPresetDialog::QnPtzPresetDialog(const QnPtzControllerPtr &controller, QWidget *parent, Qt::WindowFlags windowFlags):
-    base_type(controller, parent, windowFlags),
+QnPtzPresetDialog::QnPtzPresetDialog(QWidget *parent, Qt::WindowFlags windowFlags):
+    base_type(parent, windowFlags),
     ui(new Ui::PtzPresetDialog())
 {
     ui->setupUi(this);
@@ -39,16 +39,17 @@ void QnPtzPresetDialog::loadData(const QnPtzData &data) {
     for(int i = 0; i < 10; i++)
         hotkeys.push_back(i);
 
-    QnHotkeysHash usedHotkeys = m_hotkeysDelegate->hotkeys();
+    QnPtzHotkeyHash usedHotkeys = m_hotkeysDelegate->hotkeys();
     foreach (const QnPtzPreset &preset, data.presets) {
-        if (!usedHotkeys.contains(preset.id))
+        int key = usedHotkeys.key(preset.id, QnPtzHotkey::NoHotkey);
+        if (key == QnPtzHotkey::NoHotkey)
             continue;
-        hotkeys.removeOne(usedHotkeys[preset.id]);
+        hotkeys.removeOne(key);
     }
 
     int currentHotkey = hotkey();
     ui->hotkeyComboBox->clear();
-    ui->hotkeyComboBox->addItem(tr("None"), Qn::NoHotkey);
+    ui->hotkeyComboBox->addItem(tr("None"), QnPtzHotkey::NoHotkey);
     foreach(int hotkey, hotkeys)
         ui->hotkeyComboBox->addItem(QString::number(hotkey), hotkey);
     setHotkey(currentHotkey);
@@ -62,14 +63,18 @@ void QnPtzPresetDialog::saveData() {
     if (!m_hotkeysDelegate || hotkey() < 0)
         return;
 
-    QnHotkeysHash hotkeys = m_hotkeysDelegate->hotkeys();
-    hotkeys[presetId] = hotkey();
+    QnPtzHotkeyHash hotkeys = m_hotkeysDelegate->hotkeys();
+    hotkeys[hotkey()] = presetId;
     m_hotkeysDelegate->updateHotkeys(hotkeys);
     return;
 }
 
 Qn::PtzDataFields QnPtzPresetDialog::requiredFields() const {
     return Qn::PresetsPtzField;
+}
+
+void QnPtzPresetDialog::updateFields(Qn::PtzDataFields fields) {
+
 }
 
 QnAbstractPtzHotkeyDelegate* QnPtzPresetDialog::hotkeysDelegate() const {
@@ -87,7 +92,7 @@ int QnPtzPresetDialog::hotkey() const {
 void QnPtzPresetDialog::setHotkey(int hotkey) {
     int index = ui->hotkeyComboBox->findData(hotkey);
     if(index < 0)
-        index = ui->hotkeyComboBox->findData(Qn::NoHotkey);
+        index = ui->hotkeyComboBox->findData(QnPtzHotkey::NoHotkey);
     ui->hotkeyComboBox->setCurrentIndex(index);
 }
 

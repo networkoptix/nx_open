@@ -65,7 +65,7 @@ QString xorDecrypt(const QString &crypted, const QString &key);
 QString extractFileExtension(const QString &string);
 
 /** Returns string formed as "baseValue<spacer>(n)" that is not contained in the usedValues list. */
-QString generateUniqueString(const QStringList &usedValues, const QString &baseValue, const QString &spacer = lit(" "));
+QString generateUniqueString(const QStringList &usedStrings, const QString &defaultString, const QString &templateString);
 
 #endif // QN_STRING_H
 

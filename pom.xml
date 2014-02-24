@@ -44,6 +44,7 @@
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
+        <resources.phase>generate-sources</resources.phase>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
         <protobuf.version>2.5.0-SNAPSHOT</protobuf.version>
@@ -145,7 +146,8 @@
                 <executions>
                     <execution>
                         <id>copy-project-resources</id>
-                        <phase>generate-sources</phase>
+                        <!-- This variable is for Android. Resources for all modules should be copied on the "generate-sources" phase. However Android should copy resources at "validate" -->
+                        <phase>${resources.phase}</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -167,6 +169,7 @@
                                     <filtering>false</filtering>
                                     <excludes>
                                         <exclude>**/_unused/**</exclude>
+                                        <exclude>**/intro.*</exclude>
                                     </excludes>
                                 </resource>	   
                                 <resource>
@@ -187,23 +190,31 @@
     <profiles>
         <profile>
             <id>build-env</id>
+            <!-- preparing build-environment only if it is not ready. The last operation is installing llutil to x64 python virtualenv so it can be used as a criteria -->
             <activation>
-                <property>
-                    <name>!skipBuildenv</name>
-                </property>
+                <file>
+                    <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
+                    <missing>build_environment/target/x64/python/Lib/site-packages/llutil-0.4-py2.7-win-amd64.egg/llutil.py </missing>
+                </file> 
             </activation>
             <modules>	
-                <module>build_environment</module>       
+                <module>build_environment</module>
             </modules>	
         </profile>     
 
         <profile>
             <id>quicksync</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>quicksync</name>
+                    <value>true</value>
+                </property>
             </activation>
             <modules>	
-                <module>quicksyncdecoder</module>       
+                <module>plugins/quicksyncdecoder</module>       
             </modules>	
         </profile>   
 
@@ -218,12 +229,6 @@
                 <module>build_variables</module>
                 <module>appserver</module>
                 <module>common</module>
-                <!--<module>plugins/axiscamplugin</module>-->
-                <module>plugins/genericrtspplugin</module>
-                <module>plugins/image_library_plugin</module>
-                <module>plugins/mjpg_link</module>
-                <module>mediaserver</module>
-                <module>mediaproxy</module>
                 <!-- <module>testcamera</module> -->
             </modules>
         </profile> 
@@ -235,6 +240,15 @@
                     <family>!mac</family>
                 </os> 
             </activation>
+            <modules>
+                <!--<module>plugins/axiscamplugin</module>-->
+                <module>plugins/genericrtspplugin</module>
+                <module>plugins/image_library_plugin</module>
+                <module>plugins/mjpg_link</module>
+                <module>mediaserver</module>
+                <module>mediaproxy</module>
+                <!-- <module>testcamera</module> -->
+            </modules>            
             <properties>
                 <additional.compiler>${compiler}</additional.compiler>         
             </properties>
@@ -264,7 +278,6 @@
                 </os>
             </activation>
             <modules>
-                <module>plugins/quicksyncdecoder</module>
                 <module>plugins/image_library_plugin</module>                
                 <module>traytool</module>
                 <module>vmaxproxy</module>	
@@ -274,7 +287,8 @@
             </modules>
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
-                <python.dir>${environment.dir}/python/${arch}</python.dir>	
+                <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
+                <python.dir>${libdir}/${arch}/python/scripts</python.dir>                
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
                 <compiler>msvc2012u3</compiler>
@@ -296,7 +310,8 @@
             </activation>
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
-                <python.dir>${environment.dir}/python/bin</python.dir>		
+                <init.python.dir>${environment.dir}/python/bin</init.python.dir>				
+                <python.dir>${libdir}/${arch}/python/bin</python.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
@@ -332,11 +347,8 @@
                     <family>mac</family>
                 </os> 
             </activation>
-            <properties>
-                <environment.dir>${env.environment}</environment.dir>
-                <python.dir>${env.environment}/python/bin/</python.dir>				
+            <properties>		
                 <platform>macosx</platform>
-                <compiler>gcc</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <arch>x64</arch>
                 <qt.spec>macx-clang-libc++</qt.spec>
