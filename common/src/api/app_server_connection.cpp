@@ -922,7 +922,6 @@ Q_GLOBAL_STATIC(QnAppServerConnectionFactory, qn_appServerConnectionFactory_inst
 
 QnAppServerConnectionFactory::QnAppServerConnectionFactory(): 
     m_defaultMediaProxyPort(0), 
-    m_allowCameraChanges(true),
     m_serializer(new QnApiPbSerializer())
 {}
 
@@ -984,17 +983,6 @@ void QnAppServerConnectionFactory::setSessionKey(const QByteArray& sessionKey)
             factory->m_sessionKey = sessionKey.trimmed();
         }
     }
-}
-
-void QnAppServerConnectionFactory::setAllowCameraCHanges(bool value)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
-            factory->m_allowCameraChanges = value;
-}
-
-bool QnAppServerConnectionFactory::isAllowCameraCHanges()
-{
-    return qn_appServerConnectionFactory_instance()->m_allowCameraChanges;
 }
 
 void QnAppServerConnectionFactory::setPublicIp(const QString &publicIp)

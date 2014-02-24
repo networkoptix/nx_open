@@ -176,9 +176,11 @@ void QnAbstractResourcePropertyAdaptor::processSaveRequestsNoLock(const QnResour
 
     m_pendingSave.storeRelease(0);
 
+    // TODO: #Elric
+
     resource->setProperty(m_key, serializedValue);
     ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
-    connection->getResourceManager()->save(resource()->getId(), QnKvPairList() << QnKvPair(m_key, serializedValue), this, &QnAbstractResourcePropertyAdaptor::at_paramsSaved);
+    connection->getResourceManager()->save(resource->getId(), QnKvPairList() << QnKvPair(m_key, serializedValue), this, &QnAbstractResourcePropertyAdaptor::at_paramsSaved);
 }
 
 void QnAbstractResourcePropertyAdaptor::at_paramsSaved(int, ec2::ErrorCode)

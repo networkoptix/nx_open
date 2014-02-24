@@ -53,9 +53,11 @@ void QnServerMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
 {
     // TODO: implement me
 
-    case Qn::Message_Type_KvPairChange: {
+    // TODO: #EC2
+
+    /*case Qn::Message_Type_KvPairChange: {
         updateKvPairs(message.kvPairs);
         break;
-    }
+    }*/
 
 }

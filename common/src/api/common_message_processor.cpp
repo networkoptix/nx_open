@@ -97,7 +97,6 @@ void QnCommonMessageProcessor::on_runtimeInfoChanged( const ec2::QnRuntimeInfo& 
     QnAppServerConnectionFactory::setSystemName(runtimeInfo.systemName);
     QnAppServerConnectionFactory::setPublicIp(runtimeInfo.publicIp);
     QnAppServerConnectionFactory::setSessionKey(runtimeInfo.sessionKey);
-    QnAppServerConnectionFactory::setAllowCameraCHanges(runtimeInfo.allowCameraChanges);
 }
 
 void QnCommonMessageProcessor::on_resourceStatusChanged( const QnId& resourceId, QnResource::Status status )

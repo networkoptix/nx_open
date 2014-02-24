@@ -221,7 +221,6 @@ bool QnDbManager::updateTableGuids(const QString& tableName, const QString& fiel
 
 bool QnDbManager::updateGuids()
 {
-    QSqlQuery query();
     QMap<int, QnId> guids = getGuidList("SELECT id, guid from vms_resource_tmp order by id");
     if (!updateTableGuids("vms_resource", "guid", guids))
         return false;
