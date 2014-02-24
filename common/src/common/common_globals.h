@@ -193,6 +193,7 @@ public:
     Q_DECLARE_FLAGS(MotionTypes, MotionType);
 
     enum PanicMode {PM_None, PM_BusinessEvents, PM_User};
+    enum ServerFlags { SF_None, SF_Edge };
 
     enum TimePeriodType {
         NullTimePeriod      = 0x1,  /**< No period. */

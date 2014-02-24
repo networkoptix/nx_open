@@ -43,11 +43,11 @@ public:
     void setPrimaryIF(const QString& primaryIF);
     QString getPrimaryIF() const;
 
-    void setReserve(bool reserve = true);
-    bool getReserve() const;
-
     Qn::PanicMode getPanicMode() const;
     void setPanicMode(Qn::PanicMode panicMode);
+
+    Qn::ServerFlags getServerFlags() const;
+    void setServerFlags(Qn::ServerFlags flags);
 
     //virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
@@ -74,7 +74,7 @@ private:
     QList<QHostAddress> m_prevNetAddrList;
     QnAbstractStorageResourceList m_storages;
     bool m_primaryIFSelected;
-    bool m_reserve;
+    Qn::ServerFlags m_serverFlags;
     Qn::PanicMode m_panicMode;
     QnSoftwareVersion m_version;
     QMap<int, QString> m_runningIfRequests;
