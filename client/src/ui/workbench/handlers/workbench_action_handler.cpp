@@ -1055,9 +1055,9 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
 
     if (!resources.empty()) {
         parameters.setResources(resources);
-        if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters))
+        if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters)) {
             menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
-        else {
+        } else {
             QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
             if (layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout)) {
                 bool hasLocal = false;
