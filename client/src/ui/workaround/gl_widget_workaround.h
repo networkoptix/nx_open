@@ -6,7 +6,18 @@
 
 class QnGLWidget : public QGLWidget {
 public:
-    using QGLWidget::QGLWidget;
+    explicit QnGLWidget(QWidget* parent=0,
+                        const QGLWidget* shareWidget = 0, Qt::WindowFlags f=0)
+        : QGLWidget(parent, shareWidget, f)
+    {}
+    explicit QnGLWidget(QGLContext *context, QWidget* parent=0,
+                        const QGLWidget* shareWidget = 0, Qt::WindowFlags f=0)
+        : QGLWidget(context, parent, shareWidget, f)
+    {}
+    explicit QnGLWidget(const QGLFormat& format, QWidget* parent=0,
+                        const QGLWidget* shareWidget = 0, Qt::WindowFlags f=0)
+        : QGLWidget(format, parent, shareWidget, f)
+    {}
 
     ~QnGLWidget() {
 #ifdef Q_OS_MACX
@@ -15,6 +26,9 @@ public:
             context()->doneCurrent();
 #endif
     }
+
+private:
+    Q_DISABLE_COPY(QnGLWidget)
 };
 
 #endif // QN_GL_WIDGET_WORKAROUND_H
