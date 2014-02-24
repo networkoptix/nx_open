@@ -9,14 +9,23 @@ namespace Qn {
      * Type of a node in resource tree displayed to the user.
      */
     enum NodeType {
-        RootNode,
-        LocalNode,
-        ServersNode,
-        UsersNode,
-        ResourceNode,   /**< Node that represents a resource. */
-        ItemNode,       /**< Node that represents a layout item. */
-        BastardNode,    /**< Node that contains hidden resources. */
-        RecorderNode,   /**< Node that represents a recorder (VMAX, etc). */
+        RootNode,               /**< Root node for the tree. */
+        LocalNode,              /**< Root node for local resources. */
+        ServersNode,            /**< Root node for remote resources. */
+        UsersNode,              /**< Root node for user resources. */
+
+        BastardNode,            /**< Root node for hidden resources. */
+
+        ResourceNode,           /**< Node that represents a resource. Has only resource. */
+        ItemNode,               /**< Node that represents a layout item. Has both guid and resource. */
+        RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
+
+        VideoWallItemNode,      /**< Node that represents a video wall item. Has a guid and can have resource. */
+        VideoWallHistoryNode,   /**< Node that represents a video wall history item. Has both guid and resource. */
+
+        UserVideoWallNode,      /**< Node that represents a video wall having items that user is allowed to edit. Has both guid and resource. */
+        UserVideoWallItemNode,  /**< Node that represents a video wall item that user is allowed to edit. Has a guid. */
+
         NodeTypeCount
     };
 
@@ -255,5 +264,6 @@ Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(Qn::ItemRole)
 Q_DECLARE_METATYPE(Qn::TimeMode)
 Q_DECLARE_METATYPE(Qn::ClientSkin)
+Q_DECLARE_METATYPE(Qn::NodeType)
 
 #endif // QN_CLIENT_GLOBALS_H
