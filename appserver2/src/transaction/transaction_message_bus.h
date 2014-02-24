@@ -17,7 +17,7 @@ namespace ec2
     public:
 
         QnTransactionTransport(QnTransactionMessageBus* owner):
-            state(NotDefined), lastConnectTime(0), readyForSend(false), readyForRead(false), readBufferLen(0), chunkHeaderLen(0), sendOffset(0), chunkLen(0), isClientSide(false), owner(owner) {}
+            state(NotDefined), lastConnectTime(0), readyForSend(false), readyForRead(false), readBufferLen(0), chunkHeaderLen(0), sendOffset(0), chunkLen(0), isConnectionOriginator(false), isClientPeer(false), owner(owner) {}
         ~QnTransactionTransport();
         enum State {
             NotDefined,
@@ -44,7 +44,8 @@ namespace ec2
         int chunkHeaderLen;
         quint32 chunkLen;
         int sendOffset;
-        bool isClientSide;
+        bool isConnectionOriginator;
+        bool isClientPeer;
         QnTransactionMessageBus* owner;
         QMutex mutex;
     public:
@@ -76,7 +77,7 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url);
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QUuid& remoteGuid, bool doFullSync);
+        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QUuid& remoteGuid, bool isClient);
         
         template <class T>
         void setHandler(T* handler) { 
@@ -137,15 +138,12 @@ namespace ec2
             T* m_handler;
         };
 
-        void gotTransaction(const QByteArray& data)
-        {
-            QMutexLocker lock(&m_mutex);
-            if (m_handler)
-                m_handler->processByteArray(data);
-        }
-
+        inline void gotTransaction(const QnTransactionTransport* sender, QByteArray data) { emit sendGotTransaction(sender, data); }
+    signals:
+        void sendGotTransaction(const QnTransactionTransport* sender, QByteArray data);
     private slots:
         void at_timer();
+        void at_gotTransaction(const QnTransactionTransport* sender, QByteArray data);
     private:
         AbstractHandler* m_handler;
         QTimer* m_timer;

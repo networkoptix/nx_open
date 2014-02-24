@@ -33,13 +33,13 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void RemoteEC2Connection::startReceivingNotifications( bool fullSyncRequired)
+    void RemoteEC2Connection::startReceivingNotifications( bool isClient)
     {
         QUrl url(m_queryProcessor->getUrl());
         url.setPath("ec2/events");
         QUrlQuery q;
-        if( fullSyncRequired )
-            q.addQueryItem("fullsync", QString());
+        if( isClient )
+            q.addQueryItem("isClient", QString());
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
         url.setQuery(q);
         m_peerUrl = url;

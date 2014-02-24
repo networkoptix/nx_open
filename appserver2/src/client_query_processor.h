@@ -90,6 +90,12 @@ namespace ec2
             m_runningHttpRequests[httpClient] = new CustomHandler<decltype(func)>(func);
         }
 
+        template<class T> bool processIncomingTransaction( const QnTransaction<T>&  )
+        {
+            // nothing to do for a while
+            return true;
+        }
+
     public slots:
         void onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
         {

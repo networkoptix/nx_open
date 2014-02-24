@@ -18,6 +18,12 @@ namespace ec2
         m_dbManager( new QnDbManager(resCtx.resFactory, &m_storedFileManagerImpl, dbFileName) ),
         m_connectionInfo( connectionInfo )
     {
+        QnTransactionMessageBus::instance()->setHandler(this);
+    }
+
+    Ec2DirectConnection::~Ec2DirectConnection()
+    {
+        QnTransactionMessageBus::instance()->removeHandler();
     }
 
     QnConnectionInfo Ec2DirectConnection::connectionInfo() const
@@ -25,7 +31,7 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void Ec2DirectConnection::startReceivingNotifications( bool /*fullSyncRequired*/)
+    void Ec2DirectConnection::startReceivingNotifications( bool /*isClient*/)
     {
         //TODO/IMPL
     }

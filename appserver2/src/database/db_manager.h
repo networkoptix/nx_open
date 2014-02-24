@@ -33,7 +33,8 @@ namespace ec2
         template<class QueryDataType>
         ErrorCode executeTransaction( const QnTransaction<QueryDataType>& /*tran*/ )
         {
-            static_assert( false, "You have to add QnDbManager::executeTransaction specification" );
+            //static_assert( false, "You have to add QnDbManager::executeTransaction specification" );
+            Q_ASSERT_X( 0, Q_FUNC_INFO, "You have to add QnDbManager::executeTransaction specification" );
             return ErrorCode::ok;
         }
 

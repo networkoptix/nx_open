@@ -26,6 +26,7 @@ namespace ec2
             const ResourceContext& resCtx,
             const QnConnectionInfo& connectionInfo,
             const QString& dbFileName);
+        virtual ~Ec2DirectConnection();
 
         //!Implementation of ec2::AbstractECConnection::connectionInfo
         virtual QnConnectionInfo connectionInfo() const override;

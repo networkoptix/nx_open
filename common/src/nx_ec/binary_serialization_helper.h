@@ -63,6 +63,8 @@ public:
         pos = 0;
     }
 
+    const QByteArray& buffer() const { return m_data; }
+
 private:
     const QByteArray& m_data;
     int pos;

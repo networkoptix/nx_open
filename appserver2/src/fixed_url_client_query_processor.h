@@ -33,6 +33,11 @@ namespace ec2
             m_clientProcessor->processUpdateAsync( m_ecURL, tran, handler );
         }
 
+        template<class T> bool processIncomingTransaction( const QnTransaction<T>&  tran)
+        {
+            return m_clientProcessor->processIncomingTransaction( tran);
+        }
+
         template<class InputData, class OutputData, class HandlerType>
             void processQueryAsync( ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {

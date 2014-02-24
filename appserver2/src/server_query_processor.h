@@ -59,8 +59,25 @@ namespace ec2
 
             // delivering transaction to remote peers
             QnTransactionMessageBus::instance()->sendTransaction(tran);
-
         }
+
+        template<class T> 
+        bool processIncomingTransaction( const QnTransaction<T>& tran ) 
+        {
+            if (tran.persistent)
+            {
+                ErrorCode errorCode = dbManager->executeTransaction( tran );
+                if( errorCode != ErrorCode::ok )
+                    return false;
+
+                // saving transaction to the log
+                errorCode = transactionLog->saveTransaction( tran );
+                if( errorCode != ErrorCode::ok )
+                    return false;
+            }
+            return true;
+        }
+
 
         /*!
             \param handler Functor ( ErrorCode, OutputData )
@@ -89,6 +106,7 @@ namespace ec2
                 handler( errorCode, output );
             } );
         }
+
     };
 }
 

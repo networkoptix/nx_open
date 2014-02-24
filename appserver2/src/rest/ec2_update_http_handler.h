@@ -81,7 +81,7 @@ namespace ec2
 
              // update local data
             if (errorCode == ErrorCode::ok)
-                m_connection->processTransaction(tran);
+                m_connection->triggerNotification(tran);
 
             return errorCode == ErrorCode::ok
                 ? nx_http::StatusCode::ok

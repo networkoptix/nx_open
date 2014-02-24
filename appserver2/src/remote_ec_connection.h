@@ -31,7 +31,8 @@ namespace ec2
         virtual ~RemoteEC2Connection();
 
         virtual QnConnectionInfo connectionInfo() const override;
-        virtual void startReceivingNotifications( bool fullSyncRequired) override;
+        virtual void startReceivingNotifications( bool isClient) override;
+
 
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;

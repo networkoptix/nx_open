@@ -2,6 +2,8 @@
 #include "remote_ec_connection.h"
 #include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
+#include "ec2_connection.h"
+#include "common/common_module.h"
 
 namespace ec2
 {
@@ -60,7 +62,7 @@ void QnTransactionTransport::closeSocket()
 void QnTransactionTransport::processError()
 {
     closeSocket();
-    if (isClientSide) 
+    if (isConnectionOriginator) 
         state = State::Connect;
     else
         state = State::Closed;
@@ -95,7 +97,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                 if (chunkHeaderLen) {
                     const int fullChunkLen = chunkHeaderLen + chunkLen + 2;
                     if (readBufferLen == fullChunkLen) {
-                        owner->gotTransaction(QByteArray::fromRawData((const char *) rBuffer + chunkHeaderLen, chunkLen));
+                        owner->gotTransaction(this, QByteArray::fromRawData((const char *) rBuffer + chunkHeaderLen, chunkLen));
                         readBufferLen = chunkHeaderLen = 0;
                     }
                 }
@@ -162,7 +164,7 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         int fullChunkLen = chunkHeaderLen + chunkLen + 2;
         if (bufferLen >= fullChunkLen)
         {
-            owner->gotTransaction(QByteArray::fromRawData((const char *) buffer + chunkHeaderLen, chunkLen));
+            owner->gotTransaction(this, QByteArray::fromRawData((const char *) buffer + chunkHeaderLen, chunkLen));
             buffer += fullChunkLen;
             bufferLen -= fullChunkLen;
         }
@@ -235,6 +237,7 @@ QnTransactionMessageBus::QnTransactionMessageBus(): m_timer(0), m_thread(0)
     m_timer = new QTimer();
     connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
     m_timer->start(1);
+    connect(this, &QnTransactionMessageBus::sendGotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
 }
 
 QnTransactionMessageBus::~QnTransactionMessageBus()
@@ -247,6 +250,22 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     delete m_timer;
 }
 
+void QnTransactionMessageBus::at_gotTransaction(const QnTransactionTransport* sender, QByteArray data)
+{
+    QMutexLocker lock(&m_mutex);
+
+    // proxy incoming transaction to other peers. Source media server sends transaction to all other server. We should proxy transaction to connected clients only.
+    foreach(QnTransactionTransport* transport, m_connections) {
+        if (transport != sender && transport->isClientPeer)
+            transport->addData(data);
+    }
+
+    if (m_handler)
+        m_handler->processByteArray(data);
+}
+
+// ------------------ QnTransactionMessageBus::CustomHandler -------------------
+
 template <class T>
 template <class T2>
 bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(ApiCommand::Value command, InputBinaryStream<QByteArray>& stream)
@@ -255,8 +274,9 @@ bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(ApiCommand::
     if (!tran.deserialize(command, &stream))
         return false;
     
-    // trigger notification
-    m_handler->processTransaction<T2>(tran); 
+    // trigger notification, update local data e.t.c
+    if (!m_handler->processIncomingTransaction<T2>(tran))
+        return false;
 
     return true;
 }
@@ -377,17 +397,33 @@ void QnTransactionMessageBus::toFormattedHex(quint8* dst, quint32 payloadSize)
     }
 }
 
-void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QUuid& remoteGuid, bool doFullSync)
+void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QUuid& remoteGuid, bool isClient)
 {
     QnTransactionTransport* transport = new QnTransactionTransport(this);
     transport->remoteGuid = remoteGuid;
-    transport->isClientSide = false;
+    transport->isConnectionOriginator = false;
     transport->socket = socket;
     int handle = socket->handle();
     transport->state = QnTransactionTransport::ReadyForStreaming;
 
     QMutexLocker lock(&m_mutex);
-    if (doFullSync) {
+
+    // if we got connection from remote server and exists connection to this remote server, remove it (exclude diplicate connection server1 <==> server2 )
+    for (int i  = 0; i < m_connections.size(); ++i)
+    {
+        if (m_connections[i]->remoteGuid == remoteGuid && m_connections[i]->isConnectionOriginator &&  m_connections[i]->remoteGuid > qnCommon->moduleGUID()) 
+        {
+            delete m_connections[i];
+            m_connections.removeAt(i);
+            break;
+        }
+    }
+
+    // add new connection
+
+    if (isClient) 
+    {
+        transport->isClientPeer = true;
         QnTransaction<ApiFullData> data;
         data.command = ApiCommand::getAllDataList;
         const ErrorCode errorCode = dbManager->doQuery(nullptr, data.params);
@@ -406,7 +442,7 @@ void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url)
     QString test = url.toString();
 
     QnTransactionTransport* transport = new QnTransactionTransport(this);
-    transport->isClientSide = true;
+    transport->isConnectionOriginator = true;
     transport->remoteAddr = url;
     transport->state = QnTransactionTransport::Connect;
     m_connections.push_back(transport);
@@ -423,5 +459,6 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
 }
 
 template class QnTransactionMessageBus::CustomHandler<RemoteEC2Connection>;
+template class QnTransactionMessageBus::CustomHandler<Ec2DirectConnection>;
 
 }
