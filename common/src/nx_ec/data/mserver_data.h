@@ -30,11 +30,11 @@ namespace ec2
 
     struct ApiMediaServerData: public ApiResourceData
     {
-        ApiMediaServerData(): reserve(false), panicMode(0) {}
+        ApiMediaServerData(): flags(Qn::SF_None), panicMode(0) {}
 
         QString      apiUrl;
         QString      netAddrList;
-        bool         reserve;
+        Qn::ServerFlags flags;
         qint32       panicMode;
         QString      streamingUrl;
         QString      version; 
@@ -60,7 +60,7 @@ namespace ec2
 }
 
 #define ApiStorageDataFields  (spaceLimit) (usedForWriting)
-#define medisServerDataFields (apiUrl) (netAddrList) (reserve) (panicMode) (streamingUrl) (version) (authKey) (storages)
+#define medisServerDataFields (apiUrl) (netAddrList) (flags) (panicMode) (streamingUrl) (version) (authKey) (storages)
 
 QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiStorageData, ApiStorageDataFields)
 QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiMediaServerData, ec2::ApiResourceData, medisServerDataFields)

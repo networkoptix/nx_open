@@ -59,7 +59,7 @@ void ApiMediaServerData::fromResource(QnMediaServerResourcePtr resource)
 
     netAddrList = serializeNetAddrList(resource->getNetAddrList());
     apiUrl = resource->getApiUrl();
-    reserve = resource->getReserve();
+    flags = resource->getServerFlags();
     panicMode = resource->getPanicMode();
     streamingUrl = resource->getStreamingUrl();
     version = resource->getVersion().toString();
@@ -80,7 +80,7 @@ void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, const Res
 
     resource->setApiUrl(apiUrl);
     resource->setNetAddrList(resNetAddrList);
-    resource->setReserve(reserve);
+    resource->setServerFlags(flags);
     resource->setPanicMode((Qn::PanicMode) panicMode);
     resource->setStreamingUrl(streamingUrl);
     resource->setVersion(QnSoftwareVersion(version));

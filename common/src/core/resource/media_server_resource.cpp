@@ -18,7 +18,8 @@ private:
 QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
     QnResource(),
     m_panicMode(Qn::PM_None),
-    m_guard(NULL)
+    m_guard(NULL),
+    m_serverFlags(Qn::SF_None)
 {
     setTypeId(resTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
@@ -193,16 +194,6 @@ QString QnMediaServerResource::getPrimaryIF() const
     return m_primaryIf;
 }
 
-void QnMediaServerResource::setReserve(bool reserve)
-{
-    m_reserve = reserve;
-}
-
-bool QnMediaServerResource::getReserve() const
-{
-    return m_reserve;
-}
-
 Qn::PanicMode QnMediaServerResource::getPanicMode() const {
     return m_panicMode;
 }
@@ -215,6 +206,17 @@ void QnMediaServerResource::setPanicMode(Qn::PanicMode panicMode) {
 
     emit panicModeChanged(::toSharedPointer(this)); // TODO: #Elric emit it AFTER mutex unlock.
 }
+
+Qn::ServerFlags QnMediaServerResource::getServerFlags() const
+{
+    return m_serverFlags;
+}
+
+void QnMediaServerResource::setServerFlags(Qn::ServerFlags flags)
+{
+    m_serverFlags = flags;
+}
+
 
 void QnMediaServerResource::determineOptimalNetIF()
 {
@@ -268,7 +270,7 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
     if(localOther) {
         setPanicMode(localOther->getPanicMode());
 
-        m_reserve = localOther->m_reserve;
+        m_serverFlags = localOther->m_serverFlags;
         netAddrListChanged = m_netAddrList != localOther->m_netAddrList;
         m_netAddrList = localOther->m_netAddrList;
         setApiUrl(localOther->m_apiUrl);
