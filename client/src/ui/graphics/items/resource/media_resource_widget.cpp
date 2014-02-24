@@ -1054,7 +1054,7 @@ void QnMediaResourceWidget::at_zoomRectChanged() {
     updateAspectRatio();
     updateIconButton();
 
-    // TODO: #PTZ
+    // TODO: #PTZ probably belongs to instrument.
     if (options() & DisplayDewarped)
         m_ptzController->absoluteMove(Qn::LogicalPtzCoordinateSpace, QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()), 2.0);
 }

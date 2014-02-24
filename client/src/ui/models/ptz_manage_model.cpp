@@ -585,7 +585,7 @@ QVariant QnPtzManageModel::presetData(const QnPtzPresetItemModel &presetModel, i
         }
         case HomeColumn:
             if (role == Qt::ToolTipRole)
-                return tr("This preset will be activated after %n minutes of inactivity", 0, 5); // TODO: #Elric #PTZ use value from PTZ
+                return tr("This preset will be activated after %n minutes of inactivity", 0, 5); // TODO: #Elric #PTZ use value from home PTZ controller
             break;
         case DetailsColumn:
             return QVariant();
