@@ -59,6 +59,7 @@
 #include <ui/graphics/items/standard/graphics_message_box.h>
 
 #include <ui/workaround/gl_widget_factory.h>
+#include <ui/workaround/gl_widget_workaround.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -329,7 +330,7 @@ void QnWorkbenchDisplay::deinitSceneView() {
 }
 
 QGLWidget *QnWorkbenchDisplay::newGlWidget(QWidget *parent, Qt::WindowFlags windowFlags) const {
-    return QnGlWidgetFactory::create<QGLWidget>(parent, windowFlags);
+    return QnGlWidgetFactory::create<QnGLWidget>(parent, windowFlags);
 }
 
 void QnWorkbenchDisplay::initSceneView() {
