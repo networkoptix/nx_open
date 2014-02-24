@@ -14,10 +14,11 @@ public:
     ~QnWorkbenchPtzHandler();
 
 private slots:
-    void at_ptzSavePresetAction_triggered();
-    void at_ptzGoToPresetAction_triggered();
+    void at_ptzActivatePresetAction_triggered();
+    void at_ptzActivateTourAction_triggered();
+    void at_ptzActivateObjectAction_triggered();
 
-    void at_ptzStartTourAction_triggered();
+    void at_ptzSavePresetAction_triggered();
     void at_ptzManageAction_triggered();
 
     void at_debugCalibratePtzAction_triggered();

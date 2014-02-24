@@ -7,6 +7,11 @@
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 
+namespace {
+    const qreal normalAspectRatio = 4.0 / 3.0;
+    const qreal wideAspectRatio = 16.0 / 9.0;
+}
+
 QnWorkbenchLayoutAspectRatioWatcher::QnWorkbenchLayoutAspectRatioWatcher(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent),
@@ -44,8 +49,12 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_resourceWidget_aspectRatioChanged()
     if (!widget)
         return;
 
-    m_watchedLayout->setCellAspectRatio(widget->aspectRatio());
     disconnect(widget, SIGNAL(aspectRatioChanged()), this, SLOT(at_resourceWidget_aspectRatioChanged()));
+
+    if (qAbs(widget->aspectRatio() - normalAspectRatio) < qAbs(widget->aspectRatio() - wideAspectRatio))
+        m_watchedLayout->setCellAspectRatio(normalAspectRatio);
+    else
+        m_watchedLayout->setCellAspectRatio(wideAspectRatio);
 }
 
 void QnWorkbenchLayoutAspectRatioWatcher::at_resourceWidget_destroyed() {

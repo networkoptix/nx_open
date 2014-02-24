@@ -16,15 +16,17 @@
 // -------------------------------------------------------------------------- //
 QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(baseController->resource(), lit("ptzTours"), QnPtzTourHash(), this)),
+    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(lit("ptzTours"), QnPtzTourHash(), this)),
     m_executor(new QnTourPtzExecutor(baseController))
 {
     assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
     assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
-    m_executor->moveToThread(qnPtzPool->executorThread());
+    if(!baseController->hasCapabilities(Qn::VirtualPtzCapability)) // TODO: #Elric implement it in a saner way
+        m_executor->moveToThread(qnPtzPool->executorThread()); 
 
-    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChangedExternally, this, [this]{ emit changed(Qn::ToursPtzField); }, Qt::QueuedConnection);
+    m_adaptor->setResource(baseController->resource());
+    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ToursPtzField); }, Qt::QueuedConnection);
 }
 
 QnTourPtzController::~QnTourPtzController() {
@@ -159,10 +161,7 @@ bool QnTourPtzController::activateTour(const QString &tourId) {
 }
 
 bool QnTourPtzController::getTours(QnPtzTourList *tours) {
-    QMutexLocker locker(&m_mutex);
-
     *tours = m_adaptor->value().values();
-
     return true;
 }
 

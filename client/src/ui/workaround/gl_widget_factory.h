@@ -10,7 +10,7 @@ public:
     template<class Widget>
     static Widget *create(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) {
         QGLFormat format;
-        format.setOption(QGL::SampleBuffers); /* Multisampling. */
+        format.setSampleBuffers(false); /* No multisampling as it slows everything down terribly. */
         format.setDoubleBuffer(qnSettings->isGlDoubleBuffer());
         /* Unfortunately, in Qt5 this function is broken :( */
         // format.setSwapInterval(1);

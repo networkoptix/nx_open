@@ -7,6 +7,8 @@
 
 #include <common/common_meta_types.h>
 
+#include <utils/common/string.h>
+
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -34,7 +36,10 @@ public:
         m_filterEnabled(false)
     {}
 
-    bool isFilterEnabled() { return m_filterEnabled; }
+    bool isFilterEnabled() { 
+        return m_filterEnabled; 
+    }
+
     void setFilterEnabled(bool enabled) {
         if (m_filterEnabled == enabled)
             return;
@@ -42,13 +47,9 @@ public:
         invalidateFilter();
     }
 
-
-    /*!
-      \reimp
-    */
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override {
-        if (index.column() == Qn::CheckColumn && role == Qt::CheckStateRole){
-            Qt::CheckState checkState = (Qt::CheckState)value.toInt();
+        if (index.column() == Qn::CheckColumn && role == Qt::CheckStateRole) {
+            Qt::CheckState checkState = (Qt::CheckState) value.toInt();
             setCheckStateRecursive(index, checkState);
             setCheckStateRecursiveUp(index, checkState);
             return true;
@@ -72,12 +73,9 @@ protected:
         /* Sort by name. */
         QString leftDisplay = left.data(Qt::DisplayRole).toString();
         QString rightDisplay = right.data(Qt::DisplayRole).toString();
-        int result = leftDisplay.compare(rightDisplay);
-        if(result < 0) {
-            return true;
-        } else if(result > 0) {
-            return false;
-        }
+        int result = naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
+        if(result != 0)
+            return result < 0;
 
         /* We want the order to be defined even for items with the same name. */
         QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();

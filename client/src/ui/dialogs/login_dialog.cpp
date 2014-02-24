@@ -79,14 +79,16 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     /* Don't allow to save passwords, at least for now. */
     //ui->savePasswordCheckBox->hide();
 
-    QDir dir(qnSkin->basePath());
-    QStringList introList = dir.entryList(QStringList() << QLatin1String("intro.*"));
-    QString resourceName = QLatin1String(":/skin/intro");
-    if (!introList.isEmpty())
-        resourceName = QLatin1String(":/skin/") + introList.first();
+    static const char *introNames[] = { "intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg", NULL };
+    QString introPath;
+    for(const char **introName = introNames; *introName != NULL; introName++) {
+        introPath = qnSkin->path(*introName);
+        if(!introPath.isEmpty())
+            break;
+    }
 
-    QnAviResourcePtr resource = QnAviResourcePtr(new QnAviResource(QLatin1String("qtfile://") + resourceName));
-    if (FileTypeSupport::isImageFileExt(resourceName))
+    QnAviResourcePtr resource = QnAviResourcePtr(new QnAviResource(lit("qtfile://") + introPath));
+    if (FileTypeSupport::isImageFileExt(introPath))
         resource->addFlags(QnResource::still_image);
 
     m_renderingWidget = QnGlWidgetFactory::create<QnRenderingWidget>();
@@ -150,7 +152,7 @@ QUrl QnLoginDialog::currentUrl() const {
     url.setHost(ui->hostnameLineEdit->text().trimmed());
     url.setPort(ui->portSpinBox->value());
     url.setUserName(ui->loginLineEdit->text().trimmed());
-    url.setPassword(ui->passwordLineEdit->text().trimmed());
+    url.setPassword(ui->passwordLineEdit->text());
     return url;
 }
 
@@ -215,13 +217,13 @@ void QnLoginDialog::changeEvent(QEvent *event) {
 
 void QnLoginDialog::showEvent(QShowEvent *event) {
     base_type::showEvent(event);
-    if (m_autoConnectPending
-            && ui->rememberPasswordCheckBox->isChecked()
-            && !ui->passwordLineEdit->text().isEmpty()
-            && currentUrl().isValid())
+
+    if (m_autoConnectPending && ui->rememberPasswordCheckBox->isChecked() && !ui->passwordLineEdit->text().isEmpty() && currentUrl().isValid()) {
         accept();
-    else
+    } else {
         resetConnectionsModel();
+    }
+
 #ifdef Q_OS_MAC
     if (focusWidget())
         focusWidget()->activateWindow();

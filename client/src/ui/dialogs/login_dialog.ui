@@ -317,6 +317,8 @@
   <tabstop>connectionsComboBox</tabstop>
   <tabstop>saveButton</tabstop>
   <tabstop>deleteButton</tabstop>
+  <tabstop>hostnameLineEdit</tabstop>
+  <tabstop>portSpinBox</tabstop>
   <tabstop>loginLineEdit</tabstop>
   <tabstop>passwordLineEdit</tabstop>
   <tabstop>testButton</tabstop>

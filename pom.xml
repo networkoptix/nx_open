@@ -195,7 +195,7 @@
             <activation>
                 <file>
                     <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
-                    <missing>build_environment/target/x64/python/Lib/site-packages/llutil-0.4-py2.7-win-amd64.egg/  llutil.py </missing>
+                    <missing>build_environment/target/x64/python/Lib/site-packages/llutil-0.4-py2.7-win-amd64.egg/llutil.py </missing>
                 </file> 
             </activation>
             <modules>	

@@ -4,58 +4,181 @@
 
 #include "app_server_connection.h"
 
+// TODO: #Elric
+// Right now we have a problem in case resource property is changed very often.
+// Changes are pushed to EC and then we get them back as notifications, not
+// necessarily in the original order. This way property value gets changed
+// in totally unexpected ways.
+#if 0
+namespace {
+    QString createAdaptorKey() {
+        return lit("id%1|").arg(qrand() % 100000, 5, 10, QChar(L'0'));
+    }
+
+    bool hasAdaptorKey(const QString &string) {
+        return string.size() >= 8 && string[0] == L'i' && string[1] == L'd' && string[7] == L'|';
+    }
+
+    Q_GLOBAL_STATIC_WITH_ARGS(QString, qn_resourcePropertyAdaptor_uniqueKey, createAdaptorKey())
+}
+#endif 
+
+
 // -------------------------------------------------------------------------- //
 // QnAbstractResourcePropertyAdaptor
 // -------------------------------------------------------------------------- //
-QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(const QnResourcePtr &resource, const QString &key, QObject *parent):
+QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(const QString &key, QObject *parent):
     base_type(parent),
-    m_resource(resource),
-    m_key(key)
+    m_key(key),
+    m_pendingSave(0)
 {
-    connect(resource, &QnResource::propertyChanged, this, &QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged);
+    connect(this, &QnAbstractResourcePropertyAdaptor::saveRequestQueued, this, &QnAbstractResourcePropertyAdaptor::processSaveRequests, Qt::QueuedConnection);
 }
 
 QnAbstractResourcePropertyAdaptor::~QnAbstractResourcePropertyAdaptor() {
     return;
 }
 
-void QnAbstractResourcePropertyAdaptor::setValue(const QVariant &value) {
-    if(equals(m_value, value))
-        return;
+const QString &QnAbstractResourcePropertyAdaptor::key() const {
+    return m_key;
+}
 
-    m_value = value;
+QnResourcePtr QnAbstractResourcePropertyAdaptor::resource() const {
+    QMutexLocker locker(&m_mutex);
+    return m_resource;
+}
+
+void QnAbstractResourcePropertyAdaptor::setResource(const QnResourcePtr &resource) {
+    QString newSerializedValue = resource ? resource->getProperty(m_key) : QString();
+
+    bool changed;
+    QnResourcePtr oldResource;
+    QString oldSerializedValue;
+    {
+        QMutexLocker locker(&m_mutex);
+
+        if(m_resource == resource)
+            return;
+
+        if(m_resource) {
+            disconnect(m_resource, NULL, this, NULL);
+            oldResource = m_resource;
+            oldSerializedValue = m_serializedValue;
+        }
+
+        m_resource = resource;
+
+        if(m_resource)
+            connect(resource, &QnResource::propertyChanged, this, &QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged);
+
+        changed = loadValueLocked(newSerializedValue);
+    }
+
+    if(oldResource)
+        processSaveRequestsNoLock(oldResource, oldSerializedValue);
+
+    if(changed)
+        emit valueChanged();
+}
+
+QVariant QnAbstractResourcePropertyAdaptor::value() const {
+    QMutexLocker locker(&m_mutex);
+    return m_value;
+}
+
+QString QnAbstractResourcePropertyAdaptor::serializedValue() const {
+    QMutexLocker locker(&m_mutex);
+    return m_serializedValue;
+}
+
+void QnAbstractResourcePropertyAdaptor::setValue(const QVariant &value) {
+    {
+        QMutexLocker locker(&m_mutex);
+
+        if(equals(m_value, value))
+            return;
+
+        m_value = value;
+
+        if(!serialize(m_value, &m_serializedValue))
+            m_serializedValue = QString();
+    }
     
-    saveValue();
+    enqueueSaveRequest();
 
     emit valueChanged();
 }
 
-void QnAbstractResourcePropertyAdaptor::loadValue() {
-    QString serializedValue = m_resource->getProperty(m_key);
+bool QnAbstractResourcePropertyAdaptor::testAndSetValue(const QVariant &expectedValue, const QVariant &newValue) {
+    {
+        QMutexLocker locker(&m_mutex);
+
+        if(!equals(m_value, expectedValue))
+            return false;
+
+        if(equals(m_value, newValue))
+            return true;
+
+        m_value = newValue;
+
+        if(!serialize(m_value, &m_serializedValue))
+            m_serializedValue = QString();
+    }
+
+    enqueueSaveRequest();
+
+    emit valueChanged();
+    return true;
+}
+
+void QnAbstractResourcePropertyAdaptor::loadValue(const QString &serializedValue) {
+    {
+        QMutexLocker locker(&m_mutex);
+        if(!loadValueLocked(serializedValue))
+            return;
+    }
+
+    emit valueChanged();
+}
+
+bool QnAbstractResourcePropertyAdaptor::loadValueLocked(const QString &serializedValue) {
     if(m_serializedValue == serializedValue)
-        return;
+        return false;
 
     m_serializedValue = serializedValue;
     if(!deserialize(m_serializedValue, &m_value))
         m_value = QVariant();
-
-    emit valueChanged();
-    emit valueChangedExternally();
+    
+    return true;
 }
 
-void QnAbstractResourcePropertyAdaptor::saveValue() {
+void QnAbstractResourcePropertyAdaptor::processSaveRequests() {
+    if(!m_pendingSave.loadAcquire())
+        return;
+    
+    QnResourcePtr resource;
     QString serializedValue;
-    if(!serialize(m_value, &serializedValue))
-        serializedValue = QString();
+    {
+        QMutexLocker locker(&m_mutex);
+        if(!m_resource)
+            return;
 
-    if(m_serializedValue == serializedValue)
+        resource = m_resource;
+        serializedValue = m_serializedValue;
+    }
+
+    processSaveRequestsNoLock(resource, serializedValue);
+}
+
+void QnAbstractResourcePropertyAdaptor::processSaveRequestsNoLock(const QnResourcePtr &resource, const QString &serializedValue) {
+    if(!m_pendingSave.loadAcquire())
         return;
 
-    m_serializedValue = serializedValue;
+    m_pendingSave.storeRelease(0);
 
-    m_resource->setProperty(m_key, m_serializedValue);
+    resource->setProperty(m_key, serializedValue);
     ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
-    connection->getResourceManager()->save(resource()->getId(), QnKvPairList() << QnKvPair(m_key, m_serializedValue), this, &QnAbstractResourcePropertyAdaptor::at_paramsSaved);
+    connection->getResourceManager()->save(resource()->getId(), QnKvPairList() << QnKvPair(m_key, serializedValue), this, &QnAbstractResourcePropertyAdaptor::at_paramsSaved);
 }
 
 void QnAbstractResourcePropertyAdaptor::at_paramsSaved(int, ec2::ErrorCode)
@@ -63,7 +186,15 @@ void QnAbstractResourcePropertyAdaptor::at_paramsSaved(int, ec2::ErrorCode)
 
 }
 
-void QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged(const QnResourcePtr &, const QString &key) {
+void QnAbstractResourcePropertyAdaptor::enqueueSaveRequest() {
+    if(m_pendingSave.loadAcquire())
+        return;
+
+    m_pendingSave.storeRelease(1);
+    emit saveRequestQueued();
+}
+
+void QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key) {
     if(key == m_key)
-        loadValue();
+        loadValue(resource->getProperty(key));
 }

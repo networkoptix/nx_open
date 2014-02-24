@@ -5,6 +5,7 @@
 #include <core/ptz/ptz_fwd.h>
 
 #include <ui/dialogs/abstract_ptz_dialog.h>
+#include <ui/models/ptz_manage_model.h>
 #include <utils/common/singleton.h>
 
 namespace Ui {
@@ -12,6 +13,8 @@ namespace Ui {
 }
 
 class QnPtzManageModel;
+class QnPtzHotkeysResourcePropertyAdaptor;
+class QnLocalFileCache;
 
 // TODO: #GDM remove singleton
 class QnPtzManageDialog : public QnAbstractPtzDialog, public Singleton<QnPtzManageDialog> {
@@ -26,7 +29,7 @@ public:
     void setResource(const QnResourcePtr &resource);
 
     bool isModified() const;
-    void chechForUnsavedChanges();
+    bool checkForUnsavedChanges();
 
 protected:
     virtual void loadData(const QnPtzData &data) override;
@@ -35,9 +38,11 @@ protected:
     virtual void updateFields(Qn::PtzDataFields fields) override;
 
     virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void reject() override;
 
 private slots:
     void updateUi();
+    void updateHotkeys();
 
     void at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
 
@@ -46,20 +51,39 @@ private slots:
     void at_addTourButton_clicked();
     void at_startTourButton_clicked();
     void at_deleteButton_clicked();
+    void at_getPreviewButton_clicked();
 
     void at_tableViewport_resizeEvent();
     void at_tourSpotsChanged(const QnPtzTourSpotList &spots);
+
+    void at_cache_imageLoaded(const QString &fileName, bool ok);
+
+    void storePreview(const QString &id);
+    void setPreview(const QImage &image);
+
+    void at_model_modelAboutToBeReset();
+    void at_model_modelReset();
 
 private:
     bool savePresets();
     bool saveTours();
     bool saveHomePosition();
+    void enableDewarping();
 
+private:
     QScopedPointer<Ui::PtzManageDialog> ui;
     QnPtzManageModel *m_model;
+    QnPtzHotkeysResourcePropertyAdaptor *m_adaptor;
     QnResourcePtr m_resource;
 
+    QnLocalFileCache *m_cache;
+    QSet<QString> m_pendingPreviews;
+
+    QnPtzManageModel::RowData m_lastRowData;
+    int m_lastColumn;
+
     QString m_currentTourId;
+    bool m_submitting;
 };
 
 #endif // PTZ_TOURS_DIALOG_H

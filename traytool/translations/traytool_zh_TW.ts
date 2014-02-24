@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ko" sourcelanguage="en">
+<TS version="2.1" language="zh_TW" sourcelanguage="en">
 <context>
     <name>ConnectionTestingDialog</name>
     <message>
         <location filename="../src/connection_testing_dialog.ui" line="20"/>
         <source>Connection Test</source>
-        <translation></translation>
+        <translation>連線測試</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.ui" line="35"/>
         <source>Testing connection...</source>
-        <translation></translation>
+        <translation>測試連線中…</translation>
     </message>
 </context>
 <context>
@@ -19,12 +19,12 @@
     <message>
         <location filename="../src/findappserverdialog.ui" line="20"/>
         <source>Detected Enterprise Controllers</source>
-        <translation>제어서버 감지됨</translation>
+        <translation>偵測企業控制器</translation>
     </message>
     <message>
         <location filename="../src/findappserverdialog.ui" line="29"/>
         <source>Choose one from the list below</source>
-        <translation>해당 목록에서 하나를 선택하십시오</translation>
+        <translation>從下列列表選擇</translation>
     </message>
 </context>
 <context>
@@ -32,15 +32,13 @@
     <message>
         <location filename="../src/main.cpp" line="41"/>
         <source>System Tray</source>
-        <translation>시스템 트레이</translation>
+        <translation>系統工具列</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="42"/>
         <source>There is no system tray on this system.
 Application will now quit.</source>
-        <translation>해당 시스템에는 시스템 트레이가 없습니다.
-응용 프로그램이 종료 됩니다.
-</translation>
+        <translation>此系統無系統工具列，軟體將會跳出。</translation>
     </message>
 </context>
 <context>
@@ -87,12 +85,12 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="133"/>
         <source>Success</source>
-        <translation>성공</translation>
+        <translation>成功</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="133"/>
         <source>Failed</source>
-        <translation>실패</translation>
+        <translation>失敗</translation>
     </message>
 </context>
 <context>
@@ -100,46 +98,47 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="595"/>
         <source>Insufficient privileges to manage services</source>
-        <translation>서비스를 관리할 수 있는 권한이 불충분함</translation>
+        <translation>管理服務的權限不足</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="595"/>
         <source>UAC must be enabled to request privileges for non-admin users</source>
-        <translation>UAC 기능은 관리자가 아닌 일반 사용자에 대한 권한의 요청에 의해 사용되어야 함</translation>
+        <translation>必須允許 UAC 要求非使用者的權限</translation>
     </message>
 </context>
 <context>
     <name>QnSystrayWindow</name>
     <message>
         <source>Port</source>
-        <translation type="vanished">포트</translation>
+        <translation type="vanished">通訊埠</translation>
     </message>
     <message>
         <source>VMS settings</source>
-        <translation type="vanished">VMS 설정</translation>
+        <translation type="vanished">VMS 設定</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="145"/>
         <source>%1 Tray Assistant version %2 (%3).&lt;br/&gt;
 Built for %5-%6 with %7.&lt;br/&gt;
 </source>
-        <translation></translation>
+        <translation>%1 工具列助理版本 %2 (%3).
+ 建立於 %5-%6 採用 %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>The requested access was denied</source>
-        <translation type="vanished">요청된 접근이 거부됨</translation>
+        <translation type="vanished">要求的存取被拒絕</translation>
     </message>
     <message>
         <source>The specified database does not exist.</source>
-        <translation type="vanished">지정한 데이터베이스가 존재하지 않습니다.</translation>
+        <translation type="vanished">指定的資料庫不存在.</translation>
     </message>
     <message>
         <source>A specified parameter is invalid.</source>
-        <translation type="vanished">지정된 변수가 유효하지 않습니다.</translation>
+        <translation type="vanished">一個指定的參數是無效的。</translation>
     </message>
     <message>
         <source>Insufficient permissions to start/stop services</source>
-        <translation type="vanished">시작/정지 서비스를 위한 권한이 부족</translation>
+        <translation type="vanished">啟動/停止服務的權限不足</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="126"/>
@@ -175,62 +174,62 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/systraywindow.cpp" line="260"/>
         <source>No %1 services installed</source>
-        <translation>%1 서비스 설치 안됨</translation>
+        <translation>無 %1 已安裝服務</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="403"/>
         <source>Enterprise controller has been stopped</source>
-        <translation>제어 서버 정지</translation>
+        <translation>企業控制器已停止</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="410"/>
         <source>Enterprise controller has been started</source>
-        <translation>제어 서버 시작</translation>
+        <translation>企業控制器已啟動</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="429"/>
         <source>Media server has been stopped</source>
-        <translation>저장 서버 정지</translation>
+        <translation>媒體伺服器已停止</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="436"/>
         <source>Media server has been started</source>
-        <translation>저장 서버 시작</translation>
+        <translation>媒體伺服器已啟動</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="462"/>
         <source> (stopped)</source>
-        <translation>(정지)</translation>
+        <translation>(已停止)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="470"/>
         <source> (starting)</source>
-        <translation>(시작중)</translation>
+        <translation>(啟動中)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="478"/>
         <source> (stopping)</source>
-        <translation>(정지중)</translation>
+        <translation>(停止中)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="486"/>
         <source> (started)</source>
-        <translation>(시작)</translation>
+        <translation>(已啟動)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="494"/>
         <source> (resuming)</source>
-        <translation>(재시작중)</translation>
+        <translation>(重新啟動)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="502"/>
         <source> (paused)</source>
-        <translation>(일시정지)</translation>
+        <translation>(暫停)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="510"/>
         <source> (pausing)</source>
-        <translation>(정지중)</translation>
+        <translation>(暫停中)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="641"/>
@@ -249,160 +248,160 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Systray</source>
-        <translation type="vanished">트레이</translation>
+        <translation type="vanished">工作列</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="541"/>
         <source>Media server is going to be stopped. Are you sure?</source>
-        <translation>저장 서버를 정지합니다. 진행하시겠습니까?</translation>
+        <translation>媒體伺服器將會停止運作，您確定嗎?</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="563"/>
         <source>Enterprise controller is going to be stopped. Are you sure?</source>
-        <translation>제어서버를 정지합니다. 진행하시겠습니까?</translation>
+        <translation>企業控制器將會停止運作，您確定嗎?</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="635"/>
         <source>&amp;Settings</source>
-        <translation>&amp;설정</translation>
+        <translation>&amp;設定</translation>
     </message>
     <message>
         <source>&amp;Show Media Server Log</source>
-        <translation type="vanished">&amp;저장 서버 로그 보기</translation>
+        <translation type="vanished">&amp;顯示媒體伺服器記錄</translation>
     </message>
     <message>
         <source>&amp;Show Enterprise Controller Log</source>
-        <translation type="vanished">&amp;제어 서버 로그 보기</translation>
+        <translation type="vanished">&amp;顯示器頁控制器記錄</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="651"/>
         <source>&amp;Quit</source>
-        <translation>&amp;나가기</translation>
+        <translation>&amp;離開</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="654"/>
         <source>Start Media Server</source>
-        <translation>저장 서버 시작</translation>
+        <translation>啟動媒體伺服器</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="659"/>
         <source>Stop Media Server</source>
-        <translation>저장서버 정지</translation>
+        <translation>停止媒體伺服器</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="664"/>
         <source>Start Enterprise Controller</source>
-        <translation>제어 서버 시작</translation>
+        <translation>啟動企業控制器</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="669"/>
         <source>Stop Enterprise Controller</source>
-        <translation>제어 서버 정지</translation>
+        <translation>停止企業控制器</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="771"/>
         <source>* Last used connection *</source>
-        <translation>* 마지막 사용 서버 연결*</translation>
+        <translation>* 最後使用的連線 *</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="892"/>
         <source>The changes you made require enterprise controller and media server to be restarted. Would you like to restart now?</source>
-        <translation>변경값 적용을 위해 제어 서버와 저장 서버의 재시작이 필요합니다. 지금 다시 시작하시겠습니까?</translation>
+        <translation>此變更須重新啟動媒體伺服器及企業控制器，您確定要現在重新啟動嗎?</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="894"/>
         <source>The changes you made require enterprise controller to be restarted. Would you like to restart now?</source>
-        <translation>변경값 적용을 위해 제어 서버의 재시작이 필요합니다. 지금 다시 시작하시겠습니까?</translation>
+        <translation>此變更須重新啟動企業控制器，您確定要現在重新啟動嗎?</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="896"/>
         <source>The changes you made require media server to be restarted. Would you like to restart now?</source>
-        <translation>변경값 적용을 위해 저장 서버의 재시작이 필요합니다. 지금 다시 시작하시겠습니까?</translation>
+        <translation>此變更須重新啟動媒體伺服器，您確定要現在重新啟動嗎?</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="932"/>
         <source>Invalid %1 port specified.</source>
-        <translation>%1 포트 지정이 유효하지 않습니다.</translation>
+        <translation>指定了無效的 %1 通訊埠。</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="965"/>
         <source>enterprise controller</source>
-        <translation>제어 서버</translation>
+        <translation>企業控制器</translation>
     </message>
     <message>
         <source>media proxy</source>
-        <translation type="vanished">저장 중계</translation>
+        <translation type="vanished">媒體代理</translation>
     </message>
     <message>
         <source>media server RTSP</source>
-        <translation type="vanished">저장 서버 RTSP</translation>
+        <translation type="vanished">媒體伺服器 RTSP</translation>
     </message>
     <message>
         <source>media server API</source>
-        <translation type="vanished">저장 서버 API</translation>
+        <translation type="vanished">媒體伺服器 API</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="979"/>
         <source>%1 port is same as %2 port</source>
-        <translation>%1포트는 %2 포트와 동일</translation>
+        <translation>%1 通訊埠與 %2 通訊埠相同</translation>
     </message>
     <message>
         <source>%1 port already used by another process</source>
-        <translation type="vanished">%1 포트는 다른 프로세서에 의해 사용 중임</translation>
+        <translation type="vanished">%1 通訊埠已被其他程序使用</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="996"/>
         <source>Invalid IP address specified for public IP address</source>
-        <translation>공인 IP 주소에 대한 지정 IP가 유효하지 않음</translation>
+        <translation>指定了無效的 IP 位址給網際網路 IP位址</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="1067"/>
         <source>Invalid parameters</source>
-        <translation>유효하지 않은 변수</translation>
+        <translation>無效的參數</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="1067"/>
         <source>You have entered invalid URL.</source>
-        <translation>잘못된 URL을 입력하였습니다.</translation>
+        <translation>您輸入了無效的網址。</translation>
     </message>
 </context>
 <context>
     <name>SettingsDialog</name>
     <message>
         <source>HDWitness settings</source>
-        <translation type="vanished">TriumN Spectrum 설정</translation>
+        <translation type="vanished">TriumSpectrum 設定</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="36"/>
         <source>Media Server Settings</source>
-        <translation>저장 서버 설정</translation>
+        <translation>媒體伺服器設定</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="42"/>
         <source>Enterprise controller connection</source>
-        <translation>제어 서버 연결</translation>
+        <translation>企業控制器連接</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="vanished">로그인</translation>
+        <translation type="vanished">登入</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="vanished">비밀번호</translation>
+        <translation type="vanished">密碼</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="92"/>
         <source>0.0.0.0</source>
-        <translation></translation>
+        <translation>0.0.0.0</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation type="vanished">포트</translation>
+        <translation type="vanished">通訊埠</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="69"/>
         <source>Find</source>
-        <translation>찾기</translation>
+        <translation>尋找</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="80"/>
@@ -428,7 +427,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="165"/>
         <source>Test</source>
-        <translation>테스트</translation>
+        <translation>測試</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="185"/>
@@ -437,54 +436,54 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Host</source>
-        <translation type="vanished">호스트</translation>
+        <translation type="vanished">網址</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="179"/>
         <source>Media server network settings</source>
-        <translation>저장서버 네트워크 설정</translation>
+        <translation>媒體伺服器網路設定</translation>
     </message>
     <message>
         <source>RTSP port</source>
-        <translation type="vanished">RTSP 포트</translation>
+        <translation type="vanished">RTSP 通訊埠</translation>
     </message>
     <message>
         <source>API port</source>
-        <translation type="vanished">API 포트</translation>
+        <translation type="vanished">API 通訊埠</translation>
     </message>
     <message>
         <source>Cameras RTP transport</source>
-        <translation type="vanished">카메라 RTP 전송</translation>
+        <translation type="vanished">攝影機 RTP 傳輸</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="195"/>
         <source>AUTO</source>
-        <translation>자동</translation>
+        <translation>自動</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="200"/>
         <source>UDP</source>
-        <translation></translation>
+        <translation>UDP</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="205"/>
         <source>TCP</source>
-        <translation></translation>
+        <translation>TCP</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="231"/>
         <source>Allow access to media server via public IP address</source>
-        <translation>공인 IP를 통한 저장 서버 접근 허용</translation>
+        <translation>允許從網際網路IP位址存取媒體伺服器</translation>
     </message>
     <message>
         <source>Use specified IP or host name</source>
-        <translation type="vanished">지정된 IP 또는 호스트 이름 사용</translation>
+        <translation type="vanished">使用指定 IP 或 網址</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="253"/>
         <location filename="../src/settings.ui" line="367"/>
         <source>Auto detect public IP</source>
-        <translation>공인 IP 자동 검출</translation>
+        <translation>自動偵測網際網路IP</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="263"/>
@@ -495,41 +494,41 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="290"/>
         <source>Enterprise Controller Settings</source>
-        <translation>제어 서버 설정</translation>
+        <translation>企業控制器設定</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="302"/>
         <source>Enterprise controller network settings</source>
-        <translation>제어 서버 네트워크 설정</translation>
+        <translation>企業控制器網路設定</translation>
     </message>
     <message>
         <source>Media proxy port</source>
-        <translation type="vanished">중계 서버 포트</translation>
+        <translation type="vanished">媒體代理通訊埠</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="348"/>
         <source>Allow access to enterprise controller via public IP address</source>
-        <translation>공인 IP를 통한 제어 서버 접근 허용</translation>
+        <translation>允許從網際網路IP位址存取企業伺服器</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="407"/>
         <source>About</source>
-        <translation>상세</translation>
+        <translation>關於</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="417"/>
         <source>Language:</source>
-        <translation>언어:</translation>
+        <translation>語言:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="429"/>
         <source>(requires restart)</source>
-        <translation>(재시작 요청)</translation>
+        <translation>(需要重新啟動)</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="440"/>
         <source>Information</source>
-        <translation>정보</translation>
+        <translation>資訊</translation>
     </message>
 </context>
 </TS>

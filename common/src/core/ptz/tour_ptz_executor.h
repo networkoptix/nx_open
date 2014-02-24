@@ -33,6 +33,7 @@ private:
 
     Q_SIGNAL void startTourRequested(const QnPtzTour &tour);
     Q_SIGNAL void stopTourRequested();
+    Q_SIGNAL void controllerFinishedLater(Qn::PtzCommand command, const QVariant &data);
 
     Q_SLOT void at_controller_finished(Qn::PtzCommand command, const QVariant &data);
     Q_SLOT void at_startTourRequested(const QnPtzTour &tour);

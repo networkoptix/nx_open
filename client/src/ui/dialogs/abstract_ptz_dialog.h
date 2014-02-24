@@ -10,6 +10,7 @@
 #include <core/ptz/ptz_fwd.h>
 
 #include <ui/dialogs/button_box_dialog.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnAbstractPtzHotkeyDelegate {
 public:
@@ -17,10 +18,10 @@ public:
     virtual void updateHotkeys(const QnPtzHotkeyHash &value) = 0;
 };
 
-class QnAbstractPtzDialog : public QnButtonBoxDialog {
+class QnAbstractPtzDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware {
     Q_OBJECT
-
     typedef QnButtonBoxDialog base_type;
+
 public:
     QnAbstractPtzDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnAbstractPtzDialog();
@@ -31,6 +32,7 @@ public:
     void setController(const QnPtzControllerPtr &controller);
 
     Q_SLOT void saveChanges();
+
 protected:
     virtual void loadData(const QnPtzData &data) = 0;
     virtual void saveData() = 0;

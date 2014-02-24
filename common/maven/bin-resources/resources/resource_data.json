@@ -25,7 +25,9 @@
                 "VIVOTEK|IP8362", "VIVOTEK|MD8562", "VIVOTEK|IP8371E", "VIVOTEK|FD8363",
                 "ACTI|KCM5211", "ACTI|TCM3511", 
                 "AXIS|AXISP3344", "AXIS|AXISP1344",
-                "*|IPC-HDB3200C", "*|N53F-F"
+                "*|IPC-HDB3200C", "*|N53F-F",
+                "IPC|LR01", "hs0130|LR01", "H18A2|IPCAM_M1", "H18A3|IPCAM_M1", "H18A4|RL01", "H18A5|IPCAM_M1", "HI9712_51ÊÒÍâ|LR01"
+                
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
@@ -241,33 +243,7 @@
                     }
                 }
             }
-        },
-		{	
-            "keys": [
-				"*|LR01"
-			],
-            "ptzMapper": {
-                "fromCamera": {
-                    "x": {
-                        "extrapolationMode": "PeriodicExtrapolation",
-                        "device":  [ -1,    1],
-                        "logical": [-180, 180]
-                    },
-                    "y": {
-                        "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [1,  -1],
-                        "logical": [0, -90]
-                    },
-                    "z": {
-                        "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [0, 1],
-                        "logical": [1, 18],
-                        "logicalMultiplier": 35.25,
-                        "space": "35MmEquiv"
-                    }
-                }
-            }
-		}
+        }
     ]
 }
 

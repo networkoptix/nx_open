@@ -585,8 +585,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderResizerWidget->setProperty(Qn::NoHandScrollOver, true);
 
     m_sliderItem = new QnNavigationItem(m_controlsWidget);
-    m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
-    m_sliderItem->setFrameWidth(0.5);
+    m_sliderItem->setFrameColor(QColor(110, 110, 110, 128));
+    m_sliderItem->setFrameWidth(1.0);
     m_sliderItem->timeSlider()->toolTipItem()->setParentItem(m_controlsWidget);
 
     m_sliderItem->setProperty(Qn::NoHandScrollOver, true);

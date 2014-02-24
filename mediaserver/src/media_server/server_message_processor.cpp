@@ -52,4 +52,10 @@ void QnServerMessageProcessor::updateResource(QnResourcePtr resource)
 void QnServerMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     // TODO: implement me
+
+    case Qn::Message_Type_KvPairChange: {
+        updateKvPairs(message.kvPairs);
+        break;
+    }
+
 }

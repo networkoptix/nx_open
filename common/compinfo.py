@@ -16,10 +16,10 @@ V15 = Version(1, 5)
 V16 = Version(1, 6)
 V20 = Version(2, 0)
 V21 = Version(2, 1)
+V22 = Version(2, 2)
            
 COMPATIBILITY_INFO = (
-    (V15, (IOSCL,), Range(V16,V20)), # iOS V1.5 can connect to 1.6 and 2.0
-    (V20, (IOSCL,), Range(V15, V16)), # iOS V2.0 can connect to 1.5 and 1.6
+    (Range(V15, V22), (IOSCL,), Range(V15, V22)), # iOS 1.5-2.2 can connect to 1.5-2.2
 
     (V16, (ANDROID,), Range(V14, V20)), # android V1.6 can connect to 1.4, 1.5 and 2.0
     
@@ -72,8 +72,8 @@ if __name__ == '__main__':
     for ci in COMPATIBILITY_MATRIX:
         print version_to_string(ci.v1), ci.comp1, version_to_string(ci.v2)
 
-    print is_compatible('Client', '1.3', 'Server', '1.2')
-    print is_compatible('Client', '1.6', 'Server', '2.0')
-    print is_compatible('Client', '2.0', 'Server', '1.6')
+    #print is_compatible('Client', '1.3', 'Server', '1.2')
+    #print is_compatible('Client', '1.6', 'Server', '2.0')
+    #print is_compatible('Client', '2.0', 'Server', '1.6')
 
     

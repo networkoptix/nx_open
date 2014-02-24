@@ -265,7 +265,6 @@ private:
     QnSoftwareVersion m_currentVersion;
     QnResourceFactory *m_resourceFactory;
     QScopedPointer<QnApiSerializer> m_serializer;
-    bool m_allowCameraChanges;
 };
 
 bool initResourceTypes(QnAppServerConnectionPtr appServerConnection);

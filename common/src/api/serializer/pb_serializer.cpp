@@ -785,7 +785,6 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectionInfoPtr& connectInfo,
     connectInfo->ecsGuid = QString::fromUtf8(pb_connectInfo.ecsguid().c_str());
     connectInfo->publicIp = QString::fromUtf8(pb_connectInfo.publicip().c_str());
     connectInfo->brand = QString::fromUtf8(pb_connectInfo.brand().c_str());
-    connectInfo->allowCameraChanges = pb_connectInfo.allowcamerachanges();
 }
 
 void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRuleList &businessRules, const QByteArray &data)

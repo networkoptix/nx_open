@@ -53,10 +53,10 @@ namespace {
 
     void decompose(const QString &path, QString *prefix, QString *suffix) {
         QFileInfo info(path);
-        *prefix = info.path() + QLatin1Char('/') + info.baseName();
+        *prefix = info.path() + L'/' + info.baseName();
         *suffix = info.completeSuffix();
         if(!suffix->isEmpty())
-            *suffix = QLatin1Char('.') + *suffix;
+            *suffix = L'.' + *suffix;
     }
 
 } // anonymous namespace
@@ -64,41 +64,67 @@ namespace {
 QnSkin::QnSkin(QObject *parent):
     QObject(parent)
 {
-    init(QString());
+    init(QStringList());
 }
        
-QnSkin::QnSkin(const QString &basePath, QObject *parent):
+QnSkin::QnSkin(const QStringList &paths, QObject *parent):
     QObject(parent)
 {
-    init(basePath);
+    init(paths);
 }
 
-void QnSkin::init(const QString &basePath) {
-    if(basePath.isNull()) {
-        m_basePath = lit(":/skin");
-    } else {
-        m_basePath = QDir::toNativeSeparators(basePath);
+void QnSkin::init(const QStringList &paths) {
+    if(paths.isEmpty()) {
+        init(QStringList() << lit(":/skin"));
+        return;
     }
-    if(!m_basePath.endsWith(QDir::separator()))
-        m_basePath += QDir::separator();
+
+    m_paths = paths;
+    for(int i = 0; i < m_paths.size(); i++) {
+        m_paths[i] = QDir::toNativeSeparators(m_paths[i]);
+
+        if(!m_paths[i].endsWith(QDir::separator()))
+            m_paths[i] += QDir::separator();
+    }
 
     int cacheLimit = 64 * 1024; // 64 MB
     if(QPixmapCache::cacheLimit() < cacheLimit)
         QPixmapCache::setCacheLimit(cacheLimit);
 }
 
-const QString &QnSkin::basePath() const {
-    return m_basePath;
-}
-
 QnSkin::~QnSkin() {
     return;
 }
 
+const QStringList &QnSkin::paths() const {
+    return m_paths;
+}
+
+QString QnSkin::path(const QString &name) const {
+    for(int i = m_paths.size() - 1; i >= 0; i--) {
+        QString path = m_paths[i] + name;
+        if(QFile::exists(path))
+            return path;
+    }
+    return QString();
+}
+
+QString QnSkin::path(const char *name) const {
+    return path(QLatin1String(name));
+}
+
+bool QnSkin::hasFile(const QString &name) const {
+    return !path(name).isEmpty();
+}
+
+bool QnSkin::hasFile(const char *name) const {
+    return hasFile(QLatin1String(name));
+}
+
 QIcon QnSkin::icon(const QString &name, const QString &checkedName) {
     QString key = name + QLatin1String("=^_^=") + checkedName;
-    if(m_iconByNames.contains(key))
-        return m_iconByNames.value(key);
+    if(m_iconByKey.contains(key))
+        return m_iconByKey.value(key);
 
     QString prefix, suffix, path;
 
@@ -110,34 +136,34 @@ QIcon QnSkin::icon(const QString &name, const QString &checkedName) {
     builder.addPixmap(pixmap(name), Normal, Off);
 
     path = prefix + QLatin1String("_hovered") + suffix;
-    if(hasPixmap(path)) 
+    if(hasFile(path)) 
         builder.addPixmap(pixmap(path), Active);
     
     path = prefix + QLatin1String("_disabled") + suffix;
-    if(hasPixmap(path))
+    if(hasFile(path))
         builder.addPixmap(pixmap(path), Disabled);
     
     path = prefix + QLatin1String("_selected") + suffix;
-    if(hasPixmap(path))
+    if(hasFile(path))
         builder.addPixmap(pixmap(path), Selected);
 
     decompose(checkedName.isEmpty() ? prefix + QLatin1String("_checked") + suffix : checkedName, &prefix, &suffix);
     QString checkedPressedPath = prefix + QLatin1String("_pressed") + suffix;
 
     path = prefix + suffix;
-    if(hasPixmap(path))
+    if(hasFile(path))
         builder.addPixmap(pixmap(path), On);
     
     path = prefix + QLatin1String("_hovered") + suffix;
-    if(hasPixmap(path))
+    if(hasFile(path))
         builder.addPixmap(pixmap(path), Active, On);
 
     path = prefix + QLatin1String("_disabled") + suffix;
-    if(hasPixmap(path))
+    if(hasFile(path))
         builder.addPixmap(pixmap(path), Disabled, On);
 
     path = prefix + QLatin1String("_selected") + suffix;
-    if(hasPixmap(path))
+    if(hasFile(path))
         builder.addPixmap(pixmap(path), Selected, On);
 
     QIcon icon = builder.createIcon();
@@ -147,22 +173,22 @@ QIcon QnSkin::icon(const QString &name, const QString &checkedName) {
     pressedBuilder.addPixmap(icon.pixmap(QSize(1024, 1024), Normal, Off), Off);
     pressedBuilder.addPixmap(icon.pixmap(QSize(1024, 1024), Normal, On), On);
 
-    if(hasPixmap(pressedPath))
+    if(hasFile(pressedPath))
         pressedBuilder.addPixmap(pixmap(pressedPath), Normal);
         
-    if(hasPixmap(checkedPressedPath)) 
+    if(hasFile(checkedPressedPath)) 
         pressedBuilder.addPixmap(pixmap(checkedPressedPath), Normal, On);
 
     QIcon pressedIcon = pressedBuilder.createIcon();
 
     /* Save & return. */
-    m_iconByNames[key] = icon;
-    m_pressedIconByKey[icon.cacheKey()] = pressedIcon;
+    m_iconByKey[key] = icon;
+    m_pressedIconByCacheKey[icon.cacheKey()] = pressedIcon;
     return icon;
 }
 
-bool QnSkin::hasPixmap(const QString &name) const {
-    return QFile::exists(path(name));
+QIcon QnSkin::icon(const char *name, const char *checkedName) { 
+    return icon(QLatin1String(name), QLatin1String(checkedName)); 
 }
 
 QPixmap QnSkin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode) {
@@ -186,9 +212,13 @@ QPixmap QnSkin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMo
     return pixmap;
 }
 
+QPixmap QnSkin::pixmap(const char *name, const QSize &size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode) { 
+    return pixmap(QLatin1String(name), size, aspectMode, mode); 
+}
+
 QPixmap QnSkin::pixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode, QIcon::State state) const {
     if(mode == Pressed) {
-        return m_pressedIconByKey.value(icon.cacheKey(), icon).pixmap(size, Normal, state);
+        return m_pressedIconByCacheKey.value(icon.cacheKey(), icon).pixmap(size, Normal, state);
     } else {
         return icon.pixmap(size, mode, state);
     }
@@ -202,22 +232,18 @@ QPixmap QnSkin::pixmap(const QIcon &icon, int extent, QIcon::Mode mode, QIcon::S
     return pixmap(icon, QSize(extent, extent), mode, state);
 }
 
-QStyle *QnSkin::style() {
+QStyle *QnSkin::newStyle() {
     QStyle *baseStyle = QStyleFactory::create(QLatin1String("Bespin"));
-    if (!baseStyle) {
+    if (!baseStyle)
         qWarning() << "Bespin style could not be loaded";
-    }
     QnNoptixStyle *style = new QnNoptixStyle(baseStyle);
     return style;
 }
 
-QString QnSkin::path(const QString &name) const {
-    if (name.isEmpty())
-        return name;
-    return m_basePath + name;
-}
-
-QMovie *QnSkin::loadMovie(const QString &name, QObject *parent) {
+QMovie *QnSkin::newMovie(const QString &name, QObject *parent) {
     return new QMovie(path(name), QByteArray(), parent);
 }
 
+QMovie *QnSkin::newMovie(const char *name, QObject* parent) {
+    return newMovie(QLatin1String(name), parent);
+}

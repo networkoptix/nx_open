@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja_JP" sourcelanguage="en">
+<TS version="2.1" language="ja" sourcelanguage="en">
 <context>
     <name>ConnectionTestingDialog</name>
     <message>
@@ -111,11 +111,11 @@ You will be asked to restart the client in compatibility mode.</source>
     <name>QnSystrayWindow</name>
     <message>
         <source>Port</source>
-        <translation type="obsolete">ポート</translation>
+        <translation type="vanished">ポート</translation>
     </message>
     <message>
         <source>VMS settings</source>
-        <translation type="obsolete">VMS設定</translation>
+        <translation type="vanished">VMS設定</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="145"/>
@@ -127,19 +127,19 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>The requested access was denied</source>
-        <translation type="obsolete">要求されたアクセスは拒否されました</translation>
+        <translation type="vanished">要求されたアクセスは拒否されました</translation>
     </message>
     <message>
         <source>The specified database does not exist.</source>
-        <translation type="obsolete">指定されたデータベースは存在しません.</translation>
+        <translation type="vanished">指定されたデータベースは存在しません.</translation>
     </message>
     <message>
         <source>A specified parameter is invalid.</source>
-        <translation type="obsolete">指定されたパラメーターは無効です.</translation>
+        <translation type="vanished">指定されたパラメーターは無効です.</translation>
     </message>
     <message>
         <source>Insufficient permissions to start/stop services</source>
-        <translation type="obsolete">サービスを開始／停止するための権限が不十分です</translation>
+        <translation type="vanished">サービスを開始／停止するための権限が不十分です</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="126"/>
@@ -249,7 +249,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Systray</source>
-        <translation type="obsolete">システムトレー</translation>
+        <translation type="vanished">システムトレー</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="541"/>
@@ -268,11 +268,11 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>&amp;Show Media Server Log</source>
-        <translation type="obsolete">メディアサーバーログ表示(&amp;S)</translation>
+        <translation type="vanished">メディアサーバーログ表示(&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Show Enterprise Controller Log</source>
-        <translation type="obsolete">エンタープライズコントローラーロク表示(&amp;S)</translation>
+        <translation type="vanished">エンタープライズコントローラーロク表示(&amp;S)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="651"/>
@@ -331,15 +331,15 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>media proxy</source>
-        <translation type="obsolete">メディアプロキシ</translation>
+        <translation type="vanished">メディアプロキシ</translation>
     </message>
     <message>
         <source>media server RTSP</source>
-        <translation type="obsolete">メディアサーバーRTSP</translation>
+        <translation type="vanished">メディアサーバーRTSP</translation>
     </message>
     <message>
         <source>media server API</source>
-        <translation type="obsolete">メディアサーバーAPI</translation>
+        <translation type="vanished">メディアサーバーAPI</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="979"/>
@@ -348,7 +348,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>%1 port already used by another process</source>
-        <translation type="obsolete">%1・ポートは既に別のプロセスで使用されています</translation>
+        <translation type="vanished">%1・ポートは既に別のプロセスで使用されています</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="996"/>
@@ -370,7 +370,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <name>SettingsDialog</name>
     <message>
         <source>HDWitness settings</source>
-        <translation type="obsolete">HDウィットネス設定</translation>
+        <translation type="vanished">HDウィットネス設定</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="36"/>
@@ -410,6 +410,12 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/settings.ui" line="108"/>
+        <location filename="../src/settings.ui" line="338"/>
+        <source>Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/settings.ui" line="130"/>
         <source>Login:</source>
         <translation type="unfinished"></translation>
@@ -440,11 +446,11 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>RTSP port</source>
-        <translation type="obsolete">RTSPポート</translation>
+        <translation type="vanished">RTSPポート</translation>
     </message>
     <message>
         <source>API port</source>
-        <translation type="obsolete">APIポート</translation>
+        <translation type="vanished">APIポート</translation>
     </message>
     <message>
         <source>Cameras RTP transport</source>
@@ -492,19 +498,13 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <translation>エンタープライズコントローラー設定</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="108"/>
-        <location filename="../src/settings.ui" line="338"/>
-        <source>Port:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/settings.ui" line="302"/>
         <source>Enterprise controller network settings</source>
-        <translation type="unfinished">エンタープライズコントローラーネットワーク設定</translation>
+        <translation>エンタープライズコントローラーネットワーク設定</translation>
     </message>
     <message>
         <source>Media proxy port</source>
-        <translation type="obsolete">メディアプロキシポート</translation>
+        <translation type="vanished">メディアプロキシポート</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="348"/>
