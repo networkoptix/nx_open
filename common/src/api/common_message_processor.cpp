@@ -83,7 +83,7 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection->getStoredFileManager().get(), &ec2::AbstractStoredFileManager::removed,
         this, &QnCommonMessageProcessor::on_storedFileRemoved );
 
-    connection->startReceivingNotifications(true, qnCommon->moduleGUID());
+    connection->startReceivingNotifications(true);
 }
 
 

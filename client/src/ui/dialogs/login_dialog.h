@@ -106,6 +106,7 @@ private:
     struct QnEcData {
         QUrl url;
         QString version;
+        QString systemName;
     };
 
     /** Hash list of automatically found Enterprise Controllers based on seed as key. */

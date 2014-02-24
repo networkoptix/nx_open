@@ -104,7 +104,6 @@ namespace ec2
 
         void createNewID();
         
-        static void setPeerGuid(const QUuid& value);
         static void setStartNumber(const qint64& value);
 
         template <class T2>
@@ -120,21 +119,14 @@ namespace ec2
 
         struct ID
         {
-			ID(): number(0) {}
-
             QUuid peerGUID;
-            qint64 number;
+            QUuid tranGUID;
 
         };
 
         ApiCommand::Value command;
         ID id;
         bool persistent;
-
-    private:
-        static QUuid m_staticPeerGUID;
-        static qint64 m_staticNumber;
-        static QMutex m_mutex;
     };
 
     template <class T>
@@ -161,10 +153,9 @@ namespace ec2
     };
 
     int generateRequestID();
-    int generateUniqueID();
 }
 
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (number) )
+QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (tranGUID) )
 QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent))
 
 //QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS( QnTransaction, ... )

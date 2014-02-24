@@ -64,8 +64,8 @@ NetworkOptixModuleFinder::NetworkOptixModuleFinder(
             sock->setDestAddr( multicastGroupAddress.toString(), multicastGroupPort );
             m_clientSockets.push_back( sock.release() );
             m_localNetworkAdresses.insert( addressToUse.toString() );
-
-            m_serverSocket->joinGroup(multicastGroupAddress.toString(), addressToUse.toString());
+            if (m_serverSocket)
+                m_serverSocket->joinGroup(multicastGroupAddress.toString(), addressToUse.toString());
 
         }
         catch( const std::exception& e )

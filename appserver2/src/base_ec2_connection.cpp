@@ -7,6 +7,7 @@
 
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
+#include "common/common_module.h"
 
 
 namespace ec2
@@ -160,6 +161,29 @@ namespace ec2
         result.params.mode = mode;
         return result;
     }
+
+    template<class T>
+    void BaseEc2Connection<T>::addRemotePeer(const QUrl& _url)
+    {
+        QUrl url(_url);
+        url.setPath("ec2/events");
+        QUrlQuery q;
+        q.addQueryItem("guid", qnCommon->moduleGUID().toString());
+        url.setQuery(q);
+        QnTransactionMessageBus::instance()->addConnectionToPeer(url);
+    }
+
+    template<class T>
+    void BaseEc2Connection<T>::deleteRemotePeer(const QUrl& _url)
+    {
+        QUrl url(_url);
+        url.setPath("ec2/events");
+        QUrlQuery q;
+        q.addQueryItem("guid", qnCommon->moduleGUID().toString());
+        url.setQuery(q);
+        QnTransactionMessageBus::instance()->removeConnectionFromPeer(url);
+    }
+
 
     template class BaseEc2Connection<FixedUrlClientQueryProcessor>;
     template class BaseEc2Connection<ServerQueryProcessor>;

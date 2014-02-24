@@ -857,8 +857,9 @@ void QnMain::at_peerFound(
     if (moduleVersion == QN_APPLICATION_VERSION && systemName == qnCommon->systemName()) 
     {
         int port = moduleParameters.value("port").toInt();
-        QString url = QString(lit("http://%1:%2/ec2/events?guid=%3")).arg(remoteHostAddress).arg(port).arg(qnCommon->moduleGUID().toString());
-        //QnTransactionMessageBus::instance()->addConnectionToPeer(url);
+        QString url = QString(lit("http://%1:%2")).arg(remoteHostAddress).arg(port);
+        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        ec2Connection->addRemotePeer(url);
     }
 }
 void QnMain::at_peerLost(
@@ -869,8 +870,9 @@ void QnMain::at_peerLost(
     const QString& moduleSeed )
 {
     int port = moduleParameters.value("port").toInt();
-    QString url = QString(lit("http://%1:%2/ec2/events?guid=%3")).arg(remoteHostAddress).arg(port).arg(qnCommon->moduleGUID().toString());
-    //QnTransactionMessageBus::instance()->removeConnectionFromPeer(url);
+    QString url = QString(lit("http://%1:%2")).arg(remoteHostAddress).arg(port);
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    ec2Connection->deleteRemotePeer(url);
 }
 
 void QnMain::initTcpListener()
@@ -1252,6 +1254,7 @@ void QnMain::run()
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
+    m_moduleFinder = new NetworkOptixModuleFinder(false);
     QObject::connect(
         m_moduleFinder,
         SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
@@ -1264,6 +1267,7 @@ void QnMain::run()
         this,
         SLOT(at_peerLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
         Qt::DirectConnection );
+    m_moduleFinder->start();
 
     // ------------------------------------------
 

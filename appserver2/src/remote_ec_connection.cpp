@@ -5,6 +5,7 @@
 
 #include "remote_ec_connection.h"
 #include "transaction/transaction_message_bus.h"
+#include "common/common_module.h"
 
 
 namespace ec2
@@ -32,14 +33,14 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void RemoteEC2Connection::startReceivingNotifications( bool fullSyncRequired, const QUuid& guid )
+    void RemoteEC2Connection::startReceivingNotifications( bool fullSyncRequired)
     {
         QUrl url(m_queryProcessor->getUrl());
         url.setPath("ec2/events");
         QUrlQuery q;
         if( fullSyncRequired )
             q.addQueryItem("fullsync", QString());
-        q.addQueryItem("guid", guid.toString());
+        q.addQueryItem("guid", qnCommon->moduleGUID().toString());
         url.setQuery(q);
         m_peerUrl = url;
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);

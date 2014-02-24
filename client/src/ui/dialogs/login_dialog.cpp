@@ -286,7 +286,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
         noLocalEcs->setFlags(Qt::ItemIsEnabled);
         m_autoFoundItem->appendRow(noLocalEcs);
     } else {
-        foreach (QnEcData data, m_foundEcs) {
+        foreach (const QnEcData& data, m_foundEcs) {
             QUrl url = data.url;
 
             QnSoftwareVersion ecVersion(data.version);
@@ -295,10 +295,13 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
 
 
             QString title;
-            if (isCompatible)
-                title = lit("%1:%2").arg(url.host()).arg(url.port());
+            if (!data.systemName.isEmpty())
+                title = data.systemName;
             else
-                title = lit("%1:%2 (v%3)").arg(url.host()).arg(url.port()).arg(ecVersion.toString(QnSoftwareVersion::MinorFormat));
+                title = lit("%1:%2").arg(url.host()).arg(url.port());
+            if (!isCompatible)
+                title += lit(" (v%3)").arg(ecVersion.toString(QnSoftwareVersion::MinorFormat));
+
             QStandardItem* item = new QStandardItem(title);
             item->setData(url, Qn::UrlRole);
 
@@ -671,6 +674,7 @@ void QnLoginDialog::at_moduleFinder_moduleFound(const QString& moduleID, const Q
     QnEcData data;
     data.url = url;
     data.version = moduleVersion;
+    data.systemName = systemName;
     m_foundEcs.insert(seed, data);
     resetAutoFoundConnectionsModel();
 }
