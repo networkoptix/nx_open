@@ -431,8 +431,8 @@ public:
     }
 
     bool setData(const QVariant &value, int role, int column) {
-        if (column == Qn::CheckColumn && role == Qt::CheckStateRole){
-            m_checked = (Qt::CheckState)value.toInt();
+        if (column == Qn::CheckColumn && role == Qt::CheckStateRole) {
+            m_checked = (Qt::CheckState) value.toInt();
             changeInternal();
             return true;
         }
