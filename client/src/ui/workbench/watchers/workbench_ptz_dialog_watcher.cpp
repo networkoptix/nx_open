@@ -37,6 +37,5 @@ void QnWorkbenchPtzDialogWatcher::closePtzManageDialog(QnWorkbenchItem *item) {
     if (item && item->resourceUid() != dialog->resource()->getUniqueId())
         return;
 
-    // TODO: #dklychkov do not show 'Cancel' button in the warning window int this case
-    dialog->close();
+    dialog->closeWithoutCancel();
 }
