@@ -1,9 +1,9 @@
 #!/bin/bash
 
-TOOLCHAIN_PREFIX=/usr/local/codesourcery/arm-2011.09/bin/arm-none-linux-gnueabi-
+TOOLCHAIN_PREFIX=/usr/local/codesourcery/arm-2013.11/bin/arm-none-linux-gnueabi-
 
-CUSTOMIZATION=networkoptix
-PRODUCT_NAME=hdwitness
+CUSTOMIZATION=digitalwatchdog
+PRODUCT_NAME=dwspectrum
 MODULE_NAME=mediaserver
 VERSION=2.2.0
 
@@ -12,10 +12,17 @@ PACKAGE_NAME=$CUSTOMIZATION-$PRODUCT_NAME-$MODULE_NAME-$VERSION-edge.tar.gz
 BUILD_DIR=/tmp/hdw_isd_build.tmp
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
 
-SRC_DIR=/home/ak/develop/netoptix_vms.arm
+if [ "$USER" != "ivigasin" ]
+then
+    SRC_DIR=/home/ak/develop/netoptix_vms.arm
+    TARGET_DIR=/var/www
+else
+    SRC_DIR=$HOME/workspace/netoptix_vms
+    TARGET_DIR=$HOME/tmp/isd
+fi
+
 BUILD_OUTPUT_DIR=$SRC_DIR/build_environment/target
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
-TARGET_DIR=/var/www
 
 LIBS_TO_COPY=\
 ( libavcodec.so.54.23.100 \
@@ -64,8 +71,8 @@ popd
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 cp $BUILD_OUTPUT_DIR/bin/release/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 
-mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/plugins/
-cp $LIBS_DIR/libisd_native_plugin.so $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/plugins/
+mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
+cp $LIBS_DIR/libisd_native_plugin.so $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
 #pushd $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/plugins/
 #ln -s libisd_native_plugin.so libisd_native_plugin.so
 #popd
@@ -76,8 +83,7 @@ cp $SRC_DIR/edge_firmware/isd/maven/filter-resources/usr/local/apps/networkoptix
 
 #start script
 mkdir -p $BUILD_DIR/etc/init.d/
-cp $SRC_DIR/edge_firmware/isd/maven/filter-resources/etc/init.d/S99networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/
-chmod u+x,g+x $BUILD_DIR/etc/init.d/S99networkoptix-$MODULE_NAME
+install -m 755 $SRC_DIR/edge_firmware/isd/maven/filter-resources/etc/init.d/S99networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/S99$CUSTOMIZATION-$MODULE_NAME
 
 
 #building package

@@ -124,7 +124,7 @@ unix: {
   DEFINES += override=
   DEFINES += QN_EXPORT=  
   arm {
-    QMAKE_CXXFLAGS += -std=c++0x
+    QMAKE_CXXFLAGS += -std=c++0x 
   } else {
     QMAKE_CXXFLAGS += -std=c++11
   }

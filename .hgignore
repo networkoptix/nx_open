@@ -268,5 +268,10 @@ nx_sdk/nx_sdk
 
 libonvif/.build/
 
+plugins/*/arm
+debsetup/*/arm
+edge_firmware/isd/*.tar.gz
+
 .vagrant
 **/Makefile
+
