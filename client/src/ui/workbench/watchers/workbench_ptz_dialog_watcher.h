@@ -15,6 +15,9 @@ private slots:
     void at_workbench_currentLayoutChanged();
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_currentLayout_itemRemoved(QnWorkbenchItem *item);
+
+private:
+    void closePtzManageDialog(QnWorkbenchItem *item = NULL);
 };
 
 #endif // WORKBENCH_PTZ_DIALOG_WATCHER_H

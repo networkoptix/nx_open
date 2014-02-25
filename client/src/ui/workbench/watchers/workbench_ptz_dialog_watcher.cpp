@@ -19,14 +19,24 @@ void QnWorkbenchPtzDialogWatcher::at_workbench_currentLayoutChanged() {
 
 void QnWorkbenchPtzDialogWatcher::at_workbench_currentLayoutAboutToBeChanged() {
     disconnect(workbench()->currentLayout(), &QnWorkbenchLayout::itemRemoved, this, &QnWorkbenchPtzDialogWatcher::at_currentLayout_itemRemoved);
+    closePtzManageDialog();
 }
 
 void QnWorkbenchPtzDialogWatcher::at_currentLayout_itemRemoved(QnWorkbenchItem *item) {
+    closePtzManageDialog(item);
+}
+
+void QnWorkbenchPtzDialogWatcher::closePtzManageDialog(QnWorkbenchItem *item) {
     QnPtzManageDialog *dialog = QnPtzManageDialog::instance();
+    if (!dialog)
+        return;
+
     if (!dialog->isVisible() || dialog->resource().isNull())
         return;
 
+    if (item && item->resourceUid() != dialog->resource()->getUniqueId())
+        return;
+
     // TODO: #dklychkov do not show 'Cancel' button in the warning window int this case
-    if (item->resourceUid() == dialog->resource()->getUniqueId())
-        dialog->close();
+    dialog->close();
 }
