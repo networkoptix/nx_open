@@ -56,7 +56,6 @@ private:
     typedef QMap<QNetworkReply*, QnAbstractBusinessActionPtr> ActionMap;
     ActionMap m_actionsInProgress;
     mutable QMutex m_mutex;
-    QScopedPointer<QnApiSerializer> m_serializer;
 };
 
 #define qnBusinessMessageBus QnBusinessMessageBus::instance()

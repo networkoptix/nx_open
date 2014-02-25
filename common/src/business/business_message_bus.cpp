@@ -2,7 +2,7 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <api/serializer/pb_serializer.h>
+#include "../../appserver2/src/transaction/transaction.h"
 
 Q_GLOBAL_STATIC(QnBusinessMessageBus, QnBusinessMessageBus_instance)
 
@@ -14,8 +14,7 @@ QnBusinessMessageBus* QnBusinessMessageBus::instance()
     return _instance;
 }
 
-QnBusinessMessageBus::QnBusinessMessageBus():
-    m_serializer(new QnApiPbSerializer())
+QnBusinessMessageBus::QnBusinessMessageBus()
 {
     connect(&m_transport, SIGNAL(finished(QNetworkReply*)), this, SLOT(at_replyFinished(QNetworkReply*)));
 }
@@ -50,7 +49,8 @@ int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionP
     request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("application/data"));
 
     QByteArray data;
-    m_serializer->serializeBusinessAction(bAction, data);
+    OutputBinaryStream<QByteArray> stream(&data);
+    QnBinary::serialize(bAction, &stream);
     QNetworkReply* reply = m_transport.post(request, data);
     m_actionsInProgress.insert(reply, bAction);
 
