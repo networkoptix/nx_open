@@ -10,9 +10,14 @@ public:
     }
 };
 
+template<class Target>
+Target *qiconengine_cast(const QString &key, QIconEngine *source) {
+    return source && source->key() == key ? static_cast<Target *>(source) : NULL;
+}
+
 QnIconPixmapAccessor::QnIconPixmapAccessor(const QIcon *icon):
 	m_icon(icon),
-	m_engine(dynamic_cast<QPixmapIconEngine *>(const_cast<QIcon *>(icon)->data_ptr()->engine))
+	m_engine(qiconengine_cast<QPixmapIconEngine>(lit("QPixmapIconEngine"), const_cast<QIcon *>(icon)->data_ptr()->engine))
 {}
 
 int QnIconPixmapAccessor::size() const {
