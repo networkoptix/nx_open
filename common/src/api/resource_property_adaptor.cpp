@@ -36,7 +36,7 @@ QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(const QStri
 }
 
 QnAbstractResourcePropertyAdaptor::~QnAbstractResourcePropertyAdaptor() {
-    return;
+    setResource(QnResourcePtr()); /* This will disconnect us from resource. */
 }
 
 const QString &QnAbstractResourcePropertyAdaptor::key() const {
