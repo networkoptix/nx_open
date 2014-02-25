@@ -237,6 +237,7 @@ int naturalStringCompare( const QString & lhs, const QString & rhs, Qt::CaseSens
 			if ( tmpLeft.compare( tmpRight, caseSensitive ) == 0 )
 			{
 				retVal = lhsBufferQStr.length() - rhsBufferQStr.length();
+#if 0 // Disabling this code makes 'New Layout' go before 'New Layout 1' --Elric
 				if ( retVal )
 				{
 					QChar nextChar;
@@ -250,6 +251,7 @@ int naturalStringCompare( const QString & lhs, const QString & rhs, Qt::CaseSens
 					if ( nextIsNum )
 						retVal = -1*retVal;
 				}
+#endif
 			}
 		}
 		else if ( lhsNumber && rhsNumber )
@@ -274,9 +276,9 @@ int naturalStringCompare( const QString & lhs, const QString & rhs, Qt::CaseSens
 	if ( retVal != 0 )
 		return retVal;
 	if ( ii < lhs.length() )
-		return -1;
-	else if ( jj < rhs.length() )
 		return 1;
+	else if ( jj < rhs.length() )
+		return -1;
 	else
 		return 0;
 }
