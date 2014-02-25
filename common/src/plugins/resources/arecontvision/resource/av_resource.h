@@ -12,7 +12,7 @@
 
 class QDomElement;
 
-// this class and inherited must be very light to create
+// TODO: #Elric rename class to *ArecontVision*, rename file
 class QnPlAreconVisionResource : public QnPhysicalCameraResource
 {
     Q_OBJECT

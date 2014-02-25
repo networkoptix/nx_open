@@ -15,6 +15,7 @@ using namespace nx_http;
 
 QnPlSonyResource::QnPlSonyResource()
 {
+    setVendor(lit("Sony"));
 }
 
 QnPlSonyResource::~QnPlSonyResource() {
