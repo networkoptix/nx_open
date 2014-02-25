@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja" sourcelanguage="en">
+<TS version="2.0" language="ja" sourcelanguage="en">
 <context>
     <name>ConnectionTestingDialog</name>
     <message>
@@ -47,12 +47,12 @@ Application will now quit.</source>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="70"/>
         <source>Request timed out.</source>
-        <translation type="unfinished"></translation>
+        <translation>リクエストタイムアウト.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="98"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>入力したログイン情報が無効です.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="101"/>
@@ -60,12 +60,15 @@ Application will now quit.</source>
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>エンタープライズコントローラーとの接続が確立できません.
+入力した接続設定が無効です.
+
+問題が解決しない場合はVMSアドミニストレーターにお問い合わせください.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="106"/>
         <source>You are trying to connect to incompatible Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation>互換性のないエンタープライズコントローラーに接続しようとしています.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="111"/>
@@ -73,7 +76,10 @@ If this error persists, please contact your VMS administrator.</source>
  - Client version: %1.
  - EC version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>異なるエンタープライズコントローラーバージョン:
+ - クライアントバージョン: %1.
+ - EC バージョン: %2.
+互換性モードではバージョン%3以下はサポートされません.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="120"/>
@@ -81,7 +87,10 @@ Compatibility mode for versions lower than %3 is not supported.</source>
  - Client version: %1.
  - EC version: %2.
 You will be asked to restart the client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>異なるエンタープライズコントローラーバージョン:
+ - クライアントバージョン: %1.
+ - EC バージョン: %2.
+再起動後に互換性モードで起動できます.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="133"/>
@@ -111,11 +120,11 @@ You will be asked to restart the client in compatibility mode.</source>
     <name>QnSystrayWindow</name>
     <message>
         <source>Port</source>
-        <translation type="vanished">ポート</translation>
+        <translation>ポート</translation>
     </message>
     <message>
         <source>VMS settings</source>
-        <translation type="vanished">VMS設定</translation>
+        <translation>VMS設定</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="145"/>
@@ -127,50 +136,50 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>The requested access was denied</source>
-        <translation type="vanished">要求されたアクセスは拒否されました</translation>
+        <translation>要求されたアクセスは拒否されました</translation>
     </message>
     <message>
         <source>The specified database does not exist.</source>
-        <translation type="vanished">指定されたデータベースは存在しません.</translation>
+        <translation>指定されたデータベースは存在しません.</translation>
     </message>
     <message>
         <source>A specified parameter is invalid.</source>
-        <translation type="vanished">指定されたパラメーターは無効です.</translation>
+        <translation>指定されたパラメーターは無効です.</translation>
     </message>
     <message>
         <source>Insufficient permissions to start/stop services</source>
-        <translation type="vanished">サービスを開始／停止するための権限が不十分です</translation>
+        <translation>サービスを開始／停止するための権限が不十分です</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="126"/>
         <source>%1 Tray Assistant</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 トレーアシスト</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="232"/>
         <source>Access denied.</source>
-        <translation type="unfinished"></translation>
+        <translation>アクセス拒否.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="235"/>
         <source>Specified database does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>指定されたデータベースは存在しません.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="238"/>
         <source>Specified parameter is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>指定されたパラメーターは無効です.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="242"/>
         <source>Could not access installed services</source>
-        <translation type="unfinished"></translation>
+        <translation>インストールしたサービスにアクセスできません</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="242"/>
         <source>An error has occurred while trying to access installed services:
  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>インストールしたサービス%1へのアクセス中にエラーが発生しました</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="260"/>
@@ -235,21 +244,21 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/systraywindow.cpp" line="641"/>
         <source>Show &amp;Media Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>メディアサーバーログ表示(&amp;M)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="646"/>
         <source>Show &amp;Enterprise Controller Log</source>
-        <translation type="unfinished"></translation>
+        <translation>エンタープライズコントローラーロク表示(&amp;E)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="989"/>
         <source>%1 port is already used by another process</source>
-        <translation type="unfinished"></translation>
+        <translation>%1・ポートは既に別のプロセスで使用されています</translation>
     </message>
     <message>
         <source>Systray</source>
-        <translation type="vanished">システムトレー</translation>
+        <translation>システムトレー</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="541"/>
@@ -268,11 +277,11 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>&amp;Show Media Server Log</source>
-        <translation type="vanished">メディアサーバーログ表示(&amp;S)</translation>
+        <translation>メディアサーバーログ表示(&amp;S)</translation>
     </message>
     <message>
         <source>&amp;Show Enterprise Controller Log</source>
-        <translation type="vanished">エンタープライズコントローラーロク表示(&amp;S)</translation>
+        <translation>エンタープライズコントローラーロク表示(&amp;S)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="651"/>
@@ -331,15 +340,15 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>media proxy</source>
-        <translation type="vanished">メディアプロキシ</translation>
+        <translation>メディアプロキシ</translation>
     </message>
     <message>
         <source>media server RTSP</source>
-        <translation type="vanished">メディアサーバーRTSP</translation>
+        <translation>メディアサーバーRTSP</translation>
     </message>
     <message>
         <source>media server API</source>
-        <translation type="vanished">メディアサーバーAPI</translation>
+        <translation>メディアサーバーAPI</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="979"/>
@@ -348,7 +357,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>%1 port already used by another process</source>
-        <translation type="vanished">%1・ポートは既に別のプロセスで使用されています</translation>
+        <translation>%1・ポートは既に別のプロセスで使用されています</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="996"/>
@@ -370,7 +379,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <name>SettingsDialog</name>
     <message>
         <source>HDWitness settings</source>
-        <translation type="vanished">HDウィットネス設定</translation>
+        <translation>HDウィットネス設定</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="36"/>
@@ -384,11 +393,11 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="vanished">ログイン</translation>
+        <translation>ログイン</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="vanished">パスワード</translation>
+        <translation>パスワード</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="92"/>
@@ -397,7 +406,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation type="vanished">ポート</translation>
+        <translation>ポート</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="69"/>
@@ -407,23 +416,23 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/settings.ui" line="80"/>
         <source>Host:</source>
-        <translation type="unfinished"></translation>
+        <translation>ホスト:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="108"/>
         <location filename="../src/settings.ui" line="338"/>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>ポート:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="130"/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>ログイン:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="140"/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワード:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="165"/>
@@ -433,11 +442,11 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/settings.ui" line="185"/>
         <source>Cameras RTP transport:</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラRTP転送:</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation type="vanished">ホスト</translation>
+        <translation>ホスト</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="179"/>
@@ -446,15 +455,15 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>RTSP port</source>
-        <translation type="vanished">RTSPポート</translation>
+        <translation>RTSPポート</translation>
     </message>
     <message>
         <source>API port</source>
-        <translation type="vanished">APIポート</translation>
+        <translation>APIポート</translation>
     </message>
     <message>
         <source>Cameras RTP transport</source>
-        <translation type="vanished">カメラRTP転送</translation>
+        <translation>カメラRTP転送</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="195"/>
@@ -478,7 +487,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Use specified IP or host name</source>
-        <translation type="vanished">特定のIPアドレス又はホスト名を</translation>
+        <translation>特定のIPアドレス又はホスト名を</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="253"/>
@@ -490,7 +499,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <location filename="../src/settings.ui" line="263"/>
         <location filename="../src/settings.ui" line="357"/>
         <source>Use specified IP or host name:</source>
-        <translation type="unfinished"></translation>
+        <translation>特定のIPアドレス又はホスト名:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="290"/>
@@ -504,7 +513,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Media proxy port</source>
-        <translation type="vanished">メディアプロキシポート</translation>
+        <translation>メディアプロキシポート</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="348"/>
