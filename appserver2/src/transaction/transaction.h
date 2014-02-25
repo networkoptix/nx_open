@@ -120,9 +120,9 @@ namespace ec2
 
         struct ID
         {
-            ID(): tranID(0) {}
+            ID(): sequence(0) {}
             QUuid peerGUID;
-            qint32 tranID;
+            qint32 sequence;
         };
 
         ApiCommand::Value command;
@@ -159,20 +159,8 @@ namespace ec2
     int generateRequestID();
 }
 
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (tranID) )
+QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (sequence) )
 QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent))
 
-//QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS( QnTransaction, ... )
-
-/*
-template<class T>
-void serialize( Transaction, BinaryStream<T> );
-
-template<class T>
-void deserialize( BinaryStream<T> , Transaction * );
-
-void serialize( Transaction, QJsonValue * );
-void deserialize( const QJsonValue &, Transaction * );
-*/
 
 #endif  //EC2_TRANSACTION_H

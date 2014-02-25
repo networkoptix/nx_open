@@ -42,7 +42,7 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction::ID& tranID, co
     QSqlQuery query(m_dbManager->getDB());
     query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, sequence, tran_guid, tran_data) values (?, ?, ?, ?)");
     query.bindValue(0, tranID.peerGUID);
-    query.bindValue(1, tranID.tranID);
+    query.bindValue(1, tranID.sequence);
     query.bindValue(2, hash);
     query.bindValue(3, data);
     if (!query.exec())

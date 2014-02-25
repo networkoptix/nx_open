@@ -109,7 +109,7 @@ namespace ec2
         command = _command;
         persistent = _persistent;
         id.peerGUID = qnCommon->moduleGUID();
-        id.tranID = persistent ? dbManager->getNextSequence() : m_localSequence.fetchAndAddAcquire(1);
+        id.sequence = persistent ? dbManager->getNextSequence() : m_localSequence.fetchAndAddAcquire(1);
     }
 
     /*
