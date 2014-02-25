@@ -20,17 +20,15 @@ struct ScheduleTask: public ApiData
 	static ScheduleTask fromResource(const QnResourcePtr& cameraRes, const QnScheduleTask& resScheduleTask);
 	QnScheduleTask toResource(const QnId& resourceId) const;
 
-    //qint32   id;
-    //qint32   sourceId;
     qint32   startTime;
     qint32   endTime;
     bool     doRecordAudio;
     Qn::RecordingType   recordType;
-    qint32   dayOfWeek;
-    qint32   beforeThreshold;
-    qint32   afterThreshold;
+    qint8    dayOfWeek;
+    qint16   beforeThreshold;
+    qint16   afterThreshold;
     Qn::StreamQuality  streamQuality;
-    qint32   fps;
+    qint16   fps;
 
     QN_DECLARE_STRUCT_SQL_BINDER();
 };
