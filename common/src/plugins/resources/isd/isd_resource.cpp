@@ -33,8 +33,8 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 
 QnPlIsdResource::QnPlIsdResource()
 {
+    setVendor(lit("ISD"));
     setAuth(QLatin1String("root"), QLatin1String("admin"));
-    
 }
 
 bool QnPlIsdResource::isResourceAccessible()

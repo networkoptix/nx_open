@@ -107,6 +107,7 @@ int QnDlink_cam_info::frameRateCloseTo(int fr)
 
 QnPlDlinkResource::QnPlDlinkResource()
 {
+    setVendor(lit("Dlink"));
     setAuth(QLatin1String("admin"), QLatin1String(""));
 }
 

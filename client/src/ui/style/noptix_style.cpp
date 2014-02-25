@@ -243,9 +243,11 @@ void QnNoptixStyle::polish(QWidget *widget) {
     if(widget)
         base_type::polish(widget);
 
-    if(QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(widget)) {
-        itemView->setIconSize(QSize(18, 18)); // TODO: #Elric move to customization?
-    }
+    if(QAbstractItemView *itemView = dynamic_cast<QAbstractItemView *>(widget))
+        itemView->setIconSize(QSize(18, 18)); // TODO: #Elric #customization move to customization?
+
+    if(QAbstractButton *button = dynamic_cast<QAbstractButton *>(widget))
+        button->setIcon(m_skin->icon(button->icon()));
 
     m_customizer->customize(const_cast<QObject *>(currentTarget(widget)));
 }
@@ -601,17 +603,17 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
 
     QIcon::Mode mode;
     if(!(option->state & State_Enabled)) {
-        mode = QIcon::Disabled;
+        mode = QnIcon::Disabled;
     } else if(option->state & State_Selected) {
-        mode = QIcon::Selected;
+        mode = QnIcon::Selected;
     } else if(option->state & State_Sunken) {
-        mode = QnSkin::Pressed;
+        mode = QnIcon::Pressed;
         k = 1.0;
         stopHoverTracking(widget);
     } else if(option->state & State_MouseOver) {
-        mode = QIcon::Active;
+        mode = QnIcon::Active;
     } else {
-        mode = QIcon::Normal;
+        mode = QnIcon::Normal;
     }
     QIcon::State state = option->state & State_On ? QIcon::On : QIcon::Off;
 
@@ -644,7 +646,7 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
         painter->drawPixmap(rect, pixmap1, pixmap1.rect());
         painter->setOpacity(o);
     } else {
-        QPixmap pixmap = m_skin->pixmap(buttonOption->icon, rect.toAlignedRect().size(), mode, state);
+        QPixmap pixmap = buttonOption->icon.pixmap(rect.toAlignedRect().size(), mode, state);
         painter->drawPixmap(rect, pixmap, pixmap.rect());
     }
     return true;

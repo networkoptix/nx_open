@@ -27,16 +27,17 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnAbstractResourcePropertyAdaptor
 // -------------------------------------------------------------------------- //
-QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(const QString &key, QObject *parent):
+QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(const QString &key, QnAbstractResourcePropertyHandler *handler, QObject *parent):
     base_type(parent),
     m_key(key),
+    m_handler(handler),
     m_pendingSave(0)
 {
     connect(this, &QnAbstractResourcePropertyAdaptor::saveRequestQueued, this, &QnAbstractResourcePropertyAdaptor::processSaveRequests, Qt::QueuedConnection);
 }
 
 QnAbstractResourcePropertyAdaptor::~QnAbstractResourcePropertyAdaptor() {
-    return;
+    setResource(QnResourcePtr()); /* This will disconnect us from resource. */
 }
 
 const QString &QnAbstractResourcePropertyAdaptor::key() const {
@@ -95,12 +96,12 @@ void QnAbstractResourcePropertyAdaptor::setValue(const QVariant &value) {
     {
         QMutexLocker locker(&m_mutex);
 
-        if(equals(m_value, value))
+        if(m_handler->equals(m_value, value))
             return;
 
         m_value = value;
 
-        if(!serialize(m_value, &m_serializedValue))
+        if(!m_handler->serialize(m_value, &m_serializedValue))
             m_serializedValue = QString();
     }
     
@@ -113,15 +114,15 @@ bool QnAbstractResourcePropertyAdaptor::testAndSetValue(const QVariant &expected
     {
         QMutexLocker locker(&m_mutex);
 
-        if(!equals(m_value, expectedValue))
+        if(!m_handler->equals(m_value, expectedValue))
             return false;
 
-        if(equals(m_value, newValue))
+        if(m_handler->equals(m_value, newValue))
             return true;
 
         m_value = newValue;
 
-        if(!serialize(m_value, &m_serializedValue))
+        if(!m_handler->serialize(m_value, &m_serializedValue))
             m_serializedValue = QString();
     }
 
@@ -146,7 +147,7 @@ bool QnAbstractResourcePropertyAdaptor::loadValueLocked(const QString &serialize
         return false;
 
     m_serializedValue = serializedValue;
-    if(!deserialize(m_serializedValue, &m_value))
+    if(!m_handler->deserialize(m_serializedValue, &m_value))
         m_value = QVariant();
     
     return true;
