@@ -15,6 +15,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/local_file_cache.h>
+#include "nx_ec/data/ec2_layout_data.h"
 
 namespace {
     const int maxResourceCount = 1024;
@@ -129,14 +130,17 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         return layout;
     QByteArray layoutData = layoutFile->readAll();
     delete layoutFile;
-    QnApiPbSerializer serializer;
-    QList<QnLayoutItemDataList> orderedItems;
-    try {
-        serializer.deserializeLayout(layout, layoutData, &orderedItems);
-        if (layout == 0)
-            return layout;
-    } catch(...) {
+    
+    ec2::ApiLayoutData apiLayout;
+    InputBinaryStream<QByteArray> stream(layoutData);
+    if (QnBinary::deserialize(apiLayout, &stream))
+        apiLayout.toResource(layout);
+    else
         return layout;
+    QnLayoutItemDataList orderedItems;
+    foreach(const ec2::ApiLayoutItemData& item, apiLayout.items) {
+        orderedItems << QnLayoutItemData();
+        item.toResource(orderedItems.last());
     }
 
     QIODevice* uuidFile = layoutStorage.open(QLatin1String("uuid.bin"), QIODevice::ReadOnly);
@@ -204,7 +208,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QTextStream itemTimeZones(itemTimeZonesIO);
 
     // TODO: #Elric here is bad place to add resources to pool. need refactor
-    QnLayoutItemDataList& items = orderedItems[0];
+    QnLayoutItemDataList& items = orderedItems;
     for (int i = 0; i < items.size(); ++i)
     {
         QnLayoutItemData& item = items[i];
