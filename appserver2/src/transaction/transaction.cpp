@@ -104,11 +104,15 @@ namespace ec2
         }
     }
 
-    void QnAbstractTransaction::createNewID(ApiCommand::Value _command, bool _persistent)
+    void QnAbstractTransaction::initNew(ApiCommand::Value _command, bool _persistent)
     {
         command = _command;
         persistent = _persistent;
         id.peerGUID = qnCommon->moduleGUID();
+    }
+
+    void QnAbstractTransaction::fillSequence()
+    {
         id.sequence = persistent ? dbManager->getNextSequence() : m_localSequence.fetchAndAddAcquire(1);
     }
 

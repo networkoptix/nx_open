@@ -41,7 +41,7 @@ ThirdPartyResourceSearcher::~ThirdPartyResourceSearcher()
 {
 }
 
-QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, const QnResourceParameters& parameters )
+QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, const QString& url )
 {
     QnThirdPartyResourcePtr result;
 
@@ -60,7 +60,8 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
     }
 
     nxcip::CameraInfo cameraInfo;
-    strcpy( cameraInfo.url, parameters.url.toLatin1().data() );
+    //todo: #a.kolesnikov Check if only url parameter is enough. Create resource SHOULDN'T use a lot of parameters to create new resource instance
+    strcpy( cameraInfo.url, url.toLatin1().data() );
 
     //analyzing parameters, getting discoveryManager and filling in cameraInfo
     QString resourceName;

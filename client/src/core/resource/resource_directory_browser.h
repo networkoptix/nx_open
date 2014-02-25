@@ -6,7 +6,7 @@
 class QnResourceDirectoryBrowser : public QnAbstractFileResourceSearcher
 {
 public:
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    QnResourcePtr createResource(QnId resourceTypeId, const QString& url);
 
     static QnResourceDirectoryBrowser &instance();
 

@@ -51,7 +51,6 @@ struct ApiResourceData: public ApiData
 
 	void fromResource(const QnResourcePtr& resource);
 	void toResource(QnResourcePtr resource) const;
-	QnResourceParameters toHashMap() const;
     QN_DECLARE_STRUCT_SQL_BINDER();
 };
 

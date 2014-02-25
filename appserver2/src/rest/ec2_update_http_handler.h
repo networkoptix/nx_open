@@ -62,7 +62,6 @@ namespace ec2
             tran.originGuid = tran.id.peerGUID;
             tran.id.peerGUID = qnCommon->moduleGUID();
 
-
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;
 

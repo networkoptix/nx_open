@@ -24,8 +24,6 @@ public:
     QnNetworkResource();
     virtual ~QnNetworkResource();
 
-    //void deserialize(const QnResourceParameters& parameters);
-
     virtual QString getUniqueId() const;
 
     virtual QString getHostAddress() const;

@@ -24,14 +24,14 @@ QnResourceDirectoryBrowser::QnResourceDirectoryBrowser() {
     m_resourceReady = false;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createResource(QnId resourceTypeId, const QnResourceParameters &parameters) {
+QnResourcePtr QnResourceDirectoryBrowser::createResource(QnId resourceTypeId, const QString& url) {
     QnResourcePtr result;
 
     if (!isResourceTypeSupported(resourceTypeId)) {
         return result;
     }
 
-    result = createArchiveResource(parameters.url);
+    result = createArchiveResource(url);
     result->setTypeId(resourceTypeId);
 
     return result;

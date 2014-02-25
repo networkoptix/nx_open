@@ -32,7 +32,7 @@ namespace ec2
             assert( tran.command == ApiCommand::saveUser);
             QnUserResourcePtr userResource = m_resCtx.resFactory->createResource(
                 tran.params.typeId,
-                tran.params.toHashMap() ).dynamicCast<QnUserResource>();
+                tran.params.url ).dynamicCast<QnUserResource>();
             tran.params.toResource( userResource );
             emit addedOrUpdated( userResource );
         }

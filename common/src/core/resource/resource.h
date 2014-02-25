@@ -38,25 +38,6 @@ public:
     }
 };
 
-//typedef QMap<QByteArray, QString> QnResourceParameters;
-struct QnResourceParameters
-{
-    QString url;
-};
-
-/*
-class QnResourceParameters: public QMap<QString, QString> {
-    typedef QMap<QString, QString> base_type;
-
-public:
-    using base_type::operator[];
-
-    QString &operator[](const char *key) {
-        return base_type::operator[](QLatin1String(key));
-    }
-};
-*/
-
 class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
@@ -135,10 +116,7 @@ public:
     Q_DECLARE_FLAGS(Flags, Flag)
 
     QnResource();
-    QnResource(const QnResourceParameters &params);
     virtual ~QnResource();
-
-    //virtual void deserialize(const QnResourceParameters& parameters);
 
     QnId getId() const;
     void setId(const QnId& id);
@@ -452,7 +430,7 @@ class QnResourceFactory
 public:
     virtual ~QnResourceFactory() {}
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) = 0;
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QString& url) = 0;
 };
 
 typedef QSharedPointer<QnResourceFactory> QnResourceFactoryPtr;

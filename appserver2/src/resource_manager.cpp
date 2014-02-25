@@ -126,7 +126,7 @@ namespace ec2
         const QnId& id, QnResource::Status status)
     {
         QnTransaction<ApiSetResourceStatusData> tran;
-        tran.createNewID(command, true);
+        tran.initNew(command, true);
         tran.params.id = id;
         tran.params.status = status;
         return tran;
@@ -138,7 +138,7 @@ namespace ec2
         const QnId& id, const QnKvPairList& kvPairs)
     {
         QnTransaction<ApiResourceParams> tran;
-        tran.createNewID(command, true);
+        tran.initNew(command, true);
         tran.params.params.reserve(kvPairs.size());
         foreach(const QnKvPair& pair, kvPairs)
             tran.params.params.push_back(ApiResourceParam(pair.name(), pair.value()));
@@ -150,7 +150,7 @@ namespace ec2
     QnTransaction<ApiIdData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
     {
         QnTransaction<ApiIdData> tran;
-        tran.createNewID(command, true);
+        tran.initNew(command, true);
         tran.params.id = id;
         return tran;
     }
@@ -159,7 +159,7 @@ namespace ec2
     QnTransaction<ApiSetResourceDisabledData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id, bool disabled )
     {
         QnTransaction<ApiSetResourceDisabledData> tran;
-        tran.createNewID(command, true);
+        tran.initNew(command, true);
         tran.params.id = id;
         tran.params.disabled = disabled;
         return tran;
@@ -169,7 +169,7 @@ namespace ec2
     QnTransaction<ApiResourceData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource )
     {
         QnTransaction<ApiResourceData> tran;
-        tran.createNewID(command, true);
+        tran.initNew(command, true);
         tran.params.fromResource(resource);
         return tran;
     }

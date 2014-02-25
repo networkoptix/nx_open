@@ -38,10 +38,13 @@ namespace ec2
             \param handler Functor ( ErrorCode )
         */
         template<class QueryDataType, class HandlerType>
-            void processUpdateAsync(const QnTransaction<QueryDataType>& tran, HandlerType handler )
+            void processUpdateAsync(QnTransaction<QueryDataType>& tran, HandlerType handler )
         {
             //TODO/IMPL this method must be asynchronous
             ErrorCode errorCode = ErrorCode::ok;
+
+            if (!tran.id.sequence)
+                tran.fillSequence();
 
             auto scopedGuardFunc = [&errorCode, &handler]( ServerQueryProcessor* ){
                 QtConcurrent::run( std::bind( handler, errorCode ) );

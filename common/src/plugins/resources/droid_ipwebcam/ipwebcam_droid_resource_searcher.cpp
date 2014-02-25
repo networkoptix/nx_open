@@ -19,7 +19,7 @@ QnPlIpWebCamResourceSearcher& QnPlIpWebCamResourceSearcher::instance()
     return inst;
 }
 
-QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(QnId resourceTypeId, const QString& url)
 {
     QnNetworkResourcePtr result;
 
@@ -38,7 +38,7 @@ QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(QnId resourceTypeId, 
         return result;
     }
 
-    if (parameters.url.contains(lit("raw://")))
+    if (url.contains(lit("raw://")))
     {
         return result; // it is new droid resource
     }

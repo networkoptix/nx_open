@@ -102,8 +102,8 @@ namespace ec2
     public:
 		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false) {}
 
-        //void createNewID();
-        void createNewID(ApiCommand::Value command, bool persistent);
+        void initNew(ApiCommand::Value command, bool persistent);
+        void fillSequence();
         
         static void setStartNumber(const qint64& value);
 

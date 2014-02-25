@@ -155,7 +155,7 @@ namespace ec2
     QnTransaction<ApiPanicModeData> BaseEc2Connection<T>::prepareTransaction( ApiCommand::Value command, const Qn::PanicMode& mode)
     {
         QnTransaction<ApiPanicModeData> tran;
-        tran.createNewID(command, true);
+        tran.initNew(command, true);
         tran.params.mode = mode;
         return tran;
     }

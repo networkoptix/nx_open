@@ -80,7 +80,7 @@ namespace ec2
     QnTransaction<ApiMediaServerData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource )
     {
         QnTransaction<ApiMediaServerData> tran;
-        tran.createNewID(command, true);
+        tran.initNew(command, true);
         tran.params.fromResource(resource);
         return tran;
     }
@@ -89,7 +89,7 @@ namespace ec2
     QnTransaction<ApiIdData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
     {
         QnTransaction<ApiIdData> tran;
-        tran.createNewID(command, true);
+        tran.initNew(command, true);
         tran.params.id = id;
         return tran;
     }

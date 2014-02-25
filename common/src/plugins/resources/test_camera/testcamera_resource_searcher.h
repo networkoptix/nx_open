@@ -16,7 +16,7 @@ public:
 
     QnResourceList findResources(void);
 
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    QnResourcePtr createResource(QnId resourceTypeId, const QString& url);
     // return the manufacture of the server
     virtual QString manufacture() const;
 

@@ -95,7 +95,7 @@ template<class T>
 QnTransaction<ApiBusinessActionData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource )
 {
     QnTransaction<ApiBusinessActionData> tran;
-    tran.createNewID(command, false);
+    tran.initNew(command, false);
     tran.params.fromResource(resource);
     return tran;
 }
@@ -105,7 +105,7 @@ template<class T>
 QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource )
 {
     QnTransaction<ApiBusinessRuleData> tran;
-    tran.createNewID(command, true);
+    tran.initNew(command, true);
     tran.params.fromResource(resource);
     return tran;
 }
@@ -114,7 +114,7 @@ template<class T>
 QnTransaction<ApiIdData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
 {
     QnTransaction<ApiIdData> tran;
-    tran.createNewID(command, true);
+    tran.initNew(command, true);
     tran.params.id = id;
     return tran;
 }

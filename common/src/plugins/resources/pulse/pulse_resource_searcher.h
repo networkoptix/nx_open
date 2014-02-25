@@ -15,7 +15,7 @@ public:
 
     QnResourceList findResources(void);
 
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    QnResourcePtr createResource(QnId resourceTypeId, const QString& url);
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 

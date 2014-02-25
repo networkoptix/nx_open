@@ -95,7 +95,7 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     return m_restConnection;
 }
 
-QnResourcePtr QnMediaServerResourceFactory::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnMediaServerResourceFactory::createResource(QnId resourceTypeId, const QString& url)
 {
     Q_UNUSED(resourceTypeId)
 

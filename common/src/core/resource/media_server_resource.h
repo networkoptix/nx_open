@@ -84,7 +84,7 @@ private:
 class QnMediaServerResourceFactory : public QnResourceFactory
 {
 public:
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    QnResourcePtr createResource(QnId resourceTypeId, const QString& url);
 };
 
 Q_DECLARE_METATYPE(QnMediaServerResourcePtr);

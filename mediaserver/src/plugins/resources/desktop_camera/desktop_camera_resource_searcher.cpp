@@ -63,7 +63,7 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
     return result;
 }
 
-QnResourcePtr QnDesktopCameraResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnDesktopCameraResourceSearcher::createResource(QnId resourceTypeId, const QString& url)
 {
     QnNetworkResourcePtr result;
 

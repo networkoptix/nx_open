@@ -102,7 +102,7 @@ QnServerCameraPtr QnServerCamera::findEnabledSibling()
 
 // --------------------------- QnServerCameraFactory -----------------------------
 
-QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const QString& url)
 {
     QnResourcePtr resource;
 

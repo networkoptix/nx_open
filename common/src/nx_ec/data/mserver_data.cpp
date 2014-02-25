@@ -39,11 +39,6 @@ void ApiStorageData::toResource(QnAbstractStorageResourcePtr resource) const
     resource->setUsedForWriting(usedForWriting);
 }
 
-QnResourceParameters ApiStorageData::toHashMap() const
-{
-    return ApiResourceData::toHashMap();
-}
-
 void ApiStorageDataList::loadFromQuery(QSqlQuery& query)
 {
     QN_QUERY_TO_DATA_OBJECT(query, ApiStorageData, data, ApiStorageDataFields ApiResourceDataFields)
@@ -88,7 +83,7 @@ void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, const Res
 
     QnAbstractStorageResourceList storagesRes;
     foreach(const ApiStorageData& storage, storages) {
-        QnAbstractStorageResourcePtr storageRes = ctx.resFactory->createResource(resType->getId(), storage.toHashMap()).dynamicCast<QnAbstractStorageResource>();
+        QnAbstractStorageResourcePtr storageRes = ctx.resFactory->createResource(resType->getId(), storage.url).dynamicCast<QnAbstractStorageResource>();
         
         storage.toResource(storageRes);
         storagesRes.push_back(storageRes);

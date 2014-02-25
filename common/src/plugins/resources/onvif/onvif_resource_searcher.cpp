@@ -221,7 +221,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     return result;
 }
 
-QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const QString& url)
 {
     QnResourcePtr result;
 

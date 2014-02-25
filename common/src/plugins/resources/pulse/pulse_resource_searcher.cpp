@@ -45,7 +45,7 @@ QnResourceList QnPlPulseSearcher::findResources()
     return result;
 }
 
-QnResourcePtr QnPlPulseSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnPlPulseSearcher::createResource(QnId resourceTypeId, const QString& url)
 {
     QnNetworkResourcePtr result;
 

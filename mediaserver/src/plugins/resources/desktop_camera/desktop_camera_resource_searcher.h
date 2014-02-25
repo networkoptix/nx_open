@@ -17,7 +17,7 @@ public:
     
     virtual ~QnDesktopCameraResourceSearcher();
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QString& url) override;
 
     // return the manufacture of the server
     virtual QString manufacture() const;

@@ -89,7 +89,7 @@ namespace ec2
             foreach(const T2& data, multiTran.params.data)
             {
                 QnTransaction<T2> tran;
-                tran.createNewID(ApiCommand::saveLayout, true);
+                tran.initNew(ApiCommand::saveLayout, true);
                 tran.id.peerGUID = multiTran.id.peerGUID;
                 tran.params = data;
                 QByteArray serializedTran;

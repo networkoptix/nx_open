@@ -129,38 +129,6 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         consumer->afterUpdate();
 }
 
-/*
-void QnResource::deserialize(const QnResourceParameters& parameters)
-{
-    bool signalsBlocked = blockSignals(true);
-
-    QMutexLocker locker(&m_mutex);
-
-    if (parameters.contains("id"))
-        setId(parameters["id"]);
-
-    if (parameters.contains("typeId"))
-        setTypeId(parameters["typeId"]);
-
-    if (parameters.contains("parentId"))
-        setParentId(parameters["parentId"]);
-
-    if (parameters.contains("name"))
-        setName(parameters["name"]);
-
-    if (parameters.contains("url"))
-        setUrl(parameters["url"]);
-
-    if (parameters.contains("status"))
-        m_status = (QnResource::Status)parameters["status"].toInt();
-
-    if (parameters.contains("disabled"))
-        m_disabled = parameters["disabled"].toInt();
-
-    blockSignals(signalsBlocked);
-}
-*/
-
 QnId QnResource::getParentId() const
 {
     QMutexLocker locker(&m_mutex);

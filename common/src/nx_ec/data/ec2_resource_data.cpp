@@ -37,14 +37,6 @@ void ApiResourceData::toResource(QnResourcePtr resource) const
         resource->setParam(param.name, param.value, QnDomainDatabase);
 }
 
-QnResourceParameters ApiResourceData::toHashMap() const
-{
-    QnResourceParameters result;
-    result.url = url;
-    return result;
-}
-
-
 void ApiResourceDataList::loadFromQuery(QSqlQuery& /*query*/)
 {
     //TODO/IMPL
@@ -57,7 +49,7 @@ void ApiResourceDataList::toResourceList( QnResourceFactory* resFactory, QnResou
 	for(int i = 0; i < data.size(); ++i) {
         QnResourcePtr res = resFactory->createResource(
             data[i].typeId,
-            data[i].toHashMap() ).dynamicCast<QnResource>();
+            data[i].url ).dynamicCast<QnResource>();
 		data[i].toResource( res );
 		resList << res;
 	}

@@ -105,7 +105,7 @@ void ApiCameraDataList::toResourceList(QList<T>& outData, QnResourceFactory* fac
     outData.reserve(outData.size() + data.size());
     for(int i = 0; i < data.size(); ++i) 
     {
-        QnVirtualCameraResourcePtr camera = factory->createResource(data[i].typeId, data[i].toHashMap()).dynamicCast<QnVirtualCameraResource>();
+        QnVirtualCameraResourcePtr camera = factory->createResource(data[i].typeId, data[i].url).dynamicCast<QnVirtualCameraResource>();
         if (camera) {
             data[i].toResource(camera);
             outData << camera;

@@ -16,7 +16,7 @@ QnPlAxisResourceSearcher& QnPlAxisResourceSearcher::instance()
     return inst;
 }
 
-QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, const QString& url)
 {
     QnNetworkResourcePtr result;
 

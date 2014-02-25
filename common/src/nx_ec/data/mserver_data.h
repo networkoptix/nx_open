@@ -16,7 +16,6 @@ namespace ec2
         qint64       spaceLimit;
         bool         usedForWriting;
 
-        QnResourceParameters toHashMap() const;
         void fromResource(QnAbstractStorageResourcePtr resource);
         void toResource(QnAbstractStorageResourcePtr resource) const;
         QN_DECLARE_STRUCT_SQL_BINDER();

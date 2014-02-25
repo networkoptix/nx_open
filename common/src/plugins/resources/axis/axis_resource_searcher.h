@@ -14,7 +14,7 @@ class QnPlAxisResourceSearcher : public QnMdnsResourceSearcher
 public:
     static QnPlAxisResourceSearcher& instance();
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) override;
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QString& url) override;
 
     // return the manufacture of the server
     virtual QString manufacture() const override;

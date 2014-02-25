@@ -125,7 +125,7 @@ void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* proce
     m_resourceProcessor = processor;
 }
 
-QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, const QString& url)
 {
     QnResourcePtr result;
 
@@ -136,7 +136,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, co
     if (resourceType->getName() == QLatin1String("Storage"))
     {
 
-        result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(parameters.url));
+        result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(url));
         //if (result)
         //    result->deserialize(parameters);
     }
@@ -150,7 +150,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, co
         int i = 0;
         foreach (QnAbstractResourceSearcher *searcher, searchersList)
         {
-            result = searcher->createResource(resourceTypeId, parameters);
+            result = searcher->createResource(resourceTypeId, url);
             if (!result.isNull())
                 break;
             i++;
