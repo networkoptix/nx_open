@@ -12,10 +12,11 @@ namespace ec2
         ServerQueryProcessor* queryProcessor,
         const ResourceContext& resCtx,
         const QnConnectionInfo& connectionInfo,
-        const QString& dbFileName)
+        const QString& dbFilePath)
     :
         BaseEc2Connection<ServerQueryProcessor>( queryProcessor, resCtx ),
-        m_dbManager( new QnDbManager(resCtx.resFactory, &m_storedFileManagerImpl, dbFileName) ),
+        m_dbManager( new QnDbManager(resCtx.resFactory, &m_storedFileManagerImpl, dbFilePath) ),
+        m_transactionLog( new QnTransactionLog(m_dbManager.get() )),
         m_connectionInfo( connectionInfo )
     {
         QnTransactionMessageBus::instance()->setHandler(this);

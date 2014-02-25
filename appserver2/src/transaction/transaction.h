@@ -102,7 +102,8 @@ namespace ec2
     public:
 		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false) {}
 
-        void createNewID();
+        //void createNewID();
+        void createNewID(ApiCommand::Value command, bool persistent);
         
         static void setStartNumber(const qint64& value);
 
@@ -119,9 +120,9 @@ namespace ec2
 
         struct ID
         {
+            ID(): tranID(0) {}
             QUuid peerGUID;
-            QUuid tranGUID;
-
+            qint32 tranID;
         };
 
         ApiCommand::Value command;
@@ -129,6 +130,7 @@ namespace ec2
         bool persistent;
         
         QUuid originGuid; // this field doesn't serializable and uses local only. 
+        static QAtomicInt m_localSequence;
     };
 
     template <class T>
@@ -157,7 +159,7 @@ namespace ec2
     int generateRequestID();
 }
 
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (tranGUID) )
+QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (tranID) )
 QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent))
 
 //QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS( QnTransaction, ... )

@@ -148,6 +148,22 @@ void QnTransactionTransport::doClientConnect()
     httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     connect(httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
     connect(httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
+
+    QUrl url(remoteAddr);
+    QUrlQuery q = QUrlQuery(remoteAddr.query());
+    if( isClientPeer ) {
+        q.removeQueryItem("isClient");
+        q.addQueryItem("isClient", QString());
+    }
+    else {
+        QnTransactionLog::QnTranState state;
+        transactionLog->getTransactionsState(state);
+        
+        httpClient->addRequestHeader("tran_state", transactionLog->serializeState(state).toBase64());
+        //httpClient->m_request()
+    }
+    remoteAddr.setQuery(q);
+
     httpClient->doGet(remoteAddr);
 }
 
@@ -275,7 +291,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(ApiCommand::
         return false;
     
     // trigger notification, update local data e.t.c
-    if (!m_handler->processIncomingTransaction<T2>(tran))
+    if (!m_handler->processIncomingTransaction<T2>(tran, stream.buffer()))
         return false;
 
     return true;
@@ -397,8 +413,15 @@ void QnTransactionMessageBus::toFormattedHex(quint8* dst, quint32 payloadSize)
     }
 }
 
-void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QUuid& remoteGuid, bool isClient)
+void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QUrlQuery& query)
 {
+    bool isClient = query.hasQueryItem("isClient");
+    QUuid remoteGuid  = query.queryItemValue(lit("guid"));
+    QByteArray tranStateBin = QByteArray::fromBase64(query.queryItemValue("tran_state").toLocal8Bit());
+    QnTransactionLog::QnTranState state;
+    if (!tranStateBin.isEmpty())
+        state = transactionLog->deserializeState(tranStateBin);
+
     QnTransactionTransport* transport = new QnTransactionTransport(this);
     transport->remoteGuid = remoteGuid;
     transport->isConnectionOriginator = false;
@@ -432,17 +455,33 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
             serializeTransaction(buffer, data);
             transport->addData(buffer);
         }
+        else {
+            qWarning() << "Can't execute query for sync with client peer!";
+        }
+    }
+    else {
+        QList<QByteArray> transactions;
+        const ErrorCode errorCode = transactionLog->getTransactionsAfter(state, transactions);
+        if (errorCode == ErrorCode::ok) {
+            foreach(const QByteArray& data, transactions)
+                transport->addData(data);
+        }
+        else {
+            qWarning() << "Can't execute query for sync with server peer!";
+        }
     }
     m_connections.push_back(transport);
 }
 
-void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url)
+void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient)
 {
     QMutexLocker lock(&m_mutex);
+    
     QString test = url.toString();
 
     QnTransactionTransport* transport = new QnTransactionTransport(this);
     transport->isConnectionOriginator = true;
+    transport->isClientPeer = isClient;
     transport->remoteAddr = url;
     transport->state = QnTransactionTransport::Connect;
     m_connections.push_back(transport);

@@ -52,12 +52,12 @@ namespace ec2
         virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) override;
         virtual int saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
 
-        virtual void addRemotePeer(const QUrl& url) override;
+        virtual void addRemotePeer(const QUrl& url, bool isClient) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
     public:
 
-        template<class T> bool processIncomingTransaction( const QnTransaction<T>& tran ) {
-            if (!m_queryProcessor->processIncomingTransaction(tran))
+        template<class T> bool processIncomingTransaction( const QnTransaction<T>& tran, const QByteArray& serializedTran) {
+            if (!m_queryProcessor->processIncomingTransaction(tran, serializedTran))
                 return false;
             triggerNotification<T>(tran);
             return true;

@@ -18,11 +18,3 @@ CREATE UNIQUE INDEX idx_businessrule_guid ON vms_businessrule(guid);
 CREATE UNIQUE INDEX idx_resourcetype_guid ON vms_resourcetype(guid);
 
 ALTER TABLE "vms_server" ADD flags number;
-
-CREATE TABLE "vms_transaction_log" (id              INTEGER PRIMARY KEY AUTOINCREMENT,
-                             	   peer_guid        BLOB(16) NOT NULL,
-				   transaction_guid BLOB(16) NOT NULL,
-			           transaction_data BLOB  NOT NULL);
-
-CREATE  INDEX idx_transaction_guid      ON vms_transaction_log(transaction_guid);
-CREATE  INDEX idx_transaction_peer_guid ON vms_transaction_log(peer_guid);

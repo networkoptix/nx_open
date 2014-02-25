@@ -13,50 +13,34 @@
 #include "nx_ec/data/ec2_layout_data.h"
 #include "nx_ec/data/ec2_business_rule_data.h"
 #include "nx_ec/data/ec2_full_data.h"
+#include "utils/db/db_helper.h"
+#include "transaction/transaction_log.h"
 
-
-class QSqlDatabase;
 
 namespace ec2
 {
-    class QnDbManager
+    class QnDbManager: public QnDbHelper
     {
     public:
 		QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* const storedFileManagerImpl, const QString& dbFileName);
 		virtual ~QnDbManager();
 
         static QnDbManager* instance();
-
-
-		// ------------ transactions --------------------------------------
-
-        template<class QueryDataType>
-        ErrorCode executeTransaction( const QnTransaction<QueryDataType>& /*tran*/ )
+        
+        template <class T>
+        ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
-            //static_assert( false, "You have to add QnDbManager::executeTransaction specification" );
-            Q_ASSERT_X( 0, Q_FUNC_INFO, "You have to add QnDbManager::executeTransaction specification" );
-            return ErrorCode::ok;
+            QnDbTransactionLocker lock(&m_tran);
+            ErrorCode result = executeTransactionNoLock(tran);
+            if (result != ErrorCode::ok)
+                return result;
+            result = transactionLog->saveTransaction( tran, serializedTran);
+            if (result == ErrorCode::ok)
+                lock.commit();
+            return result;
         }
 
-        ErrorCode executeTransaction(const QnTransaction<ApiCameraData>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiCameraDataList>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiMediaServerData>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiLayoutData>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiLayoutDataList>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiSetResourceStatusData>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiSetResourceDisabledData>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiResourceParams>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiCameraServerItemData>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiPanicModeData>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiStoredFileData>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiStoredFilePath>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiResourceData>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiBusinessRuleData>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiUserData>& tran);
 
-        // delete camera, server, layout, any resource t.e.c
-        ErrorCode executeTransaction(const QnTransaction<ApiIdData>& tran);
-		
 		// --------- get methods ---------------------
 
         template <class T1, class T2>
@@ -111,34 +95,48 @@ namespace ec2
 
 		int getNextSequence();
     private:
+        friend class QnTransactionLog;
+        QSqlDatabase& getDB() { return m_sdb; }
+        QReadWriteLock& getMutex() { return m_mutex; }
 
-        class QnDbTransactionLocker;
+        // ------------ transactions --------------------------------------
 
-        class QnDbTransaction
+        template<class QueryDataType>
+        ErrorCode executeTransactionNoLock( const QnTransaction<QueryDataType>& /*tran*/ )
         {
-        public:
-            QnDbTransaction(QSqlDatabase& m_sdb, QReadWriteLock& mutex);
-        private:
-            friend class QnDbTransactionLocker;
+            static_assert( false, "You have to add QnDbManager::executeTransactionNoLock specification" );
+            return ErrorCode::ok;
+        }
 
-            void beginTran();
-            void rollback();
-            void commit();
-        private:
-            QSqlDatabase& m_sdb;
-            QReadWriteLock& m_mutex;
-        };
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraDataList>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiMediaServerData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutDataList>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceStatusData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceDisabledData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceParams>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraServerItemData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiPanicModeData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiStoredFileData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiStoredFilePath>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiBusinessRuleData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiUserData>& tran);
 
-        class QnDbTransactionLocker
-        {
-        public:
-            QnDbTransactionLocker(QnDbTransaction* tran);
-            ~QnDbTransactionLocker();
-            void commit();
-        private:
-            bool m_committed;
-            QnDbTransaction* m_tran;
-        };
+        // delete camera, server, layout, any resource t.e.c
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiIdData>& tran);
+
+
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiFullData>&) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiBusinessActionData>&) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
 
         ErrorCode deleteTableRecord(const QnId& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
@@ -182,11 +180,9 @@ namespace ec2
         ErrorCode removeBusinessRule( const QnId& id );
 
 		bool createDatabase();
-        bool execSQLFile(const QString& fileName);
         
         void mergeRuleResource(QSqlQuery& query, ApiBusinessRuleDataList& data, std::vector<qint32> ApiBusinessRuleData::*resList);
 
-        bool isObjectExists(const QString& objectType, const QString& objectName);
         qint32 getResourceInternalId( const QnId& guid );
         qint32 getBusinessRuleInternalId( const QnId& guid );
     private:
@@ -194,12 +190,9 @@ namespace ec2
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
         bool updateGuids();
     private:
-        QSqlDatabase m_sdb;
-        QReadWriteLock m_mutex;
 		QnResourceFactory* m_resourceFactory;
         StoredFileManagerImpl* const m_storedFileManagerImpl;
         QnId m_storageTypeId;
-        QnDbTransaction m_tran;
     };
 };
 

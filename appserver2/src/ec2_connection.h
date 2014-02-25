@@ -25,7 +25,7 @@ namespace ec2
             ServerQueryProcessor* queryProcessor,
             const ResourceContext& resCtx,
             const QnConnectionInfo& connectionInfo,
-            const QString& dbFileName);
+            const QString& dbFilePath);
         virtual ~Ec2DirectConnection();
 
         //!Implementation of ec2::AbstractECConnection::connectionInfo
@@ -36,6 +36,7 @@ namespace ec2
     private:
         StoredFileManagerImpl m_storedFileManagerImpl;
 		std::unique_ptr<QnDbManager> m_dbManager;   //TODO: #ak not sure this is right place for QnDbManager instance
+        std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;
     };
     typedef std::shared_ptr<Ec2DirectConnection> Ec2DirectConnectionPtr;

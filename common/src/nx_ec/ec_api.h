@@ -579,7 +579,7 @@ namespace ec2
             \note Calling entity MUST connect to all interesting signals prior to calling this method so that received data is consistent
         */
         virtual void startReceivingNotifications( bool fullSyncRequired) = 0;
-        virtual void addRemotePeer(const QUrl& url) = 0;
+        virtual void addRemotePeer(const QUrl& url, bool isClient) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
 
         virtual AbstractResourceManagerPtr getResourceManager() = 0;

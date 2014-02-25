@@ -90,7 +90,7 @@ namespace ec2
             m_runningHttpRequests[httpClient] = new CustomHandler<decltype(func)>(func);
         }
 
-        template<class T> bool processIncomingTransaction( const QnTransaction<T>&  )
+        template<class T> bool processIncomingTransaction( const QnTransaction<T>&, const QByteArray&   )
         {
             // nothing to do for a while
             return true;

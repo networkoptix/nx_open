@@ -113,6 +113,7 @@ namespace nx_http
 
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
+        void addRequestHeader(const StringType& key, const StringType& value);
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
         //!Emitted when response headers has been read

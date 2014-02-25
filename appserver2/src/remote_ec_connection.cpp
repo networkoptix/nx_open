@@ -38,11 +38,9 @@ namespace ec2
         QUrl url(m_queryProcessor->getUrl());
         url.setPath("ec2/events");
         QUrlQuery q;
-        if( isClient )
-            q.addQueryItem("isClient", QString());
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
         url.setQuery(q);
         m_peerUrl = url;
-        QnTransactionMessageBus::instance()->addConnectionToPeer(url);
+        QnTransactionMessageBus::instance()->addConnectionToPeer(url, isClient);
     }
 }

@@ -38,20 +38,6 @@ void QnEventsDB::setEventLogPeriod(qint64 periodUsec)
     m_eventKeepPeriod = periodUsec;
 }
 
-bool QnEventsDB::isObjectExists(const QString& objectType, const QString& objectName)
-{
-    QSqlQuery tableList(m_sdb);
-    QString request;
-    request = QString(lit("SELECT * FROM sqlite_master WHERE type='%1' and name='%2'")).arg(objectType).arg(objectName);
-    tableList.prepare(request);
-    if (!tableList.exec())
-        return false;
-    int fieldNo = tableList.record().indexOf(lit("name"));
-    tableList.next();
-    QString value = tableList.value(fieldNo).toString();
-    return !value.isEmpty();
-}
-
 bool QnEventsDB::createDatabase()
 {
     if (!isObjectExists(lit("table"), lit("runtime_actions")))
@@ -98,7 +84,7 @@ bool QnEventsDB::cleanupEvents()
 
 bool QnEventsDB::removeLogForRes(QnId resId)
 {
-    QMutexLocker lock(&m_mutex);
+    QWriteLocker lock(&m_mutex);
 
     if (!m_sdb.isOpen())
         return false;
@@ -115,7 +101,7 @@ bool QnEventsDB::removeLogForRes(QnId resId)
 
 bool QnEventsDB::saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePtr actionRes)
 {
-    QMutexLocker lock(&m_mutex);
+    QWriteLocker lock(&m_mutex);
 
     if (!m_sdb.isOpen())
         return false;
@@ -221,7 +207,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     QList<QnAbstractBusinessActionPtr> result;
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
-    QMutexLocker lock(&m_mutex);
+    QReadLocker lock(&m_mutex);
 
     QSqlQuery query(request);
     if (!query.exec())
@@ -279,7 +265,7 @@ void QnEventsDB::getAndSerializeActions(
 
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
-    QMutexLocker lock(&m_mutex);
+    QReadLocker lock(&m_mutex);
 
     QSqlQuery actionsQuery(request);
     if (!actionsQuery.exec())

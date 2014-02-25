@@ -48,9 +48,8 @@ void QnTransactionTcpProcessor::run()
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
     sendResponse("HTTP", CODE_OK, "application/octet-stream");
 
-    bool isClient = d->request.requestLine.url.query().contains("isClient");
-    QUuid remoteGuid  = QUrlQuery(d->request.requestLine.url.query()).queryItemValue(lit("guid"));
-    QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, remoteGuid, isClient);
+    QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
+    QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, query);
     d->socket.clear();
 }
 

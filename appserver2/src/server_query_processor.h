@@ -38,7 +38,7 @@ namespace ec2
             \param handler Functor ( ErrorCode )
         */
         template<class QueryDataType, class HandlerType>
-            void processUpdateAsync( const QnTransaction<QueryDataType>& tran, HandlerType handler )
+            void processUpdateAsync(const QnTransaction<QueryDataType>& tran, HandlerType handler )
         {
             //TODO/IMPL this method must be asynchronous
             ErrorCode errorCode = ErrorCode::ok;
@@ -48,30 +48,26 @@ namespace ec2
             };
             std::unique_ptr<ServerQueryProcessor, decltype(scopedGuardFunc)> scopedGuard( this, scopedGuardFunc );
 
-            errorCode = dbManager->executeTransaction( tran );
-            if( errorCode != ErrorCode::ok )
-                return;
+            QByteArray serializedTran;
+            OutputBinaryStream<QByteArray> stream( &serializedTran );
+            tran.serialize(&stream);
 
-            // saving transaction to the log
-            errorCode = transactionLog->saveTransaction( tran );
-            if( errorCode != ErrorCode::ok )
-                return;
+            if (tran.persistent) {
+                errorCode = dbManager->executeTransaction( tran, serializedTran);
+                if( errorCode != ErrorCode::ok )
+                    return;
+            }
 
             // delivering transaction to remote peers
-            QnTransactionMessageBus::instance()->sendTransaction(tran);
+            QnTransactionMessageBus::instance()->sendTransaction(tran, serializedTran);
         }
 
         template<class T> 
-        bool processIncomingTransaction( const QnTransaction<T>& tran ) 
+        bool processIncomingTransaction( const QnTransaction<T>& tran, const QByteArray& serializedTran ) 
         {
             if (tran.persistent)
             {
-                ErrorCode errorCode = dbManager->executeTransaction( tran );
-                if( errorCode != ErrorCode::ok )
-                    return false;
-
-                // saving transaction to the log
-                errorCode = transactionLog->saveTransaction( tran );
+                ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
                 if( errorCode != ErrorCode::ok )
                     return false;
             }

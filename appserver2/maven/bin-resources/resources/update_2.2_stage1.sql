@@ -21,3 +21,12 @@ CREATE TABLE "vms_businessrule_action_resources" (businessrule_guid BLOB(16) NOT
 
 ALTER TABLE "vms_businessrule_event_resources" RENAME TO vms_businessrule_event_resources_tmp;
 CREATE TABLE "vms_businessrule_event_resources" (businessrule_guid BLOB(16) NOT NULL, resource_guid BLOB(16) NOT NULL, PRIMARY KEY(businessrule_guid, resource_guid));
+
+
+CREATE TABLE "transaction_log" (peer_guid   BLOB(16) NOT NULL,
+			        sequence    INTEGER NOT NULL,
+			        tran_guid   BLOB(16) NOT NULL,
+			        tran_data   BLOB  NOT NULL);
+
+CREATE UNIQUE INDEX idx_transaction_key   ON transaction_log(peer_guid, sequence);
+CREATE UNIQUE INDEX idx_transaction_hash  ON transaction_log(peer_guid, tran_guid);

@@ -75,9 +75,9 @@ namespace ec2
         static QnTransactionMessageBus* instance();
         static void initStaticInstance(QnTransactionMessageBus* instance);
 
-        void addConnectionToPeer(const QUrl& url);
+        void addConnectionToPeer(const QUrl& url, bool isClient);
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QUuid& remoteGuid, bool isClient);
+        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QUrlQuery& params);
         
         template <class T>
         void setHandler(T* handler) { 
@@ -93,6 +93,30 @@ namespace ec2
         void toFormattedHex(quint8* dst, quint32 payloadSize);
 
         template <class T>
+        void sendTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
+        {
+            QByteArray buffer;
+            buffer.reserve(serializedTran.size() + 12);
+            buffer.append("00000000\r\n");
+            buffer.append(serializedTran);
+            buffer.append("\r\n"); // chunk end
+            quint32 payloadSize = buffer.size() - 12;
+            toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
+            sendTransactionInternal(tran, buffer);
+        }
+
+        template <class T>
+        void sendTransaction(const QnTransaction<T>& tran)
+        {
+            QByteArray buffer;
+            serializeTransaction(buffer, tran);
+            sendTransactionInternal(tran, buffer);
+        }
+
+    private:
+        friend class QnTransactionTransport;
+
+        template <class T>
         void serializeTransaction(QByteArray& buffer, const QnTransaction<T>& tran) 
         {
             OutputBinaryStream<QByteArray> stream(&buffer);
@@ -104,10 +128,8 @@ namespace ec2
         }
 
         template <class T>
-        void sendTransaction(const QnTransaction<T>& tran)
+        void sendTransactionInternal(const QnTransaction<T>& tran, const QByteArray& buffer)
         {
-            QByteArray buffer;
-            serializeTransaction(buffer, tran);
             QMutexLocker lock(&m_mutex);
             foreach(QnTransactionTransport* transport, m_connections) 
             {
@@ -115,8 +137,6 @@ namespace ec2
                     transport->addData(buffer); // do not send transaction to originator
             }
         }
-    private:
-        friend class QnTransactionTransport;
 
         class AbstractHandler
         {

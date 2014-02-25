@@ -859,7 +859,7 @@ void QnMain::at_peerFound(
         int port = moduleParameters.value("port").toInt();
         QString url = QString(lit("http://%1:%2")).arg(remoteHostAddress).arg(port);
         ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-        ec2Connection->addRemotePeer(url);
+        ec2Connection->addRemotePeer(url, false);
     }
 }
 void QnMain::at_peerLost(
@@ -1055,8 +1055,8 @@ void QnMain::run()
     QnConnectionInfoPtr connectInfo(new QnConnectionInfo());
     while (!needToStop())
     {
-        QString dbFileName = MSSettings::roSettings()->value( "eventsDBFilePath", closeDirPath(getDataDirectory()) + QString(lit("ecs.sqlite"))).toString();
-        QString urlString = QString("file:///%1").arg(dbFileName);
+        QString dbFilePath = MSSettings::roSettings()->value( "eventsDBFilePath", closeDirPath(getDataDirectory())).toString();
+        QString urlString = QString("file:///%1").arg(dbFilePath);
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QUrl(urlString), &ec2Connection );
         if( errorCode == ec2::ErrorCode::ok )
         {

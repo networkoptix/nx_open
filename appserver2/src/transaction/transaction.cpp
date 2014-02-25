@@ -2,10 +2,13 @@
 
 #include <atomic>
 #include "common/common_module.h"
+#include "database/db_manager.h"
 
 
 namespace ec2
 {
+
+    QAtomicInt QnAbstractTransaction::m_localSequence(1000000000);
 
     namespace ApiCommand
     {
@@ -101,14 +104,21 @@ namespace ec2
         }
     }
 
+    void QnAbstractTransaction::createNewID(ApiCommand::Value _command, bool _persistent)
+    {
+        command = _command;
+        persistent = _persistent;
+        id.peerGUID = qnCommon->moduleGUID();
+        id.tranID = persistent ? dbManager->getNextSequence() : m_localSequence.fetchAndAddAcquire(1);
+    }
 
-
+    /*
     void QnAbstractTransaction::createNewID()
     {
         id.peerGUID = qnCommon->moduleGUID();
         id.tranGUID = QUuid::createUuid();
     }
-
+    */
 
     int generateRequestID()
     {

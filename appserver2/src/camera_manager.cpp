@@ -125,50 +125,42 @@ namespace ec2
 
     template<class QueryProcessorType>
     QnTransaction<ApiCameraData> QnCameraManager<QueryProcessorType>::prepareTransaction(
-        ApiCommand::Value cmd,
+        ApiCommand::Value command,
         const QnVirtualCameraResourcePtr& resource )
     {
-		QnTransaction<ApiCameraData> result;
-		result.command = cmd;
-		result.createNewID();
-		result.persistent = true;
-		result.params.fromResource(resource);
-        return result;
+		QnTransaction<ApiCameraData> tran;
+		tran.createNewID(command, true);
+		tran.params.fromResource(resource);
+        return tran;
     }
 
     template<class QueryProcessorType>
     QnTransaction<ApiCameraDataList> QnCameraManager<QueryProcessorType>::prepareTransaction(
-        ApiCommand::Value cmd,
+        ApiCommand::Value command,
         const QnVirtualCameraResourceList& cameras )
     {
-        QnTransaction<ApiCameraDataList> result;
-        result.command = cmd;
-        result.createNewID();
-        result.persistent = true;
-        result.params.fromResourceList(cameras);
-        return result;
+        QnTransaction<ApiCameraDataList> tran;
+        tran.createNewID(command, true);
+        tran.params.fromResourceList(cameras);
+        return tran;
     }
 
     template<class QueryProcessorType>
     QnTransaction<ApiCameraServerItemData> QnCameraManager<QueryProcessorType>::prepareTransaction(
-        ApiCommand::Value cmd,
+        ApiCommand::Value command,
         const QnCameraHistoryItem& historyItem )
     {
-        QnTransaction<ApiCameraServerItemData> result;
-        result.command = cmd;
-        result.createNewID();
-        result.persistent = true;
-        result.params.fromResource(historyItem);
-        return result;
+        QnTransaction<ApiCameraServerItemData> tran;
+        tran.createNewID(command, true);
+        tran.params.fromResource(historyItem);
+        return tran;
     }
 
     template<class T>
     QnTransaction<ApiIdData> QnCameraManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
     {
         QnTransaction<ApiIdData> tran;
-        tran.createNewID();
-        tran.command = command;
-        tran.persistent = true;
+        tran.createNewID(command, true);
         tran.params.id = id;
         return tran;
     }

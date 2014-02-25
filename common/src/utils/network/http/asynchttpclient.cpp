@@ -553,6 +553,11 @@ namespace nx_http
             m_request.headers[Header::Authorization::NAME] = Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString();
     }
 
+    void AsyncHttpClient::addRequestHeader(const StringType& key, const StringType& value)
+    {
+        m_request.headers[key] = value;
+    }
+
     void AsyncHttpClient::serializeRequest()
     {
         m_requestBuffer.clear();

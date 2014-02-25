@@ -5,53 +5,6 @@
 namespace ec2
 {
 
-QnDbManager::QnDbTransaction::QnDbTransaction(QSqlDatabase& sdb, QReadWriteLock& mutex): 
-    m_sdb(sdb),
-    m_mutex(mutex)
-{
-
-}
-
-void QnDbManager::QnDbTransaction::beginTran()
-{
-    m_mutex.lockForWrite();
-    QSqlQuery query(m_sdb);
-    //query.exec("BEGIN TRANSACTION");
-}
-
-void QnDbManager::QnDbTransaction::rollback()
-{
-    QSqlQuery query(m_sdb);
-    //query.exec("ROLLBACK");
-    m_mutex.unlock();
-}
-
-void QnDbManager::QnDbTransaction::commit()
-{
-    QSqlQuery query(m_sdb);
-    //query.exec("COMMIT");
-    m_mutex.unlock();
-}
-
-QnDbManager::QnDbTransactionLocker::QnDbTransactionLocker(QnDbTransaction* tran): 
-    m_tran(tran), 
-    m_committed(false)
-{
-    m_tran->beginTran();
-}
-
-QnDbManager::QnDbTransactionLocker::~QnDbTransactionLocker()
-{
-    if (!m_committed)
-        m_tran->rollback();
-}
-
-void QnDbManager::QnDbTransactionLocker::commit()
-{
-    m_tran->commit();
-    m_committed = true;
-}
-
 static QnDbManager* globalInstance = 0;
 
 
@@ -87,16 +40,13 @@ void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subD
     }
 }
 
-QnDbManager::QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* const storedFileManagerImpl, const QString& dbFileName ):
-    m_tran(m_sdb, m_mutex),
+QnDbManager::QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* const storedFileManagerImpl, const QString& dbFilePath ):
+    QnDbHelper(),
     m_storedFileManagerImpl( storedFileManagerImpl )
 {
     m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
-    m_sdb.setDatabaseName( dbFileName );
-	//m_sdb.setDatabaseName("c:/develop/netoptix_trunk/appserver/db/ecs.db");
-    //m_sdb.setDatabaseName("d:/Projects/Serious/NetworkOptix/netoptix_vms/appserver/db/ecs.db");
-    //m_sdb.setDatabaseName("c:/Windows/System32/config/systemprofile/AppData/Local/Network Optix/Enterprise Controller/db/ecs.db");
+    m_sdb.setDatabaseName( closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite"));
     
 	if (m_sdb.open())
 	{
@@ -115,65 +65,6 @@ QnDbManager::QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* cons
 
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;
-}
-
-bool QnDbManager::isObjectExists(const QString& objectType, const QString& objectName)
-{
-    QSqlQuery tableList(m_sdb);
-    QString request;
-    request = QString(lit("SELECT * FROM sqlite_master WHERE type='%1' and name='%2'")).arg(objectType).arg(objectName);
-    tableList.prepare(request);
-    if (!tableList.exec())
-        return false;
-    int fieldNo = tableList.record().indexOf(lit("name"));
-    if (!tableList.next())
-        return false;
-    QString value = tableList.value(fieldNo).toString();
-    return !value.isEmpty();
-}
-
-QList<QByteArray> quotedSplit(const QByteArray& data)
-{
-    QList<QByteArray> result;
-    const char* curPtr = data.data();
-    const char* prevPtr = curPtr;
-    const char* end = curPtr + data.size();
-    bool inQuote1 = false;
-    bool inQuote2 = false;
-    for (;curPtr < end; ++curPtr) {
-        if (*curPtr == '\'')
-            inQuote1 = !inQuote1;
-        else if (*curPtr == '\"')
-            inQuote2 = !inQuote2;
-        else if (*curPtr == ';' && !inQuote1 && !inQuote2)
-        {
-            //*curPtr = 0;
-            result << QByteArray::fromRawData(prevPtr, curPtr - prevPtr);
-            prevPtr = curPtr+1;
-        }
-    }
-
-    return result;
-}
-
-bool QnDbManager::execSQLFile(const QString& fileName)
-{
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly))
-        return false;
-    QByteArray data = file.readAll();
-    foreach(const QByteArray& singleCommand, quotedSplit(data))
-    {
-        if (singleCommand.trimmed().isEmpty())
-            continue;
-        QSqlQuery ddlQuery(m_sdb);
-        ddlQuery.prepare(singleCommand);
-        if (!ddlQuery.exec()) {
-            qWarning() << "can't create tables for sqlLite database:" << ddlQuery.lastError().text();;
-            return false;
-        }
-    }
-    return true;
 }
 
 QMap<int, QnId> QnDbManager::getGuidList(const QString& request)
@@ -547,10 +438,8 @@ int QnDbManager::getNextSequence()
 	return result;
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiSetResourceStatusData>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiSetResourceStatusData>& tran)
 {
-    QnDbTransactionLocker lock(&m_tran);
-
     QSqlQuery query(m_sdb);
     query.prepare("UPDATE vms_resource set status = :status where guid = :id");
     query.bindValue(":status", tran.params.status);
@@ -559,14 +448,11 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiSetResourceStat
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
     }
-    lock.commit();
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiSetResourceDisabledData>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiSetResourceDisabledData>& tran)
 {
-    QnDbTransactionLocker lock(&m_tran);
-
     QSqlQuery query(m_sdb);
     query.prepare("UPDATE vms_resource set disabled = :disabled where guid = :guid");
     query.bindValue(":disabled", tran.params.disabled);
@@ -575,7 +461,6 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiSetResourceDisa
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
     }
-    lock.commit();
     return ErrorCode::ok;
 }
 
@@ -594,37 +479,29 @@ ErrorCode QnDbManager::saveCamera(const ApiCameraData& params)
     return result;
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraData>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraData>& tran)
 {
-    QnDbTransactionLocker lock(&m_tran);
-    ErrorCode result = saveCamera(tran.params);
-    if (result == ErrorCode::ok)
-        lock.commit();
-    return result;
+    return saveCamera(tran.params);
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraDataList>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraDataList>& tran)
 {
-    QnDbTransactionLocker lock(&m_tran);
     foreach(const ApiCameraData& camera, tran.params.data)
     {
         ErrorCode result = saveCamera(camera);
         if (result != ErrorCode::ok)
             return result;
     }
-    lock.commit();
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiResourceData>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceData>& tran)
 {
-    QnDbTransactionLocker lock(&m_tran);
     qint32 internalId = getResourceInternalId(tran.params.id);
     ErrorCode err = updateResource(tran.params, internalId);
     if (err != ErrorCode::ok)
         return err;
 
-    lock.commit();
     return ErrorCode::ok;
 }
 
@@ -643,9 +520,8 @@ ErrorCode QnDbManager::insertBRuleResource(const QString& tableName, const QnId&
     }
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiBusinessRuleData>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiBusinessRuleData>& tran)
 {
-    QnDbTransactionLocker lock(&m_tran);
     ErrorCode rez = insertOrReplaceBusinessRuleTable(tran.params);
     if (rez != ErrorCode::ok)
         return rez;
@@ -670,14 +546,11 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiBusinessRuleDat
             return err;
     }
 
-    lock.commit();
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiMediaServerData>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiMediaServerData>& tran)
 {
-    QnDbTransactionLocker lock(&m_tran);
-
     ErrorCode result;
     qint32 internalId;
 
@@ -692,8 +565,6 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiMediaServerData
     if (result !=ErrorCode::ok)
         return result;
     result = updateStorages(tran.params);
-    if (result == ErrorCode::ok)
-        lock.commit();
 
     return result;
 }
@@ -866,32 +737,25 @@ ErrorCode QnDbManager::saveLayout(const ApiLayoutData& params)
     return result;
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiLayoutData>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLayoutData>& tran)
 {
-    QnDbTransactionLocker lock(&m_tran);
     ErrorCode result = saveLayout(tran.params);
-    if (result == ErrorCode::ok)
-        lock.commit();
     return result;
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiLayoutDataList>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLayoutDataList>& tran)
 {
-    QnDbTransactionLocker lock(&m_tran);
     foreach(const ApiLayoutData& layout, tran.params.data)
     {
         ErrorCode err = saveLayout(layout);
         if (err != ErrorCode::ok)
             return err;
     }
-    lock.commit();
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiResourceParams>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceParams>& tran)
 {
-    QnDbTransactionLocker lock(&m_tran);
-
     qint32 internalId = getResourceInternalId(tran.params.id);
     ErrorCode result = deleteAddParams(internalId);
     if (result != ErrorCode::ok)
@@ -903,14 +767,11 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiResourceParams>
         if (result != ErrorCode::ok)
             return result;
     }
-    lock.commit();
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraServerItemData>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraServerItemData>& tran)
 {
-    QWriteLocker lock(&m_mutex);
-
     QSqlQuery query(m_sdb);
     query.prepare("INSERT INTO vms_cameraserveritem (server_guid, timestamp, physical_id) VALUES(:serverGuid, :timestamp, :physicalId)");
     tran.params.autoBindValues(query);
@@ -922,10 +783,8 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiCameraServerIte
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiPanicModeData>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiPanicModeData>& tran)
 {
-    QWriteLocker lock(&m_mutex);
-
     QSqlQuery query(m_sdb);
     query.prepare("UPDATE vms_server SET panic_mode = :mode");
     query.bindValue(QLatin1String(":mode"), (int) tran.params.mode);
@@ -1096,19 +955,19 @@ ErrorCode QnDbManager::removeLayout(qint32 internalId)
     return err;
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiStoredFileData>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiStoredFileData>& tran)
 {
     assert( tran.command == ApiCommand::addStoredFile || tran.command == ApiCommand::updateStoredFile );
     return m_storedFileManagerImpl->saveFile( tran.params );
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiStoredFilePath>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiStoredFilePath>& tran)
 {
     assert( tran.command == ApiCommand::removeStoredFile );
     return m_storedFileManagerImpl->removeFile( tran.params );
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiUserData>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiUserData>& tran)
 {
     QnDbTransactionLocker lock(&m_tran);
 
@@ -1150,10 +1009,8 @@ ErrorCode QnDbManager::removeResource(const QnId& id)
     return result;
 }
 
-ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiIdData>& tran)
 {
-    QnDbTransactionLocker lock(&m_tran);
-
     ErrorCode result;
     switch (tran.command)
     {
@@ -1181,8 +1038,6 @@ ErrorCode QnDbManager::executeTransaction(const QnTransaction<ApiIdData>& tran)
         return ErrorCode::unsupported;
     }
 
-    if (result == ErrorCode::ok)
-        lock.commit();
     return result;
 }
 

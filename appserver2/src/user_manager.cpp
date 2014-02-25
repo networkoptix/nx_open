@@ -59,9 +59,7 @@ namespace ec2
     QnTransaction<ApiUserData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource )
     {
         QnTransaction<ApiUserData> tran;
-        tran.createNewID();
-        tran.command = command;
-        tran.persistent = true;
+        tran.createNewID(command, true);
         tran.params.fromResource( resource );
         return tran;
     }
@@ -70,9 +68,7 @@ namespace ec2
     QnTransaction<ApiIdData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
     {
         QnTransaction<ApiIdData> tran;
-        tran.createNewID();
-        tran.command = command;
-        tran.persistent = true;
+        tran.createNewID(command, true);
         tran.params.id = id;
         return tran;
     }

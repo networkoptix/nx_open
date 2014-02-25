@@ -152,25 +152,23 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiPanicModeData> BaseEc2Connection<T>::prepareTransaction( ApiCommand::Value cmd, const Qn::PanicMode& mode)
+    QnTransaction<ApiPanicModeData> BaseEc2Connection<T>::prepareTransaction( ApiCommand::Value command, const Qn::PanicMode& mode)
     {
-        QnTransaction<ApiPanicModeData> result;
-        result.command = cmd;
-        result.createNewID();
-        result.persistent = true;
-        result.params.mode = mode;
-        return result;
+        QnTransaction<ApiPanicModeData> tran;
+        tran.createNewID(command, true);
+        tran.params.mode = mode;
+        return tran;
     }
 
     template<class T>
-    void BaseEc2Connection<T>::addRemotePeer(const QUrl& _url)
+    void BaseEc2Connection<T>::addRemotePeer(const QUrl& _url, bool isClient)
     {
         QUrl url(_url);
         url.setPath("ec2/events");
         QUrlQuery q;
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
         url.setQuery(q);
-        QnTransactionMessageBus::instance()->addConnectionToPeer(url);
+        QnTransactionMessageBus::instance()->addConnectionToPeer(url, isClient);
     }
 
     template<class T>

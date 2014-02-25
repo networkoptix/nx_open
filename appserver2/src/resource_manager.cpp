@@ -122,41 +122,35 @@ namespace ec2
 
     template<class QueryProcessorType>
     QnTransaction<ApiSetResourceStatusData> QnResourceManager<QueryProcessorType>::prepareTransaction(
-        ApiCommand::Value cmd,
+        ApiCommand::Value command,
         const QnId& id, QnResource::Status status)
     {
-        QnTransaction<ApiSetResourceStatusData> result;
-        result.command = cmd;
-        result.createNewID();
-        result.persistent = true;
-        result.params.id = id;
-        result.params.status = status;
-        return result;
+        QnTransaction<ApiSetResourceStatusData> tran;
+        tran.createNewID(command, true);
+        tran.params.id = id;
+        tran.params.status = status;
+        return tran;
     }
 
     template<class QueryProcessorType>
     QnTransaction<ApiResourceParams> QnResourceManager<QueryProcessorType>::prepareTransaction(
-        ApiCommand::Value cmd,
+        ApiCommand::Value command,
         const QnId& id, const QnKvPairList& kvPairs)
     {
-        QnTransaction<ApiResourceParams> result;
-        result.command = cmd;
-        result.createNewID();
-        result.persistent = true;
-        result.params.params.reserve(kvPairs.size());
+        QnTransaction<ApiResourceParams> tran;
+        tran.createNewID(command, true);
+        tran.params.params.reserve(kvPairs.size());
         foreach(const QnKvPair& pair, kvPairs)
-            result.params.params.push_back(ApiResourceParam(pair.name(), pair.value()));
-        result.params.id = id;
-        return result;
+            tran.params.params.push_back(ApiResourceParam(pair.name(), pair.value()));
+        tran.params.id = id;
+        return tran;
     }
 
     template<class T>
     QnTransaction<ApiIdData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
     {
         QnTransaction<ApiIdData> tran;
-        tran.createNewID();
-        tran.command = command;
-        tran.persistent = true;
+        tran.createNewID(command, true);
         tran.params.id = id;
         return tran;
     }
@@ -165,9 +159,7 @@ namespace ec2
     QnTransaction<ApiSetResourceDisabledData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id, bool disabled )
     {
         QnTransaction<ApiSetResourceDisabledData> tran;
-        tran.createNewID();
-        tran.command = command;
-        tran.persistent = true;
+        tran.createNewID(command, true);
         tran.params.id = id;
         tran.params.disabled = disabled;
         return tran;
@@ -177,9 +169,7 @@ namespace ec2
     QnTransaction<ApiResourceData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource )
     {
         QnTransaction<ApiResourceData> tran;
-        tran.createNewID();
-        tran.command = command;
-        tran.persistent = true;
+        tran.createNewID(command, true);
         tran.params.fromResource(resource);
         return tran;
     }
