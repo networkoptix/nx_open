@@ -84,8 +84,8 @@ QnResourcePtr QnDesktopCameraResourceSearcher::createResource(QnId resourceTypeI
     result = QnVirtualCameraResourcePtr( new QnDesktopCameraResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Desktop camera resource. TypeID" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create Desktop camera resource. TypeID" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
     return result;
 }
 

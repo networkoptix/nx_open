@@ -60,8 +60,12 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
     }
 
     nxcip::CameraInfo cameraInfo;
+    strcpy( cameraInfo.url, parameters.url.toLatin1().data() );
+
     //analyzing parameters, getting discoveryManager and filling in cameraInfo
     QString resourceName;
+
+    /*
     for( QnResourceParameters::const_iterator
         it = parameters.begin();
         it != parameters.end();
@@ -75,6 +79,8 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
         else if( it.key() == "name")
             resourceName = it.value();
     }
+    */
+
     nxcip_qt::CameraDiscoveryManager* discoveryManager = NULL;
     //choosing correct plugin
     for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
@@ -114,7 +120,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
     NX_LOG( QString::fromLatin1("Created third party resource (manufacturer %1, res type id %2)").
         arg(discoveryManager->getVendorName()).arg(resourceTypeId.toString()), cl_logDEBUG2 );
 
-    result->deserialize( parameters );
+    //result->deserialize( parameters );
     return result;
 }
 

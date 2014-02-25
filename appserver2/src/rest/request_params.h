@@ -20,7 +20,7 @@ namespace ec2
 {
     void parseHttpRequestParams( const QnRequestParamList& params, QnId* id);
     void parseHttpRequestParams( const QnRequestParamList& params, nullptr_t* );
-    void parseHttpRequestParams( const QnRequestParamList& params, QnResourceParameters* const data );
+    //void parseHttpRequestParams( const QnRequestParamList& params, QnResourceParameters* const data );
     void toUrlParams( const std::nullptr_t& , QUrlQuery* const query );
     void toUrlParams( const QnId& id, QUrlQuery* const query );
     void toUrlParams( const LoginInfo& loginInfo, QUrlQuery* const query );

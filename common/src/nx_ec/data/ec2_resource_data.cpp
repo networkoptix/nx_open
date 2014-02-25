@@ -39,15 +39,9 @@ void ApiResourceData::toResource(QnResourcePtr resource) const
 
 QnResourceParameters ApiResourceData::toHashMap() const
 {
-	QnResourceParameters parameters;
-	parameters["id"] = id.toString();
-	parameters["name"] = name;
-	parameters["url"] = url;
-	parameters["status"] = QString::number(status);
-	parameters["disabled"] = QString::number(disabled);
-	parameters["parentId"] = parentGuid.toString();
-
-	return parameters;
+    QnResourceParameters result;
+    result.url = url;
+    return result;
 }
 
 

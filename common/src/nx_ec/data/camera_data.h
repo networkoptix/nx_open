@@ -48,8 +48,8 @@ struct ApiCameraData: public ApiResourceData
 
     bool                scheduleDisabled;
     Qn::MotionType      motionType;
-    QString             region;
-    QString             mac;
+    QByteArray          region;
+    QByteArray          mac;
     QString             login;
     QString             password;
     std::vector<ScheduleTask> scheduleTask;
@@ -68,7 +68,6 @@ struct ApiCameraData: public ApiResourceData
 
 	void fromResource(const QnVirtualCameraResourcePtr& resource);
 	void toResource(QnVirtualCameraResourcePtr resource) const;
-	QnResourceParameters toHashMap() const;
     QN_DECLARE_STRUCT_SQL_BINDER();
 };
 

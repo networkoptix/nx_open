@@ -28,6 +28,7 @@ QnNetworkResource::~QnNetworkResource()
 {
 }
 
+/*
 void QnNetworkResource::deserialize(const QnResourceParameters& parameters)
 {
     QnResource::deserialize(parameters);
@@ -46,6 +47,7 @@ void QnNetworkResource::deserialize(const QnResourceParameters& parameters)
     if (parameters.contains(LOGIN) && parameters.contains(PASSWORD))
         setAuth(parameters[LOGIN], parameters[PASSWORD]);
 }
+*/
 
 QString QnNetworkResource::getUniqueId() const
 {

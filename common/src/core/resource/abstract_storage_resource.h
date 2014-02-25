@@ -39,7 +39,7 @@ public:
     void setIndex(quint16 value);
     quint16 getIndex() const;
 
-    void deserialize(const QnResourceParameters& parameters);
+    //void deserialize(const QnResourceParameters& parameters);
 
     /*
      * Returns storage usage in range [0..1]

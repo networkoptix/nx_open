@@ -25,7 +25,7 @@ public:
 
     virtual QString getUniqueId() const override;
 
-    void deserialize(const QnResourceParameters& parameters);
+    //void deserialize(const QnResourceParameters& parameters);
 
     QString toSearchString() const override;
 

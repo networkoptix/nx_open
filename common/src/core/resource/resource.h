@@ -38,7 +38,12 @@ public:
     }
 };
 
-typedef QMap<QByteArray, QString> QnResourceParameters;
+//typedef QMap<QByteArray, QString> QnResourceParameters;
+struct QnResourceParameters
+{
+    QString url;
+};
+
 /*
 class QnResourceParameters: public QMap<QString, QString> {
     typedef QMap<QString, QString> base_type;
@@ -133,7 +138,7 @@ public:
     QnResource(const QnResourceParameters &params);
     virtual ~QnResource();
 
-    virtual void deserialize(const QnResourceParameters& parameters);
+    //virtual void deserialize(const QnResourceParameters& parameters);
 
     QnId getId() const;
     void setId(const QnId& id);

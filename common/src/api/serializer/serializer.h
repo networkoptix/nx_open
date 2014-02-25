@@ -26,10 +26,10 @@
 void parseRegion(QRegion& region, const QString& regionString);
 void parseRegionList(QList<QRegion>& regions, const QString& regionsString);
 
-void parseMotionRegion(QnMotionRegion& region, const QString& regionString);
+void parseMotionRegion(QnMotionRegion& region, const QByteArray& regionString);
 QString serializeMotionRegion(const QnMotionRegion& region);
 
-void parseMotionRegionList(QList<QnMotionRegion>& regions, const QString& regionsString);
+void parseMotionRegionList(QList<QnMotionRegion>& regions, const QByteArray& regionsString);
 QString serializeMotionRegionList(const QList<QnMotionRegion>& regions);
 
 QString serializeRegion(const QRegion& region);

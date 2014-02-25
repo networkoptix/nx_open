@@ -20,17 +20,12 @@ void QnClientMessageProcessor::updateResource(QnResourcePtr resource)
 {
     QnResourcePtr ownResource;
 
-    QString guid = resource->getGuid();
-    if (!guid.isEmpty())
-        ownResource = qnResPool->getResourceByGuid(guid);
-    else
-        ownResource = qnResPool->getResourceById(resource->getId());
+    ownResource = qnResPool->getResourceById(resource->getId());
 
     if (ownResource.isNull()) {
         qnResPool->addResource(resource);
         if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
             determineOptimalIF(mediaServer);
-        qnResPool->addResource(resource);
     }
     else {
         bool mserverStatusChanged = false;

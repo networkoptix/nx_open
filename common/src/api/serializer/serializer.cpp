@@ -36,30 +36,25 @@ void parseRegionList(QList<QRegion>& regions, const QString& regionsString)
     }
 }
 
-
-void parseMotionRegionList(QList<QnMotionRegion>& regions, const QString& regionsString)
+void parseMotionRegionList(QList<QnMotionRegion>& regions, const QByteArray& regionsString)
 {
-    QStringList regList = regionsString.split(QLatin1Char(':'));
+    QList<QByteArray> regList = regionsString.split(':');
     regions.clear();
     // for compatibility with previous version. By default screen filled medium sensitivity motion window
     for (int i = 0; i < regList.size(); ++i)
-    {
-        QnMotionRegion region;
-        //region.addRect((QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY)/2, QRect(0,0,MD_WIDTH, MD_HEIGHT));
-        regions << region;
-    }
+        regions << QnMotionRegion();
 
     for (int i = 0; i < regList.size(); ++i)
         parseMotionRegion(regions[i], regList[i]);
 }
 
-void parseMotionRegion(QnMotionRegion& region, const QString& regionString)
+void parseMotionRegion(QnMotionRegion& region, const QByteArray& regionString)
 {
     QList<QRect> motionMask;
     bool firstRect = true;
-    foreach (QString rectString, regionString.split(QLatin1Char(';')))
+    foreach (const QByteArray& rectString, regionString.split(';'))
     {
-        QStringList rectList = rectString.split(QLatin1Char(','));
+        QList<QByteArray> rectList = rectString.split(',');
         QRect r;
         int sensitivity = 0;
         if (rectList.size() == 4)

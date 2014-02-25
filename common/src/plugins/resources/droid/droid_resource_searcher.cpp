@@ -128,7 +128,7 @@ QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, con
         return result;
     }
 
-    if (!parameters.value("url").contains(QLatin1String("raw://")))
+    if (!parameters.url.contains(QLatin1String("raw://")))
     {
         return result; // it is not a new droid resource
     }
@@ -137,8 +137,8 @@ QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, con
     result = QnVirtualCameraResourcePtr( new QnDroidResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Droid camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create Droid camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 

@@ -10,7 +10,6 @@ namespace ec2
 {
     static const QString ID_PARAM_NAME( QLatin1String("id") );
 
-
     void parseHttpRequestParams( const QnRequestParamList& params, QnId* id)
     {
         foreach( const QnRequestParamList::value_type& val, params )
@@ -25,6 +24,7 @@ namespace ec2
 
     void parseHttpRequestParams( const QnRequestParamList& params, nullptr_t* ) {}
 
+    /*
     void parseHttpRequestParams( const QnRequestParamList& params, QnResourceParameters* const data )
     {
         std::for_each(
@@ -32,6 +32,7 @@ namespace ec2
             params.end(),
             [data]( const QnRequestParamList::value_type& val ){ data->insert(val.first.toLatin1(), val.second); } );
     }
+    */
 
     void toUrlParams( const std::nullptr_t& , QUrlQuery* const query )
     {

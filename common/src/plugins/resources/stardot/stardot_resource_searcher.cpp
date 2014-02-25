@@ -179,8 +179,8 @@ QnResourcePtr QnStardotResourceSearcher::createResource(QnId resourceTypeId, con
     result = QnVirtualCameraResourcePtr(new QnStardotResource());
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Stardot camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create Stardot camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 }

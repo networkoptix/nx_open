@@ -47,7 +47,9 @@ void ApiCameraData::toResource(QnVirtualCameraResourcePtr resource) const
 	auth.setPassword(password);
 	resource->setAuth(auth);
 
+
 	QnScheduleTaskList tasks;
+    tasks.reserve(scheduleTask.size());
 	foreach(ScheduleTask task, scheduleTask)
 		tasks.push_back(task.toResource(id));
 	resource->setScheduleTasks(tasks);
@@ -69,14 +71,15 @@ void ApiCameraData::toResource(QnVirtualCameraResourcePtr resource) const
 
 void ApiCameraData::fromResource(const QnVirtualCameraResourcePtr& resource)
 {
-	ApiResourceData::fromResource(resource);
+    ApiResourceData::fromResource(resource);
 
 	scheduleDisabled = resource->isScheduleDisabled();
 	motionType = resource->getMotionType();
 
+
 	QList<QnMotionRegion> regions;
-	region = serializeMotionRegionList(resource->getMotionRegionList());
-	mac = resource->getMAC().toString();
+	region = serializeMotionRegionList(resource->getMotionRegionList()).toLocal8Bit();
+	mac = resource->getMAC().toString().toLocal8Bit();
 	login = resource->getAuth().user();
 	password = resource->getAuth().password();
 	scheduleTask.clear();
@@ -94,17 +97,6 @@ void ApiCameraData::fromResource(const QnVirtualCameraResourcePtr& resource)
 	statusFlags = resource->statusFlags();
 	dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(resource->getDewarpingParams());
 	vendor = resource->getVendor();
-}
-
-QnResourceParameters ApiCameraData::toHashMap() const
-{
-	QnResourceParameters parameters = ApiResourceData::toHashMap();
-	parameters["mac"] = mac;
-	parameters["physicalId"] = physicalId;
-	parameters["login"] = login;
-	parameters["password"] = password;
-
-	return parameters;
 }
 
 template <class T> 

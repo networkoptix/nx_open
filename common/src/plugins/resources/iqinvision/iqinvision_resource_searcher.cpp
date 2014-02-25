@@ -54,9 +54,9 @@ QnResourcePtr QnPlIqResourceSearcher::createResource(QnId resourceTypeId, const 
     result = QnVirtualCameraResourcePtr( new QnPlIqResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create IQE camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create IQE camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
 
-    result->deserialize(parameters);
+    //result->deserialize(parameters);
 
     return result;
 

@@ -38,8 +38,8 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const
     result = QnVirtualCameraResourcePtr( new QnPlIsdResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create ISD camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create ISD camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 

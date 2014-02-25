@@ -68,9 +68,9 @@ QnResourcePtr QnPlPulseSearcher::createResource(QnId resourceTypeId, const QnRes
     
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Pulse camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create Pulse camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
 
-    result->deserialize(parameters);
+    //result->deserialize(parameters);
 
     return result;
 }

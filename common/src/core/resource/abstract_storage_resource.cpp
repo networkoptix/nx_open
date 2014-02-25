@@ -89,6 +89,7 @@ void QnAbstractStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider
     m_providers.remove(provider);
 }
 
+/*
 void QnAbstractStorageResource::deserialize(const QnResourceParameters& parameters)
 {
     QMutexLocker lock(&m_mutex);
@@ -103,6 +104,7 @@ void QnAbstractStorageResource::deserialize(const QnResourceParameters& paramete
     if(parameters.contains(USEDFORWRITING))
         setUsedForWriting(parameters[USEDFORWRITING].toInt());
 }
+*/
 
 float QnAbstractStorageResource::getAvarageWritingUsage() const
 {

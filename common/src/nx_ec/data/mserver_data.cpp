@@ -41,11 +41,7 @@ void ApiStorageData::toResource(QnAbstractStorageResourcePtr resource) const
 
 QnResourceParameters ApiStorageData::toHashMap() const
 {
-    QnResourceParameters parameters;
-    parameters["spaceLimit"] = QString::number(spaceLimit);
-    parameters["usedForWriting"] = QString::number(usedForWriting);
-
-    return parameters;
+    return ApiResourceData::toHashMap();
 }
 
 void ApiStorageDataList::loadFromQuery(QSqlQuery& query)

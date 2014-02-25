@@ -124,7 +124,7 @@ QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const Q
         resource = QnResourcePtr(new QnServerCamera());
         resource->setTypeId(resourceTypeId);
     }
-    resource->deserialize(parameters);
+    //resource->deserialize(parameters);
     return resource;
 }
 

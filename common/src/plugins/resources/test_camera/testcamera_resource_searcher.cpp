@@ -146,8 +146,8 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(QnId resourceTypeId, 
     result = QnVirtualCameraResourcePtr( new QnTestCameraResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create test camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create test camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 

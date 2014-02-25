@@ -249,9 +249,9 @@ QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const Q
     result->setTypeId(resourceTypeId);
 
     qDebug() << "OnvifResourceSearcher::createResource: create ONVIF camera resource. TypeID: "
-             << resourceTypeId.toString() << ", Parameters: " << parameters;
+             << resourceTypeId.toString(); // << ", Parameters: " << parameters;
 
-    result->deserialize(parameters);
+    //result->deserialize(parameters);
 
     return result;
 

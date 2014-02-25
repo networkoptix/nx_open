@@ -28,6 +28,7 @@ QnAviResource::~QnAviResource()
 {
 }
 
+/*
 void QnAviResource::deserialize(const QnResourceParameters& parameters)
 {
     QnAbstractArchiveResource::deserialize(parameters);
@@ -39,6 +40,7 @@ void QnAviResource::deserialize(const QnResourceParameters& parameters)
         setName(QnFile::fileName(file));
     }
 }
+*/
 
 QString QnAviResource::toString() const
 {

@@ -38,7 +38,7 @@ QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(QnId resourceTypeId, 
         return result;
     }
 
-    if (parameters.value("url").contains(lit("raw://")))
+    if (parameters.url.contains(lit("raw://")))
     {
         return result; // it is new droid resource
     }
@@ -46,8 +46,8 @@ QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(QnId resourceTypeId, 
     result = QnVirtualCameraResourcePtr( new QnPlDriodIpWebCamResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create ipWEB camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create ipWEB camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 

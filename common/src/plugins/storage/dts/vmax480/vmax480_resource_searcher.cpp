@@ -153,8 +153,8 @@ QnResourcePtr QnPlVmax480ResourceSearcher::createResource(QnId resourceTypeId, c
     result = QnVirtualCameraResourcePtr( new QnPlVmax480Resource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Vmax480 resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create Vmax480 resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 

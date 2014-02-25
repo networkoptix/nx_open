@@ -100,7 +100,7 @@ QnResourcePtr QnMediaServerResourceFactory::createResource(QnId resourceTypeId, 
     Q_UNUSED(resourceTypeId)
 
     QnResourcePtr result(new QnMediaServerResource(qnResTypePool));
-    result->deserialize(parameters);
+    //result->deserialize(parameters);
 
     return result;
 }

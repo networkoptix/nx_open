@@ -48,9 +48,9 @@ QnResourcePtr QnPlDlinkResourceSearcher::createResource(QnId resourceTypeId, con
     result = QnVirtualCameraResourcePtr( new QnPlDlinkResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create DLink camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create DLink camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
 
-    result->deserialize(parameters);
+    //result->deserialize(parameters);
 
     return result;
 }

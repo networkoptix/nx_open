@@ -129,6 +129,7 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         consumer->afterUpdate();
 }
 
+/*
 void QnResource::deserialize(const QnResourceParameters& parameters)
 {
     bool signalsBlocked = blockSignals(true);
@@ -158,6 +159,7 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
 
     blockSignals(signalsBlocked);
 }
+*/
 
 QnId QnResource::getParentId() const
 {
@@ -450,6 +452,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         return true;
     }
 
+
     getResourceParamList(); // paramList loaded once. No more changes, instead of param value. So, use mutex for value only
     if (!m_resourceParamList.contains(name))
     {
@@ -457,6 +460,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         emit asyncParamSetDone(toSharedPointer(this), name, val, false);
         return false;
     }
+
 
     m_mutex.lock();
     QnParam param = m_resourceParamList[name];
