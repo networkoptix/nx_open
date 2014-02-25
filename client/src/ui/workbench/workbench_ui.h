@@ -210,6 +210,8 @@ protected:
     bool isThumbnailsVisible() const;
     void setThumbnailsVisible(bool visible);
 
+    bool isHovered() const;
+
 private:
     Panels openedPanels() const;
     void setOpenedPanels(Panels panels, bool animate = true, bool save = true);

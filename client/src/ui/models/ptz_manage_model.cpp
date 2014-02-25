@@ -250,7 +250,7 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
     } else if (role == Qt::EditRole && index.column() == HotkeyColumn) {
         bool ok = false;
         int hotkey = value.toInt(&ok);
-        if(!ok || hotkey > 9)
+        if(!ok || hotkey > 9 || hotkey < 0)
             return false;
 
         // preset that is assigned to this hotkey

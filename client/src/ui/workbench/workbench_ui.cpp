@@ -1315,12 +1315,10 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
 
     bool calendarVisible = calendarEnabled && m_sliderVisible && isSliderOpened();
 
-    if(m_inactive) {
-        bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_notificationsOpacityProcessor->isHovered() || m_calendarOpacityProcessor->isHovered();
-        setCalendarVisible(calendarVisible && hovered, animate);
-    } else {
+    if(m_inactive)
+        setCalendarVisible(calendarVisible && isHovered(), animate);
+    else
         setCalendarVisible(calendarVisible, animate);
-    }
 
     if(!calendarVisible)
         setCalendarOpened(false);
@@ -1337,7 +1335,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
         !action(Qn::ToggleTourModeAction)->isChecked();
 
     if(m_inactive) {
-        bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_notificationsOpacityProcessor->isHovered() || m_calendarOpacityProcessor->isHovered();
+        bool hovered = isHovered();
         setSliderVisible(sliderVisible && hovered, animate);
         setTreeVisible(hovered, animate);
         setTitleVisible(hovered, animate);
@@ -1799,6 +1797,14 @@ void QnWorkbenchUi::setThumbnailsVisible(bool visible) {
     QRectF geometry = m_sliderItem->geometry();
     geometry.setHeight(sliderHeight);
     m_sliderItem->setGeometry(geometry);
+}
+
+bool QnWorkbenchUi::isHovered() const {
+    return  m_sliderOpacityProcessor->isHovered() ||
+            m_treeOpacityProcessor->isHovered() ||
+            m_titleOpacityProcessor->isHovered() ||
+            (m_notificationsOpacityProcessor && m_notificationsOpacityProcessor->isHovered()) || // in light mode it can be NULL
+            m_calendarOpacityProcessor->isHovered();
 }
 
 QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const {
