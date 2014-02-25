@@ -146,21 +146,3 @@ QString serializeMotionRegionList(const QList<QnMotionRegion>& regions)
     }
     return result;
 }
-
-void QnApiSerializer::serialize(const QnResourcePtr& resource, QByteArray& data)
-{
-    try {
-        if (resource.dynamicCast<QnVirtualCameraResource>()) {
-            serializeCamera(resource.dynamicCast<QnVirtualCameraResource>(), data);
-        } else if (resource.dynamicCast<QnMediaServerResource>()) {
-            serializeServer(resource.dynamicCast<QnMediaServerResource>(), data);
-        } else if (resource.dynamicCast<QnUserResource>()) {
-            serializeUser(resource.dynamicCast<QnUserResource>(), data);
-        } else if (resource.dynamicCast<QnLayoutResource>()) {
-            serializeLayout(resource.dynamicCast<QnLayoutResource>(), data);
-        }
-    } catch (const std::exception& e) {
-        qCritical() << "QnApiSerializer::serialize(): Exception caught. Message: "  << e.what();
-        Q_ASSERT(0);
-    }
-}
