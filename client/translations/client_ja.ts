@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja" sourcelanguage="en">
+<TS version="2.0" language="ja" sourcelanguage="en">
 <context>
     <name>AVSettingsDlg</name>
     <message>
@@ -24,7 +24,7 @@
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="14"/>
         <source>About</source>
-        <translation type="unfinished">HD Witnessについて</translation>
+        <translation>HD Witnessについて</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="20"/>
@@ -64,12 +64,12 @@
     </message>
     <message>
         <source>Enable enhancement</source>
-        <translation type="vanished">イメージ拡張有効</translation>
+        <translation>イメージ拡張有効</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="23"/>
         <source>Enable image enhancement</source>
-        <translation type="unfinished"></translation>
+        <translation>イメージ拡張有効</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="42"/>
@@ -116,21 +116,21 @@
     </message>
     <message>
         <source>Warning! FPS/Quality settings in Recording Schedule will not work!</source>
-        <translation type="vanished">警告! 録画スケジュールのFPS/画質 設定では動作しません!</translation>
+        <translation>警告! 録画スケジュールのFPS/画質 設定では動作しません!</translation>
     </message>
     <message>
         <source>Secondary Stream Quality Control</source>
-        <translation type="vanished">2番目のストリーム画質コントロール</translation>
+        <translation>2番目のストリーム画質コントロール</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="70"/>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished"></translation>
+        <translation>注意　録画スケジュールのFPSと画質設定は有効ではありません!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="90"/>
         <source>Secondary Stream Control</source>
-        <translation type="unfinished"></translation>
+        <translation>2番目のストリームコントロール</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="96"/>
@@ -140,7 +140,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="128"/>
         <source>Don&apos;t use</source>
-        <translation type="unfinished"></translation>
+        <translation>使用しない</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="148"/>
@@ -170,21 +170,21 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="249"/>
         <source>Aspect Ratio Control</source>
-        <translation type="unfinished"></translation>
+        <translation>アスペクト比コントロール</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="255"/>
         <source>Force aspect ratio to:</source>
-        <translation type="unfinished"></translation>
+        <translation>アスペクト比固定:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="325"/>
         <source>Warning! Please read documentation before changing these settings!</source>
-        <translation type="unfinished"></translation>
+        <translation>設定変更前にマニュアルを確認して下さい!</translation>
     </message>
     <message>
         <source>Warning! Please read documentation prior to change these settings!</source>
-        <translation type="vanished">Warning! Please read documentation prior to change these settings!</translation>
+        <translation>Warning! Please read documentation prior to change these settings!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="345"/>
@@ -193,7 +193,7 @@
     </message>
     <message>
         <source>Selected camera(s) have no expert settings</source>
-        <translation type="vanished">Selected camera(s) have no expert settings</translation>
+        <translation>Selected camera(s) have no expert settings</translation>
     </message>
 </context>
 <context>
@@ -201,22 +201,22 @@
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="32"/>
         <source>Check to set aggregation period</source>
-        <translation type="unfinished">期間の確認</translation>
+        <translation>間隔チェック</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="42"/>
         <source>Interval of action :</source>
-        <translation type="unfinished">アクション間隔:</translation>
+        <translation>アクション間隔:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="64"/>
         <source>No more than once per</source>
-        <translation type="unfinished"></translation>
+        <translation>実行間隔</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="100"/>
         <source>Instant</source>
-        <translation type="unfinished">実行</translation>
+        <translation>実行</translation>
     </message>
 </context>
 <context>
@@ -232,48 +232,48 @@
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="34"/>
         <source>Event</source>
-        <translation type="unfinished">イベント</translation>
+        <translation>イベント</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="51"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="79"/>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="224"/>
         <source>at</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="86"/>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished">&lt;カメラ&gt;</translation>
+        <translation>&lt;カメラ&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="155"/>
         <source>Schedule...</source>
-        <translation type="unfinished">スケジュール...</translation>
+        <translation>スケジュール...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="185"/>
         <source>Action</source>
-        <translation type="unfinished">アクション</translation>
+        <translation>アクション</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="202"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="231"/>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="unfinished">&lt;最低1つのカメラを選択してください&gt;</translation>
+        <translation>&lt;最低1つのカメラを選択してください&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="313"/>
         <source>Comments:</source>
-        <translation type="unfinished">コメント:</translation>
+        <translation>コメント:</translation>
     </message>
 </context>
 <context>
@@ -341,7 +341,7 @@
     <name>CameraAdditionDialog</name>
     <message>
         <source>&amp;Camera Address:</source>
-        <translation type="vanished">カメラアドレス(&amp;C):</translation>
+        <translation>カメラアドレス(&amp;C):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="143"/>
@@ -381,7 +381,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="371"/>
         <source>auto</source>
-        <translation type="unfinished"></translation>
+        <translation>自動</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="382"/>
@@ -396,7 +396,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="564"/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>停止</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="602"/>
@@ -410,11 +410,11 @@
     </message>
     <message>
         <source>Cancel &amp;scan</source>
-        <translation type="vanished">スキャンキャンセル(&amp;S)</translation>
+        <translation>スキャンキャンセル(&amp;S)</translation>
     </message>
     <message>
         <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
-        <translation type="vanished">IPアドレス範囲を255以内にしてください</translation>
+        <translation>IPアドレス範囲を255以内にしてください</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="451"/>
@@ -444,17 +444,17 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="26"/>
         <source>Add cameras...</source>
-        <translation type="unfinished">カメラの追加...</translation>
+        <translation>カメラの追加...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="34"/>
         <source>Selected server:</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="133"/>
         <source>Ca&amp;mera Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラアドレス(&amp;M):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="644"/>
@@ -464,7 +464,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="651"/>
         <source>New scan...</source>
-        <translation type="unfinished"></translation>
+        <translation>新規検索...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="687"/>
@@ -476,12 +476,12 @@
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
         <source>No connection to media server %1</source>
-        <translation type="vanished">メディアサーバー接続がありません %1</translation>
+        <translation>メディアサーバー接続がありません %1</translation>
     </message>
     <message>
         <location filename="../src/camera/camera_diagnose_tool.cpp" line="142"/>
         <source>No connection to media server %1.</source>
-        <translation type="unfinished">メディアサーバー接続がありません %1.</translation>
+        <translation>メディアサーバー接続がありません %1.</translation>
     </message>
 </context>
 <context>
@@ -502,7 +502,7 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_disconnected_business_event_widget.ui" line="32"/>
         <source>Event will be raised when any camera goes offline</source>
-        <translation type="unfinished">カメラオフラインでイベント発生</translation>
+        <translation>カメラオフラインでイベント発生</translation>
     </message>
 </context>
 <context>
@@ -510,7 +510,7 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui" line="32"/>
         <source>Input ID:</source>
-        <translation type="unfinished">入力ID:</translation>
+        <translation>入力ID:</translation>
     </message>
 </context>
 <context>
@@ -523,11 +523,11 @@
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.ui" line="22"/>
         <source>Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>フィルター:</translation>
     </message>
     <message>
         <source>Search string:</source>
-        <translation type="vanished">検索文字:</translation>
+        <translation>検索文字:</translation>
     </message>
 </context>
 <context>
@@ -535,12 +535,12 @@
     <message>
         <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="20"/>
         <source>Enable camera auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ自動検索有効</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="30"/>
         <source>Enable automatic camera settings optimization</source>
-        <translation type="unfinished"></translation>
+        <translation>自動カメラ設定最適化有効</translation>
     </message>
 </context>
 <context>
@@ -548,12 +548,12 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui" line="32"/>
         <source>&amp;Output ID:</source>
-        <translation type="unfinished">出力ID(&amp;O):</translation>
+        <translation>出力ID(&amp;O):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui" line="45"/>
         <source>&amp;Auto-reset in (sec):</source>
-        <translation type="unfinished">自動リセット(秒)(&amp;A):</translation>
+        <translation>自動リセット(秒)(&amp;A):</translation>
     </message>
 </context>
 <context>
@@ -671,27 +671,27 @@
     <message>
         <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="227"/>
         <source>Installing version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>バージョン %1</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="238"/>
         <source>Installation failed</source>
-        <translation type="unfinished"></translation>
+        <translation>インストールエラー</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="250"/>
         <source>Could not cancel installation</source>
-        <translation type="unfinished"></translation>
+        <translation>インストールをキャンセルできません</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="259"/>
         <source>Installation completed</source>
-        <translation type="unfinished"></translation>
+        <translation>インストール終了</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="277"/>
         <source>Installation has been cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>インストールはキャンセルされました</translation>
     </message>
 </context>
 <context>
@@ -767,7 +767,7 @@
     <name>FisheyeSettingsWidget</name>
     <message>
         <source>Form</source>
-        <translation type="vanished">から</translation>
+        <translation>から</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="39"/>
@@ -792,7 +792,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="94"/>
         <source>Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>キャリブレーション</translation>
     </message>
 </context>
 <context>
@@ -800,114 +800,114 @@
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="26"/>
         <source>Main Media Folder</source>
-        <translation type="unfinished">メインメディアフォルダ</translation>
+        <translation>メインメディアフォルダ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="45"/>
         <source>&amp;Browse...</source>
-        <translation type="unfinished">参照(&amp;B)...</translation>
+        <translation>参照(&amp;B)...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="55"/>
         <source>Extra Media Folders</source>
-        <translation type="unfinished">外部メディアフォルダー</translation>
+        <translation>外部メディアフォルダー</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="88"/>
         <source>&amp;Add...</source>
-        <translation type="unfinished">追加(&amp;A)...</translation>
+        <translation>追加(&amp;A)...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="98"/>
         <source>&amp;Remove</source>
-        <translation type="unfinished">削除(&amp;R)</translation>
+        <translation>削除(&amp;R)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="125"/>
         <source>Look and Feel</source>
-        <translation type="unfinished">外観および操作</translation>
+        <translation>表示と操作</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="134"/>
         <source>Tour sequence cycle time:</source>
-        <translation type="unfinished"></translation>
+        <translation>ツアーシーケンス時間:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="153"/>
         <source> seconds</source>
-        <translation type="unfinished">秒</translation>
+        <translation>秒</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="162"/>
         <source>Show IP in tree:</source>
-        <translation type="unfinished"></translation>
+        <translation>IPをツリーに表示する:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="179"/>
         <source>Timeline mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムラインモード:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="206"/>
         <source>Skin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Skin:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="231"/>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="292"/>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="342"/>
         <source>Restart required.</source>
-        <translation type="unfinished">要再起動.</translation>
+        <translation>要再起動.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="243"/>
         <source>Misc</source>
-        <translation type="unfinished">その他</translation>
+        <translation>その他</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="264"/>
         <source>Language:</source>
-        <translation type="unfinished">言語:</translation>
+        <translation>言語:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="313"/>
         <source>Downmix audio from 5.1 to 2.1:</source>
-        <translation type="unfinished"></translation>
+        <translation>5.1～2.1までのダウンミックスオーディオ:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="357"/>
         <source>Auto pause video</source>
-        <translation type="unfinished"></translation>
+        <translation>自動一時停止</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="388"/>
         <source>after</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="408"/>
         <source>minutes of inactivity</source>
-        <translation type="unfinished"></translation>
+        <translation>分後</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="448"/>
         <source>Browse logs</source>
-        <translation type="unfinished"></translation>
+        <translation>ログ参照</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="461"/>
         <source>Clear local cache</source>
-        <translation type="unfinished">ローカルキャッシュのクリア</translation>
+        <translation>ローカルキャッシュのクリア</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="482"/>
         <source>Run application when PC boots up:</source>
-        <translation type="unfinished"></translation>
+        <translation>PC起動時にアプリケーション起動:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="499"/>
         <source>Network Interfaces</source>
-        <translation type="unfinished">ネットワークインターフェース</translation>
+        <translation>ネットワークインターフェース</translation>
     </message>
 </context>
 <context>
@@ -983,12 +983,12 @@
     <message>
         <location filename="../src/ui/dialogs/image_preview_dialog.ui" line="14"/>
         <source>Image View</source>
-        <translation type="unfinished">イメージ表示</translation>
+        <translation>イメージ表示</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/image_preview_dialog.ui" line="72"/>
         <source>Loading image... Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>ローディング中...お待ちください.</translation>
     </message>
 </context>
 <context>
@@ -996,73 +996,73 @@
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="20"/>
         <source>General Settings</source>
-        <translation type="unfinished">一般設定</translation>
+        <translation>一般設定</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="26"/>
         <source>Layout is locked</source>
-        <translation type="unfinished">レイアウトはロックされています</translation>
+        <translation>レイアウトのロック</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="36"/>
         <source>Background</source>
-        <translation type="unfinished">背景</translation>
+        <translation>背景</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="64"/>
         <source>Browse...</source>
-        <translation type="unfinished">参照...</translation>
+        <translation>参照...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="71"/>
         <source>View...</source>
-        <translation type="unfinished">表示...</translation>
+        <translation>表示...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="84"/>
         <source>Clear</source>
-        <translation type="unfinished">クリア</translation>
+        <translation>クリア</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="123"/>
         <source>Processing image... Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>お待ちください.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="163"/>
         <source>&amp;Crop to monitor aspect ratio</source>
-        <translation type="unfinished">モニターアスペクト比(&amp;C)</translation>
+        <translation>モニターアスペクト比(&amp;C)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="175"/>
         <source>&amp;Width:</source>
-        <translation type="unfinished">幅(&amp;W):</translation>
+        <translation>幅(&amp;W):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="188"/>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="217"/>
         <source> cells</source>
-        <translation type="unfinished">セル</translation>
+        <translation>セル</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="204"/>
         <source>&amp;Height:</source>
-        <translation type="unfinished">高さ(&amp;H):</translation>
+        <translation>高さ(&amp;H):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="233"/>
         <source>&amp;Opacity:</source>
-        <translation type="unfinished">透過(&amp;O):</translation>
+        <translation>透過(&amp;O):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="246"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="265"/>
         <source>Keep aspect ratio</source>
-        <translation type="unfinished">アスペクト比を固定</translation>
+        <translation>アスペクト比を固定</translation>
     </message>
 </context>
 <context>
@@ -1079,7 +1079,7 @@
     </message>
     <message>
         <source>...</source>
-        <translation type="vanished">...</translation>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="58"/>
@@ -1245,15 +1245,15 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Licensing</source>
-        <translation type="vanished">ライセンス</translation>
+        <translation>ライセンス</translation>
     </message>
     <message>
         <source>Use analog licenses to view selected analog cameras</source>
-        <translation type="vanished">選択したアナログカメラにアナログライセンスを使用する</translation>
+        <translation>選択したアナログカメラにアナログライセンスを使用する</translation>
     </message>
     <message>
         <source>Get More Licenses...</source>
-        <translation type="vanished">ライセンスの追加...</translation>
+        <translation>ライセンスの追加...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="30"/>
@@ -1290,19 +1290,19 @@ p, li { white-space: pre-wrap; }
     <name>Node</name>
     <message>
         <source>Root</source>
-        <translation type="vanished">Root</translation>
+        <translation>Root</translation>
     </message>
     <message>
         <source>Local</source>
-        <translation type="vanished">ローカル</translation>
+        <translation>ローカル</translation>
     </message>
     <message>
         <source>System</source>
-        <translation type="vanished">システム</translation>
+        <translation>システム</translation>
     </message>
     <message>
         <source>Users</source>
-        <translation type="vanished">ユーザー</translation>
+        <translation>ユーザー</translation>
     </message>
 </context>
 <context>
@@ -1310,17 +1310,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui" line="37"/>
         <source>Manage...</source>
-        <translation type="unfinished">管理...</translation>
+        <translation>管理...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui" line="48"/>
         <source>Volume:</source>
-        <translation type="unfinished">ボリューム:</translation>
+        <translation>ボリューム:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui" line="65"/>
         <source>Test...</source>
-        <translation type="unfinished">テスト...</translation>
+        <translation>テスト...</translation>
     </message>
 </context>
 <context>
@@ -1328,12 +1328,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/widgets/business/popup_business_action_widget.ui" line="32"/>
         <source>Show to Administrators only</source>
-        <translation type="unfinished">アドミニストレーターのみに表示する</translation>
+        <translation>アドミニストレーターのみに表示する</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/popup_business_action_widget.ui" line="52"/>
         <source>Global Notification Settings...</source>
-        <translation type="unfinished">グローバル通知設定...</translation>
+        <translation>グローバル通知設定...</translation>
     </message>
 </context>
 <context>
@@ -1341,17 +1341,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/widgets/settings/popup_settings_widget.ui" line="20"/>
         <source>Show all notifications</source>
-        <translation type="unfinished">全ての通知を表示する</translation>
+        <translation>全ての通知を表示する</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/popup_settings_widget.ui" line="34"/>
         <source>Alarms/Events</source>
-        <translation type="unfinished"></translation>
+        <translation>アラーム/イベント</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/popup_settings_widget.ui" line="42"/>
         <source>System Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>システム通知</translation>
     </message>
 </context>
 <context>
@@ -1363,83 +1363,83 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>General</source>
-        <translation type="vanished">一般</translation>
+        <translation>一般</translation>
     </message>
     <message>
         <source>Main Media Folder</source>
-        <translation type="vanished">メインメディアフォルダ</translation>
+        <translation>メインメディアフォルダ</translation>
     </message>
     <message>
         <source>&amp;Browse...</source>
-        <translation type="vanished">参照(&amp;B)...</translation>
+        <translation>参照(&amp;B)...</translation>
     </message>
     <message>
         <source>Extra Media Folders</source>
-        <translation type="vanished">外部メディアフォルダー</translation>
+        <translation>外部メディアフォルダー</translation>
     </message>
     <message>
         <source>&amp;Add...</source>
-        <translation type="vanished">追加(&amp;A)...</translation>
+        <translation>追加(&amp;A)...</translation>
     </message>
     <message>
         <source>&amp;Remove</source>
-        <translation type="vanished">削除(&amp;R)</translation>
+        <translation>削除(&amp;R)</translation>
     </message>
     <message>
         <source>Look and Feel</source>
-        <translation type="vanished">外観および操作</translation>
+        <translation>外観および操作</translation>
     </message>
     <message>
         <source> seconds</source>
-        <translation type="vanished">秒</translation>
+        <translation>秒</translation>
     </message>
     <message>
         <source>Sequence Cycle Time:</source>
-        <translation type="vanished">シーケンスサイクル時間:</translation>
+        <translation>シーケンスサイクル時間:</translation>
     </message>
     <message>
         <source>Show IP in Tree:</source>
-        <translation type="vanished">IPをツリーに表示する:</translation>
+        <translation>IPをツリーに表示する:</translation>
     </message>
     <message>
         <source>Timeline Mode:</source>
-        <translation type="vanished">タイムラインモード:</translation>
+        <translation>タイムラインモード:</translation>
     </message>
     <message>
         <source>Misc</source>
-        <translation type="vanished">その他</translation>
+        <translation>その他</translation>
     </message>
     <message>
         <source>Language:</source>
-        <translation type="vanished">言語:</translation>
+        <translation>言語:</translation>
     </message>
     <message>
         <source>Clear local cache</source>
-        <translation type="vanished">ローカルキャッシュのクリア</translation>
+        <translation>ローカルキャッシュのクリア</translation>
     </message>
     <message>
         <source>Restart required.</source>
-        <translation type="vanished">要再起動.</translation>
+        <translation>要再起動.</translation>
     </message>
     <message>
         <source>Experimental. May result in glitches.</source>
-        <translation type="vanished">正常に終了できない可能性があります.</translation>
+        <translation>正常に終了できない可能性があります.</translation>
     </message>
     <message>
         <source>Use Hardware Acceleration:</source>
-        <translation type="vanished">ハードウェアアクセラレーターを使用する:</translation>
+        <translation>ハードウェアアクセラレーターを使用する:</translation>
     </message>
     <message>
         <source>Downmix Audio from 5.1 to 2.1:</source>
-        <translation type="vanished">音声変換5.1 to 2.1:</translation>
+        <translation>音声変換5.1 to 2.1:</translation>
     </message>
     <message>
         <source>Run Application when PC Boots up:</source>
-        <translation type="vanished">PC起動時にアプリケーションを起動する:</translation>
+        <translation>PC起動時にアプリケーションを起動する:</translation>
     </message>
     <message>
         <source>Network Interfaces</source>
-        <translation type="vanished">ネットワークインターフェース</translation>
+        <translation>ネットワークインターフェース</translation>
     </message>
 </context>
 <context>
@@ -1447,52 +1447,52 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.ui" line="38"/>
         <source>Save Current Position</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のポジションを保存</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.ui" line="52"/>
         <source>Go To Position</source>
-        <translation type="unfinished"></translation>
+        <translation>ポジション移動</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.ui" line="79"/>
         <source>Create Tour</source>
-        <translation type="unfinished"></translation>
+        <translation>ツアー登録</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.ui" line="93"/>
         <source>Start Tour</source>
-        <translation type="unfinished">ツアー開始</translation>
+        <translation>ツアー開始</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.ui" line="120"/>
         <source>Delete</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.ui" line="180"/>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>詳細</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.ui" line="212"/>
         <source>No tour selected</source>
-        <translation type="unfinished"></translation>
+        <translation>ツアーが選択されていません</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.ui" line="229"/>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>プレビュー</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.ui" line="296"/>
         <source>No preview available</source>
-        <translation type="unfinished"></translation>
+        <translation>プレビュー不可</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.ui" line="306"/>
         <source>Get Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>プレビュー取得</translation>
     </message>
 </context>
 <context>
@@ -1500,19 +1500,19 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument.cpp" line="310"/>
         <source>Dewarping panoramic mode</source>
-        <translation type="unfinished"></translation>
+        <translation>パノラマモード</translation>
     </message>
 </context>
 <context>
     <name>PtzPresetDialog</name>
     <message>
         <source>PTZ Position</source>
-        <translation type="vanished">PTZポジション</translation>
+        <translation>PTZポジション</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_preset_dialog.ui" line="14"/>
         <source>Save position</source>
-        <translation type="unfinished"></translation>
+        <translation>ポジション保存</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_preset_dialog.ui" line="26"/>
@@ -1529,70 +1529,70 @@ p, li { white-space: pre-wrap; }
     <name>PtzPresetsDialog</name>
     <message>
         <source>PTZ Presets</source>
-        <translation type="vanished">PTZプリセット</translation>
+        <translation>PTZプリセット</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>* Last used connection *</source>
-        <translation type="vanished">* 前回の接続を使用する *</translation>
+        <translation>* 前回の接続を使用する *</translation>
     </message>
     <message>
         <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
-        <translation type="vanished">HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</translation>
+        <translation>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</translation>
     </message>
     <message>
         <source>Save As</source>
-        <translation type="vanished">名前を付けて保存</translation>
+        <translation>名前を付けて保存</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation type="vanished">ファイル &apos;%1&apos; は既に存在します。上書きしますか?</translation>
+        <translation>ファイル &apos;%1&apos; は既に存在します。上書きしますか?</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
-        <translation type="vanished">ファイルを上書きできません</translation>
+        <translation>ファイルを上書きできません</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation type="vanished">ファイル &apos;%1&apos; は他のプロセスで使用しています。他の名前を使用してください.</translation>
+        <translation>ファイル &apos;%1&apos; は他のプロセスで使用しています。他の名前を使用してください.</translation>
     </message>
     <message>
         <source>Not recording</source>
-        <translation type="vanished">録画なし</translation>
+        <translation>録画なし</translation>
     </message>
     <message>
         <source>Recording everything</source>
-        <translation type="vanished">全てを録画する</translation>
+        <translation>全てを録画する</translation>
     </message>
     <message>
         <source>Recording motion only</source>
-        <translation type="vanished">モーション録画のみ</translation>
+        <translation>モーション録画のみ</translation>
     </message>
     <message>
         <source>Recording motion and low quality</source>
-        <translation type="vanished">モーション録画＋低解像度</translation>
+        <translation>モーション録画＋低解像度</translation>
     </message>
     <message>
         <source>Continuous</source>
-        <translation type="vanished">連続</translation>
+        <translation>連続</translation>
     </message>
     <message>
         <source>Motion only</source>
-        <translation type="vanished">モーションのみ</translation>
+        <translation>モーションのみ</translation>
     </message>
     <message>
         <source>Motion + Lo-Res</source>
-        <translation type="vanished">モーション＋低解像度</translation>
+        <translation>モーション＋低解像度</translation>
     </message>
     <message>
         <source>Export selected cameras to file</source>
-        <translation type="vanished">選択したカメラをファイルにエクスポート</translation>
+        <translation>選択したカメラをファイルにエクスポート</translation>
     </message>
     <message>
         <source>Export selected events to file</source>
-        <translation type="vanished">選択したイベントをファイルにエクスポート</translation>
+        <translation>選択したイベントをファイルにエクスポート</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="64"/>
@@ -1626,19 +1626,19 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>start</source>
-        <translation type="vanished">開始</translation>
+        <translation>開始</translation>
     </message>
     <message>
         <source>stop</source>
-        <translation type="vanished">停止</translation>
+        <translation>停止</translation>
     </message>
     <message>
         <source>While %1</source>
-        <translation type="vanished">%1中</translation>
+        <translation>%1中</translation>
     </message>
     <message>
         <source>On %1 %2</source>
-        <translation type="vanished">%1 %2中</translation>
+        <translation>%1 %2中</translation>
     </message>
     <message>
         <location filename="../src/ui/screen_recording/video_recorder_settings.cpp" line="105"/>
@@ -1652,7 +1652,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Can&apos;t overwrite file &apos;%1&apos;. Please try another name.</source>
-        <translation type="vanished"> &apos;%1&apos;. を上書きできません。他の名前を使用してください.</translation>
+        <translation> &apos;%1&apos;. を上書きできません。他の名前を使用してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="668"/>
@@ -1669,7 +1669,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>About</source>
-        <translation type="vanished">HD Witnessについて</translation>
+        <translation>HD Witnessについて</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="82"/>
@@ -1682,13 +1682,13 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <source>&lt;b&gt;Enterprise controller&lt;/b&gt; not connected.&lt;br&gt;
 </source>
-        <translation type="vanished">&lt;b&gt;Enterprise controller&lt;/b&gt; not connected.&lt;br</translation>
+        <translation>&lt;b&gt;Enterprise controller&lt;/b&gt; not connected.&lt;br</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="98"/>
         <source>&lt;b&gt;Enterprise controller&lt;/b&gt; is not connected.&lt;br&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;エンタープライズコントローラー&lt;/b&gt; は接続されていません&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="100"/>
@@ -1744,14 +1744,14 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
 <context>
     <name>QnAbstractPtzDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/abstract_ptz_dialog.cpp" line="53"/>
+        <location filename="../src/ui/dialogs/abstract_ptz_dialog.cpp" line="52"/>
         <source>Loading...</source>
-        <translation type="unfinished">ロード中...</translation>
+        <translation>ロード中...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/abstract_ptz_dialog.cpp" line="203"/>
+        <location filename="../src/ui/dialogs/abstract_ptz_dialog.cpp" line="202"/>
         <source>Saving...</source>
-        <translation type="unfinished"></translation>
+        <translation>保存中...</translation>
     </message>
 </context>
 <context>
@@ -1881,491 +1881,491 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="421"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1084"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1079"/>
         <source>Check Camera Issues...</source>
         <translation>カメラ障害を確認...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="427"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="685"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="680"/>
         <source>Alarm/Event Log...</source>
         <translation>アラーム/イベントログ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="432"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="677"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="672"/>
         <source>Alarm/Event Rules...</source>
         <translation>アラーム/イベントルール...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="436"/>
         <source>Restart application</source>
-        <translation type="unfinished"></translation>
+        <translation>アプリケーション再起動</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="459"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="454"/>
         <source>Fit in View</source>
         <translation>ビューに合わせる</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="467"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="462"/>
         <source>Main Menu</source>
         <translation>メインメニュー</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="469"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="464"/>
         <source>Alt+Space</source>
         <translation>Alt+Space</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="481"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="476"/>
         <source>Logout</source>
         <translation>ログアウト</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="491"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="486"/>
         <source>Start Panic Recording</source>
         <translation>パニック録画開始</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="492"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="487"/>
         <source>Stop Panic Recording</source>
         <translation>パニック録画停止</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="494"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="489"/>
         <source>Ctrl+P</source>
         <translation>Ctrl+P</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="505"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="500"/>
         <source>New...</source>
         <translation>新規...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="511"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="506"/>
         <source>Layout...</source>
         <translation>レイアウト...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="512"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="507"/>
         <source>New Layout...</source>
         <translation>新規レイアウト...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="517"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="512"/>
         <source>Tab</source>
         <translation>タブ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="518"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="513"/>
         <source>New Tab</source>
         <translation>新規タブ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="519"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="514"/>
         <source>Ctrl+T</source>
         <translation>Ctrl+T</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="525"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="520"/>
         <source>Window</source>
         <translation>画面</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="526"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="521"/>
         <source>New Window</source>
         <translation>新規画面</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="527"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="522"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="533"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="528"/>
         <source>User...</source>
         <translation>ユーザー...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="534"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="529"/>
         <source>New User...</source>
         <translation>新規ユーザー...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="539"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="534"/>
         <source>Open Layout...</source>
         <translation>レイアウトを開く...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="545"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="540"/>
         <source>Open...</source>
         <translation>開く...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="551"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="546"/>
         <source>File(s)...</source>
         <translation>ファイル...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="552"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="547"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="559"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="554"/>
         <source>Layout(s)...</source>
         <translation>レイアウト...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="565"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="560"/>
         <source>Folder...</source>
         <translation>フォルダー...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="571"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="566"/>
         <source>Save Current Layout</source>
-        <translation>レイアウトを保存する</translation>
+        <translation>レイアウトの保存</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="572"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="567"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="580"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="575"/>
         <source>Save Current Layout As...</source>
-        <translation>名前を付けてレイアウトを保存する...</translation>
+        <translation>名前を付けてレイアウトを保存...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="581"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="576"/>
         <source>Ctrl+Alt+S</source>
         <translation>Ctrl+Alt+S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="591"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="586"/>
         <source>Start Screen Recording</source>
         <translation>スクリーン録画開始</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="592"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="587"/>
         <source>Stop Screen Recording</source>
         <translation>スクリーン録画停止</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="593"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="588"/>
         <source>Alt+R</source>
         <translation>Alt+R</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="604"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="599"/>
         <source>Esc</source>
         <translation>Esc</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="606"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="601"/>
         <source>Stop current action</source>
         <translation>現在をアクションを停止する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="610"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="605"/>
         <source>Go to Fullscreen</source>
         <translation>フルスクリーン表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="611"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="606"/>
         <source>Exit Fullscreen</source>
         <translation>フルスクリーン表示終了</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="632"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="627"/>
         <source>Ctrl+F</source>
         <translation>Ctrl+F</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="634"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="629"/>
         <source>Alt+Enter</source>
         <translation>Alt+Enter</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="635"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="630"/>
         <source>Alt+Return</source>
         <translation>Alt+Return</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="617"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="612"/>
         <source>Minimize</source>
         <translation>最小化</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="622"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="617"/>
         <source>Maximize</source>
         <translation>最大化</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="623"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="618"/>
         <source>Restore Down</source>
         <translation>Restore Down</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="642"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="637"/>
         <source>Show Message</source>
         <translation>メッセージを表示する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="646"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="641"/>
         <source>Show Version Mismatch Message</source>
         <translation>バージョン違いのメッセージを表示する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="654"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="649"/>
         <source>Open in Browser...</source>
         <translation>ブラウザで開く...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="659"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="654"/>
         <source>System Settings...</source>
         <translation>システム設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="666"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="661"/>
         <source>Open Web Client...</source>
         <translation>ウェブクライアントを開く...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="678"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="673"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="686"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="681"/>
         <source>Ctrl+L</source>
         <translation>Ctrl+L</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="693"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="688"/>
         <source>Camera List...</source>
         <translation>カメラリスト...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="694"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="689"/>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="701"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="696"/>
         <source>Backup/Restore Configuration...</source>
         <translation>バックアップ/リストア構成...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="711"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="706"/>
         <source>How-to Videos and FAQ...</source>
         <translation>ビデオとFAQ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="716"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="711"/>
         <source>Check for Updates...</source>
         <translation>更新を確認...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="721"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="716"/>
         <source>About...</source>
         <translation>HD Witnessについて...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="722"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="717"/>
         <source>F1</source>
         <translation>F1</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="733"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="728"/>
         <source>Exit</source>
         <translation>終了</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="734"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="729"/>
         <source>Alt+F4</source>
         <translation>Alt+F4</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="748"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="743"/>
         <source>Close</source>
         <translation>閉じる</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="749"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="744"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="754"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="749"/>
         <source>Close All But This</source>
         <translation>全てを閉じる</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="763"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="758"/>
         <source>Open in Layout</source>
         <translation>レイアウト中で開く</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="768"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="763"/>
         <source>Open</source>
         <translation>開く</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="769"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="764"/>
         <source>Monitor</source>
         <translation>モニター</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="774"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="769"/>
         <source>Open in New Tab</source>
         <translation>新規タブで開く</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="775"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="770"/>
         <source>Monitor in a New Tab</source>
         <translation>新規タブでモニター</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="780"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="775"/>
         <source>Open in New Window</source>
         <translation>新規画面で開く</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="781"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="776"/>
         <source>Monitor in a New Window</source>
         <translation>新規画面でモニター</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="786"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="781"/>
         <source>Open Layout in a New Tab</source>
         <translation>新規タブでレイアウトを開く</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="791"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="786"/>
         <source>Open Layouts</source>
         <translation>レイアウトを開く</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="796"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="791"/>
         <source>Open Layout(s) in a New Window</source>
         <translation>新規画面でレイアウトを開く</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="801"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="796"/>
         <source>Open Current Layout in a New Window</source>
         <translation>新規画面でレイアウトを開く</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="805"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="800"/>
         <source>Open Layout(s)</source>
         <translation>レイアウトを開く</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="810"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="805"/>
         <source>Open Containing Folder</source>
         <translation>コンテナフォルダーを開く</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="811"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="806"/>
         <source>Ctrl+Enter</source>
         <translation>Ctrl+Enter</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="812"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="807"/>
         <source>Ctrl+Return</source>
         <translation>Ctrl+Return</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="824"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="819"/>
         <source>Save Layout</source>
-        <translation>レイアウトを保存する</translation>
+        <translation>レイアウトを保存</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="831"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="838"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="826"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="833"/>
         <source>Save Layout As...</source>
-        <translation>名前を付けてレイアウトを保存する...</translation>
+        <translation>名前を付けてレイアウトを保存...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="848"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="843"/>
         <source>Maximize Item</source>
         <translation>最大化</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="849"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="857"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="844"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="852"/>
         <source>Enter</source>
         <translation>Enter</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="850"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="858"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="845"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="853"/>
         <source>Return</source>
         <translation>戻る</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="856"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="851"/>
         <source>Restore Item</source>
         <translation>元に戻す</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="864"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="859"/>
         <source>Show Info</source>
         <translation>情報を表示する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="865"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="871"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="877"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="937"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="860"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="866"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="872"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="932"/>
         <source>Alt+I</source>
         <translation>Alt+I</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="870"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="865"/>
         <source>Hide Info</source>
         <translation>情報を非表示にする</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="876"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="871"/>
         <source>Toggle Info</source>
         <translation>情報表示の切換え</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="882"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="877"/>
         <source>Change Resolution...</source>
         <translation>解像度変更...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="889"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="884"/>
         <source>Auto</source>
         <translation>自動</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="895"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="890"/>
         <source>Low</source>
         <translation>低</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="900"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="895"/>
         <source>High</source>
         <translation>高</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="908"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="903"/>
         <source>PTZ...</source>
         <translation>PTZ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="916"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="911"/>
         <source>Save Current Position...</source>
         <translation>現在のポジションを保存する...</translation>
     </message>
     <message>
         <source>Manage Saved Positions...</source>
-        <translation type="vanished">保存されたポジションの管理...</translation>
+        <translation>保存されたポジションの管理...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="440"/>
@@ -2375,584 +2375,579 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="446"/>
         <source>Activate PTZ Tour</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZツアー有効</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="452"/>
-        <source>Activate PTZ object</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="650"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="645"/>
         <source>Show Beta Version Warning Message</source>
-        <translation type="unfinished"></translation>
+        <translation>ベータバージョン警告メッセージ表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="922"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="917"/>
         <source>Manage...</source>
-        <translation type="unfinished">管理...</translation>
+        <translation>管理...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="930"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="925"/>
         <source>Calibrate Fisheye</source>
-        <translation type="unfinished"></translation>
+        <translation>魚眼レンズカメラ キャリブレート</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="936"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="931"/>
         <source>Toggle Resolution Mode</source>
         <translation>解像度の切換え</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="943"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="938"/>
         <source>Show Motion/Smart Search</source>
         <translation>モーション/スマート検索の表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="944"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="939"/>
         <source>Show Motion</source>
         <translation>モーション表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="945"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="952"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="963"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="940"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="947"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="958"/>
         <source>Alt+G</source>
         <translation>Alt+G</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="950"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="945"/>
         <source>Hide Motion/Smart Search</source>
         <translation>モーション/スマート検索の非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="951"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="946"/>
         <source>Hide Motion</source>
         <translation>モーション非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="957"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="952"/>
         <source>Clear Motion Selection</source>
         <translation>モーション選択の削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="962"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="957"/>
         <source>Toggle Smart Search</source>
         <translation>スマート検索の切換え</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="968"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="963"/>
         <source>Check File Watermark</source>
         <translation>ファイルウォーターマーク確認</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="969"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="964"/>
         <source>Alt+C</source>
         <translation>Alt+C</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="975"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="970"/>
         <source>Take Screenshot</source>
         <translation>スクリーンショット</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="976"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="971"/>
         <source>Alt+S</source>
         <translation>Alt+S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="982"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="977"/>
         <source>Image Enhancement...</source>
         <translation>イメージ拡張...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="983"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="978"/>
         <source>Alt+J</source>
         <translation>Alt+J</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="989"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="984"/>
         <source>Create Zoom Window</source>
         <translation>ズーム画面作成</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="994"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="989"/>
         <source>Rotate to...</source>
         <translation>回転...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="999"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="994"/>
         <source>0 degrees</source>
         <translation>0 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1003"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="998"/>
         <source>90 degrees</source>
         <translation>90 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1007"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1002"/>
         <source>180 degrees</source>
         <translation>180 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1011"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1006"/>
         <source>270 degrees</source>
         <translation>270 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1020"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1015"/>
         <source>Remove from Layout</source>
         <translation>レイアウトから削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1024"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1036"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1019"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1031"/>
         <source>Del</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1032"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1027"/>
         <source>Delete</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1049"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1044"/>
         <source>Rename</source>
         <translation>名前の変更</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1050"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1045"/>
         <source>F2</source>
         <translation>F2</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1059"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1054"/>
         <source>Upload to YouTube...</source>
         <translation>YouTubeにアップロード...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1066"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1061"/>
         <source>Delete from Disk</source>
         <translation>ディスクから削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1073"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1068"/>
         <source>Set as Layout Background</source>
         <translation>レイアウト背景として保存</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1079"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1074"/>
         <source>User Settings...</source>
         <translation>ユーザー設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1090"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1085"/>
         <source>Camera Rules...</source>
         <translation>カメラルール...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1096"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1091"/>
         <source>Camera Settings...</source>
         <translation>カメラ設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1102"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1097"/>
         <source>Picture Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>画像設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1107"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1230"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1102"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1225"/>
         <source>Layout Settings...</source>
         <translation>レイアウト設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1113"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1108"/>
         <source>Open in Camera Settings Dialog</source>
         <translation>カメラ設定画面を開く</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1117"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1112"/>
         <source>Clear Camera Settings Dialog</source>
         <translation>カメラ設定画面のクリア</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1121"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1116"/>
         <source>Add Camera(s)...</source>
         <translation>カメラの追加...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1126"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1121"/>
         <source>Camera(s) List by Server...</source>
         <translation>サーバー毎のカメラリスト...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1131"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1126"/>
         <source>Ping...</source>
         <translation>Ping...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1135"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1130"/>
         <source>Server Logs...</source>
         <translation>サーバーログ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1140"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1135"/>
         <source>Server Diagnostics...</source>
         <translation>サーバー診断...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1145"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1140"/>
         <source>Server Settings...</source>
         <translation>サーバー設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1151"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1146"/>
         <source>Change Cell Aspect Ratio...</source>
         <translation>セルのアスペクトレシオ比を変更...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1159"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1154"/>
         <source>4:3</source>
         <translation>4:3</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1166"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1161"/>
         <source>16:9</source>
         <translation>16:9</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1175"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1170"/>
         <source>Change Cell Spacing...</source>
         <translation>セルスペースの変更...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1183"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1178"/>
         <source>None</source>
         <translation>なし</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1190"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1185"/>
         <source>Small</source>
         <translation>小</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1197"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1192"/>
         <source>Medium</source>
         <translation>中</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1204"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1199"/>
         <source>Large</source>
         <translation>大</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1217"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1212"/>
         <source>Start Tour</source>
         <translation>ツアー開始</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1218"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1213"/>
         <source>Stop Tour</source>
         <translation>ツアー停止</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1219"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1214"/>
         <source>Alt+T</source>
         <translation>Alt+T</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1235"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1230"/>
         <source>Mark Selection Start</source>
         <translation>開始位置の選択</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1236"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1231"/>
         <source>[</source>
         <translation>[</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1242"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1237"/>
         <source>Mark Selection End</source>
         <translation>終了位置の選択</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1243"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1238"/>
         <source>]</source>
         <translation>]</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1249"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1244"/>
         <source>Clear Selection</source>
         <translation>選択クリア</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1254"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1249"/>
         <source>Zoom to Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>選択エリアのズーム</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1259"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1254"/>
         <source>Export Selected Area...</source>
-        <translation>選択した範囲のエクスポート...</translation>
+        <translation>単一ビデオのエクスポート...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1265"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1260"/>
         <source>Export Multi-Video...</source>
         <translation>複数ビデオのエクスポート...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1271"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1266"/>
         <source>Preview Search...</source>
         <translation>検索表示...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1278"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1273"/>
         <source>Ctrl+Alt+Shift++</source>
         <translation>Ctrl+Alt+Shift++</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1279"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1274"/>
         <source>Increment Debug Counter</source>
         <translation>デバッグカウンターの加算</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1283"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1278"/>
         <source>Ctrl+Alt+Shift+-</source>
         <translation>Ctrl+Alt+Shift+-</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1284"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1279"/>
         <source>Decrement Debug Counter</source>
         <translation>デバッグカウンターの減算</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1288"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1283"/>
         <source>Ctrl+Alt+Shift+R</source>
         <translation>Ctrl+Alt+Shift+R</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1289"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1284"/>
         <source>Show Resource Pool</source>
         <translation>リソースプールの表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1293"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1288"/>
         <source>Calibrate PTZ</source>
         <translation>PTZの調整</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1297"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1292"/>
         <source>Get PTZ Position</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZポジション取得</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1296"/>
+        <source>Ctrl+Alt+Shift+D</source>
+        <translation>Ctrl+Alt+Shift+D</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1297"/>
+        <source>Debug Control Panel</source>
+        <translation>デバッグコントロールパネル</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1301"/>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1302"/>
-        <source>Debug Control Panel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1306"/>
         <source>Space</source>
         <translation>スペース</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1307"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1302"/>
         <source>Play</source>
         <translation>再生</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1308"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1303"/>
         <source>Pause</source>
         <translation>一時停止</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1313"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1308"/>
         <source>Ctrl+-</source>
         <translation>Ctrl+-</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1314"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1309"/>
         <source>Speed Down</source>
         <translation>スロー再生</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1319"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1314"/>
         <source>Ctrl++</source>
         <translation>Ctrl++</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1320"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1315"/>
         <source>Speed Up</source>
         <translation>早送り再生</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1325"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1320"/>
         <source>Ctrl+Left</source>
         <translation>Ctrl+Left</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1326"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1321"/>
         <source>Previous Frame</source>
         <translation>前のフレーム</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1331"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1326"/>
         <source>Ctrl+Right</source>
         <translation>Ctrl+Right</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1332"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1327"/>
         <source>Next Frame</source>
         <translation>次のフレーム</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1337"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1332"/>
         <source>Z</source>
         <translation>Z</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1338"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1333"/>
         <source>To Start</source>
         <translation>開始</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1343"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1338"/>
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1344"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1339"/>
         <source>To End</source>
         <translation>終了</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1349"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1344"/>
         <source>Ctrl+Up</source>
         <translation>Ctrl+Up</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1350"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1345"/>
         <source>Volume Down</source>
         <translation>ボリュームを下げる</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1354"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1349"/>
         <source>Ctrl+Down</source>
         <translation>Ctrl+Down</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1355"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1350"/>
         <source>Volume Up</source>
         <translation>ボリュームを上げる</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1359"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1354"/>
         <source>M</source>
         <translation>M</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1360"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1355"/>
         <source>Toggle Mute</source>
         <translation>ミュート切換え</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1365"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1360"/>
         <source>L</source>
         <translation>L</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1366"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1361"/>
         <source>Jump to Live</source>
         <translation>ライブ表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1372"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1367"/>
         <source>S</source>
         <translation>S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1373"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1368"/>
         <source>Synchronize Streams</source>
         <translation>ストレームの同期</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1374"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1369"/>
         <source>Disable Stream Synchronization</source>
         <translation>ストリームの同期無効</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1384"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1379"/>
         <source>Show Thumbnails</source>
         <translation>サムネイル表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1385"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1380"/>
         <source>Hide Thumbnails</source>
         <translation>サムネイル非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1389"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1384"/>
         <source>Show Calendar</source>
         <translation>カレンダー表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1390"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1385"/>
         <source>Hide Calendar</source>
         <translation>カレンダー非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1394"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1389"/>
         <source>Show Title Bar</source>
         <translation>タイトルバー表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1395"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1390"/>
         <source>Hide Title Bar</source>
         <translation>タイトルバー非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1400"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1395"/>
         <source>Pin Tree</source>
         <translation>ツリーを固定で表示する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1401"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1396"/>
         <source>Unpin Tree</source>
         <translation>ツリーを自動的に隠す</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1406"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1401"/>
         <source>Show Tree</source>
         <translation>ツリーを表示する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1407"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1402"/>
         <source>Hide Tree</source>
         <translation>ツリーを隠す</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1412"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1407"/>
         <source>Show Timeline</source>
         <translation>タイムラインを表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1413"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1408"/>
         <source>Hide Timeline</source>
         <translation>タイムラインを非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1417"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1412"/>
         <source>Pin Notifications</source>
         <translation>通知を固定表示する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1418"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1413"/>
         <source>Unpin Notifications</source>
         <translation>通知を固定表示しない</translation>
     </message>
@@ -2961,12 +2956,12 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <name>QnAdjustVideoDialog</name>
     <message>
         <source>[No item selected]</source>
-        <translation type="vanished">[選択されていません]</translation>
+        <translation>[選択されていません]</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.cpp" line="61"/>
         <source>Image Enhancement</source>
-        <translation type="unfinished">イメージ拡張</translation>
+        <translation>イメージ拡張</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.cpp" line="63"/>
@@ -2979,40 +2974,40 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.cpp" line="53"/>
         <source>4:3</source>
-        <translation type="unfinished">4:3</translation>
+        <translation>4:3</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.cpp" line="54"/>
         <source>16:9</source>
-        <translation type="unfinished">16:9</translation>
+        <translation>16:9</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.cpp" line="55"/>
         <source>1:1</source>
-        <translation type="unfinished">1:1</translation>
+        <translation>1:1</translation>
     </message>
 </context>
 <context>
     <name>QnAggregationWidget</name>
     <message>
         <source>Form</source>
-        <translation type="vanished">から</translation>
+        <translation>から</translation>
     </message>
     <message>
         <source>Check to set aggregation period</source>
-        <translation type="vanished">期間の確認</translation>
+        <translation>期間の確認</translation>
     </message>
     <message>
         <source>Interval of action :</source>
-        <translation type="vanished">アクション間隔:</translation>
+        <translation>アクション間隔:</translation>
     </message>
     <message>
         <source>Once per</source>
-        <translation type="vanished">1回だけ</translation>
+        <translation>1回だけ</translation>
     </message>
     <message>
         <source>Instant</source>
-        <translation type="vanished">実行</translation>
+        <translation>実行</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.cpp" line="9"/>
@@ -3085,25 +3080,25 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/business/business_resource_validation.cpp" line="15"/>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished">&lt;カメラ&gt;</translation>
+        <translation>&lt;カメラ&gt;</translation>
     </message>
     <message>
         <location filename="../src/business/business_resource_validation.cpp" line="16"/>
         <source>Select at least one camera</source>
-        <translation type="unfinished">最低1つのカメラを選択してください</translation>
+        <translation>最低1つのカメラを選択してください</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="17"/>
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n カメラ</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="18"/>
         <source>%n of %1 cameras</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n / %1 カメラ</numerusform>
         </translation>
     </message>
 </context>
@@ -3129,12 +3124,12 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Recording or motion detection is disabled for %1</source>
-        <translation type="vanished">録画またはモーション検知無効 %1</translation>
+        <translation>録画またはモーション検知無効 %1</translation>
     </message>
     <message numerus="yes">
         <source>%1 of %n cameras</source>
         <comment>...for</comment>
-        <translation type="vanished">
+        <translation>
             <numerusform>%1 / %n カメラ</numerusform>
         </translation>
     </message>
@@ -3155,7 +3150,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="603"/>
         <source>Error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>エラー: %1</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="785"/>
@@ -3171,31 +3166,31 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>User &apos;%1&apos; has empty E-Mail</source>
-        <translation type="vanished">ユーザー &apos;%1&apos; はE-Mailなし</translation>
+        <translation>ユーザー &apos;%1&apos; はE-Mailなし</translation>
     </message>
     <message>
         <source>User &apos;%1&apos; has invalid E-Mail address: %2</source>
-        <translation type="vanished">ユーザー &apos;%1&apos; の無効なE-Mailアドレス %2</translation>
+        <translation>ユーザー &apos;%1&apos; の無効なE-Mailアドレス %2</translation>
     </message>
     <message>
         <source>Invalid email address: %1</source>
-        <translation type="vanished">無効なE-Mailアドレス: %1</translation>
+        <translation>無効なE-Mailアドレス: %1</translation>
     </message>
     <message>
         <source>Select at least one user</source>
-        <translation type="vanished">最低1人のユーザーを選択してください</translation>
+        <translation>最低1人のユーザーを選択してください</translation>
     </message>
     <message>
         <source>Send mail to %1</source>
-        <translation type="vanished"> %1にメール送信</translation>
+        <translation> %1にメール送信</translation>
     </message>
     <message>
         <source>%1 users, %2 additional</source>
-        <translation type="vanished">%1 ユーザー, %2 追加</translation>
+        <translation>%1 ユーザー, %2 追加</translation>
     </message>
     <message>
         <source>%1 users</source>
-        <translation type="vanished">%1 ユーザー</translation>
+        <translation>%1 ユーザー</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="814"/>
@@ -3210,7 +3205,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="840"/>
         <source>Enter text</source>
-        <translation type="unfinished"></translation>
+        <translation>テキスト入力</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="855"/>
@@ -3219,11 +3214,11 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Recording is disabled for %1</source>
-        <translation type="vanished">録画は %1で無効になります</translation>
+        <translation>録画は %1で無効になります</translation>
     </message>
     <message>
         <source>%1 of %2 cameras</source>
-        <translation type="vanished">%1 / %2 カメラ</translation>
+        <translation>%1 / %2 カメラ</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="832"/>
@@ -3232,7 +3227,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>Enter the text</source>
-        <translation type="vanished">テキスト入力</translation>
+        <translation>テキスト入力</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="868"/>
@@ -3275,52 +3270,52 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="889"/>
         <source>Stops</source>
-        <translation type="unfinished">停止</translation>
+        <translation>停止</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="891"/>
         <source>Starts</source>
-        <translation type="unfinished">開始</translation>
+        <translation>開始</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="893"/>
         <source>Starts/Stops</source>
-        <translation type="unfinished">開始/停止</translation>
+        <translation>開始/停止</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="901"/>
         <source>start</source>
-        <translation type="unfinished">開始</translation>
+        <translation>開始</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="903"/>
         <source>stop</source>
-        <translation type="unfinished">停止</translation>
+        <translation>停止</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="913"/>
         <source>While %1</source>
-        <translation type="unfinished">%1中</translation>
+        <translation>%1中</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="915"/>
         <source>On %1 %2</source>
-        <translation type="unfinished">%1 %2中</translation>
+        <translation>%1 %2中</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>Form</source>
-        <translation type="vanished">から</translation>
+        <translation>から</translation>
     </message>
     <message>
         <source>Event</source>
-        <translation type="vanished">イベント</translation>
+        <translation>イベント</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="165"/>
@@ -3329,27 +3324,27 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="vanished">&lt;カメラ&gt;</translation>
+        <translation>&lt;カメラ&gt;</translation>
     </message>
     <message>
         <source>Schedule...</source>
-        <translation type="vanished">スケジュール...</translation>
+        <translation>スケジュール...</translation>
     </message>
     <message>
         <source>Action</source>
-        <translation type="vanished">アクション</translation>
+        <translation>アクション</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>&lt;Select at least one camera&gt;</source>
-        <translation type="vanished">&lt;最低1つのカメラを選択してください&gt;</translation>
+        <translation>&lt;最低1つのカメラを選択してください&gt;</translation>
     </message>
     <message>
         <source>Comments:</source>
-        <translation type="vanished">コメント:</translation>
+        <translation>コメント:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.cpp" line="165"/>
@@ -3394,12 +3389,12 @@ This action CANNOT be undone!</translation>
     </message>
     <message>
         <source>Error while receiving rules</source>
-        <translation type="vanished">ルールの受信中にエラーが発生しました</translation>
+        <translation>ルールの受信中にエラーが発生しました</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="251"/>
         <source>Error while receiving rules.</source>
-        <translation type="unfinished"></translation>
+        <translation>ルールの取得中にエラーが発生しました.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="254"/>
@@ -3439,20 +3434,20 @@ This action CANNOT be undone!</translation>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="342"/>
         <source>Confirm save</source>
-        <translation type="unfinished"></translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="343"/>
         <source>Some rules are not valid. Should they be disabled?</source>
-        <translation type="unfinished"></translation>
+        <translation>あるルールが無効になっていませんか?</translation>
     </message>
     <message>
         <source>Confirm save invalid rules</source>
-        <translation type="vanished">無効なルールの保存</translation>
+        <translation>無効なルールの保存</translation>
     </message>
     <message>
         <source>Some rules are not valid. Should we disable them?</source>
-        <translation type="vanished">いくつかのルールが有効ではありません　無効にしますか？</translation>
+        <translation>いくつかのルールが有効ではありません　無効にしますか？</translation>
     </message>
 </context>
 <context>
@@ -3512,7 +3507,7 @@ This action CANNOT be undone!</translation>
     </message>
     <message>
         <source>Select target mediaserver in the tree.</source>
-        <translation type="vanished">ツリーよりメディアサーバーを選択.</translation>
+        <translation>ツリーよりメディアサーバーを選択.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="371"/>
@@ -3530,15 +3525,15 @@ Camera addition is possible for online servers only.</source>
     </message>
     <message>
         <source>First address in range is greater than last one</source>
-        <translation type="vanished">開始は終了前に設定してください</translation>
+        <translation>開始は終了前に設定してください</translation>
     </message>
     <message>
         <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
-        <translation type="vanished">IPアドレス範囲を255以内にしてください</translation>
+        <translation>IPアドレス範囲を255以内にしてください</translation>
     </message>
     <message>
         <source>Camera address field must contain valid url, ip address or rtsp link</source>
-        <translation type="vanished">カメラアドレスフィールドに有効なURL、IPアドレス、RTSPリンクが必要です</translation>
+        <translation>カメラアドレスフィールドに有効なURL、IPアドレス、RTSPリンクが必要です</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="753"/>
@@ -3559,43 +3554,43 @@ Camera addition is possible for online servers only.</source>
     <message>
         <source>Could not connect to server.
 Make sure the server is available and try again.</source>
-        <translation type="vanished">サーバーに接続できません
+        <translation>サーバーに接続できません
 サーバーが有効か確認し再度実行してください.</translation>
     </message>
     <message>
         <source>Server returned an error.</source>
-        <translation type="vanished">サバーはエラーを返しました.</translation>
+        <translation>サバーはエラーを返しました.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="178"/>
         <source>select target mediaserver in the tree</source>
-        <translation type="unfinished"></translation>
+        <translation>ツリーよりメディアサーバーを選択</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="221"/>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="732"/>
         <source>Initializing scan...</source>
-        <translation type="unfinished"></translation>
+        <translation>イニシャライズ　スキャン...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="530"/>
         <source>First address in range is greater than the last one.</source>
-        <translation type="unfinished"></translation>
+        <translation>開始は終了前に設定してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="536"/>
         <source>Specified IP address range contains more than 255 addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation>IPアドレス範囲を255以内にしてください.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="544"/>
         <source>Camera address field must contain valid URL, IP address or RTSP link.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラアドレスフィールドに有効なURL、IPアドレス、RTSPリンクが必要です.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="567"/>
         <source>Finishing search...</source>
-        <translation type="unfinished"></translation>
+        <translation>検索終了...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="592"/>
@@ -3624,7 +3619,7 @@ It might take a few moments to populate them in the tree.</source>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="623"/>
         <source>Error while adding camera(s).</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3632,56 +3627,56 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="664"/>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="671"/>
         <source>Server went offline</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーオフライン</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="665"/>
         <source>Server went offline, search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーオフライン　検索は異常終了しました.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="672"/>
         <source>Server went offline, cameras can be added when the server will be available.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーがオンラインに戻ってからカメラを登録して下さい.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="699"/>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="705"/>
         <source>Server was removed</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーは削除されました</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="700"/>
         <source>Server was removed, search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーは削除されました　検索は異常終了しました.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="706"/>
         <source>Server was removed, cameras cannot be added anymore.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーは削除されました　カメラの追加はできません.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="721"/>
         <source>Error while searching cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラの検索中にエラーが発生しました.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="736"/>
         <source>Scanning online hosts...</source>
-        <translation type="unfinished"></translation>
+        <translation>オンラインホストの検索中...</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="741"/>
         <source>Scanning hosts... (%1)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="742"/>
         <source>%n cameras found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n カメラ検出</numerusform>
         </translation>
     </message>
 </context>
@@ -3737,22 +3732,22 @@ It might take a few moments to populate them in the tree.</source>
     <name>QnCameraDisconnectedBusinessEventWidget</name>
     <message>
         <source>Form</source>
-        <translation type="vanished">から</translation>
+        <translation>から</translation>
     </message>
     <message>
         <source>Event will be raised when any camera goes offline</source>
-        <translation type="vanished">カメラオフラインでイベント発生</translation>
+        <translation>カメラオフラインでイベント発生</translation>
     </message>
 </context>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
         <source>Form</source>
-        <translation type="vanished">から</translation>
+        <translation>から</translation>
     </message>
     <message>
         <source>Input ID:</source>
-        <translation type="vanished">入力ID:</translation>
+        <translation>入力ID:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/camera_input_business_event_widget.cpp" line="50"/>
@@ -3765,7 +3760,7 @@ It might take a few moments to populate them in the tree.</source>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="61"/>
         <source>%1 have no input ports</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3797,18 +3792,18 @@ It might take a few moments to populate them in the tree.</source>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="99"/>
         <source>Camera List for &apos;%1&apos; - %n camera(s) found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&apos;%1&apos; - %nカメラリストにカメラはありません</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="147"/>
         <source>Export selected cameras to file</source>
-        <translation type="unfinished">選択したカメラをファイルにエクスポート</translation>
+        <translation>選択したカメラをファイルにエクスポート</translation>
     </message>
     <message numerus="yes">
         <source>Camera List for media server &apos;%1&apos; - %n camera(s) found</source>
-        <translation type="vanished">
+        <translation>
             <numerusform>カメラリスト メディアサーバー &apos;%1&apos; - %n カメラ検出</numerusform>
         </translation>
     </message>
@@ -3827,12 +3822,12 @@ It might take a few moments to populate them in the tree.</source>
     </message>
     <message>
         <source>Driver</source>
-        <translation type="vanished">ドライバ</translation>
+        <translation>ドライバ</translation>
     </message>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="134"/>
         <source>Vendor</source>
-        <translation type="unfinished"></translation>
+        <translation>ベンダー</translation>
     </message>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="135"/>
@@ -3890,8 +3885,8 @@ It might take a few moments to populate them in the tree.</source>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="83"/>
         <source>Recording or motion detection is disabled for %1</source>
-        <translation type="unfinished">
-            <numerusform>録画またはモーション検知無効 %1</numerusform>
+        <translation>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -3899,15 +3894,15 @@ It might take a few moments to populate them in the tree.</source>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
         <source>Form</source>
-        <translation type="vanished">から</translation>
+        <translation>から</translation>
     </message>
     <message>
         <source>&amp;Output ID:</source>
-        <translation type="vanished">出力ID(&amp;O):</translation>
+        <translation>出力ID(&amp;O):</translation>
     </message>
     <message>
         <source>&amp;Auto-reset in (sec):</source>
-        <translation type="vanished">自動リセット(秒)(&amp;A):</translation>
+        <translation>自動リセット(秒)(&amp;A):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.cpp" line="71"/>
@@ -3920,7 +3915,7 @@ It might take a few moments to populate them in the tree.</source>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="71"/>
         <source>%1 have no output relays</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3930,8 +3925,8 @@ It might take a few moments to populate them in the tree.</source>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="93"/>
         <source>Recording is disabled for %1</source>
-        <translation type="unfinished">
-            <numerusform>録画は %1で無効になります</numerusform>
+        <translation>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -3955,15 +3950,15 @@ It might take a few moments to populate them in the tree.</source>
     </message>
     <message>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2</source>
-        <translation type="vanished">スケジュールグリッドのFPSは %1.　最高のFPS値は %2</translation>
+        <translation>スケジュールグリッドのFPSは %1.　最高のFPS値は %2</translation>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2</source>
-        <translation type="vanished">For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2</translation>
+        <translation>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2</translation>
     </message>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>
-        <translation type="vanished">
+        <translation>
             <numerusform>%n / %1デジタルライセンス使用.</numerusform>
         </translation>
     </message>
@@ -3976,64 +3971,64 @@ It might take a few moments to populate them in the tree.</source>
     </message>
     <message>
         <source>Activate %1 more digital and %2 more analog licenses.</source>
-        <translation type="vanished"> %1デジタルと %2 アナログライセンスをアクティベート.</translation>
+        <translation> %1デジタルと %2 アナログライセンスをアクティベート.</translation>
     </message>
     <message numerus="yes">
         <source>Activate %n more digital license(s).</source>
-        <translation type="vanished">
+        <translation>
             <numerusform> %n デジタルライセンスをアクティベート.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Activate %n more analog license(s).</source>
-        <translation type="vanished">
+        <translation>
             <numerusform> %n アナログライセンスをアクティベート.</numerusform>
         </translation>
     </message>
     <message>
         <source>%1 more digital and %2 more analog licenses will be used.</source>
-        <translation type="vanished">%1 デジタルと %2 アナログライセンス使用中.</translation>
+        <translation>%1 デジタルと %2 アナログライセンス使用中.</translation>
     </message>
     <message numerus="yes">
         <source>%n more digital license(s) will be used.</source>
-        <translation type="vanished">
+        <translation>
             <numerusform>%nデジタルライセンス使用中.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="527"/>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation type="unfinished">スケジュールグリッドのFPSは %1.　最高のFPS値は %2. {1.?}</translation>
+        <translation>スケジュールグリッドのFPSは %1.　最高のFPS値は %2. </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="533"/>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation type="unfinished">For software motion 2. fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2. {2 ?} {1.?}</translation>
+        <translation>For software motion 2. fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2. </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="623"/>
         <source>%n license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n /%1ライセンス使用.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="655"/>
         <source>Activate %n more license(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n ライセンスをアクティベート.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="657"/>
         <source>%1 more licenses and %2 more analog licenses will be used.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ライセンスと %2 アナログライセンス使用中.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="662"/>
         <source>%n more license(s) will be used.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%nライセンス使用中.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -4121,7 +4116,7 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/camera/client_video_camera.cpp" line="14"/>
         <source>Invalid resource type for data export.</source>
-        <translation type="unfinished">無効なリソースタイプのデータエクスポート.</translation>
+        <translation>無効なリソースタイプのデータエクスポート.</translation>
     </message>
 </context>
 <context>
@@ -4129,7 +4124,7 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="95"/>
         <source>Testing connection to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 へのテスト接続</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="112"/>
@@ -4139,7 +4134,7 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="142"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>入力したログイン情報は無効です.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="146"/>
@@ -4155,7 +4150,7 @@ If this error persists, please contact your VMS administrator.</translation>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="152"/>
         <source>You are trying to connect to incompatible Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation>互換性のないエンタープライズコントローラーに接続を行っています.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="158"/>
@@ -4282,133 +4277,133 @@ You will be asked to restart the client in compatibility mode.</translation>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_data_provider.cpp" line="245"/>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation type="unfinished">44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</translation>
+        <translation>44.1Khz と 48Khz 音声フォーマットはサポートされません!　他のオーディオデバイスまたはnoneを選択して下さい</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_data_provider.cpp" line="391"/>
         <source>Could not find video encoder %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオエンコーダー%1を検出できません.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_data_provider.cpp" line="396"/>
         <source>Screen width must be a multiplier of 8.</source>
-        <translation type="unfinished"></translation>
+        <translation>スクリーン幅は8の倍数に設定して下さい.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_data_provider.cpp" line="473"/>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオエンコーダーをイニシャライズできません.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_data_provider.cpp" line="492"/>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>オーディオエンコーダー%1を検出できません.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_data_provider.cpp" line="511"/>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>オーディオエンコーダーをイニシャライズできません.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_data_provider.cpp" line="519"/>
         <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>オーディオデバイス%1をイニシャライズできません.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_data_provider.cpp" line="540"/>
         <source>Could not start primary audio device.</source>
-        <translation type="unfinished"></translation>
+        <translation>プライマリーオーディオデバイスを開始できません.</translation>
     </message>
 </context>
 <context>
     <name>QnDesktopFileEncoder</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation type="vanished">44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</translation>
+        <translation>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</translation>
     </message>
     <message>
         <source>Can&apos;t find video encoder </source>
-        <translation type="vanished">ビデオエンコーダーが見つかりません</translation>
+        <translation>ビデオエンコーダーが見つかりません</translation>
     </message>
     <message>
         <source>Can&apos;t create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
-        <translation type="vanished"> &apos;%1&apos;.にテンポラリーフォルダーを作成できません。スクリーン録画設定のメインメディアフォルダーを設定してください.</translation>
+        <translation> &apos;%1&apos;.にテンポラリーフォルダーを作成できません。スクリーン録画設定のメインメディアフォルダーを設定してください.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="313"/>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>44.1Khz と 48Khz 音声フォーマットはサポートされません!　他のオーディオデバイスまたはnoneを選択して下さい.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="480"/>
         <source>Could not find video encoder %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオエンコーダー%1を検出できません.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="488"/>
         <source>Could not create temporary file in folder &apos;%1&apos;. Please configure &apos;Main Media Folder&apos; in Screen Recording settings.</source>
-        <translation type="unfinished"></translation>
+        <translation> &apos;%1&apos;.にテンポラリーフォルダーを作成できません。スクリーン録画設定のメインメディアフォルダーを設定してください.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="512"/>
         <source>Could not allocate output stream for video codec.</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオコーデックにストリームの割付けができませんでした.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="517"/>
         <source>Screen width must be a multiplier of 8.</source>
-        <translation type="unfinished"></translation>
+        <translation>スクリーン幅は8の倍数に設定して下さい.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="592"/>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオエンコーダーをイニシャライズできません.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="616"/>
         <source>Could not allocate output audio stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>音声ストリームの割付けができませんでした.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="624"/>
         <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>オーディオエンコーダー%1を検出できません.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="642"/>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>オーディオエンコーダーをイニシャライズできません.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="650"/>
         <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>オーディオデバイス%1をイニシャライズできません.</translation>
     </message>
     <message>
         <location filename="../src/device_plugins/desktop_win/desktop_file_encoder.cpp" line="673"/>
         <source>Could not start primary audio device.</source>
-        <translation type="unfinished"></translation>
+        <translation>プライマリーオーディオデバイスを開始できません.</translation>
     </message>
 </context>
 <context>
     <name>QnEmailValidDelegate</name>
     <message>
         <source>%1 of %2 selected users have invalid email.</source>
-        <translation type="vanished">%1 / %2 選択したユーザーのメールが無効です.</translation>
+        <translation>%1 / %2 選択したユーザーのメールが無効です.</translation>
     </message>
 </context>
 <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
         <source>Form</source>
-        <translation type="vanished">から</translation>
+        <translation>から</translation>
     </message>
 </context>
 <context>
     <name>QnEmptyBusinessEventWidget</name>
     <message>
         <source>Form</source>
-        <translation type="vanished">から</translation>
+        <translation>から</translation>
     </message>
 </context>
 <context>
@@ -4446,53 +4441,53 @@ You will be asked to restart the client in compatibility mode.</translation>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="366"/>
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="370"/>
         <source>Event log for %1 - %n event(s) found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %1  - %n イベントログが見つかりました</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="408"/>
         <source>&lt;Any camera&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;カメラ&gt;</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="410"/>
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt; %n カメラ &gt;</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="517"/>
         <source>Export selected events to file</source>
-        <translation type="unfinished">選択したイベントをファイルにエクスポート</translation>
+        <translation>選択したイベントをファイルにエクスポート</translation>
     </message>
     <message>
         <source>Event log for period from %1 to %2 - %3 event(s) found</source>
-        <translation type="vanished">期間 %1 から %2 - %3のイベントログが見つかりました</translation>
+        <translation>期間 %1 から %2 - %3のイベントログが見つかりました</translation>
     </message>
     <message>
         <source>Event log for %1  - %2 event(s) found</source>
-        <translation type="vanished"> %1  - %2 イベントログが見つかりました</translation>
+        <translation> %1  - %2 イベントログが見つかりました</translation>
     </message>
     <message>
         <source>&lt; Any camera &gt;</source>
-        <translation type="vanished">&lt; Any camera &gt;</translation>
+        <translation>&lt; Any camera &gt;</translation>
     </message>
     <message>
         <source>&lt; 1 camera &gt;</source>
-        <translation type="vanished">&lt; 1 カメラ &gt;</translation>
+        <translation>&lt; 1 カメラ &gt;</translation>
     </message>
     <message>
         <source>&lt; %1 cameras &gt;</source>
-        <translation type="vanished">&lt; %1 カメラ &gt;</translation>
+        <translation>&lt; %1 カメラ &gt;</translation>
     </message>
 </context>
 <context>
@@ -4553,13 +4548,13 @@ You will be asked to restart the client in compatibility mode.</translation>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="87"/>
         <source>%n license(s) will be used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n /%1ライセンス使用.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n digital license(s) will be used out of %1.</source>
-        <translation type="vanished">
+        <translation>
             <numerusform>%n / %1デジタルライセンス使用.</numerusform>
         </translation>
     </message>
@@ -4576,23 +4571,23 @@ You will be asked to restart the client in compatibility mode.</translation>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.ui" line="84"/>
         <source>Auto Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>自動キャリブレーション</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="127"/>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="130"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="127"/>
         <source>Autodetection failed. Image is not round.</source>
-        <translation type="unfinished"></translation>
+        <translation>自動検索エラー.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="130"/>
         <source>Autodetection failed. The image might be too dim.</source>
-        <translation type="unfinished"></translation>
+        <translation>自動検索エラー.</translation>
     </message>
 </context>
 <context>
@@ -4600,89 +4595,90 @@ You will be asked to restart the client in compatibility mode.</translation>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="37"/>
         <source>Server Time</source>
-        <translation type="unfinished">サーバー時間</translation>
+        <translation>サーバー時間</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="38"/>
         <source>Client Time</source>
-        <translation type="unfinished">クライアント時間</translation>
+        <translation>クライアント時間</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="40"/>
         <source>Dark</source>
-        <translation type="unfinished"></translation>
+        <translation>暗い</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="41"/>
         <source>Light</source>
-        <translation type="unfinished"></translation>
+        <translation>明るい</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="137"/>
         <source>IP Address: %1, Network Mask: %2</source>
-        <translation type="unfinished">IPアドレス: %1, ネットマスク: %2</translation>
+        <translation>IPアドレス: %1, ネットマスク: %2</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="156"/>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="243"/>
         <source>Information</source>
-        <translation type="unfinished">情報</translation>
+        <translation>情報</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="157"/>
         <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
-        <translation type="unfinished"></translation>
+        <translation>変更した内容は再起動後に有効になります　再起動を行いますか?</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="185"/>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="198"/>
         <source>Select folder...</source>
-        <translation type="unfinished"></translation>
+        <translation>選択フォルダー...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="205"/>
         <source>Folder is already added</source>
-        <translation type="unfinished">フォルダーは既に追加されています</translation>
+        <translation>フォルダーは既に追加されています</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="205"/>
         <source>This folder is already added.</source>
-        <translation type="unfinished">フォルダーは既に追加されています.</translation>
+        <translation>フォルダーは既に追加されています.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="223"/>
         <source>Warning</source>
-        <translation type="unfinished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="223"/>
         <source>This option will not affect Recording Schedule. 
 Recording Schedule is always based on Server Time.</source>
-        <translation type="unfinished"></translation>
+        <translation>このオプションは録画スケジュールには反映されません. 
+録画スケジュールはサーバー時間で動作します.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="244"/>
         <source>Folder &apos;%1&apos; does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>フォルダー &apos;%1&apos; は存在しません.</translation>
     </message>
 </context>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="vanished">We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <translation>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Critical Performance Tip</source>
-        <translation type="vanished">深刻なパフォーマンス情報</translation>
+        <translation>深刻なパフォーマンス情報</translation>
     </message>
     <message>
         <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation type="vanished">We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <translation>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Important Performance Tip</source>
-        <translation type="vanished">重要なパフォーマンス情報</translation>
+        <translation>重要なパフォーマンス情報</translation>
     </message>
 </context>
 <context>
@@ -4690,27 +4686,27 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/common/grid_widget_helper.cpp" line="26"/>
         <source>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</source>
-        <translation type="unfinished">HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</translation>
+        <translation>HTML file (*.html);;Spread Sheet (CSV) File(*.csv)</translation>
     </message>
     <message>
         <location filename="../src/ui/common/grid_widget_helper.cpp" line="39"/>
         <source>Save As</source>
-        <translation type="unfinished">名前を付けて保存</translation>
+        <translation>名前を付けて保存</translation>
     </message>
     <message>
         <location filename="../src/ui/common/grid_widget_helper.cpp" line="40"/>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル &apos;%1&apos;は既に存在します　上書きしますか?</translation>
     </message>
     <message>
         <location filename="../src/ui/common/grid_widget_helper.cpp" line="52"/>
         <source>Could not overwrite file</source>
-        <translation type="unfinished">ファイルを上書きできません</translation>
+        <translation>ファイルを上書きできません</translation>
     </message>
     <message>
         <location filename="../src/ui/common/grid_widget_helper.cpp" line="53"/>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation type="unfinished">ファイル &apos;%1&apos; は他のプロセスで使用しています。他の名前を使用してください.</translation>
+        <translation>ファイル &apos;%1&apos; は他のプロセスで使用しています。他の名前を使用してください.</translation>
     </message>
 </context>
 <context>
@@ -4725,18 +4721,18 @@ Recording Schedule is always based on Server Time.</source>
     <name>QnImagePreviewDialog</name>
     <message>
         <source>Image View</source>
-        <translation type="vanished">イメージ表示</translation>
+        <translation>イメージ表示</translation>
     </message>
     <message>
         <source>Image loading can take a lot of time. Please be patient.</source>
-        <translation type="vanished">イメージのロードに膨大な時間が必要です　お待ちください.</translation>
+        <translation>イメージのロードに膨大な時間が必要です　お待ちください.</translation>
     </message>
 </context>
 <context>
     <name>QnInputEnabledDelegate</name>
     <message>
         <source>%1 of %2 selected cameras have no input ports.</source>
-        <translation type="vanished">選択したカメラの%1 / %2 に入力ポートがありません.</translation>
+        <translation>選択したカメラの%1 / %2 に入力ポートがありません.</translation>
     </message>
 </context>
 <context>
@@ -4744,80 +4740,80 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="74"/>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation type="unfinished">ファイル &apos;%1&apos; は他のプロセスで使用しています。他の名前を使用してください.</translation>
+        <translation>ファイル &apos;%1&apos; は他のプロセスで使用しています。他の名前を使用してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="306"/>
         <source>Exporting %1 to &quot;%2&quot;...</source>
-        <translation type="unfinished">エクスポート中 %1 / &quot;%2&quot;...</translation>
+        <translation>エクスポート中 %1 / &quot;%2&quot;...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="359"/>
         <source>Could not export camera %1</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ%1をエクスポートできません</translation>
     </message>
 </context>
 <context>
     <name>QnLayoutSettingsDialog</name>
     <message>
         <source>Dialog</source>
-        <translation type="vanished">ダイログ</translation>
+        <translation>ダイログ</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="vanished">一般設定</translation>
+        <translation>一般設定</translation>
     </message>
     <message>
         <source>Layout is locked</source>
-        <translation type="vanished">レイアウトはロックされています</translation>
+        <translation>レイアウトはロックされています</translation>
     </message>
     <message>
         <source>Background</source>
-        <translation type="vanished">背景</translation>
+        <translation>背景</translation>
     </message>
     <message>
         <source>Browse...</source>
-        <translation type="vanished">参照...</translation>
+        <translation>参照...</translation>
     </message>
     <message>
         <source>View...</source>
-        <translation type="vanished">表示...</translation>
+        <translation>表示...</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation type="vanished">クリア</translation>
+        <translation>クリア</translation>
     </message>
     <message>
         <source>Image processing can take a lot of time. Please be patient.</source>
-        <translation type="vanished">イメージプロセッッシングには時間を要します.</translation>
+        <translation>イメージプロセッッシングには時間を要します.</translation>
     </message>
     <message>
         <source>&amp;Crop to monitor aspect ratio</source>
-        <translation type="vanished">モニターアスペクト比(&amp;C)</translation>
+        <translation>モニターアスペクト比(&amp;C)</translation>
     </message>
     <message>
         <source>&amp;Width:</source>
-        <translation type="vanished">幅(&amp;W):</translation>
+        <translation>幅(&amp;W):</translation>
     </message>
     <message>
         <source> cells</source>
-        <translation type="vanished">セル</translation>
+        <translation>セル</translation>
     </message>
     <message>
         <source>&amp;Height:</source>
-        <translation type="vanished">高さ(&amp;H):</translation>
+        <translation>高さ(&amp;H):</translation>
     </message>
     <message>
         <source>&amp;Opacity:</source>
-        <translation type="vanished">透過(&amp;O):</translation>
+        <translation>透過(&amp;O):</translation>
     </message>
     <message>
         <source>%</source>
-        <translation type="vanished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <source>Keep aspect ratio</source>
-        <translation type="vanished">アスペクト比を固定</translation>
+        <translation>アスペクト比を固定</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="311"/>
@@ -4906,13 +4902,13 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
 Required at least %3 digital and %4 analog licenses.</source>
-        <translation type="vanished">カメラライセンス %1 デジタルと %2 アナログカメラ 
+        <translation>カメラライセンス %1 デジタルと %2 アナログカメラ 
 最低%3 デジタルと %4 アナログライセンスが必要.</translation>
     </message>
     <message>
         <source>The software is licensed to %1 digital and %2 analog cameras.
 %3 digital and %4 analog licenses are currently in use.</source>
-        <translation type="vanished">ソフトウェアは %1 デジタルと %2 アナログカメラがライセンスされてます.
+        <translation>ソフトウェアは %1 デジタルと %2 アナログカメラがライセンスされてます.
 %3 デジタルと %4 アナログライセンスが使用されてます.</translation>
     </message>
     <message>
@@ -4941,36 +4937,40 @@ Required at least %3 digital and %4 analog licenses.</source>
     </message>
     <message>
         <source>Invalid License. Contact our support team to get a valid License.</source>
-        <translation type="vanished">無効なライセンス　サポートに連絡し有効なライセンスを取得してください.</translation>
+        <translation>無効なライセンス　サポートに連絡し有効なライセンスを取得してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="102"/>
         <source>The software is licensed to %1 cameras and %2 analog cameras.
 At least %3 licenses are required.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 カメラライセンスと %2 アナログカメラ 
+最低%3 ライセンスが必要.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="109"/>
         <source>The software is licensed to %1 cameras.
 At least %3 licenses are required.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 カメラライセンス使用.
+最低 %3 ライセンス必要.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="117"/>
         <source>The software is licensed to %1 cameras and %2 analog cameras.
 %3 licenses and %4 analog licenses are currently in use.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 カメラと %2 アナログカメラが使用可能です.
+%3 カメラライセンスと %4 アナログライセンスが使用されてます.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="125"/>
         <source>The software is licensed to %1 cameras.
 %2 licenses are currently in use.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1カメラが使用可能です.
+%2 ライセンスが使用されています.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="216"/>
         <source>Invalid License. Please contact our support team to get a valid license.</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なライセンス　サポートに連絡し有効なライセンスを取得してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="220"/>
@@ -5014,37 +5014,38 @@ Archive Streams Allowed: %4</translation>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="286"/>
         <source>Network error has occurred during automatic license activation.
 Try to activate your license manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>自動ライセンスアクティベート中にネットワークエラーが発生しました
+マニュアルでアクティベートを行ってください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="310"/>
         <source>Database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースエラー.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="312"/>
         <source>Invalid data was received.</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なデータを受信しました.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="314"/>
         <source>The license key is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なライセンスキー.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="316"/>
         <source>You are trying to activate an incompatible license with your software.</source>
-        <translation type="unfinished"></translation>
+        <translation>互換性のないライセンスのアクティベートを行っています.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="318"/>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}.</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスキーはハードウェアid {{hwid}} で {{time}}にアクティベートされています.</translation>
     </message>
     <message>
         <source>Network error has occurred during the Automatic License Activation.
 Try to activate your License manually.</source>
-        <translation type="vanished">自動ライセンスアクティベート中にネットワークエラーが発生しました
+        <translation>自動ライセンスアクティベート中にネットワークエラーが発生しました
 マニュアルでアクティベートを行ってください.</translation>
     </message>
 </context>
@@ -5108,7 +5109,7 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>The Login Information you have entered is not valid.</source>
-        <translation type="vanished">入力したログイン情報は無効です.</translation>
+        <translation>入力したログイン情報は無効です.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="105"/>
@@ -5123,12 +5124,12 @@ Try to activate your License manually.</source>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="172"/>
         <source>The login information you have entered is not valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>入力したログイン情報は無効です.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="242"/>
         <source>* Last used connection *</source>
-        <translation type="unfinished">* 前回の接続を使用する *</translation>
+        <translation>* 前回の接続を使用する *</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="281"/>
@@ -5138,12 +5139,12 @@ Try to activate your License manually.</source>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="353"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>入力したログイン情報は無効です.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="359"/>
         <source>You are trying to connect to incompatible Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation>互換性のないエンタープライズコントローラーに接続を行っています.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="366"/>
@@ -5160,7 +5161,10 @@ Try to activate your License manually.</source>
  - Client version: %1.
  - EC version: %2.
 An error has occurred while trying to restart in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>エンタープライズコントローラーのバージョンが違います:
+ - クライアントバージョン: %1.
+ - EC バージョン: %2.
+互換性モードでの再起動でエラーが発生しました.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="426"/>
@@ -5168,18 +5172,22 @@ An error has occurred while trying to restart in compatibility mode.</source>
  - Client version: %1.
  - EC version: %2.
 Would you like to restart in compatibility mode?</source>
-        <translation type="unfinished"></translation>
+        <translation>異なるバージョンのエンタープライズコントローラーに接続しました:
+ - クライアントバージョン: %1.
+ - EC バージョン: %2.
+互換性モードで再起動しますか?</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="455"/>
         <source>Failure</source>
-        <translation type="unfinished"></translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="456"/>
         <source>Failed to launch compatiblity version %1
 Try to restore version %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>互換性モードバージョン %1での起動エラー
+バージョン %1に戻しますか?</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="483"/>
@@ -5188,12 +5196,16 @@ Try to restore version %1?</source>
  - EC version: %2.
 Client version %3 is required to connect to this Enterprise Controller.
 Download version %3?</source>
-        <translation type="unfinished"></translation>
+        <translation>異なるバージョンのエンタープライズコントローラーに接続しました:
+ - クライアントバージョン: %1.
+ - EC バージョン: %2.
+クライアントバージョン %3 がこのエンタープライズコントローラーとの接続に必要です.
+バージョン %3をダウンロードしますか?</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="572"/>
         <source>Connection with this name already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation>同じ名前の接続設定が既に存在します　上書きしますか?</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="355"/>
@@ -5222,7 +5234,7 @@ Compatibility mode for versions lower than %3 is not supported.</translation>
  - Client version: %1.
  - EC version: %2.
 Would you like to restart client in compatibility mode?</source>
-        <translation type="vanished">You are about to connect to Enterprise Controller which has a different version:
+        <translation>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
 Would you like to restart client in compatibility mode?</translation>
@@ -5244,7 +5256,7 @@ Please close the application and start it again using the shortcut in the start 
  - Client version: %1.
  - EC version: %2.
 Client Version %2 is required to connect to this Enterprise Controller. Please download version %2 of the product and upgrade the system.</source>
-        <translation type="vanished">You are about to connect to Enterprise Controller which has a different version:
+        <translation>You are about to connect to Enterprise Controller which has a different version:
  - Client version: %1.
  - EC version: %2.
 Client Version %2 is required to connect to this Enterprise Controller. Please download version %2 of the product and upgrade the system.</translation>
@@ -5293,7 +5305,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>Connection with the same name already exists. Overwrite it?</source>
-        <translation type="vanished">同じ名前の接続設定が既に存在します　上書きしますか?</translation>
+        <translation>同じ名前の接続設定が既に存在します　上書きしますか?</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="606"/>
@@ -5373,31 +5385,31 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="838"/>
         <source>%1x%2 %3fps @ %4Mbps%5%6%7</source>
-        <translation type="unfinished">%1x%2 %3fps @ %4Mbps%5%6%7 {1x?} {2 %3f?} {4M?}</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="852"/>
         <source>%1 (Tour &quot;%2&quot; is active)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (ツアー &quot;%2&quot; アクティブ)</translation>
     </message>
     <message>
         <source> HW</source>
-        <translation type="vanished"> HW</translation>
+        <translation> HW</translation>
     </message>
     <message>
         <source> SW</source>
-        <translation type="vanished"> SW</translation>
+        <translation> SW</translation>
     </message>
     <message>
         <source>%1x%2 %3fps @ %4Mbps%5%6%7%8</source>
-        <translation type="vanished">%1x%2 %3fps @ %4Mbps%5%6%7%8</translation>
+        <translation>%1x%2 %3fps @ %4Mbps%5%6%7%8</translation>
     </message>
 </context>
 <context>
     <name>QnMotionEnabledDelegate</name>
     <message>
         <source>Recording or motion detection is disabled for %1 of %2 selected cameras.</source>
-        <translation type="vanished">選択したカメラの録画またはモーション検知は %1 / %2 無効.</translation>
+        <translation>選択したカメラの録画またはモーション検知は %1 / %2 無効.</translation>
     </message>
 </context>
 <context>
@@ -5416,13 +5428,13 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>
-        <translation type="vanished">
+        <translation>
             <numerusform>%n / %1デジタルライセンス使用.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) are used out of %1.</source>
-        <translation type="vanished">
+        <translation>
             <numerusform>%n /%1アナログライセンス使用.</numerusform>
         </translation>
     </message>
@@ -5474,13 +5486,13 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <name>QnNotificationListWidget</name>
     <message>
         <source>%1 items more</source>
-        <translation type="vanished">%1 アイテム以上</translation>
+        <translation>%1 アイテム以上</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/graphics/items/notifications/notification_list_widget.cpp" line="178"/>
         <source>%n more item(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n　アイテム以上</numerusform>
         </translation>
     </message>
 </context>
@@ -5523,21 +5535,21 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>Clip sound up to %n seconds</source>
-        <translation type="vanished">クリップサウンドは最大 %n秒</translation>
+        <translation>クリップサウンドは最大 %n秒</translation>
     </message>
     <message>
         <source>Custom Title</source>
-        <translation type="vanished">カスタムタイトル</translation>
+        <translation>カスタムタイトル</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="71"/>
         <source>Clip sound up to %1 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>クリップサウンドは最大 %1秒</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="72"/>
         <source>Custom Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>カスタムタイトル:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="82"/>
@@ -5563,16 +5575,16 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="108"/>
         <source>New title could not be set.</source>
-        <translation type="unfinished"></translation>
+        <translation>新規タイトルはセットされません.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="125"/>
         <source>Are you sure you want to delete &apos;%1&apos;?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1を削除しますか?</translation>
     </message>
     <message>
         <source>New title could not be set</source>
-        <translation type="vanished">新規タイトルはセットされません</translation>
+        <translation>新規タイトルはセットされません</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="124"/>
@@ -5582,7 +5594,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <message>
         <source>Are you sure you want to delete
 %1</source>
-        <translation type="vanished">削除しますか
+        <translation>削除しますか
 %1</translation>
     </message>
 </context>
@@ -5698,7 +5710,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <name>QnOutputEnabledDelegate</name>
     <message>
         <source>%1 of %2 selected cameras have not output relays.</source>
-        <translation type="vanished">選択したカメラの%1 / %2 に出力リレーがありません.</translation>
+        <translation>選択したカメラの%1 / %2 に出力リレーがありません.</translation>
     </message>
 </context>
 <context>
@@ -5706,12 +5718,12 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <message>
         <location filename="../src/utils/performance_test.cpp" line="47"/>
         <source>Warning</source>
-        <translation type="unfinished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <location filename="../src/utils/performance_test.cpp" line="48"/>
         <source>Performance of this computer allows running %1 in configuration mode only. For full-featured mode please use another computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>このPCのスペックでは%1　のコンフィグレーションモードでのみ動作します　全ての機能を使用するには他のPCを使用して下さい.</translation>
     </message>
 </context>
 <context>
@@ -5719,88 +5731,88 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <message>
         <location filename="../src/ui/dialogs/picture_settings_dialog.ui" line="14"/>
         <source>Picture Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>画像設定</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/picture_settings_dialog.ui" line="42"/>
         <source>Image is not loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>イメージがロードされません</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/picture_settings_dialog.ui" line="78"/>
         <source>This is a fish-eye lens image</source>
-        <translation type="unfinished"></translation>
+        <translation>魚眼レンズイメージ</translation>
     </message>
 </context>
 <context>
     <name>QnPlaySoundBusinessActionWidget</name>
     <message>
         <source>Form</source>
-        <translation type="vanished">から</translation>
+        <translation>から</translation>
     </message>
     <message>
         <source>Manage...</source>
-        <translation type="vanished">管理...</translation>
+        <translation>管理...</translation>
     </message>
     <message>
         <source>Volume:</source>
-        <translation type="vanished">ボリューム:</translation>
+        <translation>ボリューム:</translation>
     </message>
     <message>
         <source>Test...</source>
-        <translation type="vanished">テスト...</translation>
+        <translation>テスト...</translation>
     </message>
 </context>
 <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
         <source>Show to Administrators only</source>
-        <translation type="vanished">アドミニストレーターのみに表示する</translation>
+        <translation>アドミニストレーターのみに表示する</translation>
     </message>
     <message>
         <source>Global Notification Settings...</source>
-        <translation type="vanished">グローバル通知設定...</translation>
+        <translation>グローバル通知設定...</translation>
     </message>
 </context>
 <context>
     <name>QnPopupSettingsWidget</name>
     <message>
         <source>Form</source>
-        <translation type="vanished">から</translation>
+        <translation>から</translation>
     </message>
     <message>
         <source>Show all notifications</source>
-        <translation type="vanished">全ての通知を表示する</translation>
+        <translation>全ての通知を表示する</translation>
     </message>
     <message>
         <source>Show Alarms/Events</source>
-        <translation type="vanished">アラーム/イベントを表示する</translation>
+        <translation>アラーム/イベントを表示する</translation>
     </message>
     <message>
         <source>Show System Notifications</source>
-        <translation type="vanished">システム通知を表示する</translation>
+        <translation>システム通知を表示する</translation>
     </message>
 </context>
 <context>
     <name>QnPortNumberValidator</name>
     <message>
         <source>Auto</source>
-        <translation type="vanished">自動</translation>
+        <translation>自動</translation>
     </message>
 </context>
 <context>
     <name>QnPreferencesDialog</name>
     <message>
         <source>Server Time</source>
-        <translation type="vanished">サーバー時間</translation>
+        <translation>サーバー時間</translation>
     </message>
     <message>
         <source>Client Time</source>
-        <translation type="vanished">クライアント時間</translation>
+        <translation>クライアント時間</translation>
     </message>
     <message>
         <source>Screen Recorder</source>
-        <translation type="vanished">スクリーン録画</translation>
+        <translation>スクリーン録画</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="34"/>
@@ -5809,17 +5821,17 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     </message>
     <message>
         <source>YouTube</source>
-        <translation type="vanished">YouTube</translation>
+        <translation>YouTube</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="26"/>
         <source>General</source>
-        <translation type="unfinished">一般</translation>
+        <translation>一般</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="30"/>
         <source>Screen Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>スクリーン録画</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="40"/>
@@ -5847,46 +5859,46 @@ All changes will be lost after program exit.</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="vanished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <source>Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?</source>
-        <translation type="vanished">Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?</translation>
+        <translation>Hardware acceleration is highly experimental and may result in crashes on some configurations. Are you sure you want to enable it?</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation type="vanished">情報</translation>
+        <translation>情報</translation>
     </message>
     <message>
         <source>Some changes will take effect only after application restart. Press OK to restart the application now.</source>
-        <translation type="vanished">変更した内容は再起動後に有効になります　OKをクリックすると再起動を行います.</translation>
+        <translation>変更した内容は再起動後に有効になります　OKをクリックすると再起動を行います.</translation>
     </message>
     <message>
         <source>Launcher process is not found</source>
-        <translation type="vanished">起動プロセスが見つかりません</translation>
+        <translation>起動プロセスが見つかりません</translation>
     </message>
     <message>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="vanished">Cannot restart the client.
+        <translation>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</translation>
     </message>
     <message>
         <source>IP Address: %1, Network Mask: %2</source>
-        <translation type="vanished">IPアドレス: %1, ネットマスク: %2</translation>
+        <translation>IPアドレス: %1, ネットマスク: %2</translation>
     </message>
     <message>
         <source>Folder is already added</source>
-        <translation type="vanished">フォルダーは既に追加されています</translation>
+        <translation>フォルダーは既に追加されています</translation>
     </message>
     <message>
         <source>This folder is already added.</source>
-        <translation type="vanished">フォルダーは既に追加されています.</translation>
+        <translation>フォルダーは既に追加されています.</translation>
     </message>
     <message>
         <source>This settings will not affect Recording Schedule. 
 Recording Schedule is always based on Server Time.</source>
-        <translation type="vanished">この設定は録画スケジュールに適用されません
+        <translation>この設定は録画スケジュールに適用されません
 録画スケジュールはサーバー時間で動作します.</translation>
     </message>
 </context>
@@ -5901,65 +5913,66 @@ Recording Schedule is always based on Server Time.</source>
 <context>
     <name>QnPtzManageDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="336"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="333"/>
         <source>Could not get position from camera</source>
-        <translation type="unfinished">カメラからポジションを取得できません</translation>
+        <translation>カメラからポジションを取得できません</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="337"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="334"/>
         <source>An error has occurred while trying to get current position from camera %1.
 
 Please wait for the camera to go online.</source>
-        <translation type="unfinished">An error has occurred while trying to get current position from camera %1.
+        <translation>カメラ %1.のポジション取得中にエラーが発生しました
 
-Please wait for the camera to go online.</translation>
+カメラがオンラインになるまでお待ちください.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="358"/>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="396"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="355"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="393"/>
         <source>Could not set position for camera</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラにポジションを登録できません</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="359"/>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="397"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="356"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="394"/>
         <source>An error has occurred while trying to set current position for camera %1.
 
 Please wait for the camera to go online.</source>
-        <translation type="unfinished">An error has occurred while trying to set current position for camera %1.
+        <translation>カメラ %1.のポジション登録中にエラーが発生しました
 
-Please wait for the camera to go online.</translation>
+カメラがオンラインになるまでお待ちください.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="457"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="454"/>
         <source>Remove preset</source>
-        <translation type="unfinished"></translation>
+        <translation>プリセット削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="458"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="455"/>
         <source>This preset is used in some tours.
 These tours will become invalid if you remove it.</source>
-        <translation type="unfinished"></translation>
+        <translation>プリセットはツアーに使用されています.
+削除するとツアーは無効になります.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="459"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="456"/>
         <source>Do not show again.</source>
-        <translation type="unfinished"></translation>
+        <translation>次回より表示しない.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="580"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="565"/>
         <source>Manage PTZ for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1のPTZ管理</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="592"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="577"/>
         <source>PTZ configuration is not saved</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZ設定が保存されていません</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="592"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="577"/>
         <source>Changes are not saved. Do you want to save them?</source>
-        <translation type="unfinished"></translation>
+        <translation>変更内容が保存されていません　保存しますか?</translation>
     </message>
 </context>
 <context>
@@ -5967,114 +5980,114 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/models/ptz_manage_model.cpp" line="51"/>
         <source>New tour %1</source>
-        <translation type="unfinished"></translation>
+        <translation>新規ツアー%1</translation>
     </message>
     <message>
         <location filename="../src/ui/models/ptz_manage_model.cpp" line="114"/>
         <source>Saved position %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ポジション%1 保存</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="282"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="276"/>
         <source>This hotkey is used by preset &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>ホットキーはプリセット%1で使用されています</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="283"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="277"/>
         <source>This hotkey is used by tour &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>ホットキーはツアー%1で使用されています</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="285"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="279"/>
         <source>Change hotkey</source>
-        <translation type="unfinished"></translation>
+        <translation>ホットキー変更</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="286"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="280"/>
         <source>Reassign</source>
-        <translation type="unfinished"></translation>
+        <translation>再割当て</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="393"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="379"/>
         <source>#</source>
-        <translation type="unfinished">#</translation>
+        <translation>#</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="395"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="381"/>
         <source>Name</source>
-        <translation type="unfinished">名前</translation>
+        <translation>名前</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="397"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="383"/>
         <source>Hotkey</source>
-        <translation type="unfinished">ホットキー</translation>
+        <translation>ホットキー</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="399"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="385"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>ホーム</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="401"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="387"/>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>詳細</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="557"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="543"/>
         <source>Tours</source>
-        <translation type="unfinished"></translation>
+        <translation>ツアー</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="558"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="544"/>
         <source>Positions</source>
-        <translation type="unfinished"></translation>
+        <translation>ポジション</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="592"/>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="638"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="578"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="624"/>
         <source>None</source>
-        <translation type="unfinished">なし</translation>
+        <translation>なし</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="596"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="582"/>
         <source>This preset will be activated after %n minutes of inactivity</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>プリセットは%n分後に有効になります</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="691"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="677"/>
         <source>Tour should contain at least 2 positions</source>
-        <translation type="unfinished"></translation>
+        <translation>ツアーには最低2ポジション必要です</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="704"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="690"/>
         <source>Tour has %n identical positions</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>ツアーには%nポジションが含まれます</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="713"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="699"/>
         <source>Tour time: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ツアー時間: %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="713"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="699"/>
         <source>less than a minute</source>
-        <translation type="unfinished"></translation>
+        <translation>1分以下</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="713"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="699"/>
         <source>about %n minute(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>約%n分</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="718"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="704"/>
         <source>Invalid tour</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なツアー</translation>
     </message>
 </context>
 <context>
@@ -6082,7 +6095,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/ptz_preset_dialog.cpp" line="33"/>
         <source>Saved Position %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ポジション%1保存</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_preset_dialog.cpp" line="52"/>
@@ -6102,30 +6115,30 @@ These tours will become invalid if you remove it.</source>
     <name>QnPtzPresetListModel</name>
     <message>
         <source>None</source>
-        <translation type="vanished">なし</translation>
+        <translation>なし</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="vanished">名前</translation>
+        <translation>名前</translation>
     </message>
     <message>
         <source>Hotkey</source>
-        <translation type="vanished">ホットキー</translation>
+        <translation>ホットキー</translation>
     </message>
 </context>
 <context>
     <name>QnPtzPresetsDialog</name>
     <message>
         <source>Remove</source>
-        <translation type="vanished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <source>Activate</source>
-        <translation type="vanished">アクティベート</translation>
+        <translation>アクティベート</translation>
     </message>
     <message>
         <source>PTZ presets for camera %1:</source>
-        <translation type="vanished"> %1カメラPTZプリセット:</translation>
+        <translation> %1カメラPTZプリセット:</translation>
     </message>
 </context>
 <context>
@@ -6134,13 +6147,13 @@ These tours will become invalid if you remove it.</source>
         <location filename="../src/ui/actions/action_factories.cpp" line="87"/>
         <source>%1 (active)</source>
         <comment>Template for active PTZ preset</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1(アクティブ)</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_factories.cpp" line="118"/>
         <source>%1 (active)</source>
         <comment>Template for active PTZ tour</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1(アクティブ)</translation>
     </message>
 </context>
 <context>
@@ -6148,97 +6161,97 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="63"/>
         <source>Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation>最低</translation>
     </message>
     <message>
         <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="63"/>
         <source>Low</source>
-        <translation type="unfinished">低</translation>
+        <translation>低</translation>
     </message>
     <message>
         <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="63"/>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>ノーマル</translation>
     </message>
     <message>
         <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="63"/>
         <source>High</source>
-        <translation type="unfinished">高</translation>
+        <translation>高</translation>
     </message>
     <message>
         <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="63"/>
         <source>Highest</source>
-        <translation type="unfinished"></translation>
+        <translation>最高</translation>
     </message>
     <message>
         <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="85"/>
         <source>Instant</source>
-        <translation type="unfinished">実行</translation>
+        <translation>実行</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="86"/>
         <source>%n seconds</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n秒</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="215"/>
         <source>&lt;Invalid&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;無効&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="274"/>
         <source>Position</source>
-        <translation type="unfinished"></translation>
+        <translation>ポジション</translation>
     </message>
     <message>
         <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="276"/>
         <source>Stay Time</source>
-        <translation type="unfinished"></translation>
+        <translation>稼働時間</translation>
     </message>
     <message>
         <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="278"/>
         <source>Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>スピード</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingBusinessActionWidget</name>
     <message>
         <source>Form</source>
-        <translation type="vanished">から</translation>
+        <translation>から</translation>
     </message>
     <message>
         <source>Quality:</source>
-        <translation type="vanished">画質:</translation>
+        <translation>画質:</translation>
     </message>
     <message>
         <source>fps</source>
-        <translation type="vanished">fps</translation>
+        <translation>fps</translation>
     </message>
     <message>
         <source>before</source>
-        <translation type="vanished">前</translation>
+        <translation>前</translation>
     </message>
     <message>
         <source>s</source>
-        <translation type="vanished">s</translation>
+        <translation>s</translation>
     </message>
     <message>
         <source>Post-recording:</source>
-        <translation type="vanished">ポストレコーディング:</translation>
+        <translation>ポストレコーディング:</translation>
     </message>
     <message>
         <source>max</source>
-        <translation type="vanished">最大</translation>
+        <translation>最大</translation>
     </message>
 </context>
 <context>
     <name>QnRecordingEnabledDelegate</name>
     <message>
         <source>Recording is disabled for %1 of %2 selected cameras.</source>
-        <translation type="vanished">選択したカメラの %1 / %2 は録画が無効です.</translation>
+        <translation>選択したカメラの %1 / %2 は録画が無効です.</translation>
     </message>
 </context>
 <context>
@@ -6256,7 +6269,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.cpp" line="321"/>
         <source>Select folder...</source>
-        <translation type="unfinished"></translation>
+        <translation>選択フォルダー...</translation>
     </message>
 </context>
 <context>
@@ -6265,37 +6278,37 @@ These tours will become invalid if you remove it.</source>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="35"/>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="52"/>
         <source>Not recording</source>
-        <translation type="unfinished">録画なし</translation>
+        <translation>録画なし</translation>
     </message>
     <message>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="37"/>
         <source>Recording everything</source>
-        <translation type="unfinished">全てを録画する</translation>
+        <translation>全てを録画する</translation>
     </message>
     <message>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="39"/>
         <source>Recording motion only</source>
-        <translation type="unfinished">モーション録画のみ</translation>
+        <translation>モーション録画のみ</translation>
     </message>
     <message>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="41"/>
         <source>Recording motion and low quality</source>
-        <translation type="unfinished">モーション録画＋低解像度</translation>
+        <translation>モーション録画＋低解像度</translation>
     </message>
     <message>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="54"/>
         <source>Continuous</source>
-        <translation type="unfinished">連続</translation>
+        <translation>連続</translation>
     </message>
     <message>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="56"/>
         <source>Motion only</source>
-        <translation type="unfinished">モーションのみ</translation>
+        <translation>モーションのみ</translation>
     </message>
     <message>
         <location filename="../src/ui/common/recording_status_helper.cpp" line="58"/>
         <source>Motion + Lo-Res</source>
-        <translation type="unfinished">モーション＋低解像度</translation>
+        <translation>モーション＋低解像度</translation>
     </message>
 </context>
 <context>
@@ -6322,7 +6335,7 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Sample Tooltip</source>
-        <translation type="vanished">サンプルツール</translation>
+        <translation>サンプルツール</translation>
     </message>
 </context>
 <context>
@@ -6330,22 +6343,22 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/models/resource_pool_model.cpp" line="80"/>
         <source>Root</source>
-        <translation type="unfinished">Root</translation>
+        <translation>Root</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model.cpp" line="83"/>
         <source>Local</source>
-        <translation type="unfinished">ローカル</translation>
+        <translation>ローカル</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model.cpp" line="87"/>
         <source>System</source>
-        <translation type="unfinished">システム</translation>
+        <translation>システム</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model.cpp" line="91"/>
         <source>Users</source>
-        <translation type="unfinished">ユーザー</translation>
+        <translation>ユーザー</translation>
     </message>
 </context>
 <context>
@@ -6407,23 +6420,23 @@ These tours will become invalid if you remove it.</source>
     <name>QnSayTextBusinessActionWidget</name>
     <message>
         <source>Form</source>
-        <translation type="vanished">から</translation>
+        <translation>から</translation>
     </message>
     <message>
         <source>Say the following:</source>
-        <translation type="vanished">下記を助言してください:</translation>
+        <translation>下記を助言してください:</translation>
     </message>
     <message>
         <source>Type any text here</source>
-        <translation type="vanished">何かテキストを入力してください</translation>
+        <translation>何かテキストを入力してください</translation>
     </message>
     <message>
         <source>Volume:</source>
-        <translation type="vanished">ボリューム:</translation>
+        <translation>ボリューム:</translation>
     </message>
     <message>
         <source>Test...</source>
-        <translation type="vanished">テスト...</translation>
+        <translation>テスト...</translation>
     </message>
 </context>
 <context>
@@ -6431,18 +6444,18 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/screen_recording/screen_recorder.cpp" line="66"/>
         <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>スクリーンキャプチャーがイニシャライズされていません　後で再度実行して下さい.</translation>
     </message>
 </context>
 <context>
     <name>QnSendmailBusinessActionWidget</name>
     <message>
         <source>&amp;Additional Recipients:</source>
-        <translation type="vanished">追加の受信者(&amp;A)：</translation>
+        <translation>追加の受信者(&amp;A)：</translation>
     </message>
     <message>
         <source>&amp;Global Email Settings...</source>
-        <translation type="vanished">グローバルメール設定(&amp;G)...</translation>
+        <translation>グローバルメール設定(&amp;G)...</translation>
     </message>
 </context>
 <context>
@@ -6460,18 +6473,18 @@ These tours will become invalid if you remove it.</source>
     <message numerus="yes">
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="746"/>
         <source>%1 %2 (up %n days, %3)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 %2 (最大 %n 日, %3)</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="751"/>
         <source>%1 %2</source>
-        <translation type="unfinished">%1% {1 %2?}</translation>
+        <translation>%1% {1 %2?}</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
-        <translation type="vanished">%1 (%2)</translation>
+        <translation>%1 (%2)</translation>
     </message>
 </context>
 <context>
@@ -6482,50 +6495,50 @@ These tours will become invalid if you remove it.</source>
         <translation>ストレージ削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="310"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="316"/>
         <source>Not available</source>
         <translation>有効ではありません</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="385"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="393"/>
         <source>Loading...</source>
         <translation>ロード中...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="537"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="546"/>
         <source>Warning</source>
-        <translation type="unfinished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="538"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="547"/>
         <source>You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours. This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>再同期中にディスクの使用領域が増加します　容量にもよりますが数時間掛かります　このプロセスはアーカイブフォルダーの移動、名前変更、交換の場合に実行されます　実行中はデータを紛失する事なくキャンセルを行えますが実行しますか？</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="576"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="585"/>
         <source>Finished</source>
-        <translation type="unfinished">終了</translation>
+        <translation>終了</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="577"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="586"/>
         <source>Rebuilding archive index is completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>アーカイブインデックスの再リビルド終了</translation>
     </message>
     <message>
         <source>On</source>
-        <translation type="vanished">On</translation>
+        <translation>On</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="vanished">Off</translation>
+        <translation>Off</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="613"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="623"/>
         <source>Could not load storages from server.</source>
         <translation>サーバーからストレージをロードできません.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="650"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="660"/>
         <source>&lt;a href=&apos;1&apos;&gt;Add external Storage...&lt;/a&gt;</source>
         <translation>&lt;a href=&apos;1&apos;&gt;外部ストレージの追加...&lt;/a&gt;</translation>
     </message>
@@ -6567,13 +6580,13 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>
-        <translation type="vanished">
+        <translation>
             <numerusform>%n / %1デジタルライセンス使用.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n analog license(s) are used out of %1.</source>
-        <translation type="vanished">
+        <translation>
             <numerusform>%n /%1アナログライセンス使用.</numerusform>
         </translation>
     </message>
@@ -6588,87 +6601,87 @@ These tours will become invalid if you remove it.</source>
     <name>QnSmtpSettingsWidget</name>
     <message>
         <source>Advanced settings...</source>
-        <translation type="vanished">拡張設定...</translation>
+        <translation>拡張設定...</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation type="vanished">テスト</translation>
+        <translation>テスト</translation>
     </message>
     <message>
         <source>&amp;E-Mail:</source>
-        <translation type="vanished">E-Mail(&amp;E):</translation>
+        <translation>E-Mail(&amp;E):</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation type="vanished">パスワード(&amp;P):</translation>
+        <translation>パスワード(&amp;P):</translation>
     </message>
     <message>
         <source>&amp;System Signature:</source>
-        <translation type="vanished">システム署名(&amp;S):</translation>
+        <translation>システム署名(&amp;S):</translation>
     </message>
     <message>
         <source>Enter short system description here...</source>
-        <translation type="vanished">システムの説明を入力してください...</translation>
+        <translation>システムの説明を入力してください...</translation>
     </message>
     <message>
         <source>SMTP &amp;Server:</source>
-        <translation type="vanished">SMTPサーバー(&amp;S):</translation>
+        <translation>SMTPサーバー(&amp;S):</translation>
     </message>
     <message>
         <source>&amp;User:</source>
-        <translation type="vanished">ユーザー(&amp;U):</translation>
+        <translation>ユーザー(&amp;U):</translation>
     </message>
     <message>
         <source>P&amp;ort</source>
-        <translation type="vanished">ポート(&amp;O)</translation>
+        <translation>ポート(&amp;O)</translation>
     </message>
     <message>
         <source>Unsecure connection</source>
-        <translation type="vanished">安全でない接続</translation>
+        <translation>安全でない接続</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Secure connection using TLS</source>
-        <translation type="vanished">TLSでの安全な接続</translation>
+        <translation>TLSでの安全な接続</translation>
     </message>
     <message>
         <source>Secure connection using SSL</source>
-        <translation type="vanished">SSLでの安全な接続</translation>
+        <translation>SSLでの安全な接続</translation>
     </message>
     <message>
         <source>Server:</source>
-        <translation type="vanished">サーバー:</translation>
+        <translation>サーバー:</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation type="vanished">ポート:</translation>
+        <translation>ポート:</translation>
     </message>
     <message>
         <source>User:</source>
-        <translation type="vanished">ﾕｰｻﾞｰ:</translation>
+        <translation>ﾕｰｻﾞｰ:</translation>
     </message>
     <message>
         <source>Security:</source>
-        <translation type="vanished">セキュリティ:</translation>
+        <translation>セキュリティ:</translation>
     </message>
     <message>
         <source>Progress:</source>
-        <translation type="vanished">進捗:</translation>
+        <translation>進捗:</translation>
     </message>
     <message>
         <source>Result:</source>
-        <translation type="vanished">結果:</translation>
+        <translation>結果:</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="vanished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="vanished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="81"/>
@@ -6693,26 +6706,26 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="254"/>
         <source>Provided parameters are not valid. Could not perform a test.</source>
-        <translation type="unfinished"></translation>
+        <translation>パラメータが無効でテストできません.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="287"/>
         <source>Canceled</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="297"/>
         <source>Timed out</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムアウト</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="328"/>
         <source>Could not read settings from Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation>エンタープライズコントローラーから設定を読込みできません.</translation>
     </message>
     <message>
         <source>Cannot test such parameters</source>
-        <translation type="vanished">そのパラメーターはテストできません</translation>
+        <translation>そのパラメーターはテストできません</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="266"/>
@@ -6736,11 +6749,11 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Cancelled</source>
-        <translation type="vanished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <source>Timeout</source>
-        <translation type="vanished">タイムアウト</translation>
+        <translation>タイムアウト</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="305"/>
@@ -6760,7 +6773,7 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Error while receiving settings</source>
-        <translation type="vanished">設定の受信中にエラーが発生しました</translation>
+        <translation>設定の受信中にエラーが発生しました</translation>
     </message>
 </context>
 <context>
@@ -6791,7 +6804,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="59"/>
         <source>Server offline</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーオフライン</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="60"/>
@@ -6810,7 +6823,7 @@ These tours will become invalid if you remove it.</source>
     </message>
     <message>
         <source>Activate analog license to remove this message</source>
-        <translation type="vanished">このメッセージを削除するにはアナログライセンスをアクティベートしてください</translation>
+        <translation>このメッセージを削除するにはアナログライセンスをアクティベートしてください</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/resource_status_overlay_widget.cpp" line="73"/>
@@ -6850,7 +6863,7 @@ AVAILABLE</source>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="499"/>
         <source>auto</source>
         <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of AM/PM usage based on user&apos;s system locale. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>自動</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="514"/>
@@ -6892,13 +6905,13 @@ AVAILABLE</source>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="533"/>
         <source>dd MMMM</source>
         <extracomment>Format for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>dd MMMM</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="536"/>
         <source>MMMM</source>
         <extracomment>Format for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>MMMM</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="539"/>
@@ -6907,45 +6920,45 @@ AVAILABLE</source>
         <extracomment>Format for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.
 ----------
 Format for displaying year caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>yyyy</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="543"/>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>MINUTES</comment>
         <extracomment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="546"/>
         <source>dd MMMM yyyy hh:mm ap</source>
         <extracomment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="549"/>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>HOURS</comment>
         <extracomment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="552"/>
         <source>dd MMMM yyyy h ap</source>
         <extracomment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="555"/>
         <source>dd MMMM yyyy</source>
         <extracomment>Format for displaying day caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>dd MMMM yyyy</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="558"/>
         <source>MMMM yyyy</source>
         <extracomment>Format for displaying month caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>MMMM yyyy</translation>
     </message>
 </context>
 <context>
@@ -6953,44 +6966,44 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="47"/>
         <source>Folder:</source>
-        <translation type="unfinished"></translation>
+        <translation>フォルダー:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="66"/>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="140"/>
         <source>Browse...</source>
-        <translation type="unfinished">参照...</translation>
+        <translation>参照...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="75"/>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="126"/>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル名:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="85"/>
         <source>Format:</source>
-        <translation type="unfinished"></translation>
+        <translation>フォーマット:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="101"/>
         <source>Warning: file with same name already exists!</source>
-        <translation type="unfinished"></translation>
+        <translation>注意: 既に同じ名前が登録されています!</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="156"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>オプション</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.cpp" line="176"/>
         <source>Select folder...</source>
-        <translation type="unfinished"></translation>
+        <translation>選択フォルダー...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.cpp" line="187"/>
         <source>Select file...</source>
-        <translation type="unfinished">ファイル選択...</translation>
+        <translation>ファイル選択...</translation>
     </message>
 </context>
 <context>
@@ -6998,49 +7011,49 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/business/business_resource_validation.cpp" line="104"/>
         <source>Select at least one user</source>
-        <translation type="unfinished">最低1人のユーザーを選択してください</translation>
+        <translation>最低1人のユーザーを選択してください</translation>
     </message>
     <message>
         <location filename="../src/business/business_resource_validation.cpp" line="118"/>
         <source>User %1 has invalid email address</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー %1 のE-Mailメールアドレス無効</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="119"/>
         <source>%n of %1 users have invalid E-Mail address</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n / %1 ユーザーのE-Mailアドレス無効</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/business_resource_validation.cpp" line="133"/>
         <source>Invalid E-Mail address %1</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なE-Mailアドレス%1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="134"/>
         <source>%n of %1 additional E-Mail addresses are invalid</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n / %1 のE-Mailアドレス無効</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/business_resource_validation.cpp" line="137"/>
         <source>Send mail to %1</source>
-        <translation type="unfinished"> %1にメール送信</translation>
+        <translation> %1にメール送信</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="139"/>
         <source>%n User(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n ユーザー</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="141"/>
         <source>%1, %n additional</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1, %n 追加</numerusform>
         </translation>
     </message>
 </context>
@@ -7155,7 +7168,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <name>QnVideoCamera</name>
     <message>
         <source>Invalid resource type for data export.</source>
-        <translation type="vanished">無効なリソースタイプのデータエクスポート.</translation>
+        <translation>無効なリソースタイプのデータエクスポート.</translation>
     </message>
 </context>
 <context>
@@ -7175,27 +7188,27 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <name>QnWorkbenchActionHandler</name>
     <message>
         <source>Close Layouts</source>
-        <translation type="vanished">レイアウトを閉じる</translation>
+        <translation>レイアウトを閉じる</translation>
     </message>
     <message numerus="yes">
         <source>The following %n layout(s) are not saved. Do you want to save them?</source>
-        <translation type="vanished">
+        <translation>
             <numerusform>レイアウト %n は保存されていません。保存しますか?</numerusform>
         </translation>
     </message>
     <message>
         <source>Saving Layouts</source>
-        <translation type="vanished">レイアウト保存</translation>
+        <translation>レイアウト保存</translation>
     </message>
     <message numerus="yes">
         <source>The following %n layout(s) are being saved.</source>
-        <translation type="vanished">
+        <translation>
             <numerusform>レイアウト %n は保存されました.</numerusform>
         </translation>
     </message>
     <message>
         <source>Please wait.</source>
-        <translation type="vanished">お待ちください.</translation>
+        <translation>お待ちください.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="470"/>
@@ -7225,13 +7238,13 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="555"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2266"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2256"/>
         <source>Could not save parameters</source>
         <translation>パラメーターを保存できません</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="556"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2267"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2257"/>
         <source>Failed to save the following parameters (%1):
 %2</source>
         <translation>次のパラメーターを保存できません (%1):
@@ -7249,31 +7262,31 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     </message>
     <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation type="vanished">PTZ調整_%1.jpg</translation>
+        <translation>PTZ調整_%1.jpg</translation>
     </message>
     <message>
         <source>Save Layout As</source>
-        <translation type="vanished">名前を付けてレイアウトを保存</translation>
+        <translation>名前を付けてレイアウトを保存</translation>
     </message>
     <message>
         <source>Enter layout name:</source>
-        <translation type="vanished">レイアウト名を入力:</translation>
+        <translation>レイアウト名を入力:</translation>
     </message>
     <message>
         <source>Layout already exists</source>
-        <translation type="vanished">レウアイトは既に存在します</translation>
+        <translation>レウアイトは既に存在します</translation>
     </message>
     <message>
         <source>Layout with the same name already exists
 and you do not have the rights to overwrite it.</source>
-        <translation type="vanished">同じ名前のレイアウトは既に存在します
+        <translation>同じ名前のレイアウトは既に存在します
 また上書きする権限がありません.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1021"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2398"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2454"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2477"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2388"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2444"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2467"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
@@ -7311,7 +7324,7 @@ and you do not have the rights to overwrite it.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="951"/>
         <source>New layout %1</source>
-        <translation type="unfinished"></translation>
+        <translation>新規レイアウト%1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1114"/>
@@ -7342,7 +7355,7 @@ and you do not have the rights to overwrite it.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1149"/>
         <source>Select folder...</source>
-        <translation type="unfinished"></translation>
+        <translation>選択フォルダー...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1161"/>
@@ -7371,7 +7384,7 @@ and you do not have the rights to overwrite it.</source>
     </message>
     <message>
         <source>Layout with the same name already exists. Overwrite it?</source>
-        <translation type="vanished">同じ名前のレイアウトが既に存在します　上書きしますか？</translation>
+        <translation>同じ名前のレイアウトが既に存在します　上書きしますか？</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1195"/>
@@ -7408,192 +7421,192 @@ and you do not have the rights to overwrite it.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1863"/>
         <source>Process is in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>プロセス処理中</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1864"/>
         <source>Camera addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ追加中　処理をキャンセルしますか?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1976"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1966"/>
         <source>Delete Files</source>
         <translation>ファイルの削除</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1977"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1967"/>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation>
             <numerusform> %n ファイルを削除しますか？</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1994"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1984"/>
         <source>Remove Items</source>
         <translation>アイテム削除</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1995"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1985"/>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation>
             <numerusform> %nアイテムをレイアウトから削除しますか？</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2037"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2027"/>
         <source>Rename</source>
         <translation>名前の変更</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2038"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2028"/>
         <source>Enter new name for the selected item:</source>
         <translation>選択したアイテムの名前:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2079"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2069"/>
         <source>Delete Resources</source>
         <translation>リソース削除</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2080"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2070"/>
         <source>Do you really want to delete the following %n item(s)?</source>
         <translation>
             <numerusform> %n アイテムを削除しますか？</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2679"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2669"/>
         <source>Beta version</source>
-        <translation type="unfinished"></translation>
+        <translation>ベータバージョン</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2680"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2670"/>
         <source>You are running beta version of %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ベータバージョン%1を起動しています.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2722"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2712"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished">起動プロセスが見つかりません</translation>
+        <translation>起動プロセスが見つかりません</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2723"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2713"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished">Cannot restart the client.
-Please close the application and start it again using the shortcut in the start menu.</translation>
+        <translation>クライアントの再起動ができません.
+アプリケーションを閉じて再度起動して下さい.</translation>
     </message>
     <message>
         <source>New Layout</source>
-        <translation type="vanished">新規レイアウト</translation>
+        <translation>新規レイアウト</translation>
     </message>
     <message>
         <source>Enter the name of the layout to create:</source>
-        <translation type="vanished">登録するレイアウトの名前入力:</translation>
+        <translation>登録するレイアウトの名前入力:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2169"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2159"/>
         <source>User Settings</source>
         <translation>ユーザー設定</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="vanished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes. 
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
 Do you want to continue?</source>
-        <translation type="vanished">30分超のビデオファイルのエクスポートを実行しようとしています 
+        <translation>30分超のビデオファイルのエクスポートを実行しようとしています 
 ＨＤＤ空き容量は1GB以上必要となり、接続速度によっても異なりますが数分間必要になります実行しますか？</translation>
     </message>
     <message>
         <source>Could not save a layout</source>
-        <translation type="vanished">レイアウトを保存できません</translation>
+        <translation>レイアウトを保存できません</translation>
     </message>
     <message>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
-        <translation type="vanished">現在のレイアウトにはイメージが含まれます　イメージはマルチビデオエクスポートには含まれません.</translation>
+        <translation>現在のレイアウトにはイメージが含まれます　イメージはマルチビデオエクスポートには含まれません.</translation>
     </message>
     <message>
         <source>Executable %1 Media File (x86) (*.exe)</source>
-        <translation type="vanished">Executable %1 Media File (x86) (*.exe)</translation>
+        <translation>Executable %1 Media File (x86) (*.exe)</translation>
     </message>
     <message>
         <source>Executable %1 Media File (x64) (*.exe)</source>
-        <translation type="vanished">Executable %1 Media File (x64) (*.exe)</translation>
+        <translation>Executable %1 Media File (x64) (*.exe)</translation>
     </message>
     <message>
         <source>Save local layout As...</source>
-        <translation type="vanished">名前を付けてローカルファイルを保存...</translation>
+        <translation>名前を付けてローカルファイルを保存...</translation>
     </message>
     <message>
         <source>Export Layout As...</source>
-        <translation type="vanished">名前を付けてレイアウトをエクスポート...</translation>
+        <translation>名前を付けてレイアウトをエクスポート...</translation>
     </message>
     <message>
         <source>Media File (*.nov)</source>
-        <translation type="vanished">Media File (*.nov)</translation>
+        <translation>Media File (*.nov)</translation>
     </message>
     <message>
         <source>Make file read-only</source>
-        <translation type="vanished">読取り専用</translation>
+        <translation>読取り専用</translation>
     </message>
     <message>
         <source>Save As</source>
-        <translation type="vanished">名前を付けて保存</translation>
+        <translation>名前を付けて保存</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation type="vanished">ファイル &apos;%1&apos;は既に存在します　上書きしますか?</translation>
+        <translation>ファイル &apos;%1&apos;は既に存在します　上書きしますか?</translation>
     </message>
     <message>
         <source>Could not overwrite file</source>
-        <translation type="vanished">ファイルを上書きできません</translation>
+        <translation>ファイルを上書きできません</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation type="vanished">ファイル &apos;%1&apos; は他のプロセスで使用しています。他の名前を使用してください.</translation>
+        <translation>ファイル &apos;%1&apos; は他のプロセスで使用しています。他の名前を使用してください.</translation>
     </message>
     <message>
         <source>Another export in progress. Please wait</source>
-        <translation type="vanished">他のエクスポートが実行中です　暫くお待ちください</translation>
+        <translation>他のエクスポートが実行中です　暫くお待ちください</translation>
     </message>
     <message>
         <source>Exporting Layout</source>
-        <translation type="vanished">レイアウトのエクスポート</translation>
+        <translation>レイアウトのエクスポート</translation>
     </message>
     <message>
         <source>Open New Window</source>
-        <translation type="vanished">新規画面を開く</translation>
+        <translation>新規画面を開く</translation>
     </message>
     <message>
         <source>Could not create output file %1</source>
-        <translation type="vanished">出力ファイルを作成できません %1</translation>
+        <translation>出力ファイルを作成できません %1</translation>
     </message>
     <message>
         <source>Export finished</source>
-        <translation type="vanished">エクスポート終了</translation>
+        <translation>エクスポート終了</translation>
     </message>
     <message>
         <source>Export successfully finished</source>
-        <translation type="vanished">エクスポートは正常に終了しました</translation>
+        <translation>エクスポートは正常に終了しました</translation>
     </message>
     <message>
         <source>Exporting %1 to &quot;%2&quot;...</source>
-        <translation type="vanished">エクスポート中 %1 / &quot;%2&quot;...</translation>
+        <translation>エクスポート中 %1 / &quot;%2&quot;...</translation>
     </message>
     <message>
         <source>Could not export layout</source>
-        <translation type="vanished">レイアウトをエクスポートできません</translation>
+        <translation>レイアウトをエクスポートできません</translation>
     </message>
     <message>
         <source>Could not export file</source>
-        <translation type="vanished">ファイルをエクスポートできません</translation>
+        <translation>ファイルをエクスポートできません</translation>
     </message>
     <message numerus="yes">
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
-        <translation type="vanished">
+        <translation>
             <numerusform>エクスポートには１つを選択しなければいけません　 %n アイテムが選択されています.</numerusform>
         </translation>
     </message>
@@ -7601,70 +7614,70 @@ Do you want to continue?</source>
         <source>You are about to export a video sequence that is longer than 30 minutes. 
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
 Do you want to continue?</source>
-        <translation type="vanished">30分超のビデオファイルのエクスポートを実行しようとしています 
+        <translation>30分超のビデオファイルのエクスポートを実行しようとしています 
 ＨＤＤ空き容量は1GB以上必要となり、接続速度によっても異なりますが数分間必要になります実行しますか？</translation>
     </message>
     <message>
         <source>AVI (*.avi)</source>
-        <translation type="vanished">AVI (*.avi)</translation>
+        <translation>AVI (*.avi)</translation>
     </message>
     <message>
         <source>Matroska (*.mkv)</source>
-        <translation type="vanished">Matroska (*.mkv)</translation>
+        <translation>Matroska (*.mkv)</translation>
     </message>
     <message>
         <source>Export Video As...</source>
-        <translation type="vanished">名前を付けてヴィデオをエクスポート...</translation>
+        <translation>名前を付けてビデオをエクスポート...</translation>
     </message>
     <message>
         <source>Include timestamps (requires transcoding)</source>
-        <translation type="vanished">タイムスタンプ含む (要 transcoding)</translation>
+        <translation>タイムスタンプ含む (要 transcoding)</translation>
     </message>
     <message>
         <source>Apply dewarping and image correction (requires transcoding)</source>
-        <translation type="vanished">Apply dewarping and image correction (requires transcoding)</translation>
+        <translation>Apply dewarping and image correction (requires transcoding)</translation>
     </message>
     <message>
         <source>Apply image correction (requires transcoding)</source>
-        <translation type="vanished">Apply image correction (requires transcoding)</translation>
+        <translation>Apply image correction (requires transcoding)</translation>
     </message>
     <message>
         <source>Apply dewarping (requires transcoding)</source>
-        <translation type="vanished">Apply dewarping (requires transcoding)</translation>
+        <translation>Apply dewarping (requires transcoding)</translation>
     </message>
     <message>
         <source>You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</source>
-        <translation type="vanished">You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</translation>
+        <translation>You are about to export video with filters that require transcoding. Transcoding can take a long time. Do you want to continue?</translation>
     </message>
     <message>
         <source>AVI format is not recommended</source>
-        <translation type="vanished">AVIフォーマットは推奨されません</translation>
+        <translation>AVIフォーマットは推奨されません</translation>
     </message>
     <message>
         <source>AVI format is not recommended for camera with audio track there is some recording holes exists.Press &apos;Yes&apos; to continue export or &apos;No&apos; to select other format</source>
-        <translation type="vanished">AVIフォーマットは音声を含む場合推奨されません　幾つかの欠落がありますが継続する場合は &apos;Yes&apos;、他のフォーマットを選択する場合は &apos;No&apos; をクリックしてください</translation>
+        <translation>AVIフォーマットは音声を含む場合推奨されません　幾つかの欠落がありますが継続する場合は &apos;Yes&apos;、他のフォーマットを選択する場合は &apos;No&apos; をクリックしてください</translation>
     </message>
     <message>
         <source>Exporting Video</source>
-        <translation type="vanished">ビデオエクスポート</translation>
+        <translation>ビデオエクスポート</translation>
     </message>
     <message>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation type="vanished">エクスポート中 &quot;%1&quot;...</translation>
+        <translation>エクスポート中 &quot;%1&quot;...</translation>
     </message>
     <message>
         <source>Could not export video</source>
-        <translation type="vanished">ビデオをエクスポートできません</translation>
+        <translation>ビデオをエクスポートできません</translation>
     </message>
     <message>
         <source>Could not get position from camera</source>
-        <translation type="vanished">カメラからポジションを取得できません</translation>
+        <translation>カメラからポジションを取得できません</translation>
     </message>
     <message>
         <source>An error has occurred while trying to get current position from camera %1.
 
 Please wait for the camera to go online.</source>
-        <translation type="vanished">An error has occurred while trying to get current position from camera %1.
+        <translation>An error has occurred while trying to get current position from camera %1.
 
 Please wait for the camera to go online.</translation>
     </message>
@@ -7672,67 +7685,67 @@ Please wait for the camera to go online.</translation>
         <source>An error has occurred while trying to get current position from camera %1.
 
 The camera is probably in continuous movement mode. Please stop the camera and try again.</source>
-        <translation type="vanished">An error has occurred while trying to get current position from camera %1.
+        <translation>An error has occurred while trying to get current position from camera %1.
 
 The camera is probably in continuous movement mode. Please stop the camera and try again.</translation>
     </message>
     <message>
         <source>Save Position</source>
-        <translation type="vanished">ポジション保存</translation>
+        <translation>ポジション保存</translation>
     </message>
     <message>
         <source>Could not set position from camera</source>
-        <translation type="vanished">カメラからポジションをセットできません</translation>
+        <translation>カメラからポジションを登録できません</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set current position for camera %1.
 
 Please wait for the camera to go online.</source>
-        <translation type="vanished">An error has occurred while trying to set current position for camera %1.
+        <translation>An error has occurred while trying to set current position for camera %1.
 
 Please wait for the camera to go online.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2363"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2353"/>
         <source>Updating background</source>
         <translation>背景更新</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2364"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2354"/>
         <source>Image processing can take a lot of time. Please be patient.</source>
         <translation>イメージプロセッッシングには時間を要します.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2398"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2388"/>
         <source>Image cannot be uploaded</source>
         <translation>イメージを更新できません</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation type="vanished">
+        <translation>
             <numerusform> %n レイアウトをエンタープライズコントローラーに保存できません.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="vanished">
+        <translation>
             <numerusform> %n レイアウトをリストアしますか？</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2455"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2445"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
         <translation>
             <numerusform> %n アイテムをエンタープライズコントローラーに保存できません.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2467"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2457"/>
         <source>Could not delete resource</source>
         <translation>リソースを削除できません</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2467"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2457"/>
         <source>An error has occurred while trying to delete a resource from Enterprise Controller. 
 
 Error description: &apos;%2&apos;</source>
@@ -7741,39 +7754,39 @@ Error description: &apos;%2&apos;</source>
 Error description: &apos;%2&apos;</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2478"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2468"/>
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation>
             <numerusform> %n リソースの変更を保存できません.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2623"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2613"/>
         <source>Client v%1&lt;br/&gt;</source>
         <translation>クライアント v%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2626"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2616"/>
         <source>Enterprise Controller v%1&lt;br/&gt;</source>
         <translation>エンタープライズコントローラー v%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2631"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2621"/>
         <source>Media Server v%1 at %2&lt;br/&gt;</source>
         <translation>メディアサーバー v%1 at %2&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2633"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2623"/>
         <source>Media Server v%1&lt;br/&gt;</source>
         <translation>メディアサーバー v%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2662"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2652"/>
         <source>Some components of the system are not upgraded:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please upgrade all components to the latest version %2.</source>
         <translation>いくつかのコンポーネントが更新されていません:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;全てのコンポーネントを最新バージョンに更新してください %2.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2670"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2660"/>
         <source>Version Mismatch</source>
         <translation>バージョン違い</translation>
     </message>
@@ -7793,7 +7806,7 @@ Error description: &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Cancelled</source>
-        <translation type="vanished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="640"/>
@@ -7807,17 +7820,17 @@ Error description: &apos;%2&apos;</translation>
     </message>
     <message>
         <source>recorded_video</source>
-        <translation type="vanished">ビデオ録画</translation>
+        <translation>ビデオ録画</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="623"/>
         <source>Canceled</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="646"/>
         <source>Recorded Video</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオ録画</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="653"/>
@@ -7832,10 +7845,10 @@ Error description: &apos;%2&apos;</translation>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="666"/>
         <source>Could not overwrite file &apos;%1&apos;. Please try another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル%1の上書きができません　他の名前を使用してください.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1393"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1394"/>
         <source>Press any key to stop the tour</source>
         <translation>何かのキーでツアー停止</translation>
     </message>
@@ -7844,50 +7857,50 @@ Error description: &apos;%2&apos;</translation>
     <name>QnWorkbenchEcsHandler</name>
     <message>
         <source>Error</source>
-        <translation type="vanished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation type="vanished">
+        <translation>
             <numerusform> %n レイアウトをエンタープライズコントローラーに保存できません.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="vanished">
+        <translation>
             <numerusform> %n レイアウトをリストアしますか？</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Enterprise Controller.</source>
-        <translation type="vanished">
+        <translation>
             <numerusform> %n アイテムをエンタープライズコントローラーに保存できません.</numerusform>
         </translation>
     </message>
     <message>
         <source>Error description: 
 %1</source>
-        <translation type="vanished">エラー: 
+        <translation>エラー: 
 %1</translation>
     </message>
     <message>
         <source>Could not delete resource from Enterprise Controller. 
 
 Error description: &apos;%2&apos;</source>
-        <translation type="vanished">Could not delete resource from Enterprise Controller. 
+        <translation>Could not delete resource from Enterprise Controller. 
 
 Error description: &apos;%2&apos;</translation>
     </message>
     <message numerus="yes">
         <source>Could not save changes made to the following %n resource(s).</source>
-        <translation type="vanished">
+        <translation>
             <numerusform>Could not save changes made to the following %n resource(s).</numerusform>
         </translation>
     </message>
     <message>
         <source>Error description:
 %1</source>
-        <translation type="vanished">エラー: 
+        <translation>エラー: 
 %1</translation>
     </message>
 </context>
@@ -7896,47 +7909,47 @@ Error description: &apos;%2&apos;</translation>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="83"/>
         <source>Executable %1 Media File (x64) (*.exe)</source>
-        <translation type="unfinished">Executable %1 Media File (x64) (*.exe)</translation>
+        <translation>実行可能 %1 メディアファイル (x64) (*.exe)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="85"/>
         <source>Executable %1 Media File (x86) (*.exe)</source>
-        <translation type="unfinished">Executable %1 Media File (x86) (*.exe)</translation>
+        <translation>実行可能 %1 メディアファイル (x86) (*.exe)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="94"/>
         <source>File is in use</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルは使用されています</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="95"/>
         <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル%1は既に使用されています　他の名前を使用してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="104"/>
         <source>Could not overwrite file</source>
-        <translation type="unfinished">ファイルを上書きできません</translation>
+        <translation>ファイルを上書きできません</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="105"/>
         <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル%1は他のプロセスで使用されています　他の名前を使用してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="142"/>
         <source>Exporting Layout</source>
-        <translation type="unfinished">レイアウトのエクスポート</translation>
+        <translation>レイアウトのエクスポート</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="183"/>
         <source>Could not export file</source>
-        <translation type="unfinished">ファイルをエクスポートできません</translation>
+        <translation>ファイルをエクスポートできません</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="184"/>
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>エクスポートには１つを選択しなければいけません　 %n アイテムが選択されています.</numerusform>
         </translation>
     </message>
@@ -7944,182 +7957,183 @@ Error description: &apos;%2&apos;</translation>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="201"/>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="597"/>
         <source>Warning</source>
-        <translation type="unfinished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="202"/>
         <source>You are about to export a video sequence that is longer than 30 minutes.
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
 Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>30分超のビデオファイルのエクスポートを実行しようとしています 
+ＨＤＤ空き容量は1GB以上必要となり、接続速度によっても異なりますが数分間必要になります実行しますか？</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="216"/>
         <source>AVI (*.avi)</source>
-        <translation type="unfinished">AVI (*.avi)</translation>
+        <translation>AVI (*.avi)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="217"/>
         <source>Matroska (*.mkv)</source>
-        <translation type="unfinished">Matroska (*.mkv)</translation>
+        <translation>Matroska (*.mkv)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="246"/>
         <source>Export Video As...</source>
-        <translation type="unfinished">名前を付けてヴィデオをエクスポート...</translation>
+        <translation>名前を付けてエクスポート...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="258"/>
         <source>No timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムスタンプなし</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="259"/>
         <source>Top left corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>左上（トランスコーディング必要）</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="260"/>
         <source>Top right corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>右上（トランスコーディング必要）</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="261"/>
         <source>Bottom left corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>左下（トランスコーディング必要）</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="262"/>
         <source>Bottom right corner (requires transcoding)</source>
-        <translation type="unfinished"></translation>
+        <translation>右下（トランスコーディング必要）</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="264"/>
         <source>Timestamps:</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムスタンプ:</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="271"/>
         <source>Apply dewarping and image correction (requires transcoding)</source>
-        <translation type="unfinished">Apply dewarping and image correction (requires transcoding)</translation>
+        <translation>イメージ展開（要 transcoding)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="273"/>
         <source>Apply image correction (requires transcoding)</source>
-        <translation type="unfinished">Apply image correction (requires transcoding)</translation>
+        <translation>イメージコレクション（要 transcoding)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="275"/>
         <source>Apply dewarping (requires transcoding)</source>
-        <translation type="unfinished">Apply dewarping (requires transcoding)</translation>
+        <translation>イメージ展開（要 transcoding）</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="300"/>
         <source>AVI format is not recommended</source>
-        <translation type="unfinished">AVIフォーマットは推奨されません</translation>
+        <translation>AVIフォーマットは推奨されません</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="301"/>
         <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>音声付きで連続録画でない場合AVIフォーマットは推奨されませんが宜しいですか?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="314"/>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="331"/>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="555"/>
         <source>Save As</source>
-        <translation type="unfinished">名前を付けて保存</translation>
+        <translation>名前を付けて保存</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="315"/>
         <source>You are about to export video with filters that require transcoding, which can take a long time. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>フィルター機能でのエクスポートにはトランスコーディングが必要で時間を要しますが宜しいですか?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="332"/>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="556"/>
         <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル%1は既に存在します　上書きしますか?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="368"/>
         <source>Exporting Video</source>
-        <translation type="unfinished">ビデオエクスポート</translation>
+        <translation>ビデオエクスポート</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="369"/>
         <source>Exporting to &quot;%1&quot;...</source>
-        <translation type="unfinished">エクスポート中 &quot;%1&quot;...</translation>
+        <translation>エクスポート中 &quot;%1&quot;...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="423"/>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="623"/>
         <source>Export finished</source>
-        <translation type="unfinished">エクスポート終了</translation>
+        <translation>エクスポート終了</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="423"/>
         <source>Export successfully finished</source>
-        <translation type="unfinished">エクスポートは正常に終了しました</translation>
+        <translation>エクスポートは正常に終了しました</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="426"/>
         <source>Could not export layout</source>
-        <translation type="unfinished">レイアウトをエクスポートできません</translation>
+        <translation>レイアウトをエクスポートできません</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="459"/>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="468"/>
         <source>Could not save a layout</source>
-        <translation type="unfinished">レイアウトを保存できません</translation>
+        <translation>レイアウトを保存できません</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="460"/>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
-        <translation type="unfinished">現在のレイアウトにはイメージが含まれます　イメージはマルチビデオエクスポートには含まれません.</translation>
+        <translation>現在のレイアウトにはイメージが含まれます　イメージはマルチビデオエクスポートには含まれません.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="469"/>
         <source>Current layout contains several cameras and local files. You have to keep only cameras or only local files.</source>
-        <translation type="unfinished"></translation>
+        <translation>既存のレイアウトに幾つかのカメラとローカルファイルが含まれます　カメラのみまたはローカルファイルのみにしてください.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="502"/>
         <source>Save local layout As...</source>
-        <translation type="unfinished">名前を付けてローカルファイルを保存...</translation>
+        <translation>名前を付けてローカルファイルを保存...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="504"/>
         <source>Export Layout As...</source>
-        <translation type="unfinished">名前を付けてレイアウトをエクスポート...</translation>
+        <translation>名前を付けてレイアウトをエクスポート...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="521"/>
         <source>%1 Media File (*.nov)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 メディアファイル(*.nov)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="538"/>
         <source>Make file read-only</source>
-        <translation type="unfinished">読取り専用</translation>
+        <translation>読取り専用</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="598"/>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes. 
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
 Do you want to continue?</source>
-        <translation type="unfinished">30分超のビデオファイルのエクスポートを実行しようとしています 
+        <translation>30分超のビデオファイルのエクスポートを実行しようとしています 
 ＨＤＤ空き容量は1GB以上必要となり、接続速度によっても異なりますが数分間必要になります実行しますか？</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="615"/>
         <source>Could not export video</source>
-        <translation type="unfinished">ビデオをエクスポートできません</translation>
+        <translation>ビデオをエクスポートできません</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="623"/>
         <source>Export successfully finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>エクスポートは正常に終了しました.</translation>
     </message>
 </context>
 <context>
@@ -8131,7 +8145,7 @@ Do you want to continue?</source>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="245"/>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="442"/>
         <source>Layout already exists</source>
-        <translation type="unfinished">レウアイトは既に存在します</translation>
+        <translation>レウアイトは既に存在します</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="57"/>
@@ -8139,88 +8153,89 @@ Do you want to continue?</source>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="165"/>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="443"/>
         <source>Layout with the same name already exists and you do not have the rights to overwrite it.</source>
-        <translation type="unfinished"></translation>
+        <translation>同じ名前のレイアウトは既に存在します
+また上書きする権限がありません.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="114"/>
         <source>Save Layout As</source>
-        <translation type="unfinished">名前を付けてレイアウトを保存</translation>
+        <translation>名前を付けてレイアウトを保存</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="115"/>
         <source>Enter layout name:</source>
-        <translation type="unfinished">レイアウト名を入力:</translation>
+        <translation>レイアウト名を入力:</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="246"/>
         <source>Layout with the same name already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation>同じ名前のレイアウトが既に存在します　上書きしますか？</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="311"/>
         <source>Close Layouts</source>
-        <translation type="unfinished">レイアウトを閉じる</translation>
+        <translation>レイアウトを閉じる</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="312"/>
         <source>The following %n layout(s) are not saved. Do you want to save them?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>レイアウト %n は保存されていません。保存しますか?</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="340"/>
         <source>Saving Layouts</source>
-        <translation type="unfinished">レイアウト保存</translation>
+        <translation>レイアウト保存</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="341"/>
         <source>The following %n layout(s) are being saved.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>レイアウト %n は保存されました.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="342"/>
         <source>Please wait.</source>
-        <translation type="unfinished">お待ちください.</translation>
+        <translation>お待ちください.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="426"/>
         <source>New Layout</source>
-        <translation type="unfinished">新規レイアウト</translation>
+        <translation>新規レイアウト</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="427"/>
         <source>Enter the name of the layout to create:</source>
-        <translation type="unfinished">登録するレイアウトの名前入力:</translation>
+        <translation>登録するレイアウトの名前入力:</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="428"/>
         <source>New layout</source>
-        <translation type="unfinished">新規レイアウト</translation>
+        <translation>新規レイアウト</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="428"/>
         <source>New layout %1</source>
-        <translation type="unfinished"></translation>
+        <translation>新規レイアウト%1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="540"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="541"/>
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform> %n レイアウトをエンタープライズコントローラーに保存できません.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="542"/>
         <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform> %n レイアウトをリストアしますか？</numerusform>
         </translation>
     </message>
@@ -8236,73 +8251,74 @@ Do you want to continue?</source>
         <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1244"/>
         <source>&apos;Live&apos;</source>
         <extracomment>Time slider&apos;s tooltip for position on live. Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for. That&apos;s where these single quotes come from.</extracomment>
-        <translation type="unfinished">ライブ</translation>
+        <translation>ライブ</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1248"/>
         <source>yyyy MMM dd
 hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>yyyy MMM dd
+hh:mm:ss</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1252"/>
         <source>hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip for local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>hh:mm:ss</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1255"/>
         <source>mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip for short local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>mm:ss</translation>
     </message>
     <message>
         <source>&apos;Live&apos;</source>
         <comment>LIVE_TOOL_TIP_FORMAT</comment>
-        <translation type="vanished">ライブ</translation>
+        <translation>ライブ</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchPtzHandler</name>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="106"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="104"/>
         <source>Could not get position from camera</source>
-        <translation type="unfinished">カメラからポジションを取得できません</translation>
+        <translation>カメラからポジションを取得できません</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="107"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="105"/>
         <source>An error has occurred while trying to get current position from camera %1.
 
 Please wait for the camera to go online.</source>
-        <translation type="unfinished">An error has occurred while trying to get current position from camera %1.
+        <translation>カメラ %1.のポジション取得中にエラーが発生しました
 
-Please wait for the camera to go online.</translation>
+カメラがオンラインになるまでお待ちください.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="147"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="145"/>
         <source>Could not set position for camera</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラからポジションを登録できません</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="148"/>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="181"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="146"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="179"/>
         <source>An error has occurred while trying to set current position for camera %1.
 
 Please wait for the camera to go online.</source>
-        <translation type="unfinished">An error has occurred while trying to set current position for camera %1.
+        <translation>カメラ %1.のポジション登録中にエラーが発生しました
 
-Please wait for the camera to go online.</translation>
+カメラがオンラインになるまでお待ちください.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="180"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="178"/>
         <source>Could not set position to camera</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラからポジションを登録できません</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="260"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="235"/>
         <source>PTZ_CALIBRATION_%1.jpg</source>
-        <translation type="unfinished">PTZ調整_%1.jpg</translation>
+        <translation>PTZキャリブレーション_%1.jpg</translation>
     </message>
 </context>
 <context>
@@ -8314,7 +8330,7 @@ Please wait for the camera to go online.</translation>
     </message>
     <message>
         <source>JPEG Image(*.jpg)</source>
-        <translation type="vanished">PNG Image (*.png)</translation>
+        <translation>PNG Image (*.png)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="246"/>
@@ -8323,7 +8339,7 @@ Please wait for the camera to go online.</translation>
     </message>
     <message>
         <source>Include Timestamp</source>
-        <translation type="vanished">タイムスタンプを含む</translation>
+        <translation>タイムスタンプを含む</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="280"/>
@@ -8332,7 +8348,7 @@ Please wait for the camera to go online.</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
-        <translation type="vanished">ファイル &apos;%1&apos; は既に存在します。上書きしますか?</translation>
+        <translation>ファイル &apos;%1&apos; は既に存在します。上書きしますか?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="292"/>
@@ -8341,52 +8357,52 @@ Please wait for the camera to go online.</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation type="vanished">ファイル &apos;%1&apos; は他のプロセスで使用しています。他の名前を使用してください.</translation>
+        <translation>ファイル &apos;%1&apos; は他のプロセスで使用しています。他の名前を使用してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="235"/>
         <source>JPEG Image (*.jpg)</source>
-        <translation type="unfinished"></translation>
+        <translation>JPEG Image (*.jpg)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="255"/>
         <source>No timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムスタンプなし</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="256"/>
         <source>Top left corner</source>
-        <translation type="unfinished"></translation>
+        <translation>左上</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="257"/>
         <source>Top right corner</source>
-        <translation type="unfinished"></translation>
+        <translation>右上</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="258"/>
         <source>Bottom left corner</source>
-        <translation type="unfinished"></translation>
+        <translation>左下</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="259"/>
         <source>Bottom right corner</source>
-        <translation type="unfinished"></translation>
+        <translation>右下</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="262"/>
         <source>Timestamp:</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムスタンプ:</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="281"/>
         <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル%1は既に存在します　上書きしますか?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="293"/>
         <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル%1は他のプロセスで使用されています　他の名前を使用してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="350"/>
@@ -8404,34 +8420,34 @@ Please wait for the camera to go online.</translation>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="32"/>
         <source>Quality:</source>
-        <translation type="unfinished">画質:</translation>
+        <translation>画質:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="52"/>
         <source>FPS</source>
-        <translation type="unfinished">FPS</translation>
+        <translation>FPS</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="72"/>
         <source>Pre-recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>プリレコーディング:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="79"/>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="96"/>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="106"/>
         <source>s</source>
-        <translation type="unfinished">s</translation>
+        <translation>s</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="89"/>
         <source>Post-recording:</source>
-        <translation type="unfinished">ポストレコーディング:</translation>
+        <translation>ポストレコーディング:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="119"/>
         <source>max</source>
-        <translation type="unfinished">最大</translation>
+        <translation>最大</translation>
     </message>
 </context>
 <context>
@@ -8548,7 +8564,7 @@ Please wait for the camera to go online.</translation>
     </message>
     <message>
         <source>Icon</source>
-        <translation type="vanished">アイコン</translation>
+        <translation>アイコン</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="281"/>
@@ -8601,7 +8617,7 @@ Please wait for the camera to go online.</translation>
     <name>ResourceListDialog</name>
     <message>
         <source>Dialog</source>
-        <translation type="vanished">ダイアログ</translation>
+        <translation>ダイアログ</translation>
     </message>
 </context>
 <context>
@@ -8609,22 +8625,22 @@ Please wait for the camera to go online.</translation>
     <message>
         <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui" line="34"/>
         <source>Speak the following:</source>
-        <translation type="unfinished"></translation>
+        <translation>読むテキスト:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui" line="41"/>
         <source>Type any text here</source>
-        <translation type="unfinished">何かテキストを入力してください</translation>
+        <translation>何かテキストを入力してください</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui" line="52"/>
         <source>Volume:</source>
-        <translation type="unfinished">ボリューム:</translation>
+        <translation>ボリューム:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui" line="69"/>
         <source>Test...</source>
-        <translation type="unfinished">テスト...</translation>
+        <translation>テスト...</translation>
     </message>
 </context>
 <context>
@@ -8632,12 +8648,12 @@ Please wait for the camera to go online.</translation>
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui" line="32"/>
         <source>&amp;Additional Recipients:</source>
-        <translation type="unfinished">追加の受信者(&amp;A)：</translation>
+        <translation>追加の受信者(&amp;A)：</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui" line="45"/>
         <source>&amp;Global Email Settings...</source>
-        <translation type="unfinished">グローバルメール設定(&amp;G)...</translation>
+        <translation>グローバルE-Mail設定(&amp;G)...</translation>
     </message>
 </context>
 <context>
@@ -8669,7 +8685,7 @@ Please wait for the camera to go online.</translation>
     </message>
     <message>
         <source>Panic mode:</source>
-        <translation type="vanished">パニックモード:</translation>
+        <translation>パニックモード:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="60"/>
@@ -8704,22 +8720,22 @@ Please wait for the camera to go online.</translation>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="154"/>
         <source>Rebuild archive index</source>
-        <translation type="unfinished"></translation>
+        <translation>アーカイブインデックスのリビルド</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="195"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>開始</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="222"/>
         <source>Rebuild progress</source>
-        <translation type="unfinished"></translation>
+        <translation>リビルドプロセス</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="239"/>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -8732,7 +8748,7 @@ Please wait for the camera to go online.</translation>
     <message>
         <location filename="../src/ui/widgets/settings/server_settings_widget.ui" line="39"/>
         <source>Camera Management</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ管理</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/server_settings_widget.ui" line="58"/>
@@ -8787,20 +8803,20 @@ Please wait for the camera to go online.</translation>
     </message>
     <message>
         <source>Licensing</source>
-        <translation type="vanished">ライセンス</translation>
+        <translation>ライセンス</translation>
     </message>
     <message>
         <source>Use an analog license to view this camera</source>
-        <translation type="vanished">カメラ表示にアナログライセンスを使用する</translation>
+        <translation>カメラ表示にアナログライセンスを使用する</translation>
     </message>
     <message>
         <source>Get More Licenses...</source>
-        <translation type="vanished">ライセンスを追加する...</translation>
+        <translation>ライセンスを追加する...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="73"/>
         <source>Vendor:</source>
-        <translation type="unfinished"></translation>
+        <translation>ベンダー:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="96"/>
@@ -8885,11 +8901,11 @@ Please wait for the camera to go online.</translation>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="343"/>
         <source>Software (Max FPS may be slightly decreased on media server)</source>
-        <translation type="unfinished"></translation>
+        <translation>ソフトウェア(メディアサーバーでは少しフレーム数が減少する可能性があります)</translation>
     </message>
     <message>
         <source>Software (Max fps may be slightly decreased on media server)</source>
-        <translation type="vanished">ソフトウェア(メディアサーバーでは少しフレーム数が減少する可能性があります)</translation>
+        <translation>ソフトウェア(メディアサーバーでは少しフレーム数が減少する可能性があります)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="355"/>
@@ -8942,111 +8958,111 @@ Please wait for the camera to go online.</translation>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="41"/>
         <source>Advanced settings...</source>
-        <translation type="unfinished">拡張設定...</translation>
+        <translation>拡張設定...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="61"/>
         <source>Test</source>
-        <translation type="unfinished">テスト</translation>
+        <translation>テスト</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="99"/>
         <source>&amp;E-Mail:</source>
-        <translation type="unfinished">E-Mail(&amp;E):</translation>
+        <translation>E-Mail(&amp;E):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="112"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="215"/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">パスワード(&amp;P):</translation>
+        <translation>パスワード(&amp;P):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="129"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="311"/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished">システム署名(&amp;S):</translation>
+        <translation>システム署名(&amp;S):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="146"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="321"/>
         <source>Enter short system description here...</source>
-        <translation type="unfinished">システムの説明を入力してください...</translation>
+        <translation>システムの説明を入力してください...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="189"/>
         <source>SMTP &amp;Server:</source>
-        <translation type="unfinished">SMTPサーバー(&amp;S):</translation>
+        <translation>SMTPサーバー(&amp;S):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="202"/>
         <source>&amp;User:</source>
-        <translation type="unfinished">ユーザー(&amp;U):</translation>
+        <translation>ユーザー(&amp;U):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="236"/>
         <source>P&amp;ort:</source>
-        <translation type="unfinished">ポート(&amp;O):</translation>
+        <translation>ポート(&amp;O):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="260"/>
         <source>Unsecure connection</source>
-        <translation type="unfinished">安全でない接続</translation>
+        <translation>安全でない接続</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="267"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="297"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;(recommended)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="280"/>
         <source>Secure connection using TLS</source>
-        <translation type="unfinished">TLSでの安全な接続</translation>
+        <translation>TLSでの安全な接続</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="290"/>
         <source>Secure connection using SSL</source>
-        <translation type="unfinished">SSLでの安全な接続</translation>
+        <translation>SSLでの安全な接続</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="351"/>
         <source>Server:</source>
-        <translation type="unfinished">サーバー:</translation>
+        <translation>サーバー:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="365"/>
         <source>Port:</source>
-        <translation type="unfinished">ポート:</translation>
+        <translation>ポート:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="379"/>
         <source>User:</source>
-        <translation type="unfinished">ﾕｰｻﾞｰ:</translation>
+        <translation>ﾕｰｻﾞｰ:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="393"/>
         <source>Security:</source>
-        <translation type="unfinished">セキュリティ:</translation>
+        <translation>セキュリティ:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="407"/>
         <source>Progress:</source>
-        <translation type="unfinished">進捗:</translation>
+        <translation>進捗:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="427"/>
         <source>Result:</source>
-        <translation type="unfinished">結果:</translation>
+        <translation>結果:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="445"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="458"/>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -9138,54 +9154,54 @@ Please wait for the camera to go online.</translation>
     <message>
         <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui" line="20"/>
         <source>Schedule Grid</source>
-        <translation type="unfinished">スケジュールグリッド</translation>
+        <translation>スケジュールグリッド</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui" line="54"/>
         <source>Note: Schedule is based on Server Time</source>
-        <translation type="unfinished">注: スケジュールはサーバー時間を使用</translation>
+        <translation>注: スケジュールはサーバー時間を使用</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui" line="82"/>
         <source>Schedule Settings</source>
-        <translation type="unfinished">スケジュール設定</translation>
+        <translation>スケジュール設定</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui" line="139"/>
         <source>On</source>
-        <translation type="unfinished">On</translation>
+        <translation>On</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui" line="193"/>
         <source>Off</source>
-        <translation type="unfinished">Off</translation>
+        <translation>Off</translation>
     </message>
 </context>
 <context>
     <name>WeekTimeScheduleWidget</name>
     <message>
         <source>Weekly Schedule Editor</source>
-        <translation type="vanished">スケジュール8編集</translation>
+        <translation>スケジュール8編集</translation>
     </message>
     <message>
         <source>Schedule Grid</source>
-        <translation type="vanished">スケジュールグリッド</translation>
+        <translation>スケジュールグリッド</translation>
     </message>
     <message>
         <source>Note: Schedule is based on Server Time</source>
-        <translation type="vanished">注: スケジュールはサーバー時間を使用</translation>
+        <translation>注: スケジュールはサーバー時間を使用</translation>
     </message>
     <message>
         <source>Schedule Settings</source>
-        <translation type="vanished">スケジュール設定</translation>
+        <translation>スケジュール設定</translation>
     </message>
     <message>
         <source>On</source>
-        <translation type="vanished">On</translation>
+        <translation>On</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="vanished">Off</translation>
+        <translation>Off</translation>
     </message>
 </context>
 </TS>
