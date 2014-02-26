@@ -173,6 +173,9 @@ namespace QnBinary {
     template <class T, class T2>
     void serialize(const QList<T2>& field, OutputBinaryStream<T>* binStream);
 
+    template <class T, class T2, class T3>
+    void serialize(const QMap<T2, T3>& field, OutputBinaryStream<T>* binStream);
+
     // -------------------- deserialize ---------------------
 
     template <class T>
@@ -327,6 +330,16 @@ namespace QnBinary {
             QnBinary::serialize(val, binStream);
     }
 
+    template <class T, class T2, class T3>
+    void serialize(const QMap<T2, T3>& field, OutputBinaryStream<T>* binStream) 
+    {
+        QnBinary::serialize((qint32) field.size(), binStream);
+        for(QMap<T2, T3>::const_iterator itr = field.begin(); itr != field.end(); ++itr) {
+            QnBinary::serialize(itr.first, binStream);
+            QnBinary::serialize(itr.second, binStream);
+        }
+    }
+
     template <class T, class T2>
     bool deserialize(QList<T2>& field, InputBinaryStream<T>* binStream) 
     {
@@ -341,6 +354,24 @@ namespace QnBinary {
         }
         return true;
     }
+
+    template <class T, class T2, class T3>
+    bool deserialize(QMap<T2, T3>& field, InputBinaryStream<T>* binStream) 
+    {
+        qint32 size = 0;
+        if( !deserialize(size, binStream) )
+            return false;
+        for( qint32 i = 0; i < size; ++i )
+        {
+            T2 t2;
+            T3 t3;
+            if( !QnBinary::deserialize(t2, binStream) || !QnBinary::deserialize(t3, binStream))
+                return false;
+            field.insert(t2, t3);
+        }
+        return true;
+    }
+
 }
 
 #ifndef Q_MOC_RUN

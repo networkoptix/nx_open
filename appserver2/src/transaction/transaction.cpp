@@ -98,6 +98,11 @@ namespace ec2
                 case getCurrentTime:
                     return "getCurrentTime";
 
+                case tranSyncRequest:
+                    return "tranSyncRequest";
+                case tranSyncResponse:
+                    return "tranSyncResponse";
+
                 default:
                     return "unknown";
             }

@@ -91,7 +91,10 @@ namespace ec2
             //!QString
             removeStoredFile,
 
-            getCurrentTime
+            getCurrentTime,
+
+            tranSyncRequest,
+            tranSyncResponse
         };
 
         QString toString( Value val );

@@ -23,8 +23,8 @@ namespace ec2
             NotDefined,
             Connect,
             Connecting,
+            WaitForTranSync, // ignore incoming data until we got initial sync transaction
             ReadyForStreaming,
-            ReadChunks,
             Closed
         };
 
@@ -102,7 +102,7 @@ namespace ec2
             buffer.append("\r\n"); // chunk end
             quint32 payloadSize = buffer.size() - 12;
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
-            sendTransactionInternal(tran, buffer);
+            sendTransactionInternal(tran.id.peerGUID, tran.originGuid, buffer);
         }
 
         template <class T>
@@ -110,7 +110,7 @@ namespace ec2
         {
             QByteArray buffer;
             serializeTransaction(buffer, tran);
-            sendTransactionInternal(tran, buffer);
+            sendTransactionInternal(tran.id.peerGUID, tran.originGuid, buffer);
         }
 
     private:
@@ -127,21 +127,12 @@ namespace ec2
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
         }
 
-        template <class T>
-        void sendTransactionInternal(const QnTransaction<T>& tran, const QByteArray& buffer)
-        {
-            QMutexLocker lock(&m_mutex);
-            foreach(QnTransactionTransport* transport, m_connections) 
-            {
-                if (transport->remoteGuid != tran.id.peerGUID && transport->remoteGuid != tran.originGuid)
-                    transport->addData(buffer); // do not send transaction to originator
-            }
-        }
+        void sendTransactionInternal(const QnId& ignoreGuid1, const QnId& ignnoreGuid2, const QByteArray& buffer);
 
         class AbstractHandler
         {
         public:
-            virtual bool processByteArray(const QByteArray& data) = 0;
+            virtual bool processByteArray(QnTransactionTransport* sender, const QByteArray& data) = 0;
             virtual ~AbstractHandler() {}
         };
 
@@ -151,26 +142,42 @@ namespace ec2
         public:
             CustomHandler(T* handler): m_handler(handler) {}
 
-            virtual bool processByteArray(const QByteArray& data) override;
+            virtual bool processByteArray(QnTransactionTransport* sender, const QByteArray& data) override;
         private:
             template <class T2> bool deliveryTransaction(ApiCommand::Value command, InputBinaryStream<QByteArray>& stream);
         private:
             T* m_handler;
         };
 
-        inline void gotTransaction(const QnTransactionTransport* sender, QByteArray data) { emit sendGotTransaction(sender, data); }
+        inline void gotTransaction(QnTransactionTransport* sender, QByteArray data) { emit sendGotTransaction(sender, data); }
     signals:
-        void sendGotTransaction(const QnTransactionTransport* sender, QByteArray data);
+        void sendGotTransaction(QnTransactionTransport* sender, QByteArray data);
     private slots:
         void at_timer();
-        void at_gotTransaction(const QnTransactionTransport* sender, QByteArray data);
+        void at_gotTransaction(QnTransactionTransport* sender, QByteArray data);
+    private:
+        void processConnState(QSharedPointer<QnTransactionTransport> &transport);
+        void sendSyncRequestIfRequired(QnTransactionTransport* transport);
+        static bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
+        void moveOutgoingConnToMainList(QnTransactionTransport* transport);
     private:
         AbstractHandler* m_handler;
         QTimer* m_timer;
         QMutex m_mutex;
         QThread *m_thread;
 
-        QVector<QnTransactionTransport*> m_connections;
+        //QVector<QnTransactionTransport*> m_connections;
+
+        struct QnConnectionsPair {
+            QnConnectionsPair() {}
+
+            QSharedPointer<QnTransactionTransport> incomeConn;
+            QSharedPointer<QnTransactionTransport> outcomeConn;
+        };
+
+        typedef QMap<QUuid, QnConnectionsPair> QnConnectionMap;
+        QnConnectionMap m_connections;
+        QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
     };
 }
 

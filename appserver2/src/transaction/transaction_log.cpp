@@ -85,40 +85,4 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     return ErrorCode::ok;
 }
 
-QnTransactionLog::QnTranState QnTransactionLog::deserializeState(const QByteArray& buffer)
-{
-    QnTranState result;
-    InputBinaryStream<QByteArray> binStream(buffer);
-    
-    qint32 size;
-    if (!QnBinary::deserialize(size, &binStream))
-        return result;
-
-    for (int i = 0; i < size; ++i) 
-    {
-        QnId uuid;
-        qint32 sequence;
-        if (!QnBinary::deserialize(uuid,     &binStream))
-            break;
-        if (!QnBinary::deserialize(sequence, &binStream))
-            break;
-        result.insert(uuid, sequence);
-    }
-
-    return result;
-}
-
-QByteArray QnTransactionLog::serializeState(const QnTranState& state)
-{
-    QByteArray buffer;
-    OutputBinaryStream<QByteArray> binStream(&buffer);
-    QnBinary::serialize(state.size(), &binStream);
-    for(QnTranState::const_iterator itr = state.begin(); itr != state.end(); ++itr)
-    {
-        QnBinary::serialize(itr.key(),    &binStream);
-        QnBinary::serialize(itr.value(),  &binStream);
-    }
-    return buffer;
-}
-
 }

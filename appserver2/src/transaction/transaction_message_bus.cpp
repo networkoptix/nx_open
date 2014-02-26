@@ -78,7 +78,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
     {
         while (1)
         {
-            if (state == ReadChunks) {
+            if (state == ReadyForStreaming) {
                 int toRead = chunkHeaderLen == 0 ? 20 : (chunkHeaderLen + chunkLen + 2 - readBufferLen);
                 ensureSize(readBuffer, toRead + readBufferLen);
                 quint8* rBuffer = &readBuffer[0];
@@ -155,13 +155,6 @@ void QnTransactionTransport::doClientConnect()
         q.removeQueryItem("isClient");
         q.addQueryItem("isClient", QString());
     }
-    else {
-        QnTransactionLog::QnTranState state;
-        transactionLog->getTransactionsState(state);
-        
-        httpClient->addRequestHeader("tran_state", transactionLog->serializeState(state).toBase64());
-        //httpClient->m_request()
-    }
     remoteAddr.setQuery(q);
 
     httpClient->doGet(remoteAddr);
@@ -169,7 +162,7 @@ void QnTransactionTransport::doClientConnect()
 
 void QnTransactionTransport::processTransactionData( const QByteArray& data)
 {
-    state = ReadChunks;
+    state = ReadyForStreaming;
     chunkHeaderLen = 0;
 
     const quint8* buffer = (const quint8*) data.data();
@@ -203,8 +196,7 @@ void QnTransactionTransport::startStreaming()
     socket->setSendTimeout(SOCKET_TIMEOUT);
     socket->setNonBlockingMode(true);
     chunkHeaderLen = 0;
-    state = QnTransactionTransport::ReadChunks;
-    int handle = socket->handle();
+    state = ReadyForStreaming;
     aio::AIOService::instance()->watchSocket( socket, PollSet::etRead, this );
 }
 
@@ -215,20 +207,53 @@ void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr clien
         processError();
     else {
         nx_http::HttpHeaders::const_iterator itr = client->response()->headers.find("guid");
-        if (itr != client->response()->headers.end())
+        if (itr != client->response()->headers.end()) {
             remoteGuid = itr->second;
+            owner->moveOutgoingConnToMainList(this);
+        }
+        else {
+            processError();
+        }
     }
 }
 
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
 {
-    processTransactionData(httpClient->fetchMessageBodyBuffer());
+    QByteArray data = httpClient->fetchMessageBodyBuffer();
+    if (!data.isEmpty())
+        processTransactionData(data);
     socket = httpClient->takeSocket();
     httpClient.reset();
-    startStreaming();
+
+    owner->sendSyncRequestIfRequired(this);
 }
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
+
+void QnTransactionMessageBus::sendSyncRequestIfRequired(QnTransactionTransport* transport)
+{
+    QMutexLocker lock(&m_mutex);
+    transport->startStreaming();
+
+    QnConnectionMap::iterator itr = m_connections.find(transport->remoteGuid);
+    if (itr != m_connections.end())
+    {
+        QnConnectionsPair& data = itr.value();
+        QSharedPointer<QnTransactionTransport> subling = transport->isConnectionOriginator ? data.incomeConn : data.outcomeConn;
+        if (subling && (subling->state == QnTransactionTransport::ReadyForStreaming || subling->state == QnTransactionTransport::WaitForTranSync))
+            return;
+
+        // send sync request
+        QnTransaction<QnTranState> requestTran;
+        requestTran.initNew(ApiCommand::tranSyncRequest, false);
+        transactionLog->getTransactionsState(requestTran.params);
+        QByteArray syncRequest;
+        OutputBinaryStream<QByteArray> stream(&syncRequest);
+        QnBinary::serialize(requestTran, &stream);
+        transport->addData(syncRequest);
+        transport->state = QnTransactionTransport::WaitForTranSync;
+    }
+}
 
 static QnTransactionMessageBus*m_globalInstance = 0;
 
@@ -266,19 +291,47 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     delete m_timer;
 }
 
-void QnTransactionMessageBus::at_gotTransaction(const QnTransactionTransport* sender, QByteArray data)
+void QnTransactionMessageBus::at_gotTransaction(QnTransactionTransport* sender, QByteArray data)
 {
     QMutexLocker lock(&m_mutex);
 
     // proxy incoming transaction to other peers. Source media server sends transaction to all other server. We should proxy transaction to connected clients only.
-    foreach(QnTransactionTransport* transport, m_connections) {
-        if (transport != sender && transport->isClientPeer)
-            transport->addData(data);
+    for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
+    {
+        if (itr.key() == sender->remoteGuid)
+            continue;
+        QnConnectionsPair& connection = itr.value();
+        if (connection.incomeConn && connection.incomeConn->state == QnTransactionTransport::ReadyForStreaming && connection.incomeConn->isClientPeer)
+            connection.incomeConn->addData(data);
     }
 
     if (m_handler)
-        m_handler->processByteArray(data);
+        m_handler->processByteArray(sender, data);
 }
+
+void QnTransactionMessageBus::sendTransactionInternal(const QnId& ignoreGuid1, const QnId& ignnoreGuid2, const QByteArray& buffer)
+{
+    QMutexLocker lock(&m_mutex);
+    for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
+    {
+        if (itr.key() == ignoreGuid1 || itr.key() == ignnoreGuid2)
+            continue;
+        QnConnectionsPair& data = itr.value();
+        if (data.incomeConn) {
+            if (data.incomeConn->state == QnTransactionTransport::ReadyForStreaming) {
+                data.incomeConn->addData(buffer);
+                continue;
+            }
+            else if (data.incomeConn->state == QnTransactionTransport::WaitForTranSync)
+                continue;
+        }
+        if (data.outcomeConn) {
+            if (data.outcomeConn->state == QnTransactionTransport::ReadyForStreaming)
+                data.outcomeConn->addData(buffer);
+        }
+    }
+}
+
 
 // ------------------ QnTransactionMessageBus::CustomHandler -------------------
 
@@ -297,8 +350,32 @@ bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(ApiCommand::
     return true;
 }
 
+bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream)
+{
+    sender->state = QnTransactionTransport::ReadyForStreaming;
+
+    QnTransaction<QnTranState> tran;
+    if (tran.deserialize(ApiCommand::tranSyncRequest, &stream))
+    {
+        QList<QByteArray> transactions;
+        const ErrorCode errorCode = transactionLog->getTransactionsAfter(tran.params, transactions);
+        if (errorCode == ErrorCode::ok) 
+        {
+            QnTransaction<QnTranState> response;
+                
+            foreach(const QByteArray& data, transactions)
+                sender->addData(data);
+            return true;
+        }
+        else {
+            qWarning() << "Can't execute query for sync with server peer!";
+        }
+    }
+    return false;
+}
+
 template <class T>
-bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(const QByteArray& data)
+bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTransport* sender, const QByteArray& data)
 {
     Q_ASSERT(data.size() > 4);
     InputBinaryStream<QByteArray> stream(data);
@@ -307,6 +384,9 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(const QByteArra
         return false; // bad data
     switch (command)
     {
+        case ApiCommand::tranSyncRequest:
+            return QnTransactionMessageBus::onGotTransactionSyncRequest(sender, stream);
+
         case ApiCommand::getAllDataList:
             return deliveryTransaction<ApiFullData>(command, stream);
 
@@ -377,31 +457,59 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(const QByteArra
     return true;
 }
 
+void QnTransactionMessageBus::processConnState(QSharedPointer<QnTransactionTransport> &transport)
+{
+    switch (transport->state) 
+    {
+    case QnTransactionTransport::Connect:
+        {
+            qint64 ct = QDateTime::currentDateTime().toMSecsSinceEpoch();
+            if (ct - transport->lastConnectTime >= RECONNECT_TIMEOUT) {
+                transport->lastConnectTime = ct;
+                transport->state = QnTransactionTransport::Connecting;
+                transport->doClientConnect();
+            }
+            break;
+        }
+    case QnTransactionTransport::Closed:
+        transport.clear();
+        break;
+    }
+}
+
+void QnTransactionMessageBus::moveOutgoingConnToMainList(QnTransactionTransport* transport)
+{
+    for (int i = 0; i < m_connectingConnections.size(); ++i)
+    {
+        if (m_connectingConnections[i].data() == transport) {
+            m_connections[transport->remoteGuid].outcomeConn = m_connectingConnections[i];
+            m_connectingConnections.removeAt(i);
+            break;
+        }
+    }
+}
+
 void QnTransactionMessageBus::at_timer()
 {
-    for (int i = m_connections.size()-1; i >= 0; --i)
+    QMutexLocker lock(&m_mutex);
+    for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end();)
     {
-        QnTransactionTransport* transport = m_connections[i];
-        switch (transport->state) 
-        {
-            case QnTransactionTransport::Connect:
-            {
-                qint64 ct = QDateTime::currentDateTime().toMSecsSinceEpoch();
-                if (ct - transport->lastConnectTime >= RECONNECT_TIMEOUT) {
-                    transport->lastConnectTime = ct;
-                    transport->state = QnTransactionTransport::Connecting;
-                    transport->doClientConnect();
-                }
-                break;
-            }
-            case QnTransactionTransport::Closed:
-                delete m_connections[i];
-                m_connections.removeAt(i);
-                break;
-            case QnTransactionTransport::ReadyForStreaming:
-                transport->startStreaming();
-                break;
+        QnConnectionsPair& c = itr.value();
+        if (c.incomeConn)
+            processConnState(itr.value().incomeConn);
+        if (c.outcomeConn)
+            processConnState(itr.value().outcomeConn);
+            
+        if (!c.incomeConn && !c.outcomeConn)
+            itr = m_connections.erase(itr);
+        else {
+            ++itr;
         }
+    }
+    for (int i = m_connectingConnections.size() -1; i >= 0; --i) {
+        processConnState(m_connectingConnections[i]);
+        if (!m_connectingConnections[i])
+            m_connectingConnections.removeAt(i);
     }
 }
 
@@ -417,33 +525,39 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
 {
     bool isClient = query.hasQueryItem("isClient");
     QUuid remoteGuid  = query.queryItemValue(lit("guid"));
+    /*
     QByteArray tranStateBin = QByteArray::fromBase64(query.queryItemValue("tran_state").toLocal8Bit());
-    QnTransactionLog::QnTranState state;
+    QnTranState state;
     if (!tranStateBin.isEmpty())
         state = transactionLog->deserializeState(tranStateBin);
+    */
 
     QnTransactionTransport* transport = new QnTransactionTransport(this);
     transport->remoteGuid = remoteGuid;
     transport->isConnectionOriginator = false;
     transport->socket = socket;
     int handle = socket->handle();
-    transport->state = QnTransactionTransport::ReadyForStreaming;
 
     QMutexLocker lock(&m_mutex);
 
-    // if we got connection from remote server and exists connection to this remote server, remove it (exclude diplicate connection server1 <==> server2 )
+    transport->startStreaming();
+
+    /*
+    // if we got connection from remote server and exists other connection where we try connect to the same peer, cancel outgoing connection
     for (int i  = 0; i < m_connections.size(); ++i)
     {
-        if (m_connections[i]->remoteGuid == remoteGuid && m_connections[i]->isConnectionOriginator &&  m_connections[i]->remoteGuid > qnCommon->moduleGUID()) 
+        //if (m_connections[i]->remoteGuid == remoteGuid && m_connections[i]->isConnectionOriginator &&  m_connections[i]->remoteGuid > qnCommon->moduleGUID()) 
+        if (m_connections[i]->remoteGuid == remoteGuid && m_connections[i]->isConnectionOriginator &&  m_connections[i]->state < QnTransactionTransport::ReadyForStreaming)
         {
             delete m_connections[i];
             m_connections.removeAt(i);
             break;
         }
     }
+    */
 
-    // add new connection
-
+    
+    // send fullsync to a client immediatly
     if (isClient) 
     {
         transport->isClientPeer = true;
@@ -460,17 +574,9 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         }
     }
     else {
-        QList<QByteArray> transactions;
-        const ErrorCode errorCode = transactionLog->getTransactionsAfter(state, transactions);
-        if (errorCode == ErrorCode::ok) {
-            foreach(const QByteArray& data, transactions)
-                transport->addData(data);
-        }
-        else {
-            qWarning() << "Can't execute query for sync with server peer!";
-        }
+        sendSyncRequestIfRequired(transport);
     }
-    m_connections.push_back(transport);
+    m_connections[remoteGuid].incomeConn.reset(transport);
 }
 
 void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient)
@@ -484,16 +590,19 @@ void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient
     transport->isClientPeer = isClient;
     transport->remoteAddr = url;
     transport->state = QnTransactionTransport::Connect;
-    m_connections.push_back(transport);
+    m_connectingConnections <<  QSharedPointer<QnTransactionTransport>(transport);
 }
 
 void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
 {
     QMutexLocker lock(&m_mutex);
-    foreach(QnTransactionTransport* transport, m_connections)
+    for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
-        if (transport->remoteAddr == url)
-            transport->state = QnTransactionTransport::Closed;
+        QnConnectionsPair& data = itr.value();
+        if (data.outcomeConn && data.outcomeConn->remoteAddr == url) {
+            data.outcomeConn->state = QnTransactionTransport::Closed;
+            break;
+        }
     }
 }
 
