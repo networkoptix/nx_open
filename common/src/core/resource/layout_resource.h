@@ -54,8 +54,6 @@ public:
 
     QHash<int, QVariant> data() const;
 
-    void requestStore() { emit storeRequested(::toSharedPointer(this)); } // TODO: #Elric hack
-
     QnTimePeriod getLocalRange() const;
     void setLocalRange(const QnTimePeriod& value);
 
@@ -64,19 +62,19 @@ public:
     bool userCanEdit() const;
     void setUserCanEdit(bool value);
 
-    /** Size of background image - in cells */
+    /* Size of background image - in cells */
     QSize backgroundSize() const;
     void setBackgroundSize(QSize size);
 
-    /** Filename of background image on EC */
+    /* Filename of background image on EC */
     QString backgroundImageFilename() const;
     void setBackgroundImageFilename(const QString &filename);
 
-    /** Background image opacity in range [0.0 .. 1.0] */
+    /* Background image opacity in range [0.0 .. 1.0] */
     qreal backgroundOpacity() const;
     void setBackgroundOpacity(qreal value);
 
-    /** Locked state - locked layout cannot be modified in any way */
+    /* Locked state - locked layout cannot be modified in any way */
     bool locked() const;
     void setLocked(bool value);
 
@@ -87,12 +85,12 @@ signals:
     void cellAspectRatioChanged(const QnLayoutResourcePtr &resource);
     void cellSpacingChanged(const QnLayoutResourcePtr &resource);
     void userCanEditChanged(const QnLayoutResourcePtr &resource);
-    void storeRequested(const QnLayoutResourcePtr &resource);
 
     void backgroundSizeChanged(const QnLayoutResourcePtr &resource);
     void backgroundImageChanged(const QnLayoutResourcePtr &resource);
     void backgroundOpacityChanged(const QnLayoutResourcePtr &resource);
     void lockedChanged(const QnLayoutResourcePtr &resource);
+
 protected:
     virtual void updateInner(QnResourcePtr other) override;
 
