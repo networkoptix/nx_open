@@ -22,7 +22,7 @@ extern "C"
 }
 
 #include "core/datapacket/media_data_packet.h"
-#include "win_audio_helper.h"
+#include "win_audio_device_info.h"
 #include "decoders/audio/ffmpeg_audio.h"
 
 // mux audio 1 and audio 2 to audio1 buffer

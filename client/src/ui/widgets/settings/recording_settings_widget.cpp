@@ -16,7 +16,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #ifdef Q_OS_WIN
-#   include <device_plugins/desktop_win/win_audio_helper.h>
+#   include <device_plugins/desktop_win/win_audio_device_info.h>
 #   include <ui/workbench/watchers/workbench_desktop_camera_watcher_win.h>
 #endif
 

@@ -1,4 +1,4 @@
-#include "win_audio_helper.h"
+#include "win_audio_device_info.h"
 
 #ifdef Q_OS_WIN
 

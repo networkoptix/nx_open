@@ -23,7 +23,7 @@ extern "C"
 }
 
 #include "core/datapacket/media_data_packet.h"
-#include "win_audio_helper.h"
+#include "win_audio_device_info.h"
 #include "decoders/audio/ffmpeg_audio.h"
 #include "utils/common/synctime.h"
 #include "utils/media/ffmpeg_helper.h"
@@ -587,7 +587,6 @@ int QnDesktopDataProvider::processData(bool flush)
     if (m_initTime == AV_NOPTS_VALUE)
         m_initTime = qnSyncTime->currentUSecsSinceEpoch();
 
-    AVPacket videoPkt;
     if (out_size > 0)
     {
 
@@ -628,7 +627,6 @@ int QnDesktopDataProvider::processData(bool flush)
 
         m_audioFramesCount++;
 
-        AVPacket audioPacket;
         ai->m_audioQueue.pop(audioData);
 
         // todo: add audio resample here
