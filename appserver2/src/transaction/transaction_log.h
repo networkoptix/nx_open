@@ -20,11 +20,12 @@ namespace ec2
 {
     class QnDbManager;
 
+    typedef QMap<QUuid, qint32> QnTranState;
+
     class QnTransactionLog
     {
     public:
 
-        typedef QMap<QUuid, qint32> QnTranState;
 
         QnTransactionLog(QnDbManager* db);
 
@@ -34,9 +35,6 @@ namespace ec2
         ErrorCode getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result);
         ErrorCode getTransactionsState(QnTranState& state);
         
-        QByteArray serializeState(const QnTranState& state);
-        QnTransactionLog::QnTranState deserializeState(const QByteArray& buffer);
-
         template <class T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran) {
             return saveToDB(tran.id, transactionHash(tran), serializedTran);
