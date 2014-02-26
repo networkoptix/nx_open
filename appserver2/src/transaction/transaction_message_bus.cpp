@@ -196,6 +196,7 @@ void QnTransactionTransport::startStreaming()
     socket->setSendTimeout(SOCKET_TIMEOUT);
     socket->setNonBlockingMode(true);
     chunkHeaderLen = 0;
+    state = ReadyForStreaming;
     aio::AIOService::instance()->watchSocket( socket, PollSet::etRead, this );
 }
 
@@ -505,7 +506,7 @@ void QnTransactionMessageBus::at_timer()
             ++itr;
         }
     }
-    for (int i = m_connectingConnections.size(); i >= 0; --i) {
+    for (int i = m_connectingConnections.size() -1; i >= 0; --i) {
         processConnState(m_connectingConnections[i]);
         if (!m_connectingConnections[i])
             m_connectingConnections.removeAt(i);
