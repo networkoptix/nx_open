@@ -467,8 +467,9 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
     if (checkControls && cameraSettingsDialog()->widget()->hasScheduleControlsChanges()){
+        // TODO: #Elric #TR remove first space.
         QString message = tr(" Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
-        int button = QMessageBox::warning(cameraSettingsDialog()->widget(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
+        int button = QMessageBox::warning(cameraSettingsDialog(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry) {
             cameraSettingsDialog()->ignoreAcceptOnce();
             return;
@@ -477,7 +478,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
         }
     } else if (checkControls && cameraSettingsDialog()->widget()->hasMotionControlsChanges()){
         QString message = tr("Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.");
-        int button = QMessageBox::warning(cameraSettingsDialog()->widget(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
+        int button = QMessageBox::warning(cameraSettingsDialog(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry){
             cameraSettingsDialog()->ignoreAcceptOnce();
             return;
@@ -505,7 +506,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
         if (!helper.isValid())
         {
             QString message = tr("Licenses limit exceeded. The changes will be saved, but will not take effect.");
-            QMessageBox::warning(cameraSettingsDialog()->widget(), tr("Could not apply changes"), message);
+            QMessageBox::warning(cameraSettingsDialog(), tr("Could not apply changes"), message);
             cameraSettingsDialog()->widget()->setScheduleEnabled(false);
         }
     }
