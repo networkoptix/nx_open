@@ -19,7 +19,7 @@
 #include <ui/help/help_topics.h>
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent):
-    QDialog(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
+    QDialog(parent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
 #ifdef Q_OS_MAC
     | Qt::Tool
 #endif
