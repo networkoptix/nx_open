@@ -53,10 +53,10 @@ namespace ec2
         void doClientConnect();
         void startStreaming();
         void addData(const QByteArray& data);
+        void processError();
     protected:
         void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
         void closeSocket();
-        void processError();
     private:
         static void ensureSize(std::vector<quint8>& buffer, int size);
         int getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size);

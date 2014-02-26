@@ -125,8 +125,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnId& id, QnResource::Status status)
     {
-        QnTransaction<ApiSetResourceStatusData> tran;
-        tran.initNew(command, true);
+        QnTransaction<ApiSetResourceStatusData> tran(command, true);
         tran.params.id = id;
         tran.params.status = status;
         return tran;
@@ -137,8 +136,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnId& id, const QnKvPairList& kvPairs)
     {
-        QnTransaction<ApiResourceParams> tran;
-        tran.initNew(command, true);
+        QnTransaction<ApiResourceParams> tran(command, true);
         tran.params.params.reserve(kvPairs.size());
         foreach(const QnKvPair& pair, kvPairs)
             tran.params.params.push_back(ApiResourceParam(pair.name(), pair.value()));
@@ -149,8 +147,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiIdData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
     {
-        QnTransaction<ApiIdData> tran;
-        tran.initNew(command, true);
+        QnTransaction<ApiIdData> tran(command, true);
         tran.params.id = id;
         return tran;
     }
@@ -158,8 +155,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiSetResourceDisabledData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id, bool disabled )
     {
-        QnTransaction<ApiSetResourceDisabledData> tran;
-        tran.initNew(command, true);
+        QnTransaction<ApiSetResourceDisabledData> tran(command, true);
         tran.params.id = id;
         tran.params.disabled = disabled;
         return tran;
@@ -168,8 +164,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiResourceData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource )
     {
-        QnTransaction<ApiResourceData> tran;
-        tran.initNew(command, true);
+        QnTransaction<ApiResourceData> tran(command, true);
         tran.params.fromResource(resource);
         return tran;
     }

@@ -68,8 +68,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiIdData> QnLayoutManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
     {
-        QnTransaction<ApiIdData> tran;
-        tran.initNew(command, true);
+        QnTransaction<ApiIdData> tran(command, true);
         tran.params.id = id;
         return tran;
     }
@@ -77,8 +76,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiLayoutDataList> QnLayoutManager<T>::prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts )
     {
-        QnTransaction<ApiLayoutDataList> tran;
-        tran.initNew(command, true);
+        QnTransaction<ApiLayoutDataList> tran(command, true);
         tran.params.fromResourceList(layouts);
         return tran;
     }

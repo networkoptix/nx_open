@@ -104,11 +104,9 @@ namespace ec2
     {
     public:
 		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false) {}
-
-        void initNew(ApiCommand::Value command, bool persistent);
-        void fillSequence();
+        QnAbstractTransaction(ApiCommand::Value command, bool persistent);
         
-        static void setStartNumber(const qint64& value);
+        void fillSequence();
 
         template <class T2>
         bool deserialize(InputBinaryStream<T2>* stream) 
@@ -143,6 +141,7 @@ namespace ec2
     public:
         QnTransaction() {}
         QnTransaction(const QnAbstractTransaction& abstractTran): QnAbstractTransaction(abstractTran) {}
+        QnTransaction(ApiCommand::Value command, bool persistent): QnAbstractTransaction(command, persistent) {}
         
         T params;
 

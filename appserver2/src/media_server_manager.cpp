@@ -79,8 +79,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiMediaServerData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource )
     {
-        QnTransaction<ApiMediaServerData> tran;
-        tran.initNew(command, true);
+        QnTransaction<ApiMediaServerData> tran(command, true);
         tran.params.fromResource(resource);
         return tran;
     }
@@ -88,8 +87,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiIdData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
     {
-        QnTransaction<ApiIdData> tran;
-        tran.initNew(command, true);
+        QnTransaction<ApiIdData> tran(command, true);
         tran.params.id = id;
         return tran;
     }
