@@ -34,7 +34,6 @@ public:
     /* Return item time zone offset in ms */
     qint64 timeZoneOffset() const;
     QnAviArchiveDelegate* createArchiveDelegate() const;
-protected:
 
 private:
     QnStorageResourcePtr m_storage;

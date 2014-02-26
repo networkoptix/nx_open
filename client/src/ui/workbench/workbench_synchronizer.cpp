@@ -20,8 +20,8 @@ QnWorkbenchSynchronizer::QnWorkbenchSynchronizer(QObject *parent):
         delete workbench()->layouts().back();
 
     /* Start listening to changes. */
-    connect(resourcePool(),  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
-    connect(workbench(),     SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()));
+    connect(resourcePool(),  &QnResourcePool::resourceRemoved,  this,   &QnWorkbenchSynchronizer::at_resourcePool_resourceRemoved);
+    connect(workbench(),     &QnWorkbench::layoutsChanged,      this,   &QnWorkbenchSynchronizer::at_workbench_layoutsChanged);
 
     m_submit = m_update = true;
 }

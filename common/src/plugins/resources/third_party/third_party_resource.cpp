@@ -31,6 +31,7 @@ QnThirdPartyResource::QnThirdPartyResource(
     m_refCounter( 2 ),
     m_encoderCount(0)
 {
+    setVendor( discoveryManager.getVendorName() );
     setAuth( QString::fromUtf8(camInfo.defaultLogin), QString::fromUtf8(camInfo.defaultPassword) );
 }
 

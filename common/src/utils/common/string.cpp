@@ -154,150 +154,149 @@ QString generateUniqueString(const QStringList &usedStrings, const QString &defa
  */
 #define INCBUF() { buffer += curr; ++pos; curr = ( pos < string.length() ) ? string[ pos ] : QChar(); }
 
+bool isNumberStart(const QChar &c) {
+    return c == L'-' || c == L'+' || c.isDigit();
+}
+
 void ExtractToken( QString & buffer, const QString & string, int & pos, bool & isNumber )
 {
-	buffer.clear();
-	if ( string.isNull() || pos >= string.length() )
-		return;
+    buffer.clear();
+    if ( string.isNull() || pos >= string.length() )
+        return;
 
-	isNumber = false;
-	QChar curr = string[ pos ];
-	if ( curr == L'-' || curr == L'+' || curr.isDigit() )
-	{
-		if ( curr == L'-' || curr == L'+' )
-			INCBUF();
+    isNumber = false;
+    QChar curr = string[ pos ];
+    if ( isNumberStart(curr) )
+    {
+        if ( curr == L'-' || curr == L'+' )
+            INCBUF();
 
-		if ( !curr.isNull() && curr.isDigit() )
-		{
-			isNumber = true;
-			while ( curr.isDigit() )
-				INCBUF();
+        if ( !curr.isNull() && curr.isDigit() )
+        {
+            isNumber = true;
+            while ( curr.isDigit() )
+                INCBUF();
 
-			if ( curr == L'.' )
-			{
-				INCBUF();
-				while ( curr.isDigit() )
-					INCBUF();
-			}
+            if ( curr == L'.' )
+            {
+                INCBUF();
+                while ( curr.isDigit() )
+                    INCBUF();
+            }
 
-			if ( !curr.isNull() && curr.toLower() == L'e' )
-			{
-				INCBUF();
-				if ( curr == L'-' || curr == L'+' )
-					INCBUF();
+            if ( !curr.isNull() && curr.toLower() == L'e' )
+            {
+                INCBUF();
+                if ( curr == L'-' || curr == L'+' )
+                    INCBUF();
 
-				if ( curr.isNull() || !curr.isDigit() )
-					isNumber = false;
-				else
-					while ( curr.isDigit() )
-						INCBUF();
-			}
-		}
-	}
+                if ( curr.isNull() || !curr.isDigit() )
+                    isNumber = false;
+                else
+                    while ( curr.isDigit() )
+                        INCBUF();
+            }
+        }
+    }
 
-	if ( !isNumber )
-	{
-		while ( curr != L'-' && curr != L'+' && !curr.isDigit() && pos < string.length() )
-			INCBUF();
-	}
+    if ( !isNumber )
+    {
+        while ( !isNumberStart(curr) && pos < string.length() )
+            INCBUF();
+    }
 }
 
 int naturalStringCompare( const QString & lhs, const QString & rhs, Qt::CaseSensitivity caseSensitive )
 {
-	int ii = 0;
-	int jj = 0;
+    int ii = 0;
+    int jj = 0;
 
-	QString lhsBufferQStr;
-	QString rhsBufferQStr;
+    QString lhsBufferQStr;
+    QString rhsBufferQStr;
 
-	int retVal = 0;
+    int retVal = 0;
 
-	// all status values are created on the stack outside the loop to make as fast as possible
-	bool lhsNumber = false;
-	bool rhsNumber = false;
+    // all status values are created on the stack outside the loop to make as fast as possible
+    bool lhsNumber = false;
+    bool rhsNumber = false;
 
-	double lhsValue = 0.0;
-	double rhsValue = 0.0;
-	bool ok1;
-	bool ok2;
+    double lhsValue = 0.0;
+    double rhsValue = 0.0;
+    bool ok1;
+    bool ok2;
 
-	while ( retVal == 0 && ii < lhs.length() && jj < rhs.length() )
-	{
-		ExtractToken( lhsBufferQStr, lhs, ii, lhsNumber );
-		ExtractToken( rhsBufferQStr, rhs, jj, rhsNumber );
+    while ( retVal == 0 && ii < lhs.length() && jj < rhs.length() )
+    {
+        ExtractToken( lhsBufferQStr, lhs, ii, lhsNumber );
+        ExtractToken( rhsBufferQStr, rhs, jj, rhsNumber );
 
-		if ( !lhsNumber && !rhsNumber )
-		{
-			// both strings curr val is a simple strcmp
-			retVal = lhsBufferQStr.compare( rhsBufferQStr, caseSensitive );
+        if ( !lhsNumber && !rhsNumber )
+        {
+            // both strings curr val is a simple strcmp
+            retVal = lhsBufferQStr.compare( rhsBufferQStr, caseSensitive );
 
-			int maxLen = qMin( lhsBufferQStr.length(), rhsBufferQStr.length() );
-			QString tmpRight = rhsBufferQStr.left( maxLen );
-			QString tmpLeft = lhsBufferQStr.left( maxLen );
-			if ( tmpLeft.compare( tmpRight, caseSensitive ) == 0 )
-			{
-				retVal = lhsBufferQStr.length() - rhsBufferQStr.length();
-				if ( retVal )
-				{
-					QChar nextChar;
-					if ( ii < lhs.length() ) // more on the lhs
-						nextChar = lhs[ ii ];
-					else if ( jj < rhs.length() ) // more on the rhs
-						nextChar = rhs[ jj ];
+            int maxLen = qMin( lhsBufferQStr.length(), rhsBufferQStr.length() );
+            QString tmpRight = rhsBufferQStr.left( maxLen );
+            QString tmpLeft = lhsBufferQStr.left( maxLen );
+            if ( tmpLeft.compare( tmpRight, caseSensitive ) == 0 )
+            {
+                retVal = lhsBufferQStr.length() - rhsBufferQStr.length();
 
-					bool nextIsNum = ( nextChar == L'-' || nextChar == L'+' || nextChar.isDigit() );
+                if(retVal < 0) {
+                    if(ii < lhs.length() && isNumberStart(lhs[ii]))
+                        retVal *= -1;
+                } else if(retVal > 0) {
+                    if(jj < rhs.length() && isNumberStart(rhs[jj]))
+                        retVal *= -1;
+                }
+            }
+        }
+        else if ( lhsNumber && rhsNumber )
+        {
+            // both numbers, convert and compare
+            lhsValue = lhsBufferQStr.toDouble( &ok1 );
+            rhsValue = rhsBufferQStr.toDouble( &ok2 );
+            if ( !ok1 || !ok2 )
+                retVal = lhsBufferQStr.compare( rhsBufferQStr, caseSensitive );
+            else if ( lhsValue > rhsValue )
+                retVal = 1;
+            else if ( lhsValue < rhsValue )
+                retVal = -1;
+        }
+        else
+        {
+            // completely arebitrary that a number comes before a string
+            retVal = lhsNumber ? -1 : 1;
+        }
+    }
 
-					if ( nextIsNum )
-						retVal = -1*retVal;
-				}
-			}
-		}
-		else if ( lhsNumber && rhsNumber )
-		{
-			// both numbers, convert and compare
-			lhsValue = lhsBufferQStr.toDouble( &ok1 );
-			rhsValue = rhsBufferQStr.toDouble( &ok2 );
-			if ( !ok1 || !ok2 )
-				retVal = lhsBufferQStr.compare( rhsBufferQStr, caseSensitive );
-			else if ( lhsValue > rhsValue )
-				retVal = 1;
-			else if ( lhsValue < rhsValue )
-				retVal = -1;
-		}
-		else
-		{
-			// completely arebitrary that a number comes before a string
-			retVal = lhsNumber ? -1 : 1;
-		}
-	}
-
-	if ( retVal != 0 )
-		return retVal;
-	if ( ii < lhs.length() )
-		return -1;
-	else if ( jj < rhs.length() )
-		return 1;
-	else
-		return 0;
+    if ( retVal != 0 )
+        return retVal;
+    if ( ii < lhs.length() )
+        return 1;
+    else if ( jj < rhs.length() )
+        return -1;
+    else
+        return 0;
 }
 
 bool naturalStringLessThan( const QString & lhs, const QString & rhs )
 {
-	return naturalStringCompare( lhs, rhs, Qt::CaseSensitive ) < 0;
+    return naturalStringCompare( lhs, rhs, Qt::CaseSensitive ) < 0;
 }
 
 bool naturalStringCaseInsensitiveLessThan( const QString & lhs, const QString & rhs )
 {
-	return naturalStringCompare( lhs, rhs, Qt::CaseInsensitive ) < 0;
+    return naturalStringCompare( lhs, rhs, Qt::CaseInsensitive ) < 0;
 }
 
 QStringList naturalStringSort( const QStringList & list, Qt::CaseSensitivity caseSensitive )
 {
-	QStringList retVal = list;
-	if ( caseSensitive == Qt::CaseSensitive )
-		qSort( retVal.begin(), retVal.end(), naturalStringLessThan );
-	else
-		qSort( retVal.begin(), retVal.end(), naturalStringCaseInsensitiveLessThan );
-	return retVal;
+    QStringList retVal = list;
+    if ( caseSensitive == Qt::CaseSensitive )
+        qSort( retVal.begin(), retVal.end(), naturalStringLessThan );
+    else
+        qSort( retVal.begin(), retVal.end(), naturalStringCaseInsensitiveLessThan );
+    return retVal;
 }
 

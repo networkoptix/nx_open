@@ -59,6 +59,7 @@
 #include <ui/graphics/items/standard/graphics_message_box.h>
 
 #include <ui/workaround/gl_widget_factory.h>
+#include <ui/workaround/gl_widget_workaround.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -329,7 +330,7 @@ void QnWorkbenchDisplay::deinitSceneView() {
 }
 
 QGLWidget *QnWorkbenchDisplay::newGlWidget(QWidget *parent, Qt::WindowFlags windowFlags) const {
-    return QnGlWidgetFactory::create<QGLWidget>(parent, windowFlags);
+    return QnGlWidgetFactory::create<QnGLWidget>(parent, windowFlags);
 }
 
 void QnWorkbenchDisplay::initSceneView() {
@@ -1531,7 +1532,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
     foreach(QnResourceWidget *widget, widgets()) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
-            qint64 timeUSec = mediaWidget->display()->currentTimeUSec();
+            qint64 timeUSec = mediaWidget->display()->camera()->getCurrentTime();
             if((quint64)timeUSec != AV_NOPTS_VALUE)
                 mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : timeUSec / 1000);
 

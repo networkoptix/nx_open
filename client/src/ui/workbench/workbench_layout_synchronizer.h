@@ -6,6 +6,8 @@
 #include <QtCore/QSet>
 #include <QtCore/QUuid>
 
+#include <utils/common/connective.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <client/client_globals.h>
@@ -19,8 +21,9 @@ class QnLayoutItemData;
  * This class performs bidirectional synchronization of instances of 
  * <tt>QnWorkbenchLayout</tt> and <tt>QnLayoutResource</tt>.
  */
-class QnWorkbenchLayoutSynchronizer: public QObject {
-    Q_OBJECT;
+class QnWorkbenchLayoutSynchronizer: public Connective<QObject> {
+    Q_OBJECT
+    typedef Connective<QObject> base_type;
 
 public:
     QnWorkbenchLayoutSynchronizer(QnWorkbenchLayout *layout, const QnLayoutResourcePtr &resource, QObject *parent);

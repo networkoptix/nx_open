@@ -156,11 +156,12 @@ void QnPtzManageDialog::reject() {
     if (!checkForUnsavedChanges())
         return;
 
-    // ensure that no old data will stay in dialog
-    setController(QnPtzControllerPtr());
-    m_model->setPresets(QnPtzPresetList());
-    m_model->setTours(QnPtzTourList());
-    base_type::reject();
+    clear();
+}
+
+void QnPtzManageDialog::closeWithoutCancel() {
+    checkForUnsavedChanges(true);
+    clear();
 }
 
 void QnPtzManageDialog::loadData(const QnPtzData &data) {
@@ -262,6 +263,14 @@ void QnPtzManageDialog::enableDewarping() {
         params.enabled = true;
         widget->item()->setDewarpingParams(params);
     }
+}
+
+void QnPtzManageDialog::clear() {
+    // ensure that no old data will stay in dialog
+    setController(QnPtzControllerPtr());
+    m_model->setPresets(QnPtzPresetList());
+    m_model->setTours(QnPtzTourList());
+    base_type::reject();
 }
 
 void QnPtzManageDialog::saveData() {
@@ -613,15 +622,19 @@ bool QnPtzManageDialog::isModified() const {
     return !m_model->synchronized();
 }
 
-bool QnPtzManageDialog::checkForUnsavedChanges() {
+bool QnPtzManageDialog::checkForUnsavedChanges(bool dontShowCancel) {
     if (!isModified())
         return true;
 
+    QnMessageBox::StandardButtons buttons = QnMessageBox::Yes | QnMessageBox::No;
+    if (!dontShowCancel)
+        buttons |= QnMessageBox::Cancel;
+
     show();
     QnMessageBox::StandardButton button = QnMessageBox::question(this, 0, tr("PTZ configuration is not saved"), tr("Changes are not saved. Do you want to save them?"),
-                                                                 QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, QnMessageBox::Yes);
+                                                                 buttons, QnMessageBox::Yes);
     switch (button) {
-    case QnMessageBox::Ok:
+    case QnMessageBox::Yes:
         saveChanges();
         return true;
     case QnMessageBox::Cancel:
@@ -647,8 +660,8 @@ void QnPtzManageDialog::updateUi() {
     if (ui->previewGroupBox->isEnabled())
         m_cache->downloadFile(selectedRow.id());
     ui->deleteButton->setEnabled(isPreset || isTour);
-    ui->goToPositionButton->setEnabled(isPreset || isTour);
-    ui->startTourButton->setEnabled(isValidTour);
+    ui->goToPositionButton->setEnabled(isPreset || (isTour && !selectedRow.tourModel.tour.spots.isEmpty()));
+    ui->startTourButton->setEnabled(isValidTour && !selectedRow.tourModel.local);
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(isModified());
 }
 

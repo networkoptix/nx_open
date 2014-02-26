@@ -106,7 +106,6 @@ QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, fl
 }
 
 CameraDiagnostics::Result QnPhysicalCameraResource::initInternal() {
-    m_vendor = getVendorInternal();
     return CameraDiagnostics::NoErrorResult();
 }
 

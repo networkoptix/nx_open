@@ -4,6 +4,7 @@
 #include <QtOpenGL/QGLWidget>
 
 #include <core/resource/resource_fwd.h>
+#include <ui/workaround/gl_widget_workaround.h>
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
@@ -12,7 +13,7 @@ class QnResourceWidgetRenderer;
  * Widget for displaying video from the given resource without constructing 
  * the heavy graphics scene machinery.
  */
-class QnRenderingWidget: public QGLWidget {
+class QnRenderingWidget: public QnGLWidget {
     Q_OBJECT;
 public:
     QnRenderingWidget(const QGLFormat &format, QWidget *parent = 0, QGLWidget *shareWidget = NULL, Qt::WindowFlags f = 0);
