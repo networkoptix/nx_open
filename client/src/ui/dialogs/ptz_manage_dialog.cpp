@@ -661,7 +661,7 @@ void QnPtzManageDialog::updateUi() {
         m_cache->downloadFile(selectedRow.id());
     ui->deleteButton->setEnabled(isPreset || isTour);
     ui->goToPositionButton->setEnabled(isPreset || (isTour && !selectedRow.tourModel.tour.spots.isEmpty()));
-    ui->startTourButton->setEnabled(isValidTour);
+    ui->startTourButton->setEnabled(isValidTour && !selectedRow.tourModel.local);
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(isModified());
 }
 
