@@ -179,10 +179,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     if (fpsList.size()<1)
         return CameraDiagnostics::UnknownErrorResult();
 
-    {
-        
-        setMaxFps(fpsList.at(0));
-    }
+    setMaxFps(fpsList.at(0));
 
     save();
 
