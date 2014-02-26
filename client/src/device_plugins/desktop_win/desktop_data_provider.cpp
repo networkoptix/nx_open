@@ -679,6 +679,7 @@ int QnDesktopDataProvider::processData(bool flush)
             //audio->timestamp = av_rescale_q(m_audioCodecCtx->coded_frame->pts, m_audioCodecCtx->time_base, timeBaseNative) + m_initTime;
             audio->flags |= QnAbstractMediaData::MediaFlags_LIVE;
             audio->dataProvider = this;
+            audio->channelNumber = 1;
             putData(audio);
         }
     }
@@ -793,6 +794,31 @@ void QnDesktopDataProvider::closeStream()
     foreach(EncodedAudioInfo* audioChannel, m_audioInfo)
         delete audioChannel;
     m_audioInfo.clear();
+}
+
+class QnDesktopDataProvider::QnDesktopAudioLayout: public QnResourceAudioLayout
+{
+public:
+    QnDesktopAudioLayout(): QnResourceAudioLayout(), m_channels(0) {}
+    virtual int channelCount() const override { return m_channels; }
+    virtual AudioTrack getAudioTrackInfo(int /*index*/) const override { return m_audioTrack; }
+    void setAudioTrackInfo(const AudioTrack& info) { m_audioTrack = info; m_channels = 1;}
+private:
+    AudioTrack m_audioTrack;
+    int m_channels;
+};
+
+QnConstResourceAudioLayoutPtr QnDesktopDataProvider::getAudioLayout()
+{
+    if (!audioLayout)
+        audioLayout.reset(new QnDesktopAudioLayout() );
+    if (m_audioCodecCtx && audioLayout->channelCount() == 0)
+    {
+        QnResourceAudioLayout::AudioTrack track;
+        track.codecContext = QnAbstractMediaContextPtr(new QnMediaContext(m_audioCodecCtx));
+        audioLayout->setAudioTrackInfo(track);
+    }
+    return audioLayout;
 }
 
 qint64 QnDesktopDataProvider::currentTime() const
