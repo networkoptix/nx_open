@@ -479,34 +479,26 @@ void QnScreenGrabber::drawCursor(quint32* data, int width, int height, int leftO
                 {
                     for (int y = yPos + cursorHeight-1; y >= yPos; --y)
                     {
-                        for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; )
+                        for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; ++x)
                         {
-                            for (int k = 0; k < 8; ++k)
-                            {
-                                if (x > 0 && y > 0 && x < width && y < height)
-                                    xorPixel(data, width, x, y, colorBitsPtr);
-                                colorBitsPtr++;
-                                x++;
-                            }
+                            if (x > 0 && y > 0 && x < width && y < height)
+                                xorPixel(data, width, x, y, colorBitsPtr);
+                            colorBitsPtr++;
                         }
-                        colorBitsPtr += colorStride - lpbiColor->bmiHeader.biWidth/8 * lpbiColor->bmiHeader.biBitCount;
+                        colorBitsPtr += colorStride - lpbiColor->bmiHeader.biWidth * lpbiColor->bmiHeader.biBitCount / 8;
                     }
                 }
                 else
                 {
                     for (int y = yPos-cursorHeight; y < yPos; ++y)
                     {
-                        for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; )
+                        for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; ++x)
                         {
-                            for (int k = 0; k < 8; ++k)
-                            {
-                                if (x > 0 && y > 0 && x < width && y < height)
-                                    xorPixel(data, width, x, y, colorBitsPtr);
-                                colorBitsPtr++;
-                                x++;
-                            }
+                            if (x > 0 && y > 0 && x < width && y < height)
+                                xorPixel(data, width, x, y, colorBitsPtr);
+                            colorBitsPtr++;
                         }
-                        colorBitsPtr += colorStride - lpbiColor->bmiHeader.biWidth/8 * lpbiColor->bmiHeader.biBitCount;
+                        colorBitsPtr += colorStride - lpbiColor->bmiHeader.biWidth * lpbiColor->bmiHeader.biBitCount / 8;
                     }
                 }
             }

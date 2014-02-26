@@ -1099,7 +1099,11 @@ void QnMediaResourceWidget::updateFisheye() {
     item()->setData(Qn::ItemFlipRole, flip);
 
     updateAspectRatio();
+
     emit fisheyeChanged();
+
+    if(buttonBar()->visibleButtons() & PtzButton)
+        at_ptzButton_toggled(buttonBar()->checkedButtons() & PtzButton); // TODO: #Elric doesn't belong here, hack
 }
 
 void QnMediaResourceWidget::updateCustomAspectRatio() {

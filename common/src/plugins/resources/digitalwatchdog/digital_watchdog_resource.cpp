@@ -26,6 +26,7 @@ QnPlWatchDogResource::QnPlWatchDogResource():
     m_hasZoom(false),
     m_additionalSettings()
 {
+    setVendor(lit("Digital Watchdog"));
 }
 
 QnPlWatchDogResource::~QnPlWatchDogResource()

@@ -38,8 +38,8 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     connect(m_widget->item(),   &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnFisheyePtzController::updateItemDewarpingParams);
 
     updateAspectRatio();
-    updateLimits();
     updateCapabilities();
+    updateLimits();
 }
 
 QnFisheyePtzController::~QnFisheyePtzController() {
@@ -100,7 +100,8 @@ void QnFisheyePtzController::updateLimits() {
         m_limits.maxTilt = 90.0;
     }
 
-    absoluteMoveInternal(boundedPosition(getPositionInternal()));
+    if (m_capabilities != Qn::NoPtzCapabilities)
+        absoluteMoveInternal(boundedPosition(getPositionInternal()));
 }
 
 void QnFisheyePtzController::updateCapabilities() {

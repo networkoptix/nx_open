@@ -198,7 +198,8 @@ protected:
 
 private slots:
     void updateText();
-    void updateToolTip(bool notify = false);
+    void updateToolTip(bool notify);
+    void updateToolTipSilent();
 
 private:
     QString defaultToolTipFormat() const;

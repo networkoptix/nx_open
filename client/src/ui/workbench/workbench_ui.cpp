@@ -77,7 +77,6 @@
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #include "watchers/workbench_render_watcher.h"
-#include "watchers/workbench_motion_display_watcher.h"
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_layout.h"
@@ -712,14 +711,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     DropInstrument *dropInstrument = new DropInstrument(true, context(), this);
     display()->instrumentManager()->installInstrument(dropInstrument);
     dropInstrument->setSurface(m_titleBackgroundItem);
-
-    /* Set up notifications context processing. */
-    m_motionDisplayWatcher = context()->instance<QnWorkbenchMotionDisplayWatcher>();
-    connect(display()->focusListenerInstrument(), SIGNAL(focusItemChanged()),                                                       this,                           SLOT(updateHelpContext()));
-    connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
-    connect(m_motionDisplayWatcher,     SIGNAL(motionGridShown()),                                                                  this,                           SLOT(updateHelpContext()));
-    connect(m_motionDisplayWatcher,     SIGNAL(motionGridHidden()),                                                                 this,                           SLOT(updateHelpContext()));
-    updateHelpContext();
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
@@ -1315,12 +1306,10 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
 
     bool calendarVisible = calendarEnabled && m_sliderVisible && isSliderOpened();
 
-    if(m_inactive) {
-        bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_notificationsOpacityProcessor->isHovered() || m_calendarOpacityProcessor->isHovered();
-        setCalendarVisible(calendarVisible && hovered, animate);
-    } else {
+    if(m_inactive)
+        setCalendarVisible(calendarVisible && isHovered(), animate);
+    else
         setCalendarVisible(calendarVisible, animate);
-    }
 
     if(!calendarVisible)
         setCalendarOpened(false);
@@ -1337,7 +1326,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
         !action(Qn::ToggleTourModeAction)->isChecked();
 
     if(m_inactive) {
-        bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_notificationsOpacityProcessor->isHovered() || m_calendarOpacityProcessor->isHovered();
+        bool hovered = isHovered();
         setSliderVisible(sliderVisible && hovered, animate);
         setTreeVisible(hovered, animate);
         setTitleVisible(hovered, animate);
@@ -1739,48 +1728,6 @@ void QnWorkbenchUi::updateActivityInstrumentState() {
     }
 }
 
-void QnWorkbenchUi::updateHelpContext() {
-#if 0
-    Qn::ActionScope scope = Qn::InvalidScope;
-
-    QGraphicsItem *focusItem = display()->scene()->focusItem();
-
-    if(focusItem == NULL || dynamic_cast<QnResourceWidget *>(focusItem)) {
-        scope = Qn::SceneScope;
-    } else if(focusItem == m_notificationsItem || m_notificationsItem->isAncestorOf(focusItem) || focusItem == m_titleItem || m_titleItem->isAncestorOf(focusItem)) {
-        return; /* Focusing on notifications widget or title item shouldn't change notifications context. */
-    } else if(focusItem == m_treeItem || m_treeItem->isAncestorOf(focusItem)) {
-        scope = Qn::TreeScope;
-    } else if(focusItem == m_sliderItem || m_sliderItem->isAncestorOf(focusItem)) {
-        scope = Qn::SliderScope;
-    } else {
-        return;
-    }
-
-    QnContextHelp::ContextId context;
-    switch(scope) {
-    case Qn::TreeScope:
-        context = QnContextHelp::ContextId_Tree;
-        break;
-    case Qn::SliderScope:
-        context = QnContextHelp::ContextId_Slider;
-        break;
-    case Qn::SceneScope:
-        if(m_motionDisplayWatcher->isMotionGridDisplayed()) {
-            context = QnContextHelp::ContextId_MotionGrid;
-        } else {
-            context = QnContextHelp::ContextId_Scene;
-        }
-        break;
-    default:
-        context = QnContextHelp::ContextId_Invalid;
-        break;
-    }
-
-    qnNotifications->setNotificationsContext(context);
-#endif
-}
-
 bool QnWorkbenchUi::isThumbnailsVisible() const {
     return !qFuzzyCompare(m_sliderItem->geometry().height(), m_sliderItem->effectiveSizeHint(Qt::MinimumSize).height());
 }
@@ -1799,6 +1746,14 @@ void QnWorkbenchUi::setThumbnailsVisible(bool visible) {
     QRectF geometry = m_sliderItem->geometry();
     geometry.setHeight(sliderHeight);
     m_sliderItem->setGeometry(geometry);
+}
+
+bool QnWorkbenchUi::isHovered() const {
+    return  m_sliderOpacityProcessor->isHovered() ||
+            m_treeOpacityProcessor->isHovered() ||
+            m_titleOpacityProcessor->isHovered() ||
+            (m_notificationsOpacityProcessor && m_notificationsOpacityProcessor->isHovered()) || // in light mode it can be NULL
+            m_calendarOpacityProcessor->isHovered();
 }
 
 QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const {
@@ -2013,7 +1968,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
     updateFpsGeometry();
 }
 
-void QnWorkbenchUi::at_sliderResizerWidget_wheelEvent(QObject *target, QEvent *event) {
+void QnWorkbenchUi::at_sliderResizerWidget_wheelEvent(QObject *, QEvent *event) {
     QGraphicsSceneWheelEvent *oldEvent = static_cast<QGraphicsSceneWheelEvent *>(event);
 
     QGraphicsSceneWheelEvent newEvent(QEvent::GraphicsSceneWheel);

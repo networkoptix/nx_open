@@ -928,7 +928,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::PtzCalibrateFisheyeAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
         text(tr("Calibrate Fisheye")).
-        condition(new QnPtzActionCondition(Qn::VirtualPtzCapability, this)); // TODO: #Elric fisheye cap
+        condition(new QnPtzActionCondition(Qn::VirtualPtzCapability, this));
 
 #if 0
     factory(Qn::ToggleRadassAction).
@@ -1519,8 +1519,8 @@ QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWid
 
     if(result) {
         m_parametersByMenu[result] = parameters;
-        connect(result, SIGNAL(destroyed(QObject *)), this, SLOT(at_menu_destroyed(QObject *)));
-        connect(result, SIGNAL(aboutToShow()), this, SLOT(at_menu_aboutToShow()));
+        connect(result, &QObject::destroyed, this, &QnActionManager::at_menu_destroyed);
+        connect(result, &QMenu::aboutToShow, this, &QnActionManager::at_menu_aboutToShow);
     }
 
     return result;
@@ -1541,8 +1541,8 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
         dst->setProperty(name.data(), src->property(name.data()));
 
     if(forwardSignals) {
-        connect(dst, SIGNAL(triggered()),   src, SLOT(trigger()));
-        connect(dst, SIGNAL(toggled(bool)), src, SLOT(setChecked(bool)));
+        connect(dst, &QAction::triggered,   src, &QAction::trigger);
+        connect(dst, &QAction::toggled,     src, &QAction::setChecked);
     }
 }
 
@@ -1578,7 +1578,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
             }
 
             if(menu)
-                connect(result, SIGNAL(destroyed()), menu, SLOT(deleteLater()));
+                connect(result, &QObject::destroyed, menu, &QObject::deleteLater);
 
             if (action->hasConditionalTexts())
                 replacedText = action->checkConditionalText(parameters);
