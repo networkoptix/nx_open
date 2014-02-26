@@ -3,8 +3,6 @@
 #include <QtCore/QBuffer>
 
 
-#include <api/serializer/pb_serializer.h>
-
 #include <client/client_settings.h>
 
 #include <camera/caching_time_period_loader.h>

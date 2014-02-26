@@ -10,7 +10,6 @@
 #include "plugins/resources/archive/filetypesupport.h"
 #include "core/resource/layout_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
-#include "api/serializer/pb_serializer.h"
 #include "client/client_globals.h"
 
 #include <utils/common/warnings.h>

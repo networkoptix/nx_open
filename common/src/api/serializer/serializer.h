@@ -36,27 +36,4 @@ QString serializeRegion(const QRegion& region);
 QString serializeRegionList(const QList<QRegion>& regions);
 
 
-/**
- * Base exception class for serialization-related errors.
- */
-class QnSerializationException : public QnException {
-public:
-    QnSerializationException(const QString &message): QnException(message) {}
-};
-
-
-/**
- * Serialize resource.
- */
-class QnApiSerializer
-{
-public:
-    void serialize(const QnResourcePtr& resource, QByteArray& data);
-
-    virtual void deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data, QList<QnLayoutItemDataList>* orderedItems = 0) = 0;
-    virtual void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data, QList<QnLayoutItemDataList>* orderedItems = 0) = 0;
-    virtual void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) = 0;
-    virtual void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) = 0;
-};
-
 #endif // QN_API_SERIALIZER_H
