@@ -169,6 +169,9 @@ bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool inser
         result = true;
     }
 
+    if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
+        layout->requestStore();
+
     return result;
 }
 
