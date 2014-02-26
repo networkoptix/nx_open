@@ -304,7 +304,7 @@ void QnRecordingSettingsWidget::onComboboxChanged(int index)
     additionalAdjustSize();
 #ifdef Q_OS_WIN
     QComboBox* c = (QComboBox*) sender();
-    WinAudioExtendInfo info(c->itemText(index));
+    QnWinAudioDeviceInfo info(c->itemText(index));
     QLabel* l = c == ui->primaryAudioDeviceComboBox ? ui->primaryDeviceIconLabel : ui->secondaryDeviceIconLabel;
     QPixmap icon = info.deviceIcon();
     if (!icon.isNull())

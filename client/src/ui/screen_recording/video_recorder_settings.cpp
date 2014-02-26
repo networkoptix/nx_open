@@ -53,7 +53,7 @@ QnVideoRecorderSettings::~QnVideoRecorderSettings()
 QString QnVideoRecorderSettings::getFullDeviceName(const QString& shortName)
 {
 #ifdef Q_OS_WIN
-    return WinAudioExtendInfo(shortName).fullName();
+    return QnWinAudioDeviceInfo(shortName).fullName();
 #else
     return shortName;
 #endif

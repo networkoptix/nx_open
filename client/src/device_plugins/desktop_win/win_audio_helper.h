@@ -5,35 +5,23 @@
 
 #ifdef Q_OS_WIN
 
-#include <Windows.h>
-
 #include <QtCore/QString>
+#include <QtCore/QScopedPointer>
+#include <QtGui/QPixmap>
 
-struct IMMDeviceEnumerator;
-struct IMMDevice;
+class QnWinAudioDeviceInfoPrivate;
 
-class WinAudioExtendInfo {
+class QnWinAudioDeviceInfo {
 public:
-    WinAudioExtendInfo(const QString& name);
-    virtual ~WinAudioExtendInfo();
+    QnWinAudioDeviceInfo(const QString &deviceName);
+    virtual ~QnWinAudioDeviceInfo();
 
-    QString fullName() const { return m_fullName; }
+    QString fullName() const;
     bool isMicrophone() const;
-    QPixmap deviceIcon();
+    QPixmap deviceIcon() const;
 
 private:
-    bool getDeviceInfo(IMMDevice *pMMDevice, bool isDefault);
-
-private:
-    int m_iconGroupIndex;
-    int m_iconGroupNum;
-    QString m_deviceName;
-    QString m_fullName;
-    GUID m_jackSubType;
-    QString m_iconPath;
-    IMMDeviceEnumerator *m_pMMDeviceEnumerator;
-
-    friend BOOL CALLBACK enumFunc(HMODULE hModule, LPCTSTR lpszType, LPTSTR lpszName, LONG_PTR lParam);
+    QScopedPointer<QnWinAudioDeviceInfoPrivate> d;
 };
 
 #endif // Q_OS_WIN
