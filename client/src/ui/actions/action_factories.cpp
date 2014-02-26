@@ -38,7 +38,7 @@ QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnAction
         QAction *action = new QAction(parent);
         action->setText(layout->getName());
         action->setData(QVariant::fromValue<QnLayoutResourcePtr>(layout));
-        connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
+        connect(action, &QAction::triggered, this, &QnOpenCurrentUserLayoutActionFactory::at_action_triggered);
 
         result.push_back(action);
     }
@@ -100,7 +100,7 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
                 .withArgument(Qn::PtzObjectIdRole, preset.id)
                 .withArgument(Qn::ActionIdRole, static_cast<int>(Qn::PtzActivatePresetAction))
         ));
-        connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
+        connect(action, &QAction::triggered, this, &QnPtzPresetsToursActionFactory::at_action_triggered);
 
         result.push_back(action);
     }
@@ -131,7 +131,7 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
                 .withArgument(Qn::PtzObjectIdRole, tour.id)
                 .withArgument(Qn::ActionIdRole, static_cast<int>(Qn::PtzActivateTourAction))
         ));
-        connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
+        connect(action, &QAction::triggered, this, &QnPtzPresetsToursActionFactory::at_action_triggered);
 
         result.push_back(action);
     }
