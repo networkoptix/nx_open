@@ -10,6 +10,7 @@
 
 #include "ui/workaround/gl_widget_factory.h"
 #include "ui/workaround/gl_native_painting.h"
+#include "ui/workaround/gl_widget_workaround.h"
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/help/help_topic_accessor.h"
@@ -19,11 +20,11 @@
 #include "export/sign_helper.h"
 
 // TODO: #Elric replace with QnRenderingWidget
-class QnSignDialogGlWidget: public QGLWidget
+class QnSignDialogGlWidget: public QnGLWidget
 {
 public:
     QnSignDialogGlWidget(const QGLFormat &format, QWidget *parent = NULL, QGLWidget *shareWidget = NULL, Qt::WindowFlags windowFlags = 0):
-        QGLWidget(format, parent, shareWidget, windowFlags)
+        QnGLWidget(format, parent, shareWidget, windowFlags)
     {
         m_renderer = 0;
         connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
