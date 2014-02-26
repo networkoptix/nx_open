@@ -23,6 +23,7 @@ const char* QnPlAreconVisionResource::MANUFACTURE = "ArecontVision";
 QnPlAreconVisionResource::QnPlAreconVisionResource()
     : m_totalMdZones(64)
 {
+    setVendor(lit("ArecontVision"));
 }
 
 bool QnPlAreconVisionResource::isPanoramic() const

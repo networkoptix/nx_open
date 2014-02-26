@@ -1191,7 +1191,10 @@ void QnTimeSlider::setColors(const QnTimeSliderColors &colors) {
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::updatePixmapCache() {
     m_pixmapCache->setFont(font());
-    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, palette().color(QPalette::WindowText)); // TODO: #Elric customize color
+    m_pixmapCache->setColor(palette().color(QPalette::WindowText));
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16); 
+
+    updateLineCommentPixmaps();
 }
 
 void QnTimeSlider::updateKineticProcessor() {
@@ -1243,8 +1246,7 @@ void QnTimeSlider::updateLineCommentPixmap(int line) {
 
     m_lineData[line].commentPixmap = m_pixmapCache->textPixmap(
         m_lineData[line].comment,
-        height,
-        palette().color(QPalette::WindowText)
+        height
     );
 }
 
@@ -1867,7 +1869,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         /* Draw label if needed. */
         qreal lineHeight = m_stepData[index].currentLineHeight;
         if(!qFuzzyIsNull(m_stepData[index].currentTextOpacity)) {
-            QPixmap pixmap = m_pixmapCache->positionShortPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index], palette().color(QPalette::WindowText));
+            QPixmap pixmap = m_pixmapCache->positionShortPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
             QRectF textRect(x - pixmap.width() / 2.0, rect.top() + lineHeight, pixmap.width(), pixmap.height());
 
             QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_stepData[index].currentTextOpacity);
@@ -1923,7 +1925,7 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
         painter->setBrush(number % 2 ? m_colors.dateOverlay : m_colors.dateOverlayAlternate);
         painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
 
-        QPixmap pixmap = m_pixmapCache->positionLongPixmap(pos0, textHeight, highlightStep, palette().color(QPalette::WindowText));
+        QPixmap pixmap = m_pixmapCache->positionLongPixmap(pos0, textHeight, highlightStep);
 
         QRectF textRect((x0 + x1) / 2.0 - pixmap.width() / 2.0, rect.top() + textTopMargin, pixmap.width(), pixmap.height());
         if(textRect.left() < rect.left())
@@ -2343,8 +2345,14 @@ void QnTimeSlider::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
 void QnTimeSlider::changeEvent(QEvent *event) {
     base_type::changeEvent(event);
 
-    if(event->type() == QEvent::FontChange)
+    switch (event->type()) {
+    case QEvent::FontChange:
+    case QEvent::PaletteChange:
         updatePixmapCache();
+        break;
+    default:
+        break;
+    }
 }
 
 void QnTimeSlider::startDragProcess(DragInfo *) {

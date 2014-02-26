@@ -26,7 +26,7 @@
 #include <utils/common/environment.h>
 #include <utils/common/warnings.h>
 
-#define QN_SCREENSHOT_DEBUG
+//#define QN_SCREENSHOT_DEBUG
 #ifdef QN_SCREENSHOT_DEBUG
 #   define TRACE(...) qDebug() << __VA_ARGS__
 #else

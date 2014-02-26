@@ -430,7 +430,7 @@ class QnResourceFactory
 public:
     virtual ~QnResourceFactory() {}
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QString& url) = 0;
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QString &url) = 0;
 };
 
 typedef QSharedPointer<QnResourceFactory> QnResourceFactoryPtr;

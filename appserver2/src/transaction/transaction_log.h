@@ -40,11 +40,11 @@ namespace ec2
             return saveToDB(tran.id, transactionHash(tran), serializedTran);
         }
 
-        ErrorCode saveTransaction(const QnTransaction<ApiLayoutDataList>& multiTran, const QByteArray& serializedTran) {
+        ErrorCode saveTransaction(const QnTransaction<ApiLayoutDataList>& multiTran, const QByteArray& /*serializedTran*/) {
             return saveMultiTransaction<ApiLayoutDataList, ApiLayoutData>(multiTran);
         }
 
-        ErrorCode saveTransaction(const QnTransaction<ApiCameraDataList>& multiTran, const QByteArray& serializedTran) {
+        ErrorCode saveTransaction(const QnTransaction<ApiCameraDataList>& multiTran, const QByteArray& /*serializedTran*/) {
             return saveMultiTransaction<ApiCameraDataList, ApiCameraData>(multiTran);
         }
 
@@ -74,8 +74,8 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiIdData>& tran)                  { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiSetResourceStatusData>& tran)   { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiSetResourceDisabledData>& tran) { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiCameraServerItemData>& tran)    { return QUuid::createUuid() ; }
-        QUuid transactionHash(const QnTransaction<ApiPanicModeData>& tran)           { return makeHash("panic_mode") ; }
+        QUuid transactionHash(const QnTransaction<ApiCameraServerItemData>&)         { return QUuid::createUuid() ; }
+        QUuid transactionHash(const QnTransaction<ApiPanicModeData>&)                { return makeHash("panic_mode") ; }
         QUuid transactionHash(const QnTransaction<ApiResourceParams>& tran)          { return makeHash(tran.params.id.toByteArray(), "res_params") ; }
         QUuid transactionHash(const QnTransaction<ApiStoredFileData>& tran)          { return makeHash(tran.params.path.toUtf8()); }
         QUuid transactionHash(const QnTransaction<ApiStoredFilePath>& tran)          { return makeHash(tran.params.toUtf8()); }

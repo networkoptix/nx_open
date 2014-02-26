@@ -206,6 +206,16 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
     request.Position = &onvifPosition;
     request.Speed = &onvifSpeed;
 
+#if 0
+    qDebug() << "";
+    qDebug() << "";
+    qDebug() << "";
+    qDebug() << "ABSOLUTE MOVE" << position;
+    qDebug() << "";
+    qDebug() << "";
+    qDebug() << "";
+#endif
+
     _onvifPtz__AbsoluteMoveResponse response;
     if (ptz.doAbsoluteMove(request, response) != SOAP_OK) {
         qCritical() << "Error executing PTZ absolute move command for resource " << m_resource->getUniqueId() << ". Error: " << ptz.getLastError();

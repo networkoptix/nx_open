@@ -48,6 +48,8 @@ public:
     void beforeDestroyDataProvider(QnAbstractDataConsumer* dataProviderWrapper);
 
     bool isInitialized() const;
+
+    QnConstResourceAudioLayoutPtr getAudioLayout();
 protected:
     // QnLongRunnable runable
     virtual void run();
@@ -130,6 +132,9 @@ private:
     QMutex m_startMutex;
     bool m_started;
     bool m_isInitialized;
+
+    class QnDesktopAudioLayout;
+    std::shared_ptr<QnDesktopAudioLayout> audioLayout;
 
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance,  DWORD dwParam1, DWORD dwParam2);
 };

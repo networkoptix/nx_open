@@ -36,6 +36,8 @@ QnActiResource::QnActiResource()
     m_inputCount(0),
     m_inputMonitored(false)
 {
+    setVendor(lit("ACTI"));
+
     setAuth(QLatin1String("admin"), QLatin1String("123456"));
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
         m_availBitrate << DEFAULT_AVAIL_BITRATE_KBPS[i];

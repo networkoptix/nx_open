@@ -276,7 +276,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(sceneFocusSignalingInstrument);
 
     /* View/viewport instruments. */
-    m_manager->installInstrument(m_rotationInstrument, InstallationMode::InstallAfter, display()->transformationListenerInstrument());
+    m_manager->installInstrument(m_rotationInstrument);
     m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(m_resizingInstrument);
     m_manager->installInstrument(m_moveInstrument);

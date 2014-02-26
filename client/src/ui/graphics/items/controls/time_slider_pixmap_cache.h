@@ -25,23 +25,21 @@ public:
     const QFont &font() const;
     void setFont(const QFont &font);
 
-    const QPixmap &positionShortPixmap(qint64 position, int height, const QnTimeStep &step, const QColor &color);
-    const QPixmap &positionLongPixmap(qint64 position, int height, const QnTimeStep &step, const QColor &color);
-    const QPixmap &textPixmap(const QString &text, int height, const QColor &color);
+    const QColor &color() const;
+    void setColor(const QColor &color);
 
-    /**
-     * Clears positional part of this cache.
-     * 
-     * Note that underlying <tt>QString->QPixmap</tt> cache is not cleared.
-     */
+    const QPixmap &positionShortPixmap(qint64 position, int height, const QnTimeStep &step);
+    const QPixmap &positionLongPixmap(qint64 position, int height, const QnTimeStep &step);
+    const QPixmap &textPixmap(const QString &text, int height);
+
     Q_SLOT void clear();
 
 private:
     QFont m_font;
+    QColor m_color;
     QnTextPixmapCache *m_cache;
     QCache<qint32, const QPixmap> m_pixmapByShortPositionKey;
     QCache<QnTimeStepLongCacheKey, const QPixmap> m_pixmapByLongPositionKey;
-    QPixmap m_nullPixmap;
 };
 
 #endif // QN_TIME_SLIDER_PIXMAP_CACHE_H

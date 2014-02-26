@@ -39,6 +39,8 @@ void QnClientMessageProcessor::updateResource(QnResourcePtr resource)
             determineOptimalIF(mediaServer);
     }
 
+    // TODO: #Elric #2.3 don't update layout if we're re-reading resources, 
+    // this leads to unsaved layouts spontaneously rolling back to last saved state.
 
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
