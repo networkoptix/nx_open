@@ -37,7 +37,7 @@ int QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandlerPt
 }
 
 template<class T>
-int QnBusinessEventManager<T>::testEmailSettings( const QnKvPairList& settings, impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::testEmailSettings( const QnKvPairList& /*settings*/, impl::SimpleHandlerPtr /*handler*/ )
 {
     //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;

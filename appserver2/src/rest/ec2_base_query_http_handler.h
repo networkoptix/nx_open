@@ -121,8 +121,9 @@ namespace ec2
         }
 
         template<class HandlerType>
-        void processQueryAsync( ApiCommand::Value cmdCode, const InputData& inputData, HandlerType handler )
+        void processQueryAsync( ApiCommand::Value /*cmdCode*/, const InputData& inputData, HandlerType handler )
         {
+            // TODO: #Elric maybe compare m_cmdCode and passed cmdCode?
             m_queryProcessor->processQueryAsync<InputData, OutputData, HandlerType>(
                 m_cmdCode,
                 inputData,
@@ -159,7 +160,7 @@ namespace ec2
         }
 
         template<class HandlerType>
-        void processQueryAsync( ApiCommand::Value cmdCode, const InputData& inputData, HandlerType handler )
+        void processQueryAsync( ApiCommand::Value /*cmdCode*/, const InputData& inputData, HandlerType handler )
         {
             QtConcurrent::run( [this, inputData, handler]() {
                 OutputData output;

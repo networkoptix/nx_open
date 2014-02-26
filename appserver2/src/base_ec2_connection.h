@@ -149,7 +149,7 @@ namespace ec2
             emit initNotification(fullResData);
         }
 
-        template<> void triggerNotification<ApiPanicModeData>( const QnTransaction<ApiPanicModeData>& tran ) {
+        template<> void triggerNotification<ApiPanicModeData>( const QnTransaction<ApiPanicModeData>& /*tran*/ ) {
             //TODO/IMPL
         }
 
