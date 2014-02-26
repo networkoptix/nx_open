@@ -16,6 +16,12 @@
 #include <core/ptz/home_ptz_controller.h>
 
 void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) {
+    // TODO: #Elric we're updating controller on every init call.
+    // Do it only once!!! 
+    // 
+    // TODO: #Elric we're creating controller from main thread. 
+    // Controller ctor may take some time (several seconds).
+    // => main thread will stall.
     connect(resource, &QnResource::initialized, this, &QnServerPtzControllerPool::updateController, Qt::QueuedConnection);
     base_type::registerResource(resource);
 }
