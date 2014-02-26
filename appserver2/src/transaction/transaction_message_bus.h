@@ -10,6 +10,7 @@
 namespace ec2
 {
     class QnTransactionMessageBus;
+    class QnTransactionTransport;
 
     class QnTransactionTransport: public QObject, public aio::AIOEventHandler
     {
@@ -111,10 +112,10 @@ namespace ec2
             sendTransactionInternal(!tran.originGuid.isNull() ? tran.originGuid : tran.id.peerGUID, buffer);
         }
 
+    signals:
+        void sendGotTransaction(QnTransactionTransport* sender, QByteArray data);
     private:
         friend class QnTransactionTransport;
-
-        void toFormattedHex(quint8* dst, quint32 payloadSize);
 
         template <class T>
         void serializeTransaction(QByteArray& buffer, const QnTransaction<T>& tran) 
@@ -126,8 +127,6 @@ namespace ec2
             quint32 payloadSize = buffer.size() - 12;
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
         }
-
-        void sendTransactionInternal(const QnId& originGuid, const QByteArray& buffer);
 
         class AbstractHandler
         {
@@ -149,35 +148,33 @@ namespace ec2
             T* m_handler;
         };
 
-        inline void gotTransaction(QnTransactionTransport* sender, QByteArray data) { emit sendGotTransaction(sender, data); }
-    signals:
-        void sendGotTransaction(QnTransactionTransport* sender, QByteArray data);
-    private slots:
-        void at_timer();
-        void at_gotTransaction(QnTransactionTransport* sender, QByteArray data);
-    private:
-        void processConnState(QSharedPointer<QnTransactionTransport> &transport);
-        void sendSyncRequestIfRequired(QnTransactionTransport* transport);
-        static bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
-        void moveOutgoingConnToMainList(QnTransactionTransport* transport);
-    private:
-        AbstractHandler* m_handler;
-        QTimer* m_timer;
-        QMutex m_mutex;
-        QThread *m_thread;
-
-        //QVector<QnTransactionTransport*> m_connections;
-
-        struct QnConnectionsPair {
-            QnConnectionsPair() {}
+        struct ConnectionsToPeer 
+        {
+            ConnectionsToPeer() {}
             void proxyIncomingTransaction(const QnAbstractTransaction& tran, const QByteArray& data);
             void sendOutgoingTran(const QByteArray& data);
 
             QSharedPointer<QnTransactionTransport> incomeConn;
             QSharedPointer<QnTransactionTransport> outcomeConn;
         };
+        typedef QMap<QUuid, ConnectionsToPeer> QnConnectionMap;
 
-        typedef QMap<QUuid, QnConnectionsPair> QnConnectionMap;
+    private:
+        inline void gotTransaction(QnTransactionTransport* sender, QByteArray data) { emit sendGotTransaction(sender, data); }
+        void toFormattedHex(quint8* dst, quint32 payloadSize);
+        void sendTransactionInternal(const QnId& originGuid, const QByteArray& buffer);
+        void processConnState(QSharedPointer<QnTransactionTransport> &transport);
+        void sendSyncRequestIfRequired(QnTransactionTransport* transport);
+        void moveOutgoingConnToMainList(QnTransactionTransport* transport);
+        static bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
+    private slots:
+        void at_timer();
+        void at_gotTransaction(QnTransactionTransport* sender, QByteArray data);
+    private:
+        AbstractHandler* m_handler;
+        QTimer* m_timer;
+        QMutex m_mutex;
+        QThread *m_thread;
         QnConnectionMap m_connections;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
     };
