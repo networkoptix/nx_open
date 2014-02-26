@@ -95,6 +95,9 @@ void doAutoBind(QSqlQuery& , const char* , const std::vector<T>& ) {
 
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, bool& field) { field = query.value(idx).toBool(); }
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, qint32& field) { field = query.value(idx).toInt(); }
+inline void queryFieldToDataObj(QSqlQuery& query, int idx, quint32& field) { field = query.value(idx).toUInt(); }
+inline void queryFieldToDataObj(QSqlQuery& query, int idx, qint16& field) { field = (qint16) query.value(idx).toInt(); }
+inline void queryFieldToDataObj(QSqlQuery& query, int idx, qint8& field) { field = (qint8) query.value(idx).toInt(); }
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, qint64& field) { field = query.value(idx).toLongLong(); }
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, QByteArray& field) { field = query.value(idx).toByteArray(); }
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, QString& field) { field = query.value(idx).toString(); }

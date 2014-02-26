@@ -120,6 +120,16 @@ namespace QnBinary {
     }
 
     template <class T>
+    void serialize(qint8 field, OutputBinaryStream<T>* binStream) {
+        binStream->write(&field, sizeof(field));
+    }
+
+    template <class T>
+    void serialize(quint8 field, OutputBinaryStream<T>* binStream) {
+        binStream->write(&field, sizeof(field));
+    }
+
+    template <class T>
     void serialize(qint64 field, OutputBinaryStream<T>* binStream) {
         qint64 tmp = htonll(field);
         binStream->write(&tmp, sizeof(field));
@@ -137,7 +147,8 @@ namespace QnBinary {
 
     template <class T>
     void serialize(bool field, OutputBinaryStream<T>* binStream) {
-        binStream->write(&field, sizeof(field));
+        quint8 t = field ? 0xff : 0;
+        binStream->write(&t, 1);
     }
 
     template <class T>
@@ -211,6 +222,20 @@ namespace QnBinary {
     }
 
     template <class T>
+    bool deserialize(qint8& field, InputBinaryStream<T>* binStream) {
+        if( binStream->read(&field, sizeof(field)) != sizeof(field) )
+            return false;
+        return true;
+    }
+
+    template <class T>
+    bool deserialize(quint8& field, InputBinaryStream<T>* binStream) {
+        if( binStream->read(&field, sizeof(field)) != sizeof(field) )
+            return false;
+        return true;
+    }
+
+    template <class T>
     bool deserialize(qint64& field, InputBinaryStream<T>* binStream) {
         qint64 tmp;
         if( binStream->read(&tmp, sizeof(field)) != sizeof(field) )
@@ -231,7 +256,10 @@ namespace QnBinary {
 
     template <class T>
     bool deserialize(bool& field, InputBinaryStream<T>* binStream) {
-        return binStream->read(&field, sizeof(field)) == sizeof(field);
+        quint8 t;
+        bool rez = binStream->read(&t, 1) == 1;
+        field = (bool) t;
+        return rez;
     }
 
     typedef quint8 FixedArray[];
