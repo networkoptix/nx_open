@@ -37,7 +37,7 @@ QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(const QStri
 }
 
 QnAbstractResourcePropertyAdaptor::~QnAbstractResourcePropertyAdaptor() {
-    setResource(QnResourcePtr()); /* This will disconnect us from resource. */
+    setResourceInternal(QnResourcePtr(), false); /* This will disconnect us from resource. */
 }
 
 const QString &QnAbstractResourcePropertyAdaptor::key() const {
@@ -50,6 +50,10 @@ QnResourcePtr QnAbstractResourcePropertyAdaptor::resource() const {
 }
 
 void QnAbstractResourcePropertyAdaptor::setResource(const QnResourcePtr &resource) {
+    setResourceInternal(resource, true);
+}
+
+void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr &resource, bool notify) {
     QString newSerializedValue = resource ? resource->getProperty(m_key) : QString();
 
     bool changed;
@@ -78,7 +82,7 @@ void QnAbstractResourcePropertyAdaptor::setResource(const QnResourcePtr &resourc
     if(oldResource)
         processSaveRequestsNoLock(oldResource, oldSerializedValue);
 
-    if(changed)
+    if(changed && notify)
         emit valueChanged();
 }
 

@@ -20,8 +20,10 @@ public:
     QString fullName() const { return m_fullName; }
     bool isMicrophone() const;
     QPixmap deviceIcon();
+
 private:
     bool getDeviceInfo(IMMDevice *pMMDevice, bool isDefault);
+
 private:
     int m_iconGroupIndex;
     int m_iconGroupNum;
@@ -29,9 +31,9 @@ private:
     QString m_fullName;
     GUID m_jackSubType;
     QString m_iconPath;
-    IMMDeviceEnumerator* m_pMMDeviceEnumerator;
+    IMMDeviceEnumerator *m_pMMDeviceEnumerator;
 
-    friend BOOL CALLBACK enumFunc(HMODULE hModule, LPCTSTR lpszType, LPTSTR lpszName,LONG_PTR lParam);
+    friend BOOL CALLBACK enumFunc(HMODULE hModule, LPCTSTR lpszType, LPTSTR lpszName, LONG_PTR lParam);
 };
 
 #endif // Q_OS_WIN

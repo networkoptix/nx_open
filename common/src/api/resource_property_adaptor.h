@@ -121,6 +121,8 @@ private:
     void enqueueSaveRequest();
     Q_SIGNAL void saveRequestQueued();
 
+    void setResourceInternal(const QnResourcePtr &resource, bool notify);
+
     Q_SLOT void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
 
 private:
