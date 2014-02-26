@@ -105,8 +105,8 @@
                 "fromCamera": {
                     "x": {
                         "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [0,     1,  -1, -0.05555],
-                        "logical": [0, 179.9, 180,      350]
+                        "device":  [0,        1,  -1, -0.05555],
+                        "logical": [-180, -0.01,   0,      170]
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",

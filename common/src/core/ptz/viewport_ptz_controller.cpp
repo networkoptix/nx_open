@@ -76,12 +76,12 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
     QVector3D r1 = r + x * delta.x() + y * delta.y();
     QnSphericalPoint<float> newSpherical = cartesianToSpherical<QVector3D>(r1);
 
-    /* Calculate new FOV. */
+    /* Calculate new position. */
     float newFov = qRadiansToDegrees(std::atan((unit / 2.0) / zoom)) * 2.0;
+    float newPan = qRadiansToDegrees(newSpherical.phi);
+    float newTilt = qRadiansToDegrees(newSpherical.psi);
+    QVector3D newPosition = qBound(QVector3D(newPan, newTilt, newFov), limits);
     
-    /* Fill in new position. */
-    QVector3D newPosition = qBound(QVector3D(qRadiansToDegrees(newSpherical.phi), qRadiansToDegrees(newSpherical.psi), newFov), limits);
-
     /* Send it to the camera. */
     return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed);
 }
