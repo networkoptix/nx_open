@@ -928,7 +928,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::PtzCalibrateFisheyeAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
         text(tr("Calibrate Fisheye")).
-        condition(new QnPtzActionCondition(Qn::VirtualPtzCapability, this)); // TODO: #Elric fisheye cap
+        condition(new QnPtzActionCondition(Qn::VirtualPtzCapability, this));
 
 #if 0
     factory(Qn::ToggleRadassAction).

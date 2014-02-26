@@ -21,7 +21,7 @@
 #pragma comment(lib, "ole32.lib")
 
 /* This one is private API, but it is exported from QtGui. */
-extern QPixmap qt_pixmapFromWinHICON(HICON icon); // TODO: #Elric use QWinExtras
+extern QPixmap qt_pixmapFromWinHICON(HICON icon); // TODO: #Elric use QtWin::fromHICON
 
 // -------------------------------------------------------------------------- //
 // QnWinAudioDeviceInfoPrivate

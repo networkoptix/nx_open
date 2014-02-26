@@ -45,8 +45,6 @@ QString QnResourceDirectoryBrowser::manufacture() const {
 }
 
 QnResourceDirectoryBrowser &QnResourceDirectoryBrowser::instance() {
-    // TODO: #Elric this causes heap corruption, investigate
-    //return *qnResourceDirectoryBrowserInstance();
     static QnResourceDirectoryBrowser inst;
     return inst;
 }
