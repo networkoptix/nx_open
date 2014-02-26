@@ -14,10 +14,10 @@ QnTransactionLog::QnTransactionLog(QnDbManager* db): m_dbManager(db)
     globalInstance = this;
 
     QSqlQuery query(m_dbManager->getDB());
-    query.prepare("SELECT distinct peer_guid FROM transaction_log");
+    query.prepare("SELECT peer_guid, max(sequence) as sequence FROM transaction_log GROUP BY peer_guid");
     if (query.exec()) {
         while (query.next())
-            m_peerList << QUuid::fromRfc4122(query.value(0).toByteArray());
+            m_state.insert(QUuid::fromRfc4122(query.value(0).toByteArray()), query.value(1).toInt());
     }
 }
 
@@ -37,8 +37,6 @@ QUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data
 
 ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction::ID& tranID, const QUuid& hash, const QByteArray& data)
 {
-    m_peerList.insert(tranID.peerGUID);
-
     QSqlQuery query(m_dbManager->getDB());
     query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, sequence, tran_guid, tran_data) values (?, ?, ?, ?)");
     query.bindValue(0, tranID.peerGUID);
@@ -50,28 +48,27 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction::ID& tranID, co
         return ErrorCode::failure;
     }
 
+    m_state[tranID.peerGUID] = qMax(m_state[tranID.peerGUID], tranID.sequence);
     return ErrorCode::ok;
 }
 
-ErrorCode QnTransactionLog::getTransactionsState(QnTranState& state)
+QnTranState QnTransactionLog::getTransactionsState()
 {
     QReadLocker lock(&m_dbManager->getMutex());
+    return m_state;
+}
 
-    state.clear();
-    QSqlQuery query(m_dbManager->getDB());
-    query.prepare("SELECT peer_guid, max(sequence) as sequence FROM transaction_log GROUP BY peer_guid");
-    if (query.exec())
-        return ErrorCode::failure;
-    while (query.next())
-        state.insert(QUuid::fromRfc4122(query.value(0).toByteArray()), query.value(1).toInt());
-    return ErrorCode::ok;
+bool QnTransactionLog::contains(const QnAbstractTransaction::ID& id)
+{
+    QReadLocker lock(&m_dbManager->getMutex());
+    return m_state.value(id.peerGUID) >= id.sequence;
 }
 
 ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result)
 {
     QReadLocker lock(&m_dbManager->getMutex());
 
-    foreach(const QUuid& peerGuid, m_peerList)
+    foreach(const QUuid& peerGuid, m_state.keys())
     {
         QSqlQuery query(m_dbManager->getDB());
         query.prepare("SELECT tran_data FROM transaction_log WHERE peer_guid = ? and sequence > ?");

@@ -111,9 +111,10 @@ namespace ec2
         static void setStartNumber(const qint64& value);
 
         template <class T2>
-        bool deserialize(ApiCommand::Value command, InputBinaryStream<T2>* stream) 
+        bool deserialize(InputBinaryStream<T2>* stream) 
         {
-            this->command = command;
+            if (!QnBinary::deserialize(command, stream))
+                return false;
             if (!QnBinary::deserialize(id, stream))
                 return false;
             if (!QnBinary::deserialize(persistent, stream))
@@ -141,6 +142,7 @@ namespace ec2
     {
     public:
         QnTransaction() {}
+        QnTransaction(const QnAbstractTransaction& abstractTran): QnAbstractTransaction(abstractTran) {}
         
         T params;
 
@@ -151,9 +153,9 @@ namespace ec2
         }
 
         template <class T2>
-        bool deserialize(ApiCommand::Value command, InputBinaryStream<T2>* stream) 
+        bool deserialize(InputBinaryStream<T2>* stream) 
         {
-            return QnAbstractTransaction::deserialize(command, stream) &&
+            return QnAbstractTransaction::deserialize(stream) &&
                 QnBinary::deserialize(params, stream);
                 //params.deserialize(stream);
         }

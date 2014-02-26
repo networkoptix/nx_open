@@ -246,7 +246,7 @@ void QnTransactionMessageBus::sendSyncRequestIfRequired(QnTransactionTransport* 
         // send sync request
         QnTransaction<QnTranState> requestTran;
         requestTran.initNew(ApiCommand::tranSyncRequest, false);
-        transactionLog->getTransactionsState(requestTran.params);
+        requestTran.params = transactionLog->getTransactionsState();
         QByteArray syncRequest;
         OutputBinaryStream<QByteArray> stream(&syncRequest);
         QnBinary::serialize(requestTran, &stream);
@@ -291,44 +291,58 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     delete m_timer;
 }
 
+void QnTransactionMessageBus::QnConnectionsPair::proxyIncomingTransaction(const QnAbstractTransaction& tran, const QByteArray& data)
+{
+    // proxy data to connected clients only. You can update this function to peer-to-peer sync via proxy in future
+    if (incomeConn && incomeConn->state == QnTransactionTransport::ReadyForStreaming && incomeConn->isClientPeer)
+        incomeConn->addData(data);
+}
+
+void QnTransactionMessageBus::QnConnectionsPair::sendOutgoingTran(const QByteArray& data)
+{
+    if (incomeConn && incomeConn->state   == QnTransactionTransport::WaitForTranSync ||
+        outcomeConn && outcomeConn->state == QnTransactionTransport::WaitForTranSync)
+        return; // tcp is connected, but initialSync isn't done yet. do not send data for a while
+
+    if (incomeConn && incomeConn->state == QnTransactionTransport::ReadyForStreaming)
+        incomeConn->addData(data);
+    else if (outcomeConn && outcomeConn->state == QnTransactionTransport::ReadyForStreaming)
+        outcomeConn->addData(data);
+}
+
 void QnTransactionMessageBus::at_gotTransaction(QnTransactionTransport* sender, QByteArray data)
 {
+    QnAbstractTransaction tran;
+    InputBinaryStream<QByteArray> stream(data);
+    if (!tran.deserialize(&stream)) {
+        qWarning() << Q_FUNC_INFO << "Ignore bad transaction data. size=" << data.size();
+        return;
+    }
+
     QMutexLocker lock(&m_mutex);
 
-    // proxy incoming transaction to other peers. Source media server sends transaction to all other server. We should proxy transaction to connected clients only.
+    // proxy incoming transaction to other peers.
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
         if (itr.key() == sender->remoteGuid)
             continue;
         QnConnectionsPair& connection = itr.value();
-        if (connection.incomeConn && connection.incomeConn->state == QnTransactionTransport::ReadyForStreaming && connection.incomeConn->isClientPeer)
-            connection.incomeConn->addData(data);
+        connection.proxyIncomingTransaction(tran, data);
     }
 
     if (m_handler)
         m_handler->processByteArray(sender, data);
 }
 
-void QnTransactionMessageBus::sendTransactionInternal(const QnId& ignoreGuid1, const QnId& ignnoreGuid2, const QByteArray& buffer)
+void QnTransactionMessageBus::sendTransactionInternal(const QnId& originGuid, const QByteArray& buffer)
 {
     QMutexLocker lock(&m_mutex);
     for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
-        if (itr.key() == ignoreGuid1 || itr.key() == ignnoreGuid2)
-            continue;
+        if (itr.key() == originGuid)
+            continue; // do not send transaction back to originator.
         QnConnectionsPair& data = itr.value();
-        if (data.incomeConn) {
-            if (data.incomeConn->state == QnTransactionTransport::ReadyForStreaming) {
-                data.incomeConn->addData(buffer);
-                continue;
-            }
-            else if (data.incomeConn->state == QnTransactionTransport::WaitForTranSync)
-                continue;
-        }
-        if (data.outcomeConn) {
-            if (data.outcomeConn->state == QnTransactionTransport::ReadyForStreaming)
-                data.outcomeConn->addData(buffer);
-        }
+        data.sendOutgoingTran(buffer);
     }
 }
 
@@ -337,10 +351,10 @@ void QnTransactionMessageBus::sendTransactionInternal(const QnId& ignoreGuid1, c
 
 template <class T>
 template <class T2>
-bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(ApiCommand::Value command, InputBinaryStream<QByteArray>& stream)
+bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbstractTransaction&  abstractTran, InputBinaryStream<QByteArray>& stream)
 {
-    QnTransaction<T2> tran;
-    if (!tran.deserialize(command, &stream))
+    QnTransaction<T2> tran(abstractTran);
+    if (!QnBinary::deserialize(tran.params, &stream))
         return false;
     
     // trigger notification, update local data e.t.c
@@ -354,15 +368,13 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
 {
     sender->state = QnTransactionTransport::ReadyForStreaming;
 
-    QnTransaction<QnTranState> tran;
-    if (tran.deserialize(ApiCommand::tranSyncRequest, &stream))
+    QnTranState params;
+    if (QnBinary::deserialize(params, &stream))
     {
         QList<QByteArray> transactions;
-        const ErrorCode errorCode = transactionLog->getTransactionsAfter(tran.params, transactions);
+        const ErrorCode errorCode = transactionLog->getTransactionsAfter(params, transactions);
         if (errorCode == ErrorCode::ok) 
         {
-            QnTransaction<QnTranState> response;
-                
             foreach(const QByteArray& data, transactions)
                 sender->addData(data);
             return true;
@@ -379,72 +391,75 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
 {
     Q_ASSERT(data.size() > 4);
     InputBinaryStream<QByteArray> stream(data);
-    ApiCommand::Value command;
-    if (!QnBinary::deserialize(command, &stream))
+    QnAbstractTransaction  abstractTran;
+    if (!QnBinary::deserialize(abstractTran, &stream))
         return false; // bad data
-    switch (command)
+    if (abstractTran.persistent && transactionLog->contains(abstractTran.id))
+        return true; // transaction already processed
+
+    switch (abstractTran.command)
     {
         case ApiCommand::tranSyncRequest:
             return QnTransactionMessageBus::onGotTransactionSyncRequest(sender, stream);
 
         case ApiCommand::getAllDataList:
-            return deliveryTransaction<ApiFullData>(command, stream);
+            return deliveryTransaction<ApiFullData>(abstractTran, stream);
 
         //!ApiSetResourceStatusData
         case ApiCommand::setResourceStatus:
-            return deliveryTransaction<ApiSetResourceStatusData>(command, stream);
+            return deliveryTransaction<ApiSetResourceStatusData>(abstractTran, stream);
         //!ApiSetResourceDisabledData
         case ApiCommand::setResourceDisabled:
-            return deliveryTransaction<ApiSetResourceDisabledData>(command, stream);
+            return deliveryTransaction<ApiSetResourceDisabledData>(abstractTran, stream);
         //!ApiResourceParams
         case ApiCommand::setResourceParams:
-            return deliveryTransaction<ApiResourceParams>(command, stream);
+            return deliveryTransaction<ApiResourceParams>(abstractTran, stream);
         case ApiCommand::saveResource:
-            return deliveryTransaction<ApiResourceData>(command, stream);
+            return deliveryTransaction<ApiResourceData>(abstractTran, stream);
         case ApiCommand::removeResource:
-            return deliveryTransaction<ApiIdData>(command, stream);
+            return deliveryTransaction<ApiIdData>(abstractTran, stream);
         case ApiCommand::setPanicMode:
-            return deliveryTransaction<ApiPanicModeData>(command, stream);
+            return deliveryTransaction<ApiPanicModeData>(abstractTran, stream);
             
         case ApiCommand::saveCamera:
-            return deliveryTransaction<ApiCameraData>(command, stream);
+            return deliveryTransaction<ApiCameraData>(abstractTran, stream);
         case ApiCommand::saveCameras:
-            return deliveryTransaction<ApiCameraDataList>(command, stream);
+            return deliveryTransaction<ApiCameraDataList>(abstractTran, stream);
         case ApiCommand::removeCamera:
-            return deliveryTransaction<ApiIdData>(command, stream);
+            return deliveryTransaction<ApiIdData>(abstractTran, stream);
         case ApiCommand::addCameraHistoryItem:
-            return deliveryTransaction<ApiCameraServerItemData>(command, stream);
+            return deliveryTransaction<ApiCameraServerItemData>(abstractTran, stream);
 
         case ApiCommand::saveMediaServer:
-            return deliveryTransaction<ApiMediaServerData>(command, stream);
+            return deliveryTransaction<ApiMediaServerData>(abstractTran, stream);
         case ApiCommand::removeMediaServer:
-            return deliveryTransaction<ApiIdData>(command, stream);
+            return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
         case ApiCommand::saveUser:
-            return deliveryTransaction<ApiUserData>(command, stream);
+            return deliveryTransaction<ApiUserData>(abstractTran, stream);
         case ApiCommand::removeUser:
-            return deliveryTransaction<ApiIdData>(command, stream);
+            return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
         case ApiCommand::saveBusinessRule:
-            return deliveryTransaction<ApiBusinessRuleData>(command, stream);
+            return deliveryTransaction<ApiBusinessRuleData>(abstractTran, stream);
         case ApiCommand::removeBusinessRule:
-            return deliveryTransaction<ApiIdData>(command, stream);
+            return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
         case ApiCommand::saveLayouts:
-            return deliveryTransaction<ApiLayoutDataList>(command, stream);
+            return deliveryTransaction<ApiLayoutDataList>(abstractTran, stream);
         case ApiCommand::saveLayout:
-            return deliveryTransaction<ApiLayoutData>(command, stream);
+            return deliveryTransaction<ApiLayoutData>(abstractTran, stream);
         case ApiCommand::removeLayout:
-            return deliveryTransaction<ApiIdData>(command, stream);
+            return deliveryTransaction<ApiIdData>(abstractTran, stream);
             
         case ApiCommand::addStoredFile:
         case ApiCommand::updateStoredFile:
-            return deliveryTransaction<ApiStoredFileData>(command, stream);
+            return deliveryTransaction<ApiStoredFileData>(abstractTran, stream);
         case ApiCommand::removeStoredFile:
-            return deliveryTransaction<ApiStoredFilePath>(command, stream);
+            return deliveryTransaction<ApiStoredFilePath>(abstractTran, stream);
 
         case ApiCommand::broadcastBusinessAction:
-            return deliveryTransaction<ApiBusinessActionData>(command, stream);
+            return deliveryTransaction<ApiBusinessActionData>(abstractTran, stream);
 
         default:
             break;

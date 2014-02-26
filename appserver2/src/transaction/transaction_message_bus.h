@@ -90,8 +90,6 @@ namespace ec2
             m_handler = 0;
         }
 
-        void toFormattedHex(quint8* dst, quint32 payloadSize);
-
         template <class T>
         void sendTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
@@ -102,7 +100,7 @@ namespace ec2
             buffer.append("\r\n"); // chunk end
             quint32 payloadSize = buffer.size() - 12;
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
-            sendTransactionInternal(tran.id.peerGUID, tran.originGuid, buffer);
+            sendTransactionInternal(!tran.originGuid.isNull() ? tran.originGuid : tran.id.peerGUID, buffer);
         }
 
         template <class T>
@@ -110,11 +108,13 @@ namespace ec2
         {
             QByteArray buffer;
             serializeTransaction(buffer, tran);
-            sendTransactionInternal(tran.id.peerGUID, tran.originGuid, buffer);
+            sendTransactionInternal(!tran.originGuid.isNull() ? tran.originGuid : tran.id.peerGUID, buffer);
         }
 
     private:
         friend class QnTransactionTransport;
+
+        void toFormattedHex(quint8* dst, quint32 payloadSize);
 
         template <class T>
         void serializeTransaction(QByteArray& buffer, const QnTransaction<T>& tran) 
@@ -127,7 +127,7 @@ namespace ec2
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
         }
 
-        void sendTransactionInternal(const QnId& ignoreGuid1, const QnId& ignnoreGuid2, const QByteArray& buffer);
+        void sendTransactionInternal(const QnId& originGuid, const QByteArray& buffer);
 
         class AbstractHandler
         {
@@ -144,7 +144,7 @@ namespace ec2
 
             virtual bool processByteArray(QnTransactionTransport* sender, const QByteArray& data) override;
         private:
-            template <class T2> bool deliveryTransaction(ApiCommand::Value command, InputBinaryStream<QByteArray>& stream);
+            template <class T2> bool deliveryTransaction(const QnAbstractTransaction&  abstractTran, InputBinaryStream<QByteArray>& stream);
         private:
             T* m_handler;
         };
@@ -170,6 +170,8 @@ namespace ec2
 
         struct QnConnectionsPair {
             QnConnectionsPair() {}
+            void proxyIncomingTransaction(const QnAbstractTransaction& tran, const QByteArray& data);
+            void sendOutgoingTran(const QByteArray& data);
 
             QSharedPointer<QnTransactionTransport> incomeConn;
             QSharedPointer<QnTransactionTransport> outcomeConn;

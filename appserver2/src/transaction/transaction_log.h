@@ -33,7 +33,8 @@ namespace ec2
         void initStaticInstance(QnTransactionLog* value);
 
         ErrorCode getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result);
-        ErrorCode getTransactionsState(QnTranState& state);
+        QnTranState getTransactionsState();
+        bool contains(const QnAbstractTransaction::ID& id);
         
         template <class T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran) {
@@ -104,7 +105,7 @@ namespace ec2
         ErrorCode saveToDB(const QnAbstractTransaction::ID& tranID, const QUuid& hash, const QByteArray& data);
     private:
         QnDbManager* m_dbManager;
-        QSet<QUuid> m_peerList;
+        QnTranState m_state;
     };
 };
 
