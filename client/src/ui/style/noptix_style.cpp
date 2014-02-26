@@ -243,8 +243,9 @@ void QnNoptixStyle::polish(QWidget *widget) {
     if(widget)
         base_type::polish(widget);
 
+    // TODO: #Elric #2.3 remove this line in 2.3, looks like it's not needed.
     if(QAbstractItemView *itemView = dynamic_cast<QAbstractItemView *>(widget))
-        itemView->setIconSize(QSize(18, 18)); // TODO: #Elric #customization move to customization?
+        itemView->setIconSize(QSize(18, 18)); 
 
     if(QAbstractButton *button = dynamic_cast<QAbstractButton *>(widget))
         button->setIcon(m_skin->icon(button->icon()));
