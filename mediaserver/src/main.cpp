@@ -162,6 +162,7 @@ class CmdLineArguments
 public:
     QString logLevel;
     QString rebuildArchive;
+    QString devModeKey;
 };
 
 static CmdLineArguments cmdLineArguments;
@@ -1255,6 +1256,8 @@ void QnMain::run()
     qnResPool->addResource(m_mediaServer);
 
     m_moduleFinder = new NetworkOptixModuleFinder(false);
+    //if (cmdLineArguments.devModeKey == lit("raz-raz-raz"))
+        m_moduleFinder->setCompatibilityMode(true);
     QObject::connect(
         m_moduleFinder,
         SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
@@ -1574,6 +1577,7 @@ int main(int argc, char* argv[])
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL, QString());
     commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL, QString(), "all");
+    //commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
     commandLineParser.addParameter(&configFilePath, "--conf-file", NULL, QString());
     commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL, QString());
     commandLineParser.addParameter(&showVersion, "--version", NULL, QString(), true);

@@ -45,8 +45,10 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction::ID& tranID, co
     query.bindValue(1, tranID.sequence);
     query.bindValue(2, hash);
     query.bindValue(3, data);
-    if (!query.exec())
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
+    }
 
     return ErrorCode::ok;
 }
