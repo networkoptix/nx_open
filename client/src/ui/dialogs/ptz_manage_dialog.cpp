@@ -634,7 +634,7 @@ bool QnPtzManageDialog::checkForUnsavedChanges(bool dontShowCancel) {
     QnMessageBox::StandardButton button = QnMessageBox::question(this, 0, tr("PTZ configuration is not saved"), tr("Changes are not saved. Do you want to save them?"),
                                                                  buttons, QnMessageBox::Yes);
     switch (button) {
-    case QnMessageBox::Ok:
+    case QnMessageBox::Yes:
         saveChanges();
         return true;
     case QnMessageBox::Cancel:
