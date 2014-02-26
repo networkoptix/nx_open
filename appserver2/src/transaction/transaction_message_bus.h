@@ -54,6 +54,7 @@ namespace ec2
         void startStreaming();
         void addData(const QByteArray& data);
         void processError();
+        void sendSyncRequest();
     protected:
         void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
         void closeSocket();
@@ -165,8 +166,11 @@ namespace ec2
         void sendTransactionInternal(const QnId& originGuid, const QByteArray& buffer);
         void processConnState(QSharedPointer<QnTransactionTransport> &transport);
         void sendSyncRequestIfRequired(QnTransactionTransport* transport);
+        QSharedPointer<QnTransactionTransport> getSibling(QnTransactionTransport* transport);
         void moveOutgoingConnToMainList(QnTransactionTransport* transport);
         static bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
+        void lock()   { m_mutex.lock(); }
+        void unlock() { m_mutex.unlock(); }
     private slots:
         void at_timer();
         void at_gotTransaction(QnTransactionTransport* sender, QByteArray data);
