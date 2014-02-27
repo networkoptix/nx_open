@@ -227,31 +227,31 @@ void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr clien
     nx_http::AsyncHttpClient::State state = client->state();
     if (state == nx_http::AsyncHttpClient::sFailed)
         processError();
-    else {
-        nx_http::HttpHeaders::const_iterator itr = client->response()->headers.find("guid");
-        if (itr != client->response()->headers.end()) {
-            remoteGuid = itr->second;
-            owner->moveOutgoingConnToMainList(this);
-        }
-        else {
-            processError();
-        }
-    }
 }
 
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
 {
+    nx_http::HttpHeaders::const_iterator itr = client->response()->headers.find("guid");
+    if (itr != client->response()->headers.end()) {
+        remoteGuid = itr->second;
+        owner->moveOutgoingConnToMainList(this);
+    }
+    else {
+        processError();
+        return;
+    }
+
     QByteArray data = httpClient->fetchMessageBodyBuffer();
     if (!data.isEmpty())
         processTransactionData(data);
     socket = httpClient->takeSocket();
     httpClient.reset();
 
-    if (!isClientPeer) {
-        owner->lock();
+    owner->lock();
+    startStreaming();
+    if (!isClientPeer)
         owner->sendSyncRequestIfRequired(this);
-        owner->unlock();
-    }
+    owner->unlock();
 }
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
@@ -303,7 +303,6 @@ QSharedPointer<QnTransactionTransport> QnTransactionMessageBus::getSibling(QnTra
 
 void QnTransactionMessageBus::sendSyncRequestIfRequired(QnTransactionTransport* transport)
 {
-    transport->startStreaming();
     QSharedPointer<QnTransactionTransport> subling = getSibling(transport);
     // if sync already done or in progress do not send new request
     if (!subling || (subling->state != QnTransactionTransport::ReadyForStreaming && subling->state != QnTransactionTransport::WaitForTranSync))
