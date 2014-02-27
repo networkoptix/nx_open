@@ -76,9 +76,9 @@ private:
     static void ensureSize(std::vector<quint8>& buffer, int size);
     int getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size);
     void processTransactionData( const QByteArray& data);
-    private slots:
-        void at_responseReceived( nx_http::AsyncHttpClientPtr );
-        void at_httpClientDone(nx_http::AsyncHttpClientPtr);
+private slots:
+    void at_responseReceived( nx_http::AsyncHttpClientPtr );
+    void at_httpClientDone(nx_http::AsyncHttpClientPtr);
 };
 
 }
