@@ -97,12 +97,7 @@ namespace ec2
         void sendTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
             QByteArray buffer;
-            buffer.reserve(serializedTran.size() + 12);
-            buffer.append("00000000\r\n");
-            buffer.append(serializedTran);
-            buffer.append("\r\n"); // chunk end
-            quint32 payloadSize = buffer.size() - 12;
-            toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
+            serializeTransaction(buffer, serializedTran);
             sendTransactionInternal(!tran.originGuid.isNull() ? tran.originGuid : tran.id.peerGUID, buffer);
         }
 
@@ -119,8 +114,18 @@ namespace ec2
     private:
         friend class QnTransactionTransport;
 
+        static void serializeTransaction(QByteArray& buffer, const QByteArray& serializedTran)
+        {
+            buffer.reserve(serializedTran.size() + 12);
+            buffer.append("00000000\r\n");
+            buffer.append(serializedTran);
+            buffer.append("\r\n"); // chunk end
+            quint32 payloadSize = buffer.size() - 12;
+            toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
+        }
+
         template <class T>
-        void serializeTransaction(QByteArray& buffer, const QnTransaction<T>& tran) 
+        static void serializeTransaction(QByteArray& buffer, const QnTransaction<T>& tran) 
         {
             OutputBinaryStream<QByteArray> stream(&buffer);
             stream.write("00000000\r\n",10);
@@ -163,14 +168,14 @@ namespace ec2
 
     private:
         inline void gotTransaction(QnTransactionTransport* sender, QByteArray data) { emit sendGotTransaction(sender, data); }
-        void toFormattedHex(quint8* dst, quint32 payloadSize);
-        void sendTransactionInternal(const QnId& originGuid, const QByteArray& buffer);
+        void sendTransactionInternal(const QnId& originGuid, const QByteArray& chunkData);
         void processConnState(QSharedPointer<QnTransactionTransport> &transport);
         void sendSyncRequestIfRequired(QnTransactionTransport* transport);
         QSharedPointer<QnTransactionTransport> getSibling(QnTransactionTransport* transport);
         void moveOutgoingConnToMainList(QnTransactionTransport* transport);
         static bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
         static void onGotTransactionSyncResponse(QnTransactionTransport* sender);
+        static void toFormattedHex(quint8* dst, quint32 payloadSize);
         void lock()   { m_mutex.lock(); }
         void unlock() { m_mutex.unlock(); }
     private slots:

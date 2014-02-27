@@ -66,9 +66,9 @@ void QnTransactionTransport::sendSyncRequest()
     readSync = false;
     QnTransaction<QnTranState> requestTran(ApiCommand::tranSyncRequest, false);
     requestTran.params = transactionLog->getTransactionsState();
+    
     QByteArray syncRequest;
-    OutputBinaryStream<QByteArray> stream(&syncRequest);
-    QnBinary::serialize(requestTran, &stream);
+    owner->serializeTransaction(syncRequest, requestTran);
     addData(syncRequest);
 }
 
@@ -339,7 +339,7 @@ void QnTransactionMessageBus::at_gotTransaction(QnTransactionTransport* sender, 
     }
 }
 
-void QnTransactionMessageBus::sendTransactionInternal(const QnId& originGuid, const QByteArray& buffer)
+void QnTransactionMessageBus::sendTransactionInternal(const QnId& originGuid, const QByteArray& chunkData)
 {
     QMutexLocker lock(&m_mutex);
     for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
@@ -347,25 +347,28 @@ void QnTransactionMessageBus::sendTransactionInternal(const QnId& originGuid, co
         if (itr.key() == originGuid)
             continue; // do not send transaction back to originator.
         ConnectionsToPeer& data = itr.value();
-        data.sendOutgoingTran(buffer);
+        data.sendOutgoingTran(chunkData);
     }
 }
 
 // ------------------ QnTransactionMessageBus::ConnectionsToPeer  -------------------
 
-void QnTransactionMessageBus::ConnectionsToPeer::proxyIncomingTransaction(const QnAbstractTransaction& tran, const QByteArray& data)
+void QnTransactionMessageBus::ConnectionsToPeer::proxyIncomingTransaction(const QnAbstractTransaction& tran, const QByteArray& serializedTran)
 {
     // proxy data to connected clients only. You can update this function to peer-to-peer sync via proxy in future
-    if (incomeConn && incomeConn->state == QnTransactionTransport::ReadyForStreaming && incomeConn->isClientPeer)
-        incomeConn->addData(data);
+    if (incomeConn && incomeConn->state == QnTransactionTransport::ReadyForStreaming && incomeConn->isClientPeer) {
+        QByteArray chunkData;
+        QnTransactionMessageBus::serializeTransaction(chunkData, serializedTran);
+        incomeConn->addData(chunkData);
+    }
 }
 
-void QnTransactionMessageBus::ConnectionsToPeer::sendOutgoingTran(const QByteArray& data)
+void QnTransactionMessageBus::ConnectionsToPeer::sendOutgoingTran(const QByteArray& chunkData)
 {
     if (incomeConn && incomeConn->writeSync)
-        incomeConn->addData(data);
+        incomeConn->addData(chunkData);
     else if (outcomeConn && outcomeConn->writeSync)
-        outcomeConn->addData(data);
+        outcomeConn->addData(chunkData);
 }
 
 // ------------------ QnTransactionMessageBus::CustomHandler -------------------
@@ -401,11 +404,11 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         const ErrorCode errorCode = transactionLog->getTransactionsAfter(params, transactions);
         if (errorCode == ErrorCode::ok) 
         {
-            QnAbstractTransaction tran(ApiCommand::tranSyncResponse, false);
-            QByteArray data;
-            OutputBinaryStream<QByteArray> stream(&data);
-            QnBinary::serialize(tran, &stream);
-            sender->addData(data);
+            QnTransaction<int> tran(ApiCommand::tranSyncResponse, false);
+            tran.params = 0;
+            QByteArray chunkData;
+            serializeTransaction(chunkData, tran);
+            sender->addData(chunkData);
 
             foreach(const QByteArray& data, transactions)
                 sender->addData(data);
@@ -529,6 +532,7 @@ void QnTransactionMessageBus::processConnState(QSharedPointer<QnTransactionTrans
 
 void QnTransactionMessageBus::moveOutgoingConnToMainList(QnTransactionTransport* transport)
 {
+    QMutexLocker lock(&m_mutex);
     for (int i = 0; i < m_connectingConnections.size(); ++i)
     {
         if (m_connectingConnections[i].data() == transport) {

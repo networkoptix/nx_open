@@ -335,8 +335,8 @@ namespace QnBinary {
     {
         QnBinary::serialize((qint32) field.size(), binStream);
         for(QMap<T2, T3>::const_iterator itr = field.begin(); itr != field.end(); ++itr) {
-            QnBinary::serialize(itr.first, binStream);
-            QnBinary::serialize(itr.second, binStream);
+            QnBinary::serialize(itr.key(), binStream);
+            QnBinary::serialize(itr.value(), binStream);
         }
     }
 
