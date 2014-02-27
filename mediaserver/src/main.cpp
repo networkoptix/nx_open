@@ -1260,9 +1260,9 @@ void QnMain::run()
         m_moduleFinder->setCompatibilityMode(true);
     QObject::connect(
         m_moduleFinder,
-        SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
+        SIGNAL(moduleFound(const QString&, const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
         this,
-        SLOT(at_peerFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
+        SLOT(at_peerFound(const QString&, const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
         Qt::DirectConnection );
     QObject::connect(
         m_moduleFinder,
