@@ -22,7 +22,7 @@ void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) 
     // TODO: #Elric we're creating controller from main thread. 
     // Controller ctor may take some time (several seconds).
     // => main thread will stall.
-    connect(resource, &QnResource::initialized, this, &QnServerPtzControllerPool::updateController, Qt::QueuedConnection);
+    connect(resource, &QnResource::initializedChanged, this, &QnServerPtzControllerPool::updateController, Qt::QueuedConnection);
     base_type::registerResource(resource);
 }
 

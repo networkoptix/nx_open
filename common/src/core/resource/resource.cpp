@@ -614,8 +614,12 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
     qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
 #endif
 
-    if (newStatus == Offline || newStatus == Unauthorized)
-        m_initialized = false;
+    if (newStatus == Offline || newStatus == Unauthorized) {
+        if(m_initialized) {
+            m_initialized = false;
+            emit initializedChanged(toSharedPointer(this));
+        }
+    }
 
     if (oldStatus == Offline && newStatus == Online && !m_disabled)
         init();
@@ -867,44 +871,62 @@ void QnResource::setDisabled(bool disabled)
     if (m_disabled == disabled)
         return;
 
-    bool oldDisabled = m_disabled;
+    bool disabledChanged = false;
+    bool initializedChanged = false;
 
     {
         QMutexLocker mutexLocker(&m_mutex);
 
-        m_disabled = disabled;
-        m_initialized = false;
+        if(m_disabled != disabled) {
+            m_disabled = disabled;
+            disabledChanged = true;
+        }
+
+        if(m_initialized) {
+            m_initialized = false;
+            initializedChanged = true;
+        }
     }
 
-    if (oldDisabled != disabled)
-        emit disabledChanged(toSharedPointer(this));
+    if (disabledChanged)
+        emit this->disabledChanged(toSharedPointer(this));
+
+    if (initializedChanged)
+        emit this->initializedChanged(toSharedPointer(this));
 }
 
 bool QnResource::init()
 {
-    if (m_appStopping)
+    if(m_appStopping)
         return false;
 
-    if (!m_initMutex.tryLock())
-        return false; // if init already running, skip new request
+    if(!m_initMutex.tryLock())
+        return false; /* Skip request if init is already running. */
 
-    if (!m_initialized) 
-    {
-        CameraDiagnostics::Result initResult = initInternal();
-        m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
-        {
-            QMutexLocker lk( &m_mutex );
-            m_prevInitializationResult = initResult;
-        }
-        m_initializationAttemptCount.fetchAndAddOrdered(1);
-        if( m_initialized )
-            initializationDone();
-        if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
-            setStatus(Offline);
+    if(m_initialized) {
+        m_initMutex.unlock();
+        return true; /* Nothing to do. */
     }
+
+    CameraDiagnostics::Result initResult = initInternal();
+    m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
+    {
+        QMutexLocker lk( &m_mutex );
+        m_prevInitializationResult = initResult;
+    }
+    m_initializationAttemptCount.fetchAndAddOrdered(1);
+    
+    bool changed = m_initialized;
+    if(m_initialized) {
+        initializationDone();
+    } else if (getStatus() == Online || getStatus() == Recording) {
+        setStatus(Offline);
+    }
+
     m_initMutex.unlock();
 
-    emit initialized(toSharedPointer(this));
+    if(changed)
+        emit initializedChanged(toSharedPointer(this));
 
     return true;
 }
