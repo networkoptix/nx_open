@@ -45,7 +45,7 @@ namespace ec2
         bool readSync;
         bool writeSync;
     public:
-        void doClientConnect();
+        void doOutgoingConnect();
         void startStreaming();
         void addData(const QByteArray& data);
         void processError(QSharedPointer<QnTransactionTransport> sibling);

@@ -176,7 +176,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
     }
 }
 
-void QnTransactionTransport::doClientConnect()
+void QnTransactionTransport::doOutgoingConnect()
 {
     httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     connect(httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
@@ -550,7 +550,7 @@ void QnTransactionMessageBus::processConnState(QSharedPointer<QnTransactionTrans
             if (ct - transport->lastConnectTime >= RECONNECT_TIMEOUT) {
                 transport->lastConnectTime = ct;
                 transport->setState(QnTransactionTransport::Connecting);
-                transport->doClientConnect();
+                transport->doOutgoingConnect();
             }
             break;
         }
