@@ -63,13 +63,13 @@ void QnTransactionTransport::closeSocket()
 void QnTransactionTransport::sendSyncRequest()
 {
     // send sync request
+    readSync = false;
     QnTransaction<QnTranState> requestTran(ApiCommand::tranSyncRequest, false);
     requestTran.params = transactionLog->getTransactionsState();
     QByteArray syncRequest;
     OutputBinaryStream<QByteArray> stream(&syncRequest);
     QnBinary::serialize(requestTran, &stream);
     addData(syncRequest);
-    state = QnTransactionTransport::WaitForTranSync;
 }
 
 void QnTransactionTransport::processError()
@@ -77,11 +77,13 @@ void QnTransactionTransport::processError()
     owner->lock();
 
     QSharedPointer<QnTransactionTransport> sibling = owner->getSibling(this);
-    if (sibling && sibling->state == ReadyForStreaming) {
-        if (state == WaitForTranSync || state == ReadyForStreaming)
+    if (sibling && sibling->state == ReadyForStreaming) 
+    {
+        if (readSync)
             sibling->sendSyncRequest(); // resync via sibling
     }
-
+    readSync = false;
+    writeSync = false;
     closeSocket();
     if (isConnectionOriginator) 
         state = State::Connect;
@@ -305,7 +307,7 @@ void QnTransactionMessageBus::sendSyncRequestIfRequired(QnTransactionTransport* 
 {
     QSharedPointer<QnTransactionTransport> subling = getSibling(transport);
     // if sync already done or in progress do not send new request
-    if (!subling || (subling->state != QnTransactionTransport::ReadyForStreaming && subling->state != QnTransactionTransport::WaitForTranSync))
+    if (!subling || !subling->readSync)
         transport->sendSyncRequest();
 }
 
@@ -318,6 +320,9 @@ void QnTransactionMessageBus::at_gotTransaction(QnTransactionTransport* sender, 
         sender->processError();
         return;
     }
+
+    if (!sender->readSync)
+        return;
 
     if (m_handler && !m_handler->processByteArray(sender, data)) {
         sender->processError();
@@ -358,13 +363,9 @@ void QnTransactionMessageBus::ConnectionsToPeer::proxyIncomingTransaction(const 
 
 void QnTransactionMessageBus::ConnectionsToPeer::sendOutgoingTran(const QByteArray& data)
 {
-    if (incomeConn && incomeConn->state   == QnTransactionTransport::WaitForTranSync ||
-        outcomeConn && outcomeConn->state == QnTransactionTransport::WaitForTranSync)
-        return; // tcp is connected, but initialSync isn't done yet. do not send data for a while
-
-    if (incomeConn && incomeConn->state == QnTransactionTransport::ReadyForStreaming)
+    if (incomeConn && incomeConn->writeSync)
         incomeConn->addData(data);
-    else if (outcomeConn && outcomeConn->state == QnTransactionTransport::ReadyForStreaming)
+    else if (outcomeConn && outcomeConn->writeSync)
         outcomeConn->addData(data);
 }
 
@@ -385,9 +386,14 @@ bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbst
     return true;
 }
 
+void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender)
+{
+    sender->readSync = true;
+}
+
 bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream)
 {
-    sender->state = QnTransactionTransport::ReadyForStreaming;
+    sender->writeSync = true;
 
     QnTranState params;
     if (QnBinary::deserialize(params, &stream))
@@ -396,6 +402,12 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         const ErrorCode errorCode = transactionLog->getTransactionsAfter(params, transactions);
         if (errorCode == ErrorCode::ok) 
         {
+            QnAbstractTransaction tran(ApiCommand::tranSyncResponse, false);
+            QByteArray data;
+            OutputBinaryStream<QByteArray> stream(&data);
+            QnBinary::serialize(tran, &stream);
+            sender->addData(data);
+
             foreach(const QByteArray& data, transactions)
                 sender->addData(data);
             return true;
@@ -422,6 +434,9 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
     {
         case ApiCommand::tranSyncRequest:
             return QnTransactionMessageBus::onGotTransactionSyncRequest(sender, stream);
+        case ApiCommand::tranSyncResponse:
+            QnTransactionMessageBus::onGotTransactionSyncResponse(sender);
+            return true;
 
         case ApiCommand::getAllDataList:
             return deliveryTransaction<ApiFullData>(abstractTran, stream);
@@ -562,6 +577,23 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     bool isClient = query.hasQueryItem("isClient");
     QUuid remoteGuid  = query.queryItemValue(lit("guid"));
 
+    if (remoteGuid.isNull()) {
+        qWarning() << "Invalid incoming request. GUID must be filled!";
+        return;
+    }
+
+    QnTransaction<ApiFullData> data;
+    if (isClient) 
+    {
+        data.command = ApiCommand::getAllDataList;
+        const ErrorCode errorCode = dbManager->doQuery(nullptr, data.params);
+        if (errorCode != ErrorCode::ok) {
+            qWarning() << "Can't execute query for sync with client peer!";
+            return;
+        }
+    }
+
+
     QnTransactionTransport* transport = new QnTransactionTransport(this);
     transport->remoteGuid = remoteGuid;
     transport->isConnectionOriginator = false;
@@ -574,18 +606,10 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     if (isClient) 
     {
         transport->isClientPeer = true;
-        QnTransaction<ApiFullData> data;
-        data.command = ApiCommand::getAllDataList;
-        const ErrorCode errorCode = dbManager->doQuery(nullptr, data.params);
-        if (errorCode == ErrorCode::ok) {
-            QByteArray buffer;
-            serializeTransaction(buffer, data);
-            transport->addData(buffer);
-        }
-        else {
-            qWarning() << "Can't execute query for sync with client peer!";
-            transport->processError();
-        }
+        transport->writeSync = true;
+        QByteArray buffer;
+        serializeTransaction(buffer, data);
+        transport->addData(buffer);
     }
     
     QMutexLocker lock(&m_mutex);

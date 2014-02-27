@@ -18,13 +18,14 @@ namespace ec2
     public:
 
         QnTransactionTransport(QnTransactionMessageBus* owner):
-            state(NotDefined), lastConnectTime(0), readyForSend(false), readyForRead(false), readBufferLen(0), chunkHeaderLen(0), sendOffset(0), chunkLen(0), isConnectionOriginator(false), isClientPeer(false), owner(owner) {}
+            state(NotDefined), lastConnectTime(0), readBufferLen(0), 
+            chunkHeaderLen(0), sendOffset(0), chunkLen(0), isConnectionOriginator(false), isClientPeer(false), owner(owner),
+            readSync(false), writeSync(false) {}
         ~QnTransactionTransport();
         enum State {
             NotDefined,
             Connect,
             Connecting,
-            WaitForTranSync, // ignore incoming data until we got initial sync transaction
             ReadyForStreaming,
             Closed
         };
@@ -37,9 +38,6 @@ namespace ec2
         QSharedPointer<AbstractStreamSocket> socket;
         QQueue<QByteArray> dataToSend;
         
-        bool readyForSend;
-        bool readyForRead;
-        
         std::vector<quint8> readBuffer;
         int readBufferLen;
         int chunkHeaderLen;
@@ -49,6 +47,9 @@ namespace ec2
         bool isClientPeer;
         QnTransactionMessageBus* owner;
         QMutex mutex;
+        
+        bool readSync;
+        bool writeSync;
     public:
         void doClientConnect();
         void startStreaming();
@@ -169,6 +170,7 @@ namespace ec2
         QSharedPointer<QnTransactionTransport> getSibling(QnTransactionTransport* transport);
         void moveOutgoingConnToMainList(QnTransactionTransport* transport);
         static bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
+        static void onGotTransactionSyncResponse(QnTransactionTransport* sender);
         void lock()   { m_mutex.lock(); }
         void unlock() { m_mutex.unlock(); }
     private slots:
