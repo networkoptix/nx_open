@@ -27,27 +27,20 @@ namespace ec2
             Connect,
             Connecting,
             Connected,
+            NeedStartStreaming,
             ReadyForStreaming,
-            Closed
+            Closed,
+            Error
         };
 
+        QSharedPointer<AbstractStreamSocket> socket;
         QUrl remoteAddr;
         QUuid remoteGuid;
         nx_http::AsyncHttpClientPtr httpClient;
-        State state;
         qint64 lastConnectTime;
-        QSharedPointer<AbstractStreamSocket> socket;
-        QQueue<QByteArray> dataToSend;
         
-        std::vector<quint8> readBuffer;
-        int readBufferLen;
-        int chunkHeaderLen;
-        quint32 chunkLen;
-        int sendOffset;
         bool isConnectionOriginator;
         bool isClientPeer;
-        QnTransactionMessageBus* owner;
-        QMutex mutex;
         
         bool readSync;
         bool writeSync;
@@ -55,12 +48,23 @@ namespace ec2
         void doClientConnect();
         void startStreaming();
         void addData(const QByteArray& data);
-        void processError();
+        void processError(QSharedPointer<QnTransactionTransport> sibling);
         void sendSyncRequest();
-    protected:
+        void setState(State state);
+        State getState() const;
+    private:
+        mutable QMutex mutex;
+        State state;
+        std::vector<quint8> readBuffer;
+        int readBufferLen;
+        int chunkHeaderLen;
+        quint32 chunkLen;
+        int sendOffset;
+        QnTransactionMessageBus* owner;
+        QQueue<QByteArray> dataToSend;
+    private:
         void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
         void closeSocket();
-    private:
         static void ensureSize(std::vector<quint8>& buffer, int size);
         int getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size);
         void processTransactionData( const QByteArray& data);
@@ -110,11 +114,6 @@ namespace ec2
             sendTransactionInternal(!tran.originGuid.isNull() ? tran.originGuid : tran.id.peerGUID, buffer);
         }
 
-    signals:
-        void sendGotTransaction(QWeakPointer<QnTransactionTransport> sender, QByteArray data);
-    private:
-        friend class QnTransactionTransport;
-
         static void serializeTransaction(QByteArray& buffer, const QByteArray& serializedTran)
         {
             buffer.reserve(serializedTran.size() + 12);
@@ -135,6 +134,11 @@ namespace ec2
             quint32 payloadSize = buffer.size() - 12;
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
         }
+
+    signals:
+        void sendGotTransaction(QnId remoteGuid, bool isOriginator, QByteArray data);
+    private:
+        friend class QnTransactionTransport;
 
         class AbstractHandler
         {
@@ -168,20 +172,17 @@ namespace ec2
         typedef QMap<QUuid, ConnectionsToPeer> QnConnectionMap;
 
     private:
-        void gotTransaction(QnTransactionTransport* sender, const QByteArray& data);
+        void gotTransaction(const QnId& remoteGuid, bool isConnectionOriginator, const QByteArray& data);
         void sendTransactionInternal(const QnId& originGuid, const QByteArray& chunkData);
         void processConnState(QSharedPointer<QnTransactionTransport> &transport);
-        void sendSyncRequestIfRequired(QnTransactionTransport* transport);
-        QSharedPointer<QnTransactionTransport> getSibling(QnTransactionTransport* transport);
-        void moveOutgoingConnToMainList(QnTransactionTransport* transport);
-        static bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
-        static void onGotTransactionSyncResponse(QnTransactionTransport* sender);
+        void sendSyncRequestIfRequired(QSharedPointer<QnTransactionTransport> transport);
+        QSharedPointer<QnTransactionTransport> getSibling(QSharedPointer<QnTransactionTransport> transport);
+        static bool onGotTransactionSyncRequest(QSharedPointer<QnTransactionTransport> sender, InputBinaryStream<QByteArray>& stream);
+        static void onGotTransactionSyncResponse(QSharedPointer<QnTransactionTransport> sender);
         static void toFormattedHex(quint8* dst, quint32 payloadSize);
-        void lock()   { m_mutex.lock(); }
-        void unlock() { m_mutex.unlock(); }
     private slots:
         void at_timer();
-        void at_gotTransaction(QWeakPointer<QnTransactionTransport> sender, QByteArray data);
+        void at_gotTransaction(QnId remoteGuid, bool isOriginator, QByteArray serializedTran);
     private:
         AbstractHandler* m_handler;
         QTimer* m_timer;

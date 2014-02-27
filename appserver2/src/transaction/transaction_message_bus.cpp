@@ -69,29 +69,37 @@ void QnTransactionTransport::sendSyncRequest()
     requestTran.params = transactionLog->getTransactionsState();
     
     QByteArray syncRequest;
-    owner->serializeTransaction(syncRequest, requestTran);
+    QnTransactionMessageBus::serializeTransaction(syncRequest, requestTran);
     addData(syncRequest);
 }
 
-void QnTransactionTransport::processError()
+void QnTransactionTransport::setState(State state)
 {
-    owner->lock();
+    QMutexLocker lock(&mutex);
+    this->state = state;
+}
 
+QnTransactionTransport::State QnTransactionTransport::getState() const
+{
+    QMutexLocker lock(&mutex);
+    return state;
+}
+
+void QnTransactionTransport::processError(QSharedPointer<QnTransactionTransport> sibling)
+{
+    QMutexLocker lock(&mutex);
+    closeSocket();
     readSync = false;
     writeSync = false;
-    closeSocket();
     if (isConnectionOriginator) 
         state = State::Connect;
     else
         state = State::Closed;
     dataToSend.clear();
-    
-    QSharedPointer<QnTransactionTransport> sibling = owner->getSibling(this);
-    if (sibling && sibling->state == ReadyForStreaming) 
-        sibling->processError();
 
-    owner->unlock();
-} 
+    if (sibling && sibling->getState() == ReadyForStreaming) 
+        sibling->processError(QSharedPointer<QnTransactionTransport>());
+}
 
 void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventType eventType ) throw()
 {
@@ -111,7 +119,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                 if (readed < 1) {
                     // no more data or error
                     if(readed == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock)
-                        processError();
+                        setState(State::Error);
                     return; // no more data
                 }
                 readBufferLen += readed;
@@ -120,7 +128,9 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                 if (chunkHeaderLen) {
                     const int fullChunkLen = chunkHeaderLen + chunkLen + 2;
                     if (readBufferLen == fullChunkLen) {
-                        owner->gotTransaction(this, QByteArray::fromRawData((const char *) rBuffer + chunkHeaderLen, chunkLen));
+                        QByteArray dataCopy;
+                        dataCopy.append((const char *) rBuffer + chunkHeaderLen, chunkLen);
+                        owner->gotTransaction(remoteGuid, isConnectionOriginator, dataCopy);
                         readBufferLen = chunkHeaderLen = 0;
                     }
                 }
@@ -144,7 +154,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                 if(sended == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock) {
                     sendOffset = 0;
                     aio::AIOService::instance()->removeFromWatch( socket, PollSet::etWrite, this );
-                    processError();
+                    setState(State::Error);
                 }
                 return; // can't send any more
             }
@@ -159,7 +169,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
     }
     case PollSet::etTimedOut:
     case PollSet::etError:
-        processError();
+        setState(State::Error);
         break;
     default:
         break;
@@ -186,7 +196,7 @@ void QnTransactionTransport::doClientConnect()
 
 void QnTransactionTransport::processTransactionData( const QByteArray& data)
 {
-    state = ReadyForStreaming;
+    setState(ReadyForStreaming);
     chunkHeaderLen = 0;
 
     const quint8* buffer = (const quint8*) data.data();
@@ -197,7 +207,9 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         int fullChunkLen = chunkHeaderLen + chunkLen + 2;
         if (bufferLen >= fullChunkLen)
         {
-            owner->gotTransaction(this, QByteArray::fromRawData((const char *) buffer + chunkHeaderLen, chunkLen));
+            QByteArray dataCopy;
+            dataCopy.append(QByteArray::fromRawData((const char *) buffer + chunkHeaderLen, chunkLen));
+            owner->gotTransaction(remoteGuid, isConnectionOriginator, dataCopy);
             buffer += fullChunkLen;
             bufferLen -= fullChunkLen;
         }
@@ -228,7 +240,7 @@ void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr clien
 {
     nx_http::AsyncHttpClient::State state = client->state();
     if (state == nx_http::AsyncHttpClient::sFailed)
-        processError();
+        setState(State::Error);
 }
 
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
@@ -236,10 +248,9 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     nx_http::HttpHeaders::const_iterator itr = client->response()->headers.find("guid");
     if (itr != client->response()->headers.end()) {
         remoteGuid = itr->second;
-        owner->moveOutgoingConnToMainList(this);
     }
     else {
-        processError();
+        setState(State::Error);
         return;
     }
 
@@ -248,12 +259,8 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
         processTransactionData(data);
     socket = httpClient->takeSocket();
     httpClient.reset();
-
-    owner->lock();
-    startStreaming();
-    if (!isClientPeer)
-        owner->sendSyncRequestIfRequired(this);
-    owner->unlock();
+    
+    setState(QnTransactionTransport::Connected);
 }
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
@@ -294,7 +301,7 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     delete m_timer;
 }
 
-QSharedPointer<QnTransactionTransport> QnTransactionMessageBus::getSibling(QnTransactionTransport* transport)
+QSharedPointer<QnTransactionTransport> QnTransactionMessageBus::getSibling(QSharedPointer<QnTransactionTransport> transport)
 {
     QnConnectionMap::iterator itr = m_connections.find(transport->remoteGuid);
     if (itr == m_connections.end())
@@ -303,7 +310,7 @@ QSharedPointer<QnTransactionTransport> QnTransactionMessageBus::getSibling(QnTra
     return transport->isConnectionOriginator ? data.incomeConn : data.outcomeConn;
 }
 
-void QnTransactionMessageBus::sendSyncRequestIfRequired(QnTransactionTransport* transport)
+void QnTransactionMessageBus::sendSyncRequestIfRequired(QSharedPointer<QnTransactionTransport> transport)
 {
     QSharedPointer<QnTransactionTransport> subling = getSibling(transport);
     // if sync already done or in progress do not send new request
@@ -311,17 +318,20 @@ void QnTransactionMessageBus::sendSyncRequestIfRequired(QnTransactionTransport* 
         transport->sendSyncRequest();
 }
 
-void QnTransactionMessageBus::at_gotTransaction(QWeakPointer<QnTransactionTransport> sender_ref, QByteArray serializedTran)
+void QnTransactionMessageBus::at_gotTransaction(QnId remoteGuid, bool isOriginator, QByteArray serializedTran)
 {
-    QnTransactionTransport* sender = sender_ref.data();
-    if (!sender)
+    QnConnectionMap::iterator itr = m_connections.find(remoteGuid);
+    if (itr == m_connections.end())
+        return;
+    QSharedPointer<QnTransactionTransport> sender = isOriginator ? itr.value().outcomeConn : itr.value().incomeConn;
+    if (!sender || sender->getState() != QnTransactionTransport::ReadyForStreaming)
         return;
 
     QnAbstractTransaction tran;
     InputBinaryStream<QByteArray> stream(serializedTran);
     if (!tran.deserialize(&stream)) {
         qWarning() << Q_FUNC_INFO << "Ignore bad transaction data. size=" << serializedTran.size();
-        sender->processError();
+        sender->setState(QnTransactionTransport::Error);
         return;
     }
 
@@ -337,8 +347,8 @@ void QnTransactionMessageBus::at_gotTransaction(QWeakPointer<QnTransactionTransp
     if (!sender->readSync)
         return;
 
-    if (m_handler && !m_handler->processByteArray(sender, serializedTran)) {
-        sender->processError();
+    if (m_handler && !m_handler->processByteArray(sender.data(), serializedTran)) {
+        sender->setState(QnTransactionTransport::Error);
         return;
     }
 
@@ -373,7 +383,7 @@ void QnTransactionMessageBus::sendTransactionInternal(const QnId& originGuid, co
 void QnTransactionMessageBus::ConnectionsToPeer::proxyIncomingTransaction(const QnAbstractTransaction& tran, const QByteArray& chunkData)
 {
     // proxy data to connected clients only. You can update this function to peer-to-peer sync via proxy in future
-    if (incomeConn && incomeConn->state == QnTransactionTransport::ReadyForStreaming && incomeConn->isClientPeer) {
+    if (incomeConn && incomeConn->getState() == QnTransactionTransport::ReadyForStreaming && incomeConn->isClientPeer) {
         incomeConn->addData(chunkData);
     }
 }
@@ -403,12 +413,12 @@ bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbst
     return true;
 }
 
-void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender)
+void QnTransactionMessageBus::onGotTransactionSyncResponse(QSharedPointer<QnTransactionTransport> sender)
 {
     sender->readSync = true;
 }
 
-bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream)
+bool QnTransactionMessageBus::onGotTransactionSyncRequest(QSharedPointer<QnTransactionTransport> sender, InputBinaryStream<QByteArray>& stream)
 {
     sender->writeSync = true;
 
@@ -524,19 +534,22 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
 
 void QnTransactionMessageBus::processConnState(QSharedPointer<QnTransactionTransport> &transport)
 {
-    switch (transport->state) 
+    switch (transport->getState()) 
     {
+    case QnTransactionTransport::Error:
+        transport->processError(getSibling(transport));
+        break;
     case QnTransactionTransport::Connected:
         transport->startStreaming();
         if (!transport->isClientPeer)
-            sendSyncRequestIfRequired(transport.data());
+            sendSyncRequestIfRequired(transport);
         break;
     case QnTransactionTransport::Connect:
         {
             qint64 ct = QDateTime::currentDateTime().toMSecsSinceEpoch();
             if (ct - transport->lastConnectTime >= RECONNECT_TIMEOUT) {
                 transport->lastConnectTime = ct;
-                transport->state = QnTransactionTransport::Connecting;
+                transport->setState(QnTransactionTransport::Connecting);
                 transport->doClientConnect();
             }
             break;
@@ -547,27 +560,27 @@ void QnTransactionMessageBus::processConnState(QSharedPointer<QnTransactionTrans
     }
 }
 
-void QnTransactionMessageBus::moveOutgoingConnToMainList(QnTransactionTransport* transport)
-{
-    QMutexLocker lock(&m_mutex);
-    for (int i = 0; i < m_connectingConnections.size(); ++i)
-    {
-        if (m_connectingConnections[i].data() == transport) 
-        {
-            if (m_connections[transport->remoteGuid].outcomeConn)
-                m_connectionsToRemove << m_connections[transport->remoteGuid].outcomeConn;
-            m_connections[transport->remoteGuid].outcomeConn = m_connectingConnections[i];
-            m_connectingConnections.removeAt(i);
-            break;
-        }
-    }
-}
-
 void QnTransactionMessageBus::at_timer()
 {
     QMutexLocker lock(&m_mutex);
 
     m_connectionsToRemove.clear();
+
+    for (int i = m_connectingConnections.size() -1; i >= 0; --i) 
+    {
+        QSharedPointer<QnTransactionTransport> transport = m_connectingConnections[i];
+        if (transport->getState() == QnTransactionTransport::Connected) {
+            m_connections[transport->remoteGuid].outcomeConn = transport;
+            m_connectingConnections.removeAt(i);
+
+        }
+        else {
+            processConnState(m_connectingConnections[i]);
+            if (!m_connectingConnections[i])
+                m_connectingConnections.removeAt(i);
+        }
+    }
+
 
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end();)
     {
@@ -582,11 +595,6 @@ void QnTransactionMessageBus::at_timer()
         else {
             ++itr;
         }
-    }
-    for (int i = m_connectingConnections.size() -1; i >= 0; --i) {
-        processConnState(m_connectingConnections[i]);
-        if (!m_connectingConnections[i])
-            m_connectingConnections.removeAt(i);
     }
 }
 
@@ -625,7 +633,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     transport->isConnectionOriginator = false;
     transport->socket = socket;
     int handle = socket->handle();
-    transport->state = QnTransactionTransport::Connected;
+    transport->setState(QnTransactionTransport::Connected);
 
     // send fullsync to a client immediatly
     if (isClient) 
@@ -651,7 +659,7 @@ void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient
     transport->isConnectionOriginator = true;
     transport->isClientPeer = isClient;
     transport->remoteAddr = url;
-    transport->state = QnTransactionTransport::Connect;
+    transport->setState(QnTransactionTransport::Connect);
     m_connectingConnections <<  QSharedPointer<QnTransactionTransport>(transport);
 }
 
@@ -662,25 +670,15 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
     {
         ConnectionsToPeer& data = itr.value();
         if (data.outcomeConn && data.outcomeConn->remoteAddr == url) {
-            data.outcomeConn->state = QnTransactionTransport::Closed;
+            data.outcomeConn->setState(QnTransactionTransport::Closed);
             break;
         }
     }
 }
 
-void QnTransactionMessageBus::gotTransaction(QnTransactionTransport* sender, const QByteArray& data)
+void QnTransactionMessageBus::gotTransaction(const QnId& remoteGuid, bool isConnectionOriginator, const QByteArray& data)
 {
-    QMutexLocker lock(&m_mutex);
-    QnConnectionMap::iterator itr = m_connections.find(sender->remoteGuid);
-    if (itr != m_connections.end()) 
-    {
-        QSharedPointer<QnTransactionTransport> sender_ref = itr->incomeConn.data() == sender ? itr->incomeConn : itr->outcomeConn;
-        if (sender_ref) {
-            QByteArray dataCopy;
-            dataCopy.append(data); // make deep copy
-            emit sendGotTransaction(sender_ref.toWeakRef(), dataCopy);
-        }
-    }
+    emit sendGotTransaction(remoteGuid, isConnectionOriginator, data);
 }
 
 template class QnTransactionMessageBus::CustomHandler<RemoteEC2Connection>;
