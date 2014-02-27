@@ -270,7 +270,7 @@ void QnTransactionMessageBus::initStaticInstance(QnTransactionMessageBus* instan
     m_globalInstance = instance;
 }
 
-QnTransactionMessageBus::QnTransactionMessageBus(): m_timer(0), m_thread(0)
+QnTransactionMessageBus::QnTransactionMessageBus(): m_timer(0), m_thread(0), m_mutex(QMutex::Recursive)
 {
     m_thread = new QThread();
     m_thread->setObjectName("QnTransactionMessageBusThread");

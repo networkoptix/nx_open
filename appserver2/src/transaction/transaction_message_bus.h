@@ -123,9 +123,9 @@ namespace ec2
         void serializeTransaction(QByteArray& buffer, const QnTransaction<T>& tran) 
         {
             OutputBinaryStream<QByteArray> stream(&buffer);
-            buffer.append("00000000\r\n");
+            stream.write("00000000\r\n",10);
             tran.serialize(&stream);
-            buffer.append("\r\n"); // chunk end
+            stream.write("\r\n",2); // chunk end
             quint32 payloadSize = buffer.size() - 12;
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
         }
