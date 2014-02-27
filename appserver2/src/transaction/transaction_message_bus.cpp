@@ -416,7 +416,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
     QnAbstractTransaction  abstractTran;
     if (!QnBinary::deserialize(abstractTran, &stream))
         return false; // bad data
-    if (abstractTran.persistent && transactionLog->contains(abstractTran.id))
+    if (abstractTran.persistent && transactionLog && transactionLog->contains(abstractTran.id))
         return true; // transaction already processed
 
     switch (abstractTran.command)
