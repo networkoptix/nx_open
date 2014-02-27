@@ -76,12 +76,6 @@ void QnTransactionTransport::processError()
 {
     owner->lock();
 
-    QSharedPointer<QnTransactionTransport> sibling = owner->getSibling(this);
-    if (sibling && sibling->state == ReadyForStreaming) 
-    {
-        if (readSync)
-            sibling->sendSyncRequest(); // resync via sibling
-    }
     readSync = false;
     writeSync = false;
     closeSocket();
@@ -90,6 +84,10 @@ void QnTransactionTransport::processError()
     else
         state = State::Closed;
     dataToSend.clear();
+    
+    QSharedPointer<QnTransactionTransport> sibling = owner->getSibling(this);
+    if (sibling && sibling->state == ReadyForStreaming) 
+        sibling->processError();
 
     owner->unlock();
 } 
