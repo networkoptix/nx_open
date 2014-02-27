@@ -686,6 +686,9 @@
        <property name="text">
         <string>Cl&amp;ose</string>
        </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
     </layout>
