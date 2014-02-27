@@ -37,9 +37,11 @@ QUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data
 
 ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction::ID& tranID, const QUuid& hash, const QByteArray& data)
 {
+    Q_ASSERT_X(!tranID.peerGUID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
+
     QSqlQuery query(m_dbManager->getDB());
     query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, sequence, tran_guid, tran_data) values (?, ?, ?, ?)");
-    query.bindValue(0, tranID.peerGUID);
+    query.bindValue(0, tranID.peerGUID.toRfc4122());
     query.bindValue(1, tranID.sequence);
     query.bindValue(2, hash);
     query.bindValue(3, data);
