@@ -203,7 +203,6 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
 
 void QnTransactionTransport::processTransactionData( const QByteArray& data)
 {
-    setState(ReadyForStreaming);
     m_chunkHeaderLen = 0;
 
     const quint8* buffer = (const quint8*) data.data();
@@ -253,10 +252,10 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     }
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
-    if (!data.isEmpty())
-        processTransactionData(data);
     m_socket = m_httpClient->takeSocket();
     m_httpClient.reset();
+    if (!data.isEmpty())
+        processTransactionData(data);
 
     setState(QnTransactionTransport::Connected);
 }
