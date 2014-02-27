@@ -42,13 +42,13 @@ protected:
 private slots:
     void updateData();
     void at_gotEvents(int httpStatus, const QnBusinessActionDataListPtr& events, int requestNum);
-    void at_itemClicked(const QModelIndex & index);
-    void at_customContextMenuRequested(const QPoint& screenPos);
-    void at_cameraButtonClicked();
-    void at_filterAction();
-    void at_resetFilterAction();
-    void at_copyToClipboard();
-    void at_exportAction();
+    void at_eventsGrid_clicked(const QModelIndex & index);
+    void at_eventsGrid_customContextMenuRequested(const QPoint& screenPos);
+    void at_cameraButton_clicked();
+    void at_filterAction_triggered();
+    void at_resetFilterAction_triggered();
+    void at_clipboardAction_triggered();
+    void at_exportAction_triggered();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
