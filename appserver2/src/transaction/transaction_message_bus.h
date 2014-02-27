@@ -9,7 +9,6 @@
 
 namespace ec2
 {
-    class QnTransactionMessageBus;
     class QnTransactionTransport;
 
     class QnTransactionMessageBus: public QObject
@@ -74,8 +73,6 @@ namespace ec2
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
         }
 
-    signals:
-        void sendGotTransaction(QnId remoteGuid, bool isOriginator, QByteArray data);
     private:
         friend class QnTransactionTransport;
 
@@ -111,18 +108,20 @@ namespace ec2
         typedef QMap<QUuid, ConnectionsToPeer> QnConnectionMap;
 
     private:
-        void gotTransaction(const QnId& remoteGuid, bool isConnectionOriginator, const QByteArray& data);
+        //void gotTransaction(const QnId& remoteGuid, bool isConnectionOriginator, const QByteArray& data);
         void sendTransactionInternal(const QnId& originGuid, const QByteArray& chunkData);
         void processConnState(QSharedPointer<QnTransactionTransport> &transport);
         void sendSyncRequestIfRequired(QSharedPointer<QnTransactionTransport> transport);
         QSharedPointer<QnTransactionTransport> getSibling(QSharedPointer<QnTransactionTransport> transport);
-        static bool onGotTransactionSyncRequest(QSharedPointer<QnTransactionTransport> sender, InputBinaryStream<QByteArray>& stream);
-        static void onGotTransactionSyncResponse(QSharedPointer<QnTransactionTransport> sender);
+        static bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
+        static void onGotTransactionSyncResponse(QnTransactionTransport* sender);
         static void toFormattedHex(quint8* dst, quint32 payloadSize);
     private slots:
         void at_timer();
-        void at_gotTransaction(QnId remoteGuid, bool isOriginator, QByteArray serializedTran);
+        void at_gotTransaction(QByteArray serializedTran);
     private:
+        typedef QMap<QUrl, QSharedPointer<QnTransactionTransport>> RemoveUrlMap;
+        RemoveUrlMap m_remoteUrls;
         AbstractHandler* m_handler;
         QTimer* m_timer;
         QMutex m_mutex;

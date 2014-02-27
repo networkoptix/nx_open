@@ -9,9 +9,25 @@ namespace ec2
 
 static const int SOCKET_TIMEOUT = 1000 * 1000;
 
+QnTransactionTransport::QnTransactionTransport(bool isOriginator, bool isClient, QSharedPointer<AbstractStreamSocket> socket, const QUuid& removeGuid):
+    m_socket(socket),
+    m_state(NotDefined), 
+    m_lastConnectTime(0), 
+    m_readBufferLen(0), 
+    m_chunkHeaderLen(0), 
+    m_sendOffset(0), 
+    m_chunkLen(0), 
+    m_originator(isOriginator), 
+    m_isClientPeer(isClient),
+    m_readSync(false), 
+    m_writeSync(false),
+    m_removeGuid(removeGuid)
+{
+}
+
+
 QnTransactionTransport::~QnTransactionTransport()
 {
-    Q_ASSERT(QThread::currentThread() == owner->thread());
     closeSocket();
 }
 
@@ -23,10 +39,10 @@ void QnTransactionTransport::ensureSize(std::vector<quint8>& buffer, int size)
 
 void QnTransactionTransport::addData(const QByteArray& data)
 {
-    QMutexLocker lock(&mutex);
-    if (dataToSend.isEmpty() && socket)
-        aio::AIOService::instance()->watchSocket( socket, PollSet::etWrite, this );
-    dataToSend.push_back(data);
+    QMutexLocker lock(&m_mutex);
+    if (m_dataToSend.isEmpty() && m_socket)
+        aio::AIOService::instance()->watchSocket( m_socket, PollSet::etWrite, this );
+    m_dataToSend.push_back(data);
 }
 
 int QnTransactionTransport::getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size)
@@ -48,18 +64,18 @@ int QnTransactionTransport::getChunkHeaderEnd(const quint8* data, int dataLen, q
 
 void QnTransactionTransport::closeSocket()
 {
-    if (socket) {
-        aio::AIOService::instance()->removeFromWatch( socket, PollSet::etRead, this );
-        aio::AIOService::instance()->removeFromWatch( socket, PollSet::etWrite, this );
-        socket->close();
-        socket.reset();
+    if (m_socket) {
+        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead, this );
+        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite, this );
+        m_socket->close();
+        m_socket.reset();
     }
 }
 
 void QnTransactionTransport::sendSyncRequest()
 {
     // send sync request
-    readSync = false;
+    setReadSync(false);
     QnTransaction<QnTranState> requestTran(ApiCommand::tranSyncRequest, false);
     requestTran.params = transactionLog->getTransactionsState();
 
@@ -70,27 +86,27 @@ void QnTransactionTransport::sendSyncRequest()
 
 void QnTransactionTransport::setState(State state)
 {
-    QMutexLocker lock(&mutex);
-    this->state = state;
+    QMutexLocker lock(&m_mutex);
+    this->m_state = state;
 }
 
 QnTransactionTransport::State QnTransactionTransport::getState() const
 {
-    QMutexLocker lock(&mutex);
-    return state;
+    QMutexLocker lock(&m_mutex);
+    return m_state;
 }
 
 void QnTransactionTransport::processError(QSharedPointer<QnTransactionTransport> sibling)
 {
-    QMutexLocker lock(&mutex);
+    QMutexLocker lock(&m_mutex);
     closeSocket();
-    readSync = false;
-    writeSync = false;
-    if (isConnectionOriginator) 
-        state = State::Connect;
+    m_readSync = false;
+    m_writeSync = false;
+    if (m_originator) 
+        m_state = State::Connect;
     else
-        state = State::Closed;
-    dataToSend.clear();
+        m_state = State::Closed;
+    m_dataToSend.clear();
 
     if (sibling && sibling->getState() == ReadyForStreaming) 
         sibling->processError(QSharedPointer<QnTransactionTransport>());
@@ -106,27 +122,27 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
         {
             while (1)
             {
-                if (state == ReadyForStreaming) {
-                    int toRead = chunkHeaderLen == 0 ? 20 : (chunkHeaderLen + chunkLen + 2 - readBufferLen);
-                    ensureSize(readBuffer, toRead + readBufferLen);
-                    quint8* rBuffer = &readBuffer[0];
-                    readed = socket->recv(rBuffer + readBufferLen, toRead);
+                if (m_state == ReadyForStreaming) {
+                    int toRead = m_chunkHeaderLen == 0 ? 20 : (m_chunkHeaderLen + m_chunkLen + 2 - m_readBufferLen);
+                    ensureSize(m_readBuffer, toRead + m_readBufferLen);
+                    quint8* rBuffer = &m_readBuffer[0];
+                    readed = m_socket->recv(rBuffer + m_readBufferLen, toRead);
                     if (readed < 1) {
                         // no more data or error
                         if(readed == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock)
                             setState(State::Error);
                         return; // no more data
                     }
-                    readBufferLen += readed;
-                    if (chunkHeaderLen == 0)
-                        chunkHeaderLen = getChunkHeaderEnd(rBuffer, readBufferLen, &chunkLen);
-                    if (chunkHeaderLen) {
-                        const int fullChunkLen = chunkHeaderLen + chunkLen + 2;
-                        if (readBufferLen == fullChunkLen) {
+                    m_readBufferLen += readed;
+                    if (m_chunkHeaderLen == 0)
+                        m_chunkHeaderLen = getChunkHeaderEnd(rBuffer, m_readBufferLen, &m_chunkLen);
+                    if (m_chunkHeaderLen) {
+                        const int fullChunkLen = m_chunkHeaderLen + m_chunkLen + 2;
+                        if (m_readBufferLen == fullChunkLen) {
                             QByteArray dataCopy;
-                            dataCopy.append((const char *) rBuffer + chunkHeaderLen, chunkLen);
-                            owner->gotTransaction(remoteGuid, isConnectionOriginator, dataCopy);
-                            readBufferLen = chunkHeaderLen = 0;
+                            dataCopy.append((const char *) rBuffer + m_chunkHeaderLen, m_chunkLen);
+                            emit gotTransaction(dataCopy);
+                            m_readBufferLen = m_chunkHeaderLen = 0;
                         }
                     }
                 }
@@ -138,28 +154,28 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
         }
     case PollSet::etWrite: 
         {
-            QMutexLocker lock(&mutex);
-            while (!dataToSend.isEmpty())
+            QMutexLocker lock(&m_mutex);
+            while (!m_dataToSend.isEmpty())
             {
-                QByteArray& data = dataToSend.front();
+                QByteArray& data = m_dataToSend.front();
                 const char* dataStart = data.data();
                 const char* dataEnd = dataStart + data.size();
-                int sended = socket->send(dataStart + sendOffset, data.size() - sendOffset);
+                int sended = m_socket->send(dataStart + m_sendOffset, data.size() - m_sendOffset);
                 if (sended < 1) {
                     if(sended == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock) {
-                        sendOffset = 0;
-                        aio::AIOService::instance()->removeFromWatch( socket, PollSet::etWrite, this );
+                        m_sendOffset = 0;
+                        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite, this );
                         setState(State::Error);
                     }
                     return; // can't send any more
                 }
-                sendOffset += sended;
-                if (sendOffset == data.size()) {
-                    sendOffset = 0;
-                    dataToSend.dequeue();
+                m_sendOffset += sended;
+                if (m_sendOffset == data.size()) {
+                    m_sendOffset = 0;
+                    m_dataToSend.dequeue();
                 }
             }
-            aio::AIOService::instance()->removeFromWatch( socket, PollSet::etWrite, this );
+            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite, this );
             break;
         }
     case PollSet::etTimedOut:
@@ -171,64 +187,63 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
     }
 }
 
-void QnTransactionTransport::doOutgoingConnect()
+void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
 {
-    httpClient = std::make_shared<nx_http::AsyncHttpClient>();
-    connect(httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
-    connect(httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
+    m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
+    connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
 
-    QUrl url(remoteAddr);
     QUrlQuery q = QUrlQuery(remoteAddr.query());
-    if( isClientPeer ) {
+    if( m_isClientPeer ) {
         q.removeQueryItem("isClient");
         q.addQueryItem("isClient", QString());
-        readSync = true;
+        setReadSync(true);
     }
     remoteAddr.setQuery(q);
 
-    httpClient->doGet(remoteAddr);
+    m_httpClient->doGet(remoteAddr);
 }
 
 void QnTransactionTransport::processTransactionData( const QByteArray& data)
 {
     setState(ReadyForStreaming);
-    chunkHeaderLen = 0;
+    m_chunkHeaderLen = 0;
 
     const quint8* buffer = (const quint8*) data.data();
     int bufferLen = data.size();
-    chunkHeaderLen = getChunkHeaderEnd(buffer, bufferLen, &chunkLen);
-    while (chunkHeaderLen >= 0) 
+    m_chunkHeaderLen = getChunkHeaderEnd(buffer, bufferLen, &m_chunkLen);
+    while (m_chunkHeaderLen >= 0) 
     {
-        int fullChunkLen = chunkHeaderLen + chunkLen + 2;
+        int fullChunkLen = m_chunkHeaderLen + m_chunkLen + 2;
         if (bufferLen >= fullChunkLen)
         {
             QByteArray dataCopy;
-            dataCopy.append(QByteArray::fromRawData((const char *) buffer + chunkHeaderLen, chunkLen));
-            owner->gotTransaction(remoteGuid, isConnectionOriginator, dataCopy);
+            dataCopy.append(QByteArray::fromRawData((const char *) buffer + m_chunkHeaderLen, m_chunkLen));
+            emit gotTransaction(dataCopy);
             buffer += fullChunkLen;
             bufferLen -= fullChunkLen;
         }
         else {
             break;
         }
-        chunkHeaderLen = getChunkHeaderEnd(buffer, bufferLen, &chunkLen);
+        m_chunkHeaderLen = getChunkHeaderEnd(buffer, bufferLen, &m_chunkLen);
     }
 
     if (bufferLen > 0) {
-        readBuffer.resize(bufferLen);
-        memcpy(&readBuffer[0], buffer, bufferLen);
+        m_readBuffer.resize(bufferLen);
+        memcpy(&m_readBuffer[0], buffer, bufferLen);
     }
-    readBufferLen = bufferLen;
+    m_readBufferLen = bufferLen;
 }
 
 void QnTransactionTransport::startStreaming()
 {
-    socket->setRecvTimeout(SOCKET_TIMEOUT);
-    socket->setSendTimeout(SOCKET_TIMEOUT);
-    socket->setNonBlockingMode(true);
-    chunkHeaderLen = 0;
-    state = ReadyForStreaming;
-    aio::AIOService::instance()->watchSocket( socket, PollSet::etRead, this );
+    m_socket->setRecvTimeout(SOCKET_TIMEOUT);
+    m_socket->setSendTimeout(SOCKET_TIMEOUT);
+    m_socket->setNonBlockingMode(true);
+    m_chunkHeaderLen = 0;
+    m_state = ReadyForStreaming;
+    aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this );
 }
 
 void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr client)
@@ -242,20 +257,46 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
 {
     nx_http::HttpHeaders::const_iterator itr = client->response()->headers.find("guid");
     if (itr != client->response()->headers.end()) {
-        remoteGuid = itr->second;
+        QMutexLocker lock(&m_mutex);
+        m_removeGuid = itr->second;
     }
     else {
         setState(State::Error);
         return;
     }
 
-    QByteArray data = httpClient->fetchMessageBodyBuffer();
+    QByteArray data = m_httpClient->fetchMessageBodyBuffer();
     if (!data.isEmpty())
         processTransactionData(data);
-    socket = httpClient->takeSocket();
-    httpClient.reset();
+    m_socket = m_httpClient->takeSocket();
+    m_httpClient.reset();
 
     setState(QnTransactionTransport::Connected);
 }
+
+bool QnTransactionTransport::isReadSync() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_readSync;
+}
+
+void QnTransactionTransport::setReadSync(bool value)
+{
+    QMutexLocker lock(&m_mutex);
+    m_readSync = value;
+}
+
+bool QnTransactionTransport::isWriteSync() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_writeSync;
+}
+
+void QnTransactionTransport::setWriteSync(bool value)
+{
+    QMutexLocker lock(&m_mutex);
+    m_writeSync = value;
+}
+
 
 }

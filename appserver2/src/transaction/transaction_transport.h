@@ -10,18 +10,10 @@
 namespace ec2
 {
 
-class QnTransactionMessageBus;
-
 class QnTransactionTransport: public QObject, public aio::AIOEventHandler
 {
     Q_OBJECT
 public:
-
-    QnTransactionTransport(QnTransactionMessageBus* owner):
-        state(NotDefined), lastConnectTime(0), readBufferLen(0), 
-        chunkHeaderLen(0), sendOffset(0), chunkLen(0), isConnectionOriginator(false), isClientPeer(false), owner(owner),
-        readSync(false), writeSync(false) {}
-    ~QnTransactionTransport();
     enum State {
         NotDefined,
         Connect,
@@ -33,35 +25,52 @@ public:
         Error
     };
 
-    QSharedPointer<AbstractStreamSocket> socket;
-    QUrl remoteAddr;
-    QUuid remoteGuid;
-    nx_http::AsyncHttpClientPtr httpClient;
-    qint64 lastConnectTime;
+    QnTransactionTransport(bool isOriginator, bool isClient, QSharedPointer<AbstractStreamSocket> socket = QSharedPointer<AbstractStreamSocket>(), const QUuid& remoteGuid = QUuid());
+    ~QnTransactionTransport();
 
-    bool isConnectionOriginator;
-    bool isClientPeer;
-
-    bool readSync;
-    bool writeSync;
+signals:
+    void gotTransaction(QByteArray data);
 public:
-    void doOutgoingConnect();
+    void doOutgoingConnect(QUrl remoteAddr);
     void startStreaming();
     void addData(const QByteArray& data);
     void processError(QSharedPointer<QnTransactionTransport> sibling);
     void sendSyncRequest();
+
+    // these getters/setters are using from a single thread
+    bool isOriginator() const { return m_originator; }
+    bool isClientPeer() const { return m_isClientPeer; }
+    QUuid removeGuid() const  { return m_removeGuid; }
+    qint64 lastConnectTime() { return m_lastConnectTime; }
+    void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
+
+    // This is multi thread getters/setters
+    bool isReadSync() const;
+    void setReadSync(bool value);
+    bool isWriteSync() const;
+    void setWriteSync(bool value);
     void setState(State state);
     State getState() const;
 private:
-    mutable QMutex mutex;
-    State state;
-    std::vector<quint8> readBuffer;
-    int readBufferLen;
-    int chunkHeaderLen;
-    quint32 chunkLen;
-    int sendOffset;
-    QnTransactionMessageBus* owner;
-    QQueue<QByteArray> dataToSend;
+    qint64 m_lastConnectTime;
+
+    bool m_readSync;
+    bool m_writeSync;
+
+    QUuid m_removeGuid;
+    bool m_originator;
+    bool m_isClientPeer;
+
+    mutable QMutex m_mutex;
+    QSharedPointer<AbstractStreamSocket> m_socket;
+    nx_http::AsyncHttpClientPtr m_httpClient;
+    State m_state;
+    std::vector<quint8> m_readBuffer;
+    int m_readBufferLen;
+    int m_chunkHeaderLen;
+    quint32 m_chunkLen;
+    int m_sendOffset;
+    QQueue<QByteArray> m_dataToSend;
 private:
     void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
     void closeSocket();
