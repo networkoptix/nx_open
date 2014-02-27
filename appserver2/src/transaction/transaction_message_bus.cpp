@@ -176,6 +176,7 @@ void QnTransactionTransport::doClientConnect()
     if( isClientPeer ) {
         q.removeQueryItem("isClient");
         q.addQueryItem("isClient", QString());
+        readSync = true;
     }
     remoteAddr.setQuery(q);
 
