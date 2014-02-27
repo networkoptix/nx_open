@@ -268,6 +268,18 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
     return true;
 }
 
+void QnTransactionMessageBus::queueSyncRequest(QSharedPointer<QnTransactionTransport> transport)
+{
+    // send sync request
+    transport->setReadSync(false);
+    QnTransaction<QnTranState> requestTran(ApiCommand::tranSyncRequest, false);
+    requestTran.params = transactionLog->getTransactionsState();
+
+    QByteArray syncRequest;
+    QnTransactionMessageBus::serializeTransaction(syncRequest, requestTran);
+    transport->addData(syncRequest);
+}
+
 void QnTransactionMessageBus::processConnState(QSharedPointer<QnTransactionTransport> &transport)
 {
     switch (transport->getState()) 
@@ -286,7 +298,7 @@ void QnTransactionMessageBus::processConnState(QSharedPointer<QnTransactionTrans
         QSharedPointer<QnTransactionTransport> subling = getSibling(transport);
         // if sync already done or in progress do not send new request
         if (!transport->isClientPeer() && (!subling || !subling->isReadSync()))
-            transport->sendSyncRequest();
+            queueSyncRequest(transport);
         break;
     }
     case QnTransactionTransport::Connect:

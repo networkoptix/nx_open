@@ -72,18 +72,6 @@ void QnTransactionTransport::closeSocket()
     }
 }
 
-void QnTransactionTransport::sendSyncRequest()
-{
-    // send sync request
-    setReadSync(false);
-    QnTransaction<QnTranState> requestTran(ApiCommand::tranSyncRequest, false);
-    requestTran.params = transactionLog->getTransactionsState();
-
-    QByteArray syncRequest;
-    QnTransactionMessageBus::serializeTransaction(syncRequest, requestTran);
-    addData(syncRequest);
-}
-
 void QnTransactionTransport::setState(State state)
 {
     QMutexLocker lock(&m_mutex);

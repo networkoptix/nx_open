@@ -35,7 +35,6 @@ public:
     void doOutgoingConnect(QUrl remoteAddr);
     void addData(const QByteArray& data);
     void close();
-    void sendSyncRequest();
 
     // these getters/setters are using from a single thread
     bool isOriginator() const { return m_originator; }

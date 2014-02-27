@@ -52,6 +52,9 @@ namespace ec2
             sendTransactionInternal(!tran.originGuid.isNull() ? tran.originGuid : tran.id.peerGUID, buffer);
         }
 
+    private:
+        friend class QnTransactionTransport;
+
         static void serializeTransaction(QByteArray& buffer, const QByteArray& serializedTran)
         {
             buffer.reserve(serializedTran.size() + 12);
@@ -73,8 +76,6 @@ namespace ec2
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
         }
 
-    private:
-        friend class QnTransactionTransport;
 
         class AbstractHandler
         {
@@ -115,6 +116,7 @@ namespace ec2
         static bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
         static void onGotTransactionSyncResponse(QnTransactionTransport* sender);
         static void toFormattedHex(quint8* dst, quint32 payloadSize);
+        void queueSyncRequest(QSharedPointer<QnTransactionTransport> transport);
     private slots:
         void at_timer();
         void at_gotTransaction(QByteArray serializedTran);
