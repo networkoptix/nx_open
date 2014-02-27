@@ -30,11 +30,11 @@ public:
 
 signals:
     void gotTransaction(QByteArray data);
+    void stateChanged(State state);
 public:
     void doOutgoingConnect(QUrl remoteAddr);
-    void startStreaming();
     void addData(const QByteArray& data);
-    void processError(QSharedPointer<QnTransactionTransport> sibling);
+    void close();
     void sendSyncRequest();
 
     // these getters/setters are using from a single thread

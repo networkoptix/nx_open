@@ -57,14 +57,6 @@ QSharedPointer<QnTransactionTransport> QnTransactionMessageBus::getSibling(QShar
     return transport->isOriginator() ? data.incomeConn : data.outcomeConn;
 }
 
-void QnTransactionMessageBus::sendSyncRequestIfRequired(QSharedPointer<QnTransactionTransport> transport)
-{
-    QSharedPointer<QnTransactionTransport> subling = getSibling(transport);
-    // if sync already done or in progress do not send new request
-    if (!subling || !subling->isReadSync())
-        transport->sendSyncRequest();
-}
-
 void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran)
 {
     QnTransactionTransport* sender = (QnTransactionTransport*) this->sender();
@@ -280,14 +272,23 @@ void QnTransactionMessageBus::processConnState(QSharedPointer<QnTransactionTrans
 {
     switch (transport->getState()) 
     {
-    case QnTransactionTransport::Error:
-        transport->processError(getSibling(transport));
+    case QnTransactionTransport::Error: 
+        {
+        transport->close();
+        QSharedPointer<QnTransactionTransport> sibling = getSibling(transport);
+        if (sibling && sibling->getState() == QnTransactionTransport::ReadyForStreaming) 
+            sibling->close();
         break;
+    }
     case QnTransactionTransport::Connected:
-        transport->startStreaming();
-        if (!transport->isClientPeer())
-            sendSyncRequestIfRequired(transport);
+    {
+        transport->setState(QnTransactionTransport::ReadyForStreaming);
+        QSharedPointer<QnTransactionTransport> subling = getSibling(transport);
+        // if sync already done or in progress do not send new request
+        if (!transport->isClientPeer() && (!subling || !subling->isReadSync()))
+            transport->sendSyncRequest();
         break;
+    }
     case QnTransactionTransport::Connect:
         {
             qint64 ct = QDateTime::currentDateTime().toMSecsSinceEpoch();

@@ -111,7 +111,6 @@ namespace ec2
         //void gotTransaction(const QnId& remoteGuid, bool isConnectionOriginator, const QByteArray& data);
         void sendTransactionInternal(const QnId& originGuid, const QByteArray& chunkData);
         void processConnState(QSharedPointer<QnTransactionTransport> &transport);
-        void sendSyncRequestIfRequired(QSharedPointer<QnTransactionTransport> transport);
         QSharedPointer<QnTransactionTransport> getSibling(QSharedPointer<QnTransactionTransport> transport);
         static bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
         static void onGotTransactionSyncResponse(QnTransactionTransport* sender);

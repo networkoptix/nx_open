@@ -87,7 +87,17 @@ void QnTransactionTransport::sendSyncRequest()
 void QnTransactionTransport::setState(State state)
 {
     QMutexLocker lock(&m_mutex);
-    this->m_state = state;
+    if (state == ReadyForStreaming) {
+        m_socket->setRecvTimeout(SOCKET_TIMEOUT);
+        m_socket->setSendTimeout(SOCKET_TIMEOUT);
+        m_socket->setNonBlockingMode(true);
+        m_chunkHeaderLen = 0;
+        aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this );
+    }
+    if (this->m_state != state) {
+        this->m_state = state;
+        emit stateChanged(state);
+    }
 }
 
 QnTransactionTransport::State QnTransactionTransport::getState() const
@@ -96,20 +106,19 @@ QnTransactionTransport::State QnTransactionTransport::getState() const
     return m_state;
 }
 
-void QnTransactionTransport::processError(QSharedPointer<QnTransactionTransport> sibling)
+void QnTransactionTransport::close()
 {
-    QMutexLocker lock(&m_mutex);
-    closeSocket();
-    m_readSync = false;
-    m_writeSync = false;
+    {
+        QMutexLocker lock(&m_mutex);
+        closeSocket();
+        m_readSync = false;
+        m_writeSync = false;
+        m_dataToSend.clear();
+    }
     if (m_originator) 
-        m_state = State::Connect;
+        setState(State::Connect);
     else
-        m_state = State::Closed;
-    m_dataToSend.clear();
-
-    if (sibling && sibling->getState() == ReadyForStreaming) 
-        sibling->processError(QSharedPointer<QnTransactionTransport>());
+        setState(State::Closed);
 }
 
 void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventType eventType ) throw()
@@ -234,16 +243,6 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         memcpy(&m_readBuffer[0], buffer, bufferLen);
     }
     m_readBufferLen = bufferLen;
-}
-
-void QnTransactionTransport::startStreaming()
-{
-    m_socket->setRecvTimeout(SOCKET_TIMEOUT);
-    m_socket->setSendTimeout(SOCKET_TIMEOUT);
-    m_socket->setNonBlockingMode(true);
-    m_chunkHeaderLen = 0;
-    m_state = ReadyForStreaming;
-    aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this );
 }
 
 void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr client)
