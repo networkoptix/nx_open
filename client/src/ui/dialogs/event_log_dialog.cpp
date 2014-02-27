@@ -555,6 +555,8 @@ void QnEventLogDialog::enableUpdateData()
 
 void QnEventLogDialog::setVisible(bool value)
 {
+    // TODO: #Elric use showEvent instead. 
+
     if (value && !isVisible())
         updateData();
     QDialog::setVisible(value);
