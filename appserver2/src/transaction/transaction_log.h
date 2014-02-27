@@ -73,11 +73,11 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiLayoutData>& tran)              { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiBusinessRuleData>& tran)        { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiIdData>& tran)                  { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiSetResourceStatusData>& tran)   { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiSetResourceDisabledData>& tran) { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiCameraServerItemData>&)         { return QUuid::createUuid() ; }
+        QUuid transactionHash(const QnTransaction<ApiSetResourceStatusData>& tran)   { return makeHash(tran.params.id.toRfc4122(), "status"); }
         QUuid transactionHash(const QnTransaction<ApiPanicModeData>&)                { return makeHash("panic_mode") ; }
-        QUuid transactionHash(const QnTransaction<ApiResourceParams>& tran)          { return makeHash(tran.params.id.toByteArray(), "res_params") ; }
+        QUuid transactionHash(const QnTransaction<ApiResourceParams>& tran)          { return makeHash(tran.params.id.toRfc4122(), "res_params") ; }
         QUuid transactionHash(const QnTransaction<ApiStoredFileData>& tran)          { return makeHash(tran.params.path.toUtf8()); }
         QUuid transactionHash(const QnTransaction<ApiStoredFilePath>& tran)          { return makeHash(tran.params.toUtf8()); }
         QUuid transactionHash(const QnTransaction<ApiResourceData>& tran)            { return makeHash(tran.params.id.toRfc4122(), "resource"); }

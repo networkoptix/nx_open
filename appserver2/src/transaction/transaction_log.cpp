@@ -73,7 +73,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     foreach(const QUuid& peerGuid, m_state.keys())
     {
         QSqlQuery query(m_dbManager->getDB());
-        query.prepare("SELECT tran_data FROM transaction_log WHERE peer_guid = ? and sequence > ?");
+        query.prepare("SELECT tran_data FROM transaction_log WHERE peer_guid = ? and sequence > ?  order by sequence");
         query.bindValue(0, peerGuid.toRfc4122());
         query.bindValue(1, state.value(peerGuid));
         if (!query.exec())
