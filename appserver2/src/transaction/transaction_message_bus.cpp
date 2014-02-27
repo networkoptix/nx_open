@@ -78,10 +78,8 @@ void QnTransactionTransport::processError()
 
     QSharedPointer<QnTransactionTransport> sibling = owner->getSibling(this);
     if (sibling && sibling->state == ReadyForStreaming) {
-        if (state == WaitForTranSync)
-            sibling->sendSyncRequest(); // we still doesn't sync
-        else
-            sibling->dataToSend = dataToSend;
+        if (state == WaitForTranSync || state == ReadyForStreaming)
+            sibling->sendSyncRequest(); // resync via sibling
     }
 
     closeSocket();
@@ -249,9 +247,11 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     socket = httpClient->takeSocket();
     httpClient.reset();
 
-    owner->lock();
-    owner->sendSyncRequestIfRequired(this);
-    owner->unlock();
+    if (!isClientPeer) {
+        owner->lock();
+        owner->sendSyncRequestIfRequired(this);
+        owner->unlock();
+    }
 }
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
