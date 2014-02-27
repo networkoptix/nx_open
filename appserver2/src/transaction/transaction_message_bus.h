@@ -26,6 +26,7 @@ namespace ec2
             NotDefined,
             Connect,
             Connecting,
+            Connected,
             ReadyForStreaming,
             Closed
         };
@@ -110,7 +111,7 @@ namespace ec2
         }
 
     signals:
-        void sendGotTransaction(QnTransactionTransport* sender, QByteArray data);
+        void sendGotTransaction(QWeakPointer<QnTransactionTransport> sender, QByteArray data);
     private:
         friend class QnTransactionTransport;
 
@@ -167,7 +168,7 @@ namespace ec2
         typedef QMap<QUuid, ConnectionsToPeer> QnConnectionMap;
 
     private:
-        inline void gotTransaction(QnTransactionTransport* sender, QByteArray data) { emit sendGotTransaction(sender, data); }
+        void gotTransaction(QnTransactionTransport* sender, const QByteArray& data);
         void sendTransactionInternal(const QnId& originGuid, const QByteArray& chunkData);
         void processConnState(QSharedPointer<QnTransactionTransport> &transport);
         void sendSyncRequestIfRequired(QnTransactionTransport* transport);
@@ -180,7 +181,7 @@ namespace ec2
         void unlock() { m_mutex.unlock(); }
     private slots:
         void at_timer();
-        void at_gotTransaction(QnTransactionTransport* sender, QByteArray data);
+        void at_gotTransaction(QWeakPointer<QnTransactionTransport> sender, QByteArray data);
     private:
         AbstractHandler* m_handler;
         QTimer* m_timer;
@@ -188,6 +189,7 @@ namespace ec2
         QThread *m_thread;
         QnConnectionMap m_connections;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
+        QVector<QSharedPointer<QnTransactionTransport>> m_connectionsToRemove;
     };
 }
 

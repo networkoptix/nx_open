@@ -16,6 +16,7 @@ static const int RECONNECT_TIMEOUT = 1000 * 5;
 
 QnTransactionTransport::~QnTransactionTransport()
 {
+    Q_ASSERT(QThread::currentThread() == owner->thread());
     closeSocket();
 }
 
@@ -53,9 +54,9 @@ int QnTransactionTransport::getChunkHeaderEnd(const quint8* data, int dataLen, q
 void QnTransactionTransport::closeSocket()
 {
     if (socket) {
-        socket->close();
         aio::AIOService::instance()->removeFromWatch( socket, PollSet::etRead, this );
         aio::AIOService::instance()->removeFromWatch( socket, PollSet::etWrite, this );
+        socket->close();
         socket.reset();
     }
 }
@@ -310,8 +311,12 @@ void QnTransactionMessageBus::sendSyncRequestIfRequired(QnTransactionTransport* 
         transport->sendSyncRequest();
 }
 
-void QnTransactionMessageBus::at_gotTransaction(QnTransactionTransport* sender, QByteArray serializedTran)
+void QnTransactionMessageBus::at_gotTransaction(QWeakPointer<QnTransactionTransport> sender_ref, QByteArray serializedTran)
 {
+    QnTransactionTransport* sender = sender_ref.data();
+    if (!sender)
+        return;
+
     QnAbstractTransaction tran;
     InputBinaryStream<QByteArray> stream(serializedTran);
     if (!tran.deserialize(&stream)) {
@@ -521,6 +526,11 @@ void QnTransactionMessageBus::processConnState(QSharedPointer<QnTransactionTrans
 {
     switch (transport->state) 
     {
+    case QnTransactionTransport::Connected:
+        transport->startStreaming();
+        if (!transport->isClientPeer)
+            sendSyncRequestIfRequired(transport.data());
+        break;
     case QnTransactionTransport::Connect:
         {
             qint64 ct = QDateTime::currentDateTime().toMSecsSinceEpoch();
@@ -542,7 +552,10 @@ void QnTransactionMessageBus::moveOutgoingConnToMainList(QnTransactionTransport*
     QMutexLocker lock(&m_mutex);
     for (int i = 0; i < m_connectingConnections.size(); ++i)
     {
-        if (m_connectingConnections[i].data() == transport) {
+        if (m_connectingConnections[i].data() == transport) 
+        {
+            if (m_connections[transport->remoteGuid].outcomeConn)
+                m_connectionsToRemove << m_connections[transport->remoteGuid].outcomeConn;
             m_connections[transport->remoteGuid].outcomeConn = m_connectingConnections[i];
             m_connectingConnections.removeAt(i);
             break;
@@ -553,6 +566,9 @@ void QnTransactionMessageBus::moveOutgoingConnToMainList(QnTransactionTransport*
 void QnTransactionMessageBus::at_timer()
 {
     QMutexLocker lock(&m_mutex);
+
+    m_connectionsToRemove.clear();
+
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end();)
     {
         ConnectionsToPeer& c = itr.value();
@@ -609,8 +625,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     transport->isConnectionOriginator = false;
     transport->socket = socket;
     int handle = socket->handle();
-
-    transport->startStreaming();
+    transport->state = QnTransactionTransport::Connected;
 
     // send fullsync to a client immediatly
     if (isClient) 
@@ -623,9 +638,9 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     }
     
     QMutexLocker lock(&m_mutex);
+    if (m_connections[remoteGuid].incomeConn)
+        m_connectionsToRemove << m_connections[remoteGuid].incomeConn;
     m_connections[remoteGuid].incomeConn.reset(transport);
-    if (!isClient)
-        sendSyncRequestIfRequired(transport);
 }
 
 void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient)
@@ -649,6 +664,21 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
         if (data.outcomeConn && data.outcomeConn->remoteAddr == url) {
             data.outcomeConn->state = QnTransactionTransport::Closed;
             break;
+        }
+    }
+}
+
+void QnTransactionMessageBus::gotTransaction(QnTransactionTransport* sender, const QByteArray& data)
+{
+    QMutexLocker lock(&m_mutex);
+    QnConnectionMap::iterator itr = m_connections.find(sender->remoteGuid);
+    if (itr != m_connections.end()) 
+    {
+        QSharedPointer<QnTransactionTransport> sender_ref = itr->incomeConn.data() == sender ? itr->incomeConn : itr->outcomeConn;
+        if (sender_ref) {
+            QByteArray dataCopy;
+            dataCopy.append(data); // make deep copy
+            emit sendGotTransaction(sender_ref.toWeakRef(), dataCopy);
         }
     }
 }
