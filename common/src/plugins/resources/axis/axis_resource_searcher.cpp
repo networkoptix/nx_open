@@ -61,7 +61,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     if (host.isEmpty())
         host = url.toString(); // in case if url just host address without protocol and port
 
-    int timeout = 4000;
+    int timeout = 4000; // TODO: #Elric we should probably increase this one. In some cases 4 secs is not enough.
 
 
     if (port < 0)
