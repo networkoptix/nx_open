@@ -261,29 +261,4 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     setState(QnTransactionTransport::Connected);
 }
 
-bool QnTransactionTransport::isReadSync() const
-{
-    QMutexLocker lock(&m_mutex);
-    return m_readSync;
-}
-
-void QnTransactionTransport::setReadSync(bool value)
-{
-    QMutexLocker lock(&m_mutex);
-    m_readSync = value;
-}
-
-bool QnTransactionTransport::isWriteSync() const
-{
-    QMutexLocker lock(&m_mutex);
-    return m_writeSync;
-}
-
-void QnTransactionTransport::setWriteSync(bool value)
-{
-    QMutexLocker lock(&m_mutex);
-    m_writeSync = value;
-}
-
-
 }

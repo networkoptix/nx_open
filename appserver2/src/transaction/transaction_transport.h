@@ -42,12 +42,12 @@ public:
     QUuid removeGuid() const  { return m_removeGuid; }
     qint64 lastConnectTime() { return m_lastConnectTime; }
     void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
+    bool isReadSync() const       { return m_readSync; }
+    void setReadSync(bool value)  {m_readSync = value;}
+    bool isWriteSync() const      { return m_writeSync; }
+    void setWriteSync(bool value) { m_writeSync = value; }
 
     // This is multi thread getters/setters
-    bool isReadSync() const;
-    void setReadSync(bool value);
-    bool isWriteSync() const;
-    void setWriteSync(bool value);
     void setState(State state);
     State getState() const;
 private:
