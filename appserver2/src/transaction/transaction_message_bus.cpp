@@ -310,32 +310,44 @@ void QnTransactionMessageBus::sendSyncRequestIfRequired(QnTransactionTransport* 
         transport->sendSyncRequest();
 }
 
-void QnTransactionMessageBus::at_gotTransaction(QnTransactionTransport* sender, QByteArray data)
+void QnTransactionMessageBus::at_gotTransaction(QnTransactionTransport* sender, QByteArray serializedTran)
 {
     QnAbstractTransaction tran;
-    InputBinaryStream<QByteArray> stream(data);
+    InputBinaryStream<QByteArray> stream(serializedTran);
     if (!tran.deserialize(&stream)) {
-        qWarning() << Q_FUNC_INFO << "Ignore bad transaction data. size=" << data.size();
+        qWarning() << Q_FUNC_INFO << "Ignore bad transaction data. size=" << serializedTran.size();
         sender->processError();
         return;
     }
 
+    if (tran.command == ApiCommand::tranSyncRequest) {
+        onGotTransactionSyncRequest(sender, stream);
+        return;
+    }
+    else if (tran.command == ApiCommand::tranSyncResponse) {
+        onGotTransactionSyncResponse(sender);
+        return;
+    }
+    
     if (!sender->readSync)
         return;
 
-    if (m_handler && !m_handler->processByteArray(sender, data)) {
+    if (m_handler && !m_handler->processByteArray(sender, serializedTran)) {
         sender->processError();
         return;
     }
 
     QMutexLocker lock(&m_mutex);
     // proxy incoming transaction to other peers.
+    QByteArray chunkData;
+    QnTransactionMessageBus::serializeTransaction(chunkData, serializedTran);
+
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
         if (itr.key() == sender->remoteGuid)
             continue;
         ConnectionsToPeer& connection = itr.value();
-        connection.proxyIncomingTransaction(tran, data);
+        connection.proxyIncomingTransaction(tran, chunkData);
     }
 }
 
@@ -353,12 +365,10 @@ void QnTransactionMessageBus::sendTransactionInternal(const QnId& originGuid, co
 
 // ------------------ QnTransactionMessageBus::ConnectionsToPeer  -------------------
 
-void QnTransactionMessageBus::ConnectionsToPeer::proxyIncomingTransaction(const QnAbstractTransaction& tran, const QByteArray& serializedTran)
+void QnTransactionMessageBus::ConnectionsToPeer::proxyIncomingTransaction(const QnAbstractTransaction& tran, const QByteArray& chunkData)
 {
     // proxy data to connected clients only. You can update this function to peer-to-peer sync via proxy in future
     if (incomeConn && incomeConn->state == QnTransactionTransport::ReadyForStreaming && incomeConn->isClientPeer) {
-        QByteArray chunkData;
-        QnTransactionMessageBus::serializeTransaction(chunkData, serializedTran);
         incomeConn->addData(chunkData);
     }
 }
@@ -410,8 +420,11 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
             serializeTransaction(chunkData, tran);
             sender->addData(chunkData);
 
-            foreach(const QByteArray& data, transactions)
-                sender->addData(data);
+            foreach(const QByteArray& data, transactions) {
+                QByteArray chunkData;
+                serializeTransaction(chunkData, data);
+                sender->addData(chunkData);
+            }
             return true;
         }
         else {
@@ -434,12 +447,6 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
 
     switch (abstractTran.command)
     {
-        case ApiCommand::tranSyncRequest:
-            return QnTransactionMessageBus::onGotTransactionSyncRequest(sender, stream);
-        case ApiCommand::tranSyncResponse:
-            QnTransactionMessageBus::onGotTransactionSyncResponse(sender);
-            return true;
-
         case ApiCommand::getAllDataList:
             return deliveryTransaction<ApiFullData>(abstractTran, stream);
 
