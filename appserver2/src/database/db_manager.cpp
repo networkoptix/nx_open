@@ -228,16 +228,37 @@ ErrorCode QnDbManager::insertResource(const ApiResourceData& data, qint32* inter
     return ErrorCode::ok;
 }
 
+qint32 QnDbManager::getResourceInternalId( const QnId& guid )
+{
+    QSqlQuery query(m_sdb);
+    query.prepare("SELECT id from vms_resource where guid = :guid");
+    query.bindValue(":guid", guid.toRfc4122());
+    if (!query.exec() || !query.next())
+        return 0;
+    return query.value("id").toInt();
+}
+
 ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint32* internalId)
 {
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO vms_resource (guid, xtype_guid, parent_guid, name, url, status, disabled) VALUES(:id, :typeId, :parentGuid, :name, :url, :status, :disabled)");
-    data.autoBindValues(insQuery);
-    if (!insQuery.exec()) {
-        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+    *internalId = getResourceInternalId(data.id);
+
+    QSqlQuery query(m_sdb);
+    if (*internalId) {
+        query.prepare("UPDATE vms_resource SET guid = :id, xtype_guid = :typeId, parent_guid = :parentGuid, name = :name, url = :url, status = :status, disabled = :disabled WHERE id = :internalID");
+        query.bindValue(":internalID", *internalId);
+    }
+    else {
+        query.prepare("INSERT OR REPLACE INTO vms_resource (guid, xtype_guid, parent_guid, name, url, status, disabled) VALUES(:id, :typeId, :parentGuid, :name, :url, :status, :disabled)");
+    }
+    data.autoBindValues(query);
+
+
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
     }
-    *internalId = insQuery.lastInsertId().toInt();
+    if (*internalId == 0)
+        *internalId = query.lastInsertId().toInt();
 
     if (!data.addParams.empty()) 
     {
@@ -628,16 +649,6 @@ ErrorCode QnDbManager::deleteUserProfileTable(const qint32 id)
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
         return ErrorCode::failure;
     }
-}
-
-qint32 QnDbManager::getResourceInternalId( const QnId& guid )
-{
-    QSqlQuery query(m_sdb);
-    query.prepare("SELECT id from vms_resource where guid = :guid");
-    query.bindValue(":guid", guid.toRfc4122());
-    if (!query.exec() || !query.next())
-        return 0;
-    return query.value("id").toInt();
 }
 
 qint32 QnDbManager::getBusinessRuleInternalId( const QnId& guid )

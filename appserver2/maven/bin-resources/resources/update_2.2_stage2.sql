@@ -16,5 +16,7 @@ drop table vms_businessrule_event_resources_tmp;
 
 CREATE UNIQUE INDEX idx_businessrule_guid ON vms_businessrule(guid);
 CREATE UNIQUE INDEX idx_resourcetype_guid ON vms_resourcetype(guid);
+CREATE UNIQUE INDEX idx_resource_guid     ON vms_resource(guid);
+CREATE INDEX idx_resource_parent          ON vms_resource(parent_guid);
 
 ALTER TABLE "vms_server" ADD flags number;
