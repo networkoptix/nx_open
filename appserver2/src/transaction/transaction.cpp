@@ -3,6 +3,7 @@
 #include <atomic>
 #include "common/common_module.h"
 #include "database/db_manager.h"
+#include "utils/common/synctime.h"
 
 
 namespace ec2
@@ -115,6 +116,7 @@ namespace ec2
         persistent = _persistent;
         id.peerGUID = qnCommon->moduleGUID();
         id.sequence = 0;
+        timestamp = qnSyncTime->currentMSecsSinceEpoch();
     }
 
     void QnAbstractTransaction::fillSequence()

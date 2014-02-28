@@ -103,7 +103,7 @@ namespace ec2
     class QnAbstractTransaction
     {
     public:
-		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false) {}
+		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false), timestamp(0) {}
         QnAbstractTransaction(ApiCommand::Value command, bool persistent);
         
         void fillSequence();
@@ -130,6 +130,7 @@ namespace ec2
         ApiCommand::Value command;
         ID id;
         bool persistent;
+        qint32 timestamp;
         
         QUuid originGuid; // this field doesn't serializable and uses local only. 
         static QAtomicInt m_localSequence;
@@ -164,7 +165,7 @@ namespace ec2
 }
 
 QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (sequence) )
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent))
+QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent) (timestamp))
 
 
 #endif  //EC2_TRANSACTION_H

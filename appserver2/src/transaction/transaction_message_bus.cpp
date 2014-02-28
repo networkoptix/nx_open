@@ -142,6 +142,9 @@ bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbst
     if (!QnBinary::deserialize(tran.params, &stream))
         return false;
     
+    if (abstractTran.persistent && transactionLog && transactionLog->contains(tran))
+        return true; // transaction already processed
+
     // trigger notification, update local data e.t.c
     if (!m_handler->processIncomingTransaction<T2>(tran, stream.buffer()))
         return false;
@@ -193,8 +196,6 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
     QnAbstractTransaction  abstractTran;
     if (!QnBinary::deserialize(abstractTran, &stream))
         return false; // bad data
-    if (abstractTran.persistent && transactionLog && transactionLog->contains(abstractTran.id))
-        return true; // transaction already processed
 
     switch (abstractTran.command)
     {
