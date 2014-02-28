@@ -2,7 +2,6 @@
 
 #ifdef Q_OS_MACX
 #include <ui/workaround/mac_utils.h>
-#include <ui/workaround/mac_event_loop_workaround.h>
 #endif
 
 #include <QtCore/QFile>
@@ -59,6 +58,7 @@
 #include <ui/style/noptix_style.h>
 #include <ui/style/proxy_style.h>
 #include <ui/workaround/qtbug_workaround.h>
+#include <ui/workaround/mac_event_loop_workaround.h>
 #include <ui/screen_recording/screen_recorder.h>
 
 #include <client/client_settings.h>
@@ -320,10 +320,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     menu()->newMenu(Qn::MainScope);
 #endif
 
-#ifdef Q_OS_MACX
+//#ifdef Q_OS_MACX
+    /* Side-effect of this workaround is fps lowering. So enable it for other systems too. */
     QnMacEventLoopWorkaround *macEventLoopWorkaround = new QnMacEventLoopWorkaround(m_view->viewport(), this);
     Q_UNUSED(macEventLoopWorkaround);
-#endif
+//#endif
 
     QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
     Q_UNUSED(manageDialog)
