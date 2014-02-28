@@ -111,7 +111,7 @@ SystemError::ErrorCode NamedPipeServer::listen( const QString& pipeName )
     secAttrs.lpSecurityDescriptor = pSD;
     secAttrs.bInheritHandle = FALSE;
 
-    const QString win32PipeName = QString::fromLatin1("\\\\.\\pipe\\%1").arg(pipeName);
+    const QString win32PipeName = lit("\\\\.\\pipe\\%1").arg(pipeName);
     m_impl->hPipe = CreateNamedPipe(
         reinterpret_cast<const wchar_t *>(win32PipeName.utf16()),              // pipe name 
         FILE_FLAG_FIRST_PIPE_INSTANCE | PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,       // read/write access, overlapped I/O

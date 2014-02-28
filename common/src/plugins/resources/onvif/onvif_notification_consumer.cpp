@@ -27,7 +27,7 @@ NotificationConsumerBindingService* OnvifNotificationConsumer::copy()
 
 int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest )
 {
-    NX_LOG( QString::fromLatin1("Received soap notification from %1").
+    NX_LOG( lit("Received soap notification from %1").
         arg(QString::fromLatin1(notificationRequest->soap ? notificationRequest->soap->endpoint : "")), cl_logDEBUG1 );
 
     //oasisWsnB2__Notify->
@@ -41,8 +41,7 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
             (!notification.oasisWsnB2__SubscriptionReference ||
              !notification.oasisWsnB2__SubscriptionReference->Address) )
         {
-            NX_LOG( QString::fromLatin1("Received notification with no producer reference and no subscription reference (endpoint %1). "
-                "Unable to associate with resource. Ignoring...").
+            NX_LOG( lit("Received notification with no producer reference and no subscription reference (endpoint %1). Unable to associate with resource. Ignoring...").
                 arg(QString::fromLatin1(notificationRequest->soap ? notificationRequest->soap->endpoint : "")), cl_logWARNING );
             continue;
         }
@@ -50,7 +49,7 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
         //if( !notification.oasisWsnB2__Topic ||
         //    notification.oasisWsnB2__Topic->Dialect != "tns1:Device/Trigger/Relay" )
         //{
-        //    NX_LOG( QString::fromLatin1("Received notification with unknown topic: %1. Ignoring...").
+        //    NX_LOG( lit("Received notification with unknown topic: %1. Ignoring...").
         //        arg(QString::fromStdString(notification.oasisWsnB2__Topic ? notification.oasisWsnB2__Topic->Dialect : string())), cl_logDEBUG1 );
         //    continue;
         //}
@@ -71,9 +70,9 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
                   (it = m_subscriptionReferenceToResource.find( QString::fromStdString(notification.oasisWsnB2__SubscriptionReference->Address->__item) )) != m_subscriptionReferenceToResource.end()) )
             {
                 //this is possible shortly after resource unregistration
-                //NX_LOG( QString::fromLatin1("Received notification for unknown resource. Producer address %1. Ignoring...").
+                //NX_LOG( lit("Received notification for unknown resource. Producer address %1. Ignoring...").
                 //    arg(QString::fromStdString(notification.oasisWsnB2__ProducerReference->Address->__item)), cl_logWARNING );
-                NX_LOG( QString::fromLatin1("Received notification for unknown resource. Ignoring..."), cl_logWARNING );
+                NX_LOG( lit("Received notification for unknown resource. Ignoring..."), cl_logWARNING );
                 continue;
             }
         }

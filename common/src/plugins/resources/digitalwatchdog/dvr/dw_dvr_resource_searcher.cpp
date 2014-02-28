@@ -57,7 +57,7 @@ QnResourcePtr DwDvrResourceSearcher::createResource(QnId resourceTypeId, const Q
     result = QnVirtualCameraResourcePtr();
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Axis camera resource. TypeID" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create DW DVR camera resource. TypeID" << resourceTypeId.toString() << ", Parameters: " << parameters;
     result->deserialize(parameters);
 
     return result;

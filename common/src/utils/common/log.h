@@ -17,7 +17,7 @@ public:
     QnLogLevel logLevel() const;
 
     void log(const QString &msg, QnLogLevel logLevel);
-    void log(QnLogLevel logLevel, const char* format, ...);
+    void log(QnLogLevel logLevel, const char *format, ...);
 
 #define QN_LOG_BODY(ARGS)                                                       \
         if(!isActive(logLevel))                                                 \
@@ -54,9 +54,9 @@ public:
     /*!
         Introduced to allow logging in dynamically loaded plugins
     */
-    static void initLog(QnLog* externalInstance);
+    static void initLog(QnLog *externalInstance);
     static QString logFileName();
-    static QnLog* instance();
+    static QnLog *instance();
     
     static QnLogLevel logLevelFromString(const QString &value);
     static QString logLevelToString(QnLogLevel value);
