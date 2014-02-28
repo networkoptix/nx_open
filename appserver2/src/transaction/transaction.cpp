@@ -3,6 +3,7 @@
 #include <atomic>
 #include "common/common_module.h"
 #include "database/db_manager.h"
+#include "utils/common/synctime.h"
 
 
 namespace ec2
@@ -109,11 +110,13 @@ namespace ec2
         }
     }
 
-    void QnAbstractTransaction::initNew(ApiCommand::Value _command, bool _persistent)
+    QnAbstractTransaction::QnAbstractTransaction(ApiCommand::Value _command, bool _persistent)
     {
         command = _command;
         persistent = _persistent;
         id.peerGUID = qnCommon->moduleGUID();
+        id.sequence = 0;
+        timestamp = qnSyncTime->currentMSecsSinceEpoch();
     }
 
     void QnAbstractTransaction::fillSequence()

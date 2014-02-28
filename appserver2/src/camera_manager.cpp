@@ -128,8 +128,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnVirtualCameraResourcePtr& resource )
     {
-		QnTransaction<ApiCameraData> tran;
-		tran.initNew(command, true);
+		QnTransaction<ApiCameraData> tran(command, true);
 		tran.params.fromResource(resource);
         return tran;
     }
@@ -139,8 +138,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnVirtualCameraResourceList& cameras )
     {
-        QnTransaction<ApiCameraDataList> tran;
-        tran.initNew(command, true);
+        QnTransaction<ApiCameraDataList> tran(command, true);
         tran.params.fromResourceList(cameras);
         return tran;
     }
@@ -150,8 +148,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnCameraHistoryItem& historyItem )
     {
-        QnTransaction<ApiCameraServerItemData> tran;
-        tran.initNew(command, true);
+        QnTransaction<ApiCameraServerItemData> tran(command, true);
         tran.params.fromResource(historyItem);
         return tran;
     }
@@ -159,8 +156,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiIdData> QnCameraManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
     {
-        QnTransaction<ApiIdData> tran;
-        tran.initNew(command, true);
+        QnTransaction<ApiIdData> tran(command, true);
         tran.params.id = id;
         return tran;
     }

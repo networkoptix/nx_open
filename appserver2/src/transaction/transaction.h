@@ -103,20 +103,21 @@ namespace ec2
     class QnAbstractTransaction
     {
     public:
-		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false) {}
-
-        void initNew(ApiCommand::Value command, bool persistent);
-        void fillSequence();
+		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false), timestamp(0) {}
+        QnAbstractTransaction(ApiCommand::Value command, bool persistent);
         
-        static void setStartNumber(const qint64& value);
+        void fillSequence();
 
         template <class T2>
-        bool deserialize(ApiCommand::Value command, InputBinaryStream<T2>* stream) 
+        bool deserialize(InputBinaryStream<T2>* stream) 
         {
-            this->command = command;
+            if (!QnBinary::deserialize(command, stream))
+                return false;
             if (!QnBinary::deserialize(id, stream))
                 return false;
             if (!QnBinary::deserialize(persistent, stream))
+                return false;
+            if (!QnBinary::deserialize(timestamp, stream))
                 return false;
             return true;
         }
@@ -131,6 +132,7 @@ namespace ec2
         ApiCommand::Value command;
         ID id;
         bool persistent;
+        qint32 timestamp;
         
         QUuid originGuid; // this field doesn't serializable and uses local only. 
         static QAtomicInt m_localSequence;
@@ -141,6 +143,8 @@ namespace ec2
     {
     public:
         QnTransaction() {}
+        QnTransaction(const QnAbstractTransaction& abstractTran): QnAbstractTransaction(abstractTran) {}
+        QnTransaction(ApiCommand::Value command, bool persistent): QnAbstractTransaction(command, persistent) {}
         
         T params;
 
@@ -151,9 +155,9 @@ namespace ec2
         }
 
         template <class T2>
-        bool deserialize(ApiCommand::Value command, InputBinaryStream<T2>* stream) 
+        bool deserialize(InputBinaryStream<T2>* stream) 
         {
-            return QnAbstractTransaction::deserialize(command, stream) &&
+            return QnAbstractTransaction::deserialize(stream) &&
                 QnBinary::deserialize(params, stream);
                 //params.deserialize(stream);
         }
@@ -163,7 +167,7 @@ namespace ec2
 }
 
 QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (sequence) )
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent))
+QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent) (timestamp))
 
 
 #endif  //EC2_TRANSACTION_H

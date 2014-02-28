@@ -120,29 +120,4 @@ OVERRIDE_DEFINITION = "override="
 win32-msvc*:OVERRIDE_DEFINITION = "override=override"
 DEFINES += $$OVERRIDE_DEFINITION
 
-PB_FILES = $$PWD/api/pb/camera.proto \
-           $$PWD/api/pb/layout.proto \
-           $$PWD/api/pb/license.proto \
-           $$PWD/api/pb/cameraServerItem.proto \
-           $$PWD/api/pb/user.proto \
-           $$PWD/api/pb/resourceType.proto \
-           $$PWD/api/pb/resource.proto \
-           $$PWD/api/pb/server.proto \
-           $$PWD/api/pb/ms_recordedTimePeriod.proto \
-           $$PWD/api/pb/compatibility.proto \
-           $$PWD/api/pb/connectinfo.proto \
-           $$PWD/api/pb/businessCommon.proto \
-           $$PWD/api/pb/businessAction.proto \
-           $$PWD/api/pb/businessRule.proto \
-           $$PWD/api/pb/message.proto \
-           $$PWD/api/pb/setting.proto \
-           $$PWD/api/pb/email.proto \
-           $$PWD/api/pb/kvpair.proto           
 
-pb.name = Generating code from ${QMAKE_FILE_IN}
-pb.input = PB_FILES
-pb.output = $${MOC_DIR}/${QMAKE_FILE_BASE}.pb.cc
-pb.commands = $$PROTOC_FILE --proto_path=../src/api/pb --cpp_out=$${MOC_DIR} ../src/api/pb/${QMAKE_FILE_BASE}.proto
-pb.CONFIG += target_predeps
-pb.variable_out = GENERATED_SOURCES
-QMAKE_EXTRA_COMPILERS += pb

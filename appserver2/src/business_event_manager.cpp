@@ -94,8 +94,7 @@ int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handle
 template<class T>
 QnTransaction<ApiBusinessActionData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource )
 {
-    QnTransaction<ApiBusinessActionData> tran;
-    tran.initNew(command, false);
+    QnTransaction<ApiBusinessActionData> tran(command, false);
     tran.params.fromResource(resource);
     return tran;
 }
@@ -104,8 +103,7 @@ QnTransaction<ApiBusinessActionData> QnBusinessEventManager<T>::prepareTransacti
 template<class T>
 QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource )
 {
-    QnTransaction<ApiBusinessRuleData> tran;
-    tran.initNew(command, true);
+    QnTransaction<ApiBusinessRuleData> tran(command, true);
     tran.params.fromResource(resource);
     return tran;
 }
@@ -113,8 +111,7 @@ QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction
 template<class T>
 QnTransaction<ApiIdData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
 {
-    QnTransaction<ApiIdData> tran;
-    tran.initNew(command, true);
+    QnTransaction<ApiIdData> tran(command, true);
     tran.params.id = id;
     return tran;
 }

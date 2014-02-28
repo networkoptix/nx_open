@@ -33,11 +33,14 @@ namespace ec2
         void initStaticInstance(QnTransactionLog* value);
 
         ErrorCode getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result);
-        ErrorCode getTransactionsState(QnTranState& state);
+        QnTranState getTransactionsState();
         
         template <class T>
+        bool contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran)); }
+
+        template <class T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran) {
-            return saveToDB(tran.id, transactionHash(tran), serializedTran);
+            return saveToDB(tran, transactionHash(tran), serializedTran);
         }
 
         ErrorCode saveTransaction(const QnTransaction<ApiLayoutDataList>& multiTran, const QByteArray& /*serializedTran*/) {
@@ -58,6 +61,7 @@ namespace ec2
         }
 
     private:
+        bool contains(const QnAbstractTransaction& tran, const QUuid& hash);
         QUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
 
         template <class T>
@@ -72,22 +76,26 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiLayoutData>& tran)              { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiBusinessRuleData>& tran)        { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiIdData>& tran)                  { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiSetResourceStatusData>& tran)   { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiSetResourceDisabledData>& tran) { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiCameraServerItemData>&)         { return QUuid::createUuid() ; }
+        QUuid transactionHash(const QnTransaction<ApiSetResourceStatusData>& tran)   { return makeHash(tran.params.id.toRfc4122(), "status"); }
         QUuid transactionHash(const QnTransaction<ApiPanicModeData>&)                { return makeHash("panic_mode") ; }
-        QUuid transactionHash(const QnTransaction<ApiResourceParams>& tran)          { return makeHash(tran.params.id.toByteArray(), "res_params") ; }
+        QUuid transactionHash(const QnTransaction<ApiResourceParams>& tran)          { return makeHash(tran.params.id.toRfc4122(), "res_params") ; }
         QUuid transactionHash(const QnTransaction<ApiStoredFileData>& tran)          { return makeHash(tran.params.path.toUtf8()); }
         QUuid transactionHash(const QnTransaction<ApiStoredFilePath>& tran)          { return makeHash(tran.params.toUtf8()); }
         QUuid transactionHash(const QnTransaction<ApiResourceData>& tran)            { return makeHash(tran.params.id.toRfc4122(), "resource"); }
+        
+        QUuid transactionHash(const QnTransaction<ApiFullData>& )                { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const QnTransaction<ApiCameraDataList>& )          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const QnTransaction<ApiLayoutDataList>& )          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const QnTransaction<ApiBusinessActionData>& )      { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
         template <class T, class T2>
         ErrorCode saveMultiTransaction(const QnTransaction<T>& multiTran)
         {
             foreach(const T2& data, multiTran.params.data)
             {
-                QnTransaction<T2> tran;
-                tran.initNew(ApiCommand::saveLayout, true);
+                QnTransaction<T2> tran(ApiCommand::saveLayout, true);
                 tran.id.peerGUID = multiTran.id.peerGUID;
                 tran.params = data;
                 QByteArray serializedTran;
@@ -101,10 +109,11 @@ namespace ec2
             return ErrorCode::ok;
         }
     private:
-        ErrorCode saveToDB(const QnAbstractTransaction::ID& tranID, const QUuid& hash, const QByteArray& data);
+        ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);
     private:
         QnDbManager* m_dbManager;
-        QSet<QUuid> m_peerList;
+        QnTranState m_state;
+        QMap<QUuid, qint32> m_updateHistory;
     };
 };
 

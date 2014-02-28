@@ -2,6 +2,7 @@
 #include "common/common_module.h"
 #include "database/db_manager.h"
 #include "transaction.h"
+#include "utils/common/synctime.h"
 
 namespace ec2
 {
@@ -14,11 +15,19 @@ QnTransactionLog::QnTransactionLog(QnDbManager* db): m_dbManager(db)
     globalInstance = this;
 
     QSqlQuery query(m_dbManager->getDB());
-    query.prepare("SELECT distinct peer_guid FROM transaction_log");
+    query.prepare("SELECT peer_guid, max(sequence) as sequence FROM transaction_log GROUP BY peer_guid");
     if (query.exec()) {
         while (query.next())
-            m_peerList << QUuid::fromRfc4122(query.value(0).toByteArray());
+            m_state.insert(QUuid::fromRfc4122(query.value(0).toByteArray()), query.value(1).toInt());
     }
+
+    QSqlQuery query2(m_dbManager->getDB());
+    query2.prepare("SELECT tran_guid, timestamp as timestamp FROM transaction_log");
+    if (query2.exec()) {
+        while (query2.next())
+            m_updateHistory.insert(QUuid::fromRfc4122(query.value(0).toByteArray()), query.value(1).toInt());
+    }
+
 }
 
 QnTransactionLog* QnTransactionLog::instance()
@@ -35,44 +44,49 @@ QUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data
     return QUuid::fromRfc4122(hash.result());
 }
 
-ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction::ID& tranID, const QUuid& hash, const QByteArray& data)
+ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QUuid& hash, const QByteArray& data)
 {
-    m_peerList.insert(tranID.peerGUID);
+    Q_ASSERT_X(!tran.id.peerGUID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
 
     QSqlQuery query(m_dbManager->getDB());
-    query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, sequence, tran_guid, tran_data) values (?, ?, ?, ?)");
-    query.bindValue(0, tranID.peerGUID);
-    query.bindValue(1, tranID.sequence);
-    query.bindValue(2, hash);
-    query.bindValue(3, data);
-    if (!query.exec())
+    query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, sequence, timestamp, tran_guid, tran_data) values (?, ?, ?, ?, ?)");
+    query.bindValue(0, tran.id.peerGUID.toRfc4122());
+    query.bindValue(1, tran.id.sequence);
+    query.bindValue(2, tran.timestamp/1000);
+    query.bindValue(3, hash);
+    query.bindValue(4, data);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
+    }
+
+    m_state[tran.id.peerGUID] = qMax(m_state[tran.id.peerGUID], tran.id.sequence);
+    m_updateHistory[hash] = qMax(m_updateHistory[hash], tran.timestamp);
 
     return ErrorCode::ok;
 }
 
-ErrorCode QnTransactionLog::getTransactionsState(QnTranState& state)
+QnTranState QnTransactionLog::getTransactionsState()
 {
     QReadLocker lock(&m_dbManager->getMutex());
+    return m_state;
+}
 
-    state.clear();
-    QSqlQuery query(m_dbManager->getDB());
-    query.prepare("SELECT peer_guid, max(sequence) as sequence FROM transaction_log GROUP BY peer_guid");
-    if (query.exec())
-        return ErrorCode::failure;
-    while (query.next())
-        state.insert(QUuid::fromRfc4122(query.value(0).toByteArray()), query.value(1).toInt());
-    return ErrorCode::ok;
+bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& hash)
+{
+    QReadLocker lock(&m_dbManager->getMutex());
+    return m_state.value(tran.id.peerGUID) >= tran.id.sequence ||
+           m_updateHistory.value(hash) > tran.timestamp;
 }
 
 ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result)
 {
     QReadLocker lock(&m_dbManager->getMutex());
 
-    foreach(const QUuid& peerGuid, m_peerList)
+    foreach(const QUuid& peerGuid, m_state.keys())
     {
         QSqlQuery query(m_dbManager->getDB());
-        query.prepare("SELECT tran_data FROM transaction_log WHERE peer_guid = ? and sequence > ?");
+        query.prepare("SELECT tran_data FROM transaction_log WHERE peer_guid = ? and sequence > ?  order by timestamp");
         query.bindValue(0, peerGuid.toRfc4122());
         query.bindValue(1, state.value(peerGuid));
         if (!query.exec())
