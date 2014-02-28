@@ -456,6 +456,8 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     if (qnSettings->isDevMode())
         arguments << QLatin1String("--dev-mode-key=razrazraz");
 
+    qDebug() << "Starting new instance with args" << arguments;
+
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
 }
 
