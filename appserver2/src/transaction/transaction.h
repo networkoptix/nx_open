@@ -117,6 +117,8 @@ namespace ec2
                 return false;
             if (!QnBinary::deserialize(persistent, stream))
                 return false;
+            if (!QnBinary::deserialize(timestamp, stream))
+                return false;
             return true;
         }
 
