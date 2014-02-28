@@ -2,6 +2,7 @@
 
 #ifdef Q_OS_MACX
 #include <ui/workaround/mac_utils.h>
+#include <ui/workaround/mac_event_loop_workaround.h>
 #endif
 
 #include <QtCore/QFile>
@@ -317,6 +318,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 #ifdef Q_OS_MACX
     //initialize system-wide menu
     menu()->newMenu(Qn::MainScope);
+#endif
+
+#ifdef Q_OS_MACX
+    QnMacEventLoopWorkaround *macEventLoopWorkaround = new QnMacEventLoopWorkaround(m_view->viewport(), this);
+    Q_UNUSED(macEventLoopWorkaround);
 #endif
 
     QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
