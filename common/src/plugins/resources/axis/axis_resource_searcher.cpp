@@ -24,22 +24,21 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, cons
 
     if (resourceType.isNull())
     {
-        qDebug() << "No resource type for ID = " << resourceTypeId;
+        NX_LOG(lit("No resource type for ID %1").arg(resourceTypeId.toString()), cl_logDEBUG1);
 
         return result;
     }
 
     if (resourceType->getManufacture() != manufacture())
     {
-        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
         return result;
     }
 
     result = QnVirtualCameraResourcePtr( new QnPlAxisResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Axis camera resource. TypeID" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
-    //result->deserialize(parameters);
+    NX_LOG(lit("Create Axis camera resource. TypeID %1.").arg(resourceTypeId.toString()), cl_logDEBUG1);
+
 
     return result;
 
@@ -61,7 +60,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     if (host.isEmpty())
         host = url.toString(); // in case if url just host address without protocol and port
 
-    int timeout = 4000;
+    int timeout = 4000; // TODO: #Elric we should probably increase this one. In some cases 4 secs is not enough.
 
 
     if (port < 0)

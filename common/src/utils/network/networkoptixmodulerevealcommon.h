@@ -27,7 +27,7 @@ static const char* NX_MEDIA_SERVER_ID = "Media Server";
 static const QString nxClientId = QLatin1String(NX_CLIENT_ID);
 static const QString nxMediaServerId = QLatin1String(NX_MEDIA_SERVER_ID);
 
-static const QHostAddress defaultModuleRevealMulticastGroup = QHostAddress(QString::fromLatin1("239.255.11.11"));
+static const QHostAddress defaultModuleRevealMulticastGroup = QHostAddress(lit("239.255.11.11"));
 static const unsigned int defaultModuleRevealMulticastGroupPort = 5007;
 
 //!Number of simple functions to serialize simple types (local byte order is used)

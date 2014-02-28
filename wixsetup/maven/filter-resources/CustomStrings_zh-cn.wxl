@@ -46,6 +46,8 @@
     <String Id="AppServerDlg_Network"                               Overridable="yes">网络配置</String>    
     <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">代理端口</String>
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">确认密码</String>   
+    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Extra parameters</String>   
+    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Allow system to optimize cameras settings (Recommended)</String>     
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">运行 ${product.name}</String>

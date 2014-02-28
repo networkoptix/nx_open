@@ -150,7 +150,7 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
     QStackedLayout* advancedLayout = 0;
     setAnyCameraChanges(false);
 
-    if (m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
+    if (m_camera && m_camera->getParam(lit("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
     {
         if (!m_widgetsRecreator)
         {
@@ -167,7 +167,7 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
 
             advancedTreeWidget = new QTreeWidget();
             advancedTreeWidget->setColumnCount(1);
-            advancedTreeWidget->setHeaderLabel(QString::fromLatin1("Category"));
+            advancedTreeWidget->setHeaderLabel(lit("Category")); // TODO: #TR #Elric
 
             QWidget* advancedWidget = new QWidget();
             advancedLayout = new QStackedLayout(advancedWidget);
@@ -224,7 +224,7 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
     initAdvancedTab();
 
     QVariant id;
-    if (m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
+    if (m_camera && m_camera->getParam(lit("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
     {
         QnMediaServerConnectionPtr serverConnection = getServerConnection();
         if (serverConnection.isNull()) {
@@ -708,12 +708,12 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int status, const Q
 
     if (!m_widgetsRecreator) {
         qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: widgets creator ptr is null, camera id: "
-            << (m_camera == 0? QString::fromLatin1("unknown"): m_camera->getUniqueId());
+            << (m_camera == 0? lit("unknown"): m_camera->getUniqueId());
         return;
     }
     if (status != 0) {
         qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: http status code is not OK: " << status
-            << ". Camera id: " << (m_camera == 0? QString::fromLatin1("unknown"): m_camera->getUniqueId());
+            << ". Camera id: " << (m_camera == 0? lit("unknown"): m_camera->getUniqueId());
         return;
     }
 

@@ -193,8 +193,8 @@ CameraSetting::CameraSetting(const QString& id, const QString& name, WIDGET_TYPE
             break;
         case TextField:
             //For this type, min and max values are not required, so insert dummy values
-            m_min = QString::fromLatin1("min");
-            m_max = QString::fromLatin1("max");
+            m_min = lit("min");
+            m_max = lit("max");
             break;
         case ControlButtonsPair:
             //For this type, 'current' is not defined unless user presses min or max buttons

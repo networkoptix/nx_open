@@ -296,7 +296,7 @@ void AudioPlayer::closeNonSafe()
 bool AudioPlayer::openNonSafe( QIODevice* dataSource )
 {
     const QString& temporaryFilePath = QString::number(rand());
-    const QString& temporaryResUrl = QString::fromLatin1("%1://%2").arg(QLatin1String("qiodev")).arg(temporaryFilePath);
+    const QString& temporaryResUrl = lit("%1://%2").arg(lit("qiodev")).arg(temporaryFilePath);
     m_storage->registerResourceData( temporaryFilePath, dataSource );
 
     std::auto_ptr<QnAviArchiveDelegate> mediaFileReader( new QnAviArchiveDelegate() );

@@ -2,6 +2,7 @@
 
 #include <QtCore/QTime>
 
+#include <utils/common/log.h>
 #include <utils/network/http/httptypes.h>
 
 #include "tcp_listener.h"
@@ -275,10 +276,8 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     }
 #endif
 
-    if (displayDebug) {
-        qDebug() << "Server response to " << d->socket->getPeerAddress().address.toString();
-        qDebug() << "\n" << response;
-    }
+    if (displayDebug)
+        NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getPeerAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
 
     QMutexLocker lock(&d->sockMutex);
     sendData(response.data(), response.size());

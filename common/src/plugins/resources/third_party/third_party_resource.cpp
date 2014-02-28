@@ -288,7 +288,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     if( result != nxcip::NX_NO_ERROR )
     {
         if( false )
-        NX_LOG( QString::fromLatin1("Error getting camera info from third-party camera %1:%2 (url %3). %4").
+        NX_LOG( lit("Error getting camera info from third-party camera %1:%2 (url %3). %4").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
             arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager.getLastErrorString()), cl_logDEBUG1 );
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? QnResource::Unauthorized : QnResource::Offline );
@@ -301,7 +301,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     result = m_camManager.getEncoderCount( &m_encoderCount );
     if( result != nxcip::NX_NO_ERROR )
     {
-        NX_LOG( QString::fromLatin1("Error getting encoder count from third-party camera %1:%2 (url %3). %4").
+        NX_LOG( lit("Error getting encoder count from third-party camera %1:%2 (url %3). %4").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
             arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager.getLastErrorString()), cl_logDEBUG1 );
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? QnResource::Unauthorized : QnResource::Offline );
@@ -310,7 +310,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 
     if( m_encoderCount == 0 )
     {
-        NX_LOG( QString::fromLatin1("Third-party camera %1:%2 (url %3) returned 0 encoder count!").arg(m_discoveryManager.getVendorName()).
+        NX_LOG( lit("Third-party camera %1:%2 (url %3) returned 0 encoder count!").arg(m_discoveryManager.getVendorName()).
             arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logDEBUG1 );
         return CameraDiagnostics::UnknownErrorResult();
     }
@@ -322,7 +322,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     result = m_camManager.getCameraCapabilities( &cameraCapabilities );
     if( result != nxcip::NX_NO_ERROR )
     {
-        NX_LOG( QString::fromLatin1("Error reading camera capabilities from third-party camera %1:%2 (url %3). %4").
+        NX_LOG( lit("Error reading camera capabilities from third-party camera %1:%2 (url %3). %4").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
             arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager.getLastErrorString()), cl_logDEBUG1 );
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? QnResource::Unauthorized : QnResource::Offline );
@@ -378,7 +378,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         }
         if( result != nxcip::NX_NO_ERROR )
         {
-            NX_LOG( QString::fromLatin1("Failed to get resolution list of third-party camera %1:%2 encoder %3. %4").
+            NX_LOG( lit("Failed to get resolution list of third-party camera %1:%2 encoder %3. %4").
                 arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
                 arg(encoderNumber).arg(m_camManager.getLastErrorString()), cl_logDEBUG1 );
             if( result == nxcip::NX_NOT_AUTHORIZED )
@@ -403,7 +403,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 
     if( !setParam( MAX_FPS_PARAM_NAME, maxFps, QnDomainDatabase ) )
     {
-        NX_LOG( QString::fromLatin1("Failed to set %1 parameter to %2 for third-party camera %3:%4 (url %5)").
+        NX_LOG( lit("Failed to set %1 parameter to %2 for third-party camera %3:%4 (url %5)").
             arg(MAX_FPS_PARAM_NAME).arg(maxFps).arg(m_discoveryManager.getVendorName()).
             arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logDEBUG1 );
     }
@@ -450,7 +450,7 @@ bool QnThirdPartyResource::initializeIOPorts()
     nxcip::CameraRelayIOManager* camIOManager = m_camManager.getCameraRelayIOManager();
     if( !camIOManager )
     {
-        NX_LOG( QString::fromLatin1("Failed to get pointer to nxcip::CameraRelayIOManager interface for third-party camera %1:%2 (url %3)").
+        NX_LOG( lit("Failed to get pointer to nxcip::CameraRelayIOManager interface for third-party camera %1:%2 (url %3)").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logWARNING );
         setCameraCapability( Qn::RelayInputCapability, false );
         setCameraCapability( Qn::RelayOutputCapability, false );

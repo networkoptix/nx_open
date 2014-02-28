@@ -131,8 +131,8 @@ void QnNotificationToolTipWidget::pointTo(const QPointF &pos) {
     updateTailPos();
 }
 
-void QnNotificationToolTipWidget::clicked(Qt::MouseButton button) {
-    if(button == Qt::RightButton)
+void QnNotificationToolTipWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
+    if(event->button() == Qt::RightButton)
         emit closeTriggered();
 }
 
@@ -366,7 +366,9 @@ void QnNotificationWidget::updateOverlayColor() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnNotificationWidget::clicked(Qt::MouseButton button) {
+void QnNotificationWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
+    Qt::MouseButton button = event->button();
+
     if(button == Qt::RightButton) {
         emit closeTriggered();
     } else if(button == Qt::LeftButton) {

@@ -225,6 +225,14 @@ private slots:
     void updateCalendarOpacity(bool animate = true);
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
+    
+    void updateTreeOpacityAnimated() { updateTreeOpacity(true); }
+    void updateSliderOpacityAnimated() { updateSliderOpacity(true); }
+    void updateTitleOpacityAnimated() { updateTitleOpacity(true); }
+    void updateNotificationsOpacityAnimated() { updateNotificationsOpacity(true); }
+    void updateCalendarOpacityAnimated() { updateCalendarOpacity(true); }
+    void updateCalendarVisibilityAnimated() { updateCalendarVisibility(true); }
+    void updateControlsVisibilityAnimated() { updateControlsVisibility(true); }
 
     void setTreeShowButtonUsed(bool used = true);
     void setNotificationsShowButtonUsed(bool used = true);

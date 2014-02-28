@@ -25,12 +25,12 @@ QnPtzMapper::QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &inputMapper, const Q
     /* OK, I know that this check sucks, but I really didn't want to
      * extend the space mapper interface to make it simpler. */
     qreal minPan = 36000.0, maxPan = -36000.0;
-    for(int pan = 0; pan <= 360; pan++) {
+    for(int pan = -360; pan <= 360; pan++) {
         QVector3D pos = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(QVector3D(pan, 0, 0)));
         minPan = qMin(pos.x(), minPan);
         maxPan = qMax(pos.x(), maxPan);
     }
-    if(qFuzzyCompare(maxPan - minPan, 360.0)) {
+    if(qFuzzyCompare(maxPan - minPan, 720.0)) {
         /* There are no limits for pan. */
         m_logicalLimits.minPan = 0.0;
         m_logicalLimits.maxPan = 360.0;

@@ -95,7 +95,7 @@ namespace Serialization
 }
 
 
-static const QString revealRequestStr = QString::fromLatin1("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
+static const QString revealRequestStr = lit("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
 
 bool RevealRequest::serialize( quint8** const bufStart, const quint8* bufEnd )
 {
@@ -145,9 +145,9 @@ bool RevealResponse::serialize( quint8** const bufStart, const quint8* bufEnd )
         it != typeSpecificParameters.end();
         ++it )
     {
-        str += QString::fromLatin1(",\n '%1': '%2'").arg(it.key()).arg(it.value());
+        str += lit(",\n '%1': '%2'").arg(it.key()).arg(it.value());
     }
-    str += QString::fromLatin1("}");
+    str += lit("}");
 
     return Serialization::serialize( str, bufStart, bufEnd );
 }
@@ -274,15 +274,15 @@ bool RevealResponse::deserialize( const quint8** bufStart, const quint8* bufEnd 
         it != mapElements.end();
         ++it )
     {
-        if( it->first == QString::fromLatin1("application") )
+        if( it->first == lit("application") )
             type = it->second;
-        else if( it->first == QString::fromLatin1("version") )
+        else if( it->first == lit("version") )
             version = it->second;
-        else if( it->first == QString::fromLatin1("customization") )
+        else if( it->first == lit("customization") )
             customization = it->second;
-        else if( it->first == QString::fromLatin1("systemName") )
+        else if( it->first == lit("systemName") )
             name = it->second;
-        else if( it->first == QString::fromLatin1("seed") )
+        else if( it->first == lit("seed") )
             seed = it->second;
         else
             typeSpecificParameters.insert( it->first, it->second );

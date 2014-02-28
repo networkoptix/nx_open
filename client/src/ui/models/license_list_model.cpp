@@ -72,7 +72,7 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
         item->setText(QString::number(license->cameraCount()));
         break;
     case LicenseKeyColumn:
-        item->setText(QString::fromLatin1(license->key()));
+        item->setText(QLatin1String(license->key()));
         break;
     case ExpirationDateColumn:
         item->setText(license->expirationTime() < 0 ? tr("Never") : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString());

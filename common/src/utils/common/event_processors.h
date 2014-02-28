@@ -94,10 +94,10 @@ protected:
 };
 
 
-class QnEventSignalizerBase: public QObject {
+class QnAbstractEventSignalizer: public QObject {
     Q_OBJECT;
 public:
-    QnEventSignalizerBase(QObject *parent = NULL): QObject(parent) {}
+    QnAbstractEventSignalizer(QObject *parent = NULL): QObject(parent) {}
 
 signals:
     void activated(QObject *object, QEvent *event);
@@ -118,9 +118,9 @@ protected:
 };
 
 
-typedef QnEventSignalizer<QnSingleEventProcessor<QnEventSignalizerBase> > QnSingleEventSignalizer;
-typedef QnEventSignalizer<QnMultiEventProcessor<QnEventSignalizerBase> >  QnMultiEventSignalizer;
-typedef QnEventSignalizer<QnEveryEventProcessor<QnEventSignalizerBase> >  QnEveryEventSignalizer;
+typedef QnEventSignalizer<QnSingleEventProcessor<QnAbstractEventSignalizer> > QnSingleEventSignalizer;
+typedef QnEventSignalizer<QnMultiEventProcessor<QnAbstractEventSignalizer> >  QnMultiEventSignalizer;
+typedef QnEventSignalizer<QnEveryEventProcessor<QnAbstractEventSignalizer> >  QnEveryEventSignalizer;
 
 
 namespace Qn {

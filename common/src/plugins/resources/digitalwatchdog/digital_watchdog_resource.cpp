@@ -5,7 +5,7 @@
 #include "dw_ptz_controller.h"
 #include "dw_zoom_ptz_controller.h"
 
-const QString CAMERA_SETTINGS_ID_PARAM = QString::fromLatin1("cameraSettingsId");
+const QString CAMERA_SETTINGS_ID_PARAM = lit("cameraSettingsId");
 static const int HTTP_PORT = 80;
 
 QString getIdSuffixByModel(const QString& cameraModel)
@@ -15,10 +15,10 @@ QString getIdSuffixByModel(const QString& cameraModel)
 
     if (tmp.contains(QLatin1String("fd20")) || tmp.contains(QLatin1String("mpa20m")) || tmp.contains(QLatin1String("mc421"))) {
         //without focus
-        return QString::fromLatin1("-WOFOCUS");
+        return lit("-WOFOCUS");
     }
 
-    return QString::fromLatin1("-FOCUS");
+    return lit("-FOCUS");
 }
 
 QnPlWatchDogResource::QnPlWatchDogResource():
@@ -185,7 +185,7 @@ QString QnPlWatchDogResource::fetchCameraModel()
         return QString();
     } 
 
-    return QString::fromLatin1(response.Model.c_str());
+    return QString::fromUtf8(response.Model.c_str());
 }
 
 bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
