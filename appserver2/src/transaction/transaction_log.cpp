@@ -53,7 +53,7 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QU
     query.bindValue(0, tran.id.peerGUID.toRfc4122());
     query.bindValue(1, tran.id.sequence);
     query.bindValue(2, tran.timestamp/1000);
-    query.bindValue(3, hash);
+    query.bindValue(3, hash.toRfc4122());
     query.bindValue(4, data);
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
