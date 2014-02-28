@@ -33,6 +33,7 @@ QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServ
     m_apiConnection(apiConnection),
     m_timer(new QTimer())
 {
+    // TODO: #Elric store mserver resource, not connection!!!
     connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
     m_timer->start(m_updatePeriod);
 }
@@ -84,6 +85,8 @@ void QnMediaServerStatisticsStorage::update() {
 
     emit statisticsChanged();
 
+    // TODO: #Elric in some cases m_alreadyUpdating == true, but we don't get any reply => we'll never update.
+    // Maybe introduce retry timeout?
     if (!m_listeners || m_alreadyUpdating)
         return;
 

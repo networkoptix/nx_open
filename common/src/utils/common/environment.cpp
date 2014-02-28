@@ -69,18 +69,18 @@ void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
     
     QStringList scriptArgs;
     scriptArgs 
-        << QLatin1String("-e")
-        << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"").arg(checkedPath);
-    QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
+        << lit("-e")
+        << lit("tell application \"Finder\" to reveal POSIX file \"%1\"").arg(checkedPath);
+    QProcess::execute(lit("/usr/bin/osascript"), scriptArgs);
     
     scriptArgs.clear();
     scriptArgs 
-        << QLatin1String("-e")
-        << QLatin1String("tell application \"Finder\" to activate");
-    QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
+        << lit("-e")
+        << lit("tell application \"Finder\" to activate");
+    QProcess::execute(lit("/usr/bin/osascript"), scriptArgs);
 #else
     Q_UNUSED(parent)
-    QDesktopServices::openUrl(QUrl(QLatin1String("file:///") + QFileInfo(path).path(), QUrl::TolerantMode));
+    QDesktopServices::openUrl(QUrl(lit("file:///") + QFileInfo(path).path(), QUrl::TolerantMode));
     // TODO: #Elric implement as in Qt Creator.
 #endif
 }

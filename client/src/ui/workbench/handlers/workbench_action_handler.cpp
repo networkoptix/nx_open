@@ -538,7 +538,7 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
     QnMediaServerConnectionPtr serverConnectionPtr = cameraSettingsDialog()->widget()->getServerConnection();
     if (serverConnectionPtr.isNull())
     {
-        QString error = QString::fromLatin1("Connection refused");
+        QString error = lit("Connection refused"); // #TR #Elric
 
         QString failedParams;
         QList< QPair< QString, QVariant> >::ConstIterator it =
@@ -546,8 +546,8 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         for (; it != cameraSettingsDialog()->widget()->getModifiedAdvancedParams().end(); ++it)
         {
             QString formattedParam(it->first.right(it->first.length() - 2));
-            failedParams += QString::fromLatin1("\n");
-            failedParams += formattedParam.replace(QString::fromLatin1("%%"), QString::fromLatin1("->"));
+            failedParams += lit("\n"); // #TR #Elric
+            failedParams += formattedParam.replace(lit("%%"), lit("->")); // #TR? #Elric
         }
 
         if (!failedParams.isEmpty()) {
@@ -2247,17 +2247,17 @@ void QnWorkbenchActionHandler::at_currentLayoutSettingsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult)
 {
-    QString error = httpStatusCode == 0? QString::fromLatin1("Possibly, appropriate camera's service is unavailable now"):
-        QString::fromLatin1("Mediaserver returned the following error code : ") + httpStatusCode;
+    QString error = httpStatusCode == 0? lit("Possibly, appropriate camera's service is unavailable now"):
+        lit("Mediaserver returned the following error code : ") + httpStatusCode; // #TR #Elric
 
     QString failedParams;
     QList<QPair<QString, bool> >::ConstIterator it = operationResult.begin();
     for (; it != operationResult.end(); ++it)
     {
         if (!it->second) {
-            QString formattedParam(QString::fromLatin1("Advanced->") + it->first.right(it->first.length() - 2));
-            failedParams += QString::fromLatin1("\n");
-            failedParams += formattedParam.replace(QString::fromLatin1("%%"), QString::fromLatin1("->"));
+            QString formattedParam(lit("Advanced->") + it->first.right(it->first.length() - 2));
+            failedParams += lit("\n");
+            failedParams += formattedParam.replace(lit("%%"), lit("->")); // TODO: #Elric #TR
         }
     }
 

@@ -151,7 +151,7 @@ void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
 
     QFile file(fileName);
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        ui->activationKeyTextEdit->setPlainText(QString::fromLatin1(file.readAll()));
+        ui->activationKeyTextEdit->setPlainText(QLatin1String(file.readAll()));
         ui->licenseFileLabel->setText(file.fileName());
     }
 }

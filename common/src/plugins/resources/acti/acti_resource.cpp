@@ -361,8 +361,8 @@ bool QnActiResource::startInputPortMonitoring()
     for( int i = 0; i < m_inputCount; ++i )
     {
         if( !eventStr.isEmpty() )
-            eventStr += QString::fromLatin1("&");
-        eventStr += QString::fromLatin1("EVENT_DI%1='0,0'").arg(i+1);
+            eventStr += lit("&");
+        eventStr += lit("EVENT_DI%1='0,0'").arg(i+1);
     }
     QString localInterfaceAddress;  //determining address of local interface, used to connect to camera
     QByteArray responseMsgBody = makeActiRequest(QLatin1String("encoder"), eventStr, responseStatusCode, false, &localInterfaceAddress);
@@ -385,7 +385,7 @@ bool QnActiResource::startInputPortMonitoring()
             //OK: HTTP_SERVER='1,1,192.168.0.101,3451,hz,hzhz,10'\n
     responseMsgBody = makeActiRequest(
         QLatin1String("encoder"),
-        QString::fromLatin1("HTTP_SERVER=%1,1,%2,%3,guest,guest,%4").arg(EVENT_HTTP_SERVER_NUMBER).arg(localInterfaceAddress).arg(actiEventPort).arg(MAX_CONNECTION_TIME_SEC),
+        lit("HTTP_SERVER=%1,1,%2,%3,guest,guest,%4").arg(EVENT_HTTP_SERVER_NUMBER).arg(localInterfaceAddress).arg(actiEventPort).arg(MAX_CONNECTION_TIME_SEC),
         responseStatusCode );
     if( responseStatusCode != CL_HTTP_SUCCESS )
         return false;
@@ -393,13 +393,13 @@ bool QnActiResource::startInputPortMonitoring()
     //registering URL commands (one command per input port)
         //GET /cgi-bin/cmd/encoder?EVENT_RSPCMD1=1,[api/camera_event/98/di/activated],[api/camera_event/98/di/deactivated]&EVENT_RSPCMD2=1,[],[]&EVENT_RSPCMD3=1,[],[]
 
-    const QString cgiPath = QString::fromLatin1("api/camera_event/%1/di").arg(this->getId());
+    const QString cgiPath = lit("api/camera_event/%1/di").arg(this->getId());
     QString setupURLCommandRequestStr;
     for( int i = 1; i <= m_inputCount; ++i )
     {
         if( !setupURLCommandRequestStr.isEmpty() )
             setupURLCommandRequestStr += QLatin1String("&");
-        setupURLCommandRequestStr += QString::fromLatin1("EVENT_RSPCMD%1=%2,[%3/%4/di=%1],[%3/%5/di=%1]").arg(i).arg(EVENT_HTTP_SERVER_NUMBER).arg(cgiPath).arg(CAMERA_EVENT_ACTIVATED_PARAM_NAME).arg(CAMERA_EVENT_DEACTIVATED_PARAM_NAME);
+        setupURLCommandRequestStr += lit("EVENT_RSPCMD%1=%2,[%3/%4/di=%1],[%3/%5/di=%1]").arg(i).arg(EVENT_HTTP_SERVER_NUMBER).arg(cgiPath).arg(CAMERA_EVENT_ACTIVATED_PARAM_NAME).arg(CAMERA_EVENT_DEACTIVATED_PARAM_NAME);
     }
     responseMsgBody = makeActiRequest(
         QLatin1String("encoder"),
@@ -424,7 +424,7 @@ bool QnActiResource::startInputPortMonitoring()
     {
         if( !registerEventRequestStr.isEmpty() )
             registerEventRequestStr += QLatin1String("&");
-        registerEventRequestStr += QString::fromLatin1("EVENT_CONFIG=%1,1,1234567,00:00,24:00,DI%1,CMD%1").arg(i);
+        registerEventRequestStr += lit("EVENT_CONFIG=%1,1,1234567,00:00,24:00,DI%1,CMD%1").arg(i);
     }
     responseMsgBody = makeActiRequest(
         QLatin1String("encoder"),
@@ -449,7 +449,7 @@ void QnActiResource::stopInputPortMonitoring()
     {
         if( !registerEventRequestStr.isEmpty() )
             registerEventRequestStr += QLatin1String("&");
-        registerEventRequestStr += QString::fromLatin1("EVENT_CONFIG=%1,0,1234567,00:00,24:00,DI%1,CMD%1").arg(i);
+        registerEventRequestStr += lit("EVENT_CONFIG=%1,0,1234567,00:00,24:00,DI%1,CMD%1").arg(i);
     }
     CLHttpStatus responseStatusCode = CL_HTTP_SUCCESS;
     makeActiRequest(
@@ -609,7 +609,7 @@ void QnActiResource::onTimer( const quint64& timerID )
     CLHttpStatus status = CL_HTTP_SUCCESS;
     QByteArray dioResponse = makeActiRequest(
         QLatin1String("encoder"),
-        QString::fromLatin1("DIO_OUTPUT=0x%1").arg(dioOutputMask, 2, 16, QLatin1Char('0')),
+        lit("DIO_OUTPUT=0x%1").arg(dioOutputMask, 2, 16, QLatin1Char('0')),
         status );
     if( status != CL_HTTP_SUCCESS )
         return;
