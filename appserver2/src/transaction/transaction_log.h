@@ -75,8 +75,8 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiUserData>& tran)                { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiLayoutData>& tran)              { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiBusinessRuleData>& tran)        { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiIdData>& tran)                  { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiSetResourceDisabledData>& tran) { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiIdData>& tran)                  { return makeHash(tran.params.id.toRfc4122(), "ApiIdData"); }
+        QUuid transactionHash(const QnTransaction<ApiSetResourceDisabledData>& tran) { return makeHash(tran.params.id.toRfc4122(), "disabled"); }
         QUuid transactionHash(const QnTransaction<ApiCameraServerItemData>&)         { return QUuid::createUuid() ; }
         QUuid transactionHash(const QnTransaction<ApiSetResourceStatusData>& tran)   { return makeHash(tran.params.id.toRfc4122(), "status"); }
         QUuid transactionHash(const QnTransaction<ApiPanicModeData>&)                { return makeHash("panic_mode") ; }
