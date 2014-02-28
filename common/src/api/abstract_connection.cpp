@@ -61,7 +61,7 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
         if(replyTypeName == NULL) {
             signal = SIGNAL(finished(int, int));
         } else {
-            signal = QString::fromLatin1("%1finished(int, const %2 &, int)").arg(QSIGNAL_CODE).arg(QLatin1String(replyTypeName)).toLatin1();
+            signal = lit("%1finished(int, const %2 &, int)").arg(QSIGNAL_CODE).arg(QLatin1String(replyTypeName)).toLatin1();
         }
         processor->connect(signal.constData(), target, slot, Qt::QueuedConnection);
     }

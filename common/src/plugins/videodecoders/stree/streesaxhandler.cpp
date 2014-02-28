@@ -55,7 +55,7 @@ namespace stree
         if( !newNode.get())
             return false;
 
-        int valuePos = atts.index(QString::fromLatin1("value"));
+        int valuePos = atts.index(lit("value"));
         if( !m_nodes.empty() )
             if( !m_nodes.top()->addChild( valuePos == -1 ? QVariant() : QVariant(atts.value(valuePos)), newNode.get() ) )
             {
@@ -97,14 +97,14 @@ namespace stree
 
     bool SaxHandler::error( const QXmlParseException& exception )
     {
-        m_errorDescription = QString::fromLatin1("Parse error. line %1, col %2, parser message: %3").
+        m_errorDescription = lit("Parse error. line %1, col %2, parser message: %3"). // TODO: #Elric #TR
             arg(exception.lineNumber()).arg(exception.columnNumber()).arg(exception.message());
         return false;
     }
 
     bool SaxHandler::fatalError( const QXmlParseException& exception )
     {
-        m_errorDescription = QString::fromLatin1("Fatal parse error. line %1, col %2, parser message: %3").
+        m_errorDescription = lit("Fatal parse error. line %1, col %2, parser message: %3"). // TODO: #TR #Elric
             arg(exception.lineNumber()).arg(exception.columnNumber()).arg(exception.message());
         return false;
     }
@@ -123,32 +123,32 @@ namespace stree
 
     AbstractNode* SaxHandler::createNode( const QString& nodeName, const QXmlAttributes& atts ) const
     {
-        if( nodeName == QString::fromLatin1("condition") )
+        if( nodeName == lit("condition") )
         {
             //resName, matchType
-            int resNamePos = atts.index(QString::fromLatin1("resName"));
+            int resNamePos = atts.index(lit("resName"));
             if( resNamePos == -1 )
             {
-                m_errorDescription = QString::fromLatin1( "No required attribute \"resName\" in ConditionNode" );
+                m_errorDescription = lit( "No required attribute \"resName\" in ConditionNode" ); // TODO: #TR #Elric
                 return NULL;
             }
             const QString& resName = atts.value(resNamePos);
             const ResourceNameSet::ResourceDescription& res = m_resourceNameSet.findResourceByName(resName);
             if( res.id == -1 )
             {
-                m_errorDescription = QString::fromLatin1( "Unknown resource %1 found as \"resName\" attribute of ConditionNode" ).arg(resName);
+                m_errorDescription = lit( "Unknown resource %1 found as \"resName\" attribute of ConditionNode" ).arg(resName); // TODO: #TR #Elric
                 return NULL;
             }
 
             MatchType::Value matchType = MatchType::equal;
-            int matchTypePos = atts.index(QString::fromLatin1("matchType"));
+            int matchTypePos = atts.index(lit("matchType"));
             if( matchTypePos >= 0 )
             {
                 const QString& matchTypeStr = atts.value(matchTypePos);
                 matchType = MatchType::fromString( matchTypeStr );
                 if( matchType == MatchType::unknown )
                 {
-                    m_errorDescription = QString::fromLatin1( "ConditionNode does not support match type %1" ).arg(matchTypeStr);
+                    m_errorDescription = lit( "ConditionNode does not support match type %1" ).arg(matchTypeStr); // TODO: #Elric #TR
                     return NULL;
                 }
             }
@@ -166,35 +166,35 @@ namespace stree
                 case QVariant::String:
                     return createConditionNodeForStringRes( matchType, res.id );
                 default:
-                    m_errorDescription = QString::fromLatin1( "ConditionNode currently does not support resource of type %1 (resource name %2). "
-                        "Only %3 types are supported" ).arg(res.type).arg(resName).arg(QString::fromLatin1("int, double, string"));
+                    m_errorDescription = lit( "ConditionNode currently does not support resource of type %1 (resource name %2). Only %3 types are supported" )
+                        .arg(res.type).arg(resName).arg(lit("int, double, string")); // #TR
                     return NULL;
             }
         }
-        else if( nodeName == QString::fromLatin1("sequence") )
+        else if( nodeName == lit("sequence") )
         {
             return new SequenceNode();
         }
-        else if( nodeName == QString::fromLatin1("set") )
+        else if( nodeName == lit("set") )
         {
-            int resNamePos = atts.index(QString::fromLatin1("resName"));
+            int resNamePos = atts.index(lit("resName"));
             if( resNamePos == -1 )
             {
-                m_errorDescription = QString::fromLatin1( "No required attribute \"resName\" in SetNode" );
+                m_errorDescription = lit( "No required attribute \"resName\" in SetNode" ); // TODO: #TR
                 return NULL;
             }
             const QString& resName = atts.value(resNamePos);
-            int resValuePos = atts.index(QString::fromLatin1("resValue"));
+            int resValuePos = atts.index(lit("resValue"));
             if( resValuePos == -1 )
             {
-                m_errorDescription = QString::fromLatin1( "No required attribute \"resValue\" in SetNode" );
+                m_errorDescription = lit( "No required attribute \"resValue\" in SetNode" ); // TODO: #TR
                 return NULL;
             }
 
             const ResourceNameSet::ResourceDescription& res = m_resourceNameSet.findResourceByName( resName );
             if( res.id == -1 )
             {
-                m_errorDescription = QString::fromLatin1( "Unknown resource %1 found as \"resName\" attribute of SetNode" ).arg(resName);
+                m_errorDescription = lit( "Unknown resource %1 found as \"resName\" attribute of SetNode" ).arg(resName); // TODO: #TR
                 return NULL;
             }
 
@@ -203,7 +203,7 @@ namespace stree
             QVariant resValue( resValueStr );
             if( !resValue.convert( res.type ) )
             {
-                m_errorDescription = QString::fromLatin1( "Could not convert value %1 of resource %2 to type %3" ).arg(resValueStr).arg(resName).arg(res.type);
+                m_errorDescription = lit( "Could not convert value %1 of resource %2 to type %3" ).arg(resValueStr).arg(resName).arg(res.type); // TODO: #TR
                 return NULL;
             }
 

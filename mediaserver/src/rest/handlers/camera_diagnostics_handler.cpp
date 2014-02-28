@@ -81,11 +81,11 @@ QString QnCameraDiagnosticsHandler::description() const
         diagnosticsTypeStrList += CameraDiagnostics::Step::toString(static_cast<CameraDiagnostics::Step::Value>(i));
     }
 
-    return QString::fromLatin1(
-        "Performs camera diagnostics"
-        "<BR>Param <b>%1</b> - Required. ID of camera"
-        "<BR>Param <b>%2</b> - Diagnostics to perform (%3)").
-        arg(resIDParamName).arg(diagnosticsTypeParamName).arg(diagnosticsTypeStrList);
+    return lit(
+        "Performs camera diagnostics\
+        <BR>Param <b>%1</b> - Required. ID of camera\
+        <BR>Param <b>%2</b> - Diagnostics to perform (%3)"
+    ).arg(resIDParamName).arg(diagnosticsTypeParamName).arg(diagnosticsTypeStrList);
 }
 
 CameraDiagnostics::Result QnCameraDiagnosticsHandler::checkCameraAvailability( const QnSecurityCamResourcePtr& cameraRes )

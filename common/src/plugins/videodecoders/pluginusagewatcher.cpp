@@ -16,9 +16,9 @@ PluginUsageWatcher::PluginUsageWatcher( const QString& uniquePluginID )
 :
     m_uniquePluginID( uniquePluginID ),
     m_sharedMemoryLocked( false ),
-    m_sharedMemoryLocker( uniquePluginID + QString::fromLatin1("_sync") ),
+    m_sharedMemoryLocker( uniquePluginID + lit("_sync") ),
     m_usageRecordID( 0 ),
-    m_usageDataSharedMemory( uniquePluginID + QString::fromLatin1("_shared") ),
+    m_usageDataSharedMemory( uniquePluginID + lit("_shared") ),
     m_terminated( false )
 {
     NamedMutex::ScopedLock lk( &m_sharedMemoryLocker );
@@ -28,38 +28,38 @@ PluginUsageWatcher::PluginUsageWatcher( const QString& uniquePluginID )
     {
         if( m_usageDataSharedMemory.error() != QSharedMemory::AlreadyExists )
         {
-            NX_LOG( QString::fromLatin1("Failed to create shared memory with key %1. %2").arg(m_uniquePluginID).arg(m_usageDataSharedMemory.errorString()), cl_logWARNING );
+            NX_LOG( lit("Failed to create shared memory with key %1. %2").arg(m_uniquePluginID).arg(m_usageDataSharedMemory.errorString()), cl_logWARNING );
             return;
         }
     }
 
     if( !m_usageDataSharedMemory.isAttached() && !m_usageDataSharedMemory.attach() )
     {
-        NX_LOG( QString::fromLatin1("Failed to attach to shared memory with key %1. %2").arg(m_uniquePluginID).arg(m_usageDataSharedMemory.error()), cl_logWARNING );
+        NX_LOG( lit("Failed to attach to shared memory with key %1. %2").arg(m_uniquePluginID).arg(m_usageDataSharedMemory.error()), cl_logWARNING );
         return;
     }
 
     if( created )
     {
-        NX_LOG( QString::fromLatin1("PluginUsageWatcher. Successfully created usage data shared memory region. Initializing..."), cl_logDEBUG1 );
+        NX_LOG( lit("PluginUsageWatcher. Successfully created usage data shared memory region. Initializing..."), cl_logDEBUG1 );
         //initializing
         m_totalUsageArray.prevUsageRecordID = 1;
         quint8* bufStart = static_cast<quint8*>(m_usageDataSharedMemory.data());
         const quint8* bufEnd = bufStart + m_usageDataSharedMemory.size();
         if( !m_totalUsageArray.serialize( &bufStart, bufEnd ) )
         {
-            NX_LOG( QString::fromLatin1("PluginUsageWatcher. Failed to serialize usage data to shared memory region"), cl_logWARNING );
+            NX_LOG( lit("PluginUsageWatcher. Failed to serialize usage data to shared memory region"), cl_logWARNING );
         }
     }
 
     start();
     if( !isRunning() )
     {
-        NX_LOG( QString::fromLatin1("PluginUsageWatcher. Failed to start internal thread").arg(m_uniquePluginID), cl_logDEBUG1 );
+        NX_LOG( lit("PluginUsageWatcher. Failed to start internal thread").arg(m_uniquePluginID), cl_logDEBUG1 );
         return;
     }
 
-    NX_LOG( QString::fromLatin1("PluginUsageWatcher. Successfully attached to usage data shared memory region %1").arg(m_uniquePluginID), cl_logDEBUG1 );
+    NX_LOG( lit("PluginUsageWatcher. Successfully attached to usage data shared memory region %1").arg(m_uniquePluginID), cl_logDEBUG1 );
 }
 
 PluginUsageWatcher::~PluginUsageWatcher()
@@ -143,7 +143,7 @@ bool PluginUsageWatcher::updateUsageParams()
     if( !m_usageRecordID )
     {
         m_usageRecordID = ++m_totalUsageArray.prevUsageRecordID;
-        NX_LOG( QString::fromLatin1("PluginUsageWatcher. Selected usage record id %1").arg(m_usageRecordID), cl_logDEBUG1 );
+        NX_LOG( lit("PluginUsageWatcher. Selected usage record id %1").arg(m_usageRecordID), cl_logDEBUG1 );
     }
     localUsage.sequence = m_usageRecordID;
     localUsage.updateClock = QDateTime::currentMSecsSinceEpoch();
@@ -154,7 +154,7 @@ bool PluginUsageWatcher::updateUsageParams()
     const quint8* bufEnd = bufStart + m_usageDataSharedMemory.size();
     if( !m_totalUsageArray.serialize( &bufStart, bufEnd ) )
     {
-        NX_LOG( QString::fromLatin1("PluginUsageWatcher. Failed to serialize usage data to shared memory region"), cl_logWARNING );
+        NX_LOG( lit("PluginUsageWatcher. Failed to serialize usage data to shared memory region"), cl_logWARNING );
         return false;
     }
 
@@ -186,7 +186,7 @@ bool PluginUsageWatcher::lockSharedMemory()
     m_sharedMemoryLocked = m_sharedMemoryLocker.lock();
     if( !m_sharedMemoryLocked )
     {
-        NX_LOG( QString::fromLatin1("PluginUsageWatcher. Failed to lock semaphore. id %1. error: %2").
+        NX_LOG( lit("PluginUsageWatcher. Failed to lock semaphore. id %1. error: %2").
             arg(m_uniquePluginID).arg(m_sharedMemoryLocker.errorString()), cl_logERROR );
     }
     return m_sharedMemoryLocked;
@@ -199,7 +199,7 @@ bool PluginUsageWatcher::unlockSharedMemory()
     if( m_sharedMemoryLocked )
     {
         //TODO/IMPL what to do in this case?
-        NX_LOG( QString::fromLatin1("PluginUsageWatcher. Failed to release semaphore. id %1. error: %2").
+        NX_LOG( lit("PluginUsageWatcher. Failed to release semaphore. id %1. error: %2").
             arg(m_uniquePluginID).arg(m_sharedMemoryLocker.errorString()), cl_logERROR );
     }
     return !m_sharedMemoryLocked;
@@ -211,11 +211,11 @@ bool PluginUsageWatcher::readExternalUsage( UsageRecordArray* const recArray ) c
     const quint8* bufEnd = bufStart + m_usageDataSharedMemory.size();
     if( !recArray->deserialize( &bufStart, bufEnd ) )
     {
-        NX_LOG( QString::fromLatin1("PluginUsageWatcher. Failed to deserialize usage data from shared memory region"), cl_logWARNING );
+        NX_LOG( lit("PluginUsageWatcher. Failed to deserialize usage data from shared memory region"), cl_logWARNING );
         return false;
     }
 
-    NX_LOG( QString::fromLatin1("PluginUsageWatcher. Read %1 usage records").arg(recArray->records.size()), cl_logDEBUG2 );
+    NX_LOG( lit("PluginUsageWatcher. Read %1 usage records").arg(recArray->records.size()), cl_logDEBUG2 );
 
     return true;
 }

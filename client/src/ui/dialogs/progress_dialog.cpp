@@ -281,7 +281,7 @@ QnProgressDialog::QnProgressDialog(QWidget *parent, Qt::WindowFlags f):
     Q_D(QnProgressDialog);
     d->useDefaultCancelText = true;
     d->q_ptr = this;
-    d->init(QString::fromLatin1(""), QString(), 0, 100);
+    d->init(QString(), QString(), 0, 100);
 }
 
 /*!

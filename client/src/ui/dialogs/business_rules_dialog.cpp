@@ -271,7 +271,7 @@ void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& respon
         return;
 
     if(response.status != 0) {
-        QMessageBox::critical(this, tr("Error while deleting rule"), QString::fromLatin1(response.errorString));
+        QMessageBox::critical(this, tr("Error while deleting rule"), QLatin1String(response.errorString));
         m_pendingDeleteRules.append(m_deleting[handle]);
         return;
     }

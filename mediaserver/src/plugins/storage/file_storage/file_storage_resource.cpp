@@ -215,9 +215,9 @@ bool QnFileStorageResource::isStorageDirMounted()
     const QString& storagePath = QDir(closeDirPath(getUrl())).canonicalPath();   //following symbolic link
 
     QStringList mountPoints;
-    if( !readTabFile( QLatin1String("/etc/fstab"), &mountPoints ) )
+    if( !readTabFile( lit("/etc/fstab"), &mountPoints ) )
     {
-        NX_LOG( QString::fromLatin1("Could not read /etc/fstab file while checking storage %1 availability").arg(storagePath), cl_logWARNING );
+        NX_LOG( lit("Could not read /etc/fstab file while checking storage %1 availability").arg(storagePath), cl_logWARNING );
         return false;
     }
 
@@ -237,12 +237,12 @@ bool QnFileStorageResource::isStorageDirMounted()
         //reading /etc/mtab
         if( !readTabFile( QLatin1String("/etc/mtab"), &mountedDirectories ) )
         {
-            NX_LOG( QString::fromLatin1("Could not read /etc/mtab file while checking storage %1 availability").arg(storagePath), cl_logWARNING );
+            NX_LOG( lit("Could not read /etc/mtab file while checking storage %1 availability").arg(storagePath), cl_logWARNING );
             return false;
         }
         if( !mountedDirectories.contains(storageMountPoint) )
         {
-            NX_LOG( QString::fromLatin1("Storage %1 mount directory has not been mounted yet (mount point %2)").arg(storagePath).arg(storageMountPoint), cl_logWARNING );
+            NX_LOG( lit("Storage %1 mount directory has not been mounted yet (mount point %2)").arg(storagePath).arg(storageMountPoint), cl_logWARNING );
             return false;  //storage directory has not been mounted yet
         }
     }
