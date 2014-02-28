@@ -19,9 +19,7 @@ public:
     QnClickableWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0): base_type(parent, wFlags) {}
 
 signals:
-    void clicked();
     void clicked(Qt::MouseButton button);
-    void doubleClicked();
     void doubleClicked(Qt::MouseButton button);
 };
 
@@ -37,9 +35,7 @@ public:
     QnClickableFrameWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0): base_type(parent, wFlags) {}
 
 signals:
-    void clicked();
     void clicked(Qt::MouseButton button);
-    void doubleClicked();
     void doubleClicked(Qt::MouseButton button);
 };
 
@@ -55,9 +51,8 @@ public:
     QnClickableProxyLabel(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0): base_type(parent, wFlags) {}
 
 signals:
-    void clicked();
     void clicked(Qt::MouseButton button);
-    void doubleClicked();
     void doubleClicked(Qt::MouseButton button);
 };
+
 #endif // QN_CLICKABLE_WIDGETS_H

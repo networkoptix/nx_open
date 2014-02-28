@@ -55,10 +55,8 @@ protected:
         event->accept();
 
         if(m_isDoubleClick) {
-            emit doubleClicked();
             emit doubleClicked(event->button());
         } else {
-            emit clicked();
             emit clicked(event->button());
         }
 
@@ -79,9 +77,7 @@ protected:
 
     /* Virtual signals follow. These can be overridden in derived class with actual signals. */
 
-    virtual void clicked() {}
     virtual void clicked(Qt::MouseButton button) { Q_UNUSED(button); }
-    virtual void doubleClicked() {}
     virtual void doubleClicked(Qt::MouseButton button) { Q_UNUSED(button); }
 
 private:
