@@ -1676,7 +1676,7 @@ void QnTimeSlider::drawSeparator(QPainter *painter, const QRectF &rect) {
 void QnTimeSlider::drawLastMinute(QPainter *painter, const QRectF &rect) {
     const qreal moveSpeed = 0.05;
 
-    qint64 startTime = QDateTime::currentDateTime().addSecs(-60).toMSecsSinceEpoch();
+    qint64 startTime = maximum() - 60 * 1000;
     qreal startPos = quickPositionFromValue(startTime);
     if (startPos >= rect.right())
         return;
