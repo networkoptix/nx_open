@@ -11,9 +11,9 @@
 /**
  * Graphics widget that provides signals for mouse click and double click events.
  */
-class QnClickableWidget: public Clickable<GraphicsWidget> {
+class QnClickableWidget: public Clickable<GraphicsWidget, QnClickableWidget> {
     Q_OBJECT
-    typedef Clickable<GraphicsWidget> base_type;
+    typedef Clickable<GraphicsWidget, QnClickableWidget> base_type;
 
 public:
     QnClickableWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0): base_type(parent, wFlags) {}
@@ -27,9 +27,9 @@ signals:
 /**
  * Simple frame widget that provides signals for mouse click and double click events.
  */
-class QnClickableFrameWidget: public Clickable<QnFramedWidget> {
+class QnClickableFrameWidget: public Clickable<QnFramedWidget, QnClickableFrameWidget> {
     Q_OBJECT
-    typedef Clickable<QnFramedWidget> base_type;
+    typedef Clickable<QnFramedWidget, QnClickableFrameWidget> base_type;
 
 public:
     QnClickableFrameWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0): base_type(parent, wFlags) {}
@@ -43,9 +43,9 @@ signals:
 /**
  * Proxy label widget that provides signals for mouse click and double click events.
  */
-class QnClickableProxyLabel: public Clickable<QnProxyLabel> {
+class QnClickableProxyLabel: public Clickable<QnProxyLabel, QnClickableProxyLabel> {
     Q_OBJECT
-    typedef Clickable<QnProxyLabel> base_type;
+    typedef Clickable<QnProxyLabel, QnClickableProxyLabel> base_type;
 
 public:
     QnClickableProxyLabel(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0): base_type(parent, wFlags) {}
