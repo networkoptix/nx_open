@@ -4,6 +4,8 @@
 
 #include <core/resource_management/resource_pool.h>
 
+// TODO: #Elric maybe remove this construct-in-getter? It will make things simpler.
+
 // -------------------------------------------------------------------------- //
 // QnPtzControllerPoolPrivate
 // -------------------------------------------------------------------------- //
@@ -15,23 +17,20 @@ public:
         {
             QMutexLocker locker(&mutex);
 
-            if(controllerByResource.contains(resource)) {
-                *controller = controllerByResource.value(resource);
-                return false; /* Already registered. */
-            }
+            if(*controller = controllerByResource.value(resource))
+                return false;
         }
 
-        *controller = q->createController(resource);
+        QnPtzControllerPtr newController = q->createController(resource);
 
         {
             QMutexLocker locker(&mutex);
 
-            if(controllerByResource.contains(resource)) {
-                *controller = controllerByResource.value(resource);
-                return false; /* Already registered. */
-            }
+            if(*controller = controllerByResource.value(resource))
+                return false;
 
-            controllerByResource.insert(resource, *controller);
+            *controller = newController;
+            controllerByResource.insert(resource, newController);
         }
 
         return true;
