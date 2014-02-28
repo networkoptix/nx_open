@@ -1692,13 +1692,13 @@ void QnTimeSlider::drawLastMinute(QPainter *painter, const QRectF &rect) {
     if (sliderPos > startPos && !qFuzzyEquals(startPos, sliderPos)) {
         QBrush brush(m_progressPastPattern);
         brush.setTransform(brushTransform);
-        painter->fillRect(QRectF(QPointF(startPos, rect.top()), rect.bottomRight()), brush);
+        painter->fillRect(QRectF(QPointF(startPos, rect.top()), QPointF(sliderPos, rect.bottom())), brush);
     }
 
     if (!qFuzzyEquals(rect.right(), sliderPos)) {
         QBrush brush(m_progressFuturePattern);
         brush.setTransform(brushTransform);
-        painter->fillRect(QRectF(QPointF(startPos, rect.top()), rect.bottomRight()), brush);
+        painter->fillRect(QRectF(QPointF(qMax(startPos, sliderPos), rect.top()), rect.bottomRight()), brush);
     }
 }
 
