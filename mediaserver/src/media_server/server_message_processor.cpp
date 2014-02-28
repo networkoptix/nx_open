@@ -29,36 +29,10 @@ void QnServerMessageProcessor::handleConnectionOpened(const QnMessage &message) 
         updateResource(resource);
     }
 
-    QUrl url = QnAppServerConnectionFactory::defaultUrl();
-
-    // check if it proxy connection and direct EC access is available
-    QAuthenticator auth;
-    auth.setUser(url.userName());
-    auth.setPassword(url.password());
-    static const int TEST_DIRECT_CONNECT_TIMEOUT = 2000;
-    CLSimpleHTTPClient testClient(url.host(), url.port(), TEST_DIRECT_CONNECT_TIMEOUT, auth);
-    CLHttpStatus result = testClient.doGET(lit("proxy_api/ec_port"));
-    if (result == CL_HTTP_SUCCESS)
-    {
-        QUrl directURL;
-        QByteArray data;
-        testClient.readAll(data);
-        directURL = url;
-        directURL.setPort(data.toInt());
-        QnAppServerConnectionFactory::setDefaultUrl(directURL);
-    }
-
     base_type::handleConnectionOpened(message);
 }
 
 void QnServerMessageProcessor::handleConnectionClosed(const QString &errorString) {
-    // update EC port
-    int port = MSSettings::roSettings()->value("appserverPort", DEFAULT_APPSERVER_PORT).toInt(); // defaulting to proxy
-
-    QUrl url = QnAppServerConnectionFactory::defaultUrl();
-    url.setPort(port);
-    QnAppServerConnectionFactory::setDefaultUrl(url);
-
     base_type::handleConnectionClosed(errorString);
 }
 
