@@ -161,7 +161,8 @@ int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
 
 int gsoapFsendSmallUnicast(struct soap *soap, const char *s, size_t n)
 {
-    QString recvData = QString::fromLatin1(QByteArray(s, (int) n).data());
+    // TODO: #Elric WTF????????????????????????? Why construct a temporary QByteArray????
+    QString recvData = QString::fromLatin1(QByteArray(s, (int) n).data()); 
     //avoiding sending numerous data
     if (!recvData.startsWith(lit("<?xml"))) {
         return SOAP_OK;

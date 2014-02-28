@@ -86,4 +86,13 @@ private:
 
 QN_EXPORT void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg);
 
+
+template<class T>
+QString toDebugString(const T &value) {
+    QString result;
+    QDebug stream(&result);
+    stream << value;
+    return result;
+}
+
 #endif // QN_LOG_H

@@ -63,7 +63,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
     QThread::Priority oldPriority = QThread::currentThread()->priority();
     QThread::currentThread()->setPriority(QThread::IdlePriority);
 
-    qDebug() << "Browsing directories....";
+    NX_LOG(lit("Browsing directories..."), cl_logDEBUG1);
 
     QTime time;
     time.restart();
@@ -78,7 +78,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
             break;
     }
 
-    qDebug() << "Done(Browsing directories). Time elapsed = " << time.elapsed();
+    NX_LOG(lit("Done(Browsing directories). Time elapsed = %1.").arg(time.elapsed()), cl_logDEBUG1);
 
     QThread::currentThread()->setPriority(oldPriority);
 
@@ -100,7 +100,8 @@ QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString &filename) con
 
 //=============================================================================================
 void QnResourceDirectoryBrowser::findResources(const QString& directory, QnResourceList *result) {
-    qDebug() << "Checking " << directory;
+    NX_LOG(lit("Checking %1").arg(directory), cl_logDEBUG1);
+
     if (shouldStop())
         return;
 
@@ -140,7 +141,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         return layout;
     }
 
-    QIODevice* uuidFile = layoutStorage.open(QLatin1String("uuid.bin"), QIODevice::ReadOnly);
+    QIODevice *uuidFile = layoutStorage.open(QLatin1String("uuid.bin"), QIODevice::ReadOnly);
     if (uuidFile) {
         QByteArray data = uuidFile->readAll();
         delete uuidFile;
@@ -198,9 +199,9 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     //QnLayoutItemDataMap items = layout->getItems();
     QnLayoutItemDataMap updatedItems;
 
-    QIODevice* itemNamesIO = layoutStorage.open(QLatin1String("item_names.txt"), QIODevice::ReadOnly);
+    QIODevice *itemNamesIO = layoutStorage.open(QLatin1String("item_names.txt"), QIODevice::ReadOnly);
     QTextStream itemNames(itemNamesIO);
-    QIODevice* itemTimeZonesIO = layoutStorage.open(QLatin1String("item_timezones.txt"), QIODevice::ReadOnly);
+    QIODevice *itemTimeZonesIO = layoutStorage.open(QLatin1String("item_timezones.txt"), QIODevice::ReadOnly);
     QTextStream itemTimeZones(itemTimeZonesIO);
 
     // TODO: #Elric here is bad place to add resources to pool. need refactor
