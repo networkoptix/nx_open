@@ -1,0 +1,173 @@
+{
+    "globals": {
+        "selection":            "QColor(255, 128, 80, 110)",
+        "opaqueSelection":      "selection.setAlpha(255)"
+    },
+
+    "QnGlobals": {
+        "_": "Globals settings. These ones will go away in one of the future versions.",
+        
+        "selectionColor":           "selection",
+        "backgroundGradientColor":  "QColor(26, 26, 240, 40)",
+        "frameColor":               "QColor(128, 128, 128, 196)",
+        "selectedFrameColor":       "QColor(32, 144, 224, 196)",
+        "ptzColor":                 "QColor(128, 196, 255, 255)"
+    },
+    
+    "QApplication": {
+        "palette": {
+            "_": "Main application palette. See http://qt-project.org/doc/qt-5.1/qtgui/qpalette.html#ColorRole-enum.",
+        
+            "default": {},
+            "active": {
+                "windowText":       "#f0f0f0",
+                "button":           "opaqueSelection",
+                "light":            "#f0f0f0",
+                "midlight":         "#dcdcdc",
+                "dark":             "#464646",
+                "mid":              "#646464",
+                "text":             "#f5f5f5",
+                "brightText":       "#ffffff",
+                "buttonText":       "#ffffff",
+                "base":             "#313132",
+                "window":           "#222222",
+                "shadow":           "#000000",
+                "highlight":        "opaqueSelection",
+                "highlightedText":  "#f0f0f0",
+                "link":             "#0099ff",
+                "linkVisited":      "#30aafc",
+                "alternateBase":    "#363637",
+                "toolTipBase":      "#f0f0f0",
+                "toolTipText":      "#222222"
+            },
+            "inactive": {
+                "windowText":       "#f0f0f0",
+                "button":           "opaqueSelection",
+                "light":            "#f0f0f0",
+                "midlight":         "#dcdcdc",
+                "dark":             "#464646",
+                "mid":              "#646464",
+                "text":             "#f5f5f5",
+                "brightText":       "#ffffff",
+                "buttonText":       "#ffffff",
+                "base":             "#313132",
+                "window":           "#222222",
+                "shadow":           "#000000",
+                "highlight":        "#727272",
+                "highlightedText":  "#f0f0f0",
+                "link":             "#0099ff",
+                "linkVisited":      "#30aafc",
+                "alternateBase":    "#363637",
+                "toolTipBase":      "#f0f0f0",
+                "toolTipText":      "#222222"
+            },
+            "disabled": {
+                "windowText":       "#666666",
+                "button":           "opaqueSelection",
+                "light":            "#f0f0f0",
+                "midlight":         "#dcdcdc",
+                "dark":             "#464646",
+                "mid":              "#646464",
+                "text":             "#939393",
+                "brightText":       "#ffffff",
+                "buttonText":       "#808080",
+                "base":             "#2c2c2c",
+                "window":           "#222222",
+                "shadow":           "#000000",
+                "highlight":        "#919191",
+                "highlightedText":  "#808080",
+                "link":             "#0099ff",
+                "linkVisited":      "#30aafc",
+                "alternateBase":    "#323232",
+                "toolTipBase":      "#f0f0f0",
+                "toolTipText":      "#222222"
+            }
+        }
+    },
+    
+    "QnTimeSlider": {
+        "colors": {
+            "_": "Time slider colors.",
+            
+            "tickmark": "QColor(255, 255, 255, 255)",
+            "positionMarker": "QColor(255, 255, 255, 196)",
+            "indicator": "QColor(128, 160, 192, 128)",
+            
+            "selection": "selection",
+            "selectionMarker": "selection.lighter",
+            
+            "pastBackground": "QColor(255, 255, 255, 24)",
+            "futureBackground": "QColor(0, 0, 0, 0)",
+            
+            "pastRecording": "QColor(64, 255, 64, 128)",
+            "futureRecording": "QColor(64, 255, 64, 64)",
+            
+            "pastMotion": "QColor(255, 0, 0, 128)",
+            "futureMotion": "QColor(255, 0, 0, 64)",
+            
+            "separator": "QColor(255, 255, 255, 64)",
+            
+            "dateOverlay": "QColor(255, 255, 255, 48)",
+            "dateOverlayAlternate": "selection.setAlpha(48)"
+        }
+    },
+    
+    "QnControlBackgroundWidget": {
+        "_": "Background for ui panels (resource tree, title bar, notifications panel).",
+        
+        "colors": ["#000000FF", "#00000040"],
+        "frameColor": "#80808080",
+        "frameWidth": 1.0
+    },
+    
+    "QnGraphicsView": {
+        "palette": {
+            "default": {
+                "_": "Scene background color.",
+            
+                "base": "black"
+            }
+        }
+    },
+    
+    "QnGradientBackgroundPainter": {
+        "colors": {
+            "_": "Background gradient colors.",
+            
+            "normal": "QColor(255, 128, 80, 48)",
+            "panic": "#FF0000"
+        }
+    },
+    
+    "QnServerResourceWidget": {
+        "colors": {
+            "frame": "#428ced",
+            "grid": "QColor(66, 140, 237, 100)",
+            "cpu": "#428ced",
+            "ram": "#db3ba9",
+            "hdds": ["#ededed","#edc842","#67ed42","#ff8330","#b200ff","#00ffff","#267f00","#ff7f7f","#c90000"]
+        }
+    },
+    
+    "ZoomWindowInstrument": {
+        "colors": ["#c02020", "#20c020", "#4040ff"]
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
