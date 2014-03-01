@@ -49,7 +49,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
 
     if( resourceType.isNull() )
     {
-        NX_LOG( QString::fromLatin1("ThirdPartyResourceSearcher. No resource type for ID = %1").arg(resourceTypeId.toString()), cl_logDEBUG1 );
+        NX_LOG( lit("ThirdPartyResourceSearcher. No resource type for ID = %1").arg(resourceTypeId.toString()), cl_logDEBUG1 );
         return result;
     }
 
@@ -118,7 +118,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
             result->setCameraCapability( Qn::ShareIpCapability, true );
     }
 
-    NX_LOG( QString::fromLatin1("Created third party resource (manufacturer %1, res type id %2)").
+    NX_LOG( lit("Created third party resource (manufacturer %1, res type id %2)").
         arg(discoveryManager->getVendorName()).arg(resourceTypeId.toString()), cl_logDEBUG2 );
 
     //result->deserialize( parameters );

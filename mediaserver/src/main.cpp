@@ -529,7 +529,7 @@ int serverMain(int argc, char *argv[])
     cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
-    if( cmdLineArguments.logLevel != QString::fromLatin1("none") )
+    if( cmdLineArguments.logLevel != lit("none") )
         defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
     qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
@@ -729,7 +729,7 @@ void QnMain::loadResourcesFromECS()
     QnMediaServerResourceList mediaServerList;
     while( ec2Connection->getMediaServerManager()->getServersSync( &mediaServerList) != ec2::ErrorCode::ok )
     {
-        qWarning() << "QnMain::run(). Can't get media servers."; //.arg(QLatin1String(appServerConnection->getLastError())), cl_logERROR );
+        NX_LOG( lit("QnMain::run(). Can't get media servers."), cl_logERROR );
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 
@@ -745,7 +745,7 @@ void QnMain::loadResourcesFromECS()
         //while( appServerConnection->getCameras(cameras, mediaServer->getId()) != 0 )
         while (ec2Connection->getCameraManager()->getCamerasSync(mediaServer->getId(), &cameras) != ec2::ErrorCode::ok)
         {
-            NX_LOG( QString::fromLatin1("QnMain::run(). Error retreiving server %1(%2) cameras from enterprise controller. %3").
+            NX_LOG( lit("QnMain::run(). Error retreiving server %1(%2) cameras from enterprise controller. %3").
                 arg(mediaServer->getId().toString()).arg(mediaServer->getGuid()).arg(QLatin1String("" /*appServerConnection->getLastError()*/)), cl_logERROR );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
         }

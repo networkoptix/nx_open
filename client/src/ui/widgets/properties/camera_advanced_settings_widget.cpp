@@ -316,9 +316,9 @@ QnSettingsControlButtonsPairWidget::QnSettingsControlButtonsPairWidget(QObject* 
     QHBoxLayout *hlayout = new QHBoxLayout();
     m_layout->addLayout(hlayout);
 
-    m_minBtn = new QPushButton(QString::fromLatin1("-"));
+    m_minBtn = new QPushButton(lit("-"));
     m_minBtn->setFocusPolicy(Qt::NoFocus);
-    m_maxBtn = new QPushButton(QString::fromLatin1("+"));
+    m_maxBtn = new QPushButton(lit("+"));
     m_maxBtn->setFocusPolicy(Qt::NoFocus);
 
     hlayout->addStretch(1);

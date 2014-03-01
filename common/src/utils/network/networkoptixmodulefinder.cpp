@@ -56,7 +56,7 @@ NetworkOptixModuleFinder::NetworkOptixModuleFinder(
         const QHostAddress& addressToUse = *addrIter; //using any address of interface
         try
         {
-            //if( addressToUse == QHostAddress(QString::fromLatin1("127.0.0.1")) )
+            //if( addressToUse == QHostAddress(lit("127.0.0.1")) )
             //    continue;
             std::auto_ptr<AbstractDatagramSocket> sock( SocketFactory::createDatagramSocket() );
             sock->bind( addressToUse.toString(), 0 );
@@ -70,7 +70,7 @@ NetworkOptixModuleFinder::NetworkOptixModuleFinder(
         }
         catch( const std::exception& e )
         {
-            NX_LOG( QString::fromLatin1("Failed to create socket on local address %1. %2").arg(addressToUse.toString()).arg(QString::fromLatin1(e.what())), cl_logERROR );
+            NX_LOG( lit("Failed to create socket on local address %1. %2").arg(addressToUse.toString()).arg(QString::fromLatin1(e.what())), cl_logERROR );
         }
     }
 }
@@ -232,7 +232,7 @@ bool NetworkOptixModuleFinder::processDiscoveryResponse(AbstractDatagramSocket* 
 void NetworkOptixModuleFinder::run()
 {
     initSystemThreadId();
-    NX_LOG( QString::fromLatin1("NetworkOptixModuleFinder started"), cl_logDEBUG1 );
+    NX_LOG( lit("NetworkOptixModuleFinder started"), cl_logDEBUG1 );
 
     static const unsigned int SEARCH_PACKET_LENGTH = 64;
     quint8 searchPacket[SEARCH_PACKET_LENGTH];
@@ -276,7 +276,7 @@ void NetworkOptixModuleFinder::run()
                 {
                     //failed to send packet ???
                     SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                    NX_LOG( QString::fromLatin1("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1 );
+                    NX_LOG( lit("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1 );
                     //TODO/IMPL if corresponding interface is down, should remove socket from set
                 }
             }
@@ -289,7 +289,7 @@ void NetworkOptixModuleFinder::run()
         if( socketCount < 0 )
         {
             SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-            NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR );
+            NX_LOG(lit("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR );
             msleep( ERROR_WAIT_TIMEOUT_MS );
             continue;
         }
@@ -346,5 +346,5 @@ void NetworkOptixModuleFinder::run()
         }
     }
 
-    NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder stopped"), cl_logDEBUG1 );
+    NX_LOG(lit("NetworkOptixModuleFinder stopped"), cl_logDEBUG1 );
 }

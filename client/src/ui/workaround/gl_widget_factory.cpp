@@ -19,7 +19,7 @@ void QnGlWidgetFactory::enableVSync(QGLWidget *widget) {
     typedef int (*fn_glXSwapIntervalSGI)(int);
     QByteArray extensions(glXQueryExtensionsString(QX11Info::display(), QX11Info::appScreen()));
     if (extensions.contains("GLX_SGI_swap_control")) {
-        fn_glXSwapIntervalSGI glXSwapIntervalSGI = reinterpret_cast<fn_glXSwapIntervalSGI>(widget->context()->getProcAddress(QString::fromLatin1("glXSwapIntervalSGI")));
+        fn_glXSwapIntervalSGI glXSwapIntervalSGI = reinterpret_cast<fn_glXSwapIntervalSGI>(widget->context()->getProcAddress(lit("glXSwapIntervalSGI")));
         if (glXSwapIntervalSGI)
             glXSwapIntervalSGI(1);
     }

@@ -62,7 +62,7 @@ namespace stree
         {
             if( !str.isEmpty() )
                 str += QLatin1String(", ");
-            str += QString::fromLatin1("%1:%2").arg(rns.findResourceByID(resPair.first).name).arg(resPair.second.toString());
+            str += lit("%1:%2").arg(rns.findResourceByID(resPair.first).name).arg(resPair.second.toString());
         }
         return str;
     }

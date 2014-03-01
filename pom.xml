@@ -84,7 +84,7 @@
 
     <build>
         <defaultGoal>install</defaultGoal>
-        <finalName>${finalName}</finalName>
+        <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -190,9 +190,12 @@
 
     <profiles>
         <profile>
-            <id>build-env</id>
+            <id>build-env-win</id>
             <!-- preparing build-environment only if it is not ready. The last operation is installing llutil to x64 python virtualenv so it can be used as a criteria -->
             <activation>
+                <os>
+                    <family>Windows</family>
+                </os>            
                 <file>
                     <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
                     <missing>build_environment/target/x64/python/Lib/site-packages/llutil-0.4-py2.7-win-amd64.egg/llutil.py </missing>
@@ -202,6 +205,23 @@
                 <module>build_environment</module>
             </modules>	
         </profile>     
+
+        <profile>
+            <id>build-env-unix</id>
+            <!-- preparing build-environment only if it is not ready. The last operation is installing llutil to x64 python virtualenv so it can be used as a criteria -->
+            <activation>
+                <os>
+                    <family>Unix</family>
+                </os>            
+                <file>
+                    <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
+                    <missing>/build_environment/target/x64/python/lib/python2.7/site-packages/llutil-0.4-py2.7-linux-x86_64.egg/llutil.py </missing>
+                </file> 
+            </activation>
+            <modules>	
+                <module>build_environment</module>
+            </modules>	
+        </profile>             
 
         <profile>
             <id>quicksync</id>
@@ -457,17 +477,6 @@
             </modules>
         </profile>
         <profile>
-            <id>beta</id>
-            <activation>
-                <property>
-                    <name>!beta</name>
-                </property>
-            </activation>
-            <properties>
-                <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>    
-            </properties>
-        </profile>	      
-        <profile>
             <id>nobeta</id>
             <activation>
                 <property>
@@ -476,8 +485,8 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>    
-            </properties>       
-        </profile>	        
+                <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>
+            </properties>
+        </profile>	      
     </profiles>	
 </project>

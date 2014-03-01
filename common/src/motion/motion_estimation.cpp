@@ -11,6 +11,14 @@
 #include <utils/media/sse_helper.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
+
+// TODO: #Elric move to config? 
+// see https://code.google.com/p/arxlib/source/browse/include/arx/Utility.h
+#ifndef _MSC_VER
+#   define __forceinline inline
+#endif
+
+
 //#define DEBUG_CPU_MODE
 static const unsigned char BitReverseTable256[] = 
 {
