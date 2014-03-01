@@ -17,8 +17,6 @@
 
 namespace ec2
 {
-    class QnTransactionMessageBus;
-
     class RemoteEC2Connection
     :
         public BaseEc2Connection<FixedUrlClientQueryProcessor>
@@ -37,7 +35,6 @@ namespace ec2
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
         const QnConnectionInfo m_connectionInfo;
-        QnTransactionMessageBus* m_transactionMsg;
         QUrl m_peerUrl;
     };
 }

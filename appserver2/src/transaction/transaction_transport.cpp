@@ -3,6 +3,7 @@
 #include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
 #include "transaction_log.h"
+#include "transaction_transport_serializer.h"
 
 namespace ec2
 {
@@ -135,10 +136,12 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                         m_chunkHeaderLen = getChunkHeaderEnd(rBuffer, m_readBufferLen, &m_chunkLen);
                     if (m_chunkHeaderLen) {
                         const int fullChunkLen = m_chunkHeaderLen + m_chunkLen + 2;
-                        if (m_readBufferLen == fullChunkLen) {
-                            QByteArray dataCopy;
-                            dataCopy.append((const char *) rBuffer + m_chunkHeaderLen, m_chunkLen);
-                            emit gotTransaction(dataCopy);
+                        if (m_readBufferLen == fullChunkLen) 
+                        {
+                            QSet<QnId> processedPeers;
+                            QByteArray serializedTran;
+                            QnTransactionTransportSerializer::deserialize(rBuffer + m_chunkHeaderLen, m_chunkLen, processedPeers, serializedTran);
+                            emit gotTransaction(serializedTran, processedPeers);
                             m_readBufferLen = m_chunkHeaderLen = 0;
                         }
                     }
@@ -213,9 +216,11 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         int fullChunkLen = m_chunkHeaderLen + m_chunkLen + 2;
         if (bufferLen >= fullChunkLen)
         {
-            QByteArray dataCopy;
-            dataCopy.append(QByteArray::fromRawData((const char *) buffer + m_chunkHeaderLen, m_chunkLen));
-            emit gotTransaction(dataCopy);
+            QSet<QnId> processedPeers;
+            QByteArray serializedTran;
+            QnTransactionTransportSerializer::deserialize(buffer + m_chunkHeaderLen, m_chunkLen, processedPeers, serializedTran);
+            emit gotTransaction(serializedTran, processedPeers);
+
             buffer += fullChunkLen;
             bufferLen -= fullChunkLen;
         }

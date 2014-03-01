@@ -149,6 +149,15 @@ namespace ec2
     {
         QnTransaction<ApiIdData> tran(command, true);
         tran.params.id = id;
+        
+        /*
+        if (command == ApiCommand::setResourceStatus) {
+            QnResourcePtr mServer = m_resCtx->pool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+            if (mServer)
+                tran.localTransaction = true;
+        }
+        */
+
         return tran;
     }
 

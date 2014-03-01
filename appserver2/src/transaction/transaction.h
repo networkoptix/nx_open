@@ -94,7 +94,9 @@ namespace ec2
             getCurrentTime,
 
             tranSyncRequest,
-            tranSyncResponse
+            tranSyncResponse,
+            
+            serverAliveInfo
         };
 
         QString toString( Value val );
@@ -103,7 +105,7 @@ namespace ec2
     class QnAbstractTransaction
     {
     public:
-		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false), timestamp(0) {}
+		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false), timestamp(0), localTransaction(false) {}
         QnAbstractTransaction(ApiCommand::Value command, bool persistent);
         
         void fillSequence();
@@ -134,8 +136,10 @@ namespace ec2
         bool persistent;
         qint32 timestamp;
         
-        QUuid originGuid; // this field doesn't serializable and uses local only. 
+        // this field doesn't serializable and uses local only.
+        QUuid originGuid; 
         static QAtomicInt m_localSequence;
+        bool localTransaction; // do not propagate transactions to other server peers
     };
 
     template <class T>

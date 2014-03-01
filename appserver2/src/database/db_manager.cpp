@@ -1,6 +1,7 @@
 #include "db_manager.h"
 #include <QtSql/QtSql>
 #include "nx_ec/data/ec2_business_rule_data.h"
+#include "common/common_module.h"
 
 namespace ec2
 {
@@ -40,6 +41,16 @@ void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subD
     }
 }
 
+QnId QnDbManager::getType(const QString& typeName)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare("select guid from vms_resourcetype where name = 'Storage'");
+    Q_ASSERT(query.exec());
+    if (query.next())
+        return QnId::fromRfc4122(query.value("guid").toByteArray());
+    return QnId();
+}
+
 QnDbManager::QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* const storedFileManagerImpl, const QString& dbFilePath ):
     QnDbHelper(),
     m_storedFileManagerImpl( storedFileManagerImpl )
@@ -53,11 +64,30 @@ QnDbManager::QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* cons
 		if (!createDatabase()) // create tables is DB is empty
 			qWarning() << "can't create tables for sqlLite database!";
 
-        QSqlQuery query(m_sdb);
-        query.prepare("select guid from vms_resourcetype where name = 'Storage'");
-        Q_ASSERT(query.exec());
-        if (query.next())
-            m_storageTypeId = QnId::fromRfc4122(query.value("guid").toByteArray());
+        m_storageTypeId = getType("Storage");
+        m_serverTypeId = getType("Server");
+        m_cameraTypeId = getType("Camera");
+
+
+        QSqlQuery queryServers(m_sdb);
+        queryServers.prepare("UPDATE vms_resource set status = ? WHERE xtype_guid = ?");
+        queryServers.bindValue(0, QnResource::Offline);
+        queryServers.bindValue(1, m_serverTypeId.toRfc4122());
+        Q_ASSERT(queryServers.exec());
+
+        QSqlQuery queryServers2(m_sdb);
+        queryServers2.prepare("UPDATE vms_resource set status = ? WHERE id = ?");
+        queryServers2.bindValue(0, QnResource::Online);
+        queryServers2.bindValue(1, qnCommon->moduleGUID().toRfc4122());
+        Q_ASSERT(queryServers2.exec());
+
+        QSqlQuery queryCameras(m_sdb);
+        queryCameras.prepare("UPDATE vms_camera set status = ? WHERE parent_guid = ? and xtype_guid = ?");
+        queryCameras.bindValue(0, QnResource::Offline);
+        queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
+        queryServers.bindValue(2, m_cameraTypeId.toRfc4122());
+        Q_ASSERT(queryServers.exec());
+
 	}
 	else {
 		qWarning() << "can't initialize sqlLite database! Actions log is not created!";

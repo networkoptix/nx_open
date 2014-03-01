@@ -4,8 +4,10 @@
 #include <QUuid>
 #include <QByteArray>
 #include <QQueue>
+#include <QSet>
 #include "utils/network/aio/aioeventhandler.h"
 #include "utils/network/http/asynchttpclient.h"
+#include "utils/common/id.h"
 
 namespace ec2
 {
@@ -29,7 +31,7 @@ public:
     ~QnTransactionTransport();
 
 signals:
-    void gotTransaction(QByteArray data);
+    void gotTransaction(QByteArray data, QSet<QnId> processedPeers);
     void stateChanged(State state);
 public:
     void doOutgoingConnect(QUrl remoteAddr);

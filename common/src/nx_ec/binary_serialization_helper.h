@@ -64,6 +64,7 @@ public:
     }
 
     const QByteArray& buffer() const { return m_data; }
+    int getPos() const { return pos; }
 
 private:
     const QByteArray& m_data;
@@ -172,6 +173,9 @@ namespace QnBinary {
 
     template <class T, class T2>
     void serialize(const QList<T2>& field, OutputBinaryStream<T>* binStream);
+
+    template <class T, class T2>
+    void serialize(const QSet<T2>& field, OutputBinaryStream<T>* binStream);
 
     template <class T, class T2, class T3>
     void serialize(const QMap<T2, T3>& field, OutputBinaryStream<T>* binStream);
@@ -330,6 +334,16 @@ namespace QnBinary {
             QnBinary::serialize(val, binStream);
     }
 
+    template <class T, class T2>
+    void serialize(const QSet<T2>& field, OutputBinaryStream<T>* binStream) 
+    {
+        QnBinary::serialize((qint32) field.size(), binStream);
+        using namespace std::placeholders;
+        std::for_each( field.begin(), field.end(), [binStream](const T2& val){ QnBinary::serialize(val, binStream); } );
+        for( const T2& val: field )
+            QnBinary::serialize(val, binStream);
+    }
+
     template <class T, class T2, class T3>
     void serialize(const QMap<T2, T3>& field, OutputBinaryStream<T>* binStream) 
     {
@@ -351,6 +365,22 @@ namespace QnBinary {
             field.push_back( T2() );
             if( !QnBinary::deserialize(field.back(), binStream) )
                 return false;
+        }
+        return true;
+    }
+
+    template <class T, class T2>
+    bool deserialize(QSet<T2>& field, InputBinaryStream<T>* binStream) 
+    {
+        qint32 size = 0;
+        if( !deserialize(size, binStream) )
+            return false;
+        for( qint32 i = 0; i < size; ++i )
+        {
+            T2 t2;
+            if( !QnBinary::deserialize(t2, binStream) )
+                return false;
+            field.insert( t2 );
         }
         return true;
     }

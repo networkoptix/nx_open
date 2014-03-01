@@ -117,6 +117,7 @@ namespace ec2
         id.peerGUID = qnCommon->moduleGUID();
         id.sequence = 0;
         timestamp = qnSyncTime->currentMSecsSinceEpoch()/1000;
+        localTransaction = false;
     }
 
     void QnAbstractTransaction::fillSequence()
