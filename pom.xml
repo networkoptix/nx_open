@@ -206,7 +206,7 @@
         </profile>     
 
         <profile>
-            <id>build-env-unix</id>
+            <id>build-env-unix-x64</id>
             <!-- preparing build-environment only if it is not ready. The last operation is installing llutil to x64 python virtualenv so it can be used as a criteria -->
             <activation>
                 <os>
@@ -221,6 +221,23 @@
                 <module>build_environment</module>
             </modules>	
         </profile>             
+
+        <profile>
+            <id>build-env-unix-x86</id>
+            <!-- preparing build-environment only if it is not ready. The last operation is installing llutil to x64 python virtualenv so it can be used as a criteria -->
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>            
+                <file>
+                    <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
+                    <missing>build_environment/target/x86/python/lib/python2.7/site-packages/llutil-0.4-py2.7-linux-x86_64.egg/llutil.py </missing>
+                </file> 
+            </activation>
+            <modules>	
+                <module>build_environment</module>
+            </modules>	
+        </profile>                     
 
         <profile>
             <id>quicksync</id>
