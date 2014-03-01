@@ -5,6 +5,9 @@
 
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
+#include "core/resource/media_server_resource.h"
+#include "core/resource_management/resource_pool.h"
+#include "nx_ec/ec_api.h"
 
 
 namespace ec2
@@ -150,13 +153,11 @@ namespace ec2
         QnTransaction<ApiIdData> tran(command, true);
         tran.params.id = id;
         
-        /*
         if (command == ApiCommand::setResourceStatus) {
-            QnResourcePtr mServer = m_resCtx->pool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+            QnResourcePtr mServer = m_resCtx.pool->getResourceById(id).dynamicCast<QnMediaServerResource>();
             if (mServer)
                 tran.localTransaction = true;
         }
-        */
 
         return tran;
     }
