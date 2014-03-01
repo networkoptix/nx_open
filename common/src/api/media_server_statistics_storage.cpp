@@ -21,7 +21,7 @@ namespace {
     }
 }
 
-QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, int pointsLimit, QObject *parent):
+QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServerResourcePtr &server, int pointsLimit, QObject *parent):
     QObject(parent),
     m_alreadyUpdating(false),
     m_lastId(-1),
@@ -30,10 +30,9 @@ QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServ
     m_pointsLimit(pointsLimit),
     m_updatePeriod(defaultUpdatePeriod),
     m_uptimeMs(0),
-    m_apiConnection(apiConnection),
+    m_server(server),
     m_timer(new QTimer())
 {
-    // TODO: #Elric store mserver resource, not connection!!!
     connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
     m_timer->start(m_updatePeriod);
 }
@@ -85,12 +84,12 @@ void QnMediaServerStatisticsStorage::update() {
 
     emit statisticsChanged();
 
-    // TODO: #Elric in some cases m_alreadyUpdating == true, but we don't get any reply => we'll never update.
+    // TODO: #gdm #Elric in some cases m_alreadyUpdating == true, but we don't get any reply => we'll never update.
     // Maybe introduce retry timeout?
     if (!m_listeners || m_alreadyUpdating)
         return;
 
-    m_apiConnection->getStatisticsAsync(this, SLOT(at_statisticsReceived(int, const QnStatisticsReply &, int)));
+    m_server->apiConnection()->getStatisticsAsync(this, SLOT(at_statisticsReceived(int, const QnStatisticsReply &, int)));
 
     m_alreadyUpdating = true;
 }
