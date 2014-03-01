@@ -5,7 +5,6 @@
 #include "ec2_connection.h"
 #include "common/common_module.h"
 #include "transaction_transport.h"
-#include "nx_ec/data/server_alive_data.h"
 #include "transaction_transport_serializer.h"
 #include "utils/common/synctime.h"
 
