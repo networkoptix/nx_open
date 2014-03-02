@@ -70,7 +70,7 @@ void QnTransactionMessageBus::onGotServerAliveInfo(QnAbstractTransaction& abstra
     {
         ConnectionsToPeer& connections = itr.value();
         QSharedPointer<QnTransactionTransport> conn = connections->getConnection();
-        if (conn && !tran.params.contains(conn->removeGuid()))
+        if (conn && !tran.params.contains(conn->remoteGuid()))
             conn->addData(chunkData); // proxy alive message
     }
 }
@@ -133,7 +133,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
         QnTransactionTransportPtr transport = *itr;
-        if (!processedPeers.contains(transport->removeGuid()) && transport->isWriteSync())
+        if (!processedPeers.contains(transport->remoteGuid()) && transport->isWriteSync())
             transport->addData(chunkData);
     }
 }
@@ -328,14 +328,14 @@ void QnTransactionMessageBus::processConnState(QnTransactionTransportPtr transpo
     {
     case QnTransactionTransport::Error: 
         transport->close();
-        connectToPeerLost(transport->removeGuid());
+        connectToPeerLost(transport->remoteGuid());
         break;
     case QnTransactionTransport::Connected:
         transport->setState(QnTransactionTransport::ReadyForStreaming);
         // if sync already done or in progress do not send new request
         if (!transport->isClientPeer())
             queueSyncRequest(transport);
-        connectToPeerEstablished(transport->removeGuid());
+        connectToPeerEstablished(transport->remoteGuid());
         break;
     }
 }
@@ -383,7 +383,7 @@ void QnTransactionMessageBus::at_timer()
     {
         QnTransactionTransportPtr transport = m_connectingConnections[i];
         if (transport->getState() == QnTransactionTransport::Connected) {
-            m_connections[transport->removeGuid()] = transport;
+            m_connections[transport->remoteGuid()] = transport;
             m_connectingConnections.removeAt(i);
 
         }
@@ -426,7 +426,7 @@ void QnTransactionMessageBus::at_timer()
     }
 }
 
-void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& removeGuid, qint64 timediff)
+void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& remoteGuid, qint64 timediff)
 {
     QnTransaction<ApiFullData> tran;
     if (isClient) 
@@ -439,7 +439,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         }
     }
 
-    QnTransactionTransportPtr transport(new QnTransactionTransport(false, isClient, socket, removeGuid));
+    QnTransactionTransportPtr transport(new QnTransactionTransport(false, isClient, socket, remoteGuid));
     connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     transport->setState(QnTransactionTransport::Connected);
     transport->setTimeDiff(timediff);
@@ -454,12 +454,13 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     }
     
     QMutexLocker lock(&m_mutex);
-    if (m_connections[removeGuid]) 
+    if (m_connections[remoteGuid]) 
     {
+        Q_ASSERT_X(0, Q_FUNC_INFO, "We shouldn't be here! Check sync algorpthm!");
         return; // connection already established. Ignore incoming connection
-        //m_connectionsToRemove << m_connections[removeGuid];
+        //m_connectionsToRemove << m_connections[remoteGuid];
     }
-    m_connections[removeGuid] = transport;
+    m_connections[remoteGuid] = transport;
 }
 
 void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient)

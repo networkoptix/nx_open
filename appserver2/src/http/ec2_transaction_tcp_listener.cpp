@@ -48,12 +48,12 @@ void QnTransactionTcpProcessor::run()
 
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
     bool isClient = query.hasQueryItem("isClient");
-    QUuid removeGuid  = query.queryItemValue(lit("guid"));
+    QUuid remoteGuid  = query.queryItemValue(lit("guid"));
     qint64 removeTime  = query.queryItemValue(lit("time")).toLongLong();
     qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
     qint64 timeDiff = removeTime - localTime;
 
-    if (removeGuid.isNull()) {
+    if (remoteGuid.isNull()) {
         qWarning() << "Invalid incoming request. GUID must be filled!";
         sendResponse("HTTP", CODE_INVALID_PARAMETER, "application/octet-stream");
         return;
@@ -63,30 +63,29 @@ void QnTransactionTcpProcessor::run()
     d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
 
     // 1-st stage
-    bool lockOK = QnTransactionTransport::tryAcquire(removeGuid);
+    bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);
     sendResponse("HTTP", lockOK ? CODE_OK : CODE_INVALID_PARAMETER , "application/octet-stream");
     if (!lockOK)
         return;
 
     // 2-nd stage
     if (!readRequest()) {
-        QnTransactionTransport::connectCanceled(removeGuid);
+        QnTransactionTransport::connectingCanceled(remoteGuid, false);
         return;
     }
     parseRequest();
 
     query = QUrlQuery(d->request.requestLine.url.query());
-    bool fail = query.hasQueryItem("canceled");
+    bool fail = query.hasQueryItem("canceled") || !QnTransactionTransport::tryAcquireConnected(remoteGuid, false);
     d->chunkedMode = true;
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
     d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
     sendResponse("HTTP", fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
     if (fail) {
-        QnTransactionTransport::connectCanceled(removeGuid);
+        QnTransactionTransport::connectingCanceled(remoteGuid, false);
     }
     else {
-        QnTransactionTransport::connectEstablished(removeGuid);
-        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, isClient, removeGuid, timeDiff);
+        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, isClient, remoteGuid, timeDiff);
         d->socket.clear();
     }
 }

@@ -41,7 +41,7 @@ public:
     // these getters/setters are using from a single thread
     bool isOriginator() const { return m_originator; }
     bool isClientPeer() const { return m_isClientPeer; }
-    QUuid removeGuid() const  { return m_removeGuid; }
+    QUuid remoteGuid() const  { return m_remoteGuid; }
     qint64 lastConnectTime() { return m_lastConnectTime; }
     void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
     bool isReadSync() const       { return m_readSync; }
@@ -56,9 +56,9 @@ public:
     void setState(State state);
     State getState() const;
 
-    static bool tryAcquire(const QnId& removeGuid);
-    static void connectCanceled(const QnId& id);
-    static void connectEstablished(const QnId& id);
+    static bool tryAcquireConnecting(const QnId& remoteGuid, bool isOriginator);
+    static bool tryAcquireConnected(const QnId& remoteGuid, bool isOriginator);
+    static void connectingCanceled(const QnId& id, bool isOriginator);
     static void connectDone(const QnId& id);
 private:
     qint64 m_lastConnectTime;
@@ -66,7 +66,7 @@ private:
     bool m_readSync;
     bool m_writeSync;
 
-    QUuid m_removeGuid;
+    QUuid m_remoteGuid;
     bool m_originator;
     bool m_isClientPeer;
 
@@ -85,7 +85,8 @@ private:
     bool m_connected;
 
     static QSet<QUuid> m_existConn;
-    static QSet<QUuid> m_connectingConn;
+    typedef QMap<QUuid, QPair<bool, bool>> ConnectingInfoMap;
+    static ConnectingInfoMap m_connectingConn; // first - originator, second - non originator
     static QMutex m_staticMutex;
 private:
     void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
