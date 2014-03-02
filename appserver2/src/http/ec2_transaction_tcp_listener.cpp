@@ -89,20 +89,17 @@ void QnTransactionTcpProcessor::run()
     parseRequest();
 
     query = QUrlQuery(d->request.requestLine.url.query());
-    bool isCanceled = query.hasQueryItem("canceled");
-    //QnTransactionTransport::getPeerInfo(removeGuid, &isConnExist, &isConnConnecting);
-    //fail = isCanceled || isConnExist || (isConnConnecting && removeGuid > qnCommon->moduleGUID());
     bool fail = query.hasQueryItem("canceled");
-
+    d->chunkedMode = true;
     sendResponse("HTTP", fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
     if (fail) {
         QnTransactionTransport::connectCanceled(removeGuid);
-        return;
     }
-    QnTransactionTransport::connectEstablished(removeGuid);
-    QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, isClient, removeGuid, timeDiff);
-    d->chunkedMode = true;
-    d->socket.clear();
+    else {
+        QnTransactionTransport::connectEstablished(removeGuid);
+        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, isClient, removeGuid, timeDiff);
+        d->socket.clear();
+    }
 }
 
 }
