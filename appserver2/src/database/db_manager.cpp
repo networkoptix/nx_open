@@ -82,11 +82,15 @@ QnDbManager::QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* cons
         Q_ASSERT(queryServers2.exec());
 
         QSqlQuery queryCameras(m_sdb);
-        queryCameras.prepare("UPDATE vms_camera set status = ? WHERE parent_guid = ? and xtype_guid = ?");
+        queryCameras.prepare("UPDATE vms_resource set status = ? WHERE parent_guid = ? and xtype_guid = ?");
         queryCameras.bindValue(0, QnResource::Offline);
         queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
-        queryServers.bindValue(2, m_cameraTypeId.toRfc4122());
-        Q_ASSERT(queryCameras.exec());
+        queryCameras.bindValue(2, m_cameraTypeId.toRfc4122());
+        if (!queryCameras.exec()) {
+            qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
+            Q_ASSERT(0);
+        }
+        
 
 	}
 	else {

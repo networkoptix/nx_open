@@ -1045,6 +1045,9 @@ void QnMain::run()
     connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr, QnBusiness::EventReason)), this, SLOT(at_storageManager_storageFailure(QnResourcePtr, QnBusiness::EventReason)));
     connect(QnStorageManager::instance(), SIGNAL(rebuildFinished()), this, SLOT(at_storageManager_rebuildFinished()));
 
+    qnCommon->setModuleGUID(serverGuid());
+    qnCommon->setSystemName(settings->value("systemName").toString());
+
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
 
     ec2::ResourceContext resCtx(
@@ -1165,11 +1168,8 @@ void QnMain::run()
     m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid());
     m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
 
-    qnCommon->setModuleGUID(serverGuid());
-    qnCommon->setSystemName(settings->value("systemName").toString());
 
     QHostAddress publicAddress = getPublicAddress();
-
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(publicAddress.toString()).arg(m_universalTcpListener->getPort()));
 
     Qn::PanicMode pm;
