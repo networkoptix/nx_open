@@ -22,7 +22,8 @@ QnTransactionTransport::QnTransactionTransport(bool isOriginator, bool isClient,
     m_isClientPeer(isClient),
     m_readSync(false), 
     m_writeSync(false),
-    m_removeGuid(removeGuid)
+    m_removeGuid(removeGuid),
+    m_timeDiff(0)
 {
 }
 
@@ -250,6 +251,17 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     if (itr != client->response()->headers.end()) {
         QMutexLocker lock(&m_mutex);
         m_removeGuid = itr->second;
+    }
+    else {
+        setState(State::Error);
+        return;
+    }
+    itr = client->response()->headers.find("time");
+    if (itr != client->response()->headers.end()) {
+        qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
+        qint64 removeTime = itr->second.toLongLong();
+        setTimeDiff(localTime - removeTime);
+        
     }
     else {
         setState(State::Error);

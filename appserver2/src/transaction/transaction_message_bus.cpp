@@ -98,6 +98,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
         sender->setState(QnTransactionTransport::Error);
         return;
     }
+    tran.timestamp -= sender->timeDiff();
 
     QMap<QUuid, qint64>:: iterator itr = m_lastActivity.find(tran.id.peerGUID);
     if (itr == m_lastActivity.end()) {
@@ -115,7 +116,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
         onGotTransactionSyncRequest(sender, stream);
         return;
     case ApiCommand::tranSyncResponse:
-        onGotTransactionSyncResponse(sender);
+        onGotTransactionSyncResponse(sender, stream);
         return;
         /*
     case ApiCommand::serverAliveInfo:
@@ -208,9 +209,9 @@ bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbst
     return true;
 }
 
-void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender)
+void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream)
 {
-    sender->setReadSync(true);
+	sender->setReadSync(true);
 }
 
 bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream)
@@ -220,6 +221,7 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     QnTranState params;
     if (QnBinary::deserialize(params, &stream))
     {
+
         QList<QByteArray> transactions;
         const ErrorCode errorCode = transactionLog->getTransactionsAfter(params, transactions);
         if (errorCode == ErrorCode::ok) 
@@ -331,7 +333,7 @@ void QnTransactionMessageBus::queueSyncRequest(QSharedPointer<QnTransactionTrans
     transport->setReadSync(false);
     QnTransaction<QnTranState> requestTran(ApiCommand::tranSyncRequest, false);
     requestTran.params = transactionLog->getTransactionsState();
-
+    
     QByteArray syncRequest;
     QnTransactionMessageBus::serializeTransaction(syncRequest, requestTran);
     transport->addData(syncRequest);
@@ -455,16 +457,8 @@ void QnTransactionMessageBus::at_timer()
     }
 }
 
-void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QUrlQuery& query)
+void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& removeGuid, qint64 timediff)
 {
-    bool isClient = query.hasQueryItem("isClient");
-    QUuid remoteGuid  = query.queryItemValue(lit("guid"));
-
-    if (remoteGuid.isNull()) {
-        qWarning() << "Invalid incoming request. GUID must be filled!";
-        return;
-    }
-
     QnTransaction<ApiFullData> data;
     if (isClient) 
     {
@@ -476,10 +470,10 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         }
     }
 
-
-    QnTransactionTransport* transport = new QnTransactionTransport(false, isClient, socket, remoteGuid);
+    QnTransactionTransport* transport = new QnTransactionTransport(false, isClient, socket, removeGuid);
     connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     transport->setState(QnTransactionTransport::Connected);
+    transport->setTimeDiff(timediff);
 
     // send fullsync to a client immediatly
     if (isClient) 
@@ -491,9 +485,9 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     }
     
     QMutexLocker lock(&m_mutex);
-    if (m_connections[remoteGuid].incomeConn)
-        m_connectionsToRemove << m_connections[remoteGuid].incomeConn;
-    m_connections[remoteGuid].incomeConn.reset(transport);
+    if (m_connections[removeGuid].incomeConn)
+        m_connectionsToRemove << m_connections[removeGuid].incomeConn;
+    m_connections[removeGuid].incomeConn.reset(transport);
 }
 
 void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient)

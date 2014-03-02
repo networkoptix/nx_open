@@ -48,6 +48,8 @@ public:
     void setReadSync(bool value)  {m_readSync = value;}
     bool isWriteSync() const      { return m_writeSync; }
     void setWriteSync(bool value) { m_writeSync = value; }
+    void setTimeDiff(qint64 diff) { m_timeDiff = diff; }
+    qint64 timeDiff() const       { return m_timeDiff; }
 
     // This is multi thread getters/setters
     void setState(State state);
@@ -72,6 +74,7 @@ private:
     quint32 m_chunkLen;
     int m_sendOffset;
     QQueue<QByteArray> m_dataToSend;
+    qint64 m_timeDiff;
 private:
     void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
     void closeSocket();

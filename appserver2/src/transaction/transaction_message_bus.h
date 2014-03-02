@@ -25,7 +25,7 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url, bool isClient);
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QUrlQuery& params);
+        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& removeGuid, qint64 timediff);
         
         template <class T>
         void setHandler(T* handler) { 
@@ -104,7 +104,7 @@ signals:
         void processConnState(QSharedPointer<QnTransactionTransport> &transport);
         QSharedPointer<QnTransactionTransport> getSibling(QSharedPointer<QnTransactionTransport> transport);
         bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
-        void onGotTransactionSyncResponse(QnTransactionTransport* sender);
+        void onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
         void queueSyncRequest(QSharedPointer<QnTransactionTransport> transport);
 
         void connectToPeerEstablished(const QnId& id);
@@ -129,6 +129,7 @@ signals:
         // alive control
         QElapsedTimer m_aliveSendTimer;
         QMap<QUuid, qint64> m_lastActivity;
+        //QMap<QUuid, qint64> m_peerTimeDiff;
     };
 }
 

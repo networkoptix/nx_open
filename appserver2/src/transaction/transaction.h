@@ -134,7 +134,7 @@ namespace ec2
         ApiCommand::Value command;
         ID id;
         bool persistent;
-        qint32 timestamp;
+        qint64 timestamp;
         
         // this field doesn't serializable and uses local only.
         QUuid originGuid; 

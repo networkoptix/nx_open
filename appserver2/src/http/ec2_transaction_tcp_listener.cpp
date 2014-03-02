@@ -44,12 +44,27 @@ void QnTransactionTcpProcessor::run()
             return;
     }
     parseRequest();
-    d->chunkedMode = true;
-    d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
-    sendResponse("HTTP", CODE_OK, "application/octet-stream");
 
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
-    QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, query);
+    bool isClient = query.hasQueryItem("isClient");
+    QUuid removeGuid  = query.queryItemValue(lit("guid"));
+    qint64 removeTime  = query.queryItemValue(lit("time")).toLongLong();
+    qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
+    qint64 timeDiff = removeTime - localTime;
+
+    d->chunkedMode = true;
+    d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
+
+    if (removeGuid.isNull()) {
+        qWarning() << "Invalid incoming request. GUID must be filled!";
+        sendResponse("HTTP", CODE_INVALID_PARAMETER, "application/octet-stream");
+        return;
+    }
+
+    sendResponse("HTTP", CODE_OK, "application/octet-stream");
+
+    QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, isClient, removeGuid, timeDiff);
     d->socket.clear();
 }
 

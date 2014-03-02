@@ -116,7 +116,7 @@ namespace ec2
         persistent = _persistent;
         id.peerGUID = qnCommon->moduleGUID();
         id.sequence = 0;
-        timestamp = qnSyncTime->currentMSecsSinceEpoch()/1000;
+        timestamp = QnTransactionLog::instance()->getRelativeTime();
         localTransaction = false;
     }
 

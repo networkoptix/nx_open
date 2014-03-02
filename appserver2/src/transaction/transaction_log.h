@@ -60,6 +60,8 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
+        qint64 getRelativeTime() const;
+
     private:
         bool contains(const QnAbstractTransaction& tran, const QUuid& hash);
         QUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
@@ -113,7 +115,12 @@ namespace ec2
     private:
         QnDbManager* m_dbManager;
         QnTranState m_state;
-        QMap<QUuid, qint32> m_updateHistory;
+        //QMap<QUuid, QnAbstractTransaction> m_updateHistory;
+        QMap<QUuid, qint64> m_updateHistory;
+        
+        mutable QMutex m_timeMutex;
+        QElapsedTimer m_relativeTimer;
+        qint64 m_relativeOffset;
     };
 };
 
