@@ -63,20 +63,7 @@ void QnTransactionTcpProcessor::run()
     d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
 
     // 1-st stage
-
-    bool isConnExist;
-    bool isConnConnecting;
-
-    /*
-    QnTransactionTransport::lock();
-    QnTransactionTransport::getPeerInfo(removeGuid, &isConnExist, &isConnConnecting);
-    bool fail = isConnExist || (isConnConnecting && removeGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
-    if (!fail)
-        QnTransactionTransport::connectInProgress(removeGuid);
-    QnTransactionTransport::unlock();
-    */
     bool lockOK = QnTransactionTransport::tryAcquire(removeGuid);
-
     sendResponse("HTTP", lockOK ? CODE_OK : CODE_INVALID_PARAMETER , "application/octet-stream");
     if (!lockOK)
         return;

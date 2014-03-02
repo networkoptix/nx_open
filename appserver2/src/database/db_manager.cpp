@@ -86,7 +86,7 @@ QnDbManager::QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* cons
         queryCameras.bindValue(0, QnResource::Offline);
         queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
         queryServers.bindValue(2, m_cameraTypeId.toRfc4122());
-        Q_ASSERT(queryServers.exec());
+        Q_ASSERT(queryCameras.exec());
 
 	}
 	else {

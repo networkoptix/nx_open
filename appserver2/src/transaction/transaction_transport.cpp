@@ -275,48 +275,31 @@ void QnTransactionTransport::connectDone(const QnId& id)
 
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
 {
-    nx_http::HttpHeaders::const_iterator itr = client->response()->headers.find("guid");
-    nx_http::HttpHeaders::const_iterator itr2 = client->response()->headers.find("time");
-    if (itr != client->response()->headers.end() || itr2 != client->response()->headers.end())
+    nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
+    nx_http::HttpHeaders::const_iterator itrTime = client->response()->headers.find("time");
+    if (itrGuid != client->response()->headers.end() || itrTime != client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
     {
         if (getState() == ConnectingStage2)
             QnTransactionTransport::connectCanceled(m_removeGuid);
         setState(State::Error);
         return;
     }
-
-    if (client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
-    {
-        if (getState() == ConnectingStage2)
-            QnTransactionTransport::connectCanceled(m_removeGuid);
-        setState(State::Error);
-        return;
-    }
-
-    QMutexLocker lock(&m_mutex);
-    m_removeGuid = itr->second;
-    qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
-    qint64 removeTime = itr->second.toLongLong();
-    setTimeDiff(localTime - removeTime);
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
 
     if (getState() == ConnectingStage1) {
-        bool isConnExist;
-        bool isConnConnecting;
-        {
-            QMutexLocker lock(&m_staticMutex);
-            //getPeerInfo(m_removeGuid, &isConnExist, &isConnConnecting);
-            //bool fail = isConnExist || (isConnConnecting && m_removeGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
-            bool lockOK = QnTransactionTransport::tryAcquire(m_removeGuid);
-            if (lockOK) {
-                setState(ConnectingStage2);
-            }
-            else {
-                QUrlQuery query = QUrlQuery(m_remoteAddr);
-                query.addQueryItem("canceled", QString());
-                m_remoteAddr.setQuery(query);
-            }
+        bool lockOK = QnTransactionTransport::tryAcquire(m_removeGuid);
+        if (lockOK) {
+            m_removeGuid = itrGuid->second;
+            qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
+            qint64 removeTime = itrTime->second.toLongLong();
+            setTimeDiff(localTime - removeTime);
+            setState(ConnectingStage2);
+        }
+        else {
+            QUrlQuery query = QUrlQuery(m_remoteAddr);
+            query.addQueryItem("canceled", QString());
+            m_remoteAddr.setQuery(query);
         }
         m_httpClient->doGet(m_remoteAddr);
     }
