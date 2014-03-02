@@ -330,8 +330,6 @@ namespace QnBinary {
         QnBinary::serialize((qint32) field.size(), binStream);
         using namespace std::placeholders;
         std::for_each( field.begin(), field.end(), [binStream](const T2& val){ QnBinary::serialize(val, binStream); } );
-        for( const T2& val: field )
-            QnBinary::serialize(val, binStream);
     }
 
     template <class T, class T2>
@@ -340,8 +338,6 @@ namespace QnBinary {
         QnBinary::serialize((qint32) field.size(), binStream);
         using namespace std::placeholders;
         std::for_each( field.begin(), field.end(), [binStream](const T2& val){ QnBinary::serialize(val, binStream); } );
-        for( const T2& val: field )
-            QnBinary::serialize(val, binStream);
     }
 
     template <class T, class T2, class T3>
