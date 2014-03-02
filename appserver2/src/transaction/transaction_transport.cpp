@@ -278,10 +278,18 @@ void QnTransactionTransport::connectDone(const QnId& id)
     m_existConn.remove(id);
 }
 
+void QnTransactionTransport::repeatDoGet()
+{
+    m_httpClient->doGet(m_remoteAddr);
+}
+
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
 {
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
     nx_http::HttpHeaders::const_iterator itrTime = client->response()->headers.find("time");
+
+    bool ok1 = itrGuid != client->response()->headers.end();
+    bool ok2 = itrGuid != client->response()->headers.end();
 
     if (itrGuid == client->response()->headers.end() || itrTime == client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
     {
@@ -309,7 +317,7 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
             query.addQueryItem("canceled", QString());
             m_remoteAddr.setQuery(query);
         }
-        m_httpClient->doGet(m_remoteAddr);
+        QTimer::singleShot(0, this, SLOT(repeatDoGet()));
     }
     else {
         m_socket = m_httpClient->takeSocket();

@@ -64,12 +64,6 @@ signals:
         bool isExists(const QnId& removeGuid) const;
         bool isConnecting(const QnId& removeGuid) const;
 
-        template <class T>
-        static void serializeTransaction(QByteArray& buffer, const QnTransaction<T>& tran) 
-        {
-
-        }
-
         class AbstractHandler
         {
         public:

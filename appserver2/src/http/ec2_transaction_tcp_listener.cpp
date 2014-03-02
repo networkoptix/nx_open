@@ -68,28 +68,28 @@ void QnTransactionTcpProcessor::run()
     if (!lockOK)
         return;
 
-    //if (!isClient) 
-    {
-        // 2-nd stage
-        if (!readRequest()) {
-            QnTransactionTransport::connectCanceled(removeGuid);
-            return;
-        }
-        parseRequest();
-
-        query = QUrlQuery(d->request.requestLine.url.query());
-        bool fail = query.hasQueryItem("canceled");
-        d->chunkedMode = true;
-        sendResponse("HTTP", fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
-        if (fail) {
-            QnTransactionTransport::connectCanceled(removeGuid);
-            return;
-        }
+    // 2-nd stage
+    if (!readRequest()) {
+        QnTransactionTransport::connectCanceled(removeGuid);
+        return;
     }
+    parseRequest();
 
-    QnTransactionTransport::connectEstablished(removeGuid);
-    QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, isClient, removeGuid, timeDiff);
-    d->socket.clear();
+    query = QUrlQuery(d->request.requestLine.url.query());
+    bool fail = query.hasQueryItem("canceled");
+    d->chunkedMode = true;
+    d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
+    sendResponse("HTTP", fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
+    if (fail) {
+        QnTransactionTransport::connectCanceled(removeGuid);
+    }
+    else {
+        QnTransactionTransport::connectEstablished(removeGuid);
+        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, isClient, removeGuid, timeDiff);
+        d->socket.clear();
+    }
 }
+
 
 }

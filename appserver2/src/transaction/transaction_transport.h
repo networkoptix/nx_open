@@ -97,6 +97,7 @@ private:
 private slots:
     void at_responseReceived( nx_http::AsyncHttpClientPtr );
     void at_httpClientDone(nx_http::AsyncHttpClientPtr);
+    void repeatDoGet();
 };
 typedef QSharedPointer<QnTransactionTransport> QnTransactionTransportPtr;
 

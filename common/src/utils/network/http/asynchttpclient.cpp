@@ -442,37 +442,44 @@ namespace nx_http
 
     bool AsyncHttpClient::initiateHttpMessageDelivery( const QUrl& url )
     {
+        m_httpStreamReader.resetState();
+
         if( m_socket )
         {
+            m_state = sSendingRequest;
+            serializeRequest();
+            /*
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
             m_socket.clear();
+            */
         }
-        m_state = sInit;
+        else {
+            m_state = sInit;
 
-        m_httpStreamReader.resetState();
 
-        m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket() );
-        if( !m_socket->setNonBlockingMode( true ) ||
-            !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) )
-        {
-            NX_LOG( lit("Failed to put socket to non blocking mode. %1").
-                arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-            m_socket.clear();
-            return false;
+            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket() );
+            if( !m_socket->setNonBlockingMode( true ) ||
+                !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) )
+            {
+                NX_LOG( lit("Failed to put socket to non blocking mode. %1").
+                    arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+                m_socket.clear();
+                return false;
+            }
+
+            //starting async connect
+            if( !m_socket->connect( url.host(), url.port(DEFAULT_HTTP_PORT), 0 ) )
+            {
+                NX_LOG( lit("Failed to perform async connect to %1:%2. %3").
+                    arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+                m_socket.clear();
+                return false;
+            }
+
+            m_url = url;
+            m_state = sWaitingConnectToHost;
         }
-
-        //starting async connect
-        if( !m_socket->connect( url.host(), url.port(DEFAULT_HTTP_PORT), 0 ) )
-        {
-            NX_LOG( lit("Failed to perform async connect to %1:%2. %3").
-                arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-            m_socket.clear();
-            return false;
-        }
-
-        m_url = url;
-        m_state = sWaitingConnectToHost;
 
         //connect is done if socket is available for write
         if( !aio::AIOService::instance()->watchSocket( m_socket, PollSet::etWrite, this ) )

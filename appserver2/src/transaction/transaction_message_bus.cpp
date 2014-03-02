@@ -192,7 +192,7 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
             QnTransaction<int> tran(ApiCommand::tranSyncResponse, false);
             tran.params = 0;
             QByteArray chunkData;
-            serializeTransaction(chunkData, tran);
+            m_serializer.serialize(chunkData, tran);
             sender->addData(chunkData);
 
             foreach(const QByteArray& serializedTran, transactions) {
@@ -298,7 +298,7 @@ void QnTransactionMessageBus::queueSyncRequest(QSharedPointer<QnTransactionTrans
     requestTran.params = transactionLog->getTransactionsState();
     
     QByteArray syncRequest;
-    QnTransactionMessageBus::serializeTransaction(syncRequest, requestTran);
+    m_serializer.serialize(syncRequest, requestTran);
     transport->addData(syncRequest);
 }
 
@@ -372,6 +372,7 @@ void QnTransactionMessageBus::at_timer()
         bool isClient = itr.value();
         if (!isPeerUsing(url)) {
             QnTransactionTransportPtr transport(new QnTransactionTransport(true, isClient));
+            connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
             transport->doOutgoingConnect(url);
             m_connectingConnections << transport;
         }
@@ -427,11 +428,11 @@ void QnTransactionMessageBus::at_timer()
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& removeGuid, qint64 timediff)
 {
-    QnTransaction<ApiFullData> data;
+    QnTransaction<ApiFullData> tran;
     if (isClient) 
     {
-        data.command = ApiCommand::getAllDataList;
-        const ErrorCode errorCode = dbManager->doQuery(nullptr, data.params);
+        tran.command = ApiCommand::getAllDataList;
+        const ErrorCode errorCode = dbManager->doQuery(nullptr, tran.params);
         if (errorCode != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";
             return;
@@ -448,7 +449,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     {
         transport->setWriteSync(true);
         QByteArray buffer;
-        serializeTransaction(buffer, data);
+        m_serializer.serialize(buffer, tran);
         transport->addData(buffer);
     }
     

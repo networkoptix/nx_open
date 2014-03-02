@@ -10,7 +10,7 @@ namespace ec2
 
     }
 
-    ProcessedPeers QnTransactionTransportSerializer::updateOpaque(const ProcessedPeers& opaque)
+    ProcessedPeers QnTransactionTransportSerializer::updatePeers(const ProcessedPeers& opaque)
     {
         ProcessedPeers result = opaque;
         result << qnCommon->moduleGUID();
