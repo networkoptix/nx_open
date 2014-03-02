@@ -83,6 +83,11 @@ void QnTransactionTransport::closeSocket()
 void QnTransactionTransport::setState(State state)
 {
     QMutexLocker lock(&m_mutex);
+    setStateNoLock(state);
+}
+
+void QnTransactionTransport::setStateNoLock(State state)
+{
     if (state == Connected) {
         m_connected = true;
     }
@@ -177,7 +182,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                     if(sended == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock) {
                         m_sendOffset = 0;
                         aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite, this );
-                        setState(State::Error);
+                        setStateNoLock(State::Error);
                     }
                     return; // can't send any more
                 }
@@ -277,7 +282,8 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
 {
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
     nx_http::HttpHeaders::const_iterator itrTime = client->response()->headers.find("time");
-    if (itrGuid != client->response()->headers.end() || itrTime != client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+
+    if (itrGuid == client->response()->headers.end() || itrTime == client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
     {
         if (getState() == ConnectingStage2)
             QnTransactionTransport::connectCanceled(m_removeGuid);
@@ -291,9 +297,11 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
         bool lockOK = QnTransactionTransport::tryAcquire(m_removeGuid);
         if (lockOK) {
             m_removeGuid = itrGuid->second;
-            qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
-            qint64 removeTime = itrTime->second.toLongLong();
-            setTimeDiff(localTime - removeTime);
+            if (QnTransactionLog::instance()) {
+                qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
+                qint64 removeTime = itrTime->second.toLongLong();
+                setTimeDiff(localTime - removeTime);
+            }
             setState(ConnectingStage2);
         }
         else {
