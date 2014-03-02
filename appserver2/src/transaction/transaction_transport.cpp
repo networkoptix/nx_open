@@ -224,18 +224,35 @@ void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr clien
         setState(State::Error);
 }
 
+/*
 void QnTransactionTransport::getPeerInfo(const QnId& id, bool* isExist, bool* isConnecting)
 {
-    QMutexLocker lock(&m_staticMutex);
+    //QMutexLocker lock(&m_staticMutex);
     *isExist = m_existConn.contains(id);
     *isConnecting = m_connectingConn.contains(id);
 }
+
+
 
 void QnTransactionTransport::connectInProgress(const QnId& id)
 {
     QMutexLocker lock(&m_staticMutex);
     m_connectingConn << id;
 }
+*/
+
+bool QnTransactionTransport::tryAcquire(const QnId& removeGuid)
+{
+    QMutexLocker lock(&m_staticMutex);
+
+    bool isExist = m_existConn.contains(removeGuid);
+    bool isConnecting = m_connectingConn.contains(removeGuid);
+    bool fail = isExist || (isConnecting && removeGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
+    if (!fail)
+        m_connectingConn << removeGuid;
+    return !fail;
+}
+
 
 void QnTransactionTransport::connectCanceled(const QnId& id)
 {
@@ -287,16 +304,19 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     if (getState() == ConnectingStage1) {
         bool isConnExist;
         bool isConnConnecting;
-        getPeerInfo(m_removeGuid, &isConnExist, &isConnConnecting);
-        bool fail = isConnExist || (isConnConnecting && m_removeGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
-        if (fail) {
-            QUrlQuery query = QUrlQuery(m_remoteAddr);
-            query.addQueryItem("canceled", QString());
-            m_remoteAddr.setQuery(query);
-        }
-        else {
-            QnTransactionTransport::connectInProgress(m_removeGuid);
-            setState(ConnectingStage2);
+        {
+            QMutexLocker lock(&m_staticMutex);
+            //getPeerInfo(m_removeGuid, &isConnExist, &isConnConnecting);
+            //bool fail = isConnExist || (isConnConnecting && m_removeGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
+            bool lockOK = QnTransactionTransport::tryAcquire(m_removeGuid);
+            if (lockOK) {
+                setState(ConnectingStage2);
+            }
+            else {
+                QUrlQuery query = QUrlQuery(m_remoteAddr);
+                query.addQueryItem("canceled", QString());
+                m_remoteAddr.setQuery(query);
+            }
         }
         m_httpClient->doGet(m_remoteAddr);
     }

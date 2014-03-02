@@ -56,8 +56,7 @@ public:
     void setState(State state);
     State getState() const;
 
-    static void getPeerInfo(const QnId& id, bool* isExist, bool* isConnecting);
-    static void connectInProgress(const QnId& id);
+    static bool tryAcquire(const QnId& removeGuid);
     static void connectCanceled(const QnId& id);
     static void connectEstablished(const QnId& id);
     static void connectDone(const QnId& id);

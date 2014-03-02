@@ -66,13 +66,19 @@ void QnTransactionTcpProcessor::run()
 
     bool isConnExist;
     bool isConnConnecting;
+
+    /*
+    QnTransactionTransport::lock();
     QnTransactionTransport::getPeerInfo(removeGuid, &isConnExist, &isConnConnecting);
-    
     bool fail = isConnExist || (isConnConnecting && removeGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
     if (!fail)
         QnTransactionTransport::connectInProgress(removeGuid);
-    sendResponse("HTTP", fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
-    if (fail)
+    QnTransactionTransport::unlock();
+    */
+    bool lockOK = QnTransactionTransport::tryAcquire(removeGuid);
+
+    sendResponse("HTTP", lockOK ? CODE_OK : CODE_INVALID_PARAMETER , "application/octet-stream");
+    if (!lockOK)
         return;
 
     // 2-nd stage
@@ -84,8 +90,10 @@ void QnTransactionTcpProcessor::run()
 
     query = QUrlQuery(d->request.requestLine.url.query());
     bool isCanceled = query.hasQueryItem("canceled");
-    QnTransactionTransport::getPeerInfo(removeGuid, &isConnExist, &isConnConnecting);
-    fail = isCanceled || isConnExist || (isConnConnecting && removeGuid > qnCommon->moduleGUID());
+    //QnTransactionTransport::getPeerInfo(removeGuid, &isConnExist, &isConnConnecting);
+    //fail = isCanceled || isConnExist || (isConnConnecting && removeGuid > qnCommon->moduleGUID());
+    bool fail = query.hasQueryItem("canceled");
+
     sendResponse("HTTP", fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
     if (fail) {
         QnTransactionTransport::connectCanceled(removeGuid);
