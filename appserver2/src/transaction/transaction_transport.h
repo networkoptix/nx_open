@@ -18,8 +18,8 @@ class QnTransactionTransport: public QObject, public aio::AIOEventHandler
 public:
     enum State {
         NotDefined,
-        Connect,
-        Connecting,
+        ConnectingStage1,
+        ConnectingStage2,
         Connected,
         NeedStartStreaming,
         ReadyForStreaming,
@@ -50,10 +50,17 @@ public:
     void setWriteSync(bool value) { m_writeSync = value; }
     void setTimeDiff(qint64 diff) { m_timeDiff = diff; }
     qint64 timeDiff() const       { return m_timeDiff; }
+    QUrl remoteAddr() const       { return m_remoteAddr; }
 
     // This is multi thread getters/setters
     void setState(State state);
     State getState() const;
+
+    static void getPeerInfo(const QnId& id, bool* isExist, bool* isConnecting);
+    static void connectInProgress(const QnId& id);
+    static void connectCanceled(const QnId& id);
+    static void connectEstablished(const QnId& id);
+    static void connectDone(const QnId& id);
 private:
     qint64 m_lastConnectTime;
 
@@ -75,6 +82,12 @@ private:
     int m_sendOffset;
     QQueue<QByteArray> m_dataToSend;
     qint64 m_timeDiff;
+    QUrl m_remoteAddr;
+    bool m_connected;
+
+    static QSet<QUuid> m_existConn;
+    static QSet<QUuid> m_connectingConn;
+    static QMutex m_staticMutex;
 private:
     void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
     void closeSocket();
@@ -85,6 +98,7 @@ private slots:
     void at_responseReceived( nx_http::AsyncHttpClientPtr );
     void at_httpClientDone(nx_http::AsyncHttpClientPtr);
 };
+typedef QSharedPointer<QnTransactionTransport> QnTransactionTransportPtr;
 
 }
 

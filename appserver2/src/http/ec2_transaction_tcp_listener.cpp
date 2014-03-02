@@ -4,6 +4,7 @@
 #include "nx_ec/data/ec2_full_data.h"
 #include "database/db_manager.h"
 #include "common/common_module.h"
+#include "transaction/transaction_transport.h"
 
 namespace ec2
 {
@@ -52,19 +53,47 @@ void QnTransactionTcpProcessor::run()
     qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
     qint64 timeDiff = removeTime - localTime;
 
-    d->chunkedMode = true;
-    d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
-
     if (removeGuid.isNull()) {
         qWarning() << "Invalid incoming request. GUID must be filled!";
         sendResponse("HTTP", CODE_INVALID_PARAMETER, "application/octet-stream");
         return;
     }
 
-    sendResponse("HTTP", CODE_OK, "application/octet-stream");
+    d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
 
+    // 1-st stage
+
+    bool isConnExist;
+    bool isConnConnecting;
+    QnTransactionTransport::getPeerInfo(removeGuid, &isConnExist, &isConnConnecting);
+    
+    bool fail = isConnExist || (isConnConnecting && removeGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
+    if (!fail)
+        QnTransactionTransport::connectInProgress(removeGuid);
+    sendResponse("HTTP", fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
+    if (fail)
+        return;
+
+    // 2-nd stage
+    if (!readRequest()) {
+        QnTransactionTransport::connectCanceled(removeGuid);
+        return;
+    }
+    parseRequest();
+
+    query = QUrlQuery(d->request.requestLine.url.query());
+    bool isCanceled = query.hasQueryItem("canceled");
+    QnTransactionTransport::getPeerInfo(removeGuid, &isConnExist, &isConnConnecting);
+    fail = isCanceled || isConnExist || (isConnConnecting && removeGuid > qnCommon->moduleGUID());
+    sendResponse("HTTP", fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
+    if (fail) {
+        QnTransactionTransport::connectCanceled(removeGuid);
+        return;
+    }
+    QnTransactionTransport::connectEstablished(removeGuid);
     QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, isClient, removeGuid, timeDiff);
+    d->chunkedMode = true;
     d->socket.clear();
 }
 
