@@ -68,7 +68,12 @@ private slots:
     void at_statisticsReceived(int status, const QnStatisticsReply &reply, int handle);
 
 private:
-    bool m_alreadyUpdating;
+    /** Number of update requests. Increased with every update period. */
+    int m_updateRequests;
+
+    /** Handle of the current update request. */
+    int m_updateRequestHandle;
+
     qint64 m_lastId;
     qint64 m_timeStamp;
     uint m_listeners;
