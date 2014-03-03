@@ -50,7 +50,7 @@ bool QnTimePeriod::contains(const QnTimePeriod &timePeriod) const
 
 bool QnTimePeriod::contains(qint64 timeMs) const
 {
-    return qBetween(timeMs, startTimeMs, durationMs != -1 ? startTimeMs + durationMs : DATETIME_NOW);
+    return qBetween(startTimeMs, timeMs, durationMs != -1 ? startTimeMs + durationMs : DATETIME_NOW);
 }
 
 void QnTimePeriod::addPeriod(const QnTimePeriod &timePeriod)
