@@ -45,34 +45,31 @@ win* {
 }  
     
 isEmpty(BUILDLIB) {
-DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
+  DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
 } else {
-  plugin {
-    win* {
-      contains(BUILDLIB,staticlib) {
-        DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION/plugins
-      }
-      else {
-        DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION/plugins
-      }
+    contains(BUILDLIB,staticlib) {
+      DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION/plugins
     }
     else {
-      DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
+      contains (LIBTYPE,plugin) {
+        DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION/plugins
+      }
+      else {
+        win* {
+          DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
+        }
+        else {
+          DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
+        }
+      }
     }
-  }
-  else {
-    DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
-  }
-}  
+}
 
 OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib 
-!win* {
-  LIBS += -Wl,-rpath $$OUTPUT_PATH/lib/$$CONFIGURATION
-}
 LIBS += ${global.libs}
 
 INCLUDEPATH +=  ${qt.dir}/include \
