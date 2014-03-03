@@ -327,7 +327,6 @@ void QnTransactionMessageBus::processConnState(QnTransactionTransportPtr transpo
     {
     case QnTransactionTransport::Error: 
         transport->close();
-        connectToPeerLost(transport->remoteGuid());
         break;
     case QnTransactionTransport::Connected:
         transport->setState(QnTransactionTransport::ReadyForStreaming);
@@ -400,6 +399,7 @@ void QnTransactionMessageBus::at_timer()
     {
         QnTransactionTransportPtr transport = itr.value();
         if (transport->getState() == QnTransactionTransport::Closed) {
+            connectToPeerLost(transport->remoteGuid());
             itr = m_connections.erase(itr);
         }
         else {
