@@ -18,10 +18,10 @@ public:
     /**
      * Constructor
      *
-     * \param apiConnection     Api connection of the server that will provide the statistics.
-     * \param parent            Parent of the object
+     * \param server            Server resource to use.
+     * \param parent            Parent object.
      */
-    QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, int pointsLimit, QObject *parent);
+    QnMediaServerStatisticsStorage(const QnMediaServerResourcePtr &server, int pointsLimit, QObject *parent);
 
     /**
      *  Register the consumer object.
@@ -41,16 +41,18 @@ public:
     QnStatisticsHistory history() const;
     qint64 historyId() const;
 
-    /** Data update period. Is taken from the server's response. */
+    /** 
+     * \returns                 Data update period. Is taken from the server's response. 
+     */
     int updatePeriod() const;
 
-    /** Filter statistics items of some deviceType by flags (ignore all replies that do not contain flags provided). */
     void setFlagsFilter(QnStatisticsDeviceType deviceType, int flags);
 
     qint64 uptimeMs() const;
+
 signals:
     /**
-     * Signal emitted when new data is received.
+     * This signal is emitted when new data is received.
      */
     void statisticsChanged();
 
@@ -66,7 +68,12 @@ private slots:
     void at_statisticsReceived(int status, const QnStatisticsReply &reply, int handle);
 
 private:
-    bool m_alreadyUpdating;
+    /** Number of update requests. Increased with every update period. */
+    int m_updateRequests;
+
+    /** Handle of the current update request. */
+    int m_updateRequestHandle;
+
     qint64 m_lastId;
     qint64 m_timeStamp;
     uint m_listeners;
@@ -74,9 +81,9 @@ private:
     int m_updatePeriod;
     qint64 m_uptimeMs;
 
+    QnMediaServerResourcePtr m_server;
     QnStatisticsHistory m_history;
-    QnMediaServerConnectionPtr m_apiConnection;
-    QTimer* m_timer;
+    QTimer *m_timer;
     QHash<QnStatisticsDeviceType, int> m_flagsFilter;
 };
 

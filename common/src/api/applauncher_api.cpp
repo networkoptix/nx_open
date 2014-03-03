@@ -124,7 +124,8 @@ namespace applauncher
         ////////////////////////////////////////////////////////////
         StartApplicationTask::StartApplicationTask()
         :
-            BaseTask( TaskType::startApplication )
+            BaseTask( TaskType::startApplication ),
+            autoRestore( false )
         {
         }
 
@@ -134,7 +135,8 @@ namespace applauncher
         :
             BaseTask( TaskType::startApplication ),
             version( _version ),
-            appArgs( _appParams )
+            appArgs( _appParams ),
+            autoRestore( false )
         {
         }
 
@@ -144,13 +146,16 @@ namespace applauncher
         :
             BaseTask( TaskType::startApplication ),
             version( _version ),
-            appArgs( _appParams.join(QLatin1String(" ")) )
+            appArgs( _appParams.join(QLatin1String(" ")) ),
+            autoRestore( false )
         {
         }
 
         QByteArray StartApplicationTask::serialize() const
         {
-            return lit("%1\n%2\n%3\n\n").arg(QLatin1String(TaskType::toString(type))).arg(version).arg(appArgs).toLatin1();
+            return lit("%1\n%2\n%3\n%4\n\n").arg(QLatin1String(TaskType::toString(type))).
+                arg(version).arg(appArgs).
+                arg(autoRestore ? QLatin1String("true") : QLatin1String("false")).toLatin1();
         }
 
         bool StartApplicationTask::deserialize( const QnByteArrayConstRef& data )
@@ -162,6 +167,8 @@ namespace applauncher
                 return false;
             version = QLatin1String(lines[1].toByteArrayWithRawData());
             appArgs = QLatin1String(lines[2].toByteArrayWithRawData());
+            if( lines.size() > 3 )
+                autoRestore = lines[3].toByteArrayWithRawData() == "true";
 
             return true;
         }
@@ -170,10 +177,22 @@ namespace applauncher
         ////////////////////////////////////////////////////////////
         //// class StartInstallationTask
         ////////////////////////////////////////////////////////////
+        static const QLatin1String DEFAULT_MODULE_NAME( "client" );
+
         StartInstallationTask::StartInstallationTask()
         :
             BaseTask( TaskType::install ),
-            module( QLatin1String("client") )
+            module( DEFAULT_MODULE_NAME ),
+            autoStart( false )
+        {
+        }
+
+        StartInstallationTask::StartInstallationTask( const QString& _version, bool _autoStart )
+        :
+            BaseTask( TaskType::install ),
+            version( _version ),
+            module( DEFAULT_MODULE_NAME ),
+            autoStart( _autoStart )
         {
         }
 
@@ -354,6 +373,13 @@ namespace applauncher
         :
             BaseTask( TaskType::getInstallationStatus ),
             installationID( 0 )
+        {
+        }
+
+        GetInstallationStatusRequest::GetInstallationStatusRequest( unsigned int _installationID )
+        :
+            BaseTask( TaskType::getInstallationStatus ),
+            installationID( _installationID )
         {
         }
 

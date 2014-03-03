@@ -16,7 +16,7 @@ QnMediaServerStatisticsManager::QnMediaServerStatisticsManager(QObject *parent):
 void QnMediaServerStatisticsManager::registerConsumer(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot){
     QString id = resource->getGuid();
     if (!m_statistics.contains(id)) {
-        m_statistics[id] = new QnMediaServerStatisticsStorage(resource->apiConnection(), pointsLimit(), this);
+        m_statistics[id] = new QnMediaServerStatisticsStorage(resource, pointsLimit(), this);
         foreach (QnStatisticsDeviceType key, m_flagsFilter.keys())
             m_statistics[id]->setFlagsFilter(key, m_flagsFilter[key]);
     }

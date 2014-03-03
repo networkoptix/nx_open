@@ -118,26 +118,15 @@ void QnBusinessRulesDialog::setFilter(const QString &filter) {
     ui->filterLineEdit->setText(filter);
 }
 
-void QnBusinessRulesDialog::accept()
-{
-    if (!saveAll())
-        return;
-
-    base_type::accept();
-}
-
-void QnBusinessRulesDialog::reject() {
-
+bool QnBusinessRulesDialog::canClose() {
     bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
     bool loaded = m_rulesViewModel->isLoaded();
     bool hasChanges = hasRights && loaded && (
                 !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
                 ); //TODO: #GDM calculate once and use anywhere
-    if (!hasChanges) {
-        base_type::reject();
-        return;
-    }
+    if (!hasChanges)
+        return true;
 
     QMessageBox::StandardButton btn =  QMessageBox::question(this,
                       tr("Confirm exit"),
@@ -148,14 +137,30 @@ void QnBusinessRulesDialog::reject() {
     switch (btn) {
     case QMessageBox::Yes:
         if (!saveAll())
-            return;
+            return false;   // Cancel was pressed in the confirmation dialog
         break;
     case QMessageBox::No:
         m_rulesViewModel->reloadData();
         break;
     default:
-        return;
+        return false;   // Cancel was pressed
     }
+
+    return true;
+}
+
+void QnBusinessRulesDialog::accept()
+{
+    if (!saveAll())
+        return;
+
+    base_type::accept();
+}
+
+void QnBusinessRulesDialog::reject() {
+    if (!canClose())
+        return;
+
     base_type::reject();
 }
 

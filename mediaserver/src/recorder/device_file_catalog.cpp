@@ -57,7 +57,7 @@ bool DeviceFileCatalog::Chunk::containsTime(qint64 timeMs) const
     if (startTimeMs == -1)
         return false;
     else 
-        return qBetween(timeMs, startTimeMs, endTimeMs());
+        return qBetween(startTimeMs, timeMs, endTimeMs());
 }
 
 void DeviceFileCatalog::Chunk::truncate(qint64 timeMs)

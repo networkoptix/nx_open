@@ -68,13 +68,13 @@ QN_DEFINE_COMPOSITE_NAN_FUNCTIONS(QVector4D, qreal, QVector4D(nan, nan, nan, nan
 
 
 /**
- * \param value                         Value to check.
  * \param min                           Interval's left border.
+ * \param value                         Value to check.
  * \param max                           Interval's right border.
  * \returns                             Whether the given value lies in [min, max) interval.
  */
 template<class T>
-bool qBetween(const T &value, const T &min, const T &max) {
+bool qBetween(const T &min, const T &value, const T &max) {
     return min <= value && value < max;
 }
 

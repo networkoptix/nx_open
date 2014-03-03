@@ -492,7 +492,7 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Stop Panic Recording")).
         autoRepeat(false).
         shortcut(tr("Ctrl+P")).
-        icon(qnSkin->icon("titlebar/panic.png")).
+//        icon(qnSkin->icon("titlebar/panic.png")).
         //requiredPermissions(Qn::CurrentMediaServerResourcesRole, Qn::ReadWriteSavePermission).
         condition(new QnPanicActionCondition(this));
 
