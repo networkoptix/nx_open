@@ -68,7 +68,7 @@ void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 {
     QnCommonMessageProcessor::init(connection);
     connect( connection.get(), &ec2::AbstractECConnection::removePeerFound, this, &QnServerMessageProcessor::at_removePeerFound );
-    connect( connection.get(), &ec2::AbstractECConnection::removePeerFound, this, &QnServerMessageProcessor::at_removePeerLost );
+    connect( connection.get(), &ec2::AbstractECConnection::removePeerLost, this, &QnServerMessageProcessor::at_removePeerLost );
 }
 
 void QnServerMessageProcessor::at_removePeerFound(QnId id)
