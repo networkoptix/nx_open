@@ -3,13 +3,19 @@
 #include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
 #include "transaction_log.h"
+#include "transaction_transport_serializer.h"
+#include "common/common_module.h"
 
 namespace ec2
 {
 
 static const int SOCKET_TIMEOUT = 1000 * 1000;
 
-QnTransactionTransport::QnTransactionTransport(bool isOriginator, bool isClient, QSharedPointer<AbstractStreamSocket> socket, const QUuid& removeGuid):
+QSet<QUuid> QnTransactionTransport::m_existConn;
+QnTransactionTransport::ConnectingInfoMap QnTransactionTransport::m_connectingConn;
+QMutex QnTransactionTransport::m_staticMutex;
+
+QnTransactionTransport::QnTransactionTransport(bool isOriginator, bool isClient, QSharedPointer<AbstractStreamSocket> socket, const QUuid& remoteGuid):
     m_socket(socket),
     m_state(NotDefined), 
     m_lastConnectTime(0), 
@@ -21,7 +27,9 @@ QnTransactionTransport::QnTransactionTransport(bool isOriginator, bool isClient,
     m_isClientPeer(isClient),
     m_readSync(false), 
     m_writeSync(false),
-    m_removeGuid(removeGuid)
+    m_remoteGuid(remoteGuid),
+    m_timeDiff(0),
+    m_connected(false)
 {
 }
 
@@ -75,7 +83,20 @@ void QnTransactionTransport::closeSocket()
 void QnTransactionTransport::setState(State state)
 {
     QMutexLocker lock(&m_mutex);
-    if (state == ReadyForStreaming) {
+    setStateNoLock(state);
+}
+
+void QnTransactionTransport::setStateNoLock(State state)
+{
+    if (state == Connected) {
+        m_connected = true;
+    }
+    else if (state == Error) {
+        if (m_connected)
+            connectDone(m_remoteGuid);
+        m_connected = false;
+    }
+    else if (state == ReadyForStreaming) {
         m_socket->setRecvTimeout(SOCKET_TIMEOUT);
         m_socket->setSendTimeout(SOCKET_TIMEOUT);
         m_socket->setNonBlockingMode(true);
@@ -96,17 +117,14 @@ QnTransactionTransport::State QnTransactionTransport::getState() const
 
 void QnTransactionTransport::close()
 {
+    closeSocket();
     {
         QMutexLocker lock(&m_mutex);
-        closeSocket();
         m_readSync = false;
         m_writeSync = false;
         m_dataToSend.clear();
     }
-    if (m_originator) 
-        setState(State::Connect);
-    else
-        setState(State::Closed);
+    setState(State::Closed);
 }
 
 void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventType eventType ) throw()
@@ -135,10 +153,12 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                         m_chunkHeaderLen = getChunkHeaderEnd(rBuffer, m_readBufferLen, &m_chunkLen);
                     if (m_chunkHeaderLen) {
                         const int fullChunkLen = m_chunkHeaderLen + m_chunkLen + 2;
-                        if (m_readBufferLen == fullChunkLen) {
-                            QByteArray dataCopy;
-                            dataCopy.append((const char *) rBuffer + m_chunkHeaderLen, m_chunkLen);
-                            emit gotTransaction(dataCopy);
+                        if (m_readBufferLen == fullChunkLen) 
+                        {
+                            QSet<QnId> processedPeers;
+                            QByteArray serializedTran;
+                            QnTransactionTransportSerializer::deserialize(rBuffer + m_chunkHeaderLen, m_chunkLen, processedPeers, serializedTran);
+                            emit gotTransaction(serializedTran, processedPeers);
                             m_readBufferLen = m_chunkHeaderLen = 0;
                         }
                     }
@@ -162,7 +182,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                     if(sended == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock) {
                         m_sendOffset = 0;
                         aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite, this );
-                        setState(State::Error);
+                        setStateNoLock(State::Error);
                     }
                     return; // can't send any more
                 }
@@ -186,6 +206,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
 
 void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
 {
+    setState(ConnectingStage1);
     m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
@@ -197,8 +218,137 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
         setReadSync(true);
     }
     remoteAddr.setQuery(q);
-
+    m_remoteAddr = remoteAddr;
     m_httpClient->doGet(remoteAddr);
+}
+
+void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr client)
+{
+    nx_http::AsyncHttpClient::State state = client->state();
+    if (state == nx_http::AsyncHttpClient::sFailed)
+        setState(State::Error);
+}
+
+/*
+void QnTransactionTransport::getPeerInfo(const QnId& id, bool* isExist, bool* isConnecting)
+{
+    //QMutexLocker lock(&m_staticMutex);
+    *isExist = m_existConn.contains(id);
+    *isConnecting = m_connectingConn.contains(id);
+}
+
+
+
+void QnTransactionTransport::connectInProgress(const QnId& id)
+{
+    QMutexLocker lock(&m_staticMutex);
+    m_connectingConn << id;
+}
+*/
+
+bool QnTransactionTransport::tryAcquireConnecting(const QnId& remoteGuid, bool isOriginator)
+{
+    QMutexLocker lock(&m_staticMutex);
+
+    bool isExist = m_existConn.contains(remoteGuid);
+    bool isConnecting = m_connectingConn.contains(remoteGuid);
+    bool fail = isExist || (isConnecting && remoteGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122() == isOriginator);
+    if (!fail) {
+        if (isOriginator)
+            m_connectingConn[remoteGuid].first = true;
+        else
+            m_connectingConn[remoteGuid].second = true;
+    }
+    return !fail;
+}
+
+
+void QnTransactionTransport::connectingCanceled(const QnId& remoteGuid, bool isOriginator)
+{
+    QMutexLocker lock(&m_staticMutex);
+    ConnectingInfoMap::iterator itr = m_connectingConn.find(remoteGuid);
+    if (itr != m_connectingConn.end()) {
+        if (isOriginator)
+            itr.value().first = false;
+        else
+            itr.value().second = false;
+        if (!itr.value().first && !itr.value().second)
+            m_connectingConn.erase(itr);
+    }
+}
+
+bool QnTransactionTransport::tryAcquireConnected(const QnId& remoteGuid, bool isOriginator)
+{
+    QMutexLocker lock(&m_staticMutex);
+    bool isExist = m_existConn.contains(remoteGuid);
+    bool isConnecting = m_connectingConn.contains(remoteGuid);
+    bool fail = isExist || (isConnecting && remoteGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122() == isOriginator);
+    if (!fail) {
+        m_existConn << remoteGuid;
+        m_connectingConn.remove(remoteGuid);
+    }
+    return !fail;    
+}
+
+void QnTransactionTransport::connectDone(const QnId& id)
+{
+    QMutexLocker lock(&m_staticMutex);
+    m_existConn.remove(id);
+}
+
+void QnTransactionTransport::repeatDoGet()
+{
+    m_httpClient->doGet(m_remoteAddr);
+}
+
+void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
+{
+    nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
+    nx_http::HttpHeaders::const_iterator itrTime = client->response()->headers.find("time");
+
+    bool ok1 = itrGuid != client->response()->headers.end();
+    bool ok2 = itrGuid != client->response()->headers.end();
+
+    if (itrGuid == client->response()->headers.end() || itrTime == client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    {
+        if (getState() == ConnectingStage2)
+            QnTransactionTransport::connectingCanceled(m_remoteGuid, true);
+        setState(State::Error);
+        return;
+    }
+
+    QByteArray data = m_httpClient->fetchMessageBodyBuffer();
+
+    if (getState() == ConnectingStage1) {
+        bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remoteGuid, true);
+        if (lockOK) {
+            m_remoteGuid = itrGuid->second;
+            if (QnTransactionLog::instance()) {
+                qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
+                qint64 remoteTime = itrTime->second.toLongLong();
+                setTimeDiff(localTime - remoteTime);
+            }
+            setState(ConnectingStage2);
+        }
+        else {
+            QUrlQuery query = QUrlQuery(m_remoteAddr);
+            query.addQueryItem("canceled", QString());
+            m_remoteAddr.setQuery(query);
+        }
+        QTimer::singleShot(0, this, SLOT(repeatDoGet()));
+    }
+    else {
+        m_socket = m_httpClient->takeSocket();
+        m_httpClient.reset();
+        if (QnTransactionTransport::tryAcquireConnected(m_remoteGuid, true)) {
+            if (!data.isEmpty())
+                processTransactionData(data);
+            setState(QnTransactionTransport::Connected);
+        }
+        else {
+            setState(QnTransactionTransport::Error);
+        }
+    }
 }
 
 void QnTransactionTransport::processTransactionData( const QByteArray& data)
@@ -213,9 +363,11 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         int fullChunkLen = m_chunkHeaderLen + m_chunkLen + 2;
         if (bufferLen >= fullChunkLen)
         {
-            QByteArray dataCopy;
-            dataCopy.append(QByteArray::fromRawData((const char *) buffer + m_chunkHeaderLen, m_chunkLen));
-            emit gotTransaction(dataCopy);
+            QSet<QnId> processedPeers;
+            QByteArray serializedTran;
+            QnTransactionTransportSerializer::deserialize(buffer + m_chunkHeaderLen, m_chunkLen, processedPeers, serializedTran);
+            emit gotTransaction(serializedTran, processedPeers);
+
             buffer += fullChunkLen;
             bufferLen -= fullChunkLen;
         }
@@ -230,34 +382,6 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         memcpy(&m_readBuffer[0], buffer, bufferLen);
     }
     m_readBufferLen = bufferLen;
-}
-
-void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr client)
-{
-    nx_http::AsyncHttpClient::State state = client->state();
-    if (state == nx_http::AsyncHttpClient::sFailed)
-        setState(State::Error);
-}
-
-void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
-{
-    nx_http::HttpHeaders::const_iterator itr = client->response()->headers.find("guid");
-    if (itr != client->response()->headers.end()) {
-        QMutexLocker lock(&m_mutex);
-        m_removeGuid = itr->second;
-    }
-    else {
-        setState(State::Error);
-        return;
-    }
-
-    QByteArray data = m_httpClient->fetchMessageBodyBuffer();
-    m_socket = m_httpClient->takeSocket();
-    m_httpClient.reset();
-    if (!data.isEmpty())
-        processTransactionData(data);
-
-    setState(QnTransactionTransport::Connected);
 }
 
 }

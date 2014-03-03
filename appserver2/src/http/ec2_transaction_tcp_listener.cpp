@@ -4,6 +4,7 @@
 #include "nx_ec/data/ec2_full_data.h"
 #include "database/db_manager.h"
 #include "common/common_module.h"
+#include "transaction/transaction_transport.h"
 
 namespace ec2
 {
@@ -44,13 +45,50 @@ void QnTransactionTcpProcessor::run()
             return;
     }
     parseRequest();
-    d->chunkedMode = true;
-    d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
-    sendResponse("HTTP", CODE_OK, "application/octet-stream");
 
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
-    QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, query);
-    d->socket.clear();
+    bool isClient = query.hasQueryItem("isClient");
+    QUuid remoteGuid  = query.queryItemValue(lit("guid"));
+    qint64 removeTime  = query.queryItemValue(lit("time")).toLongLong();
+    qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
+    qint64 timeDiff = removeTime - localTime;
+
+    if (remoteGuid.isNull()) {
+        qWarning() << "Invalid incoming request. GUID must be filled!";
+        sendResponse("HTTP", CODE_INVALID_PARAMETER, "application/octet-stream");
+        return;
+    }
+
+    d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
+
+    // 1-st stage
+    bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);
+    sendResponse("HTTP", lockOK ? CODE_OK : CODE_INVALID_PARAMETER , "application/octet-stream");
+    if (!lockOK)
+        return;
+
+    // 2-nd stage
+    if (!readRequest()) {
+        QnTransactionTransport::connectingCanceled(remoteGuid, false);
+        return;
+    }
+    parseRequest();
+
+    query = QUrlQuery(d->request.requestLine.url.query());
+    bool fail = query.hasQueryItem("canceled") || !QnTransactionTransport::tryAcquireConnected(remoteGuid, false);
+    d->chunkedMode = true;
+    d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
+    sendResponse("HTTP", fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
+    if (fail) {
+        QnTransactionTransport::connectingCanceled(remoteGuid, false);
+    }
+    else {
+        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, isClient, remoteGuid, timeDiff);
+        d->socket.clear();
+    }
 }
+
 
 }

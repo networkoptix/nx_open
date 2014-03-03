@@ -162,7 +162,6 @@ namespace ec2
     signals:
         void addedOrUpdated( QnMediaServerResourcePtr camera );
         void removed( QnId id );
-
     protected:
         virtual int getServers( impl::GetServersHandlerPtr handler ) = 0;
         virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) = 0;
@@ -668,6 +667,9 @@ namespace ec2
         */
         void initNotification(QnFullResourceData fullData);
         void runtimeInfoChanged(const ec2::QnRuntimeInfo& runtimeInfo);
+
+        void removePeerFound(QnId id);
+        void removePeerLost(QnId id);
 
     protected:
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;

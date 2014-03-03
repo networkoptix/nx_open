@@ -189,10 +189,13 @@ namespace ec2
         QMap<int, QnId> getGuidList(const QString& request);
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
         bool updateGuids();
+        QnId getType(const QString& typeName);
     private:
 		QnResourceFactory* m_resourceFactory;
         StoredFileManagerImpl* const m_storedFileManagerImpl;
         QnId m_storageTypeId;
+        QnId m_serverTypeId;
+        QnId m_cameraTypeId;
     };
 };
 

@@ -60,6 +60,8 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
+        qint64 getRelativeTime() const;
+
     private:
         bool contains(const QnAbstractTransaction& tran, const QUuid& hash);
         QUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
@@ -75,8 +77,8 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiUserData>& tran)                { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiLayoutData>& tran)              { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiBusinessRuleData>& tran)        { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiIdData>& tran)                  { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiSetResourceDisabledData>& tran) { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiIdData>& tran)                  { return makeHash(tran.params.id.toRfc4122(), "ApiIdData"); }
+        QUuid transactionHash(const QnTransaction<ApiSetResourceDisabledData>& tran) { return makeHash(tran.params.id.toRfc4122(), "disabled"); }
         QUuid transactionHash(const QnTransaction<ApiCameraServerItemData>&)         { return QUuid::createUuid() ; }
         QUuid transactionHash(const QnTransaction<ApiSetResourceStatusData>& tran)   { return makeHash(tran.params.id.toRfc4122(), "status"); }
         QUuid transactionHash(const QnTransaction<ApiPanicModeData>&)                { return makeHash("panic_mode") ; }
@@ -113,7 +115,12 @@ namespace ec2
     private:
         QnDbManager* m_dbManager;
         QnTranState m_state;
-        QMap<QUuid, qint32> m_updateHistory;
+        //QMap<QUuid, QnAbstractTransaction> m_updateHistory;
+        QMap<QUuid, qint64> m_updateHistory;
+        
+        mutable QMutex m_timeMutex;
+        QElapsedTimer m_relativeTimer;
+        qint64 m_relativeOffset;
     };
 };
 

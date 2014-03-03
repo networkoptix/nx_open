@@ -4,6 +4,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include "serverutil.h"
+#include "transaction/transaction_message_bus.h"
 
 
 QnServerMessageProcessor::QnServerMessageProcessor():
@@ -47,6 +48,7 @@ void QnServerMessageProcessor::updateResource(QnResourcePtr resource)
 
     if (isServer)
         syncStoragesToSettings(ownMediaServer);
+
 }
 
 void QnServerMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
@@ -60,4 +62,26 @@ void QnServerMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
         break;
     }*/
 
+}
+
+void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
+{
+    QnCommonMessageProcessor::init(connection);
+    connect( connection.get(), &ec2::AbstractECConnection::removePeerFound, this, &QnServerMessageProcessor::at_removePeerFound );
+    connect( connection.get(), &ec2::AbstractECConnection::removePeerFound, this, &QnServerMessageProcessor::at_removePeerLost );
+}
+
+void QnServerMessageProcessor::at_removePeerFound(QnId id)
+{
+    QnResourcePtr res = qnResPool->getResourceById(id);
+    if (res)
+        res->setStatus(QnResource::Online);
+
+}
+
+void QnServerMessageProcessor::at_removePeerLost(QnId id)
+{
+    QnResourcePtr res = qnResPool->getResourceById(id);
+    if (res)
+        res->setStatus(QnResource::Offline);
 }

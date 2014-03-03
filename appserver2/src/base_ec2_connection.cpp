@@ -28,6 +28,8 @@ namespace ec2
         m_layoutManager( new QnLayoutManager<T>(m_queryProcessor, resCtx) ),
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) )
     {
+        connect (QnTransactionMessageBus::instance(), SIGNAL(peerFound(QnId)), this, SIGNAL(removePeerFound(QnId)));
+        connect (QnTransactionMessageBus::instance(), SIGNAL(peerLost(QnId)),  this, SIGNAL(removePeerLost(QnId)));
     }
 
     template<class T>
@@ -163,7 +165,7 @@ namespace ec2
     void BaseEc2Connection<T>::addRemotePeer(const QUrl& _url, bool isClient)
     {
         QUrl url(_url);
-        url.setPath("ec2/events");
+        url.setPath("/ec2/events");
         QUrlQuery q;
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
         url.setQuery(q);

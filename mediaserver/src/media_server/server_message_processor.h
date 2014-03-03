@@ -17,7 +17,10 @@ protected:
     virtual void onResourceStatusChanged(QnResourcePtr , QnResource::Status ) override {}
     virtual void updateResource(QnResourcePtr resource) override;
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
-protected:
+    virtual void init(ec2::AbstractECConnectionPtr connection);
+private slots:
+    void at_removePeerFound(QnId id);
+    void at_removePeerLost(QnId id);
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H

@@ -1,11 +1,13 @@
 #ifndef __TRANSACTION_MESSAGE_BUS_H_
 #define __TRANSACTION_MESSAGE_BUS_H_
 
+#include <QElapsedTimer>
 #include <nx_ec/ec_api.h>
 #include "nx_ec/data/camera_data.h"
 #include "nx_ec/data/ec2_resource_data.h"
 #include "transaction.h"
 #include "utils/network/http/asynchttpclient.h"
+#include "transaction_transport_serializer.h"
 
 namespace ec2
 {
@@ -23,7 +25,7 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url, bool isClient);
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QUrlQuery& params);
+        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& removeGuid, qint64 timediff);
         
         template <class T>
         void setHandler(T* handler) { 
@@ -40,42 +42,27 @@ namespace ec2
         void sendTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
             QByteArray buffer;
-            serializeTransaction(buffer, serializedTran);
-            sendTransactionInternal(!tran.originGuid.isNull() ? tran.originGuid : tran.id.peerGUID, buffer);
+            m_serializer.serialize(buffer, serializedTran);
+            sendTransactionInternal(tran, buffer);
         }
 
         template <class T>
         void sendTransaction(const QnTransaction<T>& tran)
         {
             QByteArray buffer;
-            serializeTransaction(buffer, tran);
-            sendTransactionInternal(!tran.originGuid.isNull() ? tran.originGuid : tran.id.peerGUID, buffer);
+            m_serializer.serialize(buffer, tran);
+            sendTransactionInternal(tran, buffer);
         }
 
+        QSet<QnId> alivePeers() const { return m_alivePeers; }
+signals:
+        void peerLost(QnId);
+        void peerFound(QnId);
     private:
         friend class QnTransactionTransport;
 
-        static void serializeTransaction(QByteArray& buffer, const QByteArray& serializedTran)
-        {
-            buffer.reserve(serializedTran.size() + 12);
-            buffer.append("00000000\r\n");
-            buffer.append(serializedTran);
-            buffer.append("\r\n"); // chunk end
-            quint32 payloadSize = buffer.size() - 12;
-            toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
-        }
-
-        template <class T>
-        static void serializeTransaction(QByteArray& buffer, const QnTransaction<T>& tran) 
-        {
-            OutputBinaryStream<QByteArray> stream(&buffer);
-            stream.write("00000000\r\n",10);
-            tran.serialize(&stream);
-            stream.write("\r\n",2); // chunk end
-            quint32 payloadSize = buffer.size() - 12;
-            toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
-        }
-
+        bool isExists(const QnId& removeGuid) const;
+        bool isConnecting(const QnId& removeGuid) const;
 
         class AbstractHandler
         {
@@ -97,39 +84,42 @@ namespace ec2
             T* m_handler;
         };
 
-        struct ConnectionsToPeer 
-        {
-            ConnectionsToPeer() {}
-            void proxyIncomingTransaction(const QnAbstractTransaction& tran, const QByteArray& data);
-            void sendOutgoingTran(const QByteArray& data);
-
-            QSharedPointer<QnTransactionTransport> incomeConn;
-            QSharedPointer<QnTransactionTransport> outcomeConn;
-        };
-        typedef QMap<QUuid, ConnectionsToPeer> QnConnectionMap;
+        typedef QMap<QUuid, QSharedPointer<QnTransactionTransport>> QnConnectionMap;
 
     private:
         //void gotTransaction(const QnId& remoteGuid, bool isConnectionOriginator, const QByteArray& data);
-        void sendTransactionInternal(const QnId& originGuid, const QByteArray& chunkData);
-        void processConnState(QSharedPointer<QnTransactionTransport> &transport);
-        QSharedPointer<QnTransactionTransport> getSibling(QSharedPointer<QnTransactionTransport> transport);
-        static bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
-        static void onGotTransactionSyncResponse(QnTransactionTransport* sender);
-        static void toFormattedHex(quint8* dst, quint32 payloadSize);
+        void sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData);
+        void processConnState(QSharedPointer<QnTransactionTransport> transport);
+        bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
+        void onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
         void queueSyncRequest(QSharedPointer<QnTransactionTransport> transport);
+
+        void connectToPeerEstablished(const QnId& id);
+        void connectToPeerLost(const QnId& id);
+        void sendServerAliveMsg();
+        bool isPeerUsing(const QUrl& url);
     private slots:
         void at_timer();
-        void at_gotTransaction(QByteArray serializedTran);
+        void at_gotTransaction(QByteArray serializedTran, QSet<QnId> processedPeers);
     private:
-        typedef QMap<QUrl, QSharedPointer<QnTransactionTransport>> RemoveUrlMap;
-        RemoveUrlMap m_remoteUrls;
+        QnTransactionTransportSerializer m_serializer;
+        //typedef QMap<QUrl, QSharedPointer<QnTransactionTransport>> RemoveUrlMap;
+
+        //RemoveUrlMap m_remoteUrls;
+        QMap<QUrl, bool> m_removeUrls;
         AbstractHandler* m_handler;
         QTimer* m_timer;
         QMutex m_mutex;
         QThread *m_thread;
         QnConnectionMap m_connections;
+        QSet<QnId> m_alivePeers;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
-        QVector<QSharedPointer<QnTransactionTransport>> m_connectionsToRemove;
+        //QVector<QSharedPointer<QnTransactionTransport>> m_connectionsToRemove;
+
+        // alive control
+        QElapsedTimer m_aliveSendTimer;
+        QMap<QUuid, qint64> m_lastActivity;
+        //QMap<QUuid, qint64> m_peerTimeDiff;
     };
 }
 
