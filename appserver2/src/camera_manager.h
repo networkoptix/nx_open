@@ -42,6 +42,7 @@ namespace ec2
             QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
                 tran.params.typeId,
                 tran.params.url ).dynamicCast<QnVirtualCameraResource>();
+            Q_ASSERT(cameraRes);
             tran.params.toResource( cameraRes );
             emit cameraAddedOrUpdated( cameraRes );
         }

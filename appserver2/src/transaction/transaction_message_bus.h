@@ -106,7 +106,13 @@ signals:
         //typedef QMap<QUrl, QSharedPointer<QnTransactionTransport>> RemoveUrlMap;
 
         //RemoveUrlMap m_remoteUrls;
-        QMap<QUrl, bool> m_removeUrls;
+        struct RemoveUrlConnectInfo {
+            RemoveUrlConnectInfo(bool isClient = false): isClient(isClient), lastConnectedTime(0) {}
+            bool isClient;
+            qint64 lastConnectedTime;
+        };
+
+        QMap<QUrl, RemoveUrlConnectInfo> m_removeUrls;
         AbstractHandler* m_handler;
         QTimer* m_timer;
         QMutex m_mutex;

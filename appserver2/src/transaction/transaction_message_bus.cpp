@@ -366,11 +366,12 @@ void QnTransactionMessageBus::at_timer()
 
     // add new outgoing connections
     qint64 ct = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    for (QMap<QUrl, bool>::iterator itr = m_removeUrls.begin(); itr != m_removeUrls.end(); ++itr)
+    for (QMap<QUrl, RemoveUrlConnectInfo>::iterator itr = m_removeUrls.begin(); itr != m_removeUrls.end(); ++itr)
     {
         const QUrl& url = itr.key();
-        bool isClient = itr.value();
-        if (!isPeerUsing(url)) {
+        bool isClient = itr.value().isClient;
+        if (!isPeerUsing(url) && ct - itr.value().lastConnectedTime > RECONNECT_TIMEOUT) {
+            itr.value().lastConnectedTime = ct;
             QnTransactionTransportPtr transport(new QnTransactionTransport(true, isClient));
             connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
             transport->doOutgoingConnect(url);
@@ -467,7 +468,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
 void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient)
 {
     QMutexLocker lock(&m_mutex);
-    m_removeUrls.insert(url, isClient);
+    m_removeUrls.insert(url, RemoveUrlConnectInfo(isClient));
     /*
     QSharedPointer<QnTransactionTransport> transport(new QnTransactionTransport(true, isClient));
     connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
