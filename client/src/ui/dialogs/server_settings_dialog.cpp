@@ -405,6 +405,9 @@ void QnServerSettingsDialog::submitToResources() {
             QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
             if (!item.storageId.isNull())
                 storage->setId(item.storageId);
+            QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
+            if (resType)
+                storage->setTypeId(resType->getId());
             storage->setName(QUuid::createUuid().toString());
             storage->setParentId(m_server->getId());
             storage->setUrl(item.path);

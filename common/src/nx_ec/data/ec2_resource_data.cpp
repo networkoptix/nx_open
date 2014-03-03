@@ -6,9 +6,9 @@ namespace ec2 {
 void ApiResourceData::fromResource(const QnResourcePtr& resource)
 {
     Q_ASSERT(!resource->getId().isNull());
+    Q_ASSERT(!resource->getTypeId().isNull());
 
-	//id = resource->getId();
-	id = resource->getGuid();
+	id = resource->getId();
 	typeId = resource->getTypeId();
 	parentGuid = resource->getParentId();
 	name = resource->getName();
