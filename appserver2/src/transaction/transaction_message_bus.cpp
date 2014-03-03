@@ -65,7 +65,7 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& 
         return;
     }
     if (!tran.params.isAlive && !m_alivePeers.contains(tran.params.serverId))
-        emit peerLost(tran.id.peerGUID);
+        emit peerLost(tran.params.serverId);
 }
 
 void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<QnId> processedPeers)
@@ -315,7 +315,10 @@ void QnTransactionMessageBus::sendServerAliveMsg(const QnId& serverId, bool isAl
     tran.params.serverId = serverId;
     tran.params.isAlive = isAlive;
     sendTransaction(tran);
-    emit peerLost(serverId);
+    if (isAlive)
+        emit peerFound(serverId);
+    else
+        emit peerLost(serverId);
 }
 
 void QnTransactionMessageBus::processConnState(QnTransactionTransportPtr transport)
