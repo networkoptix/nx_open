@@ -1,13 +1,7 @@
 TEMPLATE = lib
 QT += core gui network xml sql concurrent multimedia
 
-win32 {
-  pb.commands = ${libdir}/bin/protoc.exe --proto_path=${project.build.sourceDirectory}/api/pb --cpp_out=$${MOC_DIR} ${project.build.sourceDirectory}/api/pb/${QMAKE_FILE_BASE}.proto
-}
-
-unix {
-  pb.commands = protoc --proto_path=${project.build.sourceDirectory}/api/pb --cpp_out=$${MOC_DIR} ${project.build.sourceDirectory}/api/pb/${QMAKE_FILE_BASE}.proto
-}
+pb.commands = ${libdir}/bin/protoc.exe --proto_path=${project.build.sourceDirectory}/api/pb --cpp_out=$${MOC_DIR} ${project.build.sourceDirectory}/api/pb/${QMAKE_FILE_BASE}.proto
 
 mac {
   LIBS += -L/usr/X11/lib/

@@ -25,6 +25,7 @@ INITDSTAGE=$STAGE$INITDTARGET
 
 SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
 #SERVER_SQLDRIVERS_PATH=$SERVER_BIN_PATH/sqldrivers
+SERVER_IMAGEFORMATS_PATH=$SERVER_BIN_PATH/imageformats
 SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
 SERVER_LIB_PLUGIN_PATH=$SERVER_LIB_PATH/plugins
 SCRIPTS_PATH=${basedir}/../scripts
@@ -32,6 +33,7 @@ SCRIPTS_PATH=${basedir}/../scripts
 # Prepare stage dir
 rm -rf $STAGEBASE
 mkdir -p $BINSTAGE
+mkdir -p $BINSTAGE/imageformats
 mkdir -p $LIBSTAGE
 mkdir -p $LIBPLUGINSTAGE
 mkdir -p $ETCSTAGE
@@ -40,6 +42,7 @@ mkdir -p $INITDSTAGE
 
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
+cp -r $SERVER_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
 cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
 #cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE
 
