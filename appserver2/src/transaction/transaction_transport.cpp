@@ -36,6 +36,9 @@ QnTransactionTransport::QnTransactionTransport(bool isOriginator, bool isClient,
 
 QnTransactionTransport::~QnTransactionTransport()
 {
+    if( m_httpClient )
+        m_httpClient->terminate();
+
     closeSocket();
 }
 

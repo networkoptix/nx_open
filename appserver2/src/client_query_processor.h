@@ -105,6 +105,7 @@ namespace ec2
                 auto it = m_runningHttpRequests.find( httpClient );
                 assert( it != m_runningHttpRequests.end() );
                 handler.reset( it->second );
+                httpClient->terminate();
                 m_runningHttpRequests.erase( it );
             }
 
