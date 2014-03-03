@@ -17,8 +17,8 @@
 #include "utils/common/enum_name_mapper.h"
 #include "utils/common/synctime.h"
 #include "session_manager.h"
-#include "message.pb.h"
 #include "common_message_processor.h"
+
 
 // -------------------------------------------------------------------------- //
 // QnAppServerConnectionFactory
