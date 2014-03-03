@@ -450,6 +450,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 
     /* Set default vector sizes. */
     m_lineData.resize(maxLines);
+    m_lastMinuteIndicatorVisible.fill(true, maxLines);
 
     generateProgressPatterns();
 
@@ -1185,6 +1186,20 @@ void QnTimeSlider::setColors(const QnTimeSliderColors &colors) {
     generateProgressPatterns();
 }
 
+void QnTimeSlider::setLastMinuteIndicatorVisible(int line, bool visible) {
+    if (line >= maxLines)
+        return;
+
+    m_lastMinuteIndicatorVisible[line] = visible;
+}
+
+bool QnTimeSlider::isLastMinuteIndicatorVisible(int line) const {
+    if (line >= maxLines)
+        return false;
+
+    return m_lastMinuteIndicatorVisible[line];
+}
+
 
 // -------------------------------------------------------------------------- //
 // Updating
@@ -1594,8 +1609,6 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
             lineTop += lineHeight;
         }
 
-        drawLastMinute(painter, lineBarRect);
-
         lineTop = lineBarRect.top();
         for(int line = 0; line < m_lineCount; line++) {
             qreal lineHeight = lineUnit * effectiveLineStretch(line);
@@ -1604,6 +1617,8 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
 
             QRectF lineRect(lineBarRect.left(), lineTop, lineBarRect.width(), lineHeight);
 
+            if (m_lastMinuteIndicatorVisible[line])
+                drawLastMinute(painter, lineRect);
             drawSeparator(painter, lineRect);
 
             lineTop += lineHeight;

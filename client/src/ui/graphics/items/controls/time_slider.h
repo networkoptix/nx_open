@@ -170,6 +170,9 @@ public:
     const QnTimeSliderColors &colors() const;
     void setColors(const QnTimeSliderColors &colors);
 
+    void setLastMinuteIndicatorVisible(int line, bool visible);
+    bool isLastMinuteIndicatorVisible(int line) const;
+
 signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
@@ -377,6 +380,7 @@ private:
     int m_lastMinuteAnimationDelta;
     QPixmap m_progressPastPattern;
     QPixmap m_progressFuturePattern;
+    QVector<bool> m_lastMinuteIndicatorVisible;
 
     QnTimeSliderPixmapCache *m_pixmapCache;
 
