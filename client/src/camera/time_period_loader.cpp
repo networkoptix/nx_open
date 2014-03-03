@@ -90,7 +90,7 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion
         if (itr != m_loadedPeriods.begin())
             itr--;
 
-        if (qBetween(periodToLoad.startTimeMs, itr->startTimeMs, itr->startTimeMs + itr->durationMs))
+        if (qBetween(itr->startTimeMs, periodToLoad.startTimeMs, itr->startTimeMs + itr->durationMs))
         {
             qint64 endPoint = periodToLoad.startTimeMs + periodToLoad.durationMs;
             periodToLoad.startTimeMs = itr->startTimeMs + itr->durationMs - 40*1000; // add addition 40 sec (may server does not flush data e.t.c)
@@ -101,7 +101,7 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion
                     periodToLoad.durationMs = itr->startTimeMs - periodToLoad.startTimeMs;
             }
         }
-        else if (qBetween(periodToLoad.startTimeMs + periodToLoad.durationMs, itr->startTimeMs, itr->startTimeMs + itr->durationMs))
+        else if (qBetween(itr->startTimeMs, periodToLoad.startTimeMs + periodToLoad.durationMs, itr->startTimeMs + itr->durationMs))
         {
             periodToLoad.durationMs = itr->startTimeMs - periodToLoad.startTimeMs;
         }

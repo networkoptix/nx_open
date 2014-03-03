@@ -1676,7 +1676,7 @@ void QnTimeSlider::drawSeparator(QPainter *painter, const QRectF &rect) {
 void QnTimeSlider::drawLastMinute(QPainter *painter, const QRectF &rect) {
     const qreal moveSpeed = 0.05;
 
-    qint64 startTime = QDateTime::currentDateTime().addSecs(-60).toMSecsSinceEpoch();
+    qint64 startTime = maximum() - 60 * 1000;
     qreal startPos = quickPositionFromValue(startTime);
     if (startPos >= rect.right())
         return;
@@ -1692,13 +1692,13 @@ void QnTimeSlider::drawLastMinute(QPainter *painter, const QRectF &rect) {
     if (sliderPos > startPos && !qFuzzyEquals(startPos, sliderPos)) {
         QBrush brush(m_progressPastPattern);
         brush.setTransform(brushTransform);
-        painter->fillRect(QRectF(QPointF(startPos, rect.top()), rect.bottomRight()), brush);
+        painter->fillRect(QRectF(QPointF(startPos, rect.top()), QPointF(sliderPos, rect.bottom())), brush);
     }
 
     if (!qFuzzyEquals(rect.right(), sliderPos)) {
         QBrush brush(m_progressFuturePattern);
         brush.setTransform(brushTransform);
-        painter->fillRect(QRectF(QPointF(startPos, rect.top()), rect.bottomRight()), brush);
+        painter->fillRect(QRectF(QPointF(qMax(startPos, sliderPos), rect.top()), rect.bottomRight()), brush);
     }
 }
 
