@@ -19,7 +19,8 @@ QnPlSonyResource::QnPlSonyResource()
 }
 
 QnPlSonyResource::~QnPlSonyResource() {
-
+    if( m_inputMonitorHttpClient )
+        m_inputMonitorHttpClient->terminate();
 }
 
 CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()

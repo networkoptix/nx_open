@@ -105,11 +105,12 @@ private:
     bool addProcessKillTimer(
         const std::shared_ptr<applauncher::api::AddProcessKillTimerRequest>& request,
         applauncher::api::AddProcessKillTimerResponse* const response );
+    bool blockingRestoreVersion( const QString& versionToLaunch );
 
     virtual void onTimer( const quint64& timerID ) override;
 
 private slots:
-    void onInstallationSucceeded();
+    void onInstallationDone( InstallationProcess* installationProcess );
 };
 
 #endif  //APPLAUNCHER_PROCESS_H

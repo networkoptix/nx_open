@@ -23,7 +23,8 @@ InstallationProcess::InstallationProcess(
     const QString& customization,
     const QString& version,
     const QString& module,
-    const QString& installationDirectory )
+    const QString& installationDirectory,
+    bool autoStartNeeded )
 :
     m_productName( productName ),
     m_customization( customization ),
@@ -33,7 +34,8 @@ InstallationProcess::InstallationProcess(
     m_state( State::init ),
     m_status( applauncher::api::InstallationStatus::init ),
     m_totalBytesDownloaded( 0 ),
-    m_totalBytesToDownload( 0 )
+    m_totalBytesToDownload( 0 ),
+    m_autoStartNeeded( autoStartNeeded )
 {
 }
 
@@ -101,10 +103,20 @@ float InstallationProcess::getProgress() const
     return percentCompleted > 100.0 ? 100.0 : percentCompleted;
 }
 
+bool InstallationProcess::autoStartNeeded() const
+{
+    return m_autoStartNeeded;
+}
+
 QString InstallationProcess::errorText() const
 {
     std::unique_lock<std::mutex> lk( m_mutex );
     return m_errorText;
+}
+
+QString InstallationProcess::getVersion() const
+{
+    return m_version;
 }
 
 void InstallationProcess::overrallDownloadSizeKnown(
@@ -145,14 +157,11 @@ void InstallationProcess::finished(
 {
     m_state = State::finished;
     if( result )
-    {
         m_status = applauncher::api::InstallationStatus::success;
-        emit installationSucceeded();
-    }
     else
-    {
         m_status = applauncher::api::InstallationStatus::failed;
-    }
+
+    emit installationDone( this );
 }
 
 void InstallationProcess::failed(
