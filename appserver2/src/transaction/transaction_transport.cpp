@@ -254,8 +254,9 @@ bool QnTransactionTransport::tryAcquireConnecting(const QnId& remoteGuid, bool i
     QMutexLocker lock(&m_staticMutex);
 
     bool isExist = m_existConn.contains(remoteGuid);
-    bool isConnecting = m_connectingConn.contains(remoteGuid);
-    bool fail = isExist || (isConnecting && remoteGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122() == isOriginator);
+    //bool isConnecting = m_connectingConn.contains(remoteGuid);
+    bool isTowardConnecting = isOriginator ?  m_connectingConn.value(remoteGuid).second : m_connectingConn.value(remoteGuid).first;
+    bool fail = isExist || (isTowardConnecting && remoteGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
     if (!fail) {
         if (isOriginator)
             m_connectingConn[remoteGuid].first = true;
@@ -284,8 +285,8 @@ bool QnTransactionTransport::tryAcquireConnected(const QnId& remoteGuid, bool is
 {
     QMutexLocker lock(&m_staticMutex);
     bool isExist = m_existConn.contains(remoteGuid);
-    bool isConnecting = m_connectingConn.contains(remoteGuid);
-    bool fail = isExist || (isConnecting && remoteGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122() == isOriginator);
+    bool isTowardConnecting = isOriginator ?  m_connectingConn.value(remoteGuid).second : m_connectingConn.value(remoteGuid).first;
+    bool fail = isExist || (isTowardConnecting && remoteGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
     if (!fail) {
         m_existConn << remoteGuid;
         m_connectingConn.remove(remoteGuid);
