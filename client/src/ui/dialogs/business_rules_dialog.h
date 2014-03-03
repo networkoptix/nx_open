@@ -35,6 +35,13 @@ public:
     virtual ~QnBusinessRulesDialog();
 
     void setFilter(const QString &filter);
+
+    /**
+     * @brief canClose      Checks if the dialog can be closed safely. If there are unsaved rules the user will be asked
+     *                      and they will be saved or dropped.
+     * @return              False if the user press Cancel, true otherwise.
+     */
+    bool canClose();
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
     virtual void keyPressEvent(QKeyEvent *event) override;

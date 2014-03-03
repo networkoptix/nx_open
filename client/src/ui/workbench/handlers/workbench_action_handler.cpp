@@ -2133,12 +2133,19 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
         qnSettings->setUserWorkbenchStates(states);
     }
 
-    menu()->trigger(Qn::ClearCameraSettingsAction);
-    if(context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true)) {
-        qApp->exit(0);
-        applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
+    if (businessRulesDialog() && businessRulesDialog()->isVisible()) {
+        businessRulesDialog()->activateWindow();
+        if (!businessRulesDialog()->canClose())
+            return;
+        businessRulesDialog()->hide();
     }
 
+    menu()->trigger(Qn::ClearCameraSettingsAction);
+    if(!context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true))
+        return;
+
+    qApp->exit(0);
+    applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
 
 QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog()
