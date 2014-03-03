@@ -712,6 +712,17 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
             if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
                 resourcePool()->removeResource(layout);
 
+        /* Sometimes we get here when 'New layout' has already been added. But all user's layouts must be created AFTER this method.
+         * Otherwise the user will see uncreated layouts in layout selection menu.
+         * As temporary workaround we can just remove that layouts. */
+        // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
+        if (user) {
+            foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
+                if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
+                    resourcePool()->removeResource(layout);
+            }
+        }
+
         /* Close all other layouts. */
         foreach(QnWorkbenchLayout *layout, workbench()->layouts()) {
             QnLayoutResourcePtr resource = layout->resource();
@@ -2133,12 +2144,19 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
         qnSettings->setUserWorkbenchStates(states);
     }
 
-    menu()->trigger(Qn::ClearCameraSettingsAction);
-    if(context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true)) {
-        qApp->exit(0);
-        applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
+    if (businessRulesDialog() && businessRulesDialog()->isVisible()) {
+        businessRulesDialog()->activateWindow();
+        if (!businessRulesDialog()->canClose())
+            return;
+        businessRulesDialog()->hide();
     }
 
+    menu()->trigger(Qn::ClearCameraSettingsAction);
+    if(!context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true))
+        return;
+
+    qApp->exit(0);
+    applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
 
 QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog()
