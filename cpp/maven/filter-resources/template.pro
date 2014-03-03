@@ -48,7 +48,7 @@ isEmpty(BUILDLIB) {
   DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
 } else {
     contains(BUILDLIB,staticlib) {
-      DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION/plugins
+      DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
     }
     else {
       contains (LIBTYPE,plugin) {
