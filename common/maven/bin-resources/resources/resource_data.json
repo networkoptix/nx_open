@@ -8,6 +8,11 @@
                                                                     \
     Multiply focal lengths by width-based crop factor to get        \
     width-based equivalent focal length.                            \
+																	\
+    Another important note.                                         \    
+    If the camera overshoots on movement, then it means that 35mm   \
+    fov in this file should be increased.                           \
+    If it undershoots, then 35mm fov should be decreased.           \
     ",
     
     "version": "1.0",
@@ -117,7 +122,7 @@
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0.016666,   0.083333],
                         "logical": [1.0,        5.0],
-                        "logicalMultiplier": 39.3,
+                        "logicalMultiplier": 41.0,
                         "space": "35MmEquiv"
                     }
                 }

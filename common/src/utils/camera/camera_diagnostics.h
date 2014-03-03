@@ -77,7 +77,7 @@ namespace CameraDiagnostics
     }
 
     /*!
-        It is strongly recommended to use inheritor classes
+        It is strongly recommended to use inherited classes.
     */
     class Result
     {
