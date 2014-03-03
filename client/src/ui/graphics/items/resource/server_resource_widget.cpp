@@ -9,7 +9,6 @@
 #include <client/client_settings.h>
 #include <core/resource/media_server_resource.h>
 
-#include <api/media_server_connection.h>
 #include <api/media_server_statistics_manager.h>
 
 #include <ui/actions/action_parameters.h>
