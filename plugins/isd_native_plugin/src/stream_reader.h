@@ -72,7 +72,7 @@ private:
     vmux_stream_info_t motion_stream_info;
     ISDMotionEstimation m_motionEstimation;
     int64_t m_firstFrameTime;
-    int64_t m_prevPts;
+    unsigned int m_prevPts;
     int64_t m_ptsDelta;
     bool m_audioEnabled;
 
@@ -85,6 +85,7 @@ private:
     bool registerFD( int fd );
     void unregisterFD( int fd );
     void fillAudioFormat( const ISDAudioPacket& audioPacket );
+    int64_t calcNextTimestamp( const unsigned int pts );
 };
 
 #endif  //ILP_STREAM_READER_H

@@ -370,44 +370,13 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
     //std::cout << "frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << "encoder=" << m_encoderNum << std::endl;
     //    std::cout<<"encoder "<<m_encoderNum<<" frame pts "<<frame.vmux_info.PTS<<"\n";
 
-    if( m_firstFrameTime == 0 )
-    {
-        std::unique_lock<std::mutex> lk( m_sharedStreamData.mutex );
-        if( m_sharedStreamData.ptsBase == -1 )
-        {
-            m_sharedStreamData.ptsBase = frame.vmux_info.PTS;
-            m_sharedStreamData.baseClock = QDateTime::currentMSecsSinceEpoch() * 1000ll;
-            //std::cout<<"1: m_sharedStreamData.ptsBase = "<<m_sharedStreamData.ptsBase<<", "<<m_sharedStreamData.baseClock<<"\n";
-        }
-        else
-        {
-            m_ptsDelta = ((frame.vmux_info.PTS - m_sharedStreamData.ptsBase) * 1000000ll) / 90000 +
-                ((QDateTime::currentMSecsSinceEpoch() * 1000ll) - m_sharedStreamData.baseClock);
-            //std::cout<<"2: PTS = "<<frame.vmux_info.PTS<<", delta "<<m_ptsDelta<<"\n";
-        }
-    }
-
-    if (m_firstFrameTime == 0) {
-        m_firstFrameTime = QDateTime::currentMSecsSinceEpoch() * 1000ll;
-        //m_firstFrameTime -= (int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000;
-        m_prevPts = frame.vmux_info.PTS;
-    }
-    m_firstFrameTime += (int64_t(frame.vmux_info.PTS - m_prevPts) * 1000000ll) / 90000; //TODO dword wrap
-    const int64_t currentTimestamp =
-#ifdef USE_SYSTEM_CLOCK
-        QDateTime::currentMSecsSinceEpoch() * 1000ll;
-#else
-        //(int64_t(frame.vmux_info.PTS) * 1000000ll) / 90000 + m_firstFrameTime,
-        m_firstFrameTime + m_ptsDelta;
-#endif
     std::auto_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
         0, // channel
-        currentTimestamp,
+        calcNextTimestamp(frame.vmux_info.PTS),
         (frame.vmux_info.pic_type == 1 ? nxcip::MediaDataPacket::fKeyPacket : 0) | 
             (m_encoderNum > 0 ? nxcip::MediaDataPacket::fLowQuality : 0),
         0, // cseq
         m_videoCodec )); 
-    m_prevPts = frame.vmux_info.PTS;
     videoPacket->resizeBuffer( frame.frame_size );
     memcpy(videoPacket->data(), frame.frame_addr, frame.frame_size);
     m_lastVideoTime = videoPacket->timestamp();
@@ -500,4 +469,47 @@ void StreamReader::fillAudioFormat( const ISDAudioPacket& audioPacket )
     }
 
     //std::cout<<"Audio format: sample_rate "<<m_audioInfo.sample_rate<<", bitrate "<<m_audioInfo.bit_rate<<"\n";
+}
+
+static const unsigned int MAX_PTS_DRIFT = 63000;    //700 ms
+static const unsigned int DEFAULT_FRAME_DURATION = 3000;    //30 fps
+
+int64_t StreamReader::calcNextTimestamp( const unsigned int pts )
+{
+    if( m_firstFrameTime == 0 )
+    {
+        std::unique_lock<std::mutex> lk( m_sharedStreamData.mutex );
+        if( m_sharedStreamData.ptsBase == -1 )
+        {
+            m_sharedStreamData.ptsBase = pts;
+            m_sharedStreamData.baseClock = QDateTime::currentMSecsSinceEpoch() * 1000ll;
+            //std::cout<<"1: m_sharedStreamData.ptsBase = "<<m_sharedStreamData.ptsBase<<", "<<m_sharedStreamData.baseClock<<"\n";
+        }
+        else
+        {
+            m_ptsDelta = ((pts - m_sharedStreamData.ptsBase) * 1000000ll) / 90000 +
+                ((QDateTime::currentMSecsSinceEpoch() * 1000ll) - m_sharedStreamData.baseClock);
+            //std::cout<<"2: PTS = "<<pts<<", delta "<<m_ptsDelta<<"\n";
+        }
+
+        m_firstFrameTime = QDateTime::currentMSecsSinceEpoch() * 1000ll;
+        //m_firstFrameTime -= (int64_t(pts) * 1000000ll) / 90000;
+        m_prevPts = pts;
+    }
+
+    if( !((pts - m_prevPts < MAX_PTS_DRIFT) || (m_prevPts - pts < MAX_PTS_DRIFT)) )
+    {
+        //pts discontinuity
+        pts = m_prevPts + DEFAULT_FRAME_DURATION;
+    }
+
+    m_firstFrameTime += (int64_t(pts - m_prevPts) * 1000000ll) / 90000; //TODO dword wrap
+    m_prevPts = pts;
+    return
+#ifdef USE_SYSTEM_CLOCK
+        QDateTime::currentMSecsSinceEpoch() * 1000ll;
+#else
+        //(int64_t(pts) * 1000000ll) / 90000 + m_firstFrameTime,
+        m_firstFrameTime + m_ptsDelta;
+#endif
 }
