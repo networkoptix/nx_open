@@ -44,7 +44,8 @@ void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subD
 QnId QnDbManager::getType(const QString& typeName)
 {
     QSqlQuery query(m_sdb);
-    query.prepare("select guid from vms_resourcetype where name = 'Storage'");
+    query.prepare("select guid from vms_resourcetype where name = ?");
+    query.bindValue(0, typeName);
     Q_ASSERT(query.exec());
     if (query.next())
         return QnId::fromRfc4122(query.value("guid").toByteArray());
