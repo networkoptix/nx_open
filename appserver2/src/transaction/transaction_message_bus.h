@@ -114,7 +114,7 @@ signals:
         QnConnectionMap m_connections;
         QSet<QnId> m_alivePeers;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
-        //QVector<QSharedPointer<QnTransactionTransport>> m_connectionsToRemove;
+        QVector<QSharedPointer<QnTransactionTransport>> m_connectionsToRemove;
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
