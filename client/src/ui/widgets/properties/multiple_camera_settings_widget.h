@@ -98,6 +98,9 @@ private:
     bool m_hasScheduleChanges;
     bool m_hasScheduleEnabledChanges;
 
+    bool m_loginWasEmpty;
+    bool m_passwordWasEmpty;
+
     /** Indicates that the user changed controls but not applied them to the schedule */
     bool m_hasScheduleControlsChanges;
 

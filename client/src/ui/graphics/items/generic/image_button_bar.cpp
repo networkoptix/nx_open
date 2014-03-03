@@ -37,6 +37,7 @@ void QnImageButtonBar::addButton(int mask, QnImageButtonWidget *button) {
     }
 
     button->setParentItem(this); /* We're expected to take ownership, even if the button wasn't actually added. */
+    button->setFocusPolicy(Qt::NoFocus); /* Button click should not take focus. */
 
     if(!qIsPower2(mask))
         qnWarning("Given mask '%1' is not a power of 2.", mask);

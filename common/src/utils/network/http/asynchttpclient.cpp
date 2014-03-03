@@ -446,13 +446,11 @@ namespace nx_http
 
         if( m_socket )
         {
-            m_state = sSendingRequest;
-            serializeRequest();
-            /*
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
-            m_socket.clear();
-            */
+
+            serializeRequest();
+            m_state = sSendingRequest;
         }
         else {
             m_state = sInit;

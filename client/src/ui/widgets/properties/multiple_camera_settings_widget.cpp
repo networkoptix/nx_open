@@ -32,7 +32,9 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     m_hasScheduleChanges(false),
     m_hasScheduleControlsChanges(false),
     m_readOnly(false),
-    m_inUpdateMaxFps(false)
+    m_inUpdateMaxFps(false),
+    m_loginWasEmpty(true),
+    m_passwordWasEmpty(true)
 {
     ui->setupUi(this);
 
@@ -135,11 +137,11 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
 
     foreach(QnVirtualCameraResourcePtr camera, m_cameras) {
         QString cameraLogin = camera->getAuth().user();
-        if (!login.isEmpty())
+        if (!login.isEmpty() || !m_loginWasEmpty)
             cameraLogin = login;
 
         QString cameraPassword = camera->getAuth().password();
-        if (!password.isEmpty())
+        if (!password.isEmpty() || !m_passwordWasEmpty)
             cameraPassword = password;
 
         camera->setAuth(cameraLogin, cameraPassword);
@@ -254,6 +256,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             ui->loginEdit->setText(QString());
             ui->loginEdit->setPlaceholderText(tr("<multiple values>", "LoginEdit"));
         }
+        m_loginWasEmpty = ui->loginEdit->text().isEmpty();
 
         if (passwords.size() == 1) {
             ui->passwordEdit->setText(*passwords.begin());
@@ -262,6 +265,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             ui->passwordEdit->setText(QString());
             ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
         }
+        m_passwordWasEmpty = ui->passwordEdit->text().isEmpty();
 
     }
 
