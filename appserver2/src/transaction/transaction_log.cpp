@@ -25,12 +25,13 @@ QnTransactionLog::QnTransactionLog(QnDbManager* db): m_dbManager(db)
     query2.prepare("SELECT tran_guid, timestamp as timestamp FROM transaction_log");
     if (query2.exec()) {
         while (query2.next())
-            m_updateHistory.insert(QUuid::fromRfc4122(query.value(0).toByteArray()), query.value(1).toLongLong());
+            m_updateHistory.insert(QUuid::fromRfc4122(query2.value(0).toByteArray()), query2.value(1).toLongLong());
     }
 
     m_relativeOffset = 0;
     QSqlQuery queryTime(m_dbManager->getDB());
     queryTime.prepare("SELECT max(timestamp) FROM transaction_log where peer_guid = ?");
+    queryTime.bindValue(0, qnCommon->moduleGUID().toRfc4122());
     if (queryTime.exec() && queryTime.next()) {
         m_relativeOffset = queryTime.value(0).toLongLong();
     }

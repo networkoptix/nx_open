@@ -362,7 +362,7 @@ void QnTransactionMessageBus::at_timer()
 {
     QMutexLocker lock(&m_mutex);
 
-    //m_connectionsToRemove.clear();
+    m_connectionsToRemove.clear();
 
     // add new outgoing connections
     qint64 ct = QDateTime::currentDateTime().toMSecsSinceEpoch();
@@ -456,8 +456,9 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     QMutexLocker lock(&m_mutex);
     if (m_connections[remoteGuid]) 
     {
-        Q_ASSERT_X(0, Q_FUNC_INFO, "We shouldn't be here! Check sync algorpthm!");
-        return; // connection already established. Ignore incoming connection
+        m_connectionsToRemove << m_connections[remoteGuid];
+        //Q_ASSERT_X(0, Q_FUNC_INFO, "We shouldn't be here! Check sync algorpthm!");
+        //return; // connection already established. Ignore incoming connection
         //m_connectionsToRemove << m_connections[remoteGuid];
     }
     m_connections[remoteGuid] = transport;
