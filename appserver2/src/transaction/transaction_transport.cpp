@@ -117,9 +117,9 @@ QnTransactionTransport::State QnTransactionTransport::getState() const
 
 void QnTransactionTransport::close()
 {
+    closeSocket();
     {
         QMutexLocker lock(&m_mutex);
-        closeSocket();
         m_readSync = false;
         m_writeSync = false;
         m_dataToSend.clear();
