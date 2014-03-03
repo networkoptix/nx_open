@@ -96,8 +96,9 @@ signals:
 
         void connectToPeerEstablished(const QnId& id);
         void connectToPeerLost(const QnId& id);
-        void sendServerAliveMsg();
+        void sendServerAliveMsg(const QnId& id, bool isAlive);
         bool isPeerUsing(const QUrl& url);
+        void onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream);
     private slots:
         void at_timer();
         void at_gotTransaction(QByteArray serializedTran, QSet<QnId> processedPeers);

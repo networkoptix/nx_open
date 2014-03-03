@@ -7,6 +7,8 @@
 #include "transaction_transport.h"
 #include "transaction_transport_serializer.h"
 #include "utils/common/synctime.h"
+#include "nx_ec/data/server_alive_data.h"
+#include "transaction_log.h"
 
 namespace ec2
 {
@@ -55,26 +57,16 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     delete m_timer;
 }
 
-/*
-void QnTransactionMessageBus::onGotServerAliveInfo(QnAbstractTransaction& abstractTran, const InputBinaryStream<QByteArray>& stream);
+void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream)
 {
-    QnTransaction<ApiServerAliveData>& tran(abstractTran);
-    if (!QnBinary::deserialize(tran.params)) {
+    QnTransaction<ApiServerAliveData> tran(abstractTran);
+    if (!QnBinary::deserialize(tran.params, &stream)) {
         qWarning() << "Got invalid ApiServerAliveData transaction. Ignoring";
         return;
     }
-    tran.params.push_back(qnCommon->moduleGUID());
-
-
-    for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
-    {
-        ConnectionsToPeer& connections = itr.value();
-        QSharedPointer<QnTransactionTransport> conn = connections->getConnection();
-        if (conn && !tran.params.contains(conn->remoteGuid()))
-            conn->addData(chunkData); // proxy alive message
-    }
+    if (!tran.params.isAlive && !m_alivePeers.contains(tran.params.serverId))
+        emit peerLost(tran.id.peerGUID);
 }
-*/
 
 void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<QnId> processedPeers)
 {
@@ -109,11 +101,9 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     case ApiCommand::tranSyncResponse:
         onGotTransactionSyncResponse(sender, stream);
         return;
-        /*
     case ApiCommand::serverAliveInfo:
         onGotServerAliveInfo(tran, stream);
-        return;
-        */
+        break; // do not return. proxy this transaction
     }
     
     if (!sender->isReadSync())
@@ -172,7 +162,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbst
     return true;
 }
 
-void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream)
+void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>&)
 {
 	sender->setReadSync(true);
 }
@@ -304,22 +294,28 @@ void QnTransactionMessageBus::queueSyncRequest(QSharedPointer<QnTransactionTrans
 
 void QnTransactionMessageBus::connectToPeerLost(const QnId& id)
 {
-    m_alivePeers.remove(id);
-    sendServerAliveMsg();
+    if (m_alivePeers.contains(id)) {
+        m_alivePeers.remove(id);
+        sendServerAliveMsg(id, false);
+    }
 }
 
 void QnTransactionMessageBus::connectToPeerEstablished(const QnId& id)
 {
-    m_alivePeers << id;
-    sendServerAliveMsg();
+    if (!m_alivePeers.contains(id)) {
+        m_alivePeers << id;
+        sendServerAliveMsg(id, true);
+    }
 }
 
-void QnTransactionMessageBus::sendServerAliveMsg()
+void QnTransactionMessageBus::sendServerAliveMsg(const QnId& serverId, bool isAlive)
 {
     m_aliveSendTimer.restart();
-    QnTransaction<int> tran(ApiCommand::serverAliveInfo, false);
-    tran.params = 0;
+    QnTransaction<ApiServerAliveData> tran(ApiCommand::serverAliveInfo, false);
+    tran.params.serverId = serverId;
+    tran.params.isAlive = isAlive;
     sendTransaction(tran);
+    emit peerLost(serverId);
 }
 
 void QnTransactionMessageBus::processConnState(QnTransactionTransportPtr transport)
@@ -411,7 +407,7 @@ void QnTransactionMessageBus::at_timer()
 
     // send keep-alive
     if (m_aliveSendTimer.elapsed() > ALIVE_UPDATE_INTERVAL)
-        sendServerAliveMsg();
+        sendServerAliveMsg(qnCommon->moduleGUID(), true);
 
     // check if some server not accessible any more
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();

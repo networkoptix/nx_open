@@ -1,4 +1,3 @@
-#include "ec2_resource_data.h"
 
 #ifndef MSERVER_DATA_H
 #define MSERVER_DATA_H
