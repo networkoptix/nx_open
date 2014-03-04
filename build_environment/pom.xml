@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <artifactId>hdwitness</artifactId>
@@ -59,6 +59,35 @@
         <defaultGoal>compile</defaultGoal>
         <plugins>
             <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>auto-clean</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>${project.build.directory}/x86/python</directory>
+                                    <followSymlinks>false</followSymlinks>
+                                    <useDefaultExcludes>true</useDefaultExcludes>
+                                </fileset>
+                                <fileset>
+                                    <directory>${project.build.directory}/x64/python</directory>
+                                    <followSymlinks>false</followSymlinks>
+                                    <useDefaultExcludes>true</useDefaultExcludes>
+                                </fileset>                                
+                            </filesets>
+                            <skip>${clean-skip}</skip>							
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>        
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>2.4</version>
@@ -88,15 +117,13 @@
                         <configuration>
                             <target>
                                 <exec dir="${environment.dir}" executable="hg" failifexecutionfails="true">
-                                    <arg line="pull -u"/> 
+                                    <arg line="pull -u -f"/> 
                                 </exec>
                                 <chmod file="${environment.dir}/${buildenv.script}" perm="755"/>    
+                                <chmod file="${libdir}/virtualenv.sh" perm="755"/>    
                                 <exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="true">
                                     <arg line="${arch} ${toolchain.version}"/> 
                                 </exec>
-                                <exec dir="${project.build.directory}" executable="${virtualenv.dir}/virtualenv" failifexecutionfails="true">
-                                    <arg line="--python ${init.python.dir}/python.exe ${arch}"/> 
-                                </exec>                                
                             </target>
                             <skip>${rsync.skip}</skip>
                         </configuration>
@@ -109,39 +136,18 @@
                 <version>1.1.1</version>
                 <executions>        
                     <execution>
-                        <id>virtualenv-x86</id>
+                        <id>virtualenv-win</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${virtualenv.dir}/virtualenv</executable>
-                            <arguments>
-                                <argument>--python</argument>
-                                <argument>${environment.dir}/python/x86/python.exe</argument>
-                                <argument>./x86/python</argument>
-                            </arguments>
+                            <executable>${project.build.directory}/virtualenv.bat</executable>
                             <workingDirectory>${project.build.directory}</workingDirectory>    
                             <skip>${unix}</skip>                            
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>virtualenv-x64</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${virtualenv.dir}/virtualenv</executable>
-                            <arguments>
-                                <argument>--python</argument>
-                                <argument>${environment.dir}/python/x64/python.exe</argument>
-                                <argument>./x64/python</argument>
-                            </arguments>
-                            <workingDirectory>${project.build.directory}</workingDirectory>     
-                            <skip>${unix}</skip>
-                        </configuration>
-                    </execution>       
+  
                     <execution>
                         <id>virtualenv-unix</id>
                         <phase>generate-sources</phase>
@@ -149,12 +155,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${virtualenv.dir}/virtualenv</executable>
-                            <arguments>
-                                <argument>--python</argument>
-                                <argument>${init.python.dir}/python</argument>
-                                <argument>./${arch}/python</argument>
-                            </arguments>
+                            <executable>${project.build.directory}/virtualenv.sh</executable>
                             <workingDirectory>${project.build.directory}</workingDirectory>     
                             <skip>${windows}</skip>
                         </configuration>

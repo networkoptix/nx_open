@@ -44,7 +44,8 @@ public:
         const QString& customization,
         const QString& version,
         const QString& module,
-        const QString& installationDirectory );
+        const QString& installationDirectory,
+        bool autoStartNeeded );
     virtual ~InstallationProcess();
 
     //!Implementation of QnStoppable::pleaseStop()
@@ -57,11 +58,14 @@ public:
     applauncher::api::InstallationStatus::Value getStatus() const;
     //!Returns installation progress (percents)
     float getProgress() const;
+    bool autoStartNeeded() const;
 
     QString errorText() const;
 
+    QString getVersion() const;
+
 signals:
-    void installationSucceeded();
+    void installationDone( InstallationProcess* installationProcess );
 
 private:
     enum class State
@@ -88,6 +92,7 @@ private:
     int64_t m_totalBytesDownloaded;
     std::map<QString, int64_t> m_unfinishedFilesBytesDownloaded;
     int64_t m_totalBytesToDownload;
+    bool m_autoStartNeeded;
 
     //!Implementation of RDirSyncher::EventReceiver::overrallDownloadSizeKnown
     virtual void overrallDownloadSizeKnown(

@@ -302,8 +302,6 @@ void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     setWindowFrameMargins(extendedFrameWidth, extendedFrameWidth, extendedFrameWidth, extendedFrameWidth);
 
     invalidateShadowShape();
-    if(shadowItem())
-        shadowItem()->setSoftWidth(m_frameWidth);
 }
 
 void QnResourceWidget::setFrameColor(const QColor &frameColor) {

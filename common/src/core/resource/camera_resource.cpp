@@ -87,7 +87,7 @@ QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, fl
         tmp.setHeight(qPower2Ceil(static_cast<unsigned int>(resolutionList[i].height() + 1), 8));
         float ar2 = getResolutionAspectRatio(tmp);
 
-        if (aspectRatio != 0 && !qBetween(aspectRatio, qMin(ar1,ar2), qMax(ar1,ar2)))
+        if (aspectRatio != 0 && !qBetween(qMin(ar1,ar2), aspectRatio, qMax(ar1,ar2)))
         {
             continue;
         }
@@ -106,7 +106,6 @@ QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, fl
 }
 
 CameraDiagnostics::Result QnPhysicalCameraResource::initInternal() {
-    m_vendor = getVendorInternal();
     return CameraDiagnostics::NoErrorResult();
 }
 

@@ -16,15 +16,17 @@
 // -------------------------------------------------------------------------- //
 QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(baseController->resource(), lit("ptzTours"), QnPtzTourHash(), this)),
+    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(lit("ptzTours"), QnPtzTourHash(), this)),
     m_executor(new QnTourPtzExecutor(baseController))
 {
     assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
     assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
-    m_executor->moveToThread(qnPtzPool->executorThread());
+    if(!baseController->hasCapabilities(Qn::VirtualPtzCapability)) // TODO: #Elric implement it in a saner way
+        m_executor->moveToThread(qnPtzPool->executorThread()); 
 
-    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChangedExternally, this, [this]{ emit changed(Qn::ToursPtzField); }, Qt::QueuedConnection);
+    m_adaptor->setResource(baseController->resource());
+    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ToursPtzField); }, Qt::QueuedConnection);
 }
 
 QnTourPtzController::~QnTourPtzController() {
@@ -48,7 +50,7 @@ bool QnTourPtzController::continuousMove(const QVector3D &speed) {
     if(!supports(Qn::ContinuousMovePtzCommand))
         return false;
 
-    m_executor->stopTour();
+    clearActiveTour();
     return base_type::continuousMove(speed);
 }
 
@@ -56,7 +58,7 @@ bool QnTourPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVect
     if(!supports(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space)))
         return false;
     
-    m_executor->stopTour();
+    clearActiveTour();
     return base_type::absoluteMove(space, position, speed);
 }
 
@@ -64,13 +66,14 @@ bool QnTourPtzController::viewportMove(qreal aspectRatio, const QRectF &viewport
     if(!supports(Qn::ViewportMovePtzCommand))
         return false;
 
-    m_executor->stopTour();
+    clearActiveTour();
     return base_type::viewportMove(aspectRatio, viewport, speed);
 }
 
 bool QnTourPtzController::activatePreset(const QString &presetId, qreal speed) {
     /* This one is 100% supported, no need to check. */
-    m_executor->stopTour();
+
+    clearActiveTour();
     return base_type::activatePreset(presetId, speed);
 }
 
@@ -79,6 +82,8 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
     if(!getPresets(&presets))
         return false;
 
+    bool restartTour = false;
+    QnPtzTour activeTour;
     {
         QMutexLocker locker(&m_mutex);
         QnPtzTourHash records = m_adaptor->value();
@@ -87,7 +92,22 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
 
         records.insert(tour.id, tour);
 
+        if(m_activeTour.id == tour.id) {
+            activeTour = tour;
+            activeTour.optimize();
+            
+            if(activeTour != m_activeTour) {
+                restartTour = true;
+                m_activeTour = activeTour;
+            }
+        }
+
         m_adaptor->setValue(records);
+    }
+
+    if(restartTour) {
+        m_executor->stopTour();
+        m_executor->startTour(activeTour);
     }
 
     emit changed(Qn::ToursPtzField);
@@ -95,6 +115,7 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
 }
 
 bool QnTourPtzController::removeTour(const QString &tourId) {
+    bool stopTour = false;
     {
         QMutexLocker locker(&m_mutex);
 
@@ -102,33 +123,51 @@ bool QnTourPtzController::removeTour(const QString &tourId) {
         if(records.remove(tourId) == 0)
             return false;
     
+        if(m_activeTour.id == tourId) {
+            m_activeTour = QnPtzTour();
+            stopTour = true;
+        }
+
         m_adaptor->setValue(records);
     }
+
+    if(stopTour)
+        m_executor->stopTour();
     
     emit changed(Qn::ToursPtzField);
     return true;
 }
 
 bool QnTourPtzController::activateTour(const QString &tourId) {
-    QnPtzTour tour;
+    QnPtzTour activeTour;
     {
         QMutexLocker locker(&m_mutex);
+        if(m_activeTour.id == tourId)
+            return true; /* Already activated. */
+
         const QnPtzTourHash &records = m_adaptor->value();
         if(!records.contains(tourId))
             return false;
-        tour = records.value(tourId);
+
+        activeTour = records.value(tourId);
+        activeTour.optimize();
+        
+        m_activeTour = activeTour;
     }
 
-    m_executor->startTour(tour);
+    m_executor->startTour(activeTour);
 
     return true;
 }
 
 bool QnTourPtzController::getTours(QnPtzTourList *tours) {
-    QMutexLocker locker(&m_mutex);
-
     *tours = m_adaptor->value().values();
-
     return true;
 }
 
+void QnTourPtzController::clearActiveTour() {
+    m_executor->stopTour();
+
+    QMutexLocker locker(&m_mutex);
+    m_activeTour = QnPtzTour();
+}

@@ -23,7 +23,7 @@ protected:
     virtual bool event(QEvent *event) override;
 
     void updateIcon();
-    QPixmap generatePixmap(int size, const QColor &color, const QColor &insideColor, bool hovered, bool checked);
+    QPixmap generatePixmap(int size, const QColor &color, const QColor &insideColor, bool hovered, bool checked, bool enabled);
 
 private:
     QColor m_color;

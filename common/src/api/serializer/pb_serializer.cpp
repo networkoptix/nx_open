@@ -783,7 +783,6 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectionInfoPtr& connectInfo,
     connectInfo->ecsGuid = QString::fromUtf8(pb_connectInfo.ecsguid().c_str());
     connectInfo->publicIp = QString::fromUtf8(pb_connectInfo.publicip().c_str());
     connectInfo->brand = QString::fromUtf8(pb_connectInfo.brand().c_str());
-    connectInfo->allowCameraChanges = pb_connectInfo.allowcamerachanges();
 }
 
 void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRuleList &businessRules, const QByteArray &data)
@@ -864,6 +863,7 @@ void QnApiPbSerializer::serializeServer(const QnMediaServerResourcePtr& serverPt
     pb_server.set_apiurl(serverPtr->getApiUrl().toUtf8().constData());
     pb_server.set_streamingurl(serverPtr->getStreamingUrl().toUtf8().constData());
     pb_serverResource.set_status(static_cast<pb::Resource_Status>(serverPtr->getStatus()));
+    pb_server.set_version(serverPtr->getVersion().toString().toUtf8().constData());
 
     if (!serverPtr->getNetAddrList().isEmpty())
         pb_server.set_netaddrlist(serializeNetAddrList(serverPtr->getNetAddrList()).toUtf8().constData());

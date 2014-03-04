@@ -46,6 +46,7 @@ namespace Qee {
 
     enum StandardFunction {
         ColorFunctions = 0x1,
+        ColorNames = 0x2
     };
     Q_DECLARE_FLAGS(StandardFunctions, StandardFunction)
     Q_DECLARE_OPERATORS_FOR_FLAGS(StandardFunctions)

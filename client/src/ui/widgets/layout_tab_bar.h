@@ -12,8 +12,7 @@ class QnWorkbenchLayout;
 class QnWorkbench;
 
 class QnLayoutTabBar: public QTabBar, public QnWorkbenchContextAware, public QnActionTargetProvider {
-    Q_OBJECT;
-
+    Q_OBJECT
     typedef QTabBar base_type;
 
 public:
@@ -22,6 +21,7 @@ public:
     virtual ~QnLayoutTabBar();
 
     virtual Qn::ActionScope currentScope() const override;
+
 signals:
     void closeRequested(QnWorkbenchLayout *layout);
     void tabTextChanged();

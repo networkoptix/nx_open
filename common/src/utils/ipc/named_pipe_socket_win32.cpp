@@ -51,7 +51,7 @@ SystemError::ErrorCode NamedPipeSocket::connectToServerSync( const QString& pipe
 {
     //TODO/IMPL: #ak timeoutMillis support
 
-    const QString win32PipeName = QString::fromLatin1("\\\\.\\pipe\\%1").arg(pipeName);
+    const QString win32PipeName = lit("\\\\.\\pipe\\%1").arg(pipeName);
 
     //TODO: use WaitNamedPipe
 

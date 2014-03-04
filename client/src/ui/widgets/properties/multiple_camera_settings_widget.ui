@@ -74,7 +74,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBoxEnableAudio">
+        <widget class="QCheckBox" name="enableAudioCheckBox">
          <property name="text">
           <string>Enable audio</string>
          </property>

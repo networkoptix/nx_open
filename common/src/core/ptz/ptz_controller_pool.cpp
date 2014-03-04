@@ -4,6 +4,8 @@
 
 #include <core/resource_management/resource_pool.h>
 
+// TODO: #Elric maybe remove this construct-in-getter? It will make things simpler.
+
 // -------------------------------------------------------------------------- //
 // QnPtzControllerPoolPrivate
 // -------------------------------------------------------------------------- //
@@ -15,23 +17,20 @@ public:
         {
             QMutexLocker locker(&mutex);
 
-            if(controllerByResource.contains(resource)) {
-                *controller = controllerByResource.value(resource);
-                return false; /* Already registered. */
-            }
+            if(*controller = controllerByResource.value(resource))
+                return false;
         }
 
-        *controller = q->createController(resource);
+        QnPtzControllerPtr newController = q->createController(resource);
 
         {
             QMutexLocker locker(&mutex);
 
-            if(controllerByResource.contains(resource)) {
-                *controller = controllerByResource.value(resource);
-                return false; /* Already registered. */
-            }
+            if(*controller = controllerByResource.value(resource))
+                return false;
 
-            controllerByResource.insert(resource, *controller);
+            *controller = newController;
+            controllerByResource.insert(resource, newController);
         }
 
         return true;
@@ -120,6 +119,8 @@ QnPtzControllerPtr QnPtzControllerPool::controller(const QnResourcePtr &resource
     if(!d->resourcePool->getResources().contains(resource))
         return QnPtzControllerPtr();
 
+    // qDebug() << ">>>>>>>> getController before registerResource for" << resource->getName();
+
     /* Controller is not there because we didn't get the signal yet. */
     if(d->registerResource(resource, &result))
         emit const_cast<QnPtzControllerPool *>(this)->controllerChanged(resource);
@@ -128,21 +129,27 @@ QnPtzControllerPtr QnPtzControllerPool::controller(const QnResourcePtr &resource
 }
 
 void QnPtzControllerPool::registerResource(const QnResourcePtr &resource) {
+    // qDebug() << ">>>>>>>> registerResource for" << resource->getName();
+
     QnPtzControllerPtr controller;
     if(d->registerResource(resource, &controller))
         emit controllerChanged(resource);
 }
 
 void QnPtzControllerPool::unregisterResource(const QnResourcePtr &resource) {
+    // qDebug() << ">>>>>>>> unregisterResource for" << resource->getName();
+
     if(d->unregisterResource(resource))
         emit controllerChanged(resource);
 }
 
-QnPtzControllerPtr QnPtzControllerPool::createController(const QnResourcePtr &resource) const {
+QnPtzControllerPtr QnPtzControllerPool::createController(const QnResourcePtr &) const {
     return QnPtzControllerPtr();
 }
 
 void QnPtzControllerPool::updateController(const QnResourcePtr &resource) {
+    qDebug() << ">>>>>>>> updateController for" << resource->getName();
+
     if(d->updateResource(resource))
         emit controllerChanged(resource);
 }

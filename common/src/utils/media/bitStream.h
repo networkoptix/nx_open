@@ -19,9 +19,9 @@ public:
     //BitStreamException(const std::string& str): std::exception(str.c_str()) {}
     BitStreamException(): std::exception() {}
     ~BitStreamException() throw() {}
-    BitStreamException(const std::string& str): message(QString::fromLatin1(str.c_str())) {}
-    BitStreamException(const QString& str): message(QString::fromLatin1(str.toLatin1())) {}
-    BitStreamException(const char* str): message(QString::fromLatin1(str)) {}
+    BitStreamException(const std::string& str): message(QLatin1String(str.c_str())) {}
+    BitStreamException(const QString& str): message(str) {}
+    BitStreamException(const char* str): message(QLatin1String(str)) {}
 
     virtual const char* what() const throw()
     {

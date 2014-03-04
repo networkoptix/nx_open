@@ -26,6 +26,10 @@
                                  Key="Software\[Manufacturer]\${applauncher.name}">
                             <RegistryValue Type="string" Name="previousLaunchedVersion" Value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}"/>
                         </RegistryKey>
+                        <RegistryKey Root="HKCU"
+                                 Key="Software\[Manufacturer]\${applauncher.name}">
+                            <RegistryValue Type="string" Name="mirrorListUrl" Value="http://enk.me/clients/mirror.xml"/>
+                        </RegistryKey>                        
                     </Component>                                
 
                     <Component Id="DefaultLanguage" Permanent="yes">

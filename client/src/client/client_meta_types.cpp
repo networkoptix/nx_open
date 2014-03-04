@@ -22,6 +22,7 @@ namespace {
 }
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
+QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientSkin)
 
 void QnClientMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK, 
@@ -50,6 +51,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnServerStorageStateHash>();
     qRegisterMetaType<Qn::TimeMode>();
     qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
+    qRegisterMetaType<Qn::ClientSkin>();
+    qRegisterMetaTypeStreamOperators<Qn::ClientSkin>();
     qRegisterMetaType<ImageCorrectionParams>();
     qRegisterMetaType<Qn::ActionId>();
     qRegisterMetaType<QnActionParameters>();
@@ -60,6 +63,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnCustomization>();
 
     qRegisterMetaType<QnTimeSliderColors>();
+    qRegisterMetaType<QnTimeScrollBarColors>();
     qRegisterMetaType<QnBackgroundColors>();
     qRegisterMetaType<QnCalendarColors>();
     qRegisterMetaType<QnStatisticsColors>();
@@ -67,6 +71,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnGridColors>();
 
     QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
+    QnJsonSerializer::registerSerializer<QnTimeScrollBarColors>();
     QnJsonSerializer::registerSerializer<QnBackgroundColors>();
     QnJsonSerializer::registerSerializer<QnCalendarColors>();
     QnJsonSerializer::registerSerializer<QnStatisticsColors>();

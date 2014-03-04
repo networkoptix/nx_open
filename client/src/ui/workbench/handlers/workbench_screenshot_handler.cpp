@@ -26,6 +26,12 @@
 #include <utils/common/environment.h>
 #include <utils/common/warnings.h>
 
+//#define QN_SCREENSHOT_DEBUG
+#ifdef QN_SCREENSHOT_DEBUG
+#   define TRACE(...) qDebug() << __VA_ARGS__
+#else
+#   define TRACE(...)
+#endif
 
 namespace {
     void drawTimeStamp(QImage &image, Qn::Corner position, const QString &timestamp) {
@@ -82,6 +88,10 @@ QString QnScreenshotParameters::timeString() const {
     return QTime().addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
 }
 
+
+// -------------------------------------------------------------------------- //
+// QnScreenshotLoader
+// -------------------------------------------------------------------------- //
 QnScreenshotLoader::QnScreenshotLoader(const QnScreenshotParameters& parameters, QObject *parent):
     QnImageProvider(parent),
     m_parameters(parameters),
@@ -89,7 +99,9 @@ QnScreenshotLoader::QnScreenshotLoader(const QnScreenshotParameters& parameters,
 {
 }
 
-QnScreenshotLoader::~QnScreenshotLoader() {}
+QnScreenshotLoader::~QnScreenshotLoader() {
+    return;
+}
 
 void QnScreenshotLoader::setBaseProvider(QnImageProvider *imageProvider) {
     m_baseProvider.reset(imageProvider);
@@ -130,8 +142,10 @@ void QnScreenshotLoader::at_imageLoaded(const QImage &image) {
     m_isReady = false;
 }
 
-//---------------- QnWorkbenchScreenshotHandler --------------------------
 
+// -------------------------------------------------------------------------- //
+// QnWorkbenchScreenshotHandler
+// -------------------------------------------------------------------------- //
 QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent): 
     QObject(parent), 
     QnWorkbenchContextAware(parent) 
@@ -145,16 +159,14 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScre
 
     QList<QImage> images;
 
+    TRACE("SCREENSHOT DEWARPING" << parameters.itemDewarpingParams.enabled << parameters.itemDewarpingParams.xAngle << parameters.itemDewarpingParams.yAngle << parameters.itemDewarpingParams.fov);
+
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
-    bool anyQuality = layout->channelCount() > 1;   //screenshots for the panoramica cameras will be done localy
+    bool anyQuality = layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
     for (int i = 0; i < layout->channelCount(); ++i) {
-        QImage channelImage = display->camDisplay()->getScreenshot(i,
-                                                                   parameters.imageCorrectionParams,
-                                                                   parameters.mediaDewarpingParams,
-                                                                   parameters.itemDewarpingParams,
-                                                                   anyQuality);
+        QImage channelImage = display->camDisplay()->getScreenshot(i, parameters.imageCorrectionParams, parameters.mediaDewarpingParams, parameters.itemDewarpingParams, anyQuality);
         if (channelImage.isNull())
-            return NULL;    // async remote screenshoy provider will be used
+            return NULL;    // async remote screenshot provider will be used
         images.push_back(channelImage);
     }
     QSize channelSize = images[0].size();
@@ -197,13 +209,10 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.isUtc = widget->resource()->toResource()->flags() & QnResource::utc;
     parameters.filename = actionParameters.argument<QString>(Qn::FileNameRole);
     parameters.timestampPosition = qnSettings->timestampCorner();
-    if (widget->item()->zoomTargetItem())
-        parameters.itemDewarpingParams = widget->item()->zoomTargetItem()->dewarpingParams();
-    else
-        parameters.itemDewarpingParams = widget->item()->dewarpingParams();
+    parameters.itemDewarpingParams = widget->item()->dewarpingParams();
     parameters.mediaDewarpingParams = widget->dewarpingParams();
     parameters.imageCorrectionParams = widget->item()->imageEnhancement();
-    parameters.zoomRect = widget->zoomRect();
+    parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
 
     QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, display.data());
     if (!imageProvider)

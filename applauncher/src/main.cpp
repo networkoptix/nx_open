@@ -237,7 +237,8 @@ int doInstallation(
         customization,
         version,
         module,
-        effectiveInstallationPath );
+        effectiveInstallationPath,
+        false );
     if( !installationProcess.start( settings ) )
     {
         std::cerr<<"FAILURE. Cannot start installation. "<<installationProcess.errorText().toStdString()<<std::endl;

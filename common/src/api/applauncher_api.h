@@ -58,6 +58,7 @@ namespace applauncher
             QString version;
             //!Command-line params to pass to application instance
             QString appArgs;
+            bool autoRestore;
 
             StartApplicationTask();
             StartApplicationTask(
@@ -80,8 +81,10 @@ namespace applauncher
             QString version;
             //!Module name for install. By default, "client". For future use
             QString module;
+            bool autoStart;
 
             StartInstallationTask();
+            StartInstallationTask( const QString& _version, bool _autoStart = false );
 
             //!Implementation of \a BaseTask::serialize()
             virtual QByteArray serialize() const override;
@@ -167,6 +170,7 @@ namespace applauncher
             unsigned int installationID;
 
             GetInstallationStatusRequest();
+            GetInstallationStatusRequest( unsigned int installationID );
 
             virtual QByteArray serialize() const override;
             virtual bool deserialize( const QnByteArrayConstRef& data ) override;

@@ -16,7 +16,7 @@ public:
     QnAviResource(const QString& file);
     ~QnAviResource();
 
-    void deserialize(const QnResourceParameters&);
+    virtual void deserialize(const QnResourceParameters&) override;
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
     virtual QString toString() const;
@@ -36,7 +36,6 @@ public:
     /* Return item time zone offset in ms */
     qint64 timeZoneOffset() const;
     QnAviArchiveDelegate* createArchiveDelegate() const;
-protected:
 
 private:
     QnStorageResourcePtr m_storage;

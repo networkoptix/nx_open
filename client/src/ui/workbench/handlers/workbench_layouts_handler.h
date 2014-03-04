@@ -18,6 +18,7 @@ public:
 
     void renameLayout(const QnLayoutResourcePtr &layout, const QString &newName);
     bool closeAllLayouts(bool waitForReply = false);
+
 protected:
     QnAppServerConnectionPtr connection() const;
 
@@ -32,6 +33,7 @@ private slots:
     void at_closeAllButThisLayoutAction_triggered();
 
     void at_layouts_saved(int status, const QnResourceList &resources, int handle);
+
 private:
     void saveLayout(const QnLayoutResourcePtr &layout);
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);

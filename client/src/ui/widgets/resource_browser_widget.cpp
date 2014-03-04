@@ -56,8 +56,9 @@ namespace {
 //    const char *qn_searchCriterionPropertyName = "_qn_searchCriterion";
 }
 
-/********** QnResourceBrowserToolTipWidget *********************/
-
+// -------------------------------------------------------------------------- //
+// QnResourceBrowserToolTipWidget
+// -------------------------------------------------------------------------- //
 QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem *parent):
     base_type(parent),
     m_textLabel(new QnProxyLabel(this)),
@@ -73,7 +74,7 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem *pa
     m_thumbnailLabel->setClickableButtons(Qt::LeftButton);
     m_thumbnailLabel->setVisible(false);
     setPaletteColor(m_thumbnailLabel, QPalette::Window, Qt::transparent);
-    connect(m_thumbnailLabel, SIGNAL(clicked()), this, SIGNAL(thumbnailClicked()));
+    connect(m_thumbnailLabel, &QnClickableProxyLabel::clicked, this, &QnResourceBrowserToolTipWidget::thumbnailClicked);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -704,8 +705,6 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
 
     emit currentTabChanged();
 }
-
-
 
 void QnResourceBrowserWidget::at_showUrlsInTree_changed() {
     bool urlsShown = qnSettings->isIpShownInTree();

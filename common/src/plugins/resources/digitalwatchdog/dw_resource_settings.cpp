@@ -4,7 +4,7 @@
 // class DWCameraProxy
 //
 
-QRegExp DW_RES_SETTINGS_FILTER(QString::fromLatin1("[{},']"));
+QRegExp DW_RES_SETTINGS_FILTER(lit("[{},']"));
 
 
 DWCameraProxy::DWCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth):
@@ -50,7 +50,7 @@ void DWCameraProxy::fetchParamsFromHttpRespons(const QByteArray& body)
     {
         QString str = QString::fromLatin1(lines[i]);
         str.replace(DW_RES_SETTINGS_FILTER, QString());
-        QStringList pairStrs = str.split(QString::fromLatin1(":"));
+        QStringList pairStrs = str.split(L':');
         if (pairStrs.size() == 2) {
             m_bufferedValues.insert(pairStrs[0].trimmed(), pairStrs[1].trimmed());
         }
@@ -75,7 +75,7 @@ bool DWCameraProxy::setToCamera(DWCameraSetting& src)
 {
     QString desiredVal = src.getCurrentAsIntStr();
 
-    bool res = src.getMethod() == QString::fromLatin1("POST")? setToCameraPost(src, desiredVal) :
+    bool res = src.getMethod() == lit("POST")? setToCameraPost(src, desiredVal) :
         setToCameraGet(src, desiredVal);
     if (!res) {
         qWarning() << "Can't set parameter" << src.getName() << "value" << desiredVal << "to camera" << m_host;
@@ -106,10 +106,10 @@ bool DWCameraProxy::setToCameraGet(DWCameraSetting& src, const QString& desiredV
 
     //Todo: get rid of tricky logic
     if (src.getType() == CameraSetting::ControlButtonsPair) {
-        paramQuery = paramQuery + QString::fromLatin1("=") + desiredVal;
+        paramQuery = paramQuery + lit("=") + desiredVal;
     } else {
         paramQuery = paramQuery.startsWith(QLatin1String("/")) ? paramQuery : 
-            (QString::fromLatin1("cgi-bin/camerasetup.cgi?") + paramQuery + QString::fromLatin1("=") + desiredVal);
+            (lit("cgi-bin/camerasetup.cgi?") + paramQuery + lit("=") + desiredVal);
     }
 
     return httpClient.doGET(QByteArray(paramQuery.toLatin1())) == CL_HTTP_SUCCESS;
@@ -124,10 +124,10 @@ bool DWCameraProxy::setToCameraPost(DWCameraSetting& src, const QString& desired
     //Todo: get rid of tricky logic
     if (paramQuery.startsWith(QLatin1String("/"))) {
         query = paramQuery.toLatin1();
-        paramQuery = QString::fromLatin1("action=all");
+        paramQuery = lit("action=all");
     } else {
         query = "/cgi-bin/systemsetup.cgi";
-        paramQuery = QString::fromLatin1("ftp_upgrade_") + paramQuery + QString::fromLatin1("=") + desiredVal;
+        paramQuery = lit("ftp_upgrade_") + paramQuery + lit("=") + desiredVal;
     }
 
     return httpClient.doPOST(query, paramQuery) == CL_HTTP_SUCCESS;

@@ -6,26 +6,17 @@
 
 QString extractHost(const QString &url) 
 {
-    /* speed optimization. This version many times faster. It is important for event log speed */ 
-    int prefixIdx = url.indexOf(lit("://"));
-    if (prefixIdx == -1)
-        return url;
-    prefixIdx += 3;
-    int postfixIdx = url.indexOf(L':', prefixIdx);
-    if (postfixIdx)
-        return url.mid(prefixIdx, postfixIdx - prefixIdx);
-    else
-        return url.mid(prefixIdx);
+    /* Don't go through QHostAddress/QUrl constructors as it is SLOW. 
+     * Speed is important for event log. */ 
+    int startPos = url.indexOf(lit("://"));
+    startPos = startPos == -1 ? 0 : startPos + 3;
 
-    /*
-    // Try it as a host address first.
-    QHostAddress hostAddress(url);
-    if(!hostAddress.isNull())
-        return hostAddress.toString();
+    int endPos = url.indexOf(L':', startPos);
+    if (endPos == -1)
+        endPos = url.indexOf(L'/', startPos); /* No port, but we may still get '/' after address. */
+    endPos = endPos == -1 ? url.size() : endPos;
 
-    // Then go default QUrl route. 
-    return QUrl(url).host();
-    */
+    return url.mid(startPos, endPos - startPos);
 }
 
 QString getFullResourceName(const QnResourcePtr &resource, bool showIp) {

@@ -29,8 +29,8 @@ void QnControlBackgroundWidget::init(Qn::Border gradientBorder) {
     m_gradientBorder = gradientBorder;
     m_colors << QColor(0, 0, 0, 255) << QColor(0, 0, 0, 64);
     
-    setFrameColor(QColor(110, 110, 110, 255));
-    setFrameWidth(0.5);
+    setFrameColor(QColor(110, 110, 110, 128));
+    setFrameWidth(1.0);
 
     updateWindowBrush();
 }

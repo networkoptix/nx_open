@@ -24,5 +24,6 @@ unix: !mac {
 }
 
 mac {
-    OBJECTIVE_SOURCES += ${basedir}/src/mac_utils.mm
+    OBJECTIVE_SOURCES += ${basedir}/src/ui/workaround/mac_utils.mm
+    LIBS += -lobjc -framework Foundation -framework AudioUnit -framework AppKit
 }

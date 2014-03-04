@@ -12,7 +12,6 @@ class QnQtbugWorkaroundPrivate;
  * 
  * Windows bugs:
  * https://bugreports.qt-project.org/browse/QTBUG-28513
- * https://bugreports.qt-project.org/browse/QTBUG-32835 (Fixed in #Qt5.2.0) 
  * https://bugreports.qt-project.org/browse/QTBUG-806
  */
 class QnQtbugWorkaround: public QObject, public QAbstractNativeEventFilter {

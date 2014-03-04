@@ -376,17 +376,17 @@
         <translation>Impossible d&apos;analyser l&apos;information de connexion sérialisée.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="793"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="792"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation>Impossible d&apos;analyser les règles évènement/action sérialisées.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="802"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="801"/>
         <source>Cannot parse serialized action.</source>
         <translation>Impossible d&apos;analyser l&apos;action sérialisée.</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="811"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="810"/>
         <source>Cannot parse serialized actions.</source>
         <translation>Impossible d&apos;analyser les actions sérialisées.</translation>
     </message>

@@ -28,18 +28,20 @@ public:
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
     virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) override;
 
+    virtual bool removePreset(const QString &presetId) override;
     virtual bool activatePreset(const QString &presetId, qreal speed) override;
+
+    virtual bool removeTour(const QString &tourId) override;
     virtual bool activateTour(const QString &tourId) override;
 
     virtual bool getActiveObject(QnPtzObject *activeObject) override;
 
-private:
-    void setActiveObject(const QnPtzObject &activeObject);
+    virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
 
 private:
-    Mode m_mode;
+    const Mode m_mode;
+    const bool m_asynchronous;
     QnResourcePropertyAdaptor<QnPtzObject> *m_adaptor;
-    QnPtzObject m_activeObject;
 };
 
 #endif // QN_ACTIVITY_PTZ_CONTROLLER_H

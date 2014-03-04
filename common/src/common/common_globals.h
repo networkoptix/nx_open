@@ -277,6 +277,13 @@ public:
         ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
         ItemCheckedButtonsRole,                     /**< Role for buttons that a checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
 
+        /* Ptz-based. */
+        PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
+        PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */
+        PtzObjectIdRole,                            /**< Role for PTZ tour/preset id. Value of type QString. */
+        PtzObjectNameRole,                          /**< Role for PTZ tour/preset name. Value of type QString. */
+        PtzTourSpotRole,                            /**< Role for PTZ tour spot. Value of type QnPtzTourSpot. */
+
         /* Context-based. */
         CurrentLayoutResourceRole,
         CurrentUserResourceRole,
@@ -299,11 +306,7 @@ public:
 
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
-        PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
-        PtzPresetIdRole,                            /**< Role for PTZ preset id. Value of type QString. */
-        PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */
-        PtzTourIdRole,                              /**< Role for PTZ tour id. Value of type QString. */
-        PtzTourSpotRole,                            /**< Role for PTZ tour spot. Value of type QnPtzTourSpot. */
+        
         TranslationRole,                            /**< Role for translations. Value of type QnTranslation. */
 
         ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */

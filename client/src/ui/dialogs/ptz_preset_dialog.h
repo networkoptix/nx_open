@@ -25,6 +25,7 @@ protected:
     virtual void loadData(const QnPtzData &data) override;
     virtual void saveData() override;
     virtual Qn::PtzDataFields requiredFields() const override;
+    virtual void updateFields(Qn::PtzDataFields fields) override;
 
 protected:
     int hotkey() const;

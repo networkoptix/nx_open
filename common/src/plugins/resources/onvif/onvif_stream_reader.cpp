@@ -436,10 +436,14 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapp
             return result;
     }
 
-    if (m_onvifRes->isCameraControlDisabled())
+    if (m_onvifRes->isCameraControlDisabled()) {
+        // TODO: #Elric need to untangle this evil.
+        m_onvifRes->setPtzProfileToken(QString::fromStdString(profile->token));
+
         return CameraDiagnostics::NoErrorResult();
-    else
+    } else {
         return sendProfileToCamera(info, profile);
+    }
 
 }
 
@@ -547,7 +551,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
 
     if (getRole() == QnResource::Role_LiveVideo)
     {
-        if(!m_onvifRes->getPtzfUrl().isEmpty() && !m_onvifRes->getPtzConfigurationToken().isEmpty()) {
+        if(!m_onvifRes->getPtzUrl().isEmpty() && !m_onvifRes->getPtzConfigurationToken().isEmpty()) {
             bool ptzMatched = profile && profile->PTZConfiguration;
             if (!ptzMatched) {
                 AddPTZConfigReq request;

@@ -131,8 +131,8 @@ void QnNotificationToolTipWidget::pointTo(const QPointF &pos) {
     updateTailPos();
 }
 
-void QnNotificationToolTipWidget::clicked(Qt::MouseButton button) {
-    if(button == Qt::RightButton)
+void QnNotificationToolTipWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
+    if(event->button() == Qt::RightButton)
         emit closeTriggered();
 }
 
@@ -164,8 +164,8 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem *parent, Qt::WindowFlag
     m_color = QnNotificationLevels::notificationColor(m_notificationLevel);
 
     setClickableButtons(Qt::RightButton | Qt::LeftButton);
-    setFrameColor(QColor(110, 110, 110, 255)); // TODO: Same as in workbench_ui. Unify?
-    setFrameWidth(0.5);
+    setFrameColor(QColor(110, 110, 110, 128)); // TODO: Same as in workbench_ui. Unify?
+    setFrameWidth(1.0);
     setWindowBrush(Qt::transparent);
 
     m_overlayWidget = new QnFramedWidget(this);
@@ -366,7 +366,9 @@ void QnNotificationWidget::updateOverlayColor() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnNotificationWidget::clicked(Qt::MouseButton button) {
+void QnNotificationWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
+    Qt::MouseButton button = event->button();
+
     if(button == Qt::RightButton) {
         emit closeTriggered();
     } else if(button == Qt::LeftButton) {

@@ -15,6 +15,7 @@ using namespace nx_http;
 
 QnPlSonyResource::QnPlSonyResource()
 {
+    setVendor(lit("Sony"));
 }
 
 QnPlSonyResource::~QnPlSonyResource() {
@@ -87,7 +88,7 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
                     << confToken.c_str() << ") from camera (URL: " << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
                     << "). GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
                 return CameraDiagnostics::RequestFailedResult(
-                    QString::fromLatin1("setVideoEncoderConfiguration(%1x%2)").arg(it->width()).arg(it->height()),
+                    lit("setVideoEncoderConfiguration(%1x%2)").arg(it->width()).arg(it->height()),
                     soapWrapper.getLastError() );
             }
         }
@@ -102,7 +103,7 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     }
 
     if (soapRes != SOAP_OK) {
-        return CameraDiagnostics::RequestFailedResult( QString::fromLatin1("setVideoEncoderConfiguration"), soapWrapper.getLastError() );
+        return CameraDiagnostics::RequestFailedResult( lit("setVideoEncoderConfiguration"), soapWrapper.getLastError() );
     }
 
     if (triesNumLeft == MAX_RESOLUTION_DECREASES_NUM) {
@@ -132,7 +133,7 @@ CameraDiagnostics::Result QnPlSonyResource::initInternal()
     CLHttpStatus status = http.doGET( QLatin1String("/command/system.cgi?AlarmData=on") );
     if( status % 100 != 2 )
     {
-        NX_LOG( QString::fromLatin1("Failed to execute /command/system.cgi?AlarmData=on on Sony camera %1. http status %2").
+        NX_LOG( lit("Failed to execute /command/system.cgi?AlarmData=on on Sony camera %1. http status %2").
             arg(getHostAddress()).arg(status), cl_logDEBUG1 );
     }
 
@@ -165,7 +166,7 @@ bool QnPlSonyResource::startInputPortMonitoring()
         //it is safe to proceed with no lock futher because stopInputMonitoring can be only called from current thread 
             //and forgetHttpClient cannot be called before doGet call
 
-    requestUrl.setPath( QString::fromLatin1("/command/alarmdata.cgi?interval=%1").arg(INPUT_MONITOR_TIMEOUT_SEC) );
+    requestUrl.setPath( lit("/command/alarmdata.cgi?interval=%1").arg(INPUT_MONITOR_TIMEOUT_SEC) );
     m_inputMonitorHttpClient = std::make_shared<nx_http::AsyncHttpClient>();
     connect( m_inputMonitorHttpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClientPtr)),          this, SLOT(onMonitorResponseReceived(nx_http::AsyncHttpClientPtr)),        Qt::DirectConnection );
     connect( m_inputMonitorHttpClient.get(), SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClientPtr)),  this, SLOT(onMonitorMessageBodyAvailable(nx_http::AsyncHttpClientPtr)),    Qt::DirectConnection );
@@ -204,7 +205,7 @@ void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClientPtr httpClient 
 
     if( (m_inputMonitorHttpClient->response()->statusLine.statusCode / 100) * 100 != StatusCode::ok )
     {
-        cl_log.log( QString::fromLatin1("Sony camera %1. Failed to subscribe to input monitoring. %3").
+        cl_log.log( lit("Sony camera %1. Failed to subscribe to input monitoring. %3").
             arg(getUrl()).arg(QLatin1String(m_inputMonitorHttpClient->response()->statusLine.reasonPhrase)), cl_logDEBUG1 );
         m_inputMonitorHttpClient.reset();
         return;
