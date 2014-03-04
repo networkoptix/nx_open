@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="fr" sourcelanguage="en">
+<TS version="2.0" language="fr" sourcelanguage="en">
 <context>
     <name>ConnectionTestingDialog</name>
     <message>
@@ -58,12 +58,12 @@ L&apos;application va être fermée.</translation>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="70"/>
         <source>Request timed out.</source>
-        <translation type="unfinished"></translation>
+        <translation>Requête expirée.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="98"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;utilisateur ou le mot de passe que vous avez entré est incorrect. S.V.P, essayer à nouveau.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="101"/>
@@ -71,12 +71,15 @@ L&apos;application va être fermée.</translation>
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>La connexion sur le Contrôleur Entreprise ne peut pas être établie.
+Les détails de connexion que vous avez entrés sont incorrects, S.V.P, essayer à nouveau.
+
+Si l&apos;erreur persiste, S.V.P, contacter votre administrateur VMS.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="106"/>
         <source>You are trying to connect to incompatible Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous essayez de vous connecter sur un Contrôleur Entreprise incompatible.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="111"/>
@@ -84,7 +87,10 @@ If this error persists, please contact your VMS administrator.</source>
  - Client version: %1.
  - EC version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le Contrôleur Entreprise à une version différente:
+ - Version Client: %1.
+ - Version EC: %2.
+Le mode compatibilité pour les versions inférieures à %3 n&apos;est pas supporté.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="120"/>
@@ -92,7 +98,10 @@ Compatibility mode for versions lower than %3 is not supported.</source>
  - Client version: %1.
  - EC version: %2.
 You will be asked to restart the client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le Contrôleur Entreprise à une version différente:
+ - Version Client: %1.
+ - Version EC: %2.
+Vous serez invité à redémarrer le client en mode de compatibilité.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="133"/>
@@ -304,43 +313,44 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
     <message>
         <location filename="../src/systraywindow.cpp" line="126"/>
         <source>%1 Tray Assistant</source>
-        <translation type="unfinished"></translation>
+        <translation>Assistant de notification %1</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="232"/>
         <source>Access denied.</source>
-        <translation type="unfinished"></translation>
+        <translation>Accès refusé.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="235"/>
         <source>Specified database does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Base de données spécifiée n&apos;existe pas.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="238"/>
         <source>Specified parameter is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètre spécifié est invalide.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="242"/>
         <source>Could not access installed services</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne peut pas accéder les services installés</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="242"/>
         <source>An error has occurred while trying to access installed services:
  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Une erreur est survenue en essayant d&apos;accéder aux services installés:
+%1</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="641"/>
         <source>Show &amp;Media Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Afficher le journal du Média Serveur</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="646"/>
         <source>Show &amp;Enterprise Controller Log</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Afficher le journal du Contrôleur Entreprise</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="654"/>
@@ -390,7 +400,7 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
     <message>
         <location filename="../src/systraywindow.cpp" line="989"/>
         <source>%1 port is already used by another process</source>
-        <translation type="unfinished"></translation>
+        <translation>Le port %1 est déjà utilisé par un autre processus</translation>
     </message>
     <message>
         <source>media proxy</source>
@@ -453,12 +463,12 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
     <message>
         <source>Login</source>
         <translatorcomment>If it need to be shorter, &quot; ID &quot; can be use</translatorcomment>
-        <translation type="vanished">Identifiant</translation>
+        <translation>Identifiant</translation>
     </message>
     <message>
         <source>Password</source>
         <translatorcomment>If it need to be shorter, &quot; MDP &quot; can be use</translatorcomment>
-        <translation type="vanished">Mot de passe</translation>
+        <translation>Mot de passe</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="92"/>
@@ -467,7 +477,7 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
     </message>
     <message>
         <source>Port</source>
-        <translation type="vanished">Port</translation>
+        <translation>Port</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="69"/>
@@ -477,17 +487,17 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="80"/>
         <source>Host:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hôte:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="130"/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>Identifiant:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="140"/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="165"/>
@@ -497,17 +507,17 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="185"/>
         <source>Cameras RTP transport:</source>
-        <translation type="unfinished"></translation>
+        <translation>Transport RTP des Caméras:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="108"/>
         <location filename="../src/settings.ui" line="338"/>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>Port:</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation type="vanished">Hôte</translation>
+        <translation>Hôte</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="179"/>
@@ -531,7 +541,7 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <location filename="../src/settings.ui" line="263"/>
         <location filename="../src/settings.ui" line="357"/>
         <source>Use specified IP or host name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Spécifier IP ou le nom d&apos;hôte:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="290"/>
@@ -541,7 +551,7 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="302"/>
         <source>Enterprise controller network settings</source>
-        <translation type="unfinished">Configurations réseau du contrôleur entreprise</translation>
+        <translation>Configurations réseau du contrôleur entreprise</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="348"/>
@@ -558,7 +568,7 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
     </message>
     <message>
         <source>Cameras RTP transport</source>
-        <translation type="vanished">Transport RTP des Caméras</translation>
+        <translation>Transport RTP des Caméras</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="195"/>
@@ -581,7 +591,7 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
     </message>
     <message>
         <source>Use specified IP or host name</source>
-        <translation type="vanished">Spécifier IP ou le nom d&apos;hôte</translation>
+        <translation>Spécifier IP ou le nom d&apos;hôte</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="253"/>
