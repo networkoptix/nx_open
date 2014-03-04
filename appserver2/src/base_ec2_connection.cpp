@@ -176,7 +176,7 @@ namespace ec2
     void BaseEc2Connection<T>::deleteRemotePeer(const QUrl& _url)
     {
         QUrl url(_url);
-        url.setPath("ec2/events");
+        url.setPath("/ec2/events");
         QUrlQuery q;
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
         url.setQuery(q);

@@ -44,13 +44,20 @@ namespace ec2
             void processUpdateAsync( const QUrl& ecBaseUrl, const QnTransaction<QueryDataType>& tran, HandlerType handler )
         {
             QUrl requestUrl( ecBaseUrl );
+            nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+            if (!requestUrl.userName().isEmpty()) {
+                httpClient->setUserName(requestUrl.userName());
+                httpClient->setUserPassword(requestUrl.password());
+                requestUrl.setUserName(QString());
+                requestUrl.setPassword(QString());
+            }
+
             requestUrl.setPath( QString::fromLatin1("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
 
             QByteArray tranBuffer;
             OutputBinaryStream<QByteArray> outputStream( &tranBuffer );
             tran.serialize(&outputStream);
 
-            nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
             QMutexLocker lk( &m_mutex );
@@ -72,12 +79,19 @@ namespace ec2
             void processQueryAsync( const QUrl& ecBaseUrl, ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
             QUrl requestUrl( ecBaseUrl );
+            nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+            if (!requestUrl.userName().isEmpty()) {
+                httpClient->setUserName(requestUrl.userName());
+                httpClient->setUserPassword(requestUrl.password());
+                requestUrl.setUserName(QString());
+                requestUrl.setPassword(QString());
+            }
+
             requestUrl.setPath( QString::fromLatin1("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;
             toUrlParams( input, &query );
             requestUrl.setQuery( query );
 
-            nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
             QMutexLocker lk( &m_mutex );

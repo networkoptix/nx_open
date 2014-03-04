@@ -214,6 +214,14 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
 
+    if (!remoteAddr.userName().isEmpty())
+    {
+        m_httpClient->setUserName(remoteAddr.userName());
+        m_httpClient->setUserPassword(remoteAddr.password());
+        remoteAddr.setUserName(QString());
+        remoteAddr.setPassword(QString());
+    }
+
     QUrlQuery q = QUrlQuery(remoteAddr.query());
     if( m_isClientPeer ) {
         q.removeQueryItem("isClient");
