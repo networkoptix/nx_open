@@ -12,8 +12,8 @@ QnFramedLabel::QnFramedLabel(QWidget* parent):
 
 QnFramedLabel::~QnFramedLabel() {}
 
-QSize QnFramedLabel::size() const {
-    return base_type::size() - QSize(lineWidth()*2, lineWidth()*2);
+QSize QnFramedLabel::contentSize() const {
+    return size() - QSize(lineWidth() * 2, lineWidth() * 2);
 }
 
 qreal QnFramedLabel::opacity() const {
