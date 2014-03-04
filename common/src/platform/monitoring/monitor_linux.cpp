@@ -373,6 +373,11 @@ QnLinuxMonitor::~QnLinuxMonitor() {
     return;
 }
 
+QList<QnPlatformMonitor::NetworkLoad> QnLinuxMonitor::totalNetworkLoad()
+{
+    return d_ptr->totalNetworkLoad();
+}
+
 QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
 {
     QList<QnPlatformMonitor::PartitionSpace> partitions = base_type::totalPartitionSpaceInfo();
