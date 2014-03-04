@@ -85,6 +85,9 @@ namespace {
      * Tickmarks that are closer to each other will never be displayed. */
     const qreal criticalTickmarkLineStepPixels = 2.0;
 
+    /** Estimated maximal size of tickmark text label. */
+    const qreal maxTickmarkTextSizePixels = 80.0;
+
     /** Minimal distance between tickmarks from the same group for text labels to be visible for this group. */
     const qreal minTickmarkTextStepPixels = 40.0;
 
@@ -1851,7 +1854,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         minStepIndex = stepCount - 1; /* Tests show that we can actually get here. */
 
     /* Find initial and maximal positions. */
-    QPointF overlap(criticalTickmarkTextStepPixels / 2.0, 0.0);
+    QPointF overlap(maxTickmarkTextSizePixels / 2.0, 0.0);
     qint64 startPos = qMax(minimum() + 1, valueFromPosition(positionFromValue(m_windowStart) - overlap, false)) + m_localOffset;
     qint64 endPos = qMin(maximum() - 1, valueFromPosition(positionFromValue(m_windowEnd) + overlap, false)) + m_localOffset;
 

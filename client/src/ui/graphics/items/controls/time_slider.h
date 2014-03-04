@@ -222,7 +222,10 @@ private:
     };
 
     struct TimeStepData {
-        TimeStepData(): currentHeight(0.0), targetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
+        TimeStepData(): minTickmarkTextStepPixels(0), criticalTickmarkTextStepPixels(0), currentHeight(0.0), targetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
+
+        int minTickmarkTextStepPixels;
+        int criticalTickmarkTextStepPixels;
 
         qreal currentHeight;
         qreal targetHeight;
