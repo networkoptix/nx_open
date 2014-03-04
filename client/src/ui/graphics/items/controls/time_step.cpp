@@ -191,6 +191,19 @@ QString toShortString(qint64 msecs, const QnTimeStep &step) {
     }
 }
 
+QString toLongestShortString(const QnTimeStep &step) {
+    if(step.isRelative)
+        return QString::number(step.wrapUnits - 1) + step.format;
+
+    switch(step.type) {
+    case QnTimeStep::Milliseconds:
+    case QnTimeStep::Hours:
+        return QString::number(step.wrapUnits - 1) + step.format;
+    default:
+        return QString();
+    }
+}
+
 QString toLongString(qint64 msecs, const QnTimeStep &step) {
     if(step.isRelative) {
         return QString();

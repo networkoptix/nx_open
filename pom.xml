@@ -83,7 +83,7 @@
 
     <build>
         <defaultGoal>install</defaultGoal>
-        <finalName>${finalName}</finalName>
+        <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -194,14 +194,14 @@
             <activation>
                 <file>
                     <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
-                    <missing>build_environment/target/x64/python/Lib/site-packages/llutil-0.4-py2.7-win-amd64.egg/llutil.py </missing>
+                    <missing>build_environment/target/buildenv.timestamp</missing>
                 </file> 
             </activation>
             <modules>	
                 <module>build_environment</module>
             </modules>	
         </profile>     
-
+        
         <profile>
             <id>quicksync</id>
             <activation>
@@ -455,17 +455,6 @@
             </modules>
         </profile>
         <profile>
-            <id>beta</id>
-            <activation>
-                <property>
-                    <name>!beta</name>
-                </property>
-            </activation>
-            <properties>
-                <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>    
-            </properties>
-        </profile>	      
-        <profile>
             <id>nobeta</id>
             <activation>
                 <property>
@@ -474,8 +463,9 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>    
-            </properties>       
-        </profile>	        
+                <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>
+            </properties>
+        </profile>	      
     </profiles>	
 </project>
+

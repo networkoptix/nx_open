@@ -28,8 +28,8 @@
 
 namespace {
     QString versionString(const char *version) {
-        QString result = QString::fromLatin1(version);
-        result.replace(QLatin1String("-SNAPSHOT"), QString());
+        QString result = QLatin1String(version);
+        result.replace(lit("-SNAPSHOT"), QString());
         return result;
     }
 
@@ -126,9 +126,9 @@ void QnAboutDialog::retranslateUi()
             "<b>SIGAR %7</b> - Copyright (c) 2004-2011 VMware Inc.<br/>\n"
             "<b>Boost %8</b> - Copyright (c) 2000-2012 Boost developers.<br/>\n"
         ).
-        arg(QString::fromLatin1(QN_ORGANIZATION_NAME) + QLatin1String("(tm)")).
-        arg(QString::fromLatin1(QN_APPLICATION_NAME)).
-        arg(QString::fromLatin1(QT_VERSION_STR)).
+        arg(QLatin1String(QN_ORGANIZATION_NAME) + QLatin1String("(tm)")).
+        arg(QLatin1String(QN_APPLICATION_NAME)).
+        arg(QLatin1String(QT_VERSION_STR)).
         arg(versionString(QN_FFMPEG_VERSION)).
         arg(QtvAudioDevice::instance()->versionString()).
         arg(QtvAudioDevice::instance()->company()).

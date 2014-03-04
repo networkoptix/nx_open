@@ -7,6 +7,7 @@
 QnFlexWatchResource::QnFlexWatchResource():
     QnPlOnvifResource()
 {
+    // TODO: #Elric set vendor here
     m_tmpH264Conf = new onvifXsd__H264Configuration;
 }
 

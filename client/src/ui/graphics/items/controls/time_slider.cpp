@@ -85,6 +85,9 @@ namespace {
      * Tickmarks that are closer to each other will never be displayed. */
     const qreal criticalTickmarkLineStepPixels = 2.0;
 
+    /** Estimated maximal size of tickmark text label. */
+    const qreal maxTickmarkTextSizePixels = 80.0;
+
     /** Minimal distance between tickmarks from the same group for text labels to be visible for this group. */
     const qreal minTickmarkTextStepPixels = 40.0;
 
@@ -450,6 +453,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 
     /* Set default vector sizes. */
     m_lineData.resize(maxLines);
+    m_lastMinuteIndicatorVisible.fill(true, maxLines);
 
     generateProgressPatterns();
 
@@ -1185,13 +1189,30 @@ void QnTimeSlider::setColors(const QnTimeSliderColors &colors) {
     generateProgressPatterns();
 }
 
+void QnTimeSlider::setLastMinuteIndicatorVisible(int line, bool visible) {
+    if (line >= maxLines)
+        return;
+
+    m_lastMinuteIndicatorVisible[line] = visible;
+}
+
+bool QnTimeSlider::isLastMinuteIndicatorVisible(int line) const {
+    if (line >= maxLines)
+        return false;
+
+    return m_lastMinuteIndicatorVisible[line];
+}
+
 
 // -------------------------------------------------------------------------- //
 // Updating
 // -------------------------------------------------------------------------- //
 void QnTimeSlider::updatePixmapCache() {
     m_pixmapCache->setFont(font());
-    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, palette().color(QPalette::WindowText)); // TODO: #Elric customize color
+    m_pixmapCache->setColor(palette().color(QPalette::WindowText));
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16); 
+
+    updateLineCommentPixmaps();
 }
 
 void QnTimeSlider::updateKineticProcessor() {
@@ -1243,8 +1264,7 @@ void QnTimeSlider::updateLineCommentPixmap(int line) {
 
     m_lineData[line].commentPixmap = m_pixmapCache->textPixmap(
         m_lineData[line].comment,
-        height,
-        palette().color(QPalette::WindowText)
+        height
     );
 }
 
@@ -1592,8 +1612,6 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
             lineTop += lineHeight;
         }
 
-        drawLastMinute(painter, lineBarRect);
-
         lineTop = lineBarRect.top();
         for(int line = 0; line < m_lineCount; line++) {
             qreal lineHeight = lineUnit * effectiveLineStretch(line);
@@ -1602,6 +1620,8 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
 
             QRectF lineRect(lineBarRect.left(), lineTop, lineBarRect.width(), lineHeight);
 
+            if (m_lastMinuteIndicatorVisible[line])
+                drawLastMinute(painter, lineRect);
             drawSeparator(painter, lineRect);
 
             lineTop += lineHeight;
@@ -1674,7 +1694,7 @@ void QnTimeSlider::drawSeparator(QPainter *painter, const QRectF &rect) {
 void QnTimeSlider::drawLastMinute(QPainter *painter, const QRectF &rect) {
     const qreal moveSpeed = 0.05;
 
-    qint64 startTime = QDateTime::currentDateTime().addSecs(-60).toMSecsSinceEpoch();
+    qint64 startTime = maximum() - 60 * 1000;
     qreal startPos = quickPositionFromValue(startTime);
     if (startPos >= rect.right())
         return;
@@ -1690,13 +1710,13 @@ void QnTimeSlider::drawLastMinute(QPainter *painter, const QRectF &rect) {
     if (sliderPos > startPos && !qFuzzyEquals(startPos, sliderPos)) {
         QBrush brush(m_progressPastPattern);
         brush.setTransform(brushTransform);
-        painter->fillRect(QRectF(QPointF(startPos, rect.top()), rect.bottomRight()), brush);
+        painter->fillRect(QRectF(QPointF(startPos, rect.top()), QPointF(sliderPos, rect.bottom())), brush);
     }
 
     if (!qFuzzyEquals(rect.right(), sliderPos)) {
         QBrush brush(m_progressFuturePattern);
         brush.setTransform(brushTransform);
-        painter->fillRect(QRectF(QPointF(startPos, rect.top()), rect.bottomRight()), brush);
+        painter->fillRect(QRectF(QPointF(qMax(startPos, sliderPos), rect.top()), rect.bottomRight()), brush);
     }
 }
 
@@ -1834,7 +1854,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         minStepIndex = stepCount - 1; /* Tests show that we can actually get here. */
 
     /* Find initial and maximal positions. */
-    QPointF overlap(criticalTickmarkTextStepPixels / 2.0, 0.0);
+    QPointF overlap(maxTickmarkTextSizePixels / 2.0, 0.0);
     qint64 startPos = qMax(minimum() + 1, valueFromPosition(positionFromValue(m_windowStart) - overlap, false)) + m_localOffset;
     qint64 endPos = qMin(maximum() - 1, valueFromPosition(positionFromValue(m_windowEnd) + overlap, false)) + m_localOffset;
 
@@ -1867,7 +1887,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         /* Draw label if needed. */
         qreal lineHeight = m_stepData[index].currentLineHeight;
         if(!qFuzzyIsNull(m_stepData[index].currentTextOpacity)) {
-            QPixmap pixmap = m_pixmapCache->positionShortPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index], palette().color(QPalette::WindowText));
+            QPixmap pixmap = m_pixmapCache->positionShortPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
             QRectF textRect(x - pixmap.width() / 2.0, rect.top() + lineHeight, pixmap.width(), pixmap.height());
 
             QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_stepData[index].currentTextOpacity);
@@ -1923,7 +1943,7 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
         painter->setBrush(number % 2 ? m_colors.dateOverlay : m_colors.dateOverlayAlternate);
         painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
 
-        QPixmap pixmap = m_pixmapCache->positionLongPixmap(pos0, textHeight, highlightStep, palette().color(QPalette::WindowText));
+        QPixmap pixmap = m_pixmapCache->positionLongPixmap(pos0, textHeight, highlightStep);
 
         QRectF textRect((x0 + x1) / 2.0 - pixmap.width() / 2.0, rect.top() + textTopMargin, pixmap.width(), pixmap.height());
         if(textRect.left() < rect.left())
@@ -2343,8 +2363,14 @@ void QnTimeSlider::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
 void QnTimeSlider::changeEvent(QEvent *event) {
     base_type::changeEvent(event);
 
-    if(event->type() == QEvent::FontChange)
+    switch (event->type()) {
+    case QEvent::FontChange:
+    case QEvent::PaletteChange:
         updatePixmapCache();
+        break;
+    default:
+        break;
+    }
 }
 
 void QnTimeSlider::startDragProcess(DragInfo *) {

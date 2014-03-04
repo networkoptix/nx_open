@@ -79,6 +79,12 @@
                             <excludeDefaultDirectories>true</excludeDefaultDirectories>
                             <filesets>
                                 <fileset>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>buildenv</include>
+                                    </includes>
+                                </fileset>   
+                                <fileset>
                                     <directory>${project.build.directory}/x86/python</directory>
                                     <followSymlinks>false</followSymlinks>
                                     <useDefaultExcludes>true</useDefaultExcludes>
@@ -154,7 +160,7 @@
                             <skip>${unix}</skip>                            
                         </configuration>
                     </execution>
-  
+
                     <execution>
                         <id>virtualenv-unix</id>
                         <phase>generate-sources</phase>

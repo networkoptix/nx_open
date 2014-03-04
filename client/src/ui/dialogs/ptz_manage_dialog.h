@@ -29,7 +29,8 @@ public:
     void setResource(const QnResourcePtr &resource);
 
     bool isModified() const;
-    bool checkForUnsavedChanges();
+    bool checkForUnsavedChanges(bool dontShowCancel = false);
+    void closeWithoutCancel();
 
 protected:
     virtual void loadData(const QnPtzData &data) override;
@@ -69,6 +70,7 @@ private:
     bool saveTours();
     bool saveHomePosition();
     void enableDewarping();
+    void clear();
 
 private:
     QScopedPointer<Ui::PtzManageDialog> ui;

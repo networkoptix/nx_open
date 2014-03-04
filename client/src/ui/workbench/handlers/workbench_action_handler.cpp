@@ -185,7 +185,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
-    connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_messageProcessor_connectionClosed()));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_messageProcessor_connectionOpened()));
@@ -456,6 +455,8 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     if (qnSettings->isDevMode())
         arguments << QLatin1String("--dev-mode-key=razrazraz");
 
+    qDebug() << "Starting new instance with args" << arguments;
+
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
 }
 
@@ -467,8 +468,9 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
     if (checkControls && cameraSettingsDialog()->widget()->hasScheduleControlsChanges()){
+        // TODO: #Elric #TR remove first space.
         QString message = tr(" Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
-        int button = QMessageBox::warning(mainWindow(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
+        int button = QMessageBox::warning(cameraSettingsDialog(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry) {
             cameraSettingsDialog()->ignoreAcceptOnce();
             return;
@@ -477,7 +479,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
         }
     } else if (checkControls && cameraSettingsDialog()->widget()->hasMotionControlsChanges()){
         QString message = tr("Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.");
-        int button = QMessageBox::warning(mainWindow(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
+        int button = QMessageBox::warning(cameraSettingsDialog(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry){
             cameraSettingsDialog()->ignoreAcceptOnce();
             return;
@@ -505,7 +507,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
         if (!helper.isValid())
         {
             QString message = tr("Licenses limit exceeded. The changes will be saved, but will not take effect.");
-            QMessageBox::warning(mainWindow(), tr("Could not apply changes"), message);
+            QMessageBox::warning(cameraSettingsDialog(), tr("Could not apply changes"), message);
             cameraSettingsDialog()->widget()->setScheduleEnabled(false);
         }
     }
@@ -537,7 +539,7 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
     QnMediaServerConnectionPtr serverConnectionPtr = cameraSettingsDialog()->widget()->getServerConnection();
     if (serverConnectionPtr.isNull())
     {
-        QString error = QString::fromLatin1("Connection refused");
+        QString error = lit("Connection refused"); // #TR #Elric
 
         QString failedParams;
         QList< QPair< QString, QVariant> >::ConstIterator it =
@@ -545,8 +547,8 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         for (; it != cameraSettingsDialog()->widget()->getModifiedAdvancedParams().end(); ++it)
         {
             QString formattedParam(it->first.right(it->first.length() - 2));
-            failedParams += QString::fromLatin1("\n");
-            failedParams += formattedParam.replace(QString::fromLatin1("%%"), QString::fromLatin1("->"));
+            failedParams += lit("\n"); // #TR #Elric
+            failedParams += formattedParam.replace(lit("%%"), lit("->")); // #TR? #Elric
         }
 
         if (!failedParams.isEmpty()) {
@@ -700,23 +702,36 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         //menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
     //}
 
-    // we should not restore state when using "Open in New Window"
-    if (m_delayedDrops.size() == 0) {
+    // we should not change state when using "Open in New Window"
+    if (m_delayedDrops.isEmpty()) {
         QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());
         workbench()->update(state);
+
+        /* Delete orphaned layouts. */
+        foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(QnId()).filtered<QnLayoutResource>())
+            if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
+                resourcePool()->removeResource(layout);
+
+        /* Sometimes we get here when 'New layout' has already been added. But all user's layouts must be created AFTER this method.
+         * Otherwise the user will see uncreated layouts in layout selection menu.
+         * As temporary workaround we can just remove that layouts. */
+        // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
+        if (user) {
+            foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
+                if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
+                    resourcePool()->removeResource(layout);
+            }
+        }
+
+        /* Close all other layouts. */
+        foreach(QnWorkbenchLayout *layout, workbench()->layouts()) {
+            QnLayoutResourcePtr resource = layout->resource();
+            if(resource->getParentId() != user->getId())
+                workbench()->removeLayout(layout);
+        }
     }
 
-    /* Delete orphaned layouts. */
-    foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(QnId()).filtered<QnLayoutResource>())
-        if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
-            resourcePool()->removeResource(layout);
-
-    /* Close all other layouts. */
-    foreach(QnWorkbenchLayout *layout, workbench()->layouts()) {
-        QnLayoutResourcePtr resource = layout->resource();
-        if(resource->getParentId() != user->getId())
-            workbench()->removeLayout(layout);
-    }
+    submitDelayedDrops();
 }
 
 void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
@@ -724,7 +739,7 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
         return;
 
     menu()->trigger(Qn::OpenNewTabAction);
-    submitDelayedDrops();
+    //submitDelayedDrops();
 }
 
 void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
@@ -2129,12 +2144,19 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
         qnSettings->setUserWorkbenchStates(states);
     }
 
-    menu()->trigger(Qn::ClearCameraSettingsAction);
-    if(context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true)) {
-        qApp->exit(0);
-        applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
+    if (businessRulesDialog() && businessRulesDialog()->isVisible()) {
+        businessRulesDialog()->activateWindow();
+        if (!businessRulesDialog()->canClose())
+            return;
+        businessRulesDialog()->hide();
     }
 
+    menu()->trigger(Qn::ClearCameraSettingsAction);
+    if(!context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true))
+        return;
+
+    qApp->exit(0);
+    applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
 
 QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog()
@@ -2246,17 +2268,17 @@ void QnWorkbenchActionHandler::at_currentLayoutSettingsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult)
 {
-    QString error = httpStatusCode == 0? QString::fromLatin1("Possibly, appropriate camera's service is unavailable now"):
-        QString::fromLatin1("Mediaserver returned the following error code : ") + httpStatusCode;
+    QString error = httpStatusCode == 0? lit("Possibly, appropriate camera's service is unavailable now"):
+        lit("Mediaserver returned the following error code : ") + httpStatusCode; // #TR #Elric
 
     QString failedParams;
     QList<QPair<QString, bool> >::ConstIterator it = operationResult.begin();
     for (; it != operationResult.end(); ++it)
     {
         if (!it->second) {
-            QString formattedParam(QString::fromLatin1("Advanced->") + it->first.right(it->first.length() - 2));
-            failedParams += QString::fromLatin1("\n");
-            failedParams += formattedParam.replace(QString::fromLatin1("%%"), QString::fromLatin1("->"));
+            QString formattedParam(lit("Advanced->") + it->first.right(it->first.length() - 2));
+            failedParams += lit("\n");
+            failedParams += formattedParam.replace(lit("%%"), lit("->")); // TODO: #Elric #TR
         }
     }
 

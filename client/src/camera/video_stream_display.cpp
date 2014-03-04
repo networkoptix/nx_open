@@ -460,7 +460,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
                 widgetRenderer ? widgetRenderer->glContext() : NULL);
         dec->setSpeed( m_speed );
         if (dec == 0) {
-            cl_log.log(QString::fromLatin1("Can't find create decoder for compression type %1").arg(data->compressionType), cl_logDEBUG2);
+            cl_log.log(lit("Can't find create decoder for compression type %1").arg(data->compressionType), cl_logDEBUG2);
             return Status_Displayed;
         }
 

@@ -13,8 +13,6 @@ QnFallbackPtzController::QnFallbackPtzController(const QnPtzControllerPtr &mainC
     m_mainController(mainController),
     m_fallbackController(fallbackController)
 {
-    assert(qnHasEventLoop(thread()));
-
     if(mainController->resource() != fallbackController->resource())
         qnWarning("Fallback controller was created with two different resources ('%1' != '%2').", mainController->resource()->getName(), fallbackController->resource()->getName());
 

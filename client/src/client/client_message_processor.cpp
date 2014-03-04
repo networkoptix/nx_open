@@ -108,7 +108,7 @@ void QnClientMessageProcessor::handleMessage(const QnMessage &message) {
             qWarning() << "Got Message_Type_ResourceChange with empty resource in it";
             return;
         }
-        updateResource(message.resource);
+        updateResource(message.resource, true, true);
         break;
     }
     case Qn::Message_Type_ResourceDelete: {
@@ -126,7 +126,7 @@ void QnClientMessageProcessor::processResources(const QnResourceList& resources)
     QnResourceList newResources;
 
     foreach (const QnResourcePtr& resource, resources)
-        if(!updateResource(resource, false))
+        if(!updateResource(resource, false, false))
             newResources.push_back(resource);
 
     qnResPool->addResources(newResources);
@@ -137,7 +137,7 @@ void QnClientMessageProcessor::processLicenses(const QnLicenseList& licenses)
     qnLicensePool->replaceLicenses(licenses);
 }
 
-bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool insert) // TODO: #Elric 'insert' parameter is hacky. Get rid of it and write some nicer code.
+bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool insert, bool updateLayouts)
 {
     bool result = false;
     QnResourcePtr ownResource;
@@ -155,8 +155,7 @@ bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool inser
         }
         if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
             determineOptimalIF(mediaServer);
-    }
-    else {
+    } else if(updateLayouts || !ownResource.dynamicCast<QnLayoutResource>()) {
         bool mserverStatusChanged = false;
         QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>();
         if (mediaServer)
@@ -169,7 +168,6 @@ bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool inser
 
         result = true;
     }
-
 
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();

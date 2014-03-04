@@ -43,6 +43,7 @@
 #include <ui/workbench/handlers/workbench_debug_handler.h>
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
+#include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
 #include <ui/workbench/workbench_controller.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
@@ -57,6 +58,7 @@
 #include <ui/style/noptix_style.h>
 #include <ui/style/proxy_style.h>
 #include <ui/workaround/qtbug_workaround.h>
+#include <ui/workaround/mac_event_loop_workaround.h>
 #include <ui/screen_recording/screen_recorder.h>
 
 #include <client/client_settings.h>
@@ -196,6 +198,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
+    context->instance<QnWorkbenchPtzDialogWatcher>();
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
@@ -316,6 +319,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     //initialize system-wide menu
     menu()->newMenu(Qn::MainScope);
 #endif
+
+//#ifdef Q_OS_MACX
+    /* Side-effect of this workaround is fps lowering. So enable it for other systems too. */
+    QnMacEventLoopWorkaround *macEventLoopWorkaround = new QnMacEventLoopWorkaround(m_view->viewport(), this);
+    Q_UNUSED(macEventLoopWorkaround);
+//#endif
 
     QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
     Q_UNUSED(manageDialog)

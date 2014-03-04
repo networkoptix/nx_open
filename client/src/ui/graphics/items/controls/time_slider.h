@@ -170,6 +170,9 @@ public:
     const QnTimeSliderColors &colors() const;
     void setColors(const QnTimeSliderColors &colors);
 
+    void setLastMinuteIndicatorVisible(int line, bool visible);
+    bool isLastMinuteIndicatorVisible(int line) const;
+
 signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
@@ -219,7 +222,10 @@ private:
     };
 
     struct TimeStepData {
-        TimeStepData(): currentHeight(0.0), targetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
+        TimeStepData(): minTickmarkTextStepPixels(0), criticalTickmarkTextStepPixels(0), currentHeight(0.0), targetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
+
+        int minTickmarkTextStepPixels;
+        int criticalTickmarkTextStepPixels;
 
         qreal currentHeight;
         qreal targetHeight;
@@ -377,6 +383,7 @@ private:
     int m_lastMinuteAnimationDelta;
     QPixmap m_progressPastPattern;
     QPixmap m_progressFuturePattern;
+    QVector<bool> m_lastMinuteIndicatorVisible;
 
     QnTimeSliderPixmapCache *m_pixmapCache;
 

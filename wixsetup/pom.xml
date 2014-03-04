@@ -20,7 +20,7 @@
     </properties>
 
     <build>
-        <finalName>${finalName}</finalName>
+        <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${install.type}-beta</finalName>
         <directory>${arch}</directory>
         <sourceDirectory>${basedir}</sourceDirectory>
         <plugins>
@@ -161,18 +161,7 @@
             </plugin>            
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>beta</id>
-            <activation>
-                <property>
-                    <name>!beta</name>
-                </property>
-            </activation>
-            <properties>
-                <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${install.type}-beta</finalName>    
-            </properties>
-        </profile>	      
+    <profiles>	      
         <profile>
             <id>nobeta</id>
             <activation>

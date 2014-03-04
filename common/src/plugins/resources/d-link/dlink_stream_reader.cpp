@@ -123,7 +123,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         if (url.isEmpty())
         {
             qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting non empty rtsl url.";
-            return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), QString::fromLatin1("config/rtspurl.cgi?profileid=%1").arg(dlinkProfile) );
+            return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), lit("config/rtspurl.cgi?profileid=%1").arg(dlinkProfile) );
         }
 
         m_rtpReader.setRequest(url);

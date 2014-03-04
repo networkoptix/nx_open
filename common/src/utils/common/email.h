@@ -10,6 +10,9 @@
 #include <utils/common/json.h>
 
 class QnEmail {
+    Q_GADGET
+    Q_ENUMS(ConnectionType)
+
 public:
     enum ConnectionType {
         Unsecure,
@@ -73,6 +76,7 @@ public:
 
     Settings settings() const;
     QString domain() const;
+
 private:
     /**
      * @brief initSmtpPresets   This function should be called only from GUI thread
@@ -96,8 +100,6 @@ inline bool deserialize(const QJsonValue &value, QnEmail::ConnectionType *target
     return true;
 }
 
-Q_DECLARE_METATYPE(QnEmail::SmtpServerPreset)
-QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnEmail::ConnectionType, inline)
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnEmail::SmtpServerPreset, (server)(connectionType)(port), inline)
+QN_DECLARE_FUNCTIONS(QnEmail::SmtpServerPreset, (json))
 
 #endif // EMAIL_H

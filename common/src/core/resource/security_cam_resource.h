@@ -202,12 +202,6 @@ protected slots:
     virtual void at_disabledChanged();
 
 protected:
-    //!Returns camera's vendor name
-    /*!
-        For onvif camera it returns real vendor name, not "onvif"
-    */
-    virtual QString getVendorInternal() const;
-
     void updateInner(QnResourcePtr other) override;
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role) override;
@@ -232,7 +226,6 @@ protected:
 
 protected:
     QList<QnMotionRegion> m_motionMaskList;
-    QString m_vendor;
 
 private:
     QnDataProviderFactory *m_dpFactory;
@@ -250,6 +243,7 @@ private:
     bool m_advancedWorking;
     bool m_manuallyAdded;
     QString m_model;
+    QString m_vendor;
     QString m_firmware;
 };
 

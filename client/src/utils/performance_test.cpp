@@ -28,8 +28,9 @@ void QnPerformanceTest::detectLightMode() {
 
     {
         // It creates OpenGL context
-        QGLWidget openGlDummy;
-        openGlDummy.show();
+        QWidget hideWidget;
+        QGLWidget *openGlDummy = new QGLWidget(&hideWidget);
+        openGlDummy->show();
 
         QString renderer = QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)));
         QRegExp slowRendererRegExp(lit("Gallium .* on llvmpipe .*"));

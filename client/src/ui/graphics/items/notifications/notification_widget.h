@@ -77,7 +77,7 @@ signals:
     void closeTriggered();
 
 protected:
-    virtual void clicked(Qt::MouseButton button) override;
+    virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
 
 private slots:
     void at_provider_imageChanged(const QImage &image);
@@ -130,7 +130,7 @@ signals:
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual void clicked(Qt::MouseButton button) override;
+    virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
 
 private:
     void hideToolTip();

@@ -50,7 +50,7 @@ namespace Qn {
         case Message_Type_KvPairChange:                 return QLatin1String("KvPairChang");
         case Message_Type_KvPairDelete:                 return QLatin1String("KvPairDelete");
         default:
-            return QString::fromLatin1("Unknown %1").arg((int)val);
+            return lit("Unknown %1").arg((int)val);
         }
     }
 } //Qn namespace

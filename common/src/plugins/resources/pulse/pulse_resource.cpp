@@ -9,6 +9,7 @@ const char* QnPlPulseResource::MANUFACTURE = "Pulse";
 
 QnPlPulseResource::QnPlPulseResource()
 {
+    setVendor(lit("Pulse"));
     setAuth(QLatin1String("admin"), QLatin1String("admin"));
 }
 

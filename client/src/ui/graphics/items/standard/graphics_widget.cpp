@@ -37,6 +37,7 @@ GraphicsWidgetPrivate::GraphicsWidgetPrivate():
     transformOrigin(GraphicsWidget::Legacy), 
     resizeEffectRadius(qn_graphicsWidget_defaultResizeEffectRadius), 
     style(NULL), 
+    inSetGeometry(false),
     windowData(NULL) 
 {};
 
@@ -311,7 +312,12 @@ void GraphicsWidget::handlePendingLayoutRequests(QGraphicsScene *scene) {
 void GraphicsWidget::setGeometry(const QRectF &rect) {
     Q_D(GraphicsWidget);
 
+    if(d->inSetGeometry && rect == geometry())
+        return; // TODO: #Elric #2395 patch QGraphicsWidget::setGeometry
+    
+    d->inSetGeometry = true;
     base_type::setGeometry(rect);
+    d->inSetGeometry = false;
 
     if(d->transformOrigin != Legacy)
         setTransformOriginPoint(d->calculateTransformOrigin());
