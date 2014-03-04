@@ -7,7 +7,11 @@
 
 QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, const QString &directory,
                                        const QString &filter, const QStringList &extensions):
+#ifdef Q_OS_MAC
     base_type(parent, caption, directory, filter, extensions),
+#else
+    base_type(parent, caption, directory, filter),
+#endif
     m_currentCol(0)
 {
     setOptions(QnCustomFileDialog::fileDialogOptions());
