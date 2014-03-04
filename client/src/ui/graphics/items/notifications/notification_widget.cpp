@@ -213,6 +213,8 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem *parent, Qt::WindowFlag
     updateOverlayGeometry();
     updateOverlayVisibility(false);
     updateOverlayColor();
+
+    setCacheMode(QGraphicsItem::ItemCoordinateCache);
 }
 
 QnNotificationWidget::~QnNotificationWidget() {
