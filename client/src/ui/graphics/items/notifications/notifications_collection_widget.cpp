@@ -284,6 +284,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         return; /* Just drop the notification if we already have too many of them in queue. */
 
     QnNotificationWidget *item = new QnNotificationWidget(m_list);
+    item->setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
     BusinessEventType::Value eventType = params.getEventType();
 
