@@ -3,6 +3,7 @@
 
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
+#include <core/resource/network_resource.h>
 
 static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
 
