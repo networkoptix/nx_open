@@ -191,6 +191,24 @@ QString toShortString(qint64 msecs, const QnTimeStep &step) {
     }
 }
 
+template<class Functor>
+QString longestName(int min, int max, const Functor &functor) {
+    QString result;
+    for(int i = min; i <= max; i++) {
+        QString name = functor(i);
+        if(name.size() > result.size())
+            result = name;
+    }
+    return result;
+}
+
+QString longestAmPm() {
+    QString amText = QLocale().amText();
+    QString pmText = QLocale().pmText();
+
+    return amText.size() > pmText.size() ? amText : pmText;
+}
+
 QString toLongestShortString(const QnTimeStep &step) {
     if(step.isRelative)
         return QString::number(step.wrapUnits - 1) + step.format;
@@ -199,8 +217,79 @@ QString toLongestShortString(const QnTimeStep &step) {
     case QnTimeStep::Milliseconds:
     case QnTimeStep::Hours:
         return QString::number(step.wrapUnits - 1) + step.format;
-    default:
-        return QString();
+    default: {
+        QString result = step.format;
+        
+        if(result.contains(lit("yyyy"))) {
+            result.replace(lit("yyyy"), lit("2000"));
+        } else if(result.contains(lit("yy"))) {
+            result.replace(lit("yy"), lit("2000"));
+        }
+
+        if(result.contains(lit("hh"))) {
+            result.replace(lit("hh"), lit("23"));
+        } else if(result.contains(lit("h"))) {
+            result.replace(lit("h"), lit("23"));
+        }
+
+        if(result.contains(lit("HH"))) {
+            result.replace(lit("HH"), lit("23"));
+        } else if(result.contains(lit("H"))) {
+            result.replace(lit("H"), lit("23"));
+        }
+
+        if(result.contains(lit("mm"))) {
+            result.replace(lit("mm"), lit("59"));
+        } else if(result.contains(lit("m"))) {
+            result.replace(lit("m"), lit("59"));
+        }
+
+        if(result.contains(lit("ss"))) {
+            result.replace(lit("ss"), lit("59"));
+        } else if(result.contains(lit("s"))) {
+            result.replace(lit("s"), lit("59"));
+        }
+
+        if(result.contains(lit("zzz"))) {
+            result.replace(lit("zzz"), lit("999"));
+        } else if(result.contains(lit("z"))) {
+            result.replace(lit("z"), lit("999"));
+        }
+
+        if(result.contains(lit("ap"))) {
+            result.replace(lit("ap"), longestAmPm());
+        } else if(result.contains(lit("a"))) {
+            result.replace(lit("a"), longestAmPm());
+        }
+
+        if(result.contains(lit("AP"))) {
+            result.replace(lit("AP"), longestAmPm());
+        } else if(result.contains(lit("A"))) {
+            result.replace(lit("A"), longestAmPm());
+        }
+
+        if(result.contains(lit("MMMM"))) {
+            result.replace(lit("MMMM"), longestName(1, 12, [](int i){ return QLocale().monthName(i, QLocale::LongFormat); }));
+        } else if(result.contains(lit("MMM"))) {
+            result.replace(lit("MMM"), longestName(1, 12, [](int i){ return QLocale().monthName(i, QLocale::ShortFormat); }));
+        } else if(result.contains(lit("MM"))) { 
+            result.replace(lit("MM"), lit("12"));
+        } else if(result.contains(lit("M"))) {
+            result.replace(lit("M"), lit("12"));
+        }
+
+        if(result.contains(lit("dddd"))) {
+            result.replace(lit("dddd"), longestName(1, 7, [](int i){ return QLocale().dayName(i, QLocale::LongFormat); }));
+        } else if(result.contains(lit("ddd"))) {
+            result.replace(lit("ddd"), longestName(1, 7, [](int i){ return QLocale().dayName(i, QLocale::ShortFormat); }));
+        } else if(result.contains(lit("dd"))) {
+            result.replace(lit("dd"), lit("29"));
+        } else if(result.contains(lit("d"))) {
+            result.replace(lit("d"), lit("29"));
+        }
+
+        return result;
+    }
     }
 }
 

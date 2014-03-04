@@ -714,8 +714,10 @@ void QnTimeSlider::setOptions(Options options) {
     Options difference = m_options ^ options;
     m_options = options;
 
-    if(difference & UseUTC)
+    if(difference & UseUTC) {
         updateSteps();
+        updateTickmarkTextSteps();
+    }
 }
 
 void QnTimeSlider::setOption(Option option, bool value) {
@@ -1213,6 +1215,7 @@ void QnTimeSlider::updatePixmapCache() {
     m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16); 
 
     updateLineCommentPixmaps();
+    updateTickmarkTextSteps();
 }
 
 void QnTimeSlider::updateKineticProcessor() {
@@ -1281,6 +1284,19 @@ void QnTimeSlider::updateSteps() {
     m_stepData.resize(m_steps.size());
 }
 
+void QnTimeSlider::updateTickmarkTextSteps() {
+
+    // TODO: #Elric this one is VERY slow right now.
+
+    for(int i = 0; i < m_steps.size(); i++) {
+        QString text = toLongestShortString(m_steps[i]);
+        QPixmap pixmap = m_pixmapCache->textPixmap(text, 10);
+
+        /* 2.5 is the AR that our constants are expected to work well with. */
+        m_stepData[i].tickmarkTextOversize = qMax(1.0, (1.0 / 2.5) * pixmap.width() / pixmap.height());
+    }
+}
+
 void QnTimeSlider::updateMSecsPerPixel() {
     qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
     if(qFuzzyIsNull(msecsPerPixel))
@@ -1347,7 +1363,10 @@ void QnTimeSlider::updateStepAnimationTargets() {
             }
         }
 
-        if(separationPixels < minTickmarkTextStepPixels) {
+        qreal minTextStepPixels = minTickmarkTextStepPixels * data.tickmarkTextOversize;
+        qreal criticalTextStepPixels = criticalTickmarkTextStepPixels * data.tickmarkTextOversize;
+
+        if(separationPixels < minTextStepPixels) {
             data.targetTextOpacity = 0.0;
         } else {
             data.targetTextOpacity = qMax(minTickmarkTextOpacity, data.targetLineOpacity);
@@ -1356,7 +1375,7 @@ void QnTimeSlider::updateStepAnimationTargets() {
         /* Adjust for max height & opacity. */
         qreal maxHeight = qMax(0.0, (separationPixels - criticalTickmarkLineStepPixels) / criticalTickmarkLineStepPixels);
         qreal maxLineOpacity = minTickmarkLineOpacity + (1.0 - minTickmarkLineOpacity) * maxHeight;
-        qreal maxTextOpacity = qMin(maxLineOpacity, qMax(0.0, (separationPixels - criticalTickmarkTextStepPixels) / criticalTickmarkTextStepPixels));
+        qreal maxTextOpacity = qMin(maxLineOpacity, qMax(0.0, (separationPixels - criticalTextStepPixels) / criticalTextStepPixels));
         data.currentHeight      = qMin(data.currentHeight,      maxHeight);
         data.currentLineOpacity = qMin(data.currentLineOpacity, maxLineOpacity);
         data.currentTextOpacity = qMin(data.currentTextOpacity, maxTextOpacity);

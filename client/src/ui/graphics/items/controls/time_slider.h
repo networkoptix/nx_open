@@ -222,10 +222,9 @@ private:
     };
 
     struct TimeStepData {
-        TimeStepData(): minTickmarkTextStepPixels(0), criticalTickmarkTextStepPixels(0), currentHeight(0.0), targetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
+        TimeStepData(): tickmarkTextOversize(1.0), currentHeight(0.0), targetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
 
-        int minTickmarkTextStepPixels;
-        int criticalTickmarkTextStepPixels;
+        qreal tickmarkTextOversize;
 
         qreal currentHeight;
         qreal targetHeight;
@@ -292,6 +291,7 @@ private:
     void updateToolTipVisibility();
     void updateToolTipText();
     void updateSteps();
+    void updateTickmarkTextSteps();
     void updateMSecsPerPixel();
     void updateMinimalWindow();
     void updateStepAnimationTargets();
