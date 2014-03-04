@@ -84,7 +84,8 @@ QnResourcePtr QnResource::toSharedPointer() const
 
 void QnResource::updateInner(QnResourcePtr other)
 {
-    Q_ASSERT(getUniqueId() == other->getUniqueId()); // unique id MUST be the same
+    //Q_ASSERT(getUniqueId() == other->getUniqueId()); // unique id MUST be the same
+    Q_ASSERT(getGuid() == other->getGuid()); // unique id MUST be the same
 
     m_id = other->m_id; //TODO: #Elric this is WRONG!!!!!!!!!11111111
     m_typeId = other->m_typeId;

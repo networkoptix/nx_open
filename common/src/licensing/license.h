@@ -94,7 +94,6 @@ private:
         QByteArray* const v1LicenseBlock,
         QByteArray* const v2LicenseBlock );
     void licenseBlockFromData(
-
         QByteArray* const v1LicenseBlock,
         QByteArray* const v2LicenseBlock );
     void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );

@@ -128,7 +128,7 @@ public:
     QString getGuid() const;
 
     // device unique identifier
-    virtual QString getUniqueId() const = 0;
+    virtual QString getUniqueId() const { return getGuid(); };
     virtual void setUniqId(const QString& value);
 
 
