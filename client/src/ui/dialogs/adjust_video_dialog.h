@@ -12,6 +12,7 @@ namespace Ui {
     class AdjustVideoDialog;
 }
 
+// TODO: #Elric rename image enhancement dialog
 class QnAdjustVideoDialog : public QDialog {
     Q_OBJECT
     typedef QDialog base_type;
