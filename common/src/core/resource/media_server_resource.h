@@ -57,6 +57,8 @@ public:
     QnSoftwareVersion getVersion() const;
     void setVersion(const QnSoftwareVersion& version);
 
+    static bool isEdgeServer(const QnResourcePtr &resource);
+
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
     void determineOptimalNetIF_testProxy();

@@ -19,6 +19,7 @@ namespace Qn {
         ResourceNode,           /**< Node that represents a resource. Has only resource. */
         ItemNode,               /**< Node that represents a layout item. Has both guid and resource. */
         RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
+        EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
 
         VideoWallItemNode,      /**< Node that represents a video wall item. Has a guid and can have resource. */
         VideoWallHistoryNode,   /**< Node that represents a video wall history item. Has both guid and resource. */

@@ -109,8 +109,13 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
         return m_rootNodes[m_rootNodeType];
 
     QHash<QnResourcePtr, QnResourcePoolModelNode *>::iterator pos = m_resourceNodeByResource.find(resource);
-    if(pos == m_resourceNodeByResource.end())
-        pos = m_resourceNodeByResource.insert(resource, new QnResourcePoolModelNode(this, resource));
+    if(pos == m_resourceNodeByResource.end()) {
+        Qn::NodeType nodeType = QnMediaServerResource::isEdgeServer(resource->getParentResource())
+            ? Qn::EdgeNode
+            : Qn::ResourceNode;
+        pos = m_resourceNodeByResource.insert(resource, new QnResourcePoolModelNode(this, resource, nodeType));
+
+    }
     return *pos;
 }
 
@@ -179,7 +184,7 @@ void QnResourcePoolModel::deleteNode(Qn::NodeType nodeType, const QUuid &uuid, c
 }
 
 QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModelNode *node) {
-    assert(node->type() == Qn::ResourceNode);
+    assert(node->type() == Qn::ResourceNode || node->type() == Qn::EdgeNode);
 
     if(!node->resource())
         return m_rootNodes[m_rootNodeType];
@@ -191,6 +196,9 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
             return m_rootNodes[Qn::UsersNode];
         }
     }
+
+    if (node->type() == Qn::EdgeNode)
+        return m_rootNodes[Qn::ServersNode];
 
     if(node->resourceFlags() & QnResource::server)
         return m_rootNodes[Qn::ServersNode];

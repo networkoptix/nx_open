@@ -766,20 +766,37 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
         text(tr("Open")).
-        conditionalText(tr("Monitor"), hasFlags(QnResource::server), Qn::All).
-        condition(new QnOpenInCurrentLayoutActionCondition(this));
+        condition(new QnOpenInCurrentLayoutActionCondition(false, this));
 
     factory(Qn::OpenInNewLayoutAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in New Tab")).
-        conditionalText(tr("Monitor in a New Tab"), hasFlags(QnResource::server), Qn::All).
-        condition(new QnOpenInNewEntityActionCondition(this));
+        condition(new QnOpenInNewEntityActionCondition(false, this));
 
     factory(Qn::OpenInNewWindowAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in New Window")).
-        conditionalText(tr("Monitor in a New Window"), hasFlags(QnResource::server), Qn::All).
-        condition(new QnOpenInNewEntityActionCondition(this));
+        condition(new QnOpenInNewEntityActionCondition(false, this));
+
+    factory().
+        flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        separator();
+    
+    factory(Qn::MonitorInCurrentLayoutAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
+        text(tr("Monitor")).
+        condition(new QnOpenInCurrentLayoutActionCondition(true, this));
+
+    factory(Qn::MonitorInNewLayoutAction).
+        flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        text(tr("Monitor in New Tab")).
+        condition(new QnOpenInNewEntityActionCondition(true, this));
+
+    factory(Qn::MonitorInNewWindowAction).
+        flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
+        text(tr("Monitor in New Window")).
+        condition(new QnOpenInNewEntityActionCondition(true, this));
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
@@ -1130,13 +1147,18 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Ping..."));
 
+    factory().
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this)).
+        separator();
+
     factory(Qn::ServerLogsAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Logs...")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
     factory(Qn::ServerIssuesAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Diagnostics...")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 

@@ -21,6 +21,7 @@
 #include <utils/math/interpolator.h>
 #include <utils/math/color_transformations.h>
 
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -384,7 +385,10 @@ void QnServerSettingsDialog::updateFromResources()
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
 
+    bool edge = QnMediaServerResource::isEdgeServer(m_server);
     ui->nameLineEdit->setText(m_server->getName());
+    ui->nameLineEdit->setEnabled(!edge);
+
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 
@@ -421,7 +425,9 @@ void QnServerSettingsDialog::submitToResources() {
         qnSettings->setServerStorageStates(serverStorageStates);
     }
 
-    m_server->setName(ui->nameLineEdit->text());
+    bool edge = QnMediaServerResource::isEdgeServer(m_server);
+    if (!edge)
+        m_server->setName(ui->nameLineEdit->text());
 }
 
 void QnServerSettingsDialog::setBottomLabelText(const QString &text) {

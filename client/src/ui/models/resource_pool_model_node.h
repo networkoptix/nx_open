@@ -32,7 +32,7 @@ public:
     /**
      * Constructor for resource nodes.
      */
-    QnResourcePoolModelNode(QnResourcePoolModel *model, const QnResourcePtr &resource);
+    QnResourcePoolModelNode(QnResourcePoolModel *model, const QnResourcePtr &resource, Qn::NodeType nodeType);
 
     /**
      * Constructor for item nodes.

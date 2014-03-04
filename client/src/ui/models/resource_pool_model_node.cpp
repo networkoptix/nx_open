@@ -3,6 +3,7 @@
 #include <common/common_meta_types.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 
 #ifdef QN_ENABLE_VIDEO_WALL
 #include <core/resource/videowall_resource.h>
@@ -69,9 +70,9 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
 /**
  * Constructor for resource nodes.
  */
-QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, const QnResourcePtr &resource):
+QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, const QnResourcePtr &resource, Qn::NodeType nodeType):
     m_model(model),
-    m_type(Qn::ResourceNode),
+    m_type(nodeType),
     m_state(Invalid),
     m_bastard(false),
     m_parent(NULL),
@@ -80,6 +81,8 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
     m_checked(Qt::Unchecked)
 {
     assert(model != NULL);
+    assert(nodeType == Qn::ResourceNode ||
+           nodeType == Qn::EdgeNode);
 
     setResource(resource);
 }
@@ -113,12 +116,19 @@ QnResourcePoolModelNode::~QnResourcePoolModelNode() {
 void QnResourcePoolModelNode::clear() {
     setParent(NULL);
 
-    if(m_type == Qn::ItemNode || m_type == Qn::ResourceNode || m_type == Qn::VideoWallItemNode)
+    if (m_type == Qn::ItemNode ||
+        m_type == Qn::ResourceNode || 
+        m_type == Qn::VideoWallItemNode || 
+        m_type == Qn::EdgeNode)
         setResource(QnResourcePtr());
 }
 
 void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
-    assert(m_type == Qn::ItemNode || m_type == Qn::ResourceNode || m_type == Qn::VideoWallItemNode);
+    assert(
+        m_type == Qn::ItemNode ||
+        m_type == Qn::ResourceNode || 
+        m_type == Qn::VideoWallItemNode || 
+        m_type == Qn::EdgeNode);
 
     if(m_resource == resource)
         return;
@@ -136,7 +146,7 @@ void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
 
 void QnResourcePoolModelNode::update() {
     /* Update stored fields. */
-    if(m_type == Qn::ResourceNode || m_type == Qn::ItemNode) {
+    if(m_type == Qn::ResourceNode || m_type == Qn::ItemNode || m_type == Qn::EdgeNode) {
         if(m_resource.isNull()) {
             m_displayName = m_name = QString();
             m_flags = 0;
@@ -197,6 +207,11 @@ void QnResourcePoolModelNode::update() {
             bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
         if(!bastard)
             bastard = (m_flags & QnResource::local_media) == QnResource::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")); //TODO: #Elric hack hack hack
+        if (!bastard)
+            bastard = QnMediaServerResource::isEdgeServer(m_resource);
+        break;
+    case Qn::EdgeNode:
+        bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
         break;
     case Qn::UsersNode:
         bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
@@ -342,6 +357,7 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
 
     switch(m_type) {
     case Qn::ResourceNode:
+    case Qn::EdgeNode:
         if(m_model->context()->menu()->canTrigger(Qn::RenameAction, QnActionParameters(m_resource)))
             result |= Qt::ItemIsEditable;
         /* Fall through. */

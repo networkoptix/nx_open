@@ -192,12 +192,19 @@ protected slots:
     void at_previousLayoutAction_triggered();
     void at_openLayoutsAction_triggered();
     void at_openNewTabAction_triggered();
+
+    void at_monitorInCurrentLayoutAction_triggered();
+    void at_monitorInNewLayoutAction_triggered();
+    void at_monitorInNewWindowAction_triggered();
+
     void at_openInLayoutAction_triggered();
+
     void at_openInCurrentLayoutAction_triggered();
     void at_openInNewLayoutAction_triggered();
+    void at_openInNewWindowAction_triggered();
+
     void at_openLayoutsInNewWindowAction_triggered();
     void at_openCurrentLayoutInNewWindowAction_triggered();
-    void at_openInNewWindowAction_triggered();
     void at_openNewWindowAction_triggered();
 
     void at_moveCameraAction_triggered();

@@ -24,6 +24,8 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     setTypeId(resTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
     removeFlags(QnResource::media); // TODO: #Elric is this call needed here?
+
+      //TODO: #GDM in case of EDGE servers getName should return name of its camera. Possibly name just should be synced on EC.
     setName(tr("Server"));
 
     m_primaryIFSelected = false;
@@ -322,4 +324,10 @@ void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
     QMutexLocker lock(&m_mutex);
 
     m_version = version;
+}
+
+bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) 
+        return (server->getServerFlags() & Qn::SF_Edge);
+    return false;
 }

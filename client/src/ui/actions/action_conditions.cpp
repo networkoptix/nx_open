@@ -467,7 +467,7 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
         bool isMediaResource = resource->hasFlags(QnResource::media);
         bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
                 && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
-        bool allowed = isServer || isMediaResource;
+        bool allowed = m_server ? isServer : isMediaResource;
         bool forbidden = isExportedLayout && (isServer || isLocalResource);
         if(allowed && !forbidden)
             return Qn::EnabledAction;
@@ -476,8 +476,9 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
 }
 
 Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceList &resources) {
+    QnResource::Flag flag = m_server ? QnResource::server : QnResource::media;
     foreach(const QnResourcePtr &resource, resources)
-        if(resource->hasFlags(QnResource::media) || resource->hasFlags(QnResource::server))
+        if(resource->hasFlags(flag))
             return Qn::EnabledAction;
 
     return Qn::InvisibleAction;

@@ -363,17 +363,21 @@ private:
 
 class QnOpenInCurrentLayoutActionCondition: public QnActionCondition {
 public:
-    QnOpenInCurrentLayoutActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnOpenInCurrentLayoutActionCondition(bool isServer, QObject *parent = NULL): QnActionCondition(parent), m_server(isServer) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+private:
+    bool m_server;
 };
 
 class QnOpenInNewEntityActionCondition: public QnActionCondition {
 public: 
-    QnOpenInNewEntityActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnOpenInNewEntityActionCondition(bool isServer, QObject *parent = NULL): QnActionCondition(parent), m_server(isServer) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
     virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
+private:
+    bool m_server;
 };
 
 class QnSetAsBackgroundActionCondition: public QnActionCondition {
