@@ -8,7 +8,7 @@
 
 #include <utils/common/event_processors.h>
 
-QnPtzTourWidget::QnPtzTourWidget(QWidget *parent) :
+QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
     QWidget(parent),
     ui(new Ui::PtzTourWidget),
     m_model(new QnPtzTourSpotsModel(this))

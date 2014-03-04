@@ -1,22 +1,21 @@
 #ifndef __GRID_WIDGET_HELPER_H__
 #define __GRID_WIDGET_HELPER_H__
 
-#include <QtCore/QLatin1Char>
-
-#include <ui/workbench/workbench_context_aware.h>
+#include <QtCore/QCoreApplication>
 
 class QTableView;
+class QWidget;
 
+// TODO: #Elric rename into something saner
 
-class QnGridWidgetHelper: public QObject, public QnWorkbenchContextAware {
-    Q_OBJECT
+class QnGridWidgetHelper {
+    Q_DECLARE_TR_FUNCTIONS(QnGridWidgetHelper)
 public:
-    QnGridWidgetHelper(QnWorkbenchContext *context); // TODO: QObject *parent
+    static void exportToFile(QTableView *grid, QWidget *parent, const QString &caption);
+    static void copyToClipboard(QTableView *grid);
 
-    void exportToFile(QTableView* grid, const QString& caption);
-    void copyToClipboard(QTableView* grid);
 private:
-    void getGridData(QTableView* grid, QString& textData, QString& htmlData, const QLatin1Char& textDelimiter);
+    static void getGridData(QTableView *grid, const QLatin1Char &textDelimiter, QString *textData, QString *htmlData);
 };
 
 #endif // __GRID_WIDGET_HELPER_H__

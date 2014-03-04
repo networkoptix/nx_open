@@ -56,12 +56,51 @@ L&apos;application va être fermée.</translation>
 <context>
     <name>QnConnectionTestingDialog</name>
     <message>
-        <location filename="../src/connection_testing_dialog.cpp" line="89"/>
+        <location filename="../src/connection_testing_dialog.cpp" line="70"/>
+        <source>Request timed out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="98"/>
+        <source>Login or password you have entered are incorrect, please try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="101"/>
+        <source>Connection to the Enterprise Controller could not be established.
+Connection details that you have entered are incorrect, please try again.
+
+If this error persists, please contact your VMS administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="106"/>
+        <source>You are trying to connect to incompatible Enterprise Controller.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="111"/>
+        <source>Enterprise Controller has a different version:
+ - Client version: %1.
+ - EC version: %2.
+Compatibility mode for versions lower than %3 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="120"/>
+        <source>Enterprise Controller has a different version:
+ - Client version: %1.
+ - EC version: %2.
+You will be asked to restart the client in compatibility mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="133"/>
         <source>Success</source>
         <translation>Succès</translation>
     </message>
     <message>
-        <location filename="../src/connection_testing_dialog.cpp" line="89"/>
+        <location filename="../src/connection_testing_dialog.cpp" line="133"/>
         <source>Failed</source>
         <translation>Échec</translation>
     </message>
@@ -412,64 +451,66 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation>Connexion au contrôleur Entreprise</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="154"/>
         <source>Login</source>
         <translatorcomment>If it need to be shorter, &quot; ID &quot; can be use</translatorcomment>
-        <translation>Identifiant</translation>
+        <translation type="vanished">Identifiant</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="171"/>
         <source>Password</source>
         <translatorcomment>If it need to be shorter, &quot; MDP &quot; can be use</translatorcomment>
-        <translation>Mot de passe</translation>
+        <translation type="vanished">Mot de passe</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="79"/>
+        <location filename="../src/settings.ui" line="92"/>
         <source>0.0.0.0</source>
         <translation>0.0.0.0</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="95"/>
         <source>Port</source>
-        <translation>Port</translation>
+        <translation type="vanished">Port</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="143"/>
+        <location filename="../src/settings.ui" line="69"/>
         <source>Find</source>
         <translation>Chercher</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="213"/>
+        <location filename="../src/settings.ui" line="80"/>
+        <source>Host:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="130"/>
+        <source>Login:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="140"/>
+        <source>Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="165"/>
         <source>Test</source>
         <translation>Test</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="259"/>
-        <source>Enable auto discovery for cameras</source>
+        <location filename="../src/settings.ui" line="185"/>
+        <source>Cameras RTP transport:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="345"/>
-        <source>Enterprise controller settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/settings.ui" line="351"/>
+        <location filename="../src/settings.ui" line="108"/>
+        <location filename="../src/settings.ui" line="338"/>
         <source>Port:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="358"/>
-        <source>Do not control camera settings:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/settings.ui" line="63"/>
         <source>Host</source>
-        <translation>Hôte</translation>
+        <translation type="vanished">Hôte</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="225"/>
+        <location filename="../src/settings.ui" line="179"/>
         <source>Media server network settings</source>
         <translation>Configurations réseau du Média serveur</translation>
     </message>
@@ -482,21 +523,28 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation type="obsolete">Port API</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="271"/>
+        <location filename="../src/settings.ui" line="231"/>
         <source>Allow access to media server via public IP address</source>
         <translation>Autoriser l&apos;accès au serveur média via l&apos;adresse IP publique</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="333"/>
+        <location filename="../src/settings.ui" line="263"/>
+        <location filename="../src/settings.ui" line="357"/>
+        <source>Use specified IP or host name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="290"/>
         <source>Enterprise Controller Settings</source>
         <translation>Configurations du contrôleur entreprise</translation>
     </message>
     <message>
+        <location filename="../src/settings.ui" line="302"/>
         <source>Enterprise controller network settings</source>
-        <translation type="obsolete">Configurations réseau du contrôleur entreprise</translation>
+        <translation type="unfinished">Configurations réseau du contrôleur entreprise</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="405"/>
+        <location filename="../src/settings.ui" line="348"/>
         <source>Allow access to enterprise controller via public IP address</source>
         <translation>Autoriser l&apos;accès au contrôleur entreprise via l&apos;adresse IP publique</translation>
     </message>
@@ -509,22 +557,21 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation type="obsolete">Port API</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="233"/>
         <source>Cameras RTP transport</source>
-        <translation>Transport RTP des Caméras</translation>
+        <translation type="vanished">Transport RTP des Caméras</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="241"/>
+        <location filename="../src/settings.ui" line="195"/>
         <source>AUTO</source>
         <translation>AUTO</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="246"/>
+        <location filename="../src/settings.ui" line="200"/>
         <source>UDP</source>
         <translation>UDP</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="251"/>
+        <location filename="../src/settings.ui" line="205"/>
         <source>TCP</source>
         <translation>TCP</translation>
     </message>
@@ -533,14 +580,12 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation type="obsolete">Autoriser l&apos;accès au serveur via l&apos;adresse IP publique</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="280"/>
-        <location filename="../src/settings.ui" line="414"/>
         <source>Use specified IP or host name</source>
-        <translation>Spécifier IP ou le nom d&apos;hôte</translation>
+        <translation type="vanished">Spécifier IP ou le nom d&apos;hôte</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="290"/>
-        <location filename="../src/settings.ui" line="424"/>
+        <location filename="../src/settings.ui" line="253"/>
+        <location filename="../src/settings.ui" line="367"/>
         <source>Auto detect public IP</source>
         <translation>Détection automatique IP publique</translation>
     </message>
@@ -561,22 +606,22 @@ Construit pour %5-%6 par %7.&lt;br/&gt;
         <translation type="obsolete">Autoriser l&apos;accès au contrôleur entreprise via l&apos;adresse IP publiques</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="464"/>
+        <location filename="../src/settings.ui" line="407"/>
         <source>About</source>
         <translation>À propos</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="474"/>
+        <location filename="../src/settings.ui" line="417"/>
         <source>Language:</source>
         <translation>Langue:</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="486"/>
+        <location filename="../src/settings.ui" line="429"/>
         <source>(requires restart)</source>
         <translation>(nécessite un redémarrage)</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="497"/>
+        <location filename="../src/settings.ui" line="440"/>
         <source>Information</source>
         <translation>Informations</translation>
     </message>

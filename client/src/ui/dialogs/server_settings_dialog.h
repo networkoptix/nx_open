@@ -35,6 +35,14 @@ public slots:
     virtual void reject() override;
 
 private:
+    enum RebuildState {
+        Invalid,
+        Ready,
+        Starting,
+        InProgress,
+        Stopping
+    };
+
     void updateFromResources();
     void submitToResources();
 
@@ -47,6 +55,7 @@ private:
     QString bottomLabelText() const;
     int dataRowCount() const;
 
+    void updateRebuildUi(RebuildState newState, int progress = -1);
 private slots:
     void at_tableBottomLabel_linkActivated();
     void at_storagesTable_cellChanged(int row, int column);
@@ -69,9 +78,8 @@ private:
     QAction *m_removeAction;
 
     bool m_hasStorageChanges;
-#ifndef Q_OS_MACX
-    QnRebuildArchiveReply m_lastRebuildReply;
-#endif
+
+    RebuildState m_rebuildState;
 };
 
 #endif // SERVER_SETTINGS_DIALOG_H

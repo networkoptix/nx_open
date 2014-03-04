@@ -65,6 +65,7 @@ private:
 private:
     QnWorkbenchUserEmailWatcher *m_userEmailWatcher;
     QnBusinessEventsFilterResourcePropertyAdaptor *m_adaptor;
+    quint64 m_popupSystemHealthFilter;
 };
 
 #endif // WORKBENCH_NOTIFICATIONS_HANDLER_H

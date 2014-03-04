@@ -465,6 +465,9 @@ namespace aio
                 break;
             if( triggeredSocketCount < 0 )
             {
+                const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
+                if( errorCode == SystemError::interrupted )
+                    continue;
                 NX_LOG( QString::fromLatin1( "Poll failed. %1" ).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
                 msleep( ERROR_RESET_TIMEOUT );
                 continue;

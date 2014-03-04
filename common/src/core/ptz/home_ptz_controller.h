@@ -29,8 +29,8 @@ public:
     virtual bool activatePreset(const QString &presetId, qreal speed) override;
     virtual bool activateTour(const QString &tourId) override;
 
-    virtual bool updateHomePosition(const QnPtzObject &homePosition) override;
-    virtual bool getHomePosition(QnPtzObject *homePosition) override;
+    virtual bool updateHomeObject(const QnPtzObject &homePosition) override;
+    virtual bool getHomeObject(QnPtzObject *homePosition) override;
 
 public:
     QMutex m_mutex;

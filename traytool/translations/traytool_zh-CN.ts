@@ -45,12 +45,51 @@ Application will now quit.</source>
 <context>
     <name>QnConnectionTestingDialog</name>
     <message>
-        <location filename="../src/connection_testing_dialog.cpp" line="89"/>
+        <location filename="../src/connection_testing_dialog.cpp" line="70"/>
+        <source>Request timed out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="98"/>
+        <source>Login or password you have entered are incorrect, please try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="101"/>
+        <source>Connection to the Enterprise Controller could not be established.
+Connection details that you have entered are incorrect, please try again.
+
+If this error persists, please contact your VMS administrator.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="106"/>
+        <source>You are trying to connect to incompatible Enterprise Controller.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="111"/>
+        <source>Enterprise Controller has a different version:
+ - Client version: %1.
+ - EC version: %2.
+Compatibility mode for versions lower than %3 is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="120"/>
+        <source>Enterprise Controller has a different version:
+ - Client version: %1.
+ - EC version: %2.
+You will be asked to restart the client in compatibility mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/connection_testing_dialog.cpp" line="133"/>
         <source>Success</source>
         <translation>成功</translation>
     </message>
     <message>
-        <location filename="../src/connection_testing_dialog.cpp" line="89"/>
+        <location filename="../src/connection_testing_dialog.cpp" line="133"/>
         <source>Failed</source>
         <translation>失败</translation>
     </message>
@@ -397,62 +436,64 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>系统控制器连接</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="154"/>
         <source>Login</source>
-        <translation>登录</translation>
+        <translation type="vanished">登录</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="171"/>
         <source>Password</source>
-        <translation>密码</translation>
+        <translation type="vanished">密码</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="79"/>
+        <location filename="../src/settings.ui" line="92"/>
         <source>0.0.0.0</source>
         <translation>0.0.0.0</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="95"/>
         <source>Port</source>
-        <translation>端口</translation>
+        <translation type="vanished">端口</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="143"/>
+        <location filename="../src/settings.ui" line="69"/>
         <source>Find</source>
         <translation>寻找</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="213"/>
+        <location filename="../src/settings.ui" line="80"/>
+        <source>Host:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="130"/>
+        <source>Login:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="140"/>
+        <source>Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="165"/>
         <source>Test</source>
         <translation>测试</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="259"/>
-        <source>Enable auto discovery for cameras</source>
+        <location filename="../src/settings.ui" line="185"/>
+        <source>Cameras RTP transport:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="345"/>
-        <source>Enterprise controller settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/settings.ui" line="351"/>
+        <location filename="../src/settings.ui" line="108"/>
+        <location filename="../src/settings.ui" line="338"/>
         <source>Port:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="358"/>
-        <source>Do not control camera settings:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/settings.ui" line="63"/>
         <source>Host</source>
-        <translation>主机</translation>
+        <translation type="vanished">主机</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="225"/>
+        <location filename="../src/settings.ui" line="179"/>
         <source>Media server network settings</source>
         <translation>媒体服务器网络设置</translation>
     </message>
@@ -465,21 +506,28 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">API端口</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="271"/>
+        <location filename="../src/settings.ui" line="231"/>
         <source>Allow access to media server via public IP address</source>
         <translation>允许通过公网IP地址存取媒体服务器</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="333"/>
+        <location filename="../src/settings.ui" line="263"/>
+        <location filename="../src/settings.ui" line="357"/>
+        <source>Use specified IP or host name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settings.ui" line="290"/>
         <source>Enterprise Controller Settings</source>
         <translation>系统控制器设置</translation>
     </message>
     <message>
+        <location filename="../src/settings.ui" line="302"/>
         <source>Enterprise controller network settings</source>
-        <translation type="obsolete">系统控制器网络设置</translation>
+        <translation type="unfinished">系统控制器网络设置</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="405"/>
+        <location filename="../src/settings.ui" line="348"/>
         <source>Allow access to enterprise controller via public IP address</source>
         <translation>允许通过公网IP地址存取系统服务器</translation>
     </message>
@@ -492,22 +540,21 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">API端口</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="233"/>
         <source>Cameras RTP transport</source>
-        <translation>摄像机RTP传输</translation>
+        <translation type="vanished">摄像机RTP传输</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="241"/>
+        <location filename="../src/settings.ui" line="195"/>
         <source>AUTO</source>
         <translation>自动</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="246"/>
+        <location filename="../src/settings.ui" line="200"/>
         <source>UDP</source>
         <translation>UDP</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="251"/>
+        <location filename="../src/settings.ui" line="205"/>
         <source>TCP</source>
         <translation>TCP</translation>
     </message>
@@ -516,14 +563,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">允许通过公共IP地址访问服务器</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="280"/>
-        <location filename="../src/settings.ui" line="414"/>
         <source>Use specified IP or host name</source>
-        <translation>使用指定的IP地址或主机名</translation>
+        <translation type="vanished">使用指定的IP地址或主机名</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="290"/>
-        <location filename="../src/settings.ui" line="424"/>
+        <location filename="../src/settings.ui" line="253"/>
+        <location filename="../src/settings.ui" line="367"/>
         <source>Auto detect public IP</source>
         <translation>自动侦测公共IP</translation>
     </message>
@@ -544,22 +589,22 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="obsolete">允许通过公共IP地址访问系统控制器</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="464"/>
+        <location filename="../src/settings.ui" line="407"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="474"/>
+        <location filename="../src/settings.ui" line="417"/>
         <source>Language:</source>
         <translation>语言：</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="486"/>
+        <location filename="../src/settings.ui" line="429"/>
         <source>(requires restart)</source>
         <translation>(需重新启动)</translation>
     </message>
     <message>
-        <location filename="../src/settings.ui" line="497"/>
+        <location filename="../src/settings.ui" line="440"/>
         <source>Information</source>
         <translation>信息</translation>
     </message>

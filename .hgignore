@@ -263,7 +263,7 @@ image_library_plugin/x64
 image_library_plugin/arm
 
 
-nx_sdk/nx_sdk 
+nx_sdk/nx_sdk
 
 
 libonvif/.build/
@@ -274,4 +274,7 @@ edge_firmware/isd/*.tar.gz
 
 .vagrant
 **/Makefile
+
+android-client/android-main/AndroidManifest.xml
+android-client/android-main/res/**
 

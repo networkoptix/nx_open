@@ -362,6 +362,8 @@ void QnFisheyeCalibrator::analyseFrame(QImage frame)
     m_center = QPointF(0.5, 0.5);
     m_radius = 0.5;
 
+    frame = frame.scaled(frame.width() / 2, frame.height() / 2); // addition filtering
+
     if (frame.format() != QImage::Format_Indexed8) 
     {
         // copy data to the tmp buffer because source buffer may be unaligned

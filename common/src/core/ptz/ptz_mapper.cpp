@@ -61,7 +61,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<q
     /* Note: source == device space, target == logical space. */
 
     Qn::ExtrapolationMode extrapolationMode;
-    QList<qreal> device, logical;
+    QVector<qreal> device, logical;
     qreal deviceMultiplier = 1.0, logicalMultiplier = 1.0; 
     AngleSpace space = DegreesSpace;
     if(
@@ -82,9 +82,19 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<q
         device[i] = deviceMultiplier * device[i];
     }
 
-    if(space == Mm35EquivSpace)
+    if(space == Mm35EquivSpace) {
+        /* What is linear in 35mm-equiv space is non-linear in degrees, 
+         * so we compensate by inserting additional data points. */
+        while(logical.size() < 16) {
+            for(int i = logical.size() - 2; i >= 0; i--) {
+                logical.insert(i + 1, (logical[i] + logical[i + 1]) / 2.0);
+                device.insert(i + 1, (device[i] + device[i + 1]) / 2.0);
+            }
+        }
+
         for(int i = 0; i < logical.size(); i++)
             logical[i] = q35mmEquivToDegrees(logical[i]);
+    }
 
     QVector<QPair<qreal, qreal> > sourceToTarget;
     for(int i = 0; i < logical.size(); i++)

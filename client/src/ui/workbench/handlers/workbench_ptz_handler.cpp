@@ -21,8 +21,7 @@
 #include <ui/actions/action_target_provider.h>
 
 #include <ui/dialogs/ptz_preset_dialog.h>
-#include <ui/dialogs/ptz_presets_dialog.h>
-#include <ui/dialogs/ptz_tours_dialog.h>
+#include <ui/dialogs/ptz_manage_dialog.h>
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
@@ -82,11 +81,17 @@ QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent):
 {
     connect(action(Qn::PtzSavePresetAction),                    &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered);
     connect(action(Qn::PtzGoToPresetAction),                    &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered);
-    connect(action(Qn::PtzManagePresetsAction),                 &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzManagePresetsAction_triggered);
     connect(action(Qn::PtzStartTourAction),                     &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered);
-    connect(action(Qn::PtzManageToursAction),                   &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzManageToursAction_triggered);
+    connect(action(Qn::PtzManageAction),                        &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzManageAction_triggered);
     connect(action(Qn::DebugCalibratePtzAction),                &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered);
     connect(action(Qn::DebugGetPtzPositionAction),              &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered);
+
+    QnPtzManageDialog *manageDialog = new QnPtzManageDialog(mainWindow()); //initializing instance of a singleton
+    Q_UNUSED(manageDialog)
+}
+
+QnWorkbenchPtzHandler::~QnWorkbenchPtzHandler() {
+    delete QnPtzManageDialog::instance();
 }
 
 void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
@@ -108,7 +113,8 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
 
     QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(new QnSingleCameraPtzHotkeysDelegate(resource, context()));
 
-    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(widget->ptzController(), mainWindow()));
+    QScopedPointer<QnPtzPresetDialog> dialog(new QnPtzPresetDialog(mainWindow()));
+    dialog->setController(widget->ptzController());
     dialog->setHotkeysDelegate(hotkeysDelegate.data());
     dialog->exec();
 }
@@ -126,8 +132,6 @@ void QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered() {
         //TODO: #GDM PTZ show appropriate error message?
         return;
     }
-
-    qDebug() << "goToPreset activated" << resource->getId() << id;
 
     if (widget->dewarpingParams().enabled) {
         QnItemDewarpingParams params = widget->item()->dewarpingParams();
@@ -151,19 +155,6 @@ void QnWorkbenchPtzHandler::at_ptzGoToPresetAction_triggered() {
     }
 }
 
-void QnWorkbenchPtzHandler::at_ptzManagePresetsAction_triggered() {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
-    if(!widget || !widget->ptzController())
-        return;
-    QnResourcePtr resource = widget->resource()->toResourcePtr();
-
-    QScopedPointer<QnSingleCameraPtzHotkeysDelegate> hotkeysDelegate(new QnSingleCameraPtzHotkeysDelegate(resource, context()));
-
-    QScopedPointer<QnPtzPresetsDialog> dialog(new QnPtzPresetsDialog(widget->ptzController(), mainWindow()));
-    dialog->setHotkeysDelegate(hotkeysDelegate.data());
-    dialog->exec();
-}
-
 void QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
@@ -174,8 +165,6 @@ void QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered() {
     QString id = parameters.argument<QString>(Qn::PtzTourIdRole).trimmed();
     if(id.isEmpty())
         return;
-
-    qDebug() << "startTour activated" << resource->getId() << id;
 
     if (widget->dewarpingParams().enabled) {
         QnItemDewarpingParams params = widget->item()->dewarpingParams();
@@ -199,7 +188,7 @@ void QnWorkbenchPtzHandler::at_ptzStartTourAction_triggered() {
     }
 }
 
-void QnWorkbenchPtzHandler::at_ptzManageToursAction_triggered() {
+void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
     QnPtzTourList tours;
@@ -207,8 +196,12 @@ void QnWorkbenchPtzHandler::at_ptzManageToursAction_triggered() {
     if(!widget || !widget->ptzController() || !widget->ptzController()->getTours(&tours))
         return;
 
-    QScopedPointer<QnPtzToursDialog> dialog(new QnPtzToursDialog(widget->ptzController(), mainWindow()));
-    dialog->exec();
+    QnPtzManageDialog* dialog = QnPtzManageDialog::instance();
+    assert(dialog);
+
+    dialog->setController(widget->ptzController());
+    dialog->setResource(widget->resource()->toResourcePtr());
+    dialog->show();
 }
 
 void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered() {

@@ -11,7 +11,7 @@ QnProxyPtzController::QnProxyPtzController(const QnPtzControllerPtr &baseControl
     assert(qnHasEventLoop(thread()));
 
     connect(baseController, &QnAbstractPtzController::finished,             this, &QnProxyPtzController::baseFinished);
-    connect(baseController, &QnAbstractPtzController::capabilitiesChanged,  this, &QnProxyPtzController::baseCapabilitiesChanged);
+    connect(baseController, &QnAbstractPtzController::changed,              this, &QnProxyPtzController::baseChanged);
     connect(this,           &QnProxyPtzController::finishedLater,           this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
 }
 

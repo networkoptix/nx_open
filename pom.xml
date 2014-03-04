@@ -58,6 +58,7 @@
         <customization>default</customization>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>        
+        <toolchain.version>none</toolchain.version>            
 
         <additional.defines/>
 
@@ -206,7 +207,7 @@
                     <family>Windows</family>
                 </os>
                 <property>
-                    <name>!quicksync</name>
+                    <name>quicksync</name>
                     <value>true</value>
                 </property>
             </activation>
@@ -260,9 +261,6 @@
                 <module>applauncher</module> 
                 <module>client</module>		
             </modules>	
-            <properties>
-                <toolchain.version>none</toolchain.version>            
-            </properties>
         </profile>         
         <profile>
             <id>windows</id>
@@ -281,7 +279,9 @@
             </modules>
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
-                <python.dir>${environment.dir}/python/${arch}</python.dir>	
+                <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
+                <virtualenv.dir>${init.python.dir}/scripts</virtualenv.dir>
+                <python.dir>${libdir}/${arch}/python/scripts</python.dir>                
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
                 <compiler>msvc2012u3</compiler>
@@ -303,7 +303,9 @@
             </activation>
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
-                <python.dir>${environment.dir}/python/bin</python.dir>		
+                <init.python.dir>${environment.dir}/python/bin</init.python.dir>				
+                <python.dir>${project.build.directory}/${arch}/python/bin</python.dir>
+                <virtualenv.dir>/usr/local/bin</virtualenv.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
@@ -339,11 +341,8 @@
                     <family>mac</family>
                 </os> 
             </activation>
-            <properties>
-                <environment.dir>${env.environment}</environment.dir>
-                <python.dir>${env.environment}/python/bin/</python.dir>				
+            <properties>		
                 <platform>macosx</platform>
-                <compiler>gcc</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <arch>x64</arch>
                 <qt.spec>macx-clang-libc++</qt.spec>
@@ -355,7 +354,7 @@
         </profile>        
 
         <profile>
-            <id>linux-arm</id>
+            <id>linux-arm-isd</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -363,8 +362,8 @@
                     <name>linux</name>
                 </os> 
                 <property>
-                    <name>arch</name>
-                    <value>arm</value>
+                    <name>box</name>
+                    <value>isd</value>
                 </property>
             </activation>
             <properties>
@@ -379,6 +378,30 @@
                 <module>plugins/isd_native_plugin</module>
             </modules>
         </profile>	
+
+        <profile>
+            <id>linux-arm-rpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>rpi</value>
+                </property>
+            </activation>
+            <properties>
+                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
+                <toolchain.version>rpi</toolchain.version>
+                <compiler>${toolchain.version}</compiler>
+                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
+                <additional.defines>DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA</additional.defines>
+            </properties>
+        </profile>
+
         <profile>
             <id>linux-x64</id>
             <activation>

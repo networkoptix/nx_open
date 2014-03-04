@@ -15,7 +15,7 @@ class QnPtzPresetDialog: public QnAbstractPtzDialog {
 
     typedef QnAbstractPtzDialog base_type;
 public:
-    QnPtzPresetDialog(const QnPtzControllerPtr &controller, QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnPtzPresetDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnPtzPresetDialog();
 
     QnAbstractPtzHotkeyDelegate* hotkeysDelegate() const;

@@ -332,7 +332,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     if( cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability )
         setCameraCapability( Qn::RelayOutputCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability )
-        setCameraCapability( Qn::shareIpCapability, true );
+        setCameraCapability( Qn::ShareIpCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::primaryStreamSoftMotionCapability )
         setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )

@@ -40,6 +40,7 @@ void QnAbstractResourcePropertyAdaptor::loadValue() {
         m_value = QVariant();
 
     emit valueChanged();
+    emit valueChangedExternally();
 }
 
 void QnAbstractResourcePropertyAdaptor::saveValue() {

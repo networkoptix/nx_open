@@ -899,15 +899,9 @@ QnActionManager::QnActionManager(QObject *parent):
             requiredPermissions(Qn::WritePtzPermission).
             condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
 
-        factory(Qn::PtzManagePresetsAction).
+        factory(Qn::PtzManageAction).
             flags(Qn::Scene | Qn::SingleTarget).
-            text(tr("Manage Saved Positions...")).
-            requiredPermissions(Qn::WritePtzPermission).
-            condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
-
-        factory(Qn::PtzManageToursAction).
-            flags(Qn::Scene | Qn::SingleTarget).
-            text(tr("Manage Tours...")).
+            text(tr("Manage...")).
             requiredPermissions(Qn::WritePtzPermission).
             condition(new QnPtzActionCondition(Qn::ToursPtzCapability, this));
 

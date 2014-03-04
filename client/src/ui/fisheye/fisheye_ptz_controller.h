@@ -36,6 +36,8 @@ public:
     QnMediaDewarpingParams mediaDewarpingParams() const;
     QnItemDewarpingParams itemDewarpingParams() const;
 
+    static QVector3D positionFromRect(const QnMediaDewarpingParams &dewarpingParams, const QRectF &rect);
+
 protected:
     virtual void tick(int deltaMSecs) override;
 
@@ -61,6 +63,7 @@ private:
     QPointer<QnMediaResourceWidget> m_widget;
     QPointer<QnResourceWidgetRenderer> m_renderer;
     Qn::PtzCapabilities m_capabilities;
+    QVector3D m_unitSpeed;
 
     QnPtzLimits m_limits;
     bool m_unlimitedPan;

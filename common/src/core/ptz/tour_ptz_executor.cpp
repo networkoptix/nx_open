@@ -43,6 +43,8 @@ struct QnPtzTourData {
     
     Qn::PtzCoordinateSpace space;
     QnPtzTourSpotDataList spots;
+
+    int size() const { return tour.spots.size(); }
 };
 
 
@@ -73,11 +75,14 @@ public:
     void startWaiting();
     void processWaiting();
 
+    void activateCurrentSpot();
+    void requestPosition();
+
     bool handleTimer(int timerId);
     void handleFinished(Qn::PtzCommand command, const QVariant &data);
 
-    QnPtzTourSpot &currentSpot() { return currentData.tour.spots[currentIndex]; }
-    QnPtzTourSpotData &currentSpotData() { return currentData.spots[currentIndex]; }
+    QnPtzTourSpot &currentSpot() { return data.tour.spots[index]; }
+    QnPtzTourSpotData &currentSpotData() { return data.spots[index]; }
 
     QnTourPtzExecutor *q;
 
@@ -87,12 +92,12 @@ public:
     Qn::PtzDataField defaultDataField;
     Qn::PtzCommand defaultCommand;
     
-    QBasicTimer moveTimer, waitTimer;
+    QBasicTimer moveTimer;
+    QBasicTimer waitTimer;
 
-    QnPtzTourData currentData;
-    int currentSize;
-    int currentIndex;
-    State currentState;
+    QnPtzTourData data;
+    int index;
+    State state;
     
     bool usingDefaultMoveTimer;
     bool needPositionUpdate;
@@ -100,11 +105,13 @@ public:
     
     QElapsedTimer spotTimer;
     QVector3D startPosition;
-    QVector3D currentPosition;
+    QVector3D lastPosition;
+    int lastPositionRequestTime;
+    int newPositionRequestTime;
 };
 
 QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate(): 
-    currentState(Stopped),
+    state(Stopped),
     usingThreadController(false)
 {}
 
@@ -135,7 +142,7 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller) {
 }
 
 void QnTourPtzExecutorPrivate::stopTour() {
-    currentState = Stopped;
+    state = Stopped;
 
     moveTimer.stop();
     waitTimer.stop();
@@ -146,46 +153,40 @@ void QnTourPtzExecutorPrivate::startTour(const QnPtzTour &tour) {
 
     TRACE("START TOUR" << tour.name);
 
-    currentData.tour = tour;
-    currentData.tour.optimize();
-    currentData.space = defaultSpace;
-    currentSize = currentData.tour.spots.size();
-    qnResizeList(currentData.spots, currentSize);
+    data.tour = tour;
+    data.tour.optimize();
+    data.space = defaultSpace;
+    qnResizeList(data.spots, data.size());
 
     startMoving();
 }
 
 void QnTourPtzExecutorPrivate::startMoving() {
-    if(currentState == Stopped) {
-        currentIndex = 0;
-        currentState = Entering;
-        currentPosition = qQNaN<QVector3D>();
+    if(state == Stopped) {
+        index = 0;
+        state = Entering;
+        lastPosition = qQNaN<QVector3D>();
+        lastPositionRequestTime = 0;
         
         startPosition = qQNaN<QVector3D>();
-    } else if(currentState == Waiting) {
-        currentIndex = (currentIndex + 1) % currentSize;
-        currentState = Moving;
+    } else if(state == Waiting) {
+        index = (index + 1) % data.size();
+        state = Moving;
 
-        startPosition = currentPosition;
+        startPosition = lastPosition;
     } else {
         return; /* Invalid state. */
     }
 
-    TRACE("GO TO SPOT" << currentIndex);
+    TRACE("GO TO SPOT" << index);
 
     spotTimer.restart();
 
-    const QnPtzTourSpot &spot = currentSpot();
+    activateCurrentSpot();
+    requestPosition();
+
     const QnPtzTourSpotData &spotData = currentSpotData();
-    
-    QVector3D tmp;
-    baseController->activatePreset(spot.presetId, spot.speed);
-    baseController->getPosition(defaultSpace, &tmp);
-
-    needPositionUpdate = false;
-    waitingForNewPosition = true;
-
-    if(currentState == Moving && spotData.moveTime > pingTimeout) {
+    if(state == Moving && spotData.moveTime > pingTimeout) {
         TRACE("ESTIMATED MOVE TIME" << spotData.moveTime << "MS");
 
         moveTimer.start(spotData.moveTime - pingTimeout, q);
@@ -197,7 +198,7 @@ void QnTourPtzExecutorPrivate::startMoving() {
 }
 
 void QnTourPtzExecutorPrivate::processMoving() {
-    if(currentState != Entering && currentState != Moving)
+    if(state != Entering && state != Moving)
         return;
 
     if(!usingDefaultMoveTimer) {
@@ -208,42 +209,36 @@ void QnTourPtzExecutorPrivate::processMoving() {
     if(waitingForNewPosition) {
         needPositionUpdate = true;
     } else {
-        QVector3D tmp;
-        baseController->getPosition(defaultSpace, &tmp);
-        
-        needPositionUpdate = false;
-        waitingForNewPosition = true;
+        requestPosition();
     }
 }
 
 void QnTourPtzExecutorPrivate::processMoving(bool status, const QVector3D &position) {
-    if(currentState != Entering && currentState != Moving)
+    if(state != Entering && state != Moving)
         return;
 
     TRACE("GOT POS" << position);
 
     bool moved = !qFuzzyEquals(startPosition, position);
-    bool stopped = qFuzzyEquals(currentPosition, position);
+    bool stopped = qFuzzyEquals(lastPosition, position);
 
     if(status && stopped && (moved || spotTimer.elapsed() > samePositionTimeout)) {
-        if(currentState == Moving) {
+        if(state == Moving) {
             QnPtzTourSpotData &spotData = currentSpotData();
-            spotData.moveTime = spotTimer.elapsed();
-            spotData.position = position;
+            spotData.moveTime = lastPositionRequestTime;
+            spotData.position = lastPosition;
         }
 
         moveTimer.stop();
         startWaiting();
     } else {
-        if(status)
-            currentPosition = position;
+        if(status) {
+            lastPosition = position;
+            lastPositionRequestTime = newPositionRequestTime;
+        }
 
         if(needPositionUpdate) {
-            QVector3D tmp;
-            baseController->getPosition(defaultSpace, &tmp);
-
-            waitingForNewPosition = true;
-            needPositionUpdate = false;
+            requestPosition();
         } else {
             waitingForNewPosition = false;
         }
@@ -251,13 +246,13 @@ void QnTourPtzExecutorPrivate::processMoving(bool status, const QVector3D &posit
 }
 
 void QnTourPtzExecutorPrivate::startWaiting() {
-    if(currentState != Entering && currentState != Moving)
+    if(state != Entering && state != Moving)
         return;
 
-    currentState = Waiting;
+    state = Waiting;
 
-    int waitTime = currentSpot().stayTime;
-    if(waitTime != 0) {
+    int waitTime = currentSpot().stayTime - qMin(0ll, spotTimer.elapsed() - currentSpotData().moveTime);
+    if(waitTime > 0) {
         TRACE("WAIT FOR" << waitTime << "MS");
 
         waitTimer.start(waitTime, q);
@@ -267,11 +262,26 @@ void QnTourPtzExecutorPrivate::startWaiting() {
 }
 
 void QnTourPtzExecutorPrivate::processWaiting() {
-    if(currentState != Waiting)
+    if(state != Waiting)
         return;
 
     waitTimer.stop();
     startMoving();
+}
+
+void QnTourPtzExecutorPrivate::activateCurrentSpot() {
+    const QnPtzTourSpot &spot = currentSpot();
+    baseController->activatePreset(spot.presetId, spot.speed);
+}
+
+void QnTourPtzExecutorPrivate::requestPosition() {
+    QVector3D tmp;
+    baseController->getPosition(defaultSpace, &tmp);
+
+    needPositionUpdate = false;
+    waitingForNewPosition = true;
+
+    newPositionRequestTime = spotTimer.elapsed();
 }
 
 bool QnTourPtzExecutorPrivate::handleTimer(int timerId) {

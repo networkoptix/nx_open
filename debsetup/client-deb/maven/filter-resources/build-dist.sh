@@ -49,11 +49,10 @@ mkdir -p "$STAGE/etc/xdg/$FULL_COMPANY_NAME"
 mv -f debian/client.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_PRODUCT_NAME"
 mv -f usr/share/applications/icon.desktop usr/share/applications/${namespace.additional}.desktop
 
-# Copy client binary, x264, old version libs
+# Copy client binary, old version libs
 cp -r $CLIENT_BIN_PATH/client $BINSTAGE/$MINORVERSION/client-bin
 cp -r $CLIENT_BIN_PATH/applauncher $BINSTAGE/$MINORVERSION/applauncher-bin
 cp -r bin/applauncher $BINSTAGE/$MINORVERSION
-cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE/$MINORVERSION
 
 # Copy icons
 cp -P -Rf usr $STAGE

@@ -11,14 +11,14 @@ class QnWorkbenchPtzHandler : public QObject, public QnWorkbenchContextAware {
 
 public:
     explicit QnWorkbenchPtzHandler(QObject *parent = 0);
+    ~QnWorkbenchPtzHandler();
 
 private slots:
     void at_ptzSavePresetAction_triggered();
     void at_ptzGoToPresetAction_triggered();
-    void at_ptzManagePresetsAction_triggered();
 
     void at_ptzStartTourAction_triggered();
-    void at_ptzManageToursAction_triggered();
+    void at_ptzManageAction_triggered();
 
     void at_debugCalibratePtzAction_triggered();
     void at_debugGetPtzPositionAction_triggered();

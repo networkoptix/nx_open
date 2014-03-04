@@ -2249,7 +2249,7 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered(
 void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     QnActionParameters params = menu()->currentParameters(sender());
 
-    QnResourceWidget *widget = params.widget();
+    QnMediaResourceWidget *widget = params.widget<QnMediaResourceWidget>();
     if(!widget)
         return;
 
@@ -2258,11 +2258,12 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     addParams.usePosition = true;
     addParams.position = widget->item()->combinedGeometry().center();
     addParams.zoomWindow = rect;
+    addParams.dewarpingParams.enabled = widget->dewarpingParams().enabled;
     addParams.zoomUuid = widget->item()->uuid();
     addParams.frameColor = params.argument<QColor>(Qn::ItemFrameColorRole);
     addParams.rotation = widget->item()->rotation();
 
-    addToLayout(workbench()->currentLayout()->resource(), widget->resource(), addParams);
+    addToLayout(workbench()->currentLayout()->resource(), widget->resource()->toResourcePtr(), addParams);
 }
 
 void QnWorkbenchActionHandler::at_rotate0Action_triggered(){

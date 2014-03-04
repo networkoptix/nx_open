@@ -3,149 +3,237 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_type.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <ui/common/recording_status_helper.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
+#include <core/resource/resource_name.h>
 
 QnCameraListModel::QnCameraListModel(QObject *parent):
-    QnResourceListModel(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent)
 {
+    /* Connect to context. */
+    connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(addCamera(QnResourcePtr)), Qt::QueuedConnection);
+    connect(resourcePool(),     SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(removeCamera(QnResourcePtr)), Qt::QueuedConnection);
+
+    QnResourceList resources = resourcePool()->getResources(); 
+
+    /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
+    foreach(const QnResourcePtr &resource, resources)
+        addCamera(resource);
 }
 
 QnCameraListModel::~QnCameraListModel() {
     return;
 }
 
-QVariant QnCameraListModel::data(const QModelIndex &index, int role) const
-{
-    QVariant result;
+QModelIndex QnCameraListModel::index(int row, int column, const QModelIndex &parent) const {
+    return hasIndex(row, column, parent) ? createIndex(row, column, (void*)0) : QModelIndex();
+}
 
-    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+QModelIndex QnCameraListModel::parent(const QModelIndex &child) const {
+    Q_UNUSED(child)
+        return QModelIndex();
+}
+
+int QnCameraListModel::rowCount(const QModelIndex &parent) const {
+    if(!parent.isValid())
+        return m_cameras.size();
+    return 0;
+}
+
+int QnCameraListModel::columnCount(const QModelIndex &parent) const {
+    Q_UNUSED(parent)
+    return ColumnCount;
+}
+
+QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
+    if (!index.isValid() 
+        || index.model() != this 
+        || index.row() < 0 
+        || index.row() >= m_cameras.size())
         return QVariant();
 
-    const QnVirtualCameraResourcePtr &camera = m_resources[index.row()].dynamicCast<QnVirtualCameraResource>();
-    if(!camera)
-        return QVariant();
-
-    Column column = m_columns[index.column()];
+    QnVirtualCameraResourcePtr camera = m_cameras[index.row()];
+    QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
 
     switch(role) {
     case Qt::DecorationRole:
-        switch(column) {
-        case RecordingColumn: {
-            int recordingMode = camera->isScheduleDisabled() ? -1 : Qn::RecordingType_Never;
-            recordingMode = QnRecordingStatusHelper::currentRecordingMode(context(), camera);
-            result =  QnRecordingStatusHelper::icon(recordingMode);
-            break;
-        }
-        case NameColumn: {
-            result = qnResIconCache->icon(camera->flags(), camera->getStatus());
-            break;
-        }
-        case ServerColumn: {
-            QnResourcePtr server = camera->getParentResource();
-            if (server)
-                result = qnResIconCache->icon(server->flags(), server->getStatus());
-            break;
-        }
+        switch(index.column()) {
+        case RecordingColumn: 
+            {
+                int recordingMode = camera->isScheduleDisabled() ? -1 : Qn::RecordingType_Never;
+                recordingMode = QnRecordingStatusHelper::currentRecordingMode(context(), camera);
+                return QnRecordingStatusHelper::icon(recordingMode);
+            }
+        case NameColumn: 
+            return qnResIconCache->icon(camera->flags(), camera->getStatus());
+        case ServerColumn:
+            return server ? qnResIconCache->icon(server->flags(), server->getStatus()) : QVariant();
         default:
-            result = base_type::data(index, role);
             break;
         }
         break;
     case Qn::DisplayHtmlRole:
     case Qt::DisplayRole:
-        switch (column) {
-            case RecordingColumn: {
+        switch (index.column()) {
+        case RecordingColumn: 
+            {
                 int recordingMode = camera->isScheduleDisabled() ? -1 : Qn::RecordingType_Never;
                 recordingMode = QnRecordingStatusHelper::currentRecordingMode(context(), camera);
-                result =  QnRecordingStatusHelper::shortTooltip(recordingMode);
-                break;
+                return QnRecordingStatusHelper::shortTooltip(recordingMode);
             }
-            case NameColumn:
-                result = camera->getName();
-                break;
-            case VendorColumn:
-                result = camera->getVendor();
-                break;
-            case ModelColumn:
-                result = camera->getModel();
-                break;
-            case FirmwareColumn:
-                result = camera->getFirmware();
-                break;
-            case DriverColumn:
-                result = camera->getDriverName();
-                break;
-            case IpColumn:
-                result = camera->getHostAddress();
-                break;
-            case UniqIdColumn:
-                result = camera->getPhysicalId();
-                break;
-            case ServerColumn: {
-                QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
-                if (server)
-                    result = QString(lit("%1 (%2)")).arg(server->getName()).arg(QUrl(server->getApiUrl()).host());
-                break;
-            }
-            default:
-                result = base_type::data(index, role);
+        case NameColumn:
+            return camera->getName();
+        case VendorColumn:
+            return camera->getVendor();
+        case ModelColumn:
+            return camera->getModel();
+        case FirmwareColumn:
+            return camera->getFirmware();
+        case IpColumn:
+            return camera->getHostAddress();
+        case UniqIdColumn:
+            return camera->getPhysicalId();
+        case ServerColumn: 
+            return server ? getFullResourceName(server, true) : QVariant();
+        default:
+            break;
         }
         break;
+    case Qn::ResourceRole:
+        return QVariant::fromValue<QnResourcePtr>(camera);
     default:
-        result = base_type::data(index, role);
+        break;
     }
 
-    return result;
+    return QVariant();
 }
 
-QString QnCameraListModel::columnTitle(Column column) const
-{
-    switch(column) {
+QVariant QnCameraListModel::headerData(int section, Qt::Orientation orientation, int role) const {
+    if (orientation != Qt::Horizontal)
+        return QVariant();
+
+    switch (role) {
+    case Qt::DisplayRole:
+    case Qt::ToolTipRole:
+    case Qt::StatusTipRole:
+    case Qt::WhatsThisRole:
+    case Qt::AccessibleTextRole:
+    case Qt::AccessibleDescriptionRole:
+        break;
+    default:
+        return QVariant();
+    }
+
+    switch (section) {
     case RecordingColumn: return tr("Recording");
     case NameColumn:      return tr("Name");
     case VendorColumn:    return tr("Vendor");
     case ModelColumn:     return tr("Model");
     case FirmwareColumn:  return tr("Firmware");
-    case DriverColumn:    return tr("Driver");
     case IpColumn:        return tr("IP/Name");
     case UniqIdColumn:    return tr("ID/MAC");
     case ServerColumn:    return tr("Server");
     default:
-        assert(false);
-        return QString();
+        break;
     }
+
+    return QVariant();
 }
 
-const QList<QnCameraListModel::Column> &QnCameraListModel::columns() const 
-{
-    return m_columns;
-}
-
-void QnCameraListModel::setColumns(const QList<Column>& columns)
-{
-    if(m_columns == columns)
+void QnCameraListModel::setServer(const QnMediaServerResourcePtr & server) {
+    if(m_server == server)
         return;
 
     beginResetModel();
-    m_columns = columns;
+    m_server = server;
+
+    while (!m_cameras.isEmpty())
+        removeCamera(m_cameras.first());
+    
+    QnResourceList resources = resourcePool()->getAllEnabledCameras(m_server); 
+    foreach(const QnResourcePtr &resource, resources)
+        addCamera(resource);
+
     endResetModel();
+
+    emit serverChanged();
 }
 
-int QnCameraListModel::columnCount(const QModelIndex &parent) const
-{
-    if(!parent.isValid())
-        return m_columns.size();
-
-    return 0;
+QnMediaServerResourcePtr QnCameraListModel::server() const {
+    return m_server;
 }
 
-QVariant QnCameraListModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole && section >= 0 && section < m_columns.size())
-        return columnTitle(m_columns[section]);
-    return QnResourceListModel::headerData(section, orientation, role);
+
+void QnCameraListModel::addCamera(const QnResourcePtr &resource) {
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
+    if (m_cameras.contains(camera))
+        return;
+
+    if (!cameraFits(camera))
+        return;
+
+    connect(camera, &QnResource::parentIdChanged, this, &QnCameraListModel::at_resource_parentIdChanged);
+    connect(camera, &QnResource::resourceChanged, this, &QnCameraListModel::at_resource_resourceChanged);
+
+    int row = m_cameras.size();
+    beginInsertRows(QModelIndex(), row, row);
+    m_cameras << camera;
+    endInsertRows();
+
+    //emit dataChanged(index(row, 0), index(row, ColumnCount - 1));
+}
+
+void QnCameraListModel::removeCamera(const QnResourcePtr &resource) {
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+    int row = m_cameras.indexOf(camera);
+    if(row < 0)
+        return;
+
+    disconnect(camera, NULL, this, NULL);
+
+    beginRemoveRows(QModelIndex(), row, row);
+    m_cameras.removeAt(row);
+    endRemoveRows();
+}
+
+void QnCameraListModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {
+    // ignore parent changes if displaying all cameras
+    if (!m_server)
+        return;
+
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
+    if (camera->getParentId() == m_server->getId())
+        addCamera(camera);
+    else
+        removeCamera(camera);
+}
+
+void QnCameraListModel::at_resource_resourceChanged(const QnResourcePtr &resource) {
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+    int row = m_cameras.indexOf(camera);
+    if(row < 0)
+        return;
+
+    emit dataChanged(index(row, 0), index(row, ColumnCount - 1));
+}
+
+bool QnCameraListModel::cameraFits(const QnVirtualCameraResourcePtr &camera) const {
+    return camera 
+        && !camera-> isDisabled() 
+        && !camera->hasFlags(QnResource::foreigner)
+        && (!m_server  || camera->getParentId() == m_server->getId());
 }
