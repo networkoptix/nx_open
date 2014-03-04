@@ -1,7 +1,13 @@
+
 #include "db_manager.h"
+
 #include <QtSql/QtSql>
-#include "nx_ec/data/ec2_business_rule_data.h"
+
 #include "common/common_module.h"
+#include "managers/impl/license_manager_impl.h"
+#include "managers/impl/stored_file_manager_impl.h"
+#include "nx_ec/data/ec2_business_rule_data.h"
+
 
 namespace ec2
 {
@@ -52,9 +58,15 @@ QnId QnDbManager::getType(const QString& typeName)
     return QnId();
 }
 
-QnDbManager::QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* const storedFileManagerImpl, const QString& dbFilePath ):
+QnDbManager::QnDbManager(
+    QnResourceFactory* factory,
+    StoredFileManagerImpl* const storedFileManagerImpl,
+    LicenseManagerImpl* const licenseManagerImpl,
+    const QString& dbFilePath )
+:
     QnDbHelper(),
-    m_storedFileManagerImpl( storedFileManagerImpl )
+    m_storedFileManagerImpl( storedFileManagerImpl ),
+    m_licenseManagerImpl( licenseManagerImpl )
 {
     m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
@@ -1098,6 +1110,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiIdData>& 
     return result;
 }
 
+
 /* 
 -------------------------------------------------------------
 -------------------------- getters --------------------------
@@ -1427,6 +1440,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullData& data)
     if ((err = doQueryNoLock(dummy, data.cameraHistory)) != ErrorCode::ok)
         return err;
 
+    if ((err = doQueryNoLock(dummy, data.licenses)) != ErrorCode::ok)
+        return err;
+
     std::vector<ApiResourceParamWithRef> kvPairs;
     QSqlQuery queryParams(m_sdb);
     queryParams.prepare(QString("SELECT r.guid as resourceId, kv.value, kv.name \
@@ -1443,7 +1459,20 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullData& data)
     mergeObjectListData<ApiUserData>(data.users.data,          kvPairs, &ApiUserData::addParams,        &ApiResourceParamWithRef::resourceId);
     mergeObjectListData<ApiLayoutData>(data.layouts.data,      kvPairs, &ApiLayoutData::addParams,      &ApiResourceParamWithRef::resourceId);
 
+    //filling serverinfo
+    fillServerInfo( &data.serverInfo );
+
     return err;
+}
+
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicenseList>& tran)
+{
+    return m_licenseManagerImpl->addLicenses( tran.params );
+}
+
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseList& data)
+{
+    return m_licenseManagerImpl->getLicenses( &data );
 }
 
 ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& path, ApiStoredDirContents& data)
@@ -1456,5 +1485,9 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& path, ApiStoredFileData&
     return m_storedFileManagerImpl->readFile( path, data );
 }
 
+void QnDbManager::fillServerInfo( ServerInfo* const serverInfo )
+{
+    m_licenseManagerImpl->getHardwareId( serverInfo );
+}
 
 }

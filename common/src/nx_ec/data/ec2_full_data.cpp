@@ -16,8 +16,10 @@ namespace ec2
         cameras.toResourceList(outData.resources, ctx.resFactory);
         users.toResourceList(outData.resources);
         layouts.toResourceList(outData.resources);
+        licenses.toResourceList(outData.licenses);
 
         rules.toResourceList(outData.bRules, ctx.pool);
         cameraHistory.toResourceList(outData.cameraHistory);
+        outData.serverInfo = serverInfo;
     }
 }

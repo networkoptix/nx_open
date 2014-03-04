@@ -7,6 +7,7 @@
 #include "ec2_business_rule_data.h"
 #include "ec2_user_data.h"
 #include "ec2_layout_data.h"
+#include "ec2_license.h"
 #include "nx_ec/ec_api.h"
 #include "camera_server_item_data.h"
 #include "ec2_resource_type_data.h"
@@ -22,6 +23,7 @@ namespace ec2
         ApiLayoutDataList layouts;
         ApiBusinessRuleDataList rules;
         ApiCameraServerItemDataList cameraHistory;
+        ApiLicenseList licenses;
         ServerInfo serverInfo;
         
         void toResourceList(QnFullResourceData&, const ResourceContext&) const;
@@ -30,6 +32,6 @@ namespace ec2
 
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ServerInfo, (hardwareId1) (oldHardwareId) (hardwareId2) 
     (publicIp) (systemName) (hardwareId3) (sessionKey) (allowCameraChanges) )
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiFullData, (resTypes) (servers) (cameras) (users) (layouts) (rules) (cameraHistory) (serverInfo) )
+QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiFullData, (resTypes) (servers) (cameras) (users) (layouts) (rules) (cameraHistory) (licenses) (serverInfo) )
 
 #endif // __EC2_FULL_DATA_H_

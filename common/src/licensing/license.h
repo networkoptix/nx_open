@@ -24,10 +24,14 @@ public:
         TrialLicense,
         AnalogLicense,
         ProfessionalLicense,
-        TypeCount
+        TypeCount,
+        Invalid
     };
 
+    QnLicense();
     QnLicense(const QByteArray& licenseBlock);
+
+    void loadLicenseBlock( const QByteArray& licenseBlock );
 
     /**
      * Check if signature matches other fields, also check hardwareId and brand
@@ -84,6 +88,16 @@ private:
 
     // Is full license valid (signature2 is used)
     bool m_isValid2;
+
+    void parseLicenseBlock(
+        const QByteArray& licenseBlock,
+        QByteArray* const v1LicenseBlock,
+        QByteArray* const v2LicenseBlock );
+    void licenseBlockFromData(
+
+        QByteArray* const v1LicenseBlock,
+        QByteArray* const v2LicenseBlock );
+    void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
 };
 
 typedef QList<QnLicensePtr> QnLicenseList;
