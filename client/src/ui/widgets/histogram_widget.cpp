@@ -8,8 +8,17 @@
 #include <ui/style/globals.h>
 
 QnHistogramWidget::QnHistogramWidget(QWidget *parent, Qt::WindowFlags windowFlags):
-    QWidget(parent, windowFlags)
+    base_type(parent, windowFlags)
 {}
+
+const QnHistogramColors &QnHistogramWidget::colors() const {
+    return m_colors;
+}
+
+void QnHistogramWidget::setColors(const QnHistogramColors &colors) {
+    m_colors = colors;
+    update();
+}
 
 void QnHistogramWidget::setHistogramData(const ImageCorrectionResult& data)
 {
@@ -29,12 +38,8 @@ void QnHistogramWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     
-    QColor baseColor = palette().color(QPalette::Base);
-    QColor altBaseColor = palette().color(QPalette::AlternateBase);
-    QColor textColor = palette().color(QPalette::Text);
-
     painter.setPen(Qt::NoPen);
-    painter.setBrush(baseColor);
+    painter.setBrush(m_colors.background);
     painter.drawRect(rect());
 
     double w = width();
@@ -66,25 +71,24 @@ void QnHistogramWidget::paintEvent(QPaintEvent *)
             prevY = curY;
         }
 
-        painter.setPen(altBaseColor);
+        painter.setPen(m_colors.histogram);
         painter.drawLines(lines);
-        painter.setPen(linearCombine(0.5, baseColor, 0.5, altBaseColor));
+        painter.setPen(linearCombine(0.5, m_colors.histogram, 0.5, m_colors.background));
         painter.drawLines(lines2);
 
-        const QColor selectionColor = qnGlobals->selectionColor();
-        painter.setPen(selectionColor.lighter());
-        painter.setBrush(selectionColor);
+        painter.setPen(m_colors.selection.lighter());
+        painter.setBrush(m_colors.selection);
         double xScale = w / 256;
         painter.drawRect(QRect(qAbs(m_data.bCoeff * 256.0) * xScale, 1,  256.0 / m_data.aCoeff * xScale + 0.5, height()));
         
-        painter.setPen(textColor);
+        painter.setPen(m_colors.text);
         painter.drawText(QRect(2, 2, width() - 4, height() - 4), Qt::AlignRight, tr("Gamma %1").arg(m_data.gamma, 0, 'f', 2));
     }
 
     QPen pen;
     pen.setStyle(Qt::DashLine);
     pen.setWidth(1);
-    pen.setBrush(QColor(0,255,0, 30));
+    pen.setBrush(m_colors.grid);
     painter.setPen(pen);
     painter.drawLine(width() / 4, 0, width() / 4, height());
     painter.drawLine(width() / 2, 0, width() / 2, height());
@@ -92,6 +96,6 @@ void QnHistogramWidget::paintEvent(QPaintEvent *)
     painter.drawLine(0, height() / 2, width(), height() / 2);
 
     painter.setBrush(Qt::NoBrush);
-    painter.setPen(Qt::white);
+    painter.setPen(m_colors.border);
     painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
 }
