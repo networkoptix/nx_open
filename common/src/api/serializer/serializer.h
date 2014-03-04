@@ -11,6 +11,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_history.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_control_message.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource/motion_window.h>
 
@@ -69,6 +71,7 @@ public:
     virtual void deserializeBusinessActionVector(QnBusinessActionDataListPtr& businessActionList, const QByteArray& data) = 0;
     virtual void deserializeKvPairs(QnKvPairListsById& kvPairs, const QByteArray& data) = 0;
     virtual void deserializeSettings(QnKvPairList& kvPairs, const QByteArray& data) = 0;
+    virtual void deserializeVideoWalls(QnVideoWallResourceList& videoWalls, const QByteArray& data) = 0;
 
     virtual void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) = 0;
     virtual void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) = 0;
@@ -84,6 +87,8 @@ public:
     virtual void serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data) = 0;
     virtual void serializeKvPairs(int resourceId, const QnKvPairList& kvPairs, QByteArray& data) = 0;
     virtual void serializeSettings(const QnKvPairList& kvPairs, QByteArray& data) = 0;
+    virtual void serializeVideoWall(const QnVideoWallResourcePtr& videoWall, QByteArray& data) = 0;
+    virtual void serializeVideoWallControl(const QnVideoWallControlMessage &message, QByteArray& data) = 0;
 
 protected:
     virtual void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) = 0;

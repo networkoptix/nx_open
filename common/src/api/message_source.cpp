@@ -95,6 +95,10 @@ void QnMessageSource::setAuthKey(const QString& authKey)
     m_authKey = authKey;
 }
 
+void QnMessageSource::setVideoWallKey(const QString &videoWallKey) {
+    m_videoWallKey = videoWallKey;
+}
+
 void QnMessageSource::stop()
 {
     emit stopped();
@@ -118,6 +122,8 @@ void QnMessageSource::startRequest()
     request.setRawHeader("Authorization", "Basic " + m_url.userInfo().toLatin1().toBase64());
     if (!m_authKey.isEmpty())
         request.setRawHeader("X-NetworkOptix-AuthKey", m_authKey.toLatin1());
+    if (!m_videoWallKey.isEmpty())
+        request.setRawHeader("X-NetworkOptix-VideoWall", m_videoWallKey.toLatin1());
 
     m_reply = m_manager.post(request, "");
     connect(m_reply, SIGNAL(finished()),

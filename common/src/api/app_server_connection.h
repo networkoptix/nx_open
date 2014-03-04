@@ -144,7 +144,7 @@ public:
      */
     int requestDirectoryListingAsync(const QString &folderName, QObject *target, const char *slot);
 
-    int testConnectionAsync(QObject *target, const char *slot);
+    int testConnectionAsync(QObject *target = NULL, const char *slot = NULL);
     int connectAsync(QObject *target, const char *slot);
     int getLicensesAsync(QObject *target, const char *slot);
     int getBusinessRulesAsync(QObject *target, const char *slot);

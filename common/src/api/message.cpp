@@ -27,6 +27,7 @@ void parseResources(QnResourceList& resources, const PbResourceList& pb_resource
 void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses);
 void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems);
 void parseKvPairs(QnKvPairListsById& kvPairs, const PbKvPairList& pb_kvPairs);
+void parseVideoWallControl(QnVideoWallControlMessage &controlMessage, const pb::VideoWallControl& pb_videoWallControl);
 
 namespace Qn {
     QString toString(const Message_Type val) {
@@ -49,6 +50,7 @@ namespace Qn {
         case Message_Type_BusinessRuleReset:            return QLatin1String("BusinessRuleReset");
         case Message_Type_KvPairChange:                 return QLatin1String("KvPairChang");
         case Message_Type_KvPairDelete:                 return QLatin1String("KvPairDelete");
+        case Message_Type_VideoWallControl:             return QLatin1String("VideoWallControl");
         default:
             return lit("Unknown %1").arg((int)val);
         }
@@ -198,6 +200,13 @@ bool QnMessage::load(const pb::Message &message)
         command = static_cast<Command>(commandMessage.command());
         break;
     }
+    case pb::Message_Type_VideoWallControl:
+    {
+        const pb::VideoWallControlMessage& videoWallControl = message.GetExtension(pb::VideoWallControlMessage::message);
+        parseVideoWallControl(videoWallControlMessage, videoWallControl.control());
+        break;
+    }
+
     default:
         break;
     }

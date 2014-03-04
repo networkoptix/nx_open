@@ -10,6 +10,7 @@
 #include <core/resource/resource_type.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_history.h>
+#include <core/resource/videowall_control_message.h>
 
 #include <business/business_event_rule.h>
 #include <business/actions/abstract_business_action.h>
@@ -41,6 +42,7 @@ namespace Qn {
         Message_Type_KvPairChange = 16,
         Message_Type_KvPairDelete = 17,
         Message_Type_Command = 18,
+        Message_Type_VideoWallControl = 19,
 
         Message_Type_Count
     };
@@ -94,6 +96,8 @@ public:
     QnKvPairListsById kvPairs;
 
     Command command;
+
+    QnVideoWallControlMessage videoWallControlMessage;
 
     bool load(const pb::Message& message);
 

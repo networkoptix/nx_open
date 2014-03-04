@@ -90,6 +90,13 @@ public:
 
     QnUserResourcePtr getAdministrator() const;
 
+    /**
+     * @brief getVideoWallItemByUuid            Find videowall item by uuid.
+     * @param uuid                              Unique id of the item.
+     * @return                                  Pair of videowall containing the item and item's uuid.
+     */
+    QnVideoWallItemIndex getVideoWallItemByUuid(const QUuid &uuid) const;
+
     QStringList allTags() const;
 
     int activeCamerasByClass(bool analog) const;

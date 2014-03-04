@@ -15,6 +15,7 @@
 #include "email.pb.h"
 #include "kvpair.pb.h"
 #include "setting.pb.h"
+#include "videowall.pb.h"
 
 #include "pb_serializer.h"
 
@@ -65,6 +66,7 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const PbResourc
 void parseLicenses(QnLicenseList& licenses, const PbLicenseList& pb_licenses);
 void parseCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCameraServerItemList& pb_cameraServerItems);
 void parseKvPairs(QnKvPairListsById& kvPairs, const PbKvPairList& pb_kvPairs);
+void parseVideoWallControl(QnVideoWallControlMessage &controlMessage, const pb::VideoWallControl& pb_videoWallControl);
 
 namespace {
 
@@ -374,6 +376,11 @@ void parseUser(QnUserResourcePtr& user, const pb::Resource& pb_userResource)
         user->setEmail(QString::fromUtf8(pb_user.email().c_str()));
     user->setHash(QString::fromUtf8(pb_user.hash().c_str()));
     user->setDigest(QString::fromUtf8(pb_user.digest().c_str()));
+    QSet<QUuid> uuids;
+    for (int i = 0; i < pb_user.video_wall_item_size(); i++) {
+        uuids << QUuid(QString::fromUtf8(pb_user.video_wall_item(i).c_str()));
+    }
+    user->setVideoWallItems(uuids);
 }
 
 void parseUsers(QnUserResourceList& users, const PbResourceList& pb_users)
@@ -401,6 +408,87 @@ void parseSettings(QnKvPairList& kvPairs, const PbSettingList& pb_settings)
         kvPairs.append(kvPair);
     }
 }
+
+void parseRect(QRect &rect, const pb::VideoWall_Rect& pb_rect) {
+    rect.setLeft(pb_rect.left());
+    rect.setTop(pb_rect.top());
+    rect.setRight(pb_rect.right());
+    rect.setBottom(pb_rect.bottom());
+}
+
+void parseVideoWall(QnVideoWallResourcePtr& videoWall, const pb::Resource& pb_videoWallResource) {
+    const pb::VideoWall& pb_videoWall = pb_videoWallResource.GetExtension(pb::VideoWall::resource);
+
+    videoWall = QnVideoWallResourcePtr(new QnVideoWallResource());
+
+    if (pb_videoWallResource.has_id())
+        videoWall->setId(pb_videoWallResource.id());
+
+    if (pb_videoWallResource.has_guid())
+        videoWall->setGuid(QString::fromUtf8(pb_videoWallResource.guid().c_str()));
+
+    videoWall->setParentId(pb_videoWallResource.parentid());
+    videoWall->setName(QString::fromUtf8(pb_videoWallResource.name().c_str()));
+
+    if (pb_videoWall.item_size() > 0) {
+        QnVideoWallItemList items;
+
+        for (int j = 0; j < pb_videoWall.item_size(); j++) {
+            const pb::VideoWall_Item& pb_item = pb_videoWall.item(j);
+
+            QnVideoWallItem itemData;
+            itemData.layout = pb_item.layout();
+            itemData.uuid = QUuid(QString::fromUtf8(pb_item.uuid().c_str()));
+            itemData.pcUuid = QUuid(QString::fromUtf8(pb_item.pc_uuid().c_str()));
+            itemData.name = QString::fromUtf8(pb_item.name().c_str());
+            parseRect(itemData.geometry, pb_item.rect());
+            items.append(itemData);
+        }
+
+        videoWall->setItems(items);
+    }
+
+    if (pb_videoWall.pc_size() > 0) {
+        QnVideoWallPcDataList pcs;
+
+        for (int j = 0; j < pb_videoWall.pc_size(); j++) {
+            const pb::VideoWall_Pc& pb_pc = pb_videoWall.pc(j);
+
+            QnVideoWallPcData pcData;
+            pcData.uuid = QUuid(QString::fromUtf8(pb_pc.uuid().c_str()));
+            if (pb_pc.has_rect())
+                parseRect(pcData.geometry, pb_pc.rect());
+
+            for (int k = 0; k < pb_pc.screen_size(); k++) {
+                const pb::VideoWall_Pc_Screen& pb_screen = pb_pc.screen(k);
+
+                QnVideoWallPcData::PcScreen screen;
+                screen.index = pb_screen.index();
+                parseRect(screen.geometry, pb_screen.rect());
+
+                pcData.screens.append(screen);
+            }
+
+            pcs.append(pcData);
+        }
+
+        videoWall->setPcs(pcs);
+    }
+}
+
+void parseVideoWalls(QnVideoWallResourceList& videoWalls, const PbResourceList& pb_videoWalls) {
+    for (PbResourceList::const_iterator ci = pb_videoWalls.begin(); ci != pb_videoWalls.end(); ++ci)
+    {
+        const pb::Resource& pb_videoWallResource = *ci;
+        QnVideoWallResourcePtr videoWall;
+        parseVideoWall(videoWall, pb_videoWallResource);
+        if (videoWall)
+            videoWalls.append(videoWall);
+        else
+            cl_log.log("Can't create resource with id=", ci->id(), cl_logWARNING);
+    }
+}
+
 
 } // namespace {}
 
@@ -614,6 +702,51 @@ void serializeLicense_i(pb::License& pb_license, const QnLicensePtr& license)
     pb_license.set_rawlicense(license->rawLicense().constData());
 }
 
+void serializeRect(pb::VideoWall_Rect& pb_rect, const QRect& rectIn) {
+    pb_rect.set_left(rectIn.left());
+    pb_rect.set_top(rectIn.top());
+    pb_rect.set_right(rectIn.right());
+    pb_rect.set_bottom(rectIn.bottom());
+}
+
+void serializeVideoWall_i(pb::Resource& pb_videoWallResource, const QnVideoWallResourcePtr& videoWallIn) {
+    pb_videoWallResource.set_type(pb::Resource_Type_VideoWall);
+    pb::VideoWall &pb_videoWall = *pb_videoWallResource.MutableExtension(pb::VideoWall::resource);
+
+    pb_videoWallResource.set_parentid(videoWallIn->getParentId().toInt());
+    pb_videoWallResource.set_name(videoWallIn->getName().toUtf8().constData());
+    pb_videoWallResource.set_guid(videoWallIn->getGuid().toUtf8().constData());
+
+    if (!videoWallIn->getItems().isEmpty()) {
+        foreach(const QnVideoWallItem& itemIn, videoWallIn->getItems()) {
+            pb::VideoWall_Item& pb_item = *pb_videoWall.add_item();
+
+            pb_item.set_layout(itemIn.layout);
+            pb_item.set_uuid(itemIn.uuid.toString().toUtf8().constData());
+            pb_item.set_pc_uuid(itemIn.pcUuid.toString().toUtf8().constData());
+            pb_item.set_name(itemIn.name.toUtf8().constData());
+            serializeRect(*pb_item.mutable_rect(), itemIn.geometry);
+        }
+    }
+
+    if (!videoWallIn->getPcs().isEmpty()) {
+        foreach(const QnVideoWallPcData& pcIn, videoWallIn->getPcs()) {
+            pb::VideoWall_Pc& pb_pc = *pb_videoWall.add_pc();
+
+            pb_pc.set_uuid(pcIn.uuid.toString().toUtf8().constData());
+            serializeRect(*pb_pc.mutable_rect(), pcIn.geometry);
+
+            foreach (const QnVideoWallPcData::PcScreen& screenIn, pcIn.screens) {
+                pb::VideoWall_Pc_Screen& pb_screen = *pb_pc.add_screen();
+
+                pb_screen.set_index(screenIn.index);
+                serializeRect(*pb_screen.mutable_rect(), screenIn.geometry);
+            }
+
+        }
+    }
+}
+
 BusinessEventType::Value parsePbBusinessEventType(int pbValue) {
     int userEvent = pbValue - pb::UserDefinedEvent;
     if (userEvent >= 0)
@@ -655,8 +788,6 @@ BusinessActionType::Value parsePbBusinessActionType(int pbValue) {
     }
     return BusinessActionType::NotDefined;
 }
-
-
 
 void QnApiPbSerializer::deserializeCameras(QnNetworkResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory)
 {
@@ -812,6 +943,16 @@ void QnApiPbSerializer::deserializeBusinessActionVector(QnBusinessActionDataList
     parseBusinessActionVector(businessActionList, pb_businessActionList);
 }
 
+void QnApiPbSerializer::deserializeVideoWalls(QnVideoWallResourceList& videoWalls, const QByteArray& data) {
+    pb::Resources pb_videoWalls;
+    if (!pb_videoWalls.ParseFromArray(data.data(), data.size()))
+        throw QnSerializationException(tr("Cannot parse serialized layouts."));
+
+    parseVideoWalls(videoWalls, pb_videoWalls.resource());
+}
+
+//----------- Serialization methods -----------------------------------------------------------------------------//
+
 void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data)
 {
     pb::Resources pb_cameras;
@@ -906,6 +1047,9 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
     pb_user.set_isadmin(userPtr->isAdmin());
     pb_user.set_email(userPtr->getEmail().toUtf8().constData());
     pb_userResource.set_guid(userPtr->getGuid().toUtf8().constData());
+    foreach (const QUuid &uuid, userPtr->videoWallItems()) {
+        pb_user.add_video_wall_item(uuid.toString().toUtf8().constData());
+    }
 
     std::string str;
     pb_users.SerializeToString(&str);
@@ -1081,6 +1225,31 @@ void QnApiPbSerializer::serializeSettings(const QnKvPairList& kvPairs, QByteArra
     data = QByteArray(str.data(), (int) str.length());
 }
 
+void QnApiPbSerializer::serializeVideoWall(const QnVideoWallResourcePtr &videoWall, QByteArray &data) {
+    pb::Resources pb_videoWalls;
+    serializeVideoWall_i(*pb_videoWalls.add_resource(), videoWall);
+
+    std::string str;
+    pb_videoWalls.SerializeToString(&str);
+    data = QByteArray(str.data(), (int) str.length());
+}
+
+void QnApiPbSerializer::serializeVideoWallControl(const QnVideoWallControlMessage &message, QByteArray &data) {
+    pb::VideoWallControl pb_videoWallControl;
+    pb_videoWallControl.set_uuid(message.videoWallGuid.toString().toUtf8().constData());
+    pb_videoWallControl.set_item_uuid(message.instanceGuid.toString().toUtf8().constData());
+    pb_videoWallControl.set_op_code(message.operation);
+    foreach (const QString &key, message.params.keys()) {
+        pb::VideoWallControl_Parameter* parameter = pb_videoWallControl.add_param();
+        parameter->set_name(key.toUtf8().constData());
+        parameter->set_value(message.params[key].toUtf8().constData());
+    }
+
+    std::string str;
+    pb_videoWallControl.SerializeToString(&str);
+    data = QByteArray(str.data(), (int) str.length());
+}
+
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory)
 {
     switch (pb_resource.type())
@@ -1111,6 +1280,13 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
             QnLayoutResourcePtr layout;
             parseLayout(layout, pb_resource, 0);
             resource = layout;
+            break;
+        }
+        case pb::Resource_Type_VideoWall:
+        {
+            QnVideoWallResourcePtr videoWall;
+            parseVideoWall(videoWall, pb_resource);
+            resource = videoWall;
             break;
         }
     }
@@ -1461,4 +1637,12 @@ void parseKvPairs(QnKvPairListsById& kvPairs, const PbKvPairList& pb_kvPairs)
 
         kvPairs[ci->resourceid()].append(kvPair);
     }
+}
+
+void parseVideoWallControl(QnVideoWallControlMessage &controlMessage, const pb::VideoWallControl& pb_videoWallControl) {
+    controlMessage.videoWallGuid = QUuid(QString::fromUtf8(pb_videoWallControl.uuid().c_str()));;
+    controlMessage.instanceGuid = QUuid(QString::fromUtf8(pb_videoWallControl.item_uuid().c_str()));;
+    controlMessage.operation = static_cast<QnVideoWallControlMessage::QnVideoWallControlOperation>(pb_videoWallControl.op_code());
+    for (int i = 0; i < pb_videoWallControl.param_size(); i++)
+        controlMessage.params[QString::fromUtf8(pb_videoWallControl.param(i).name().c_str())] = QString::fromUtf8(pb_videoWallControl.param(i).value().c_str());
 }

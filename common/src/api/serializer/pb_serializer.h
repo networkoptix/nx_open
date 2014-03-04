@@ -24,8 +24,9 @@ public:
     void deserializeBusinessRules(QnBusinessEventRuleList& businessRules, const QByteArray& data) override;
     void deserializeBusinessAction(QnAbstractBusinessActionPtr& businessAction, const QByteArray& data) override;
     void deserializeBusinessActionVector(QnBusinessActionDataListPtr &businessActionList, const QByteArray& data) override;
-    void deserializeKvPairs(QnKvPairListsById& kvPairs, const QByteArray& data);
-    void deserializeSettings(QnKvPairList& kvPairs, const QByteArray& data);
+    void deserializeKvPairs(QnKvPairListsById& kvPairs, const QByteArray& data) override;
+    void deserializeSettings(QnKvPairList& kvPairs, const QByteArray& data) override;
+    void deserializeVideoWalls(QnVideoWallResourceList& videoWalls, const QByteArray& data) override;
 
     void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) override;
     void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) override;
@@ -38,9 +39,11 @@ public:
     void serializeEmail(const QStringList& to, const QString& subject, const QString& message, const QnEmailAttachmentList& attachments, int timeout, QByteArray& data);
     void serializeBusinessAction(const QnAbstractBusinessActionPtr& action, QByteArray& data) override;
     void serializeBusinessActionList(const QnAbstractBusinessActionList &businessActions, QByteArray& data) override;
-    void serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data);
-    void serializeKvPairs(int resourceId, const QnKvPairList& kvPairs, QByteArray& data);
-    void serializeSettings(const QnKvPairList& kvPairs, QByteArray& data);
+    void serializeKvPair(const QnResourcePtr& resource, const QnKvPair& kvPair, QByteArray& data) override;
+    void serializeKvPairs(int resourceId, const QnKvPairList& kvPairs, QByteArray& data) override;
+    void serializeSettings(const QnKvPairList& kvPairs, QByteArray& data) override;
+    void serializeVideoWall(const QnVideoWallResourcePtr& videoWall, QByteArray& data) override;
+    void serializeVideoWallControl(const QnVideoWallControlMessage &message, QByteArray& data) override;
 
 private:
     void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) override;

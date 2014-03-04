@@ -27,6 +27,7 @@ public:
     virtual ~QnMessageSource();
 
     void setAuthKey(const QString& authKey);
+    void setVideoWallKey(const QString& videoWallKey);
     void stop();
 
 signals:
@@ -55,6 +56,7 @@ private:
     QUrl m_url;
     int m_retryTimeout;
     QString m_authKey;
+    QString m_videoWallKey;
     QNetworkAccessManager m_manager;
     QNetworkReply *m_reply;
 
