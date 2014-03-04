@@ -367,11 +367,13 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const {
                         result.append(resource);
                 }
             }
+            break;
         case Qn::ResourceNode: {
                 QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
                 if(resource && !result.contains(resource))
                     result.append(resource);
             }
+            break;
         case Qn::EdgeNode: {
             QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
             if (resource && !result.contains(resource))
@@ -380,6 +382,7 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const {
             if (server && !result.contains(server))
                 result.append(server);
             }
+            break;
         case Qn::LocalNode:
         case Qn::ServersNode:
         case Qn::UsersNode:
