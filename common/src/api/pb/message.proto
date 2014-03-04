@@ -184,7 +184,7 @@ message CommandMessage {
 
 message VideoWallControlMessage {
     extend Message {
-        required VideoWallControlMessage message = 111;
+        required VideoWallControlMessage message = 114;
     }
 
     required VideoWallControl control = 1;
