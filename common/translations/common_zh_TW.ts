@@ -35,7 +35,7 @@
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>語言</translation>
+        <translation>國語</translation>
     </message>
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="156"/>
