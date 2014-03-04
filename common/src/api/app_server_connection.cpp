@@ -432,6 +432,10 @@ int QnAppServerConnection::saveServer(const QnMediaServerResourcePtr &serverPtr,
     QByteArray data;
     m_serializer.serialize(serverPtr, data);
 
+    if (serverPtr->getStatus() != 2) {
+        qWarning() << "XYZ1: (!!!!) QnAppServerConnection::saveServer() " << serverPtr->getId().toString() << " to " << QString::number(serverPtr->getStatus());
+    }
+
     QnServersReply reply;
     int status = sendSyncRequest(QNetworkAccessManager::PostOperation, ServerAuthObject, m_requestHeaders, m_requestParams, data, &reply);
     if (status == 0) {
@@ -841,6 +845,8 @@ int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnReso
     requestParams.append(QnRequestParam("id", resourceId.toString()));
     requestParams.append(QnRequestParam("status", QString::number(status)));
 
+    qWarning() << "XYZ1: QnAppServerConnection::setResourceStatusAsync(): Setting status of " << resourceId.toString() << " to " << QString::number(status);
+
     return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(StatusObject), requestHeaders, requestParams, "", target, slot);
 }
 
@@ -855,6 +861,7 @@ int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resourc
         requestParams.append(QnRequestParam(QString(QLatin1String("id%1")).arg(n), resource->getId().toString()));
         requestParams.append(QnRequestParam(QString(QLatin1String("status%1")).arg(n), QString::number(resource->getStatus())));
 
+        qWarning() << "XYZ1: QnAppServerConnection::setResourcesStatusAsync(): Setting status of " << resource->getId().toString() << " to " << QString::number(resource->getStatus());
         n++;
     }
 
@@ -868,6 +875,8 @@ int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource:
 
     requestParams.append(QnRequestParam("id", resourceId.toString()));
     requestParams.append(QnRequestParam("status", QString::number(status)));
+
+    qWarning() << "XYZ1: QnAppServerConnection::setResourceStatus(): Setting status of " << resourceId.toString() << " to " << QString::number(status);
 
     QnHTTPRawResponse response;
     return QnSessionManager::instance()->sendSyncPostRequest(url(), nameMapper()->name(StatusObject), requestHeaders, requestParams, "", response);
