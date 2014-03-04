@@ -55,10 +55,14 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource) {
     if (isCamera && resource->getParentId() != ownMediaServer->getId())
         resource->addFlags( QnResource::foreigner );
 
+    if (isServer && resource->getId() != ownMediaServer->getId())
+        resource->addFlags( QnResource::foreigner );
+
     bool needUpdateServer = false;
     // We are always online
     if (isServer && resource->getGuid() == serverGuid()) {
         if (resource->getStatus() != QnResource::Online) {
+            qWarning() << "XYZ1: Received message that our status is " << resource->getStatus();
             resource->setStatus(QnResource::Online);
             needUpdateServer = true;
         }
