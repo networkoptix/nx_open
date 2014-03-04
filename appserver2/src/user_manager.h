@@ -20,7 +20,7 @@ namespace ec2
         QnUserManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
 
         virtual int getUsers( impl::GetUsersHandlerPtr handler ) override;
-        virtual int save( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler ) override;
+        virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) override;
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
         template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
@@ -30,9 +30,7 @@ namespace ec2
         template<> void triggerNotification<ApiUserData>( const QnTransaction<ApiUserData>& tran )
         {
             assert( tran.command == ApiCommand::saveUser);
-            QnUserResourcePtr userResource = m_resCtx.resFactory->createResource(
-                tran.params.typeId,
-                tran.params.url ).dynamicCast<QnUserResource>();
+            QnUserResourcePtr userResource(new QnUserResource());
             tran.params.toResource( userResource );
             emit addedOrUpdated( userResource );
         }

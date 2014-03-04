@@ -183,9 +183,9 @@ namespace ec2
         ErrorCode updateLayoutItems(const ApiLayoutData& data, qint32 internalLayoutId);
         ErrorCode removeLayoutItems(qint32 id);
 
-        ErrorCode saveUser( const ApiUserData& data );
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnId& guid );
+        ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
 
         ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);

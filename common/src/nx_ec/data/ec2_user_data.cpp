@@ -7,17 +7,35 @@ namespace ec2
     void ApiUserData::toResource(QnUserResourcePtr resource) const
     {
         ApiResourceData::toResource(resource);
-        resource->setPassword(password);
         resource->setAdmin(isAdmin);
-        resource->setPermissions(rights);
         resource->setEmail(email);
-        resource->setDigest(digest);
         resource->setHash(hash);
+
+        resource->setPermissions(rights);
+        resource->setDigest(digest);
     }
     
-    void ApiUserData::fromResource(QnUserResourcePtr resource) const
+    void ApiUserData::fromResource(QnUserResourcePtr resource)
     {
-        //TODO/IMPL
+        ApiResourceData::fromResource(resource);
+        QString password = resource->getPassword();
+        QByteArray salt = QByteArray::number(rand(), 16);
+        
+        QCryptographicHash md5(QCryptographicHash::Md5);
+        md5.addData(salt);
+        md5.addData(password.toUtf8());
+        hash = "md5$";
+        hash.append(salt);
+        hash.append("$");
+        hash.append(md5.result().toHex());
+        
+        md5.reset();
+        md5.addData(QString(lit("%1:NetworkOptix:%2")).arg(resource->getName(), password).toLatin1());
+        digest = md5.result().toHex();
+
+        isAdmin = resource->isAdmin();
+        rights = resource->getPermissions();
+        email = resource->getEmail();
     }
 
     template <class T>

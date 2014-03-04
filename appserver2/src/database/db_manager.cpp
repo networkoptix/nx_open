@@ -362,6 +362,42 @@ ErrorCode QnDbManager::updateResource(const ApiResourceData& data, qint32 intern
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 internalId)
+{
+/*        
+        "select r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentGuid, r.name, r.url, r.status,r. disabled, \
+                          u.is_superuser as isAdmin, u.email, p.digest as digest, u.password as hash, p.rights \
+                          from vms_resource r \
+                          join auth_user u  on u.id = r.id\
+                          join vms_userprofile p on p.user_id = u.id\
+                          order by r.id"));
+*/
+
+
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT OR REPLACE INTO auth_user (id, username, is_superuser, email, password, is_staff, is_active, last_login, date_joined) VALUES (:internalId, :name, :isAdmin, :email, :hash, 1, 1, '', '')");
+    data.autoBindValues(insQuery);
+    insQuery.bindValue(":internalId", internalId);
+    insQuery.bindValue(":name", data.name);
+    if (!insQuery.exec())
+    {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+
+    QSqlQuery insQuery2(m_sdb);
+    insQuery2.prepare("INSERT OR REPLACE INTO vms_userprofile (user_id, resource_ptr_id, digest, rights) VALUES (:internalId, :internalId, :digest, :rights)");
+    data.autoBindValues(insQuery2);
+    insQuery2.bindValue(":internalId", internalId);
+    if (!insQuery2.exec())
+    {
+        qWarning() << Q_FUNC_INFO << insQuery2.lastError().text();
+        return ErrorCode::failure;
+    }
+
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
@@ -687,12 +723,6 @@ ErrorCode QnDbManager::updateLayoutItems(const ApiLayoutData& data, qint32 inter
         }
     }
     return ErrorCode::ok;
-}
-
-ErrorCode QnDbManager::saveUser( const ApiUserData& data )
-{
-    //TODO/IMPL
-    return ErrorCode::notImplemented;
 }
 
 ErrorCode QnDbManager::deleteUserProfileTable(const qint32 id)
@@ -1038,13 +1068,13 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiStoredFil
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiUserData>& tran)
 {
-    QnDbTransactionLocker lock(&m_tran);
+    qint32 internalId;
 
-    ErrorCode result = saveUser( tran.params );
-    if (result != ErrorCode::ok)
+    ErrorCode result = insertOrReplaceResource(tran.params, &internalId);
+    if (result !=ErrorCode::ok)
         return result;
-    lock.commit();
-    return ErrorCode::ok;
+
+    return insertOrReplaceUser(tran.params, internalId);
 }
 
 ErrorCode QnDbManager::removeResource(const QnId& id)
@@ -1322,7 +1352,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList
     //digest = md5('%s:%s:%s' % (self.user.username.lower(), 'NetworkOptix', password)).hexdigest()
     QSqlQuery query(m_sdb);
     query.prepare(QString("select r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentGuid, r.name, r.url, r.status,r. disabled, \
-                          u.password, u.is_superuser as isAdmin, u.email, p.digest as digest, u.password as hash, p.rights \
+                          u.is_superuser as isAdmin, u.email, p.digest as digest, u.password as hash, p.rights \
                           from vms_resource r \
                           join auth_user u  on u.id = r.id\
                           join vms_userprofile p on p.user_id = u.id\

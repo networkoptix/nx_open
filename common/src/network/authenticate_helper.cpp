@@ -151,7 +151,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
         {
             if (user->getName().toUtf8().toLower() == userName)
             {
-                QByteArray dbHash = user->getDigest().toUtf8();
+                QByteArray dbHash = user->getDigest();
 
                 QCryptographicHash md5Hash( QCryptographicHash::Md5 );
                 md5Hash.addData(dbHash);
@@ -184,7 +184,7 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::HttpResponse
     {
         if (user->getName().toUtf8().toLower() == userName)
         {
-            QList<QByteArray> pswdData = user->getHash().toUtf8().split('$');
+            QList<QByteArray> pswdData = user->getHash().split('$');
             if (pswdData.size() == 3)
             {
                 QCryptographicHash md5Hash( QCryptographicHash::Md5 );
@@ -210,7 +210,7 @@ bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, nx_http::Ht
 
     foreach(QnUserResourcePtr user, m_users)
     {
-        if (user->getDigest().toLatin1() == digest)
+        if (user->getDigest() == digest)
             return true;
     }
     return false;

@@ -13,13 +13,13 @@ QString QnUserResource::getUniqueId() const
     return getGuid();
 }
 
-QString QnUserResource::getHash() const
+QByteArray QnUserResource::getHash() const
 {
     QMutexLocker locker(&m_mutex);
     return m_hash;
 }
 
-void QnUserResource::setHash(const QString& hash)
+void QnUserResource::setHash(const QByteArray& hash)
 {
     QMutexLocker locker(&m_mutex);
     m_hash = hash;
@@ -37,13 +37,13 @@ void QnUserResource::setPassword(const QString& password)
     m_password = password;
 }
 
-void QnUserResource::setDigest(const QString& digest)
+void QnUserResource::setDigest(const QByteArray& digest)
 {
     QMutexLocker locker(&m_mutex);
     m_digest = digest;
 }
 
-QString QnUserResource::getDigest() const
+QByteArray QnUserResource::getDigest() const
 {
     QMutexLocker locker(&m_mutex);
     return m_digest;

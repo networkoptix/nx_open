@@ -39,10 +39,21 @@ namespace ec2
     }
 
     template<class T>
-    int QnUserManager<T>::save( const QnUserResourcePtr& resource, impl::SimpleHandlerPtr handler )
+    int QnUserManager<T>::save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler )
     {
-        Q_ASSERT_X(0, Q_FUNC_INFO, "Implement me!!!");
-        return INVALID_REQ_ID;
+
+        //preparing output data
+        QnUserResourceList users;
+        if (resource->getId().isNull()) {
+            resource->setId(QnId::createUuid());
+        }
+        users.push_back( resource );
+
+        const int reqID = generateRequestID();
+        auto tran = prepareTransaction( ApiCommand::saveUser, resource );
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::AddUserHandler::done ), handler, reqID, _1, users ) );
+        return reqID;
     }
 
     template<class T>

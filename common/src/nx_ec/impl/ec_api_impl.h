@@ -161,6 +161,7 @@ namespace ec2
             void emitSaveBusinessRuleDone( int reqID, const ErrorCode p1, const QnBusinessEventRulePtr& p2) { emit onSaveBusinessRuleDone( reqID, p1, p2 ); }
             void emitGetServersDone( int reqID, const ErrorCode p1, const QnMediaServerResourceList& p2 ) { emit onGetServersDone( reqID, p1, p2 ); }
             void emitAddCameraDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( reqID, p1, p2 ); }
+            void emitAddUserDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onAddUserDone( reqID, p1, p2 ); }
             void emitGetCamerasDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( reqID, p1, p2 ); }
             void emitGetCamerasHistoryDone( int reqID, const ErrorCode p1, const QnCameraHistoryList& p2 ) { emit onGetCamerasHistoryDone( reqID, p1, p2 ); }
             void emitGetUsersDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onGetUsersDone( reqID, p1, p2 ); }
@@ -189,6 +190,7 @@ namespace ec2
             void onSaveBusinessRuleDone( int reqID, const ErrorCode, const QnBusinessEventRulePtr&);
             void onGetServersDone( int reqID, const ErrorCode, const QnMediaServerResourceList& );
             void onAddCameraDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
+            void onAddUserDone( int reqID, const ErrorCode, const QnUserResourceList& );
             void onGetCamerasDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
             void onGetCamerasHistoryDone( int reqID, const ErrorCode, const QnCameraHistoryList& );
             void onGetUsersDone( int reqID, const ErrorCode, const QnUserResourceList& );
@@ -245,6 +247,7 @@ namespace ec2
         ///////// Handlers for AbstractUserManager
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER( GetUsers, ErrorCode, QnUserResourceList )
+        DEFINE_TWO_ARG_HANDLER( AddUser, ErrorCode, QnUserResourceList )
 
 
         //////////////////////////////////////////////////////////

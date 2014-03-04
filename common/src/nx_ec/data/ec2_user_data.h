@@ -11,15 +11,15 @@ struct ApiUserData: public ApiResourceData
 {
     ApiUserData(): isAdmin(false), rights(0) {}
     
-    QString password;
+    //QString password;
     bool isAdmin;
     qint64 rights;
     QString email;
-    QString digest;
-    QString hash; 
+    QByteArray digest;
+    QByteArray hash; 
 
     void toResource(QnUserResourcePtr resource) const;
-    void fromResource(QnUserResourcePtr resource) const;
+    void fromResource(QnUserResourcePtr resource);
     QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
@@ -33,7 +33,7 @@ struct ApiUserDataList: public ApiData
 
 }
 
-#define ApiUserDataFields (password) (isAdmin) (rights) (email) (digest) (hash)
+#define ApiUserDataFields (isAdmin) (rights) (email) (digest) (hash)
 QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS(ec2::ApiUserData, ec2::ApiResourceData, ApiUserDataFields)
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiUserDataList, (data) )
 

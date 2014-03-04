@@ -15,14 +15,14 @@ public:
 
     virtual QString getUniqueId() const override;
 
-    QString getHash() const;
-    void setHash(const QString &hash);
+    QByteArray getHash() const;
+    void setHash(const QByteArray&hash);
 
     QString getPassword() const;
     void setPassword(const QString &password);
 
-    QString getDigest() const;
-    void setDigest(const QString& digest);
+    QByteArray getDigest() const;
+    void setDigest(const QByteArray& digest);
 
     quint64 getPermissions() const;
     void setPermissions(quint64 permissions);
@@ -41,8 +41,8 @@ protected:
 
 private:
     QString m_password;
-    QString m_hash;
-    QString m_digest;
+    QByteArray m_hash;
+    QByteArray m_digest;
     quint64 m_permissions;
     bool m_isAdmin;
     QString m_email;
