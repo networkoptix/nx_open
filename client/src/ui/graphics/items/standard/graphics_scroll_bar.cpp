@@ -147,6 +147,13 @@ GraphicsScrollBar::GraphicsScrollBar(Qt::Orientation orientation, QGraphicsItem 
     d_func()->init();
 }
 
+GraphicsScrollBar::GraphicsScrollBar(GraphicsScrollBarPrivate &dd, Qt::Orientation orientation, QGraphicsItem *parent)
+    : base_type(dd, parent)
+{
+    d_func()->orientation = orientation;
+    d_func()->init();
+}
+
 GraphicsScrollBar::~GraphicsScrollBar()
 {
 }
