@@ -89,8 +89,17 @@ bool QnDbHelper::execSQLFile(const QString& fileName)
     if (!file.open(QFile::ReadOnly))
         return false;
     QByteArray data = file.readAll();
-    foreach(const QByteArray& singleCommand, quotedSplit(data))
+    QList<QByteArray> commands = quotedSplit(data);
+#ifdef DB_DEBUG
+    int n = commands.size();
+    qDebug() << "creating db" << n << "commands queued";
+    int i = 0;
+#endif // DB_DEBUG
+    foreach(const QByteArray& singleCommand, commands)
     {
+#ifdef DB_DEBUG
+        qDebug() << QString(QLatin1String("processing command %1 of %2")).arg(++i).arg(n);
+#endif // DB_DEBUG
         if (singleCommand.trimmed().isEmpty())
             continue;
         QSqlQuery ddlQuery(m_sdb);

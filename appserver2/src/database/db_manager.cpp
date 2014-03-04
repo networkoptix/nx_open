@@ -133,8 +133,16 @@ QMap<int, QnId> QnDbManager::getGuidList(const QString& request)
 
 bool QnDbManager::updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids)
 {
+#ifdef DB_DEBUG
+    int n = guids.size();
+    qDebug() << "updating table guids" << n << "commands queued";
+    int i = 0;
+#endif // DB_DEBUG
     for(QMap<int, QnId>::const_iterator itr = guids.begin(); itr != guids.end(); ++itr)
     {
+#ifdef DB_DEBUG
+        qDebug() << QString(QLatin1String("processing guid %1 of %2")).arg(++i).arg(n);
+#endif // DB_DEBUG
         QSqlQuery query(m_sdb);
         query.prepare(QString("UPDATE %1 SET %2 = :guid WHERE id = :id").arg(tableName).arg(fieldName));
         query.bindValue(":id", itr.key());
@@ -187,6 +195,9 @@ bool QnDbManager::createDatabase()
             return false;
     }
     lock.commit();
+#ifdef DB_DEBUG
+    qDebug() << "database created successfully";
+#endif // DB_DEBUG
     return true;
 }
 
