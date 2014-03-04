@@ -91,6 +91,11 @@ namespace ec2
             //!QString
             removeStoredFile,
 
+            //!ApiLicenseList
+            addLicenses,
+            //!ApiLicenseList
+            getLicenses,
+
             getCurrentTime,
 
             tranSyncRequest,

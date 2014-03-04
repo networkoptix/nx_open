@@ -5,6 +5,9 @@
 #include <QtCore/QObject>
 
 #include <nx_ec/ec_api.h>
+#include <nx_ec/data/ec2_license.h>
+
+#include "transaction/transaction.h"
 
 
 namespace ec2
@@ -18,10 +21,12 @@ namespace ec2
         QnLicenseManager( QueryProcessorType* const queryProcessor );
 
         virtual int getLicenses( impl::GetLicensesHandlerPtr handler ) override;
-        virtual int addLicensesAsync( const QList<QnLicensePtr>& licenses, impl::SimpleHandlerPtr handler ) override;
+        virtual int addLicenses( const QnLicenseList& licenses, impl::SimpleHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
+
+        QnTransaction<ApiLicenseList> prepareTransaction( ApiCommand::Value cmd, const QnLicenseList& licenses );
     };
 }
 

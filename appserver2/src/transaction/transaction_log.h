@@ -13,6 +13,7 @@
 #include "nx_ec/data/camera_server_item_data.h"
 #include "nx_ec/data/ec2_stored_file_data.h"
 #include "nx_ec/data/ec2_full_data.h"
+#include "nx_ec/data/ec2_license.h"
 #include "utils/db/db_helper.h"
 #include <QSet>
 
@@ -51,6 +52,10 @@ namespace ec2
             return saveMultiTransaction<ApiCameraDataList, ApiCameraData>(multiTran);
         }
 
+        ErrorCode saveTransaction(const QnTransaction<ApiLicenseList>& multiTran, const QByteArray& /*serializedTran*/) {
+            return saveMultiTransaction<ApiLicenseList, ApiLicense>(multiTran);
+        }
+
         ErrorCode saveTransaction(const QnTransaction<ApiFullData>& , const QByteArray&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
@@ -86,10 +91,12 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiStoredFileData>& tran)          { return makeHash(tran.params.path.toUtf8()); }
         QUuid transactionHash(const QnTransaction<ApiStoredFilePath>& tran)          { return makeHash(tran.params.toUtf8()); }
         QUuid transactionHash(const QnTransaction<ApiResourceData>& tran)            { return makeHash(tran.params.id.toRfc4122(), "resource"); }
+        QUuid transactionHash(const QnTransaction<ApiLicense>& tran)                 { return makeHash(tran.params.key, "ApiLicense"); }    //TODO
         
         QUuid transactionHash(const QnTransaction<ApiFullData>& )                { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiCameraDataList>& )          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiLayoutDataList>& )          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const QnTransaction<ApiLicenseList>&)              { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiBusinessActionData>& )      { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
         template <class T, class T2>

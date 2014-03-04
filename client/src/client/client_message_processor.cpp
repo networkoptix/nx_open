@@ -73,15 +73,12 @@ void QnClientMessageProcessor::processLicenses(const QnLicenseList& licenses)
     qnLicensePool->replaceLicenses(licenses);
 }
 
-void QnClientMessageProcessor::updateHardwareIds(const ec2::QnFullResourceData& /*fullData*/)
+void QnClientMessageProcessor::updateHardwareIds(const ec2::QnFullResourceData& fullData)
 {
-    // TODO: implement me
-    /*
-    qnLicensePool->setOldHardwareId(fullData.oldHardwareId);
-    qnLicensePool->setHardwareId1(fullData.hardwareId1);
-    qnLicensePool->setHardwareId2(fullData.hardwareId2);
-    qnLicensePool->setHardwareId3(fullData.hardwareId3);
-    */
+    qnLicensePool->setOldHardwareId(fullData.serverInfo.oldHardwareId);
+    qnLicensePool->setHardwareId1(fullData.serverInfo.hardwareId1);
+    qnLicensePool->setHardwareId2(fullData.serverInfo.hardwareId2);
+    qnLicensePool->setHardwareId3(fullData.serverInfo.hardwareId3);
 }
 
 void QnClientMessageProcessor::processCameraServerItems(const QnCameraHistoryList& cameraHistoryList)

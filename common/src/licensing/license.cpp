@@ -53,74 +53,27 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnLicense
 // -------------------------------------------------------------------------- //
+QnLicense::QnLicense()
+:
+    m_cameraCount(0),
+    m_isValid1(false),
+    m_isValid2(false)
+{
+}
+
 QnLicense::QnLicense(const QByteArray &licenseBlock)
     : m_rawLicense(licenseBlock),
       m_isValid1(false),
       m_isValid2(false)
 {
+    loadLicenseBlock( licenseBlock );
+}
+
+void QnLicense::loadLicenseBlock( const QByteArray& licenseBlock )
+{
     QByteArray v1LicenseBlock, v2LicenseBlock;
-
-    int n = 0;
-    foreach (QByteArray line, licenseBlock.split('\n'))
-    {
-        line = line.trimmed();
-        if (line.isEmpty())
-            continue;
-
-        const int eqPos = line.indexOf('=');
-        if (eqPos != -1)
-        {
-            const QByteArray aname = line.left(eqPos);
-            const QByteArray avalue = line.mid(eqPos + 1);
-
-            if (aname == "NAME")
-                m_name = QString::fromUtf8(avalue);
-            else if (aname == "SERIAL")
-                m_key = avalue;
-            else if (aname == "COUNT")
-                m_cameraCount = avalue.toInt();
-            else if (aname == "HWID")
-                m_hardwareId = avalue;
-            else if (aname == "SIGNATURE")
-                m_signature = avalue;
-            else if (aname == "CLASS")
-                m_class = QString::fromUtf8(avalue);
-            else if (aname == "VERSION")
-                m_version = QString::fromUtf8(avalue);
-            else if (aname == "BRAND")
-                m_brand = QString::fromUtf8(avalue);
-            else if (aname == "EXPIRATION")
-                m_expiration = QString::fromUtf8(avalue);
-            else if (aname == "SIGNATURE2")
-                m_signature2 = avalue;
-        }
-
-        // v1 license activation is 4 strings + signature
-        if (n < 4) {
-            v1LicenseBlock += line + "\n";
-        }
-
-        // v2 license activation is 8 strings + signature
-        if (n < 8) {
-            v2LicenseBlock += line + "\n";
-        }
-
-        n++;
-    }
-
-    // Remove trailing "\n"
-//    v1LicenseBlock.chop(1);
-//    v2LicenseBlock.chop(1);
-
-    if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey))) {
-        m_isValid2 = true;
-    } else if (isSignatureMatch(v1LicenseBlock, QByteArray::fromBase64(m_signature), QByteArray(networkOptixRSAPublicKey))) {
-        m_class = QLatin1String("digital");
-        m_brand = QLatin1String("");
-        m_version = QLatin1String("1.4");
-        m_expiration = QLatin1String("");
-        m_isValid1 = true;
-    }
+    parseLicenseBlock( licenseBlock, &v1LicenseBlock, &v2LicenseBlock );
+    verify( v1LicenseBlock, v2LicenseBlock );
 }
 
 QnLicensePtr QnLicense::readFromStream(QTextStream &stream)
@@ -157,6 +110,11 @@ const QByteArray &QnLicense::key() const
 qint32 QnLicense::cameraCount() const
 {
     return m_cameraCount;
+}
+
+const QByteArray &QnLicense::hardwareId() const
+{
+    return m_hardwareId;
 }
 
 const QByteArray &QnLicense::signature() const
@@ -243,6 +201,77 @@ QString QnLicense::typeName() const {
         return QString();
     }
 }
+
+void QnLicense::parseLicenseBlock(
+    const QByteArray& licenseBlock,
+    QByteArray* const v1LicenseBlock,
+    QByteArray* const v2LicenseBlock )
+{
+    int n = 0;
+    foreach (QByteArray line, licenseBlock.split('\n'))
+    {
+        line = line.trimmed();
+        if (line.isEmpty())
+            continue;
+
+        const int eqPos = line.indexOf('=');
+        if (eqPos != -1)
+        {
+            const QByteArray aname = line.left(eqPos);
+            const QByteArray avalue = line.mid(eqPos + 1);
+
+            if (aname == "NAME")
+                m_name = QString::fromUtf8(avalue);
+            else if (aname == "SERIAL")
+                m_key = avalue;
+            else if (aname == "COUNT")
+                m_cameraCount = avalue.toInt();
+            else if (aname == "HWID")
+                m_hardwareId = avalue;
+            else if (aname == "SIGNATURE")
+                m_signature = avalue;
+            else if (aname == "CLASS")
+                m_class = QString::fromUtf8(avalue);
+            else if (aname == "VERSION")
+                m_version = QString::fromUtf8(avalue);
+            else if (aname == "BRAND")
+                m_brand = QString::fromUtf8(avalue);
+            else if (aname == "EXPIRATION")
+                m_expiration = QString::fromUtf8(avalue);
+            else if (aname == "SIGNATURE2")
+                m_signature2 = avalue;
+        }
+
+        // v1 license activation is 4 strings + signature
+        if (n < 4) {
+            *v1LicenseBlock += line + "\n";
+        }
+
+        // v2 license activation is 8 strings + signature
+        if (n < 8) {
+            *v2LicenseBlock += line + "\n";
+        }
+
+        n++;
+    }
+    // Remove trailing "\n"
+//    v1LicenseBlock.chop(1);
+//    v2LicenseBlock.chop(1);
+}
+
+void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock )
+{
+    if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey))) {
+        m_isValid2 = true;
+    } else if (isSignatureMatch(v1LicenseBlock, QByteArray::fromBase64(m_signature), QByteArray(networkOptixRSAPublicKey))) {
+        m_class = QLatin1String("digital");
+        m_brand = QLatin1String("");
+        m_version = QLatin1String("1.4");
+        m_expiration = QLatin1String("");
+        m_isValid1 = true;
+    }
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnLicenseListHelper

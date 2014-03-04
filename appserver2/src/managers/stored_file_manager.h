@@ -45,6 +45,9 @@ namespace ec2
     private:
         QueryProcessorType* const m_queryProcessor;
         const ResourceContext m_resCtx;
+
+        QnTransaction<ApiStoredFileData> prepareTransaction( const QString& filename, const QByteArray& data );
+        QnTransaction<ApiStoredFilePath> prepareTransaction( const QString& filename );
     };
 }
 

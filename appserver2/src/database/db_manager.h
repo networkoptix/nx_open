@@ -1,7 +1,6 @@
 #ifndef __DB_MANAGER_H_
 #define __DB_MANAGER_H_
 
-#include "managers/impl/stored_file_manager_impl.h"
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 #include "nx_ec/data/camera_data.h"
@@ -11,6 +10,7 @@
 #include "nx_ec/data/camera_server_item_data.h"
 #include "nx_ec/data/ec2_user_data.h"
 #include "nx_ec/data/ec2_layout_data.h"
+#include "nx_ec/data/ec2_license.h"
 #include "nx_ec/data/ec2_business_rule_data.h"
 #include "nx_ec/data/ec2_full_data.h"
 #include "utils/db/db_helper.h"
@@ -19,10 +19,17 @@
 
 namespace ec2
 {
+    class StoredFileManagerImpl;
+    class LicenseManagerImpl;
+
     class QnDbManager: public QnDbHelper
     {
     public:
-		QnDbManager(QnResourceFactory* factory, StoredFileManagerImpl* const storedFileManagerImpl, const QString& dbFileName);
+		QnDbManager(
+            QnResourceFactory* factory,
+            StoredFileManagerImpl* const storedFileManagerImpl,
+            LicenseManagerImpl* const licenseManagerImpl,
+            const QString& dbFileName );
 		virtual ~QnDbManager();
 
         static QnDbManager* instance();
@@ -91,6 +98,9 @@ namespace ec2
         // ApiFullData
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiFullData& data);
 
+        //getLicenses
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseList& data);
+
 		// --------- misc -----------------------------
 
 		int getNextSequence();
@@ -126,6 +136,8 @@ namespace ec2
 
         // delete camera, server, layout, any resource t.e.c
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiIdData>& tran);
+
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicenseList>& tran);
 
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiFullData>&) {
@@ -193,9 +205,12 @@ namespace ec2
     private:
 		QnResourceFactory* m_resourceFactory;
         StoredFileManagerImpl* const m_storedFileManagerImpl;
+        LicenseManagerImpl* const m_licenseManagerImpl;
         QnId m_storageTypeId;
         QnId m_serverTypeId;
         QnId m_cameraTypeId;
+
+        void fillServerInfo( ServerInfo* const serverInfo );
     };
 };
 

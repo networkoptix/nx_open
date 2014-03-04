@@ -96,6 +96,11 @@ namespace ec2
                 case removeStoredFile:
                     return "removeStoredFile";
 
+                case addLicenses:
+                    return "addLicenses";
+                case getLicenses:
+                    return "getLicenses";
+
                 case getCurrentTime:
                     return "getCurrentTime";
 

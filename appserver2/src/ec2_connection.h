@@ -11,6 +11,7 @@
 #include "base_ec2_connection.h"
 #include "database/db_manager.h"
 #include "server_query_processor.h"
+#include "managers/impl/license_manager_impl.h"
 #include "managers/impl/stored_file_manager_impl.h"
 
 
@@ -35,6 +36,7 @@ namespace ec2
 
     private:
         StoredFileManagerImpl m_storedFileManagerImpl;
+        LicenseManagerImpl m_licenseManagerImpl;
 		std::unique_ptr<QnDbManager> m_dbManager;   //TODO: #ak not sure this is right place for QnDbManager instance
         std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;

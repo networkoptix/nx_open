@@ -15,7 +15,11 @@ namespace ec2
         const QString& dbFilePath)
     :
         BaseEc2Connection<ServerQueryProcessor>( queryProcessor, resCtx ),
-        m_dbManager( new QnDbManager(resCtx.resFactory, &m_storedFileManagerImpl, dbFilePath) ),
+        m_dbManager( new QnDbManager(
+            resCtx.resFactory,
+            &m_storedFileManagerImpl,
+            &m_licenseManagerImpl,
+            dbFilePath) ),
         m_transactionLog( new QnTransactionLog(m_dbManager.get() )),
         m_connectionInfo( connectionInfo )
     {

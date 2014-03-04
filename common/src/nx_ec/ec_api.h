@@ -23,8 +23,21 @@
 namespace ec2
 {
 
+    struct ServerInfo
+    {
+        QByteArray hardwareId1;
+        QByteArray oldHardwareId;
+        QByteArray hardwareId2;
+        QString publicIp;
+        QString systemName;
+        QByteArray hardwareId3;
+        QString sessionKey;
+        bool allowCameraChanges;
+    };
+
     struct QnFullResourceData
     {
+        ServerInfo serverInfo;
         QnResourceTypeList resTypes;
         QnResourceList resources;
         QnBusinessEventRuleList bRules;
@@ -278,7 +291,7 @@ namespace ec2
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int addLicenses( const QList<QnLicensePtr>& licenses, TargetType* target, HandlerType handler ) {
-            return addLicensesAsync( licenses, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return addLicenses( licenses, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
     signals:
@@ -286,7 +299,7 @@ namespace ec2
 
     protected:
         virtual int getLicenses( impl::GetLicensesHandlerPtr handler ) = 0;
-        virtual int addLicensesAsync( const QList<QnLicensePtr>& licenses, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int addLicenses( const QList<QnLicensePtr>& licenses, impl::SimpleHandlerPtr handler ) = 0;
     };
     typedef std::shared_ptr<AbstractLicenseManager> AbstractLicenseManagerPtr;
 
@@ -547,18 +560,6 @@ namespace ec2
     };
     typedef std::shared_ptr<AbstractStoredFileManager> AbstractStoredFileManagerPtr;
 
-    struct ServerInfo
-    {
-        QString hardwareId1;
-        QString oldHardwareId;
-        QString hardwareId2;
-        QString publicIp;
-        QString systemName;
-        QString hardwareId3;
-        QString sessionKey;
-        bool allowCameraChanges;
-    };
-
     /*!
         \note All methods are asynchronous if other not specified
     */
@@ -650,7 +651,7 @@ namespace ec2
 
         //!Cancel running async request
         /*!
-            \warning Request handler may still be called after return of this method, since request could already have been completed and resulted posted to handler
+            \warning Request handler may still be called after return of this method, since request could already have been completed and resulte posted to handler
         */
         //virtual void cancelRequest( int requestID ) = 0;
 
