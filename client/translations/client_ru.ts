@@ -7049,7 +7049,7 @@ AVAILABLE</source>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="499"/>
         <source>auto</source>
         <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of AM/PM usage based on user&apos;s system locale. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>auto</translation>
+        <translation>none</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="514"/>

@@ -500,7 +500,7 @@ QnTimeSlider::~QnTimeSlider() {
 void QnTimeSlider::createSteps(QVector<QnTimeStep> *absoluteSteps, QVector<QnTimeStep> *relativeSteps) {
     //: Translate this into 'none' or 'forced' if you want to switch off automatic detection of
     //: AM/PM usage based on user's system locale. Do not translate this string unless you know what you're doing.
-    QString ampmUsage = tr("auto");
+    QString ampmUsage = tr("auto"); // TODO: #Elric #tr AM_PM_USAGE as 2nd param
     
     bool ampm;
     if(ampmUsage == lit("forced")) {
@@ -540,7 +540,7 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep> *absoluteSteps, QVector<QnTim
     QString moFormat = tr("MMMM");
 
     //: Format for displaying years on timeline. Do not translate this string unless you know what you're doing.
-    QString yFormat = tr("yyyy");
+    QString yFormat = tr("yyyy"); // TODO: #Elric #TR duplicate with dateYearsFormat
 
 
     //: Format for displaying minute caption in timeline's header, without am/pm indicator. Do not translate this string unless you know what you're doing.
