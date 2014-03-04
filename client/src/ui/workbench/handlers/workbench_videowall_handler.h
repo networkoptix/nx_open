@@ -9,6 +9,9 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <core/resource/videowall_item.h>
+#include <core/resource/videowall_control_message.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchItem;

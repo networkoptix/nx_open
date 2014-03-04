@@ -6,18 +6,21 @@
 
 #include <boost/preprocessor/stringize.hpp>
 
-#include <client_message_processor.h>
+#include <client/client_message_processor.h>
 #include <client/client_settings.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_pc_data.h>
-#include <core/resource/dewarping_params.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
+
+#include <core/ptz/item_dewarping_params.h>
+#include <core/ptz/media_dewarping_params.h>
 
 #include <recording/time_period.h>
 
@@ -39,7 +42,7 @@
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/json.h>
-#include <utils/resource_name_generator.h>
+
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG

@@ -4,12 +4,18 @@
 
 #include <QtCore/QMetaObject>
 
-#include "utils/common/warnings.h"
-#include "utils/common/checked_cast.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource/layout_resource.h"
-#include "core/resource/user_resource.h"
-#include "core/resource/camera_resource.h"
+#include <core/resource/media_server_resource.h>
+#include <core/resource/network_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item.h>
+#include <core/resource/videowall_item_index.h>
+
+#include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
+
 
 #ifdef QN_RESOURCE_POOL_DEBUG
 #   define TRACE(...) qDebug << __VA_ARGS__;
@@ -231,8 +237,7 @@ QnResourceList QnResourcePool::getResources() const
     return m_resources.values();
 }
 
-QnResourcePtr QnResourcePool::getResourceById(QnId id, Filter searchFilter) const
-{
+QnResourcePtr QnResourcePool::getResourceById(const QnId &id, Filter searchFilter) const {
     QMutexLocker locker(&m_resourcesMtx);
 
     QHash<QString, QnResourcePtr>::const_iterator resIter = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByID(id) );
@@ -286,8 +291,7 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
     return QnNetworkResourcePtr(0);
 }
 
-QnResourceList QnResourcePool::getAllEnabledCameras(QnResourcePtr mServer) const
-{
+QnResourceList QnResourcePool::getAllEnabledCameras(const QnResourcePtr &mServer) const {
     QnId parentId = mServer ? mServer->getId() : QnId();
     QnResourceList result;
     QMutexLocker locker(&m_resourcesMtx);
@@ -451,7 +455,7 @@ QStringList QnResourcePool::allTags() const
     return result;
 }
 
-QnResourcePtr QnResourcePool::getResourceByGuid(QString guid) const
+QnResourcePtr QnResourcePool::getResourceByGuid(const QString &guid) const
 {
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
@@ -460,6 +464,10 @@ QnResourcePtr QnResourcePool::getResourceByGuid(QString guid) const
     }
 
     return QnNetworkResourcePtr(0);
+}
+
+QnResourcePtr QnResourcePool::getResourceByGuid(const QUuid &guid) const {
+    return getResourceByGuid(guid.toString());
 }
 
 int QnResourcePool::activeCamerasByClass(bool analog) const
@@ -500,4 +508,14 @@ bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHas
         (*resourcePool)[uniqueId] = resource;
         return true;
     }
+}
+
+QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QUuid &uuid) const {
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
+        if (!videoWall || !videoWall->hasItem(uuid))
+            continue;
+        return QnVideoWallItemIndex(videoWall, uuid);
+    }
+    return QnVideoWallItemIndex();
 }

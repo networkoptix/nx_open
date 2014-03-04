@@ -44,6 +44,7 @@
         GlobalEditCamerasPermission             = 0x00000400,   /**< Can edit camera settings. */
         GlobalPtzControlPermission              = 0x00000800,   /**< Can change camera's PTZ state. */
         GlobalPanicPermission                   = 0x00001000,   /**< Can trigger panic recording. */
+        GlobalEditVideoWallPermission           = 0x00002000,   /**< Can create and edit videowalls */
         
         /* Deprecated permissions. */
         DeprecatedEditCamerasPermission         = 0x00000010,   /**< Can edit camera settings and change camera's PTZ state. */

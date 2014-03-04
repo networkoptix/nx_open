@@ -48,6 +48,9 @@ namespace {
         ((DeleteFileObject,         "rmfile"))
         ((ListDirObject,            "listdir"))
         ((ResetBusinessRulesObject, "resetBusinessRules"))
+        ((VideoWallObject,          "videoWall"))
+        ((VideoWallControlObject,   "videoWallControl"))
+        ((VideoWallInstanceIdObject,"instanceid"))
     );
 
 } // anonymous namespace
@@ -314,6 +317,22 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
         emitFinished(this, status, reply, handle);
         break;
     }
+    case VideoWallObject: {
+        int status = response.status;
+
+        QnVideoWallResourceList reply;
+        if(status == 0) {
+            try {
+                m_serializer.deserializeVideoWalls(reply, response.data);
+            } catch (const QnSerializationException& e) {
+                m_errorString += e.message();
+                status = -1;
+            }
+        }
+
+        emitFinished(this, status, QnResourceList(reply), handle);
+        break;
+    }
     default:
         assert(false); /* We should never get here. */
         break;
@@ -326,7 +345,13 @@ void QnAppServerReplyProcessor::processReply(const QnHTTPRawResponse &response, 
 // -------------------------------------------------------------------------- //
 // QnAppServerConnection
 // -------------------------------------------------------------------------- //
-QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory &resourceFactory, QnApiSerializer &serializer, const QString &guid, const QString &authKey): 
+QnAppServerConnection::QnAppServerConnection(const QUrl &url,
+                                             QnResourceFactory &resourceFactory,
+                                             QnApiSerializer &serializer,
+                                             const QString &guid,
+                                             const QString &clientType,
+                                             const QString &authKey,
+                                             const QString &videoWallKey):
     m_resourceFactory(resourceFactory),
     m_serializer(serializer)
 {
@@ -335,7 +360,10 @@ QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory 
 
     m_requestParams.append(QnRequestParam("format", m_serializer.format()));
     m_requestParams.append(QnRequestParam("guid", guid));
+    m_requestParams.append(QnRequestParam("ct", clientType));
     m_requestHeaders.append(QnRequestHeader(QLatin1String("X-NetworkOptix-AuthKey"), authKey));
+    if (!videoWallKey.isEmpty())
+        m_requestHeaders.append(QnRequestHeader(QLatin1String("X-NetworkOptix-VideoWall"), videoWallKey));
 }
 
 QnAppServerConnection::~QnAppServerConnection()
@@ -468,6 +496,8 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr &resource, QObject *tar
         return saveAsync(user, target, slot);
     else if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
         return saveAsync(layout, target, slot);
+    else if (QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>())
+        return saveAsync(videoWall, target, slot);
     return 0;
 }
 
@@ -552,6 +582,14 @@ int QnAppServerConnection::saveAsync(const QnLayoutResourcePtr &layout, QObject 
     m_serializer.serialize(layout, data);
 
     return addObjectAsync(LayoutObject, data, QN_STRINGIZE_TYPE(QnResourceList), target, slot);
+}
+
+int QnAppServerConnection::saveAsync(const QnVideoWallResourcePtr &videoWall, QObject *target, const char *slot) {
+
+    QByteArray data;
+    m_serializer.serialize(videoWall, data);
+
+    return addObjectAsync(VideoWallObject, data, QN_STRINGIZE_TYPE(QnResourceList), target, slot);
 }
 
 int QnAppServerConnection::saveAsync(const QnBusinessEventRulePtr &rule, QObject *target, const char *slot)
@@ -709,6 +747,11 @@ int QnAppServerConnection::deleteAsync(const QnLayoutResourcePtr &layout, QObjec
     return deleteObjectAsync(LayoutObject, layout->getId().toInt(), target, slot);
 }
 
+int QnAppServerConnection::deleteAsync(const QnVideoWallResourcePtr &videoWall, QObject *target, const char *slot)
+{
+    return deleteObjectAsync(VideoWallObject, videoWall->getId().toInt(), target, slot);
+}
+
 int QnAppServerConnection::deleteRuleAsync(int ruleId, QObject *target, const char *slot)
 {
     return deleteObjectAsync(BusinessRuleObject, ruleId, target, slot);
@@ -723,6 +766,8 @@ int QnAppServerConnection::deleteAsync(const QnResourcePtr &resource, QObject *t
         return deleteAsync(user, target, slot);
     } else if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         return deleteAsync(layout, target, slot);
+    } else if(QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>()) {
+        return deleteAsync(videoWall, target, slot);
     } else {
         qWarning() << "Cannot delete resources of type" << resource->metaObject()->className();
         return 0;
@@ -921,6 +966,22 @@ int QnAppServerConnection::resetBusinessRulesAsync(QObject *target, const char *
     return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(ResetBusinessRulesObject), m_requestHeaders, m_requestParams, "", target, slot);
 }
 
+int QnAppServerConnection::sendVideoWallControlMessage(const QnVideoWallControlMessage &message, QObject *target, const char *slot) {
+    QByteArray body;
+    m_serializer.serializeVideoWallControl(message, body);
+
+    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(VideoWallControlObject), m_requestHeaders, m_requestParams, body, target, slot);
+}
+
+int QnAppServerConnection::sendVideoWallInstanceId(const QUuid &guid, QObject *target, const char *slot) {
+
+    QnRequestParamList requestParams(m_requestParams);
+    requestParams.append(QnRequestParam("instanceid", guid.toString()));
+
+    return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(VideoWallInstanceIdObject), m_requestHeaders, requestParams, "", target, slot);
+}
+
+
 // -------------------------------------------------------------------------- //
 // QnAppServerConnectionFactory
 // -------------------------------------------------------------------------- //
@@ -1025,6 +1086,16 @@ QString QnAppServerConnectionFactory::authKey()
     return QString();
 }
 
+QString QnAppServerConnectionFactory::videoWallKey()
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        return factory->m_videoWallKey;
+    }
+
+    return QString();
+}
+
+
 QString QnAppServerConnectionFactory::clientGuid()
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
@@ -1033,6 +1104,16 @@ QString QnAppServerConnectionFactory::clientGuid()
 
     return QString();
 }
+
+QString QnAppServerConnectionFactory::clientType()
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        return factory->m_clientType;
+    }
+
+    return QString();
+}
+
 
 QUrl QnAppServerConnectionFactory::defaultUrl()
 {
@@ -1059,10 +1140,24 @@ void QnAppServerConnectionFactory::setAuthKey(const QString &authKey)
     }
 }
 
+void QnAppServerConnectionFactory::setVideoWallKey(const QString &videoWallKey)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_videoWallKey = videoWallKey;
+    }
+}
+
 void QnAppServerConnectionFactory::setClientGuid(const QString &guid)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_clientGuid = guid;
+    }
+}
+
+void QnAppServerConnectionFactory::setClientType(const QString &type)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_clientType = type;
     }
 }
 
@@ -1096,7 +1191,9 @@ QnAppServerConnectionPtr QnAppServerConnectionFactory::createConnection(const QU
         *(qn_appServerConnectionFactory_instance()->m_resourceFactory),
         qn_appServerConnectionFactory_instance()->m_serializer,
         qn_appServerConnectionFactory_instance()->m_clientGuid,
-        qn_appServerConnectionFactory_instance()->m_authKey)
+        qn_appServerConnectionFactory_instance()->m_clientType,
+        qn_appServerConnectionFactory_instance()->m_authKey,
+        qn_appServerConnectionFactory_instance()->m_videoWallKey)
     );
 }
 

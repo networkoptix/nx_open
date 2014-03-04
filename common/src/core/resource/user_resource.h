@@ -1,8 +1,10 @@
 #ifndef QN_USER_RESOURCE_H
 #define QN_USER_RESOURCE_H
 
-#include "resource.h"
-#include "layout_resource.h"
+#include <QtCore/QUuid>
+
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource.h>
 
 class QnUserResource : public QnResource
 {
@@ -33,11 +35,25 @@ public:
     QString getEmail() const;
     void setEmail(const QString &email);
 
+    /** Returns set of uuids of videowall items the user is able to control. */
+    QSet<QUuid> videoWallItems() const;
+    void setVideoWallItems(QSet<QUuid> uuids);
+
+    void addVideoWallItem(const QUuid &uuid);
+    void removeVideoWallItem(const QUuid &uuid);
+
 signals:
     void emailChanged(const QnUserResourcePtr &user);
 
+    void videoWallItemAdded(const QnUserResourcePtr &user, const QUuid &uuid);
+    void videoWallItemRemoved(const QnUserResourcePtr &user, const QUuid &uuid);
+
 protected:
     virtual void updateInner(QnResourcePtr other) override;
+
+private:
+    void addVideoWallItemUnderLock(const QUuid &uuid);
+    void removeVideoWallItemUnderLock(const QUuid &uuid);
 
 private:
     QString m_password;
@@ -46,6 +62,9 @@ private:
     quint64 m_permissions;
     bool m_isAdmin;
     QString m_email;
+
+    /** Set of uuids of QnVideoWallItems that user is allowed to control. */
+    QSet<QUuid> m_videoWallItemUuids;
 };
 
 Q_DECLARE_METATYPE(QnUserResourcePtr)

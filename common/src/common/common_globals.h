@@ -240,11 +240,17 @@ public:
         UserResourceRole,                           /**< Role for QnUserResourcePtr. */
         LayoutResourceRole,                         /**< Role for QnLayoutResourcePtr. */
         MediaServerResourceRole,                    /**< Role for QnMediaServerResourcePtr. */
+        VideoWallResourceRole,                      /**< Role for QnVideoWallResourcePtr */
+
         ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
         ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (QnResource::Flags). */
         ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
         ResourceStatusRole,                         /**< Role for resource status. Value of type int (QnResource::Status). */
         ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
+
+        VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QUuid. */
+        VideoWallInstanceGuidRole,                  /**< Role for videowall pc instance unique id. Value of type QUuid. */
+        VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QUuid. */
 
         /* Layout-based. */
         LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type QSizeF. */

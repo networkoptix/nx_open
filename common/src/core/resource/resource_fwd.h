@@ -106,4 +106,11 @@ typedef QSharedPointer<QnDesktopResource> QnDesktopResourcePtr;
 class QnThirdPartyResource;
 typedef QSharedPointer<QnThirdPartyResource> QnThirdPartyResourcePtr;
 
+class QnVideoWallResource;
+typedef QnSharedResourcePointer<QnVideoWallResource> QnVideoWallResourcePtr;
+typedef QnSharedResourcePointerList<QnVideoWallResource> QnVideoWallResourceList;
+
+class QnVideoWallItemIndex;
+typedef QList<QnVideoWallItemIndex> QnVideoWallItemIndexList;
+
 #endif // QN_RESOURCE_FWD_H

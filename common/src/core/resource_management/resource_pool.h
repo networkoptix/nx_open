@@ -5,10 +5,12 @@
 #include <QtCore/QHash>
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
+#include <QtCore/QUuid>
+#include <QtNetwork/QHostAddress>
 
-#include "core/resource/resource.h"
-#include "core/resource_management/resource_criterion.h"
-#include "core/resource/network_resource.h"
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_criterion.h>
 
 class QnResource;
 class QnNetworkResource;
@@ -57,8 +59,9 @@ public:
 
     QnResourceList getResources() const;
 
-    QnResourcePtr getResourceById(QnId id, Filter searchFilter = OnlyFriends) const;
-    QnResourcePtr getResourceByGuid(QString guid) const;
+    QnResourcePtr getResourceById(const QnId &id, Filter searchFilter = OnlyFriends) const;
+    QnResourcePtr getResourceByGuid(const QString &guid) const; // TODO: #Elric remove
+    QnResourcePtr getResourceByGuid(const QUuid &guid) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
     void updateUniqId(QnResourcePtr res, const QString &newUniqId);
@@ -76,7 +79,7 @@ public:
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
     QnNetworkResourcePtr getEnabledResourceByPhysicalId(const QString &mac) const;
-    QnResourceList getAllEnabledCameras(QnResourcePtr mServer = QnResourcePtr()) const;
+    QnResourceList getAllEnabledCameras(const QnResourcePtr &mServer = QnResourcePtr()) const;
     QnResourcePtr getEnabledResourceByUniqueId(const QString &uniqueId) const;
 
     // returns list of resources with such flag

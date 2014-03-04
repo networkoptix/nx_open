@@ -163,6 +163,7 @@ public:
     int saveAsync(const QnUserResourcePtr &resource, QObject *target, const char *slot);
     int saveAsync(const QnLayoutResourcePtr &resource, QObject *target, const char *slot);
     int saveAsync(const QnBusinessEventRulePtr &rule, QObject *target, const char *slot);
+    int saveAsync(const QnVideoWallResourcePtr &videoWall, QObject *target, const char *slot);
 
     int saveAsync(const QnLayoutResourceList &resources, QObject *target, const char *slot);
     int saveAsync(const QnVirtualCameraResourceList &cameras, QObject *target, const char *slot);
@@ -177,6 +178,7 @@ public:
     int deleteAsync(const QnVirtualCameraResourcePtr &resource, QObject *target, const char *slot);
     int deleteAsync(const QnUserResourcePtr &resource, QObject *target, const char *slot);
     int deleteAsync(const QnLayoutResourcePtr &resource, QObject *target, const char *slot);
+    int deleteAsync(const QnVideoWallResourcePtr &videoWall, QObject *target, const char *slot);
 
     int deleteRuleAsync(int ruleId, QObject *target, const char *slot);
 
@@ -186,11 +188,21 @@ public:
 
     int resetBusinessRulesAsync(QObject *target, const char *slot);
 
+    int sendVideoWallControlMessage(const QnVideoWallControlMessage &message, QObject *target = NULL, const char *slot = NULL);
+
+    int sendVideoWallInstanceId(const QUuid &guid, QObject *target = NULL, const char *slot = NULL);
+
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
 
 private:
-    QnAppServerConnection(const QUrl &url, QnResourceFactory &resourceFactory, QnApiSerializer &serializer, const QString &guid, const QString &authKey);
+    QnAppServerConnection(const QUrl &url,
+                          QnResourceFactory &resourceFactory,
+                          QnApiSerializer &serializer,
+                          const QString &guid,
+                          const QString &clientType,
+                          const QString &authKey,
+                          const QString &videoWallKey);
 
     int connectAsync_i(const QnRequestHeaderList &headers, const QnRequestParamList &params, QObject *target, const char *slot);
 
@@ -219,7 +231,9 @@ public:
     QnAppServerConnectionFactory(): m_defaultMediaProxyPort(0) {}
 
     static QString authKey();
+    static QString videoWallKey();
     static QString clientGuid();
+    static QString clientType();
     static QUrl defaultUrl();
     static QUrl publicUrl();
     static QByteArray prevSessionKey();
@@ -229,8 +243,10 @@ public:
     static QnSoftwareVersion currentVersion();
     static QnResourceFactory* defaultFactory();
 
-    static void setAuthKey(const QString &key);
+    static void setAuthKey(const QString &authKey);
+    static void setVideoWallKey(const QString &videoWallKey);
     static void setClientGuid(const QString &guid);
+    static void setClientType(const QString &type);
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory *);
     static void setDefaultMediaProxyPort(int port);
@@ -246,7 +262,9 @@ public:
 private:
     QMutex m_mutex;
     QString m_clientGuid;
+    QString m_clientType;   /**< Type of the client: GUI client, mediaserver, mediaproxy */
     QString m_authKey;
+    QString m_videoWallKey; /**< Special key for connecting in videowall mode */
     QUrl m_defaultUrl;
     QUrl m_publicUrl;
     QString m_systemName;

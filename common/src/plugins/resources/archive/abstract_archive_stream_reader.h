@@ -47,11 +47,6 @@ public:
     // Manual open. Open will be called automatically on first data access
     bool open();
 
-    /**
-     * \returns                         Current position of this reader, in
-     *                                  microseconds.
-     */
-    virtual qint64 currentTime() const = 0;
     virtual bool isSkippingFrames() const = 0;
 
     /**
@@ -109,6 +104,13 @@ public:
     virtual void startPaused() = 0;
     virtual void setGroupId(const QByteArray& groupId)  = 0;
 protected:
+
+    /**
+     * \returns                         Current position of this reader, in
+     *                                  microseconds.
+     */
+    virtual qint64 currentTime() const = 0;
+
     virtual QnAbstractMediaDataPtr getNextData() = 0;
 signals:
     void beforeJump(qint64 mksec);
