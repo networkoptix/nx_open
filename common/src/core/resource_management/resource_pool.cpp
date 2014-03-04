@@ -472,7 +472,7 @@ QStringList QnResourcePool::allTags() const
     return result;
 }
 
-QnResourcePtr QnResourcePool::getResourceByGuid(QString guid) const
+QnResourcePtr QnResourcePool::getResourceByGuid(const QUuid& guid) const
 {
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {

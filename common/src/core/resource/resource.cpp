@@ -70,11 +70,10 @@ void QnResource::setGuid(const QUuid& guid)
     m_id = guid;
 }
 
-QString QnResource::getGuid() const
+QUuid QnResource::getGuid() const
 {
     QMutexLocker mutexLocker(&m_mutex);
-
-    return m_id.toString();
+    return m_id;
 }
 
 QnResourcePtr QnResource::toSharedPointer() const

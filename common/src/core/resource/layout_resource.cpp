@@ -81,7 +81,7 @@ QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {
 
 QString QnLayoutResource::getUniqueId() const
 {
-    return getGuid();
+    return getGuid().toString();
 }
 
 void QnLayoutResource::updateInner(QnResourcePtr other) {

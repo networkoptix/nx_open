@@ -63,7 +63,11 @@ public:
 
     /* Check if current time allowed in schedule */
     bool isScheduleMatchTime(const QDateTime& datetime) const;
+
+    static QnBusinessEventRuleList getDefaultRules();
 private:
+    QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, BusinessActionType::Value bActionType, BusinessEventType::Value bEventType, QnResourcePtr actionRes= QnResourcePtr());
+
     QnId m_id;
 
     BusinessEventType::Value m_eventType;

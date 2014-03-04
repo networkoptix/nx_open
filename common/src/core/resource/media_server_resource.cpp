@@ -147,7 +147,7 @@ void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int resp
     QMutexLocker lock(&m_mutex);
 
     QString urlStr = m_runningIfRequests.value(responseNum);
-    QByteArray guid = getGuid().toUtf8();
+    QByteArray guid = getGuid().toByteArray();
     if (response.data.contains("Requested method is absent") || response.data.contains(guid) || response.data.contains("<time><clock>"))
     {
         // server OK

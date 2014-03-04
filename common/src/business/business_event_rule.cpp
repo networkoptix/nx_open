@@ -3,6 +3,7 @@
 #include <business/business_action_factory.h>
 
 #include <core/resource/resource.h>
+#include "core/resource_management/resource_pool.h"
 
 QnBusinessEventRule::QnBusinessEventRule()
 :
@@ -150,4 +151,50 @@ bool QnBusinessEventRule::isScheduleMatchTime(const QDateTime& datetime) const
 
     bool rez = bool(m_binSchedule.at(byteOffset) & mask);
     return rez;
+}
+
+QnBusinessEventRule::QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, BusinessActionType::Value bActionType, BusinessEventType::Value bEventType,
+                                         QnResourcePtr actionRes)
+{
+    m_disabled = false;
+    m_eventState = Qn::UndefinedState;
+    
+    m_id = intToGuid(internalId);
+    m_aggregationPeriod = aggregationPeriod;
+    m_system = isSystem;
+    m_actionType = bActionType;
+    m_eventType = bEventType;
+
+    QnBusinessParams bParams = deserializeBusinessParams(actionParams);
+    m_actionParams  = QnBusinessActionParameters::fromBusinessParams(bParams);
+    if (actionRes)
+        m_actionResources << actionRes;
+}
+
+
+QnBusinessEventRuleList QnBusinessEventRule::getDefaultRules()
+{
+    QnResourcePtr admin = qnResPool->getResourceByGuid("e3219e00-cb8f-496c-81a0-28abc1b3a830");
+
+    QnBusinessEventRuleList result;
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(1,  30,    "{ \"userGroup\" : 0 }",  0, BusinessActionType::ShowPopup,   BusinessEventType::Camera_Disconnect));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(2,  30,    QByteArray(),             0, BusinessActionType::ShowPopup,   BusinessEventType::Storage_Failure));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(3,  30,    QByteArray(),             0, BusinessActionType::ShowPopup,   BusinessEventType::Network_Issue));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(4,  30,    QByteArray(),             0, BusinessActionType::ShowPopup,   BusinessEventType::Camera_Ip_Conflict));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(5,  30,    QByteArray(),             0, BusinessActionType::ShowPopup,   BusinessEventType::MediaServer_Failure));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(6,  30,    QByteArray(),             0, BusinessActionType::ShowPopup,   BusinessEventType::MediaServer_Conflict));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(7,  21600, QByteArray(),             0, BusinessActionType::SendMail,    BusinessEventType::Camera_Disconnect, admin));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(8,  21600, QByteArray(),             0, BusinessActionType::SendMail,    BusinessEventType::Storage_Failure, admin));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(9,  21600, QByteArray(),             0, BusinessActionType::SendMail,    BusinessEventType::Network_Issue, admin));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(10, 21600, QByteArray(),             0, BusinessActionType::SendMail,    BusinessEventType::Camera_Ip_Conflict, admin));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(11, 21600, QByteArray(),             0, BusinessActionType::SendMail,    BusinessEventType::MediaServer_Failure, admin));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(12, 21600, QByteArray(),             0, BusinessActionType::SendMail,    BusinessEventType::MediaServer_Conflict, admin));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(13, 30,    QByteArray(),             1, BusinessActionType::Diagnostics, BusinessEventType::Camera_Disconnect));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(14, 30,    QByteArray(),             1, BusinessActionType::Diagnostics, BusinessEventType::Storage_Failure));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(15, 30,    QByteArray(),             1, BusinessActionType::Diagnostics, BusinessEventType::Network_Issue));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(16, 30,    QByteArray(),             1, BusinessActionType::Diagnostics, BusinessEventType::Camera_Ip_Conflict));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(17, 30,    QByteArray(),             1, BusinessActionType::Diagnostics, BusinessEventType::MediaServer_Failure));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(18, 30,    QByteArray(),             1, BusinessActionType::Diagnostics, BusinessEventType::MediaServer_Conflict));
+
+    return result;
 }

@@ -14,7 +14,7 @@ QnMediaServerStatisticsManager::QnMediaServerStatisticsManager(QObject *parent):
 {}
 
 void QnMediaServerStatisticsManager::registerConsumer(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot){
-    QString id = resource->getGuid();
+    QString id = resource->getGuid().toString();
     if (!m_statistics.contains(id)) {
         m_statistics[id] = new QnMediaServerStatisticsStorage(resource, pointsLimit(), this);
         foreach (QnStatisticsDeviceType key, m_flagsFilter.keys())
@@ -24,14 +24,14 @@ void QnMediaServerStatisticsManager::registerConsumer(const QnMediaServerResourc
 }
 
 void QnMediaServerStatisticsManager::unregisterConsumer(const QnMediaServerResourcePtr &resource, QObject *target){
-    QString id = resource->getGuid();
+    QString id = resource->getGuid().toString();
     if (!m_statistics.contains(id))
         return;
     m_statistics[id]->unregisterConsumer(target);
 }
 
 QnStatisticsHistory QnMediaServerStatisticsManager::history(const QnMediaServerResourcePtr &resource) const {
-    QString id = resource->getGuid();
+    QString id = resource->getGuid().toString();
     if (!m_statistics.contains(id))
         return QnStatisticsHistory();
     return m_statistics[id]->history();
@@ -39,21 +39,21 @@ QnStatisticsHistory QnMediaServerStatisticsManager::history(const QnMediaServerR
 
 qint64 QnMediaServerStatisticsManager::uptimeMs(const QnMediaServerResourcePtr &resource) const
 {
-    QString id = resource->getGuid();
+    QString id = resource->getGuid().toString();
     if (!m_statistics.contains(id))
         return 0;
     return m_statistics[id]->uptimeMs();
 }
 
 qint64 QnMediaServerStatisticsManager::historyId(const QnMediaServerResourcePtr &resource) const {
-    QString id = resource->getGuid();
+    QString id = resource->getGuid().toString();
     if (!m_statistics.contains(id))
         return -1;
     return m_statistics[id]->historyId();
 }
 
 int QnMediaServerStatisticsManager::updatePeriod(const QnMediaServerResourcePtr &resource) const {
-    QString id = resource->getGuid();
+    QString id = resource->getGuid().toString();
     if (!m_statistics.contains(id))
         return -1;
     return m_statistics[id]->updatePeriod();
