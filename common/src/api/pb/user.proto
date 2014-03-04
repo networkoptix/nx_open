@@ -5,15 +5,18 @@ import "resource.proto";
 option java_package = "com.google.protobuf.implementation";
 option java_outer_classname = "UserProtos";
 
+//see style guide here: https://developers.google.com/protocol-buffers/docs/style
+
 message User {
     extend Resource {
         required User resource = 102;
     }
 
-    optional string password = 1;
-    required bool isAdmin    = 2;
-    optional uint64 rights   = 3;
-    optional string email    = 4;
-    optional string digest   = 5;
-    optional string hash     = 6;
+    optional string password            = 1;
+    required bool isAdmin               = 2;
+    optional uint64 rights              = 3;
+    optional string email               = 4;
+    optional string digest              = 5;
+    optional string hash                = 6;
+    repeated string video_wall_item     = 7;    // contain uuid-s of the VideoWallItems that the user can control
 }

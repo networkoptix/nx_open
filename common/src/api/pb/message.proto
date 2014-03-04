@@ -7,6 +7,7 @@ import "cameraServerItem.proto";
 import "businessRule.proto";
 import "businessAction.proto";
 import "kvpair.proto";
+import "videowall.proto";
 
 option java_package = "com.google.protobuf.implementation";
 option java_outer_classname = "MessageProtos";
@@ -42,6 +43,8 @@ message Message {
         KvPairDelete            = 17;
 
         Command                 = 18;
+        
+        VideoWallControl        = 19;
     }
 
     required Type type = 1;
@@ -177,4 +180,12 @@ message CommandMessage {
     }
 
     required Command command = 1;
+}
+
+message VideoWallControlMessage {
+    extend Message {
+        required VideoWallControlMessage message = 111;
+    }
+
+    required VideoWallControl control = 1;
 }
