@@ -3,6 +3,7 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPen>
 
+#include <utils/math/linear_combination.h>
 
 #include <ui/style/globals.h>
 
@@ -28,8 +29,12 @@ void QnHistogramWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     
-    painter.setBrush(QBrush(Qt::Dense5Pattern));
+    QColor baseColor = palette().color(QPalette::Base);
+    QColor altBaseColor = palette().color(QPalette::AlternateBase);
+    QColor textColor = palette().color(QPalette::Text);
+
     painter.setPen(Qt::NoPen);
+    painter.setBrush(baseColor);
     painter.drawRect(rect());
 
     double w = width();
@@ -61,9 +66,9 @@ void QnHistogramWidget::paintEvent(QPaintEvent *)
             prevY = curY;
         }
 
-        painter.setPen(Qt::white);
+        painter.setPen(altBaseColor);
         painter.drawLines(lines);
-        painter.setPen(QColor(0x60, 0x60, 0x60));
+        painter.setPen(linearCombine(0.5, baseColor, 0.5, altBaseColor));
         painter.drawLines(lines2);
 
         const QColor selectionColor = qnGlobals->selectionColor();
@@ -72,7 +77,7 @@ void QnHistogramWidget::paintEvent(QPaintEvent *)
         double xScale = w / 256;
         painter.drawRect(QRect(qAbs(m_data.bCoeff * 256.0) * xScale, 1,  256.0 / m_data.aCoeff * xScale + 0.5, height()));
         
-        painter.setPen(Qt::white);
+        painter.setPen(textColor);
         painter.drawText(QRect(2, 2, width() - 4, height() - 4), Qt::AlignRight, tr("Gamma %1").arg(m_data.gamma, 0, 'f', 2));
     }
 
@@ -81,10 +86,10 @@ void QnHistogramWidget::paintEvent(QPaintEvent *)
     pen.setWidth(1);
     pen.setBrush(QColor(0,255,0, 30));
     painter.setPen(pen);
-    painter.drawLine(width()/4, 0, width()/4, height());
-    painter.drawLine(width()/2, 0, width()/2, height());
-    painter.drawLine(width()/4*3, 0, width()/4*3, height());
-    painter.drawLine(0, height()/2, width(), height()/2);
+    painter.drawLine(width() / 4, 0, width() / 4, height());
+    painter.drawLine(width() / 2, 0, width() / 2, height());
+    painter.drawLine(width() / 4 * 3, 0, width() / 4 * 3, height());
+    painter.drawLine(0, height() / 2, width(), height() / 2);
 
     painter.setBrush(Qt::NoBrush);
     painter.setPen(Qt::white);
