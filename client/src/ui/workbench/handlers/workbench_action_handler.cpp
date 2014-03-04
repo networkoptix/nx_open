@@ -1730,7 +1730,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setGuid(QUuid::createUuid().toString());
+    layout->setGuid(QUuid::createUuid());
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
     layout->setTypeByName(lit("Layout"));
     if(context()->user())
@@ -2193,7 +2193,8 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
         return;
 
     dialog->submitToResource();
-    user->setGuid(QUuid::createUuid().toString());
+    user->setId(QUuid::createUuid());
+    user->setTypeByName(lit("User"));
 
     connection2()->getUserManager()->save(
         user, this,

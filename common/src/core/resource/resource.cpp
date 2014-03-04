@@ -63,7 +63,7 @@ void QnResource::setResourcePool(QnResourcePool *resourcePool)
     m_resourcePool = resourcePool;
 }
 
-void QnResource::setGuid(const QString& guid)
+void QnResource::setGuid(const QUuid& guid)
 {
     QMutexLocker mutexLocker(&m_mutex);
 

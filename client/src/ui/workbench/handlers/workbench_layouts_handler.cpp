@@ -179,7 +179,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     QnLayoutResourcePtr newLayout;
 
     newLayout = QnLayoutResourcePtr(new QnLayoutResource());
-    newLayout->setGuid(QUuid::createUuid().toString());
+    newLayout->setGuid(QUuid::createUuid());
     newLayout->setTypeByName(lit("Layout"));
     newLayout->setName(name);
     newLayout->setParentId(user->getId());
@@ -467,7 +467,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
     } while (button != QMessageBox::Yes);
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setGuid(QUuid::createUuid().toString());
+    layout->setGuid(QUuid::createUuid());
     layout->setTypeByName(lit("Layout"));
     layout->setName(dialog->name());
     layout->setParentId(user->getId());

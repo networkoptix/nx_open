@@ -145,12 +145,12 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     if (uuidFile) {
         QByteArray data = uuidFile->readAll();
         delete uuidFile;
-        layout->setGuid(QUuid(data.data()).toString());
+        layout->setGuid(QUuid(data.data()));
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByGuid(layout->getGuid()).dynamicCast<QnLayoutResource>();
         if (existingLayout)
             return existingLayout;
     } else {
-        layout->setGuid(QUuid::createUuid().toString());
+        layout->setGuid(QUuid::createUuid());
     }
 
     QIODevice* rangeFile = layoutStorage.open(QLatin1String("range.bin"), QIODevice::ReadOnly);

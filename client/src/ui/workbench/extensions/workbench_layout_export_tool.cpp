@@ -56,7 +56,7 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
 
     // If exporting layout, create new guid. If layout just renamed, keep guid
     if (mode == Qn::LayoutExport)
-        m_layout->setGuid(QUuid::createUuid().toString());
+        m_layout->setGuid(QUuid::createUuid());
 }
 
 bool QnLayoutExportTool::start() {
