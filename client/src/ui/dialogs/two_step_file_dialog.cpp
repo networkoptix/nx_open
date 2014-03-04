@@ -8,6 +8,7 @@
 #include <QtWidgets/QLineEdit>
 
 #include <ui/style/warning_style.h>
+#include <ui/dialogs/file_dialog.h>
 
 #include <utils/common/string.h>
 
@@ -63,11 +64,12 @@ namespace {
 
 }
 
-QnTwoStepFileDialog::QnTwoStepFileDialog(QWidget *parent, const QString &caption, const QString &initialFile, const QString &filter) :
+QnTwoStepFileDialog::QnTwoStepFileDialog(QWidget *parent, const QString &caption, const QString &initialFile, const QString &filter, const QStringList& extensions) :
     base_type(parent),
     ui(new Ui::QnTwoStepFileDialog),
     m_mode(QFileDialog::AnyFile),
-    m_filter(filter)
+    m_filter(filter),
+    m_extensions(extensions)
 {
     ui->setupUi(this);
     setWindowTitle(caption);
@@ -172,7 +174,7 @@ void QnTwoStepFileDialog::updateMode() {
 }
 
 void QnTwoStepFileDialog::at_browseFolderButton_clicked() {
-    QString dirName = QFileDialog::getExistingDirectory(this,
+    QString dirName = QnFileDialog::getExistingDirectory(this,
                                                         tr("Select folder..."),
                                                         ui->directoryLabel->text(),
                                                         directoryDialogOptions());
@@ -183,10 +185,11 @@ void QnTwoStepFileDialog::at_browseFolderButton_clicked() {
 }
 
 void QnTwoStepFileDialog::at_browseFileButton_clicked() {
-    QString fileName = QFileDialog::getOpenFileName(this,
+    QString fileName = QnFileDialog::getOpenFileName(this,
                                                     tr("Select file..."),
                                                     ui->existingFileLabel->text(),
                                                     m_filter,
+                                                    m_extensions,
                                                     &m_selectedExistingFilter,
                                                     fileDialogOptions());
     if (fileName.isEmpty()) {

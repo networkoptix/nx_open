@@ -8,6 +8,7 @@
 #include <QtMultimedia/QAudioDeviceInfo>
 
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
@@ -317,7 +318,7 @@ void QnRecordingSettingsWidget::onComboboxChanged(int index)
 }
 
 void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked(){
-    QString dirName = QFileDialog::getExistingDirectory(this,
+    QString dirName = QnFileDialog::getExistingDirectory(this,
                                                         tr("Select folder..."),
                                                         ui->recordingFolderLabel->text(),
                                                         QnCustomFileDialog::directoryDialogOptions());

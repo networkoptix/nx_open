@@ -16,7 +16,9 @@ class QnTwoStepFileDialog : public QnButtonBoxDialog
 
     typedef QnButtonBoxDialog base_type;
 public:
-    explicit QnTwoStepFileDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &initialFile = QString(), const QString &filter = QString());
+    explicit QnTwoStepFileDialog(QWidget *parent = 0, const QString &caption = QString(),
+                                 const QString &initialFile = QString(), const QString &filter = QString(),
+                                 const QStringList &extensions = QStringList());
     ~QnTwoStepFileDialog();
 
     void setOptions(QFileDialog::Options options);
@@ -47,6 +49,7 @@ private:
 
     QFileDialog::FileMode m_mode;
     QString m_filter;
+    QStringList m_extensions;
     QString m_selectedExistingFilter;
 };
 

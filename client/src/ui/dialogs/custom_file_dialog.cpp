@@ -5,8 +5,9 @@
 
 #include <utils/common/string.h>
 
-QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, const QString &directory, const QString &filter):
-    base_type(parent, caption, directory, filter),
+QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, const QString &directory,
+                                       const QString &filter, const QStringList &extensions):
+    base_type(parent, caption, directory, filter, extensions),
     m_currentCol(0)
 {
     setOptions(QnCustomFileDialog::fileDialogOptions());
