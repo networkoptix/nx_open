@@ -55,6 +55,8 @@ QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseS
 bool naturalStringLessThan(const QString &lhs, const QString &rhs);
 bool naturalStringCaseInsensitiveLessThan(const QString &lhs, const QString &rhs);
 
+void naturalStringCompareTest();
+
 QString xorEncrypt(const QString &plaintext, const QString &key);
 QString xorDecrypt(const QString &crypted, const QString &key);
 
