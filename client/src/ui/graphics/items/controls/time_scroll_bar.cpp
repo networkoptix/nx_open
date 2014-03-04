@@ -4,23 +4,11 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 
+#include <ui/common/geometry.h>
 #include <ui/graphics/items/standard/graphics_scroll_bar_p.h>
 #include <ui/style/noptix_style.h>
 
 namespace {
-    QPointF cwiseDiv(const QPointF &l, const QSizeF &r) {
-        return QPointF(
-            l.x() / r.width(),
-            l.y() / r.height()
-        );
-    }
-
-    QPointF cwiseMul(const QPointF &l, const QSizeF &r) {
-        return QPointF(
-            l.x() * r.width(),
-            l.y() * r.height()
-        );
-    }
 
     const qreal indicatorHuntingRadius = 3.0;
 
@@ -125,7 +113,7 @@ void QnTimeScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 
     if (d->pressedControl == QStyle::SC_ScrollBarSlider) {
         QRectF sliderRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, this);
-        qint64 newPosition = valueFromPosition(event->pos() - cwiseMul(d->relativeClickOffset, sliderRect.size()));
+        qint64 newPosition = valueFromPosition(event->pos() - QnGeometry::cwiseMul(d->relativeClickOffset, sliderRect.size()));
         int m = style()->pixelMetric(QStyle::PM_MaximumDragDistance, &opt, this);
         if (m >= 0) {
             QRectF r = rect();
