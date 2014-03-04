@@ -951,20 +951,17 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent type) {
 
     QnTimePeriodList periods = QnTimePeriod::mergeTimePeriods(periodsList);
 
-    bool lastMinuteIndicatorVisible = false;
-
     if (type == Qn::MotionContent) {
         foreach(QnMediaResourceWidget *widget, m_syncedWidgets) {
             QnAbstractArchiveReader  *archiveReader = widget->display()->archiveReader();
             if (archiveReader)
                 archiveReader->setPlaybackMask(periods);
-
-            QnResource *resource = NULL;
-            if (widget->resource())
-                resource = widget->resource()->toResource();
-            lastMinuteIndicatorVisible |= resource && !resource->flags().testFlag(QnResource::local);
         }
     }
+
+    bool lastMinuteIndicatorVisible = false;
+    foreach(const QnResourceWidget *widget, m_syncedWidgets)
+        lastMinuteIndicatorVisible |= widget->resource() && !widget->resource()->flags().testFlag(QnResource::local);
 
     m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, lastMinuteIndicatorVisible);
     m_timeSlider->setTimePeriods(SyncedLine, type, periods);
