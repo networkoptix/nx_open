@@ -21,7 +21,7 @@ namespace ec2
         const int reqID = generateRequestID();
 
         auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiStoredFileData& fileData) {
-            handler->done( reqID, errorCode, fileData.fileData );
+            handler->done( reqID, errorCode, fileData.data );
         };
         m_queryProcessor->processQueryAsync<QString, ApiStoredFileData, decltype(queryDoneHandler)> ( ApiCommand::getStoredFile, filename, queryDoneHandler);
         return reqID;
@@ -71,7 +71,7 @@ namespace ec2
         QnTransaction<ApiStoredFileData> tran;
         tran.command = ApiCommand::addStoredFile;
         tran.params.path = filename;
-        tran.params.fileData = data;
+        tran.params.data = data;
         return tran;
     }
 

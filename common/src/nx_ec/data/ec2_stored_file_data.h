@@ -16,7 +16,7 @@ namespace ec2
     {
     public:
         QString path;
-        QByteArray fileData;
+        QByteArray data;
     };
 
     typedef std::vector<QString> ApiStoredDirContents;
@@ -29,6 +29,6 @@ namespace ec2
     }
 }
 
-QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS( ec2::ApiStoredFileData, (path)(fileData) )
+QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS( ec2::ApiStoredFileData, (path) (data) )
 
 #endif //EC2_STORED_FILE_DATA_H

@@ -65,7 +65,6 @@ QnDbManager::QnDbManager(
     const QString& dbFilePath )
 :
     QnDbHelper(),
-    m_storedFileManagerImpl( storedFileManagerImpl ),
     m_licenseManagerImpl( licenseManagerImpl )
 {
     m_resourceFactory = factory;
@@ -1063,13 +1062,32 @@ ErrorCode QnDbManager::removeLayout(qint32 internalId)
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiStoredFileData>& tran)
 {
     assert( tran.command == ApiCommand::addStoredFile || tran.command == ApiCommand::updateStoredFile );
-    return m_storedFileManagerImpl->saveFile( tran.params );
+
+    QSqlQuery query(m_sdb);
+    query.prepare("INSERT OR REPLACE INTO vms_storedFiles (path, data) values (:path, :data)");
+    query.bindValue(":path", tran.params.path);
+    query.bindValue(":data", tran.params.data);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
+    
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiStoredFilePath>& tran)
 {
     assert( tran.command == ApiCommand::removeStoredFile );
-    return m_storedFileManagerImpl->removeFile( tran.params );
+
+    QSqlQuery query(m_sdb);
+    query.prepare("DELETE FROM vms_storedFiles WHERE path = :path");
+    query.bindValue(":path", tran.params);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
+
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiUserData>& tran)
@@ -1532,14 +1550,37 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicense
     return m_licenseManagerImpl->getLicenses( &data );
 }
 
-ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& path, ApiStoredDirContents& data)
+ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data)
 {
-    return m_storedFileManagerImpl->listDirectory( path, data );
+    QSqlQuery query(m_sdb);
+    QString q = QString(lit("SELECT data FROM vms_storedFiles WHERE path LIKE '%1%' AND substr(path, %2) NOT LIKE '%/%' ")).arg(path).arg(path.length()+1);
+    query.prepare(q);
+    if (!query.exec())
+    {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return ErrorCode::failure;
+    }
+    while (query.next()) 
+        data.push_back(query.value(0).toString());
+    
+    return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& path, ApiStoredFileData& data)
+ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& _path, ApiStoredFileData& data)
 {
-    return m_storedFileManagerImpl->readFile( path, data );
+    QString path = closeDirPath(_path);
+    QSqlQuery query(m_sdb);
+    query.prepare("SELECT data FROM vms_storedFiles WHERE path = :path");
+    query.bindValue(":path", path);
+    if (!query.exec())
+    {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return ErrorCode::failure;
+    }
+    data.path = path;
+    if (query.next())
+        data.data = query.value(0).toByteArray();
+    return ErrorCode::ok;
 }
 
 void QnDbManager::fillServerInfo( ServerInfo* const serverInfo )

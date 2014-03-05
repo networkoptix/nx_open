@@ -66,10 +66,11 @@ namespace ec2
 
         //getCurrentTime
         ErrorCode doQuery(const nullptr_t& /*dummy*/, qint64& currentTime);
-        //getStoragePath
-        ErrorCode doQuery(const ApiStoredFilePath& path, ApiStoredDirContents& data);
-        ErrorCode doQuery(const ApiStoredFilePath& path, ApiStoredFileData& data);
 
+        //getStoragePath
+        ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
+        //getStorageData
+        ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileData& data);
 
         //getResourceTypes
 		ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeList& resourceTypeList);
@@ -206,7 +207,6 @@ namespace ec2
         QnId getType(const QString& typeName);
     private:
 		QnResourceFactory* m_resourceFactory;
-        StoredFileManagerImpl* const m_storedFileManagerImpl;
         LicenseManagerImpl* const m_licenseManagerImpl;
         QnId m_storageTypeId;
         QnId m_serverTypeId;
