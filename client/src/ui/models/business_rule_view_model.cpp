@@ -47,7 +47,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     m_actionTypesModel(new QStandardItemModel(this))
 {
 
-    for (int i = 0; i < BusinessEventType::Count; i++) {
+    for (int i = 1; i < BusinessEventType::Count; i++) {
         BusinessEventType::Value val = (BusinessEventType::Value)i;
 
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::eventName(val));
@@ -69,8 +69,10 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         m_eventStatesModel->appendRow(row);
     }
 
-    for (int i = 0; i < BusinessActionType::Count; i++) {
+    for (int i = 1; i < BusinessActionType::Count; i++) {
         BusinessActionType::Value val = (BusinessActionType::Value)i;
+        if (BusinessActionType::isNotImplemented(val))
+            continue;
 
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
         item->setData(val);

@@ -87,8 +87,10 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
         m_actionTypesModel->appendRow(anyActionItem);
 
 
-        for (int i = 0; i < BusinessActionType::Count; i++) {
-            BusinessActionType::Value val = (BusinessActionType::Value)i;
+        for (int i = 1; i < BusinessActionType::Count; i++) {
+            BusinessActionType::Value val = (BusinessActionType::Value) i;
+            if (BusinessActionType::isNotImplemented(val))
+                continue;
 
             QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
             item->setData(val);

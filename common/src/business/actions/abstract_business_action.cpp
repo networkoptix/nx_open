@@ -70,6 +70,8 @@ namespace BusinessActionType {
         }
         return false;
     }
+
+    bool isNotImplemented(Value value) { return value == Bookmark; }
 }
 
 QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters& runtimeParams):

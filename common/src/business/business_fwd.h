@@ -83,7 +83,7 @@ namespace BusinessEventType {
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        Count = NotDefined,
+        Count,
 
         /** System health message. */
         SystemHealthMessage = 500,
@@ -153,8 +153,10 @@ namespace BusinessActionType {
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        Count = Bookmark
+        Count
     };
+
+    bool isNotImplemented(Value value);
 }
 
 #endif // QN_BUSINESS_FWD_H
