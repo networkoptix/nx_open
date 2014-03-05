@@ -35,6 +35,7 @@
         <windows.defines>_USING_V110_SDK71_</windows.defines>
         <linux.defines/>
         <mac.defines/>      
+        <qt.libs>core gui network opengl xml multimedia sql</qt.libs>
     </properties>   
 
     <build>
@@ -64,20 +65,7 @@
             </properties>
         </profile>	
         <profile>
-            <id>noarm</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>arch</name>
-                    <value>!arm</value>
-                </property>
-            </activation>            
-            <properties>
-                <qt.libs>core gui network opengl xml multimedia sql</qt.libs>
-            </properties>
-        </profile>      
-        <profile>
-            <id>linux-arm</id>
+            <id>linux-arm-isd</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -85,14 +73,33 @@
                     <name>linux</name>
                 </os> 
                 <property>
-                    <name>arch</name>
-                    <value>arm</value>
+                    <name>box</name>
+                    <value>isd</value>
                 </property>
             </activation>            
             <properties>
                 <qt.libs>core network xml sql</qt.libs>
             </properties>
         </profile>          
+
+        <profile>
+            <id>linux-arm-rpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>rpi</value>
+                </property>
+            </activation>
+            <properties>
+                <qt.libs>core network xml sql</qt.libs>
+            </properties>
+        </profile>
+
     </profiles>	
 
 </project>

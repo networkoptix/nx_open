@@ -31,13 +31,6 @@
             <classifier>${profile.classifier}-${additional.compiler}</classifier>
         </dependency>                           
         <dependency>
-            <groupId>org.openssl</groupId>
-            <artifactId>openssl</artifactId>
-            <version>${openssl.version}</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}-${compiler}</classifier>
-        </dependency>
-        <dependency>
             <groupId>org</groupId>
             <artifactId>onvif</artifactId>
             <version>${onvif.version}</version>
@@ -121,7 +114,7 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.7</version>
                 <executions>
-                    <execution>
+                    <!-- <execution>
                         <id>update-buildenv</id>
                         <phase>generate-sources</phase>
                         <goals>
@@ -140,7 +133,7 @@
                             </target>
                             <skip>${rsync.skip}</skip>
                         </configuration>
-                    </execution>    
+                    </execution>     -->
                 </executions>
             </plugin>            
             <plugin>
@@ -256,6 +249,13 @@
             </activation>
             <dependencies>
                 <dependency>
+                    <groupId>org.openssl</groupId>
+                    <artifactId>openssl</artifactId>
+                    <version>${openssl.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
+                <dependency>
                     <groupId>com.creativelabs</groupId>
                     <artifactId>openal</artifactId>
                     <version>1.1-SNAPSHOT</version>
@@ -309,7 +309,13 @@
                 </property>
             </activation>            
             <dependencies>
-
+                <dependency>
+                    <groupId>org.openssl</groupId>
+                    <artifactId>openssl</artifactId>
+                    <version>${openssl.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
                 <dependency>
                     <groupId>org</groupId>
                     <artifactId>festival</artifactId>
@@ -317,7 +323,6 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>                                   
-
                 <dependency>
                     <groupId>com.sourceforge.cloudcity</groupId>
                     <artifactId>bespin</artifactId>
@@ -336,7 +341,7 @@
         </profile>      
 
         <profile>
-            <id>linux-arm</id>
+            <id>linux-arm-isd</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -344,12 +349,19 @@
                     <name>linux</name>
                 </os>
                 <property>
-                    <name>arch</name>
-                    <value>arm</value>
+                    <name>box</name>
+                    <value>isd</value>
                 </property>
             </activation>
 
             <dependencies>              
+                <dependency>
+                    <groupId>org.openssl</groupId>
+                    <artifactId>openssl</artifactId>
+                    <version>${openssl.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
                 <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
@@ -366,5 +378,31 @@
                 </dependency>      
             </dependencies>             
         </profile>
-    </profiles> 
+
+        <profile>
+            <id>linux-arm-rpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>rpi</value>
+                </property>
+            </activation>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.ffmpeg</groupId>
+                    <artifactId>ffmpeg</artifactId>
+                    <version>${ffmpeg.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${compiler}</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        
+        </profiles> 
 </project>
