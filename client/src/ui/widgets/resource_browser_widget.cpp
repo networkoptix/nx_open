@@ -22,6 +22,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/layout_item_index.h>
+#include <core/resource/videowall_item_index.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -307,8 +309,9 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
     QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, mainWindow(), ignoreSelection ? QnActionParameters() : currentParameters(Qn::TreeScope)));
 
     /* Add tree-local actions to the menu. */
-    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()) || ignoreSelection)
-        manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */ // TODO: #Elric implement with action parameters
+//    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()) || ignoreSelection)
+//        manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */ // TODO: #Elric implement with action parameters
+    //TODO: #GDM check
 
     if(currentTreeWidget() == ui->searchTreeWidget) {
         /* Disable rename action for search view. */
@@ -318,7 +321,7 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
     }
 
     /* Do not show 'Rename' on the recorder when it contains only one camera. */
-    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) == Qn::RecorderNode)
+    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole).value<Qn::NodeType>() == Qn::RecorderNode)
         manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
 
     if(menu->isEmpty())
@@ -356,7 +359,7 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const {
     QnResourceList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
-        int nodeType = index.data(Qn::NodeTypeRole).toInt();
+        Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
         switch (nodeType) {
         case Qn::RecorderNode: {
@@ -380,7 +383,7 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const {
         case Qn::ItemNode:
         case Qn::BastardNode:
         case Qn::RootNode:
-            continue;
+            break;
         default:
             break;
         }
@@ -407,6 +410,21 @@ QnLayoutItemIndexList QnResourceBrowserWidget::selectedLayoutItems() const {
     return result;
 }
 
+QnVideoWallItemIndexList QnResourceBrowserWidget::selectedVideoWallItems() const {
+    QnVideoWallItemIndexList result;
+
+    foreach (const QModelIndex &modelIndex, currentSelectionModel()->selectedRows()) {
+        QUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QUuid>();
+        if(uuid.isNull())
+            continue;
+        QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(uuid);
+        if (!index.isNull())
+            result.push_back(index);
+    }
+
+    return result;
+}
+
 Qn::ActionScope QnResourceBrowserWidget::currentScope() const {
     return Qn::TreeScope;
 }
@@ -417,11 +435,14 @@ QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
 
     QItemSelectionModel *selectionModel = currentSelectionModel();
 
-    if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QUuid>().isNull()) { /* If it's a layout item. */
+    Qn::NodeType nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    if(nodeType == Qn::VideoWallItemNode || nodeType == Qn::UserVideoWallItemNode)
+        return QVariant::fromValue(selectedVideoWallItems());
+
+    if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QUuid>().isNull()) /* If it's a layout item. */
         return QVariant::fromValue(selectedLayoutItems());
-    } else {
-        return QVariant::fromValue(selectedResources());
-    }
+
+    return QVariant::fromValue(selectedResources());
 }
 
 QString QnResourceBrowserWidget::toolTipAt(const QPointF &pos) const {
@@ -491,8 +512,8 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget *widget) {
 
 QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const {
     QItemSelectionModel *selectionModel = currentSelectionModel();
-    int nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).toInt();
-    return QnActionParameters(currentTarget(scope)).withArgument(Qn::NodeTypeRole, nodeType); // TODO: #Elric just pass all the data through?
+    QVariant data = selectionModel->currentIndex().data(Qn::NodeTypeRole);
+    return QnActionParameters(currentTarget(scope)).withArgument(Qn::NodeTypeRole, data); // TODO: #Elric just pass all the data through?
 }
 
 void QnResourceBrowserWidget::updateFilter(bool force) {

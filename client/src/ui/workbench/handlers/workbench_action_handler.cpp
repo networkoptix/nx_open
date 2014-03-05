@@ -47,6 +47,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/file_processor.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item.h>
 
 #include <device_plugins/server_camera/appserver.h>
 
@@ -361,13 +363,14 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     {
         //TODO: #GDM refactor duplicated code
         bool isServer = resource->hasFlags(QnResource::server);
+        bool isLayout = resource->hasFlags(QnResource::layout);
         bool isMediaResource = resource->hasFlags(QnResource::media);
         bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
                 && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
         bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
 
-        bool allowed = isServer || isMediaResource;
-        bool forbidden = isExportedLayout && (isServer || isLocalResource);
+        bool allowed = isServer || isMediaResource || isLayout;
+        bool forbidden = isExportedLayout && (isServer || isLocalResource || isLayout);
         if(!allowed || forbidden)
             return;
     }
@@ -703,7 +706,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     //}
 
     // we should not change state when using "Open in New Window"
-    if (m_delayedDrops.isEmpty()) {
+    if (m_delayedDrops.isEmpty() && !qnSettings->isVideoWallMode()) {
         QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());
         workbench()->update(state);
 
@@ -943,6 +946,8 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
             layout = new QnWorkbenchLayout(layoutResource, workbench());
             workbench()->addLayout(layout);
         }
+        /* Explicit set that we do not control videowall through this layout */
+        layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QUuid()));
 
         workbench()->setCurrentLayout(layout);
     }
@@ -1053,9 +1058,14 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     foreach(QnLayoutResourcePtr r, layouts)
         resources.removeOne(r);
 
+    QnVideoWallResourceList videowalls = resources.filtered<QnVideoWallResource>();
+    foreach(QnVideoWallResourcePtr r, videowalls)
+        resources.removeOne(r);
+
     if (workbench()->currentLayout()->resource()->locked() &&
             !resources.empty() &&
-            layouts.empty()) {
+            layouts.empty() &&
+            videowalls.empty()) {
         QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
         return;
     }
@@ -1090,7 +1100,9 @@ void QnWorkbenchActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnLayoutResourceList layouts = parameters.resources().filtered<QnLayoutResource>();
-    if(layouts.empty()) /* That's media drop, open new layout. */
+    QnVideoWallResourceList videowalls = parameters.resources().filtered<QnVideoWallResource>();
+
+    if(layouts.empty() && (videowalls.size() != parameters.resources().size())) /* There are some media in the drop, open new layout. */
         menu()->trigger(Qn::OpenNewTabAction);
 
     menu()->trigger(Qn::DropResourcesAction, parameters);
@@ -2135,7 +2147,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_exitAction_triggered() {
-    if(context()->user()) { // TODO: #Elric factor out
+    if(context()->user() && !qnSettings->isVideoWallMode()) { // TODO: #Elric factor out
         QnWorkbenchState state;
         workbench()->submit(state);
 
@@ -2467,17 +2479,20 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QnResourceLi
     if(status == 0)
         return;
 
-    if (resources.isEmpty())
-        return;
-
-    QnResourceListDialog::exec(
-                mainWindow(),
-                resources,
-                tr("Error"),
-                tr("Could not save the following %n items to Enterprise Controller.", "", resources.size()),
-                QDialogButtonBox::Ok
-                );
-
+    if (!resources.isEmpty()) {
+        QnResourceListDialog::exec(
+            mainWindow(),
+            resources,
+            tr("Error"),
+            tr("Could not save the following %n items to Enterprise Controller.", "", resources.size()),
+            QDialogButtonBox::Ok
+        );
+    } else { // ec returns an empty list because of error
+        QMessageBox::warning(
+                    mainWindow(),
+                    tr("Changes are not applied"),
+                    tr("Could not save changes to Enterprise Controller."));
+    }
 }
 
 void QnWorkbenchActionHandler::at_resource_deleted(const QnHTTPRawResponse& response, int handle) {

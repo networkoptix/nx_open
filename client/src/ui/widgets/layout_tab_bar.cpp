@@ -1,10 +1,13 @@
 #include "layout_tab_bar.h"
 
 #include <QtCore/QVariant>
+#include <QtCore/QUuid>
 
 #include <QtGui/QContextMenuEvent>
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QMenu>
+
+#include <core/resource/videowall_resource.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -111,11 +114,17 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout *layout) const {
     if(!layout)
         return QIcon();
 
-    QnLayoutResourcePtr resource = layout->resource();
-    if (!resource || !resource->locked())
-        return QIcon();
-    return qnSkin->icon("titlebar/lock.png");
+    if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
+        return qnSkin->icon("titlebar/videowall.png");
 
+    if (!layout->data(Qn::VideoWallItemGuidRole).value<QUuid>().isNull())
+        return qnSkin->icon("titlebar/screen.png");
+
+    QnLayoutResourcePtr resource = layout->resource();
+    if (resource && resource->locked())
+        return qnSkin->icon("titlebar/lock.png");
+
+    return QIcon();
 }
 
 void QnLayoutTabBar::updateTabText(QnWorkbenchLayout *layout) {
@@ -256,6 +265,14 @@ void QnLayoutTabBar::at_layout_lockedChanged() {
     updateTabIcon(layout);
 }
 
+void QnLayoutTabBar::at_layout_dataChanged(int role) {
+    if (role != Qn::VideoWallItemGuidRole)
+        return;
+
+    QnWorkbenchLayout *layout = checked_cast<QnWorkbenchLayout *>(sender());
+    updateTabIcon(layout);
+}
+
 void QnLayoutTabBar::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
     updateTabText(QnWorkbenchLayout::instance(resource));
 }
@@ -274,6 +291,7 @@ void QnLayoutTabBar::tabInserted(int index) {
         QnWorkbenchLayout *layout = m_layouts[index];
         connect(layout, SIGNAL(nameChanged()),          this, SLOT(at_layout_nameChanged()));
         connect(layout, SIGNAL(lockedChanged()),        this, SLOT(at_layout_lockedChanged()));
+        connect(layout, SIGNAL(dataChanged(int)),       this, SLOT(at_layout_dataChanged(int)));
 
         if(!name.isNull())
             layout->setName(name); /* It is important to set the name after connecting so that the name change signal is delivered to us. */

@@ -41,6 +41,7 @@
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_ptz_handler.h>
 #include <ui/workbench/handlers/workbench_debug_handler.h>
+#include <ui/workbench/handlers/workbench_videowall_handler.h>
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
@@ -163,9 +164,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     setWindowTitle(QApplication::applicationName());
     setAcceptDrops(true);
 
-    bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;
-    setMinimumWidth(smallWindow ? minimalWindowWidth / 2 : minimalWindowWidth);
-    setMinimumHeight(smallWindow ? minimalWindowHeight / 2 : minimalWindowHeight);
+    if (!qnSettings->isVideoWallMode()) {
+        bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;
+        setMinimumWidth(smallWindow ? minimalWindowWidth / 2 : minimalWindowWidth);
+        setMinimumHeight(smallWindow ? minimalWindowHeight / 2 : minimalWindowHeight);
+    }
 
     /* Set up scene & view. */
     m_scene.reset(new QnGraphicsScene(this));
@@ -182,12 +185,17 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Set up model & control machinery. */
     display()->setScene(m_scene.data());
     display()->setView(m_view.data());
-    display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
+    if (qnSettings->isVideoWallMode())
+        display()->setNormalMarginFlags(0);
+    else
+        display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
 
     m_controller.reset(new QnWorkbenchController(this));
     m_ui.reset(new QnWorkbenchUi(this));
-    m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
-
+    if (qnSettings->isVideoWallMode())
+        m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::HideWhenNormal );
+    else
+        m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
 
     /* Set up handlers. */
     context->instance<QnWorkbenchActionHandler>();
@@ -197,6 +205,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchLayoutsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
+    context->instance<QnWorkbenchVideoWallHandler>();
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
 
@@ -208,6 +217,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::PreviousLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAsAction));
+    addAction(action(Qn::SaveVideoWallReviewAction));
     addAction(action(Qn::ExitAction));
     addAction(action(Qn::EscapeHotkeyAction));
     addAction(action(Qn::FullscreenMaximizeHotkeyAction));
@@ -227,6 +237,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::OpenInFolderAction));
     addAction(action(Qn::RemoveLayoutItemAction));
     addAction(action(Qn::RemoveFromServerAction));
+    addAction(action(Qn::DeleteVideoWallItemAction));
     addAction(action(Qn::SelectAllAction));
     addAction(action(Qn::CheckFileSignatureAction));
     addAction(action(Qn::TakeScreenshotAction));
@@ -466,9 +477,10 @@ void QnMainWindow::updateDecorationsState() {
     bool uiTitleUsed = fullScreen || maximized;
 #endif
 
-    setTitleVisible(!uiTitleUsed);
+    bool windowTitleUsed = !uiTitleUsed && !qnSettings->isVideoWallMode();
+    setTitleVisible(windowTitleUsed);
     m_ui->setTitleUsed(uiTitleUsed);
-    m_view->setLineWidth(uiTitleUsed ? 0 : 1);
+    m_view->setLineWidth(windowTitleUsed ? 0 : 1);
 
     updateDwmState();
 }

@@ -53,6 +53,7 @@ private slots:
     
     void at_layout_nameChanged();
     void at_layout_lockedChanged();
+    void at_layout_dataChanged(int role);
     void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource);
     
     void at_workbench_layoutsChanged();

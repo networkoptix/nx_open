@@ -96,7 +96,7 @@ public:
     /**
      * \returns                         Resource associated with this widget.
      */
-    QnResourcePtr resource() const;
+    const QnResourcePtr &resource() const;
 
     /**
      * \returns                         Workbench item associated with this widget. Never returns NULL.
@@ -377,6 +377,10 @@ private:
 
     Q_SLOT void at_iconButton_visibleChanged();
     Q_SLOT void at_infoButton_toggled(bool toggled);
+
+    Q_SLOT void at_buttonBar_checkedButtonsChanged();
+
+    Q_SLOT void at_item_dataChanged(int role);
 
     struct OverlayWidget {
         OverlayVisibility visibility;

@@ -8,6 +8,8 @@
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGraphicsLinearLayout>
 
+#include <client/client_settings.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/util.h>
@@ -157,7 +159,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     closeButton->setToolTip(tr("Close"));
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
-    connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
+    //TODO: #GDM VW Why?? o_O
+    if (accessController()->notifier(item->layout()->resource()) != NULL)
+        connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
 
     QnImageButtonWidget *infoButton = new QnImageButtonWidget();
     infoButton->setIcon(qnSkin->icon("item/info.png"));
@@ -179,6 +183,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_buttonBar->addButton(CloseButton, closeButton);
     m_buttonBar->addButton(InfoButton, infoButton);
     m_buttonBar->addButton(RotateButton, rotateButton);
+    connect(m_buttonBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_buttonBar_checkedButtonsChanged()));
 
     m_iconButton = new QnImageButtonWidget();
     m_iconButton->setParent(this);
@@ -256,6 +261,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
     setChannelLayout(qn_resourceWidget_defaultContentLayout);
 
+    connect(item, SIGNAL(dataChanged(int)), this, SLOT(at_item_dataChanged(int)));
+
     /* Run handlers. */
     updateTitleText();
     updateButtonsVisibility();
@@ -266,7 +273,7 @@ QnResourceWidget::~QnResourceWidget() {
     ensureAboutToBeDestroyedEmitted();
 }
 
-QnResourcePtr QnResourceWidget::resource() const {
+const QnResourcePtr &QnResourceWidget::resource() const {
     return m_resource;
 }
 
@@ -520,7 +527,10 @@ QnResourceWidget::Buttons QnResourceWidget::visibleButtons() const {
 }
 
 QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
-    Buttons result = InfoButton | RotateButton;
+    Buttons result = InfoButton;
+
+    if (!(m_options & WindowRotationForbidden))
+        result |= RotateButton;
 
     if(item() && item()->layout()) {
         Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
@@ -947,6 +957,17 @@ void QnResourceWidget::at_iconButton_visibleChanged() {
 void QnResourceWidget::at_infoButton_toggled(bool toggled){
     setInfoVisible(toggled);
     setOverlayVisible(toggled || m_mouseInWidget);
+}
+
+void QnResourceWidget::at_buttonBar_checkedButtonsChanged() {
+    item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(checkedButtons()));
+}
+
+void QnResourceWidget::at_item_dataChanged(int role) {
+    if (role != Qn::ItemCheckedButtonsRole)
+        return;
+    int checked = item()->data(Qn::ItemCheckedButtonsRole).toInt();
+    setCheckedButtons(static_cast<Buttons>(checked));
 }
 
 QColor QnResourceWidget::activeFrameColor() const {
