@@ -229,7 +229,6 @@
             </activation>
             <modules>
                 <module>build_variables</module>
-                <module>appserver</module>
                 <module>appserver2</module>
                 <module>common</module>
                 <!-- <module>testcamera</module> -->
@@ -337,7 +336,6 @@
                 <module>plugins/image_library_plugin</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
-                <module>debsetup/appserver-deb</module>
             </modules>            
         </profile>	
         <profile>
@@ -374,7 +372,7 @@
             </activation>
             <properties>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-                <toolchain.version>2011.09</toolchain.version>
+                <toolchain.version>2013.05</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
