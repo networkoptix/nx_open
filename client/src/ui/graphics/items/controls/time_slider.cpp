@@ -85,6 +85,9 @@ namespace {
      * Tickmarks that are closer to each other will never be displayed. */
     const qreal criticalTickmarkLineStepPixels = 2.0;
 
+    /** Estimated maximal size of tickmark text label. */
+    const qreal maxTickmarkTextSizePixels = 80.0;
+
     /** Minimal distance between tickmarks from the same group for text labels to be visible for this group. */
     const qreal minTickmarkTextStepPixels = 40.0;
 
@@ -450,6 +453,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
 
     /* Set default vector sizes. */
     m_lineData.resize(maxLines);
+    m_lastMinuteIndicatorVisible.fill(true, maxLines);
 
     generateProgressPatterns();
 
@@ -496,7 +500,7 @@ QnTimeSlider::~QnTimeSlider() {
 void QnTimeSlider::createSteps(QVector<QnTimeStep> *absoluteSteps, QVector<QnTimeStep> *relativeSteps) {
     //: Translate this into 'none' or 'forced' if you want to switch off automatic detection of
     //: AM/PM usage based on user's system locale. Do not translate this string unless you know what you're doing.
-    QString ampmUsage = tr("auto");
+    QString ampmUsage = tr("auto"); // TODO: #Elric #tr AM_PM_USAGE as 2nd param
     
     bool ampm;
     if(ampmUsage == lit("forced")) {
@@ -536,7 +540,7 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep> *absoluteSteps, QVector<QnTim
     QString moFormat = tr("MMMM");
 
     //: Format for displaying years on timeline. Do not translate this string unless you know what you're doing.
-    QString yFormat = tr("yyyy");
+    QString yFormat = tr("yyyy"); // TODO: #Elric #TR duplicate with dateYearsFormat
 
 
     //: Format for displaying minute caption in timeline's header, without am/pm indicator. Do not translate this string unless you know what you're doing.
@@ -710,8 +714,10 @@ void QnTimeSlider::setOptions(Options options) {
     Options difference = m_options ^ options;
     m_options = options;
 
-    if(difference & UseUTC)
+    if(difference & UseUTC) {
         updateSteps();
+        updateTickmarkTextSteps();
+    }
 }
 
 void QnTimeSlider::setOption(Option option, bool value) {
@@ -1185,6 +1191,20 @@ void QnTimeSlider::setColors(const QnTimeSliderColors &colors) {
     generateProgressPatterns();
 }
 
+void QnTimeSlider::setLastMinuteIndicatorVisible(int line, bool visible) {
+    if (line >= maxLines)
+        return;
+
+    m_lastMinuteIndicatorVisible[line] = visible;
+}
+
+bool QnTimeSlider::isLastMinuteIndicatorVisible(int line) const {
+    if (line >= maxLines)
+        return false;
+
+    return m_lastMinuteIndicatorVisible[line];
+}
+
 
 // -------------------------------------------------------------------------- //
 // Updating
@@ -1195,6 +1215,7 @@ void QnTimeSlider::updatePixmapCache() {
     m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16); 
 
     updateLineCommentPixmaps();
+    updateTickmarkTextSteps();
 }
 
 void QnTimeSlider::updateKineticProcessor() {
@@ -1263,6 +1284,19 @@ void QnTimeSlider::updateSteps() {
     m_stepData.resize(m_steps.size());
 }
 
+void QnTimeSlider::updateTickmarkTextSteps() {
+
+    // TODO: #Elric this one is VERY slow right now.
+
+    for(int i = 0; i < m_steps.size(); i++) {
+        QString text = toLongestShortString(m_steps[i]);
+        QPixmap pixmap = m_pixmapCache->textPixmap(text, 10);
+
+        /* 2.5 is the AR that our constants are expected to work well with. */
+        m_stepData[i].tickmarkTextOversize = qMax(1.0, (1.0 / 2.5) * pixmap.width() / pixmap.height());
+    }
+}
+
 void QnTimeSlider::updateMSecsPerPixel() {
     qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
     if(qFuzzyIsNull(msecsPerPixel))
@@ -1329,7 +1363,10 @@ void QnTimeSlider::updateStepAnimationTargets() {
             }
         }
 
-        if(separationPixels < minTickmarkTextStepPixels) {
+        qreal minTextStepPixels = minTickmarkTextStepPixels * data.tickmarkTextOversize;
+        qreal criticalTextStepPixels = criticalTickmarkTextStepPixels * data.tickmarkTextOversize;
+
+        if(separationPixels < minTextStepPixels) {
             data.targetTextOpacity = 0.0;
         } else {
             data.targetTextOpacity = qMax(minTickmarkTextOpacity, data.targetLineOpacity);
@@ -1338,7 +1375,7 @@ void QnTimeSlider::updateStepAnimationTargets() {
         /* Adjust for max height & opacity. */
         qreal maxHeight = qMax(0.0, (separationPixels - criticalTickmarkLineStepPixels) / criticalTickmarkLineStepPixels);
         qreal maxLineOpacity = minTickmarkLineOpacity + (1.0 - minTickmarkLineOpacity) * maxHeight;
-        qreal maxTextOpacity = qMin(maxLineOpacity, qMax(0.0, (separationPixels - criticalTickmarkTextStepPixels) / criticalTickmarkTextStepPixels));
+        qreal maxTextOpacity = qMin(maxLineOpacity, qMax(0.0, (separationPixels - criticalTextStepPixels) / criticalTextStepPixels));
         data.currentHeight      = qMin(data.currentHeight,      maxHeight);
         data.currentLineOpacity = qMin(data.currentLineOpacity, maxLineOpacity);
         data.currentTextOpacity = qMin(data.currentTextOpacity, maxTextOpacity);
@@ -1594,8 +1631,6 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
             lineTop += lineHeight;
         }
 
-        drawLastMinute(painter, lineBarRect);
-
         lineTop = lineBarRect.top();
         for(int line = 0; line < m_lineCount; line++) {
             qreal lineHeight = lineUnit * effectiveLineStretch(line);
@@ -1604,6 +1639,8 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
 
             QRectF lineRect(lineBarRect.left(), lineTop, lineBarRect.width(), lineHeight);
 
+            if (m_lastMinuteIndicatorVisible[line])
+                drawLastMinute(painter, lineRect);
             drawSeparator(painter, lineRect);
 
             lineTop += lineHeight;
@@ -1836,7 +1873,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         minStepIndex = stepCount - 1; /* Tests show that we can actually get here. */
 
     /* Find initial and maximal positions. */
-    QPointF overlap(criticalTickmarkTextStepPixels / 2.0, 0.0);
+    QPointF overlap(maxTickmarkTextSizePixels / 2.0, 0.0);
     qint64 startPos = qMax(minimum() + 1, valueFromPosition(positionFromValue(m_windowStart) - overlap, false)) + m_localOffset;
     qint64 endPos = qMin(maximum() - 1, valueFromPosition(positionFromValue(m_windowEnd) + overlap, false)) + m_localOffset;
 

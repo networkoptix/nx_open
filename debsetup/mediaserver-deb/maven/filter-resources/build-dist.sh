@@ -9,7 +9,7 @@ ARCHITECTURE=${os.arch}
 TARGET=/opt/$COMPANY_NAME/mediaserver
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
-LIBPLUGINTARGET=$LIBTARGET/plugins
+LIBPLUGINTARGET=$BINTARGET/plugins
 ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
@@ -27,7 +27,7 @@ SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
 #SERVER_SQLDRIVERS_PATH=$SERVER_BIN_PATH/sqldrivers
 SERVER_IMAGEFORMATS_PATH=$SERVER_BIN_PATH/imageformats
 SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
-SERVER_LIB_PLUGIN_PATH=$SERVER_LIB_PATH/plugins
+SERVER_LIB_PLUGIN_PATH=$SERVER_BIN_PATH/plugins
 SCRIPTS_PATH=${basedir}/../scripts
 
 # Prepare stage dir
@@ -47,17 +47,19 @@ cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
 #cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE
 
 # Strip and remove rpath
-for f in `find $LIBPLUGINSTAGE -type f`
-do
-    strip $f
-    chrpath -d $f
-done
 
-for f in `find $LIBSTAGE -type f`
-do
+if [ '${build.configuration}' == 'release' ]
+then
+  for f in `find $LIBPLUGINSTAGE -type f`
+  do
     strip $f
-    chrpath -d $f
-done
+  done
+
+  for f in `find $LIBSTAGE -type f`
+  do
+    strip $f
+  done
+fi
 
 find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
 find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
@@ -69,9 +71,6 @@ install -m 755 $SCRIPTS_PATH/config_helper.py $BINSTAGE
 
 # Copy mediaserver startup script
 install -m 755 bin/mediaserver $BINSTAGE
-
-# We set rpath as settings capabilities makes LD_LIBRARY_PATH useless
-chrpath -r ../lib $BINSTAGE/mediaserver-bin
 
 # Copy upstart and sysv script
 install -m 644 init/networkoptix-mediaserver.conf $INITSTAGE/$COMPANY_NAME-mediaserver.conf

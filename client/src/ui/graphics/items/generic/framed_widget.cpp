@@ -94,24 +94,19 @@ void FramedBase::setWindowColor(const QColor &windowColor) {
     setWindowBrush(windowColor);
 }
 
-QPainterPath FramedBase::framePath(const QRectF &rect) const {
-    qreal d = m_frameWidth / 2.0;
-    QRectF frameRect = rect.adjusted(d, d, -d, -d);
-
-    QPainterPath path;
-    if(m_frameShape == Qn::RectangularFrame) {
-        path.addRect(frameRect);
-    } else {
-        path.addEllipse(frameRect);
-    }
-    return path;
-}
-
 void FramedBase::paintFrame(QPainter *painter, const QRectF &rect) {
     if(m_frameShape == Qn::NoFrame)
         return;
 
     QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush(), m_frameWidth, m_frameStyle));
     QnScopedPainterBrushRollback brushRollback(painter, windowBrush());
-    painter->drawPath(framePath(rect));
+
+    qreal d = m_frameWidth / 2.0;
+    QRectF frameRect = rect.adjusted(d, d, -d, -d);
+
+    if(m_frameShape == Qn::RectangularFrame) {
+        painter->drawRect(frameRect);
+    } else {
+        painter->drawEllipse(frameRect);
+    }
 }

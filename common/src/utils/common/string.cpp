@@ -184,6 +184,10 @@ void ExtractToken( QString & buffer, const QString & string, int & pos, bool & i
                     INCBUF();
             }
 
+            /* We don't want to handle exponential notation.
+             * Besides, this implementation is buggy as it treats '14easd' 
+             * as a number. */
+#if 0
             if ( !curr.isNull() && curr.toLower() == L'e' )
             {
                 INCBUF();
@@ -196,6 +200,7 @@ void ExtractToken( QString & buffer, const QString & string, int & pos, bool & i
                     while ( curr.isDigit() )
                         INCBUF();
             }
+#endif
         }
     }
 
@@ -300,3 +305,13 @@ QStringList naturalStringSort( const QStringList & list, Qt::CaseSensitivity cas
     return retVal;
 }
 
+void naturalStringCompareTestCase(const QString &l, const QString &r, int value) {
+    assert(qBound(-1, naturalStringCompare(l, r, Qt::CaseInsensitive), 1) == value);
+    assert(qBound(-1, naturalStringCompare(r, l, Qt::CaseInsensitive), 1) == -value);
+}
+
+void naturalStringCompareTest() {
+    naturalStringCompareTestCase(lit("Layout"), lit("Layout 1"), -1);
+    naturalStringCompareTestCase(lit("admin"), lit("admin1"), -1);
+    naturalStringCompareTestCase(lit("20nov.nov"), lit("14exe_x64_read_only.exe"), 1);
+}

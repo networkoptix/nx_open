@@ -67,7 +67,7 @@ bool QnCameraOutputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &cam
 
 QString QnCameraOutputPolicy::getText(const QnResourceList &resources, const bool detailed) {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    int invalid = invalidResourcesCount<QnCameraInputPolicy>(cameras);
+    int invalid = invalidResourcesCount<QnCameraOutputPolicy>(cameras);
     return genericCameraText<QnCameraOutputPolicy>(cameras, detailed, tr("%1 have no output relays", "", invalid), invalid);
 }
 
@@ -79,7 +79,7 @@ bool QnCameraMotionPolicy::isResourceValid(const QnVirtualCameraResourcePtr &cam
 
 QString QnCameraMotionPolicy::getText(const QnResourceList &resources, const bool detailed) {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    int invalid = invalidResourcesCount<QnCameraInputPolicy>(cameras);
+    int invalid = invalidResourcesCount<QnCameraMotionPolicy>(cameras);
     return genericCameraText<QnCameraMotionPolicy>(cameras, detailed, tr("Recording or motion detection is disabled for %1", "", invalid), invalid);
 }
 
@@ -89,7 +89,7 @@ bool QnCameraRecordingPolicy::isResourceValid(const QnVirtualCameraResourcePtr &
 
 QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const bool detailed) {
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    int invalid = invalidResourcesCount<QnCameraInputPolicy>(cameras);
+    int invalid = invalidResourcesCount<QnCameraRecordingPolicy>(cameras);
     return genericCameraText<QnCameraRecordingPolicy>(cameras, detailed, tr("Recording is disabled for %1", "", invalid), invalid);
 }
 

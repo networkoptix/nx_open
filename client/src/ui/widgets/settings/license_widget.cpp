@@ -14,6 +14,7 @@
 #include <utils/common/product_features.h>
 
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/file_dialog.h>
 
 #include <licensing/license.h>
 
@@ -140,10 +141,11 @@ void QnLicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
 }
 
 void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
-    QString fileName = QFileDialog::getOpenFileName(this,
+    QString fileName = QnFileDialog::getOpenFileName(this,
                                                     tr("Open License File"),
                                                     QString(),
                                                     tr("All files (*.*)"),
+                                                    QStringList(),
                                                     0,
                                                     QnCustomFileDialog::fileDialogOptions());
     if (fileName.isEmpty())

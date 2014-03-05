@@ -42,6 +42,7 @@ build_environment/python/build_packages/ecapi_pb2/ecapi_pb2.egg-info/dependency_
 build_environment/python/build_packages/ecapi_pb2/ecapi_pb2.egg-info/top_level.txt
 build_environment/python/build_packages/ecapi_pb2/pb2.proto
 build_environment/target
+build_environment/target/buildenv.timestamp
 build_environment/x86
 build_environment/x64
 build_environment/arm

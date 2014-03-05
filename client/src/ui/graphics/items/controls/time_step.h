@@ -72,7 +72,11 @@ qint32 shortCacheKey(qint64 msecs, int height, const QnTimeStep &step);
 
 QnTimeStepLongCacheKey longCacheKey(qint64 msecs, int height, const QnTimeStep &step);
 
+// TODO: #Elric #TR what to do with locale-translation inconsistencies?
+
 QString toShortString(qint64 msecs, const QnTimeStep &step);
+
+QString toLongestShortString(const QnTimeStep &step);
 
 QString toLongString(qint64 msecs, const QnTimeStep &step);
 
