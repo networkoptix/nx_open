@@ -151,6 +151,17 @@
     
     "ZoomWindowInstrument": {
         "colors": ["#c02020", "#20c020", "#4040ff"]
+    },
+    
+    "QnHistogramWidget": {
+        "colors": {
+            "background": "#000000ff",
+            "border": "#606060ff",
+            "histogram": "#c0c0c0ff",
+            "selection": "selection",
+            "grid": "#00800080",
+            "text": "#ffffffff",
+        }
     }
 }
 

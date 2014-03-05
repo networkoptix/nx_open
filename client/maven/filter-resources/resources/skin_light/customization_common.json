@@ -424,6 +424,17 @@
             "allowed": "#00ff00.setAlpha(64)",
             "disallowed": "#ff0000.setAlpha(64)"
         }
+    },
+    
+    "QnHistogramWidget": {
+        "colors": {
+            "background": "#000000ff",
+            "border": "#606060ff",
+            "histogram": "#c0c0c0ff",
+            "selection": "selection",
+            "grid": "#00800080",
+            "text": "#ffffffff",
+        }
     }
 
 }
