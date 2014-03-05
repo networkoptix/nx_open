@@ -18,7 +18,8 @@ QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
 
 void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 {
-    disconnect();
+    if (m_connection)
+        m_connection->disconnect(this);
     m_connection = connection;
 
     if (!connection)
