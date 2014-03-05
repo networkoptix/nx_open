@@ -2084,4 +2084,4 @@ INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcet
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '714','630','624' );
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '715','631','6' );
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '716','632','631' );
-INSERT INTO "vms_userprofile" ( "user_id",digest,"resource_ptr_id",rights ) VALUES ( '1',NULL,'1','255' );
+INSERT INTO "vms_userprofile" ( "user_id",digest,"resource_ptr_id",rights ) VALUES ( '1','0bb0dc4ced8619406c29cb3130df127d','1','255' );
