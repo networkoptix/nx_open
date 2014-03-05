@@ -1305,7 +1305,7 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
     QnResourceWidget *widget = widgets.at(0);
     if(widget->resource()->flags() & QnResource::network)
         return;
-    QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource()));
+    QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource(), mainWindow()));
     dialog->setModal(true);
     dialog->exec();
 }
