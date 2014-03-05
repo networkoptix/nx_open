@@ -259,8 +259,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         comboBox->addItem(tr("Bottom right corner"), static_cast<int>(Qn::BottomRightCorner));
         comboBox->setCurrentIndex(comboBox->findData(parameters.timestampPosition, Qt::UserRole, Qt::MatchExactly));
 
-        dialog->addWidget(new QLabel(tr("Timestamp:"), dialog.data()));
-        dialog->addWidget(comboBox, false);
+        dialog->addWidget(tr("Timestamp:"), comboBox);
 
         if (!dialog->exec())
             return;

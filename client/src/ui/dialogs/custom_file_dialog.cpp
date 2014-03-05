@@ -12,25 +12,25 @@ QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, 
 #else
     base_type(parent, caption, directory, filter),
 #endif
-    m_currentCol(0)
+    m_currentColumn(0)
 {
     setOptions(QnCustomFileDialog::fileDialogOptions());
     connect(this, SIGNAL(accepted()), this, SLOT(at_accepted()));
 }
 
 QnCustomFileDialog::~QnCustomFileDialog() {
+    return;
 }
 
-void QnCustomFileDialog::addCheckBox(const QString &text, bool *value, QnWidgetControlAbstractDelegate* delegate) {
+void QnCustomFileDialog::addCheckBox(const QString &text, bool *value, QnAbstractWidgetControlDelegate* delegate) {
     QCheckBox* checkbox = new QCheckBox(this);
     checkbox->setText(text);
     checkbox->setChecked(*value);
     m_checkBoxes.insert(checkbox, value);
-    addWidget(checkbox, true, delegate);
+    addWidget(QString(), checkbox, delegate);
 }
 
 void QnCustomFileDialog::addSpinBox(const QString &text, int minValue, int maxValue, int *value) {
-
     QWidget* widget = new QWidget(this);
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -60,54 +60,34 @@ void QnCustomFileDialog::addSpinBox(const QString &text, int minValue, int maxVa
 
     widget->setLayout(layout);
 
-    addWidget(widget);
+    addWidget(QString(), widget, NULL);
 }
 
+void QnCustomFileDialog::addLineEdit(const QString &label, QString *value) {
+    QLineEdit *lineEdit = new QLineEdit(this);
+    lineEdit->setText(*value);
+    m_lineEdits.insert(lineEdit, value);
 
-void QnCustomFileDialog::addLineEdit(const QString &text, QString *value) {
-
-    QWidget* widget = new QWidget(this);
-    QHBoxLayout* layout = new QHBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
-
-    QLabel* label = new QLabel(widget);
-    label->setText(text);
-    layout->addWidget(label);
-
-    QLineEdit* edit = new QLineEdit(widget);
-    edit->setText(*value);
-    m_lineEdits.insert(edit, value);
-    layout->addWidget(edit);
-
-//    layout->addStretch();
-
-    widget->setLayout(layout);
-
-    addWidget(widget);
+    addWidget(label, lineEdit, NULL);
 }
 
+void QnCustomFileDialog::addWidget(const QString &label, QWidget *widget, QnAbstractWidgetControlDelegate *delegate) {
+    QGridLayout *layout = customizedLayout();
+    assert(layout);
 
-void QnCustomFileDialog::addWidget(QWidget *widget, bool newRow, QnWidgetControlAbstractDelegate* delegate) {
-    QGridLayout * gl = customizedLayout();
-    if (gl)
-    {
-        int r = gl->rowCount();
-        if (newRow) {
-            m_currentCol = 0;
-            gl->addWidget(widget, r, m_currentCol, 1, gl->columnCount());
-
-        }
-        else {
-            gl->addWidget(widget, r-1, m_currentCol);
-        }
-        gl->setRowStretch(r, m_currentCol++);
-        widget->raise();
+    int row = layout->rowCount();
+    if(label.isEmpty()) {
+        layout->addWidget(widget, row, 0, 1, 2);
+    } else {
+        layout->addWidget(new QLabel(label, this), row, 0);
+        layout->addWidget(widget, row, 1);
     }
+    widget->raise();
 
     if (delegate) {
         delegate->addWidget(widget);
         delegate->disconnect();
-        connect(this, SIGNAL(filterSelected(QString)), delegate, SLOT(at_filterSelected(QString)));
+        connect(this, &QFileDialog::filterSelected, delegate, &QnAbstractWidgetControlDelegate::updateWidget);
     }
 }
 
