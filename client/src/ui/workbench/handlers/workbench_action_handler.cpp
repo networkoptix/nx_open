@@ -2487,7 +2487,7 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QnResourceLi
             tr("Could not save the following %n items to Enterprise Controller.", "", resources.size()),
             QDialogButtonBox::Ok
         );
-    } else { // ec returns an empty list because of error
+    } else { // Note that we may get reply of size 0 if EC is down.
         QMessageBox::warning(
                     mainWindow(),
                     tr("Changes are not applied"),

@@ -414,6 +414,28 @@ qreal QnWorkbenchNavigator::maximalSpeed() const {
     return 1.0;
 }
 
+qint64 QnWorkbenchNavigator::position() const {
+    if(!m_currentMediaWidget)
+        return 0;
+
+    return m_currentMediaWidget->display()->camera()->getCurrentTime();
+}
+
+void QnWorkbenchNavigator::setPosition(qint64 position) {
+    if(!m_currentMediaWidget)
+        return;
+
+    QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
+    if(!reader)
+        return;
+
+    if(isPlaying())
+        reader->jumpTo(position, 0);
+    else
+        reader->jumpTo(position, position);
+    emit positionChanged();
+}
+
 void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget) {
     if (widget == NULL) {
         qnNullWarning(widget);
@@ -566,6 +588,7 @@ void QnWorkbenchNavigator::jumpBackward() {
         }
     }
     reader->jumpTo(pos, pos);
+    emit positionChanged();
 }
 
 void QnWorkbenchNavigator::jumpForward() {
@@ -600,6 +623,7 @@ void QnWorkbenchNavigator::jumpForward() {
         }
     }
     reader->jumpTo(pos, pos);
+    emit positionChanged();
 }
 
 void QnWorkbenchNavigator::stepBackward() {
@@ -612,14 +636,15 @@ void QnWorkbenchNavigator::stepBackward() {
 
     m_pausedOverride = false;
 
-    if (!reader->isSkippingFrames() && reader->currentTime() > reader->startTime() && !m_currentMediaWidget->display()->camDisplay()->isBuffering()) {
-        quint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
+    qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
+    if (!reader->isSkippingFrames() && currentTime > reader->startTime() && !m_currentMediaWidget->display()->camDisplay()->isBuffering()) {
 
         if (reader->isSingleShotMode())
             m_currentMediaWidget->display()->camDisplay()->playAudio(false); // TODO: #Elric wtf?
 
         reader->previousFrame(currentTime);
     }
+    emit positionChanged();
 }
 
 void QnWorkbenchNavigator::stepForward() {
@@ -633,6 +658,7 @@ void QnWorkbenchNavigator::stepForward() {
     m_pausedOverride = false;
 
     reader->nextFrame();
+    emit positionChanged();
 }
 
 void QnWorkbenchNavigator::setPlayingTemporary(bool playing) {
@@ -1273,19 +1299,23 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
             if (value == DATETIME_NOW) {
                 reader->jumpToPreviousFrame(DATETIME_NOW);
             } else {
-                if (m_preciseNextSeek)
+                if (m_preciseNextSeek) {
                     reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
-                else if (m_timeSlider->isSliderDown())
+                }
+                else if (m_timeSlider->isSliderDown()) {
                     reader->jumpTo(value * 1000, 0);
+                }
                 //else if (qnRedAssController->isPrecSeekAllowed(m_currentMediaWidget->display()->camDisplay()))
                 //    reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
-                else
+                else {
                     reader->setSkipFramesToTime(value * 1000); /* Precise seek. */
+                }
                 m_preciseNextSeek = false;
             }
         }
 
         updateLive();
+        emit positionChanged();
     }
 }
 

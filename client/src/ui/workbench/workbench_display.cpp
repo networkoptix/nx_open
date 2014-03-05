@@ -49,6 +49,7 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/resource/layout_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/graphics/items/grid/curtain_item.h>
@@ -777,7 +778,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    if ((!resource->hasFlags(QnResource::media) && !resource->hasFlags(QnResource::server)) || resource->hasFlags(QnResource::layout)) { // TODO: #Elric unsupported for now
+    if (    !resource->hasFlags(QnResource::media) &&
+            !resource->hasFlags(QnResource::server) &&
+            !resource->hasFlags(QnResource::layout)
+            ) { // TODO: #Elric unsupported for now
         qnDeleteLater(item);
         return false;
     }
@@ -785,6 +789,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     QnResourceWidget *widget;
     if (resource->hasFlags(QnResource::server))
         widget = new QnServerResourceWidget(context(), item);
+    else if (resource->hasFlags(QnResource::layout))
+        widget = new QnLayoutResourceWidget(context(), item);
     else
         widget = new QnMediaResourceWidget(context(), item);
 
@@ -1147,7 +1153,11 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
             ? layoutBoundingRect
             : layoutBoundingRect.united(backgroundBoundingRect);
 
-    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-0.05, -0.05, 0.05, 0.05));
+    if (qnSettings->isVideoWallMode())
+        return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect));
+
+    const qreal adjust = 0.05; // half of minimal cell spacing
+    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-adjust, -adjust, adjust, adjust));
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const {
@@ -1249,12 +1259,14 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 
         QSizeF newWidgetSize = enclosingGeometry.size() * focusExpansion;
-        QSizeF maxWidgetSize;
-        if(workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty()) {
-            maxWidgetSize = viewportGeometry.size() * 0.33; // TODO: #Elric magic const
-        } else {
-            maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
-        }
+
+        qreal magicConst = maxExpandedSize;
+        if (qnSettings->isVideoWallMode())
+            magicConst = 0.8;   //TODO: #Elric magic const
+        else
+        if(workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
+            magicConst = 0.33;  //TODO: #Elric magic const
+        QSizeF maxWidgetSize = viewportGeometry.size() * magicConst;
 
         QPointF viewportCenter = viewportGeometry.center();
 
@@ -1539,7 +1551,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
         }
 
-        widget->item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(widget->checkedButtons()));
+//        widget->item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(widget->checkedButtons()));
     }
 
     foreach(QnWorkbenchItem *item, layout->items())

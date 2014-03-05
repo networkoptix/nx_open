@@ -2,6 +2,7 @@
 #define QN_WORKBENCH_UI_H
 
 #include <QtCore/QObject>
+#include <QtCore/QTimer>
 
 #include <utils/common/disconnective.h>
 
@@ -145,6 +146,7 @@ public slots:
 
     void setTreeVisible(bool visible = true, bool animate = true);
     void setSliderVisible(bool visible = true, bool animate = true);
+    void setSliderHidden();
     void setTitleVisible(bool visible = true, bool animate = true);
     void setNotificationsVisible(bool visible = true, bool animate = true);
     void setCalendarVisible(bool visible = true, bool animate = true);
@@ -375,6 +377,8 @@ private:
     QnImageButtonWidget *m_sliderShowButton;
 
     AnimatorGroup *m_sliderOpacityAnimatorGroup;
+
+    QTimer* m_sliderAutoHideTimer;
 
     qreal m_lastThumbnailsHeight;
 

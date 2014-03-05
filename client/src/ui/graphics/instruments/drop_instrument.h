@@ -3,6 +3,7 @@
 
 #include "instrument.h"
 #include <core/resource/resource_fwd.h>
+#include <core/resource/videowall_item_index.h>
 #include "scene_event_filter.h"
 
 class QnWorkbenchContext;

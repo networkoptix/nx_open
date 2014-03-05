@@ -237,6 +237,8 @@ namespace {
     const int hideConstrolsTimeoutMSec = 2000;
     const int closeConstrolsTimeoutMSec = 2000;
 
+    const int sliderAutoHideTimeoutMSec = 10000;
+
 } // anonymous namespace
 
 
@@ -605,6 +607,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     }
     m_sliderShowButton->setFocusProxy(m_sliderItem);
 
+    if (qnSettings->isVideoWallMode()) {
+        m_sliderShowButton->setVisible(false);
+
+        m_sliderAutoHideTimer = new QTimer(this);
+        connect(m_sliderAutoHideTimer, SIGNAL(timeout()), this, SLOT(setSliderHidden()));
+    }
+
     QnImageButtonWidget *sliderZoomOutButton = new QnImageButtonWidget();
     sliderZoomOutButton->setIcon(qnSkin->icon("slider/buttons/zoom_out.png"));
     sliderZoomOutButton->setPreferredSize(16, 16);
@@ -670,6 +679,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_sliderItem,               &QGraphicsWidget::geometryChanged,          this,           &QnWorkbenchUi::at_sliderItem_geometryChanged);
     connect(m_sliderResizerWidget,      &QGraphicsWidget::geometryChanged,          this,           &QnWorkbenchUi::at_sliderResizerWidget_geometryChanged);
     connect(navigator(),                &QnWorkbenchNavigator::currentWidgetChanged,this,           &QnWorkbenchUi::updateControlsVisibilityAnimated);
+    if (qnSettings->isVideoWallMode()) {
+        connect(navigator(),            SIGNAL(positionChanged()),                  this,           SLOT(updateControlsVisibility()));
+        connect(navigator(),            SIGNAL(speedChanged()),                     this,           SLOT(updateControlsVisibility()));
+    }
     connect(action(Qn::ToggleTourModeAction), &QAction::toggled,                    this,           &QnWorkbenchUi::updateControlsVisibilityAnimated);
     connect(action(Qn::ToggleThumbnailsAction), &QAction::toggled,                  this,           &QnWorkbenchUi::at_toggleThumbnailsAction_toggled);
     connect(action(Qn::ToggleSliderAction), &QAction::toggled,                      this,           &QnWorkbenchUi::at_toggleSliderAction_toggled);
@@ -852,6 +865,11 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate, bool save) {
 }
 
 void QnWorkbenchUi::setSliderOpened(bool opened, bool animate, bool save) {
+    if (qnSettings->isVideoWallMode()) {
+        opened = true;
+        save = false;
+    }
+
     if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
 
@@ -989,6 +1007,12 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
     bool changed = m_sliderVisible != visible;
 
     m_sliderVisible = visible;
+    if (qnSettings->isVideoWallMode()) {
+        if (visible)
+            m_sliderAutoHideTimer->start(sliderAutoHideTimeoutMSec);
+        else
+            m_sliderAutoHideTimer->stop();
+    }
 
     updateSliderOpacity(animate);
     if(changed) {
@@ -998,6 +1022,10 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
 
         m_sliderItem->setEnabled(m_sliderVisible); /* So that it doesn't handle mouse events while disappearing. */
     }
+}
+
+void QnWorkbenchUi::setSliderHidden() {
+    setSliderVisible(false, true);
 }
 
 void QnWorkbenchUi::setTitleVisible(bool visible, bool animate) {
@@ -1321,6 +1349,18 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
     if (qnSettings->lightMode() & Qn::LightModeNoAnimation)
         animate = false;
+
+    if (qnSettings->isVideoWallMode()) {
+        bool sliderVisible =
+            navigator()->currentWidget() != NULL &&
+            !(navigator()->currentWidget()->resource()->flags() & (QnResource::still_image | QnResource::server));
+
+        setSliderVisible(sliderVisible, animate);
+        setTreeVisible(false, false);
+        setTitleVisible(false, false);
+        setNotificationsVisible(false, false);
+        return;
+    }
 
     bool sliderVisible =
         navigator()->currentWidget() != NULL &&
@@ -1927,6 +1967,20 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
 
             /* Viewport margins have changed, force fit-in-view. */
             display()->fitInView();
+        }
+    }
+
+    if (qnSettings->isVideoWallMode()) {
+        switch (role) {
+        case Qn::ZoomedRole:
+        case Qn::RaisedRole:
+            if (newWidget)
+                updateControlsVisibility(true);
+            else
+                setSliderHidden();
+            break;
+        default:
+            break;
         }
     }
 }

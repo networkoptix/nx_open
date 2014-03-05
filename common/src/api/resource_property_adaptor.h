@@ -16,6 +16,9 @@
 
 class QnAbstractResourcePropertyHandler {
 public:
+    QnAbstractResourcePropertyHandler() {}
+    virtual ~QnAbstractResourcePropertyHandler() {}
+
     virtual bool serialize(const QVariant &value, QString *target) const = 0;
     virtual bool deserialize(const QString &value, QVariant *target) const = 0;
     virtual bool equals(const QVariant &l, const QVariant &r) const = 0;

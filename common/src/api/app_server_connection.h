@@ -160,10 +160,10 @@ public:
 
     int saveAsync(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot);
     int saveAsync(const QnVirtualCameraResourcePtr &resource, QObject *target, const char *slot);
-    int saveAsync(const QnUserResourcePtr &resource, QObject *target, const char *slot);
+    int saveAsync(const QnUserResourcePtr &resource, QObject *target = NULL, const char *slot = NULL);
     int saveAsync(const QnLayoutResourcePtr &resource, QObject *target, const char *slot);
     int saveAsync(const QnBusinessEventRulePtr &rule, QObject *target, const char *slot);
-    int saveAsync(const QnVideoWallResourcePtr &videoWall, QObject *target, const char *slot);
+    int saveAsync(const QnVideoWallResourcePtr &videoWall, QObject *target = NULL, const char *slot = NULL);
 
     int saveAsync(const QnLayoutResourceList &resources, QObject *target, const char *slot);
     int saveAsync(const QnVirtualCameraResourceList &cameras, QObject *target, const char *slot);

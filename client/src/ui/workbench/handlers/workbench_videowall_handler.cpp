@@ -26,6 +26,7 @@
 
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
+#include <ui/common/ui_resource_name.h>
 #include <ui/dialogs/layout_name_dialog.h> //TODO: #GDM VW refactor
 #include <ui/graphics/items/standard/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -42,7 +43,8 @@
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/json.h>
-
+#include <utils/common/json_functions.h>
+#include <utils/common/string.h>
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
@@ -103,7 +105,6 @@ namespace {
     }
 #endif
 }
-
 
 QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     QObject(parent),
@@ -263,7 +264,12 @@ QRect QnWorkbenchVideoWallHandler::calculateSnapGeometry() {
 void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &videoWall, const QnId &layoutId) {
     QnVideoWallItem data;
     data.layout = layoutId;
-    data.name = uniqueScreenName(videoWall, tr("Screen"));
+    data.name = generateUniqueString([&videoWall] () {
+        QStringList used;
+        foreach (const QnVideoWallItem &item, videoWall->getItems())
+            used << item.name;
+        return used;
+    }(), tr("Screen"), tr("Screen %1") );
     data.geometry = calculateSnapGeometry();
     mainWindow()->setGeometry(data.geometry);   // WYSIWYG
 
@@ -413,7 +419,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
     }
     case QnVideoWallControlMessage::LayoutDataChanged:
     {
-        QString value = message[valueKey];
+        QByteArray value = message[valueKey].toUtf8();
         int role = message[roleKey].toInt();
         switch (role) {
         case Qn::LayoutCellSpacingRole:
@@ -425,7 +431,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
         case Qn::LayoutCellAspectRatioRole:
         {
             qreal data;
-            QJson::deserialize(value.toUtf8(), &data);
+            QJson::deserialize(value, &data);
             workbench()->currentLayout()->setData(role, data);
             break;
         }
@@ -446,9 +452,9 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
             return;
 
         QString resourceUid = message[resourceKey];
-        QRect geometry = QJson::deserialized<QRect>(message[geometryKey]);
-        QRectF zoomRect = QJson::deserialized<QRectF>(message[zoomRectKey]);
-        qreal rotation = QJson::deserialized<qreal>(message[rotationKey]);
+        QRect geometry = QJson::deserialized<QRect>(message[geometryKey].toUtf8());
+        QRectF zoomRect = QJson::deserialized<QRectF>(message[zoomRectKey].toUtf8());
+        qreal rotation = QJson::deserialized<qreal>(message[rotationKey].toUtf8());
         QnWorkbenchItem* item = new QnWorkbenchItem(resourceUid, uuid, workbench()->currentLayout());
         item->setGeometry(geometry);
         item->setZoomRect(zoomRect);
@@ -470,7 +476,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
     }
     case QnVideoWallControlMessage::LayoutItemDataChanged:
     {
-        QString value = message[valueKey];
+        QByteArray value = message[valueKey].toUtf8();
         QUuid uuid = QUuid(message[uuidKey]);
         if (!workbench()->currentLayout()->item(uuid))
             return;
@@ -508,7 +514,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
         case Qn::ItemSpeedRole:
         {
             qreal data;
-            QJson::deserialize(value.toUtf8(), &data);
+            QJson::deserialize(value, &data);
             workbench()->currentLayout()->item(uuid)->setData(role, data);
             break;
         }
@@ -516,14 +522,14 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
         case Qn::ItemPausedRole:
         {
             bool data;
-            QJson::deserialize(value.toUtf8(), &data);
+            QJson::deserialize(value, &data);
             workbench()->currentLayout()->item(uuid)->setData(role, data);
             break;
         }
         case Qn::ItemCheckedButtonsRole:
         {
             int data;
-            QJson::deserialize(value.toUtf8(), &data);
+            QJson::deserialize(value, &data);
             workbench()->currentLayout()->item(uuid)->setData(role, data);
             break;
         }
@@ -548,7 +554,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
         }
         case Qn::ItemImageDewarpingRole:
         {
-            DewarpingParams data = QJson::deserialized<DewarpingParams>(value);
+            QnItemDewarpingParams data = QJson::deserialized<QnItemDewarpingParams>(value);
             workbench()->currentLayout()->item(uuid)->setData(role, data);
             break;
         }
@@ -596,14 +602,15 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
     }
     case QnVideoWallControlMessage::SynchronizationChanged:
     {
-        QString value = message[valueKey];
+        QByteArray value = message[valueKey].toUtf8();
         QnStreamSynchronizationState state = QJson::deserialized<QnStreamSynchronizationState>(value);
         context()->instance<QnWorkbenchStreamSynchronizer>()->setState(state);
         break;
     }
     case QnVideoWallControlMessage::MotionSelectionChanged:
     {
-        QList<QRegion> regions = QJson::deserialized<QList<QRegion> >(message[valueKey]);
+        QByteArray value = message[valueKey].toUtf8();
+        QList<QRegion> regions = QJson::deserialized<QList<QRegion> >(value);
         QUuid uuid(message[uuidKey]);
         QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(uuid));
         if (widget)
@@ -893,7 +900,14 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Video Wall"));
     dialog->setText(tr("Enter the name of the video wall to create:"));
-    dialog->setName(uniqueVideoWallName(tr("Videowall")));
+    dialog->setName(
+        generateUniqueString([] () {
+                QStringList used;
+                foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::videowall))
+                    used << resource->getName();
+                return used;
+            }(), tr("Videowall"), tr("Videowall %1") )
+    );
     dialog->setWindowModality(Qt::ApplicationModal);
 
     if(!dialog->exec())
@@ -921,7 +935,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     //TODO: #GDM VW extract copy layout method
     QnLayoutResourcePtr newLayout(new QnLayoutResource());
     newLayout->setGuid(QUuid::createUuid().toString());
-    newLayout->setName(uniqueLayoutName(context()->user(), tr("VideoWall Layout")));
+    newLayout->setName(generateUniqueLayoutName(context()->user(), tr("VideoWall Layout"),  tr("VideoWall Layout %1")));
     newLayout->setParentId(context()->user()->getId());
     newLayout->setCellSpacing(QSizeF(0.0, 0.0));
     newLayout->setCellAspectRatio(layout->cellAspectRatio());
@@ -1419,7 +1433,7 @@ void QnWorkbenchVideoWallHandler::at_widget_motionSelectionChanged() {
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::MotionSelectionChanged);
     message[uuidKey] = widget->item()->uuid().toString();
-    message[valueKey] = QJson::serialized<QList<QRegion> >(widget->motionSelection());
+    message[valueKey] = QString::fromUtf8(QJson::serialized<QList<QRegion> >(widget->motionSelection()));
     sendMessage(message);
 }
 
@@ -1456,9 +1470,9 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode(QnWor
     QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemAdded);
     message[uuidKey] = item->uuid().toString();
     message[resourceKey] = item->resourceUid();
-    message[geometryKey] = QJson::serialized(item->geometry());
-    message[zoomRectKey] = QJson::serialized(item->zoomRect());
-    message[rotationKey] = QJson::serialized(item->rotation());
+    message[geometryKey] = QString::fromUtf8(QJson::serialized(item->geometry()));
+    message[zoomRectKey] = QString::fromUtf8(QJson::serialized(item->zoomRect()));
+    message[rotationKey] = QString::fromUtf8(QJson::serialized(item->rotation()));
     sendMessage(message);
 }
 
@@ -1618,7 +1632,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(int role) {
         break;
 
     case Qn::ItemImageDewarpingRole:
-        QJson::serialize(data.value<DewarpingParams>(), &json);
+        QJson::serialize(data.value<QnItemDewarpingParams>(), &json);
         break;
     default:
 #ifdef SENDER_DEBUG
@@ -1704,6 +1718,6 @@ void QnWorkbenchVideoWallHandler::at_workbenchStreamSynchronizer_runningChanged(
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::SynchronizationChanged);
-    message[valueKey] = QJson::serialized(context()->instance<QnWorkbenchStreamSynchronizer>()->state());
+    message[valueKey] = QString::fromUtf8(QJson::serialized(context()->instance<QnWorkbenchStreamSynchronizer>()->state()));
     sendMessage(message);
 }

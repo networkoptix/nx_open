@@ -31,6 +31,9 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/file_processor.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item.h>
+#include <core/resource/videowall_item_index.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -76,6 +79,7 @@
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/resource/layout_resource_widget.h>
 #include <ui/graphics/items/standard/graphics_message_box.h>
 
 #include <ui/help/help_handler.h>
@@ -1154,7 +1158,26 @@ void QnWorkbenchController::at_item_doubleClicked(QnMediaResourceWidget *widget)
     at_item_doubleClicked(static_cast<QnResourceWidget *>(widget));
 }
 
+void QnWorkbenchController::at_item_doubleClicked(QnLayoutResourceWidget *widget) {
+    if (!widget)
+        return;
+
+    QnVideoWallItemIndexList indexes = widget->linkedVideoWalls();
+    if (indexes.isEmpty())
+        return;
+
+    context()->menu()->trigger(
+        Qn::StartVideoWallControlAction,
+        QnActionParameters(indexes)
+    );
+}
+
 void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget) {
+    if (widget->resource() && (widget->resource()->flags() & QnResource::layout)) {
+        at_item_doubleClicked(dynamic_cast<QnLayoutResourceWidget*>(widget));
+        return;
+    }
+
     display()->scene()->clearSelection();
     widget->setSelected(true);
 

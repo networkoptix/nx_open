@@ -2,6 +2,8 @@
 
 #include <limits>
 
+#include <client/client_settings.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <utils/common/warnings.h>
@@ -105,8 +107,11 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
     // TODO: #Elric note that we keep items that are not present in resource's data.
     // This is not correct, but we currently need it.
     const QHash<int, QVariant> data = resource->data();
-    for(QHash<int, QVariant>::const_iterator i = data.begin(); i != data.end(); i++)
+    for(QHash<int, QVariant>::const_iterator i = data.begin(); i != data.end(); i++) {
+        if (i.key() == Qn::VideoWallItemGuidRole)
+            continue;
         setData(i.key(), i.value());
+    }
 
     bool result = true;
 
@@ -323,6 +328,9 @@ bool QnWorkbenchLayout::canMoveItem(QnWorkbenchItem *item, const QRect &geometry
         qnWarning("Cannot move an item that does not belong to this layout.");
         return false;
     }
+
+    if (qnSettings->isVideoWallMode())
+        return true;
 
     if(item->isPinned()) {
         return m_itemMap.isOccupiedBy(
