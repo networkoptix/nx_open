@@ -77,6 +77,8 @@ namespace ec2
                     return "broadcastBusinessAction";
                 case getBusinessRuleList:
                     return "getBusinessRuleList";
+                case resetBusinessRules:
+                    return "resetBusinessRules";
 
                 case saveLayouts:
                     return "addOrUpdateLayouts";

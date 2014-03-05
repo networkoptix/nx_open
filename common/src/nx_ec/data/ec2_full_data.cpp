@@ -18,7 +18,7 @@ namespace ec2
         layouts.toResourceList(outData.resources);
         licenses.toResourceList(outData.licenses);
 
-        rules.toResourceList(outData.bRules, ctx.pool);
+        outData.bRules = rules.toResourceList(ctx.pool);
         cameraHistory.toResourceList(outData.cameraHistory);
         outData.serverInfo = serverInfo;
     }

@@ -107,6 +107,7 @@ extern "C"
 #include "core/ptz/client_ptz_controller_pool.h"
 #include "ui/dialogs/message_box.h"
 #include <nx_ec/ec2_lib.h>
+#include <nx_ec/dummy_handler.h>
 
 
 
@@ -335,6 +336,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.parse(argc, argv, stderr);
 
     initLog(logLevel);
+
+    ec2::DummyHandler dummyEc2RequestHandler;
 
     /* Dev mode. */
     if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */

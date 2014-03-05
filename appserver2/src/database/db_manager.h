@@ -133,6 +133,7 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiUserData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
 
         // delete camera, server, layout, any resource t.e.c
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiIdData>& tran);
@@ -190,6 +191,7 @@ namespace ec2
         ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);
         ErrorCode removeBusinessRule( const QnId& id );
+        ErrorCode updateBusinessRule(const ApiBusinessRuleData& rule);
 
 		bool createDatabase();
         

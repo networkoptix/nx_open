@@ -45,9 +45,10 @@ struct ApiBusinessRuleData: public ApiData
 struct ApiBusinessRuleDataList: public ApiData
 {
     std::vector<ApiBusinessRuleData> data;
-
+    
     void loadFromQuery(QSqlQuery& query);
-    void toResourceList(QnBusinessEventRuleList& outData, QnResourcePool* resourcePool) const;
+    QnBusinessEventRuleList toResourceList(QnResourcePool* resourcePool) const;
+    void fromResourceList(const QnBusinessEventRuleList& inData);
 };
 
 struct ApiBusinessActionData: public ApiData
@@ -65,6 +66,11 @@ struct ApiBusinessActionData: public ApiData
     QnAbstractBusinessActionPtr toResource(QnResourcePool* resourcePool) const;
 };
 
+struct ApiResetBusinessRuleData: public ApiData
+{
+    ApiBusinessRuleDataList defaultRules;
+};
+
 }
 
 #define ApiBusinessRuleFields (id) (eventType) (eventResource) (eventCondition) (eventState) (actionType) (actionResource) (actionParams) (aggregationPeriod) (disabled) (comments) (schedule) (system)
@@ -72,6 +78,7 @@ QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiBusinessRuleData, ApiBusinessRul
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiBusinessRuleDataList, (data) )
 #define ApiBusinessActionDataFields (actionType) (toggleState) (receivedFromRemoteHost) (resources) (params) (runtimeParams) (businessRuleId) (aggregationCount)
 QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiBusinessActionData, ApiBusinessActionDataFields )
+QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiResetBusinessRuleData, (defaultRules) )
 
 
 #endif // __EC2__BUSINESS_RULE_DATA_H_
