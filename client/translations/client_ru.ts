@@ -5689,7 +5689,7 @@ Download version %3?</source>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="71"/>
         <source>Clip sound up to %1 seconds</source>
-        <translation>Воспроизводить % секунд</translation>
+        <translation>Воспроизводить %1 секунд</translation>
     </message>
     <message>
         <source>Custom Title</source>
@@ -5698,7 +5698,7 @@ Download version %3?</source>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="72"/>
         <source>Custom Title:</source>
-        <translation>Другой заголовок</translation>
+        <translation>Другой заголовок:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="82"/>
