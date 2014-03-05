@@ -54,7 +54,8 @@
         GlobalLiveViewerPermissions             = GlobalViewLivePermission,
         GlobalViewerPermissions                 = GlobalLiveViewerPermissions       | GlobalViewArchivePermission | GlobalExportPermission,
         GlobalAdvancedViewerPermissions         = GlobalViewerPermissions           | GlobalEditCamerasPermission | GlobalPtzControlPermission,
-        GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions | GlobalPanicPermission,
+        GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission |
+                                                    GlobalProtectedPermission | GlobalEditServersPermissions | GlobalPanicPermission | GlobalEditVideoWallPermission,
         GlobalOwnerPermissions                  = GlobalAdminPermissions            | GlobalEditProtectedUserPermission,
             
         AllPermissions                          = 0xFFFFFFFF

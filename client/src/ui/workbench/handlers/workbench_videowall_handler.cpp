@@ -917,7 +917,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
     videoWall->setGuid(QUuid::createUuid().toString());
     videoWall->setName(dialog->name());
     videoWall->setParentId(0);
-    connection()->saveAsync(videoWall);
+    connection()->saveAsync(videoWall); //TODO: #GDM VW show message if not successfull
 }
 
 void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
