@@ -744,4 +744,6 @@ namespace ec2
     };
 }
 
+Q_DECLARE_METATYPE(ec2::QnFullResourceData);
+
 #endif  //EC_API_H

@@ -156,7 +156,6 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaTypeStreamOperators<Qn::Corner>();
 
     qRegisterMetaType<QnConnectionInfo>();
-    qRegisterMetaType<ec2::QnFullResourceData>();
 
     QnJsonSerializer::registerSerializer<QUuid>();
 
