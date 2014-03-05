@@ -37,9 +37,6 @@ namespace ec2
         }
 
         template<> void triggerNotification<ApiResourceData>( const QnTransaction<ApiResourceData>& tran ) {
-            //QnResourcePtr resource = m_resCtx.resFactory->createResource(
-            //    tran.params.typeId,
-            //    tran.params.url );
             QnResourcePtr resource( new QnResource() );
             tran.params.toResource( resource );
             emit resourceChanged( resource );

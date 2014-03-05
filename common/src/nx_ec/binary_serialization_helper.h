@@ -270,16 +270,10 @@ namespace QnBinary {
         return rez;
     }
 
-    typedef quint8 FixedArray[];
-    template <class T>
-    bool deserialize(FixedArray& field, InputBinaryStream<T>* binStream) {
+    template <std::size_t N, class T>
+    bool deserialize(quint8(&field)[N], InputBinaryStream<T>* binStream) {
         return binStream->read(&field, sizeof(field)) == sizeof(field);
     }
-
-    //template <std::size_t N, class T>
-    //bool deserialize(quint8(&)[N] field, InputBinaryStream<T>* binStream) {
-    //    return binStream->read(&field, sizeof(field)) == sizeof(field);
-    //}
 
     template <class T>
     bool deserialize(QByteArray& field, InputBinaryStream<T>* binStream) {
