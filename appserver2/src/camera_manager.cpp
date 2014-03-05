@@ -56,7 +56,7 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::getCameras( QnId mediaServerId, impl::GetCamerasHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::getCameras( const QnId& mediaServerId, impl::GetCamerasHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 

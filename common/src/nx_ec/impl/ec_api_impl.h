@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include <QtCore/QObject.h>
+#include <QtCore/QObject>
 
 #include <api/model/connection_info.h>
 #include <api/model/kvpair.h>

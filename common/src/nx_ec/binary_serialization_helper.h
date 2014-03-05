@@ -19,6 +19,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
 #include "utils/common/id.h"
+#include "utils/math/math.h"
 
 
 //!Stream providing read operation
@@ -275,6 +276,11 @@ namespace QnBinary {
         return binStream->read(&field, sizeof(field)) == sizeof(field);
     }
 
+    //template <std::size_t N, class T>
+    //bool deserialize(quint8(&)[N] field, InputBinaryStream<T>* binStream) {
+    //    return binStream->read(&field, sizeof(field)) == sizeof(field);
+    //}
+
     template <class T>
     bool deserialize(QByteArray& field, InputBinaryStream<T>* binStream) {
         qint32 size;
@@ -307,7 +313,7 @@ namespace QnBinary {
     void serialize(const std::vector<T2>& field, OutputBinaryStream<T>* binStream) 
     {
         QnBinary::serialize((qint32) field.size(), binStream);
-        for (std::vector<T2>::const_iterator itr = field.begin(); itr != field.end(); ++itr)
+        for (typename std::vector<T2>::const_iterator itr = field.begin(); itr != field.end(); ++itr)
             QnBinary::serialize(*itr, binStream);
     }
 
@@ -344,7 +350,7 @@ namespace QnBinary {
     void serialize(const QMap<T2, T3>& field, OutputBinaryStream<T>* binStream) 
     {
         QnBinary::serialize((qint32) field.size(), binStream);
-        for(QMap<T2, T3>::const_iterator itr = field.begin(); itr != field.end(); ++itr) {
+        for(typename QMap<T2, T3>::const_iterator itr = field.begin(); itr != field.end(); ++itr) {
             QnBinary::serialize(itr.key(), binStream);
             QnBinary::serialize(itr.value(), binStream);
         }

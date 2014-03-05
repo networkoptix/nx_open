@@ -5,6 +5,8 @@
 
 #include "file_transcoder.h"
 
+#include <memory>
+
 #include <QtCore/QDir>
 #include <QtCore/QMutexLocker>
 #include <QtCore/QDir>
@@ -286,7 +288,7 @@ void FileTranscoder::setDest( QIODevice* dest )
 
 bool FileTranscoder::openFiles()
 {
-    std::auto_ptr<QnAviArchiveDelegate> mediaFileReader( new QnAviArchiveDelegate() ); //TODO: #ak auto_ptr is deprecated
+    std::unique_ptr<QnAviArchiveDelegate> mediaFileReader( new QnAviArchiveDelegate() );
 
     QnResourcePtr res( new DummyResource() );
     res->setUrl( m_srcFilePath );
@@ -297,7 +299,7 @@ bool FileTranscoder::openFiles()
     if( !m_dest->open( QIODevice::WriteOnly ) )
         return false;
 
-    m_mediaFileReader = mediaFileReader;
+    m_mediaFileReader = std::move(mediaFileReader);
     m_mediaFileReader->setAudioChannel( 0 );
     return true;
 }
