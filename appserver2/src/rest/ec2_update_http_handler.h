@@ -58,7 +58,6 @@ namespace ec2
                 return nx_http::StatusCode::badRequest;
             
             // replace client GUID to own GUID (take transaction ownership).
-            tran.originGuid = tran.id.peerGUID;
             tran.id.peerGUID = qnCommon->moduleGUID();
 
             ErrorCode errorCode = ErrorCode::ok;

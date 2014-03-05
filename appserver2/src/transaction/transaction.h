@@ -141,8 +141,6 @@ namespace ec2
         bool persistent;
         qint64 timestamp;
         
-        // this field doesn't serializable and uses local only.
-        QUuid originGuid; 
         static QAtomicInt m_localSequence;
         bool localTransaction; // do not propagate transactions to other server peers
     };

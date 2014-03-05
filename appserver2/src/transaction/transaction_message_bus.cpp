@@ -130,13 +130,9 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
 
 void QnTransactionMessageBus::sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData)
 {
-    QnId originGuid = !tran.originGuid.isNull() ? tran.originGuid : tran.id.peerGUID;
-    
     QMutexLocker lock(&m_mutex);
     for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
-        if (itr.key() == originGuid)
-            continue; // do not send transaction back to originator.
         QnTransactionTransportPtr transport = *itr;
         transport->addData(chunkData);
     }
