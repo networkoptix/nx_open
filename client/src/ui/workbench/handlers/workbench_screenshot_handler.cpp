@@ -252,11 +252,11 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
         QComboBox* comboBox = new QComboBox(dialog.data());
-        comboBox->addItem(tr("No timestamp"), Qn::NoCorner);
-        comboBox->addItem(tr("Top left corner"), Qn::TopLeftCorner);
-        comboBox->addItem(tr("Top right corner"), Qn::TopRightCorner);
-        comboBox->addItem(tr("Bottom left corner"), Qn::BottomLeftCorner);
-        comboBox->addItem(tr("Bottom right corner"), Qn::BottomRightCorner);
+        comboBox->addItem(tr("No timestamp"), static_cast<int>(Qn::NoCorner));
+        comboBox->addItem(tr("Top left corner"), static_cast<int>(Qn::TopLeftCorner));
+        comboBox->addItem(tr("Top right corner"), static_cast<int>(Qn::TopRightCorner));
+        comboBox->addItem(tr("Bottom left corner"), static_cast<int>(Qn::BottomLeftCorner));
+        comboBox->addItem(tr("Bottom right corner"), static_cast<int>(Qn::BottomRightCorner));
         comboBox->setCurrentIndex(comboBox->findData(parameters.timestampPosition, Qt::UserRole, Qt::MatchExactly));
 
         dialog->addWidget(new QLabel(tr("Timestamp:"), dialog.data()));
@@ -297,7 +297,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         }
 
         parameters.filename = fileName;
-        parameters.timestampPosition = comboBox->itemData(comboBox->currentIndex()).value<Qn::Corner>();
+        parameters.timestampPosition = static_cast<Qn::Corner>(comboBox->itemData(comboBox->currentIndex()).value<int>());
         loader->setParameters(parameters); //update changed fields
     }
     loader->loadAsync();
