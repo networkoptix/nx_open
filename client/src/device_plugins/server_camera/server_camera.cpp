@@ -12,9 +12,12 @@ void QnLocalFileProcessor::processResources(const QnResourceList &resources)
 }
 
 
-QnServerCamera::QnServerCamera()
+QnServerCamera::QnServerCamera(const QnId& resourceTypeId): QnVirtualCameraResource()
 {
+    setTypeId(resourceTypeId);
     addFlags(server_live_cam);
+    if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
+        addFlags(QnResource::motion);
 }
 
 bool QnServerCamera::isResourceAccessible()
@@ -121,8 +124,7 @@ QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const Q
         if (!resourceType->isCamera())
             return resource;
 
-        resource = QnResourcePtr(new QnServerCamera());
-        resource->setTypeId(resourceTypeId);
+        resource = QnResourcePtr(new QnServerCamera(resourceTypeId));
     }
     //resource->deserialize(parameters);
     return resource;
