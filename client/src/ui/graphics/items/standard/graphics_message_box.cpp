@@ -48,16 +48,18 @@ void QnGraphicsMessageBoxItem::paint(QPainter *painter, const QStyleOptionGraphi
 //-----------------------QnGraphicsMessageBox---------------------------------------//
 
 namespace {
-    const int fontSize(22);
+    const int defaultFontSize(22);
+    const int identifyFontSize(100);
     const int borderRadius(18);
     const int defaultTimeout(3000);
+    const int identifyTimeout(5000);
     const QColor fontColor(166, 166, 166);
     const QColor borderColor(83, 83, 83);
     const QColor backgroundColor(33, 33, 80);
 }
 
 
-QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString &text, int timeoutMsec):
+QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString &text, int timeoutMsec, int fontSize):
     base_type(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool)
 {
     m_timeout = timeoutMsec == 0 ? defaultTimeout : timeoutMsec;
@@ -66,7 +68,7 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
     setFrameShape(GraphicsFrame::NoFrame);
 
     QFont font;
-    font.setPixelSize(fontSize);
+    font.setPixelSize(fontSize > 0 ? fontSize : defaultFontSize);
     setFont(font);
 
     QPalette palette = this->palette();
@@ -86,7 +88,6 @@ QnGraphicsMessageBox::~QnGraphicsMessageBox() {
 }
 
 QnGraphicsMessageBox* QnGraphicsMessageBox::information(const QString &text) {
-
     if (!instance)
         return NULL;
 
@@ -94,6 +95,16 @@ QnGraphicsMessageBox* QnGraphicsMessageBox::information(const QString &text) {
     instance->addItem(box);
     return box;
 }
+
+QnGraphicsMessageBox* QnGraphicsMessageBox::identify(const QString &text) {
+    if (!instance)
+        return NULL;
+
+    QnGraphicsMessageBox* box = new QnGraphicsMessageBox(instance, text, identifyTimeout, identifyFontSize);
+    instance->addItem(box);
+    return box;
+}
+
 
 int QnGraphicsMessageBox::timeout() const {
     return m_timeout;

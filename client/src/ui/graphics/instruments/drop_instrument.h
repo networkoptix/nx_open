@@ -40,6 +40,7 @@ protected:
 
 private:
     QnResourceList m_resources;
+    QnVideoWallItemIndexList m_videoWallItems;
     
     QPointer<QnWorkbenchContext> m_context;
     QScopedPointer<SceneEventFilterItem> m_filterItem;

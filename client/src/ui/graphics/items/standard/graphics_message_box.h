@@ -34,10 +34,11 @@ class QnGraphicsMessageBox : public Animated<GraphicsLabel>
 
     typedef Animated<GraphicsLabel> base_type;
 public:
-    explicit QnGraphicsMessageBox(QGraphicsItem *parent = NULL, const QString &text = QString(), int timeoutMsec = 0);
+    explicit QnGraphicsMessageBox(QGraphicsItem *parent = NULL, const QString &text = QString(), int timeoutMsec = 0, int fontSize = 0);
     ~QnGraphicsMessageBox();
     
     static QnGraphicsMessageBox* information(const QString &text);
+    static QnGraphicsMessageBox* identify(const QString &text); //TODO: #GDM VW refactor?
 
     int timeout() const;
 public slots:

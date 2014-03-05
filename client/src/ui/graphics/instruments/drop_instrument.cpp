@@ -6,10 +6,13 @@
 #include <QtWidgets/QGraphicsItem>
 #include <QtCore/QMimeData>
 
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/file_processor.h>
+#include <core/resource/videowall_item.h>
+#include <core/resource/videowall_item_index.h>
 
 #include <utils/common/warnings.h>
 
@@ -111,6 +114,7 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
     QnResourceList media;   // = resources.filtered<QnMediaResource>();
     QnResourceList layouts; // = resources.filtered<QnLayoutResource>();
     QnResourceList servers; // = resources.filtered<QnMediaServerResource>();
+    QnResourceList videowalls;
 
     foreach( QnResourcePtr res, resources )
     {
@@ -120,13 +124,30 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
             layouts.push_back( res );
         if( res.dynamicCast<QnMediaServerResource>() )
             servers.push_back( res );
+        if( res.dynamicCast<QnVideoWallResource>() )
+            videowalls.push_back( res );
     }
 
     m_resources = media;
     m_resources << layouts;
     m_resources << servers;
+    m_resources << videowalls;
 
-    if (m_resources.empty())
+    m_videoWallItems.clear();
+    if (event->mimeData()->hasFormat(QnVideoWallItem::mimeType())) {
+        QByteArray data = event->mimeData()->data(QnVideoWallItem::mimeType());
+        QDataStream stream(&data, QIODevice::ReadOnly);
+        QList<QString> videoWallItemUuids;
+        stream >> videoWallItemUuids;
+
+        foreach (QString uuid, videoWallItemUuids) {
+            QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(uuid);
+            if (!index.isNull())
+                m_videoWallItems << index;
+        }
+    }
+
+    if (m_resources.empty() && m_videoWallItems.empty())
         return false;
 
     event->acceptProposedAction();
@@ -134,7 +155,7 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
 }
 
 bool DropInstrument::dragMoveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
-    if(m_resources.empty())
+    if(m_resources.empty() && m_videoWallItems.empty())
         return false;
 
     event->acceptProposedAction();
@@ -142,7 +163,7 @@ bool DropInstrument::dragMoveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent 
 }
 
 bool DropInstrument::dragLeaveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *) {
-    if(m_resources.empty())
+    if(m_resources.empty() && m_videoWallItems.empty())
         return false;
 
     return true;
@@ -153,6 +174,13 @@ bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *eve
     if(context == NULL)
         return true;
 
+    if (!m_videoWallItems.empty()) {
+        context->menu()->trigger(
+            Qn::StartVideoWallControlAction,
+            QnActionParameters(m_videoWallItems)
+        );
+    }
+    else
     if(!m_intoNewLayout) {
         context->menu()->trigger(
             Qn::DropResourcesAction, 
