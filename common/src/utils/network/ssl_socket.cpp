@@ -52,10 +52,9 @@ static int sock_puts(BIO *bp, const char *str)
     return(ret);
 }
 
-static long sock_ctrl(BIO *b, int cmd, long num, void *ptr)
+static long sock_ctrl(BIO *b, int cmd, long num, void* /*ptr*/)
 {
     long ret=1;
-    int *ip;
 
     switch (cmd)
     {
@@ -247,7 +246,7 @@ bool QnSSLSocket::doClientHandshake()
     return ret == 1;
 }
 
-int QnSSLSocket::recvInternal(void* buffer, unsigned int bufferLen, int flags)
+int QnSSLSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*/)
 {
     Q_D(QnSSLSocket);
 
@@ -269,7 +268,7 @@ int QnSSLSocket::recvInternal(void* buffer, unsigned int bufferLen, int flags)
     return d->wrappedSocket->recv(buffer, bufferLen);
 }
 
-int QnSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
+int QnSSLSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/)
 {
     Q_D(QnSSLSocket);
     if (!SSL_is_init_finished(d->ssl)) {
