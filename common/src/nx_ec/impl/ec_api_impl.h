@@ -290,9 +290,10 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER( Connect, ErrorCode, AbstractECConnectionPtr )
     }
 
-    Q_DECLARE_METATYPE( ErrorCode );
-    Q_DECLARE_METATYPE( AbstractECConnectionPtr );
     Q_ENUMS( ErrorCode );
 }
+
+Q_DECLARE_METATYPE( ec2::ErrorCode );
+Q_DECLARE_METATYPE( ec2::AbstractECConnectionPtr );
 
 #endif  //EC_API_IMPL_H

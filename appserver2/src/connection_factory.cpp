@@ -27,8 +27,8 @@ namespace ec2
         srand( ::time(NULL) );
 
         //registering ec2 types with Qt meta types system
-        qRegisterMetaType<ErrorCode>();
-        qRegisterMetaType<AbstractECConnectionPtr>();
+        qRegisterMetaType<ErrorCode>( "ErrorCode" );
+        qRegisterMetaType<AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
 
         ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
     }
