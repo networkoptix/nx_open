@@ -19,6 +19,8 @@
 
 namespace ec2
 {
+    static const char ADD_HASH_DATA[] = "$$_HASH_$$";
+
     class QnDbManager;
 
     typedef QMap<QUuid, qint32> QnTranState;
@@ -86,13 +88,13 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiSetResourceDisabledData>& tran) { return makeHash(tran.params.id.toRfc4122(), "disabled"); }
         QUuid transactionHash(const QnTransaction<ApiCameraServerItemData>&)         { return QUuid::createUuid() ; }
         QUuid transactionHash(const QnTransaction<ApiSetResourceStatusData>& tran)   { return makeHash(tran.params.id.toRfc4122(), "status"); }
-        QUuid transactionHash(const QnTransaction<ApiPanicModeData>&)                { return makeHash("panic_mode") ; }
+        QUuid transactionHash(const QnTransaction<ApiPanicModeData>&)                { return makeHash("panic_mode", ADD_HASH_DATA) ; }
         QUuid transactionHash(const QnTransaction<ApiResourceParams>& tran)          { return makeHash(tran.params.id.toRfc4122(), "res_params") ; }
-        QUuid transactionHash(const QnTransaction<ApiStoredFileData>& tran)          { return makeHash(tran.params.path.toUtf8()); }
-        QUuid transactionHash(const QnTransaction<ApiStoredFilePath>& tran)          { return makeHash(tran.params.toUtf8()); }
+        QUuid transactionHash(const QnTransaction<ApiStoredFileData>& tran)          { return makeHash(tran.params.path.toUtf8(), ADD_HASH_DATA); }
+        QUuid transactionHash(const QnTransaction<ApiStoredFilePath>& tran)          { return makeHash(tran.params.toUtf8(), ADD_HASH_DATA); }
         QUuid transactionHash(const QnTransaction<ApiResourceData>& tran)            { return makeHash(tran.params.id.toRfc4122(), "resource"); }
         QUuid transactionHash(const QnTransaction<ApiLicense>& tran)                 { return makeHash(tran.params.key, "ApiLicense"); }    //TODO
-        QUuid transactionHash(const QnTransaction<ApiResetBusinessRuleData>& tran)   { return makeHash("reset_brule"); }
+        QUuid transactionHash(const QnTransaction<ApiResetBusinessRuleData>& tran)   { return makeHash("reset_brule", ADD_HASH_DATA); }
         
         QUuid transactionHash(const QnTransaction<ApiFullData>& )                { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiCameraDataList>& )          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
