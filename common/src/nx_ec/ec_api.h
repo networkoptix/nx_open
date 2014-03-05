@@ -68,7 +68,8 @@ namespace ec2
         }
         ErrorCode getResourceTypesSync( QnResourceTypeList* const resTypeList ) {
             using namespace std::placeholders;
-            return impl::doSyncCall<impl::GetResourceTypesHandler>( std::bind<int(AbstractResourceManager::*)(impl::GetResourceTypesHandlerPtr)>(&AbstractResourceManager::getResourceTypes, this, _1), resTypeList );
+            int(AbstractResourceManager::*fn)(impl::GetResourceTypesHandlerPtr) = &AbstractResourceManager::getResourceTypes;
+            return impl::doSyncCall<impl::GetResourceTypesHandler>( std::bind(fn, this, _1), resTypeList );
         }
         /*!
             \param handler Functor with params: (ErrorCode)
@@ -79,7 +80,8 @@ namespace ec2
         ErrorCode setResourceStatusSync( const QnId& id, QnResource::Status status) {
             using namespace std::placeholders;
             QnId rezId;
-            return impl::doSyncCall<impl::SetResourceStatusHandler>( std::bind<int(AbstractResourceManager::*)(const QnId&, QnResource::Status, impl::SetResourceStatusHandlerPtr)>(&AbstractResourceManager::setResourceStatus, this, id, status, _1), &rezId );
+            int(AbstractResourceManager::*fn)(const QnId&, QnResource::Status, impl::SetResourceStatusHandlerPtr) = &AbstractResourceManager::setResourceStatus;
+            return impl::doSyncCall<impl::SetResourceStatusHandler>( std::bind(fn, this, id, status, _1), &rezId );
         }
 
         /*!
@@ -152,7 +154,8 @@ namespace ec2
         
         ErrorCode getServersSync(QnMediaServerResourceList* const serverList ) {
             using namespace std::placeholders;
-            return impl::doSyncCall<impl::GetServersHandler>( std::bind<int(AbstractMediaServerManager::*)(impl::GetServersHandlerPtr)>(&AbstractMediaServerManager::getServers, this, _1), serverList );
+            int(AbstractMediaServerManager::*fn)(impl::GetServersHandlerPtr) = &AbstractMediaServerManager::getServers;
+            return impl::doSyncCall<impl::GetServersHandler>( std::bind(fn, this, _1), serverList );
         }
 
         /*!
@@ -164,7 +167,8 @@ namespace ec2
 
         ErrorCode saveSync( const QnMediaServerResourcePtr& serverRes, QnMediaServerResourcePtr* const server ) {
             using namespace std::placeholders;
-            return impl::doSyncCall<impl::SaveServerHandler>( std::bind<int(AbstractMediaServerManager::*)(const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr)>(&AbstractMediaServerManager::save, this, serverRes, _1), server );
+            int(AbstractMediaServerManager::*fn)(const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr) = &AbstractMediaServerManager::save;
+            return impl::doSyncCall<impl::SaveServerHandler>( std::bind(fn, this, serverRes, _1), server );
         }
 
         /*!
@@ -205,7 +209,8 @@ namespace ec2
         }
         ErrorCode addCameraSync( const QnVirtualCameraResourcePtr& camRes, QnVirtualCameraResourceList* const cameras = 0) {
             using namespace std::placeholders;
-            return impl::doSyncCall<impl::AddCameraHandler>( std::bind<int(AbstractCameraManager::*)(const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr)>(&AbstractCameraManager::addCamera, this, camRes, _1), cameras );
+            int(AbstractCameraManager::*fn)(const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr) = &AbstractCameraManager::addCamera;
+            return impl::doSyncCall<impl::AddCameraHandler>( std::bind(fn, this, camRes, _1), cameras );
         }
         /*!
             \param handler Functor with params: (ErrorCode)
@@ -215,7 +220,8 @@ namespace ec2
         }
         ErrorCode addCameraHistoryItemSync( const QnCameraHistoryItem& historyItem) {
             using namespace std::placeholders;
-            return impl::doSyncCall<impl::SimpleHandler>( std::bind<int(AbstractCameraManager::*)(const QnCameraHistoryItem&, impl::SimpleHandlerPtr)>(&AbstractCameraManager::addCameraHistoryItem, this, historyItem, _1));
+            int(AbstractCameraManager::*fn)(const QnCameraHistoryItem&, impl::SimpleHandlerPtr) = &AbstractCameraManager::addCameraHistoryItem;
+            return impl::doSyncCall<impl::SimpleHandler>( std::bind(fn, this, historyItem, _1));
         }
 
         /*!
@@ -227,7 +233,8 @@ namespace ec2
 
         ErrorCode getCamerasSync(const QnId& mServerId, QnVirtualCameraResourceList* const cameraList ) {
             using namespace std::placeholders;
-            return impl::doSyncCall<impl::GetCamerasHandler>( std::bind<int(AbstractCameraManager::*)(const QnId&, impl::GetCamerasHandlerPtr)>(&AbstractCameraManager::getCameras, this, mServerId, _1), cameraList );
+            int(AbstractCameraManager::*fn)(const QnId&, impl::GetCamerasHandlerPtr) = &AbstractCameraManager::getCameras;
+            return impl::doSyncCall<impl::GetCamerasHandler>( std::bind(fn, this, mServerId, _1), cameraList );
         }
 
 
@@ -240,7 +247,8 @@ namespace ec2
 
         ErrorCode getCameraHistoryListSync(QnCameraHistoryList* const cameraHistoryList ) {
             using namespace std::placeholders;
-            return impl::doSyncCall<impl::GetCamerasHistoryHandler>( std::bind<int(AbstractCameraManager::*)(impl::GetCamerasHistoryHandlerPtr)>(&AbstractCameraManager::getCameraHistoryList, this,  _1), cameraHistoryList );
+            int(AbstractCameraManager::*fn)(impl::GetCamerasHistoryHandlerPtr) = &AbstractCameraManager::getCameraHistoryList;
+            return impl::doSyncCall<impl::GetCamerasHistoryHandler>( std::bind(fn, this,  _1), cameraHistoryList );
         }
 
         /*!
@@ -327,7 +335,8 @@ namespace ec2
 
         ErrorCode getBusinessRulesSync(QnBusinessEventRuleList* const businessEventList ) {
             using namespace std::placeholders;
-            return impl::doSyncCall<impl::GetBusinessRulesHandler>( std::bind<int(AbstractBusinessEventManager::*)(impl::GetBusinessRulesHandlerPtr)>(&AbstractBusinessEventManager::getBusinessRules, this, _1), businessEventList );
+            int(AbstractBusinessEventManager::*fn)(impl::GetBusinessRulesHandlerPtr) = &AbstractBusinessEventManager::getBusinessRules;
+            return impl::doSyncCall<impl::GetBusinessRulesHandler>( std::bind(fn, this, _1), businessEventList );
         }
 
         //!Test if email settings are valid
@@ -431,7 +440,8 @@ namespace ec2
 
         ErrorCode getUsersSync(QnUserResourceList* const userList ) {
             using namespace std::placeholders;
-            return impl::doSyncCall<impl::GetUsersHandler>( std::bind<int(AbstractUserManager::*)(impl::GetUsersHandlerPtr)>(&AbstractUserManager::getUsers, this, _1), userList );
+            int(AbstractUserManager::*fn)(impl::GetUsersHandlerPtr) = &AbstractUserManager::getUsers;
+            return impl::doSyncCall<impl::GetUsersHandler>( std::bind(fn, this, _1), userList );
         }
 
 
@@ -603,7 +613,8 @@ namespace ec2
         }
         ErrorCode setPanicModeSync(Qn::PanicMode value) {
             using namespace std::placeholders;
-            return impl::doSyncCall<impl::SimpleHandler>( std::bind<int(AbstractECConnection::*)(Qn::PanicMode, impl::SimpleHandlerPtr)>(&AbstractECConnection::setPanicMode, this, value, _1));
+            int(AbstractECConnection::*fn)(Qn::PanicMode, impl::SimpleHandlerPtr) = &AbstractECConnection::setPanicMode;
+            return impl::doSyncCall<impl::SimpleHandler>( std::bind(fn, this, value, _1));
         }
 
         /*!
@@ -616,7 +627,8 @@ namespace ec2
 
         ErrorCode getCurrentTimeSync(qint64* const time) {
             using namespace std::placeholders;
-            return impl::doSyncCall<impl::CurrentTimeHandler>( std::bind<int(AbstractECConnection::*)(impl::CurrentTimeHandlerPtr)>(&AbstractECConnection::getCurrentTime, this, _1), time );
+            int(AbstractECConnection::*fn)(impl::CurrentTimeHandlerPtr) = &AbstractECConnection::getCurrentTime;
+            return impl::doSyncCall<impl::CurrentTimeHandler>( std::bind(fn, this, _1), time );
         }
 
         /*!

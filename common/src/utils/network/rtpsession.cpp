@@ -1343,7 +1343,7 @@ RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBuffer
 }
 
 
-int RTPSession::buildClientRTCPReport(quint8* dstBuffer, int /*bufferLen*/)
+int RTPSession::buildClientRTCPReport(quint8* dstBuffer, int bufferLen)
 {
     QByteArray esDescr("netoptix");
 
