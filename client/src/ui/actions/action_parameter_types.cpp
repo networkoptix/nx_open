@@ -7,6 +7,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/layout_item_index.h>
+#include <core/resource/videowall_item_index.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -21,6 +23,7 @@ namespace ParameterMetaType {
         ResourceWidget,
         ResourceWidgetList,
         LayoutItemIndexList,
+        VideoWallItemIndexList,
         WorkbenchLayout,
         WorkbenchLayoutList,
         Invalid = -1
@@ -47,6 +50,7 @@ namespace {
             insert(qMetaTypeId<QnResourceWidget *>(),        ResourceWidget);
             insert(qMetaTypeId<QnResourceWidgetList>(),      ResourceWidgetList);
             insert(qMetaTypeId<QnLayoutItemIndexList>(),     LayoutItemIndexList);
+            insert(qMetaTypeId<QnVideoWallItemIndexList>(),  VideoWallItemIndexList);
             insert(qMetaTypeId<QnWorkbenchLayout *>(),       WorkbenchLayout);
             insert(qMetaTypeId<QnWorkbenchLayoutList>(),     WorkbenchLayoutList);
         }
@@ -107,6 +111,8 @@ int QnActionParameterTypes::size(const QVariant &items) {
         return items.value<QnResourceWidgetList>().size();
     case LayoutItemIndexList:
         return items.value<QnLayoutItemIndexList>().size();
+    case VideoWallItemIndexList:
+        return items.value<QnVideoWallItemIndexList>().size();
     case WorkbenchLayout:
         return items.value<QnWorkbenchLayout *>() ? 1 : 0;
     case WorkbenchLayoutList:
@@ -131,6 +137,8 @@ Qn::ActionParameterType QnActionParameterTypes::type(const QVariant &items) {
         return Qn::WidgetType;
     case LayoutItemIndexList:
         return Qn::LayoutItemType;
+    case VideoWallItemIndexList:
+        return Qn::VideoWallItemType;
     case WorkbenchLayout:
     case WorkbenchLayoutList:
         return Qn::LayoutType;
@@ -280,6 +288,17 @@ QnLayoutItemIndexList QnActionParameterTypes::layoutItems(const QVariant &items)
         return items.value<QnLayoutItemIndexList>();
     default:
         return QnLayoutItemIndexList();
+    }
+}
+
+QnVideoWallItemIndexList QnActionParameterTypes::videoWallItems(const QVariant &items) {
+    using namespace ParameterMetaType;
+
+    switch(qn_actionMetaTypeMap()->value(items.userType())) {
+    case VideoWallItemIndexList:
+        return items.value<QnVideoWallItemIndexList>();
+    default:
+        return QnVideoWallItemIndexList();
     }
 }
 

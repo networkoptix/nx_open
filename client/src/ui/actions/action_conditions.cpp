@@ -6,6 +6,7 @@
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/videowall_item_index.h>
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <recording/time_period_list.h>
@@ -66,13 +67,26 @@ Qn::ActionVisibility QnActionCondition::check(const QnActionParameters &paramete
     }
 }
 
+bool QnVideoWallReviewModeCondition::isVideoWallReviewMode() const {
+    return context()->workbench()->currentLayout()->data().contains(Qn::VideoWallResourceRole);
+}
+
+Qn::ActionVisibility QnVideoWallReviewModeCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
+    if (m_hide == isVideoWallReviewMode())
+        return Qn::InvisibleAction;
+    return Qn::EnabledAction;
+}
+
 Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetList &widgets) {
     if(widgets.size() != 1 || !widgets[0])
         return Qn::InvisibleAction;
 
+    if (widgets[0]->resource()->flags() & QnResource::layout)
+        return Qn::InvisibleAction;
+
     return ((widgets[0]->item() == workbench()->item(Qn::ZoomedRole)) == m_requiredZoomedState) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
-
 
 Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetList &widgets) {
     foreach(QnResourceWidget *widget, widgets) {
@@ -215,7 +229,7 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
         if(resource->hasFlags(QnResource::layout) && !resource->hasFlags(QnResource::local))
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(QnResource::user))
+        if(resource->hasFlags(QnResource::user) || resource->hasFlags(QnResource::videowall))
             continue; /* OK to remove. */
 
         if(resource->hasFlags(QnResource::remote_server) || resource->hasFlags(QnResource::live_cam)) // TODO: #Elric move this to permissions.
@@ -232,7 +246,7 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
 Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
     foreach(const QnLayoutItemIndex &item, layoutItems)
         if(!accessController()->hasPermissions(item.layout(), Qn::WritePermission | Qn::AddRemoveItemsPermission))
-            return Qn::DisabledAction;
+            return Qn::InvisibleAction;
 
     return Qn::EnabledAction;
 }
@@ -288,7 +302,7 @@ Qn::ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetL
         return Qn::InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
-    if(widget->resource()->flags() & QnResource::server)
+    if(widget->resource()->flags() & (QnResource::server | QnResource::layout))
         return Qn::InvisibleAction;
 
     QString url = widget->resource()->getUrl().toLower();
@@ -368,6 +382,8 @@ Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
 
 Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &parameters) {
     Q_UNUSED(parameters)
+    if (isVideoWallReviewMode())
+        return Qn::InvisibleAction;
     return context()->workbench()->currentLayout()->items().size() <= 1 ? Qn::DisabledAction : Qn::EnabledAction;
 }
 
@@ -452,7 +468,7 @@ Qn::ActionVisibility QnCreateZoomWindowActionCondition::check(const QnResourceWi
 
 Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &parameters) {
     if (parameters.hasArgument(Qn::NodeTypeRole)) {
-        int nodeType = parameters.argument(Qn::NodeTypeRole).toInt();
+        Qn::NodeType nodeType = parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>();
         return (nodeType == m_nodeType) ? Qn::EnabledAction : Qn::InvisibleAction;
     }
     return Qn::EnabledAction;
@@ -465,11 +481,12 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
     foreach (const QnResourcePtr &resource, resources) {
         //TODO: #GDM refactor duplicated code
         bool isServer = resource->hasFlags(QnResource::server);
+        bool isLayout = resource->hasFlags(QnResource::layout);
         bool isMediaResource = resource->hasFlags(QnResource::media);
         bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
                 && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
-        bool allowed = isServer || isMediaResource;
-        bool forbidden = isExportedLayout && (isServer || isLocalResource);
+        bool allowed = isServer || isMediaResource || isLayout;
+        bool forbidden = isExportedLayout && (isServer || isLocalResource || isLayout);
         if(allowed && !forbidden)
             return Qn::EnabledAction;
     }
@@ -522,6 +539,9 @@ Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &) {
 }
 
 Qn::ActionVisibility QnChangeResolutionActionCondition::check(const QnActionParameters &) {
+    if (isVideoWallReviewMode())
+        return Qn::InvisibleAction;
+
     if  (!context()->user())
         return Qn::InvisibleAction;
     QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
@@ -568,4 +588,38 @@ Qn::ActionVisibility QnPtzActionCondition::check(const QnResourceWidgetList &wid
 
 bool QnPtzActionCondition::check(const QnPtzControllerPtr &controller) {
     return controller && controller->hasCapabilities(m_capabilities);
+}
+
+Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionParameters &parameters) {
+    if (parameters.videoWallItems().size() > 0)
+        return Qn::EnabledAction;
+    return QnActionCondition::check(parameters);
+}
+
+Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnResourceList &resources) {
+    foreach(const QnResourcePtr &resource, resources)
+        if(resource->hasFlags(QnResource::videowall))
+            return Qn::EnabledAction;
+    return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnResetVideoWallLayoutActionCondition::check(const QnActionParameters &parameters) {
+    if (!context()->user() || parameters.videoWallItems().isEmpty())
+        return Qn::InvisibleAction;
+
+    if (accessController()->globalPermissions() & Qn::GlobalEditVideoWallPermission)
+        return Qn::EnabledAction;
+
+    QnVideoWallItemIndex index = parameters.videoWallItems().first();
+    if (context()->user()->videoWallItems().contains(index.uuid()))
+        return Qn::EnabledAction;
+    return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnRotateItemCondition::check(const QnResourceWidgetList &widgets) {
+    foreach (QnResourceWidget *widget, widgets) {
+        if (widget->options() & QnResourceWidget::WindowRotationForbidden)
+            return Qn::InvisibleAction;
+    }
+    return Qn::EnabledAction;
 }

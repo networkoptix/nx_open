@@ -1,5 +1,8 @@
 #include "action_parameters.h"
 
+#include <core/resource/layout_item_index.h>
+#include <core/resource/videowall_item_index.h>
+
 #include <utils/common/warnings.h>
 
 #include <ui/workbench/workbench_layout.h>
@@ -56,6 +59,11 @@ QnActionParameters::QnActionParameters(const QnLayoutItemIndexList &layoutItems,
     setItems(QVariant::fromValue<QnLayoutItemIndexList>(layoutItems));
 }
 
+QnActionParameters::QnActionParameters(const QnVideoWallItemIndexList &videoWallItems, const ArgumentHash &arguments) {
+    setArguments(arguments);
+    setItems(QVariant::fromValue<QnVideoWallItemIndexList>(videoWallItems));
+}
+
 void QnActionParameters::setArguments(const ArgumentHash &arguments) {
     for(ArgumentHash::const_iterator pos = arguments.begin(); pos != arguments.end(); pos++)
         setArgument(pos.key(), pos.value());
@@ -99,6 +107,10 @@ QnResourcePtr QnActionParameters::resource(int key) const {
 
 QnLayoutItemIndexList QnActionParameters::layoutItems(int key) const {
     return QnActionParameterTypes::layoutItems(argument(key));
+}
+
+QnVideoWallItemIndexList QnActionParameters::videoWallItems(int key) const {
+    return QnActionParameterTypes::videoWallItems(argument(key));
 }
 
 QnWorkbenchLayoutList QnActionParameters::layouts(int key) const {

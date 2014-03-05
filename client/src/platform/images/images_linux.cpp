@@ -16,7 +16,7 @@ QCursor QnLinuxImages::bitmapCursor(Qt::CursorShape shape) const {
     XFixesCursorImage *xImage = XFixesGetCursorImage(QX11Info::display());
     QGuiApplication::restoreOverrideCursor();
     if(!xImage)
-        return QCursor(QPixmap());
+        return QCursor(shape);
 
     uchar* cursorData;
     bool freeCursorData;

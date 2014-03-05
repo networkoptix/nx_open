@@ -5,6 +5,7 @@
 
 #include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
+#include <core/resource/videowall_control_message.h>
 
 #include <licensing/license.h>
 
@@ -17,6 +18,10 @@ public:
     QnClientMessageProcessor();
 
     virtual void run() override;
+
+signals:
+    void videoWallControlMessageReceived(const QnVideoWallControlMessage &message);
+
 protected:
     virtual void loadRuntimeInfo(const QnMessage &message) override;
     virtual void handleConnectionOpened(const QnMessage &message) override;

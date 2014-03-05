@@ -2,25 +2,31 @@
 #include "rtsp_client_archive_delegate.h"
 
 #include <QtCore/QBuffer>
+#include <QtNetwork/QNetworkCookie>
 
 extern "C"
 {
     #include <libavcodec/avcodec.h>
 }
 
-#include "core/datapacket/media_data_packet.h"
-#include "core/resource_management/resource_pool.h"
-#include "utils/network/rtp_stream_parser.h"
-#include "utils/media/ffmpeg_helper.h"
-#include "utils/network/ffmpeg_sdp.h"
-#include "utils/common/util.h"
-#include "utils/common/sleep.h"
-#include "utils/common/synctime.h"
-#include "core/resource/camera_history.h"
-#include "core/resource/media_server_resource.h"
-#include "redass/redass_controller.h"
-#include "device_plugins/server_camera/server_camera.h"
-#include "api/app_server_connection.h"
+#include <api/app_server_connection.h>
+#include <api/session_manager.h>
+
+#include <core/datapacket/media_data_packet.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/media_server_resource.h>
+
+#include <device_plugins/server_camera/server_camera.h>
+
+#include <redass/redass_controller.h>
+
+#include <utils/common/util.h>
+#include <utils/common/sleep.h>
+#include <utils/common/synctime.h>
+#include <utils/media/ffmpeg_helper.h>
+#include <utils/network/rtp_stream_parser.h>
+#include <utils/network/ffmpeg_sdp.h>
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
@@ -458,7 +464,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
         if (m_tcpMode)
         {
             if (blockSize < 4) {
-                qWarning() << Q_FUNC_INFO << __LINE__ << "strange RTP/TCP packet. len < 4. Ignored";
+//                qWarning() << Q_FUNC_INFO << __LINE__ << "strange RTP/TCP packet. len < 4. Ignored";
                 return result;
             }
             rtpChannelNum = m_rtpDataBuffer[1];
@@ -817,6 +823,9 @@ void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
     auth.setPassword(password);
     
     m_rtspSession.setAuth(auth, RTPSession::authDigest);
+
+    if (QnSessionManager::instance()->authCookieEnabled())
+        m_rtspSession.setAdditionAttribute("cookie", QnSessionManager::instance()->authCookie().toRawForm(QNetworkCookie::NameAndValueOnly));
 }
 
 void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)

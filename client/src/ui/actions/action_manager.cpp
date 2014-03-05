@@ -165,7 +165,7 @@ public:
 
     QnActionBuilder separator(bool isSeparator = true) {
         m_action->setSeparator(isSeparator);
-        m_action->setFlags(m_action->flags() | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::WidgetTarget | Qn::ResourceTarget | Qn::LayoutItemTarget);
+        m_action->setFlags(m_action->flags() | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::WidgetTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::VideoWallItemTarget);
 
         return *this;
     }
@@ -352,6 +352,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::ResourceTarget | Qn::WidgetTarget | Qn::LayoutItemTarget | Qn::LayoutTarget | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Drop Resources into a New Layout"));
 
+    factory(Qn::DelayedOpenVideoWallItemAction).
+        flags(Qn::NoTarget).
+        text(tr("Delayed Open VideoWall"));
+
     factory(Qn::DelayedDropResourcesAction).
         flags(Qn::NoTarget).
         text(tr("Delayed Drop Resources"));
@@ -430,6 +434,15 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Alarm/Event Rules..."));
+
+    factory(Qn::AddVideoWallItemsToUserAction).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+        text(tr("Assign Screen to User"));
+
+    factory(Qn::StartVideoWallControlAction).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
+        text(tr("Start Videowall control"));
 
     factory(Qn::QueueAppRestartAction).
         flags(Qn::NoTarget).
@@ -531,7 +544,17 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Main | Qn::Tree | Qn::NoTarget).
             requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditUsersPermission).
             text(tr("User...")).
-            pulledText(tr("New User..."));
+            pulledText(tr("New User...")).
+            condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this)). //TODO: #GDM check in the main menu
+            autoRepeat(false);
+
+        factory(Qn::NewVideoWallAction).
+            flags(Qn::Main).
+            requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+            text(tr("Video Wall...")).
+            pulledText(tr("New Video Wall...")).
+            autoRepeat(false);
+
     } factory.endSubMenu();
 
     factory(Qn::OpenCurrentUserLayoutMenu).
@@ -566,7 +589,7 @@ QnActionManager::QnActionManager(QObject *parent):
     } factory.endSubMenu();
 
     factory(Qn::SaveCurrentLayoutAction).
-        flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
+        flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey | Qn::IntentionallyAmbiguous).
         requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::SavePermission).
         text(tr("Save Current Layout")).
         shortcut(tr("Ctrl+S")).
@@ -580,6 +603,13 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Save Current Layout As...")).
         shortcut(tr("Ctrl+Alt+S")).
         autoRepeat(false);
+
+    factory(Qn::SaveVideoWallReviewAction).
+        flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey | Qn::IntentionallyAmbiguous).
+        text(tr("Save VideoWall View")).
+        shortcut(tr("Ctrl+S")).
+        autoRepeat(false).
+        condition(new QnVideoWallReviewModeCondition(false, this));
 
     factory().
         flags(Qn::Main).
@@ -805,6 +835,11 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Open Layout(s)")).
         condition(hasFlags(QnResource::layout));
 
+    factory(Qn::OpenVideoWallsReviewAction).
+       flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
+       text(tr("Open VideoWall(s)")).
+       condition(hasFlags(QnResource::videowall));
+
     factory(Qn::OpenInFolderAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Open Containing Folder")).
@@ -813,10 +848,50 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnOpenInFolderActionCondition(this));
 
+    factory(Qn::IdentifyVideoWallAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::VideoWallItemTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission). //TODO: #GDM VW may be this action should be attached to the screens and require user permission?
+        text(tr("Identify")).
+        autoRepeat(false).
+        condition(new QnIdentifyVideoWallActionCondition(this));
+
+    factory(Qn::AttachToVideoWallAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+        requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::SavePermission). //TODO: #GDM VW what if current layout is already saved and not ours?
+        text(tr("Attach to Video Wall")).
+        autoRepeat(false).
+        condition(hasFlags(QnResource::videowall));
+
+    factory(Qn::StartVideoWallAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission). //TODO: #GDM VW User permission?
+        text(tr("Start Video Wall")).
+        autoRepeat(false).
+        condition(hasFlags(QnResource::videowall));
+
+    factory(Qn::ResetVideoWallLayoutAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
+        text(tr("Update Layout")).
+        autoRepeat(false).
+        condition(new QnResetVideoWallLayoutActionCondition(this));
+
     factory().
         flags(Qn::Scene | Qn::Tree).
         separator();
 
+    factory(Qn::StopVideoWallAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+        text(tr("Stop Video Wall")).
+        autoRepeat(false).
+        condition(hasFlags(QnResource::videowall));
+
+    factory(Qn::DetachFromVideoWallAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).    //TODO: #GDM VW User permission!
+        text(tr("Detach Layout")).
+        autoRepeat(false);
 
     factory(Qn::SaveLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
@@ -838,10 +913,16 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Save Layout As...")).
         condition(hasFlags(QnResource::layout));
 
-
     factory().
         flags(Qn::Scene | Qn::Tree).
         separator();
+
+    factory(Qn::DeleteVideoWallItemAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget | Qn::IntentionallyAmbiguous).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+        text(tr("Delete")).
+        shortcut(tr("Del")).
+        autoRepeat(false);
 
     factory(Qn::MaximizeItemAction).
         flags(Qn::Scene | Qn::SingleTarget).
@@ -996,19 +1077,23 @@ QnActionManager::QnActionManager(QObject *parent):
     factory.beginSubMenu();{
         factory(Qn::Rotate0Action).
             flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-            text(tr("0 degrees"));
+            text(tr("0 degrees")).
+            condition(new QnRotateItemCondition(this));
 
         factory(Qn::Rotate90Action).
             flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-            text(tr("90 degrees"));
+            text(tr("90 degrees")).
+            condition(new QnRotateItemCondition(this));
 
         factory(Qn::Rotate180Action).
             flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-            text(tr("180 degrees"));
+            text(tr("180 degrees")).
+            condition(new QnRotateItemCondition(this));
 
         factory(Qn::Rotate270Action).
             flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
-            text(tr("270 degrees"));
+            text(tr("270 degrees")).
+            condition(new QnRotateItemCondition(this));
     } factory.endSubMenu();
 
     factory().
@@ -1044,7 +1129,7 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::RenameAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::VideoWallItemTarget).
         requiredPermissions(Qn::WritePermission | Qn::WriteNamePermission).
         text(tr("Rename")).
         shortcut(tr("F2")).
@@ -1148,7 +1233,8 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
-        text(tr("Change Cell Aspect Ratio..."));
+        text(tr("Change Cell Aspect Ratio...")).
+        condition(new QnVideoWallReviewModeCondition(true, this));
 
     factory.beginSubMenu(); {
         factory.beginGroup();
@@ -1172,7 +1258,8 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
-        text(tr("Change Cell Spacing..."));
+        text(tr("Change Cell Spacing...")).
+        condition(new QnVideoWallReviewModeCondition(true, this));
 
     factory.beginSubMenu(); {
         factory.beginGroup();

@@ -31,6 +31,8 @@ void QnClientMessageProcessor::init()
     appServerEventsUrl.setQuery(query);
 
     base_type::init(appServerEventsUrl, QString());
+
+    m_source->setVideoWallKey(QnAppServerConnectionFactory::videoWallKey());
 }
 
 QnClientMessageProcessor::QnClientMessageProcessor():
@@ -114,6 +116,11 @@ void QnClientMessageProcessor::handleMessage(const QnMessage &message) {
     case Qn::Message_Type_ResourceDelete: {
         if (QnResourcePtr ownResource = qnResPool->getResourceById(message.resourceId))
             qnResPool->removeResource(ownResource);
+        break;
+    }
+    case Qn::Message_Type_VideoWallControl:
+    {
+        emit videoWallControlMessageReceived(message.videoWallControlMessage);
         break;
     }
     default:

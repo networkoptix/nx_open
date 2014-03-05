@@ -78,6 +78,21 @@ public:
     virtual Qn::ActionVisibility check(const QnWorkbenchLayoutList &layouts);
 };
 
+/** Base condition class for actions that should be hidden in videowall review mode
+ *  and visible in all other cases - or vise versa. */
+class QnVideoWallReviewModeCondition: public QnActionCondition {
+public:
+    QnVideoWallReviewModeCondition(bool hide, QObject* parent = NULL):
+        QnActionCondition(parent),
+        m_hide(hide)
+    {}
+protected:
+    bool isVideoWallReviewMode() const;
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+private:
+    /** Flag that describes if action should be visible or hidden in videowall review mode. */
+    bool m_hide;
+};
 
 /**
  * Condition for a single resource widget that checks its zoomed state.
@@ -300,9 +315,9 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
-class QnToggleTourActionCondition: public QnActionCondition {
+class QnToggleTourActionCondition: public QnVideoWallReviewModeCondition {
 public:
-    QnToggleTourActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnToggleTourActionCondition(QObject *parent = NULL): QnVideoWallReviewModeCondition(true, parent) {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
@@ -384,9 +399,9 @@ public:
     virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
 };
 
-class QnChangeResolutionActionCondition: public QnActionCondition {
+class QnChangeResolutionActionCondition: public QnVideoWallReviewModeCondition {
 public:
-    QnChangeResolutionActionCondition(QObject* parent = NULL): QnActionCondition(parent) {}
+    QnChangeResolutionActionCondition(QObject* parent = NULL): QnVideoWallReviewModeCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
@@ -426,6 +441,25 @@ private:
 private:
     Qn::PtzCapabilities m_capabilities;
     bool m_disableIfPtzDialogVisible;
+};
+
+class QnIdentifyVideoWallActionCondition: public QnActionCondition {
+public:
+    QnIdentifyVideoWallActionCondition(QObject* parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+class QnResetVideoWallLayoutActionCondition: public QnActionCondition {
+public:
+    QnResetVideoWallLayoutActionCondition(QObject* parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
+class QnRotateItemCondition: public QnActionCondition {
+public:
+    QnRotateItemCondition(QObject* parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 };
 
 #endif // QN_ACTION_CONDITIONS_H

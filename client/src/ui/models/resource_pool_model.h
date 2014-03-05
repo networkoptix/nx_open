@@ -75,13 +75,11 @@ private slots:
     void at_resource_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
     void at_resource_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
 
-#ifdef QN_ENABLE_VIDEO_WALL
     void at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 
     void at_user_videoWallItemAdded(const QnUserResourcePtr &user, const QUuid &uuid);
     void at_user_videoWallItemRemoved(const QnUserResourcePtr &user, const QUuid &uuid);
-#endif
 
 private:
     friend class QnResourcePoolModelNode;
