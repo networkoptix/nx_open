@@ -41,7 +41,6 @@ namespace ec2
     template<class T>
     int QnUserManager<T>::save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler )
     {
-
         //preparing output data
         QnUserResourceList users;
         if (resource->getId().isNull()) {
@@ -52,7 +51,7 @@ namespace ec2
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::saveUser, resource );
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::AddUserHandler::done ), handler, reqID, _1, users ) );
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::AddUserHandler::done, handler, reqID, _1, users ) );
         return reqID;
     }
 
@@ -62,7 +61,7 @@ namespace ec2
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::removeUser, id );
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
         return reqID;
     }
 

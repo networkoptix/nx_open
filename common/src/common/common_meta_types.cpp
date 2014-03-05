@@ -87,6 +87,8 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnSecurityCamResourcePtr>();
     qRegisterMetaType<QnAbstractStorageResourcePtr>();
 
+    qRegisterMetaType<QnUserResourceList>();
+
     qRegisterMetaType<QnCameraHistoryList>();
 
     qRegisterMetaType<QnLicenseList>();
