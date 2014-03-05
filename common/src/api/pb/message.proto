@@ -138,12 +138,12 @@ message RuntimeInfoChangeMessage {
         required RuntimeInfoChangeMessage message = 109;
     }
 
-    optional string publicIp = 1;
-    optional string systemName = 2;
-    optional string sessionKey = 3;
+    optional string publicIp                    = 1;
+    optional string systemName                  = 2;
+    optional string sessionKey                  = 3;
     optional bool allowCameraChanges_deprecated = 4;
-    repeated string mainHardwareId = 3;
-    repeated string compatibleHardwareId = 4;
+    repeated string mainHardwareId              = 5;
+    repeated string compatibleHardwareId        = 6;
 }
 
 message BusinessRuleResetMessage {
