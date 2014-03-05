@@ -25,7 +25,7 @@ namespace ec2
     RemoteEC2Connection::~RemoteEC2Connection()
     {
         QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
-        QnTransactionMessageBus::instance()->removeHandler();
+        QnTransactionMessageBus::instance()->removeHandler(this);
     }
 
     QnConnectionInfo RemoteEC2Connection::connectionInfo() const

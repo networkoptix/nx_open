@@ -28,7 +28,7 @@ namespace ec2
 
     Ec2DirectConnection::~Ec2DirectConnection()
     {
-        QnTransactionMessageBus::instance()->removeHandler();
+        QnTransactionMessageBus::instance()->removeHandler(this);
     }
 
     QnConnectionInfo Ec2DirectConnection::connectionInfo() const

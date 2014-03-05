@@ -478,6 +478,12 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
 {
     QMutexLocker lock(&m_mutex);
     m_removeUrls.remove(url);
+    QString urlStr = getUrlAddr(url);
+    foreach(QnTransactionTransportPtr transport, m_connections.values())
+    {
+        if (getUrlAddr(transport->remoteAddr()) == urlStr)
+            transport->setState(QnTransactionTransport::Error);
+    }
     /*
     QSharedPointer<QnTransactionTransport> transport = m_remoteUrls.value(url);
     if (transport)

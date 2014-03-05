@@ -33,9 +33,13 @@ namespace ec2
             m_handler = new CustomHandler<T>(handler); 
         }
 
-        void removeHandler() { 
+        template <class T>
+        void removeHandler(T* handler) { 
             QMutexLocker lock(&m_mutex);
-            m_handler = 0;
+            if (m_handler->getHandler() == handler) {
+                delete m_handler;
+                m_handler = 0;
+            }
         }
 
         template <class T>
@@ -68,6 +72,7 @@ signals:
         {
         public:
             virtual bool processByteArray(QnTransactionTransport* sender, const QByteArray& data) = 0;
+            virtual void* getHandler() const = 0;
             virtual ~AbstractHandler() {}
         };
 
@@ -78,6 +83,7 @@ signals:
             CustomHandler(T* handler): m_handler(handler) {}
 
             virtual bool processByteArray(QnTransactionTransport* sender, const QByteArray& data) override;
+            virtual void* getHandler() const override { return m_handler; }
         private:
             template <class T2> bool deliveryTransaction(const QnAbstractTransaction&  abstractTran, InputBinaryStream<QByteArray>& stream);
         private:
