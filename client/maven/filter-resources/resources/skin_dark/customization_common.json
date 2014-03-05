@@ -160,7 +160,7 @@
             "histogram": "#c0c0c0ff",
             "selection": "selection",
             "grid": "#00800080",
-            "text": "#ffffffff",
+            "text": "#ffffffff"
         }
     }
 }

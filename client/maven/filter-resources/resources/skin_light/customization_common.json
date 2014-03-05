@@ -428,12 +428,12 @@
     
     "QnHistogramWidget": {
         "colors": {
-            "background": "#000000ff",
-            "border": "#606060ff",
-            "histogram": "#c0c0c0ff",
+            "background": "#ffffffff",
+            "border": "#a0a0a0ff",
+            "histogram": "#404040ff",
             "selection": "selection",
             "grid": "#00800080",
-            "text": "#ffffffff",
+            "text": "#000000ff"
         }
     }
 
