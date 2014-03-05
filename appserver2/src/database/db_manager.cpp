@@ -919,7 +919,8 @@ ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 id)
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
     }
-    query.next();
+    if( !query.next() )
+        return ErrorCode::ok;   //already deleted
     if (query.value("cnt").toInt() > 1)
         return ErrorCode::ok; // camera instance on a other media server still present
 
@@ -1089,7 +1090,8 @@ ErrorCode QnDbManager::removeResource(const QnId& id)
     query.bindValue(":guid", id.toRfc4122());
     if (!query.exec())
         return ErrorCode::failure;
-    query.next();
+    if( !query.next() )
+        return ErrorCode::ok;   //Record already deleted. That's exactly what we wanted
     QString objectType = query.value("name").toString();
     ErrorCode result;
     if (objectType == "Camera")
