@@ -105,16 +105,16 @@ bool QnDesktopResource::isRendererSlow() const
 
 void QnDesktopResource::addConnection(QnMediaServerResourcePtr mServer)
 {
-    if (m_connectionPool.contains(mServer->getGuid()))
+    if (m_connectionPool.contains(mServer->getGuid().toString()))
         return;
     QnDesktopCameraConnectionPtr connection = QnDesktopCameraConnectionPtr(new QnDesktopCameraConnection(this, mServer));
-    m_connectionPool[mServer->getGuid()] = connection;
+    m_connectionPool[mServer->getGuid().toString()] = connection;
     connection->start();
 }
 
 void QnDesktopResource::removeConnection(QnMediaServerResourcePtr mServer)
 {
-    m_connectionPool.remove(mServer->getGuid());
+    m_connectionPool.remove(mServer->getGuid().toString());
 }
 
 static std::shared_ptr<QnEmptyResourceAudioLayout> emptyAudioLayout( new QnEmptyResourceAudioLayout() );

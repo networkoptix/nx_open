@@ -635,33 +635,38 @@ ErrorCode QnDbManager::insertBRuleResource(const QString& tableName, const QnId&
     }
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiBusinessRuleData>& tran)
+ErrorCode QnDbManager::updateBusinessRule(const ApiBusinessRuleData& rule)
 {
-    ErrorCode rez = insertOrReplaceBusinessRuleTable(tran.params);
+    ErrorCode rez = insertOrReplaceBusinessRuleTable(rule);
     if (rez != ErrorCode::ok)
         return rez;
 
-    ErrorCode err = deleteTableRecord(tran.params.id, "vms_businessrule_action_resources", "businessrule_guid");
+    ErrorCode err = deleteTableRecord(rule.id, "vms_businessrule_action_resources", "businessrule_guid");
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteTableRecord(tran.params.id, "vms_businessrule_event_resources", "businessrule_guid");
+    err = deleteTableRecord(rule.id, "vms_businessrule_event_resources", "businessrule_guid");
     if (err != ErrorCode::ok)
         return err;
 
-    foreach(const QnId& resourceId, tran.params.eventResource) {
-        err = insertBRuleResource("vms_businessrule_event_resources", tran.params.id, resourceId);
+    foreach(const QnId& resourceId, rule.eventResource) {
+        err = insertBRuleResource("vms_businessrule_event_resources", rule.id, resourceId);
         if (err != ErrorCode::ok)
             return err;
     }
 
-    foreach(const QnId& resourceId, tran.params.actionResource) {
-        err = insertBRuleResource("vms_businessrule_action_resources", tran.params.id, resourceId);
+    foreach(const QnId& resourceId, rule.actionResource) {
+        err = insertBRuleResource("vms_businessrule_action_resources", rule.id, resourceId);
         if (err != ErrorCode::ok)
             return err;
     }
 
     return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiBusinessRuleData>& tran)
+{
+    return updateBusinessRule(tran.params);
 }
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiMediaServerData>& tran)
@@ -1494,6 +1499,26 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullData& data)
 
     return err;
 }
+
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran)
+{
+    if (!execSQLQuery("DELETE FROM vms_businessrule_action_resources"))
+        return ErrorCode::failure;
+    if (!execSQLQuery("DELETE FROM vms_businessrule_event_resources"))
+        return ErrorCode::failure;
+    if (!execSQLQuery("DELETE FROM vms_businessrule"))
+        return ErrorCode::failure;
+
+    foreach (const ApiBusinessRuleData& rule, tran.params.defaultRules.data)
+    {
+        ErrorCode rez = updateBusinessRule(rule);
+        if (rez != ErrorCode::ok)
+            return rez;
+    }
+
+    return ErrorCode::ok;
+}
+
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicenseList>& tran)
 {

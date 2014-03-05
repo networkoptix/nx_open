@@ -159,7 +159,7 @@ bool QnLayoutExportTool::start() {
     delete device;
 
     device = m_storage->open(QLatin1String("uuid.bin"), QIODevice::WriteOnly);
-    device->write(m_layout->getGuid().toUtf8());
+    device->write(m_layout->getGuid().toByteArray());
     delete device;
 
     foreach (const QnMediaResourcePtr resource, m_resources) {

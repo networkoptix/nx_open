@@ -29,7 +29,7 @@ int QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandlerPt
     auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiBusinessRuleDataList& rules) {
         QnBusinessEventRuleList outData;
         if( errorCode == ErrorCode::ok )
-            rules.toResourceList(outData, m_resCtx.pool);
+            outData = rules.toResourceList(m_resCtx.pool);
         handler->done( reqID, errorCode, outData);
     };
     m_queryProcessor->processQueryAsync<nullptr_t, ApiBusinessRuleDataList, decltype(queryDoneHandler)> ( ApiCommand::getBusinessRuleList, nullptr, queryDoneHandler);
@@ -87,8 +87,14 @@ int QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusiness
 template<class T>
 int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handler )
 {
-    //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
-    return INVALID_REQ_ID;
+    const int reqID = generateRequestID();
+    QnTransaction<ApiResetBusinessRuleData> tran(ApiCommand::resetBusinessRules, true);
+    tran.params.defaultRules.fromResourceList(QnBusinessEventRule::getDefaultRules());
+
+    using namespace std::placeholders;
+    m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+
+    return reqID;
 }
 
 template<class T>

@@ -49,6 +49,13 @@ namespace ec2
             emit addedOrUpdated( businessRule );
         }
 
+        template<> void triggerNotification<ApiResetBusinessRuleData>( const QnTransaction<ApiResetBusinessRuleData>& tran )
+        {
+            assert( tran.command == ApiCommand::resetBusinessRules);
+            emit businessRuleReset( tran.params.defaultRules.toResourceList(m_resCtx.pool) );
+        }
+        
+
     private:
         QueryProcessorType* const m_queryProcessor;
         ResourceContext m_resCtx;

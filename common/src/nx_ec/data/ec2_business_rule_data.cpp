@@ -65,14 +65,25 @@ void ApiBusinessRuleData::fromResource(const QnBusinessEventRulePtr& resource)
     system = resource->system();
 }
 
-void ApiBusinessRuleDataList::toResourceList(QnBusinessEventRuleList& outData, QnResourcePool* resourcePool) const
+QnBusinessEventRuleList ApiBusinessRuleDataList::toResourceList(QnResourcePool* resourcePool) const
 {
+    QnBusinessEventRuleList outData;
     outData.reserve(outData.size() + data.size());
     for(int i = 0; i < data.size(); ++i) 
     {
         QnBusinessEventRulePtr rule(new QnBusinessEventRule());
         data[i].toResource(rule, resourcePool);
         outData << rule;
+    }
+    return outData;
+}
+
+void ApiBusinessRuleDataList::fromResourceList(const QnBusinessEventRuleList& inData)
+{
+    data.resize(inData.size());
+    foreach(const QnBusinessEventRulePtr& bRule, inData) {
+        data.push_back(ApiBusinessRuleData());
+        data.back().fromResource(bRule);
     }
 }
 

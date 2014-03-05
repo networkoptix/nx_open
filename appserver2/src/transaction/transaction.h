@@ -71,6 +71,9 @@ namespace ec2
             //!ApiBusinessActionData
             broadcastBusinessAction,
 
+            //!ApiResetBusinessRuleData
+            resetBusinessRules,
+
             //!ApiLayoutData
             saveLayouts,
             //!ApiLayoutDataList

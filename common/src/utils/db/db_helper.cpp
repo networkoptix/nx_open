@@ -83,6 +83,13 @@ QList<QByteArray> quotedSplit(const QByteArray& data)
     return result;
 }
 
+bool QnDbHelper::execSQLQuery(const QString& queryStr)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare(queryStr);
+    return query.exec(queryStr);
+}
+
 bool QnDbHelper::execSQLFile(const QString& fileName)
 {
     QFile file(fileName);

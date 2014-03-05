@@ -12,6 +12,7 @@ public:
     QnDbHelper();
 protected:
     bool execSQLFile(const QString& fileName);
+    bool execSQLQuery(const QString& query);
 protected:
     class QnDbTransactionLocker;
 
