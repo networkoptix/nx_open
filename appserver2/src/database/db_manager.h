@@ -19,7 +19,6 @@
 
 namespace ec2
 {
-    class StoredFileManagerImpl;
     class LicenseManagerImpl;
 
     class QnDbManager: public QnDbHelper
@@ -27,7 +26,6 @@ namespace ec2
     public:
 		QnDbManager(
             QnResourceFactory* factory,
-            StoredFileManagerImpl* const storedFileManagerImpl,
             LicenseManagerImpl* const licenseManagerImpl,
             const QString& dbFileName );
 		virtual ~QnDbManager();

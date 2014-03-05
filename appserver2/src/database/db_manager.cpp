@@ -5,7 +5,6 @@
 
 #include "common/common_module.h"
 #include "managers/impl/license_manager_impl.h"
-#include "managers/impl/stored_file_manager_impl.h"
 #include "nx_ec/data/ec2_business_rule_data.h"
 
 
@@ -60,7 +59,6 @@ QnId QnDbManager::getType(const QString& typeName)
 
 QnDbManager::QnDbManager(
     QnResourceFactory* factory,
-    StoredFileManagerImpl* const storedFileManagerImpl,
     LicenseManagerImpl* const licenseManagerImpl,
     const QString& dbFilePath )
 :

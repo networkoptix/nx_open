@@ -12,7 +12,6 @@
 #include "database/db_manager.h"
 #include "server_query_processor.h"
 #include "managers/impl/license_manager_impl.h"
-#include "managers/impl/stored_file_manager_impl.h"
 
 
 namespace ec2
@@ -35,7 +34,6 @@ namespace ec2
         virtual void startReceivingNotifications( bool fullSyncRequired) override;
 
     private:
-        StoredFileManagerImpl m_storedFileManagerImpl;
         LicenseManagerImpl m_licenseManagerImpl;
 		std::unique_ptr<QnDbManager> m_dbManager;   //TODO: #ak not sure this is right place for QnDbManager instance
         std::unique_ptr<QnTransactionLog> m_transactionLog;
