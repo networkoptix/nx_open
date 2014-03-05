@@ -3,7 +3,7 @@
 RETVAL=0
 
 SERVICE_NAME=mediaserver
-CUSTOMIZATION=networkoptix
+CUSTOMIZATION=digitalwatchdog
 SERVICE_NAME=appserver
 PREFIX=/usr/local/apps/$CUSTOMIZATION/appserver/
 BIN_NAME=python2.7

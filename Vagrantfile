@@ -8,11 +8,11 @@ Vagrant.configure("2") do |config|
 
   config.vm.box = "precise32"
   config.vm.box_url = "http://noptix.enk.me/vagrant-boxes/precise32.box"
-  #config.vm.network :private_network, ip: "192.168.33.10"
-  config.vm.network :public_network
-  config.vm.provision :shell, :path => ".vagrant/bootstrap.sh"  
-  config.vm.network :forwarded_port, guest: 7011, host: 7011
-  config.ssh.private_key_path = "~/.ssh/id_rsa"
+  config.vm.network :private_network, ip: "192.168.33.10"
+ #config.vm.network :public_network
+  #config.vm.provision :shell, :path => ".vagrant/bootstrap.sh"  
+#config.vm.network :forwarded_port, guest: 7011, host: 7011
+#config.ssh.private_key_path = "~/.ssh/id_rsa"
   config.ssh.forward_agent = true
 
 #  config.vm.define :node1 do |node1|
@@ -67,8 +67,8 @@ Vagrant.configure("2") do |config|
     #vb.gui = true
     #vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     vb.customize ["modifyvm", :id, "--natnet1", "172.23.24/24"]
-    vb.customize ["modifyvm", :id, "--memory", "2048"]
-    vb.customize ["modifyvm", :id, "--cpus", "2"]
+    vb.customize ["modifyvm", :id, "--memory", "512"]
+    vb.customize ["modifyvm", :id, "--cpus", "1"]
     vb.customize ["modifyvm", :id, "--ioapic", "on"]
   end
   #

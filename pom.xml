@@ -59,6 +59,7 @@
         <customization>default</customization>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>        
+        <toolchain.version>none</toolchain.version>            
 
         <additional.defines/>
 
@@ -268,9 +269,6 @@
                 <module>applauncher</module> 
                 <module>client</module>		
             </modules>	
-            <properties>
-                <toolchain.version>none</toolchain.version>            
-            </properties>
         </profile>         
         <profile>
             <id>windows</id>
@@ -362,7 +360,7 @@
         </profile>        
 
         <profile>
-            <id>linux-arm</id>
+            <id>linux-arm-isd</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -370,8 +368,8 @@
                     <name>linux</name>
                 </os> 
                 <property>
-                    <name>arch</name>
-                    <value>arm</value>
+                    <name>box</name>
+                    <value>isd</value>
                 </property>
             </activation>
             <properties>
@@ -386,6 +384,30 @@
                 <module>plugins/isd_native_plugin</module>
             </modules>
         </profile>	
+
+        <profile>
+            <id>linux-arm-rpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>rpi</value>
+                </property>
+            </activation>
+            <properties>
+                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
+                <toolchain.version>rpi</toolchain.version>
+                <compiler>${toolchain.version}</compiler>
+                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
+                <additional.defines>DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA</additional.defines>
+            </properties>
+        </profile>
+
         <profile>
             <id>linux-x64</id>
             <activation>
