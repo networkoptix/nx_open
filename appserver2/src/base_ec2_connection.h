@@ -67,6 +67,11 @@ namespace ec2
             static_assert( false, "Missing RemoteEC2Connection::processTransaction<> specification" );
         }
 
+        template<> void triggerNotification<ApiResetBusinessRuleData>( const QnTransaction<ApiResetBusinessRuleData>& tran ) {
+            m_businessEventManager->triggerNotification( tran );
+        }
+
+
         template<> void triggerNotification<ApiCameraData>( const QnTransaction<ApiCameraData>& tran ) {
             m_cameraManager->triggerNotification( tran );
         }
