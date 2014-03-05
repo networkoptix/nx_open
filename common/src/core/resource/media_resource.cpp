@@ -119,7 +119,7 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractSt
     }
 }
 
-void QnMediaResource::setCustomVideoLayout(QnConstCustomResourceVideoLayoutPtr newLayout)
+void QnMediaResource::setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLayout)
 {
     //if (!m_customVideoLayout)
         //m_customVideoLayout.reset( new QnCustomResourceVideoLayout(newLayout->size()) );
