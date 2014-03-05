@@ -134,6 +134,16 @@ QnPtzManageModelColors::QnPtzManageModelColors() {
     warning = QColor(64, 64, 16);
 }
 
+QnHistogramColors::QnHistogramColors() {
+    background = Qt::darkGray;
+    border = Qt::white;
+    histogram = Qt::white;
+    selection = qnGlobals->selectionColor();
+    grid = QColor(0, 255, 0, 30);
+    text = Qt::white;
+}
+
+
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QnTimeSliderColors, 
     (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)
@@ -184,6 +194,9 @@ QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QJson::Optional
 )
 
-
-
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnHistogramColors, 
+    (background)(border)(histogram)(selection)(grid)(text), 
+    QJson::Optional
+)
 

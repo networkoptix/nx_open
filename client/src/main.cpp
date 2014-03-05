@@ -109,6 +109,9 @@ extern "C"
 #include "ui/dialogs/message_box.h"
 
 
+#ifdef Q_OS_MAC
+#include "ui/workaround/mac_utils.h"
+#endif
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -307,7 +310,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QString translationPath;
     QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
     bool skipMediaFolderScan = false;
+#ifdef Q_OS_MAC
+    bool noFullScreen = true;
+#else
     bool noFullScreen = false;
+#endif
     bool noVersionMismatchCheck = false;
     QString lightMode;
     bool noVSync = false;
@@ -661,6 +668,10 @@ int main(int argc, char **argv)
     QnSessionManager::instance();
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
+#ifdef Q_OS_MAC
+    mac_restoreFileAccess();
+#endif
+
     int result = runApplication(application.data(), argc, argv);
 
     delete QnResourcePool::instance();
@@ -668,6 +679,10 @@ int main(int argc, char **argv)
 
 #ifdef Q_OS_WIN
     QnDesktopResourceSearcher::initStaticInstance( NULL );
+#endif
+
+#ifdef Q_OS_MAC
+    mac_stopFileAccess();
 #endif
 
 //    qApp->processEvents(); //TODO: #Elric crashes
