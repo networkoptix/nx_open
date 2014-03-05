@@ -23,6 +23,8 @@
 #       include <shlwapi.h>
 #       include <Strsafe.h>
 #   endif
+#else
+#    include <arpa/inet.h>
 #endif
 
 
