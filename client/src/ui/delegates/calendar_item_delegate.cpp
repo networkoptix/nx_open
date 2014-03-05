@@ -71,6 +71,7 @@ void QnCalendarItemDelegate::paintCell(QPainter *painter, const QPalette &palett
 }
 
 void QnCalendarItemDelegate::paintCell(QPainter *painter, const QPalette &palette, const QRect &rect, bool isEnabled, bool isSelected, FillType primaryFill, FillType secondaryFill, const QString &text) const {
+    return;
     QnScopedPainterBrushRollback brushRollback(painter);
     QnScopedPainterPenRollback penRollback(painter);
     QnScopedPainterFontRollback fontRollback(painter);
