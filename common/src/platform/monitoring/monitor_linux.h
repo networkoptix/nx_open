@@ -13,6 +13,7 @@ public:
     QnLinuxMonitor(QObject *parent = NULL);
     virtual ~QnLinuxMonitor();
 
+    virtual QList<QnPlatformMonitor::NetworkLoad> totalNetworkLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
 
 private:

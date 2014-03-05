@@ -34,7 +34,7 @@ QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent, Qt::WindowFlags window
 QnAdjustVideoDialog::~QnAdjustVideoDialog() {
     if (m_widget) {
         m_widget->renderer()->disconnect(this);
-        m_widget->renderer()->setHystogramConsumer(0);
+        m_widget->renderer()->setHistogramConsumer(0);
     }
 }
 
@@ -43,12 +43,12 @@ void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
 {
     if (m_widget) {
         m_widget->renderer()->disconnect(this);
-        m_widget->renderer()->setHystogramConsumer(0);
+        m_widget->renderer()->setHistogramConsumer(0);
     }
     
     m_widget = widget;
     if (m_widget) {
-        m_widget->renderer()->setHystogramConsumer(histogramConsumer());
+        m_widget->renderer()->setHistogramConsumer(histogramConsumer());
         setParams(widget->imageEnhancement());
         m_widget->renderer()->disconnect(this);
         connect(m_widget->renderer(), SIGNAL(beforeDestroy()), this, SLOT(at_rendererDestryed()));

@@ -5,7 +5,6 @@
 
 #include <ui/graphics/items/generic/framed_widget.h>
 
-// TODO: #Elric widget, not item
 class QnControlBackgroundWidget: public QnFramedWidget {
     Q_OBJECT
     Q_PROPERTY(QVector<QColor> colors READ colors WRITE setColors)

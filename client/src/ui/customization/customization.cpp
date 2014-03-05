@@ -5,18 +5,17 @@
 
 namespace {
     QJsonObject mergeObjects(const QJsonObject &l, const QJsonObject &r) {
-        if(l.size() < r.size())
-            return mergeObjects(r, l); /* This will be faster. */
-
         if(r.isEmpty())
             return l;
 
         QJsonObject result = l;
 
         for(auto rPos = r.begin(); rPos != r.end(); rPos++) {
-            auto lPos = result.find(rPos.key());
+            const QString &key = rPos.key();
+
+            auto lPos = result.find(key);
             if(lPos == result.end()) {
-                result.insert(rPos.key(), rPos.value());
+                result.insert(key, rPos.value());
                 continue;
             }
 

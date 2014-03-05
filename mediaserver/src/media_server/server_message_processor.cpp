@@ -24,19 +24,19 @@ void QnServerMessageProcessor::updateResource(QnResourcePtr resource)
     if (!isServer && !isCamera && !isUser)
         return;
 
-    // If the resource is mediaServer then ignore if not this server
-    if (isServer && resource->getGuid() != serverGuid())
-        return;
-
     //storing all servers' cameras too
     // If camera from other server - marking it
     if (isCamera && resource->getParentId() != ownMediaServer->getId())
         resource->addFlags( QnResource::foreigner );
 
+    if (isServer && resource->getId() != ownMediaServer->getId())
+        resource->addFlags( QnResource::foreigner );
+
     bool needUpdateServer = false;
     // We are always online
-    if (isServer) {
+    if (isServer && resource->getGuid() == serverGuid()) {
         if (resource->getStatus() != QnResource::Online) {
+            qWarning() << "XYZ1: Received message that our status is " << resource->getStatus();
             resource->setStatus(QnResource::Online);
         }
     }
@@ -46,7 +46,7 @@ void QnServerMessageProcessor::updateResource(QnResourcePtr resource)
     else
         qnResPool->addResource(resource);
 
-    if (isServer)
+    if (isServer && resource->getGuid() == serverGuid())
         syncStoragesToSettings(ownMediaServer);
 
 }

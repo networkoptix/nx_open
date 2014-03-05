@@ -25,9 +25,6 @@
 
 namespace {
 
-    /** Flashing text flash interval. */
-    static const int testFlashingPeriodMSec = 1000;
-
     class QnLoadingProgressPainterFactory {
     public:
         QnLoadingProgressPainter *operator()(const QGLContext *context) {
@@ -40,6 +37,10 @@ namespace {
 
     Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_pausedPainterStorage);
 
+    const qreal staticFontSize = 50;
+
+    const int flashingPeriodMSec = 1000;
+
 } // anonymous namespace
 
 
@@ -51,7 +52,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     setAcceptedMouseButtons(0);
 
     /* Init static text. */
-    m_staticFont.setPointSizeF(100);
+    m_staticFont.setPointSizeF(staticFontSize);
     m_staticFont.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
 
     m_staticTexts[NoDataText] = tr("NO DATA");
@@ -226,9 +227,9 @@ void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, const QStaticTe
     QnScopedPainterTransformRollback transformRollback(painter);
 
     qreal opacity = painter->opacity();
-    painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(testFlashingPeriodMSec * 2) * M_PI)));
+    painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(flashingPeriodMSec * 2) * M_PI)));
     painter->translate(rect.center() + offset * unit);
-    painter->scale(textSize * unit / 100, textSize * unit / 100);
+    painter->scale(textSize * unit / staticFontSize, textSize * unit / staticFontSize);
 
     painter->drawStaticText(-toPoint(text.size() / 2), text);
     painter->setOpacity(opacity);

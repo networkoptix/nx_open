@@ -538,6 +538,10 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
         init();
 
 
+    if (hasFlags(foreigner)) {
+        qWarning() << "Status changed for foreign resource!";
+    }
+
     Q_ASSERT_X(!hasFlags(foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
 
     emit statusChanged(toSharedPointer(this));

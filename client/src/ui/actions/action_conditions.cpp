@@ -24,6 +24,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/dialogs/ptz_manage_dialog.h>
 
 #include "action_parameter_types.h"
 #include "action_manager.h"
@@ -544,6 +545,9 @@ Qn::ActionVisibility QnPtzActionCondition::check(const QnResourceList &resources
         if(!check(qnPtzPool->controller(resource)))
             return Qn::InvisibleAction;
 
+    if (m_disableIfPtzDialogVisible && QnPtzManageDialog::instance() && QnPtzManageDialog::instance()->isVisible())
+        return Qn::DisabledAction;
+
     return Qn::EnabledAction;
 }
 
@@ -556,6 +560,9 @@ Qn::ActionVisibility QnPtzActionCondition::check(const QnResourceWidgetList &wid
         if(!check(mediaWidget->ptzController()))
             return Qn::InvisibleAction;
     }
+
+    if (m_disableIfPtzDialogVisible && QnPtzManageDialog::instance() && QnPtzManageDialog::instance()->isVisible())
+        return Qn::DisabledAction;
 
     return Qn::EnabledAction;
 }

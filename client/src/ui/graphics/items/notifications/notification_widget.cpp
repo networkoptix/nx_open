@@ -213,6 +213,8 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem *parent, Qt::WindowFlag
     updateOverlayGeometry();
     updateOverlayVisibility(false);
     updateOverlayColor();
+
+    setCacheMode(QGraphicsItem::ItemCoordinateCache);
 }
 
 QnNotificationWidget::~QnNotificationWidget() {
@@ -305,7 +307,7 @@ void QnNotificationWidget::addActionButton(const QIcon &icon, const QString &too
 void QnNotificationWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     base_type::paint(painter, option, widget);
 
-    painter->setPen(QPen(QColor(110, 110, 110, 255), 0.5));
+    painter->setPen(QPen(frameBrush(), frameWidth(), frameStyle()));
     painter->setBrush(QBrush(toTransparent(m_color, 0.5)));
     painter->drawRect(QnGeometry::aligned(colorSignSize, rect(), Qt::AlignLeft | Qt::AlignVCenter));
 

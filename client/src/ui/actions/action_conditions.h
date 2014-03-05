@@ -415,9 +415,11 @@ public:
 
 class QnPtzActionCondition: public QnActionCondition {
 public:
-    QnPtzActionCondition(Qn::PtzCapabilities capabilities, QObject* parent = NULL):
+    QnPtzActionCondition(Qn::PtzCapabilities capabilities, bool disableIfPtzDialogVisible = false, QObject* parent = NULL):
         QnActionCondition(parent),
-        m_capabilities(capabilities) {}
+        m_capabilities(capabilities),
+        m_disableIfPtzDialogVisible(disableIfPtzDialogVisible)
+    {}
     
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
@@ -427,6 +429,7 @@ private:
 
 private:
     Qn::PtzCapabilities m_capabilities;
+    bool m_disableIfPtzDialogVisible;
 };
 
 #endif // QN_ACTION_CONDITIONS_H

@@ -238,15 +238,16 @@ namespace Qn {
      * Flags describing the client light mode.
      */
     enum LightModeFlag {
-        LightModeNoAnimation    = 0x01,
-        LightModeSmallWindow    = 0x02,
-        LightModeNoBackground   = 0x04,
-        LightModeNoOpacity      = 0x08,
-        LightModeNoNotifications= 0x10,
-        LightModeSingleItem     = 0x20,
-        LightModeNoShadows      = 0x40,
+        LightModeNoAnimation        = 0x01,
+        LightModeSmallWindow        = 0x02,
+        LightModeNoBackground       = 0x04,
+        LightModeNoOpacity          = 0x08,
+        LightModeNoNotifications    = 0x10,
+        LightModeSingleItem         = 0x20,
+        LightModeNoShadows          = 0x40,
+        LightModeNoMultisampling    = 0x80,
 
-        LightModeFull           = 0xFF
+        LightModeFull               = 0xFFFFFFFF
 
     };
     Q_DECLARE_FLAGS(LightModeFlags, LightModeFlag)

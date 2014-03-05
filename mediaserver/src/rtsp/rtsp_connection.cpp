@@ -118,6 +118,7 @@ public:
         prevEndTime(AV_NOPTS_VALUE),
         metadataChannelNum(7),
         audioEnabled(false),
+		wasDualStreaming(false),
         tcpMode(true),
         transcodedVideoSize(640, 480)
     {
@@ -194,6 +195,7 @@ public:
     qint64 prevEndTime;
     int metadataChannelNum;
     bool audioEnabled;
+	bool wasDualStreaming;
     bool tcpMode;
     QSize transcodedVideoSize;
 };
@@ -918,6 +920,10 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged()
             m_needStop = true;
             d->socket->close();
         }
+		if (cameraResource->hasDualStreaming2() != d->wasDualStreaming) {
+			m_needStop = true;
+			d->socket->close();
+		}
     }
 }
 
@@ -1005,6 +1011,9 @@ void QnRtspConnectionProcessor::checkQuality()
             qWarning() << "Primary stream has big fps for camera" << d->mediaRes->toResource()->getUniqueId() << ". Secondary stream is disabled.";
         }
     }
+	QnVirtualCameraResourcePtr cameraRes = d->mediaRes.dynamicCast<QnVirtualCameraResource>();
+	if (cameraRes)
+		d->wasDualStreaming = cameraRes->hasDualStreaming2();
 }
 
 void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayoutPtr videoLayout)

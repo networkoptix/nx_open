@@ -921,6 +921,10 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodContent type) {
         periods = loader->periods(type);
     }
 
+    bool isSearch = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>().step > 0;
+    bool isLocal = m_currentWidget && m_currentWidget->resource()->flags().testFlag(QnResource::local);
+
+    m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, !isSearch && !isLocal);
     m_timeSlider->setTimePeriods(CurrentLine, type, periods);
     if(m_calendar)
         m_calendar->setCurrentTimePeriods(type, periods);
@@ -958,6 +962,12 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent type) {
         }
     }
 
+    bool isSearch = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>().step > 0;
+    bool hasNonLocalResource = false;
+    foreach(const QnResourceWidget *widget, m_syncedWidgets)
+        hasNonLocalResource |= widget->resource() && !widget->resource()->flags().testFlag(QnResource::local);
+
+    m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, !isSearch && hasNonLocalResource);
     m_timeSlider->setTimePeriods(SyncedLine, type, periods);
     if(m_calendar)
         m_calendar->setSyncedTimePeriods(type, periods);

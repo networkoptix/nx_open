@@ -49,15 +49,15 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnTimestampsCheckboxControlDelegate
 // -------------------------------------------------------------------------- //
-class QnTimestampsCheckboxControlDelegate: public QnWidgetControlAbstractDelegate {
+class QnTimestampsCheckboxControlDelegate: public QnAbstractWidgetControlDelegate {
 public:
     QnTimestampsCheckboxControlDelegate(const QString &target, QObject *parent = NULL):
-        QnWidgetControlAbstractDelegate(parent),
+        QnAbstractWidgetControlDelegate(parent),
         m_target(target){ }
 
     ~QnTimestampsCheckboxControlDelegate() {}
 
-    void at_filterSelected(const QString &value) override {
+    void updateWidget(const QString &value) override {
         foreach(QWidget* widget, widgets())
             widget->setEnabled(value != m_target);
     }
@@ -250,7 +250,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         dialog->setFileMode(QFileDialog::AnyFile);
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
-        QnWidgetControlAbstractDelegate* delegate = NULL;
+        QnAbstractWidgetControlDelegate* delegate = NULL;
 #ifdef Q_OS_WIN
         delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
 #endif
@@ -261,8 +261,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         comboBox->addItem(tr("Bottom left corner (requires transcoding)"), Qn::BottomLeftCorner);
         comboBox->addItem(tr("Bottom right corner (requires transcoding)"), Qn::BottomRightCorner);
 
-        dialog->addWidget(new QLabel(tr("Timestamps:"), dialog.data()), true, delegate);
-        dialog->addWidget(comboBox, false, delegate);
+        dialog->addWidget(tr("Timestamps:"), comboBox, delegate);
 
 
         bool doTranscode = contrastParams.enabled || dewarpingParams.enabled;
@@ -527,7 +526,6 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
             ;
 
     while (true) {
-
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
             mainWindow(),
             dialogName,

@@ -4,6 +4,8 @@
 #include <client/client_color_types.h>
 #include <ui/graphics/items/standard/graphics_scroll_bar.h>
 
+class QnTimeScrollBarPrivate;
+
 class QnTimeScrollBar: public GraphicsScrollBar {
     Q_OBJECT
     Q_PROPERTY(QnTimeScrollBarColors colors READ colors WRITE setColors)
@@ -23,10 +25,16 @@ public:
 
 protected:
     virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
     QnTimeScrollBarColors m_colors;
     qint64 m_indicatorPosition;
+
+private:
+    Q_DECLARE_PRIVATE(QnTimeScrollBar)
 };
 
 

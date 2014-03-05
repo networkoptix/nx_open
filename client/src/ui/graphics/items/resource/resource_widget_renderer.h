@@ -92,7 +92,7 @@ public:
 
     virtual void setPaused(bool value) override;
     virtual void setScreenshotInterface(ScreenshotInterface* value) override;
-    void setHystogramConsumer(QnHistogramConsumer* value);
+    void setHistogramConsumer(QnHistogramConsumer* value);
 
 signals:
     /**

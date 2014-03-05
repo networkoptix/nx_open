@@ -111,7 +111,7 @@ void QnResourceSelectionDialog::init(SelectionTarget target) {
     if (target == CameraResourceTarget) {
         connect(ui->resourcesWidget->treeView(), SIGNAL(entered(QModelIndex)), this, SLOT(updateThumbnail(QModelIndex)));
         m_thumbnailManager = new QnCameraThumbnailManager(this);
-        m_thumbnailManager->setThumbnailSize(ui->screenshotLabel->size());
+        m_thumbnailManager->setThumbnailSize(ui->screenshotLabel->contentSize());
         connect(m_thumbnailManager, SIGNAL(thumbnailReady(QnId,QPixmap)), this, SLOT(at_thumbnailReady(int, QPixmap)));
         updateThumbnail(QModelIndex());
     }
