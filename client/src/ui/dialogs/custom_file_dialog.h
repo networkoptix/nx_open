@@ -14,40 +14,40 @@
 #endif
 
 #ifdef QN_TWO_STEP_DIALOG
-    #include <ui/dialogs/two_step_file_dialog.h>
-    typedef QnTwoStepFileDialog QnSystemBasedCustomDialog;
+#   include <ui/dialogs/two_step_file_dialog.h>
+
+typedef QnTwoStepFileDialog QnSystemBasedCustomDialog;
 
 #else
-    class QnSystemBasedCustomDialog: public QFileDialog {
-    public:
-        explicit QnSystemBasedCustomDialog(QWidget *parent = 0,
-                                           const QString &caption = QString(),
-                                           const QString &directory = QString(),
-                                           const QString &filter = QString()):
-            QFileDialog(parent, caption, directory, filter) {}
+class QnSystemBasedCustomDialog: public QFileDialog {
+public:
+    explicit QnSystemBasedCustomDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &directory = QString(), const QString &filter = QString()):
+        QFileDialog(parent, caption, directory, filter) 
+    {}
 
-        QString selectedFile() const {
-            QStringList files = selectedFiles();
-            if (files.size() < 0)
-                return QString();
-            return files.first();
-        }
+    QString selectedFile() const {
+        QStringList files = selectedFiles();
+        if (files.size() < 0)
+            return QString();
+        return files.first();
+    }
 
-        static QFileDialog::Options fileDialogOptions() { return QFileDialog::DontUseNativeDialog; }
-        static QFileDialog::Options directoryDialogOptions() {return QFileDialog::DontUseNativeDialog | QFileDialog::ShowDirsOnly; }
-    protected:
-        QGridLayout* customizedLayout() const {return dynamic_cast<QGridLayout*>(layout()); }
-    };
+    static QFileDialog::Options fileDialogOptions() { return QFileDialog::DontUseNativeDialog; }
+    static QFileDialog::Options directoryDialogOptions() {return QFileDialog::DontUseNativeDialog | QFileDialog::ShowDirsOnly; }
+
+protected:
+    QGridLayout *customizedLayout() const { return dynamic_cast<QGridLayout *>(layout()); }
+};
 #endif
 
 
-class QnWidgetControlAbstractDelegate: public QObject
+class QnAbstractWidgetControlDelegate: public QObject
 {
     Q_OBJECT
 
 public:
-    QnWidgetControlAbstractDelegate(QObject *parent = 0): QObject(parent) {}
-    ~QnWidgetControlAbstractDelegate() {}
+    QnAbstractWidgetControlDelegate(QObject *parent = 0): QObject(parent) {}
+    ~QnAbstractWidgetControlDelegate() {}
 
     QList<QWidget*> widgets() const {
         return m_widgets;
@@ -57,8 +57,7 @@ public:
         m_widgets << value;
     }
 
-public slots:
-    virtual void at_filterSelected(const QString &value) = 0;
+    virtual void updateWidget(const QString &value) = 0;
 
 private:
     QList<QWidget*> m_widgets;
@@ -68,12 +67,14 @@ private:
 class QnCustomFileDialog : public QnSystemBasedCustomDialog
 {
     Q_OBJECT
-
     typedef QnSystemBasedCustomDialog base_type;
 
 public:
-    explicit QnCustomFileDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &directory = QString(), const QString &filter = QString());
+    explicit QnCustomFileDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &directory = QString(),
+                                const QString &filter = QString(), const QStringList &extensions = QStringList());
     ~QnCustomFileDialog();
+
+    // TODO: #GDM what is the ownership semantics for delegate here? I believe it must be owned by this dialog when passed in a call.
 
     /**
      * @brief addCheckbox               Adds a checkbox to this file dialog.
@@ -85,8 +86,8 @@ public:
      *                                  It is the callee's responsibility to make sure
      *                                  that pointed-to value still exists at that point.
      * @param delegate                  Delegate that will control state of the checkbox.
-     */
-    void addCheckBox(const QString &text, bool *value, QnWidgetControlAbstractDelegate* delegate = NULL);
+     */ 
+    void addCheckBox(const QString &text, bool *value, QnAbstractWidgetControlDelegate* delegate = NULL);
 
     /**
      * @brief addSpinBox                Adds a spinbox to this file dialog.
@@ -109,20 +110,21 @@ public:
      * @brief addWidget                 Adds custom widget to this file dialog.
      * @param widget                    Pointer to the widget.
      */
-    void addWidget(QWidget *widget, bool newRow = true, QnWidgetControlAbstractDelegate* delegate = NULL);
+    void addWidget(const QString &label, QWidget *widget, QnAbstractWidgetControlDelegate *delegate = NULL);
 
     /** Returns extension of the selected filter, containing the dot, e.g. ".png". */
     QString selectedExtension() const;
 
     static QString valueSpacer() {return lit("%value%"); }
+
 private slots:
     void at_accepted();
 
 private:
-    QMap<QCheckBox*, bool *> m_checkBoxes;
-    QMap<QSpinBox*, int *> m_spinBoxes;
-    QMap<QLineEdit*, QString *> m_lineEdits;
-    int m_currentCol;
+    QMap<QCheckBox *, bool *> m_checkBoxes;
+    QMap<QSpinBox *, int *> m_spinBoxes;
+    QMap<QLineEdit *, QString *> m_lineEdits;
+    int m_currentColumn;
 };
 
 #endif // CUSTOM_FILE_DIALOG_H

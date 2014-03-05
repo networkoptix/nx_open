@@ -947,10 +947,6 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodContent type) {
         periods = loader->periods(type);
     }
 
-    bool isSearch = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>().step > 0;
-    bool isLocal = m_currentWidget && m_currentWidget->resource()->flags().testFlag(QnResource::local);
-
-    m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, !isSearch && !isLocal);
     m_timeSlider->setTimePeriods(CurrentLine, type, periods);
     if(m_calendar)
         m_calendar->setCurrentTimePeriods(type, periods);
@@ -988,12 +984,6 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent type) {
         }
     }
 
-    bool isSearch = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>().step > 0;
-    bool hasNonLocalResource = false;
-    foreach(const QnResourceWidget *widget, m_syncedWidgets)
-        hasNonLocalResource |= widget->resource() && !widget->resource()->flags().testFlag(QnResource::local);
-
-    m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, !isSearch && hasNonLocalResource);
     m_timeSlider->setTimePeriods(SyncedLine, type, periods);
     if(m_calendar)
         m_calendar->setSyncedTimePeriods(type, periods);
@@ -1013,6 +1003,29 @@ void QnWorkbenchNavigator::updateLines() {
     } else {
         m_timeSlider->setLineVisible(CurrentLine, false);
         m_timeSlider->setLineVisible(SyncedLine, false);
+    }
+
+    QnResourcePtr currentLayout = workbench()->currentLayout()->resource();
+    bool localLayout = currentLayout && currentLayout->flags().testFlag(QnResource::local);
+    if (localLayout) {
+        m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, false);
+        m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, false);
+    } else {
+        bool isSearch = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>().step > 0;
+        bool isLocal = m_currentWidget && m_currentWidget->resource()->flags().testFlag(QnResource::local);
+
+        bool hasNonLocalResource = !isLocal;
+        if (!hasNonLocalResource) {
+            foreach(const QnResourceWidget *widget, m_syncedWidgets) {
+                if (widget->resource() && !widget->resource()->flags().testFlag(QnResource::local)) {
+                    hasNonLocalResource = true;
+                    break;
+                }
+            }
+        }
+
+        m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, !isSearch && !isLocal);
+        m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, !isSearch && hasNonLocalResource);
     }
 }
 

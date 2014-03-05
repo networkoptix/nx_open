@@ -79,6 +79,7 @@
 #include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
 #include <ui/dialogs/message_box.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
@@ -1172,7 +1173,7 @@ void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
-    QString dirName = QFileDialog::getExistingDirectory(mainWindow(),
+    QString dirName = QnFileDialog::getExistingDirectory(mainWindow(),
                                                         tr("Select folder..."),
                                                         QString(),
                                                         QnCustomFileDialog::directoryDialogOptions());
@@ -2167,9 +2168,9 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
     if(!context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true))
         return;
 
-    qApp->exit(0);
-    applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
-}
+        qApp->exit(0);
+        applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
+    }
 
 QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog()
 {

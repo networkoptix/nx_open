@@ -542,7 +542,10 @@ QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
 }
 
 void QnResourceWidget::updateButtonsVisibility() {
-    m_buttonBar->setVisibleButtons(calculateButtonsVisibility());
+    m_buttonBar->setVisibleButtons(
+        calculateButtonsVisibility() & 
+        ~(item() ? item()->data<int>(Qn::ItemDisabledButtonsRole, 0): 0)
+    );
 }
 
 Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &region) const {

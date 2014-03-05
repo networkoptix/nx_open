@@ -1651,6 +1651,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         int checkedButtons = widget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
         if(checkedButtons != -1)
             widget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
+
+        if(thumbnailed)
+            widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(QnMediaResourceWidget::PtzButton));
     }
 
     QVector<QUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QUuid> >();

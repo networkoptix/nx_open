@@ -151,7 +151,42 @@
     
     "ZoomWindowInstrument": {
         "colors": ["#c02020", "#20c020", "#4040ff"]
+    },
+    
+    "QnHistogramWidget": {
+        "colors": {
+            "background": "#000000ff",
+            "border": "#606060ff",
+            "histogram": "#c0c0c0ff",
+            "selection": "selection",
+            "grid": "#00800080",
+            "text": "#ffffffff"
+        }
+    },
+    
+    "QnCalendarItemDelegate": {
+        "colors": {
+            "selection": "selection.withAlpha(192)",
+            "primaryRecording": "#208020ff",
+            "secondaryRecording": "#20ff20ff",
+            "primaryMotion": "#800000ff",
+            "secondaryMotion": "#ff0000ff",
+            "separator": "#000000ff"
+        }
+    },
+    
+    "QnCalendarWidget": {
+        "palette": { "default": {
+            "highlight": "#000000ff"
+        }}
+    },
+    
+    "QnDayTimeWidget": {
+        "palette": { "default": {
+            "highlight": "#000000ff"
+        }}
     }
+
 }
 
 

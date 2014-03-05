@@ -135,12 +135,12 @@ QnPtzManageModelColors::QnPtzManageModelColors() {
 }
 
 QnHistogramColors::QnHistogramColors() {
-    background = Qt::darkGray;
-    border = Qt::white;
-    histogram = Qt::white;
+    background = QColor(0, 0, 0);
+    border = QColor(96, 96, 96);
+    histogram = QColor(192, 192, 192);
     selection = qnGlobals->selectionColor();
-    grid = QColor(0, 255, 0, 30);
-    text = Qt::white;
+    grid = QColor(0, 128, 0, 128);
+    text = QColor(255, 255, 255);
 }
 
 

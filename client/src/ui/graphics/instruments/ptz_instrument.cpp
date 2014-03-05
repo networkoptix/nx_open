@@ -1021,15 +1021,16 @@ void PtzInstrument::finishDragProcess(DragInfo *info) {
         case ContinuousMovement:
             ptzMove(target(), QVector3D(0.0, 0.0, 0.0));
             break;
-        case PtzInstrument::ViewportMovement:
-            if(m_isClick && m_isDoubleClick) {
-                processPtzDoubleClick();
-            } else if(m_isClick) {
-                m_clickTimer.start(m_clickDelayMSec, this);
-                m_clickPos = info->mousePressItemPos();
+        case ViewportMovement:
+        case VirtualMovement:
+            if(m_isClick) {
+                if(m_isDoubleClick) {
+                    processPtzDoubleClick();
+                } else {
+                    m_clickTimer.start(m_clickDelayMSec, this);
+                    m_clickPos = info->mousePressItemPos();
+                }
             }
-            break;
-        case PtzInstrument::VirtualMovement:
             break;
         default:
             break;

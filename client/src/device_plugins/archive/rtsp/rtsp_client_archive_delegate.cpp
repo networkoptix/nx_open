@@ -279,8 +279,12 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
             m_customVideoLayout = QnCustomResourceVideoLayout::fromString(vLayout);
 
             QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource> (resource);
-            if (mediaRes)
-                mediaRes->setCustomVideoLayout(m_customVideoLayout);
+            if (mediaRes) {
+                // TODO: 
+                // #Elric we need to create another layout instance, but
+                // there is no need to reparse it!
+                mediaRes->setCustomVideoLayout(QnCustomResourceVideoLayout::fromString(vLayout));
+            }
         }
     }
 
