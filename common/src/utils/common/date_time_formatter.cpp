@@ -7,37 +7,6 @@
 
 /* Contents copied from Qt and modified for our needs. */
 
-extern QString qt_readEscapedFormatString(const QString &format, int *idx);
-
-static void getTimeFormatAPD(const QString &format, bool *containsAP, bool *containsD)
-{
-    *containsAP = *containsD = false;
-
-    int i = 0;
-    while (i < format.size()) {
-        if (format.at(i).unicode() == '\'') {
-            qt_readEscapedFormatString(format, &i);
-            continue;
-        }
-
-        if (format.at(i).toLower().unicode() == 'a') {
-            *containsAP = true;
-
-            if(*containsD)
-                return;
-        }
-
-        if (format.at(i).unicode() == 'd') {
-            *containsD = true;
-
-            if(*containsAP)
-                return;
-        }
-
-        ++i;
-    }
-}
-
 static QString qt_readEscapedFormatString(const QString &format, int *idx)
 {
     int &i = *idx;
@@ -70,6 +39,35 @@ static QString qt_readEscapedFormatString(const QString &format, int *idx)
         ++i;
 
     return result;
+}
+
+static void getTimeFormatAPD(const QString &format, bool *containsAP, bool *containsD)
+{
+    *containsAP = *containsD = false;
+
+    int i = 0;
+    while (i < format.size()) {
+        if (format.at(i).unicode() == '\'') {
+            qt_readEscapedFormatString(format, &i);
+            continue;
+        }
+
+        if (format.at(i).toLower().unicode() == 'a') {
+            *containsAP = true;
+
+            if(*containsD)
+                return;
+        }
+
+        if (format.at(i).unicode() == 'd') {
+            *containsD = true;
+
+            if(*containsAP)
+                return;
+        }
+
+        ++i;
+    }
 }
 
 static int qt_repeatCount(const QString &s, int i)
