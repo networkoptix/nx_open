@@ -22,7 +22,7 @@ class QnFramedLabel: public QLabel {
     typedef QLabel base_type;
 
 public:
-    explicit QnFramedLabel(QWidget* parent = 0);
+    explicit QnFramedLabel(QWidget *parent = NULL);
     virtual ~QnFramedLabel();
 
     /** 
@@ -41,7 +41,6 @@ protected:
 
 private:
     qreal m_opacity;
-    QColor m_frameColor;
 };
 
 #endif // FRAMED_LABEL_H

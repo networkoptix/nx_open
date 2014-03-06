@@ -28,7 +28,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/dialogs/layout_name_dialog.h> //TODO: #GDM VW refactor
-#include <ui/graphics/items/standard/graphics_message_box.h>
+#include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench.h>
@@ -104,6 +104,9 @@ namespace {
         }
     }
 #endif
+
+    const int identifyTimeout  = 5000;
+    const int identifyFontSize = 100;
 }
 
 QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
@@ -625,7 +628,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
 
         QnVideoWallItem data = videoWall->getItem(m_videoWallMode.instanceGuid);
         if (!data.name.isEmpty())
-            QnGraphicsMessageBox::identify(data.name);
+            QnGraphicsMessageBox::information(data.name, identifyTimeout, identifyFontSize);
         break;
     }
     default:
