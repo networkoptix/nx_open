@@ -60,7 +60,7 @@ namespace {
 
     QList<QString> initNetworkSuffixes() {
         QList<QString> result;
-        result << QObject::tr("b/s");
+        result << QObject::tr("b/s"); // TODO: #Elric #TR add propert context.
         result << QObject::tr("Kb/s");
         result << QObject::tr("Mb/s");
    //     result << QObject::tr("Gb/s");

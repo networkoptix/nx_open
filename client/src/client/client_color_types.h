@@ -72,7 +72,6 @@ struct QnStatisticsColors {
     QColor frame;
     QColor cpu;
     QColor ram;
-    QColor networkLimit;
     QVector<QColor> hdds;
     QVector<QColor> network;
 

@@ -68,7 +68,6 @@ QnStatisticsColors::QnStatisticsColors() {
     frame = QColor(66, 140, 237);
     cpu = QColor(66, 140, 237);
     ram = QColor(219, 59, 169);
-    networkLimit = QColor(Qt::white);
     
     hdds 
         << QColor(237, 237, 237)   // C: sda
@@ -97,12 +96,14 @@ QColor QnStatisticsColors::hddByKey(const QString &key) const {
 
     int id = 0;
     if (key.contains(QLatin1Char(':'))) {
-        // cutting keys like 'C:' to 'C'. Also works with complex keys such as 'C: E:'
+        /* Cutting keys like 'C:' to 'C'. Also works with complex keys such as 'C: E:'. */
         id = key.at(0).toLatin1() - 'C';
     } else if (key.startsWith(QLatin1String("sd"))) {
         id = asciisum(key) - sda;
     } else if (key.startsWith(QLatin1String("hd"))) {
         id = asciisum(key) - hda;
+    } else {
+        id = asciisum(key);
     }
     return hdds[qMod(id, hdds.size())];
 }
@@ -172,7 +173,7 @@ QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
 
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QnStatisticsColors, 
-    (grid)(frame)(cpu)(ram)(hdds), 
+    (grid)(frame)(cpu)(ram)(hdds)(network), 
     QJson::Optional
 )
 
