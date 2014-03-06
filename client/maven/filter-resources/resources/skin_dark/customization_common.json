@@ -85,6 +85,10 @@
         }
     },
     
+    "QnNavigationItem": {
+		"palette": { "default": { "window": "#000000" } }
+	},
+
     "QnTimeSlider": {
         "colors": {
             "_": "Time slider colors.",
@@ -109,6 +113,14 @@
             
             "dateOverlay": "QColor(255, 255, 255, 48)",
             "dateOverlayAlternate": "selection.setAlpha(48)"
+        }
+    },
+    
+    "QnTimeScrollBar": {
+        "colors": {
+            "indicator": "#ffffffff",
+            "border": "#ffffff40",
+            "handle": "#ffffff30"
         }
     },
     
