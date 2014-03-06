@@ -189,7 +189,7 @@
     
     "QnCalendarItemDelegate": {
         "colors": {
-            "selection": "selection.withAlpha(192)",
+            "selection": "selection.setAlpha(192)",
             "primaryRecording": "#208020ff",
             "secondaryRecording": "#20ff20ff",
             "primaryMotion": "#800000ff",
