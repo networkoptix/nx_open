@@ -361,6 +361,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         noSingleApplication = true;
         noFullScreen = true;
         noVersionMismatchCheck = true;
+        qnSettings->setLightModeOverride(Qn::LightModeVideoWall);
     }
 
     if (!lightMode.isEmpty()) {

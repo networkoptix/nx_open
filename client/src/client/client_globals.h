@@ -246,6 +246,7 @@ namespace Qn {
         LightModeNoShadows          = 0x40,
         LightModeNoMultisampling    = 0x80,
 
+        LightModeVideoWall          = LightModeNoBackground | LightModeNoNotifications | LightModeNoShadows | LightModeNoAnimation,
         LightModeFull               = 0xFFFFFFFF
 
     };
