@@ -50,7 +50,8 @@ namespace ec2
     };
 }
 
-QN_DEFINE_STRUCT_SERIALIZATORS( ec2::ApiLicense, (name)(key)(cameraCount)(hardwareID)(signature)(type)(xclass)(version)(brand)(expirationTime)(licenseBlock) )
+#define ApiLicenseFields (name)(key)(cameraCount)(hardwareID)(signature)(type)(xclass)(version)(brand)(expirationTime)(licenseBlock)
+QN_DEFINE_STRUCT_SERIALIZATORS( ec2::ApiLicense, ApiLicenseFields )
 QN_DEFINE_STRUCT_SERIALIZATORS( ec2::ApiLicenseList, (data) )
 
 #endif  //EC2_LICENSE_H

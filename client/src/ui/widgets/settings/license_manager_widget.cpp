@@ -160,7 +160,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
 
     QUrl url(QLatin1String(QN_LICENSE_URL));
     QNetworkRequest request;
-    //request.setUrl(url.toString());
+    request.setUrl(url.toString());
 
     QUrlQuery params;
     params.addQueryItem(QLatin1String("license_key"), QLatin1String(licenseKey));
@@ -302,7 +302,7 @@ void QnLicenseManagerWidget::at_downloadError() {
         reply->deleteLater();
 
         /* QNetworkReply slots should not start eventLoop */
-        emit showMessageLater(tr("License Activation"),
+        emit showMessageLater(tr("License Activation ") + reply->errorString(),
                               tr("Network error has occurred during automatic license activation.\nTry to activate your license manually."),
                               true);
 
