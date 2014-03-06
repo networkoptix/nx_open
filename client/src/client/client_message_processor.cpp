@@ -27,6 +27,7 @@ void QnClientMessageProcessor::init()
     QUrlQuery query;
     query.addQueryItem(QLatin1String("format"), QLatin1String("pb"));
     query.addQueryItem(QLatin1String("guid"), QnAppServerConnectionFactory::clientGuid());
+    query.addQueryItem(QLatin1String("ct"), QnAppServerConnectionFactory::clientType());
 
     appServerEventsUrl.setQuery(query);
 

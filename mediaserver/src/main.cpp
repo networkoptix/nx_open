@@ -563,6 +563,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
 {
     QUrl appServerEventsUrl;
 
+    //TODO: #GDM move to server_message_processor as in client
     // ### remove
     appServerEventsUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
     appServerEventsUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
@@ -575,6 +576,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     appServerEventsUrlQuery.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
     appServerEventsUrlQuery.addQueryItem("version", QN_ENGINE_VERSION);
     appServerEventsUrlQuery.addQueryItem("format", "pb");
+    appServerEventsUrlQuery.addQueryItem("ct", QnAppServerConnectionFactory::clientType());
     appServerEventsUrl.setQuery( appServerEventsUrlQuery );
 
     QnServerMessageProcessor::instance()->init(appServerEventsUrl, settings.value("authKey").toString());
