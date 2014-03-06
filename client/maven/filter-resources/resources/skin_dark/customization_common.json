@@ -140,15 +140,7 @@
             "handle": "#00000020"
         }
     },
-    
-    "QnTimeScrollBar": {
-        "colors": {
-            "indicator": "#ffffffff",
-            "border": "#ffffff40",
-            "handle": "#ffffff30"
-        }
-    },
-    
+
     "QnControlBackgroundWidget": {
         "_": "Background for ui panels (resource tree, title bar, notifications panel).",
         
@@ -188,9 +180,14 @@
             "ram": "#db3ba9",
             "hdds": ["#ededed","#edc842","#67ed42","#ff8330","#b200ff","#00ffff","#267f00","#ff7f7f","#c90000"],
             "network": ["#ff3434", "#f0ff34", "#8484ff", "#34ff84"]
+        },    
 		"palette": { "default": { "window": "black" } }
     },
     
+    "ZoomWindowInstrument": {
+        "colors": ["#c02020", "#20c020", "#4040ff"]
+    },
+
     "QnStatusOverlayWidget": {
         "palette": { "default": {
             "window": "#black",
@@ -201,24 +198,8 @@
             "frameColor": "#801010ff",
             "textColor": "#ffffffff"
         }
-    },    
+    },   
     
-    "ZoomWindowInstrument": {
-        "colors": ["#c02020", "#20c020", "#4040ff"]
-    },
-
-    "QnStatusOverlayWidget": {
-        "palette": { "default": {
-            "window": "#00000080",
-            "windowText": "#ffffffa0"
-        }},
-        "diagnosticsButton": {
-            "windowColor": "#ffffff80",
-            "frameColor": "#ffffffc0",
-            "textColor": "#ffffffff"
-        }
-    }
-
 	"QnStyledTooltipWidget": {
 		"windowColor": "QColor(0, 0, 0, 255)",
 		"frameColor": "QColor(203, 210, 233, 128)",
