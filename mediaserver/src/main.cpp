@@ -223,6 +223,7 @@ QHostAddress resolveHost(const QString& hostString)
 
 QString defaultLocalAddress(const QHostAddress& target)
 {
+    if (!target.isNull())
     {
         QUdpSocket socket;
         socket.connectToHost(target, 53);
@@ -551,15 +552,21 @@ int serverMain(int argc, char *argv[])
 void initAppServerConnection(const QSettings &settings)
 {
     QUrl appServerUrl;
-
+    
     // ### remove
-    appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
-    QString host = settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
-    int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
+    QString host = settings.value("appserverHost").toString();
+    if (QUrl(host).scheme() == "file")
+        appServerUrl = QUrl(host); // it is a completed URL
+    else if (host.isEmpty())
+        appServerUrl = QUrl(QString("file:///") + closeDirPath(getDataDirectory()));
+    else {
+        appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
+        int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
+        appServerUrl.setHost(host);
+        appServerUrl.setPort(port);
+    }
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
     QString password = settings.value("appserverPassword", QLatin1String("123")).toString();
-    appServerUrl.setHost(host);
-    appServerUrl.setPort(port);
     appServerUrl.setUserName(userName);
     appServerUrl.setPassword(password);
 
@@ -1060,9 +1067,7 @@ void QnMain::run()
     QnConnectionInfoPtr connectInfo(new QnConnectionInfo());
     while (!needToStop())
     {
-        QString dbFilePath = MSSettings::roSettings()->value( "eventsDBFilePath", closeDirPath(getDataDirectory())).toString();
-        QString urlString = QString("file:///%1").arg(dbFilePath);
-        const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QUrl(urlString), &ec2Connection );
+        const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QnAppServerConnectionFactory::defaultUrl(), &ec2Connection );
         if( errorCode == ec2::ErrorCode::ok )
         {
             *connectInfo = ec2Connection->connectionInfo();
@@ -1147,14 +1152,6 @@ void QnMain::run()
 
     QnResourcePool::instance(); // to initialize net state;
 
-    QString appserverHostString = MSSettings::roSettings()->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString();
-
-    QHostAddress appserverHost;
-    do
-    {
-        appserverHost = resolveHost(appserverHostString);
-    } while (appserverHost.toIPv4Address() == 0);
-
     QnRestProcessorPool restProcessorPool;
     QnRestProcessorPool::initStaticInstance( &restProcessorPool );
 
@@ -1185,6 +1182,15 @@ void QnMain::run()
         }
         server->setVersion(QnSoftwareVersion(QN_ENGINE_VERSION));
 
+        QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
+        bool isLocal = appserverHostString.isEmpty() || QUrl(appserverHostString).scheme() == "file";
+        QHostAddress appserverHost;
+        if (!isLocal) {
+            do
+            {
+                appserverHost = resolveHost(appserverHostString);
+            } while (appserverHost.toIPv4Address() == 0);
+        }
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost), m_universalTcpListener->getPort());
 
         QList<QHostAddress> serverIfaceList = allLocalAddresses();
@@ -1271,7 +1277,11 @@ void QnMain::run()
         this,
         SLOT(at_peerLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
         Qt::DirectConnection );
-    m_moduleFinder->start();
+    QUrl url = ec2Connection->connectionInfo().ecUrl;
+    if (url.scheme() == "file") {
+        // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
+        m_moduleFinder->start();
+    }
 
     // ------------------------------------------
 
@@ -1495,16 +1505,6 @@ protected:
         bool primaryGuidAbsent = MSSettings::roSettings()->value(lit("serverGuid")).isNull();
         if (primaryGuidAbsent)
             MSSettings::roSettings()->setValue("separateGuidForRemoteEC", 1);
-
-        QString ECHost = resolveHost(MSSettings::roSettings()->value("appserverHost").toString()).toString();
-        bool isLocalAddr = (ECHost == lit("127.0.0.1") || ECHost == lit("localhost"));
-        foreach(const QHostAddress& addr, allLocalAddresses())
-        {
-            if (addr.toString() == ECHost)
-                isLocalAddr = true;
-        }
-        if (!isLocalAddr && MSSettings::roSettings()->value("separateGuidForRemoteEC").toBool())
-            setUseAlternativeGuid(true);
 
         QString guid = serverGuid();
         if (guid.isEmpty())

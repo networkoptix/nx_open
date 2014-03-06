@@ -44,7 +44,7 @@ namespace ec2
         ResourceContext m_resCtx;
         //std::map<QUrl, AbstractECConnectionPtr> m_urlToConnection;
 
-        int establishDirectConnection(const QString& dbFileName, impl::ConnectHandlerPtr handler);
+        int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);
         int establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler );
         //!Called on client side after receiving connection response from remote server
         void remoteConnectionFinished(
