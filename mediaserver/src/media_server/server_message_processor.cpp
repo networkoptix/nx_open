@@ -71,9 +71,13 @@ void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection.get(), &ec2::AbstractECConnection::removePeerLost, this, &QnServerMessageProcessor::at_removePeerLost );
 }
 
+/*
+* EC2 related processing. Need move to other class
+*/
+
 void QnServerMessageProcessor::at_removePeerFound(QnId id)
 {
-    QnResourcePtr res = qnResPool->getResourceById(id);
+    QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::AllResources);
     if (res)
         res->setStatus(QnResource::Online);
 
@@ -81,7 +85,10 @@ void QnServerMessageProcessor::at_removePeerFound(QnId id)
 
 void QnServerMessageProcessor::at_removePeerLost(QnId id)
 {
-    QnResourcePtr res = qnResPool->getResourceById(id);
-    if (res)
+    QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::AllResources);
+    if (res) {
         res->setStatus(QnResource::Offline);
+        foreach(QnResourcePtr camera, qnResPool->getAllEnabledCameras(res, QnResourcePool::AllResources))
+            camera->setStatus(QnResource::Offline);
+    }
 }

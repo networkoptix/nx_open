@@ -150,7 +150,7 @@ QnPtzControllerPtr QnPtzControllerPool::createController(const QnResourcePtr &) 
 
 void QnPtzControllerPool::updateController(const QnResourcePtr &resource) {
     bool isMediaServer = (resource.dynamicCast<QnMediaServerResource>() != 0);
-    Q_ASSERT(!isMediaServer);
+    //Q_ASSERT(!isMediaServer);
     if (isMediaServer) {
         qWarning() << "QnPtzControllerPool::updateController(): called for mediaserver resource";
     }

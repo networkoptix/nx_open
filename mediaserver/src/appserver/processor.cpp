@@ -108,7 +108,7 @@ bool QnAppserverResourceProcessor::isSetStatusInProgress(const QnResourcePtr &re
 
 void QnAppserverResourceProcessor::at_resource_statusChanged(const QnResourcePtr &resource)
 {
-    Q_ASSERT_X(!resource->hasFlags(QnResource::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
+    //Q_ASSERT_X(!resource->hasFlags(QnResource::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
 
     if (!isSetStatusInProgress(resource))
         updateResourceStatusAsync(resource);
