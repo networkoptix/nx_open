@@ -74,9 +74,6 @@ struct QnStatisticsColors {
     QColor ram;
     QVector<QColor> hdds;
     QVector<QColor> network;
-
-    QColor hddByKey(const QString &key) const;
-    QColor networkByKey(const QString &key) const;
 };
 
 struct QnScheduleGridColors {

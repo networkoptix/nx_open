@@ -6,17 +6,6 @@
 #include <utils/common/json.h>
 #include <utils/math/math.h>
 
-namespace {
-    int asciisum(const QString &value) {
-        int result = 0;
-        foreach (QChar c, value)
-            result += c.toLatin1();
-        return result;
-    }
-
-} // anonymous namespace
-
-
 QnTimeSliderColors::QnTimeSliderColors() {
     tickmark = QColor(255, 255, 255, 255);
     positionMarker = QColor(255, 255, 255, 196);
@@ -85,35 +74,6 @@ QnStatisticsColors::QnStatisticsColors() {
         << QColor(240, 255, 52)
         << QColor(228, 52, 255)
         << QColor(255, 52, 132);
-}
-
-QColor QnStatisticsColors::hddByKey(const QString &key) const {
-    static int sda = asciisum(QLatin1String("sda"));
-    static int hda = asciisum(QLatin1String("hda"));
-
-    if(hdds.isEmpty())
-        return QColor();
-
-    int id = 0;
-    if (key.contains(QLatin1Char(':'))) {
-        /* Cutting keys like 'C:' to 'C'. Also works with complex keys such as 'C: E:'. */
-        id = key.at(0).toLatin1() - 'C';
-    } else if (key.startsWith(QLatin1String("sd"))) {
-        id = asciisum(key) - sda;
-    } else if (key.startsWith(QLatin1String("hd"))) {
-        id = asciisum(key) - hda;
-    } else {
-        id = asciisum(key);
-    }
-    return hdds[qMod(id, hdds.size())];
-}
-
-QColor QnStatisticsColors::networkByKey(const QString &key) const {
-    if(network.isEmpty())
-        return QColor();
-
-    int id = asciisum(key);
-    return network[qMod(id, network.size())];
 }
 
 QnScheduleGridColors::QnScheduleGridColors() {

@@ -81,7 +81,7 @@ private:
 
     void updateLegend();
 
-    QColor deviceColor(QnStatisticsDeviceType deviceType, const QString &key) const;
+    QColor nextColor(QnStatisticsDeviceType deviceType);
 
 private:
     //TODO: #GDM move all required fields to inner class
@@ -110,7 +110,7 @@ private:
     /** Id of the our widget in the statistics manager. */
     int m_statisticsId;
 
-    /** Number of successfull responces received, required to smooth scroll. */
+    /** Number of successful responses received, required to smooth scroll. */
     int m_counter;
 
     /** Number of data points displayed simultaneously. */
@@ -139,6 +139,7 @@ private:
         int mask;
         bool visible;
         qreal opacity;
+        QColor color;
     };
 
     /** Which buttons are checked on each button bar */
@@ -147,6 +148,9 @@ private:
     QString m_hoveredKey;
 
     qreal m_infoOpacity;
+
+    int m_hddCount;
+    int m_networkCount;
 };
 
 Q_DECLARE_METATYPE(QnServerResourceWidget *)
