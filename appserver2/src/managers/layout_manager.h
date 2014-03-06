@@ -24,17 +24,13 @@ namespace ec2
         virtual int save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) override;
         virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) override;
 
-        template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
-            static_assert( false, "Specify QnLayoutManager::triggerNotification<>, please" );
-        }
-
-        template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran )
+        void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
             assert( tran.command == ApiCommand::removeLayout );
             emit removed( QnId(tran.params.id) );
         }
 
-        template<> void triggerNotification<ApiLayoutData>( const QnTransaction<ApiLayoutData>& tran )
+        void triggerNotification( const QnTransaction<ApiLayoutData>& tran )
         {
             assert( tran.command == ApiCommand::saveLayout);
             QnLayoutResourcePtr layoutResource = m_resCtx.resFactory->createResource(
@@ -44,7 +40,7 @@ namespace ec2
             emit addedOrUpdated( layoutResource );
         }
 
-        template<> void triggerNotification<ApiLayoutDataList>( const QnTransaction<ApiLayoutDataList>& tran )
+        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran )
         {
             assert(tran.command == ApiCommand::saveLayouts );
             foreach(const ApiLayoutData& layout, tran.params.data) 

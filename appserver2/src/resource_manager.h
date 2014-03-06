@@ -32,25 +32,21 @@ namespace ec2
         //!Implementation of AbstractResourceManager::remove
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
-        template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
-            static_assert( false, "Specify QnResourceManager::triggerNotification<>, please" );
-        }
-
-        template<> void triggerNotification<ApiResourceData>( const QnTransaction<ApiResourceData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiResourceData>& tran ) {
             QnResourcePtr resource( new QnResource() );
             tran.params.toResource( resource );
             emit resourceChanged( resource );
         }
 
-        template<> void triggerNotification<ApiSetResourceStatusData>( const QnTransaction<ApiSetResourceStatusData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiSetResourceStatusData>& tran ) {
             emit statusChanged( QnId(tran.params.id), tran.params.status );
         }
 
-        template<> void triggerNotification<ApiSetResourceDisabledData>( const QnTransaction<ApiSetResourceDisabledData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiSetResourceDisabledData>& tran ) {
             emit disabledChanged( QnId(tran.params.id), tran.params.disabled );
         }
 
-        template<> void triggerNotification<ApiResourceParams>( const QnTransaction<ApiResourceParams>& tran ) {
+        void triggerNotification( const QnTransaction<ApiResourceParams>& tran ) {
             QnKvPairList outData;
 
             for( const ApiResourceParam& param: tran.params.params )
@@ -58,7 +54,7 @@ namespace ec2
             emit resourceParamsChanged( tran.params.id, outData );
         }
 
-        template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiIdData>& tran ) {
             emit resourceRemoved( tran.params.id );
         }
 

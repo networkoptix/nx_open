@@ -24,7 +24,6 @@ struct QnConnectionInfo {
 
 Q_DECLARE_METATYPE( QnConnectionInfo );
 
-//TODO: #ak serialize version and compatibilityItems
 QN_DEFINE_STRUCT_SERIALIZATORS (QnConnectionInfo, (ecUrl) (version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand))
 
 // TODO: #Elric remove shared pointer?

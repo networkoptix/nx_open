@@ -6,6 +6,7 @@
 #include <vector>
 #include "nx_ec/binary_serialization_helper.h"
 #include "nx_ec/ec_api.h"
+#include "nx_ec/data/ec2_license.h"
 
 
 namespace ec2
@@ -147,7 +148,13 @@ namespace ec2
         static QAtomicInt m_localSequence;
         bool localTransaction; // do not propagate transactions to other server peers
     };
+}
 
+QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (sequence) )
+QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent) (timestamp))
+
+namespace ec2
+{
     template <class T>
     class QnTransaction: public QnAbstractTransaction
     {
@@ -175,9 +182,5 @@ namespace ec2
 
     int generateRequestID();
 }
-
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (sequence) )
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent) (timestamp))
-
 
 #endif  //EC2_TRANSACTION_H

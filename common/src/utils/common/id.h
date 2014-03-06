@@ -5,6 +5,8 @@
 #include <QtCore/QMetaType>
 #include <QUuid>
 
+#include <utils/network/socket.h>
+
 typedef QUuid QnId;
 
 /*

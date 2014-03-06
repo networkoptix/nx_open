@@ -25,18 +25,14 @@ namespace ec2
         //!Implementation of QnMediaServerManager::remove
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
-        template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
-            static_assert( false, "Specify QnMediaServerManager::triggerNotification<>, please" );
-        }
-
-        template<> void triggerNotification<ApiMediaServerData>( const QnTransaction<ApiMediaServerData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiMediaServerData>& tran ) {
             assert( tran.command == ApiCommand::saveMediaServer);
             QnMediaServerResourcePtr mserverRes(new QnMediaServerResource(m_resCtx.resTypePool));
             tran.params.toResource( mserverRes, m_resCtx);
             emit addedOrUpdated( mserverRes );
         }
 
-        template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran )
+        void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
             assert( tran.command == ApiCommand::removeMediaServer );
             emit removed( QnId(tran.params.id) );

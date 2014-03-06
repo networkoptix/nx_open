@@ -4,7 +4,7 @@
 
 #include <functional>
 
-#include <QtCore/QObject.h>
+#include <QtCore/QObject>
 
 #include "ec_api.h"
 #include "impl/ec_api_impl.h"
