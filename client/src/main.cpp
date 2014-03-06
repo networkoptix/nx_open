@@ -108,7 +108,6 @@ extern "C"
 #include "core/ptz/client_ptz_controller_pool.h"
 #include "ui/dialogs/message_box.h"
 
-
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
 #endif

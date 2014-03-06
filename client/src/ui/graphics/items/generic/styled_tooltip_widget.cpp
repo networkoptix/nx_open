@@ -14,7 +14,6 @@ QnStyledTooltipWidget::QnStyledTooltipWidget(QGraphicsItem *parent):
     setContentsMargins(5.0, 5.0, 5.0, 5.0);
     setTailWidth(5.0);
 
-    // TODO: #Elric #customization
     setPaletteColor(this, QPalette::WindowText, QColor(63, 159, 216));
     setWindowBrush(QColor(0, 0, 0, 255));
     setFrameBrush(QColor(203, 210, 233, 128));

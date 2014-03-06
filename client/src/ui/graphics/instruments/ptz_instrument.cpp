@@ -673,11 +673,14 @@ void PtzInstrument::processPtzClick(const QPointF &pos) {
     if(!target() || m_skipNextAction)
         return;
 
-    QnSplashItem *splashItem = newSplashItem(target());
-    splashItem->setSplashType(QnSplashItem::Circular);
-    splashItem->setRect(QRectF(0.0, 0.0, 0.0, 0.0));
-    splashItem->setPos(pos);
-    m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
+    /* Don't animate for virtual cameras as it looks bad. */
+    if(m_movement != VirtualMovement) {
+        QnSplashItem *splashItem = newSplashItem(target());
+        splashItem->setSplashType(QnSplashItem::Circular);
+        splashItem->setRect(QRectF(0.0, 0.0, 0.0, 0.0));
+        splashItem->setPos(pos);
+        m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
+    }
 
     ptzMoveTo(target(), pos);
 }

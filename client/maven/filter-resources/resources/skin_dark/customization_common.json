@@ -98,10 +98,10 @@
         }
     },
     
-	"QnNavigationItem": {
+    "QnNavigationItem": {
 		"palette": { "default": { "window": "#000000" } }
 	},
-    
+
     "QnTimeSlider": {
         "colors": {
             "_": "Time slider colors.",
@@ -141,6 +141,14 @@
         }
     },
     
+    "QnTimeScrollBar": {
+        "colors": {
+            "indicator": "#ffffffff",
+            "border": "#ffffff40",
+            "handle": "#ffffff30"
+        }
+    },
+    
     "QnControlBackgroundWidget": {
         "_": "Background for ui panels (resource tree, title bar, notifications panel).",
         
@@ -168,18 +176,18 @@
         }
     },
     
-	"QnMediaResourceWidget": {
-		"palette": { "default": { "window": "black" } }
+    "QnMediaResourceWidget": {
+		"palette": { "default": { "window": "#000000ff" } }
 	},
-    
+
     "QnServerResourceWidget": {
         "colors": {
             "frame": "#428ced",
             "grid": "QColor(66, 140, 237, 100)",
             "cpu": "#428ced",
             "ram": "#db3ba9",
-            "hdds": ["#ededed","#edc842","#67ed42","#ff8330","#b200ff","#00ffff","#267f00","#ff7f7f","#c90000"]
-        },
+            "hdds": ["#ededed","#edc842","#67ed42","#ff8330","#b200ff","#00ffff","#267f00","#ff7f7f","#c90000"],
+            "network": ["#ff3434", "#f0ff34", "#8484ff", "#34ff84"]
 		"palette": { "default": { "window": "black" } }
     },
     
@@ -199,20 +207,32 @@
         "colors": ["#c02020", "#20c020", "#4040ff"]
     },
 
+    "QnStatusOverlayWidget": {
+        "palette": { "default": {
+            "window": "#00000080",
+            "windowText": "#ffffffa0"
+        }},
+        "diagnosticsButton": {
+            "windowColor": "#ffffff80",
+            "frameColor": "#ffffffc0",
+            "textColor": "#ffffffff"
+        }
+    }
+
 	"QnStyledTooltipWidget": {
-		"windowColor": "QColor(0, 0, 0, 192)",
-		"frameColor": "#808080",
-		"palette": { "default": { "windowText": "#FFFFFF" } }
+		"windowColor": "QColor(0, 0, 0, 255)",
+		"frameColor": "QColor(203, 210, 233, 128)",
+		"palette": { "default": { "windowText": "QColor(63, 159, 216)" } }
 	},
     
     "QnGridItem": {
         "colors": {
-            "grid": "darkGrey.setAlpha(64)",
-            "allowed": "#00ff00.setAlpha(64)",
-            "disallowed": "#ff0000.setAlpha(64)"
+            "grid": "QColor(0, 240, 240, 128)",
+            "allowed": "QColor(0, 255, 0, 64)",
+            "disallowed": "QColor(255, 0, 0, 64)"
         }
     },
- 	  
+
     "QnHistogramWidget": {
         "colors": {
             "background": "#000000ff",
@@ -226,7 +246,7 @@
     
     "QnCalendarItemDelegate": {
         "colors": {
-            "selection": "selection.withAlpha(192)",
+            "selection": "selection.setAlpha(192)",
             "primaryRecording": "#208020ff",
             "secondaryRecording": "#20ff20ff",
             "primaryMotion": "#800000ff",
@@ -245,6 +265,18 @@
         "palette": { "default": {
             "highlight": "#000000ff"
         }}
+    },
+    
+    "QnClockLabel": {
+        "palette": { "default": {
+            "windowText": "opaqueSelection.darker()"
+        }}
+    },
+    
+    "QnGraphicsMessageBox": {
+        "frameColor": "#505050ff",
+        "windowColor": "#202050ff",
+        "textColor": "#a0a0a0ff"
     }
 
 }

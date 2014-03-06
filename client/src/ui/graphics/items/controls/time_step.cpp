@@ -5,6 +5,7 @@
 #include <utils/common/warnings.h>
 #include <utils/math/math.h>
 #include <utils/common/time.h>
+#include <utils/common/date_time_formatter.h>
 
 namespace {
     QDateTime addHours(const QDateTime &dateTime, int hours) {
@@ -187,7 +188,7 @@ QString toShortString(qint64 msecs, const QnTimeStep &step) {
     case QnTimeStep::Hours:
         return QString::number(timeToMSecs(QDateTime::fromMSecsSinceEpoch(msecs).time()) / step.unitMSecs % step.wrapUnits) + step.format;
     default:
-        return QLocale().toString(QDateTime::fromMSecsSinceEpoch(msecs), step.format);
+        return QnDateTimeFormatter::dateTimeToString(step.format, QDateTime::fromMSecsSinceEpoch(msecs), QLocale());
     }
 }
 
@@ -297,7 +298,7 @@ QString toLongString(qint64 msecs, const QnTimeStep &step) {
     if(step.isRelative) {
         return QString();
     } else {
-        return QLocale().toString(QDateTime::fromMSecsSinceEpoch(msecs), step.longFormat);
+        return QnDateTimeFormatter::dateTimeToString(step.longFormat, QDateTime::fromMSecsSinceEpoch(msecs), QLocale());
     }
 }
 

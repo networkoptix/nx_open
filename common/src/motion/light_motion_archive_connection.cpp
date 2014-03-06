@@ -36,5 +36,9 @@ QnMetaDataV1Ptr QnLightMotionArchiveConnection::getMotionData(qint64 timeUsec)
     else {
         m_lastResult = QnMetaDataV1::fromLightData(*itr);
     }
+
+    if (!m_lastResult->containTime(timeUsec))
+        return QnMetaDataV1Ptr();
+
     return m_lastResult;
 }

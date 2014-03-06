@@ -81,11 +81,9 @@ public:
     QnCameraHistoryList cameraServerItems;
 
     QString systemName;
-    QByteArray oldHardwareId;
-    QByteArray hardwareId1;
-    QByteArray hardwareId2;
     QByteArray sessionKey;
-    QByteArray hardwareId3;
+    QList<QByteArray> mainHardwareIds;
+    QList<QByteArray> compatibleHardwareIds;
 
 
     QString filename;

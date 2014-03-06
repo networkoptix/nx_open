@@ -25,7 +25,7 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     m_mediaDewarpingParams(widget->dewarpingParams()),
     m_itemDewarpingParams(widget->item()->dewarpingParams())
 {
-    m_unitSpeed = QVector3D(60.0, 60.0, -30.0);
+    m_unitSpeed = QVector3D(60.0, 60.0, 30.0);
 
     m_widget = widget;
     m_widget->registerAnimation(this);
@@ -227,6 +227,7 @@ bool QnFisheyePtzController::getFlip(Qt::Orientations *flip) {
 
 bool QnFisheyePtzController::continuousMove(const QVector3D &speed) {
     m_speed = speed;
+    m_speed.setZ(-m_speed.z()); /* Positive speed means that fov should decrease. */
 
     if(qFuzzyIsNull(speed)) {
         stopListening();

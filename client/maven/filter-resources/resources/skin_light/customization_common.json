@@ -178,11 +178,16 @@
             "grid": "custom_blue.setAlpha(64)",
             "cpu": "#3776ca",
             "ram": "#db3ba9",
-            "hdds": ["#438231","#484848","#aa880b","#b25e26","#9200d1","#00d5d5","#267f00","#8f5656","#c90000"]
+            "hdds": ["#438231","#484848","#aa880b","#b25e26","#9200d1","#00d5d5","#267f00","#8f5656","#c90000"],
+            "network": ["#ff3434", "#f0ff34", "#8484ff", "#34ff84"]
         },
 		"palette": { "default": { "window": "#e6e6e6" } }
     },
     
+    "ZoomWindowInstrument": {
+        "colors": ["#c02020", "#20c020", "#4040ff"]
+    },
+
     "QnStatusOverlayWidget": {
         "palette": { "default": {
             "window": "#ffffff80",
@@ -195,10 +200,6 @@
         }
     },
     
-    "ZoomWindowInstrument": {
-        "colors": ["#c02020", "#20c020", "#4040ff"]
-    },
-	
 	"QnStyledTooltipWidget": {
 		"windowColor": "QColor(255, 255, 255, 192)",
 		"frameColor": "#808080",
@@ -245,6 +246,23 @@
         "palette": { "default": {
             "highlight": "#ffffffff"
         }}
+    },
+    
+    "QnClockLabel": {
+        "palette": { "default": {
+            "windowText": "opaqueSelection.darker()"
+        }}
+    },
+    
+    "QnGraphicsMessageBox": {
+        "frameColor": "#505050ff",
+        "windowColor": "#202050ff",
+        "textColor": "#a0a0a0ff"
     }
 
 }
+
+
+
+
+
