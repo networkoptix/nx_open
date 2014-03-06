@@ -75,12 +75,8 @@ void QnClientMessageProcessor::processLicenses(const QnLicenseList& licenses)
 
 void QnClientMessageProcessor::updateHardwareIds(const ec2::QnFullResourceData& fullData)
 {
-    // TODO: #EC2
-
-    /*qnLicensePool->setOldHardwareId(fullData.serverInfo.oldHardwareId);
-    qnLicensePool->setHardwareId1(fullData.serverInfo.hardwareId1);
-    qnLicensePool->setHardwareId2(fullData.serverInfo.hardwareId2);
-    qnLicensePool->setHardwareId3(fullData.serverInfo.hardwareId3);*/
+    qnLicensePool->setMainHardwareIds( QList<QByteArray>() << fullData.serverInfo.hardwareId1 << fullData.serverInfo.hardwareId2 << fullData.serverInfo.hardwareId3 );
+    //qnLicensePool->setCompatibleHardwareIds(  );
 }
 
 void QnClientMessageProcessor::processCameraServerItems(const QnCameraHistoryList& cameraHistoryList)
