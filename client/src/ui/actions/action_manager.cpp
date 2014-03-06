@@ -836,7 +836,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(hasFlags(QnResource::layout));
 
     factory(Qn::OpenVideoWallsReviewAction).
-       flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
+       flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
        text(tr("Open VideoWall(s)")).
        condition(hasFlags(QnResource::videowall));
 

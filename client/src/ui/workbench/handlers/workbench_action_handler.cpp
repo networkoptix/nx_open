@@ -1093,8 +1093,12 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
             }
         }
     }
+
     if(!layouts.empty())
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
+
+    if (!videowalls.empty())
+        menu()->trigger(Qn::OpenVideoWallsReviewAction, videowalls);
 }
 
 void QnWorkbenchActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
