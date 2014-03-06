@@ -28,8 +28,6 @@ namespace ec2
     class QnTransactionLog
     {
     public:
-
-
         QnTransactionLog(QnDbManager* db);
 
         static QnTransactionLog* instance();
