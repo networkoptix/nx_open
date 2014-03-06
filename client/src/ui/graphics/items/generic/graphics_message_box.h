@@ -8,6 +8,8 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/animation/animated.h>
 
+// TODO: #Elric rename, not standard item => no "graphics" prefix.
+
 const int defaultMessageTimeout = 3;
 
 class QnGraphicsMessageBoxItem: public GraphicsWidget
@@ -22,8 +24,10 @@ public:
 
     void addItem(QGraphicsLayoutItem* item);
     void removeItem(QGraphicsLayoutItem* item);
+
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
 private:
     QGraphicsLinearLayout *m_layout;
 };
@@ -40,6 +44,7 @@ public:
     static QnGraphicsMessageBox* information(const QString &text);
 
     int timeout() const;
+
 public slots:
     void hideImmideately();
 
