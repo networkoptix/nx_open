@@ -104,7 +104,7 @@ void QnCommonMessageProcessor::on_runtimeInfoChanged( const ec2::QnRuntimeInfo& 
 
 void QnCommonMessageProcessor::on_resourceStatusChanged( const QnId& resourceId, QnResource::Status status )
 {
-    QnResourcePtr resource = qnResPool->getResourceById(resourceId);
+    QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
     if (resource)
         onResourceStatusChanged(resource, status);
 }

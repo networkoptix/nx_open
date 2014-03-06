@@ -14,7 +14,7 @@ class QnServerMessageProcessor : public QnCommonMessageProcessor
 public:
     QnServerMessageProcessor();
 protected:
-    virtual void onResourceStatusChanged(QnResourcePtr , QnResource::Status ) override {}
+    virtual void onResourceStatusChanged(QnResourcePtr , QnResource::Status ) override;
     virtual void updateResource(QnResourcePtr resource) override;
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
     virtual void init(ec2::AbstractECConnectionPtr connection);

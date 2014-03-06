@@ -26,11 +26,12 @@ void QnServerMessageProcessor::updateResource(QnResourcePtr resource)
 
     //storing all servers' cameras too
     // If camera from other server - marking it
-    if (isCamera && resource->getParentId() != ownMediaServer->getId())
-        resource->addFlags( QnResource::foreigner );
+    
+    //if (isCamera && resource->getParentId() != ownMediaServer->getId())
+    //    resource->addFlags( QnResource::foreigner );
 
-    if (isServer && resource->getId() != ownMediaServer->getId())
-        resource->addFlags( QnResource::foreigner );
+    //if (isServer && resource->getId() != ownMediaServer->getId())
+    //    resource->addFlags( QnResource::foreigner );
 
     bool needUpdateServer = false;
     // We are always online
@@ -91,4 +92,9 @@ void QnServerMessageProcessor::at_removePeerLost(QnId id)
         foreach(QnResourcePtr camera, qnResPool->getAllEnabledCameras(res, QnResourcePool::AllResources))
             camera->setStatus(QnResource::Offline);
     }
+}
+
+void QnServerMessageProcessor::onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status)
+{
+    resource->setStatus(status, true);
 }

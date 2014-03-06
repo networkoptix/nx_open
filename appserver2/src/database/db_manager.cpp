@@ -92,10 +92,11 @@ QnDbManager::QnDbManager(
         Q_ASSERT(queryServers2.exec());
 
         QSqlQuery queryCameras(m_sdb);
-        queryCameras.prepare("UPDATE vms_resource set status = ? WHERE parent_guid = ? and xtype_guid = ?");
+        //queryCameras.prepare("UPDATE vms_resource set status = ? WHERE parent_guid = ? and xtype_guid = ?");
+        queryCameras.prepare("UPDATE vms_resource set status = ? WHERE id in (select resource_ptr_id from vms_camera)");
         queryCameras.bindValue(0, QnResource::Offline);
-        queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
-        queryCameras.bindValue(2, m_cameraTypeId.toRfc4122());
+        //queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
+        //queryCameras.bindValue(1, m_cameraTypeId.toRfc4122());
         if (!queryCameras.exec()) {
             qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
             Q_ASSERT(0);
