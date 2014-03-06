@@ -84,8 +84,10 @@ void QnWorkbenchLayoutAspectRatioWatcher::watchCurrentLayout() {
 }
 
 void QnWorkbenchLayoutAspectRatioWatcher::unwatchCurrentLayout() {
-    disconnect(m_watchedLayout, 0, this, 0);
-    m_watchedLayout = 0;
+    if (m_watchedLayout) {
+        disconnect(m_watchedLayout, 0, this, 0);
+        m_watchedLayout = 0;
+    }
 
     foreach (QnResourceWidget *widget, m_watchedWidgets)
         disconnect(widget, 0, this, 0);
