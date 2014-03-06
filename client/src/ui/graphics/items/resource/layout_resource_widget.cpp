@@ -111,7 +111,7 @@ void QnLayoutResourceWidget::paintItem(QPainter *painter, const QRectF &paintRec
     }
 
     if (resource && (resource->flags() & QnResource::server)) {
-        m_thumbs[resource->getId()] = qnSkin->pixmap("thumbs/thumb_server.png");
+        m_thumbs[resource->getId()] = qnSkin->pixmap("events/thumb_server.png");
     }
 
     QPen pen(Qt::gray);
