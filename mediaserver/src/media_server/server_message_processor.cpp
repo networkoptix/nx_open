@@ -42,7 +42,7 @@ void QnServerMessageProcessor::updateResource(QnResourcePtr resource)
         }
     }
 
-    if (QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId(), QnResourcePool::AllResources))
+    if (QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId()))
         ownResource->update(resource);
     else
         qnResPool->addResource(resource);
@@ -78,7 +78,7 @@ void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 
 void QnServerMessageProcessor::at_removePeerFound(QnId id)
 {
-    QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::AllResources);
+    QnResourcePtr res = qnResPool->getResourceById(id);
     if (res)
         res->setStatus(QnResource::Online);
 
@@ -86,11 +86,11 @@ void QnServerMessageProcessor::at_removePeerFound(QnId id)
 
 void QnServerMessageProcessor::at_removePeerLost(QnId id)
 {
-    QnResourcePtr res = qnResPool->getResourceById(id, QnResourcePool::AllResources);
+    QnResourcePtr res = qnResPool->getResourceById(id);
     if (res) {
         res->setStatus(QnResource::Offline);
-        foreach(QnResourcePtr camera, qnResPool->getAllEnabledCameras(res, QnResourcePool::AllResources))
-            camera->setStatus(QnResource::Offline);
+        //foreach(QnResourcePtr camera, qnResPool->getAllEnabledCameras(res, QnResourcePool::AllResources))
+        //    camera->setStatus(QnResource::Offline);
     }
 }
 

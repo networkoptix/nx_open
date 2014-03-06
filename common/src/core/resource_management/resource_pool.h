@@ -59,7 +59,7 @@ public:
 
     QnResourceList getResources() const;
 
-    QnResourcePtr getResourceById(QnId id, Filter searchFilter = OnlyFriends) const;
+    QnResourcePtr getResourceById(QnId id) const;
     QnResourcePtr getResourceByGuid(const QUuid& guid) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
@@ -122,11 +122,6 @@ private:
     bool m_tranInProgress;
     QnResourceList m_tmpResources;
     QHash<QString, QnResourcePtr> m_resources;
-    //!Resources with flag \a QnResource::foreign set
-    /*!
-        Using separate dictionary to minimize existing code modification
-    */
-    QHash<QString, QnResourcePtr> m_foreignResources;
 
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource

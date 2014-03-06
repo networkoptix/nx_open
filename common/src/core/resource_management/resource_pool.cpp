@@ -120,7 +120,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     {
         if( insertOrUpdateResource(
                 resource,
-                resource->hasFlags(QnResource::foreigner) ? &m_foreignResources : &m_resources ) )
+                &m_resources ) )
         {
             newResources.insert(resource->getId(), resource);
         }
@@ -211,16 +211,6 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
             m_resources.erase( resIter );
             removedResources.append(resource);
         }
-        else
-        {
-            //may be foreign resource?
-            resIter = std::find_if( m_foreignResources.begin(), m_foreignResources.end(), MatchResourceByID(resource->getId()) );
-            if( resIter != m_foreignResources.end() )
-            {
-                m_foreignResources.erase( resIter );
-                removedResources.append(resource);
-            }
-        }
 
         resource->setResourcePool(NULL);
     }
@@ -252,20 +242,12 @@ QnResourceList QnResourcePool::getResources() const
     return m_resources.values();
 }
 
-QnResourcePtr QnResourcePool::getResourceById(QnId id, Filter searchFilter) const
+QnResourcePtr QnResourcePool::getResourceById(QnId id) const
 {
     QMutexLocker locker(&m_resourcesMtx);
 
     QHash<QString, QnResourcePtr>::const_iterator resIter = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByID(id) );
     if( resIter != m_resources.end() )
-        return resIter.value();
-
-    if( searchFilter == OnlyFriends )
-        return QnResourcePtr(NULL);
-
-    //looking through foreign resources
-    resIter = std::find_if( m_foreignResources.begin(), m_foreignResources.end(), MatchResourceByID(id) );
-    if( resIter != m_foreignResources.end() )
         return resIter.value();
 
     return QnResourcePtr(NULL);
@@ -314,23 +296,11 @@ QnResourceList QnResourcePool::getAllEnabledCameras(QnResourcePtr mServer, Filte
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
-        if (camResource != 0 && !camResource->isDisabled() && !camResource->hasFlags(QnResource::foreigner))
+        if (camResource != 0 && !camResource->isDisabled() && 
+            ( !camResource->hasFlags(QnResource::foreigner) || searchFilter == AllResources))
         {
             if (parentId.isNull() || camResource->getParentId() == parentId)
             result << camResource;
-        }
-    }
-
-    if (searchFilter == AllResources) 
-    {
-        foreach (const QnResourcePtr &resource, m_foreignResources) 
-        {
-            QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
-            if (camResource != 0 && !camResource->isDisabled())
-            {
-                if (parentId.isNull() || camResource->getParentId() == parentId)
-                    result << camResource;
-            }
         }
     }
 
@@ -515,7 +485,6 @@ void QnResourcePool::clear()
     QMutexLocker lk( &m_resourcesMtx );
 
     m_resources.clear();
-    m_foreignResources.clear();
 }
 
 bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHash<QString, QnResourcePtr>* const resourcePool )

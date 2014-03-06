@@ -68,48 +68,67 @@ QnDbManager::QnDbManager(
     m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
     m_sdb.setDatabaseName( closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite"));
-    
-	if (m_sdb.open())
-	{
-		if (!createDatabase()) // create tables is DB is empty
-			qWarning() << "can't create tables for sqlLite database!";
-
-        m_storageTypeId = getType("Storage");
-        m_serverTypeId = getType("Server");
-        m_cameraTypeId = getType("Camera");
-
-
-        QSqlQuery queryServers(m_sdb);
-        queryServers.prepare("UPDATE vms_resource set status = ? WHERE xtype_guid = ?");
-        queryServers.bindValue(0, QnResource::Offline);
-        queryServers.bindValue(1, m_serverTypeId.toRfc4122());
-        Q_ASSERT(queryServers.exec());
-
-        QSqlQuery queryServers2(m_sdb);
-        queryServers2.prepare("UPDATE vms_resource set status = ? WHERE id = ?");
-        queryServers2.bindValue(0, QnResource::Online);
-        queryServers2.bindValue(1, qnCommon->moduleGUID().toRfc4122());
-        Q_ASSERT(queryServers2.exec());
-
-        QSqlQuery queryCameras(m_sdb);
-        //queryCameras.prepare("UPDATE vms_resource set status = ? WHERE parent_guid = ? and xtype_guid = ?");
-        queryCameras.prepare("UPDATE vms_resource set status = ? WHERE id in (select resource_ptr_id from vms_camera)");
-        queryCameras.bindValue(0, QnResource::Offline);
-        //queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
-        //queryCameras.bindValue(1, m_cameraTypeId.toRfc4122());
-        if (!queryCameras.exec()) {
-            qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
-            Q_ASSERT(0);
-        }
-        
-
-	}
-	else {
-		qWarning() << "can't initialize sqlLite database! Actions log is not created!";
-	}
-
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;
+}
+
+bool QnDbManager::init()
+{
+	if (!m_sdb.open())
+	{
+        qWarning() << "can't initialize sqlLite database! Actions log is not created!";
+        return false;
+    }
+
+	if (!createDatabase())  { 
+        // create tables is DB is empty
+		qWarning() << "can't create tables for sqlLite database!";
+        return false;
+    }
+
+    m_storageTypeId = getType("Storage");
+    m_serverTypeId = getType("Server");
+    m_cameraTypeId = getType("Camera");
+
+
+    QSqlQuery queryServers(m_sdb);
+    queryServers.prepare("UPDATE vms_resource set status = ? WHERE xtype_guid = ?");
+    queryServers.bindValue(0, QnResource::Offline);
+    queryServers.bindValue(1, m_serverTypeId.toRfc4122());
+    Q_ASSERT(queryServers.exec());
+
+    QSqlQuery queryServers2(m_sdb);
+    queryServers2.prepare("UPDATE vms_resource set status = ? WHERE id = ?");
+    queryServers2.bindValue(0, QnResource::Online);
+    queryServers2.bindValue(1, qnCommon->moduleGUID().toRfc4122());
+    Q_ASSERT(queryServers2.exec());
+
+    ApiCameraDataList cameras;
+    doQueryNoLock(qnCommon->moduleGUID(), cameras);
+    foreach(const ApiCameraData& camera, cameras.data)
+    {
+        QnTransaction<ApiSetResourceStatusData> tran(ApiCommand::setResourceStatus, true);
+        tran.fillSequence();
+        executeTransactionNoLock(tran);
+        QByteArray serializedTran;
+        OutputBinaryStream<QByteArray> stream(&serializedTran);
+        tran.serialize(&stream);
+        transactionLog->saveTransaction(tran, serializedTran);
+    }
+
+    /*
+    QSqlQuery queryCameras(m_sdb);
+    queryCameras.prepare("UPDATE vms_resource set status = ? WHERE parent_guid = ? and id in (select resource_ptr_id from vms_camera)");
+    queryCameras.bindValue(0, QnResource::Offline);
+    queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
+    //queryCameras.bindValue(1, m_cameraTypeId.toRfc4122());
+    if (!queryCameras.exec()) {
+        qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
+        Q_ASSERT(0);
+    }
+    */
+
+    return true;
 }
 
 QMap<int, QnId> QnDbManager::getGuidList(const QString& request)

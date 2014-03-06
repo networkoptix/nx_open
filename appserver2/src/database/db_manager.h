@@ -30,6 +30,8 @@ namespace ec2
             const QString& dbFileName );
 		virtual ~QnDbManager();
 
+        bool init();
+
         static QnDbManager* instance();
         
         template <class T>

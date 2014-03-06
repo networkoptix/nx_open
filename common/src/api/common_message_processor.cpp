@@ -104,7 +104,7 @@ void QnCommonMessageProcessor::on_runtimeInfoChanged( const ec2::QnRuntimeInfo& 
 
 void QnCommonMessageProcessor::on_resourceStatusChanged( const QnId& resourceId, QnResource::Status status )
 {
-    QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
+    QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (resource)
         onResourceStatusChanged(resource, status);
 }
@@ -123,7 +123,7 @@ void QnCommonMessageProcessor::on_resourceChanged( QnResourcePtr resource )
 
 void QnCommonMessageProcessor::on_resourceParamsChanged( const QnId& resourceId, const QnKvPairList& kvPairs )
 {
-    QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
+    QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (!resource)
         return;
 

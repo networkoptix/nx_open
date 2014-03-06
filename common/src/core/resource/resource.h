@@ -141,7 +141,7 @@ public:
     bool isDisabled() const;
     void setDisabled(bool disabled = true);
 
-    Status getStatus() const;
+    virtual Status getStatus() const;
     virtual void setStatus(Status newStatus, bool silenceMode = false);
     QDateTime getLastStatusUpdateTime() const;
 

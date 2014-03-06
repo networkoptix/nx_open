@@ -22,6 +22,7 @@ namespace ec2
         m_transactionLog( new QnTransactionLog(m_dbManager.get() )),
         m_connectionInfo( connectionInfo )
     {
+        m_dbManager->init();
         QnTransactionMessageBus::instance()->setHandler(this);
     }
 
