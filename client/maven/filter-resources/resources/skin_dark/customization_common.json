@@ -170,12 +170,32 @@
         "colors": ["#c02020", "#20c020", "#4040ff"]
     },
     
+    "QnStatusOverlayWidget": {
+        "palette": { "default": {
+            "window": "#00000080",
+            "windowText": "#ffffffa0"
+        }},
+        "diagnosticsButton": {
+            "windowColor": "#ffffff80",
+            "frameColor": "#ffffffc0",
+            "textColor": "#ffffffff"
+        }
+    }
+
 	"QnStyledTooltipWidget": {
 		"windowColor": "QColor(0, 0, 0, 255)",
 		"frameColor": "QColor(203, 210, 233, 128)",
 		"palette": { "default": { "windowText": "QColor(63, 159, 216)" } }
 	},
     
+    "QnGridItem": {
+        "colors": {
+            "grid": "QColor(0, 240, 240, 128)",
+            "allowed": "QColor(0, 255, 0, 64)",
+            "disallowed": "QColor(255, 0, 0, 64)"
+        }
+    },
+
     "QnHistogramWidget": {
         "colors": {
             "background": "#000000ff",

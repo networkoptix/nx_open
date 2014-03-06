@@ -182,6 +182,10 @@
 		"palette": { "default": { "window": "#e6e6e6" } }
     },
     
+    "ZoomWindowInstrument": {
+        "colors": ["#c02020", "#20c020", "#4040ff"]
+    },
+
     "QnStatusOverlayWidget": {
         "palette": { "default": {
             "window": "#ffffff80",
@@ -194,10 +198,6 @@
         }
     },
     
-    "ZoomWindowInstrument": {
-        "colors": ["#c02020", "#20c020", "#4040ff"]
-    },
-	
 	"QnStyledTooltipWidget": {
 		"windowColor": "QColor(255, 255, 255, 192)",
 		"frameColor": "#808080",
