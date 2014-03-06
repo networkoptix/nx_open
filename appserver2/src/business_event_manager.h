@@ -24,24 +24,20 @@ namespace ec2
         virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) override;
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) override;
 
-        template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
-            static_assert( false, "Specify QnBusinessEventManager::triggerNotification<>, please" );
-        }
-
-        template<> void triggerNotification<ApiBusinessActionData>( const QnTransaction<ApiBusinessActionData>& tran )
+        void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran )
         {
             assert( tran.command == ApiCommand::broadcastBusinessAction );
             QnAbstractBusinessActionPtr businessAction = tran.params.toResource( m_resCtx.pool );
             emit gotBroadcastAction( businessAction );
         }
 
-        template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran )
+        void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
             assert( tran.command == ApiCommand::removeBusinessRule );
             emit removed( QnId(tran.params.id) );
         }
 
-        template<> void triggerNotification<ApiBusinessRuleData>( const QnTransaction<ApiBusinessRuleData>& tran )
+        void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran )
         {
             assert( tran.command == ApiCommand::saveBusinessRule);
             QnBusinessEventRulePtr businessRule( new QnBusinessEventRule() );
@@ -49,7 +45,7 @@ namespace ec2
             emit addedOrUpdated( businessRule );
         }
 
-        template<> void triggerNotification<ApiResetBusinessRuleData>( const QnTransaction<ApiResetBusinessRuleData>& tran )
+        void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran )
         {
             assert( tran.command == ApiCommand::resetBusinessRules);
             emit businessRuleReset( tran.params.defaultRules.toResourceList(m_resCtx.pool) );

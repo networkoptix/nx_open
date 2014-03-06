@@ -114,7 +114,7 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.7</version>
                 <executions>
-                    <!-- <execution>
+                    <execution>
                         <id>update-buildenv</id>
                         <phase>generate-sources</phase>
                         <goals>
@@ -133,7 +133,7 @@
                             </target>
                             <skip>${rsync.skip}</skip>
                         </configuration>
-                    </execution>     -->
+                    </execution>
                 </executions>
             </plugin>            
             <plugin>

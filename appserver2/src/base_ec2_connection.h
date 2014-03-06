@@ -59,32 +59,27 @@ namespace ec2
         template<class T> bool processIncomingTransaction( const QnTransaction<T>& tran, const QByteArray& serializedTran) {
             if (!m_queryProcessor->processIncomingTransaction(tran, serializedTran))
                 return false;
-            triggerNotification<T>(tran);
+            triggerNotification(tran);
             return true;
         }
 
-        template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
-            static_assert( false, "Missing RemoteEC2Connection::processTransaction<> specification" );
-        }
-
-        template<> void triggerNotification<ApiResetBusinessRuleData>( const QnTransaction<ApiResetBusinessRuleData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran ) {
             m_businessEventManager->triggerNotification( tran );
         }
 
-
-        template<> void triggerNotification<ApiCameraData>( const QnTransaction<ApiCameraData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiCameraData>& tran ) {
             m_cameraManager->triggerNotification( tran );
         }
 
-        template<> void triggerNotification<ApiCameraDataList>( const QnTransaction<ApiCameraDataList>& tran ) {
+        void triggerNotification( const QnTransaction<ApiCameraDataList>& tran ) {
             m_cameraManager->triggerNotification( tran );
         }
 
-        template<> void triggerNotification<ApiBusinessActionData>( const QnTransaction<ApiBusinessActionData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran ) {
             m_businessEventManager->triggerNotification( tran );
         }
 
-        template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiIdData>& tran ) {
             switch( tran.command )
             {
             case ApiCommand::removeResource:
@@ -104,61 +99,61 @@ namespace ec2
             }
         }
 
-        template<> void triggerNotification<ApiMediaServerData>( const QnTransaction<ApiMediaServerData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiMediaServerData>& tran ) {
             m_mediaServerManager->triggerNotification( tran );
         }
 
-        template<> void triggerNotification<ApiResourceData>( const QnTransaction<ApiResourceData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiResourceData>& tran ) {
             m_resourceManager->triggerNotification( tran );
         }
 
-        template<> void triggerNotification<ApiSetResourceStatusData>( const QnTransaction<ApiSetResourceStatusData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiSetResourceStatusData>& tran ) {
             m_resourceManager->triggerNotification( tran );
         }
 
-        template<> void triggerNotification<ApiSetResourceDisabledData>( const QnTransaction<ApiSetResourceDisabledData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiSetResourceDisabledData>& tran ) {
             m_resourceManager->triggerNotification( tran );
         }
 
-        template<> void triggerNotification<ApiResourceParams>( const QnTransaction<ApiResourceParams>& tran ) {
+        void triggerNotification( const QnTransaction<ApiResourceParams>& tran ) {
             m_resourceManager->triggerNotification( tran );
         }
 
-        template<> void triggerNotification<ApiCameraServerItemData>( const QnTransaction<ApiCameraServerItemData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran ) {
             return m_cameraManager->triggerNotification( tran );
         }
 
-        template<> void triggerNotification<ApiUserData>( const QnTransaction<ApiUserData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiUserData>& tran ) {
             return m_userManager->triggerNotification( tran );
         }
 
-        template<> void triggerNotification<ApiBusinessRuleData>( const QnTransaction<ApiBusinessRuleData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran ) {
             return m_businessEventManager->triggerNotification( tran );
         }
 
-        template<> void triggerNotification<ApiLayoutData>( const QnTransaction<ApiLayoutData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiLayoutData>& tran ) {
             return m_layoutManager->triggerNotification( tran );
         }
 
-        template<> void triggerNotification<ApiLayoutDataList>( const QnTransaction<ApiLayoutDataList>& tran ) {
+        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran ) {
             return m_layoutManager->triggerNotification( tran );
         }
 
-        template<> void triggerNotification<ApiStoredFileData>( const QnTransaction<ApiStoredFileData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiStoredFileData>& tran ) {
             return m_storedFileManager->triggerNotification( tran );
         }
 
-        template<> void triggerNotification<ApiFullData>( const QnTransaction<ApiFullData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiFullData>& tran ) {
             QnFullResourceData fullResData;
             tran.params.toResourceList( fullResData, m_resCtx );
             emit initNotification(fullResData);
         }
 
-        template<> void triggerNotification<ApiPanicModeData>( const QnTransaction<ApiPanicModeData>& /*tran*/ ) {
+        void triggerNotification( const QnTransaction<ApiPanicModeData>& /*tran*/ ) {
             //TODO/IMPL
         }
 
-        template<> void triggerNotification<QString>( const QnTransaction<QString>& tran ) {
+        void triggerNotification( const QnTransaction<QString>& tran ) {
             if( tran.command == ApiCommand::removeStoredFile )
                 m_storedFileManager->triggerNotification( tran );
         }

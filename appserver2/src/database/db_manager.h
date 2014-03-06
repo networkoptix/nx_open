@@ -55,13 +55,6 @@ namespace ec2
             return doQueryNoLock(t1, t2);
         }
 
-        template <class T1, class T2>
-        ErrorCode doQueryNoLock(const T1& t1, T2& t2)
-        {
-            static_assert( false, "You have to add QnDbManager::doQueryNoLock specification" );
-            return ErrorCode::ok;
-        }
-
         //getCurrentTime
         ErrorCode doQuery(const nullptr_t& /*dummy*/, qint64& currentTime);
 
@@ -109,13 +102,6 @@ namespace ec2
         QReadWriteLock& getMutex() { return m_mutex; }
 
         // ------------ transactions --------------------------------------
-
-        template<class QueryDataType>
-        ErrorCode executeTransactionNoLock( const QnTransaction<QueryDataType>& /*tran*/ )
-        {
-            static_assert( false, "You have to add QnDbManager::executeTransactionNoLock specification" );
-            return ErrorCode::ok;
-        }
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraDataList>& tran);

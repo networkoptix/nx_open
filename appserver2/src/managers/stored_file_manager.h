@@ -22,11 +22,7 @@ namespace ec2
         virtual int deleteStoredFile( const QString& filename, impl::SimpleHandlerPtr handler ) override;
         virtual int listDirectory( const QString& folderName, impl::ListDirectoryHandlerPtr handler ) override;
 
-        template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
-            static_assert( false, "Specify QnCameraManager::triggerNotification<>, please" );
-        }
-
-        template<> void triggerNotification<ApiStoredFileData>( const QnTransaction<ApiStoredFileData>& tran )
+        void triggerNotification( const QnTransaction<ApiStoredFileData>& tran )
         {
             if( tran.command == ApiCommand::addStoredFile )
                 emit added( tran.params.path );
@@ -36,7 +32,7 @@ namespace ec2
                 assert( false );
         }
 
-        template<> void triggerNotification<QString>( const QnTransaction<QString>& tran )
+        void triggerNotification( const QnTransaction<QString>& tran )
         {
             assert( tran.command == ApiCommand::removeStoredFile );
             emit removed( tran.params );

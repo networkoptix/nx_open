@@ -20,6 +20,7 @@
 #include <boost/mpl/bool.hpp>
 #include "utils/common/id.h"
 #include "utils/math/math.h"
+#include "nx_ec/data/ec2_layout_data.h"
 
 
 //!Stream providing read operation

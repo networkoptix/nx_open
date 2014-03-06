@@ -32,11 +32,7 @@ namespace ec2
         //!Implementation of AbstractCameraManager::remove
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
-        template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
-            static_assert( false, "Specify QnCameraManager::triggerNotification<>, please" );
-        }
-
-        template<> void triggerNotification<ApiCameraData>( const QnTransaction<ApiCameraData>& tran )
+        void triggerNotification( const QnTransaction<ApiCameraData>& tran )
         {
             assert( tran.command == ApiCommand::saveCamera);
             QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
@@ -47,7 +43,7 @@ namespace ec2
             emit cameraAddedOrUpdated( cameraRes );
         }
 
-        template<> void triggerNotification<ApiCameraDataList>( const QnTransaction<ApiCameraDataList>& tran )
+        void triggerNotification( const QnTransaction<ApiCameraDataList>& tran )
         {
             assert( tran.command == ApiCommand::saveCameras );
             foreach(const ApiCameraData& camera, tran.params.data) 
@@ -60,13 +56,13 @@ namespace ec2
             }
         }
 
-        template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran )
+        void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
             assert( tran.command == ApiCommand::removeCamera );
             emit cameraRemoved( QnId(tran.params.id) );
         }
 
-        template<> void triggerNotification<ApiCameraServerItemData>( const QnTransaction<ApiCameraServerItemData>& tran )
+        void triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran )
         {
             QnCameraHistoryItemPtr cameraHistoryItem( new QnCameraHistoryItem(
                 tran.params.physicalId,

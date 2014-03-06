@@ -23,11 +23,7 @@ namespace ec2
         virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) override;
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
-        template<class T> void triggerNotification( const QnTransaction<T>& tran ) {
-            static_assert( false, "Specify QnUserManager::triggerNotification<>, please" );
-        }
-
-        template<> void triggerNotification<ApiUserData>( const QnTransaction<ApiUserData>& tran )
+        void triggerNotification( const QnTransaction<ApiUserData>& tran )
         {
             assert( tran.command == ApiCommand::saveUser);
             QnUserResourcePtr userResource(new QnUserResource());
@@ -35,7 +31,7 @@ namespace ec2
             emit addedOrUpdated( userResource );
         }
 
-        template<> void triggerNotification<ApiIdData>( const QnTransaction<ApiIdData>& tran )
+        void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
             assert( tran.command == ApiCommand::removeUser );
             emit removed( QnId(tran.params.id) );

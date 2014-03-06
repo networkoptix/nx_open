@@ -106,6 +106,6 @@ inline void queryFieldToDataObj(QSqlQuery& query, int idx, QnId& field) { field 
 template <class T> void queryFieldToDataObj(QSqlQuery&, int, std::vector<T>&) { ; } // TODO: #Elric wtf?
 template <class T> void queryFieldToDataObj(QSqlQuery& query, int idx, T& field, typename std::enable_if<std::is_enum<T>::value>::type* = NULL ) { field = (T) query.value(idx).toInt(); }
 
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiIdData,  (id) )
+//QN_DEFINE_STRUCT_SERIALIZATORS(ec2::ApiIdData, (id) )
 
 #endif // __API_DATA_H__
