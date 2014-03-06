@@ -797,7 +797,9 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
 
 void QnSingleCameraSettingsWidget::updateIpAddressText() {
     if(m_camera) {
-        ui->ipAddressEdit->setText(m_camera->getUrl());
+        QString urlString = m_camera->getUrl();
+        QUrl url = QUrl::fromUserInput(urlString);
+        ui->ipAddressEdit->setText(!url.isEmpty() && url.isValid() ? url.host() : urlString);
     } else {
         ui->ipAddressEdit->clear();
     }
