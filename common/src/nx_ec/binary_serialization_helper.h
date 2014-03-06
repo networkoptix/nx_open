@@ -169,6 +169,11 @@ namespace QnBinary {
         serialize(field.toUtf8(), binStream);
     }
 
+    template <class T>
+    void serialize(const QUrl& field, OutputBinaryStream<T>* binStream) {
+        serialize(field.toString(), binStream);
+    }
+
     template <class T, class T2>
     void serialize(const std::vector<T2>& field, OutputBinaryStream<T>* binStream);
 
@@ -290,6 +295,15 @@ namespace QnBinary {
         if( !deserialize(data, binStream) )
             return false;
         field = QString::fromUtf8(data);
+        return true;
+    }
+
+    template <class T>
+    bool deserialize(QUrl& field, InputBinaryStream<T>* binStream) {
+        QByteArray data;
+        if( !deserialize(data, binStream) )
+            return false;
+        field = QUrl(QString::fromUtf8(data));
         return true;
     }
 
