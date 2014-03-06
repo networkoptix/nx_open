@@ -12,14 +12,6 @@ QnClientMessageProcessor::QnClientMessageProcessor():
 }
 
 void QnClientMessageProcessor::onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status)
-    case Qn::Message_Type_RuntimeInfoChange: {
-        if (!message.mainHardwareIds.isEmpty())
-            qnLicensePool->setMainHardwareIds(message.mainHardwareIds);
-
-        if (!message.compatibleHardwareIds.isEmpty())
-            qnLicensePool->setCompatibleHardwareIds(message.compatibleHardwareIds);
-    }
-
 {
     resource->setStatus(status);
 }
@@ -83,10 +75,12 @@ void QnClientMessageProcessor::processLicenses(const QnLicenseList& licenses)
 
 void QnClientMessageProcessor::updateHardwareIds(const ec2::QnFullResourceData& fullData)
 {
-    qnLicensePool->setOldHardwareId(fullData.serverInfo.oldHardwareId);
+    // TODO: #EC2
+
+    /*qnLicensePool->setOldHardwareId(fullData.serverInfo.oldHardwareId);
     qnLicensePool->setHardwareId1(fullData.serverInfo.hardwareId1);
     qnLicensePool->setHardwareId2(fullData.serverInfo.hardwareId2);
-    qnLicensePool->setHardwareId3(fullData.serverInfo.hardwareId3);
+    qnLicensePool->setHardwareId3(fullData.serverInfo.hardwareId3);*/
 }
 
 void QnClientMessageProcessor::processCameraServerItems(const QnCameraHistoryList& cameraHistoryList)
