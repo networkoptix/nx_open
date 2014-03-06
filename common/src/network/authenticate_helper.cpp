@@ -145,7 +145,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     md5Hash.addData(uri);
     QByteArray ha2 = md5Hash.result().toHex();
 
-    if (userName == qnCommon->systemName().toUtf8())
+    if (userName == "system")
     {
         QCryptographicHash md5Hash( QCryptographicHash::Md5 );
         md5Hash.addData(qnCommon->systemName().toUtf8());
@@ -202,7 +202,7 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::HttpResponse
     QByteArray userName = digest.left(pos).toLower();
     QByteArray password = digest.mid(pos+1);
 
-    if (userName == qnCommon->systemName().toUtf8() && password == qnCommon->getSystemPassword())
+    if (userName == "system" && password == qnCommon->getSystemPassword())
         return true;
 
     foreach(QnUserResourcePtr user, m_users)

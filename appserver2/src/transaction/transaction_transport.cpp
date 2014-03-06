@@ -218,7 +218,7 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     {
         //m_httpClient->setUserName(remoteAddr.userName());
         //m_httpClient->setUserPassword(remoteAddr.password());
-        m_httpClient->setUserName(qnCommon->systemName());
+        m_httpClient->setUserName("system");
         m_httpClient->setUserPassword(qnCommon->getSystemPassword());
         remoteAddr.setUserName(QString());
         remoteAddr.setPassword(QString());

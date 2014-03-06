@@ -69,6 +69,8 @@ struct ApiSetResourceStatusData: public ApiData
     QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
+typedef std::vector<ApiSetResourceStatusData> ApiSyncResponseData;
+
 struct ApiSetResourceDisabledData: public ApiData {
     QnId id;
     bool disabled;
