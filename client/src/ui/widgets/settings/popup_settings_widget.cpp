@@ -75,7 +75,7 @@ void QnPopupSettingsWidget::submitToSettings() {
         if (!ui->showAllCheckBox->isChecked()) {
             quint64 eventsFlag = 1;
             for (int i = 1; i < BusinessEventType::Count; i++) {
-                if (!m_businessRulesCheckBoxes[i]->isChecked())
+                if (!m_businessRulesCheckBoxes[i-1]->isChecked())
                     eventsShown &= ~eventsFlag;
                 eventsFlag = eventsFlag << 1;
             }
@@ -125,7 +125,7 @@ void QnPopupSettingsWidget::at_showBusinessEvents_valueChanged() {
     quint64 eventsFlag = 1;
     for (int i = 1; i < BusinessEventType::Count; i++) {
         bool checked = eventsShown & eventsFlag;
-        m_businessRulesCheckBoxes[i]->setChecked(checked);
+        m_businessRulesCheckBoxes[i-1]->setChecked(checked);
         all = all && checked;
         eventsFlag = eventsFlag << 1;
     }
