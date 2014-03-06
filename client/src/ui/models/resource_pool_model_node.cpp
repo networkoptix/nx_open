@@ -4,11 +4,9 @@
 
 #include <core/resource_management/resource_pool.h>
 
-#ifdef QN_ENABLE_VIDEO_WALL
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
-#endif
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
@@ -152,7 +150,6 @@ void QnResourcePoolModelNode::update() {
             m_displayName = getResourceName(m_resource);
         }
     } else if (m_type == Qn::VideoWallItemNode || m_type == Qn::UserVideoWallItemNode) {
-#ifdef QN_ENABLE_VIDEO_WALL
         m_status = QnResource::Online;
         m_searchString = QString();
         m_flags = QnResource::videowall_item;
@@ -171,7 +168,6 @@ void QnResourcePoolModelNode::update() {
         } else {
             m_displayName = m_name = QString();
         }
-#endif
     }
 
     /* Update bastard state. */
@@ -180,14 +176,12 @@ void QnResourcePoolModelNode::update() {
     case Qn::ItemNode:
         bastard = m_resource.isNull();
         break;
-#ifdef QN_ENABLE_VIDEO_WALL
     case Qn::VideoWallItemNode:
         bastard = false;
         break;
     case Qn::UserVideoWallItemNode:
         bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditVideoWallPermission);
         break;
-#endif
     case Qn::ResourceNode:
         bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
         if(!bastard)
@@ -346,13 +340,8 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
             result |= Qt::ItemIsEditable;
         /* Fall through. */
     case Qn::ItemNode:
-#ifdef QN_ENABLE_VIDEO_WALL
         if(m_flags & (QnResource::media | QnResource::layout | QnResource::server | QnResource::user | QnResource::videowall))
             result |= Qt::ItemIsDragEnabled;
-#else
-        if(m_flags & (QnResource::media | QnResource::layout | QnResource::server | QnResource::user))
-            result |= Qt::ItemIsDragEnabled;
-#endif
         break;
     case Qn::VideoWallItemNode:
     case Qn::UserVideoWallItemNode:
@@ -454,12 +443,10 @@ bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int colum
 
     QnActionParameters parameters;
     if (m_type == Qn::VideoWallItemNode || m_type == Qn::UserVideoWallItemNode) {
-#ifdef QN_ENABLE_VIDEO_WALL
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
         if (index.isNull())
             return false;
         parameters = QnActionParameters(QnVideoWallItemIndexList() << index).withArgument(Qn::ResourceNameRole, value.toString());
-#endif
     } else {
         parameters = QnActionParameters(m_resource).withArgument(Qn::ResourceNameRole, value.toString());
     }
