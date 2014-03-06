@@ -1,7 +1,15 @@
 {
     "globals": {
-        "selection":            "QColor(255, 128, 80, 110)",
-        "opaqueSelection":      "selection.setAlpha(255)"
+        "noptix_blue":              "QColor(26, 26, 240)",
+        "custom_blue":              "QColor(0, 150, 255)",
+        "custom_orange":            "QColor(255, 128, 80)",
+        "custom_red":               "#C10505",
+        "custom_grey":              "#D4D4D4",
+        "custom_green":             "#8ABF22",
+        "darkGrey":					"#231F20",
+        "opaqueSelection":			"custom_blue",
+        "selection":				"opaqueSelection.setAlpha(110)",
+        "exShadowColor":			"#ff0000"
     },
 
     "QnGlobals": {
@@ -11,7 +19,12 @@
         "backgroundGradientColor":  "QColor(26, 26, 240, 40)",
         "frameColor":               "QColor(128, 128, 128, 196)",
         "selectedFrameColor":       "QColor(32, 144, 224, 196)",
-        "ptzColor":                 "QColor(128, 196, 255, 255)"
+        "ptzColor":                 "QColor(128, 196, 255, 255)",
+        "shadowColor":              "black",
+        "businessRuleDisabledHighlightColor": "QColor(64, 64, 64)",
+        "businessRuleInvalidBackgroundColor": "QColor(150, 0, 0)",
+        "businessRuleInvalidColumnBackgroundColor": "QColor(204, 0, 0)",
+        "businessRuleInvalidHighlightColor": "opaqueSelection"
     },
     
     "QApplication": {
@@ -112,18 +125,22 @@
             "separator": "QColor(255, 255, 255, 64)",
             
             "dateOverlay": "QColor(255, 255, 255, 48)",
-            "dateOverlayAlternate": "selection.setAlpha(48)"
-        }
+            "dateOverlayAlternate": "selection.setAlpha(48)",
+
+			"pastLastMinute": "QColor(255, 255, 255, 48)",
+            "futureLastMinute": "QColor(0, 0, 0, 48)"            
+        },
+		"palette": { "default": { "windowText": "#FFFFFF" } }        
     },
     
     "QnTimeScrollBar": {
         "colors": {
-            "indicator": "#ffffffff",
-            "border": "#ffffff40",
-            "handle": "#ffffff30"
+            "indicator": "#000000FF",
+            "border": "#80808080",
+            "handle": "#00000020"
         }
     },
-    
+
     "QnControlBackgroundWidget": {
         "_": "Background for ui panels (resource tree, title bar, notifications panel).",
         
@@ -146,7 +163,7 @@
         "colors": {
             "_": "Background gradient colors.",
             
-            "normal": "QColor(255, 128, 80, 48)",
+            "normal": "noptix_blue.setAlpha(48)",
             "panic": "#FF0000"
         }
     },
@@ -163,12 +180,25 @@
             "ram": "#db3ba9",
             "hdds": ["#ededed","#edc842","#67ed42","#ff8330","#b200ff","#00ffff","#267f00","#ff7f7f","#c90000"],
             "network": ["#ff3434", "#f0ff34", "#8484ff", "#34ff84"]
-        }
+        },    
+		"palette": { "default": { "window": "black" } }
     },
     
     "ZoomWindowInstrument": {
         "colors": ["#c02020", "#20c020", "#4040ff"]
     },
+
+    "QnStatusOverlayWidget": {
+        "palette": { "default": {
+            "window": "#black",
+            "windowText": "#801010c0"
+        }},
+        "diagnosticsButton": { 
+            "windowColor": "#801010c0",
+            "frameColor": "#801010ff",
+            "textColor": "#ffffffff"
+        }
+    },   
     
 	"QnStyledTooltipWidget": {
 		"windowColor": "QColor(0, 0, 0, 255)",
@@ -176,6 +206,14 @@
 		"palette": { "default": { "windowText": "QColor(63, 159, 216)" } }
 	},
     
+    "QnGridItem": {
+        "colors": {
+            "grid": "QColor(0, 240, 240, 128)",
+            "allowed": "QColor(0, 255, 0, 64)",
+            "disallowed": "QColor(255, 0, 0, 64)"
+        }
+    },
+
     "QnHistogramWidget": {
         "colors": {
             "background": "#000000ff",
@@ -223,21 +261,3 @@
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

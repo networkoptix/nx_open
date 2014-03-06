@@ -517,9 +517,7 @@ void QnMediaResourceWidget::updateIconButton() {
         return;
     }
 
-    int recordingMode = Qn::RecordingType_Never;
-    if(m_camera->getStatus() == QnResource::Recording)
-        recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), m_camera);
+    int recordingMode = QnRecordingStatusHelper::currentRecordingMode(context(), m_camera);
     QIcon recIcon = QnRecordingStatusHelper::icon(recordingMode);
     iconButton()->setVisible(!recIcon.isNull());
     iconButton()->setIcon(recIcon);

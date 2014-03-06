@@ -1,6 +1,8 @@
 {
     "globals": {
-        "custom_blue":              "QColor(255, 128, 80, 110)",
+        "noptix_blue":              "QColor(26, 26, 240)",
+        "custom_blue":              "QColor(0, 150, 255)",
+        "custom_orange":            "QColor(255, 128, 80)",
         "custom_red":               "#C10505",
         "custom_grey":              "#D4D4D4",
         "custom_green":             "#8ABF22",
@@ -125,8 +127,8 @@
             "dateOverlay": "QColor(255, 255, 255, 48)",
             "dateOverlayAlternate": "selection.setAlpha(48)",
 
-			"pastLastMinute": "QColor(255, 255, 255, 24)",
-            "futureLastMinute": "QColor(0, 0, 0, 24)"
+			"pastLastMinute": "QColor(255, 255, 255, 48)",
+            "futureLastMinute": "QColor(0, 0, 0, 48)"
         },
 		"palette": { "default": { "windowText": "#000000" } }
     },
@@ -182,6 +184,10 @@
 		"palette": { "default": { "window": "#e6e6e6" } }
     },
     
+    "ZoomWindowInstrument": {
+        "colors": ["#c02020", "#20c020", "#4040ff"]
+    },
+
     "QnStatusOverlayWidget": {
         "palette": { "default": {
             "window": "#ffffff80",
@@ -194,10 +200,6 @@
         }
     },
     
-    "ZoomWindowInstrument": {
-        "colors": ["#c02020", "#20c020", "#4040ff"]
-    },
-	
 	"QnStyledTooltipWidget": {
 		"windowColor": "QColor(255, 255, 255, 192)",
 		"frameColor": "#808080",
@@ -259,9 +261,3 @@
     }
 
 }
-
-
-
-
-
-

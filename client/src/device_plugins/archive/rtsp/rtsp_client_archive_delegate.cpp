@@ -652,7 +652,7 @@ QnResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
         for (QMap<int, QnFfmpegRtpParserPtr>::const_iterator itr = m_parsers.begin(); itr != m_parsers.end(); ++itr)
         {
             QnMediaContextPtr context = itr.value()->mediaContext();
-            if (context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO)
+            if (context && context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO)
                 m_audioLayout->addAudioTrack(QnResourceAudioLayout::AudioTrack(context, getAudioCodecDescription(context->ctx())));
         }
     }
