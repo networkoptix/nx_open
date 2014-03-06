@@ -151,6 +151,10 @@
         }
     },
     
+    "QnMediaResourceWidget": {
+		"palette": { "default": { "window": "#000000ff" } }
+	},
+
     "QnServerResourceWidget": {
         "colors": {
             "frame": "#428ced",
@@ -164,6 +168,12 @@
     "ZoomWindowInstrument": {
         "colors": ["#c02020", "#20c020", "#4040ff"]
     },
+    
+	"QnStyledTooltipWidget": {
+		"windowColor": "QColor(0, 0, 0, 255)",
+		"frameColor": "QColor(203, 210, 233, 128)",
+		"palette": { "default": { "windowText": "QColor(63, 159, 216)" } }
+	},
     
     "QnHistogramWidget": {
         "colors": {
