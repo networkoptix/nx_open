@@ -19,6 +19,8 @@
 
 namespace ec2
 {
+    static const char ADD_HASH_DATA[] = "$$_HASH_$$";
+
     class QnDbManager;
 
     typedef QMap<QUuid, qint32> QnTranState;
