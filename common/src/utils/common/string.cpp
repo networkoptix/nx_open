@@ -155,7 +155,15 @@ QString generateUniqueString(const QStringList &usedStrings, const QString &defa
 #define INCBUF() { buffer += curr; ++pos; curr = ( pos < string.length() ) ? string[ pos ] : QChar(); }
 
 bool isNumberStart(const QChar &c) {
-    return c == L'-' || c == L'+' || c.isDigit();
+    /* We don't want to handle negative numbers as this leads to very strange
+     * results. Think how "1-1" and "1-2" are going to be compared in this 
+     * case. */
+
+    return 
+#if 0 
+        c == L'-' || c == L'+' || 
+#endif
+        c.isDigit();
 }
 
 void ExtractToken( QString & buffer, const QString & string, int & pos, bool & isNumber )
@@ -168,8 +176,10 @@ void ExtractToken( QString & buffer, const QString & string, int & pos, bool & i
     QChar curr = string[ pos ];
     if ( isNumberStart(curr) )
     {
+#if 0
         if ( curr == L'-' || curr == L'+' )
             INCBUF();
+#endif
 
         if ( !curr.isNull() && curr.isDigit() )
         {
@@ -184,6 +194,10 @@ void ExtractToken( QString & buffer, const QString & string, int & pos, bool & i
                     INCBUF();
             }
 
+            /* We don't want to handle exponential notation.
+             * Besides, this implementation is buggy as it treats '14easd' 
+             * as a number. */
+#if 0
             if ( !curr.isNull() && curr.toLower() == L'e' )
             {
                 INCBUF();
@@ -196,6 +210,7 @@ void ExtractToken( QString & buffer, const QString & string, int & pos, bool & i
                     while ( curr.isDigit() )
                         INCBUF();
             }
+#endif
         }
     }
 
@@ -300,3 +315,14 @@ QStringList naturalStringSort( const QStringList & list, Qt::CaseSensitivity cas
     return retVal;
 }
 
+void naturalStringCompareTestCase(const QString &l, const QString &r, int value) {
+    assert(qBound(-1, naturalStringCompare(l, r, Qt::CaseInsensitive), 1) == value);
+    assert(qBound(-1, naturalStringCompare(r, l, Qt::CaseInsensitive), 1) == -value);
+}
+
+void naturalStringCompareTest() {
+    naturalStringCompareTestCase(lit("1-6.png"), lit("1-5.png"), 1);
+    naturalStringCompareTestCase(lit("Layout"), lit("Layout 1"), -1);
+    naturalStringCompareTestCase(lit("admin"), lit("admin1"), -1);
+    naturalStringCompareTestCase(lit("20nov.nov"), lit("14exe_x64_read_only.exe"), 1);
+}

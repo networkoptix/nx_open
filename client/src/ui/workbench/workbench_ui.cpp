@@ -41,6 +41,7 @@
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/graphics/items/generic/proxy_label.h>
+#include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/controls/navigation_item.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/speed_slider.h>
@@ -48,7 +49,6 @@
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/graphics/items/standard/graphics_message_box.h>
 #include <ui/graphics/items/notifications/notifications_collection_widget.h>
 #include <ui/common/palette.h>
 #include <ui/processors/hover_processor.h>
@@ -186,16 +186,20 @@ namespace {
         }
     };
 
-    class QnGeometryGraphicsProxyWidget: public QGraphicsProxyWidget {
+    class QnTabBarGraphicsProxyWidget: public QGraphicsProxyWidget {
         typedef QGraphicsProxyWidget base_type;
     public:
-        QnGeometryGraphicsProxyWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): base_type(parent, windowFlags) {}
+        QnTabBarGraphicsProxyWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): base_type(parent, windowFlags) {}
 
     protected:
         virtual bool eventFilter(QObject *object, QEvent *event) override {
-            if(object == widget())
+            if(object == widget()) {
                 if(event->type() == QEvent::Move)
                     return false; /* Don't propagate moves. */
+
+                if(event->type() == QEvent::UpdateRequest && isVisible())
+                    widget()->setAttribute(Qt::WA_Mapped); /* This one gets cleared for no reason in some cases. We just hack it around. */
+            }
 
             return base_type::eventFilter(object, event);
         }
@@ -413,7 +417,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Note: using QnGeometryGraphicsProxyWidget here fixes this bug:
      * https://noptix.enk.me/redmine/issues/2330. */
-    m_tabBarItem = new QnGeometryGraphicsProxyWidget(m_controlsWidget);
+    m_tabBarItem = new QnTabBarGraphicsProxyWidget(m_controlsWidget);
     m_tabBarItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
 
     m_tabBarWidget = new QnLayoutTabBar(NULL, context());
@@ -1058,14 +1062,13 @@ void QnWorkbenchUi::setTitleUsed(bool used) {
         at_titleItem_geometryChanged();
 
         /* For reasons unknown, tab bar's size gets messed up when it is shown
-         * after new items were added to it. Re-embedding notificationss, probably there is
-         * a simpler workaround. */
+         * after new items are added to it. Re-embedding helps, probably there is
+         * a better workaround. */
         QTabBar *widget = checked_cast<QTabBar *>(m_tabBarItem->widget());
         m_tabBarItem->setWidget(NULL);
         m_tabBarItem->setWidget(widget);
-        widget->installEventFilter(m_tabBarItem);
 
-        /* There are cases where even re-embedding doesn't notifications.
+        /* There are cases where even re-embedding doesn't help.
          * So we cheat even more, forcing the tab bar to refresh. */
         QTabBar::Shape shape = widget->shape();
         widget->setShape(QTabBar::TriangularWest);

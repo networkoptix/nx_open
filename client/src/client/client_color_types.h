@@ -72,12 +72,8 @@ struct QnStatisticsColors {
     QColor frame;
     QColor cpu;
     QColor ram;
-    QColor networkLimit;
     QVector<QColor> hdds;
     QVector<QColor> network;
-
-    QColor hddByKey(const QString &key) const;
-    QColor networkByKey(const QString &key) const;
 };
 
 struct QnScheduleGridColors {
@@ -106,8 +102,19 @@ struct QnPtzManageModelColors {
     QColor warning;
 };
 
+struct QnHistogramColors {
+    QnHistogramColors();
+
+    QColor background;
+    QColor border;
+    QColor histogram;
+    QColor selection;
+    QColor grid;
+    QColor text;
+};
+
 QN_DECLARE_FUNCTIONS_FOR_TYPES(
-    (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors)(QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors), 
+    (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors)(QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors)(QnHistogramColors), 
     (metatype)(json)
 );
 

@@ -40,7 +40,7 @@ void QnPictureSettingsDialog::updateFromResource(const QnMediaResourcePtr &resou
     QImage image(resource->toResource()->getUrl());
     ui->fisheyeCheckBox->setEnabled(!image.isNull());
 
-    ui->imageLabel->setPixmap(QPixmap::fromImage(image).scaled(ui->imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    ui->imageLabel->setPixmap(QPixmap::fromImage(image).scaled(ui->imageLabel->contentSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     QnMediaDewarpingParams params = resource->getDewarpingParams();
     ui->fisheyeCheckBox->setChecked(params.enabled);

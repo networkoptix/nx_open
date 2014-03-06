@@ -3,6 +3,7 @@
 #include <QtCore/QMutex>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 
 // TODO: #Elric maybe remove this construct-in-getter? It will make things simpler.
 
@@ -148,6 +149,12 @@ QnPtzControllerPtr QnPtzControllerPool::createController(const QnResourcePtr &) 
 }
 
 void QnPtzControllerPool::updateController(const QnResourcePtr &resource) {
+    bool isMediaServer = (resource.dynamicCast<QnMediaServerResource>() != 0);
+    Q_ASSERT(!isMediaServer);
+    if (isMediaServer) {
+        qWarning() << "QnPtzControllerPool::updateController(): called for mediaserver resource";
+    }
+
     qDebug() << ">>>>>>>> updateController for" << resource->getName();
 
     if(d->updateResource(resource))

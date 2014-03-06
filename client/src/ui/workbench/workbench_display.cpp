@@ -52,11 +52,11 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/graphics/items/grid/curtain_item.h>
+#include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/generic/splash_item.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
 #include <ui/graphics/items/grid/grid_raised_cone_item.h>
-#include <ui/graphics/items/standard/graphics_message_box.h>
 
 #include <ui/workaround/gl_widget_factory.h>
 #include <ui/workaround/gl_widget_workaround.h>
@@ -1639,6 +1639,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         int checkedButtons = widget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
         if(checkedButtons != -1)
             widget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
+
+        if(thumbnailed)
+            widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(QnMediaResourceWidget::PtzButton));
     }
 
     QVector<QUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QUuid> >();

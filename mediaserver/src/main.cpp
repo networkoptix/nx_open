@@ -717,6 +717,7 @@ void QnMain::loadResourcesFromECS()
         if( mediaServer->getGuid() == serverGuid() )
             continue;
 
+        mediaServer->addFlags( QnResource::foreigner );  //marking resource as not belonging to us
         qnResPool->addResource( mediaServer );
         //requesting remote server cameras
         QnVirtualCameraResourceList cameras;

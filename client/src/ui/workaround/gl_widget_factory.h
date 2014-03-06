@@ -9,12 +9,7 @@ class QnGlWidgetFactory {
 public:
     template<class Widget>
     static Widget *create(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) {
-        QGLFormat format;
-        format.setSampleBuffers(false); /* No multisampling as it slows everything down terribly. */
-        format.setDoubleBuffer(qnSettings->isGlDoubleBuffer());
-        /* Unfortunately, in Qt5 this function is broken :( */
-        // format.setSwapInterval(1);
-        return create<Widget>(format, parent, windowFlags);
+        return create<Widget>(createDefaultFormat(), parent, windowFlags);
     }
 
     template<class Widget>
@@ -32,6 +27,7 @@ public:
     }
 
 private:
+    static QGLFormat createDefaultFormat();
     static void enableVSync(QGLWidget *widget);
 };
 

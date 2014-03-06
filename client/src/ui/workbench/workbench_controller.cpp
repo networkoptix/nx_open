@@ -74,9 +74,9 @@
 #include <ui/graphics/instruments/zoom_window_instrument.h>
 
 #include <ui/graphics/items/grid/grid_item.h>
+#include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/standard/graphics_message_box.h>
 
 #include <ui/help/help_handler.h>
 
@@ -1305,7 +1305,7 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
     QnResourceWidget *widget = widgets.at(0);
     if(widget->resource()->flags() & QnResource::network)
         return;
-    QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource()));
+    QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource(), mainWindow()));
     dialog->setModal(true);
     dialog->exec();
 }

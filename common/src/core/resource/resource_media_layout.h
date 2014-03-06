@@ -15,12 +15,16 @@
 
 class QnResourceLayout {
 public:
+    QnResourceLayout() {}
     virtual ~QnResourceLayout() {}
 
     /** 
      * \returns                         Number of audio or video channels a device has.
      */
     virtual int channelCount() const = 0;
+
+private:
+    Q_DISABLE_COPY(QnResourceLayout);
 };
 
 
@@ -194,6 +198,7 @@ public:
 
     QVector<int> getChannels() const            { return m_channels; }
     void setChannels(const QVector<int>& value) { m_channels = value; }
+
 protected:
     QVector<int> m_channels;
     QSize m_size;
