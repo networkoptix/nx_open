@@ -169,6 +169,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
         }
     case DEBUG_COUNTER:
     case DEV_MODE:
+    case VIDEO_WALL_MODE:
         return defaultValue; /* Not to be read from settings. */
     default:
         return base_type::readValueFromSettings(settings, id, defaultValue);
@@ -177,6 +178,9 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
 }
 
 void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
+    if (isVideoWallMode())
+        return;
+
     switch(id) {
     case LAST_USED_CONNECTION:
         settings->beginGroup(QLatin1String("AppServerConnections"));
@@ -227,6 +231,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     case LIGHT_MODE:
     case LIGHT_MODE_OVERRIDE:
     case PTZ_PRESET_IN_USE_WARNING_DISABLED:
+    case VIDEO_WALL_MODE:
         break; /* Not to be saved to settings. */
     default:
         base_type::writeValueToSettings(settings, id, value);

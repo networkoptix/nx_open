@@ -47,7 +47,7 @@ signals:
     void pcChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
 
 protected:
-    virtual void updateInner(const QnResourcePtr &other) override;
+    virtual void updateInner(QnResourcePtr other) override;
 
 private:
     void addItemUnderLock(const QnVideoWallItem &item);

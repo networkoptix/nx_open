@@ -16,7 +16,7 @@ QString QnVideoWallResource::getUniqueId() const
     return getGuid();
 }
 
-void QnVideoWallResource::updateInner(const QnResourcePtr &other) {
+void QnVideoWallResource::updateInner(QnResourcePtr other) {
     base_type::updateInner(other);
 
     QnVideoWallResourcePtr localOther = other.dynamicCast<QnVideoWallResource>();
