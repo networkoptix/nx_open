@@ -4,16 +4,16 @@
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGraphicsLinearLayout>
 
-#include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/animation/animated.h>
 
-// TODO: #Elric rename, not standard item => no "graphics" prefix.
+#include "framed_widget.h"
 
-const int defaultMessageTimeout = 3;
+class GraphicsLabel;
 
-class QnGraphicsMessageBoxItem: public GraphicsWidget
-{
+// TODO: #Elric rename, not standard item => no "graphics" prefix?
+
+class QnGraphicsMessageBoxItem: public GraphicsWidget {
     Q_OBJECT
     typedef GraphicsWidget base_type;
 
@@ -32,18 +32,21 @@ private:
     QGraphicsLinearLayout *m_layout;
 };
 
-class QnGraphicsMessageBox : public Animated<GraphicsLabel>
-{
-    Q_OBJECT
 
-    typedef Animated<GraphicsLabel> base_type;
+class QnGraphicsMessageBox : public Animated<QnFramedWidget> {
+    Q_OBJECT
+    typedef Animated<QnFramedWidget> base_type;
+
 public:
     explicit QnGraphicsMessageBox(QGraphicsItem *parent = NULL, const QString &text = QString(), int timeoutMsec = 0);
     ~QnGraphicsMessageBox();
-    
-    static QnGraphicsMessageBox* information(const QString &text);
+
+    const QString &text() const;
+    void setText(const QString &text);
 
     int timeout() const;
+
+    static QnGraphicsMessageBox* information(const QString &text);
 
 public slots:
     void hideImmideately();
@@ -53,15 +56,14 @@ signals:
     void tick(int time);
 
 protected:
-    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    //virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
 
 private slots:
     void at_animationIn_finished();
 
 private:
+    GraphicsLabel *m_label;
     int m_timeout;
-
 };
 
 #endif // GRAPHICS_MESSAGE_BOX_H
