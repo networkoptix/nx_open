@@ -61,15 +61,14 @@ namespace ec2
             std::copy( folderContents.begin(), folderContents.end(), std::back_inserter(outputFolderContents) );
             handler->done( reqID, errorCode, outputFolderContents );
         };
-        m_queryProcessor->processQueryAsync<QString, ApiStoredDirContents, decltype(queryDoneHandler)>( ApiCommand::listDirectory, folderName, queryDoneHandler );
+        m_queryProcessor->processQueryAsync<ApiStoredFilePath, ApiStoredDirContents, decltype(queryDoneHandler)>( ApiCommand::listDirectory, (ApiStoredFilePath) folderName, queryDoneHandler );
         return reqID;
     }
 
     template<class QueryProcessorType>
     QnTransaction<ApiStoredFileData> QnStoredFileManager<QueryProcessorType>::prepareTransaction( const QString& filename, const QByteArray& data )
     {
-        QnTransaction<ApiStoredFileData> tran;
-        tran.command = ApiCommand::addStoredFile;
+        QnTransaction<ApiStoredFileData> tran(ApiCommand::addStoredFile, true);
         tran.params.path = filename;
         tran.params.data = data;
         return tran;
@@ -78,8 +77,7 @@ namespace ec2
     template<class QueryProcessorType>
     QnTransaction<ApiStoredFilePath> QnStoredFileManager<QueryProcessorType>::prepareTransaction( const QString& filename )
     {
-        QnTransaction<ApiStoredFilePath> tran;
-        tran.command = ApiCommand::removeStoredFile;
+        QnTransaction<ApiStoredFilePath> tran(ApiCommand::removeStoredFile, true);
         tran.params = filename;
         return tran;
     }

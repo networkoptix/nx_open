@@ -23,9 +23,15 @@ namespace ec2
 
     typedef QString ApiStoredFilePath;
 
-    inline void parseHttpRequestParams( const QnRequestParamList& /*params*/, ApiStoredFilePath* /*path*/ )
+    static const QString FOLDER_NAME_PARAM_NAME( QLatin1String("folder") );
+
+    inline void parseHttpRequestParams( const QnRequestParamList& params, ApiStoredFilePath* path )
     {
-        //TODO/IMPL
+        for (int i = 0; i < params.size(); ++i)
+        {
+            if (params[i].first == lit("folder"))
+                *path = params[i].second;
+        }
     }
 }
 

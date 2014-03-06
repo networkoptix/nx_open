@@ -1548,10 +1548,20 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicense
     return m_licenseManagerImpl->getLicenses( &data );
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data)
+ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& _path, ApiStoredDirContents& data)
 {
     QSqlQuery query(m_sdb);
-    QString q = QString(lit("SELECT data FROM vms_storedFiles WHERE path LIKE '%1%' AND substr(path, %2) NOT LIKE '%/%' ")).arg(path).arg(path.length()+1);
+    QString path;
+    if (!_path.isEmpty())
+        path = closeDirPath(_path);
+    
+    QString pathFilter(lit("path"));
+    if (!path.isEmpty())
+        pathFilter = QString(lit("substr(path, %2)")).arg(path.length()+1);
+    QString q = QString(lit("SELECT %1 FROM vms_storedFiles WHERE path LIKE '%2%' ")).arg(pathFilter).arg(path);
+    if (!path.isEmpty())
+        q += QString(lit("AND substr(path, %2) NOT LIKE '%/%' ")).arg(path.length()+1);
+
     query.prepare(q);
     if (!query.exec())
     {
@@ -1564,9 +1574,8 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDir
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& _path, ApiStoredFileData& data)
+ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileData& data)
 {
-    QString path = closeDirPath(_path);
     QSqlQuery query(m_sdb);
     query.prepare("SELECT data FROM vms_storedFiles WHERE path = :path");
     query.bindValue(":path", path);

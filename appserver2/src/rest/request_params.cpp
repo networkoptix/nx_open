@@ -24,17 +24,22 @@ namespace ec2
 
     void parseHttpRequestParams( const QnRequestParamList& params, nullptr_t* ) {}
 
-    void toUrlParams( const std::nullptr_t& , QUrlQuery* const query )
+    void toUrlParams( const std::nullptr_t& , QUrlQuery* const query)
     {
         // nothing to do
     }
 
-    void toUrlParams( const QnId& id, QUrlQuery* const query )
+    void toUrlParams( const QnId& id, QUrlQuery* const query)
     {
         query->addQueryItem( ID_PARAM_NAME, id.toString() );
     }
 
-    void toUrlParams( const LoginInfo& loginInfo, QUrlQuery* const query )
+    void toUrlParams( const ApiStoredFilePath& name, QUrlQuery* const query)
+    {
+        query->addQueryItem( FOLDER_NAME_PARAM_NAME, name );
+    }
+
+    void toUrlParams( const LoginInfo& loginInfo, QUrlQuery* const query)
     {
         //TODO/IMPL
     }

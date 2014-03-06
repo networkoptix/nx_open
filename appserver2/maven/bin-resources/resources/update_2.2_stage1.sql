@@ -33,4 +33,4 @@ CREATE UNIQUE INDEX idx_transaction_key   ON transaction_log(peer_guid, sequence
 CREATE UNIQUE INDEX idx_transaction_hash  ON transaction_log(tran_guid);
 CREATE INDEX idx_transaction_time  ON transaction_log(timestamp);
 
-CREATE TABLE "vms_storedFiles" (path VARCHAR PRIMARY KEY, data BLOB)
+CREATE TABLE "vms_storedFiles" (path VARCHAR PRIMARY KEY, data BLOB);
