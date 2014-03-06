@@ -246,7 +246,7 @@
     },
     
     "QnClockLabel": {
-        "palette": {"default": {
+        "palette": { "default": {
             "windowText": "opaqueSelection.darker()"
         }}
     }
