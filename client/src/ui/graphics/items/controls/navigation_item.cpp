@@ -12,7 +12,6 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
-#include <utils/clock_data_provider.h>
 
 #include <ui/common/palette.h>
 #include <ui/style/skin.h>
@@ -32,6 +31,7 @@
 
 #include "time_slider.h"
 #include "time_scroll_bar.h"
+#include "clock_label.h"
 
 namespace {
     QnImageButtonWidget *newActionButton(QAction *action, QGraphicsItem *parent = NULL) {
@@ -40,23 +40,6 @@ namespace {
         button->setCached(true);
         return button;
     }
-
-    GraphicsLabel *newClockItem(QGraphicsItem *parent = NULL) {
-        GraphicsLabel *label = new GraphicsLabel(parent);
-
-        QFont font;
-        font.setPixelSize(30);
-        label->setFont(font);
-
-        QPalette palette = label->palette();
-        palette.setColor(QPalette::WindowText, qnGlobals->selectedFrameColor());
-        label->setPalette(palette);
-
-        QnClockDataProvider *dp = new QnClockDataProvider(lit("hh:mm:ss"), label);
-        QObject::connect(dp, SIGNAL(timeChanged(QString)), label, SLOT(setText(QString)));
-        return label;
-    }
-
 
 } // anonymous namespace
 
@@ -159,7 +142,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     leftLayoutV->setMinimumHeight(87.0);
     leftLayoutV->addItem(m_speedSlider);
     leftLayoutV->addItem(buttonsLayout);
-    leftLayoutV->addItem(newClockItem(this));
+    leftLayoutV->addItem(new QnClockLabel(this));
 
     GraphicsWidget *leftWidget = new GraphicsWidget();
     leftWidget->setLayout(leftLayoutV);

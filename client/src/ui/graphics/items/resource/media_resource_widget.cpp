@@ -24,6 +24,7 @@
 #include <core/ptz/fallback_ptz_controller.h>
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/home_ptz_controller.h>
+#include <core/ptz/viewport_ptz_controller.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -143,9 +144,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     /* Set up PTZ controller. */
     QnPtzControllerPtr fisheyeController;
     fisheyeController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
+    fisheyeController.reset(new QnViewportPtzController(fisheyeController));
     fisheyeController.reset(new QnPresetPtzController(fisheyeController));
     fisheyeController.reset(new QnTourPtzController(fisheyeController));
-    fisheyeController.reset(new QnHomePtzController(fisheyeController));
     fisheyeController.reset(new QnActivityPtzController(QnActivityPtzController::Local, fisheyeController));
 
     if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {

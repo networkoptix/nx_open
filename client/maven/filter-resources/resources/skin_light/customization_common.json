@@ -243,6 +243,18 @@
         "palette": { "default": {
             "highlight": "#ffffffff"
         }}
+    },
+    
+    "QnClockLabel": {
+        "palette": { "default": {
+            "windowText": "opaqueSelection.darker()"
+        }}
     }
 
 }
+
+
+
+
+
+

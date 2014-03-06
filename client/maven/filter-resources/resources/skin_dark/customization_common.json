@@ -185,6 +185,12 @@
         "palette": { "default": {
             "highlight": "#000000ff"
         }}
+    },
+    
+    "QnClockLabel": {
+        "palette": { "default": {
+            "windowText": "opaqueSelection.darker()"
+        }}
     }
 
 }

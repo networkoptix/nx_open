@@ -5,7 +5,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
-#include <utils/image_transformations.h>
+#include <ui/common/image_processing.h>
 
 QnThreadedImageLoaderPrivate::QnThreadedImageLoaderPrivate() :
     QObject(),
@@ -54,7 +54,7 @@ void QnThreadedImageLoaderPrivate::start() {
 
     QImage output = m_input;
     if (!output.isNull() && !qFuzzyIsNull(m_aspectRatio) && (m_flags & Qn::CropToTargetAspectRatio)) {
-        output = cropImageToAspectRatio(output, m_aspectRatio);
+        output = cropToAspectRatio(output, m_aspectRatio);
     }
 
     if (!output.isNull() && m_size.isValid() && !m_size.isNull()) {

@@ -75,6 +75,14 @@ void QnClientMessageProcessor::handleMessage(const QnMessage &message) {
     base_type::handleMessage(message);
 
     switch(message.messageType) {
+    case Qn::Message_Type_RuntimeInfoChange: {
+        if (!message.mainHardwareIds.isEmpty())
+            qnLicensePool->setMainHardwareIds(message.mainHardwareIds);
+
+        if (!message.compatibleHardwareIds.isEmpty())
+            qnLicensePool->setCompatibleHardwareIds(message.compatibleHardwareIds);
+    }
+
     case Qn::Message_Type_License: {
         qnLicensePool->addLicense(message.license);
         break;
@@ -209,8 +217,6 @@ void QnClientMessageProcessor::processCameraServerItems(const QnCameraHistoryLis
 
 void QnClientMessageProcessor::updateHardwareIds(const QnMessage& message)
 {
-    qnLicensePool->setOldHardwareId(message.oldHardwareId);
-    qnLicensePool->setHardwareId1(message.hardwareId1);
-    qnLicensePool->setHardwareId2(message.hardwareId2);
-    qnLicensePool->setHardwareId3(message.hardwareId3);
+    qnLicensePool->setMainHardwareIds(message.mainHardwareIds);
+    qnLicensePool->setCompatibleHardwareIds(message.compatibleHardwareIds);
 }
