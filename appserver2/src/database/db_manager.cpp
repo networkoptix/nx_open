@@ -1539,14 +1539,55 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResetBusi
 }
 
 
+ErrorCode QnDbManager::saveLicense(const ApiLicense& license) {
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO vms_license (raw_license) VALUES(:licenseBlock)");
+    insQuery.bindValue(":licenseBlock", license.licenseBlock);
+    if (insQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+
+}
+
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicense>& tran)
+{
+    return saveLicense(tran.params);
+}
+
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicenseList>& tran)
 {
-    return m_licenseManagerImpl->addLicenses( tran.params );
+    foreach (const ApiLicense& license, tran.params.data) {
+        ErrorCode result = saveLicense(license);
+        if (result != ErrorCode::ok) {
+            return ErrorCode::failure;
+        }
+    }
+
+    return ErrorCode::ok;
+
+//    return m_licenseManagerImpl->addLicenses( tran.params );
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseList& data)
 {
-    return m_licenseManagerImpl->getLicenses( &data );
+    QSqlQuery query(m_sdb);
+
+    QString q = QString(lit("SELECT raw_license from vms_license"));
+    query.prepare(q);
+
+    if (!query.exec())
+    {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return ErrorCode::failure;
+    }
+
+    QN_QUERY_TO_DATA_OBJECT(query, ApiLicense, data.data, ApiLicenseFields);
+    // m_licenseManagerImpl->getLicenses( &data );
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& _path, ApiStoredDirContents& data)

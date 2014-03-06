@@ -124,6 +124,7 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiIdData>& tran);
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicenseList>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicense>& tran);
 
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiFullData>&) {
@@ -177,6 +178,8 @@ namespace ec2
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);
         ErrorCode removeBusinessRule( const QnId& id );
         ErrorCode updateBusinessRule(const ApiBusinessRuleData& rule);
+
+        ErrorCode saveLicense(const ApiLicense& license);
 
 		bool createDatabase();
         

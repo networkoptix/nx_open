@@ -60,9 +60,9 @@ namespace ec2
 
     void LicenseManagerImpl::getHardwareId( ServerInfo* const serverInfo )
     {
-        serverInfo->oldHardwareId = "0333333333333333333333333333333333";
-        serverInfo->hardwareId1 = "0333333333333333333333333333333333";
-        serverInfo->hardwareId2 = "0333333333333333333333333333333333";
+        serverInfo->oldHardwareId = "33333333333333333333333333333333";
+        serverInfo->hardwareId1 = "0133333333333333333333333333333333";
+        serverInfo->hardwareId2 = "0233333333333333333333333333333333";
         serverInfo->hardwareId3 = "0333333333333333333333333333333333";
     }
 }
