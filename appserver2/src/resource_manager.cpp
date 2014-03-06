@@ -154,8 +154,10 @@ namespace ec2
         tran.params.id = id;
         
         if (command == ApiCommand::setResourceStatus) {
-            QnResourcePtr mServer = m_resCtx.pool->getResourceById(id).dynamicCast<QnMediaServerResource>();
-            if (mServer)
+            QnResourcePtr res = m_resCtx.pool->getResourceById(id);
+            if (res.dynamicCast<QnMediaServerResource>())
+                tran.localTransaction = true;
+            else if (res->hasFlags(QnResource::foreigner))
                 tran.localTransaction = true;
         }
 

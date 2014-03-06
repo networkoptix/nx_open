@@ -27,11 +27,11 @@ void QnServerMessageProcessor::updateResource(QnResourcePtr resource)
     //storing all servers' cameras too
     // If camera from other server - marking it
     
-    //if (isCamera && resource->getParentId() != ownMediaServer->getId())
-    //    resource->addFlags( QnResource::foreigner );
+    if (isCamera && resource->getParentId() != ownMediaServer->getId())
+        resource->addFlags( QnResource::foreigner );
 
-    //if (isServer && resource->getId() != ownMediaServer->getId())
-    //    resource->addFlags( QnResource::foreigner );
+    if (isServer && resource->getId() != ownMediaServer->getId())
+        resource->addFlags( QnResource::foreigner );
 
     bool needUpdateServer = false;
     // We are always online
