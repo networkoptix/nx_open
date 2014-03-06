@@ -234,7 +234,15 @@ void QnLayoutExportTool::finishExport(bool success) {
         if (m_realFilename != m_targetFilename)
         {
             m_storage->renameFile(m_storage->getUrl(), QnLayoutFileStorageResource::layoutPrefix() + m_targetFilename);
-            snapshotManager()->store(m_layout);
+            if (m_mode == Qn::LayoutLocalSave) {
+                QnLayoutResourcePtr layout = resourcePool()->getResourceByUniqId(m_layout->getUniqueId()).dynamicCast<QnLayoutResource>();
+                if (layout) {
+                    layout->update(m_layout);
+                    snapshotManager()->store(layout);
+                }
+            } else {
+                snapshotManager()->store(m_layout);
+            }
         }
         else if (m_mode == Qn::LayoutLocalSaveAs)
         {

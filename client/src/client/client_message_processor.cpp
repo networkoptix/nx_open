@@ -12,6 +12,14 @@ QnClientMessageProcessor::QnClientMessageProcessor():
 }
 
 void QnClientMessageProcessor::onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status)
+    case Qn::Message_Type_RuntimeInfoChange: {
+        if (!message.mainHardwareIds.isEmpty())
+            qnLicensePool->setMainHardwareIds(message.mainHardwareIds);
+
+        if (!message.compatibleHardwareIds.isEmpty())
+            qnLicensePool->setCompatibleHardwareIds(message.compatibleHardwareIds);
+    }
+
 {
     resource->setStatus(status);
 }

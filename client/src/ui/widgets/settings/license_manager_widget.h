@@ -41,7 +41,7 @@ signals:
     void showMessageLater(const QString &title, const QString &message, bool warning);
 
 private:
-    void updateFromServer(const QByteArray &licenseKey, const QString &hardwareId, const QString &oldHardwareId, const QString &hardwareId2, const QString &hardwareId3);
+    void updateFromServer(const QByteArray &licenseKey, const QList<QByteArray> &mainHardwareIds, const QList<QByteArray> &compatibleHardwareIds);
     void validateLicenses(const QByteArray& licenseKey, const QList<QnLicensePtr> &licenses);
     void showLicenseDetails(const QnLicensePtr &license);
 

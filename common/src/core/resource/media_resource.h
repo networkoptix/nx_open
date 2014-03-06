@@ -66,7 +66,7 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0);
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0);
 
-    void setCustomVideoLayout(QnConstCustomResourceVideoLayoutPtr newLayout);
+    void setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLayout);
 
     virtual const QnResource* toResource() const = 0;
     virtual QnResource* toResource() = 0;

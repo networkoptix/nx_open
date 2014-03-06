@@ -11,7 +11,6 @@ class GraphicsLabel : public GraphicsFrame
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText)
-
     typedef GraphicsFrame base_type;
 
 public:

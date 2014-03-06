@@ -150,13 +150,13 @@ const QByteArray& QnLicense::rawLicense() const
     return m_rawLicense;
 }
 
-bool QnLicense::isValid(const QByteArray& hardwareId, const QString& brand) const
+bool QnLicense::isValid(const QList<QByteArray>& hardwareIds, const QString& brand) const
 {
-    return (m_isValid1 || m_isValid2) && (hardwareId == m_hardwareId) &&
-        (m_brand == brand ||
-            // temporary fix for current trial DW licenses
-            // TODO: Ivan, remove it for v2.0, all trial licenses should be expired by that moment
-            (m_brand == lit("digitalwatchdog") && brand == lit("dwspectrum")));
+    // >= v1.5, shoud have hwid1, hwid2 or hwid3, and have brand
+    // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
+    // We just allow empty brand for all, because we believe license is correct.
+
+    return (m_isValid1 || m_isValid2) && hardwareIds.contains(m_hardwareId) && (m_brand == brand || m_brand.isEmpty());
 }
 
 bool QnLicense::isAnalog() const {
@@ -310,36 +310,6 @@ int QnLicenseListHelper::totalCamerasByClass(bool analog) const
     return result;
 }
 
-#if 0
-
-void QnLicenseList::append(QnLicensePtr license)
-{
-    if (m_licenses.contains(license->key())) {
-        // Update if resulting license is valid with current hardwareId
-        if (license->isValid(m_hardwareId2))
-            m_licenses[license->key()] = license;
-
-        return;
-    }
-
-    // We allow adding any valid license by now.
-    // So, user can game us as follows:
-    // 1. Activate license with v1.4, 
-    //    activation will be bound to the old hardware id, which is stored in registry
-    // 2. Clone the system
-    // 3. Re-Activate the license on all clones
-    if (license->isValid(m_hardwareId2) || license->isValid(m_hardwareId1) || license->isValid(m_oldHardwareId))
-        m_licenses.insert(license->key(), license);
-}
-
-void QnLicenseList::append(QnLicenseList licenses)
-{
-    foreach (QnLicensePtr license, licenses.m_licenses.values())
-        append(license);
-}
-
-#endif // 0
-
 // -------------------------------------------------------------------------- //
 // QnLicensePool
 // -------------------------------------------------------------------------- //
@@ -365,15 +335,7 @@ QnLicenseList QnLicensePool::getLicenses() const
 bool QnLicensePool::isLicenseMatchesCurrentSystem(const QnLicensePtr &license) {
     const QString brand(QLatin1String(QN_PRODUCT_NAME_SHORT));
 
-    // >= v1.5, shoud have hwid1, hwid2 or hwid3, and have brand
-    if (license->isValid(m_hardwareId1, brand) || license->isValid(m_hardwareId2, brand) || license->isValid(m_hardwareId3, brand))
-        return true;
-
-    // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
-    if (license->isValid(m_oldHardwareId, brand) || license->isValid(m_oldHardwareId, QLatin1String("")))
-        return true;
-
-    return false;
+    return license->isValid(m_mainHardwareIds + m_compatibleHardwareIds, brand);
 }
 
 bool QnLicensePool::addLicense_i(const QnLicensePtr &license)
@@ -441,59 +403,31 @@ bool QnLicensePool::isEmpty() const
     return m_licenseDict.isEmpty();
 }
 
-void QnLicensePool::setHardwareId1(const QByteArray &hardwareId1)
+void QnLicensePool::setMainHardwareIds(const QList<QByteArray> &hardwareIds)
 {
-    m_hardwareId1 = hardwareId1;
+    m_mainHardwareIds = hardwareIds;
 }
 
-QByteArray QnLicensePool::hardwareId1() const
+QList<QByteArray> QnLicensePool::mainHardwareIds() const
 {
-    return m_hardwareId1;
+    return m_mainHardwareIds;
 }
 
-void QnLicensePool::setOldHardwareId(const QByteArray &oldHardwareId)
+void QnLicensePool::setCompatibleHardwareIds(const QList<QByteArray> &hardwareIds)
 {
-    m_oldHardwareId = oldHardwareId;
+    m_compatibleHardwareIds = hardwareIds;
 }
 
-QByteArray QnLicensePool::oldHardwareId() const
+QList<QByteArray> QnLicensePool::compatibleHardwareIds() const
 {
-    return m_oldHardwareId;
+    return m_compatibleHardwareIds;
 }
 
-void QnLicensePool::setHardwareId2(const QByteArray &hardwareId2)
+QList<QByteArray> QnLicensePool::allHardwareIds() const
 {
-    m_hardwareId2 = hardwareId2;
+    return m_mainHardwareIds + m_compatibleHardwareIds;
 }
-
-QByteArray QnLicensePool::hardwareId2() const
-{
-    return m_hardwareId2;
-}
-
-void QnLicensePool::setHardwareId3(const QByteArray &hardwareId3)
-{
-    m_hardwareId3 = hardwareId3;
-}
-
-QByteArray QnLicensePool::hardwareId3() const
-{
-    return m_hardwareId3;
-}
-
 QByteArray QnLicensePool::currentHardwareId() const
 {
-    if (!m_hardwareId3.isEmpty())
-        return m_hardwareId3;
-
-    if (!m_hardwareId2.isEmpty())
-        return m_hardwareId2;
-
-    if (!m_hardwareId1.isEmpty())
-        return m_hardwareId1;
-
-    if (!m_oldHardwareId.isEmpty())
-        return m_oldHardwareId;
-
-    return QByteArray();
+    return m_mainHardwareIds.isEmpty() ? QByteArray() : m_mainHardwareIds.last();
 }

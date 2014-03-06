@@ -23,16 +23,19 @@ signals:
 private slots:
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
     void at_thumbnailReceived(int status, const QImage& thumbnail, int handle);
+
 private:
     Q_SIGNAL void thumbnailReadyDelayed(QnId resourceId, const QPixmap& thumbnail);
     int loadThumbnailForResource(const QnResourcePtr &resource);
+    void forceRefreshThumbnails();
 
     enum ThumbnailStatus {
         None,
         Loading,
         Loaded,
         NoData,
-        NoSignal
+        NoSignal,
+        Refreshing
     };
 
     struct ThumbnailData {
@@ -46,6 +49,7 @@ private:
     QHash<QnResourcePtr, ThumbnailData> m_thumbnailByResource;
     QSize m_thumnailSize;
     QHash<ThumbnailStatus, QPixmap> m_statusPixmaps;
+    QTimer *m_refreshingTimer;
 };
 
 #endif // CAMERA_THUMBNAIL_MANAGER_H

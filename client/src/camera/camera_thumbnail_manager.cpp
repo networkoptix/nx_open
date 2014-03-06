@@ -1,5 +1,7 @@
 #include "camera_thumbnail_manager.h"
 
+#include <QtCore/QTimer>
+
 #include <core/resource/resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
@@ -16,21 +18,29 @@ QnCameraThumbnailManager::QnCameraThumbnailManager(QObject *parent) :
     QObject(parent),
     m_thumnailSize(0, 0)
 {
-    connect(qnResPool,  SIGNAL(resourceRemoved(QnResourcePtr)),         this,   SLOT(at_resPool_resourceRemoved(QnResourcePtr)));
-    connect(this,       SIGNAL(thumbnailReadyDelayed(QnId,QPixmap)),     this,   SIGNAL(thumbnailReady(QnId,QPixmap)), Qt::QueuedConnection);
+    m_refreshingTimer = new QTimer(this);
+    m_refreshingTimer->setInterval(10 * 1000);
+
+    connect(m_refreshingTimer,      &QTimer::timeout,                                   this,   &QnCameraThumbnailManager::forceRefreshThumbnails);
+    connect(qnResPool,              &QnResourcePool::resourceRemoved,                   this,   &QnCameraThumbnailManager::at_resPool_resourceRemoved);
+    connect(this,                   &QnCameraThumbnailManager::thumbnailReadyDelayed,   this,   &QnCameraThumbnailManager::thumbnailReady, Qt::QueuedConnection);
     setThumbnailSize(defaultThumbnailSize);
+
+    m_refreshingTimer->start();
 }
 
 QnCameraThumbnailManager::~QnCameraThumbnailManager() {}
 
 void QnCameraThumbnailManager::selectResource(const QnResourcePtr &resource) {
     ThumbnailData& data = m_thumbnailByResource[resource];
-    if (data.status == None) {
+    if (data.status == None || data.status == Refreshing) {
         data.loadingHandle = loadThumbnailForResource(resource);
-        if (data.loadingHandle != 0)
-            data.status = Loading;
-        else
+        if (data.loadingHandle != 0) {
+            if (data.status != Refreshing)
+                data.status = Loading;
+        } else {
             data.status = NoSignal;
+        }
     }
 
     QPixmap thumbnail;
@@ -43,6 +53,7 @@ void QnCameraThumbnailManager::selectResource(const QnResourcePtr &resource) {
         thumbnail = m_statusPixmaps[data.status];
         break;
     case Loaded:
+    case Refreshing:
         thumbnail = QPixmap::fromImage(data.thumbnail);
         break;
     }
@@ -107,4 +118,11 @@ void QnCameraThumbnailManager::at_thumbnailReceived(int status, const QImage &th
 
 void QnCameraThumbnailManager::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
     m_thumbnailByResource.remove(resource);
+}
+
+void QnCameraThumbnailManager::forceRefreshThumbnails() {
+    for (auto it = m_thumbnailByResource.begin(); it != m_thumbnailByResource.end(); ++it) {
+        if (it.key()->getStatus() == QnResource::Recording && it.value().status == Loaded)
+            it.value().status = Refreshing;
+    }
 }

@@ -109,7 +109,6 @@ extern "C"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
 
-
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
 #endif

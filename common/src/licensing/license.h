@@ -36,7 +36,7 @@ public:
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(const QByteArray& hardwareId, const QString& brand) const;
+    bool isValid(const QList<QByteArray>& hardwareIds, const QString& brand) const;
 
     /**
      * @returns                         Whether this license is for analog cameras.
@@ -154,18 +154,13 @@ public:
     void reset();
     bool isEmpty() const;
 
-    void setHardwareId1(const QByteArray& hardwareId);
-    QByteArray hardwareId1() const;
+    void setMainHardwareIds(const QList<QByteArray>& hardwareIds);
+    QList<QByteArray> mainHardwareIds() const;
 
-    void setOldHardwareId(const QByteArray& oldHardwareId);
-    QByteArray oldHardwareId() const;
+    void setCompatibleHardwareIds(const QList<QByteArray>& hardwareIds);
+    QList<QByteArray> compatibleHardwareIds() const;
 
-    void setHardwareId2(const QByteArray& hardwareId);
-    QByteArray hardwareId2() const;
-
-    void setHardwareId3(const QByteArray& hardwareId);
-    QByteArray hardwareId3() const;
-
+    QList<QByteArray> allHardwareIds() const;
     QByteArray currentHardwareId() const;
 signals:
     void licensesChanged();
@@ -179,18 +174,8 @@ private:
     bool addLicenses_i(const QnLicenseList &licenses);
 
 private:
-    // The one 1.5 uses
-    QByteArray m_hardwareId1;
-
-    // Pre 1.5
-    QByteArray m_oldHardwareId;
-
-    // The one 1.6 uses
-    QByteArray m_hardwareId2;
-
-    // The one for 2.0.2 and later
-    QByteArray m_hardwareId3;
-
+    QList<QByteArray> m_mainHardwareIds;
+    QList<QByteArray> m_compatibleHardwareIds;
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;
 };

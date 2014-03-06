@@ -673,11 +673,14 @@ void PtzInstrument::processPtzClick(const QPointF &pos) {
     if(!target() || m_skipNextAction)
         return;
 
-    QnSplashItem *splashItem = newSplashItem(target());
-    splashItem->setSplashType(QnSplashItem::Circular);
-    splashItem->setRect(QRectF(0.0, 0.0, 0.0, 0.0));
-    splashItem->setPos(pos);
-    m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
+    /* Don't animate for virtual cameras as it looks bad. */
+    if(m_movement != VirtualMovement) {
+        QnSplashItem *splashItem = newSplashItem(target());
+        splashItem->setSplashType(QnSplashItem::Circular);
+        splashItem->setRect(QRectF(0.0, 0.0, 0.0, 0.0));
+        splashItem->setPos(pos);
+        m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
+    }
 
     ptzMoveTo(target(), pos);
 }
@@ -1021,15 +1024,16 @@ void PtzInstrument::finishDragProcess(DragInfo *info) {
         case ContinuousMovement:
             ptzMove(target(), QVector3D(0.0, 0.0, 0.0));
             break;
-        case PtzInstrument::ViewportMovement:
-            if(m_isClick && m_isDoubleClick) {
-                processPtzDoubleClick();
-            } else if(m_isClick) {
-                m_clickTimer.start(m_clickDelayMSec, this);
-                m_clickPos = info->mousePressItemPos();
+        case ViewportMovement:
+        case VirtualMovement:
+            if(m_isClick) {
+                if(m_isDoubleClick) {
+                    processPtzDoubleClick();
+                } else {
+                    m_clickTimer.start(m_clickDelayMSec, this);
+                    m_clickPos = info->mousePressItemPos();
+                }
             }
-            break;
-        case PtzInstrument::VirtualMovement:
             break;
         default:
             break;

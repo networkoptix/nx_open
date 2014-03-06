@@ -60,7 +60,7 @@ namespace {
 
     QList<QString> initNetworkSuffixes() {
         QList<QString> result;
-        result << QObject::tr("b/s");
+        result << QObject::tr("b/s"); // TODO: #Elric #TR add propert context.
         result << QObject::tr("Kb/s");
         result << QObject::tr("Mb/s");
    //     result << QObject::tr("Gb/s");
@@ -394,7 +394,7 @@ protected:
                 qreal currentValue = 0;
                 QPainterPath path = createChartPath(values, x_step, -1.0 * (oh - 2*space_offset), elapsed_step, &currentValue);
                 displayValues[key] = currentValue;
-                graphPen.setColor(toTransparent(m_widget->deviceColor(stats.deviceType, key), data.opacity));
+                graphPen.setColor(toTransparent(data.color, data.opacity));
                 painter->strokePath(path, graphPen);
             }
         }
@@ -417,10 +417,8 @@ protected:
                 qreal opacity = painter->opacity();
                 painter->setOpacity(opacity * m_widget->m_infoOpacity);
 
-                qreal xRight = offsetX + ow + itemSpacing*2;
+                qreal xRight = offsetX + ow + itemSpacing * 2;
                 foreach(QString key, m_widget->m_sortedKeys) {
-                    QnStatisticsData &stats = m_widget->m_history[key];
-
                     const QnServerResourceWidget::GraphData &data = m_widget->m_graphDataByKey[key];
                     if (!data.visible)
                         continue;
@@ -430,7 +428,7 @@ protected:
                         continue;
                     qreal y = offsetTop + qMax(offsetTop, oh * (1.0 - interValue));
 
-                    main_pen.setColor(toTransparent(m_widget->deviceColor(stats.deviceType, key), data.opacity));
+                    main_pen.setColor(toTransparent(data.color, data.opacity));
                     painter->setPen(main_pen);
                     painter->drawText(xRight, y, tr("%1%").arg(qRound(interValue * 100.0)));
                 }
@@ -454,7 +452,9 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     m_lastHistoryId(-1),
     m_counter(0),
     m_renderStatus(Qn::NothingRendered),
-    m_infoOpacity(0.0)
+    m_infoOpacity(0.0),
+    m_hddCount(0),
+    m_networkCount(0)
 {
     registerAnimation(this);
     startListening();
@@ -526,16 +526,16 @@ void QnServerResourceWidget::setColors(const QnStatisticsColors &colors) {
     m_colors = colors;
 }
 
-QColor QnServerResourceWidget::deviceColor(QnStatisticsDeviceType deviceType, const QString &key) const {
+QColor QnServerResourceWidget::nextColor(QnStatisticsDeviceType deviceType) {
     switch (deviceType) {
     case CPU:
         return m_colors.cpu;
     case RAM:
         return m_colors.ram;
     case HDD:
-        return m_colors.hddByKey(key);
+        return m_colors.hdds[qMod(m_hddCount++, m_colors.hdds.size())];
     case NETWORK:
-        return m_colors.networkByKey(key);
+        return m_colors.network[qMod(m_networkCount++, m_colors.network.size())];
     default:
         return QColor(Qt::white);
     }
@@ -648,8 +648,9 @@ void QnServerResourceWidget::updateLegend() {
             data.bar = m_legendButtonBar[buttonBarByDeviceType(stats.deviceType)];
             data.mask = data.bar->unusedMask();
             data.visible = true;
+            data.color = nextColor(stats.deviceType);
 
-            LegendButtonWidget* newButton = new LegendButtonWidget(key, deviceColor(stats.deviceType, key));
+            LegendButtonWidget* newButton = new LegendButtonWidget(key, data.color);
             newButton->setProperty(legendKeyPropertyName, key);
             newButton->setChecked(true);
 

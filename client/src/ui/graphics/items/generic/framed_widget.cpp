@@ -10,6 +10,7 @@
 FramedBase::FramedBase():
     m_self(NULL),
     m_frameWidth(1.0),
+    m_roundingRadius(0.0),
     m_frameStyle(Qt::SolidLine),
     m_frameShape(Qn::RectangularFrame)
 {}
@@ -94,6 +95,17 @@ void FramedBase::setWindowColor(const QColor &windowColor) {
     setWindowBrush(windowColor);
 }
 
+qreal FramedBase::roundingRadius() const {
+    return m_roundingRadius;
+}
+void FramedBase::setRoundingRadius(qreal roundingRadius) {
+    if(qFuzzyCompare(m_roundingRadius, roundingRadius))
+        return;
+
+    m_roundingRadius = roundingRadius;
+    m_self->update();
+}
+
 void FramedBase::paintFrame(QPainter *painter, const QRectF &rect) {
     if(m_frameShape == Qn::NoFrame)
         return;
@@ -104,9 +116,17 @@ void FramedBase::paintFrame(QPainter *painter, const QRectF &rect) {
     qreal d = m_frameWidth / 2.0;
     QRectF frameRect = rect.adjusted(d, d, -d, -d);
 
-    if(m_frameShape == Qn::RectangularFrame) {
+    switch (m_frameShape) {
+    case Qn::RectangularFrame:
         painter->drawRect(frameRect);
-    } else {
+        break;
+    case Qn::RoundedRectangularFrame:
+        painter->drawRoundedRect(rect, m_roundingRadius, m_roundingRadius, Qt::AbsoluteSize);
+        break;
+    case Qn::EllipticalFrame:
         painter->drawEllipse(frameRect);
+        break;
+    default:
+        break;
     }
 }

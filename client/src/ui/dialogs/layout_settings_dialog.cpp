@@ -17,6 +17,7 @@
 #include <core/resource/layout_resource.h>
 
 #include <ui/common/geometry.h>
+#include <ui/common/image_processing.h>
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
@@ -28,7 +29,6 @@
 #include <utils/threaded_image_loader.h>
 #include <utils/app_server_image_cache.h>
 #include <utils/local_file_cache.h>
-#include <utils/image_transformations.h>
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
@@ -542,7 +542,7 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
     /* Disable cropping for images that are quite well aspected. */
     qreal imageAspectRatio = (qreal)image.width() / (qreal)image.height();
     if (qAbs(imageAspectRatio - screenAspectRatio()) > aspectRatioVariation) {
-        d->croppedPreview = cropImageToAspectRatio(image, screenAspectRatio());
+        d->croppedPreview = cropToAspectRatio(image, screenAspectRatio());
     }
     else {
         d->croppedPreview = QImage();

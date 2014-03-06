@@ -48,7 +48,7 @@ QnCalendarWidget::QnCalendarWidget(QWidget *parent):
     QTableView *tableView = findChild<QTableView *>(QLatin1String("qt_calendar_calendarview"));
     tableView->horizontalHeader()->setMinimumSectionSize(18);
     connect(tableView, SIGNAL(changeDate(const QDate &, bool)), this, SIGNAL(dateClicked(const QDate &)));
-    setPaletteColor(tableView, QPalette::Highlight, QColor(0, 0, 0, 255));
+    //setPaletteColor(tableView, QPalette::Highlight, QColor(0, 0, 0, 255));
 
     QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
     signalizer->setEventType(QEvent::Paint);
