@@ -191,6 +191,12 @@
         "palette": { "default": {
             "windowText": "opaqueSelection.darker()"
         }}
+    },
+    
+    "QnGraphicsMessageBox": {
+        "frameColor": "#505050ff",
+        "windowColor": "#202050ff",
+        "textColor": "#a0a0a0ff"
     }
 
 }

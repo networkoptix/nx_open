@@ -35,6 +35,8 @@ private:
 
 class QnGraphicsMessageBox : public Animated<QnFramedWidget> {
     Q_OBJECT
+    Q_PROPERTY(QString text READ text WRITE setText)
+    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
     typedef Animated<QnFramedWidget> base_type;
 
 public:
@@ -43,6 +45,9 @@ public:
 
     const QString &text() const;
     void setText(const QString &text);
+
+    const QColor &textColor() const;
+    void setTextColor(const QColor &textColor);
 
     int timeout() const;
 

@@ -78,7 +78,7 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
     font.setPixelSize(defaultFontSize);
     setFont(font);
 
-    setPaletteColor(this, QPalette::WindowText, QColor(166, 166, 166));
+    setTextColor(QColor(166, 166, 166));
     setFrameColor(QColor(83, 83, 83));
     setWindowColor(QColor(33, 33, 80));
 
@@ -100,6 +100,14 @@ const QString &QnGraphicsMessageBox::text() const {
 
 void QnGraphicsMessageBox::setText(const QString &text) {
     m_label->setText(text);
+}
+
+const QColor &QnGraphicsMessageBox::textColor() const {
+    return palette().color(QPalette::WindowText);
+}
+
+void QnGraphicsMessageBox::setTextColor(const QColor &textColor) {
+    setPaletteColor(this, QPalette::WindowText, textColor);
 }
 
 int QnGraphicsMessageBox::timeout() const {
