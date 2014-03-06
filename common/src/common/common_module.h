@@ -39,6 +39,7 @@ public:
 
     void setSystemName(const QString& value) { m_systemName = value; }
     QString systemName() { return m_systemName; }
+    QByteArray getSystemPassword() { return "{61D85D22-E7AA-44EC-B5EC-1BEAC9FE19C5}"; }
 
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName);
