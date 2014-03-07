@@ -2,7 +2,7 @@
 
 #include <QtCore/QUrlQuery>
 
-#include "../../appserver2/src/transaction/transaction.h"
+#include "nx_ec/data/ec2_business_rule_data.h"
 
 Q_GLOBAL_STATIC(QnBusinessMessageBus, QnBusinessMessageBus_instance)
 
@@ -50,7 +50,9 @@ int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionP
 
     QByteArray data;
     OutputBinaryStream<QByteArray> stream(&data);
-    serialize(bAction, &stream);
+    ec2::ApiBusinessActionData apiData;
+    apiData.fromResource(bAction);
+    serialize(apiData, &stream);
     QNetworkReply* reply = m_transport.post(request, data);
     m_actionsInProgress.insert(reply, bAction);
 
