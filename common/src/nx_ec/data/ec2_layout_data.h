@@ -29,6 +29,14 @@ namespace ec2
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
+    #define ApiLayoutItemDataFields (uuid) (flags) (left) (top) (right) (bottom) (rotation) (resourceId) (zoomLeft) (zoomTop) (zoomRight) (zoomBottom) (zoomTargetUuid) (contrastParams) (dewarpingParams)
+    QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiLayoutItemData, ApiLayoutItemDataFields)
+}
+
+
+
+namespace ec2
+{
     struct ApiLayoutItemDataWithRef: public ApiLayoutItemData {
         QnId layoutId;
     };
@@ -52,6 +60,13 @@ namespace ec2
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
+    #define ApiLayoutDataFields (cellAspectRatio) (cellSpacingWidth) (cellSpacingHeight) (items) (userCanEdit) (locked) (backgroundImageFilename) (backgroundWidth) (backgroundHeight) (backgroundOpacity) (userId)
+    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ApiLayoutData, ec2::ApiResourceData, ApiLayoutDataFields)
+}
+                                                                                
+
+namespace ec2
+{
     struct ApiLayoutDataList: public ApiData
     {
         std::vector<ApiLayoutData> data;
@@ -68,13 +83,8 @@ namespace ec2
             }
         }
     };
+
+    QN_DEFINE_STRUCT_SERIALIZATORS (ApiLayoutDataList, (data) )
 }
-
-#define ApiLayoutItemDataFields (uuid) (flags) (left) (top) (right) (bottom) (rotation) (resourceId) (zoomLeft) (zoomTop) (zoomRight) (zoomBottom) (zoomTargetUuid) (contrastParams) (dewarpingParams)
-#define ApiLayoutDataFields (cellAspectRatio) (cellSpacingWidth) (cellSpacingHeight) (items) (userCanEdit) (locked) (backgroundImageFilename) (backgroundWidth) (backgroundHeight) (backgroundOpacity) (userId)
-
-QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiLayoutItemData, ApiLayoutItemDataFields)
-QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiLayoutData, ec2::ApiResourceData, ApiLayoutDataFields)
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiLayoutDataList, (data) )
 
 #endif  //EC2_LAYOUT_DATA_H

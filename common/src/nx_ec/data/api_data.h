@@ -14,6 +14,7 @@ namespace ec2 {
         QnId id;
     };
 
+    QN_DEFINE_STRUCT_SERIALIZATORS (ApiIdData, (id) )
 }
 
 #ifndef Q_MOC_RUN
@@ -105,7 +106,5 @@ inline void queryFieldToDataObj(QSqlQuery& query, int idx, float& field) { field
 inline void queryFieldToDataObj(QSqlQuery& query, int idx, QnId& field) { field = QnId::fromRfc4122(query.value(idx).toByteArray()); }
 template <class T> void queryFieldToDataObj(QSqlQuery&, int, std::vector<T>&) { ; } // TODO: #Elric wtf?
 template <class T> void queryFieldToDataObj(QSqlQuery& query, int idx, T& field, typename std::enable_if<std::is_enum<T>::value>::type* = NULL ) { field = (T) query.value(idx).toInt(); }
-
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiIdData, (id) )
 
 #endif // __API_DATA_H__

@@ -85,7 +85,7 @@ private:
     bool registerFD( int fd );
     void unregisterFD( int fd );
     void fillAudioFormat( const ISDAudioPacket& audioPacket );
-    int64_t calcNextTimestamp( const unsigned int pts );
+    int64_t calcNextTimestamp( unsigned int pts );
 };
 
 #endif  //ILP_STREAM_READER_H

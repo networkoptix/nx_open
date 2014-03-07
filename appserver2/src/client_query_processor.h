@@ -56,7 +56,7 @@ namespace ec2
 
             QByteArray tranBuffer;
             OutputBinaryStream<QByteArray> outputStream( &tranBuffer );
-            tran.serialize(&outputStream);
+            serialize( tran, &outputStream );
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
@@ -165,7 +165,7 @@ namespace ec2
             const QByteArray& msgBody = httpClient->fetchMessageBodyBuffer();
             InputBinaryStream<QByteArray> inputStream( msgBody );
             OutputData outputData;
-            if( !QnBinary::deserialize( outputData, &inputStream ) )
+            if( !deserialize( outputData, &inputStream ) )
                 handler( ErrorCode::badResponse, outputData );
             else
                 handler( ErrorCode::ok, outputData );

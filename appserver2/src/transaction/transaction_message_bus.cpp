@@ -32,10 +32,11 @@ void QnTransactionMessageBus::initStaticInstance(QnTransactionMessageBus* instan
 }
 
 QnTransactionMessageBus::QnTransactionMessageBus(): 
-    m_timer(0), 
-    m_thread(0), 
+    m_serializer(*this),
+    m_handler(nullptr),
+    m_timer(nullptr), 
     m_mutex(QMutex::Recursive),
-    m_serializer(*this)
+    m_thread(nullptr)
 {
     m_thread = new QThread();
     m_thread->setObjectName("QnTransactionMessageBusThread");
@@ -60,7 +61,7 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
 void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream)
 {
     QnTransaction<ApiServerAliveData> tran(abstractTran);
-    if (!QnBinary::deserialize(tran.params, &stream)) {
+    if (!deserialize(tran.params, &stream)) {
         qWarning() << "Got invalid ApiServerAliveData transaction. Ignoring";
         return;
     }
@@ -76,7 +77,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
 
     QnAbstractTransaction tran;
     InputBinaryStream<QByteArray> stream(serializedTran);
-    if (!tran.deserialize(&stream)) {
+    if (!deserialize(tran, &stream)) {
         qWarning() << Q_FUNC_INFO << "Ignore bad transaction data. size=" << serializedTran.size();
         sender->setState(QnTransactionTransport::Error);
         return;
@@ -104,6 +105,8 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     case ApiCommand::serverAliveInfo:
         onGotServerAliveInfo(tran, stream);
         break; // do not return. proxy this transaction
+    default:
+        break;
     }
     
     if (!sender->isReadSync())
@@ -118,7 +121,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
 
     // proxy incoming transaction to other peers.
     QByteArray chunkData;
-    m_serializer.serialize(chunkData, serializedTran, processedPeers);
+    m_serializer.serializeTran(chunkData, serializedTran, processedPeers);
 
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
@@ -128,7 +131,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     }
 }
 
-void QnTransactionMessageBus::sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData)
+void QnTransactionMessageBus::sendTransactionInternal(const QnAbstractTransaction& /*tran*/, const QByteArray& chunkData)
 {
     QMutexLocker lock(&m_mutex);
     for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
@@ -145,14 +148,14 @@ template <class T2>
 bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbstractTransaction&  abstractTran, InputBinaryStream<QByteArray>& stream)
 {
     QnTransaction<T2> tran(abstractTran);
-    if (!QnBinary::deserialize(tran.params, &stream))
+    if (!deserialize(tran.params, &stream))
         return false;
     
     if (abstractTran.persistent && transactionLog && transactionLog->contains(tran))
         return true; // transaction already processed
 
     // trigger notification, update local data e.t.c
-    if (!m_handler->processIncomingTransaction<T2>(tran, stream.buffer()))
+    if (!m_handler->template processIncomingTransaction<T2>(tran, stream.buffer()))
         return false;
 
     return true;
@@ -168,7 +171,7 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     sender->setWriteSync(true);
 
     QnTranState params;
-    if (QnBinary::deserialize(params, &stream))
+    if (deserialize(params, &stream))
     {
 
         QList<QByteArray> transactions;
@@ -178,12 +181,12 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
             QnTransaction<int> tran(ApiCommand::tranSyncResponse, false);
             tran.params = 0;
             QByteArray chunkData;
-            m_serializer.serialize(chunkData, tran);
+            m_serializer.serializeTran(chunkData, tran);
             sender->addData(chunkData);
 
             foreach(const QByteArray& serializedTran, transactions) {
                 QByteArray chunkData;
-                m_serializer.serialize(chunkData, serializedTran);
+                m_serializer.serializeTran(chunkData, serializedTran);
                 sender->addData(chunkData);
             }
             return true;
@@ -196,12 +199,12 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
 }
 
 template <class T>
-bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTransport* sender, const QByteArray& data)
+bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTransport* /*sender*/, const QByteArray& data)
 {
     Q_ASSERT(data.size() > 4);
     InputBinaryStream<QByteArray> stream(data);
     QnAbstractTransaction  abstractTran;
-    if (!QnBinary::deserialize(abstractTran, &stream))
+    if (!deserialize(abstractTran, &stream))
         return false; // bad data
 
     switch (abstractTran.command)
@@ -284,7 +287,7 @@ void QnTransactionMessageBus::queueSyncRequest(QSharedPointer<QnTransactionTrans
     requestTran.params = transactionLog->getTransactionsState();
     
     QByteArray syncRequest;
-    m_serializer.serialize(syncRequest, requestTran);
+    m_serializer.serializeTran(syncRequest, requestTran);
     transport->addData(syncRequest);
 }
 
@@ -332,6 +335,8 @@ void QnTransactionMessageBus::processConnState(QnTransactionTransportPtr transpo
         if (!transport->isClientPeer())
             queueSyncRequest(transport);
         connectToPeerEstablished(transport->remoteGuid(), transport->isClientPeer());
+        break;
+    default:
         break;
     }
 }
@@ -447,7 +452,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     {
         transport->setWriteSync(true);
         QByteArray buffer;
-        m_serializer.serialize(buffer, tran);
+        m_serializer.serializeTran(buffer, tran);
         transport->addData(buffer);
     }
     

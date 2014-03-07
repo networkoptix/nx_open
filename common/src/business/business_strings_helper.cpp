@@ -46,8 +46,8 @@ QString QnBusinessStringsHelper::actionName(BusinessActionType::Value value) {
     case PlaySound:             return tr("Play sound");
     case PlaySoundRepeated:     return tr("Repeat sound");
     case SayText:               return tr("Speak");
+    default:                    return tr("Unknown (%1)").arg(static_cast<int>(value));
     }
-    return tr("Unknown (%1)").arg(static_cast<int>(value));
 }
 
 QString QnBusinessStringsHelper::eventName(BusinessEventType::Value value) {

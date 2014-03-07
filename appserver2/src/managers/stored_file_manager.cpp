@@ -23,7 +23,7 @@ namespace ec2
         auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiStoredFileData& fileData) {
             handler->done( reqID, errorCode, fileData.data );
         };
-        m_queryProcessor->processQueryAsync<QString, ApiStoredFileData, decltype(queryDoneHandler)> ( ApiCommand::getStoredFile, filename, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<QString, ApiStoredFileData, decltype(queryDoneHandler)> ( ApiCommand::getStoredFile, filename, queryDoneHandler);
         return reqID;
     }
 
@@ -61,7 +61,7 @@ namespace ec2
             std::copy( folderContents.begin(), folderContents.end(), std::back_inserter(outputFolderContents) );
             handler->done( reqID, errorCode, outputFolderContents );
         };
-        m_queryProcessor->processQueryAsync<ApiStoredFilePath, ApiStoredDirContents, decltype(queryDoneHandler)>( ApiCommand::listDirectory, (ApiStoredFilePath) folderName, queryDoneHandler );
+        m_queryProcessor->template processQueryAsync<ApiStoredFilePath, ApiStoredDirContents, decltype(queryDoneHandler)>( ApiCommand::listDirectory, (ApiStoredFilePath) folderName, queryDoneHandler );
         return reqID;
     }
 

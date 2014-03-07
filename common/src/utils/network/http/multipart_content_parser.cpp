@@ -71,6 +71,9 @@ namespace nx_http
                                 m_contentLength = headerValue.toUInt();
                             break;
                         }
+
+                        default:
+                            break;
                     }
                     break;
                 }

@@ -28,7 +28,7 @@ namespace ec2
                 layouts.toResourceList(outData);
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->processQueryAsync<nullptr_t, ApiLayoutDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiLayoutDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getLayoutList, nullptr, queryDoneHandler );
         return reqID;
     }

@@ -25,8 +25,10 @@ namespace BusinessActionType {
         case Bookmark:
         case CameraRecording:
             return true;
+
+        default:
+            return false;
         }
-        return false;
     }
 
     bool requiresUserResource(Value val) {
@@ -46,8 +48,10 @@ namespace BusinessActionType {
 
         case SendMail:
             return true;
+
+        default:
+            return false;
         }
-        return false;
     }
 
     bool hasToggleState(Value val) {
@@ -67,8 +71,10 @@ namespace BusinessActionType {
         case PanicRecording:
         case PlaySoundRepeated:
             return true;
+
+        default:
+            return false;
         }
-        return false;
     }
 
     bool isNotImplemented(Value value) { return value == Bookmark; }

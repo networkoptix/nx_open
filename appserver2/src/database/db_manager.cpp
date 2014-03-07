@@ -33,8 +33,8 @@ void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<
     }
 }
 
-template <class MainData, class SubData, class MainSubData, class IdType>
-void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subDataList, std::vector<MainSubData> MainData::*subDataListField, IdType SubData::*parentIdField)
+template <class MainData, class SubData, class MainSubData, class MainOrParentType, class IdType, class SubOrParentType>
+void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subDataList, std::vector<MainSubData> MainOrParentType::*subDataListField, IdType SubOrParentType::*parentIdField)
 {
     int idx = 0;
     foreach(const SubData& subData, subDataList)
@@ -119,7 +119,7 @@ bool QnDbManager::init()
         executeTransactionNoLock(tran);
         QByteArray serializedTran;
         OutputBinaryStream<QByteArray> stream(&serializedTran);
-        tran.serialize(&stream);
+        serialize(tran, &stream);
         transactionLog->saveTransaction(tran, serializedTran);
     }
 

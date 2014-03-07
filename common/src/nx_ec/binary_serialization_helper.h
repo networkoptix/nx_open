@@ -2,10 +2,11 @@
 #ifndef SERIALIZATION_HELPER_H
 #define SERIALIZATION_HELPER_H
 
-#include <QByteArray>
-#include <QIODevice>
-#include <QString>
-#include <QUuid>
+#include <QtCore/QByteArray>
+#include <QtCore/QIODevice>
+#include <QtCore/QString>
+#include <QtCore/QUuid>
+#include <QtCore/QUrl>
 
 #include <type_traits>
 
@@ -91,7 +92,8 @@ private:
 };
 
 
-namespace QnBinary {
+//namespace ec2 {
+
     template <class T>
     void serialize(const QnId& field, OutputBinaryStream<T>* binStream) {
         QByteArray data = field.toRfc4122();
@@ -320,9 +322,9 @@ namespace QnBinary {
     template <class T, class T2>
     void serialize(const std::vector<T2>& field, OutputBinaryStream<T>* binStream) 
     {
-        QnBinary::serialize((qint32) field.size(), binStream);
+        serialize((qint32) field.size(), binStream);
         for (typename std::vector<T2>::const_iterator itr = field.begin(); itr != field.end(); ++itr)
-            QnBinary::serialize(*itr, binStream);
+            serialize(*itr, binStream);
     }
 
     template <class T, class T2>
@@ -333,7 +335,7 @@ namespace QnBinary {
             return false;
         field.resize(size);
         for( T2& val: field )
-            if( !QnBinary::deserialize(val, binStream) )
+            if( !deserialize(val, binStream) )
                 return false;
         return true;
     }
@@ -341,26 +343,26 @@ namespace QnBinary {
     template <class T, class T2>
     void serialize(const QList<T2>& field, OutputBinaryStream<T>* binStream) 
     {
-        QnBinary::serialize((qint32) field.size(), binStream);
+        serialize((qint32) field.size(), binStream);
         using namespace std::placeholders;
-        std::for_each( field.begin(), field.end(), [binStream](const T2& val){ QnBinary::serialize(val, binStream); } );
+        std::for_each( field.begin(), field.end(), [binStream](const T2& val){ serialize(val, binStream); } );
     }
 
     template <class T, class T2>
     void serialize(const QSet<T2>& field, OutputBinaryStream<T>* binStream) 
     {
-        QnBinary::serialize((qint32) field.size(), binStream);
+        serialize((qint32) field.size(), binStream);
         using namespace std::placeholders;
-        std::for_each( field.begin(), field.end(), [binStream](const T2& val){ QnBinary::serialize(val, binStream); } );
+        std::for_each( field.begin(), field.end(), [binStream](const T2& val){ serialize(val, binStream); } );
     }
 
     template <class T, class T2, class T3>
     void serialize(const QMap<T2, T3>& field, OutputBinaryStream<T>* binStream) 
     {
-        QnBinary::serialize((qint32) field.size(), binStream);
+        serialize((qint32) field.size(), binStream);
         for(typename QMap<T2, T3>::const_iterator itr = field.begin(); itr != field.end(); ++itr) {
-            QnBinary::serialize(itr.key(), binStream);
-            QnBinary::serialize(itr.value(), binStream);
+            serialize(itr.key(), binStream);
+            serialize(itr.value(), binStream);
         }
     }
 
@@ -373,7 +375,7 @@ namespace QnBinary {
         for( qint32 i = 0; i < size; ++i )
         {
             field.push_back( T2() );
-            if( !QnBinary::deserialize(field.back(), binStream) )
+            if( !deserialize(field.back(), binStream) )
                 return false;
         }
         return true;
@@ -388,7 +390,7 @@ namespace QnBinary {
         for( qint32 i = 0; i < size; ++i )
         {
             T2 t2;
-            if( !QnBinary::deserialize(t2, binStream) )
+            if( !deserialize(t2, binStream) )
                 return false;
             field.insert( t2 );
         }
@@ -405,19 +407,18 @@ namespace QnBinary {
         {
             T2 t2;
             T3 t3;
-            if( !QnBinary::deserialize(t2, binStream) || !QnBinary::deserialize(t3, binStream))
+            if( !deserialize(t2, binStream) || !deserialize(t3, binStream))
                 return false;
             field.insert(t2, t3);
         }
         return true;
     }
 
-}
+//}
 
 #ifndef Q_MOC_RUN
 
 #define QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
-namespace QnBinary { \
     template <class T> \
     __VA_ARGS__ void serialize(const TYPE &value, OutputBinaryStream<T> *target) { \
        BOOST_PP_SEQ_FOR_EACH(SERIALIZE_FIELD, ~, FIELD_SEQ) \
@@ -427,14 +428,13 @@ namespace QnBinary { \
     __VA_ARGS__ bool deserialize(TYPE &value, InputBinaryStream<T> *target) { \
        BOOST_PP_SEQ_FOR_EACH(DESERIALIZE_FIELD, ~, FIELD_SEQ) \
        return true; \
-    } \
-}
+    } 
 
 #define SERIALIZE_FIELD(R, D, FIELD) \
-    QnBinary::serialize(value.FIELD, target); \
+    serialize(value.FIELD, target); \
 
 #define DESERIALIZE_FIELD(R, D, FIELD) \
-    if( !QnBinary::deserialize(value.FIELD, target) ) \
+    if( !deserialize(value.FIELD, target) ) \
         return false;
 
 
@@ -445,33 +445,31 @@ namespace QnBinary { \
     void TYPE::serialize(OutputBinaryStream<T>* stream) const \
 { \
     BASE_TYPE::serialize(stream); \
-    QnBinary::serialize(*this, stream); \
+    serialize(*this, stream); \
 } \
     \
     template <class T> \
     bool TYPE::deserialize(InputBinaryStream<T>* stream) \
 { \
     return BASE_TYPE::deserialize(stream) && \
-           QnBinary::deserialize(*this, stream); \
+           deserialize(*this, stream); \
 }
 */
 
 #define QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(TYPE, BASE_TYPE, FIELD_SEQ, ... ) \
-    namespace QnBinary { \
     template <class T> \
     __VA_ARGS__ void serialize(const TYPE &value, OutputBinaryStream<T> *target) { \
-    QnBinary::serialize((const BASE_TYPE&)value, target);  \
-    BOOST_PP_SEQ_FOR_EACH(SERIALIZE_FIELD, ~, FIELD_SEQ) \
-} \
+        serialize((const BASE_TYPE&)value, target);  \
+        BOOST_PP_SEQ_FOR_EACH(SERIALIZE_FIELD, ~, FIELD_SEQ) \
+    } \
     \
     template <class T> \
     __VA_ARGS__ bool deserialize(TYPE &value, InputBinaryStream<T> *target) { \
-    if( !QnBinary::deserialize((BASE_TYPE&)value, target))  \
-    return false; \
-    BOOST_PP_SEQ_FOR_EACH(DESERIALIZE_FIELD, ~, FIELD_SEQ) \
-    return true; \
-} \
-}
+        if( !deserialize((BASE_TYPE&)value, target))  \
+            return false; \
+        BOOST_PP_SEQ_FOR_EACH(DESERIALIZE_FIELD, ~, FIELD_SEQ) \
+        return true; \
+    }
 
 
 #define QN_DEFINE_STRUCT_SERIALIZATORS(TYPE, FIELD_SEQ, ... /* PREFIX */) \

@@ -28,10 +28,10 @@ namespace ec2
         
         void toResourceList(QnFullResourceData&, const ResourceContext&) const;
     };
-}
 
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ServerInfo, (hardwareId1) (oldHardwareId) (hardwareId2) 
-    (publicIp) (systemName) (hardwareId3) (sessionKey) (allowCameraChanges) )
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiFullData, (resTypes) (servers) (cameras) (users) (layouts) (rules) (cameraHistory) (licenses) (serverInfo) )
+    QN_DEFINE_STRUCT_SERIALIZATORS (ServerInfo, (hardwareId1) (oldHardwareId) (hardwareId2) 
+        (publicIp) (systemName) (hardwareId3) (sessionKey) (allowCameraChanges) )
+    QN_DEFINE_STRUCT_SERIALIZATORS (ApiFullData, (resTypes) (servers) (cameras) (users) (layouts) (rules) (cameraHistory) (licenses) (serverInfo) )
+}
 
 #endif // __EC2_FULL_DATA_H_

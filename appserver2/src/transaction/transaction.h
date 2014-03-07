@@ -119,20 +119,6 @@ namespace ec2
         
         void fillSequence();
 
-        template <class T2>
-        bool deserialize(InputBinaryStream<T2>* stream) 
-        {
-            if (!QnBinary::deserialize(command, stream))
-                return false;
-            if (!QnBinary::deserialize(id, stream))
-                return false;
-            if (!QnBinary::deserialize(persistent, stream))
-                return false;
-            if (!QnBinary::deserialize(timestamp, stream))
-                return false;
-            return true;
-        }
-
         struct ID
         {
             ID(): sequence(0) {}
@@ -164,21 +150,22 @@ namespace ec2
         QnTransaction(ApiCommand::Value command, bool persistent): QnAbstractTransaction(command, persistent) {}
         
         T params;
-
-        template <class T2>
-        void serialize(OutputBinaryStream<T2>* stream) const {
-            QnBinary::serialize( *(QnAbstractTransaction*)this, stream);
-            QnBinary::serialize(params, stream);
-        }
-
-        template <class T2>
-        bool deserialize(InputBinaryStream<T2>* stream) 
-        {
-            return QnAbstractTransaction::deserialize(stream) &&
-                QnBinary::deserialize(params, stream);
-                //params.deserialize(stream);
-        }
     };
+
+    template <class TranParamType, class T2>
+    void serialize( const QnTransaction<TranParamType>& tran, OutputBinaryStream<T2>* stream )
+    {
+        serialize( (const QnAbstractTransaction&)tran, stream);
+        serialize(tran.params, stream);
+    }
+
+    template <class TranParamType, class T2>
+    bool deserialize( QnTransaction<TranParamType>& tran, InputBinaryStream<T2>* stream )
+    {
+        return deserialize( (QnAbstractTransaction&)tran, stream) &&
+            deserialize(tran.params, stream);
+            //params.deserialize(stream);
+    }
 
     int generateRequestID();
 }

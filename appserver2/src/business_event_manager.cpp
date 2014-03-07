@@ -4,10 +4,11 @@
 #include <QtConcurrent>
 
 #include "fixed_url_client_query_processor.h"
-#include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
 #include "transaction/transaction_log.h"
 #include "server_query_processor.h"
+#include "nx_ec/data/ec2_business_rule_data.h"
+
 
 namespace ec2
 {
@@ -32,7 +33,7 @@ int QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandlerPt
             outData = rules.toResourceList(m_resCtx.pool);
         handler->done( reqID, errorCode, outData);
     };
-    m_queryProcessor->processQueryAsync<nullptr_t, ApiBusinessRuleDataList, decltype(queryDoneHandler)> ( ApiCommand::getBusinessRuleList, nullptr, queryDoneHandler);
+    m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiBusinessRuleDataList, decltype(queryDoneHandler)> ( ApiCommand::getBusinessRuleList, nullptr, queryDoneHandler);
     return reqID;
 }
 
@@ -44,7 +45,7 @@ int QnBusinessEventManager<T>::testEmailSettings( const QnKvPairList& /*settings
 }
 
 template<class T>
-int QnBusinessEventManager<T>::sendEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, const QnEmailAttachmentList& attachments, impl::SimpleHandlerPtr handler )
+int QnBusinessEventManager<T>::sendEmail(const QStringList& /*to*/, const QString& /*subject*/, const QString& /*message*/, int /*timeout*/, const QnEmailAttachmentList& /*attachments*/, impl::SimpleHandlerPtr /*handler*/ )
 {
     //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
     return INVALID_REQ_ID;
@@ -61,7 +62,7 @@ int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::S
     auto tran = prepareTransaction( ApiCommand::saveBusinessRule, rule );
 
     using namespace std::placeholders;
-    m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveBusinessRuleHandler::done ), handler, reqID, _1, rule ) );
+    m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SaveBusinessRuleHandler::done, handler, reqID, _1, rule ) );
 
     return reqID;
 }
@@ -79,9 +80,11 @@ int QnBusinessEventManager<T>::deleteRule( QnId ruleId, impl::SimpleHandlerPtr h
 template<class T>
 int QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler )
 {
+    const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::broadcastBusinessAction, businessAction );
     QnTransactionMessageBus::instance()->sendTransaction(tran);
-    return INVALID_REQ_ID;
+    QtConcurrent::run( std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
+    return reqID;
 }
 
 template<class T>

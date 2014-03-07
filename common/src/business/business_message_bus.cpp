@@ -50,7 +50,7 @@ int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionP
 
     QByteArray data;
     OutputBinaryStream<QByteArray> stream(&data);
-    QnBinary::serialize(bAction, &stream);
+    serialize(bAction, &stream);
     QNetworkReply* reply = m_transport.post(request, data);
     m_actionsInProgress.insert(reply, bAction);
 

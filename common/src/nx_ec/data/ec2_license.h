@@ -38,6 +38,12 @@ namespace ec2
         void toResource( QnLicense& license ) const;
     };
 
+    #define ApiLicenseFields (name)(key)(cameraCount)(hardwareID)(signature)(type)(xclass)(version)(brand)(expirationTime)(licenseBlock)
+    QN_DEFINE_STRUCT_SERIALIZATORS( ec2::ApiLicense, ApiLicenseFields )
+}
+
+namespace ec2
+{
     class ApiLicenseList
     :
         public ApiData
@@ -48,10 +54,8 @@ namespace ec2
         void fromResourceList( const QnLicenseList& licList );
         void toResourceList( QnLicenseList& licenseList ) const;
     };
-}
 
-#define ApiLicenseFields (name)(key)(cameraCount)(hardwareID)(signature)(type)(xclass)(version)(brand)(expirationTime)(licenseBlock)
-QN_DEFINE_STRUCT_SERIALIZATORS( ec2::ApiLicense, ApiLicenseFields )
-QN_DEFINE_STRUCT_SERIALIZATORS( ec2::ApiLicenseList, (data) )
+    QN_DEFINE_STRUCT_SERIALIZATORS( ApiLicenseList, (data) )
+}
 
 #endif  //EC2_LICENSE_H

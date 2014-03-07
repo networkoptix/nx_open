@@ -52,7 +52,7 @@ namespace ec2
         return ErrorCode::ok;
     }
 
-    ErrorCode LicenseManagerImpl::addLicenses( const ApiLicenseList& licenses )
+    ErrorCode LicenseManagerImpl::addLicenses( const ApiLicenseList& /*licenses*/ )
     {
         //TODO/IMPL
         return ErrorCode::notImplemented;

@@ -474,7 +474,7 @@ void StreamReader::fillAudioFormat( const ISDAudioPacket& audioPacket )
 static const unsigned int MAX_PTS_DRIFT = 63000;    //700 ms
 static const unsigned int DEFAULT_FRAME_DURATION = 3000;    //30 fps
 
-int64_t StreamReader::calcNextTimestamp( const unsigned int pts )
+int64_t StreamReader::calcNextTimestamp( unsigned int pts )
 {
     if( m_firstFrameTime == 0 )
     {

@@ -117,7 +117,7 @@ namespace ec2
                 outData = currentTime;
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->processQueryAsync<nullptr_t, qint64, decltype(queryDoneHandler)> (
+        m_queryProcessor->template processQueryAsync<nullptr_t, qint64, decltype(queryDoneHandler)> (
             ApiCommand::getCurrentTime, nullptr, queryDoneHandler );
 
         return reqID;
@@ -126,28 +126,28 @@ namespace ec2
 
 
     template<class T>
-    int BaseEc2Connection<T>::dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler )
+    int BaseEc2Connection<T>::dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr /*handler*/ )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
     template<class T>
-    int BaseEc2Connection<T>::restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler )
+    int BaseEc2Connection<T>::restoreDatabaseAsync( const QByteArray& /*dbFile*/, impl::SimpleHandlerPtr /*handler*/ )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
     template<class T>
-    int BaseEc2Connection<T>::getSettingsAsync( impl::GetSettingsHandlerPtr handler )
+    int BaseEc2Connection<T>::getSettingsAsync( impl::GetSettingsHandlerPtr /*handler*/ )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
     }
 
     template<class T>
-    int BaseEc2Connection<T>::saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler )
+    int BaseEc2Connection<T>::saveSettingsAsync( const QnKvPairList& /*kvPairs*/, impl::SimpleHandlerPtr /*handler*/ )
     {
         //TODO/IMPL
         return INVALID_REQ_ID;
