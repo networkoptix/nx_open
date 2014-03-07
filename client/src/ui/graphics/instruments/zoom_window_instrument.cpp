@@ -450,7 +450,7 @@ void ZoomWindowInstrument::registerLink(QnMediaResourceWidget *widget, QnMediaRe
     overlayWidget->addWidget(windowWidget);
     data.windowWidget = windowWidget;
     connect(windowWidget, SIGNAL(geometryChanged()), this, SLOT(at_windowWidget_geometryChanged()));
-    connect(windowWidget, SIGNAL(doubleClicked()), this, SLOT(at_windowWidget_doubleClicked()));
+    connect(windowWidget, SIGNAL(doubleClicked(Qt::MouseButton)), this, SLOT(at_windowWidget_doubleClicked()));
 
     updateWindowFromWidget(widget);
 }

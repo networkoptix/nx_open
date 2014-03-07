@@ -267,6 +267,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     updateTitleText();
     updateButtonsVisibility();
     updateCursor();
+
+    // calling after all nested constructors are finished
+    QTimer::singleShot(1, this, SLOT(updateCheckedButtons()));
 }
 
 QnResourceWidget::~QnResourceWidget() {
@@ -443,6 +446,10 @@ QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
         return constraint;
 
     return expanded(m_aspectRatio, constraint, Qt::KeepAspectRatio);
+}
+
+void QnResourceWidget::updateCheckedButtons() {
+    setCheckedButtons(static_cast<Buttons>(item()->data(Qn::ItemCheckedButtonsRole).toInt()));
 }
 
 QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
@@ -964,6 +971,7 @@ void QnResourceWidget::at_infoButton_toggled(bool toggled){
 
 void QnResourceWidget::at_buttonBar_checkedButtonsChanged() {
     item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(checkedButtons()));
+    update();
 }
 
 void QnResourceWidget::at_item_dataChanged(int role) {

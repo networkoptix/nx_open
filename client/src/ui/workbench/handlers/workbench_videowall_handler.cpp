@@ -63,6 +63,7 @@ namespace {
     PARAM_KEY(speed)
     PARAM_KEY(geometry)
     PARAM_KEY(zoomRect)
+    PARAM_KEY(checkedButtons)
 
 #if defined(SENDER_DEBUG) || defined(RECEIVER_DEBUG)
     static QByteArray debugRole(int role) {
@@ -332,6 +333,10 @@ void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args) {
     arguments << QLatin1String("--auth");
     arguments << QLatin1String(url.toEncoded());
 
+#ifdef SENDER_DEBUG
+    qDebug() << "arguments" << arguments;
+#endif
+    //--videowall {1f91dc77-229a-4b1e-9b07-99a5c2650a5a} --auth https://127.0.0.1:7011
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
 }
 
@@ -458,11 +463,13 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
         QRect geometry = QJson::deserialized<QRect>(message[geometryKey].toUtf8());
         QRectF zoomRect = QJson::deserialized<QRectF>(message[zoomRectKey].toUtf8());
         qreal rotation = QJson::deserialized<qreal>(message[rotationKey].toUtf8());
+        int checkedButtons = QJson::deserialized<int>(message[checkedButtonsKey].toUtf8());
         QnWorkbenchItem* item = new QnWorkbenchItem(resourceUid, uuid, workbench()->currentLayout());
         item->setGeometry(geometry);
         item->setZoomRect(zoomRect);
         item->setRotation(rotation);
         item->setFlag(Qn::PendingGeometryAdjustment);
+        item->setData(Qn::ItemCheckedButtonsRole, checkedButtons);
         workbench()->currentLayout()->addItem(item);
 
 #ifdef RECEIVER_DEBUG
@@ -1476,6 +1483,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode(QnWor
     message[geometryKey] = QString::fromUtf8(QJson::serialized(item->geometry()));
     message[zoomRectKey] = QString::fromUtf8(QJson::serialized(item->zoomRect()));
     message[rotationKey] = QString::fromUtf8(QJson::serialized(item->rotation()));
+    message[checkedButtonsKey] = QString::fromUtf8(QJson::serialized(item->data(Qn::ItemCheckedButtonsRole).toInt()));
     sendMessage(message);
 }
 

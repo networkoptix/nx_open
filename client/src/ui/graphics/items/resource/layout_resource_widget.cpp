@@ -107,18 +107,14 @@ void QnLayoutResourceWidget::paintItem(QPainter *painter, const QRectF &paintRec
 
     if (resource && (resource->flags() & QnResource::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
         m_thumbnailManager->selectResource(resource);
-        return;
-    }
-
-    if (resource && (resource->flags() & QnResource::server)) {
+    } else if (resource && (resource->flags() & QnResource::server)) {
         m_thumbs[resource->getId()] = qnSkin->pixmap("events/thumb_server.png");
-    }
+    } //TODO: #GDM VW local files placeholder
 
-    QPen pen(Qt::gray);
-    pen.setWidth(15);
-    painter->setPen(pen);
-    painter->drawRect(paintRect);
-    //painter->fillRect(paintRect, Qt::gray);
+    {
+        QnScopedPainterPenRollback(painter, QPen(Qt::gray, 15));
+        painter->drawRect(paintRect);
+    }
 }
 
 Qn::RenderStatus QnLayoutResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
@@ -126,10 +122,14 @@ Qn::RenderStatus QnLayoutResourceWidget::paintChannelBackground(QPainter *painte
     Q_UNUSED(channel)
     Q_UNUSED(channelRect)
 
-    painter->fillRect(paintRect, Qt::black);
-
-    if (paintRect.width() == 0 || paintRect.width() == 0)
+    if (!paintRect.isValid())
         return Qn::NothingRendered;
+
+    painter->fillRect(paintRect, Qt::black);
+    {
+        QnScopedPainterPenRollback(painter, QPen(Qt::blue, 15));
+        painter->drawRect(paintRect);
+    }
 
     if (m_resource->getItems().isEmpty()) {
         return Qn::NothingRendered;
@@ -223,4 +223,8 @@ QString QnLayoutResourceWidget::calculateInfoText() const {
     return QString(QLatin1String("%1\t%2"))
             .arg(m_resource->getName())
             .arg(videoWallNames.join(QLatin1String(", ")));
+}
+
+Qn::ResourceStatusOverlay QnLayoutResourceWidget::calculateStatusOverlay() const {
+    return Qn::EmptyOverlay;
 }

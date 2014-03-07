@@ -1059,6 +1059,8 @@ void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, co
 
 void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget) {
     QnLayoutItemData data = widget->item()->data();
+    delete widget;
+
     data.uuid = QUuid::createUuid();
     data.resource.id = zoomTargetWidget->resource()->toResource()->getId().toInt();
     data.resource.path = zoomTargetWidget->resource()->toResource()->getUniqueId();
@@ -1066,9 +1068,7 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
     data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
-    
-    QnResourceWidget::Buttons buttons = widget->checkedButtons();
-    delete widget;
+
 
     int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
             ? 1
@@ -1078,7 +1078,6 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     if (layout->getItems().size() >= maxItems)
         return;
     layout->addItem(data);
-    display()->widget(data.uuid)->setCheckedButtons(buttons);
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {

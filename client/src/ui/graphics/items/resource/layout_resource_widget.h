@@ -32,6 +32,8 @@ protected:
 
     virtual QString calculateTitleText() const override;
     virtual QString calculateInfoText() const override;
+
+    virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const;
 private slots:
     void at_thumbnailReady(int resourceId, const QPixmap &thumbnail);
 
