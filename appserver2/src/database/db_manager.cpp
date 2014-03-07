@@ -97,36 +97,31 @@ bool QnDbManager::init()
     queryServers.bindValue(1, m_serverTypeId.toRfc4122());
     Q_ASSERT(queryServers.exec());
 
-    QSqlQuery queryServers2(m_sdb);
-    queryServers2.prepare("UPDATE vms_resource set status = ? WHERE id = ?");
-    queryServers2.bindValue(0, QnResource::Online);
-    queryServers2.bindValue(1, qnCommon->moduleGUID().toRfc4122());
-    Q_ASSERT(queryServers2.exec());
-
-    ApiCameraDataList cameras;
-    doQueryNoLock(qnCommon->moduleGUID(), cameras);
-    foreach(const ApiCameraData& camera, cameras.data)
+    QSqlQuery queryCameras(m_sdb);
+    // select cameras from media servers without DB and local cameras
+    queryCameras.prepare("SELECT r.guid FROM vms_resource r \
+                          JOIN vms_camera c on c.resource_ptr_id = r.id \
+                          JOIN vms_resource sr on sr.guid = r.parent_guid \
+                          JOIN vms_server s on s.resource_ptr_id = sr.id \
+                          WHERE r.status != ? AND ((s.flags & 2) or sr.guid = ?)");
+    queryCameras.bindValue(0, QnResource::Offline);
+    queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
+    if (!queryCameras.exec()) {
+        qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
+        Q_ASSERT(0);
+    }
+    while (queryCameras.next()) 
     {
         QnTransaction<ApiSetResourceStatusData> tran(ApiCommand::setResourceStatus, true);
         tran.fillSequence();
+        tran.params.id = QnId::fromRfc4122(queryCameras.value(0).toByteArray());
+        tran.params.status = QnResource::Offline;
         executeTransactionNoLock(tran);
         QByteArray serializedTran;
         OutputBinaryStream<QByteArray> stream(&serializedTran);
         tran.serialize(&stream);
         transactionLog->saveTransaction(tran, serializedTran);
     }
-
-    /*
-    QSqlQuery queryCameras(m_sdb);
-    queryCameras.prepare("UPDATE vms_resource set status = ? WHERE parent_guid = ? and id in (select resource_ptr_id from vms_camera)");
-    queryCameras.bindValue(0, QnResource::Offline);
-    queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
-    //queryCameras.bindValue(1, m_cameraTypeId.toRfc4122());
-    if (!queryCameras.exec()) {
-        qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
-        Q_ASSERT(0);
-    }
-    */
 
     return true;
 }

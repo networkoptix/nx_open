@@ -1184,6 +1184,15 @@ void QnMain::run()
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
         bool isLocal = appserverHostString.isEmpty() || QUrl(appserverHostString).scheme() == "file";
+
+        int serverFlags = Qn::SF_None;
+#ifdef __ARM
+        serverFlags |= SF_Edge;
+#endif
+        if (!isLocal)
+            serverFlags |= Qn::SF_RemoteEC;
+        server->setServerFlags((Qn::ServerFlags) serverFlags);
+
         QHostAddress appserverHost;
         if (!isLocal) {
             do
