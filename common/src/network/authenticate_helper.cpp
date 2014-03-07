@@ -37,8 +37,7 @@ QnAuthHelper* QnAuthHelper::instance()
     return m_instance;
 }
 
-bool QnAuthHelper::authenticate(const nx_http::HttpRequest& request, nx_http::HttpResponse& response)
-{
+bool QnAuthHelper::authenticate(const nx_http::HttpRequest& request, nx_http::HttpResponse& response) {
     QString cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
     int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
     if (customAuthInfoPos >= 0) {
@@ -48,6 +47,10 @@ bool QnAuthHelper::authenticate(const nx_http::HttpRequest& request, nx_http::Ht
         if (doCustomAuthorization(digest.toLatin1(), response, QnAppServerConnectionFactory::prevSessionKey()))
             return true;
     }
+
+    nx_http::StringType videoWall_auth = nx_http::getHeaderValue( request.headers, "X-NetworkOptix-VideoWall" );
+    if (!videoWall_auth.isEmpty())
+        return (!qnResPool->getResourceByGuid(QUuid(videoWall_auth)).dynamicCast<QnVideoWallResource>().isNull());
 
     nx_http::StringType authorization = nx_http::getHeaderValue( request.headers, "Authorization" );
     if (authorization.isEmpty()) {

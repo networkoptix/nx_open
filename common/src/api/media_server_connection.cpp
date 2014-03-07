@@ -393,7 +393,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // -------------------------------------------------------------------------- //
 // QnMediaServerConnection
 // -------------------------------------------------------------------------- //
-QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, QObject *parent):
+QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, const QString &videoWallKey, QObject *parent):
     base_type(parent),
     m_proxyPort(0)
 {
@@ -402,6 +402,8 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
 
     QnRequestHeaderList extraHeaders;
     extraHeaders << QnRequestHeader(lit("x-server-guid"), mserver->getGuid());
+    if (!videoWallKey.isEmpty())
+        extraHeaders << QnRequestHeader(lit("X-NetworkOptix-VideoWall"), videoWallKey);
     setExtraHeaders(extraHeaders);
 }
 

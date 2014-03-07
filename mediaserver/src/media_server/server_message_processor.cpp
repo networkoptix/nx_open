@@ -46,8 +46,9 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource) {
     bool isServer = resource.dynamicCast<QnMediaServerResource>();
     bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
     bool isUser = resource.dynamicCast<QnUserResource>();
+    bool isVideoWall = resource.dynamicCast<QnVideoWallResource>();
 
-    if (!isServer && !isCamera && !isUser)
+    if (!isServer && !isCamera && !isUser && !isVideoWall)
         return;
 
     //storing all servers' cameras too
