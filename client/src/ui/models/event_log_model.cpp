@@ -419,16 +419,16 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
 
         if (eventType == BusinessEventType::Camera_Motion) {
             if (action.hasFlags(QnBusinessActionData::MotionExists))
-                result = lit("Motion video");
+                result = tr("Motion video");
         }
         else {
-            result = QnBusinessStringsHelper::eventDetails(action.getRuntimeParams(), 1, lit("\n"));
+            result = QnBusinessStringsHelper::eventDetails(action.getRuntimeParams(), 1, tr("\n"));
         }
 
         if (!BusinessEventType::hasToggleState(eventType)) {
-            int cnt = action.getAggregationCount();
-            if (cnt > 1)
-                result += QString(lit(" (%1 times)")).arg(cnt);
+            int count = action.getAggregationCount();
+            if (count > 1)
+                result += tr(" (%1 times)").arg(count); // TODO: #Elric #TR this will probably look bad =\
         }
         return result;
     }
@@ -536,7 +536,7 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
         if (url.isEmpty())
             return text;
         else 
-            return QString(lit("<a href=\"%1\">%2</a>")).arg(url, text);
+            return lit("<a href=\"%1\">%2</a>").arg(url, text);
     }
     case Qn::HelpTopicIdRole:
         return helpTopicIdData(column, action);
