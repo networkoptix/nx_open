@@ -91,6 +91,7 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnCameraHistoryList>();
 
+    qRegisterMetaType<QnLicensePtr>();
     qRegisterMetaType<QnLicenseList>();
 
     qRegisterMetaType<QnLayoutItemData>();

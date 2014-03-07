@@ -9,26 +9,12 @@
 namespace ec2
 {
     ApiLicense::ApiLicense()
-    :
-        cameraCount( 0 ),
-        type( QnLicense::Invalid ),
-        expirationTime( -1 )
     {
     }
 
     void ApiLicense::fromResource( const QnLicense& lic )
     {
-        //name = lic.name();
-        //key = lic.key();
-        //cameraCount = lic.cameraCount();
-        //hardwareID = lic.hardwareId();
-        //signature = lic.signature();
-        //type = lic.type();
-        //xclass = lic.xclass();
-        //version = lic.version();
-        //brand = lic.brand();
-        //expirationTime = lic.expirationTime();
-
+        key = lic.key();
         licenseBlock = lic.rawLicense();
     }
 

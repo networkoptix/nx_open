@@ -105,7 +105,7 @@ namespace ec2
 
 
         //TODO AbstractLicenseManager
-        registerUpdateFuncHandler<ApiLicense>( restProcessorPool, ApiCommand::addLicenses );
+        registerUpdateFuncHandler<ApiLicenseList>( restProcessorPool, ApiCommand::addLicenses );
 
 
         //AbstractBusinessEventManager::getBusinessRules

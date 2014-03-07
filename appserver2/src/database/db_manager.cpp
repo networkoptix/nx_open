@@ -1541,7 +1541,8 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResetBusi
 
 ErrorCode QnDbManager::saveLicense(const ApiLicense& license) {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT INTO vms_license (raw_license) VALUES(:licenseBlock)");
+    insQuery.prepare("INSERT OR REPLACE INTO vms_license (license_key, license_block) VALUES(:licenseKey, :licenseBlock)");
+    insQuery.bindValue(":licenseKey", license.key);
     insQuery.bindValue(":licenseBlock", license.licenseBlock);
     if (insQuery.exec()) {
         return ErrorCode::ok;
@@ -1576,7 +1577,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicense
 {
     QSqlQuery query(m_sdb);
 
-    QString q = QString(lit("SELECT raw_license from vms_license"));
+    QString q = QString(lit("SELECT license_key as key, license_block as licenseBlock from vms_license"));
     query.prepare(q);
 
     if (!query.exec())
@@ -1586,6 +1587,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicense
     }
 
     QN_QUERY_TO_DATA_OBJECT(query, ApiLicense, data.data, ApiLicenseFields);
+
     // m_licenseManagerImpl->getLicenses( &data );
     return ErrorCode::ok;
 }
