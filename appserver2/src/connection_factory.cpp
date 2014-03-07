@@ -241,7 +241,7 @@ namespace ec2
     }
 
     ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
-        const LoginInfo& loginInfo,
+        const LoginInfo& /*loginInfo*/,
         QnConnectionInfo* const connectionInfo )
     {
         //TODO/IMPL
@@ -252,7 +252,7 @@ namespace ec2
         return ErrorCode::ok;
     }
 
-    int Ec2DirectConnectionFactory::testDirectConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler )
+    int Ec2DirectConnectionFactory::testDirectConnection( const QUrl& /*addr*/, impl::TestConnectionHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         QnConnectionInfo connectionInfo;

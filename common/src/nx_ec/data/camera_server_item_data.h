@@ -7,33 +7,31 @@
 
 namespace ec2
 {
+    struct ApiCameraServerItemData: public ApiData
+    {
+        ApiCameraServerItemData(): timestamp(0) {}
 
-struct ApiCameraServerItemData: public ApiData
-{
-    ApiCameraServerItemData(): timestamp(0) {}
+        QString  physicalId;
+        QString  serverGuid;
+        qint64   timestamp;
 
-    QString  physicalId;
-    QString  serverGuid;
-    qint64   timestamp;
+        QN_DECLARE_STRUCT_SQL_BINDER();
+        void fromResource(const QnCameraHistoryItem& item);
+        void toResource(QnCameraHistoryItem* const item);
+    };
 
-    QN_DECLARE_STRUCT_SQL_BINDER();
-    void fromResource(const QnCameraHistoryItem& item);
-    void toResource(QnCameraHistoryItem* const item);
-};
+    #define ApiCameraServerItemFields (physicalId) (serverGuid) (timestamp)
+    QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiCameraServerItemData, ApiCameraServerItemFields)
 
-struct ApiCameraServerItemDataList: public ApiData
-{
-    std::vector<ApiCameraServerItemData> data;
+    struct ApiCameraServerItemDataList: public ApiData
+    {
+        std::vector<ApiCameraServerItemData> data;
 
-    void loadFromQuery(QSqlQuery& query);
-    void toResourceList(QnCameraHistoryList& outData) const;
-};
+        void loadFromQuery(QSqlQuery& query);
+        void toResourceList(QnCameraHistoryList& outData) const;
+    };
 
+    QN_DEFINE_STRUCT_SERIALIZATORS (ApiCameraServerItemDataList, (data) )
 }
-
-#define ApiCameraServerItemFields (physicalId) (serverGuid) (timestamp)
-QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiCameraServerItemData, ApiCameraServerItemFields)
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiCameraServerItemDataList, (data) )
-
 
 #endif // __CAMERA_SERVER_ITEM_DATA_H__

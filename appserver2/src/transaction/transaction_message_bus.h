@@ -46,7 +46,7 @@ namespace ec2
         void sendTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
             QByteArray buffer;
-            m_serializer.serialize(buffer, serializedTran);
+            m_serializer.serializeTran(buffer, serializedTran);
             sendTransactionInternal(tran, buffer);
         }
 
@@ -54,7 +54,7 @@ namespace ec2
         void sendTransaction(const QnTransaction<T>& tran)
         {
             QByteArray buffer;
-            m_serializer.serialize(buffer, tran);
+            m_serializer.serializeTran(buffer, tran);
             sendTransactionInternal(tran, buffer);
         }
 

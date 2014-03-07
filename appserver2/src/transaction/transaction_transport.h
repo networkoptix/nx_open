@@ -91,7 +91,7 @@ private:
 private:
     void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
     void closeSocket();
-    static void ensureSize(std::vector<quint8>& buffer, int size);
+    static void ensureSize(std::vector<quint8>& buffer, std::size_t size);
     int getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size);
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);

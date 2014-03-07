@@ -19,11 +19,11 @@ namespace ec2
         return result;
     }
 
-    bool QnTransactionTransportSerializer::deserialize(const quint8* chunkPayload, int len,  ProcessedPeers& peers, QByteArray& tranData)
+    bool QnTransactionTransportSerializer::deserializeTran(const quint8* chunkPayload, int len,  ProcessedPeers& peers, QByteArray& tranData)
     {
         QByteArray srcData = QByteArray::fromRawData((const char*) chunkPayload, len);
         InputBinaryStream<QByteArray> stream(srcData);
-        if (!QnBinary::deserialize(peers, &stream))
+        if (!deserialize(peers, &stream))
             return false;
         tranData.append((const char*) chunkPayload + stream.getPos(), len - stream.getPos());
         return true;

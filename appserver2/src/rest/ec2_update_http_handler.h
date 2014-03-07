@@ -54,7 +54,7 @@ namespace ec2
             QnTransaction<RequestDataType> tran;
             //tran.command = ;
             InputBinaryStream<QByteArray> stream( body );
-            if (!tran.deserialize(&stream))
+            if (!deserialize(tran, &stream))
                 return nx_http::StatusCode::badRequest;
             
             // replace client GUID to own GUID (take transaction ownership).

@@ -66,7 +66,7 @@ namespace ec2
 				cameras.toResourceList(outData, m_resCtx.resFactory);
 			handler->done( reqID, errorCode, outData);
 		};
-		m_queryProcessor->processQueryAsync<QnId, ApiCameraDataList, decltype(queryDoneHandler)>
+		m_queryProcessor->template processQueryAsync<QnId, ApiCameraDataList, decltype(queryDoneHandler)>
 			( ApiCommand::getCameras, mediaServerId, queryDoneHandler );
 		return reqID;
     }
@@ -82,7 +82,7 @@ namespace ec2
                 cameraHistory.toResourceList(outData);
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->processQueryAsync<nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> (
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> (
             ApiCommand::getCameraHistoryList, nullptr, queryDoneHandler );
         return reqID;
     }

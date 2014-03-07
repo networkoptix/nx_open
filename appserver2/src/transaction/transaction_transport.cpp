@@ -16,18 +16,18 @@ QnTransactionTransport::ConnectingInfoMap QnTransactionTransport::m_connectingCo
 QMutex QnTransactionTransport::m_staticMutex;
 
 QnTransactionTransport::QnTransactionTransport(bool isOriginator, bool isClient, QSharedPointer<AbstractStreamSocket> socket, const QUuid& remoteGuid):
-    m_socket(socket),
-    m_state(NotDefined), 
     m_lastConnectTime(0), 
-    m_readBufferLen(0), 
-    m_chunkHeaderLen(0), 
-    m_sendOffset(0), 
-    m_chunkLen(0), 
-    m_originator(isOriginator), 
-    m_isClientPeer(isClient),
     m_readSync(false), 
     m_writeSync(false),
     m_remoteGuid(remoteGuid),
+    m_originator(isOriginator), 
+    m_isClientPeer(isClient),
+    m_socket(socket),
+    m_state(NotDefined), 
+    m_readBufferLen(0), 
+    m_chunkHeaderLen(0), 
+    m_chunkLen(0), 
+    m_sendOffset(0), 
     m_timeDiff(0),
     m_connected(false)
 {
@@ -42,7 +42,7 @@ QnTransactionTransport::~QnTransactionTransport()
     closeSocket();
 }
 
-void QnTransactionTransport::ensureSize(std::vector<quint8>& buffer, int size)
+void QnTransactionTransport::ensureSize(std::vector<quint8>& buffer, std::size_t size)
 {
     if (buffer.size() < size)
         buffer.resize(size);
@@ -160,7 +160,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                         {
                             QSet<QnId> processedPeers;
                             QByteArray serializedTran;
-                            QnTransactionTransportSerializer::deserialize(rBuffer + m_chunkHeaderLen, m_chunkLen, processedPeers, serializedTran);
+                            QnTransactionTransportSerializer::deserializeTran(rBuffer + m_chunkHeaderLen, m_chunkLen, processedPeers, serializedTran);
                             emit gotTransaction(serializedTran, processedPeers);
                             m_readBufferLen = m_chunkHeaderLen = 0;
                         }
@@ -179,7 +179,6 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
             {
                 QByteArray& data = m_dataToSend.front();
                 const char* dataStart = data.data();
-                const char* dataEnd = dataStart + data.size();
                 int sended = m_socket->send(dataStart + m_sendOffset, data.size() - m_sendOffset);
                 if (sended < 1) {
                     if(sended == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock) {
@@ -320,9 +319,6 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
     nx_http::HttpHeaders::const_iterator itrTime = client->response()->headers.find("time");
 
-    bool ok1 = itrGuid != client->response()->headers.end();
-    bool ok2 = itrGuid != client->response()->headers.end();
-
     if (itrGuid == client->response()->headers.end() || itrTime == client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
     {
         if (getState() == ConnectingStage2)
@@ -379,7 +375,7 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         {
             QSet<QnId> processedPeers;
             QByteArray serializedTran;
-            QnTransactionTransportSerializer::deserialize(buffer + m_chunkHeaderLen, m_chunkLen, processedPeers, serializedTran);
+            QnTransactionTransportSerializer::deserializeTran(buffer + m_chunkHeaderLen, m_chunkLen, processedPeers, serializedTran);
             emit gotTransaction(serializedTran, processedPeers);
 
             buffer += fullChunkLen;

@@ -54,7 +54,7 @@ namespace ec2
                 if( _errorCode == ErrorCode::ok )
                 {
                     OutputBinaryStream<QByteArray> stream( &result );
-                    QnBinary::serialize( outputData, &stream );
+                    serialize( outputData, &stream );
                     contentType = "application/octet-stream";
                 }
                 errorCode = _errorCode;
@@ -63,7 +63,7 @@ namespace ec2
                 finished = true;
                 m_cond.wakeAll();
             };
-            m_queryProcessor->processQueryAsync<InputData, OutputData, decltype(queryDoneHandler)>(
+            m_queryProcessor->template processQueryAsync<InputData, OutputData, decltype(queryDoneHandler)>(
                 m_cmdCode,
                 inputData,
                 queryDoneHandler );

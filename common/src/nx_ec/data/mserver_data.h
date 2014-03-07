@@ -20,11 +20,18 @@ namespace ec2
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
+    #define ApiStorageDataFields  (spaceLimit) (usedForWriting)
+    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ApiStorageData, ec2::ApiResourceData, ApiStorageDataFields)
+
+
     struct ApiStorageDataList: public ApiData {
         std::vector<ApiStorageData> data;
 
         void loadFromQuery(QSqlQuery& query);
     };
+
+    QN_DEFINE_STRUCT_SERIALIZATORS (ApiStorageDataList, (data))
+
 
     struct ApiMediaServerData: public ApiResourceData
     {
@@ -44,10 +51,17 @@ namespace ec2
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
+    #define medisServerDataFields (apiUrl) (netAddrList) (flags) (panicMode) (streamingUrl) (version) (authKey) (storages)
+    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ApiMediaServerData, ec2::ApiResourceData, medisServerDataFields)
+
+
     struct ApiPanicModeData: public ApiData
     {
         Qn::PanicMode mode;
     };
+
+    QN_DEFINE_STRUCT_SERIALIZATORS (ApiPanicModeData, (mode))
+
 
     struct ApiMediaServerDataList: public ApiData {
         std::vector<ApiMediaServerData> data;
@@ -55,15 +69,8 @@ namespace ec2
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData, const ResourceContext& ctx) const;
     };
+
+    QN_DEFINE_STRUCT_SERIALIZATORS (ApiMediaServerDataList, (data))
 }
-
-#define ApiStorageDataFields  (spaceLimit) (usedForWriting)
-#define medisServerDataFields (apiUrl) (netAddrList) (flags) (panicMode) (streamingUrl) (version) (authKey) (storages)
-
-QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiStorageData, ec2::ApiResourceData, ApiStorageDataFields)
-QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ec2::ApiMediaServerData, ec2::ApiResourceData, medisServerDataFields)
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiMediaServerDataList, (data))
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiStorageDataList, (data))
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiPanicModeData, (mode))
 
 #endif //MSERVER_DATA_H

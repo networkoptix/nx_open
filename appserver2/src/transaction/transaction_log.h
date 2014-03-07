@@ -9,6 +9,7 @@
 #include "nx_ec/data/camera_data.h"
 #include "nx_ec/data/mserver_data.h"
 #include "nx_ec/data/ec2_user_data.h"
+#include "nx_ec/data/ec2_resource_data.h"
 #include "nx_ec/data/ec2_layout_data.h"
 #include "nx_ec/data/camera_server_item_data.h"
 #include "nx_ec/data/ec2_stored_file_data.h"
@@ -44,16 +45,16 @@ namespace ec2
             return saveToDB(tran, transactionHash(tran), serializedTran);
         }
 
+        ErrorCode saveTransaction(const QnTransaction<ApiLicenseList>& multiTran, const QByteArray& /*serializedTran*/) {
+            return saveMultiTransaction<ApiLicenseList, ApiLicense>(multiTran);
+        }
+
         ErrorCode saveTransaction(const QnTransaction<ApiLayoutDataList>& multiTran, const QByteArray& /*serializedTran*/) {
             return saveMultiTransaction<ApiLayoutDataList, ApiLayoutData>(multiTran);
         }
 
         ErrorCode saveTransaction(const QnTransaction<ApiCameraDataList>& multiTran, const QByteArray& /*serializedTran*/) {
             return saveMultiTransaction<ApiCameraDataList, ApiCameraData>(multiTran);
-        }
-
-        ErrorCode saveTransaction(const QnTransaction<ApiLicenseList>& multiTran, const QByteArray& /*serializedTran*/) {
-            return saveMultiTransaction<ApiLicenseList, ApiLicense>(multiTran);
         }
 
         ErrorCode saveTransaction(const QnTransaction<ApiFullData>& , const QByteArray&) {
@@ -94,17 +95,17 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiLicenseList>&)              { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiBusinessActionData>& )      { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
-        template <class T, class T2>
-        ErrorCode saveMultiTransaction(const QnTransaction<T>& multiTran)
+        template <class DataList, class Data>
+        ErrorCode saveMultiTransaction(const QnTransaction<DataList>& multiTran)
         {
-            foreach(const T2& data, multiTran.params.data)
+            foreach(const Data& data, multiTran.params.data)
             {
-                QnTransaction<T2> tran(ApiCommand::saveLayout, true);
+                QnTransaction<Data> tran(multiTran.command, true);
                 tran.id.peerGUID = multiTran.id.peerGUID;
                 tran.params = data;
                 QByteArray serializedTran;
                 OutputBinaryStream<QByteArray> stream(&serializedTran);
-                tran.serialize(&stream);
+                serialize( tran, &stream );
                 ErrorCode result = saveTransaction(tran, serializedTran);
                 if (result != ErrorCode::ok) {
                     return result;

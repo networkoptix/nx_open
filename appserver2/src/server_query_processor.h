@@ -53,7 +53,7 @@ namespace ec2
 
             QByteArray serializedTran;
             OutputBinaryStream<QByteArray> stream( &serializedTran );
-            tran.serialize(&stream);
+            serialize( tran, &stream );
 
             if (tran.persistent) {
                 errorCode = dbManager->executeTransaction( tran, serializedTran);

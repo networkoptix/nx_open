@@ -52,7 +52,7 @@ namespace ec2
                 if( _errorCode == ErrorCode::ok )
                 {
                     OutputBinaryStream<QByteArray> stream( &result );
-                    QnBinary::serialize( outputData, &stream );
+                    serialize( outputData, &stream );
                     contentType = "application/octet-stream";
                 }
                 errorCode = _errorCode;
@@ -62,7 +62,7 @@ namespace ec2
                 m_cond.wakeAll();
             };
 
-            static_cast<ChildType*>(this)->processQueryAsync<decltype(queryDoneHandler)>(
+            static_cast<ChildType*>(this)->template processQueryAsync<decltype(queryDoneHandler)>(
                 m_cmdCode,
                 inputData,
                 queryDoneHandler );
@@ -124,7 +124,7 @@ namespace ec2
         void processQueryAsync( ApiCommand::Value /*cmdCode*/, const InputData& inputData, HandlerType handler )
         {
             // TODO: #Elric maybe compare m_cmdCode and passed cmdCode?
-            m_queryProcessor->processQueryAsync<InputData, OutputData, HandlerType>(
+            m_queryProcessor->template processQueryAsync<InputData, OutputData, HandlerType>(
                 m_cmdCode,
                 inputData,
                 handler );
@@ -138,8 +138,8 @@ namespace ec2
         }
 
     private:
-        ServerQueryProcessor* const m_queryProcessor;
         ApiCommand::Value m_cmdCode;
+        ServerQueryProcessor* const m_queryProcessor;
     };
 
 

@@ -34,7 +34,7 @@ namespace ec2
                 users.toResourceList(outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->processQueryAsync<nullptr_t, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUserList, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUserList, nullptr, queryDoneHandler);
         return reqID;
     }
 

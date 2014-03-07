@@ -12,6 +12,8 @@ namespace ec2
     class QnTransactionMessageBus;
 
     typedef QSet<QnId> ProcessedPeers;
+    //using namespace ::QnBinary;
+
 
     class QnTransactionTransportSerializer
     {
@@ -20,22 +22,22 @@ namespace ec2
         QnTransactionTransportSerializer(QnTransactionMessageBus& owner);
 
         template <class T>
-        void serialize(QByteArray& buffer, const QnTransaction<T>& tran, const ProcessedPeers& peers = ProcessedPeers())
+        void serializeTran(QByteArray& buffer, const QnTransaction<T>& tran, const ProcessedPeers& peers = ProcessedPeers())
         {
             OutputBinaryStream<QByteArray> stream(&buffer);
             stream.write("00000000\r\n",10);
-            QnBinary::serialize(updatePeers(peers), &stream);
-            tran.serialize(&stream);
+            serialize(updatePeers(peers), &stream);
+            serialize( tran, &stream );
             stream.write("\r\n",2); // chunk end
             quint32 payloadSize = buffer.size() - 12;
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
         }
 
-        void serialize(QByteArray& buffer, const QByteArray& serializedTran, const ProcessedPeers& peers = ProcessedPeers())
+        void serializeTran(QByteArray& buffer, const QByteArray& serializedTran, const ProcessedPeers& peers = ProcessedPeers())
         {
             OutputBinaryStream<QByteArray> stream(&buffer);
             stream.write("00000000\r\n",10);
-            QnBinary::serialize(updatePeers(peers), &stream);
+            serialize(updatePeers(peers), &stream);
             stream.write(serializedTran.data(), serializedTran.size());
             stream.write("\r\n",2); // chunk end
             quint32 payloadSize = buffer.size() - 12;
@@ -43,7 +45,7 @@ namespace ec2
         }
 
         
-        static bool deserialize(const quint8* chunkPayload, int len,  ProcessedPeers& peers, QByteArray& tranData);
+        static bool deserializeTran(const quint8* chunkPayload, int len,  ProcessedPeers& peers, QByteArray& tranData);
 
     private:
         ProcessedPeers updatePeers(const ProcessedPeers& opaque);

@@ -31,7 +31,7 @@ namespace ec2
 				resTypeList.toResourceTypeList(outResTypeList);
             handler->done( reqID, errorCode, outResTypeList );
         };
-        m_queryProcessor->processQueryAsync<nullptr_t, ApiResourceTypeList, decltype(queryDoneHandler)>
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiResourceTypeList, decltype(queryDoneHandler)>
             ( ApiCommand::getResourceTypes, nullptr, queryDoneHandler );
         return reqID;
     }
@@ -63,7 +63,7 @@ namespace ec2
             }
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->processQueryAsync<QnId, ApiResourceParams, decltype(queryDoneHandler)>
+        m_queryProcessor->template processQueryAsync<QnId, ApiResourceParams, decltype(queryDoneHandler)>
             ( ApiCommand::getResourceParams, resourceId, queryDoneHandler );
         return reqID;
     }

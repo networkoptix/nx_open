@@ -25,7 +25,7 @@ namespace ec2
                 licenses.toResourceList(outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->processQueryAsync<nullptr_t, ApiLicenseList, decltype(queryDoneHandler)>( ApiCommand::getLicenses, nullptr, queryDoneHandler );
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiLicenseList, decltype(queryDoneHandler)>( ApiCommand::getLicenses, nullptr, queryDoneHandler );
         return reqID;
     }
     

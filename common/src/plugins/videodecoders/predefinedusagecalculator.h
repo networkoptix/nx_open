@@ -41,7 +41,7 @@ private:
     const stree::ResourceNameSet& m_rns;
     const QString m_predefinedDataFilePath;
     PluginUsageWatcher* const m_usageWatcher;
-    std::auto_ptr<stree::AbstractNode> m_currentTree;
+    std::unique_ptr<stree::AbstractNode> m_currentTree;
     mutable QMutex m_treeMutex;
 
     void updateTree();

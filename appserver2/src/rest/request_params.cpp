@@ -22,9 +22,9 @@ namespace ec2
         }
     }
 
-    void parseHttpRequestParams( const QnRequestParamList& params, nullptr_t* ) {}
+    void parseHttpRequestParams( const QnRequestParamList& /*params*/, nullptr_t* ) {}
 
-    void toUrlParams( const std::nullptr_t& , QUrlQuery* const query)
+    void toUrlParams( const std::nullptr_t& , QUrlQuery* const /*query*/)
     {
         // nothing to do
     }
@@ -39,7 +39,7 @@ namespace ec2
         query->addQueryItem( FOLDER_NAME_PARAM_NAME, name );
     }
 
-    void toUrlParams( const LoginInfo& loginInfo, QUrlQuery* const query)
+    void toUrlParams( const LoginInfo& /*loginInfo*/, QUrlQuery* const /*query*/)
     {
         //TODO/IMPL
     }
