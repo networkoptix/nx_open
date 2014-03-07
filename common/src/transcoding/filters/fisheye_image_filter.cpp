@@ -245,7 +245,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
 
     QVector3D dx = sphericalToCartesian(xShift + M_PI/2.0, 0.0) * kx;
     QVector3D dy = sphericalToCartesian(xShift, -yShift + M_PI/2.0) * kx; // /aspectRatio;
-    QVector3D  center = sphericalToCartesian(xShift, -yShift);
+    QVector3D center = sphericalToCartesian(xShift, -yShift);
 
     QMatrix4x4 to3d(dx.x(),     dy.x(),     center.x(),     0.0,
                     dx.y(),     dy.y(),     center.y(),     0.0,
