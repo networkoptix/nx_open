@@ -534,7 +534,7 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
         }
     }
 
-    if (oldStatus == Offline && newStatus == Online && !m_disabled)
+    if (oldStatus == Offline && newStatus == Online && !m_disabled && !hasFlags(foreigner))
         init();
 
 
