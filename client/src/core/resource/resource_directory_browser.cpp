@@ -131,7 +131,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     
     ec2::ApiLayoutData apiLayout;
     InputBinaryStream<QByteArray> stream(layoutData);
-    if (QnBinary::deserialize(apiLayout, &stream))
+    if (deserialize(apiLayout, &stream))
         apiLayout.toResource(layout);
     else
         return layout;

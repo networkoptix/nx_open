@@ -135,7 +135,7 @@ bool QnLayoutExportTool::start() {
     ec2::ApiLayoutData layoutObject;
     layoutObject.fromResource(m_layout);
     OutputBinaryStream<QByteArray> stream(&layoutData);
-    QnBinary::serialize(layoutObject, &stream);
+    serialize(layoutObject, &stream);
 
 
     QIODevice* device = m_storage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
