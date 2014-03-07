@@ -568,7 +568,7 @@ int QnDbManager::getNextSequence()
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiSetResourceStatusData>& tran)
 {
     QSqlQuery query(m_sdb);
-    query.prepare("UPDATE vms_resource set status = :status where guid = :id");
+    query.prepare("UPDATE vms_resource set status = :status where guid = :guid");
     query.bindValue(":status", tran.params.status);
     query.bindValue(":guid", tran.params.id.toRfc4122());
     if (!query.exec()) {
