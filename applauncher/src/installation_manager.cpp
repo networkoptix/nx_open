@@ -22,6 +22,12 @@ static QRegExp versionDirMatch( ".*" );
 static QRegExp versionDirMatch( "\\d+\\.\\d+.*" );
 #endif
 
+#ifdef Q_OS_LINUX
+static QString installationPathPrefix = ".local/share";
+#else
+static QString installationPathPrefix = "AppData/Local";
+#endif
+
 InstallationManager::InstallationManager( QObject* const parent )
 :
     QObject( parent )
@@ -36,11 +42,13 @@ InstallationManager::InstallationManager( QObject* const parent )
     m_defaultDirectoryForNewInstallations = QStandardPaths::writableLocation( QStandardPaths::HomeLocation );
     if( !m_defaultDirectoryForNewInstallations.isEmpty() )
     {
-        m_defaultDirectoryForNewInstallations += QString::fromLatin1("/AppData/Local/%1/compatibility/%2/").arg(QN_ORGANIZATION_NAME).arg(QN_CUSTOMIZATION_NAME);
+        m_defaultDirectoryForNewInstallations += QString::fromLatin1("/%1/%2/compatibility/%3/").arg(installationPathPrefix, QN_ORGANIZATION_NAME, QN_CUSTOMIZATION_NAME);
         m_rootInstallDirectoryList.push_back( m_defaultDirectoryForNewInstallations );
     }
 
     updateInstalledVersionsInformation();
+    if( m_installedProductsByVersion.size() > 1 )
+        createLatestVersionGhost();
 }
 
 void InstallationManager::updateInstalledVersionsInformation()
@@ -49,12 +57,17 @@ void InstallationManager::updateInstalledVersionsInformation()
 
     for( const QString& rootDir: m_rootInstallDirectoryList  )
     {
-        const QStringList& entries = QDir(rootDir).entryList( QDir::Dirs );
+        const QStringList& entries = QDir(rootDir).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
         for( int i = 0; i < entries.size(); ++i )
         {
             //each entry - is a version
-            if( entries[i] == QLatin1String(".") || entries[i] == QLatin1String("..") || !versionDirMatch.exactMatch(entries[i]) )
+            if( !versionDirMatch.exactMatch(entries[i]) )
                 continue;
+
+            // Skip empty dirs. Also skip created ghost dir.
+            if( QDir(rootDir + QLatin1String("/") + entries[i]).entryList(QDir::AllEntries | QDir::NoDotAndDotDot).isEmpty() )
+                continue;
+
             tempInstalledProductsByVersion.insert( std::make_pair(
                 entries[i],
                 AppData(
@@ -65,6 +78,14 @@ void InstallationManager::updateInstalledVersionsInformation()
 
     std::unique_lock<std::mutex> lk( m_mutex );
     m_installedProductsByVersion.swap( tempInstalledProductsByVersion );
+}
+
+void InstallationManager::createLatestVersionGhost()
+{
+    QString version = getMostRecentVersion();
+    QDir installationDir(m_defaultDirectoryForNewInstallations);
+    if( !installationDir.exists(version) )
+        installationDir.mkdir(version);
 }
 
 int InstallationManager::count() const
