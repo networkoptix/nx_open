@@ -5,10 +5,19 @@
 #include "core/resource/layout_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
 #include "utils/common/synctime.h"
+#include "common/common_module.h"
 
 QnClientMessageProcessor::QnClientMessageProcessor():
-    base_type()
+    base_type(),
+    m_opened(false)
 {
+}
+
+void QnClientMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
+{
+    QnCommonMessageProcessor::init(connection);
+    connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
+    connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
 }
 
 void QnClientMessageProcessor::onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status)
@@ -96,5 +105,31 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
 
     QnResourceDiscoveryManager::instance()->setReady(true);
     qnSyncTime->reset();
-    emit connectionOpened();
+    //emit connectionOpened();
+}
+
+void QnClientMessageProcessor::at_remotePeerFound(QnId id, bool isClient, bool isProxy)
+{
+    if (isProxy)
+        return;
+
+    if (!m_opened) {
+        m_opened = true;
+        emit connectionOpened();
+    }
+}
+
+void QnClientMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool isProxy)
+{
+    if (isProxy)
+        return;
+
+    if (m_opened) {
+        m_opened = false;
+        emit connectionClosed();
+        foreach(QnResourcePtr res, qnResPool->getAllResourceByTypeName(lit("Server")))
+            res->setStatus(QnResource::Offline);
+        foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras())
+            res->setStatus(QnResource::Offline);
+    }
 }

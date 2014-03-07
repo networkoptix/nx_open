@@ -13,11 +13,16 @@ class QnClientMessageProcessor : public QnCommonMessageProcessor
     typedef QnCommonMessageProcessor base_type;
 public:
     QnClientMessageProcessor();
-
+    virtual void init(ec2::AbstractECConnectionPtr connection) override;
 protected:
     virtual void onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status) override;
     virtual void updateResource(QnResourcePtr resource) override;
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
+private:
+    bool m_opened;
+private slots:
+    void QnClientMessageProcessor::at_remotePeerFound(QnId id, bool isClient, bool isProxy);
+    void at_remotePeerLost(QnId id, bool isClient, bool isProxy);
 private:
     void determineOptimalIF(const QnMediaServerResourcePtr &resource);
     void processLicenses(const QnLicenseList& licenses);

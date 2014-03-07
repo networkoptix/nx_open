@@ -76,7 +76,7 @@ void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 * EC2 related processing. Need move to other class
 */
 
-void QnServerMessageProcessor::at_remotePeerFound(QnId id)
+void QnServerMessageProcessor::at_remotePeerFound(QnId id, bool isClient, bool isProxy)
 {
     QnResourcePtr res = qnResPool->getResourceById(id);
     if (res)
@@ -84,7 +84,7 @@ void QnServerMessageProcessor::at_remotePeerFound(QnId id)
 
 }
 
-void QnServerMessageProcessor::at_remotePeerLost(QnId id, bool isClient)
+void QnServerMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool isProxy)
 {
     QnResourcePtr res = qnResPool->getResourceById(id);
     if (res) {

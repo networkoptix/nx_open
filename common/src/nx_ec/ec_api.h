@@ -683,8 +683,8 @@ namespace ec2
         void initNotification(QnFullResourceData fullData);
         void runtimeInfoChanged(const ec2::QnRuntimeInfo& runtimeInfo);
 
-        void remotePeerFound(QnId id);
-        void remotePeerLost(QnId id, bool isClient);
+        void remotePeerFound(QnId id, bool isClient, bool isProxy);
+        void remotePeerLost(QnId id, bool isClient, bool isProxy);
 
     protected:
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;

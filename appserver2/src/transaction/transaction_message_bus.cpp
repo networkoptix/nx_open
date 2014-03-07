@@ -65,8 +65,15 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& 
         qWarning() << "Got invalid ApiServerAliveData transaction. Ignoring";
         return;
     }
-    if (!tran.params.isAlive && !m_alivePeers.contains(tran.params.serverId))
-        emit peerLost(tran.params.serverId, tran.params.isClient);
+
+    // proxy alive info from non-direct connected host
+    if (!m_alivePeers.contains(tran.params.serverId))
+    {
+        if (tran.params.isAlive)
+            emit peerFound(tran.params.serverId, tran.params.isClient, true);
+        else
+            emit peerLost(tran.params.serverId, tran.params.isClient, true);
+    }
 }
 
 void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<QnId> processedPeers)
@@ -86,8 +93,9 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
 
     QMap<QUuid, qint64>:: iterator itr = m_lastActivity.find(tran.id.peerGUID);
     if (itr == m_lastActivity.end()) {
+        Q_ASSERT(!tran.id.peerGUID.isNull());
         m_lastActivity.insert(tran.id.peerGUID, qnSyncTime->currentMSecsSinceEpoch());
-        emit peerFound(tran.id.peerGUID);
+        emit peerFound(tran.id.peerGUID, itr.value(), true);
     }
     else {
         *itr = qnSyncTime->currentMSecsSinceEpoch();
@@ -317,9 +325,9 @@ void QnTransactionMessageBus::sendServerAliveMsg(const QnId& serverId, bool isAl
     tran.params.isClient = isClient;
     sendTransaction(tran);
     if (isAlive)
-        emit peerFound(serverId);
+        emit peerFound(serverId, isClient, false);
     else
-        emit peerLost(serverId, isClient);
+        emit peerLost(serverId, isClient, false);
 }
 
 void QnTransactionMessageBus::processConnState(QnTransactionTransportPtr transport)
@@ -420,7 +428,7 @@ void QnTransactionMessageBus::at_timer()
     for (QMap<QUuid, qint64>::iterator itr = m_lastActivity.begin(); itr != m_lastActivity.end(); )
     {
         if (currentTime - itr.value() > ALIVE_UPDATE_INTERVAL * 2) {
-            emit peerLost(itr.key(), itr.value());
+            emit peerLost(itr.key(), itr.value(), false);
             itr = m_lastActivity.erase(itr);
         }
         else {
@@ -435,6 +443,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     if (isClient) 
     {
         tran.command = ApiCommand::getAllDataList;
+        tran.id.peerGUID = qnCommon->moduleGUID();
         const ErrorCode errorCode = dbManager->doQuery(nullptr, tran.params);
         if (errorCode != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";

@@ -20,7 +20,7 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 {
     if (m_connection) {
         m_connection->disconnect(this);
-        emit connectionClosed();
+        //emit connectionClosed();
     }
     m_connection = connection;
 

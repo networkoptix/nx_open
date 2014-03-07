@@ -28,8 +28,8 @@ namespace ec2
         m_layoutManager( new QnLayoutManager<T>(m_queryProcessor, resCtx) ),
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) )
     {
-        connect (QnTransactionMessageBus::instance(), SIGNAL(peerFound(QnId)), this, SIGNAL(remotePeerFound(QnId)));
-        connect (QnTransactionMessageBus::instance(), SIGNAL(peerLost(QnId, bool)),  this, SIGNAL(remotePeerLost(QnId, bool)));
+        connect (QnTransactionMessageBus::instance(), SIGNAL(peerFound(QnId, bool, bool)), this, SIGNAL(remotePeerFound(QnId, bool, bool)), Qt::DirectConnection);
+        connect (QnTransactionMessageBus::instance(), SIGNAL(peerLost(QnId, bool, bool)),  this, SIGNAL(remotePeerLost(QnId, bool, bool)), Qt::DirectConnection);
     }
 
     template<class T>

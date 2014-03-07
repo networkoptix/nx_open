@@ -60,8 +60,8 @@ namespace ec2
 
         QMap<QnId, bool> alivePeers() const { return m_alivePeers; }
 signals:
-        void peerLost(QnId, bool isClient);
-        void peerFound(QnId);
+        void peerLost(QnId, bool isClient, bool isProxy);
+        void peerFound(QnId, bool isClient, bool isProxy);
     private:
         friend class QnTransactionTransport;
 
