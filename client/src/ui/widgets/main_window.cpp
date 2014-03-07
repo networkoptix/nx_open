@@ -479,7 +479,7 @@ void QnMainWindow::updateDecorationsState() {
 
     bool windowTitleUsed = !uiTitleUsed && !qnSettings->isVideoWallMode();
     setTitleVisible(windowTitleUsed);
-    m_ui->setTitleUsed(uiTitleUsed);
+    m_ui->setTitleUsed(uiTitleUsed && !qnSettings->isVideoWallMode());
     m_view->setLineWidth(windowTitleUsed ? 0 : 1);
 
     updateDwmState();
