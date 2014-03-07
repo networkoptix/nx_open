@@ -16,15 +16,15 @@
         "_": "Globals settings. These ones will go away in one of the future versions.",
         
         "selectionColor":           "selection",
-        "backgroundGradientColor":  "custom_grey",
-        "frameColor":               "custom_grey",
-        "selectedFrameColor":       "custom_blue",
+        "backgroundGradientColor":  "QColor(26, 26, 240, 40)",
+        "frameColor":               "QColor(128, 128, 128, 196)",
+        "selectedFrameColor":       "QColor(32, 144, 224, 196)",
         "ptzColor":                 "QColor(128, 196, 255, 255)",
-        "shadowColor":              "#00000000",
+        "shadowColor":              "black",
         "businessRuleDisabledHighlightColor": "QColor(64, 64, 64)",
         "businessRuleInvalidBackgroundColor": "QColor(150, 0, 0)",
         "businessRuleInvalidColumnBackgroundColor": "QColor(204, 0, 0)",
-        "businessRuleInvalidHighlightColor": "custom_blue"
+        "businessRuleInvalidHighlightColor": "opaqueSelection"
     },
     
     "QApplication": {
@@ -33,44 +33,44 @@
         
             "default": {},
             "active": {
-                "windowText":       "#000000",
+                "windowText":       "#f0f0f0",
                 "button":           "opaqueSelection",
                 "light":            "#f0f0f0",
                 "midlight":         "#dcdcdc",
                 "dark":             "#464646",
                 "mid":              "#646464",
-                "text":             "#202020",
+                "text":             "#f5f5f5",
                 "brightText":       "#ffffff",
                 "buttonText":       "#ffffff",
-                "base":             "#ffffff",
-                "window":           "#D0D0D0",
+                "base":             "#313132",
+                "window":           "#222222",
                 "shadow":           "#000000",
                 "highlight":        "opaqueSelection",
                 "highlightedText":  "#f0f0f0",
                 "link":             "#0099ff",
                 "linkVisited":      "#30aafc",
-                "alternateBase":    "#e0e0e0",
+                "alternateBase":    "#363637",
                 "toolTipBase":      "#f0f0f0",
                 "toolTipText":      "#222222"
             },
             "inactive": {
-                "windowText":       "#000000",
+                "windowText":       "#f0f0f0",
                 "button":           "opaqueSelection",
                 "light":            "#f0f0f0",
                 "midlight":         "#dcdcdc",
                 "dark":             "#464646",
                 "mid":              "#646464",
-                "text":             "#202020",
+                "text":             "#f5f5f5",
                 "brightText":       "#ffffff",
                 "buttonText":       "#ffffff",
-                "base":             "#ffffff",
-                "window":           "#D0D0D0",
+                "base":             "#313132",
+                "window":           "#222222",
                 "shadow":           "#000000",
                 "highlight":        "#727272",
                 "highlightedText":  "#f0f0f0",
                 "link":             "#0099ff",
                 "linkVisited":      "#30aafc",
-                "alternateBase":    "#e0e0e0",
+                "alternateBase":    "#363637",
                 "toolTipBase":      "#f0f0f0",
                 "toolTipText":      "#222222"
             },
@@ -81,33 +81,41 @@
                 "midlight":         "#dcdcdc",
                 "dark":             "#464646",
                 "mid":              "#646464",
-                "text":             "#202020",
+                "text":             "#939393",
                 "brightText":       "#ffffff",
                 "buttonText":       "#808080",
-                "base":             "#ffffff",
-                "window":           "#D0D0D0",
+                "base":             "#2c2c2c",
+                "window":           "#222222",
                 "shadow":           "#000000",
                 "highlight":        "#919191",
                 "highlightedText":  "#808080",
                 "link":             "#0099ff",
                 "linkVisited":      "#30aafc",
-                "alternateBase":    "#e0e0e0",
+                "alternateBase":    "#323232",
                 "toolTipBase":      "#f0f0f0",
                 "toolTipText":      "#222222"
             }
         }
     },
     
-	"QnNavigationItem": {
-		"palette": { "default": { "window": "#D0D0D0" } }
+    "QnMainWindow": {
+        "palette": { "default": {
+            "window": "#000000"
+        }}
+    },
+    
+    "QnNavigationItem": {
+		"palette": { "default": { 
+            "window": "#000000" 
+        }}
 	},
 
     "QnTimeSlider": {
         "colors": {
             "_": "Time slider colors.",
             
-            "tickmark": "#000000FF",
-            "positionMarker": "#000000C0",
+            "tickmark": "QColor(255, 255, 255, 255)",
+            "positionMarker": "QColor(255, 255, 255, 196)",
             "indicator": "QColor(128, 160, 192, 128)",
             
             "selection": "selection",
@@ -116,21 +124,21 @@
             "pastBackground": "QColor(255, 255, 255, 24)",
             "futureBackground": "QColor(0, 0, 0, 0)",
             
-            "pastRecording": "QColor(0, 128, 0, 255)",
-            "futureRecording": "QColor(0, 128, 0, 192)",
+            "pastRecording": "QColor(64, 255, 64, 128)",
+            "futureRecording": "QColor(64, 255, 64, 64)",
             
-            "pastMotion": "QColor(128, 0, 0, 255)",
-            "futureMotion": "QColor(128, 0, 0, 192)",
+            "pastMotion": "QColor(255, 0, 0, 128)",
+            "futureMotion": "QColor(255, 0, 0, 64)",
             
-            "separator": "#00000040",
+            "separator": "QColor(255, 255, 255, 64)",
             
             "dateOverlay": "QColor(255, 255, 255, 48)",
             "dateOverlayAlternate": "selection.setAlpha(48)",
 
 			"pastLastMinute": "QColor(255, 255, 255, 48)",
-            "futureLastMinute": "QColor(0, 0, 0, 48)"
+            "futureLastMinute": "QColor(0, 0, 0, 48)"            
         },
-		"palette": { "default": { "windowText": "#000000" } }
+		"palette": { "default": { "windowText": "#FFFFFF" } }        
     },
     
     "QnTimeScrollBar": {
@@ -140,11 +148,11 @@
             "handle": "#00000020"
         }
     },
-    
+
     "QnControlBackgroundWidget": {
         "_": "Background for ui panels (resource tree, title bar, notifications panel).",
         
-        "colors": ["custom_grey.setAlpha(128)", "darkGrey.setAlpha(32)"],
+        "colors": ["#000000FF", "#00000040"],
         "frameColor": "#80808080",
         "frameWidth": 1.0
     },
@@ -154,7 +162,7 @@
             "default": {
                 "_": "Scene background color.",
             
-                "base": "custom_grey"
+                "base": "black"
             }
         }
     },
@@ -163,25 +171,25 @@
         "colors": {
             "_": "Background gradient colors.",
             
-            "normal": "darkGrey",
-            "panic": "custom_red"
+            "normal": "noptix_blue.setAlpha(48)",
+            "panic": "#FF0000"
         }
     },
-
-	"QnMediaResourceWidget": {
-		"palette": { "default": { "window": "custom_grey.setAlpha(64)" } }
-	},
     
+    "QnMediaResourceWidget": {
+		"palette": { "default": { "window": "#000000ff" } }
+	},
+
     "QnServerResourceWidget": {
         "colors": {
-            "frame": "custom_blue",
-            "grid": "custom_blue.setAlpha(64)",
-            "cpu": "#3776ca",
+            "frame": "#428ced",
+            "grid": "QColor(66, 140, 237, 100)",
+            "cpu": "#428ced",
             "ram": "#db3ba9",
-            "hdds": ["#438231","#484848","#aa880b","#b25e26","#9200d1","#00d5d5","#267f00","#8f5656","#c90000"],
+            "hdds": ["#ededed","#edc842","#67ed42","#ff8330","#b200ff","#00ffff","#267f00","#ff7f7f","#c90000"],
             "network": ["#ff3434", "#f0ff34", "#8484ff", "#34ff84"]
-        },
-		"palette": { "default": { "window": "#e6e6e6" } }
+        },    
+		"palette": { "default": { "window": "black" } }
     },
     
     "ZoomWindowInstrument": {
@@ -190,7 +198,7 @@
 
     "QnStatusOverlayWidget": {
         "palette": { "default": {
-            "window": "#ffffff80",
+            "window": "#black",
             "windowText": "#801010c0"
         }},
         "diagnosticsButton": { 
@@ -198,53 +206,53 @@
             "frameColor": "#801010ff",
             "textColor": "#ffffffff"
         }
-    },
+    },   
     
 	"QnStyledTooltipWidget": {
-		"windowColor": "QColor(255, 255, 255, 192)",
-		"frameColor": "#808080",
-		"palette": { "default": { "windowText": "#000000" } }
+		"windowColor": "QColor(0, 0, 0, 255)",
+		"frameColor": "QColor(203, 210, 233, 128)",
+		"palette": { "default": { "windowText": "QColor(63, 159, 216)" } }
 	},
     
     "QnGridItem": {
         "colors": {
-            "grid": "darkGrey.setAlpha(64)",
-            "allowed": "#00ff00.setAlpha(64)",
-            "disallowed": "#ff0000.setAlpha(64)"
+            "grid": "QColor(0, 240, 240, 128)",
+            "allowed": "QColor(0, 255, 0, 64)",
+            "disallowed": "QColor(255, 0, 0, 64)"
         }
     },
-    
+
     "QnHistogramWidget": {
         "colors": {
-            "background": "#ffffffff",
-            "border": "#a0a0a0ff",
-            "histogram": "#606060ff",
+            "background": "#000000ff",
+            "border": "#606060ff",
+            "histogram": "#c0c0c0ff",
             "selection": "selection",
             "grid": "#00800080",
-            "text": "#000000ff"
+            "text": "#ffffffff"
         }
     },
     
     "QnCalendarItemDelegate": {
         "colors": {
             "selection": "selection.setAlpha(192)",
-            "primaryRecording": "#80B080ff",
-            "secondaryRecording": "#80ff80ff",
-            "primaryMotion": "#B06060ff",
-            "secondaryMotion": "#ff8080ff",
-            "separator": "#808080ff"
+            "primaryRecording": "#208020ff",
+            "secondaryRecording": "#20ff20ff",
+            "primaryMotion": "#800000ff",
+            "secondaryMotion": "#ff0000ff",
+            "separator": "#000000ff"
         }
     },
     
     "QnCalendarWidget": {
         "palette": { "default": {
-            "highlight": "#ffffffff"
+            "highlight": "#000000ff"
         }}
     },
     
     "QnDayTimeWidget": {
         "palette": { "default": {
-            "highlight": "#ffffffff"
+            "highlight": "#000000ff"
         }}
     },
     
