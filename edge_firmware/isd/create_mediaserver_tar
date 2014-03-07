@@ -34,6 +34,8 @@ do
         exit 0
     elif [[ "$i" =~ "--target-dir=" ]] ; then
         TARGET_DIR="`echo $i | sed 's/--target-dir=\(.*\)/\1/'`"
+    elif [ "$i" == "--no-strip" ] ; then
+        STRIP=
     fi
 done
 
@@ -49,13 +51,13 @@ libavutil.so.51.54.100 \
 libcommon.so.220.0.0 \
 libappserver2.so.220.0.0 \
 libpostproc.so.52.0.100 \
-libQt5Concurrent.so.5.1.1 \
-libQt5Core.so.5.1.1 \
-libQt5Gui.so.5.1.1 \
-libQt5Multimedia.so.5.1.1 \
-libQt5Network.so.5.1.1 \
-libQt5Sql.so.5.1.1 \
-libQt5Xml.so.5.1.1 \
+libQt5Concurrent.so.5.2.1 \
+libQt5Core.so.5.2.1 \
+libQt5Gui.so.5.2.1 \
+libQt5Multimedia.so.5.2.1 \
+libQt5Network.so.5.2.1 \
+libQt5Sql.so.5.2.1 \
+libQt5Xml.so.5.2.1 \
 libsigar.so \
 libswresample.so.0.15.100 \
 libswscale.so.2.1.100 )
@@ -73,7 +75,7 @@ for var in "${LIBS_TO_COPY[@]}"
 do
   cp $LIBS_DIR/${var} $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
   if [ ! -z "$STRIP" ]; then
-    $TOOLCHAIN_PREFIX"strip" $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+    $TOOLCHAIN_PREFIX"strip" $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
   fi
 done
 
