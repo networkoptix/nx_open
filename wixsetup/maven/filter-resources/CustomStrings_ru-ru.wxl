@@ -123,6 +123,7 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">Запустить ${product.name} по окончании установки.</String>    
+    <String Id="Product_ArchMismatch"                               Overridable="yes">Этот продукт предназначен для 32-разрядной ОС. Установка будет закончена.</String>    
 
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Хотя бы один компонент должен быть выбран</String>    
