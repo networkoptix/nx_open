@@ -1,28 +1,42 @@
 #!/bin/bash
 
+function printHelp()
+{
+    echo "--target-dir={dir to copy packet to}"
+    echo
+}
+
+
 TOOLCHAIN_PREFIX=/usr/local/codesourcery/arm-2013.11/bin/arm-none-linux-gnueabi-
 
-CUSTOMIZATION=digitalwatchdog
-PRODUCT_NAME=dwspectrum
+CUSTOMIZATION=networkoptix
+PRODUCT_NAME=hdwitness
 MODULE_NAME=mediaserver
 VERSION=2.2.0
 
-PACKAGE_NAME=$CUSTOMIZATION-$PRODUCT_NAME-$MODULE_NAME-$VERSION-edge.tar.gz
+PACKAGE_NAME=$PRODUCT_NAME-$MODULE_NAME-$VERSION-edge.tar.gz
 
 BUILD_DIR=/tmp/hdw_isd_build.tmp
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
 
-if [ "$USER" != "ivigasin" ]
-then
-    SRC_DIR=/home/ak/develop/netoptix_vms.arm
-    TARGET_DIR=/var/www
-else
-    SRC_DIR=$HOME/workspace/netoptix_vms
-    TARGET_DIR=$HOME/tmp/isd
-fi
+SRC_DIR=../../
 
 BUILD_OUTPUT_DIR=$SRC_DIR/build_environment/target
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
+
+
+for i in "$@"
+do
+    if [ $i == "-h" -o $i == "--help"  ] ; then
+        printHelp
+        exit 0
+    elif [[ "$i" =~ "--target-dir=" ]] ; then
+        TARGET_DIR="`echo $i | sed 's/--target-dir=\(.*\)/\1/'`"
+    fi
+done
+
+
+
 
 LIBS_TO_COPY=\
 ( libavcodec.so.54.23.100 \
@@ -41,8 +55,9 @@ libQt5Sql.so.5.1.1 \
 libQt5Xml.so.5.1.1 \
 libsigar.so \
 libswresample.so.0.15.100 \
-libswscale.so.2.1.100 \
-libvpx.so.1.2.0 )
+libswscale.so.2.1.100 )
+
+#libvpx.so.1.2.0 )
 
 
 
