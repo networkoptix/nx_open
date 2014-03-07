@@ -14,6 +14,43 @@ extern "C" {
 #endif
 };
 
+static qreal qSlowSin(qreal angle) {
+    angle = qMod(angle, 2 * M_PI);
+    if(angle < M_PI) {
+        if(angle < 0.5 * M_PI) {
+            return std::sin(angle);
+        } else {
+            return std::sin(M_PI - angle);
+        }
+    } else {
+        if(angle < 1.5 * M_PI) {
+            return -std::sin(angle - M_PI);
+        } else {
+            return -std::sin(2 * M_PI - angle);
+        }
+    }
+}
+
+static qreal qSlowCos(qreal angle) {
+    angle = qMod(angle, 2 * M_PI);
+    if(angle < M_PI) {
+        if(angle < 0.5 * M_PI) {
+            return std::cos(angle);
+        } else {
+            return -std::cos(M_PI - angle);
+        }
+    } else {
+        if(angle < 1.5 * M_PI) {
+            return -std::cos(angle - M_PI);
+        } else {
+            return std::cos(2 * M_PI - angle);
+        }
+    }
+}
+
+#define sin qSlowSin
+#define cos qSlowCos
+
 static bool saveTransformImage(const QPointF *transform, int width, int height, const QString &fileName) {
     QImage image(width, height, QImage::Format_ARGB32);
 
@@ -52,7 +89,7 @@ inline __m128 CalcWeights(float x, float y)
     w_x = _mm_movelh_ps(w_x, w_x);      // x (1-x) x (1-x)
     __m128 w_y = _mm_shuffle_ps(psXYfrac1, psXYfrac, _MM_SHUFFLE(1, 1, 1, 1)); // y y (1-y) (1-y)
 
-    // complete weight vector
+    // complete weight vectorqFastCos
     return _mm_mul_ps(w_x, w_y);
 }
 
@@ -177,7 +214,7 @@ void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int pl
     else
         updateFisheyeTransformEquirectangular(imageSize, plane);
 
-    //saveTransformImage(m_transform[plane], imageSize.width(), imageSize.height(), lit("D:/transform_%1.png").arg(plane));
+    //saveTransformImage(m_transform[plane], imageSize.width(), imageSize.height(), lit("/home/alexandra/transform_%1.png").arg(plane));
 }
 
 void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageSize, int plane)
