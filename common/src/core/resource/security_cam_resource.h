@@ -160,8 +160,6 @@ public:
 
     bool needCheckIpConflicts() const;
 
-    virtual Status getStatus() const override;
-
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
         \param detailLevel Minimal time period gap (usec) that is of interest to the caller. 

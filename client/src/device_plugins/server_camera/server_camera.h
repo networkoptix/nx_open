@@ -30,10 +30,14 @@ public:
     QString getUniqueIdForServer(const QnResourcePtr mServer) const;
 
     QnServerCameraPtr findEnabledSibling();
+    virtual Status getStatus() const override;
 
+    void setTmpStatus(Status value);
 protected:
     virtual QString getUniqueId() const override;
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
+private:
+    Status m_tmpStatus;
 
 private:
     QnServerCameraPtr m_activeCamera;

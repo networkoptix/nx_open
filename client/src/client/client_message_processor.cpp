@@ -6,6 +6,7 @@
 #include "core/resource_management/resource_discovery_manager.h"
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
+#include "device_plugins/server_camera/server_camera.h"
 
 QnClientMessageProcessor::QnClientMessageProcessor():
     base_type(),
@@ -108,10 +109,24 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     //emit connectionOpened();
 }
 
+void QnClientMessageProcessor::updateTmpStatus(const QnId& id, QnResource::Status status)
+{
+    QnResourcePtr server = qnResPool->getResourceById(id);
+    if (!server)
+        return;
+    foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras(server)) {
+        QnServerCameraPtr serverCamera = res.dynamicCast<QnServerCamera>();
+        if (serverCamera)
+            serverCamera->setTmpStatus(status);
+    }
+}
+
 void QnClientMessageProcessor::at_remotePeerFound(QnId id, bool isClient, bool isProxy)
 {
-    if (isProxy)
+    if (isProxy) {
+        updateTmpStatus(id, QnResource::NotDefined);
         return;
+    }
 
     if (!m_opened) {
         m_opened = true;
@@ -121,8 +136,10 @@ void QnClientMessageProcessor::at_remotePeerFound(QnId id, bool isClient, bool i
 
 void QnClientMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool isProxy)
 {
-    if (isProxy)
+    if (isProxy) {
+        updateTmpStatus(id, QnResource::Offline);
         return;
+    }
 
     if (m_opened) {
         m_opened = false;

@@ -592,13 +592,3 @@ QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(
 
     return QnTimePeriodList();
 }
-
-QnResource::Status QnSecurityCamResource::getStatus() const
-{
-    /*
-    QnResourcePtr mServer = getParentResource();
-    if (mServer && mServer->getStatus() == Offline)
-        return Offline;
-    */
-    return QnResource::getStatus();
-}

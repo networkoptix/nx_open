@@ -18,6 +18,7 @@ QnServerCamera::QnServerCamera(const QnId& resourceTypeId): QnVirtualCameraResou
     addFlags(server_live_cam);
     if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
         addFlags(QnResource::motion);
+    m_tmpStatus = NotDefined;
 }
 
 bool QnServerCamera::isResourceAccessible()
@@ -137,3 +138,22 @@ QnServerCameraFactory& QnServerCameraFactory::instance()
     return _instance;
 }
 
+
+QnResource::Status QnServerCamera::getStatus() const
+{
+    if (m_tmpStatus != NotDefined)
+        return m_tmpStatus;
+    else
+        return QnResource::getStatus();
+}
+
+void QnServerCamera::setTmpStatus(Status value)
+{
+    if (value != m_tmpStatus) {
+        Status oldStatus = getStatus();
+        m_tmpStatus = value;
+        Status newStatus = getStatus();
+        if (oldStatus != newStatus)
+            emit statusChanged(toSharedPointer(this));
+    }
+}

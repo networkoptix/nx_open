@@ -29,6 +29,7 @@ private:
     void processResources(const QnResourceList& resources);
     void updateHardwareIds(const ec2::QnFullResourceData& fullData);
     void processCameraServerItems(const QnCameraHistoryList& cameraHistoryList);
+    void updateTmpStatus(const QnId& id, QnResource::Status status);
 };
 
 #endif // _client_event_manager_h

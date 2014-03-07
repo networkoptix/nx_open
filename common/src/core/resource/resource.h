@@ -66,6 +66,7 @@ public:
         Unauthorized,
         Online,
         Recording,
+        NotDefined,
 
         /** Locked status used in layouts only */
         Locked = Recording
