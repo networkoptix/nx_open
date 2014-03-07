@@ -14,6 +14,23 @@ extern "C" {
 #endif
 };
 
+static bool saveTransformImage(const QPointF *transform, int width, int height, const QString &fileName) {
+    QImage image(width, height, QImage::Format_ARGB32);
+
+    int stride = image.bytesPerLine();
+    unsigned char *line = (unsigned char *) image.scanLine(0);
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            line[stride * y + x * 4 + 0] = transform[y * width + x].x() / width * 255;
+            line[stride * y + x * 4 + 1] = transform[y * width + x].y() / height * 255;
+            line[stride * y + x * 4 + 2] = 0;
+            line[stride * y + x * 4 + 3] = 255;
+        }
+    }
+    
+    return image.save(fileName);
+}
+
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
 // constant values that will be needed
@@ -72,8 +89,7 @@ static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
 
 // ------------ QnFisheyeImageFilter ----------------------
 
-QnFisheyeImageFilter::QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDewarping,
-                                           const QnItemDewarpingParams& itemDewarping):
+QnFisheyeImageFilter::QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDewarping, const QnItemDewarpingParams& itemDewarping):
     QnAbstractImageFilter(),
     m_mediaDewarping(mediaDewarping),
     m_itemDewarping(itemDewarping),
@@ -147,7 +163,7 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
     }
 }
 
-QVector3D sphericalToCartesian(qreal theta, qreal phi) {
+QVector3D sphericalToCartesian(qreal theta, qreal phi) { // TODO: #Elric use function from coordinate_transform header
     return QVector3D(cos(phi) * sin(theta), cos(phi)*cos(theta), sin(phi));
 }
 
@@ -160,6 +176,8 @@ void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int pl
         updateFisheyeTransformRectilinear(imageSize, plane);
     else
         updateFisheyeTransformEquirectangular(imageSize, plane);
+
+    //saveTransformImage(m_transform[plane], imageSize.width(), imageSize.height(), lit("D:/transform_%1.png").arg(plane));
 }
 
 void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageSize, int plane)
