@@ -98,8 +98,17 @@
         }
     },
     
+    "QnMainWindow": {
+        "palette": { "default": {
+            "window": "#D0D0D0"
+        }}
+    },
+    
+
 	"QnNavigationItem": {
-		"palette": { "default": { "window": "#D0D0D0" } }
+		"palette": { "default": { 
+            "window": "#D0D0D0" 
+        }}
 	},
 
     "QnTimeSlider": {
