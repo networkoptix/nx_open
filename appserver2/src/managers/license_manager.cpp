@@ -54,11 +54,14 @@ namespace ec2
     }
 
     template<class T>
-    void QnLicenseManager<T>::triggerNotification( const QnTransaction<ApiLicense>& tran )
+    void QnLicenseManager<T>::triggerNotification( const QnTransaction<ApiLicenseList>& tran )
     {
-        QnLicensePtr license(new QnLicense());
-        tran.params.toResource(*license);
-        emit licenseChanged(license);
+        QnLicenseList licenseList;
+        tran.params.toResourceList(licenseList);
+
+        foreach (const QnLicensePtr& license, licenseList) {
+            emit licenseChanged(license);
+        }
     }
 
     template class QnLicenseManager<ServerQueryProcessor>;

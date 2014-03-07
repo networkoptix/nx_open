@@ -27,12 +27,16 @@ namespace ec2
 
     struct ServerInfo
     {
-        QByteArray hardwareId1;
+        QList<QByteArray> mainHardwareIds;
+        QList<QByteArray> compatibleHardwareIds;
+
+        /* QByteArray hardwareId1;
         QByteArray oldHardwareId;
         QByteArray hardwareId2;
+        QByteArray hardwareId3; */
+
         QString publicIp;
         QString systemName;
-        QByteArray hardwareId3;
         QString sessionKey;
         bool allowCameraChanges;
     };

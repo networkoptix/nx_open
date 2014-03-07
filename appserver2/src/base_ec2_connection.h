@@ -63,7 +63,7 @@ namespace ec2
             return true;
         }
 
-        void triggerNotification( const QnTransaction<ApiLicense>& tran ) {
+        void triggerNotification( const QnTransaction<ApiLicenseList>& tran ) {
             m_licenseManager->triggerNotification( tran );
         }
 

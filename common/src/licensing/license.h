@@ -99,6 +99,8 @@ private:
     void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
 };
 
+Q_DECLARE_METATYPE(QnLicensePtr)
+
 typedef QList<QnLicensePtr> QnLicenseList;
 typedef QMap<QByteArray, QnLicensePtr> QnLicenseDict;
 

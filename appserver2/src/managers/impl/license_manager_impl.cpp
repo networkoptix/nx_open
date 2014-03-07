@@ -4,6 +4,7 @@
 ***********************************************************/
 
 #include "license_manager_impl.h"
+#include "llutil/hardware_id.h"
 
 
 static const char TEST_LICENSE_NX[] = 
@@ -60,9 +61,10 @@ namespace ec2
 
     void LicenseManagerImpl::getHardwareId( ServerInfo* const serverInfo )
     {
-        serverInfo->oldHardwareId = "33333333333333333333333333333333";
-        serverInfo->hardwareId1 = "0133333333333333333333333333333333";
-        serverInfo->hardwareId2 = "0233333333333333333333333333333333";
-        serverInfo->hardwareId3 = "0333333333333333333333333333333333";
+        int guidCompatibility = 0;
+
+        // TODO: #Ivan, add guidCompatibility to settings
+        serverInfo->mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
+        serverInfo->compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
     }
 }

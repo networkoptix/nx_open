@@ -19,17 +19,7 @@ namespace ec2
         public ApiData
     {
     public:
-        QString name;
         QByteArray key;
-        qint32 cameraCount;
-        QByteArray hardwareID;
-        QByteArray signature;
-        QnLicense::Type type;
-        QString xclass;
-        QString version;
-        QString brand;
-        //!Expiration time of this license, in milliseconds since epoch, or -1 if this license never expires
-        qint64 expirationTime;
         QByteArray licenseBlock;
 
         ApiLicense();
@@ -38,12 +28,10 @@ namespace ec2
         void toResource( QnLicense& license ) const;
     };
 
-    #define ApiLicenseFields (name)(key)(cameraCount)(hardwareID)(signature)(type)(xclass)(version)(brand)(expirationTime)(licenseBlock)
-    QN_DEFINE_STRUCT_SERIALIZATORS( ec2::ApiLicense, ApiLicenseFields )
-}
-
-namespace ec2
-{
+	
+	#define ApiLicenseFields (key)(licenseBlock)
+	QN_DEFINE_STRUCT_SERIALIZATORS( ApiLicense, ApiLicenseFields )
+	
     class ApiLicenseList
     :
         public ApiData
@@ -55,7 +43,7 @@ namespace ec2
         void toResourceList( QnLicenseList& licenseList ) const;
     };
 
-    QN_DEFINE_STRUCT_SERIALIZATORS( ApiLicenseList, (data) )
+	QN_DEFINE_STRUCT_SERIALIZATORS( ApiLicenseList, (data) )
 }
 
 #endif  //EC2_LICENSE_H
