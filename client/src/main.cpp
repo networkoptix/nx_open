@@ -566,6 +566,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     mainWindow->show();
     if (!noFullScreen)
         context->action(Qn::EffectiveMaximizeAction)->trigger();
+    else
+        mainWindow->updateDecorationsState();
 
     if(noVersionMismatchCheck)
         context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
