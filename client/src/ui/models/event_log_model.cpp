@@ -428,7 +428,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
         if (!BusinessEventType::hasToggleState(eventType)) {
             int count = action.getAggregationCount();
             if (count > 1)
-                result += tr(" (%1 times)").arg(count); // TODO: #Elric #TR this will probably look bad =\
+                result += tr(" (%1 times)").arg(count); // TODO: #Elric #TR this will probably look bad 
         }
         return result;
     }
