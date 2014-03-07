@@ -9,10 +9,6 @@ class QnEventLogModel: public QAbstractItemModel {
     typedef QAbstractItemModel base_type;
 
 public:
-    enum Roles {
-         ItemLinkRole = Qt::UserRole + 500
-    };
-
     enum Column {
         DateTimeColumn,
         EventColumn,
