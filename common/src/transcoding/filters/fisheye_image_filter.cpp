@@ -14,6 +14,13 @@ extern "C" {
 #endif
 };
 
+#ifdef Q_CC_GNU
+/* There is a very strange bug in libm that results in sin/cos returning +-inf 
+ * for some values. The actual functions called are __sin_avx and __cos_avx.
+ * This bug is worked around by invoking them for angles in [0, pi/2] range. */
+
+// TODO: #Elric #2.3 #gcc Investigate further! Maybe it's fixed in new gcc release?
+
 static qreal qSlowSin(qreal angle) {
     angle = qMod(angle, 2 * M_PI);
     if(angle < M_PI) {
@@ -50,6 +57,7 @@ static qreal qSlowCos(qreal angle) {
 
 #define sin qSlowSin
 #define cos qSlowCos
+#endif // Q_CC_GNU
 
 static bool saveTransformImage(const QPointF *transform, int width, int height, const QString &fileName) {
     QImage image(width, height, QImage::Format_ARGB32);
@@ -245,7 +253,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
 
     QVector3D dx = sphericalToCartesian(xShift + M_PI/2.0, 0.0) * kx;
     QVector3D dy = sphericalToCartesian(xShift, -yShift + M_PI/2.0) * kx; // /aspectRatio;
-    QVector3D  center = sphericalToCartesian(xShift, -yShift);
+    QVector3D center = sphericalToCartesian(xShift, -yShift);
 
     QMatrix4x4 to3d(dx.x(),     dy.x(),     center.x(),     0.0,
                     dx.y(),     dy.y(),     center.y(),     0.0,
