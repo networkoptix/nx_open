@@ -373,6 +373,11 @@ QnLinuxMonitor::~QnLinuxMonitor() {
     return;
 }
 
+QList<HddLoad> QnLinuxMonitor::totalHddLoad() 
+{
+    return d_ptr->totalHddLoad();
+}
+
 QList<QnPlatformMonitor::NetworkLoad> QnLinuxMonitor::totalNetworkLoad()
 {
     return d_ptr->totalNetworkLoad();
