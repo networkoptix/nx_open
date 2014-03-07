@@ -25,6 +25,8 @@ BUILD_OUTPUT_DIR=$SRC_DIR/build_environment/target
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
 
 
+STRIP=1
+
 for i in "$@"
 do
     if [ $i == "-h" -o $i == "--help"  ] ; then
@@ -45,6 +47,7 @@ libavfilter.so.2.77.100 \
 libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
 libcommon.so.220.0.0 \
+libappserver2.so.220.0.0 \
 libpostproc.so.52.0.100 \
 libQt5Concurrent.so.5.1.1 \
 libQt5Core.so.5.1.1 \
@@ -68,8 +71,10 @@ mkdir -p $BUILD_DIR/$PREFIX_DIR
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
 for var in "${LIBS_TO_COPY[@]}"
 do
-  $TOOLCHAIN_PREFIX"strip" $LIBS_DIR/${var}
   cp $LIBS_DIR/${var} $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+  if [ ! -z "$STRIP" ]; then
+    $TOOLCHAIN_PREFIX"strip" $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+  fi
 done
 
 #generating links

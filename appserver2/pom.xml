@@ -21,6 +21,7 @@
 	<name>HD Witness New Enterprise Controller</name>    
 
     <properties>
+        <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <product.title>${appserver2.name}</product.title>  
         <!--Global libs-->		
         <qt.libs>core network xml sql concurrent</qt.libs>
