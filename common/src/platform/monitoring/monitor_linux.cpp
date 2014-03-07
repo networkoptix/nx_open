@@ -373,7 +373,7 @@ QnLinuxMonitor::~QnLinuxMonitor() {
     return;
 }
 
-QList<HddLoad> QnLinuxMonitor::totalHddLoad() 
+QList<QnPlatformMonitor::HddLoad> QnLinuxMonitor::totalHddLoad()
 {
     return d_ptr->totalHddLoad();
 }
