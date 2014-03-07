@@ -87,7 +87,7 @@ mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 cp $BUILD_OUTPUT_DIR/bin/release/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
-cp $LIBS_DIR/libisd_native_plugin.so $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
+cp $BUILD_OUTPUT_DIR/bin/release/plugins/libisd_native_plugin.so $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
 #pushd $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/plugins/
 #ln -s libisd_native_plugin.so libisd_native_plugin.so
 #popd
