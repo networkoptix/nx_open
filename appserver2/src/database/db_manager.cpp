@@ -989,11 +989,11 @@ ErrorCode QnDbManager::removeCamera(const QnId& guid)
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteTableRecord(id, "vms_businessrule_action_resources", "resource_id");
+    err = deleteTableRecord(id, "vms_businessrule_action_resources", "resource_guid");
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteTableRecord(id, "vms_businessrule_event_resources", "resource_id");
+    err = deleteTableRecord(id, "vms_businessrule_event_resources", "resource_guid");
     if (err != ErrorCode::ok)
         return err;
 
