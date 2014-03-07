@@ -276,7 +276,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget 
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     QnId resourceId = params.getEventResourceId();
-    QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
+    QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (!resource)
         return;
 

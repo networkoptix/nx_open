@@ -14,7 +14,8 @@ namespace ec2
     {
         ProcessedPeers result = opaque;
         result << qnCommon->moduleGUID();
-        result += m_owner.alivePeers();
+        foreach(const QnId& id, m_owner.alivePeers().keys())
+        	result += id;
         return result;
     }
 

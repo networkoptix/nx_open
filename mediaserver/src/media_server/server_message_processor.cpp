@@ -68,15 +68,15 @@ void QnServerMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
 void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 {
     QnCommonMessageProcessor::init(connection);
-    connect( connection.get(), &ec2::AbstractECConnection::removePeerFound, this, &QnServerMessageProcessor::at_removePeerFound );
-    connect( connection.get(), &ec2::AbstractECConnection::removePeerLost, this, &QnServerMessageProcessor::at_removePeerLost );
+    connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnServerMessageProcessor::at_remotePeerFound );
+    connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnServerMessageProcessor::at_remotePeerLost );
 }
 
 /*
 * EC2 related processing. Need move to other class
 */
 
-void QnServerMessageProcessor::at_removePeerFound(QnId id)
+void QnServerMessageProcessor::at_remotePeerFound(QnId id)
 {
     QnResourcePtr res = qnResPool->getResourceById(id);
     if (res)
@@ -84,13 +84,16 @@ void QnServerMessageProcessor::at_removePeerFound(QnId id)
 
 }
 
-void QnServerMessageProcessor::at_removePeerLost(QnId id)
+void QnServerMessageProcessor::at_remotePeerLost(QnId id, bool isClient)
 {
     QnResourcePtr res = qnResPool->getResourceById(id);
     if (res) {
         res->setStatus(QnResource::Offline);
-        //foreach(QnResourcePtr camera, qnResPool->getAllEnabledCameras(res, QnResourcePool::AllResources))
-        //    camera->setStatus(QnResource::Offline);
+        if (isClient) {
+            // This media server hasn't own DB
+            foreach(QnResourcePtr camera, qnResPool->getAllEnabledCameras(res, QnResourcePool::AllResources))
+                camera->setStatus(QnResource::Offline);
+        }
     }
 }
 

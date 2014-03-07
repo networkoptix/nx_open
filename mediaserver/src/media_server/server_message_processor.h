@@ -19,8 +19,8 @@ protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
     virtual void init(ec2::AbstractECConnectionPtr connection);
 private slots:
-    void at_removePeerFound(QnId id);
-    void at_removePeerLost(QnId id);
+    void at_remotePeerFound(QnId id);
+    void at_remotePeerLost(QnId id, bool isClient);
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H

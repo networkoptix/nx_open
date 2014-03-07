@@ -58,9 +58,9 @@ namespace ec2
             sendTransactionInternal(tran, buffer);
         }
 
-        QSet<QnId> alivePeers() const { return m_alivePeers; }
+        QMap<QnId, bool> alivePeers() const { return m_alivePeers; }
 signals:
-        void peerLost(QnId);
+        void peerLost(QnId, bool isClient);
         void peerFound(QnId);
     private:
         friend class QnTransactionTransport;
@@ -100,9 +100,9 @@ signals:
         void onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
         void queueSyncRequest(QSharedPointer<QnTransactionTransport> transport);
 
-        void connectToPeerEstablished(const QnId& id);
+        void connectToPeerEstablished(const QnId& id, bool isClient);
         void connectToPeerLost(const QnId& id);
-        void sendServerAliveMsg(const QnId& id, bool isAlive);
+        void sendServerAliveMsg(const QnId& id, bool isAlive, bool isClient);
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream);
     private slots:
@@ -125,7 +125,7 @@ signals:
         QMutex m_mutex;
         QThread *m_thread;
         QnConnectionMap m_connections;
-        QSet<QnId> m_alivePeers;
+        QMap<QnId, bool> m_alivePeers;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectionsToRemove;
 

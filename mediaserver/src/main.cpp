@@ -1280,6 +1280,7 @@ void QnMain::run()
     QUrl url = ec2Connection->connectionInfo().ecUrl;
     if (url.scheme() == "file") {
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
+        qnCommon->setCloudMode(true);
         m_moduleFinder->start();
     }
 

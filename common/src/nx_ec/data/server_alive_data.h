@@ -12,10 +12,11 @@ struct ApiServerAliveData: public ApiData
 {
     QnId serverId;
     bool isAlive;
+    bool isClient;
 };
 
 }
 
-QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiServerAliveData, (serverId) (isAlive) )
+QN_DEFINE_STRUCT_SERIALIZATORS (ec2::ApiServerAliveData, (serverId) (isAlive) (isClient) )
 
 #endif // __SERVER_ALIVE_DATA_H_
