@@ -7,11 +7,13 @@ namespace ec2
 
     void ApiLayoutItemData::toResource(QnLayoutItemData& resource) const
     {
+
         resource.uuid = uuid;
         resource.flags = flags;
         resource.combinedGeometry = QRectF(QPointF(left, top), QPointF(right, bottom));
         resource.rotation = rotation;
         resource.resource.id =  resourceId;
+        resource.resource.path = resourcePath;
         resource.zoomRect = QRectF(QPointF(zoomLeft, zoomTop), QPointF(zoomRight, zoomBottom));
         resource.zoomTargetUuid = zoomTargetUuid;
         resource.contrastParams = ImageCorrectionParams::deserialize(contrastParams);
@@ -28,6 +30,7 @@ namespace ec2
         bottom = resource.combinedGeometry.bottomRight().y();
         rotation = resource.rotation;
         resourceId = resource.resource.id;
+        resourcePath = resource.resource.path;
         zoomLeft = resource.zoomRect.topLeft().x();
         zoomTop = resource.zoomRect.topLeft().y();
         zoomRight = resource.zoomRect.bottomRight().x();

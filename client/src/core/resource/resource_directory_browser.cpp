@@ -120,21 +120,21 @@ void QnResourceDirectoryBrowser::findResources(const QString& directory, QnResou
 }
 
 QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xfile) {
-    QnLayoutResourcePtr layout;
     QnLayoutFileStorageResource layoutStorage;
     layoutStorage.setUrl(xfile);
     QIODevice* layoutFile = layoutStorage.open(QLatin1String("layout.pb"), QIODevice::ReadOnly);
     if (layoutFile == 0)
-        return layout;
+        return QnLayoutResourcePtr();
     QByteArray layoutData = layoutFile->readAll();
     delete layoutFile;
     
+    QnLayoutResourcePtr layout(new QnLayoutResource());
     ec2::ApiLayoutData apiLayout;
     InputBinaryStream<QByteArray> stream(layoutData);
     if (deserialize(apiLayout, &stream))
         apiLayout.toResource(layout);
     else
-        return layout;
+        return QnLayoutResourcePtr();
     QnLayoutItemDataList orderedItems;
     foreach(const ec2::ApiLayoutItemData& item, apiLayout.items) {
         orderedItems << QnLayoutItemData();

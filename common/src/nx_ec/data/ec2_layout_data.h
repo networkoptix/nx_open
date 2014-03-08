@@ -16,6 +16,7 @@ namespace ec2
         float bottom;
         float rotation;
         QnId resourceId;
+        QString resourcePath;
         float zoomLeft;
         float zoomTop;
         float zoomRight;
@@ -29,7 +30,7 @@ namespace ec2
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define ApiLayoutItemDataFields (uuid) (flags) (left) (top) (right) (bottom) (rotation) (resourceId) (zoomLeft) (zoomTop) (zoomRight) (zoomBottom) (zoomTargetUuid) (contrastParams) (dewarpingParams)
+    #define ApiLayoutItemDataFields (uuid) (flags) (left) (top) (right) (bottom) (rotation) (resourceId) (resourcePath) (zoomLeft) (zoomTop) (zoomRight) (zoomBottom) (zoomTargetUuid) (contrastParams) (dewarpingParams)
     QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiLayoutItemData, ApiLayoutItemDataFields)
 }
 
