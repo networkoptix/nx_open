@@ -5,13 +5,19 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <QtCore/QList>
+#include <QtCore/QByteArray>
+
 #include "util.h"
 #include "hardware_id.h"
 
 namespace {
 
-inline std::string trim(const std::string& str)
-{
+QByteArray fromString(const std::string& s) {
+    return QByteArray(s.data(), s.size());
+}
+
+std::string trim(const std::string& str) {
     std::string result = str;
 
     result.erase(0, result.find_first_not_of(" \t\n"));
@@ -20,14 +26,12 @@ inline std::string trim(const std::string& str)
     return result;
 }
 
-std::string read_file(const char* path)
-{
+std::string read_file(const char* path) {
     std::ifstream ifs(path);
     return trim(std::string((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>()));
 }
 
-void trim2(std::string& str)
-{
+void trim2(std::string& str) {
     std::string::size_type pos = str.find_last_not_of(" \n\t");
 
     if(pos != std::string::npos) {
@@ -78,9 +82,11 @@ void getMemoryInfo(std::string& memoryInfo) {
 
 } // namespace {}
 
+namespace LLUtil {
+
 #if defined(__i686__) || defined(__x86_64__)
 
-void LLUtil::fillHardwareIds(std::vector<std::string>& hardwareIds);
+void fillHardwareIds(QList<QByteArray>& hardwareIds)
 {
     std::string board_serial = read_file("/sys/class/dmi/id/board_serial");
     std::string board_vendor = read_file("/sys/class/dmi/id/board_vendor");
@@ -89,26 +95,29 @@ void LLUtil::fillHardwareIds(std::vector<std::string>& hardwareIds);
     std::string product_uuid = read_file("/sys/class/dmi/id/product_uuid");
     std::string product_serial = read_file("/sys/class/dmi/id/product_serial");
     std::string bios_vendor = read_file("/sys/class/dmi/id/bios_vendor");
+
     std::string memory_info;
-
     getMemoryInfo(memory_info);
+    QByteArray memory_info_ba = fromString(memory_info);
 
-    hardwareIds[0] = board_serial + product_uuid + board_vendor + board_name + product_serial + bios_vendor;
-    hardwareIds[1] = hardwareIds[0];
-    hardwareIds[2] = hardwareIds[1] + memory_info;
-
+    QByteArray hardwareId = fromString(board_serial + product_uuid + board_vendor + board_name + product_serial + bios_vendor);
+    hardwareIds << hardwareId << hardwareId << (hardwareId + memory_info_ba);
+    
     changeGuidByteOrder(product_uuid);
 
-    hardwareIds[3] = board_serial + product_uuid + board_vendor + board_name + product_serial + bios_vendor;
-    hardwareIds[4] = hardwareIds[3];
-    hardwareIds[5] = hardwareIds[4] + memory_info;
+    hardwareId = fromString(board_serial + product_uuid + board_vendor + board_name + product_serial + bios_vendor);
+    hardwareIds << hardwareId << hardwareId << (hardwareId + memory_info_ba);
 }
 
 #elif defined(__arm__)
 
-void LLUtil::fillHardwareIds(std::vector<std::string>& hardwareIds);
+void fillHardwareIds(std::vector<std::string>& hardwareIds);
 {
-    hardwareIds[0] = hardwareIds[1] = hardwareIds[2] = hardwareIds[3] = hardwareIds[4] = hardwareIds[5] = read_file("/proc/cpuinfo");
+    QByteArray hardwareId = read_file("/proc/cpuinfo");
+    hardwareIds << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId;
 }
 
+
 #endif
+
+} // namespace LLUtil {}

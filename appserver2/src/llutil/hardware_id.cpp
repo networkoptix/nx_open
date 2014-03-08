@@ -3,7 +3,7 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QList>
 #include <QtCore/QString>
-#include <QtCore/Qsettings>
+#include <QtCore/QSettings>
 
 #include "hardware_id.h"
 
