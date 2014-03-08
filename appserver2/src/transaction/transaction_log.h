@@ -67,6 +67,7 @@ namespace ec2
         }
 
         qint64 getRelativeTime() const;
+        void init();
 
     private:
         bool contains(const QnAbstractTransaction& tran, const QUuid& hash);

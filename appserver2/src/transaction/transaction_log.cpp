@@ -13,7 +13,10 @@ QnTransactionLog::QnTransactionLog(QnDbManager* db): m_dbManager(db)
 {
     Q_ASSERT(!globalInstance);
     globalInstance = this;
+}
 
+void QnTransactionLog::init()
+{
     QSqlQuery query(m_dbManager->getDB());
     query.prepare("SELECT peer_guid, max(sequence) as sequence FROM transaction_log GROUP BY peer_guid");
     if (query.exec()) {
