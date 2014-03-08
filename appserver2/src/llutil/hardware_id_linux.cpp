@@ -111,9 +111,9 @@ void fillHardwareIds(QList<QByteArray>& hardwareIds)
 
 #elif defined(__arm__)
 
-void fillHardwareIds(std::vector<std::string>& hardwareIds);
+void fillHardwareIds(QList<QByteArray> &hardwareIds)
 {
-    QByteArray hardwareId = read_file("/proc/cpuinfo");
+    QByteArray hardwareId = fromString(read_file("/proc/cpuinfo"));
     hardwareIds << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId;
 }
 
