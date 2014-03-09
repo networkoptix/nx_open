@@ -371,6 +371,7 @@ protected:
     QColor activeFrameColor() const;
     QColor selectedFrameColor() const;
 
+    Q_SLOT virtual void at_itemDataChanged(int role);
 private:
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);
@@ -381,8 +382,6 @@ private:
     Q_SLOT void at_infoButton_toggled(bool toggled);
 
     Q_SLOT void at_buttonBar_checkedButtonsChanged();
-
-    Q_SLOT void at_item_dataChanged(int role);
 
     struct OverlayWidget {
         OverlayVisibility visibility;

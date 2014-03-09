@@ -261,7 +261,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
     setChannelLayout(qn_resourceWidget_defaultContentLayout);
 
-    connect(item, SIGNAL(dataChanged(int)), this, SLOT(at_item_dataChanged(int)));
+    connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
 
     /* Run handlers. */
     updateTitleText();
@@ -956,6 +956,13 @@ void QnResourceWidget::optionsChangedNotify(Options changedFlags){
         setOverlayVisible(visible || m_mouseInWidget);
     }
 }
+
+void QnResourceWidget::at_itemDataChanged(int role) {
+    if (role != Qn::ItemCheckedButtonsRole)
+        return;
+    updateCheckedButtons();
+}
+
 void QnResourceWidget::at_iconButton_visibleChanged() {
     if(m_iconButton->isVisible()) {
         m_headerLayout->insertItem(0, m_iconButton);
@@ -972,13 +979,6 @@ void QnResourceWidget::at_infoButton_toggled(bool toggled){
 void QnResourceWidget::at_buttonBar_checkedButtonsChanged() {
     item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(checkedButtons()));
     update();
-}
-
-void QnResourceWidget::at_item_dataChanged(int role) {
-    if (role != Qn::ItemCheckedButtonsRole)
-        return;
-    int checked = item()->data(Qn::ItemCheckedButtonsRole).toInt();
-    setCheckedButtons(static_cast<Buttons>(checked));
 }
 
 QColor QnResourceWidget::activeFrameColor() const {

@@ -31,6 +31,7 @@
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -100,6 +101,8 @@ namespace {
             return "ItemImageEnhancementRole";
         case Qn::ItemImageDewarpingRole:
             return "ItemImageDewarpingRole";
+        case Qn::ItemHealthMonitoringButtonsRole:
+            return "ItemHealthMonitoringButtonsRole";
         default:
             return "unknown role " + QString::number(role).toUtf8();
         }
@@ -565,6 +568,12 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
         case Qn::ItemImageDewarpingRole:
         {
             QnItemDewarpingParams data = QJson::deserialized<QnItemDewarpingParams>(value);
+            workbench()->currentLayout()->item(uuid)->setData(role, data);
+            break;
+        }
+        case Qn::ItemHealthMonitoringButtonsRole:
+        {
+            QnServerResourceWidget::HealthMonitoringButtons data = QJson::deserialized<QnServerResourceWidget::HealthMonitoringButtons>(value);
             workbench()->currentLayout()->item(uuid)->setData(role, data);
             break;
         }
@@ -1644,6 +1653,10 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(int role) {
 
     case Qn::ItemImageDewarpingRole:
         QJson::serialize(data.value<QnItemDewarpingParams>(), &json);
+        break;
+
+    case Qn::ItemHealthMonitoringButtonsRole:
+        QJson::serialize(data.value<QnServerResourceWidget::HealthMonitoringButtons>(), &json);
         break;
     default:
 #ifdef SENDER_DEBUG

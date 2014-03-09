@@ -28,6 +28,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_item.h>
 
 namespace {
     /** Convert angle from radians to degrees */
@@ -526,6 +527,26 @@ void QnServerResourceWidget::setColors(const QnStatisticsColors &colors) {
     m_colors = colors;
 }
 
+QnServerResourceWidget::HealthMonitoringButtons QnServerResourceWidget::checkedHealthMonitoringButtons() const {
+    HealthMonitoringButtons result;
+    for(QHash<QString, GraphData>::const_iterator pos = m_graphDataByKey.constBegin(); pos != m_graphDataByKey.constEnd(); pos++) {
+        GraphData data = *pos;
+        result[pos.key()] = (data.bar->checkedButtons() & data.mask);
+    }
+    return result;
+}
+
+void QnServerResourceWidget::setCheckedHealthMonitoringButtons(const QnServerResourceWidget::HealthMonitoringButtons &buttons) {
+    for(QHash<QString, GraphData>::iterator pos = m_graphDataByKey.begin(); pos != m_graphDataByKey.end(); pos++) {
+        GraphData &data = *pos;
+        QnImageButtonWidget* button = data.bar->button(data.mask);
+        if (!button)
+            continue;
+        button->setChecked(buttons.value(pos.key(), true));
+    }
+    updateGraphVisibility();
+}
+
 QColor QnServerResourceWidget::nextColor(QnStatisticsDeviceType deviceType) {
     switch (deviceType) {
     case CPU:
@@ -652,8 +673,14 @@ void QnServerResourceWidget::updateLegend() {
 
             LegendButtonWidget* newButton = new LegendButtonWidget(key, data.color);
             newButton->setProperty(legendKeyPropertyName, key);
-            newButton->setChecked(true);
+            HealthMonitoringButtons checkedData = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
+            newButton->setChecked(checkedData.value(key, true));
 
+            connect(newButton, &QnImageButtonWidget::toggled, this, [this, key](bool toggled) {
+                HealthMonitoringButtons value = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
+                value[key] = toggled;
+                this->item()->setData(Qn::ItemHealthMonitoringButtonsRole, qVariantFromValue<HealthMonitoringButtons>(value));
+            });
 
             { // fix text length on already existing buttons and the new one
                 int mask = data.bar->visibleButtons();
@@ -763,6 +790,17 @@ Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const
     if (m_resource->getStatus() == QnResource::Offline)
         return Qn::ServerOfflineOverlay;
     return base_type::calculateStatusOverlay();
+}
+
+void QnServerResourceWidget::updateCheckedHealthMonitoringButtons() {
+    setCheckedHealthMonitoringButtons(item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>());
+}
+
+void QnServerResourceWidget::at_itemDataChanged(int role) {
+    base_type::at_itemDataChanged(role);
+    if (role != Qn::ItemHealthMonitoringButtonsRole)
+        return;
+    updateCheckedHealthMonitoringButtons();
 }
 
 void QnServerResourceWidget::at_statistics_received() {
