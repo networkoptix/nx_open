@@ -607,6 +607,11 @@ Qn::ActionVisibility QnResetVideoWallLayoutActionCondition::check(const QnAction
     if (!context()->user() || parameters.videoWallItems().isEmpty())
         return Qn::InvisibleAction;
 
+    QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole,
+                                                                          workbench()->currentLayout()->resource());
+    if (layout->data().contains(Qn::VideoWallResourceRole))
+        return Qn::InvisibleAction;
+
     if (accessController()->globalPermissions() & Qn::GlobalEditVideoWallPermission)
         return Qn::EnabledAction;
 

@@ -947,9 +947,14 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     if(videoWall.isNull())
         return;    // TODO: #GDM VW implement videoWall selection / creation dialog
 
+    // TODO: #GDM VW ugly copypaste, make common check in action_conditions
     QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
     if (snapshotManager()->isFile(layout))
         return; // TODO: #GDM VW action should not be available
+
+    // attaching review layouts is disallowed
+    if (layout->data().contains(Qn::VideoWallResourceRole))
+        return;  // TODO: #GDM VW action should not be available
 
     //TODO: #GDM VW extract copy layout method
     QnLayoutResourcePtr newLayout(new QnLayoutResource());
@@ -1007,8 +1012,13 @@ void QnWorkbenchVideoWallHandler::at_resetVideoWallLayoutAction_triggered() {
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole,
                                                                           workbench()->currentLayout()->resource());
 
+    // TODO: #GDM VW ugly copypaste, make common check in action_conditions
     if (snapshotManager()->isFile(layout))
         return; // TODO: #GDM VW action should not be available
+
+    // attaching review layouts is disallowed
+    if (layout->data().contains(Qn::VideoWallResourceRole))
+        return;  // TODO: #GDM VW action should not be available
 
     layout->setCellSpacing(QSizeF(0.0, 0.0));
     layout->setUserCanEdit(true);
