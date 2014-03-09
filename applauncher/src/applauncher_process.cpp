@@ -13,6 +13,7 @@
 #include <utils/common/log.h>
 #include <utils/common/process.h>
 
+#include "process_utils.h"
 
 ApplauncherProcess::ApplauncherProcess(
     QSettings* const settings,
@@ -300,10 +301,33 @@ bool ApplauncherProcess::startApplication(
     //TODO/IMPL start process asynchronously ?
 
     const QString binPath = appData.installationDirectory + "/" + APPLICATION_BIN_NAME;
+
+    QStringList environment = QProcess::systemEnvironment();
+#ifdef Q_OS_LINUX
+    QString variableValue = appData.installationDirectory + "/lib";
+    if (QFile::exists(variableValue)) {
+        const QString variableName = "LD_LIBRARY_PATH";
+
+        QRegExp varRegExp(QString("%1=(.+)").arg(variableName));
+
+        auto it = environment.begin();
+        for (; it != environment.end(); ++it) {
+            if (varRegExp.exactMatch(*it)) {
+                *it = QString("%1=%2:%3").arg(variableName, variableValue, varRegExp.cap(1));
+                break;
+            }
+        }
+        if (it == environment.end())
+            environment.append(QString("%1=%2").arg(variableName, variableValue));
+    }
+#endif
+
     NX_LOG( QString::fromLatin1("Launching version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG2 );
-    if( QProcess::startDetached(
+    if( ProcessUtils::startProcessDetached(
             binPath,
-            task->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts) ) )
+            task->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts),
+            QString(),
+            environment) )
     {
         NX_LOG( QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG1 );
         m_settings->setValue( QLatin1String("previousLaunchedVersion"), task->version );

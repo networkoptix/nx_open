@@ -31,7 +31,7 @@ static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin
 static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String("client")) );
 #endif
 #else
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String(QN_CLIENT_EXECUTABLE_NAME)) );
+static const QString APPLICATION_BIN_NAME( QLatin1String(QN_CLIENT_EXECUTABLE_NAME) );
 #endif
 
 class ApplauncherProcess

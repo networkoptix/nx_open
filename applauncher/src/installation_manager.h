@@ -47,6 +47,9 @@ public:
     InstallationManager( QObject* const parent = NULL );
 
     void updateInstalledVersionsInformation();
+    /*! Create an empty directory with name as the latest version is.
+     *  It is needed to signalize client <= 2.1 about version installed in a standard way (not in compatibility folder). */
+    void createLatestVersionGhost();
     //!Returns number of installed versions
     int count() const;
     QString getMostRecentVersion() const;

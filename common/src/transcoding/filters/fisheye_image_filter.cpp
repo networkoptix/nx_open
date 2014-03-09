@@ -14,6 +14,68 @@ extern "C" {
 #endif
 };
 
+#ifdef Q_CC_GNU
+/* There is a very strange bug in libm that results in sin/cos returning +-inf 
+ * for some values. The actual functions called are __sin_avx and __cos_avx.
+ * This bug is worked around by invoking them for angles in [0, pi/2] range. */
+
+// TODO: #Elric #2.3 #gcc Investigate further! Maybe it's fixed in new gcc release?
+
+static qreal qSlowSin(qreal angle) {
+    angle = qMod(angle, 2 * M_PI);
+    if(angle < M_PI) {
+        if(angle < 0.5 * M_PI) {
+            return std::sin(angle);
+        } else {
+            return std::sin(M_PI - angle);
+        }
+    } else {
+        if(angle < 1.5 * M_PI) {
+            return -std::sin(angle - M_PI);
+        } else {
+            return -std::sin(2 * M_PI - angle);
+        }
+    }
+}
+
+static qreal qSlowCos(qreal angle) {
+    angle = qMod(angle, 2 * M_PI);
+    if(angle < M_PI) {
+        if(angle < 0.5 * M_PI) {
+            return std::cos(angle);
+        } else {
+            return -std::cos(M_PI - angle);
+        }
+    } else {
+        if(angle < 1.5 * M_PI) {
+            return -std::cos(angle - M_PI);
+        } else {
+            return std::cos(2 * M_PI - angle);
+        }
+    }
+}
+
+#define sin qSlowSin
+#define cos qSlowCos
+#endif // Q_CC_GNU
+
+static bool saveTransformImage(const QPointF *transform, int width, int height, const QString &fileName) {
+    QImage image(width, height, QImage::Format_ARGB32);
+
+    int stride = image.bytesPerLine();
+    unsigned char *line = (unsigned char *) image.scanLine(0);
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            line[stride * y + x * 4 + 0] = transform[y * width + x].x() / width * 255;
+            line[stride * y + x * 4 + 1] = transform[y * width + x].y() / height * 255;
+            line[stride * y + x * 4 + 2] = 0;
+            line[stride * y + x * 4 + 3] = 255;
+        }
+    }
+    
+    return image.save(fileName);
+}
+
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
 // constant values that will be needed
@@ -35,7 +97,7 @@ inline __m128 CalcWeights(float x, float y)
     w_x = _mm_movelh_ps(w_x, w_x);      // x (1-x) x (1-x)
     __m128 w_y = _mm_shuffle_ps(psXYfrac1, psXYfrac, _MM_SHUFFLE(1, 1, 1, 1)); // y y (1-y) (1-y)
 
-    // complete weight vector
+    // complete weight vectorqFastCos
     return _mm_mul_ps(w_x, w_y);
 }
 
@@ -72,8 +134,7 @@ static inline quint8 GetPixel(quint8* buffer, int stride, float x, float y)
 
 // ------------ QnFisheyeImageFilter ----------------------
 
-QnFisheyeImageFilter::QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDewarping,
-                                           const QnItemDewarpingParams& itemDewarping):
+QnFisheyeImageFilter::QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDewarping, const QnItemDewarpingParams& itemDewarping):
     QnAbstractImageFilter(),
     m_mediaDewarping(mediaDewarping),
     m_itemDewarping(itemDewarping),
@@ -147,7 +208,7 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
     }
 }
 
-QVector3D sphericalToCartesian(qreal theta, qreal phi) {
+QVector3D sphericalToCartesian(qreal theta, qreal phi) { // TODO: #Elric use function from coordinate_transform header
     return QVector3D(cos(phi) * sin(theta), cos(phi)*cos(theta), sin(phi));
 }
 
@@ -160,6 +221,8 @@ void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int pl
         updateFisheyeTransformRectilinear(imageSize, plane);
     else
         updateFisheyeTransformEquirectangular(imageSize, plane);
+
+    //saveTransformImage(m_transform[plane], imageSize.width(), imageSize.height(), lit("/home/alexandra/transform_%1.png").arg(plane));
 }
 
 void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageSize, int plane)
@@ -190,7 +253,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
 
     QVector3D dx = sphericalToCartesian(xShift + M_PI/2.0, 0.0) * kx;
     QVector3D dy = sphericalToCartesian(xShift, -yShift + M_PI/2.0) * kx; // /aspectRatio;
-    QVector3D  center = sphericalToCartesian(xShift, -yShift);
+    QVector3D center = sphericalToCartesian(xShift, -yShift);
 
     QMatrix4x4 to3d(dx.x(),     dy.x(),     center.x(),     0.0,
                     dx.y(),     dy.y(),     center.y(),     0.0,
