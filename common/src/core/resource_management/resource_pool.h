@@ -79,6 +79,7 @@ public:
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
     QnNetworkResourcePtr getEnabledResourceByPhysicalId(const QString &mac) const;
     QnResourceList getAllEnabledCameras(QnResourcePtr mServer = QnResourcePtr(), Filter searchFilter = OnlyFriends) const;
+    QnResourceList getResourcesByParentId(const QnId& parentId) const;
     QnResourcePtr getEnabledResourceByUniqueId(const QString &uniqueId) const;
 
     // returns list of resources with such flag

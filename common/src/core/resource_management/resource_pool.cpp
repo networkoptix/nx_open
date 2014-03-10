@@ -307,6 +307,17 @@ QnResourceList QnResourcePool::getAllEnabledCameras(QnResourcePtr mServer, Filte
     return result;
 }
 
+QnResourceList QnResourcePool::getResourcesByParentId(const QnId& parentId) const
+{
+    QnResourceList result;
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (const QnResourcePtr &resource, m_resources) 
+        if (resource->getParentId() == parentId)
+            result << resource;
+
+    return result;
+}
+
 QnResourceList QnResourcePool::getAllResourceByTypeName(const QString &typeName) const
 {
     QnResourceList result;

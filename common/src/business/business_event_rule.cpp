@@ -172,6 +172,42 @@ QnBusinessEventRule::QnBusinessEventRule(int internalId, int aggregationPeriod, 
 }
 
 
+QnBusinessEventRule* QnBusinessEventRule::clone()
+{
+    QnBusinessEventRule* newRule = new QnBusinessEventRule();
+    newRule->m_id = m_id;
+    newRule->m_eventType = m_eventType;
+    newRule->m_eventResources = m_eventResources;
+    newRule->m_eventParams = m_eventParams;
+    newRule->m_eventState = m_eventState;
+    newRule->m_actionType = m_actionType;
+    newRule->m_actionResources = m_actionResources;
+    newRule->m_actionParams = m_actionParams;
+    newRule->m_aggregationPeriod = m_aggregationPeriod;
+    newRule->m_disabled = m_disabled;
+    newRule->m_schedule = m_schedule;
+    newRule->m_binSchedule = m_binSchedule;
+    newRule->m_comments = m_comments;
+    newRule->m_system = m_system;
+    return newRule;
+}
+
+void QnBusinessEventRule::removeResource(const QnId& resId)
+{
+    for (int i = m_actionResources.size() - 1; i >= 0; --i)
+    {
+        if (m_actionResources[i]->getId() == resId)
+            m_actionResources.removeAt(i);
+    }
+    for (int i = m_eventResources.size() - 1; i >= 0; --i)
+    {
+        if (m_eventResources[i]->getId() == resId)
+            m_eventResources.removeAt(i);
+    }
+    
+}
+
+
 QnBusinessEventRuleList QnBusinessEventRule::getDefaultRules()
 {
     QnResourcePtr admin = qnResPool->getResourceByGuid("e3219e00-cb8f-496c-81a0-28abc1b3a830");

@@ -34,7 +34,7 @@ signals:
     void businessRuleDeleted(QnId id);
     void businessRuleReset(QnBusinessEventRuleList rules);
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
-
+    void resourceRemoved(QnId id);
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) = 0;
     virtual void onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status) = 0;

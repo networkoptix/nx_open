@@ -133,6 +133,7 @@ private slots:
 
     void at_businessRuleChanged(QnBusinessEventRulePtr bRule);
     void at_businessRuleDeleted(QnId id);
+    void at_resourceDeleted(QnId id);
     void at_businessRuleReset(QnBusinessEventRuleList rules);
 
     void at_timer();

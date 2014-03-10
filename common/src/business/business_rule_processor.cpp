@@ -55,6 +55,8 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
             this, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
     connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleDeleted(QnId)),
             this, SLOT(at_businessRuleDeleted(QnId)));
+    connect(QnCommonMessageProcessor::instance(),       SIGNAL(resourceRemoved(QnId)),
+        this, SLOT(at_resourceDeleted(QnId)));
     connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleReset(QnBusinessEventRuleList)),
             this, SLOT(at_businessRuleReset(QnBusinessEventRuleList)));
 
@@ -595,6 +597,21 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
         itr = m_aggregateActions.erase(itr);
         if (itr == m_aggregateActions.end() || !itr.key().startsWith(aggKey))
             break;
+    }
+}
+
+void QnBusinessRuleProcessor::at_resourceDeleted(QnId id)
+{
+    QMutexLocker lock(&m_mutex);
+
+    for (int i = 0; i < m_rules.size(); ++i)
+    {
+        if (containResource(m_rules[i]->eventResources(), id) || containResource(m_rules[i]->actionResources(), id))
+        {
+            QnBusinessEventRulePtr bRule(m_rules[i]->clone());
+            bRule->removeResource(id);
+            at_businessRuleChanged_i(bRule);
+        }
     }
 }
 

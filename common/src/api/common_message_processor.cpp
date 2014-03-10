@@ -133,8 +133,14 @@ void QnCommonMessageProcessor::on_resourceParamsChanged( const QnId& resourceId,
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnId& resourceId )
 {
-    if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId))
+    if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId)) 
+    {
+        // delete dependent objects
+        foreach(QnResourcePtr subRes, qnResPool->getResourcesByParentId(resourceId))
+            qnResPool->removeResource(subRes);
         qnResPool->removeResource(ownResource);
+    }
+    emit resourceRemoved(resourceId);
 }
 
 void QnCommonMessageProcessor::on_mediaServerAddedOrUpdated( QnMediaServerResourcePtr mediaServer )

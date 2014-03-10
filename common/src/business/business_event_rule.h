@@ -65,6 +65,9 @@ public:
     bool isScheduleMatchTime(const QDateTime& datetime) const;
 
     static QnBusinessEventRuleList getDefaultRules();
+
+    QnBusinessEventRule* clone();
+    void removeResource(const QnId& resId);
 private:
     QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, BusinessActionType::Value bActionType, BusinessEventType::Value bEventType, QnResourcePtr actionRes= QnResourcePtr());
 
