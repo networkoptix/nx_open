@@ -14,32 +14,40 @@ public:
     public:
         PcScreen() {}
 
+        /** Index of the screen in the Virtual Desktop. */
         int index;
-        QRect geometry;
+
+        /** Position and size of the screen in the Virtual Desktop coordinate system. */
+        QRect desktopGeometry;
+
+        /**
+         * Position and size of the screen in the videowall review layout.
+         * Can be null if this screen shares an item and is managed by another screen.
+         */
+        QRect layoutGeometry;
 
         friend bool operator==(const PcScreen &l, const PcScreen &r) {
             return (l.index == r.index &&
-                    l.geometry == r.geometry);
+                    l.desktopGeometry == r.desktopGeometry &&
+                    l.layoutGeometry == r.layoutGeometry);
         }
     };
 
     QnVideoWallPcData() {}
 
     QUuid uuid;
-    QRect geometry;
     QList<PcScreen> screens;
 
-    QRect unitedGeometry() const {
-        QRect result;
-        foreach (PcScreen screen, screens) {
-            result = result.united(screen.geometry);
-        }
-        return result;
-    }
+//    QRect unitedGeometry() const {
+//        QRect result;
+//        foreach (PcScreen screen, screens) {
+//            result = result.united(screen.geometry);
+//        }
+//        return result;
+//    }
 
     friend bool operator==(const QnVideoWallPcData &l, const QnVideoWallPcData &r) {
         return (l.uuid == r.uuid &&
-                l.geometry == r.geometry &&
                 l.screens == r.screens);
     }
 };

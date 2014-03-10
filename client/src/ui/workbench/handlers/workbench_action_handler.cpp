@@ -364,14 +364,14 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     {
         //TODO: #GDM refactor duplicated code
         bool isServer = resource->hasFlags(QnResource::server);
-        bool isLayout = resource->hasFlags(QnResource::layout);
+        bool isVideowall = resource->hasFlags(QnResource::videowall);
         bool isMediaResource = resource->hasFlags(QnResource::media);
         bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
                 && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
         bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
 
-        bool allowed = isServer || isMediaResource || isLayout;
-        bool forbidden = isExportedLayout && (isServer || isLocalResource || isLayout);
+        bool allowed = isServer || isMediaResource || isVideowall;
+        bool forbidden = isExportedLayout && (isServer || isLocalResource || isVideowall);
         if(!allowed || forbidden)
             return;
     }

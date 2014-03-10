@@ -32,6 +32,7 @@ public:
     void setPcs(const QnVideoWallPcDataMap &pcs);
     QnVideoWallPcDataMap getPcs() const;
     QnVideoWallPcData getPc(const QUuid &pcUuid) const;
+    bool hasPc(const QUuid &pcUuid) const;
     void addPc(const QnVideoWallPcData &pc);
     void removePc(const QnVideoWallPcData &pc);
     void removePc(const QUuid &pcUuid);

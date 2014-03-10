@@ -320,7 +320,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QString lightMode;
     bool noVSync = false;
     QString sVideoWallGuid;
-    QString sVideoWallInstanceGuid;
+    QString sVideoWallItemGuid;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -342,7 +342,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString());
     commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
     commandLineParser.addParameter(&sVideoWallGuid,         "--videowall",                  NULL,   QString());
-    commandLineParser.addParameter(&sVideoWallInstanceGuid, "--videowall-instance",         NULL,   QString());
+    commandLineParser.addParameter(&sVideoWallItemGuid,     "--videowall-instance",         NULL,   QString());
 
     commandLineParser.parse(argc, argv, stderr);
 
@@ -354,7 +354,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     QUuid videoWallGuid(sVideoWallGuid);
-    QUuid videoWallInstanceGuid(sVideoWallInstanceGuid);
+    QUuid videoWallItemGuid(sVideoWallItemGuid);
 
     if (!videoWallGuid.isNull()) {
         qnSettings->setVideoWallMode(true);
@@ -622,7 +622,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if (!videoWallGuid.isNull()) {
         context->menu()->trigger(Qn::DelayedOpenVideoWallItemAction, QnActionParameters()
                              .withArgument(Qn::VideoWallGuidRole, videoWallGuid)
-                             .withArgument(Qn::VideoWallInstanceGuidRole, videoWallInstanceGuid));
+                             .withArgument(Qn::VideoWallItemGuidRole, videoWallItemGuid));
     } else {
         /* Drop resources if needed. */
         if(!delayedDrop.isEmpty()) {

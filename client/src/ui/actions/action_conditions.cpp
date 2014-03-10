@@ -481,12 +481,12 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
     foreach (const QnResourcePtr &resource, resources) {
         //TODO: #GDM refactor duplicated code
         bool isServer = resource->hasFlags(QnResource::server);
-        bool isLayout = resource->hasFlags(QnResource::layout);
+        bool isVideowall = resource->hasFlags(QnResource::videowall);
         bool isMediaResource = resource->hasFlags(QnResource::media);
         bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
                 && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
-        bool allowed = isServer || isMediaResource || isLayout;
-        bool forbidden = isExportedLayout && (isServer || isLocalResource || isLayout);
+        bool allowed = isServer || isMediaResource || isVideowall;
+        bool forbidden = isExportedLayout && (isServer || isLocalResource || isVideowall);
         if(allowed && !forbidden)
             return Qn::EnabledAction;
     }

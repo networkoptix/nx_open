@@ -27,8 +27,6 @@ public:
 private:
     QnAppServerConnectionPtr connection() const;
 
-    QRect calculateSnapGeometry();
-
     void attachLayout(const QnVideoWallResourcePtr &videoWall, const QnId &layoutId);
     void resetLayout(const QnVideoWallItemIndexList &items, const QnId &layoutId);
 
@@ -46,7 +44,8 @@ private:
     void storeMessage(const QnVideoWallControlMessage &message, const QUuid &controllerUuid, qint64 sequence);
     void restoreMessages(const QUuid &controllerUuid, qint64 sequence);
 
-    void addScreenToReviewLayout(const QnVideoWallItem &source, const QnLayoutResourcePtr &layout, QRect &boundingRect, QRect geometry = QRect());
+//    void addScreenToReviewLayout(const QnVideoWallItem &source, const QnLayoutResourcePtr &layout, QRect &boundingRect, QRect geometry = QRect());
+    void addScreenToReviewLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallPcData &pc, const QnVideoWallPcData::PcScreen &screen, const QnLayoutResourcePtr &layout);
 
     /** Returns list of target videowall items for current layout. */
     QnVideoWallItemIndexList targetList() const;
@@ -114,6 +113,35 @@ private slots:
     void submitDelayedItemOpen();
 
 private:
+    struct ScreenSnap {
+        int index;          /**< Index of the screen. */
+        int value;          /**< Value of the snap. */
+        bool intermidiate;  /**< Flag if the snap is in the center of the screen. */
+
+        ScreenSnap(): index(-1), value(-1) {}
+
+        ScreenSnap(int index, int value, bool intermidiate):
+            index(index), value(value), intermidiate(intermidiate){}
+
+        operator int() const {return value;}
+        bool isValid() { return index >= 0 && value >= 0; }
+    };
+
+    struct ScreenSnaps {
+        QList<ScreenSnap> left;
+        QList<ScreenSnap> right;
+        QList<ScreenSnap> top;
+        QList<ScreenSnap> bottom;
+    };
+
+    ScreenSnaps calculateSnaps(const QUuid &pcUuid, const QList<QnVideoWallPcData::PcScreen> &screens);
+    QRect calculateSnapGeometry(const QList<QnVideoWallPcData::PcScreen> &localScreens);
+
+    static ScreenSnap findNearest(const QList<ScreenSnap> &snaps, int value);
+    static ScreenSnap findEdge(const QList<ScreenSnap> &snaps, QSet<int> screens, bool backward = false);
+    static QList<int> getScreensByItem(const ScreenSnaps &snaps, const QRect &source);
+
+private:
     typedef QHash<qint64, QnVideoWallControlMessage> StoredMessagesHash;
 
     struct {
@@ -121,18 +149,11 @@ private:
         bool ready;         /**< Resources are loaded. */
         bool opening;       /**< We are currently opening videowall. */
         QUuid guid;
-        QUuid instanceGuid;
+        QUuid instanceGuid; /**< Guid of the videowall item we are currently displaying. */
         QHash<QUuid, qint64> sequenceByPcUuid;
         QHash<QUuid, StoredMessagesHash> storedMessages;
     }  m_videoWallMode;
 
-    struct {
-        QList<int> left;
-        QList<int> right;
-        QList<int> top;
-        QList<int> bottom;
-        bool calculated;
-    } m_screenSnaps;
 
     struct {
         bool active;
@@ -145,6 +166,8 @@ private:
         bool inGeometryChange;
     } m_reviewMode;
 
+
+    QHash<QUuid, ScreenSnaps> m_screenSnapsByUuid;
 
     QHash<int, QnVideoWallResourcePtr> m_attaching;
     QHash<int, QnVideoWallItemIndexList> m_resetting;

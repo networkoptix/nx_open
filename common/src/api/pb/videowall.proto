@@ -31,16 +31,19 @@ message VideoWall {
     // PC description, coordinates in the videowall layout coordinate system (for the GUI only)
     message Pc {
 
-        // single screen of PC, coordinates in the desktop coordinate system
+        // single screen of PC
         message Screen {
             required int32  index       = 1;
-            required Rect   rect        = 2;
+
+            // Coordinates in the desktop coordinate system
+            required Rect desktop_rect  = 2;
+
+            // Coordinates in the videowall review layout
+            required Rect layout_rect   = 3;
         }
 
         required string uuid            = 1;
-        optional Rect rect              = 2;
-        
-        repeated Screen screen          = 3;
+        repeated Screen screen          = 2;
     }
 
     repeated Item       item            = 1;

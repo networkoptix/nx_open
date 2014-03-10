@@ -456,15 +456,14 @@ void parseVideoWall(QnVideoWallResourcePtr& videoWall, const pb::Resource& pb_vi
 
             QnVideoWallPcData pcData;
             pcData.uuid = QUuid(QString::fromUtf8(pb_pc.uuid().c_str()));
-            if (pb_pc.has_rect())
-                parseRect(pcData.geometry, pb_pc.rect());
 
             for (int k = 0; k < pb_pc.screen_size(); k++) {
                 const pb::VideoWall_Pc_Screen& pb_screen = pb_pc.screen(k);
 
                 QnVideoWallPcData::PcScreen screen;
                 screen.index = pb_screen.index();
-                parseRect(screen.geometry, pb_screen.rect());
+                parseRect(screen.desktopGeometry, pb_screen.desktop_rect());
+                parseRect(screen.layoutGeometry, pb_screen.layout_rect());
 
                 pcData.screens.append(screen);
             }
@@ -734,13 +733,13 @@ void serializeVideoWall_i(pb::Resource& pb_videoWallResource, const QnVideoWallR
             pb::VideoWall_Pc& pb_pc = *pb_videoWall.add_pc();
 
             pb_pc.set_uuid(pcIn.uuid.toString().toUtf8().constData());
-            serializeRect(*pb_pc.mutable_rect(), pcIn.geometry);
 
             foreach (const QnVideoWallPcData::PcScreen& screenIn, pcIn.screens) {
                 pb::VideoWall_Pc_Screen& pb_screen = *pb_pc.add_screen();
 
                 pb_screen.set_index(screenIn.index);
-                serializeRect(*pb_screen.mutable_rect(), screenIn.geometry);
+                serializeRect(*pb_screen.mutable_desktop_rect(), screenIn.desktopGeometry);
+                serializeRect(*pb_screen.mutable_layout_rect(), screenIn.layoutGeometry);
             }
 
         }

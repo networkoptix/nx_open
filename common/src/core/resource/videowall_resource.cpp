@@ -169,6 +169,11 @@ QnVideoWallPcData QnVideoWallResource::getPc(const QUuid &pcUuid) const {
     return m_pcByUuid.value(pcUuid);
 }
 
+bool QnVideoWallResource::hasPc(const QUuid &pcUuid) const {
+    QMutexLocker locker(&m_mutex);
+
+    return m_pcByUuid.contains(pcUuid);
+}
 
 void QnVideoWallResource::addPc(const QnVideoWallPcData &pc) {
     QMutexLocker locker(&m_mutex);
