@@ -24,7 +24,8 @@
 
 #define MAX_ERROR_MSG_LENGTH 1024
 
-
+// TODO: #Elric inherit from QnException?
+// 
 /**
  *   Signals a problem with the execution of a socket call.
  */

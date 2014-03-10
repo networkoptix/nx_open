@@ -25,7 +25,11 @@ public:
 
 private:
     QString m_message;
-    mutable QByteArray m_cachedWhat;
+
+    // TODO: #Elric uncache, throwing an expection is an expensive operation,
+    // so there is no point trying to avoid an additional latin1 conversion.
+
+    mutable QByteArray m_cachedWhat; 
 };
 
 
