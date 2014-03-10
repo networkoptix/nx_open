@@ -447,6 +447,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         const ErrorCode errorCode = dbManager->doQuery(nullptr, tran.params);
         if (errorCode != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";
+            QnTransactionTransport::connectDone(remoteGuid); // release connection
             return;
         }
     }
