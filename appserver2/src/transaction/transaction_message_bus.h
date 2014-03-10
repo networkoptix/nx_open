@@ -103,6 +103,7 @@ signals:
         void sendServerAliveMsg(const QnId& id, bool isAlive, bool isClient);
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream);
+        void doPeriodicTasks();
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();

@@ -47,7 +47,7 @@ QnTransactionMessageBus::QnTransactionMessageBus():
 
     m_timer = new QTimer();
     connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
-    m_timer->start(1000);
+    m_timer->start(500);
 }
 
 QnTransactionMessageBus::~QnTransactionMessageBus()
@@ -409,17 +409,22 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
 void QnTransactionMessageBus::at_timer()
 {
     QMutexLocker lock(&m_mutex);
+    doPeriodicTasks();
+}
 
+void QnTransactionMessageBus::doPeriodicTasks()
+{
     m_connectionsToRemove.clear();
 
     // add new outgoing connections
-    qint64 ct = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     for (QMap<QUrl, RemoveUrlConnectInfo>::iterator itr = m_removeUrls.begin(); itr != m_removeUrls.end(); ++itr)
     {
         const QUrl& url = itr.key();
         bool isClient = itr.value().isClient;
-        if (!isPeerUsing(url) && ct - itr.value().lastConnectedTime > RECONNECT_TIMEOUT) {
-            itr.value().lastConnectedTime = ct;
+        if (currentTime - itr.value().lastConnectedTime > RECONNECT_TIMEOUT && !isPeerUsing(url)) 
+        {
+            itr.value().lastConnectedTime = currentTime;
             QnTransactionTransportPtr transport(new QnTransactionTransport(true, isClient));
             connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
             connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
@@ -433,7 +438,6 @@ void QnTransactionMessageBus::at_timer()
         sendServerAliveMsg(qnCommon->moduleGUID(), true, qnCommon->isCloudMode());
 
     // check if some server not accessible any more
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     for (QMap<QUuid, qint64>::iterator itr = m_lastActivity.begin(); itr != m_lastActivity.end(); )
     {
         if (currentTime - itr.value() > ALIVE_UPDATE_INTERVAL * 2) {
@@ -492,14 +496,7 @@ void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient
 {
     QMutexLocker lock(&m_mutex);
     m_removeUrls.insert(url, RemoveUrlConnectInfo(isClient));
-    /*
-    QSharedPointer<QnTransactionTransport> transport(new QnTransactionTransport(true, isClient));
-    connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
-
-    m_remoteUrls.insert(url, transport);
-    transport->setState(QnTransactionTransport::Connect);
-    m_connectingConnections <<  QSharedPointer<QnTransactionTransport>(transport);
-    */
+    doPeriodicTasks();
 }
 
 void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
