@@ -52,7 +52,8 @@ QnId QnDbManager::getType(const QString& typeName)
     query.setForwardOnly(true);
     query.prepare("select guid from vms_resourcetype where name = ?");
     query.bindValue(0, typeName);
-    Q_ASSERT(query.exec());
+    bool rez = query.exec();
+    Q_ASSERT(rez);
     if (query.next())
         return QnId::fromRfc4122(query.value("guid").toByteArray());
     return QnId();
@@ -96,7 +97,8 @@ bool QnDbManager::init()
     queryServers.prepare("UPDATE vms_resource set status = ? WHERE xtype_guid = ?");
     queryServers.bindValue(0, QnResource::Offline);
     queryServers.bindValue(1, m_serverTypeId.toRfc4122());
-    Q_ASSERT(queryServers.exec());
+    bool rez = queryServers.exec();
+    Q_ASSERT(rez);
 
     QSqlQuery queryCameras(m_sdb);
     // select cameras from media servers without DB and local cameras
