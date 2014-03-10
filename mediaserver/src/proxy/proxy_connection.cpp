@@ -87,8 +87,10 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QString& guid, con
     if (!d->dstSocket) {
 
         QnServerMessageProcessor* processor = dynamic_cast<QnServerMessageProcessor*> (QnServerMessageProcessor::instance());
+#ifdef PROXY_STRICT_IP
         if (!processor->isKnownAddr(url.host()) && ! isLocalAddress(url.host()))
             return QString();
+#endif
 
         d->dstSocket = QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket(url.scheme() == lit("https")));
         d->dstSocket->setRecvTimeout(CONNECT_TIMEOUT);

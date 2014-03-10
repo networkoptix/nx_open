@@ -8,11 +8,10 @@
 #include "transaction.h"
 #include "utils/network/http/asynchttpclient.h"
 #include "transaction_transport_serializer.h"
+#include "transaction_transport.h"
 
 namespace ec2
 {
-    class QnTransactionTransport;
-
     class QnTransactionMessageBus: public QObject
     {
         Q_OBJECT
@@ -95,10 +94,9 @@ signals:
     private:
         //void gotTransaction(const QnId& remoteGuid, bool isConnectionOriginator, const QByteArray& data);
         void sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData);
-        void processConnState(QSharedPointer<QnTransactionTransport> transport);
         bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
         void onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
-        void queueSyncRequest(QSharedPointer<QnTransactionTransport> transport);
+        void queueSyncRequest(QnTransactionTransport* transport);
 
         void connectToPeerEstablished(const QnId& id, bool isClient);
         void connectToPeerLost(const QnId& id);
@@ -106,6 +104,7 @@ signals:
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream);
     private slots:
+        void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
         void at_gotTransaction(QByteArray serializedTran, QSet<QnId> processedPeers);
     private:

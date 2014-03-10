@@ -13,6 +13,8 @@ QnServerMessageProcessor::QnServerMessageProcessor():
 
 }
 
+#ifdef PROXY_STRICT_IP
+
 void QnServerMessageProcessor::updateAllIPList(const QnId& id, const QList<QHostAddress>& addrList)
 {
     QStringList addrListStr;
@@ -59,7 +61,7 @@ void QnServerMessageProcessor::updateAllIPList(const QnId& id, const QList<QStri
     }
 
 }
-
+#endif
 
 void QnServerMessageProcessor::updateResource(QnResourcePtr resource)
 {
@@ -81,7 +83,9 @@ void QnServerMessageProcessor::updateResource(QnResourcePtr resource)
             resource->addFlags( QnResource::foreigner );
         // update all known IP list
         QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
+#ifdef PROXY_STRICT_IP
         updateAllIPList(camRes->getId(), camRes->getHostAddress());
+#endif
     }
 
     if (isServer) 
@@ -89,7 +93,9 @@ void QnServerMessageProcessor::updateResource(QnResourcePtr resource)
         if (resource->getId() != ownMediaServer->getId())
             resource->addFlags( QnResource::foreigner );
         // update all known IP list
+#ifdef PROXY_STRICT_IP
         updateAllIPList(resource->getId(), resource.dynamicCast<QnMediaServerResource>()->getNetAddrList());
+#endif
     }
 
     bool needUpdateServer = false;
@@ -114,8 +120,11 @@ void QnServerMessageProcessor::updateResource(QnResourcePtr resource)
 void QnServerMessageProcessor::afterRemovingResource(const QnId& id)
 {
     QnCommonMessageProcessor::afterRemovingResource(id);
+#ifdef PROXY_STRICT_IP
     updateAllIPList(id, QList<QString>());
+    QMutexLocker lock(&m_mutexAddrList);
     m_addrById.remove(id);
+#endif
 }
 
 void QnServerMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
@@ -138,12 +147,14 @@ void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnServerMessageProcessor::at_remotePeerLost );
 }
 
+#ifdef PROXY_STRICT_IP
 bool QnServerMessageProcessor::isKnownAddr(const QString& addr) const
 {
     QMutexLocker lock(&m_mutexAddrList);
     //return true;
     return m_allIPAddress.contains(addr);
 }
+#endif
 
 /*
 * EC2 related processing. Need move to other class
