@@ -1434,14 +1434,14 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRule
     }
 
     QSqlQuery queryRuleEventRes(m_sdb);
-    queryRuleEventRes.prepare(QString("SELECT businessrule_guid as parentId, resource_guid as id from vms_businessrule_event_resources order by businessrule_guid"));
+    queryRuleEventRes.prepare(QString("SELECT businessrule_guid as id, resource_guid as parentId from vms_businessrule_event_resources order by businessrule_guid"));
     if (!queryRuleEventRes.exec()) {
         qWarning() << Q_FUNC_INFO << queryRuleEventRes.lastError().text();
         return ErrorCode::failure;
     }
 
     QSqlQuery queryRuleActionRes(m_sdb);
-    queryRuleActionRes.prepare(QString("SELECT businessrule_guid as parentId, resource_guid as id from vms_businessrule_action_resources order by businessrule_guid"));
+    queryRuleActionRes.prepare(QString("SELECT businessrule_guid as id, resource_guid as parentId from vms_businessrule_action_resources order by businessrule_guid"));
     if (!queryRuleActionRes.exec()) {
         qWarning() << Q_FUNC_INFO << queryRuleActionRes.lastError().text();
         return ErrorCode::failure;
