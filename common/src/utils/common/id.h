@@ -6,6 +6,7 @@
 #include <QUuid>
 
 #include <utils/network/socket.h>
+#include <common/common_globals.h>
 
 typedef QUuid QnId;
 
