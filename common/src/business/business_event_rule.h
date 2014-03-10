@@ -27,8 +27,10 @@ public:
     BusinessEventType::Value eventType() const;
     void setEventType(const BusinessEventType::Value value);
 
-    QnResourceList eventResources() const;
-    void setEventResources(const QnResourceList &value);
+    QVector<QnId> eventResources() const;
+    void setEventResources(const QVector<QnId> &value);
+    QnResourceList eventResourceObjects() const;
+
 
     QnBusinessEventParameters eventParams() const;
     void setEventParams(const QnBusinessEventParameters& params);
@@ -39,8 +41,9 @@ public:
     BusinessActionType::Value actionType() const;
     void setActionType(const BusinessActionType::Value value);
 
-    QnResourceList actionResources() const;
-    void setActionResources(const QnResourceList &value);
+    QVector<QnId> actionResources() const;
+    QnResourceList actionResourceObjects() const;
+    void setActionResources(const QVector<QnId> &value);
 
     QnBusinessActionParameters actionParams() const;
     void setActionParams(const QnBusinessActionParameters& params);
@@ -74,12 +77,12 @@ private:
     QnId m_id;
 
     BusinessEventType::Value m_eventType;
-    QnResourceList m_eventResources;
+    QVector<QnId> m_eventResources;
     QnBusinessEventParameters m_eventParams;
     Qn::ToggleState m_eventState;
 
     BusinessActionType::Value m_actionType;
-    QnResourceList m_actionResources;
+    QVector<QnId> m_actionResources;
     QnBusinessActionParameters m_actionParams;
 
     int m_aggregationPeriod;

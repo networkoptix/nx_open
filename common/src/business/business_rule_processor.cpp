@@ -55,8 +55,6 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
             this, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
     connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleDeleted(QnId)),
             this, SLOT(at_businessRuleDeleted(QnId)));
-    connect(QnCommonMessageProcessor::instance(),       SIGNAL(resourceRemoved(QnId)),
-        this, SLOT(at_resourceDeleted(QnId)));
     connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleReset(QnBusinessEventRuleList)),
             this, SLOT(at_businessRuleReset(QnBusinessEventRuleList)));
 
@@ -82,7 +80,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusin
 
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
-    QnResourceList resList = action->getResources().filtered<QnNetworkResource>();
+    QnResourceList resList = action->getResourceObjects().filtered<QnNetworkResource>();
     if (resList.isEmpty()) {
         executeActionInternal(action, QnResourcePtr());
     }
@@ -344,7 +342,7 @@ void QnBusinessRuleProcessor::at_timer()
 
 bool QnBusinessRuleProcessor::checkEventCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
 {
-    bool resOK = !bEvent->getResource() || rule->eventResources().isEmpty() || containResource(rule->eventResources(), bEvent->getResource()->getId());
+    bool resOK = !bEvent->getResource() || rule->eventResources().isEmpty() || rule->eventResources().contains(bEvent->getResource()->getId());
     if (!resOK)
         return false;
 
@@ -416,7 +414,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
 
     QStringList log;
     QStringList recipients;
-    foreach (const QnUserResourcePtr &user, action->getResources().filtered<QnUserResource>()) {
+    foreach (const QnUserResourcePtr &user, action->getResourceObjects().filtered<QnUserResource>()) {
         QString email = user->getEmail();
         log << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(user->getEmail());
         if (!email.isEmpty() && QnEmail::isValid(email))
@@ -600,21 +598,6 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
     }
 }
 
-void QnBusinessRuleProcessor::at_resourceDeleted(QnId id)
-{
-    QMutexLocker lock(&m_mutex);
-
-    for (int i = 0; i < m_rules.size(); ++i)
-    {
-        if (containResource(m_rules[i]->eventResources(), id) || containResource(m_rules[i]->actionResources(), id))
-        {
-            QnBusinessEventRulePtr bRule(m_rules[i]->clone());
-            bRule->removeResource(id);
-            at_businessRuleChanged_i(bRule);
-        }
-    }
-}
-
 void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
 {
     QMutexLocker lock(&m_mutex);
@@ -638,7 +621,7 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( QnBusinessE
     {
         if( businessRule->eventType() == BusinessEventType::Camera_Input)
         {
-            QnResourceList resList = businessRule->eventResources();
+            QnResourceList resList = businessRule->eventResourceObjects();
             if (resList.isEmpty())
                 resList = qnResPool->getAllEnabledCameras();
 
@@ -657,7 +640,7 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( QnBusinessE
 
     //notifying resources about recording action
     {
-        const QnResourceList& resList = businessRule->actionResources();
+        const QnResourceList& resList = businessRule->actionResourceObjects();
         if( businessRule->actionType() == BusinessActionType::CameraRecording)
         {
             for( QnResourceList::const_iterator it = resList.begin(); it != resList.end(); ++it )

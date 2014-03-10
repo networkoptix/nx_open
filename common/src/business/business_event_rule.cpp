@@ -38,11 +38,22 @@ void QnBusinessEventRule::setEventType(const BusinessEventType::Value value) {
 }
 
 
-QnResourceList QnBusinessEventRule::eventResources() const {
+QVector<QnId> QnBusinessEventRule::eventResources() const {
     return m_eventResources;
 }
 
-void QnBusinessEventRule::setEventResources(const QnResourceList &value) {
+QnResourceList QnBusinessEventRule::eventResourceObjects() const 
+{
+    QnResourceList result;
+    foreach(const QnId& id, m_eventResources) {
+        QnResourcePtr res = qnResPool->getResourceById(id);
+        if (res)
+            result << res;
+    }
+    return result;
+}
+
+void QnBusinessEventRule::setEventResources(const QVector<QnId> &value) {
     m_eventResources = value;
 }
 
@@ -72,11 +83,22 @@ void QnBusinessEventRule::setActionType(const BusinessActionType::Value value) {
     //TODO: #GDM fill action params with default values? filter action resources?
 }
 
-QnResourceList QnBusinessEventRule::actionResources() const {
+QVector<QnId> QnBusinessEventRule::actionResources() const {
     return m_actionResources;
 }
 
-void QnBusinessEventRule::setActionResources(const QnResourceList &value) {
+QnResourceList QnBusinessEventRule::actionResourceObjects() const 
+{
+    QnResourceList result;
+    foreach(const QnId& id, m_actionResources) {
+        QnResourcePtr res = qnResPool->getResourceById(id);
+        if (res)
+            result << res;
+    }
+    return result;
+}
+
+void QnBusinessEventRule::setActionResources(const QVector<QnId> &value) {
     m_actionResources = value;
 }
 
@@ -168,7 +190,7 @@ QnBusinessEventRule::QnBusinessEventRule(int internalId, int aggregationPeriod, 
     QnBusinessParams bParams = deserializeBusinessParams(actionParams);
     m_actionParams  = QnBusinessActionParameters::fromBusinessParams(bParams);
     if (actionRes)
-        m_actionResources << actionRes;
+        m_actionResources << actionRes->getId();
 }
 
 
@@ -196,12 +218,12 @@ void QnBusinessEventRule::removeResource(const QnId& resId)
 {
     for (int i = m_actionResources.size() - 1; i >= 0; --i)
     {
-        if (m_actionResources[i]->getId() == resId)
+        if (m_actionResources[i] == resId)
             m_actionResources.removeAt(i);
     }
     for (int i = m_eventResources.size() - 1; i >= 0; --i)
     {
-        if (m_eventResources[i]->getId() == resId)
+        if (m_eventResources[i] == resId)
             m_eventResources.removeAt(i);
     }
     

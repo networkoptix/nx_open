@@ -93,12 +93,24 @@ QnAbstractBusinessAction::~QnAbstractBusinessAction()
 {
 }
 
-void QnAbstractBusinessAction::setResources(const QnResourceList& resources) {
+void QnAbstractBusinessAction::setResources(const QVector<QnId>& resources) {
     m_resources = resources;
 }
 
-const QnResourceList& QnAbstractBusinessAction::getResources() const {
+const QVector<QnId>& QnAbstractBusinessAction::getResources() const {
     return m_resources;
+}
+
+QnResourceList QnAbstractBusinessAction::getResourceObjects() const
+{
+    QnResourceList result;
+    foreach(const QnId& id, m_resources)
+    {
+        QnResourcePtr res = qnResPool->getResourceById(id);
+        if (res)
+            result << res;
+    }
+    return result;
 }
 
 void QnAbstractBusinessAction::setParams(const QnBusinessActionParameters& params) {

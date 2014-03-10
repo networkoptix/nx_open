@@ -92,6 +92,10 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 
 void QnCommonMessageProcessor::on_gotInitialNotification(ec2::QnFullResourceData fullData)
 {
+    m_rules.clear();
+    foreach(QnBusinessEventRulePtr bRule, fullData.bRules)
+        m_rules[bRule->id()] = bRule;
+
     onGotInitialNotification(fullData);
 }
 
@@ -140,7 +144,7 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnId& resourceId )
             qnResPool->removeResource(subRes);
         qnResPool->removeResource(ownResource);
     }
-    emit resourceRemoved(resourceId);
+    processRemovedResource(resourceId);
 }
 
 void QnCommonMessageProcessor::on_mediaServerAddedOrUpdated( QnMediaServerResourcePtr mediaServer )
@@ -175,11 +179,13 @@ void QnCommonMessageProcessor::on_licenseChanged(QnLicensePtr license)
 
 void QnCommonMessageProcessor::on_businessEventAddedOrUpdated( QnBusinessEventRulePtr businessRule )
 {
+    m_rules[businessRule->id()] = businessRule;
     emit businessRuleChanged(businessRule);
 }
 
 void QnCommonMessageProcessor::on_businessEventRemoved( QnId id )
 {
+    m_rules.remove(id);
     emit businessRuleDeleted(id);
 }
 
@@ -190,6 +196,10 @@ void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBus
 
 void QnCommonMessageProcessor::on_businessRuleReset( const QnBusinessEventRuleList& rules )
 {
+    m_rules.clear();
+    foreach(QnBusinessEventRulePtr bRule, QnBusinessEventRule::getDefaultRules())
+        m_rules[bRule->id()] = bRule;
+
     emit businessRuleReset(rules);
 }
 
@@ -231,4 +241,19 @@ void QnCommonMessageProcessor::on_storedFileUpdated( QString filename )
 void QnCommonMessageProcessor::on_storedFileRemoved( QString filename )
 {
     emit fileRemoved(filename);
+}
+
+// todo: ec2 relate logic. remove from this class
+
+void QnCommonMessageProcessor::processRemovedResource(const QnId& id)
+{
+    foreach(QnBusinessEventRulePtr bRule, m_rules.values())
+    {
+        if (bRule->eventResources().contains(id) || bRule->actionResources().contains(id))
+        {
+            QnBusinessEventRulePtr updatedRule(bRule->clone());
+            updatedRule->removeResource(id);
+            emit businessRuleChanged(updatedRule);
+        }
+    }
 }

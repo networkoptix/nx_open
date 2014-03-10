@@ -11,13 +11,7 @@ void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource, QnResource
     resource->setId(id);
     resource->setEventType(eventType);
     
-    QnResourceList resList;
-    foreach(const QnId& resId, eventResource) {
-        QnResourcePtr res = resourcePool->getResourceById(resId);
-        if (res)
-            resList << res;
-    }
-    resource->setEventResources(resList);
+    resource->setEventResources(QVector<QnId>::fromStdVector(eventResource));
     
     QnBusinessParams bParams = deserializeBusinessParams(eventCondition);
     resource->setEventParams(QnBusinessEventParameters::fromBusinessParams(bParams));
@@ -25,13 +19,7 @@ void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource, QnResource
     resource->setEventState(eventState);
     resource->setActionType(actionType);
 
-    resList.clear();
-    foreach(const QnId& resId, actionResource) {
-        QnResourcePtr res = resourcePool->getResourceById(resId);
-        if (res)
-            resList << res;
-    }
-    resource->setActionResources(resList);
+    resource->setActionResources(QVector<QnId>::fromStdVector(actionResource));
 
     bParams = deserializeBusinessParams(actionParams);
     resource->setActionParams(QnBusinessActionParameters::fromBusinessParams(bParams));
@@ -48,10 +36,8 @@ void ApiBusinessRuleData::fromResource(const QnBusinessEventRulePtr& resource)
     id = resource->id();
     eventType = resource->eventType();
 
-    foreach(const QnResourcePtr& res,  resource->eventResources())
-        eventResource.push_back(res->getId());
-    foreach(const QnResourcePtr& res,  resource->actionResources())
-        actionResource.push_back(res->getId());
+    eventResource = resource->eventResources().toStdVector();
+    actionResource = resource->actionResources().toStdVector();
 
     eventCondition = serializeBusinessParams(resource->eventParams().toBusinessParams());
     actionParams = serializeBusinessParams(resource->actionParams().toBusinessParams());
@@ -97,8 +83,7 @@ void ApiBusinessActionData::fromResource(const QnAbstractBusinessActionPtr& reso
     actionType = resource->actionType();
     toggleState = resource->getToggleState();
     receivedFromRemoteHost = resource->isReceivedFromRemoteHost();
-    foreach(const QnResourcePtr& res, resource->getResources())
-        resources.push_back(res->getId());
+    resources = resource->getResources().toStdVector();
 
     params = serializeBusinessParams(resource->getParams().toBusinessParams());
     runtimeParams = serializeBusinessParams(resource->getRuntimeParams().toBusinessParams());
@@ -115,13 +100,7 @@ QnAbstractBusinessActionPtr  ApiBusinessActionData::toResource(QnResourcePool* r
     resource->setToggleState(toggleState);
     resource->setReceivedFromRemoteHost(receivedFromRemoteHost);
 
-    QnResourceList resList;
-    foreach(const QnId& resId, resources) {
-        QnResourcePtr res = resourcePool->getResourceById(resId);
-        if (res)
-            resList << res;
-    }
-    resource->setResources(resList);
+    resource->setResources(QVector<QnId>::fromStdVector(resources));
 
     bParams = deserializeBusinessParams(params);
     resource->setParams(QnBusinessActionParameters::fromBusinessParams(bParams));

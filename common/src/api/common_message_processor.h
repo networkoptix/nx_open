@@ -34,12 +34,11 @@ signals:
     void businessRuleDeleted(QnId id);
     void businessRuleReset(QnBusinessEventRuleList rules);
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
-    void resourceRemoved(QnId id);
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) = 0;
     virtual void onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status) = 0;
     virtual void updateResource(QnResourcePtr resource) = 0;
-
+    virtual void processRemovedResource(const QnId& id);
 private slots:
     void on_gotInitialNotification( ec2::QnFullResourceData fullData );
     void on_runtimeInfoChanged( const ec2::QnRuntimeInfo& runtimeInfo );
@@ -76,6 +75,7 @@ private slots:
     void on_storedFileRemoved( QString filename );
 protected:
     ec2::AbstractECConnectionPtr m_connection;
+    QMap<QnId, QnBusinessEventRulePtr> m_rules;
 };
 
 #endif // COMMON_MESSAGE_PROCESSOR_H
