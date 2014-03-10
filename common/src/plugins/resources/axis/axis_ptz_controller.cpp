@@ -9,7 +9,9 @@
 
 #include "axis_resource.h"
 
-static const quint16 DEFAULT_AXIS_API_PORT = 80; // TODO: #Elric copypasta from axis_resource.cpp
+static const int DEFAULT_AXIS_API_PORT = 80; // TODO: #Elric copypasta from axis_resource.cpp
+
+static const int DEFAULT_AXIS_TIMEOUT = 15000; /* Increased from default 5000 as list request can take quite a lot of time. */
 
 
 // -------------------------------------------------------------------------- //
@@ -159,7 +161,7 @@ CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const {
     return new CLSimpleHTTPClient(
         m_resource->getHostAddress(), 
         QUrl(m_resource->getUrl()).port(DEFAULT_AXIS_API_PORT), 
-        m_resource->getNetworkTimeout(), 
+        qMax(DEFAULT_AXIS_TIMEOUT, static_cast<int>(m_resource->getNetworkTimeout())),  // TODO: #Elric use int in getNetworkTimeout
         m_resource->getAuth()
     );
 }
