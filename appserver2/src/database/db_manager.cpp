@@ -637,7 +637,7 @@ ErrorCode QnDbManager::insertBRuleResource(const QString& tableName, const QnId&
     QSqlQuery query(m_sdb);
     query.prepare(QString("INSERT INTO %1 (businessrule_guid, resource_guid) VALUES (:ruleGuid, :resourceGuid)").arg(tableName));
     query.bindValue(":ruleGuid", ruleGuid.toRfc4122());
-    query.bindValue(":resGuid", resourceGuid.toRfc4122());
+    query.bindValue(":resourceGuid", resourceGuid.toRfc4122());
     if (query.exec()) {
         return ErrorCode::ok;
     }
