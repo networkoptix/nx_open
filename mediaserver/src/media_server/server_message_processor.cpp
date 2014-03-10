@@ -141,7 +141,7 @@ void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 bool QnServerMessageProcessor::isKnownAddr(const QString& addr) const
 {
     QMutexLocker lock(&m_mutexAddrList);
-    return true;
+    //return true;
     return m_allIPAddress.contains(addr);
 }
 
