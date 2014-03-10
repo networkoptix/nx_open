@@ -224,13 +224,13 @@ QnWorkbenchVideoWallHandler::ScreenSnap QnWorkbenchVideoWallHandler::findEdge(co
 
     if (backward) {
         foreach(const ScreenSnap &snap, snaps | boost::adaptors::reversed) {
-            if (snap.intermidiate || screens.contains(snap.index))
+            if (snap.intermidiate || !screens.contains(snap.index))
                 continue;
             return snap;
         }
     } else {
         foreach(const ScreenSnap &snap, snaps) {
-            if (snap.intermidiate || screens.contains(snap.index))
+            if (snap.intermidiate || !screens.contains(snap.index))
                 continue;
             return snap;
         }
@@ -256,20 +256,20 @@ QRect QnWorkbenchVideoWallHandler::calculateSnapGeometry(const QList<QnVideoWall
         return source;
 
     ScreenSnaps localSnaps = calculateSnaps(qnSettings->pcUuid(), localScreens);
-    ScreenSnap left     = findNearest(localSnaps.left, source.left());
-    ScreenSnap top      = findNearest(localSnaps.top, source.top());
-    ScreenSnap right    = findNearest(localSnaps.right, source.right());
-    ScreenSnap bottom   = findNearest(localSnaps.bottom, source.bottom());
+    ScreenSnap left     = findNearest(localSnaps.left,      source.left());
+    ScreenSnap top      = findNearest(localSnaps.top,       source.top());
+    ScreenSnap right    = findNearest(localSnaps.right,     source.right());
+    ScreenSnap bottom   = findNearest(localSnaps.bottom,    source.bottom());
     QSet<int> screenIndices;
     screenIndices << left.index << top.index << right.index << bottom.index;
     if (screenIndices.size() > 1) { // if client uses some screens it should fill them completely
-        left    = findEdge(localSnaps.left, screenIndices);
-        top     = findEdge(localSnaps.left, screenIndices);
-        right   = findEdge(localSnaps.left, screenIndices);
-        bottom  = findEdge(localSnaps.left, screenIndices);
+        left    = findEdge(localSnaps.left,     screenIndices);
+        top     = findEdge(localSnaps.top,      screenIndices);
+        right   = findEdge(localSnaps.right,    screenIndices, true);
+        bottom  = findEdge(localSnaps.bottom,   screenIndices, true);
     }
     //TODO: #GDM VW check edges validity
-    //TODO: #GDM VW check that screens are not is use already
+    //TODO: #GDM VW check that screens are not in use already
 
     return QRect(QPoint(left.value, top.value), QPoint(right.value, bottom.value));
 

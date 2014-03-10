@@ -778,21 +778,23 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    if (    !resource->hasFlags(QnResource::media) &&
-            !resource->hasFlags(QnResource::server) &&
-            !resource->hasFlags(QnResource::layout)
-            ) { // TODO: #Elric unsupported for now
+    QnResourceWidget *widget;
+    if (resource->hasFlags(QnResource::server)) {
+        widget = new QnServerResourceWidget(context(), item);
+    }
+    else
+    if (resource->hasFlags(QnResource::videowall)) {
+        widget = new QnVideowallResourceScreenWidget(context(), item);
+    }
+    else
+    if (resource->hasFlags(QnResource::media)) {
+        widget = new QnMediaResourceWidget(context(), item);
+    }
+    else {
+        // TODO: #Elric unsupported for now
         qnDeleteLater(item);
         return false;
     }
-
-    QnResourceWidget *widget;
-    if (resource->hasFlags(QnResource::server))
-        widget = new QnServerResourceWidget(context(), item);
-    else if (resource->hasFlags(QnResource::videowall))
-        widget = new QnVideowallResourceScreenWidget(context(), item);
-    else
-        widget = new QnMediaResourceWidget(context(), item);
 
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
     widget->setAttribute(Qt::WA_DeleteOnClose);
