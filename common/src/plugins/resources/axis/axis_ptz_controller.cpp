@@ -280,7 +280,7 @@ bool QnAxisPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *p
         return false;
 
     qreal pan, tilt, zoom;
-    if(params.value("pan", &pan) && params.value("tilt", &tilt) && params.value("zoom", &zoom)) {
+    if(params.value(lit("pan"), &pan) && params.value(lit("tilt"), &tilt) && params.value(lit("zoom"), &zoom)) {
         position->setX(pan);
         position->setY(tilt);
         position->setZ(q35mmEquivToDegrees(m_cameraTo35mmEquivZoom(zoom)));
