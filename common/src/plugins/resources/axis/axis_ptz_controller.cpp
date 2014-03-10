@@ -24,8 +24,8 @@ public:
     }
 
     template<class T>
-    T value(const char *key, const T &defaultValue = T()) const { // TODO: #Elric use QLatin1Literal
-        QString result = m_data.value(QLatin1String(key));
+    T value(const QString &key, const T &defaultValue = T()) const {
+        QString result = m_data.value(key);
         if(result.isNull())
             return defaultValue;
 
@@ -38,8 +38,8 @@ public:
     }
 
     template<class T>
-    bool value(const char *key, T *value) const { // TODO: #Elric use QLatin1Literal
-        QString result = m_data.value(QLatin1String(key));
+    bool value(const QString &key, T *value) const {
+        QString result = m_data.value(key);
         if(result.isNull())
             return false;
 
@@ -81,54 +81,56 @@ void QnAxisPtzController::updateState() {
 void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
     m_capabilities = 0;
 
-    QString ptzEnabled = params.value<QString>("root.Properties.PTZ.PTZ");
+    int channel = qMax(this->channel(), 1);
+
+    QString ptzEnabled = params.value<QString>(lit("root.Properties.PTZ.PTZ"));
     if(ptzEnabled != lit("yes"))
         return;
 
-    if(params.value<bool>("root.PTZ.Various.V1.Locked", false))
+    if(params.value<bool>(lit("root.PTZ.Various.V%1.Locked").arg(channel), false))
         return;
 
-    if(params.value<bool>("root.PTZ.Support.S1.ContinuousPan", false))
+    if(params.value<bool>(lit("root.PTZ.Support.S%1.ContinuousPan").arg(channel), false))
         m_capabilities |= Qn::ContinuousPanCapability;
 
-    if(params.value<bool>("root.PTZ.Support.S1.ContinuousTilt", false))
+    if(params.value<bool>(lit("root.PTZ.Support.S%1.ContinuousTilt").arg(channel), false))
         m_capabilities |= Qn::ContinuousTiltCapability;
 
-    if(params.value<bool>("root.PTZ.Support.S1.ContinuousZoom", false))
+    if(params.value<bool>(lit("root.PTZ.Support.S%1.ContinuousZoom").arg(channel), false))
         m_capabilities |= Qn::ContinuousZoomCapability;
 
-    if(params.value<bool>("root.PTZ.Support.S1.AbsolutePan", false))
+    if(params.value<bool>(lit("root.PTZ.Support.S%1.AbsolutePan").arg(channel), false))
         m_capabilities |= Qn::AbsolutePanCapability;
         
-    if(params.value<bool>("root.PTZ.Support.S1.AbsoluteTilt", false))
+    if(params.value<bool>(lit("root.PTZ.Support.S%1.AbsoluteTilt").arg(channel), false))
         m_capabilities |= Qn::AbsoluteTiltCapability;
         
-    if(params.value<bool>("root.PTZ.Support.S1.AbsoluteZoom", false))
+    if(params.value<bool>(lit("root.PTZ.Support.S%1.AbsoluteZoom").arg(channel), false))
         m_capabilities |= Qn::AbsoluteZoomCapability;
 
-    if(!params.value<bool>("root.PTZ.Various.V1.PanEnabled", true))
+    if(!params.value<bool>(lit("root.PTZ.Various.V%1.PanEnabled").arg(channel), true))
         m_capabilities &= ~(Qn::ContinuousPanCapability | Qn::AbsolutePanCapability);
         
-    if(!params.value<bool>("root.PTZ.Various.V1.TiltEnabled", true))
+    if(!params.value<bool>(lit("root.PTZ.Various.V%1.TiltEnabled").arg(channel), true))
         m_capabilities &= ~(Qn::ContinuousTiltCapability | Qn::AbsoluteTiltCapability);
 
-    if(!params.value<bool>("root.PTZ.Various.V1.ZoomEnabled", true))
+    if(!params.value<bool>(lit("root.PTZ.Various.V%1.ZoomEnabled").arg(channel), true))
         m_capabilities &= ~(Qn::ContinuousZoomCapability | Qn::AbsoluteZoomCapability);
 
     /* Note that during continuous move axis takes care of image rotation automagically. */
-    qreal rotation = params.value("root.Image.I0.Appearance.Rotation", 0.0);
+    qreal rotation = params.value(lit("root.Image.I0.Appearance.Rotation"), 0.0); // TODO: #Elric I0? Not I%1?
     if(qFuzzyCompare(rotation, static_cast<qreal>(180.0)))
         m_flip = Qt::Vertical | Qt::Horizontal;
     m_capabilities |= Qn::FlipPtzCapability;
 
     QnPtzLimits limits;
     if(
-        params.value("root.PTZ.Limit.L1.MinPan", &limits.minPan) &&
-        params.value("root.PTZ.Limit.L1.MaxPan", &limits.maxPan) &&
-        params.value("root.PTZ.Limit.L1.MinTilt", &limits.minTilt) &&
-        params.value("root.PTZ.Limit.L1.MaxTilt", &limits.maxTilt) &&
-        params.value("root.PTZ.Limit.L1.MinFieldAngle", &limits.minFov) &&
-        params.value("root.PTZ.Limit.L1.MaxFieldAngle", &limits.maxFov) &&
+        params.value(lit("root.PTZ.Limit.L%1.MinPan").arg(channel), &limits.minPan) &&
+        params.value(lit("root.PTZ.Limit.L%1.MaxPan").arg(channel), &limits.maxPan) &&
+        params.value(lit("root.PTZ.Limit.L%1.MinTilt").arg(channel), &limits.minTilt) &&
+        params.value(lit("root.PTZ.Limit.L%1.MaxTilt").arg(channel), &limits.maxTilt) &&
+        params.value(lit("root.PTZ.Limit.L%1.MinFieldAngle").arg(channel), &limits.minFov) &&
+        params.value(lit("root.PTZ.Limit.L%1.MaxFieldAngle").arg(channel), &limits.maxFov) &&
         limits.minPan <= limits.maxPan && 
         limits.minTilt <= limits.maxTilt &&
         limits.minFov <= limits.maxFov
@@ -237,15 +239,7 @@ bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *para
             if(index == -1)
                 continue;
 
-            QString key = line.left(index);
-            QString value = line.mid(index + 1);
-
-            for (int i = 2; i <= 4; ++i) {
-                key.replace(lit("root.PTZ.Support.S%1").arg(i), lit("root.PTZ.Support.S1")); // TODO: #Elric evil hardcode, implement properly
-                key.replace(lit("root.PTZ.Various.V%1").arg(i), lit("root.PTZ.Various.V1"));
-            }
-
-            params->insert(key, value);
+            params->insert(line.left(index), line.mid(index + 1));
         }
     }
 
