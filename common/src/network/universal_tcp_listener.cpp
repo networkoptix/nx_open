@@ -31,7 +31,7 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(QSharedP
     for (int i = 0; i < m_handlers.size(); ++i)
     {
         HandlerInfo h = m_handlers[i];
-        if (m_handlers[i].protocol == protocol && normPath.startsWith(m_handlers[i].path))
+        if ((m_handlers[i].protocol == "*" || m_handlers[i].protocol == protocol) && normPath.startsWith(m_handlers[i].path))
         {
             int pathLen = m_handlers[i].path.length();
             if (pathLen > bestPathLen) {

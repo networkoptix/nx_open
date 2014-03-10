@@ -21,6 +21,8 @@ public:
 
     virtual void init(ec2::AbstractECConnectionPtr connection);
 
+    virtual void updateResource(QnResourcePtr resource) = 0;
+
 signals:
     void connectionOpened();
     void connectionClosed();
@@ -37,8 +39,10 @@ signals:
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) = 0;
     virtual void onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status) = 0;
-    virtual void updateResource(QnResourcePtr resource) = 0;
-    virtual void processRemovedResource(const QnId& id);
+    
+    virtual void afterRemovingResource(const QnId& id);
+public slots:
+    void on_businessEventAddedOrUpdated( QnBusinessEventRulePtr camera );
 private slots:
     void on_gotInitialNotification( ec2::QnFullResourceData fullData );
     void on_runtimeInfoChanged( const ec2::QnRuntimeInfo& runtimeInfo );
@@ -58,7 +62,6 @@ private slots:
 
     void on_licenseChanged(QnLicensePtr license);
 
-    void on_businessEventAddedOrUpdated( QnBusinessEventRulePtr camera );
     void on_businessEventRemoved( QnId id );
     void on_businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
     void on_businessRuleReset( const QnBusinessEventRuleList& rules );

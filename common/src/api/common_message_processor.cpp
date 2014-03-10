@@ -137,6 +137,8 @@ void QnCommonMessageProcessor::on_resourceParamsChanged( const QnId& resourceId,
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnId& resourceId )
 {
+    //beforeRemovingResource(resourceId);
+
     if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId)) 
     {
         // delete dependent objects
@@ -144,7 +146,8 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnId& resourceId )
             qnResPool->removeResource(subRes);
         qnResPool->removeResource(ownResource);
     }
-    processRemovedResource(resourceId);
+    
+    afterRemovingResource(resourceId);
 }
 
 void QnCommonMessageProcessor::on_mediaServerAddedOrUpdated( QnMediaServerResourcePtr mediaServer )
@@ -245,7 +248,7 @@ void QnCommonMessageProcessor::on_storedFileRemoved( QString filename )
 
 // todo: ec2 relate logic. remove from this class
 
-void QnCommonMessageProcessor::processRemovedResource(const QnId& id)
+void QnCommonMessageProcessor::afterRemovingResource(const QnId& id)
 {
     foreach(QnBusinessEventRulePtr bRule, m_rules.values())
     {

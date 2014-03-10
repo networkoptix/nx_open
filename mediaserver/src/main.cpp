@@ -132,6 +132,8 @@
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
 #include "utils/network/networkoptixmodulefinder.h"
+#include "proxy/proxy_receiver_connection_processor.h"
+#include "proxy/proxy_connection.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -702,35 +704,12 @@ void QnMain::updateDisabledVendorsIfNeeded()
     }
 }
 
-void QnMain::loadResourcesFromECS()
+void QnMain::loadResourcesFromECS(QnServerMessageProcessor* messageProcessor)
 {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
     QnVirtualCameraResourceList cameras;
     ec2::ErrorCode rez;
-    while ((rez = ec2Connection->getCameraManager()->getCamerasSync(m_mediaServer->getId(), &cameras)) != ec2::ErrorCode::ok)
-    {
-        qDebug() << "QnMain::run(): Can't get cameras. Reason: " << ec2::toString(rez);
-        QnSleep::msleep(10000);
-    }
-
-    QnManualCameraInfoMap manualCameras;
-    foreach(const QnSecurityCamResourcePtr &camera, cameras)
-    {
-        QnResourcePtr ownResource = qnResPool->getResourceById(camera->getId());
-        if (ownResource) {
-            ownResource->update(camera);
-        }
-        else {
-            qnResPool->addResource(camera);
-            QnVirtualCameraResourcePtr virtualCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(camera);
-            if (virtualCamera->isManuallyAdded()) {
-                QnResourceTypePtr resType = qnResTypePool->getResourceType(virtualCamera->getTypeId());
-                manualCameras.insert(virtualCamera->getUrl(), QnManualCameraInfo(QUrl(virtualCamera->getUrl()), virtualCamera->getAuth(), resType->getName()));
-            }
-        }
-    }
-    QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
 
     //reading media servers list
     QnMediaServerResourceList mediaServerList;
@@ -739,30 +718,25 @@ void QnMain::loadResourcesFromECS()
         NX_LOG( lit("QnMain::run(). Can't get media servers."), cl_logERROR );
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
+    foreach(const QnMediaServerResourcePtr &mediaServer, mediaServerList) 
+        messageProcessor->updateResource(mediaServer);
+    
 
-    //reading other servers' cameras
-    foreach( const QnMediaServerResourcePtr& mediaServer, mediaServerList )
+    // read camera list
+    QnManualCameraInfoMap manualCameras;
+    while ((rez = ec2Connection->getCameraManager()->getCamerasSync(QnId(), &cameras)) != ec2::ErrorCode::ok)
     {
-        if( mediaServer->getGuid() == serverGuid() )
-            continue;
-
-        mediaServer->addFlags( QnResource::foreigner );  //marking resource as not belonging to us
-        qnResPool->addResource( mediaServer );
-        //requesting remote server cameras
-        QnVirtualCameraResourceList cameras;
-        //while( appServerConnection->getCameras(cameras, mediaServer->getId()) != 0 )
-        while (ec2Connection->getCameraManager()->getCamerasSync(mediaServer->getId(), &cameras) != ec2::ErrorCode::ok)
-        {
-            NX_LOG( lit("QnMain::run(). Error retreiving server %1(%2) cameras from enterprise controller. %3").
-                arg(mediaServer->getId().toString()).arg(mediaServer->getGuid().toString()).arg(QLatin1String("" /*appServerConnection->getLastError()*/)), cl_logERROR );
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-        }
-        foreach( const QnVirtualCameraResourcePtr &camera, cameras )
-        {
-            camera->addFlags( QnResource::foreigner );  //marking resource as not belonging to us
-            qnResPool->addResource( camera );
+        qDebug() << "QnMain::run(): Can't get cameras. Reason: " << ec2::toString(rez);
+        QnSleep::msleep(10000);
+    }
+    foreach(const QnSecurityCamResourcePtr &camera, cameras) {
+        messageProcessor->updateResource(camera);
+        if (camera->isManuallyAdded()) {
+            QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
+            manualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
         }
     }
+    QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
 
     QnCameraHistoryList cameraHistoryList;
     while (( rez = ec2Connection->getCameraManager()->getCameraHistoryListSync(&cameraHistoryList)) != ec2::ErrorCode::ok)
@@ -772,9 +746,7 @@ void QnMain::loadResourcesFromECS()
     }
 
     foreach(QnCameraHistoryPtr history, cameraHistoryList)
-    {
         QnCameraHistoryPool::instance()->addCameraHistory(history);
-    }
 
     //loading business rules
     QnUserResourceList users;
@@ -785,7 +757,7 @@ void QnMain::loadResourcesFromECS()
     }
 
     foreach(const QnUserResourcePtr &user, users)
-        qnResPool->addResource(user);
+        messageProcessor->updateResource(user);
 
     //loading business rules
     QnBusinessEventRuleList rules;
@@ -796,7 +768,7 @@ void QnMain::loadResourcesFromECS()
     }
 
     foreach(const QnBusinessEventRulePtr &rule, rules)
-        qnBusinessRuleProcessor->addBusinessRule( rule );
+        messageProcessor->on_businessEventAddedOrUpdated(rule);
 }
 
 void QnMain::at_localInterfacesChanged()
@@ -918,6 +890,10 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
+
+    m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy");
+    m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
+
 
     if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
         m_universalTcpListener->disableAuth();
@@ -1365,7 +1341,7 @@ void QnMain::run()
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
-    loadResourcesFromECS();
+    loadResourcesFromECS(messageProcessor.data());
     updateDisabledVendorsIfNeeded();
     QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
     if (disabledVendors .size() > 0)

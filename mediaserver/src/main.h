@@ -20,6 +20,7 @@ class QnRtspListener;
 class QnRestServer;
 class QNetworkReply;
 class NetworkOptixModuleFinder;
+class QnServerMessageProcessor;
 
 class QnMain : public QnLongRunnable
 {
@@ -35,7 +36,7 @@ public slots:
     void stopAsync();
     void stopSync();
 private slots:
-    void loadResourcesFromECS();
+    void loadResourcesFromECS(QnServerMessageProcessor* messageProcessor);
     void at_localInterfacesChanged();
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(QHostAddress host, QStringList macAddrList);
