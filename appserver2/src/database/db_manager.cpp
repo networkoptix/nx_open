@@ -544,11 +544,11 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 in
         return ErrorCode::failure;
     }
 
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO vms_scheduletask (source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES\
+                     (:sourceId, :startTime, :endTime, :doRecordAudio, :recordType, :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps)");
 	foreach(const ScheduleTask& task, data.scheduleTask) 
 	{
-		QSqlQuery insQuery(m_sdb);
-		insQuery.prepare("INSERT INTO vms_scheduletask (source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES\
-					     (:sourceId, :startTime, :endTime, :doRecordAudio, :recordType, :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps)");
 		task.autoBindValues(insQuery);
         insQuery.bindValue(":sourceId", internalId);
 
