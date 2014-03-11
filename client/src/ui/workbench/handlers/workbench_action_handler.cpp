@@ -82,6 +82,7 @@
 #include <ui/dialogs/message_box.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/dialogs/picture_settings_dialog.h>
+#include <ui/dialogs/ping_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -1958,9 +1959,13 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
     QProcess::startDetached(cmd.arg(host));
 #endif
 #ifdef Q_OS_MACX
-    QnConnectionTestingDialog dialog;
-    dialog.testResource(resource);
-    dialog.exec();
+    QUrl url = QUrl::fromUserInput(resource->getUrl());
+    QString host = url.host();
+    QnPingDialog *dialog = new QnPingDialog();
+    dialog->setHostAddress(host);
+    dialog->show();
+    dialog->startPings();
+    dialog->raise();
 #endif
 
 }

@@ -13,12 +13,13 @@ public:
     };
 
     struct PingResponce {
-        int code;
+        int type;
+        quint16 code;
         quint32 bytes;
         QString hostAddress;
         quint16 seq;
         quint32 ttl;
-        quint32 time;
+        qreal time;
     };
 
     explicit QnPingUtility(QObject *parent = 0);
