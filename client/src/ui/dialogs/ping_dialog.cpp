@@ -8,10 +8,11 @@
 
 
 QnPingDialog::QnPingDialog(QWidget *parent) :
-    base_type(parent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
+    base_type(parent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint
 #ifdef Q_OS_MAC
     | Qt::Tool
 #endif
+    )
 {
     m_pingText = new QTextEdit(this);
     m_pingText->setReadOnly(true);
