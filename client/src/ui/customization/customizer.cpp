@@ -112,8 +112,9 @@ public:
     }
 };
 
+// TODO: #Elric implement BrushData & PenData (like QnPaletteData)
 // TODO: #Elric #customization implement QPalette/QBrush/QPen handling here.
-template<class Base>
+/*template<class Base>
 class QnPropertyAccessorWrapper: public Base {
 public:
     QnPropertyAccessorWrapper()
@@ -123,7 +124,7 @@ public:
     virtual bool write(QObject *object, const QString &name, const QVariant &value) const = 0;
 
 
-};
+};*/
 
 
 // -------------------------------------------------------------------------- //

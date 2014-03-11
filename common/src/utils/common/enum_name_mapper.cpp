@@ -47,3 +47,9 @@ QString QnEnumNameMapper::name(int value, const QString &defaultValue) const {
 }
 
 
+class QtStaticMetaObject: public QObject {
+public:
+    using QObject::staticQtMetaObject;
+};
+
+const QMetaObject &Qt::staticMetaObject = QtStaticMetaObject::staticQtMetaObject;

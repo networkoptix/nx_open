@@ -620,7 +620,10 @@ void ZoomWindowInstrument::startDrag(DragInfo *) {
     selectionItem()->setOpacity(1.0);
     
     m_zoomWindowColor = nextZoomWindowColor();
-    selectionItem()->setColor(toTransparent(m_zoomWindowColor, 0.75));
+    
+    QPen pen = selectionItem()->pen();
+    pen.setColor(toTransparent(m_zoomWindowColor, 0.75)); // TODO: #Elric write in 1 line? 
+    selectionItem()->setPen(pen);
 
     /* Everything else will be initialized in the first call to drag(). */
 

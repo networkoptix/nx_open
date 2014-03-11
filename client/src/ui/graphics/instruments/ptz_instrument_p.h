@@ -7,10 +7,10 @@
 #include <ui/graphics/items/standard/graphics_path_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/ui_elements_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 
 #include <ui/style/skin.h>
 
-class QnMediaResourceWidget;
 
 // -------------------------------------------------------------------------- //
 // PtzArrowItem
@@ -251,7 +251,7 @@ public:
             dy += d1;
         }
 
-        QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, QPen(ptzItemBorderColor, 0.0));
+        //QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, QPen(ptzItemBorderColor, 0.0));
         painter->drawLines(crosshairLines);
     }
 

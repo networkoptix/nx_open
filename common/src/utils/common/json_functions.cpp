@@ -5,6 +5,11 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QVarLengthArray>
 
+#include "enum_name_mapper.h"
+
+QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qt, BrushStyle, static)
+QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::BrushStyle, static)
+
 QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QColor)
 
 QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QSize, 
@@ -75,6 +80,43 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QRegion *target) {
 
     target->setRects(rects.data(), rects.size());
     return true;
+}
+
+void serialize(QnJsonContext *ctx, const QBrush &value, QJsonValue *target) {
+    if(value.style() == Qt::SolidPattern) {
+        QJson::serialize(ctx, value.color(), target);
+    } else {
+        QJsonObject map;
+        QJson::serialize(ctx, value.color(), lit("color"), &map);
+        QJson::serialize(ctx, value.style(), lit("style"), &map);
+        *target = map;
+    }
+}
+
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QBrush *target) {
+    if(value.type() == QJsonValue::String) {
+        QColor color;
+        if(!QJson::deserialize(ctx, value, &color))
+            return false;
+        *target = color;
+        return true;
+    } else if(value.type() == QJsonValue::Object) {
+        QJsonObject map = value.toObject();
+
+        QColor color;
+        Qt::BrushStyle style;
+        if(
+            !QJson::deserialize(ctx, map, lit("color"), &color) ||
+            !QJson::deserialize(ctx, map, lit("style"), &style)
+        ) {
+            return false;
+        }
+
+        *target = QBrush(color, style);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void serialize(QnJsonContext *, const QUuid &value, QJsonValue *target) {
