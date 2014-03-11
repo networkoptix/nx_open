@@ -6,6 +6,7 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <arpa/inet.h>
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
@@ -92,11 +93,13 @@ void QnPingUtility::run() {
 
 QnPingUtility::PingResponce QnPingUtility::ping(quint16 seq) {
     PingResponce result;
-    result.code = UnknownError;
+    result.type = UnknownError;
     result.hostAddress = m_hostAddress;
     result.seq = seq;
 
 #ifdef Q_OS_MACX
+    timeval time_sent, time_recv;
+
     unsigned short id  = (unsigned short) (arc4random() >> 15);
     int fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
     if (fd == -1) {
@@ -115,10 +118,10 @@ QnPingUtility::PingResponce QnPingUtility::ping(quint16 seq) {
     packet.icmp.icmp_id = id;
     packet.icmp.icmp_cksum = in_cksum((unsigned short *) &packet.icmp, sizeof(packet.icmp));
 
-    in_addr_t addr = inet_addr(hostAddr.toLatin1().data());
+    in_addr_t addr = inet_addr(m_hostAddress.toLatin1().data());
     if (addr == INADDR_NONE)
     {
-        qDebug() << "Failed conversion" << hostAddr << "to inet addr";
+        qDebug() << "Failed conversion" << m_hostAddress << "to inet addr";
         return result;
     }
 
@@ -130,6 +133,7 @@ QnPingUtility::PingResponce QnPingUtility::ping(quint16 seq) {
     saddr.sin_addr.s_addr = addr;
     saddr.sin_len = sizeof(struct sockaddr_in);
 
+    gettimeofday(&time_sent, NULL);
     if (sendto(fd, (void*)&packet.icmp, sizeof (packet.icmp), 0, (sockaddr*)&saddr, sizeof(saddr)) == -1) {
         close(fd);
         qDebug() << "Error when sending packet";
@@ -148,7 +152,7 @@ QnPingUtility::PingResponce QnPingUtility::ping(quint16 seq) {
 
     struct timeval tv;
 
-    long usecs = timeoutMSec * 1000;
+    long usecs = m_timeout * 1000;
     tv.tv_usec = usecs % 1000000;
     tv.tv_sec = usecs / 1000000;
 
@@ -158,7 +162,7 @@ QnPingUtility::PingResponce QnPingUtility::ping(quint16 seq) {
         close(fd);
         if (res == 0) {
             qDebug() << "Ping timeout";
-            result.code = Timeout;
+            result.type = Timeout;
         } else {
             qDebug() << "Waiting was interrupted" << res;
         }
@@ -169,6 +173,8 @@ QnPingUtility::PingResponce QnPingUtility::ping(quint16 seq) {
     if (FD_ISSET(fd, &rset)) {
         res = recvfrom(fd, &packet, sizeof(packet), 0, (struct sockaddr *)&faddr, &len);
 
+        gettimeofday(&time_recv, NULL);
+
         if (res == sizeof(packet) &&
                 saddr.sin_addr.s_addr == faddr.sin_addr.s_addr &&
                 packet.icmp.icmp_type == ICMP_ECHOREPLY &&
@@ -177,8 +183,13 @@ QnPingUtility::PingResponce QnPingUtility::ping(quint16 seq) {
         {
             close(fd);
             qDebug() << "Ping reply received successfully";
+            result.type = packet.icmp.icmp_type;
             result.code = packet.icmp.icmp_code;
-            result.time = packet.icmp.icmp_ttime;
+            result.bytes = 64;
+            result.ttl = 64;
+            qreal elapsed_time = (time_recv.tv_sec - time_sent.tv_sec) * 1000.0;
+            elapsed_time += (time_recv.tv_usec - time_sent.tv_usec) / 1000.0;
+            result.time = elapsed_time;
             return result;
         }
     }

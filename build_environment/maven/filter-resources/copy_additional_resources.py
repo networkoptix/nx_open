@@ -109,7 +109,7 @@ if __name__ == '__main__':
                 target_plugins = join(target_dir, config, 'plugins')
                 if not os.path.exists(target_plugins):
                     os.makedirs(join(target_dir, config, 'plugins'))
-                #shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), target_vox)                        
+                #shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), target_vox)                        z
 
     else:     
         lib_source_dir = '${qt.dir}/lib'
