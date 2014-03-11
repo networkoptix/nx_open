@@ -14,51 +14,6 @@ extern "C" {
 #endif
 };
 
-#ifdef Q_CC_GNU
-/* There is a very strange bug in libm that results in sin/cos returning +-inf 
- * for some values. The actual functions called are __sin_avx and __cos_avx.
- * This bug is worked around by invoking them for angles in [0, pi/2] range. */
-
-// TODO: #Elric #2.3 #gcc Investigate further! Maybe it's fixed in new gcc release?
-
-static qreal qSlowSin(qreal angle) {
-    angle = qMod(angle, 2 * M_PI);
-    if(angle < M_PI) {
-        if(angle < 0.5 * M_PI) {
-            return std::sin(angle);
-        } else {
-            return std::sin(M_PI - angle);
-        }
-    } else {
-        if(angle < 1.5 * M_PI) {
-            return -std::sin(angle - M_PI);
-        } else {
-            return -std::sin(2 * M_PI - angle);
-        }
-    }
-}
-
-static qreal qSlowCos(qreal angle) {
-    angle = qMod(angle, 2 * M_PI);
-    if(angle < M_PI) {
-        if(angle < 0.5 * M_PI) {
-            return std::cos(angle);
-        } else {
-            return -std::cos(M_PI - angle);
-        }
-    } else {
-        if(angle < 1.5 * M_PI) {
-            return -std::cos(angle - M_PI);
-        } else {
-            return std::cos(2 * M_PI - angle);
-        }
-    }
-}
-
-#define sin qSlowSin
-#define cos qSlowCos
-#endif // Q_CC_GNU
-
 static bool saveTransformImage(const QPointF *transform, int width, int height, const QString &fileName) {
     QImage image(width, height, QImage::Format_ARGB32);
 
@@ -157,6 +112,7 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
+    int prevRoundMode = _MM_GET_ROUNDING_MODE();
     _MM_SET_ROUNDING_MODE(_MM_ROUND_TOWARD_ZERO);
 #elif __arm__ && __ARM_NEON__
     //TODO/ARM
@@ -206,6 +162,13 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
             }
         }
     }
+#if defined(__i386) || defined(__amd64) || defined(_WIN32)
+    _MM_SET_ROUNDING_MODE(prevRoundMode);
+#elif __arm__ && __ARM_NEON__
+    //TODO/ARM
+#else
+    //TODO: C fallback routine
+#endif
 }
 
 QVector3D sphericalToCartesian(qreal theta, qreal phi) { // TODO: #Elric use function from coordinate_transform header
