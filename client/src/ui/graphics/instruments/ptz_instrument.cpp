@@ -191,11 +191,8 @@ public:
         QPointF center = rect.center();
         QPointF centralStep = QPointF(penWidth, penWidth);
 
-        QnScopedPainterPenRollback penRollback(painter, QPen(ptzItemBorderColor, penWidth));
-        Q_UNUSED(penRollback)
-        QnScopedPainterBrushRollback brushRollback(painter, ptzItemBaseColor);
-        Q_UNUSED(brushRollback)
-
+        QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, QPen(ptzItemBorderColor, penWidth));
+        QN_SCOPED_PAINTER_BRUSH_ROLLBACK(painter, ptzItemBaseColor);
         painter->drawEllipse(rect);
         painter->drawEllipse(QRectF(center - centralStep, center + centralStep));
     }
@@ -275,11 +272,6 @@ public:
 
         if(!qFuzzyEquals(oldSize, size()))
             updateLayout();
-    }
-
-    void setModeButtonText(const QString& text)
-    {
-        m_modeButton->setText(text);
     }
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
