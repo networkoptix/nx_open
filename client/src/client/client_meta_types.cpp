@@ -4,6 +4,7 @@
 
 #include <utils/color_space/image_correction.h>
 #include <utils/common/json_serializer.h>
+#include <utils/ping_utility.h>
 
 #include <camera/thumbnail.h>
 #include <ui/actions/actions.h>
@@ -61,6 +62,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnWeakObjectHash>();
     qRegisterMetaType<WeakGraphicsItemPointerList>();
     qRegisterMetaType<QnCustomization>();
+    qRegisterMetaType<QnPingUtility::PingResponce>();
 
     qRegisterMetaType<QnTimeSliderColors>();
     qRegisterMetaType<QnTimeScrollBarColors>();
