@@ -1961,11 +1961,10 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
 #ifdef Q_OS_MACX
     QUrl url = QUrl::fromUserInput(resource->getUrl());
     QString host = url.host();
-    QnPingDialog *dialog = new QnPingDialog();
+    QnPingDialog *dialog = new QnPingDialog(NULL, Qt::Dialog | Qt::WindowStaysOnTopHint);
     dialog->setHostAddress(host);
     dialog->show();
     dialog->startPings();
-    dialog->raise();
 #endif
 
 }

@@ -11,8 +11,8 @@
 #include <netinet/ip_icmp.h>
 #endif
 
-QnPingDialog::QnPingDialog(QWidget *parent) :
-    base_type(parent)
+QnPingDialog::QnPingDialog(QWidget *parent, Qt::WindowFlags flags) :
+    base_type(parent, flags)
 {
     m_pingText = new QTextEdit(this);
     m_pingText->setReadOnly(true);
