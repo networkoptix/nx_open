@@ -61,7 +61,8 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
 
     nxcip::CameraInfo cameraInfo;
     //analyzing parameters, getting discoveryManager and filling in cameraInfo
-    QString resourceName;
+    QString modelName;
+    QString vendorName;
     for( QnResourceParameters::const_iterator
         it = parameters.begin();
         it != parameters.end();
@@ -72,8 +73,10 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
             strcpy( cameraInfo.uid, valLatin1.data() );
         else if( it.key() == QLatin1String("url") )
             strcpy( cameraInfo.url, valLatin1.data() );
-        else if( it.key() == QLatin1String("name") )
-            resourceName = it.value();
+        else if( it.key() == QLatin1String("model") )
+            modelName = it.value();
+        else if( it.key() == QLatin1String("vendor") )
+            vendorName = it.value();
     }
     nxcip_qt::CameraDiscoveryManager* discoveryManager = NULL;
     //choosing correct plugin
@@ -82,7 +85,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
         it != m_thirdPartyCamPlugins.end();
         ++it )
     {
-        if( resourceName.startsWith(it->getVendorName()) )
+        if( it->getVendorName() == vendorName )
         {
             discoveryManager = &*it;
             break;
@@ -93,8 +96,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
 
     Q_ASSERT( discoveryManager->getRef() );
 
-    const QByteArray& resourceNameLatin1 = resourceName.toLatin1();
-    strcpy( cameraInfo.modelName, resourceNameLatin1.data() + discoveryManager->getVendorName().size() + 1 );   //skipping vendor name and '-'
+    strcpy( cameraInfo.modelName, modelName.toLatin1().constData() );   //skipping vendor name and '-'
 
     nxcip::BaseCameraManager* camManager = discoveryManager->createCameraManager( cameraInfo );
     if( !camManager )
@@ -293,6 +295,8 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid) );
+    resource->setVendor( discoveryManager->getVendorName() );
+    resource->setModel( QString::fromUtf8(cameraInfo.modelName) );
     
     unsigned int caps;
     if (camManager->getCameraCapabilities(&caps) == 0) 
