@@ -4,20 +4,24 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/common/geometry.h>
+#include <ui/customization/customized.h>
 #include <ui/graphics/items/standard/graphics_path_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/ui_elements_widget.h>
+#include <ui/graphics/items/generic/framed_widget.h>
+#include <ui/graphics/items/generic/splash_item.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-
 #include <ui/style/skin.h>
+
+#include "selection_item.h"
 
 
 // -------------------------------------------------------------------------- //
 // PtzArrowItem
 // -------------------------------------------------------------------------- //
-class PtzArrowItem: public GraphicsPathItem {
+class PtzArrowItem: public Customized<GraphicsPathItem> {
     Q_OBJECT
-    typedef GraphicsPathItem base_type;
+    typedef Customized<GraphicsPathItem> base_type;
 
 public:
     PtzArrowItem(QGraphicsItem *parent = NULL): 
@@ -27,8 +31,8 @@ public:
     {
         setAcceptedMouseButtons(0);
 
-        //setPen(QPen(ptzArrowBorderColor, 0.0));
-        //setBrush(ptzArrowBaseColor);
+        setPen(QPen(QColor(128, 196, 255, 192), 0.0));
+        setBrush(QColor(128, 196, 255, 192).lighter(120));
     }
 
     const QSizeF &size() const {
@@ -103,8 +107,8 @@ public:
         setStateOpacity(HOVERED, 0.7);
         setStateOpacity(PRESSED, 1.0);
 
-        //setFrameColor(ptzItemBorderColor);
-        //setWindowColor(ptzItemBaseColor);
+        setFrameColor(QColor(128, 196, 255, 192));
+        setWindowColor(QColor(128, 196, 255, 64).lighter(120));
     }
 
     QnMediaResourceWidget *target() const {
@@ -125,12 +129,23 @@ private:
 // -------------------------------------------------------------------------- //
 class PtzManipulatorWidget: public GraphicsWidget {
     Q_OBJECT
+    Q_PROPERTY(QPen pen READ pen WRITE setPen)
+    Q_PROPERTY(QBrush brush READ brush WRITE setBrush)
     typedef GraphicsWidget base_type;
 
 public:
     PtzManipulatorWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
         base_type(parent, windowFlags) 
-    {}
+    {
+        setPen(QPen(QColor(128, 196, 255, 192), 0.0));
+        setBrush(QColor(128, 196, 255, 64).lighter(120));
+    }
+
+    const QBrush &brush() const { return m_brush; }
+    void setBrush(const QBrush &brush) { m_brush = brush; }
+
+    const QPen &pen() const { return m_pen; }
+    void setPen(const QPen &pen) { m_pen = pen; }
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
         QRectF rect = this->rect();
@@ -138,11 +153,18 @@ public:
         QPointF center = rect.center();
         QPointF centralStep = QPointF(penWidth, penWidth);
 
-        //QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, QPen(ptzItemBorderColor, penWidth));
-        //QN_SCOPED_PAINTER_BRUSH_ROLLBACK(painter, ptzItemBaseColor);
+        QPen pen = m_pen;
+        pen.setWidthF(penWidth);
+
+        QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, pen);
+        QN_SCOPED_PAINTER_BRUSH_ROLLBACK(painter, m_brush);
         painter->drawEllipse(rect);
         painter->drawEllipse(QRectF(center - centralStep, center + centralStep));
     }
+
+private:
+    QPen m_pen;
+    QBrush m_brush;
 };
 
 
@@ -151,6 +173,7 @@ public:
 // -------------------------------------------------------------------------- //
 class PtzOverlayWidget: public GraphicsWidget {
     Q_OBJECT
+    Q_PROPERTY(QPen pen READ pen WRITE setPen)
     typedef GraphicsWidget base_type;
 
 public:
@@ -174,7 +197,12 @@ public:
 
         updateLayout();
         showCursor();
+
+        setPen(QPen(QColor(128, 196, 255, 192), 0.0));
     }
+
+    const QPen &pen() const { return m_pen; }
+    void setPen(const QPen &pen) { m_pen = pen; }
 
     void hideCursor() {
         manipulatorWidget()->setCursor(Qt::BlankCursor);
@@ -251,7 +279,7 @@ public:
             dy += d1;
         }
 
-        //QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, QPen(ptzItemBorderColor, 0.0));
+        QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, m_pen);
         painter->drawLines(crosshairLines);
     }
 
@@ -277,6 +305,7 @@ private:
     PtzImageButtonWidget *m_zoomInButton;
     PtzImageButtonWidget *m_zoomOutButton;
     PtzImageButtonWidget *m_modeButton;
+    QPen m_pen;
 };
 
 
@@ -305,6 +334,38 @@ private:
     PtzArrowItem *m_arrowItem;
 };
 
+
+// -------------------------------------------------------------------------- //
+// PtzSplashItem
+// -------------------------------------------------------------------------- //
+class PtzSplashItem: public Customized<QnSplashItem> {
+    Q_OBJECT
+    typedef Customized<QnSplashItem> base_type;
+
+public:
+    PtzSplashItem(QGraphicsItem *parent = NULL): 
+        base_type(parent) 
+    {
+        setColor(QColor(128, 196, 255, 128));
+    }
+};
+
+
+// -------------------------------------------------------------------------- //
+// PtzSelectionItem
+// -------------------------------------------------------------------------- //
+class PtzSelectionItem: public Customized<FixedArSelectionItem> {
+    Q_OBJECT
+    typedef Customized<FixedArSelectionItem> base_type;
+
+public:
+    PtzSelectionItem(QGraphicsItem *parent = NULL):
+        base_type(parent)
+    {
+        setPen(QPen(QColor(128, 196, 255, 192), 0.0));
+        setBrush(QColor(128, 196, 255, 64).lighter(120));
+    }
+};
 
 
 #endif // QN_PTZ_INSTRUMENT_P_H

@@ -18,17 +18,12 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/animation_event.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/generic/image_button_widget.h>
-#include <ui/graphics/items/generic/splash_item.h>
-#include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
-
-#include "selection_item.h"
 
 //#define QN_PTZ_INSTRUMENT_DEBUG
 #ifdef QN_PTZ_INSTRUMENT_DEBUG
@@ -38,16 +33,6 @@
 #endif
 
 namespace {
-    // TODO: #Elric #customization
-
-    const QColor ptzColor = qnGlobals->ptzColor();
-
-    const QColor ptzArrowBorderColor = toTransparent(ptzColor, 0.75);
-    const QColor ptzArrowBaseColor = toTransparent(ptzColor.lighter(120), 0.75);
-
-    const QColor ptzItemBorderColor = toTransparent(ptzColor, 0.75);
-    const QColor ptzItemBaseColor = toTransparent(ptzColor.lighter(120), 0.25);
-
     const qreal instantSpeedUpdateThreshold = 0.1;
     const qreal speedUpdateThreshold = 0.001;
     const int speedUpdateIntervalMSec = 500;
@@ -55,8 +40,8 @@ namespace {
     const double minPtzZoomRectSize = 0.08;
 
     const qreal itemUnzoomThreshold = 0.975; /* In sync with hardcoded constant in workbench_controller */ // TODO: #Elric
-
 }
+
 
 // -------------------------------------------------------------------------- //
 // PtzInstrument
@@ -94,8 +79,7 @@ QnSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
         m_freeAnimations.pop_back();
         result->setParentItem(parentItem);
     } else {
-        result = new QnSplashItem(parentItem);
-        result->setColor(toTransparent(ptzColor, 0.5));
+        result = new PtzSplashItem(parentItem);
         connect(result, SIGNAL(destroyed()), this, SLOT(at_splashItem_destroyed()));
     }
 
@@ -147,10 +131,8 @@ void PtzInstrument::ensureSelectionItem() {
     if(selectionItem())
         return;
 
-    m_selectionItem = new FixedArSelectionItem();
+    m_selectionItem = new PtzSelectionItem();
     selectionItem()->setOpacity(0.0);
-    selectionItem()->setPen(QPen(ptzItemBorderColor, 0.0));
-    selectionItem()->setBrush(ptzItemBaseColor);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
     selectionItem()->setOptions(FixedArSelectionItem::DrawCentralElement | FixedArSelectionItem::DrawSideElements);
 
