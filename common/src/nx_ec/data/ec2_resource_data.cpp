@@ -57,4 +57,26 @@ void ApiResourceDataList::toResourceList( QnResourceFactory* resFactory, QnResou
 	}
 }
 
+void ApiParamList::fromResourceList(const QnKvPairList& resources)
+{
+    data.resize(resources.size());
+    for (int i = 0; i < resources.size(); ++i)
+    {
+        data[i].name = resources[i].name();
+        data[i].value = resources[i].value();
+    }
+}
+
+void ApiParamList::toResourceList(QnKvPairList& resources) const
+{
+    resources.reserve(data.size());
+    foreach(const ApiResourceParam& param, data)
+    {
+        resources << QnKvPair();
+        resources.last().setName(param.name);
+        resources.last().setValue(param.value);
+    }
+}
+
+
 }

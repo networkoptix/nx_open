@@ -153,13 +153,21 @@ namespace ec2
             emit initNotification(fullResData);
         }
 
-        void triggerNotification( const QnTransaction<ApiPanicModeData>& /*tran*/ ) {
-            //TODO/IMPL
+        void triggerNotification( const QnTransaction<ApiPanicModeData>& tran ) {
+            emit panicModeChanged(tran.params.mode);
         }
 
         void triggerNotification( const QnTransaction<QString>& tran ) {
             if( tran.command == ApiCommand::removeStoredFile )
                 m_storedFileManager->triggerNotification( tran );
+        }
+
+        void triggerNotification( const QnTransaction<ApiParamList>& tran ) {
+            if( tran.command == ApiCommand::saveSettings ) {
+                QnKvPairList newSettings;
+                tran.params.toResourceList(newSettings);
+                emit settingsChanged(newSettings);
+            }
         }
 
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }

@@ -226,7 +226,6 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER( GetKvPairs, ErrorCode, QnKvPairListsById )
         DEFINE_TWO_ARG_HANDLER( SaveKvPairs, ErrorCode, QnKvPairListsById )
 
-
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractMediaServerManager
         //////////////////////////////////////////////////////////

@@ -76,6 +76,7 @@ private slots:
     void on_storedFileAdded( QString filename );
     void on_storedFileUpdated( QString filename );
     void on_storedFileRemoved( QString filename );
+    void on_panicModeChanged(Qn::PanicMode mode);
 protected:
     ec2::AbstractECConnectionPtr m_connection;
     QMap<QnId, QnBusinessEventRulePtr> m_rules;

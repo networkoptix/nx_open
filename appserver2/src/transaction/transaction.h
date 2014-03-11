@@ -100,6 +100,11 @@ namespace ec2
             //!ApiLicenseList
             getLicenses,
 
+            //!ApiResourceParamList
+            getSettings,
+            //!ApiResourceParamList
+            saveSettings,
+
             getCurrentTime,
 
             tranSyncRequest,

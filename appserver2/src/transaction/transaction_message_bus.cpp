@@ -93,6 +93,8 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     }
     tran.timestamp -= sender->timeDiff();
 
+    qDebug() << "got transaction " << tran.command;
+
     QMap<QUuid, qint64>:: iterator itr = m_lastActivity.find(tran.id.peerGUID);
     if (itr == m_lastActivity.end()) {
         Q_ASSERT(!tran.id.peerGUID.isNull());
@@ -278,7 +280,14 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
         case ApiCommand::broadcastBusinessAction:
             return deliveryTransaction<ApiBusinessActionData>(abstractTran, stream);
 
+        case ApiCommand::saveSettings:
+            return deliveryTransaction<ApiParamList>(abstractTran, stream);
+
+        case ApiCommand::serverAliveInfo:
+            break; // nothing to do
+
         default:
+            Q_ASSERT(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
             break;
     }
 

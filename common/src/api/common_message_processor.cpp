@@ -86,6 +86,9 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection->getStoredFileManager().get(), &ec2::AbstractStoredFileManager::removed,
         this, &QnCommonMessageProcessor::on_storedFileRemoved );
 
+    connect( connection.get(), &ec2::AbstractECConnection::panicModeChanged,
+        this, &QnCommonMessageProcessor::on_panicModeChanged );
+
     connection->startReceivingNotifications(true);
 }
 
@@ -244,6 +247,16 @@ void QnCommonMessageProcessor::on_storedFileUpdated( QString filename )
 void QnCommonMessageProcessor::on_storedFileRemoved( QString filename )
 {
     emit fileRemoved(filename);
+}
+
+void QnCommonMessageProcessor::on_panicModeChanged(Qn::PanicMode mode)
+{
+    QnResourceList resList = qnResPool->getAllResourceByTypeName(lit("Server"));
+    foreach(QnResourcePtr res, resList) {
+        QnMediaServerResourcePtr mServer = res.dynamicCast<QnMediaServerResource>();
+        if (mServer)
+            mServer->setPanicMode(mode);
+    }
 }
 
 // todo: ec2 relate logic. remove from this class

@@ -140,17 +140,32 @@ namespace ec2
     }
 
     template<class T>
-    int BaseEc2Connection<T>::getSettingsAsync( impl::GetSettingsHandlerPtr /*handler*/ )
+    int BaseEc2Connection<T>::getSettingsAsync( impl::GetSettingsHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const int reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiParamList& settings) {
+            QnKvPairList outData;
+            if( errorCode == ErrorCode::ok )
+                settings.toResourceList(outData);
+            handler->done( reqID, errorCode, outData );
+        };
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiParamList, decltype(queryDoneHandler)> ( ApiCommand::getSettings, nullptr, queryDoneHandler);
+        return reqID;
     }
 
     template<class T>
-    int BaseEc2Connection<T>::saveSettingsAsync( const QnKvPairList& /*kvPairs*/, impl::SimpleHandlerPtr /*handler*/ )
+    int BaseEc2Connection<T>::saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler )
     {
-        //TODO/IMPL
-        return INVALID_REQ_ID;
+        const int reqID = generateRequestID();
+
+        QnTransaction<ApiParamList> tran(ApiCommand::saveSettings, true);
+        tran.params.fromResourceList(kvPairs);
+
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1) );
+
+        return reqID;
     }
 
     template<class T>

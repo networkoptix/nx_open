@@ -92,6 +92,16 @@ bool QnDbManager::init()
     m_serverTypeId = getType("Server");
     m_cameraTypeId = getType("Camera");
 
+    QSqlQuery queryAdminUser(m_sdb);
+    queryAdminUser.setForwardOnly(true);
+    queryAdminUser.prepare("SELECT r.guid, r.id FROM vms_resource r JOIN auth_user u on u.id = r.id and r.name = 'admin'");
+    bool execRez = queryAdminUser.exec();
+    Q_ASSERT(execRez);
+    if (queryAdminUser.next()) {
+        m_adminUserID = QnId::fromRfc4122(queryAdminUser.value(0).toByteArray());
+        m_adminUserInternalID = queryAdminUser.value(1).toInt();
+    }
+
 
     QSqlQuery queryServers(m_sdb);
     queryServers.prepare("UPDATE vms_resource set status = ? WHERE xtype_guid = ?");
@@ -1562,6 +1572,16 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullData& data)
     return err;
 }
 
+//getParams
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiParamList& data)
+{
+    ApiResourceParams params;
+    ErrorCode rez = doQueryNoLock(m_adminUserID, params);
+    if (rez == ErrorCode::ok)
+        data.data = params.params;
+    return rez;
+}
+
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran)
 {
     if (!execSQLQuery("DELETE FROM vms_businessrule_action_resources"))
@@ -1576,6 +1596,23 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResetBusi
         ErrorCode rez = updateBusinessRule(rule);
         if (rez != ErrorCode::ok)
             return rez;
+    }
+
+    return ErrorCode::ok;
+}
+
+// save settings
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiParamList>& tran)
+{
+    ErrorCode result = deleteAddParams(m_adminUserInternalID);
+    if (result != ErrorCode::ok)
+        return result;
+
+    foreach(const ApiResourceParam& param, tran.params.data) 
+    {
+        result = insertAddParam(param, m_adminUserInternalID);
+        if (result != ErrorCode::ok)
+            return result;
     }
 
     return ErrorCode::ok;
