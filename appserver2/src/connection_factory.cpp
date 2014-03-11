@@ -36,6 +36,7 @@ namespace ec2
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     {
+        m_directConnection.reset();
         ec2::QnTransactionMessageBus::initStaticInstance(0);
     }
 
