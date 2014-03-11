@@ -420,10 +420,10 @@ void QnProxyConnectionProcessor::doSmartProxy()
                                     QByteArray protocol = tmp.mid(prefixEnd+1, prefixEnd2 - prefixEnd-1);
                                     if (isProtocol(protocol)) {
                                         prefixEnd2 = tmp.indexOf("/", prefixEnd2+1);
-                                        d->clientRequest = d->clientRequest.remove(urlPos, prefixEnd2);
+                                        d->clientRequest = d->clientRequest.remove(urlPos, prefixEnd2 - urlPos);
                                     }
                                     else {
-                                        d->clientRequest = d->clientRequest.remove(urlPos, prefixEnd);
+                                        d->clientRequest = d->clientRequest.remove(urlPos, prefixEnd - urlPos);
                                     }
                                 }
                             }
