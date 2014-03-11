@@ -376,7 +376,7 @@
                 <compiler>2011.09</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA debug_in_release</additional.defines>
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>

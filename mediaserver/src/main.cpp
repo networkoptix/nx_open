@@ -1162,7 +1162,7 @@ void QnMain::run()
         bool isLocal = appserverHostString.isEmpty() || QUrl(appserverHostString).scheme() == "file";
 
         int serverFlags = Qn::SF_None;
-#ifdef __ARM
+#ifdef EDGE_SERVER
         serverFlags |= SF_Edge;
 #endif
         if (!isLocal)

@@ -43,6 +43,11 @@ else {
          QMAKE_CFLAGS += -ggdb3
          QMAKE_LFLAGS += -ggdb3
       }
+      contains( DEFINES, enable_gprof ) {
+         QMAKE_CXXFLAGS += -pg
+         QMAKE_CFLAGS += -pg
+         QMAKE_LFLAGS += -pg
+      }
   }
 }
 
