@@ -4,6 +4,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QStringList>
 
+#include <api/common_message_processor.h>
 #include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
 
@@ -36,7 +37,7 @@ public slots:
     void stopAsync();
     void stopSync();
 private slots:
-    void loadResourcesFromECS(QnServerMessageProcessor* messageProcessor);
+    void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
     void at_localInterfacesChanged();
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(QHostAddress host, QStringList macAddrList);

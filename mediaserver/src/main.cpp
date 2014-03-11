@@ -704,7 +704,7 @@ void QnMain::updateDisabledVendorsIfNeeded()
     }
 }
 
-void QnMain::loadResourcesFromECS(QnServerMessageProcessor* messageProcessor)
+void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
 {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
@@ -1347,7 +1347,7 @@ void QnMain::run()
     if (disabledVendors .size() > 0)
         qWarning() << "Some autodiscovery is disabled: " << disabledVendors;
 
-    connect(QnServerMessageProcessor::instance(), SIGNAL(connectionReset()), this, SLOT(loadResourcesFromECS()));
+    connect(QnServerMessageProcessor::instance(), &QnServerMessageProcessor::connectionReset, this, &QnMain::loadResourcesFromECS);
 
     /*
     QnScheduleTaskList scheduleTasks;
