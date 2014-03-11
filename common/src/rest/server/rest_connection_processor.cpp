@@ -21,6 +21,7 @@ void QnRestProcessorPool::registerHandler( const QString& path, QnRestRequestHan
 {
     m_handlers.insert(path, QnRestRequestHandlerPtr(handler));
     handler->setPath(path);
+
 }
 
 QnRestRequestHandlerPtr QnRestProcessorPool::findHandler( QString path ) const
@@ -30,10 +31,12 @@ QnRestRequestHandlerPtr QnRestProcessorPool::findHandler( QString path ) const
     if (path.endsWith(L'/'))
         path = path.left(path.length()-1);
 
-    for (Handlers::const_iterator i = m_handlers.begin();i != m_handlers.end(); ++i)
+    Handlers::const_iterator i = m_handlers.upperBound(path);
+    if (i == m_handlers.begin())
+        return path.startsWith(i.key()) ? i.value() : QnRestRequestHandlerPtr();
+    while (i-- != m_handlers.begin()) 
     {
-        QRegExp expr(i.key(), Qt::CaseSensitive, QRegExp::Wildcard);
-        if (expr.indexIn(path) != -1)
+        if (path.startsWith(i.key()))
             return i.value();
     }
 
