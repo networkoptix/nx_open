@@ -37,9 +37,6 @@ public:
         NO_RECORD_COLOR,
         MRS_COLOR,
         RECORD_ALWAYS_COLOR,
-        
-        PTZ_COLOR,
-        ZOOM_WINDOW_COLOR,
 
         OPACITY_CHANGE_PERIOD,
 

@@ -8,6 +8,7 @@
         "custom_green":             "#8ABF22",
         "darkGrey":					"#231F20",
         "opaqueSelection":			"custom_blue",
+        "ptz":                      "#80c0ff",
         "selection":				"opaqueSelection.setAlpha(110)",
         "exShadowColor":			"#ff0000"
     },
@@ -19,7 +20,6 @@
         "backgroundGradientColor":  "custom_grey",
         "frameColor":               "custom_grey",
         "selectedFrameColor":       "custom_blue",
-        "ptzColor":                 "QColor(128, 196, 255, 255)",
         "shadowColor":              "#00000000",
         "businessRuleDisabledHighlightColor": "QColor(64, 64, 64)",
         "businessRuleInvalidBackgroundColor": "QColor(150, 0, 0)",
@@ -267,6 +267,37 @@
         "frameColor": "#505050ff",
         "windowColor": "#202050ff",
         "textColor": "#a0a0a0ff"
-    }
+    },
 
+    "QnFisheyeCalibrationImageWidget": {
+        "lineColor": "ptz"
+    },
+    
+    "PtzArrowItem": {
+        "pen": { "color": "ptz.setAlpha(192)" },
+        "brush": "ptz.setAlpha(192).lighter(120)"
+    },
+    
+    "PtzImageButtonWidget": {
+        "frameColor": "ptz.setAlpha(192)",
+        "windowColor": "ptz.setAlpha(64).lighter(120)"
+    },
+    
+    "PtzManipulatorWidget": {
+        "pen": { "color": "ptz.setAlpha(192)" },
+        "brush": "ptz.setAlpha(64).lighter(120)"
+    },
+    
+    "PtzOverlayWidget": {
+        "pen": { "color": "ptz.setAlpha(192)" }
+    },
+    
+    "PtzSplashItem": {
+        "color": "ptz.setAlpha(128)"
+    },
+    
+    "PtzSelectionItem": {
+        "pen": { "color": "ptz.setAlpha(192)" },
+        "brush": "ptz.setAlpha(64).lighter(120)"
+    }
 }
