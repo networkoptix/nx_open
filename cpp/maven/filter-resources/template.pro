@@ -36,6 +36,14 @@ else {
   win* {
     LIBS = ${windows.oslibs.release}
   }
+
+  !win32 {
+      contains( DEFINES, debug_in_release ) {
+         QMAKE_CXXFLAGS += -ggdb3
+         QMAKE_CFLAGS += -ggdb3
+         QMAKE_LFLAGS += -ggdb3
+      }
+  }
 }
 
 win* {
