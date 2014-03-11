@@ -29,7 +29,7 @@ public:
 protected:
     // return the manufacture of the server
     virtual QString manufacture() const;
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QString& url) override;
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params) override;
 private:
     QMap<int, QByteArray> getCamNames(const QByteArray& answer);
     bool vmaxAuthenticate(CLSimpleHTTPClient& client, const QAuthenticator& auth);

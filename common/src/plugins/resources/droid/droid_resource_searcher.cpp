@@ -109,7 +109,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
     return resList;
 }
 
-QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, const QString& url)
+QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -128,7 +128,7 @@ QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, con
         return result;
     }
 
-    if (!url.contains(QLatin1String("raw://")))
+    if (!params.url.contains(QLatin1String("raw://")))
     {
         return result; // it is not a new droid resource
     }

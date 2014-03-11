@@ -35,7 +35,7 @@ namespace ec2
             assert( tran.command == ApiCommand::saveLayout);
             QnLayoutResourcePtr layoutResource = m_resCtx.resFactory->createResource(
                 tran.params.typeId,
-                tran.params.url ).dynamicCast<QnLayoutResource>();
+                QnResourceParams(tran.params.url, QString()) ).dynamicCast<QnLayoutResource>();
             tran.params.toResource( layoutResource );
             emit addedOrUpdated( layoutResource );
         }

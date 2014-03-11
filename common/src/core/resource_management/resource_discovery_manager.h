@@ -83,7 +83,7 @@ public:
     void addDTSServer(QnAbstractDTSSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
 
-    QnResourcePtr createResource(QnId resourceTypeId, const QString& url);
+    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
 
     virtual void pleaseStop();
 

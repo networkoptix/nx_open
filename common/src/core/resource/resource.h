@@ -421,12 +421,21 @@ QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource
 }
 
 
+struct QnResourceParams
+{
+    QnResourceParams() {}
+    QnResourceParams(const QString& url, const QString& vendor): url(url), vendor(vendor) {}
+
+    QString url;
+    QString vendor;
+};
+
 class QnResourceFactory
 {
 public:
     virtual ~QnResourceFactory() {}
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QString &url) = 0;
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams &params) = 0;
 };
 
 typedef QSharedPointer<QnResourceFactory> QnResourceFactoryPtr;

@@ -51,7 +51,7 @@ void ApiResourceDataList::toResourceList( QnResourceFactory* resFactory, QnResou
 	for(int i = 0; i < data.size(); ++i) {
         QnResourcePtr res = resFactory->createResource(
             data[i].typeId,
-            data[i].url ).dynamicCast<QnResource>();
+            QnResourceParams(data[i].url, QString() )).dynamicCast<QnResource>();
 		data[i].toResource( res );
 		resList << res;
 	}

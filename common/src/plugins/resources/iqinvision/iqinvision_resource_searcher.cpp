@@ -32,7 +32,7 @@ QnPlIqResourceSearcher& QnPlIqResourceSearcher::instance()
     return inst;
 }
 
-QnResourcePtr QnPlIqResourceSearcher::createResource(QnId resourceTypeId, const QString& url)
+QnResourcePtr QnPlIqResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 

@@ -10,7 +10,7 @@ class DwDvrResourceSearcher : public QnAbstractNetworkResourceSearcher
 public:
     static DwDvrResourceSearcher& instance();
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QString& url);
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
 
     // return the manufacture of the server
     virtual QString manufacture() const;

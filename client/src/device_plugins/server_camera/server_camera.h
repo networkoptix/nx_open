@@ -46,7 +46,7 @@ private:
 class QnServerCameraFactory : public QnResourceFactory
 {
 public:
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QString& url) override;
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params) override;
 
     static QnServerCameraFactory& instance();
 };

@@ -83,7 +83,7 @@ void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, const Res
 
     QnAbstractStorageResourceList storagesRes;
     foreach(const ApiStorageData& storage, storages) {
-        QnAbstractStorageResourcePtr storageRes = ctx.resFactory->createResource(resType->getId(), storage.url).dynamicCast<QnAbstractStorageResource>();
+        QnAbstractStorageResourcePtr storageRes = ctx.resFactory->createResource(resType->getId(), QnResourceParams(storage.url, QString())).dynamicCast<QnAbstractStorageResource>();
         
         storage.toResource(storageRes);
         storagesRes.push_back(storageRes);

@@ -163,7 +163,7 @@ QnPlArecontResourceSearcher& QnPlArecontResourceSearcher::instance()
     return inst;
 }
 
-QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, const QString& url)
+QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 

@@ -23,7 +23,7 @@ public:
 
     static void initStaticInstance(QnDesktopResourceSearcher* instance);
 protected:
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QString& url) override;
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params) override;
 
 private:
     IDirect3D9 *m_pD3D;

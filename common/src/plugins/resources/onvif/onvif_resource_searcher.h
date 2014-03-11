@@ -28,7 +28,7 @@ public:
 
     virtual QnResourceList findResources();
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QString& url);
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
 
     virtual QString manufacture() const;
 

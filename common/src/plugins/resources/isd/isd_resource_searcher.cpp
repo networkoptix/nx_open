@@ -16,7 +16,7 @@ QnPlISDResourceSearcher& QnPlISDResourceSearcher::instance()
     return inst;
 }
 
-QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const QString& url)
+QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
