@@ -1,6 +1,5 @@
-#ifndef QN_ABSOLUTE_PTZ_INSTRUMENT_H
-#define QN_ABSOLUTE_PTZ_INSTRUMENT_H
-
+#ifndef QN_PTZ_INSTRUMENT_H
+#define QN_PTZ_INSTRUMENT_H
 
 #include <QtCore/QBasicTimer>
 #include <QtCore/QVector>
@@ -156,4 +155,4 @@ private:
 };
 
 
-#endif // QN_ABSOLUTE_PTZ_INSTRUMENT_H
+#endif // QN_PTZ_INSTRUMENT_H
