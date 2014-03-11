@@ -317,11 +317,11 @@ qint32 QnDbManager::getResourceInternalId( const QnId& guid )
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare("SELECT id from vms_resource where guid = :guid");
-    query.bindValue(":guid", guid.toRfc4122());
+    query.prepare("SELECT id from vms_resource where guid = ?");
+    query.bindValue(0, guid.toRfc4122());
     if (!query.exec() || !query.next())
         return 0;
-    return query.value("id").toInt();
+    return query.value(0).toInt();
 }
 
 ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint32* internalId)
