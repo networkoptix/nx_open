@@ -113,8 +113,6 @@ public:
     }
 };
 
-// TODO: #Elric implement BrushData & PenData (like QnPaletteData)
-// TODO: #Elric #customization implement QPalette/QBrush/QPen handling here.
 template<class Base>
 class QnPropertyAccessorWrapper: public Base {
     typedef Base base_type;
