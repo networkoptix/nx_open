@@ -112,6 +112,19 @@ public:
     }
 };
 
+// TODO: #Elric #customization implement QPalette/QBrush/QPen handling here.
+template<class Base>
+class QnPropertyAccessorWrapper: public Base {
+public:
+    QnPropertyAccessorWrapper()
+
+    virtual ~QnPropertyAccessorWrapper() {}
+    virtual QVariant read(const QObject *object, const QString &name) const = 0;
+    virtual bool write(QObject *object, const QString &name, const QVariant &value) const = 0;
+
+
+};
+
 
 // -------------------------------------------------------------------------- //
 // QnCustomizationData
