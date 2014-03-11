@@ -34,7 +34,7 @@
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
 
 
-const char* QnPlOnvifResource::MANUFACTURE = "OnvifDevice";
+const QString QnPlOnvifResource::MANUFACTURE(lit("OnvifDevice"));
 static const float MAX_EPS = 0.01f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
@@ -337,7 +337,7 @@ bool QnPlOnvifResource::isResourceAccessible()
 
 QString QnPlOnvifResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 bool QnPlOnvifResource::hasDualStreaming() const

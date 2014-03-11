@@ -55,7 +55,7 @@ QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(QnId resourceTypeId, 
 
 QString QnPlIpWebCamResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlDriodIpWebCamResource::MANUFACTURE);
+    return QnPlDriodIpWebCamResource::MANUFACTURE;
 }
 
 

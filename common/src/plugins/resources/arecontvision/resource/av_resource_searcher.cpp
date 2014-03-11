@@ -28,7 +28,7 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 
 QString QnPlArecontResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlAreconVisionResource::MANUFACTURE);
+    return QnPlAreconVisionResource::MANUFACTURE;
 }
 
 // returns all available devices
@@ -116,7 +116,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 // in any case let's HTTP do it's job at very end of discovery
                 QnNetworkResourcePtr resource( new QnPlAreconVisionResource() );
                 //resource->setName("AVUNKNOWN");
-                resource->setTypeId(qnResTypePool->getResourceTypeId(QLatin1String(QnPlAreconVisionResource::MANUFACTURE), QLatin1String("ArecontVision_Abstract")));
+                resource->setTypeId(qnResTypePool->getResourceTypeId(QnPlAreconVisionResource::MANUFACTURE, QLatin1String("ArecontVision_Abstract")));
 
                 if (resource==0)
                     continue;

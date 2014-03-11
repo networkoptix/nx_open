@@ -26,7 +26,7 @@ class QnActiResource
     Q_OBJECT
 
 public:
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     static const int MAX_STREAMS = 2;
 

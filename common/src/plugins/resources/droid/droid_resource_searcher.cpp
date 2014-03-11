@@ -146,7 +146,7 @@ QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, con
 
 QString QnPlDroidResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnDroidResource::MANUFACTURE);
+    return QnDroidResource::MANUFACTURE;
 }
 
 QList<QnResourcePtr> QnPlDroidResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)

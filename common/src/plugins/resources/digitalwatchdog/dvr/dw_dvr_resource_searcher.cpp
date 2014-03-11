@@ -66,7 +66,7 @@ QnResourcePtr DwDvrResourceSearcher::createResource(QnId resourceTypeId, const Q
 
 QString DwDvrResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnDwDvrResource::MANUFACTURE);
+    return QnDwDvrResource::MANUFACTURE;
 }
 
 QnResourceList DwDvrResourceSearcher::findResources()

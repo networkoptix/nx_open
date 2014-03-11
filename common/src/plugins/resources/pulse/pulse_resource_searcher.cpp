@@ -58,7 +58,7 @@ QnResourcePtr QnPlPulseSearcher::createResource(QnId resourceTypeId, const QnRes
         return result;
     }
 
-    if (resourceType->getManufacture() == QLatin1String(QnPlPulseResource::MANUFACTURE))
+    if (resourceType->getManufacture() == QnPlPulseResource::MANUFACTURE)
     {
         result = QnVirtualCameraResourcePtr( new QnPlPulseResource() );
     }
@@ -98,7 +98,7 @@ QnNetworkResourcePtr QnPlPulseSearcher::createResource(const QString& manufactur
     if (rt.isNull())
         return result;
 
-    if (manufacture == QLatin1String(QnPlPulseResource::MANUFACTURE))
+    if (manufacture == QnPlPulseResource::MANUFACTURE)
     {
         result = QnNetworkResourcePtr(new QnPlPulseResource());
     }

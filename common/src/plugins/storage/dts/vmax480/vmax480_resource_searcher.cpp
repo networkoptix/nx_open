@@ -390,7 +390,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
 
 QString QnPlVmax480ResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlVmax480Resource::MANUFACTURE);
+    return QnPlVmax480Resource::MANUFACTURE;
 }
 
 #endif // #ifdef ENABLE_VMAX

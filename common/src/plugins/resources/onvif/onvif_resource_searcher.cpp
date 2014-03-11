@@ -66,7 +66,7 @@ bool OnvifResourceSearcher::isProxy() const
 
 QString OnvifResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlOnvifResource::MANUFACTURE);
+    return QnPlOnvifResource::MANUFACTURE;
 }
 
 

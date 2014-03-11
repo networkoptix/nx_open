@@ -16,7 +16,7 @@
 
 using namespace std;
 
-const char* QnPlAxisResource::MANUFACTURE = "Axis";
+const QString QnPlAxisResource::MANUFACTURE(lit("Axis"));
 static const float MAX_AR_EPS = 0.04f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 static const quint16 DEFAULT_AXIS_API_PORT = 80;
@@ -40,7 +40,7 @@ bool QnPlAxisResource::isResourceAccessible()
 
 QString QnPlAxisResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnPlAxisResource::setIframeDistance(int /*frames*/, int /*timems*/)

@@ -17,7 +17,7 @@
 #include "business/business_event_connector.h"
 
 
-const char* QnActiResource::MANUFACTURE = "ACTI";
+const QString QnActiResource::MANUFACTURE(lit("ACTI"));
 static const int TCP_TIMEOUT = 3000;
 static const int DEFAULT_RTSP_PORT = 7070;
 
@@ -73,7 +73,7 @@ int QnActiResource::eventPort() {
 
 QString QnActiResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnActiResource::setIframeDistance(int /*frames*/, int /*timems*/)

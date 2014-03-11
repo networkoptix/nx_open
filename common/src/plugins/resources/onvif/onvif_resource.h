@@ -83,7 +83,7 @@ public:
         SIZE_OF_AUDIO_CODECS
     };
 
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
     static QString MEDIA_URL_PARAM_NAME;
     static QString ONVIF_URL_PARAM_NAME;
     static QString MAX_FPS_PARAM_NAME;

@@ -4,7 +4,7 @@
 #include "testcamera_stream_reader.h"
 
 
-const char* QnTestCameraResource::MANUFACTURE = "NetworkOptix";
+const QString QnTestCameraResource::MANUFACTURE(lit("NetworkOptix"));
 
 QnTestCameraResource::QnTestCameraResource()
 {
@@ -22,7 +22,7 @@ bool QnTestCameraResource::isResourceAccessible()
 
 QString QnTestCameraResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnTestCameraResource::setIframeDistance(int /*frames*/, int /*timems*/)

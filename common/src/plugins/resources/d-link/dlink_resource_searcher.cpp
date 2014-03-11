@@ -159,7 +159,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
 QString QnPlDlinkResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlDlinkResource::MANUFACTURE);
+    return QnPlDlinkResource::MANUFACTURE;
 }
 
 

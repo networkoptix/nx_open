@@ -4,7 +4,7 @@
 #include "iqinvision_resource.h"
 #include "../onvif/dataprovider/rtp_stream_provider.h"
 
-const char* QnPlIqResource::MANUFACTURE = "IqEye";
+const QString QnPlIqResource::MANUFACTURE(lit("IqEye"));
 
 
 QnPlIqResource::QnPlIqResource()
@@ -20,7 +20,7 @@ bool QnPlIqResource::isResourceAccessible()
 
 QString QnPlIqResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnPlIqResource::setIframeDistance(int /*frames*/, int /*timems*/)

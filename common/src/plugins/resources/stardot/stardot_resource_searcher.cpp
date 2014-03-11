@@ -21,7 +21,7 @@ QnStardotResourceSearcher::QnStardotResourceSearcher()
 
 QString QnStardotResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnStardotResource::MANUFACTURE);
+    return QnStardotResource::MANUFACTURE;
 }
 
 // returns all available devices
@@ -98,7 +98,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 // in any case let's HTTP do it's job at very end of discovery
                 QnStardotResourcePtr resource( new QnStardotResource() );
                 //resource->setName("AVUNKNOWN");
-                QnId typeId = qnResTypePool->getResourceTypeId(QLatin1String(QnStardotResource::MANUFACTURE), lit("STARDOT_COMMON"));
+                QnId typeId = qnResTypePool->getResourceTypeId(QnStardotResource::MANUFACTURE, lit("STARDOT_COMMON"));
                 if (typeId.isNull())
                     continue;
                 resource->setTypeId(typeId);

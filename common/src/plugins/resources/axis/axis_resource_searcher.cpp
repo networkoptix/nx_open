@@ -46,7 +46,7 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, cons
 
 QString QnPlAxisResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlAxisResource::MANUFACTURE);
+    return QnPlAxisResource::MANUFACTURE;
 }
 
 

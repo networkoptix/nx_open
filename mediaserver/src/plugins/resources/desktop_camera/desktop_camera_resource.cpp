@@ -4,13 +4,13 @@
 #include "desktop_camera_reader.h"
 #include <media_server/serverutil.h>
 
-const char* QnDesktopCameraResource::MANUFACTURE = "VIRTUAL_CAMERA";
+const QString QnDesktopCameraResource::MANUFACTURE("VIRTUAL_CAMERA");
 
 static QByteArray ID_PREFIX("Desktop_camera_");
 
 QString QnDesktopCameraResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 QnDesktopCameraResource::QnDesktopCameraResource(): QnPhysicalCameraResource()

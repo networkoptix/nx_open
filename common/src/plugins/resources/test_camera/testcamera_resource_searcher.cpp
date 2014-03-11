@@ -155,7 +155,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(QnId resourceTypeId, 
 
 QString QnTestCameraResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnTestCameraResource::MANUFACTURE);
+    return QnTestCameraResource::MANUFACTURE;
 }
 
 QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)

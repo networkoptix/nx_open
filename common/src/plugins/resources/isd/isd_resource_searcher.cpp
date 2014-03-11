@@ -47,7 +47,7 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const
 
 QString QnPlISDResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlIsdResource::MANUFACTURE);
+    return QnPlIsdResource::MANUFACTURE;
 }
 
 static const QLatin1String DEFAULT_ISD_USERNAME( "root" );

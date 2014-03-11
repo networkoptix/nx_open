@@ -127,7 +127,7 @@ QnResourcePtr QnActiResourceSearcher::createResource(QnId resourceTypeId, const 
 
 QString QnActiResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnActiResource::MANUFACTURE);
+    return QnActiResource::MANUFACTURE;
 }
 
 
