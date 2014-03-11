@@ -30,5 +30,11 @@ QnVideowallResourceScreenWidget::~QnVideowallResourceScreenWidget() {
 }
 
 Qn::RenderStatus QnVideowallResourceScreenWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
+    Q_UNUSED(channel)
+    Q_UNUSED(channelRect)
+
+    if (!paintRect.isValid())
+        return Qn::NothingRendered;
     painter->fillRect(paintRect, Qt::red);
+    return Qn::NewFrameRendered;
 }
