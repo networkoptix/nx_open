@@ -9,6 +9,8 @@
 #include <QtConcurrent>
 #include <QDateTime>
 
+#include <utils/common/scoped_thread_rollback.h>
+
 #include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
 #include "transaction/transaction.h"
@@ -47,6 +49,7 @@ namespace ec2
                 tran.fillSequence();
 
             auto scopedGuardFunc = [&errorCode, &handler]( ServerQueryProcessor* ){
+                QnScopedThreadRollback ensureFreeThread(1);
                 QtConcurrent::run( std::bind( handler, errorCode ) );
             };
             std::unique_ptr<ServerQueryProcessor, decltype(scopedGuardFunc)> scopedGuard( this, scopedGuardFunc );
@@ -85,6 +88,7 @@ namespace ec2
         template<class InputData, class OutputData, class HandlerType>
             void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputData input, HandlerType handler )
         {
+            QnScopedThreadRollback ensureFreeThread(1);
             QtConcurrent::run( [input, handler]() {
                 OutputData output;
                 const ErrorCode errorCode = dbManager->doQuery( input, output );
@@ -99,13 +103,13 @@ namespace ec2
         template<class OutputData, class InputParamType1, class InputParamType2, class HandlerType>
             void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputParamType1 input1, InputParamType2 input2, HandlerType handler )
         {
+            QnScopedThreadRollback ensureFreeThread(1);
             QtConcurrent::run( [input1, input2, handler]() {
                 OutputData output;
                 const ErrorCode errorCode = dbManager->doQuery( input1, input2, output );
                 handler( errorCode, output );
             } );
         }
-
     };
 }
 

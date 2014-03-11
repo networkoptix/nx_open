@@ -162,6 +162,7 @@ namespace ec2
         template<class HandlerType>
         void processQueryAsync( ApiCommand::Value /*cmdCode*/, const InputData& inputData, HandlerType handler )
         {
+            QnScopedThreadRollback ensureFreeThread(1);
             QtConcurrent::run( [this, inputData, handler]() {
                 OutputData output;
                 const ErrorCode errorCode = m_queryHandler( inputData, &output );

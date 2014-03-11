@@ -26,7 +26,7 @@ public:
 signals:
     void connectionOpened();
     void connectionClosed();
-    void connectionReset();
+    void connectionReset( QnCommonMessageProcessor* );
 
     void fileAdded(const QString &filename);
     void fileUpdated(const QString &filename);

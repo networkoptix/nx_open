@@ -182,7 +182,8 @@ namespace ec2
             if( !m_directConnection )
                 m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url.path() ) );
         }
-        QtConcurrent::run( std::bind( std::mem_fn( &impl::ConnectHandler::done ), handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
+        QnScopedThreadRollback ensureFreeThread(1);
+        QtConcurrent::run( std::bind( &impl::ConnectHandler::done, handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
         return reqID;
     }
 
@@ -260,6 +261,7 @@ namespace ec2
         const int reqID = generateRequestID();
         QnConnectionInfo connectionInfo;
         fillConnectionInfo( LoginInfo(), &connectionInfo );
+        QnScopedThreadRollback ensureFreeThread(1);
         QtConcurrent::run( std::bind( &impl::TestConnectionHandler::done, handler, reqID, ec2::ErrorCode::ok, connectionInfo ) );
         return reqID;
     }
