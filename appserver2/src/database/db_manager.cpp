@@ -250,19 +250,19 @@ QnDbManager* QnDbManager::instance()
     return globalInstance;
 }
 
-ErrorCode QnDbManager::insertAddParam(const ApiResourceParam& param, qint32 internalId)
+ErrorCode QnDbManager::insertAddParams(const std::vector<ApiResourceParam>& params, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT INTO vms_kvpair (resource_id, name, value) VALUES(:resourceId, :name, :value)");
-    insQuery.bindValue(":resourceId", internalId);
-    param.autoBindValues(insQuery);
-    if (insQuery.exec()) {
-        return ErrorCode::ok;
+    foreach(const ApiResourceParam& param, params) {
+        insQuery.bindValue(":resourceId", internalId);
+        param.autoBindValues(insQuery);
+        if (!insQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+            return ErrorCode::failure;
+        }        
     }
-    else {
-        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-        return ErrorCode::failure;
-    }
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::removeAddParam(const ApiResourceParam& param)
@@ -304,13 +304,7 @@ ErrorCode QnDbManager::insertResource(const ApiResourceData& data, qint32* inter
 	}
     *internalId = insQuery.lastInsertId().toInt();
 
-    foreach(const ApiResourceParam& param, data.addParams) {
-        ErrorCode result = insertAddParam(param, *internalId);
-        if (result != ErrorCode::ok)
-            return result;
-    }
-
-    return ErrorCode::ok;
+    return insertAddParams(data.addParams, *internalId);
 }
 
 qint32 QnDbManager::getResourceInternalId( const QnId& guid )
@@ -352,11 +346,9 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
         if (result != ErrorCode::ok)
             return result;
 
-        foreach(const ApiResourceParam& param, data.addParams) {
-            ErrorCode result = insertAddParam(param, *internalId);
-            if (result != ErrorCode::ok)
-                return result;
-        }
+        result = insertAddParams(data.addParams, *internalId);
+        if (result != ErrorCode::ok)
+            return result;
     }
 
     return ErrorCode::ok;
@@ -381,11 +373,9 @@ ErrorCode QnDbManager::updateResource(const ApiResourceData& data, qint32 intern
         if (result != ErrorCode::ok)
             return result;
 
-        foreach(const ApiResourceParam& param, data.addParams) {
-            ErrorCode result = insertAddParam(param, internalId);
-            if (result != ErrorCode::ok)
-                return result;
-        }
+        result = insertAddParams(data.addParams, internalId);
+        if (result != ErrorCode::ok)
+            return result;
     }
     return ErrorCode::ok;
 }
@@ -896,13 +886,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceP
     if (result != ErrorCode::ok)
         return result;
 
-    foreach(const ApiResourceParam& param, tran.params.params) 
-    {
-        result = insertAddParam(param, internalId);
-        if (result != ErrorCode::ok)
-            return result;
-    }
-    return ErrorCode::ok;
+    return insertAddParams(tran.params.params, internalId);
 }
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraServerItemData>& tran)
@@ -1608,14 +1592,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiParamList
     if (result != ErrorCode::ok)
         return result;
 
-    foreach(const ApiResourceParam& param, tran.params.data) 
-    {
-        result = insertAddParam(param, m_adminUserInternalID);
-        if (result != ErrorCode::ok)
-            return result;
-    }
-
-    return ErrorCode::ok;
+    return insertAddParams(tran.params.data, m_adminUserInternalID);
 }
 
 

@@ -153,7 +153,7 @@ namespace ec2
         ErrorCode deleteResourceTable(const qint32 id);
         ErrorCode removeResource(const QnId& id);
 
-        ErrorCode insertAddParam(const ApiResourceParam& param, qint32 internalId);
+        ErrorCode insertAddParams(const std::vector<ApiResourceParam>& params, qint32 internalId);
         ErrorCode removeAddParam(const ApiResourceParam& param);
         ErrorCode deleteAddParams(qint32 resourceId);
 
