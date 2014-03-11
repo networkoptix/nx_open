@@ -198,7 +198,7 @@
 
     "QnStatusOverlayWidget": {
         "palette": { "default": {
-            "window": "#black",
+            "window": "#000000",
             "windowText": "#801010c0"
         }},
         "diagnosticsButton": { 
