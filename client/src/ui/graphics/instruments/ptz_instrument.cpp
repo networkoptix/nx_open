@@ -141,87 +141,6 @@ private:
 
 
 // -------------------------------------------------------------------------- //
-// PtzPointerItem
-// -------------------------------------------------------------------------- //
-class PtzPointerItem: public Animated<GraphicsPathItem>, public AnimationTimerListener {
-    typedef Animated<GraphicsPathItem> base_type;
-
-public:
-    PtzPointerItem(QGraphicsItem *parent = NULL): 
-        base_type(parent),
-        m_size(QSizeF(0, 0)),
-        m_pathValid(false)
-    {
-        registerAnimation(this);
-        startListening();
-
-        setAcceptedMouseButtons(0);
-
-        setSize(QSizeF(32, 32));
-        setBrush(Qt::NoBrush);
-        setPen(QPen(ptzItemBorderColor, 0.0));
-    }
-
-    const QSizeF &size() const {
-        return m_size;
-    }
-
-    void setSize(const QSizeF &size) {
-        if(qFuzzyEquals(size, m_size))
-            return;
-
-        m_size = size;
-
-        setTransformOriginPoint(QnGeometry::toPoint(m_size / 2));
-        invalidatePath();
-    }
-
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = NULL) override {
-        ensurePath();
-
-        base_type::paint(painter, option, widget);
-    }
-
-protected:
-    virtual void tick(int deltaMSecs) override {
-        setRotation(rotation() + deltaMSecs / 1000.0 * 540.0);
-    }
-
-    void updatePen() {
-        setPen(QPen(ptzItemBorderColor, qMin(m_size.height(), m_size.width()) / 3));
-    }
-
-    void invalidatePath() {
-        m_pathValid = false;
-    }
-
-    void ensurePath() {
-        if(m_pathValid)
-            return;
-
-        QRectF rect(QPointF(0, 0), m_size);
-
-        QPainterPath path;
-        path.arcMoveTo(rect, 0);
-        path.arcTo(rect, 0, 90);
-        path.arcMoveTo(rect, 180);
-        path.arcTo(rect, 180, 90);
-        setPath(path);
-        
-        QPen pen = this->pen();
-        pen.setWidthF(qMax(m_size.width(), m_size.height()) / 4.0);
-        setPen(pen);
-    }
-
-private:
-    /** Pointer size. */
-    QSizeF m_size;
-
-    bool m_pathValid;
-};
-
-
-// -------------------------------------------------------------------------- //
 // PtzImageButtonWidget
 // -------------------------------------------------------------------------- //
 class PtzImageButtonWidget: public QnTextButtonWidget {
@@ -448,26 +367,16 @@ public:
     {
         setAcceptedMouseButtons(0);
 
-        /* Note that construction order is important as it defines which items are on top. */
         m_arrowItem = new PtzArrowItem(this);
-        m_pointerItem = new PtzPointerItem(this);
-
         m_arrowItem->setOpacity(0.0);
-        m_pointerItem->setOpacity(0.0);
-        m_pointerItem->setSize(QSizeF(24.0, 24.0));
     }
 
     PtzArrowItem *arrowItem() const {
         return m_arrowItem;
     }
 
-    PtzPointerItem *pointerItem() const {
-        return m_pointerItem;
-    }
-
 private:
     PtzArrowItem *m_arrowItem;
-    PtzPointerItem *m_pointerItem;
 };
 
 
