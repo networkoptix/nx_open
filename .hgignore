@@ -67,6 +67,8 @@ appserver/setup/build
 appserver/version_maven.py
 appserver/version.py
 
+appserver2/arm
+
 applauncher/bin
 applauncher/build
 applauncher/src/Info.plist
