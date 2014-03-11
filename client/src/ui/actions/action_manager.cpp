@@ -1266,8 +1266,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
-        text(tr("Change Cell Spacing...")).
-        condition(new QnVideoWallReviewModeCondition(true, this));
+        text(tr("Change Cell Spacing..."));
 
     factory.beginSubMenu(); {
         factory.beginGroup();

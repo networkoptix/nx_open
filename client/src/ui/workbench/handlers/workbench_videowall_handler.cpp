@@ -205,11 +205,16 @@ QnAppServerConnectionPtr QnWorkbenchVideoWallHandler::connection() const {
 QnWorkbenchVideoWallHandler::ScreenSnap QnWorkbenchVideoWallHandler::findNearest(const QList<ScreenSnap> &list, int value) {
 
     QList<ScreenSnap>::ConstIterator i = qLowerBound(list.constBegin(), list.constEnd(), value);
+    if (i == list.constEnd())
+        return list.last();
+
     if (i->value == value)
         return *i;
+
     int idx = (i - list.constBegin());
     if (idx <= 0)
         return list.first();
+
     if (idx >= list.size())
         return list.last();
 
@@ -220,7 +225,7 @@ QnWorkbenchVideoWallHandler::ScreenSnap QnWorkbenchVideoWallHandler::findNearest
     return next;
 }
 
-QnWorkbenchVideoWallHandler::ScreenSnap QnWorkbenchVideoWallHandler::findEdge(const QList<QnWorkbenchVideoWallHandler::ScreenSnap> &snaps, QSet<int> screens, bool backward) {
+QnWorkbenchVideoWallHandler::ScreenSnap QnWorkbenchVideoWallHandler::findEdge(const QList<QnWorkbenchVideoWallHandler::ScreenSnap> &snaps, QList<int> screens, bool backward) {
 
     if (backward) {
         foreach(const ScreenSnap &snap, snaps | boost::adaptors::reversed) {
@@ -240,13 +245,31 @@ QnWorkbenchVideoWallHandler::ScreenSnap QnWorkbenchVideoWallHandler::findEdge(co
 }
 
 QList<int> QnWorkbenchVideoWallHandler::getScreensByItem(const ScreenSnaps &snaps, const QRect &source) {
-    ScreenSnap left     = findNearest(snaps.left, source.left());
-    ScreenSnap top      = findNearest(snaps.top, source.top());
-    ScreenSnap right    = findNearest(snaps.right, source.right());
-    ScreenSnap bottom   = findNearest(snaps.bottom, source.bottom());
+
+    ScreenSnaps joined = snaps.joined();
+
+    ScreenSnap left     = findNearest(joined.left, source.left());
+    ScreenSnap top      = findNearest(joined.top, source.top());
+    ScreenSnap right    = findNearest(joined.right, source.right());
+    ScreenSnap bottom   = findNearest(joined.bottom, source.bottom());
     QSet<int> screenIndices;
     screenIndices << left.index << top.index << right.index << bottom.index;
-    return screenIndices.values();
+
+    QList<int> result = screenIndices.values();
+    foreach (int index, result) {   //check if it is really one screen
+        ScreenSnaps filtered = snaps.filtered(index);
+        if (findNearest(filtered.left, source.left()).value != left.value)
+            continue;
+        if (findNearest(filtered.top, source.top()).value != top.value)
+            continue;
+        if (findNearest(filtered.right, source.right()).value != right.value)
+            continue;
+        if (findNearest(filtered.bottom, source.bottom()).value != bottom.value)
+            continue;
+
+        return QList<int>() << index;
+    }
+    return result;
 }
 
 QRect QnWorkbenchVideoWallHandler::calculateSnapGeometry(const QList<QnVideoWallPcData::PcScreen> &localScreens) {
@@ -256,17 +279,24 @@ QRect QnWorkbenchVideoWallHandler::calculateSnapGeometry(const QList<QnVideoWall
         return source;
 
     ScreenSnaps localSnaps = calculateSnaps(qnSettings->pcUuid(), localScreens);
-    ScreenSnap left     = findNearest(localSnaps.left,      source.left());
-    ScreenSnap top      = findNearest(localSnaps.top,       source.top());
-    ScreenSnap right    = findNearest(localSnaps.right,     source.right());
-    ScreenSnap bottom   = findNearest(localSnaps.bottom,    source.bottom());
-    QSet<int> screenIndices;
-    screenIndices << left.index << top.index << right.index << bottom.index;
+
+    ScreenSnap left, top, right, bottom;
+
+    // multiple calculations are not important because function is used very rare and datasets are small
+    QList<int> screenIndices = getScreensByItem(localSnaps, source);
     if (screenIndices.size() > 1) { // if client uses some screens it should fill them completely
         left    = findEdge(localSnaps.left,     screenIndices);
         top     = findEdge(localSnaps.top,      screenIndices);
         right   = findEdge(localSnaps.right,    screenIndices, true);
         bottom  = findEdge(localSnaps.bottom,   screenIndices, true);
+    } else if (!screenIndices.isEmpty()) {  //safety check
+        ScreenSnaps joined = localSnaps.joined();
+        left    = findNearest(joined.left,      source.left());
+        top     = findNearest(joined.top,       source.top());
+        right   = findNearest(joined.right,     source.right());
+        bottom  = findNearest(joined.bottom,    source.bottom());
+    } else {
+        return source;
     }
     //TODO: #GDM VW check edges validity
     //TODO: #GDM VW check that screens are not in use already
@@ -748,7 +778,7 @@ void QnWorkbenchVideoWallHandler::addScreenToReviewLayout(const QnVideoWallResou
     item.uuid = QUuid::createUuid();
 //    item.combinedGeometry = geometry;
     item.resource.id = videowall->getId(); //source.layout;
-    item.dataByRole[Qn::VideoWallPcGuidRole] = pc.uuid;
+    item.dataByRole[Qn::VideoWallPcGuidRole] = qVariantFromValue<QUuid>(pc.uuid);
 //    item.dataByRole[Qn::VideoWallPcScreenIndexRole] = screen.index;
 //    item.dataByRole[Qn::ItemScreenPositionRole] = qVariantFromValue(QPoint(x, y));
 
@@ -890,32 +920,28 @@ QnWorkbenchVideoWallHandler::ScreenSnaps QnWorkbenchVideoWallHandler::calculateS
         return m_screenSnapsByUuid[pcUuid];
 
     ScreenSnaps result;
-    QSet<ScreenSnap> leftSet, rightSet, topSet, bottomSet;
+    QList<ScreenSnap> left, right, top, bottom;
 
     foreach (const QnVideoWallPcData::PcScreen &screen, screens) {
         QRect geom = screen.desktopGeometry;
         int w = geom.width() / 2;
         int h = geom.height() / 2;
 
-        leftSet     << ScreenSnap(screen.index, geom.left(), false)      << ScreenSnap(screen.index, geom.left() + w + 1, true);
-        rightSet    << ScreenSnap(screen.index, geom.left() + w, true)   << ScreenSnap(screen.index, geom.right(), false);
-        topSet      << ScreenSnap(screen.index, geom.top(), false)       << ScreenSnap(screen.index, geom.top() + h + 1, true);
-        bottomSet   << ScreenSnap(screen.index, geom.top() + h, true)    << ScreenSnap(screen.index, geom.bottom(), false);
+        left     << ScreenSnap(screen.index, geom.left(), false)      << ScreenSnap(screen.index, geom.left() + w + 1, true);
+        right    << ScreenSnap(screen.index, geom.left() + w, true)   << ScreenSnap(screen.index, geom.right(), false);
+        top      << ScreenSnap(screen.index, geom.top(), false)       << ScreenSnap(screen.index, geom.top() + h + 1, true);
+        bottom   << ScreenSnap(screen.index, geom.top() + h, true)    << ScreenSnap(screen.index, geom.bottom(), false);
     }
 
-    QList<ScreenSnap> left = leftSet.values();
     qSort(left);
     result.left = left;
 
-    QList<ScreenSnap> right = rightSet.values();
     qSort(right);
     result.right = right;
 
-    QList<ScreenSnap> top = topSet.values();
     qSort(top);
     result.top = top;
 
-    QList<ScreenSnap> bottom = bottomSet.values();
     qSort(bottom);
     result.bottom = bottom;
 
@@ -1264,8 +1290,8 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         if(context()->user())
             layout->setParentId(context()->user()->getId());
 
-        layout->setCellAspectRatio(1.0);
-        layout->setCellSpacing(0.0, 0.0);
+//        layout->setCellAspectRatio(1.0);
+//        layout->setCellSpacing(0.0, 0.0);
         layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission | Qn::WritePermission));
         layout->setData(Qn::VideoWallResourceRole, qVariantFromValue(videoWall));
         resourcePool()->addResource(layout);
@@ -1307,11 +1333,12 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
                     continue;
 
                 QnLayoutItemData itemData;
-                itemData.flags = Qn::Pinned;
+//                itemData.flags = Qn::Pinned;
+                itemData.flags = Qn::PendingGeometryAdjustment;
                 itemData.uuid = QUuid::createUuid();
                 itemData.combinedGeometry = pc.screens[firstScreen].layoutGeometry;
                 itemData.resource.id = videoWall->getId(); //source.layout;
-                itemData.dataByRole[Qn::VideoWallPcGuidRole] = pc.uuid;
+                itemData.dataByRole[Qn::VideoWallPcGuidRole] = qVariantFromValue<QUuid>(pc.uuid);
                 itemData.dataByRole[Qn::VideoWallPcScreenIndicesRole] = qVariantFromValue<QList<int> >(screens);
                 layout->addItem(itemData);
             }

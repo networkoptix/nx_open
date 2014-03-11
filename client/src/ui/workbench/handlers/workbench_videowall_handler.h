@@ -132,13 +132,39 @@ private:
         QList<ScreenSnap> right;
         QList<ScreenSnap> top;
         QList<ScreenSnap> bottom;
+
+        ScreenSnaps filtered(const int index) const {
+            ScreenSnaps result;
+            foreach (const ScreenSnap &i, left)    if (i.index == index) result.left << i;
+            foreach (const ScreenSnap &i, right)   if (i.index == index) result.right << i;
+            foreach (const ScreenSnap &i, top)     if (i.index == index) result.top << i;
+            foreach (const ScreenSnap &i, bottom)  if (i.index == index) result.bottom << i;
+            return result;
+        }
+
+        ScreenSnaps joined() const {
+            ScreenSnaps result;
+
+            auto contains = [](const QList<ScreenSnap> &list, const int value) {
+                foreach (const ScreenSnap &snap, list)
+                    if (snap.value == value)
+                        return true;
+                return false;
+            };
+
+            foreach (const ScreenSnap &i, left)    if (!contains(result.left, i.value)) result.left << i;
+            foreach (const ScreenSnap &i, right)   if (!contains(result.right, i.value)) result.right << i;
+            foreach (const ScreenSnap &i, top)     if (!contains(result.top, i.value)) result.top << i;
+            foreach (const ScreenSnap &i, bottom)  if (!contains(result.bottom, i.value)) result.bottom << i;
+            return result;
+        }
     };
 
     ScreenSnaps calculateSnaps(const QUuid &pcUuid, const QList<QnVideoWallPcData::PcScreen> &screens);
     QRect calculateSnapGeometry(const QList<QnVideoWallPcData::PcScreen> &localScreens);
 
     static ScreenSnap findNearest(const QList<ScreenSnap> &snaps, int value);
-    static ScreenSnap findEdge(const QList<ScreenSnap> &snaps, QSet<int> screens, bool backward = false);
+    static ScreenSnap findEdge(const QList<ScreenSnap> &snaps, QList<int> screens, bool backward = false);
     static QList<int> getScreensByItem(const ScreenSnaps &snaps, const QRect &source);
 
 private:
