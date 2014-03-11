@@ -111,6 +111,11 @@ namespace ec2
                 case tranSyncResponse:
                     return "tranSyncResponse";
 
+                case getSettings:
+                    return "getSettings";
+                case saveSettings:
+                    return "saveSettings";
+
                 default:
                     return "unknown";
             }

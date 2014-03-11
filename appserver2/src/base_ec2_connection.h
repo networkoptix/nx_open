@@ -162,6 +162,14 @@ namespace ec2
                 m_storedFileManager->triggerNotification( tran );
         }
 
+        void triggerNotification( const QnTransaction<ApiParamList>& tran ) {
+            if( tran.command == ApiCommand::saveSettings ) {
+                QnKvPairList newSettings;
+                tran.params.toResourceList(newSettings);
+                emit settingsChanged(newSettings);
+            }
+        }
+
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
     protected:
         QueryProcessorType* m_queryProcessor;

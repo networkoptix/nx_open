@@ -93,6 +93,8 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     }
     tran.timestamp -= sender->timeDiff();
 
+    qDebug() << "got transaction " << tran.command;
+
     QMap<QUuid, qint64>:: iterator itr = m_lastActivity.find(tran.id.peerGUID);
     if (itr == m_lastActivity.end()) {
         Q_ASSERT(!tran.id.peerGUID.isNull());

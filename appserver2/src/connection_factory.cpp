@@ -149,6 +149,9 @@ namespace ec2
         //AbstractStoredFileManager::deleteStoredFile
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeStoredFile );
 
+        //ApiResourceParamList
+        registerGetFuncHandler<nullptr_t, ApiParamList>( restProcessorPool, ApiCommand::getSettings );
+        registerUpdateFuncHandler<ApiParamList>( restProcessorPool, ApiCommand::saveSettings );
 
         //AbstractECConnection
         registerGetFuncHandler<nullptr_t, qint64>( restProcessorPool, ApiCommand::getCurrentTime );

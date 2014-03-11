@@ -26,11 +26,16 @@ namespace ec2
 
     #define ApiResourceParamFields (name) (value)
     QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiResourceParam, ApiResourceParamFields )
-}
 
+    struct ApiParamList
+    {
+        std::vector<ApiResourceParam> data;
+        void toResourceList(QnKvPairList& resources) const;
+        void fromResourceList(const QnKvPairList& resources);
+    };
+    QN_DEFINE_STRUCT_SERIALIZATORS (ApiParamList, (data) )
+        
 
-namespace ec2
-{
     struct ApiResourceParamWithRef: public ApiResourceParam
     {
         QnId resourceId;
@@ -43,11 +48,7 @@ namespace ec2
     };
 
     QN_DEFINE_STRUCT_SERIALIZATORS (ApiResourceParams,  (id) (params) )
-}
 
-
-namespace ec2
-{
     struct ApiResourceData: public ApiData 
     {
         ApiResourceData(): status(QnResource::Offline), disabled(false) {}

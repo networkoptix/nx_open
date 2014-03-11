@@ -690,6 +690,8 @@ namespace ec2
         void remotePeerFound(QnId id, bool isClient, bool isProxy);
         void remotePeerLost(QnId id, bool isClient, bool isProxy);
 
+        void settingsChanged(QnKvPairList settings);
+
     protected:
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) = 0;

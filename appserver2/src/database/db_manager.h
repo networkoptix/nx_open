@@ -95,6 +95,9 @@ namespace ec2
         //getLicenses
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseList& data);
 
+        //getParams
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiParamList& data);
+
 		// --------- misc -----------------------------
 
 		int getNextSequence();
@@ -121,6 +124,7 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiUserData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiParamList>& tran); // save settings
 
         // delete camera, server, layout, any resource t.e.c
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiIdData>& tran);
@@ -200,6 +204,8 @@ namespace ec2
         QnId m_storageTypeId;
         QnId m_serverTypeId;
         QnId m_cameraTypeId;
+        QnId m_adminUserID;
+        int m_adminUserInternalID;
 
         void fillServerInfo( ServerInfo* const serverInfo );
     };
