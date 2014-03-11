@@ -11,8 +11,6 @@
 
 static const int DEFAULT_AXIS_API_PORT = 80; // TODO: #Elric copypasta from axis_resource.cpp
 
-static const int DEFAULT_AXIS_TIMEOUT = 15000; /* Increased from default 5000 as list request can take quite a lot of time. */
-
 
 // -------------------------------------------------------------------------- //
 // QnAxisParameterMap
@@ -48,6 +46,10 @@ public:
         return QnLexical::deserialize(result, value);
     }
 
+    bool isEmpty() const {
+        return m_data.isEmpty();
+    }
+
 private:
 #ifdef _DEBUG /* QMap is easier to look through in debug. */
     QMap<QString, QString> m_data;
@@ -74,8 +76,19 @@ QnAxisPtzController::~QnAxisPtzController() {
 
 void QnAxisPtzController::updateState() {
     QnAxisParameterMap params;
-    if(!query(lit("param.cgi?action=list"), &params))
-        return;
+
+    for(int retries = 0; retries < 5; retries++) {
+        if(!query(lit("param.cgi?action=list"), &params))
+            return;
+
+        /* Axis cameras sometimes return empty OK reply, so we have to resend
+         * the request in this case. Note that this is not important in case
+         * of other requests, but this one we cannot lose. */
+        if(!params.isEmpty())
+            break;
+
+        qnWarning("Received empty reply from AXIS camera %1 on %2 attempt.", m_resource->getName(), retries);
+    }
     
     updateState(params);
 }
@@ -161,7 +174,7 @@ CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const {
     return new CLSimpleHTTPClient(
         m_resource->getHostAddress(), 
         QUrl(m_resource->getUrl()).port(DEFAULT_AXIS_API_PORT), 
-        qMax(DEFAULT_AXIS_TIMEOUT, static_cast<int>(m_resource->getNetworkTimeout())),  // TODO: #Elric use int in getNetworkTimeout
+        m_resource->getNetworkTimeout(),  // TODO: #Elric use int in getNetworkTimeout
         m_resource->getAuth()
     );
 }
@@ -306,4 +319,4 @@ bool QnAxisPtzController::getFlip(Qt::Orientations *flip) {
     return true;
 }
 
-#endif // #ifdef ENABLE_AXIS
+#endif // ENABLE_AXIS
