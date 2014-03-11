@@ -282,6 +282,8 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
 
         case ApiCommand::saveSettings:
             return deliveryTransaction<ApiParamList>(abstractTran, stream);
+        case ApiCommand::addLicenses:
+            return deliveryTransaction<ApiLicenseList>(abstractTran, stream);
 
         case ApiCommand::serverAliveInfo:
             break; // nothing to do
