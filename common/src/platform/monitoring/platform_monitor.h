@@ -125,6 +125,8 @@ public:
     QnPlatformMonitor(QObject *parent = NULL): QObject(parent) {}
     virtual ~QnPlatformMonitor() {}
 
+    // TODO: #Elric remove 'total' from names.
+
     /**
      * \returns                         Percent of CPU time (both user and kernel) consumed 
      *                                  by all running processes since the last call to this function,
