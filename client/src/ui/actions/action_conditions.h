@@ -95,6 +95,26 @@ private:
 };
 
 /**
+ * Condition wich is a conjunction of two or more conditions
+ */
+class QnConjunctionActionCondition: public QnActionCondition {
+public:
+    QnConjunctionActionCondition(const QList<QnActionCondition*> conditions, QObject *parent = NULL);
+    QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QObject *parent = NULL);
+    QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QObject *parent = NULL);
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+    virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+    virtual Qn::ActionVisibility check(const QnWorkbenchLayoutList &layouts) override;
+
+private:
+    QList<QnActionCondition*> m_conditions;
+};
+
+
+/**
  * Condition for a single resource widget that checks its zoomed state.
  */
 class QnItemZoomedActionCondition: public QnActionCondition {
@@ -460,6 +480,19 @@ class QnRotateItemCondition: public QnActionCondition {
 public:
     QnRotateItemCondition(QObject* parent): QnActionCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+};
+
+class QnLightModeCondition: public QnActionCondition {
+public:
+    QnLightModeCondition(Qn::LightModeFlags flags, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_lightModeFlags(flags)
+    {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+
+private:
+    Qn::LightModeFlags m_lightModeFlags;
 };
 
 #endif // QN_ACTION_CONDITIONS_H

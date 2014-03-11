@@ -6,7 +6,6 @@
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 
-
 class QnException: virtual public std::exception {
 public:
     QnException(const QString &message = QString()): m_message(message) {}
@@ -18,15 +17,16 @@ public:
     }
 
     virtual const char *what() const throw() override {
+        /* Note that message() can be overridden, so we need to do latin1
+         * conversion here, and not in constructor. */
         if(m_cachedWhat.isNull())
-            m_cachedWhat = message().toLocal8Bit();
+            m_cachedWhat = message().toLatin1();
         return m_cachedWhat.data();
     }
 
 private:
     QString m_message;
-    mutable QByteArray m_cachedWhat;
+    mutable QByteArray m_cachedWhat; 
 };
-
 
 #endif // QN_EXCEPTION_H

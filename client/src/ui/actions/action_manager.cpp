@@ -538,7 +538,8 @@ QnActionManager::QnActionManager(QObject *parent):
             text(tr("Window")).
             pulledText(tr("New Window")).
             shortcut(tr("Ctrl+N")).
-            autoRepeat(false);
+            autoRepeat(false).
+            condition(new QnLightModeCondition(Qn::LightModeNoNewWindow, this));
 
         factory(Qn::NewUserAction).
             flags(Qn::Main | Qn::Tree | Qn::NoTarget).
@@ -809,7 +810,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in New Window")).
         conditionalText(tr("Monitor in a New Window"), hasFlags(QnResource::server), Qn::All).
-        condition(new QnOpenInNewEntityActionCondition(this));
+        condition(new QnConjunctionActionCondition(
+                      new QnOpenInNewEntityActionCondition(this),
+                      new QnLightModeCondition(Qn::LightModeNoNewWindow, this),
+                      this));
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
@@ -824,11 +828,15 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenLayoutsInNewWindowAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Open Layout(s) in a New Window")). // TODO: #Elric split into sinle- & multi- action
-        condition(hasFlags(QnResource::layout));
+        condition(new QnConjunctionActionCondition(
+                      new QnResourceActionCondition(hasFlags(QnResource::layout), Qn::All, this),
+                      new QnLightModeCondition(Qn::LightModeNoNewWindow, this),
+                      this));
 
     factory(Qn::OpenCurrentLayoutInNewWindowAction).
         flags(Qn::NoTarget).
-        text(tr("Open Current Layout in a New Window"));
+        text(tr("Open Current Layout in a New Window")).
+        condition(new QnLightModeCondition(Qn::LightModeNoNewWindow, this));
 
     factory(Qn::OpenAnyNumberOfLayoutsAction).
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).

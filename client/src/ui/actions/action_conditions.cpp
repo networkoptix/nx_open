@@ -66,8 +66,7 @@ Qn::ActionVisibility QnActionCondition::check(const QnActionParameters &paramete
         return Qn::InvisibleAction;
     }
 }
-
-bool QnVideoWallReviewModeCondition::isVideoWallReviewMode() const {
+ bool QnVideoWallReviewModeCondition::isVideoWallReviewMode() const {
     return context()->workbench()->currentLayout()->data().contains(Qn::VideoWallResourceRole);
 }
 
@@ -76,6 +75,65 @@ Qn::ActionVisibility QnVideoWallReviewModeCondition::check(const QnActionParamet
     if (m_hide == isVideoWallReviewMode())
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
+}
+QnConjunctionActionCondition::QnConjunctionActionCondition(const QList<QnActionCondition *> conditions, QObject *parent) :
+    QnActionCondition(parent),
+    m_conditions(conditions)
+{}
+
+QnConjunctionActionCondition::QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QObject *parent) :
+    QnActionCondition(parent)
+{
+    m_conditions.append(condition1);
+    m_conditions.append(condition2);
+}
+
+QnConjunctionActionCondition::QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QObject *parent) :
+    QnActionCondition(parent)
+{
+    m_conditions.append(condition1);
+    m_conditions.append(condition2);
+    m_conditions.append(condition3);
+}
+
+Qn::ActionVisibility QnConjunctionActionCondition::check(const QnActionParameters &parameters) {
+    Qn::ActionVisibility result = Qn::EnabledAction;
+    foreach (QnActionCondition *condition, m_conditions)
+        result = qMin(result, condition->check(parameters));
+
+    return result;
+}
+
+Qn::ActionVisibility QnConjunctionActionCondition::check(const QnResourceList &resources) {
+    Qn::ActionVisibility result = Qn::EnabledAction;
+    foreach (QnActionCondition *condition, m_conditions)
+        result = qMin(result, condition->check(resources));
+
+    return result;
+}
+
+Qn::ActionVisibility QnConjunctionActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
+    Qn::ActionVisibility result = Qn::EnabledAction;
+    foreach (QnActionCondition *condition, m_conditions)
+        result = qMin(result, condition->check(layoutItems));
+
+    return result;
+}
+
+Qn::ActionVisibility QnConjunctionActionCondition::check(const QnResourceWidgetList &widgets) {
+    Qn::ActionVisibility result = Qn::EnabledAction;
+    foreach (QnActionCondition *condition, m_conditions)
+        result = qMin(result, condition->check(widgets));
+
+    return result;
+}
+
+Qn::ActionVisibility QnConjunctionActionCondition::check(const QnWorkbenchLayoutList &layouts) {
+    Qn::ActionVisibility result = Qn::EnabledAction;
+    foreach (QnActionCondition *condition, m_conditions)
+        result = qMin(result, condition->check(layouts));
+
+    return result;
 }
 
 Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetList &widgets) {
@@ -626,5 +684,14 @@ Qn::ActionVisibility QnRotateItemCondition::check(const QnResourceWidgetList &wi
         if (widget->options() & QnResourceWidget::WindowRotationForbidden)
             return Qn::InvisibleAction;
     }
+    return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnLightModeCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
+
+    if (qnSettings->lightMode() & m_lightModeFlags)
+        return Qn::InvisibleAction;
+
     return Qn::EnabledAction;
 }
