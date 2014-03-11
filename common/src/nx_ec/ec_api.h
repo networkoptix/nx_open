@@ -691,6 +691,7 @@ namespace ec2
         void remotePeerLost(QnId id, bool isClient, bool isProxy);
 
         void settingsChanged(QnKvPairList settings);
+        void panicModeChanged(Qn::PanicMode mode);
 
     protected:
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;

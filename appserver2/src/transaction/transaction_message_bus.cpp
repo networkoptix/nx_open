@@ -280,7 +280,14 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
         case ApiCommand::broadcastBusinessAction:
             return deliveryTransaction<ApiBusinessActionData>(abstractTran, stream);
 
+        case ApiCommand::saveSettings:
+            return deliveryTransaction<ApiParamList>(abstractTran, stream);
+
+        case ApiCommand::serverAliveInfo:
+            break; // nothing to do
+
         default:
+            Q_ASSERT(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
             break;
     }
 
