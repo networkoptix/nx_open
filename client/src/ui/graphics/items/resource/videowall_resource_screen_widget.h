@@ -35,6 +35,8 @@ private slots:
     void at_thumbnailReady(int resourceId, const QPixmap &thumbnail);
 
 private:
+    friend class LayoutOverlayWidget;
+
     QnVideoWallResourcePtr m_videowall;
     QList<QnVideoWallItem> m_items;
     QList<QnVideoWallPcData::PcScreen> m_screens;

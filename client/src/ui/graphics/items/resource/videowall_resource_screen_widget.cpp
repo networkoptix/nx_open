@@ -29,8 +29,9 @@
 class LayoutOverlayWidget: public GraphicsWidget {
     typedef GraphicsWidget base_type;
 public:
-    LayoutOverlayWidget(const QnLayoutResourcePtr &layout, QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
+    LayoutOverlayWidget(const QnLayoutResourcePtr &layout, QnVideowallResourceScreenWidget *parent, Qt::WindowFlags windowFlags = 0):
         base_type(parent, windowFlags),
+        m_widget(parent),
         m_layout(layout)
     {
 
@@ -39,13 +40,131 @@ public:
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override {
         Q_UNUSED(widget)
-        if (!m_layout)
+        if (!m_layout) {
             painter->fillRect(option->rect, Qt::red);
-        else
+        }
+        else {
             painter->fillRect(option->rect, Qt::blue);
+
+            QRectF bounding;
+            foreach (const QnLayoutItemData &data, m_layout->getItems()) {
+                QRectF itemRect = data.combinedGeometry;
+                if (!itemRect.isValid())
+                    continue;
+                bounding = bounding.united(itemRect);
+            }
+
+            if (bounding.isNull())
+                return;
+
+            qreal x = option->rect.left();
+            qreal y = option->rect.top();
+
+            qreal xspace = m_layout->cellSpacing().width() * 0.5;
+            qreal yspace = m_layout->cellSpacing().height() * 0.5;
+
+            qreal xscale, yscale, xoffset, yoffset;
+            qreal sourceAr = m_layout->cellAspectRatio() * bounding.width() / bounding.height();
+            qreal targetAr = option->rect.width() / option->rect.height();
+            if (sourceAr > targetAr) {
+                xscale = option->rect.width() / bounding.width();
+                yscale = xscale / m_layout->cellAspectRatio();
+                xoffset = 0;
+
+                qreal h = bounding.height() * yscale;
+                yoffset = (option->rect.height() - h) * 0.5 + option->rect.top();
+            } else {
+                yscale = option->rect.height() / bounding.height();
+                xscale = yscale * m_layout->cellAspectRatio();
+                yoffset = 0;
+
+                qreal w = bounding.width() * xscale;
+                xoffset = (option->rect.width() - w) * 0.5 + option->rect.top();
+            }
+
+        #ifdef RECT_DEBUG
+            QPen pen(Qt::red);
+            pen.setWidth(15);
+            painter->setPen(pen);
+        #endif
+
+            foreach (const QnLayoutItemData &data, m_layout->getItems()) {
+                QRectF itemRect = data.combinedGeometry;
+                if (!itemRect.isValid())
+                    continue;
+
+                // cell bounds
+                qreal x1 = (itemRect.left() - bounding.left() + xspace) * xscale + xoffset;
+                qreal y1 = (itemRect.top() - bounding.top() + yspace) * yscale + yoffset;
+                qreal w1 = (itemRect.width() - xspace*2) * xscale;
+                qreal h1 = (itemRect.height() - yspace*2) * yscale;
+
+                paintItem(painter, QRectF(x + x1, y + y1, w1, h1), data);
+        #ifdef RECT_DEBUG
+                painter->drawRect(QRectF(x + x1, y + y1, w1, h1));
+        #endif
+            }
+        }
     }
 
 private:
+    void paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data) {
+        QnResourcePtr resource = (data.resource.id.isValid())
+                ? qnResPool->getResourceById(data.resource.id)
+                : qnResPool->getResourceByUniqId(data.resource.path);
+
+        bool isServer = resource && (resource->flags() & QnResource::server);
+
+        if (isServer && !m_widget->m_thumbs.contains(resource->getId())) {
+            m_widget->m_thumbs[resource->getId()] = qnSkin->pixmap("events/thumb_server.png");
+        } //TODO: #GDM VW local files placeholder
+
+        if (resource && m_widget->m_thumbs.contains(resource->getId())) {
+            QPixmap pixmap = m_widget->m_thumbs[resource->getId()];
+
+
+            qreal targetAr = paintRect.width() / paintRect.height();
+            qreal sourceAr = isServer
+                    ? targetAr
+                    : (qreal)pixmap.width() / pixmap.height();
+
+            qreal x, y, w, h;
+            if (sourceAr > targetAr) {
+                w = paintRect.width();
+                x = paintRect.left();
+                h = w / sourceAr;
+                y = (paintRect.height() - h) * 0.5 + paintRect.top();
+            } else {
+                h = paintRect.height();
+                y = paintRect.top();
+                w = h * sourceAr;
+                x = (paintRect.width() - w) * 0.5 + paintRect.left();
+            }
+
+            if (!qFuzzyIsNull(data.rotation)) {
+                QnScopedPainterTransformRollback guard(painter); Q_UNUSED(guard);
+                painter->translate(paintRect.center());
+                painter->rotate(data.rotation);
+                painter->translate(-paintRect.center());
+                painter->drawPixmap(QRectF(x, y, w, h).toRect(), pixmap);
+            } else {
+                painter->drawPixmap(QRectF(x, y, w, h).toRect(), pixmap);
+            }
+            return;
+        }
+
+        if (resource && (resource->flags() & QnResource::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
+            m_widget->m_thumbnailManager->selectResource(resource);
+        }
+
+        {
+            QnScopedPainterPenRollback(painter, QPen(Qt::gray, 15));
+            painter->drawRect(paintRect);
+        }
+    }
+
+private:
+    QnVideowallResourceScreenWidget* m_widget;
     const QnLayoutResourcePtr m_layout;
 };
 
