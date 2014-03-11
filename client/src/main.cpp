@@ -347,6 +347,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnSettings->setDevMode(true);
     }
 
+    // TODO: #Elric why QString???
     if (!lightMode.isEmpty()) {
         bool ok;
         int lightModeOverride = lightMode.toInt(&ok);

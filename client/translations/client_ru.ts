@@ -6654,7 +6654,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="751"/>
         <source>%1 %2</source>
-        <translation>%1% {1 %2?}</translation>
+        <translation>%1 %2</translation>
     </message>
     <message>
         <source>%1 %2 </source>

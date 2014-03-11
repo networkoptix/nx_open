@@ -84,7 +84,23 @@ void InstallationManager::createLatestVersionGhost()
 {
     QString version = getMostRecentVersion();
     QDir installationDir(m_defaultDirectoryForNewInstallations);
-    if( !installationDir.exists(version) )
+
+    bool skipDirCreation = false;
+
+    /* The first - remove old possible ghosts */
+    QStringList entries = installationDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    qDebug() << entries;
+    foreach( const QString &entry, entries ) {
+        if( entry == version ) {
+            skipDirCreation = true;
+        } else {
+            if (QDir(installationDir.absolutePath() + "/" + entry).entryList(QDir::AllEntries | QDir::NoDotAndDotDot).isEmpty())
+                installationDir.rmdir(entry);
+        }
+    }
+
+    /* The second - create new one */
+    if( !skipDirCreation && !installationDir.exists(version) )
         installationDir.mkdir(version);
 }
 
