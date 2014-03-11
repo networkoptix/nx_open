@@ -46,7 +46,7 @@ void QnPingDialog::at_pingUtility_pingResponce(const QnPingUtility::PingResponce
 }
 
 QString QnPingDialog::responceToString(const QnPingUtility::PingResponce &responce) const {
-    // TODO: #dklychkov maybe add more details and translate the strings below
+    // TODO: #TR #dklychkov maybe add more details and translate the strings below
     switch (responce.type) {
     case QnPingUtility::UnknownError:
         return QString(lit("Unknown error for icmp_seq %1")).arg(responce.seq);
