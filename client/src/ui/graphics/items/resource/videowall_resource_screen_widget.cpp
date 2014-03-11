@@ -158,8 +158,8 @@ private:
         }
 
         {
-            QnScopedPainterPenRollback(painter, QPen(Qt::gray, 15));
-            painter->drawRect(paintRect);
+//            QnScopedPainterPenRollback(painter, QPen(Qt::gray, 15));
+//            painter->drawRect(paintRect);
         }
     }
 

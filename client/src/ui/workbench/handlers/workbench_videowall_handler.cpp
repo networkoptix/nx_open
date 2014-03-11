@@ -116,7 +116,7 @@ namespace {
 }
 
 QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent)
 {
     m_videoWallMode.active = qnSettings->isVideoWallMode();
@@ -127,7 +127,6 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     m_controlMode.sequence = 0;
 
     m_reviewMode.active = false;
-    m_reviewMode.inGeometryChange = false;
 
     QUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull()) {
@@ -137,54 +136,59 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     m_controlMode.pcUuid = pcUuid.toString();
 
     /* Common connections */
-    connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceRemoved(const QnResourcePtr &)));
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved);
 
     if (m_videoWallMode.active) {
 
         /* Videowall reaction actions */
 
-        connect(action(Qn::DelayedOpenVideoWallItemAction),     SIGNAL(triggered()),        this,   SLOT(at_delayedOpenVideoWallItemAction_triggered()));
+        connect(action(Qn::DelayedOpenVideoWallItemAction), &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
 
-        connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resPool_resourceAdded(const QnResourcePtr &)));
+        connect(resourcePool(), &QnResourcePool::resourceAdded,   this,   &QnWorkbenchVideoWallHandler::at_resPool_resourceAdded);
+
         foreach(const QnResourcePtr &resource, resourcePool()->getResources())
             at_resPool_resourceAdded(resource);
 
-        connect(QnClientMessageProcessor::instance(),  SIGNAL(videoWallControlMessageReceived(QnVideoWallControlMessage)),
-                this, SLOT(at_eventManager_controlMessageReceived(const QnVideoWallControlMessage &)));
+        //TODO: #GDM VW may be we should override ::instance() ?
+        QnClientMessageProcessor* clientMessageProcessor = static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance());
 
-        //connect(QnClientMessageProcessor::instance(), SIGNAL(connectionClosed()) TODO: #GDM VW reinitialize window state if someone control us?
-        connect(QnClientMessageProcessor::instance(),       SIGNAL(connectionOpened()), this,   SLOT(at_connection_opened()));
+        connect(clientMessageProcessor,   &QnClientMessageProcessor::videoWallControlMessageReceived,
+                this,                     &QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived);
+
+        //connect(clientMessageProcessor, SIGNAL(connectionClosed()) TODO: #GDM VW reinitialize window state if someone control us?
+        connect(clientMessageProcessor,   &QnClientMessageProcessor::connectionOpened,  this,   &QnWorkbenchVideoWallHandler::at_connection_opened);
     } else {
 
         /* Control videowall actions */
 
-        connect(action(Qn::NewVideoWallAction),             SIGNAL(triggered()),        this,   SLOT(at_newVideoWallAction_triggered()));
-        connect(action(Qn::AttachToVideoWallAction),        SIGNAL(triggered()),        this,   SLOT(at_attachToVideoWallAction_triggered()));
-        connect(action(Qn::DetachFromVideoWallAction),      SIGNAL(triggered()),        this,   SLOT(at_detachFromVideoWallAction_triggered()));
-        connect(action(Qn::ResetVideoWallLayoutAction),     SIGNAL(triggered()),        this,   SLOT(at_resetVideoWallLayoutAction_triggered()));
-        connect(action(Qn::DeleteVideoWallItemAction),      SIGNAL(triggered()),        this,   SLOT(at_deleteVideoWallItemAction_triggered()));
-        connect(action(Qn::StartVideoWallAction),           SIGNAL(triggered()),        this,   SLOT(at_startVideoWallAction_triggered()));
-        connect(action(Qn::StopVideoWallAction),            SIGNAL(triggered()),        this,   SLOT(at_stopVideoWallAction_triggered()));
-        connect(action(Qn::RenameAction),                   SIGNAL(triggered()),        this,   SLOT(at_renameAction_triggered()));
-        connect(action(Qn::IdentifyVideoWallAction),        SIGNAL(triggered()),        this,   SLOT(at_identifyVideoWallAction_triggered()));
-        connect(action(Qn::AddVideoWallItemsToUserAction),  SIGNAL(triggered()),        this,   SLOT(at_addVideoWallItemsToUserAction_triggered()));
-        connect(action(Qn::StartVideoWallControlAction),    SIGNAL(triggered()),        this,   SLOT(at_startVideoWallControlAction_triggered()));
-        connect(action(Qn::OpenVideoWallsReviewAction),     SIGNAL(triggered()),        this,   SLOT(at_openVideoWallsReviewAction_triggered()));
-        connect(action(Qn::SaveVideoWallReviewAction),      SIGNAL(triggered()),        this,   SLOT(at_saveVideoWallReviewAction_triggered()));
+        connect(action(Qn::NewVideoWallAction),             &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered);
+        connect(action(Qn::AttachToVideoWallAction),        &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered);
+        connect(action(Qn::DetachFromVideoWallAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered);
+        connect(action(Qn::ResetVideoWallLayoutAction),     &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_resetVideoWallLayoutAction_triggered);
+        connect(action(Qn::DeleteVideoWallItemAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered);
+        connect(action(Qn::StartVideoWallAction),           &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered);
+        connect(action(Qn::StopVideoWallAction),            &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered);
+        connect(action(Qn::RenameAction),                   &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_renameAction_triggered);
+        connect(action(Qn::IdentifyVideoWallAction),        &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered);
+        connect(action(Qn::AddVideoWallItemsToUserAction),  &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_addVideoWallItemsToUserAction_triggered);
+        connect(action(Qn::StartVideoWallControlAction),    &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered);
+        connect(action(Qn::OpenVideoWallsReviewAction),     &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered);
+        connect(action(Qn::SaveVideoWallReviewAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered);
 
 
-        connect(display(),          SIGNAL(widgetAdded(QnResourceWidget*)),             this,   SLOT(at_display_widgetAdded(QnResourceWidget*)));
-        connect(display(),          SIGNAL(widgetAboutToBeRemoved(QnResourceWidget*)),  this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget*)));
+        connect(display(),     &QnWorkbenchDisplay::widgetAdded,                        this,   &QnWorkbenchVideoWallHandler::at_display_widgetAdded);
+        connect(display(),     &QnWorkbenchDisplay::widgetAboutToBeRemoved,             this,   &QnWorkbenchVideoWallHandler::at_display_widgetAboutToBeRemoved);
 
-        connect(context(),          SIGNAL(userChanged(const QnUserResourcePtr &)),     this,   SLOT(at_context_userChanged()));
+        connect(context(),     &QnWorkbenchContext::userChanged,                        this,   &QnWorkbenchVideoWallHandler::at_context_userChanged);
 
-        connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this,   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
-        connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this,   SLOT(at_workbench_currentLayoutChanged()));
+        connect(workbench(),   &QnWorkbench::currentLayoutAboutToBeChanged,             this,   &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutAboutToBeChanged);
+        connect(workbench(),   &QnWorkbench::currentLayoutChanged,                      this,   &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutChanged);
 
-        connect(navigator(),        SIGNAL(positionChanged()),                          this,   SLOT(at_navigator_positionChanged()));
-        connect(navigator(),        SIGNAL(speedChanged()),                             this,   SLOT(at_navigator_speedChanged()));
+        connect(navigator(),   &QnWorkbenchNavigator::positionChanged,                  this,   &QnWorkbenchVideoWallHandler::at_navigator_positionChanged);
+        connect(navigator(),   &QnWorkbenchNavigator::speedChanged,                     this,   &QnWorkbenchVideoWallHandler::at_navigator_speedChanged);
 
-        connect(context()->instance<QnWorkbenchStreamSynchronizer>(), SIGNAL(runningChanged()), this, SLOT(at_workbenchStreamSynchronizer_runningChanged()));
+        connect(context()->instance<QnWorkbenchStreamSynchronizer>(),   &QnWorkbenchStreamSynchronizer::runningChanged,
+                this,                                                   &QnWorkbenchVideoWallHandler::at_workbenchStreamSynchronizer_runningChanged);
 
         foreach(QnResourceWidget *widget, display()->widgets())
             at_display_widgetAdded(widget);
@@ -711,107 +715,33 @@ void QnWorkbenchVideoWallHandler::restoreMessages(const QUuid &controllerUuid, q
     }
 }
 
-void QnWorkbenchVideoWallHandler::addScreenToReviewLayout(const QnVideoWallResourcePtr &videowall,
-                                                          const QnVideoWallPcData &pc,
-                                                          const QnVideoWallPcData::PcScreen &screen,
-                                                          const QnLayoutResourcePtr &layout) {
-
-/*    QnVideoWallResourcePtr videoWall = layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
-    if (!videoWall)
-        return;
-
-    QnVideoWallPcData pc = videoWall->getPc(source.pcUuid);
-    if (pc.screens.isEmpty())
-        return;
-*/
-    /*
-    QRect united = pc.unitedGeometry();
-
-    QSet<int> leftSet, topSet;
-    foreach(QnVideoWallPcData::PcScreen screen, pc.screens) {
-        int w = screen.geometry.width() / 2;
-        int h = screen.geometry.height() / 2;
-        leftSet << screen.geometry.left() << screen.geometry.left() + w + 1;
-        topSet << screen.geometry.top() << screen.geometry.top() + h + 1;
-    }
-
-    int xsnaps = leftSet.size();
-    int ysnaps = topSet.size();
-
-    qreal xstep = (qreal)united.width() / xsnaps;
-    qreal ystep = (qreal)united.height() / ysnaps;
-    if (pc.geometry.width() > 0 && pc.geometry.height() > 0) {
-        xstep /= pc.geometry.width();
-        ystep /= pc.geometry.height();
-    }
-
-    int x = qRound(qreal(source.geometry.left() - united.left()) / xstep);
-    int y = qRound(qreal(source.geometry.top() - united.top()) / ystep);
-
-    if (!geometry.isValid()) {
-        int w = qRound(qreal(source.geometry.width()) / xstep);
-        int h = qRound(qreal(source.geometry.height()) / ystep);
-
-        if (!pc.geometry.isValid()) {
-            if (boundingRect.isValid()) {
-                if (boundingRect.width() > boundingRect.height()) {
-                    pc.geometry.setLeft(boundingRect.left());
-                    pc.geometry.setTop(boundingRect.top() + boundingRect.height() + 1);
-                } else {
-                    pc.geometry.setLeft(boundingRect.left() + boundingRect.width() + 1);
-                    pc.geometry.setTop(boundingRect.top());
-                }
-            }
-            pc.geometry.setWidth(1);
-            pc.geometry.setHeight(1);
-            videoWall->updatePc(pc.uuid, pc);
-        }
-        boundingRect = boundingRect.united(QRect(pc.geometry.left(), pc.geometry.top(), united.width() / xstep, united.height() / ystep));
-
-        geometry = QRect(x, y, w, h);
-        geometry.adjust(pc.geometry.left(), pc.geometry.top(), pc.geometry.left(), pc.geometry.top());
-    }
-    */
-
-    QnLayoutItemData item;
-    item.flags = Qn::Pinned;
-    item.uuid = QUuid::createUuid();
-//    item.combinedGeometry = geometry;
-    item.resource.id = videowall->getId(); //source.layout;
-    item.dataByRole[Qn::VideoWallPcGuidRole] = qVariantFromValue<QUuid>(pc.uuid);
-//    item.dataByRole[Qn::VideoWallPcScreenIndexRole] = screen.index;
-//    item.dataByRole[Qn::ItemScreenPositionRole] = qVariantFromValue(QPoint(x, y));
-
-    layout->addItem(item);
-//    layout->setCellAspectRatio(xstep / ystep);
-}
-
 void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
     if (m_controlMode.active == active)
         return;
 
     QnWorkbenchLayout* layout = workbench()->currentLayout();
     if (active) {
-        connect(workbench(),    SIGNAL(itemChanged(Qn::ItemRole)),         this,    SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-        connect(layout,         SIGNAL(itemAdded(QnWorkbenchItem *)),      this,    SLOT(at_workbenchLayout_itemAdded_controlMode(QnWorkbenchItem *)));
-        connect(layout,         SIGNAL(itemRemoved(QnWorkbenchItem *)),    this,    SLOT(at_workbenchLayout_itemRemoved_controlMode(QnWorkbenchItem *)));
-        connect(layout,         SIGNAL(zoomLinkAdded(QnWorkbenchItem*,QnWorkbenchItem*)),   this, SLOT(at_workbenchLayout_zoomLinkAdded(QnWorkbenchItem*,QnWorkbenchItem*)));
-        connect(layout,         SIGNAL(zoomLinkRemoved(QnWorkbenchItem*,QnWorkbenchItem*)), this, SLOT(at_workbenchLayout_zoomLinkRemoved(QnWorkbenchItem*,QnWorkbenchItem*)));
+        connect(workbench(),    &QnWorkbench::itemChanged,              this,   &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
+        connect(layout,         &QnWorkbenchLayout::itemAdded,          this,   &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode);
+        connect(layout,         &QnWorkbenchLayout::itemRemoved,        this,   &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemRemoved_controlMode);
+        connect(layout,         &QnWorkbenchLayout::zoomLinkAdded,      this,   &QnWorkbenchVideoWallHandler::at_workbenchLayout_zoomLinkAdded);
+        connect(layout,         &QnWorkbenchLayout::zoomLinkRemoved,    this,   &QnWorkbenchVideoWallHandler::at_workbenchLayout_zoomLinkRemoved);
 
         foreach (QnWorkbenchItem* item, layout->items()) {
-             connect(item,      SIGNAL(dataChanged(int)),                  this,    SLOT(at_workbenchLayoutItem_dataChanged(int)));
+             connect(item,      &QnWorkbenchItem::dataChanged,          this,   &QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged);
         }
 
         m_controlMode.active = active;
         sendMessage(QnVideoWallControlMessage(QnVideoWallControlMessage::ControlStarted));
     } else {
-        disconnect(workbench(), SIGNAL(itemChanged(Qn::ItemRole)),         this,    SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-        disconnect(layout,      SIGNAL(itemAdded(QnWorkbenchItem *)),      this,    SLOT(at_workbenchLayout_itemAdded_controlMode(QnWorkbenchItem *)));
-        disconnect(layout,      SIGNAL(itemRemoved(QnWorkbenchItem *)),    this,    SLOT(at_workbenchLayout_itemRemoved_controlMode(QnWorkbenchItem *)));
-        disconnect(layout,      SIGNAL(zoomLinkAdded(QnWorkbenchItem*,QnWorkbenchItem*)),   this, SLOT(at_workbenchLayout_zoomLinkAdded(QnWorkbenchItem*,QnWorkbenchItem*)));
-        disconnect(layout,      SIGNAL(zoomLinkRemoved(QnWorkbenchItem*,QnWorkbenchItem*)), this, SLOT(at_workbenchLayout_zoomLinkRemoved(QnWorkbenchItem*,QnWorkbenchItem*)));
+        disconnect(workbench(),    &QnWorkbench::itemChanged,           this,   &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
+        disconnect(layout,         &QnWorkbenchLayout::itemAdded,       this,   &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode);
+        disconnect(layout,         &QnWorkbenchLayout::itemRemoved,     this,   &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemRemoved_controlMode);
+        disconnect(layout,         &QnWorkbenchLayout::zoomLinkAdded,   this,   &QnWorkbenchVideoWallHandler::at_workbenchLayout_zoomLinkAdded);
+        disconnect(layout,         &QnWorkbenchLayout::zoomLinkRemoved, this,   &QnWorkbenchVideoWallHandler::at_workbenchLayout_zoomLinkRemoved);
+
         foreach (QnWorkbenchItem* item, layout->items()) {
-             disconnect(item,   SIGNAL(dataChanged(int)),                  this,    SLOT(at_workbenchLayoutItem_dataChanged(int)));
+             disconnect(item,      &QnWorkbenchItem::dataChanged,       this,   &QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged);
         }
 
         sendMessage(QnVideoWallControlMessage(QnVideoWallControlMessage::ControlStopped));
@@ -822,25 +752,8 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
 void QnWorkbenchVideoWallHandler::setReviewMode(bool active) {
     if (m_reviewMode.active == active)
         return;
-
-    QnWorkbenchLayout* layout = workbench()->currentLayout();
-    if (active) {
-        connect(layout,         SIGNAL(itemAdded(QnWorkbenchItem *)),      this,    SLOT(at_workbenchLayout_itemAdded_reviewMode(QnWorkbenchItem *)));
-        connect(layout,         SIGNAL(itemRemoved(QnWorkbenchItem *)),    this,    SLOT(at_workbenchLayout_itemRemoved_reviewMode(QnWorkbenchItem *)));
-        foreach (QnWorkbenchItem* item, layout->items()) {
-             connect(item,      SIGNAL(geometryChanged()),                 this,    SLOT(at_workbenchLayoutItem_geometryChanged()));
-        }
-
-        m_reviewMode.active = active;
-    } else {
-        disconnect(layout,      SIGNAL(itemAdded(QnWorkbenchItem *)),      this,    SLOT(at_workbenchLayout_itemAdded_reviewMode(QnWorkbenchItem *)));
-        disconnect(layout,      SIGNAL(itemRemoved(QnWorkbenchItem *)),    this,    SLOT(at_workbenchLayout_itemRemoved_reviewMode(QnWorkbenchItem *)));
-        foreach (QnWorkbenchItem* item, layout->items()) {
-             disconnect(item,      SIGNAL(geometryChanged()),              this,    SLOT(at_workbenchLayoutItem_geometryChanged()));
-        }
-
-        m_reviewMode.active = active;
-    }
+    m_reviewMode.active = active;
+    //TODO: #GDM VW what should we update or notify?
 }
 
 
@@ -885,8 +798,8 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen() {
         return;
     }
 
-    connect(videoWall.data(), SIGNAL(itemChanged(const QnVideoWallResourcePtr&, const QnVideoWallItem&)), this, SLOT(at_videoWall_itemChanged(const QnVideoWallResourcePtr&, const QnVideoWallItem&)));
-    connect(videoWall.data(), SIGNAL(itemRemoved(const QnVideoWallResourcePtr&, const QnVideoWallItem&)), this, SLOT(at_videoWall_itemRemoved(const QnVideoWallResourcePtr&, const QnVideoWallItem&)));
+    connect(videoWall, &QnVideoWallResource::itemChanged, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged);
+    connect(videoWall, &QnVideoWallResource::itemRemoved, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved);
 
     bool master = m_videoWallMode.instanceGuid.isNull();
     if (master) {
@@ -1296,12 +1209,9 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         layout->setData(Qn::VideoWallResourceRole, qVariantFromValue(videoWall));
         resourcePool()->addResource(layout);
 
-        connect(videoWall.data(),   SIGNAL(itemAdded(const QnVideoWallResourcePtr &, const QnVideoWallItem &)),
-                this,               SLOT(at_videoWall_itemAdded_inReviewMode(QnVideoWallResourcePtr,QnVideoWallItem)));
-        connect(videoWall.data(),   SIGNAL(itemChanged(QnVideoWallResourcePtr,QnVideoWallItem)),
-                this,               SLOT(at_videoWall_itemChanged_inReviewMode(QnVideoWallResourcePtr,QnVideoWallItem)));
-        connect(videoWall.data(),   SIGNAL(itemRemoved(const QnVideoWallResourcePtr &, const QnVideoWallItem &)),
-                this,               SLOT(at_videoWall_itemRemoved_inReviewMode(QnVideoWallResourcePtr,QnVideoWallItem)));
+        connect(videoWall, &QnVideoWallResource::itemAdded,     this, &QnWorkbenchVideoWallHandler::at_videoWall_itemAdded_inReviewMode);
+        connect(videoWall, &QnVideoWallResource::itemChanged,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_inReviewMode);
+        connect(videoWall, &QnVideoWallResource::itemRemoved,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_inReviewMode);
 
 //        QRect boundingRect;
 
@@ -1332,6 +1242,56 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
                 if (firstScreen < 0)
                     continue;
 
+                //TODO: #GDM VW here we should read desktopGeometry field and set it to items
+                /*
+                QRect united = pc.unitedGeometry();
+
+                QSet<int> leftSet, topSet;
+                foreach(QnVideoWallPcData::PcScreen screen, pc.screens) {
+                    int w = screen.geometry.width() / 2;
+                    int h = screen.geometry.height() / 2;
+                    leftSet << screen.geometry.left() << screen.geometry.left() + w + 1;
+                    topSet << screen.geometry.top() << screen.geometry.top() + h + 1;
+                }
+
+                int xsnaps = leftSet.size();
+                int ysnaps = topSet.size();
+
+                qreal xstep = (qreal)united.width() / xsnaps;
+                qreal ystep = (qreal)united.height() / ysnaps;
+                if (pc.geometry.width() > 0 && pc.geometry.height() > 0) {
+                    xstep /= pc.geometry.width();
+                    ystep /= pc.geometry.height();
+                }
+
+                int x = qRound(qreal(source.geometry.left() - united.left()) / xstep);
+                int y = qRound(qreal(source.geometry.top() - united.top()) / ystep);
+
+                if (!geometry.isValid()) {
+                    int w = qRound(qreal(source.geometry.width()) / xstep);
+                    int h = qRound(qreal(source.geometry.height()) / ystep);
+
+                    if (!pc.geometry.isValid()) {
+                        if (boundingRect.isValid()) {
+                            if (boundingRect.width() > boundingRect.height()) {
+                                pc.geometry.setLeft(boundingRect.left());
+                                pc.geometry.setTop(boundingRect.top() + boundingRect.height() + 1);
+                            } else {
+                                pc.geometry.setLeft(boundingRect.left() + boundingRect.width() + 1);
+                                pc.geometry.setTop(boundingRect.top());
+                            }
+                        }
+                        pc.geometry.setWidth(1);
+                        pc.geometry.setHeight(1);
+                        videoWall->updatePc(pc.uuid, pc);
+                    }
+                    boundingRect = boundingRect.united(QRect(pc.geometry.left(), pc.geometry.top(), united.width() / xstep, united.height() / ystep));
+
+                    geometry = QRect(x, y, w, h);
+                    geometry.adjust(pc.geometry.left(), pc.geometry.top(), pc.geometry.left(), pc.geometry.top());
+                }
+                */
+
                 QnLayoutItemData itemData;
 //                itemData.flags = Qn::Pinned;
                 itemData.flags = Qn::PendingGeometryAdjustment;
@@ -1346,8 +1306,6 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
 
         }
 
-//        foreach(const QnVideoWallItem &source, videoWall->getItems())
-//            addScreenToReviewLayout(source, layout, boundingRect);
 
         menu()->trigger(Qn::OpenSingleLayoutAction, layout);
     }
@@ -1440,12 +1398,9 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr
             }
 
             if (QnVideoWallResourcePtr videoWall = layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>()) {
-                disconnect(videoWall.data(),   SIGNAL(itemAdded(const QnVideoWallResourcePtr &, const QnVideoWallItem &)),
-                            this,               SLOT(at_videoWall_itemAdded_inReviewMode(QnVideoWallResourcePtr,QnVideoWallItem)));
-                disconnect(videoWall.data(),   SIGNAL(itemChanged(QnVideoWallResourcePtr,QnVideoWallItem)),
-                            this,               SLOT(at_videoWall_itemChanged_inReviewMode(QnVideoWallResourcePtr,QnVideoWallItem)));
-                disconnect(videoWall.data(),   SIGNAL(itemRemoved(const QnVideoWallResourcePtr &, const QnVideoWallItem &)),
-                            this,               SLOT(at_videoWall_itemRemoved_inReviewMode(QnVideoWallResourcePtr,QnVideoWallItem)));
+                disconnect(videoWall, &QnVideoWallResource::itemAdded,     this, &QnWorkbenchVideoWallHandler::at_videoWall_itemAdded_inReviewMode);
+                disconnect(videoWall, &QnVideoWallResource::itemChanged,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_inReviewMode);
+                disconnect(videoWall, &QnVideoWallResource::itemRemoved,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_inReviewMode);
             }
         }
 
@@ -1474,18 +1429,22 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved(const QnVideoWallReso
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded_inReviewMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     QnWorkbenchLayout* layout = findReviewModeLayout(videoWall);
+    assert(false); //TODO: #GDM VW this should be reimplemented for sure
+
     if (!layout)
         return;
 
-//    QRect boundingRect = layout->boundingRect();
-//    addScreenToReviewLayout(item, layout->resource(), boundingRect);
+
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_inReviewMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     QnWorkbenchLayout* layout = findReviewModeLayout(videoWall);
+    assert(false); //TODO: #GDM VW this should be reimplemented for sure
+
     if (!layout)
         return;
 
+    //TODO: #GDM VW reimplement
 //    foreach (QnWorkbenchItem* workbenchItem, layout->items()) {
 //        if (workbenchItem->data(Qn::VideoWallItemGuidRole).toUuid() != item.uuid)
 //            continue;
@@ -1501,8 +1460,12 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_inReviewMode(const Qn
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_inReviewMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     QnWorkbenchLayout* layout = findReviewModeLayout(videoWall);
+    assert(false); //TODO: #GDM VW this should be reimplemented for sure
+
     if (!layout)
         return;
+
+    //TODO: #GDM VW reimplement
 
 //    foreach (QnWorkbenchItem* workbenchItem, layout->items()) {
 //        if (workbenchItem->data(Qn::VideoWallItemGuidRole).toUuid() != item.uuid)
@@ -1563,7 +1526,7 @@ void QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived(const Q
 void QnWorkbenchVideoWallHandler::at_display_widgetAdded(QnResourceWidget* widget) {
     if (widget->resource()->flags() & QnResource::sync) {
         if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
-            connect(mediaWidget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
+            connect(mediaWidget, &QnMediaResourceWidget::motionSelectionChanged, this, &QnWorkbenchVideoWallHandler::at_widget_motionSelectionChanged);
         }
     }
 }
@@ -1587,12 +1550,12 @@ void QnWorkbenchVideoWallHandler::at_widget_motionSelectionChanged() {
 }
 
 void QnWorkbenchVideoWallHandler::at_workbench_currentLayoutAboutToBeChanged() {
-    disconnect(workbench()->currentLayout(), 0, this, 0);
+    disconnect(workbench()->currentLayout(), NULL, this, NULL);
     setControlMode(false);
 }
 
 void QnWorkbenchVideoWallHandler::at_workbench_currentLayoutChanged() {
-    connect(workbench()->currentLayout(), SIGNAL(dataChanged(int)), this, SLOT(at_workbenchLayout_dataChanged(int)));
+    connect(workbench()->currentLayout(), &QnWorkbenchLayout::dataChanged, this, &QnWorkbenchVideoWallHandler::at_workbenchLayout_dataChanged);
     updateMode();
 }
 
@@ -1611,7 +1574,7 @@ void QnWorkbenchVideoWallHandler::at_workbench_itemChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode(QnWorkbenchItem *item) {
-    connect(item, SIGNAL(dataChanged(int)),     this,   SLOT(at_workbenchLayoutItem_dataChanged(int)));
+    connect(item, &QnWorkbenchItem::dataChanged,     this,   &QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged);
 
     if (!m_controlMode.active)
         return;
@@ -1627,7 +1590,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode(QnWor
 }
 
 void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemRemoved_controlMode(QnWorkbenchItem *item) {
-    disconnect(item, SIGNAL(dataChanged(int)),     this,   SLOT(at_workbenchLayoutItem_dataChanged(int)));
+    disconnect(item, &QnWorkbenchItem::dataChanged,     this,   &QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged);
 
     if (!m_controlMode.active)
         return;
@@ -1635,14 +1598,6 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemRemoved_controlMode(QnW
     QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemRemoved);
     message[uuidKey] = item->uuid().toString();
     sendMessage(message);
-}
-
-void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_reviewMode(QnWorkbenchItem *item) {
-//    connect(item, SIGNAL(geometryChanged()),    this,   SLOT(at_workbenchLayoutItem_geometryChanged()));
-}
-
-void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemRemoved_reviewMode(QnWorkbenchItem *item) {
-//    disconnect(item, SIGNAL(geometryChanged()),    this,   SLOT(at_workbenchLayoutItem_geometryChanged()));
 }
 
 void QnWorkbenchVideoWallHandler::at_workbenchLayout_zoomLinkAdded(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem) {
@@ -1800,43 +1755,6 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(int role) {
     message[uuidKey] = item->uuid().toString();
     message[valueKey] = QString::fromUtf8(json);
     sendMessage(message);
-}
-
-void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_geometryChanged() {
-//    if (!m_reviewMode.active)
-//        return;
-//    if (m_reviewMode.inGeometryChange)
-//        return;
-
-//    QnWorkbenchLayout* layout = context()->workbench()->currentLayout();
-//    QnVideoWallResourcePtr videoWall = layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
-//    if (!videoWall)
-//        return;
-
-//    m_reviewMode.inGeometryChange = true;
-
-//    QnWorkbenchItem* item = static_cast<QnWorkbenchItem *>(sender());
-//    QUuid itemUuid = item->data(Qn::VideoWallItemGuidRole).value<QUuid>();
-//    QUuid pcUuid = videoWall->getItem(itemUuid).pcUuid;
-//    QPoint screenPosition = item->data(Qn::ItemScreenPositionRole).value<QPoint>();
-
-//    foreach (QnWorkbenchItem* otherItem, layout->items()) {
-//        if (otherItem == item)
-//            continue;
-
-//        QUuid otherItemUuid = otherItem->data(Qn::VideoWallItemGuidRole).value<QUuid>();
-//        QUuid otherPcUuid = videoWall->getItem(otherItemUuid).pcUuid;
-//        if (otherPcUuid != pcUuid)
-//            continue;
-
-//        QPoint otherScreenPosition = otherItem->data(Qn::ItemScreenPositionRole).value<QPoint>();
-//        QRect otherGeometry = item->geometry();
-//        otherGeometry.moveTopLeft(otherGeometry.topLeft() + otherScreenPosition - screenPosition);
-//        otherItem->setGeometry(otherGeometry);
-//    }
-
-//    m_reviewMode.inGeometryChange = false;
-
 }
 
 void QnWorkbenchVideoWallHandler::at_navigator_positionChanged() {

@@ -14,12 +14,16 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <utils/common/connective.h>
+
 class QnWorkbenchItem;
 class QnResourceWidget;
 
-class QnWorkbenchVideoWallHandler : public QObject, public QnWorkbenchContextAware
+class QnWorkbenchVideoWallHandler : public Connective<QObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
+
+    typedef Connective<QObject> base_type;
 public:
     explicit QnWorkbenchVideoWallHandler(QObject *parent = 0);
     virtual ~QnWorkbenchVideoWallHandler();
@@ -43,9 +47,6 @@ private:
     void handleMessage(const QnVideoWallControlMessage &message, const QUuid &controllerUuid = QUuid(), qint64 sequence = -1 );
     void storeMessage(const QnVideoWallControlMessage &message, const QUuid &controllerUuid, qint64 sequence);
     void restoreMessages(const QUuid &controllerUuid, qint64 sequence);
-
-//    void addScreenToReviewLayout(const QnVideoWallItem &source, const QnLayoutResourcePtr &layout, QRect &boundingRect, QRect geometry = QRect());
-    void addScreenToReviewLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallPcData &pc, const QnVideoWallPcData::PcScreen &screen, const QnLayoutResourcePtr &layout);
 
     /** Returns list of target videowall items for current layout. */
     QnVideoWallItemIndexList targetList() const;
@@ -96,14 +97,11 @@ private slots:
 
     void at_workbenchLayout_itemAdded_controlMode(QnWorkbenchItem *item);
     void at_workbenchLayout_itemRemoved_controlMode(QnWorkbenchItem *item);
-    void at_workbenchLayout_itemAdded_reviewMode(QnWorkbenchItem *item);
-    void at_workbenchLayout_itemRemoved_reviewMode(QnWorkbenchItem *item);
     void at_workbenchLayout_zoomLinkAdded(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
     void at_workbenchLayout_zoomLinkRemoved(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem);
     void at_workbenchLayout_dataChanged(int role);
 
     void at_workbenchLayoutItem_dataChanged(int role);
-    void at_workbenchLayoutItem_geometryChanged();
 
     void at_navigator_positionChanged();
     void at_navigator_speedChanged();
@@ -189,7 +187,6 @@ private:
 
     struct {
         bool active;
-        bool inGeometryChange;
     } m_reviewMode;
 
 
