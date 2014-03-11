@@ -37,19 +37,19 @@ QnActionCondition::QnActionCondition(QObject *parent):
 
 Qn::ActionVisibility QnActionCondition::check(const QnResourceList &) { 
     return Qn::InvisibleAction; 
-};
+}
 
 Qn::ActionVisibility QnActionCondition::check(const QnLayoutItemIndexList &layoutItems) { 
     return check(QnActionParameterTypes::resources(layoutItems));
-};
+}
 
 Qn::ActionVisibility QnActionCondition::check(const QnResourceWidgetList &widgets) { 
     return check(QnActionParameterTypes::layoutItems(widgets));
-};
+}
 
 Qn::ActionVisibility QnActionCondition::check(const QnWorkbenchLayoutList &layouts) { 
     return check(QnActionParameterTypes::resources(layouts));
-};
+}
 
 Qn::ActionVisibility QnActionCondition::check(const QnActionParameters &parameters) {
     switch(parameters.type()) {
@@ -66,6 +66,7 @@ Qn::ActionVisibility QnActionCondition::check(const QnActionParameters &paramete
         return Qn::InvisibleAction;
     }
 }
+
  bool QnVideoWallReviewModeCondition::isVideoWallReviewMode() const {
     return context()->workbench()->currentLayout()->data().contains(Qn::VideoWallResourceRole);
 }
@@ -140,7 +141,7 @@ Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetLi
     if(widgets.size() != 1 || !widgets[0])
         return Qn::InvisibleAction;
 
-    if (widgets[0]->resource()->flags() & QnResource::layout)
+    if (widgets[0]->resource()->flags() & QnResource::videowall)
         return Qn::InvisibleAction;
 
     return ((widgets[0]->item() == workbench()->item(Qn::ZoomedRole)) == m_requiredZoomedState) ? Qn::EnabledAction : Qn::InvisibleAction;
@@ -360,7 +361,7 @@ Qn::ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetL
         return Qn::InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
-    if(widget->resource()->flags() & (QnResource::server | QnResource::layout))
+    if(widget->resource()->flags() & (QnResource::server | QnResource::videowall))
         return Qn::InvisibleAction;
 
     QString url = widget->resource()->getUrl().toLower();
