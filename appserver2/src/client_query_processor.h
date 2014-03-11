@@ -13,6 +13,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 
+#include <utils/common/scoped_thread_rollback.h>
 #include <utils/network/http/asynchttpclient.h>
 
 #include "cluster/cluster_manager.h"
@@ -63,6 +64,7 @@ namespace ec2
             QMutexLocker lk( &m_mutex );
             if( !httpClient->doPost( requestUrl, "application/octet-stream", tranBuffer ) )
             {
+                QnScopedThreadRollback ensureFreeThread(1);
                 QtConcurrent::run( std::bind( handler, ErrorCode::failure ) );
                 return;
             }
@@ -97,6 +99,7 @@ namespace ec2
             QMutexLocker lk( &m_mutex );
             if( !httpClient->doGet( requestUrl ) )
             {
+                QnScopedThreadRollback ensureFreeThread(1);
                 QtConcurrent::run( std::bind( handler, ErrorCode::failure, OutputData() ) );
                 return;
             }
