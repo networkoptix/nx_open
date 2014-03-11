@@ -287,7 +287,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
             break; // nothing to do
 
         default:
-            Q_ASSERT(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
+            Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
             break;
     }
 
