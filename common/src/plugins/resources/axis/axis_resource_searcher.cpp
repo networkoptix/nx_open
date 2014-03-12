@@ -210,25 +210,23 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
     local_results.push_back(resource);
 
 
-    
-
-    int channesl = 1;
+    int channels = 1;
 
     if (resource->hasParam(QLatin1String("channelsAmount")))
     {
         QVariant val;
         resource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
-        channesl = val.toUInt();
+        channels = val.toUInt();
     }
 
-    if (channesl > 1) //
+    if (channels > 1)
     {
         resource->setGroupName(resource->getPhysicalId());
         resource->setGroupId(resource->getPhysicalId());
 
         resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(1));
 
-        for (int i = 2; i <= channesl; ++i)
+        for (int i = 2; i <= channels; ++i)
         {
             QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 

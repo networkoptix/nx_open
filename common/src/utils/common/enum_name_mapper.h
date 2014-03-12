@@ -140,4 +140,11 @@ __VA_ARGS__ QnTypedEnumNameMapper<SCOPE::ENUM> createEnumNameMapper(SCOPE::ENUM 
 }
 
 
+namespace Qt {
+    /**
+     * Workaround for accessing Qt namespace metaobject.
+     */
+    extern const QMetaObject &staticMetaObject;
+}
+
 #endif // QN_ENUM_NAME_MAPPER_H

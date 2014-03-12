@@ -26,6 +26,7 @@ public:
      */
     virtual QString toolTipAt(const QPointF &pos) const = 0;
 
+    // TODO: #Elric do we need this function? Probably not. Just returning empty QString should suffice.
     /**
      * \param pos                       Position inside an item.
      * \returns                         True if default GraphicsTooltip should not be drawn.

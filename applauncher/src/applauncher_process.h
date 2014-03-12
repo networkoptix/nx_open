@@ -23,17 +23,6 @@
 #include "task_server_new.h"
 #include "version.h"
 
-
-#ifdef AK_DEBUG
-#ifdef _WIN32
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String("client.exe")) );
-#else
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String("client")) );
-#endif
-#else
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String(QN_CLIENT_EXECUTABLE_NAME)) );
-#endif
-
 class ApplauncherProcess
 :
     public QObject,

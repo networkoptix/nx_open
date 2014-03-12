@@ -22,6 +22,9 @@ typedef QnBusinessActionData* QnLightBusinessActionP;
 
 QHash<QnId, QnResourcePtr> QnEventLogModel::m_resourcesHash;
 
+// -------------------------------------------------------------------------- //
+// QnEventLogModel::DataIndex
+// -------------------------------------------------------------------------- //
 class QnEventLogModel::DataIndex
 {
 public:
@@ -42,9 +45,9 @@ public:
             events.insert(QnBusinessStringsHelper::eventName(BusinessEventType::Value(i)), i);
             m_eventTypeToLexOrder[i] = 255; // put undefined events to the end of the list
         }
-        int cnt = 0;
+        int count = 0;
         for(QMap<QString, int>::const_iterator itr = events.begin(); itr != events.end(); ++itr)
-            m_eventTypeToLexOrder[itr.value()] = cnt++;
+            m_eventTypeToLexOrder[itr.value()] = count++;
 
         // action types to lex order
         QMap<QString, int> actions;
@@ -52,9 +55,9 @@ public:
             actions.insert(QnBusinessStringsHelper::actionName(BusinessActionType::Value(i)), i);
             m_actionTypeToLexOrder[i] = 255; // put undefined actions to the end of the list
         }
-        cnt = 0;
-        for(QMap<QString, int>::const_iterator itr = events.begin(); itr != events.end(); ++itr)
-            m_actionTypeToLexOrder[itr.value()] = cnt++;
+        count = 0;
+        for(QMap<QString, int>::const_iterator itr = actions.begin(); itr != actions.end(); ++itr)
+            m_actionTypeToLexOrder[itr.value()] = count++;
     }
 
     void setSort(int column, Qt::SortOrder order)
@@ -96,16 +99,16 @@ public:
     }
 
     /*
-    * Reorder event types to lexographical order (for sorting)
-    */
+     * Reorder event types to lexicographical order (for sorting)
+     */
     static int toLexEventType(BusinessEventType::Value eventType)
     {
         return m_eventTypeToLexOrder[((int) eventType) & 0xff];
     }
 
     /*
-    * Reorder actions types to lexographical order (for sorting)
-    */
+     * Reorder actions types to lexicographical order (for sorting)
+     */
     static int toLexActionType(BusinessActionType::Value actionType)
     {
         return m_actionTypeToLexOrder[((int) actionType) & 0xff];
@@ -175,8 +178,7 @@ public:
         }
 
         LessFunc lessThan;
-        switch(m_sortCol)
-        {
+        switch(m_sortCol) {
         case DateTimeColumn:
             lessThan = &lessThanTimestamp;
             break;
@@ -202,15 +204,17 @@ private:
     QVector<QnBusinessActionDataListPtr> m_events;
     QVector<QnLightBusinessActionP> m_records;
     int m_size;
-    static int m_eventTypeToLexOrder[256];
+    static int m_eventTypeToLexOrder[256]; // TODO: #Elric evil statics. Make non-static.
     static int m_actionTypeToLexOrder[256];
 };
 
 int QnEventLogModel::DataIndex::m_eventTypeToLexOrder[256];
 int QnEventLogModel::DataIndex::m_actionTypeToLexOrder[256];
 
-// ---------------------- EventLogModel --------------------------
 
+// -------------------------------------------------------------------------- //
+// QnEventLogModel
+// -------------------------------------------------------------------------- //
 QnEventLogModel::QnEventLogModel(QObject *parent):
     base_type(parent),
     m_linkBrush(QPalette().link())
@@ -218,7 +222,7 @@ QnEventLogModel::QnEventLogModel(QObject *parent):
     m_linkFont.setUnderline(true);
     m_index = new DataIndex();
 
-    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(at_resource_removed(QnResourcePtr)));
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnEventLogModel::at_resource_removed);
 }
 
 QnEventLogModel::~QnEventLogModel() {
@@ -263,8 +267,7 @@ QModelIndex QnEventLogModel::index(int row, int column, const QModelIndex &paren
         : QModelIndex();
 }
 
-QModelIndex QnEventLogModel::parent(const QModelIndex &child) const {
-    Q_UNUSED(child);
+QModelIndex QnEventLogModel::parent(const QModelIndex &) const {
     return QModelIndex();
 }
 
@@ -309,7 +312,6 @@ QnResourcePtr QnEventLogModel::getResource(const Column &column, const QnBusines
     }
     return QnResourcePtr();
 }
-
 
 QnResourcePtr QnEventLogModel::getResourceById(const QnId &id) {
     if (!id.isValid())
@@ -395,7 +397,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
         qint64 timestampUsec = action.getRuntimeParams().getEventTimestamp();
         QDateTime dt = QDateTime::fromMSecsSinceEpoch(timestampUsec/1000);
         return dt.toString(Qt::SystemLocaleShortDate);
-                         }
+    }
     case EventColumn:
         return QnBusinessStringsHelper::eventName(action.getRuntimeParams().getEventType());
     case EventCameraColumn:
@@ -410,26 +412,26 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
             return getUserGroupString(action.getParams().getUserGroup());
         else
             return getResourceNameString(action.getRuntimeParams().getActionResourceId());
-                             }
+    }
     case DescriptionColumn: {
         BusinessEventType::Value eventType = action.getRuntimeParams().getEventType();
         QString result;
 
         if (eventType == BusinessEventType::Camera_Motion) {
             if (action.hasFlags(QnBusinessActionData::MotionExists))
-                result = lit("Motion video");
+                result = tr("Motion video");
         }
         else {
-            result = QnBusinessStringsHelper::eventDetails(action.getRuntimeParams(), 1, lit("\n"));
+            result = QnBusinessStringsHelper::eventDetails(action.getRuntimeParams(), 1, tr("\n"));
         }
 
         if (!BusinessEventType::hasToggleState(eventType)) {
-            int cnt = action.getAggregationCount();
-            if (cnt > 1)
-                result += QString(lit(" (%1 times)")).arg(cnt);
+            int count = action.getAggregationCount();
+            if (count > 1)
+                result += tr(" (%1 times)").arg(count); // TODO: #Elric #TR this will probably look bad 
         }
         return result;
-                            }
+    }
     default:
         return QString();
     }
@@ -458,6 +460,7 @@ QString QnEventLogModel::motionUrl(Column column, const QnBusinessActionData& ac
 
     if (action.getRuntimeParams().getEventType() != BusinessEventType::Camera_Motion)
         return QString();
+
     return QnBusinessStringsHelper::motionUrl(action.getRuntimeParams(), true);
 }
 
@@ -476,12 +479,12 @@ bool QnEventLogModel::hasMotionUrl(const QModelIndex &index) const {
 
 int QnEventLogModel::columnCount(const QModelIndex &parent) const {
     Q_UNUSED(parent);
-    return m_columns.size();
+    return m_columns.size(); // TODO: #Elric incorrect, should return zero for non-root nodes.
 }
 
 int QnEventLogModel::rowCount(const QModelIndex &parent) const {
     Q_UNUSED(parent);
-    return m_index->size();
+    return m_index->size(); // TODO: #Elric incorrect, should return zero for non-root nodes.
 }
 
 QVariant QnEventLogModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -504,7 +507,7 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
-    if (index.column() < 0 || index.column() >= m_columns.size())
+    if (index.column() < 0 || index.column() >= m_columns.size()) // TODO: #Elric this is probably not needed, hasIndex checks it?
         return QVariant();
 
     const Column &column = m_columns[index.column()];
@@ -514,8 +517,7 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
 
     const QnBusinessActionData &action = m_index->at(index.row());
 
-    switch(role)
-    {
+    switch(role) {
     case Qt::DisplayRole:
         return QVariant(textData(column, action));
     case Qt::DecorationRole:
@@ -534,8 +536,8 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
         if (url.isEmpty())
             return text;
         else 
-            return QString(lit("<a href=\"%1\">%2</a>")).arg(url, text);
-                              }
+            return lit("<a href=\"%1\">%2</a>").arg(url, text);
+    }
     case Qn::HelpTopicIdRole:
         return helpTopicIdData(column, action);
     default:
@@ -569,6 +571,6 @@ qint64 QnEventLogModel::eventTimestamp(int row) const {
     return AV_NOPTS_VALUE;
 }
 
-void QnEventLogModel::at_resource_removed(QnResourcePtr res) {
-    m_resourcesHash.remove(res->getId());
+void QnEventLogModel::at_resource_removed(const QnResourcePtr &resource) {
+    m_resourcesHash.remove(resource->getId());
 }

@@ -189,9 +189,9 @@
 
     <profiles>
         <profile>
-            <id>build-env</id>
+            <id>build-env-win</id>
             <!-- preparing build-environment only if it is not ready. The last operation is installing llutil to x64 python virtualenv so it can be used as a criteria -->
-            <activation>
+            <activation>        
                 <file>
                     <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
                     <missing>build_environment/target/buildenv.timestamp</missing>
@@ -205,9 +205,6 @@
         <profile>
             <id>quicksync</id>
             <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
                 <property>
                     <name>quicksync</name>
                     <value>true</value>
@@ -468,4 +465,3 @@
         </profile>	      
     </profiles>	
 </project>
-

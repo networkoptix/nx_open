@@ -147,6 +147,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     fisheyeController.reset(new QnPresetPtzController(fisheyeController));
     fisheyeController.reset(new QnTourPtzController(fisheyeController));
     fisheyeController.reset(new QnActivityPtzController(QnActivityPtzController::Local, fisheyeController));
+    fisheyeController.reset(new QnHomePtzController(fisheyeController));
 
     if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {
         serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
@@ -505,9 +506,7 @@ void QnMediaResourceWidget::updateIconButton() {
         return;
     }
 
-    int recordingMode = Qn::RecordingType_Never;
-    if(m_camera->getStatus() == QnResource::Recording)
-        recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), m_camera);
+    int recordingMode = QnRecordingStatusHelper::currentRecordingMode(context(), m_camera);
     QIcon recIcon = QnRecordingStatusHelper::icon(recordingMode);
     iconButton()->setVisible(!recIcon.isNull());
     iconButton()->setIcon(recIcon);
