@@ -178,7 +178,7 @@
         "frameColors": {
             "normal": "808080c0",
             "active": "c0c0c0c0",
-            "selected": "opaqueSelection.darker(30).setAlpha(128)"
+            "selected": "opaqueSelection"
         }
     },
 
@@ -217,7 +217,7 @@
     "QnStyledTooltipWidget": {
         "windowColor": "QColor(255, 255, 255, 192)",
         "frameColor": "#808080",
-        "palette": { "default": { "windowText": "#000000" } }
+        "palette": { "default": { "windowText": "opaqueSelection.darker()" } }
     },
     
     "QnGridItem": {
@@ -269,8 +269,8 @@
     },
     
     "QnGraphicsMessageBox": {
-        "frameColor": "#505050ff",
-        "windowColor": "#202050ff",
+        "frameColor": "opaqueSelection.darker()",
+        "windowColor": "opaqueSelection",
         "textColor": "#a0a0a0ff"
     },
 

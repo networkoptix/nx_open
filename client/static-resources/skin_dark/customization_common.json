@@ -177,7 +177,7 @@
         "frameColors": {
             "normal": "808080c0",
             "active": "c0c0c0c0",
-            "selected": "opaqueSelection.darker(30).setAlpha(128)"
+            "selected": "opaqueSelection"
         }
     },
     
@@ -216,7 +216,7 @@
     "QnStyledTooltipWidget": {
         "windowColor": "QColor(0, 0, 0, 255)",
         "frameColor": "QColor(203, 210, 233, 128)",
-        "palette": { "default": { "windowText": "QColor(63, 159, 216)" } }
+        "palette": { "default": { "windowText": "opaqueSelection" } }
     },
     
     "QnGridItem": {
