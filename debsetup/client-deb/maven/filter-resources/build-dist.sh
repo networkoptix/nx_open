@@ -3,6 +3,7 @@
 COMPANY_NAME=${deb.customization.company.name}
 FULL_COMPANY_NAME="${company.name}"
 FULL_PRODUCT_NAME="${company.name} ${product.name} Client.conf"
+FULL_APPLAUNCHER_NAME="${company.name} Launcher.conf"
 
 PACKAGENAME=$COMPANY_NAME-client
 VERSION=${release.version}
@@ -47,6 +48,7 @@ mkdir -p $BGSTAGE
 mkdir -p $ICONSTAGE
 mkdir -p "$STAGE/etc/xdg/$FULL_COMPANY_NAME"
 mv -f debian/client.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_PRODUCT_NAME"
+mv -f debian/applauncher.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_APPLAUNCHER_NAME"
 mv -f usr/share/applications/icon.desktop usr/share/applications/${namespace.additional}.desktop
 
 # Copy client binary, old version libs
