@@ -32,6 +32,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/style/noptix_style.h>
+#include <ui/widgets/storage_space_slider.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "storage_url_dialog.h"
@@ -59,120 +60,6 @@ namespace {
         ColumnCount
     };
 
-    QString formatStorageSize(qint64 size) {
-        return formatFileSize(size, 1, 10);
-    }
-
-    class ArchiveSpaceSlider: public QSlider {
-        Q_DECLARE_TR_FUNCTIONS(ArchiveSpaceSlider)
-        typedef QSlider base_type;
-    public:
-        ArchiveSpaceSlider(QWidget *parent = NULL):
-            base_type(parent),
-            m_color(Qt::white)
-        {
-            setOrientation(Qt::Horizontal);
-            setMouseTracking(true);
-            setProperty(Qn::SliderLength, 0);
-
-            setTextFormat(QLatin1String("%1"));
-
-            connect(this, SIGNAL(sliderPressed()), this, SLOT(update()));
-            connect(this, SIGNAL(sliderReleased()), this, SLOT(update()));
-        }
-
-        const QColor &color() const {
-            return m_color;
-        }
-
-        void setColor(const QColor &color) {
-            m_color = color;
-        }
-
-        QString text() const {
-            if(!m_textFormatHasPlaceholder) {
-                return m_textFormat;
-            } else {
-                if(isSliderDown()) {
-                    return formatStorageSize(sliderPosition() * bytesInMiB);
-                } else {
-                    return tr("%1%").arg(static_cast<int>(relativePosition() * 100));
-                }
-            }
-        }
-
-        QString textFormat() const {
-            return m_textFormat;
-        }
-
-        void setTextFormat(const QString &textFormat) {
-            if(m_textFormat == textFormat)
-                return;
-
-            m_textFormat = textFormat;
-            m_textFormatHasPlaceholder = textFormat.contains(QLatin1String("%1"));
-            update();
-        }
-
-    protected:
-        virtual void mouseMoveEvent(QMouseEvent *event) override {
-            base_type::mouseMoveEvent(event);
-
-            if(!isEmpty()) {
-                int x = handlePos();
-                if(qAbs(x - event->pos().x()) < 6) {
-                    setCursor(Qt::SplitHCursor);
-                } else {
-                    unsetCursor();
-                }
-            }
-        }
-
-        virtual void leaveEvent(QEvent *event) override {
-            unsetCursor();
-
-            base_type::leaveEvent(event);
-        }
-
-        virtual void paintEvent(QPaintEvent *) override {
-            QPainter painter(this);
-            QRect rect = this->rect();
-
-            painter.fillRect(rect, palette().color(backgroundRole()));
-
-            if(!isEmpty()) {
-                int x = handlePos();
-                painter.fillRect(QRect(QPoint(0, 0), QPoint(x, rect.bottom())), m_color);
-
-                painter.setPen(withAlpha(m_color.lighter(), 128));
-                painter.drawLine(QPoint(x, 0), QPoint(x, rect.bottom()));
-            }
-
-            const int textMargin = style()->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, this) + 1;
-            QRect textRect = rect.adjusted(textMargin, 0, -textMargin, 0);
-            painter.setPen(palette().color(QPalette::WindowText));
-            painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, text());
-        }
-
-    private:
-        qreal relativePosition() const {
-            return isEmpty() ? 0.0 : static_cast<double>(sliderPosition() - minimum()) / (maximum() - minimum());
-        }
-
-        int handlePos() const {
-            return rect().width() * relativePosition();
-        }
-
-        bool isEmpty() const {
-            return maximum() == minimum();
-        }
-
-    private:
-        QColor m_color;
-        QString m_textFormat;
-        bool m_textFormatHasPlaceholder;
-    };
-
     class ArchiveSpaceItemDelegate: public QStyledItemDelegate {
         typedef QStyledItemDelegate base_type;
     public:
@@ -181,13 +68,13 @@ namespace {
         }
 
         virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const {
-            ArchiveSpaceSlider *result = new ArchiveSpaceSlider(parent);
+            QnStorageSpaceSlider *result = new QnStorageSpaceSlider(parent);
             result->setColor(m_color);
             return result;
         }
 
         virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override {
-            ArchiveSpaceSlider *slider = dynamic_cast<ArchiveSpaceSlider *>(editor);
+            QnStorageSpaceSlider *slider = dynamic_cast<QnStorageSpaceSlider *>(editor);
             if(!slider) {
                 base_type::setEditorData(editor, index);
                 return;
@@ -201,7 +88,7 @@ namespace {
         }
 
         virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
-            ArchiveSpaceSlider *slider = dynamic_cast<ArchiveSpaceSlider *>(editor);
+            QnStorageSpaceSlider *slider = dynamic_cast<QnStorageSpaceSlider *>(editor);
             if(!slider) {
                 base_type::setModelData(editor, model, index);
                 return;
@@ -307,7 +194,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
 
     QTableWidgetItem *capacityItem = new QTableWidgetItem();
     capacityItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-    capacityItem->setData(Qt::DisplayRole, item.totalSpace == -1 ? tr("Not available") : formatStorageSize(item.totalSpace));
+    capacityItem->setData(Qt::DisplayRole, item.totalSpace == -1 ? tr("Not available") : QnStorageSpaceSlider::formatSize(item.totalSpace));
 
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     QTableWidgetItem *archiveSpaceItem = new QTableWidgetItem();
