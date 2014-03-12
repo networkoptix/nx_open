@@ -6,11 +6,11 @@
         "custom_red":               "#C10505",
         "custom_grey":              "#D4D4D4",
         "custom_green":             "#8ABF22",
-        "darkGrey":					"#231F20",
-        "opaqueSelection":			"custom_blue",
+        "darkGrey":                 "#231F20",
+        "opaqueSelection":          "custom_blue",
         "ptz":                      "#opaqueSelection",
-        "selection":				"opaqueSelection.setAlpha(110)",
-        "exShadowColor":			"#ff0000"
+        "selection":                "opaqueSelection.setAlpha(110)",
+        "exShadowColor":            "#ff0000"
     },
 
     "QnGlobals": {
@@ -101,10 +101,10 @@
     },
     
     "QnNavigationItem": {
-		"palette": { "default": { 
+        "palette": { "default": { 
             "window": "#000000" 
         }}
-	},
+    },
 
     "QnTimeSlider": {
         "colors": {
@@ -134,7 +134,7 @@
             "pastLastMinute": "QColor(24, 24, 24, 255)",
             "futureLastMinute": "QColor(0, 0, 0, 255)"
         },
-		"palette": { "default": { "windowText": "#FFFFFF" } }        
+        "palette": { "default": { "windowText": "#FFFFFF" } }        
     },
     
     "QnTimeScrollBar": {
@@ -173,17 +173,17 @@
     },
 
     "QnResourceWidget": {
-		"palette": { "default": { "highlight": "selection" } },
+        "palette": { "default": { "highlight": "selection" } },
         "frameColors": {
             "normal": "808080c0",
             "active": "c0c0c0c0",
             "selected": "opaqueSelection.darker(30).setAlpha(128)"
         }
-	},
+    },
     
     "QnMediaResourceWidget": {
-		"palette": { "default": { "window": "#000000ff" } }
-	},
+        "palette": { "default": { "window": "#000000ff" } }
+    },
 
     "QnServerResourceWidget": {
         "colors": {
@@ -194,7 +194,7 @@
             "hdds": ["#ededed","#edc842","#67ed42","#ff8330","#b200ff","#00ffff","#267f00","#ff7f7f","#c90000"],
             "network": ["#ff3434", "#f0ff34", "#8484ff", "#34ff84"]
         },    
-		"palette": { "default": { "window": "black" } }
+        "palette": { "default": { "window": "black" } }
     },
     
     "ZoomWindowInstrument": {
@@ -213,11 +213,11 @@
         }
     },   
     
-	"QnStyledTooltipWidget": {
-		"windowColor": "QColor(0, 0, 0, 255)",
-		"frameColor": "QColor(203, 210, 233, 128)",
-		"palette": { "default": { "windowText": "QColor(63, 159, 216)" } }
-	},
+    "QnStyledTooltipWidget": {
+        "windowColor": "QColor(0, 0, 0, 255)",
+        "frameColor": "QColor(203, 210, 233, 128)",
+        "palette": { "default": { "windowText": "QColor(63, 159, 216)" } }
+    },
     
     "QnGridItem": {
         "colors": {
