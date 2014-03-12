@@ -1163,7 +1163,7 @@ void QnMain::run()
 
         int serverFlags = Qn::SF_None;
 #ifdef EDGE_SERVER
-        serverFlags |= SF_Edge;
+        serverFlags |= Qn::SF_Edge;
 #endif
         if (!isLocal)
             serverFlags |= Qn::SF_RemoteEC;

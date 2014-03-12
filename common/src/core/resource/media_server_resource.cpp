@@ -18,8 +18,8 @@ private:
 QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
     QnResource(),
     m_panicMode(Qn::PM_None),
-    m_guard(NULL),
-    m_serverFlags(Qn::SF_None)
+    m_serverFlags(Qn::SF_None),
+    m_guard(NULL)
 {
     setTypeId(resTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);

@@ -33,8 +33,8 @@ void QnDbHelper::QnDbTransaction::commit()
 }
 
 QnDbHelper::QnDbTransactionLocker::QnDbTransactionLocker(QnDbTransaction* tran): 
-    m_tran(tran), 
-    m_committed(false)
+    m_committed(false),
+    m_tran(tran)
 {
     m_tran->beginTran();
 }
