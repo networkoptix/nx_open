@@ -173,6 +173,10 @@
             "panic": "#FF0000"
         }
     },
+
+    "QnResourceWidget": {
+		"palette": { "default": { "highlight": "selection" } }
+	},
     
     "QnMediaResourceWidget": {
 		"palette": { "default": { "window": "#000000ff" } }

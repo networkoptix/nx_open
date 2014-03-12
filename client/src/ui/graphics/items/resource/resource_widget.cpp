@@ -871,7 +871,7 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
     if(!(m_options & DisplaySelection))
         return;
 
-    painter->fillRect(rect, qnGlobals->selectionColor());
+    painter->fillRect(rect, palette().color(QPalette::Highlight));
 }
 
 

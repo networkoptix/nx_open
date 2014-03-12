@@ -91,6 +91,7 @@ private:
     QPointF m_pointTo;
 };
 
+
 class QnNotificationWidget: public Clickable<QnFramedWidget> {
     Q_OBJECT
     typedef Clickable<QnFramedWidget> base_type;
