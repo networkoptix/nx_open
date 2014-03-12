@@ -527,8 +527,8 @@ ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
 ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 internalId)
 {
 	QSqlQuery delQuery(m_sdb);
-	delQuery.prepare("DELETE FROM vms_scheduletask where source_id = :id");
-	delQuery.bindValue(":id", internalId);
+	delQuery.prepare("DELETE FROM vms_scheduletask where source_id = ?");
+	delQuery.addBindValue(internalId);
 	if (!delQuery.exec()) {
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
         return ErrorCode::failure;
