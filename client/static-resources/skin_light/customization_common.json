@@ -20,7 +20,6 @@
         "backgroundGradientColor":  "custom_grey",
         "frameColor":               "custom_grey",
         "selectedFrameColor":       "custom_blue",
-        "shadowColor":              "#00000000",
         "businessRuleDisabledHighlightColor": "QColor(64, 64, 64)",
         "businessRuleInvalidBackgroundColor": "QColor(150, 0, 0)",
         "businessRuleInvalidColumnBackgroundColor": "QColor(204, 0, 0)",
@@ -299,5 +298,27 @@
     "PtzSelectionItem": {
         "pen": { "color": "ptz.setAlpha(192)" },
         "brush": "ptz.setAlpha(64).lighter(120)"
+    },
+    
+    "QnShadowItem": {
+        "color": "#00000000"
     }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

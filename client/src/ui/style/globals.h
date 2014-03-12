@@ -25,7 +25,6 @@ class QnGlobals: public QnPropertyStorage {
 public:
     enum Variable {
         SETTINGS_FONT,
-        SHADOW_COLOR,
         SELECTION_COLOR,
         MOTION_MASK_COLOR,
         MOTION_MASK_RUBBER_BAND_BORDER_COLOR,
@@ -111,7 +110,6 @@ protected:
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
-        QN_DECLARE_R_PROPERTY(QColor,   shadowColor,                    SHADOW_COLOR,                           QColor(0, 0, 0, 128))
         QN_DECLARE_R_PROPERTY(QColor,   selectionColor,                 SELECTION_COLOR,                        QColor(0, 150, 255, 110))
         QN_DECLARE_R_PROPERTY(QColor,   motionMaskRubberBandBorderColor,MOTION_MASK_RUBBER_BAND_BORDER_COLOR,   QColor(255, 255, 255, 80))
         QN_DECLARE_R_PROPERTY(QColor,   motionMaskRubberBandColor,      MOTION_MASK_RUBBER_BAND_COLOR,          QColor(255, 255, 255, 40))
