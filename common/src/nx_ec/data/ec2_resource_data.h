@@ -16,7 +16,7 @@ namespace ec2
     struct ApiResourceParam: public ApiData
     {
         ApiResourceParam() {}
-        ApiResourceParam(const QString& name, const QString& value): name(name), value(value) {}
+        ApiResourceParam(const QString& name, const QString& value): value(value), name(name) {}
 
         QString value;
         QString name;

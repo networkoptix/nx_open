@@ -259,7 +259,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
     const int roundedWidth = qPower2Ceil((unsigned) dstSize.width(), 8);
     const int roundedHeight = qPower2Ceil((unsigned) dstSize.height(), 2);
 
-    if (format == "jpg" || format == "jpeg")
+    if (format == "jpg" || format == "jpeg" || format == "png")
     {
         // prepare image using ffmpeg encoder
 
@@ -283,7 +283,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
         videoEncoderCodecCtx->time_base.num = 1;
         videoEncoderCodecCtx->time_base.den = 30;
     
-        AVCodec* codec = avcodec_find_encoder(CODEC_ID_MJPEG);
+        AVCodec* codec = avcodec_find_encoder_by_name(format == "jpg" || format == "jpeg" ? "mjpeg" : format.constData());
         if (avcodec_open2(videoEncoderCodecCtx, codec, NULL) < 0)
         {
             qWarning() << "Can't initialize ffmpeg encoder for encoding image";

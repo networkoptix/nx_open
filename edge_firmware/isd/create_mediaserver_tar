@@ -1,25 +1,36 @@
 #!/bin/bash
 
+SRC_DIR=../../
+
+
 function printHelp()
 {
     echo "--target-dir={dir to copy packet to}"
     echo
 }
 
+function get_var()
+{
+    local h="`grep -R $1 $SRC_DIR/mediaserver/arm/version.h | sed 's/.*"\(.*\)".*/\1/'`"
+    if [[ "$1" == "QN_CUSTOMIZATION_NAME" && "$h" == "default" ]]; then
+        h=networkoptix
+    fi
+    echo "$h"
+}
+
+
 
 TOOLCHAIN_PREFIX=/usr/local/codesourcery/arm-2013.11/bin/arm-none-linux-gnueabi-
 
-CUSTOMIZATION=networkoptix
-PRODUCT_NAME=hdwitness
+CUSTOMIZATION=$(get_var "QN_CUSTOMIZATION_NAME")
+PRODUCT_NAME=$(get_var "QN_PRODUCT_NAME_SHORT")
 MODULE_NAME=mediaserver
-VERSION=2.2.0
+VERSION=$(get_var "ENGINE_VERSION")
 
-PACKAGE_NAME=$PRODUCT_NAME-$MODULE_NAME-$VERSION-edge.tar.gz
+PACKAGE_NAME=$CUSTOMIZATION-$PRODUCT_NAME-$MODULE_NAME-$VERSION-edge.tar.gz
 
 BUILD_DIR=/tmp/hdw_isd_build.tmp
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
-
-SRC_DIR=../../
 
 BUILD_OUTPUT_DIR=$SRC_DIR/build_environment/target
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
