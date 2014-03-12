@@ -44,7 +44,7 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     m_cameraControlDisabled = !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
 
-    connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
+    connect(this, &QnResource::disabledChanged, this, &QnSecurityCamResource::at_disabledChanged, Qt::DirectConnection);
 
     QnMediaResource::initMediaResource();
 
