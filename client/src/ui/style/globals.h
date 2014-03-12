@@ -25,12 +25,10 @@ class QnGlobals: public QnPropertyStorage {
 public:
     enum Variable {
         SETTINGS_FONT,
-        SELECTION_COLOR,
         MOTION_MASK_COLOR,
         MOTION_MASK_RUBBER_BAND_BORDER_COLOR,
         MOTION_MASK_RUBBER_BAND_COLOR,
         FRAME_COLOR,
-        SELECTED_FRAME_COLOR,
 
         RECORD_MOTION_COLOR,
         NO_RECORD_COLOR,
@@ -115,7 +113,6 @@ private:
 
         QN_DECLARE_R_PROPERTY(QColor,   motionMaskColor,                MOTION_MASK_COLOR,                      QColor(180, 180, 180, 96))
         QN_DECLARE_R_PROPERTY(QColor,   frameColor,                     FRAME_COLOR,                            QColor(128, 128, 128, 196))
-        QN_DECLARE_R_PROPERTY(QColor,   selectedFrameColor,             SELECTED_FRAME_COLOR,                   QColor(64, 130, 180, 128))
 
         QN_DECLARE_R_PROPERTY(int,      opacityChangePeriod,            OPACITY_CHANGE_PERIOD,                  250)
         QN_DECLARE_R_PROPERTY(QColor,   errorTextColor,                 ERROR_TEXT_COLOR,                       QColor(255, 64, 64))
@@ -130,7 +127,6 @@ private:
 
         QN_DECLARE_R_PROPERTY(QColor,   selectionOpacityDelta,          SELECTION_OPACITY_DELTA,                QColor(0, 0, 0, 0x80))
         QN_DECLARE_R_PROPERTY(QColor,   selectionBorderDelta,           SELECTION_BORDER_DELTA,                 QColor(48, 48, 48, 0))
-
 
         QN_DECLARE_R_PROPERTY(QColor,   notificationColorSystem,        NOTIFICATION_COLOR_SYSTEM,              QColor(255, 0, 0))
         QN_DECLARE_R_PROPERTY(QColor,   notificationColorCommon,        NOTIFICATION_COLOR_COMMON,              QColor(103, 237, 66))
