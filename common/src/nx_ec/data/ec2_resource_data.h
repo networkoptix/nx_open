@@ -18,13 +18,13 @@ namespace ec2
         ApiResourceParam() {}
         ApiResourceParam(const QString& name, const QString& value): name(name), value(value) {}
 
-        QString name;
         QString value;
+        QString name;
 
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define ApiResourceParamFields (name) (value)
+    #define ApiResourceParamFields (value) (name)
     QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiResourceParam, ApiResourceParamFields )
 
     struct ApiParamList

@@ -253,10 +253,11 @@ QnDbManager* QnDbManager::instance()
 ErrorCode QnDbManager::insertAddParams(const std::vector<ApiResourceParam>& params, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT INTO vms_kvpair (resource_id, name, value) VALUES(:resourceId, :name, :value)");
+    //insQuery.prepare("INSERT INTO vms_kvpair (resource_id, name, value) VALUES(:resourceId, :name, :value)");
+    insQuery.prepare("INSERT INTO vms_kvpair VALUES(?, NULL, ?, ?)");
+    insQuery.bindValue(0, internalId);
     foreach(const ApiResourceParam& param, params) {
-        insQuery.bindValue(":resourceId", internalId);
-        param.autoBindValues(insQuery);
+        param.autoBindValuesOrdered(insQuery, 1);
         if (!insQuery.exec()) {
             qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
             return ErrorCode::failure;
