@@ -16,7 +16,6 @@
     "QnGlobals": {
         "_": "Globals settings. These ones will go away in one of the future versions.",
         
-        "selectionColor":           "selection",
         "frameColor":               "QColor(128, 128, 128, 196)",
         "selectedFrameColor":       "QColor(32, 144, 224, 196)",
         "businessRuleDisabledHighlightColor": "QColor(64, 64, 64)",
@@ -175,7 +174,12 @@
     },
 
     "QnResourceWidget": {
-		"palette": { "default": { "highlight": "selection" } }
+		"palette": { "default": { "highlight": "selection" } },
+        "frameColors": {
+            "normal": "808080c0",
+            "active": "c0c0c0c0",
+            "selected": "opaqueSelection.darker(30).setAlpha(128)"
+        }
 	},
     
     "QnMediaResourceWidget": {

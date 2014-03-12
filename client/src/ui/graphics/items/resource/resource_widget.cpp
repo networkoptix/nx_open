@@ -113,7 +113,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_enclosingAspectRatio(1.0),
     m_frameOpacity(1.0),
     m_frameWidth(-1.0),
-    m_frameDistinctionColor(qnGlobals->frameColor()),
     m_titleTextFormat(QLatin1String("%1")),
     m_infoTextFormat(QLatin1String("%1")),
     m_titleTextFormatHasPlaceholder(true),
