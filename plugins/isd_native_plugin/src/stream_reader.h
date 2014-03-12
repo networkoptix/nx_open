@@ -16,8 +16,11 @@
 
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <utils/network/rtpsession.h>
 
 #include "isd_motion_estimation.h"
+
+//#define DUPLICATE_MOTION_TO_HIGH_STREAM
 
 
 class ISDAudioPacket;
@@ -32,7 +35,10 @@ public:
     /*!
         \param liveMode In this mode, plays all pictures in a loop
     */
-    StreamReader( nxpt::CommonRefManager* const parentRefManager, int encoderNum);
+    StreamReader(
+        nxpt::CommonRefManager* const parentRefManager,
+        int encoderNum,
+        const char* cameraUid );
     virtual ~StreamReader();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -75,8 +81,13 @@ private:
     unsigned int m_prevPts;
     int64_t m_ptsDelta;
     bool m_audioEnabled;
+    QnRtspTimeHelper m_timeHelper;
+    RtspStatistic m_timeStatistics;
 
     int m_epollFD;
+#ifdef DUPLICATE_MOTION_TO_HIGH_STREAM
+    MotionDataPicture* m_currentMotionData;
+#endif
 
     int initializeVMux();
     int initializeAMux();
