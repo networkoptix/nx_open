@@ -237,6 +237,15 @@ public:
         update();
     }
 
+    QColor color() const {
+        return m_color;
+    }
+
+    void setColor(const QColor &color) {
+        m_color = color;
+        update();
+    }
+
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override {
         switch (which) {
@@ -524,18 +533,19 @@ const QnStatisticsColors &QnServerResourceWidget::colors() const {
 
 void QnServerResourceWidget::setColors(const QnStatisticsColors &colors) {
     m_colors = colors;
+    updateColors();
 }
 
-QColor QnServerResourceWidget::nextColor(QnStatisticsDeviceType deviceType) {
+QColor QnServerResourceWidget::getColor(QnStatisticsDeviceType deviceType, int index) {
     switch (deviceType) {
     case CPU:
         return m_colors.cpu;
     case RAM:
         return m_colors.ram;
     case HDD:
-        return m_colors.hdds[qMod(m_hddCount++, m_colors.hdds.size())];
+        return m_colors.hdds[qMod(index, m_colors.hdds.size())];
     case NETWORK:
-        return m_colors.network[qMod(m_networkCount++, m_colors.network.size())];
+        return m_colors.network[qMod(index, m_colors.network.size())];
     default:
         return QColor(Qt::white);
     }
@@ -640,6 +650,8 @@ QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDevic
 }
 
 void QnServerResourceWidget::updateLegend() {
+    QHash<QnStatisticsDeviceType, int> indexes;
+
     foreach (QString key, m_sortedKeys) {
         QnStatisticsData &stats = m_history[key];
 
@@ -648,11 +660,12 @@ void QnServerResourceWidget::updateLegend() {
             data.bar = m_legendButtonBar[buttonBarByDeviceType(stats.deviceType)];
             data.mask = data.bar->unusedMask();
             data.visible = true;
-            data.color = nextColor(stats.deviceType);
+            data.color = getColor(stats.deviceType, indexes[stats.deviceType]++);
 
             LegendButtonWidget* newButton = new LegendButtonWidget(key, data.color);
             newButton->setProperty(legendKeyPropertyName, key);
             newButton->setChecked(true);
+            m_legendButtonByKey.insert(key, newButton);
 
 
             { // fix text length on already existing buttons and the new one
@@ -700,6 +713,21 @@ void QnServerResourceWidget::updateInfoOpacity() {
     m_infoOpacity = headerOverlayWidget()->opacity();
     for (int i = 0; i < ButtonBarCount; i++)
         m_legendButtonBar[i]->setOpacity(m_infoOpacity);
+}
+
+void QnServerResourceWidget::updateColors() {
+    QHash<QnStatisticsDeviceType, int> indexes;
+
+    foreach (QString key, m_sortedKeys) {
+        QnStatisticsData &stats = m_history[key];
+
+        if (m_graphDataByKey.contains(key)) {
+            GraphData &data = m_graphDataByKey[key];
+            data.color = getColor(stats.deviceType, indexes[stats.deviceType]++);
+            if (LegendButtonWidget *legendButton = dynamic_cast<LegendButtonWidget *>(m_legendButtonByKey[key]))
+                legendButton->setColor(data.color);
+        }
+    }
 }
 
 void QnServerResourceWidget::updateHoverKey() {
