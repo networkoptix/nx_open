@@ -139,9 +139,9 @@
     
     "QnTimeScrollBar": {
         "colors": {
-            "indicator": "#000000FF",
+            "indicator": "#ffffffff",
             "border": "#80808080",
-            "handle": "#00000020"
+            "handle": "#ffffff20"
         }
     },
 
