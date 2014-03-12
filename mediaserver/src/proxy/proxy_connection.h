@@ -20,14 +20,13 @@ protected:
 private:
     static bool doProxyData(fd_set* read_set, AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize);
     static int getDefaultPortByProtocol(const QString& protocol);
-    QString connectToRemoteHost(const QString& guid, const QUrl& url, int port); // return new client request buffer size or -1 if error
+    QString connectToRemoteHost(const QString& guid, const QUrl& url); // return new client request buffer size or -1 if error
     bool isProtocol(const QString& protocol) const;
     void doRawProxy();
     void doSmartProxy();
-    bool isSameDstAddr();
-    QString getServerGuid();
     bool openProxyDstConnection();
     QUrl getDefaultProxyUrl();
+    bool updateClientRequest(QUrl& dstUrl, QString& xServerGUID);
 private:
     Q_DECLARE_PRIVATE(QnProxyConnectionProcessor);
 };

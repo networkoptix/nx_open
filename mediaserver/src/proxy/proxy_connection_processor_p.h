@@ -17,7 +17,7 @@ public:
 
     QSharedPointer<AbstractStreamSocket> dstSocket;
     QnTcpListener* owner;
-    QString lastConnectedUrl;
+    QUrl lastConnectedUrl;
 };
 
 #endif // __PROXY_CONNECTION_PROCESSOR_PRIV_H_

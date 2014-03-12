@@ -68,7 +68,8 @@ bool QnProxyConnectionProcessor::doProxyData(fd_set* read_set, AbstractStreamSoc
 
         if (readed < 1)
             return false;
-        dstSocket->send(buffer, readed);
+        int sended = dstSocket->send(buffer, readed);
+        Q_ASSERT(sended == readed);
     }
     return true;
 }
@@ -79,10 +80,10 @@ static bool isLocalAddress(const QString& addr)
 }
 
 
-QString QnProxyConnectionProcessor::connectToRemoteHost(const QString& guid, const QUrl& url, int port )
+QString QnProxyConnectionProcessor::connectToRemoteHost(const QString& guid, const QUrl& url)
 {
     Q_D(QnProxyConnectionProcessor);
-    qWarning() << url.host().toLatin1() << " " << port;
+    qWarning() << url.host().toLatin1() << " " << url.port();
     d->dstSocket = (dynamic_cast<QnUniversalTcpListener*> (d->owner))->getProxySocket(guid, CONNECT_TIMEOUT);
     if (!d->dstSocket) {
 
@@ -95,11 +96,11 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QString& guid, con
         d->dstSocket = QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket(url.scheme() == lit("https")));
         d->dstSocket->setRecvTimeout(CONNECT_TIMEOUT);
         d->dstSocket->setSendTimeout(CONNECT_TIMEOUT);
-        if (!d->dstSocket->connect(url.host().toLatin1().data(), port)) {
+        if (!d->dstSocket->connect(url.host().toLatin1().data(), url.port())) {
             d->socket->close();
             return QString(); // now answer from destination address
         }
-        return url.host();
+        return url.toString();
     }
     else {
         d->dstSocket->setRecvTimeout(CONNECT_TIMEOUT);
@@ -113,24 +114,56 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QString& guid, con
     return QString();
 }
 
-QString QnProxyConnectionProcessor::getServerGuid()
-{
-    Q_D(QnProxyConnectionProcessor);
-#ifdef USE_NX_HTTP
-    QString xServerGUID = nx_http::getHeaderValue( d->request.headers, "x-server-guid" );
-    QUrlQuery query(d->request.requestLine.url);
-    if (xServerGUID.isEmpty() && query.hasQueryItem(lit("serverGuid")))
-        xServerGUID = query.queryItemValue(lit("serverGuid"));
-#else
-    const QString& xServerGUID = d->requestHeaders.value("x-server-guid");
-#endif
-    return xServerGUID;
-}
 
 QUrl QnProxyConnectionProcessor::getDefaultProxyUrl()
 {
     Q_D(QnProxyConnectionProcessor);
     return QUrl(lit("http://localhost:%1").arg(d->owner->getPort()));
+}
+
+bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xServerGUID)
+{
+    Q_D(QnProxyConnectionProcessor);
+
+    QUrl url = d->request.requestLine.url;
+    QString urlPath = url.path();
+
+    int proxyEndPos = urlPath.indexOf('/', 1); // remove proxy prefix
+    int protocolEndPos = urlPath.indexOf('/', proxyEndPos+1); // remove proxy prefix
+    if (protocolEndPos == -1)
+        return false;
+    int hostEndPos = urlPath.indexOf('/', protocolEndPos+1); // remove proxy prefix
+    if (hostEndPos == -1)
+        hostEndPos = urlPath.size();
+
+    QString protocol = urlPath.mid(proxyEndPos+1, protocolEndPos - proxyEndPos-1);
+    QString host = urlPath.mid(protocolEndPos+1, hostEndPos - protocolEndPos-1);
+    if (host.startsWith("{"))
+        xServerGUID = host;
+
+    urlPath = urlPath.mid(hostEndPos);
+    if (urlPath.isEmpty())
+        urlPath = "/";
+
+    d->request.requestLine.url.setPath(urlPath);
+
+    for (nx_http::HttpHeaders::iterator itr = d->request.headers.begin(); itr != d->request.headers.end(); ++itr)
+    {
+        if (itr->first.toLower() == "host")
+            itr->second = host.toUtf8();
+        else if (itr->first == "x-server-guid")
+            xServerGUID = itr->second;
+    }
+
+    d->clientRequest.clear();
+    d->request.serialize(&d->clientRequest);
+
+    // get dst ip and port
+    QStringList hostAndPort = host.split(':');
+    int port = hostAndPort.size() > 1 ? hostAndPort[1].toInt() : getDefaultPortByProtocol(protocol);
+
+    dstUrl = QUrl(lit("%1://%2:%3").arg(protocol).arg(hostAndPort[0]).arg(port));
+    return true;
 }
 
 bool QnProxyConnectionProcessor::openProxyDstConnection()
@@ -139,100 +172,20 @@ bool QnProxyConnectionProcessor::openProxyDstConnection()
 
     d->dstSocket.clear();
 
-    char* extBuffer = d->clientRequest.data();
-    int readed = d->clientRequest.size();
-
-    QUrl url = d->request.requestLine.url;
-
-    if (url.path() == lit("/proxy_api/ec_port"))
+    // update source request
+    QUrl dstUrl;
+    QString xServerGUID;
+    if (!updateClientRequest(dstUrl, xServerGUID))
     {
-        QString data(lit("HTTP 200 OK\r\ncontentLength\r\n port=%1"));
-        d->responseBody = QByteArray::number(QnAppServerConnectionFactory::defaultUrl().port());
-        sendResponse("HTTP", 200, "text/plain");
+        d->socket->close();
         return false;
     }
 
-
-    QByteArray proxyPattern("proxy");
-    if (url.path().startsWith('/'))
-        proxyPattern = QByteArray("/proxy");
-    QString dstProtocol("http");
-    bool addProtocolToUrl = false;
-    QString xServerGUID;
-    if (url.path().startsWith(proxyPattern))
-    {
-        QList<QString> proxyParams = url.path().split('/');
-        if (proxyParams[0].isEmpty())
-            proxyParams.removeAt(0);
-        if (proxyParams.size() > 2 && isProtocol(proxyParams[1])) {
-            dstProtocol = proxyParams[1];
-            proxyParams.removeAt(1);
-            addProtocolToUrl = true;
-        }
-        if (proxyParams.size() >= 2)
-        {
-            bool isRelativePath = url.host().isEmpty();
-
-            if (proxyParams[1].startsWith("{"))
-            {
-                xServerGUID = proxyParams[1];
-            }
-            else {
-            	QList<QString> hostAndPort = proxyParams[1].toLower().split(":");
-                url.setHost(hostAndPort[0]);
-                if (hostAndPort.size() > 1)
-                    url.setPort(hostAndPort[1].toInt());
-                else
-                    url.setPort(getDefaultPortByProtocol(d->protocol));
-            }
-            if (url.scheme().isEmpty())
-                url.setScheme(dstProtocol);
-            int proxyEndPos = url.path().indexOf('/', proxyPattern.length()+1);
-            url.setPath(url.path().mid(proxyEndPos));
-            QByteArray newUrl = url.toString().toUtf8();
-            if (isRelativePath) {
-                int idx = newUrl.indexOf("://");
-                if (idx >= 0)
-                    newUrl = newUrl.mid(idx+3);
-                idx = newUrl.indexOf("://");
-                if (idx >= 0)
-                    newUrl = newUrl.mid(idx+3);
-                newUrl = newUrl.mid(newUrl.indexOf('/'));
-                if (addProtocolToUrl)
-                    newUrl = dstProtocol.toLatin1() + QByteArray(":/") + newUrl;
-            }
-
-            const char* bufEnd = extBuffer + readed;
-            //QByteArray allData = QByteArray::fromRawData(buffer, readed);
-            int urlStartPos = d->clientRequest.indexOf(' ')+1;
-            int urlEndPos = d->clientRequest.indexOf(' ', urlStartPos+1);
-            //int oldUrlLen = urlEndPos - urlStartPos;
-            int newEndPos = urlStartPos + newUrl.length();
-            memmove(extBuffer + newEndPos, extBuffer + urlEndPos, bufEnd - (extBuffer + urlEndPos));
-            readed -= urlEndPos - newEndPos;
-            memcpy(extBuffer + urlStartPos, newUrl.data(), newUrl.length());
-        }
-    }
-
-    int port = url.port(getDefaultPortByProtocol(d->protocol));
-    if (port == -1 || url.host().isEmpty()) 
-    {
-        url = getDefaultProxyUrl();
-        if (url.isEmpty()) {
-            d->socket->close();
-            return false; // unknown destination url
-        }
-        else
-            port = url.port(getDefaultPortByProtocol(d->protocol));
-    }
-
-    if (xServerGUID.isEmpty())
-        xServerGUID = getServerGuid();
-    d->lastConnectedUrl = connectToRemoteHost(xServerGUID , url, port);
+    d->lastConnectedUrl = connectToRemoteHost(xServerGUID , dstUrl);
     if (d->lastConnectedUrl.isEmpty())
         return false; // invalid dst address
 
-    d->dstSocket->send(d->clientRequest.data(), readed);
+    d->dstSocket->send(d->clientRequest.data(), d->clientRequest.size());
 
     return true;
 }
@@ -313,54 +266,6 @@ void QnProxyConnectionProcessor::doRawProxy()
 
 }
 
-bool QnProxyConnectionProcessor::isSameDstAddr()
-{
-    Q_D(QnProxyConnectionProcessor);
-
-    QString xServerGUID = getServerGuid();
-    QUrl url = d->request.requestLine.url;
-
-    QByteArray proxyPattern("proxy");
-    if (url.path().startsWith('/'))
-        proxyPattern = QByteArray("/proxy");
-    QString dstProtocol("http");
-    if (url.path().startsWith(proxyPattern))
-    {
-        QList<QString> proxyParams = url.path().split('/');
-        if (proxyParams[0].isEmpty())
-            proxyParams.removeAt(0);
-        if (proxyParams.size() > 2 && isProtocol(proxyParams[1])) {
-            dstProtocol = proxyParams[1];
-            proxyParams.removeAt(1);
-        }
-        if (proxyParams.size() >= 2)
-        {
-            bool isRelativePath = url.host().isEmpty();
-            if (proxyParams[1].startsWith("{")) {
-                xServerGUID = proxyParams[1];
-            }
-            else {
-                QList<QString> hostAndPort = proxyParams[1].toLower().split(":");
-                url.setHost(hostAndPort[0]);
-                if (hostAndPort.size() > 1)
-                    url.setPort(hostAndPort[1].toInt());
-                else
-                    url.setPort(getDefaultPortByProtocol(d->protocol));
-            }
-            if (url.scheme().isEmpty())
-                url.setScheme(dstProtocol);
-            int proxyEndPos = url.path().indexOf('/', proxyPattern.length()+1);
-            url.setPath(url.path().mid(proxyEndPos));
-        }
-    }
-
-    int port = url.port(getDefaultPortByProtocol(d->protocol));
-    if (port == -1 || url.host().isEmpty()) 
-        url = getDefaultProxyUrl();
-
-    return xServerGUID == d->lastConnectedUrl || url.host() == d->lastConnectedUrl;
-}
-
 void QnProxyConnectionProcessor::doSmartProxy()
 {
     Q_D(QnProxyConnectionProcessor);
@@ -403,33 +308,13 @@ void QnProxyConnectionProcessor::doSmartProxy()
             if (isFullMessage(d->clientRequest)) 
             {
                 parseRequest();
+                QUrl dstUrl;
+                QString xServerGUID;
+                updateClientRequest(dstUrl, xServerGUID);
                 bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
-                if (isSameDstAddr()) 
+                bool isSameAddr = d->lastConnectedUrl == xServerGUID || d->lastConnectedUrl == dstUrl;
+                if (isSameAddr) 
                 {
-                    // remove proxy prefix from the request if exists
-                    int urlPos = d->clientRequest.indexOf(" ");
-                    if (urlPos > 0) {
-                        urlPos++;
-                        QByteArray tmp = QByteArray::fromRawData(d->clientRequest.data() + urlPos, d->clientRequest.size() - urlPos);
-                        if (tmp.startsWith("/proxy") || tmp.startsWith("proxy")) 
-                        {
-                            int prefixEnd = tmp.indexOf("/", 1);
-                            if (prefixEnd > 0) {
-                                int prefixEnd2 = tmp.indexOf("/", prefixEnd+1);
-                                if (prefixEnd2 > 0) {
-                                    QByteArray protocol = tmp.mid(prefixEnd+1, prefixEnd2 - prefixEnd-1);
-                                    if (isProtocol(protocol)) {
-                                        prefixEnd2 = tmp.indexOf("/", prefixEnd2+1);
-                                        d->clientRequest = d->clientRequest.remove(urlPos, prefixEnd2 - urlPos);
-                                    }
-                                    else {
-                                        d->clientRequest = d->clientRequest.remove(urlPos, prefixEnd - urlPos);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
                     d->dstSocket->send(d->clientRequest);
                     if (isWebSocket) 
                     {
@@ -441,8 +326,14 @@ void QnProxyConnectionProcessor::doSmartProxy()
                 }
                 else {
                     // new server
-                    if(!openProxyDstConnection())
-                        break;
+                    d->lastConnectedUrl = connectToRemoteHost(xServerGUID , dstUrl);
+                    if (d->lastConnectedUrl.isEmpty()) {
+                        d->socket->close();
+                        return; // invalid dst address
+                    }
+
+                    d->dstSocket->send(d->clientRequest.data(), d->clientRequest.size());
+
                     if (isWebSocket) 
                     {
                         doRawProxy(); // switch to binary mode
