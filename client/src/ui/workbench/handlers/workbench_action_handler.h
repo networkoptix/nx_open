@@ -115,7 +115,7 @@ protected:
         QRectF zoomWindow;
         QUuid zoomUuid;
         qint64 time;
-        QColor frameColor;
+        QColor frameDistinctionColor;
         qreal rotation;
         ImageCorrectionParams contrastParams;
         QnItemDewarpingParams dewarpingParams;

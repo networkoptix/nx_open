@@ -80,6 +80,7 @@
 #include <ui/dialogs/message_box.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/dialogs/picture_settings_dialog.h>
+#include <ui/dialogs/ping_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -385,8 +386,8 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.contrastParams = params.contrastParams;
     data.dewarpingParams = params.dewarpingParams;
     data.dataByRole[Qn::ItemTimeRole] = params.time;
-    if(params.frameColor.isValid())
-        data.dataByRole[Qn::ItemFrameColorRole] = params.frameColor;
+    if(params.frameDistinctionColor.isValid())
+        data.dataByRole[Qn::ItemFrameDistinctionColorRole] = params.frameDistinctionColor;
     if(params.usePosition) {
         data.combinedGeometry = QRectF(params.position, params.position); /* Desired position is encoded into a valid rect. */
     } else {
@@ -2020,9 +2021,12 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
     QProcess::startDetached(cmd.arg(host));
 #endif
 #ifdef Q_OS_MACX
-    QnConnectionTestingDialog dialog;
-    dialog.testResource(resource);
-    dialog.exec();
+    QUrl url = QUrl::fromUserInput(resource->getUrl());
+    QString host = url.host();
+    QnPingDialog *dialog = new QnPingDialog(NULL, Qt::Dialog | Qt::WindowStaysOnTopHint);
+    dialog->setHostAddress(host);
+    dialog->show();
+    dialog->startPings();
 #endif
 
 }
@@ -2412,7 +2416,7 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     addParams.zoomWindow = rect;
     addParams.dewarpingParams.enabled = widget->dewarpingParams().enabled;
     addParams.zoomUuid = widget->item()->uuid();
-    addParams.frameColor = params.argument<QColor>(Qn::ItemFrameColorRole);
+    addParams.frameDistinctionColor = params.argument<QColor>(Qn::ItemFrameDistinctionColorRole);
     addParams.rotation = widget->item()->rotation();
 
     addToLayout(workbench()->currentLayout()->resource(), widget->resource()->toResourcePtr(), addParams);

@@ -151,7 +151,7 @@ namespace detail
 
 #ifndef _WIN32
         //setting execution rights to file
-        if( entryPath.endsWith(APPLICATION_BIN_NAME) )
+        if( entryPath.endsWith(QN_CLIENT_EXECUTABLE_NAME) )
             chmod( (m_localDirPath + "/" + entryPath).toUtf8().constData(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH );
 #endif
 

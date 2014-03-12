@@ -89,6 +89,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStream()
     // get URL
 
     QString streamUrl = m_actiRes->getRtspUrl(ch);
+    NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(streamUrl).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
 
     m_multiCodec.setRequest(streamUrl);
     const CameraDiagnostics::Result result = m_multiCodec.openStream();

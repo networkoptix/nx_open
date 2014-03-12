@@ -3691,9 +3691,9 @@ Camera addition is possible for online servers only.</source>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="742"/>
         <source>%n cameras found</source>
         <translation>
-            <numerusform>Найдена %1 камера</numerusform>
-            <numerusform>Найдено %1 камеры</numerusform>
-            <numerusform>Найдено %1 камер</numerusform>
+            <numerusform>Найдена %n камера</numerusform>
+            <numerusform>Найдено %n камеры</numerusform>
+            <numerusform>Найдено %n камер</numerusform>
         </translation>
     </message>
     <message>
@@ -3851,17 +3851,17 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="99"/>
         <source>Camera List for &apos;%1&apos; - %n camera(s) found</source>
         <translation>
-            <numerusform>Список камер на &apos;%1&apos; -  найдена %n камера</numerusform>
-            <numerusform>Список камер на &apos;%1&apos; -  найдены %n камеры</numerusform>
-            <numerusform>Список камер на &apos;%1&apos; -  найдены %n камер</numerusform>
+            <numerusform>Список камер на &apos;%1&apos; - найдена %n камера</numerusform>
+            <numerusform>Список камер на &apos;%1&apos; - найдены %n камеры</numerusform>
+            <numerusform>Список камер на &apos;%1&apos; - найдены %n камер</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Camera List for media server &apos;%1&apos; - %n camera(s) found</source>
         <translation>
-            <numerusform>Список камер Медиа Сервера %1- найдена %n камера</numerusform>
-            <numerusform>Список камер Медиа Сервера %1- найдено %n камеры</numerusform>
-            <numerusform>Список камер Медиа Сервера %1- найдено %n камер</numerusform>
+            <numerusform>Список камер Медиа Сервера %1 - найдена %n камера</numerusform>
+            <numerusform>Список камер Медиа Сервера %1 - найдено %n камеры</numerusform>
+            <numerusform>Список камер Медиа Сервера %1 - найдено %n камер</numerusform>
         </translation>
     </message>
 </context>
@@ -4042,9 +4042,9 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="662"/>
         <source>%n more license(s) will be used.</source>
         <translation>
-            <numerusform>Будет использована  еще %n лицензия</numerusform>
-            <numerusform>Будет использовано  еще %n лицензии</numerusform>
-            <numerusform>Будет использовано  еще %n лицензий</numerusform>
+            <numerusform>Будет использована еще %n лицензия</numerusform>
+            <numerusform>Будет использовано еще %n лицензии</numerusform>
+            <numerusform>Будет использовано еще %n лицензий</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -4092,9 +4092,9 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="664"/>
         <source>%n more analog license(s) will be used.</source>
         <translation>
-            <numerusform>Будет дополнительно использована %n аналоговая  лицензия.</numerusform>
-            <numerusform>Будет дополнительно использовано %n аналоговые  лицензии.</numerusform>
-            <numerusform>Будет дополнительно использовано %n аналоговых  лицензий.</numerusform>
+            <numerusform>Будет дополнительно использована %n аналоговая лицензия.</numerusform>
+            <numerusform>Будет дополнительно использовано %n аналоговые лицензии.</numerusform>
+            <numerusform>Будет дополнительно использовано %n аналоговых лицензий.</numerusform>
         </translation>
     </message>
     <message>
@@ -5683,10 +5683,6 @@ Download version %3?</source>
         <translation>Звуковые файлы</translation>
     </message>
     <message>
-        <source>Clip sound up to %n seconds</source>
-        <translation type="obsolete">Воспроизводить % секунд</translation>
-    </message>
-    <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="71"/>
         <source>Clip sound up to %1 seconds</source>
         <translation>Воспроизводить %1 секунд</translation>
@@ -6366,9 +6362,9 @@ These tours will become invalid if you remove it.</source>
         <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="86"/>
         <source>%n seconds</source>
         <translation>
-            <numerusform>% сек</numerusform>
-            <numerusform>% сек</numerusform>
-            <numerusform>% сек</numerusform>
+            <numerusform>%n сек</numerusform>
+            <numerusform>%n сек</numerusform>
+            <numerusform>%n сек</numerusform>
         </translation>
     </message>
     <message>
@@ -6658,7 +6654,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="751"/>
         <source>%1 %2</source>
-        <translation>%1% {1 %2?}</translation>
+        <translation>%1 %2</translation>
     </message>
     <message>
         <source>%1 %2 </source>
@@ -7208,7 +7204,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <location filename="../src/business/business_resource_validation.cpp" line="119"/>
         <source>%n of %1 users have invalid E-Mail address</source>
         <translation>
-            <numerusform>Неверные почтовые адреса у %n из %1 пользователя</numerusform>
+            <numerusform>Неверные почтовые адреса у %n из %1 пользователей</numerusform>
             <numerusform>Неверные почтовые адреса у %n из %1 пользователей</numerusform>
             <numerusform>Неверные почтовые адреса у %n из %1 пользователей</numerusform>
         </translation>
@@ -7236,18 +7232,18 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <location filename="../src/business/business_resource_validation.cpp" line="139"/>
         <source>%n User(s)</source>
         <translation>
-            <numerusform>%1 пользователь</numerusform>
-            <numerusform>%1 пользователя</numerusform>
-            <numerusform>%1 пользователей</numerusform>
+            <numerusform>%n пользователь</numerusform>
+            <numerusform>%n пользователя</numerusform>
+            <numerusform>%n пользователей</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="141"/>
         <source>%1, %n additional</source>
         <translation>
-            <numerusform>пользователей: %1 , дополнительных: %2 </numerusform>
-            <numerusform>пользователей: %1 , дополнительных: %2 </numerusform>
-            <numerusform>пользователей: %1 , дополнительных: %2 </numerusform>
+            <numerusform>пользователей: %1 , дополнительных: %n </numerusform>
+            <numerusform>пользователей: %1 , дополнительных: %n </numerusform>
+            <numerusform>пользователей: %1 , дополнительных: %n </numerusform>
         </translation>
     </message>
 </context>

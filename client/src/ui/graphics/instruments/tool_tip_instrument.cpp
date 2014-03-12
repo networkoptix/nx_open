@@ -68,10 +68,7 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     QGraphicsItem *targetItem = NULL;
     ToolTipQueryable* targetAsToolTipQueryable = NULL;
     foreach(QGraphicsItem *item, scene()->items(scenePos, Qt::IntersectsItemShape, Qt::DescendingOrder, view->viewportTransform())) {
-        if(!item->toolTip().isEmpty() ||
-                dynamic_cast<ToolTipQueryable *>(item) ||
-                dynamic_cast<QGraphicsProxyWidget *>(item)
-                ) {
+        if(!item->toolTip().isEmpty() || dynamic_cast<ToolTipQueryable *>(item) || dynamic_cast<QGraphicsProxyWidget *>(item) ) {
             targetItem = item;
             targetAsToolTipQueryable = dynamic_cast<ToolTipQueryable *>(item);
             QGraphicsProxyWidget* targetAsGraphicsProxy = dynamic_cast<QGraphicsProxyWidget *>(item);
@@ -85,8 +82,7 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
         return true; /* Eat it anyway. */
     }
 
-    if (targetAsToolTipQueryable &&
-            targetAsToolTipQueryable->showOwnTooltip(targetItem->mapFromScene(scenePos))) {
+    if (targetAsToolTipQueryable && targetAsToolTipQueryable->showOwnTooltip(targetItem->mapFromScene(scenePos))) {
         helpEvent->accept();
         return true;
     }

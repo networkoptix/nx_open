@@ -123,6 +123,7 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">当 ${product.name} 安装成后自动运行.</String>    
+    <String Id="Product_ArchMismatch"                               Overridable="yes">这个包是专为32位操作系统.安装程序将无法继续.</String>	
 
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">请选择您所需要安装的组件！</String>    

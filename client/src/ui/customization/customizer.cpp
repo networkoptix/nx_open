@@ -11,6 +11,7 @@
 #include <utils/common/evaluator.h>
 
 #include "palette_data.h"
+#include "pen_data.h"
 
 namespace {
     QGraphicsObject *findGraphicsChild(const QGraphicsObject *object, const QString &name) {
@@ -110,6 +111,61 @@ public:
     virtual bool write(QObject *object, const QString &name, const QVariant &value) const override {
         return static_cast<QnPropertyStorage *>(object)->setValue(name, value);
     }
+};
+
+template<class Base>
+class QnPropertyAccessorWrapper: public Base {
+    typedef Base base_type;
+public:
+    QnPropertyAccessorWrapper() {
+        m_paletteDataType = qMetaTypeId<QnPaletteData>();
+        m_penDataType = qMetaTypeId<QnPenData>();
+
+        m_dummyPaletteData = QVariant::fromValue(QnPaletteData());
+        m_dummyPenData = QVariant::fromValue(QnPenData());
+    }
+
+    virtual QVariant read(const QObject *object, const QString &name) const {
+        QVariant result = base_type::read(object, name);
+
+        /* Note that return value is not used, so we don't copy the underlying data. */
+        switch(result.userType()) {
+        case QVariant::Pen:
+            return m_dummyPenData;
+        case QVariant::Palette:
+            return m_dummyPaletteData;
+        default:
+            return result;
+        }
+    }
+
+    virtual bool write(QObject *object, const QString &name, const QVariant &value) const {
+        if(value.userType() == m_paletteDataType) {
+            QVariant objectValue = base_type::read(object, name);
+            if(objectValue.userType() == QVariant::Palette) {
+                static_cast<const QnPaletteData *>(value.data())->applyTo(static_cast<QPalette *>(objectValue.data()));
+                return base_type::write(object, name, objectValue);
+            } else {
+                return false;
+            }
+        } else if(value.userType() == m_penDataType) {
+            QVariant objectValue = base_type::read(object, name);
+            if(objectValue.userType() == QVariant::Pen) {
+                static_cast<const QnPenData *>(value.data())->applyTo(static_cast<QPen *>(objectValue.data()));
+                return base_type::write(object, name, objectValue);
+            } else {
+                return false;
+            }
+        } else {
+            return base_type::write(object, name, value);
+        }
+    }
+
+private:
+    int m_paletteDataType;
+    int m_penDataType;
+    QVariant m_dummyPaletteData;
+    QVariant m_dummyPenData;
 };
 
 
@@ -230,7 +286,6 @@ public:
     QnPropertyAccessor *accessor(QObject *object) const;
 
     int customizationHashType;
-    int paletteDataType;
     
     QnCustomization customization;
     QHash<QLatin1String, QnCustomizationData> dataByClassName;
@@ -245,15 +300,14 @@ public:
 
 QnCustomizerPrivate::QnCustomizerPrivate() {
     customizationHashType = qMetaTypeId<QnCustomizationDataHash>();
-    paletteDataType = qMetaTypeId<QnPaletteData>();
 
-    defaultAccessor.reset(new QnObjectPropertyAccessor());
+    defaultAccessor.reset(new QnPropertyAccessorWrapper<QnObjectPropertyAccessor>());
     colorSerializer.reset(new QnCustomizationColorSerializer());
     customizationHashSerializer.reset(new QnDefaultJsonSerializer<QnCustomizationDataHash>());
     
-    accessorByClassName.insert(QLatin1String("QApplication"), new QnApplicationPropertyAccessor());
-    accessorByClassName.insert(QLatin1String("QnPropertyStorage"), new QnStoragePropertyAccessor());
-    accessorByClassName.insert(QLatin1String("QGraphicsObject"), new QnGraphicsObjectPropertyAccessor());
+    accessorByClassName.insert(QLatin1String("QApplication"), new QnPropertyAccessorWrapper<QnApplicationPropertyAccessor>());
+    accessorByClassName.insert(QLatin1String("QnPropertyStorage"), new QnPropertyAccessorWrapper<QnStoragePropertyAccessor>());
+    accessorByClassName.insert(QLatin1String("QGraphicsObject"), new QnPropertyAccessorWrapper<QnGraphicsObjectPropertyAccessor>());
 
     /* QnJsonSerializer does locking, so we use local cache to avoid it. */
     foreach(QnJsonSerializer *serializer, QnJsonSerializer::allSerializers())
@@ -328,13 +382,11 @@ void QnCustomizerPrivate::customize(QObject *object, const QString &key, QnCusto
     }
 
     int type = value.userType();
-    int underlyingType = QMetaType::UnknownType;
+    bool isObject = false;
+
     if(type == QMetaType::QObjectStar) {
-        underlyingType = type;
         type = customizationHashType;
-    } else if(type == QMetaType::QPalette) {
-        underlyingType = type;
-        type = paletteDataType;
+        isObject = true;
     }
 
     if(data->type != type) {
@@ -362,20 +414,13 @@ void QnCustomizerPrivate::customize(QObject *object, const QString &key, QnCusto
     if(data->value.userType() == QMetaType::UnknownType)
         return; 
 
-    if(underlyingType != QMetaType::UnknownType) {
-        if(underlyingType == QMetaType::QObjectStar) {
-            QObject *subObject = value.value<QObject *>();
-            customize(subObject, data, this->accessor(subObject), subObject->metaObject()->className());
-            return; /* Nothing to write back. */
-        } else if(underlyingType == QMetaType::QPalette) {
-            static_cast<const QnPaletteData *>(data->value.data())->applyTo(static_cast<QPalette *>(value.data()));
-        }
+    if(isObject) {
+        QObject *subObject = value.value<QObject *>();
+        customize(subObject, data, this->accessor(subObject), subObject->metaObject()->className());
     } else {
-        value = data->value;
+        if(!accessor->write(object, key, data->value))
+            qnWarning("Could not customize property '%1' of class '%2'. Property writing has failed.", key, className);
     }
-
-    if(!accessor->write(object, key, value))
-        qnWarning("Could not customize property '%1' of class '%2'. Property writing has failed.", key, className);
 }
 
 

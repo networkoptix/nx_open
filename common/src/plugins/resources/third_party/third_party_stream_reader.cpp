@@ -178,6 +178,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
             return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
         }
 
+        NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(mediaUrlStr).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
         m_rtpStreamParser.setRequest( mediaUrlStr );
         return m_rtpStreamParser.openStream();
     }

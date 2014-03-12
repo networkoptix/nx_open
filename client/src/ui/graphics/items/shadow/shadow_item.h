@@ -3,15 +3,19 @@
 
 #include <QtWidgets/QGraphicsObject>
 
+#include <ui/customization/customized.h>
+
 #include "shadow_shape_provider.h"
+
+// TODO: #Elric get rid of shape provider, inherit from PathItem.
 
 /**
  * An item that draws a polygonal shadow.
  */
-class QnShadowItem: public QGraphicsObject {
+class QnShadowItem: public Customized<QGraphicsObject> {
     Q_OBJECT
     Q_PROPERTY(QColor color READ color WRITE setColor)
-    typedef QGraphicsObject base_type;
+    typedef Customized<QGraphicsObject> base_type;
 
 public:
     QnShadowItem(QGraphicsItem *parent = NULL);

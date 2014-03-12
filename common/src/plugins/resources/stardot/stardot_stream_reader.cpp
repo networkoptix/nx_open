@@ -58,6 +58,7 @@ CameraDiagnostics::Result QnStardotStreamReader::openStream()
     }
 
     QString streamUrl = m_stardotRes->getRtspUrl();
+    NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(streamUrl).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
     m_multiCodec.setRole(getRole());
     m_multiCodec.setRequest(streamUrl);
     const CameraDiagnostics::Result result = m_multiCodec.openStream();

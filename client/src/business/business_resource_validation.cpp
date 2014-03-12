@@ -116,7 +116,7 @@ QString QnUserEmailPolicy::getText(const QnResourceList &resources, const bool d
     if (detailed && invalid > 0) {
         if (users.size() == 1)
             return tr("User %1 has invalid email address").arg(users.first()->getName());
-        return tr("%n of %1 users have invalid E-Mail address", "", invalid).arg(users.size());
+        return tr("%n of %1 users have invalid E-Mail address", "", invalid).arg(users.size()); // TODO: #Elric #TR invalid %n placement!
     }
 
     invalid = 0;

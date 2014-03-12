@@ -215,7 +215,7 @@ void RubberBandInstrument::installedNotify() {
     rubberBand()->setVisible(false);
     scene()->addItem(rubberBand());
 
-    connect(scene(), SIGNAL(selectionChanged()), this, SLOT(at_scene_selectionChanged()));
+    connect(scene(), &QGraphicsScene::selectionChanged, this, &RubberBandInstrument::at_scene_selectionChanged);
 
     m_inSelectionChanged = false;
     m_protectSelection = false;

@@ -59,6 +59,10 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 {
     QnResourceList result;
 
+    std::unique_ptr<AbstractDatagramSocket> recvSocket( SocketFactory::createDatagramSocket() );
+    if (!recvSocket->bind(BROADCAST_ADDRESS, 0))
+        return QnResourceList();
+
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
 
@@ -66,8 +70,9 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             return QnResourceList();
 
         std::unique_ptr<AbstractDatagramSocket> sock( SocketFactory::createDatagramSocket() );
+        sock->setReuseAddrFlag(true);
 
-        if (!sock->bind(iface.address.toString(), 0))
+        if (!sock->bind(iface.address.toString(), recvSocket->getLocalAddress().port))
             continue;
 
         // sending broadcast
@@ -82,7 +87,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
         // collecting response
         QnSleep::msleep(150);
-        while (sock->hasData())
+        while (recvSocket->hasData())
         {
             QByteArray datagram;
             datagram.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
@@ -90,7 +95,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             QString sender;
             quint16 senderPort;
 
-            int readed = sock->recvFrom(datagram.data(), datagram.size(),    sender, senderPort);
+            int readed = recvSocket->recvFrom(datagram.data(), datagram.size(),    sender, senderPort);
 
             if (senderPort != 62976 || readed < 32) // minimum response size
                 continue;

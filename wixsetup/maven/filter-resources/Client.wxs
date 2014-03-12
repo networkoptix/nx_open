@@ -26,9 +26,9 @@
                                  Key="Software\[Manufacturer]\${applauncher.name}">
                             <RegistryValue Type="string" Name="previousLaunchedVersion" Value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}"/>
                         </RegistryKey>
-                        <RegistryKey Root="HKCU"
+                        <RegistryKey Root="HKLM"
                                  Key="Software\[Manufacturer]\${applauncher.name}">
-                            <RegistryValue Type="string" Name="mirrorListUrl" Value="http://enk.me/clients/mirror.xml"/>
+                            <RegistryValue Type="string" Name="mirrorListUrl" Value="${mirrorListUrl}"/>
                         </RegistryKey>                        
                     </Component>                                
 

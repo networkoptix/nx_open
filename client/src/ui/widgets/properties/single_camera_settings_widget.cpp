@@ -631,7 +631,7 @@ void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
     if(!m_motionWidget)
         return;
     bool hwMotion = m_camera && (m_camera->supportedMotionType() & (Qn::MT_HardwareGrid | Qn::MT_MotionWindow));
-    m_motionWidget->setNeedControlMaxRects(m_cameraSupportsMotion && hwMotion && !ui->softwareMotionButton->isChecked());
+    m_motionWidget->setControlMaxRects(m_cameraSupportsMotion && hwMotion && !ui->softwareMotionButton->isChecked());
 }
 
 void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
