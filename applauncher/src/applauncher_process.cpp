@@ -498,6 +498,7 @@ void ApplauncherProcess::onInstallationDone( InstallationProcess* installationPr
     if( installationProcess->getStatus() == applauncher::api::InstallationStatus::success )
     {
         m_installationManager->updateInstalledVersionsInformation();
+        m_installationManager->createLatestVersionGhostForVersion(installationProcess->getVersion());
         if( installationProcess->autoStartNeeded() )
         {
             applauncher::api::Response response;

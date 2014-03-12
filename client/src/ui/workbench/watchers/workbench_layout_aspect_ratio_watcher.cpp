@@ -10,6 +10,13 @@
 namespace {
     const qreal normalAspectRatio = 4.0 / 3.0;
     const qreal wideAspectRatio = 16.0 / 9.0;
+
+    qreal standardAspectRatio(qreal aspectRatio) {
+        if (qAbs(aspectRatio - normalAspectRatio) < qAbs(aspectRatio - wideAspectRatio))
+            return normalAspectRatio;
+        else
+            return wideAspectRatio;
+    }
 }
 
 QnWorkbenchLayoutAspectRatioWatcher::QnWorkbenchLayoutAspectRatioWatcher(QObject *parent) :
@@ -33,7 +40,7 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_widgetChanged(QnResou
         return;
 
     if (widget->hasAspectRatio()) {
-        m_watchedLayout->setCellAspectRatio(widget->aspectRatio());
+        m_watchedLayout->setCellAspectRatio(standardAspectRatio(widget->aspectRatio()));
     } else {
         connect(widget, SIGNAL(aspectRatioChanged()), this, SLOT(at_resourceWidget_aspectRatioChanged()));
         connect(widget, SIGNAL(destroyed()),          this, SLOT(at_resourceWidget_destroyed()));
@@ -51,10 +58,7 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_resourceWidget_aspectRatioChanged()
 
     disconnect(widget, SIGNAL(aspectRatioChanged()), this, SLOT(at_resourceWidget_aspectRatioChanged()));
 
-    if (qAbs(widget->aspectRatio() - normalAspectRatio) < qAbs(widget->aspectRatio() - wideAspectRatio))
-        m_watchedLayout->setCellAspectRatio(normalAspectRatio);
-    else
-        m_watchedLayout->setCellAspectRatio(wideAspectRatio);
+    m_watchedLayout->setCellAspectRatio(standardAspectRatio(widget->aspectRatio()));
 }
 
 void QnWorkbenchLayoutAspectRatioWatcher::at_resourceWidget_destroyed() {

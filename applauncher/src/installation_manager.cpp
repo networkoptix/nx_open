@@ -70,8 +70,7 @@ InstallationManager::InstallationManager( QObject* const parent )
     }
 
     updateInstalledVersionsInformation();
-    if( m_installedProductsByVersion.size() > 1 )
-        createLatestVersionGhost();
+    createLatestVersionGhosts();
 }
 
 InstallationManager::AppData InstallationManager::getAppData(const QString &rootPath) const
@@ -138,28 +137,56 @@ void InstallationManager::updateInstalledVersionsInformation()
     m_installedProductsByVersion.swap(tempInstalledProductsByVersion);
 }
 
-void InstallationManager::createLatestVersionGhost()
+void InstallationManager::doCreateLatestVersionGhost(const AppData &appData, const QString &version)
 {
-    QString version = getMostRecentVersion();
-    QDir installationDir(m_defaultDirectoryForNewInstallations);
+    QDir binDir = QFileInfo(appData.executablePath()).absoluteDir();
+    binDir.cdUp();
+    doCreateLatestVersionGhost(binDir.absolutePath(), version);
+}
+
+void InstallationManager::doCreateLatestVersionGhost(const QString &path, const QString &version)
+{
+    QDir rootDir(path);
 
     bool skipDirCreation = false;
 
     /* The first - remove old possible ghosts */
-    QStringList entries = installationDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-    qDebug() << entries;
-    foreach( const QString &entry, entries ) {
-        if( entry == version ) {
+    QStringList entries = rootDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    foreach (const QString &entry, entries) {
+        if (entry == version) {
             skipDirCreation = true;
         } else {
-            if (QDir(installationDir.absolutePath() + "/" + entry).entryList(QDir::AllEntries | QDir::NoDotAndDotDot).isEmpty())
-                installationDir.rmdir(entry);
+            if (QDir(path + "/" + entry).entryList(QDir::AllEntries | QDir::NoDotAndDotDot).isEmpty())
+                rootDir.rmdir(entry);
         }
     }
 
     /* The second - create new one */
-    if( !skipDirCreation && !installationDir.exists(version) )
-        installationDir.mkdir(version);
+    if (!skipDirCreation && !rootDir.exists(version))
+        rootDir.mkdir(version);
+}
+
+void InstallationManager::createLatestVersionGhosts()
+{
+    QString version = getMostRecentVersion();
+
+    QDir installationDir(m_defaultDirectoryForNewInstallations);
+    QStringList entries = installationDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    foreach (const QString &entry, entries) {
+        if (entry == version)
+            continue;
+        else
+            doCreateLatestVersionGhost(m_defaultDirectoryForNewInstallations + "/" + entry, version);
+    }
+}
+
+void InstallationManager::createLatestVersionGhostForVersion(const QString &version)
+{
+    auto it = m_installedProductsByVersion.find(version);
+    if (it == m_installedProductsByVersion.end())
+        return;
+
+    doCreateLatestVersionGhost(it.value(), getMostRecentVersion());
 }
 
 int InstallationManager::count() const
