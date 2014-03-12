@@ -48,9 +48,9 @@ MediaEncoder::MediaEncoder(
     m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
     m_encoderNum( encoderNum ),
+    m_motionMask( nullptr ),
     m_fpsListRead( false ),
     m_resolutionListRead( false ),
-    m_motionMask( 0 ),
     m_audioEnabled( false )
 {
 }
@@ -157,8 +157,9 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 {
     if( !m_streamReader.get() ) {
         m_streamReader.reset( new StreamReader(
-        &m_refManager,
-        m_encoderNum) );
+            &m_refManager,
+            m_encoderNum,
+            m_cameraManager->info().uid ) );
         if (m_motionMask)
             m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
         m_streamReader->setAudioEnabled( m_audioEnabled );
@@ -172,7 +173,8 @@ int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
     if( !m_streamReader.get() ) {
         m_streamReader.reset( new StreamReader(
             &m_refManager,
-            m_encoderNum) );
+            m_encoderNum,
+            m_cameraManager->info().uid ) );
         if (m_motionMask)
             m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
         m_streamReader->setAudioEnabled( m_audioEnabled );

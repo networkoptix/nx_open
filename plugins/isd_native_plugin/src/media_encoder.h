@@ -63,7 +63,7 @@ public:
 private:
     mutable nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
-    mutable std::auto_ptr<StreamReader> m_streamReader;
+    mutable std::unique_ptr<StreamReader> m_streamReader;
     unsigned int m_encoderNum;
     nxcip::Picture* m_motionMask;
     mutable bool m_fpsListRead;

@@ -26,20 +26,27 @@
 #include <QDateTime>
 
 #include <plugins/resources/third_party/motion_data_picture.h>
+#include <utils/common/synctime.h>
 
 #include "ilp_video_packet.h"
 #include "ilp_empty_packet.h"
 #include "isd_audio_packet.h"
 
+//#define USE_OWN_TIMESTAMP_GENERATION
+
 
 //if defined, video frames receive curernt system time as pts
 //#define USE_SYSTEM_CLOCK
 
-
 static const int HIGH_QUALITY_ENCODER = 0;
+static const int ENCODER_STREAM_TO_ADD_MOTION_TO = 1;   //1 - low stream
 static const int64_t MOTION_TIMEOUT_USEC = 1000ll * 300;
+static const int PTS_FREQUENCY = 90000;
 
-StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager, int encoderNum)
+StreamReader::StreamReader(
+    nxpt::CommonRefManager* const parentRefManager,
+    int encoderNum,
+    const char* cameraUid )
 :
     m_refManager( parentRefManager ),
     m_encoderNum( encoderNum ),
@@ -53,7 +60,11 @@ StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager, int e
     m_prevPts(0),
     m_ptsDelta(0),
     m_audioEnabled(false),
+    m_timeHelper( QString::fromLatin1(cameraUid) ),
     m_epollFD(-1)
+#ifdef DUPLICATE_MOTION_TO_HIGH_STREAM
+    , m_currentMotionData(nullptr)
+#endif
 {
 }
 
@@ -113,7 +124,7 @@ unsigned int StreamReader::releaseRef()
 
 bool StreamReader::needMetaData()
 {
-    if (m_encoderNum == 1) {
+    if (m_encoderNum == ENCODER_STREAM_TO_ADD_MOTION_TO) {
         if (m_lastVideoTime - m_lastMotionTime >= MOTION_TIMEOUT_USEC)
         {
             m_lastMotionTime = m_lastVideoTime;
@@ -182,7 +193,6 @@ int StreamReader::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 
 struct SharedStreamData
 {
-    std::mutex mutex;
     int64_t ptsBase;
     int64_t baseClock;
 
@@ -195,6 +205,7 @@ struct SharedStreamData
 };
 
 static SharedStreamData m_sharedStreamData;
+static std::mutex timestampSynchronizationMutex;
 
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
@@ -302,6 +313,7 @@ int StreamReader::initializeVMux()
         return nxcip::NX_INVALID_ENCODER_NUMBER; // error
     }
     m_firstFrameTime = 0;
+    m_timeStatistics.nptTime = -1;
 
     m_vmux = vmux.release();
 
@@ -367,7 +379,7 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
     if (frame.vmux_info.pic_type == 1) {
         //std::cout << "I-frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << std::endl;
     }
-    //std::cout << "frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << "encoder=" << m_encoderNum << std::endl;
+    //std::cout << "frame pts = " << frame.vmux_info.PTS << ", pic_type=" << frame.vmux_info.pic_type << ", encoder=" << m_encoderNum;
     //    std::cout<<"encoder "<<m_encoderNum<<" frame pts "<<frame.vmux_info.PTS<<"\n";
 
     std::auto_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
@@ -383,10 +395,27 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
     if (needMetaData()) {
         MotionDataPicture* motionData = getMotionData();
         if (motionData) {
+            //std::cout<<". Motion to low stream";
             videoPacket->setMotionData( motionData );
+#ifdef DUPLICATE_MOTION_TO_HIGH_STREAM
+            if( m_currentMotionData )
+                m_currentMotionData->releaseRef();
+            m_currentMotionData = motionData;
+#else
             motionData->releaseRef();   //videoPacket takes reference to motionData
+#endif
         }
     }
+#ifdef DUPLICATE_MOTION_TO_HIGH_STREAM
+    else if( m_encoderNum != ENCODER_STREAM_TO_ADD_MOTION_TO && m_currentMotionData )
+    {
+        videoPacket->setMotionData( m_currentMotionData );
+        m_currentMotionData->releaseRef();
+        m_currentMotionData = nullptr;
+    }
+#endif
+
+    //std::cout << std::endl;
 
     *lpPacket = videoPacket.release();
     return nxcip::NX_NO_ERROR;
@@ -474,11 +503,31 @@ void StreamReader::fillAudioFormat( const ISDAudioPacket& audioPacket )
 static const unsigned int MAX_PTS_DRIFT = 63000;    //700 ms
 static const unsigned int DEFAULT_FRAME_DURATION = 3000;    //30 fps
 
+
+static RtspStatistic rtcpTimeStatistics;
+
+
 int64_t StreamReader::calcNextTimestamp( unsigned int pts )
 {
+    qint64 newTs = 0;
+#ifndef USE_OWN_TIMESTAMP_GENERATION
+
     if( m_firstFrameTime == 0 )
     {
-        std::unique_lock<std::mutex> lk( m_sharedStreamData.mutex );
+        std::unique_lock<std::mutex> lk( timestampSynchronizationMutex );
+        if( m_timeStatistics.timestamp == 0 )
+        {
+            rtcpTimeStatistics.timestamp = pts;
+            rtcpTimeStatistics.localtime = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
+        }
+        m_firstFrameTime = 1;   //any non-zero value
+    }
+
+    newTs = m_timeHelper.getUsecTime( pts, rtcpTimeStatistics, PTS_FREQUENCY );
+#else
+    if( m_firstFrameTime == 0 )
+    {
+        std::unique_lock<std::mutex> lk( timestampSynchronizationMutex );
         if( m_sharedStreamData.ptsBase == -1 )
         {
             m_sharedStreamData.ptsBase = pts;
@@ -505,11 +554,14 @@ int64_t StreamReader::calcNextTimestamp( unsigned int pts )
 
     m_firstFrameTime += (int64_t(pts - m_prevPts) * 1000000ll) / 90000; //TODO dword wrap
     m_prevPts = pts;
-    return
+    newTs =
 #ifdef USE_SYSTEM_CLOCK
         QDateTime::currentMSecsSinceEpoch() * 1000ll;
 #else
         //(int64_t(pts) * 1000000ll) / 90000 + m_firstFrameTime,
         m_firstFrameTime + m_ptsDelta;
 #endif
+#endif
+    //std::cout<<"pts0 "<<pts<<", pts "<<newTs<<", "<<(m_encoderNum == 0 ? "hgh" : "low")<<std::endl;
+    return newTs;
 }
