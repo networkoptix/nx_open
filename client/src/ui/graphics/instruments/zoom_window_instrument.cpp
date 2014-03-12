@@ -335,9 +335,9 @@ ZoomWindowInstrument::ZoomWindowInstrument(QObject *parent):
         << QColor(32, 192, 32)
         << QColor(64, 64, 255);
 
-    connect(display(), SIGNAL(zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAdded(QnResourceWidget *, QnResourceWidget *)));
-    connect(display(), SIGNAL(zoomLinkAboutToBeRemoved(QnResourceWidget *, QnResourceWidget *)), this, SLOT(at_display_zoomLinkAboutToBeRemoved(QnResourceWidget *, QnResourceWidget *)));
-    connect(display(), SIGNAL(widgetChanged(Qn::ItemRole)), this, SLOT(at_display_widgetChanged(Qn::ItemRole)));
+    connect(display(), &QnWorkbenchDisplay::zoomLinkAdded,              this, &ZoomWindowInstrument::at_display_zoomLinkAdded);
+    connect(display(), &QnWorkbenchDisplay::zoomLinkAboutToBeRemoved,   this, &ZoomWindowInstrument::at_display_zoomLinkAboutToBeRemoved);
+    connect(display(), &QnWorkbenchDisplay::widgetChanged,              this, &ZoomWindowInstrument::at_display_widgetChanged);
 }
 
 ZoomWindowInstrument::~ZoomWindowInstrument() {
@@ -347,7 +347,7 @@ ZoomWindowInstrument::~ZoomWindowInstrument() {
 QColor ZoomWindowInstrument::nextZoomWindowColor() const {
     QSet<QColor> colors;
     foreach(QnResourceWidget *widget, display()->widgets())
-        colors.insert(widget->frameColor());
+        colors.insert(widget->frameDistinctionColor());
 
     foreach(const QColor &color, m_colors)
         if(!colors.contains(color))
@@ -414,14 +414,14 @@ void ZoomWindowInstrument::ensureSelectionItem() {
 }
 
 void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget) {
-    connect(widget, SIGNAL(zoomRectChanged()), this, SLOT(at_widget_zoomRectChanged()));
-    connect(widget, SIGNAL(frameColorChanged()), this, SLOT(at_widget_frameColorChanged()));
-    connect(widget, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_widget_aboutToBeDestroyed()));
-    connect(widget, SIGNAL(optionsChanged()), this, SLOT(at_widget_optionsChanged()));
+    connect(widget, &QnResourceWidget::zoomRectChanged,                 this, &ZoomWindowInstrument::at_widget_zoomRectChanged);
+    connect(widget, &QnResourceWidget::frameDistinctionColorChanged,    this, &ZoomWindowInstrument::at_widget_frameColorChanged);
+    connect(widget, &QnResourceWidget::aboutToBeDestroyed,              this, &ZoomWindowInstrument::at_widget_aboutToBeDestroyed);
+    connect(widget, &QnResourceWidget::optionsChanged,                  this, &ZoomWindowInstrument::at_widget_optionsChanged);
 
     // TODO: #Elric hack =(
-    if(!widget->zoomRect().isNull() && widget->frameColor() == qnGlobals->frameColor())
-        widget->setFrameColor(nextZoomWindowColor());
+    if(!widget->zoomRect().isNull() && widget->frameDistinctionColor() == qnGlobals->frameColor())
+        widget->setFrameDistinctionColor(nextZoomWindowColor());
 }
 
 void ZoomWindowInstrument::unregisterWidget(QnMediaResourceWidget *widget) {
@@ -449,8 +449,8 @@ void ZoomWindowInstrument::registerLink(QnMediaResourceWidget *widget, QnMediaRe
     windowWidget->setZoomWidget(widget);
     overlayWidget->addWidget(windowWidget);
     data.windowWidget = windowWidget;
-    connect(windowWidget, SIGNAL(geometryChanged()), this, SLOT(at_windowWidget_geometryChanged()));
-    connect(windowWidget, SIGNAL(doubleClicked()), this, SLOT(at_windowWidget_doubleClicked()));
+    connect(windowWidget, &ZoomWindowWidget::geometryChanged,   this, &ZoomWindowInstrument::at_windowWidget_geometryChanged);
+    connect(windowWidget, &ZoomWindowWidget::doubleClicked,     this, &ZoomWindowInstrument::at_windowWidget_doubleClicked);
 
     updateWindowFromWidget(widget);
 }
@@ -503,7 +503,7 @@ void ZoomWindowInstrument::updateWindowFromWidget(QnMediaResourceWidget *widget)
 
     if(windowWidget && overlayWidget) {
         overlayWidget->setWidgetRect(windowWidget, widget->zoomRect(), true);
-        windowWidget->setFrameColor(widget->frameColor().lighter(110));
+        windowWidget->setFrameColor(widget->frameDistinctionColor().lighter(110));
     }
 
     m_processingWidgets.remove(widget);
