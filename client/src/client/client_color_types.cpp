@@ -11,7 +11,7 @@ QnTimeSliderColors::QnTimeSliderColors() {
     positionMarker = QColor(255, 255, 255, 196);
     indicator = QColor(128, 160, 192, 128);
 
-    selection = qnGlobals->selectionColor();
+    selection = QColor(0, 150, 255, 110);
     selectionMarker = selection.lighter();
 
     pastBackground = QColor(255, 255, 255, 24);
@@ -44,7 +44,7 @@ QnBackgroundColors::QnBackgroundColors() {
 }
 
 QnCalendarColors::QnCalendarColors() {
-    selection = withAlpha(qnGlobals->selectionColor(), 192);
+    selection = QColor(0, 150, 255, 192);
     primaryRecording = QColor(32, 128, 32, 255);
     secondaryRecording = QColor(32, 255, 32, 255);
     primaryMotion = QColor(128, 0, 0, 255);
@@ -99,7 +99,7 @@ QnHistogramColors::QnHistogramColors() {
     background = QColor(0, 0, 0);
     border = QColor(96, 96, 96);
     histogram = QColor(192, 192, 192);
-    selection = qnGlobals->selectionColor();
+    selection = QColor(0, 150, 255, 110);
     grid = QColor(0, 128, 0, 128);
     text = QColor(255, 255, 255);
 }
