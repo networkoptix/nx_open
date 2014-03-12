@@ -266,25 +266,11 @@ ErrorCode QnDbManager::insertAddParams(const std::vector<ApiResourceParam>& para
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::removeAddParam(const ApiResourceParam& param)
-{
-    QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_kvpair where resource_id = :resourceId and name = :name");
-    param.autoBindValues(delQuery);
-    if (delQuery.exec()) {
-        return ErrorCode::ok;
-    }
-    else {
-        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
-        return ErrorCode::failure;
-    }
-}
-
 ErrorCode QnDbManager::deleteAddParams(qint32 resourceId)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("DELETE FROM vms_kvpair WHERE resource_id = :resourceId");
-    insQuery.bindValue(":resourceId", resourceId);
+    insQuery.prepare("DELETE FROM vms_kvpair WHERE resource_id = ?");
+    insQuery.addBindValue(resourceId);
     if (insQuery.exec()) {
         return ErrorCode::ok;
     }
