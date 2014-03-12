@@ -3,11 +3,15 @@
 
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
-#include "core/resource/resource.h"
-#include "core/resource/camera_resource.h"
-#include "ui/graphics/instruments/click_instrument.h"
+
+#include <core/resource/resource_fwd.h>
+#include <core/resource/motion_window.h>
+
+#include <utils/common/connective.h>
 
 class MotionSelectionInstrument;
+class ClickInstrument;
+class ClickInfo;
 
 class QnGraphicsView;
 class QnGraphicsScene;
@@ -18,10 +22,10 @@ class QnWorkbenchItem;
 class QnWorkbenchContext;
 class QnMediaResourceWidget;
 
-class QnCameraMotionMaskWidget: public QWidget
-{
+class QnCameraMotionMaskWidget: public Connective<QWidget> {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
+    typedef Connective<QWidget> base_type;
         
 public:
     QnCameraMotionMaskWidget(QWidget *parent = 0);
@@ -38,7 +42,8 @@ public:
     int motionSensitivity() const;
     void setMotionSensitivity(int motionSensitivity);
 
-    void setNeedControlMaxRects(bool value);
+    void setControlMaxRects(bool controlMaxRects);
+    bool isControlMaxRects() const;
 
     /** Check if motion region is valid */
     bool isValidMotionRegion();
@@ -77,7 +82,7 @@ private:
 
     bool m_readOnly;
     int m_motionSensitivity;
-    bool m_needControlMaxRects;
+    bool m_controlMaxRects;
 };
 
 #endif // QN_CAMERA_MOTION_MASK_WIDGET_H

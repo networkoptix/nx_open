@@ -206,6 +206,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
         stream << "&camera=" << res->getChannelNumAxis();
     }
 
+    NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(request).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
     
 
     // ============== requesting a video ==========================

@@ -9,10 +9,6 @@ class QnEventLogModel: public QAbstractItemModel {
     typedef QAbstractItemModel base_type;
 
 public:
-    enum Roles {
-         ItemLinkRole = Qt::UserRole + 500
-    };
-
     enum Column {
         DateTimeColumn,
         EventColumn,
@@ -46,10 +42,12 @@ public:
     QnResourcePtr eventResource(int row) const;
     qint64 eventTimestamp(int row) const;
 
-    class DataIndex;
 public slots:
     void clear();
+
 private:
+    class DataIndex;
+
     QnResourcePtr getResource(const Column &column, const QnBusinessActionData &action) const;
     QVariant fontData(const Column& column, const QnBusinessActionData &action) const;
     QVariant foregroundData(const Column& column, const QnBusinessActionData &action) const;
@@ -64,8 +62,9 @@ private:
     static QnResourcePtr getResourceById(const QnId& id);
     static QString getResourceNameString(QnId id);
     static QString getUserGroupString(QnBusinessActionParameters::UserGroup value);
-private slots:
-    void at_resource_removed(QnResourcePtr res);
+
+    Q_SLOT void at_resource_removed(const QnResourcePtr &resource);
+
 private:
     QList<Column> m_columns;
     QBrush m_linkBrush;

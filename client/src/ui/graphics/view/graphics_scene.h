@@ -16,7 +16,7 @@ protected:
         /* #QTBUG 
          * There is a bug in Qt5 that results in drops not working if no
          * drag move events were delivered. We work this around by invoking the 
-         * corresponding handler in drag enter event. */
+         * corresponding handler in drag enter event. */ // TODO: #Elric check if this is still relevant
         base_type::dragEnterEvent(event);
         base_type::dragMoveEvent(event);
         event->accept(); /* Drag enter always accepts the event, so we should re-accept it. */

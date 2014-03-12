@@ -26,10 +26,14 @@ ALLOW_CAMERA_CHANGES_DEFAULT=true
 
 # This is necessary because changed configuration options should take effect 
 # immediately.
-if status $COMPANY_NAME-entcontroller | grep "start/running" > /dev/null; then
-  stop $COMPANY_NAME-entcontroller
+if status $COMPANY_NAME-mediaproxy | grep "start/running" > /dev/null; then
+  invoke-rc.d $COMPANY_NAME-mediaproxy stop || exit $?
 fi
-    
+
+if status $COMPANY_NAME-entcontroller | grep "start/running" > /dev/null; then
+  invoke-rc.d $COMPANY_NAME-entcontroller stop || exit $?
+fi
+
 function to_int {
     local -i num="10#${1}"
     echo "${num}"

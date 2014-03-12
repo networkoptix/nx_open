@@ -13,7 +13,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <UI>
-            <Dialog Id="AllFieldsAreMandatoryDlg" Width="280" Height="70" Title="Configuration error">
+            <Dialog Id="AllFieldsAreMandatoryDlg" Width="280" Height="70" Title="loc.(PasswordShouldMatchDlg_ConfigError)">
                 <Control Id="Ok" Type="PushButton" X="220" Y="44" Width="56" Height="17" Text="!(loc.StdString_Ok)">
                     <Publish Event="EndDialog" Value="Return">1</Publish>
                 </Control>

@@ -1,0 +1,57 @@
+#include "process_utils.h"
+
+#include <QtCore/QProcess>
+
+#ifdef Q_OS_LINUX
+#include <unistd.h>
+#include <QtCore/QFile>
+
+bool ProcessUtils::startProcessDetached(const QString &program, const QStringList &arguments, const QString &workingDirectory, const QStringList &environment) {
+    /* prepare argv */
+    QList<QByteArray> enc_args;
+    enc_args.append(QFile::encodeName(program));
+    for (int i = 0; i < arguments.size(); ++i)
+        enc_args.append(arguments.at(i).toLocal8Bit());
+
+    const int argc = enc_args.size();
+    QScopedArrayPointer<char*> raw_argv(new char*[argc + 1]);
+    for (int i = 0; i < argc; ++i)
+        raw_argv[i] = const_cast<char *>(enc_args.at(i).data());
+    raw_argv[argc] = 0;
+
+    /* prepare environment */
+    QList<QByteArray> enc_env;
+    foreach (const QString &s, environment)
+        enc_env.append(s.toLocal8Bit());
+
+    int envc = enc_env.size();
+    QScopedArrayPointer<char*> raw_env(new char*[envc + 1]);
+    for (int i = 0; i < envc; ++i)
+        raw_env[i] = const_cast<char *>(enc_env.at(i).data());
+    raw_env[envc] = 0;
+
+    // Encode the working directory if it's non-empty, otherwise just pass 0.
+    const char *enc_wd = 0;
+    if (!workingDirectory.isEmpty())
+        enc_wd = QFile::encodeName(workingDirectory).constData();
+
+    pid_t childPid = fork();
+
+    if (childPid == 0) {
+        if (enc_wd)
+            chdir(enc_wd);
+
+        execve(enc_args[0], raw_argv.data(), raw_env.data());
+        ::exit(-1);
+    }
+
+    return childPid != -1;
+}
+
+#else
+
+bool ProcessUtils::startProcessDetached(const QString &program, const QStringList &arguments, const QString &workingDirectory, const QStringList &environment) {
+    return QProcess::startDetached(program, arguments, workingDirectory);
+}
+
+#endif

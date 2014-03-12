@@ -148,6 +148,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
 
         if (url.length() > 1 && url.at(0)==QLatin1Char('/'))
             url = url.mid(1);
+        NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(url).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
 
         mHttpClient = new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth());
         const CLHttpStatus status = mHttpClient->doGET(url);

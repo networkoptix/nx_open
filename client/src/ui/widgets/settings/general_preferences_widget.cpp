@@ -151,14 +151,16 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
 
 bool QnGeneralPreferencesWidget::confirm() {
     if (m_oldDownmix != ui->downmixAudioCheckBox->isChecked() ||
-        m_oldLanguage != ui->languageComboBox->currentIndex()) {
-        switch(QMessageBox::information(
-                    this,
-                    tr("Information"),
-                    tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
-                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                    QMessageBox::Yes
-        )) {
+        m_oldLanguage != ui->languageComboBox->currentIndex() ||
+        m_oldSkin != ui->skinComboBox->currentIndex())
+    {
+        QMessageBox::StandardButton result = QMessageBox::information(
+                 this,
+                 tr("Information"),
+                 tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
+                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                 QMessageBox::Yes);
+        switch (result) {
         case QMessageBox::Cancel:
             return false;
         case QMessageBox::Yes:

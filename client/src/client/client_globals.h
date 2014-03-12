@@ -246,6 +246,7 @@ namespace Qn {
         LightModeSingleItem         = 0x20,
         LightModeNoShadows          = 0x40,
         LightModeNoMultisampling    = 0x80,
+        LightModeNoNewWindow        = 0x100,
 
         LightModeFull               = 0xFFFFFFFF
 
