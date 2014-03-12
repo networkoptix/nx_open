@@ -135,8 +135,8 @@
             "dateOverlay": "QColor(255, 255, 255, 48)",
             "dateOverlayAlternate": "selection.setAlpha(48)",
 
-			"pastLastMinute": "QColor(255, 255, 255, 48)",
-            "futureLastMinute": "QColor(0, 0, 0, 48)"            
+            "pastLastMinute": "QColor(24, 24, 24, 255)",
+            "futureLastMinute": "QColor(0, 0, 0, 255)"
         },
 		"palette": { "default": { "windowText": "#FFFFFF" } }        
     },
