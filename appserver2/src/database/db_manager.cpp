@@ -727,17 +727,17 @@ ErrorCode QnDbManager::updateLayoutItems(const ApiLayoutData& data, qint32 inter
     if (result != ErrorCode::ok)
         return result;
 
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO vms_layoutitem (zoom_bottom, right, uuid, zoom_left, resource_id, \
+                     zoom_right, top, layout_id, bottom, zoom_top, \
+                     zoom_target_uuid, flags, contrast_params, rotation, \
+                     dewarping_params, left) VALUES \
+                     (:zoomBottom, :right, :uuid, :zoomLeft, :resourceId, \
+                     :zoomRight, :top, :layoutId, :bottom, :zoomTop, \
+                     :zoomTargetUuid, :flags, :contrastParams, :rotation, \
+                     :dewarpingParams, :left)");
     foreach(const ApiLayoutItemData& item, data.items)
     {
-        QSqlQuery insQuery(m_sdb);
-        insQuery.prepare("INSERT INTO vms_layoutitem (zoom_bottom, right, uuid, zoom_left, resource_id, \
-                         zoom_right, top, layout_id, bottom, zoom_top, \
-                         zoom_target_uuid, flags, contrast_params, rotation, \
-                         dewarping_params, left) VALUES \
-                         (:zoomBottom, :right, :uuid, :zoomLeft, :resourceId, \
-                         :zoomRight, :top, :layoutId, :bottom, :zoomTop, \
-                         :zoomTargetUuid, :flags, :contrastParams, :rotation, \
-                         :dewarpingParams, :left)");
         item.autoBindValues(insQuery);
         insQuery.bindValue(":layoutId", internalLayoutId);
 
