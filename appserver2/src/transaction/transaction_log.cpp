@@ -38,6 +38,15 @@ void QnTransactionLog::init()
     if (queryTime.exec() && queryTime.next()) {
         m_relativeOffset = queryTime.value(0).toLongLong();
     }
+
+    QSqlQuery querySequence(m_dbManager->getDB());
+    int startSequence = 1;
+    queryTime.prepare("SELECT max(sequence) FROM transaction_log where peer_guid = ?");
+    queryTime.bindValue(0, qnCommon->moduleGUID().toRfc4122());
+    if (queryTime.exec() && queryTime.next())
+        startSequence = queryTime.value(0).toInt() + 1;
+    QnAbstractTransaction::setStartSequence(startSequence);
+
     m_relativeTimer.restart();
 }
 

@@ -9,7 +9,7 @@
 namespace ec2
 {
 
-    QAtomicInt QnAbstractTransaction::m_localSequence(1000000000);
+    QAtomicInt QnAbstractTransaction::m_sequence(1);
 
     namespace ApiCommand
     {
@@ -132,9 +132,14 @@ namespace ec2
         localTransaction = false;
     }
 
+    void QnAbstractTransaction::setStartSequence(int value)
+    {
+        m_sequence = value;
+    }
+
     void QnAbstractTransaction::fillSequence()
     {
-        id.sequence = persistent ? dbManager->getNextSequence() : m_localSequence.fetchAndAddAcquire(1);
+        id.sequence = m_sequence.fetchAndAddAcquire(1);
     }
 
     /*

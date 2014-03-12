@@ -539,28 +539,6 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 in
 	return ErrorCode::ok;
 }
 
-int QnDbManager::getNextSequence()
-{
-	QWriteLocker lock(&m_mutex);
-
-	QSqlQuery query(m_sdb);
-	query.prepare("update sqlite_sequence set seq = seq + 1 where name=\"vms_resource\"");
-	if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-		return 0;
-    }
-	QSqlQuery query2(m_sdb);
-    query2.setForwardOnly(true);
-	query.prepare("select seq from sqlite_sequence where name=\"vms_resource\"");
-	if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-		return 0;
-    }
-	query.next();
-	int result = query.value(0).toInt();
-	return result;
-}
-
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiSetResourceStatusData>& tran)
 {
     QSqlQuery query(m_sdb);

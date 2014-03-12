@@ -100,7 +100,6 @@ namespace ec2
 
 		// --------- misc -----------------------------
 
-		int getNextSequence();
     private:
         friend class QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }

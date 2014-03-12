@@ -122,6 +122,7 @@ namespace ec2
 		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false), timestamp(0), localTransaction(false) {}
         QnAbstractTransaction(ApiCommand::Value command, bool persistent);
         
+        static void setStartSequence(int value);
         void fillSequence();
 
         struct ID
@@ -136,7 +137,7 @@ namespace ec2
         bool persistent;
         qint64 timestamp;
         
-        static QAtomicInt m_localSequence;
+        static QAtomicInt m_sequence;
         bool localTransaction; // do not propagate transactions to other server peers
     };
 }
