@@ -423,8 +423,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
                     motion->assign( *srcMotionData, srcVideoPacket->timestamp(), DEFAULT_MOTION_DURATION );
                     motion->timestamp = srcVideoPacket->timestamp();
                     motion->channelNumber = packet->channelNumber();
-                    if( packet->flags() & nxcip::MediaDataPacket::fLowQuality )
-                        motion->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
                     motion->flags |= QnAbstractMediaData::MediaFlags_LIVE;
                     static_cast<QnCompressedVideoData*>(mediaPacket.data())->motion = motion;
                 }
