@@ -28,6 +28,28 @@ static QString installationPathPrefix = ".local/share";
 static QString installationPathPrefix = "AppData/Local";
 #endif
 
+
+bool InstallationManager::AppData::exists() const {
+    return !m_binaryPath.isEmpty() && QFile::exists(executablePath());
+}
+
+QString InstallationManager::AppData::version() const {
+    return m_version;
+}
+
+QString InstallationManager::AppData::rootPath() const {
+    return m_rootPath;
+}
+
+QString InstallationManager::AppData::executablePath() const {
+    return m_binaryPath.isEmpty() ? QString() : m_rootPath + "/" + m_binaryPath;
+}
+
+QString InstallationManager::AppData::libraryPath() const {
+    return m_libPath.isEmpty() ? QString() : m_rootPath + "/" + m_libPath;
+}
+
+
 InstallationManager::InstallationManager( QObject* const parent )
 :
     QObject( parent )
@@ -36,9 +58,10 @@ InstallationManager::InstallationManager( QObject* const parent )
 
     //NOTE application path may be not-writable (actually it is always so if application running with no admistrator rights),
         //so selecting different path for new installations
-    QDir appDir( QCoreApplication::applicationDirPath() );
-    appDir.cdUp();
-    m_rootInstallDirectoryList.push_back( appDir.absolutePath() );
+//    QDir appDir( QCoreApplication::applicationDirPath() );
+//    appDir.cdUp();
+//    m_rootInstallDirectoryList.push_back( appDir.absolutePath() );
+
     m_defaultDirectoryForNewInstallations = QStandardPaths::writableLocation( QStandardPaths::HomeLocation );
     if( !m_defaultDirectoryForNewInstallations.isEmpty() )
     {
@@ -51,33 +74,68 @@ InstallationManager::InstallationManager( QObject* const parent )
         createLatestVersionGhost();
 }
 
+InstallationManager::AppData InstallationManager::getAppData(const QString &rootPath) const
+{
+    QDir rootDir(rootPath);
+
+    AppData appData;
+    appData.m_rootPath = rootPath;
+
+    QString binary = QN_CLIENT_EXECUTABLE_NAME;
+    if (rootDir.exists(binary)) {
+        appData.m_binaryPath = binary;
+    } else {
+        binary.prepend("bin/");
+        if (rootDir.exists(binary))
+            appData.m_binaryPath = binary;
+    }
+
+    QString lib = "lib";
+    if (rootDir.exists(lib)) {
+        appData.m_libPath = lib;
+    } else {
+        lib.prepend("../");
+        if (rootDir.exists(lib))
+            appData.m_libPath = lib;
+    }
+
+    return appData;
+}
+
 void InstallationManager::updateInstalledVersionsInformation()
 {
     decltype(m_installedProductsByVersion) tempInstalledProductsByVersion;
 
-    for( const QString& rootDir: m_rootInstallDirectoryList  )
-    {
-        const QStringList& entries = QDir(rootDir).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-        for( int i = 0; i < entries.size(); ++i )
-        {
+    // detect current installation
+    AppData current = getAppData(QCoreApplication::applicationDirPath());
+    if (current.exists()) {
+        QRegExp verRegExp("(\\d+\\.\\d+).*");
+        if (verRegExp.exactMatch(QN_APPLICATION_VERSION))
+            current.m_version = verRegExp.cap(1);
+    }
+    tempInstalledProductsByVersion.insert(current.version(), current);
+
+    // find other versions
+    foreach (const QString &rootPath, m_rootInstallDirectoryList) {
+        const QStringList &entries = QDir(rootPath).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+        foreach (const QString &entry, entries) {
             //each entry - is a version
-            if( !versionDirMatch.exactMatch(entries[i]) )
+            if (!versionDirMatch.exactMatch(entry))
                 continue;
 
-            // Skip empty dirs. Also skip created ghost dir.
-            if( QDir(rootDir + QLatin1String("/") + entries[i]).entryList(QDir::AllEntries | QDir::NoDotAndDotDot).isEmpty() )
+            AppData appData = getAppData(rootPath + "/" + entry);
+
+            if (!appData.exists())
                 continue;
 
-            tempInstalledProductsByVersion.insert( std::make_pair(
-                entries[i],
-                AppData(
-                    rootDir,
-                    QString::fromLatin1("%1/%2").arg(rootDir).arg(entries[i])) ) );
+            appData.m_version = entry;
+
+            tempInstalledProductsByVersion.insert(entry, appData);
         }
     }
 
-    std::unique_lock<std::mutex> lk( m_mutex );
-    m_installedProductsByVersion.swap( tempInstalledProductsByVersion );
+    std::unique_lock<std::mutex> lk(m_mutex);
+    m_installedProductsByVersion.swap(tempInstalledProductsByVersion);
 }
 
 void InstallationManager::createLatestVersionGhost()
@@ -114,7 +172,7 @@ QString InstallationManager::getMostRecentVersion() const
 {
     std::unique_lock<std::mutex> lk( m_mutex );
     //TODO/IMPL numeric sorting of versions is required
-    return m_installedProductsByVersion.empty() ? QString() : m_installedProductsByVersion.begin()->first;
+    return m_installedProductsByVersion.empty() ? QString() : m_installedProductsByVersion.lastKey();
 }
 
 bool InstallationManager::isVersionInstalled( const QString& version ) const
@@ -122,33 +180,29 @@ bool InstallationManager::isVersionInstalled( const QString& version ) const
     std::unique_lock<std::mutex> lk( m_mutex );
 
     auto iter = m_installedProductsByVersion.find(version);
-    if( iter == m_installedProductsByVersion.end() )
+    if (iter == m_installedProductsByVersion.end())
         return false;
-
-    const QString installationDirectory = iter->second.installationDirectory;
 
     lk.unlock();
 
     //checking that directory exists
-    if( !QDir(installationDirectory).exists() )
-    {
-        m_installedProductsByVersion.erase( version );
+    if (!iter.value().exists()) {
+        m_installedProductsByVersion.erase(iter);
         return false;
     }
 
     return true;
 }
 
-bool InstallationManager::getInstalledVersionData(
-    const QString& version,
-    InstallationManager::AppData* const appData ) const
+bool InstallationManager::getInstalledVersionData(const QString &version, InstallationManager::AppData *const appData) const
 {
     std::unique_lock<std::mutex> lk( m_mutex );
 
-    std::map<QString, AppData, std::greater<QString> >::const_iterator it = m_installedProductsByVersion.find(version);
-    if( it == m_installedProductsByVersion.end() )
+    auto it = m_installedProductsByVersion.find(version);
+    if (it == m_installedProductsByVersion.end())
         return false;
-    *appData = it->second;
+
+    *appData = it.value();
     return true;
 }
 

@@ -300,12 +300,12 @@ bool ApplauncherProcess::startApplication(
 
     //TODO/IMPL start process asynchronously ?
 
-    const QString binPath = appData.installationDirectory + "/" + APPLICATION_BIN_NAME;
+    const QString binPath = appData.executablePath();
 
     QStringList environment = QProcess::systemEnvironment();
 #ifdef Q_OS_LINUX
-    QString variableValue = appData.installationDirectory + "/lib";
-    if (QFile::exists(variableValue)) {
+    QString variableValue = appData.libraryPath();
+    if (!variableValue.isEmpty() && QFile::exists(variableValue)) {
         const QString variableName = "LD_LIBRARY_PATH";
 
         QRegExp varRegExp(QString("%1=(.+)").arg(variableName));
