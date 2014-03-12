@@ -53,8 +53,10 @@ case "$1" in
         if [ ! -z $SERVICE_PID ]
         then
             echo "$SERVICE_NAME is running with pid $SERVICE_PID"
+            exit 0
         else
             echo "$SERVICE_NAME is stopped"
+            exit 1
         fi
         ;;
     server_status)

@@ -79,6 +79,7 @@ libswscale.so.2.1.100 )
 
 rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR/$PREFIX_DIR
+echo "$VERSION" > $BUILD_DIR/$PREFIX_DIR/VERSION
 
 #copying libs
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
