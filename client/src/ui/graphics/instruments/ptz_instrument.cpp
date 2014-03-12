@@ -80,7 +80,7 @@ QnSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
         result->setParentItem(parentItem);
     } else {
         result = new PtzSplashItem(parentItem);
-        connect(result, SIGNAL(destroyed()), this, SLOT(at_splashItem_destroyed()));
+        connect(result, &QObject::destroyed, this, &PtzInstrument::at_splashItem_destroyed);
     }
 
     result->setOpacity(0.0);
@@ -112,11 +112,11 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
 
     data.overlayWidget = overlay;
 
-    connect(overlay->zoomInButton(),    SIGNAL(pressed()),  this, SLOT(at_zoomInButton_pressed()));
-    connect(overlay->zoomInButton(),    SIGNAL(released()), this, SLOT(at_zoomInButton_released()));
-    connect(overlay->zoomOutButton(),   SIGNAL(pressed()),  this, SLOT(at_zoomOutButton_pressed()));
-    connect(overlay->zoomOutButton(),   SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
-    connect(overlay->modeButton(),      SIGNAL(clicked()),  this, SLOT(at_modeButton_clicked()));
+    connect(overlay->zoomInButton(),    &QnImageButtonWidget::pressed,  this, &PtzInstrument::at_zoomInButton_pressed);
+    connect(overlay->zoomInButton(),    &QnImageButtonWidget::released, this, &PtzInstrument::at_zoomInButton_released);
+    connect(overlay->zoomOutButton(),   &QnImageButtonWidget::pressed,  this, &PtzInstrument::at_zoomOutButton_pressed);
+    connect(overlay->zoomOutButton(),   &QnImageButtonWidget::released, this, &PtzInstrument::at_zoomOutButton_released);
+    connect(overlay->modeButton(),      &QnImageButtonWidget::clicked,  this, &PtzInstrument::at_modeButton_clicked);
 
     widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, true, false, false);
 
@@ -156,10 +156,10 @@ void PtzInstrument::ensureElementsWidget() {
 }
 
 void PtzInstrument::updateOverlayWidget() {
-    updateOverlayWidget(checked_cast<QnMediaResourceWidget *>(sender()));
+    updateOverlayWidgetInternal(checked_cast<QnMediaResourceWidget *>(sender()));
 }
 
-void PtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
+void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget *widget) {
     bool hasCrosshair = widget->options() & QnResourceWidget::DisplayCrosshair;
 
     if(hasCrosshair)
@@ -198,7 +198,7 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
         return;
 
     data.capabilities = capabilities;
-    updateOverlayWidget(widget);
+    updateOverlayWidgetInternal(widget);
 }
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
@@ -320,8 +320,8 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
 
     if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item)) {
         if(widget->resource()) {
-            connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
-            connect(widget, SIGNAL(fisheyeChanged()), this, SLOT(updateOverlayWidget()));
+            connect(widget, &QnMediaResourceWidget::optionsChanged, this, &PtzInstrument::updateOverlayWidget);
+            connect(widget, &QnMediaResourceWidget::fisheyeChanged, this, &PtzInstrument::updateOverlayWidget);
 
             PtzData &data = m_dataByWidget[widget];
             data.capabilitiesConnection = connect(widget->ptzController(), &QnAbstractPtzController::changed, this, 
@@ -332,7 +332,7 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
             );
 
             updateCapabilities(widget);
-            updateOverlayWidget(widget);
+            updateOverlayWidgetInternal(widget);
 
             return true;
         }
@@ -634,7 +634,7 @@ void PtzInstrument::at_modeButton_clicked() {
         iparams.panoFactor = allowed[idx];
         widget->item()->setDewarpingParams(iparams);
 
-        updateOverlayWidget(widget);
+        updateOverlayWidgetInternal(widget);
     }
 }
 

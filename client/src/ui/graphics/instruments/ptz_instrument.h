@@ -70,7 +70,7 @@ private slots:
     void at_zoomButton_activated(qreal speed);
 
     void updateOverlayWidget();
-    void updateOverlayWidget(QnMediaResourceWidget *widget);
+    void updateOverlayWidgetInternal(QnMediaResourceWidget *widget);
     void updateCapabilities(QnMediaResourceWidget *widget);
 
 private:

@@ -11,7 +11,7 @@ SelectionOverlayHackInstrument::~SelectionOverlayHackInstrument() {
 }
 
 void SelectionOverlayHackInstrument::installedNotify() {
-    connect(scene(), SIGNAL(selectionChanged()), this, SLOT(at_scene_selectionChanged()));
+    connect(scene(), &QGraphicsScene::selectionChanged, this, &SelectionOverlayHackInstrument::at_scene_selectionChanged);
 }
 
 void SelectionOverlayHackInstrument::aboutToBeUninstalledNotify() {
