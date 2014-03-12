@@ -268,8 +268,8 @@
     },
     
     "QnGraphicsMessageBox": {
-        "frameColor": "#505050ff",
-        "windowColor": "#202050ff",
+        "frameColor": "opaqueSelection.darker()",
+        "windowColor": "opaqueSelection",
         "textColor": "#a0a0a0ff"
     },
     
