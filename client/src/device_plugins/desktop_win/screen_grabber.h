@@ -7,6 +7,7 @@
 
 #include <QtCore/QObject>
 
+// TODO: #Elric move system includes into implementation
 #include <windows.h>
 #include <shellapi.h>
 #include <commdlg.h>

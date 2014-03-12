@@ -9,10 +9,8 @@
 #include "core/dataprovider/spush_media_stream_provider.h"
 
 
-class QnDesktopStreamreader: public CLServerPushStreamReader
-{
-private:
-    enum {BLOCK_SIZE = 1460};
+class QnDesktopStreamreader: public CLServerPushStreamReader {
+    Q_OBJECT
 
 public:
     QnDesktopStreamreader(QnResourcePtr dev);

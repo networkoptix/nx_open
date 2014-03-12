@@ -10,9 +10,8 @@
 
 struct QnAbstractMediaData;
 
-class CLServerPushStreamReader : public QnLiveStreamProvider
-{
-    Q_OBJECT;
+class CLServerPushStreamReader : public QnLiveStreamProvider {
+    Q_OBJECT
 
 public:
     CLServerPushStreamReader(QnResourcePtr dev );
