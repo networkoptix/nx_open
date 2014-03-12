@@ -1,16 +1,17 @@
 ----------------------------------------------2.2.0.xxxx-------------------------------------------
 
 Features:
-1. Connecting to system behind NAT (desktop clent, mobile clients, web-client). Added authorization support for new media proxy.
-2. Added a new light skin. Introduced the option in System/Settings to switch between dark (regular) and light (introduced) skin.
-3. PTZ tours.
+1. More easy network configuration: no more 3 ports to port forward( used to be EC port, Media Proxy port and Media Server port ). From now it's simply going to be one port only(normally 7001).
+Also EC machine no longer needs to be able to connect to each MS. In order for client to be able to access video, MS should be able to connect to EC only, not vice versa any more. 
+2. PTZ tours. PTZ tours are introduced together with "home position". Many different tours can be created and engaged. If user does not touch the camera for a while, camera can be moved to "home position" or default tour can be executed.
+3. Added a new light skin. Introduced the option in System/Settings to switch between dark (regular) and light (introduced) skin.
 4. Added a new events and actions:
-    - Continius sound action on "Motion on camera" and "Input signal on camera"
-    - Disk is full
-    - "Media server is started" diagnostic event
-5. Added a checkbox into installer "Allow server to optimize cameras settings". If it's on than MS can changed stream settings for all new cameras.
+    - Continius sound action on "Motion on camera" and "Input signal on camera" (action lasts as long as event lasts)
+    - Disk is full (If user assined storage with no space in it for recording he will get red notification about it)
+    - "Media server is started" diagnostic event 
+5. Added a checkbox into installer "Allow server to optimize cameras settings". Enabled by default. If it's enabled than MS can changed stream settings for all new cameras. It gives an abbility to useres to prevent server changing cameras settings at all.
    Also it can be changed for the current camera in "Camera settings" dialog.
-6. A simple way to restore archive: 
+6. A simple way to restore archive( in case if data was moved from one place to another or due to partial HDD failure): 
     - Added a new button to "Server settings" dialog. 
     - Archive can be restored without stopping recording.
 7. Improved compatibility mode: added possibility to download of old versions of client.
