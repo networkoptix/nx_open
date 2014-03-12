@@ -134,10 +134,10 @@
             "dateOverlay": "QColor(255, 255, 255, 48)",
             "dateOverlayAlternate": "selection.setAlpha(48)",
 
-			"pastLastMinute": "QColor(255, 255, 255, 48)",
-            "futureLastMinute": "QColor(0, 0, 0, 48)"
+            "pastLastMinute": "QColor(195, 195, 195, 255)",
+            "futureLastMinute": "QColor(201, 201, 201, 255)"
         },
-		"palette": { "default": { "windowText": "#000000" } }
+        "palette": { "default": { "windowText": "#000000" } }
     },
     
     "QnTimeScrollBar": {
