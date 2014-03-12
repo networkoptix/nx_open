@@ -17,7 +17,6 @@
         "_": "Globals settings. These ones will go away in one of the future versions.",
         
         "selectionColor":           "selection",
-        "backgroundGradientColor":  "QColor(26, 26, 240, 40)",
         "frameColor":               "QColor(128, 128, 128, 196)",
         "selectedFrameColor":       "QColor(32, 144, 224, 196)",
         "businessRuleDisabledHighlightColor": "QColor(64, 64, 64)",

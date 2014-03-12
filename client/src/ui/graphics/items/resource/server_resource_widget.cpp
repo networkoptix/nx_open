@@ -565,50 +565,7 @@ Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painte
 }
 
 void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painter) {
-
     painter->fillRect(rect, palette().color(QPalette::Window));
-
-#if 0
-    qreal width = rect.width();
-    qreal height = rect.height();
-    qreal min = qMin(width, height);
-
-    qreal offset = min / 20.0;
-
-    qreal oh = height - offset*2;
-    qreal ow = width - offset*2;
-
-    if (ow <= 0 || oh <= 0)
-        return;
-
-    QRectF inner(offset, offset, ow, oh);
-
-
-    /* Draw background */
-    if(!m_backgroundGradientPainter)
-        m_backgroundGradientPainter = qn_serverResourceWidget_backgroundGradientPainterStorage()->get(QGLContext::currentContext());
-
-    QnGlNativePainting::begin(painter);
-    {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        glColor(toTransparent(palette().color(QPalette::Window), painter->opacity()));
-        glBegin(GL_QUADS);
-        glVertices(rect);
-        glEnd();
-
-        glPushMatrix();
-        glTranslatef(inner.center().x(), inner.center().y(), 1.0);
-        qreal radius = min * 0.5 - offset;
-        glScale(radius, radius);
-        m_backgroundGradientPainter->paint(toTransparent(qnGlobals->backgroundGradientColor(), painter->opacity()));
-        glPopMatrix();
-
-        glDisable(GL_BLEND);
-    }
-    QnGlNativePainting::begin(end);
-#endif
 }
 
 void QnServerResourceWidget::addOverlays() {

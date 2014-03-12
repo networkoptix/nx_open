@@ -63,14 +63,10 @@ namespace {
     class ArchiveSpaceItemDelegate: public QStyledItemDelegate {
         typedef QStyledItemDelegate base_type;
     public:
-        ArchiveSpaceItemDelegate(QObject *parent = NULL): base_type(parent) {
-            m_color = toTransparent(withAlpha(qnGlobals->selectionColor(), 255), 0.25);
-        }
+        ArchiveSpaceItemDelegate(QObject *parent = NULL): base_type(parent) {}
 
         virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const {
-            QnStorageSpaceSlider *result = new QnStorageSpaceSlider(parent);
-            result->setColor(m_color);
-            return result;
+            return new QnStorageSpaceSlider(parent);
         }
 
         virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override {
@@ -98,9 +94,6 @@ namespace {
             qint64 videoSpace = slider->value() * bytesInMiB;
             model->setData(index, totalSpace - videoSpace, ReservedSpaceRole);
         }
-
-    private:
-        QColor m_color;
     };
 
 } // anonymous namespace
