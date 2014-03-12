@@ -535,13 +535,13 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 in
     }
 
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT INTO vms_scheduletask (source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES\
-                     (:sourceId, :startTime, :endTime, :doRecordAudio, :recordType, :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps)");
+    //insQuery.prepare("INSERT INTO vms_scheduletask (source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES\
+                     //:sourceId, :startTime, :endTime, :doRecordAudio, :recordType, :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps)");
+    insQuery.prepare("INSERT INTO vms_scheduletask VALUES (NULL, ?,?,?,?,?,?,?,?,?,?)");
+    insQuery.bindValue(0, internalId);
 	foreach(const ScheduleTask& task, data.scheduleTask) 
 	{
-		task.autoBindValues(insQuery);
-        insQuery.bindValue(":sourceId", internalId);
-
+		task.autoBindValuesOrdered(insQuery, 1);
 		if (!insQuery.exec()) {
             qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
 			return ErrorCode::failure;

@@ -20,20 +20,15 @@ namespace ec2 {
 #ifndef Q_MOC_RUN
 
 #define QN_DECLARE_STRUCT_SQL_BINDER() \
-    inline void autoBindValues(QSqlQuery& query) const;
+    inline void autoBindValues(QSqlQuery& query) const; \
+    inline void autoBindValuesOrdered(QSqlQuery& query, int startIdx) const;
 
 
 #define QN_DEFINE_STRUCT_SQL_BINDER(TYPE, FIELD_SEQ, ...) \
     void TYPE::autoBindValues(QSqlQuery& query)  const\
-{ \
-    BOOST_PP_SEQ_FOR_EACH(BIND_FIELD, ~, FIELD_SEQ) \
-}
-
-#define QN_DEFINE_STRUCT_SQL_BINDER_DERIVED(TYPE, FIELD_SEQ, ...) \
-    void TYPE::autoBindValues(QSqlQuery& query)  const\
-{ \
-    BOOST_PP_SEQ_FOR_EACH(BIND_FIELD, ~, FIELD_SEQ) \
-}
+{ BOOST_PP_SEQ_FOR_EACH(BIND_FIELD, ~, FIELD_SEQ) } \
+void TYPE::autoBindValuesOrdered(QSqlQuery& query, int startIdx)  const\
+{ BOOST_PP_SEQ_FOR_EACH(BIND_FIELD_ORDERED, startIdx, FIELD_SEQ) }
 
 #define QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
     QN_DEFINE_STRUCT_SERIALIZATORS(TYPE, FIELD_SEQ); \
@@ -41,7 +36,7 @@ namespace ec2 {
 
 #define QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS(TYPE, BASE_TYPE, FIELD_SEQ, ... /* PREFIX */) \
 	QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(TYPE, BASE_TYPE, FIELD_SEQ); \
-	QN_DEFINE_STRUCT_SQL_BINDER_DERIVED(TYPE, FIELD_SEQ);
+	QN_DEFINE_STRUCT_SQL_BINDER(TYPE, FIELD_SEQ);
 
 // --------------- fill query params from a object
 
@@ -63,7 +58,26 @@ void doAutoBind(QSqlQuery& , const char* , const std::vector<T>& ) {
 	//
 }
 
+template <class T>
+void doAutoBindOrdered(QSqlQuery& query, int idx, const T& field) {
+    query.bindValue(idx, field);
+}
+
+inline void doAutoBindOrdered(QSqlQuery& query, int idx, const QString& field) {
+    query.bindValue(idx, field.isNull() ? QString(QLatin1String("")) : field);
+}
+
+inline void doAutoBindOrdered(QSqlQuery& query, int idx, const QnId& field) {
+    query.bindValue(idx, field.toRfc4122());
+}
+
+template <class T>
+void doAutoBindOrdered(QSqlQuery& , int , const std::vector<T>& ) {
+    //
+}
+
 #define BIND_FIELD(R, D, FIELD) doAutoBind(query, ":" BOOST_PP_STRINGIZE(FIELD), FIELD);
+#define BIND_FIELD_ORDERED(R, idx, FIELD) doAutoBindOrdered(query, idx++, FIELD);
 
 // ----------------- load query data to a object
 #define TO_IDX_VAR(x) x ## idx
