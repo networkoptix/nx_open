@@ -8,7 +8,7 @@
         "custom_green":             "#8ABF22",
         "darkGrey":					"#231F20",
         "opaqueSelection":			"custom_blue",
-        "ptz":                      "#80c0ff",
+        "ptz":                      "#opaqueSelection",
         "selection":				"opaqueSelection.setAlpha(110)",
         "exShadowColor":			"#ff0000"
     },
@@ -18,7 +18,7 @@
         
         "selectionColor":           "selection",
         "frameColor":               "QColor(128, 128, 128, 196)",
-        "selectedFrameColor":       "QColor(32, 144, 224, 196)",
+        "selectedFrameColor":       "selection",
         "businessRuleDisabledHighlightColor": "QColor(64, 64, 64)",
         "businessRuleInvalidBackgroundColor": "QColor(150, 0, 0)",
         "businessRuleInvalidColumnBackgroundColor": "QColor(204, 0, 0)",
@@ -184,8 +184,8 @@
 
     "QnServerResourceWidget": {
         "colors": {
-            "frame": "#428ced",
-            "grid": "QColor(66, 140, 237, 100)",
+            "frame": "opaqueSelection",
+            "grid": "opaqueSelection.setAlpha(100)",
             "cpu": "#428ced",
             "ram": "#db3ba9",
             "hdds": ["#ededed","#edc842","#67ed42","#ff8330","#b200ff","#00ffff","#267f00","#ff7f7f","#c90000"],
