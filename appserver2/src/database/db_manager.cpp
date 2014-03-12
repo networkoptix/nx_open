@@ -283,8 +283,10 @@ ErrorCode QnDbManager::deleteAddParams(qint32 resourceId)
 ErrorCode QnDbManager::insertResource(const ApiResourceData& data, qint32* internalId)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT INTO vms_resource (guid, xtype_guid, parent_guid, name, url, status, disabled) VALUES(:id, :typeId, :parentGuid, :name, :url, :status, :disabled)");
-    data.autoBindValues(insQuery);
+    //insQuery.prepare("INSERT INTO vms_resource (guid, xtype_guid, parent_guid, name, url, status, disabled) VALUES(:id, :typeId, :parentGuid, :name, :url, :status, :disabled)");
+    //data.autoBindValues(insQuery);
+    insQuery.prepare("INSERT INTO vms_resource VALUES(NULL, ?,?,?,?,?,?,?)");
+    data.autoBindValuesOrdered(insQuery, 0);
 	if (!insQuery.exec()) {
 		qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
 		return ErrorCode::failure;
@@ -905,8 +907,8 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiPanicMode
 ErrorCode QnDbManager::deleteResourceTable(const qint32 id)
 {
     QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_resource where id = :id");
-    delQuery.bindValue(QLatin1String(":id"), id);
+    delQuery.prepare("DELETE FROM vms_resource where id = ?");
+    delQuery.addBindValue(id);
     if (delQuery.exec()) {
         return ErrorCode::ok;
     }

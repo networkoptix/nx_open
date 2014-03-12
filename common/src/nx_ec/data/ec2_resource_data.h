@@ -54,12 +54,12 @@ namespace ec2
         ApiResourceData(): status(QnResource::Offline), disabled(false) {}
 
         QnId          id;
-        QnId          typeId;
         QnId          parentGuid;
-        QString       name;
-        QString       url;
         QnResource::Status    status;
         bool          disabled;
+        QString       name;
+        QString       url;
+        QnId          typeId;
         std::vector<ApiResourceParam> addParams;
 
 	    void fromResource(const QnResourcePtr& resource);
@@ -67,7 +67,7 @@ namespace ec2
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define ApiResourceDataFields (id) (typeId) (parentGuid) (name) (url) (status) (disabled) (addParams)
+    #define ApiResourceDataFields (id) (parentGuid) (status) (disabled) (name) (url) (typeId) (addParams)
     QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiResourceData,  ApiResourceDataFields )
 }
 
