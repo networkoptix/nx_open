@@ -104,6 +104,12 @@ QnHistogramColors::QnHistogramColors() {
     text = QColor(255, 255, 255);
 }
 
+QnResourceWidgetFrameColors::QnResourceWidgetFrameColors() {
+    normal = QColor(128, 128, 128, 196);
+    active = normal.lighter();
+    selected = QColor(64, 130, 180, 128);
+}
+
 
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QnTimeSliderColors, 
@@ -161,3 +167,8 @@ QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QJson::Optional
 )
 
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnResourceWidgetFrameColors, 
+    (normal)(active)(selected), 
+    QJson::Optional
+)
