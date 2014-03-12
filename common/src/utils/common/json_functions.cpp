@@ -104,7 +104,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QBrush *target) {
         QJsonObject map = value.toObject();
 
         QColor color;
-        Qt::BrushStyle style;
+        Qt::BrushStyle style = Qt::SolidPattern;
         if(
             !QJson::deserialize(ctx, map, lit("color"), &color) ||
             !QJson::deserialize(ctx, map, lit("style"), &style)
