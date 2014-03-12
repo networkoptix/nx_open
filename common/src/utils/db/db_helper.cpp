@@ -15,20 +15,20 @@ void QnDbHelper::QnDbTransaction::beginTran()
 {
     m_mutex.lockForWrite();
     QSqlQuery query(m_sdb);
-    //query.exec(lit("BEGIN TRANSACTION"));
+    query.exec(lit("BEGIN TRANSACTION"));
 }
 
 void QnDbHelper::QnDbTransaction::rollback()
 {
     QSqlQuery query(m_sdb);
-    //query.exec(lit("ROLLBACK"));
+    query.exec(lit("ROLLBACK"));
     m_mutex.unlock();
 }
 
 void QnDbHelper::QnDbTransaction::commit()
 {
     QSqlQuery query(m_sdb);
-    //query.exec(lit("COMMIT"));
+    query.exec(lit("COMMIT"));
     m_mutex.unlock();
 }
 
