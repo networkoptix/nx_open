@@ -76,20 +76,14 @@ QnAxisPtzController::~QnAxisPtzController() {
 
 void QnAxisPtzController::updateState() {
     QnAxisParameterMap params;
-
-    for(int retries = 0; retries < 5; retries++) {
-        if(!query(lit("param.cgi?action=list"), &params))
-            return;
-
-        /* Axis cameras sometimes return empty OK reply, so we have to resend
-         * the request in this case. Note that this is not important in case
-         * of other requests, but this one we cannot lose. */
-        if(!params.isEmpty())
-            break;
-
-        qnWarning("Received empty reply from AXIS camera %1 on %2 attempt.", m_resource->getName(), retries);
+    if(
+        !query(lit("param.cgi?action=list&group=Properties.PTZ"), 5, &params) ||
+        !query(lit("param.cgi?action=list&group=PTZ"), 5, &params) ||
+        !query(lit("param.cgi?action=list&group=Image"), 5, &params)
+    ) {
+        qnWarning("Could not initialize AXIS PTZ for camera %1.", m_resource->getName());
     }
-    
+
     updateState(params);
 }
 
@@ -238,13 +232,13 @@ bool QnAxisPtzController::query(const QString &request, QByteArray *body) {
     }
 }
 
-bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *params) {
-    QByteArray body;
-    if(!query(request, &body))
+bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *params, QByteArray *body) {
+    QByteArray localBody;
+    if(!query(request, &localBody))
         return false;
 
     if(params) {
-        QTextStream stream(&body, QIODevice::ReadOnly);
+        QTextStream stream(&localBody, QIODevice::ReadOnly);
         while(true) {
             QString line = stream.readLine();
             if(line.isNull())
@@ -258,7 +252,28 @@ bool QnAxisPtzController::query(const QString &request, QnAxisParameterMap *para
         }
     }
 
+    if(body)
+        *body = localBody;
+
     return true;
+}
+
+bool QnAxisPtzController::query(const QString &request, int retries, QnAxisParameterMap *params, QByteArray *body) {
+    QByteArray localBody;
+
+    for(int i = 0; i < retries; i++) {
+        if(!query(request, params, &localBody))
+            return false;
+
+        if(localBody.isEmpty())
+            continue;
+
+        if(body)
+            *body = localBody;
+        return true;
+    }
+
+    return false;
 }
 
 int QnAxisPtzController::channel() {
