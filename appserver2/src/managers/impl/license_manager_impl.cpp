@@ -61,6 +61,11 @@ namespace ec2
 
     void LicenseManagerImpl::getHardwareId( ServerInfo* const serverInfo )
     {
+        serverInfo->mainHardwareIds << QByteArray( "0333333333333333333333333333333333" );
+        serverInfo->compatibleHardwareIds << QByteArray( "0333333333333333333333333333333333" );
+        return;
+
+
         int guidCompatibility = 0;
 
         // TODO: #Ivan, add guidCompatibility to settings
