@@ -85,7 +85,7 @@
 #include <rest/handlers/business_action_rest_handler.h>
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
-#include <rest/handlers/ext_bevent_handler.h>
+#include <rest/handlers/external_business_event_rest_handler.h>
 #include <rest/handlers/favicon_rest_handler.h>
 #include <rest/handlers/image_rest_handler.h>
 #include <rest/handlers/log_rest_handler.h>
@@ -847,7 +847,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzRestHandler());
     QnRestConnectionProcessor::registerHandler("api/image", new QnImageRestHandler());
     QnRestConnectionProcessor::registerHandler("api/execAction", new QnBusinessActionRestHandler());
-    QnRestConnectionProcessor::registerHandler("api/onEvent", new QnExternalBusinessEventHandler());
+    QnRestConnectionProcessor::registerHandler("api/onEvent", new QnExternalBusinessEventRestHandler());
     QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeRestHandler());
     QnRestConnectionProcessor::registerHandler("api/ping", new QnPingRestHandler());
     QnRestConnectionProcessor::registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
