@@ -51,11 +51,11 @@ namespace ec2
         }
 
         template <class T>
-        void sendTransaction(const QnTransaction<T>& tran)
+        void sendTransaction(const QnTransaction<T>& tran, const QnId& dstPeer = QnId())
         {
             QByteArray buffer;
             m_serializer.serializeTran(buffer, tran);
-            sendTransactionInternal(tran, buffer);
+            sendTransactionInternal(tran, buffer, dstPeer);
         }
 
         /* map: peer, isClient */
@@ -99,7 +99,7 @@ signals:
 
     private:
         //void gotTransaction(const QnId& remoteGuid, bool isConnectionOriginator, const QByteArray& data);
-        void sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData);
+        void sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData, const QnId& dstPeer = QnId());
         bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
         void onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
         void onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, InputBinaryStream<QByteArray>&);

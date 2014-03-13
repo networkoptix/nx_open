@@ -18,7 +18,10 @@ QnDistributedMutexManager::QnDistributedMutexManager()
 
 QnDistributedMutexPtr QnDistributedMutexManager::getLock(const QByteArray& name, int timeoutMs)
 {
+    QMutexLocker lock(&m_mutex);
+
     Q_ASSERT(!m_mutexList.value(name));
+
 
     QnDistributedMutexPtr netMutex(new QnDistributedMutex(this));
     m_mutexList.insert(name, netMutex);
@@ -100,13 +103,13 @@ bool QnDistributedMutex::isAllPeersReady() const
     return true;
 }
 
-void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command)
+void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QnId& dstPeer)
 {
     QnTransaction<ApiLockData> tran(command, false);
     tran.params.name = m_name;
     tran.params.peer = lockInfo.peer;
     tran.params.timestamp = lockInfo.timestamp;
-    qnTransactionBus->sendTransaction(tran);
+    qnTransactionBus->sendTransaction(tran, dstPeer);
 }
 
 void QnDistributedMutex::at_newPeerFound(QnId peer)
@@ -144,8 +147,6 @@ void QnDistributedMutex::lockAsync(const QByteArray& name, int timeoutMs)
 
     m_name = name;
     m_selfLock = LockRuntimeInfo(qnCommon->moduleGUID(), qnSyncTime->currentMSecsSinceEpoch());
-    if (!m_peerLockInfo.isEmpty())
-        m_selfLock.timestamp = qMax(m_selfLock.timestamp, m_peerLockInfo.lastKey().timestamp+1);
     sendTransaction(m_selfLock, ApiCommand::lockRequest);
     timer.start(timeoutMs);
     m_peerLockInfo.insert(m_selfLock, 0);
@@ -156,18 +157,17 @@ void QnDistributedMutex::unlock()
 {
     QMutexLocker lock(&m_mutex);
 
-    if (m_locked) {
-        foreach(const ApiLockData& lockData, m_delayedResponse)
-        {
-            m_peerLockInfo.insert(lockData, 0);
-            sendTransaction(m_peerLockInfo.begin().key(), ApiCommand::lockResponse);
-        }
-        m_delayedResponse.clear();
-    }
+    ApiLockData data;
+    data.name = m_name;
+    data.peer = qnCommon->moduleGUID();
+    data.timestamp = NO_MUTEX_LOCK;
+
+    foreach(const ApiLockData& lockData, m_delayedResponse)
+        sendTransaction(data, ApiCommand::lockResponse, lockData.peer);
+    m_delayedResponse.clear();
 
     if (!m_selfLock.isEmpty()) {
         sendTransaction(m_selfLock, ApiCommand::unlockRequest);
-        m_peerLockInfo.remove(m_selfLock);
         m_selfLock.clear();
     }
     m_locked = false;
@@ -190,13 +190,13 @@ void QnDistributedMutex::at_gotLockRequest(ApiLockData lockData)
 {
     QMutexLocker lock(&m_mutex);
 
-    if (m_locked && LockRuntimeInfo(lockData) < m_peerLockInfo.firstKey())
+    if (!m_locked && LockRuntimeInfo(lockData) < m_selfLock)
     {
-        m_delayedResponse << lockData; // it is possible if new peer just appeared. block originator just do not sending response
+        m_peerLockInfo.insert(lockData, 0);
+        sendTransaction(m_selfLock, ApiCommand::lockResponse, lockData.peer);
     }
     else {
-        m_peerLockInfo.insert(lockData, 0);
-        sendTransaction(m_selfLock, ApiCommand::lockResponse);
+        m_delayedResponse << lockData;
     }
 }
 

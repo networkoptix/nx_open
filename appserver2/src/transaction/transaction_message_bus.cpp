@@ -148,12 +148,22 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     }
 }
 
-void QnTransactionMessageBus::sendTransactionInternal(const QnAbstractTransaction& /*tran*/, const QByteArray& chunkData)
+void QnTransactionMessageBus::sendTransactionInternal(const QnAbstractTransaction& /*tran*/, const QByteArray& chunkData, const QnId& dstPeer)
 {
     QMutexLocker lock(&m_mutex);
+    bool dataQueued = false;
     for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
         QnTransactionTransportPtr transport = *itr;
+        if (dstPeer.isNull() || transport->remoteGuid() == dstPeer) {
+            transport->addData(chunkData);
+            dataQueued = true;
+        }
+    }
+    
+    // proxy via first connection
+    if (!m_connections.isEmpty() && !dataQueued) {
+        QnTransactionTransportPtr transport = m_connections.first();
         transport->addData(chunkData);
     }
 }
