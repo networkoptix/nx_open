@@ -318,12 +318,23 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
         }
     }
 
+    bool intfListChanged = intfList.size() != m_ifaceToSock.size();
+    if( !intfListChanged )
+        for( const QnInterfaceAndAddr& intf: intfList )
+        {
+            if( m_ifaceToSock.find( intf.address.toString() ) == m_ifaceToSock.end() )
+                intfListChanged = true;
+        }
+
     // if interface list is changed, remove old sockets
-    std::map<QString, ProbeContext*>::iterator itr = m_ifaceToSock.begin();
-    for(; itr != m_ifaceToSock.end() ; ++itr) {
-        delete itr->second;
+    if( intfListChanged )
+    {
+        std::map<QString, ProbeContext*>::iterator itr = m_ifaceToSock.begin();
+        for(; itr != m_ifaceToSock.end() ; ++itr) {
+            delete itr->second;
+        }
+        m_ifaceToSock.clear();
     }
-    m_ifaceToSock.clear();
 
     foreach(QnInterfaceAndAddr iface, intfList)
     {
