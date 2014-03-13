@@ -57,6 +57,7 @@ namespace ec2
             sendTransactionInternal(tran, buffer);
         }
 
+        /* map: peer, isClient */
         QMap<QnId, bool> alivePeers() const { return m_alivePeers; }
 signals:
         void peerLost(QnId, bool isClient, bool isProxy);
@@ -135,5 +136,6 @@ signals:
         //QMap<QUuid, qint64> m_peerTimeDiff;
     };
 }
+#define qnTransactionBus QnTransactionMessageBus::instance()
 
 #endif // __TRANSACTION_MESSAGE_BUS_H_

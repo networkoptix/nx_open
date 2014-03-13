@@ -110,7 +110,10 @@ namespace ec2
             tranSyncRequest,
             tranSyncResponse,
             
-            serverAliveInfo
+            serverAliveInfo,
+            
+            //!ApiLockInfo
+            lockRequest,
         };
 
         QString toString( Value val );
