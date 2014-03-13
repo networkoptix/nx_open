@@ -116,6 +116,13 @@ namespace ec2
                 case saveSettings:
                     return "saveSettings";
 
+                case lockRequest:
+                    return "lockRequest";
+                case lockResponse:
+                    return "lockResponse";
+                case unlockRequest:
+                    return "unlockRequest";
+
                 default:
                     return "unknown";
             }

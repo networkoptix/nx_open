@@ -9,6 +9,7 @@
 #include "utils/network/http/asynchttpclient.h"
 #include "transaction_transport_serializer.h"
 #include "transaction_transport.h"
+#include "nx_ec/data/ec2_lock_data.h"
 
 namespace ec2
 {
@@ -62,6 +63,10 @@ namespace ec2
 signals:
         void peerLost(QnId, bool isClient, bool isProxy);
         void peerFound(QnId, bool isClient, bool isProxy);
+
+        void gotLockRequest(ApiLockData);
+        void gotUnlockRequest(ApiLockData);
+        void gotLockResponse(ApiLockData);
     private:
         friend class QnTransactionTransport;
 
@@ -97,6 +102,7 @@ signals:
         void sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData);
         bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
         void onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
+        void onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, InputBinaryStream<QByteArray>&);
         void queueSyncRequest(QnTransactionTransport* transport);
 
         void connectToPeerEstablished(const QnId& id, bool isClient);

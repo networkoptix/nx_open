@@ -13,33 +13,53 @@ QnDistributedMutex::QnDistributedMutex():
     connect(&timer, &QTimer::timeout, this, &QnDistributedMutex::lockTimeout);
     timer.setSingleShot(true);
 
-    // todo: connect to transaction transport here
+    connect(qnTransactionBus, &QnTransactionMessageBus::peerFound,         this, &QnDistributedMutex::at_newPeerFound);
+    connect(qnTransactionBus, &QnTransactionMessageBus::peerLost,          this, &QnDistributedMutex::at_peerLost);
+    connect(qnTransactionBus, &QnTransactionMessageBus::gotLockRequest,    this, &QnDistributedMutex::at_gotLockRequest);
+    connect(qnTransactionBus, &QnTransactionMessageBus::gotLockResponse,   this, &QnDistributedMutex::at_gotLockResponse);
+    connect(qnTransactionBus, &QnTransactionMessageBus::gotUnlockRequest,  this, &QnDistributedMutex::at_gotUnlockRequest);
 }
 
 bool QnDistributedMutex::isAllPeersReady() const
 {
     foreach(const QnId& peer, qnTransactionBus->alivePeers().keys())
     {
-        if (!m_peerLockInfo.contains(peer))
+        if (!m_proccesedPeers.contains(peer))
             return false;
     }
     return true;
 }
 
-void QnDistributedMutex::sendTransaction()
+void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo)
 {
-    QnTransaction<ApiLockInfo> tran(ApiCommand::lockRequest, false);
-    tran.params.timestamp = m_selfLock.timestamp;
+    QnTransaction<ApiLockData> tran(ApiCommand::lockRequest, false);
     tran.params.name = m_name;
+    tran.params.peer = lockInfo.peer;
+    tran.params.timestamp = lockInfo.timestamp;
     qnTransactionBus->sendTransaction(tran);
 }
 
-void QnDistributedMutex::at_newPeerFound()
+void QnDistributedMutex::at_newPeerFound(QnId peer)
 {
     QMutexLocker lock(&m_mutex);
 
     if (!m_selfLock.isEmpty())
-        sendTransaction();
+        sendTransaction(m_selfLock);
+}
+
+void QnDistributedMutex::at_peerLost(QnId peer)
+{
+    QMutexLocker lock(&m_mutex);
+
+    m_proccesedPeers.remove(peer);
+    for (LockedMap::iterator itr = m_peerLockInfo.begin(); itr != m_peerLockInfo.end();)
+    {
+        if (itr.key().peer == peer)
+            itr = m_peerLockInfo.erase(itr);
+        else
+            ++itr;
+    }
+    checkForLocked();
 }
 
 void QnDistributedMutex::lockAsync(const QByteArray& name, int timeoutMs)
@@ -48,7 +68,7 @@ void QnDistributedMutex::lockAsync(const QByteArray& name, int timeoutMs)
 
     m_name = name;
     m_selfLock = LockRuntimeInfo(qnCommon->moduleGUID(), qnSyncTime->currentMSecsSinceEpoch());
-    sendTransaction();
+    sendTransaction(m_selfLock);
     timer.start(timeoutMs);
     m_peerLockInfo.insert(m_selfLock, 0);
     checkForLocked();
@@ -63,21 +83,28 @@ void QnDistributedMutex::unlock()
     timer.stop();
 }
 
-void QnDistributedMutex::at_gotLockInfo(LockRuntimeInfo lockInfo)
+void QnDistributedMutex::at_gotLockResponse(ApiLockData lockData)
 {
     QMutexLocker lock(&m_mutex);
-
-    m_peerLockInfo.insert(lockInfo, 0);
+    m_peerLockInfo.insert(lockData, 0);
+    m_proccesedPeers << lockData.peer;
     checkForLocked();
 }
 
-void QnDistributedMutex::at_gotUnlockInfo(LockRuntimeInfo lockInfo)
+void QnDistributedMutex::at_gotLockRequest(ApiLockData lockData)
+{
+    QMutexLocker lock(&m_mutex);
+    m_peerLockInfo.insert(lockData, 0);
+    sendTransaction(m_peerLockInfo.begin().key());
+}
+
+void QnDistributedMutex::at_gotUnlockRequest(ApiLockData lockData)
 {
     QMutexLocker lock(&m_mutex);
 
-    LockedMap::iterator itr = m_peerLockInfo.find(lockInfo);
+    LockedMap::iterator itr = m_peerLockInfo.find(lockData);
     if (itr != m_peerLockInfo.end()) {
-        itr.value() = INT64_MAX;
+        m_peerLockInfo.erase(itr);
         checkForLocked();
     }
 }

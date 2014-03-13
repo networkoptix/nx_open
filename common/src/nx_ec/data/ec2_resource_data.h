@@ -69,10 +69,7 @@ namespace ec2
 
     #define ApiResourceDataFields (id) (parentGuid) (status) (disabled) (name) (url) (typeId) (addParams)
     QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiResourceData,  ApiResourceDataFields )
-}
 
-namespace ec2
-{
     struct ApiResourceDataList: public ApiData {
 	    void loadFromQuery(QSqlQuery& query);
 	    void toResourceList( QnResourceFactory* resFactory, QnResourceList& resList ) const;
@@ -101,6 +98,7 @@ namespace ec2
     };
 
     QN_DEFINE_STRUCT_SERIALIZATORS (ApiSetResourceDisabledData,  (id) (disabled) )
+
 }
 
 #endif // __RESOURCE_TRANSACTION_DATA_H__

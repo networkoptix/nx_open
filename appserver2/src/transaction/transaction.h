@@ -114,6 +114,8 @@ namespace ec2
             
             //!ApiLockInfo
             lockRequest,
+            lockResponse,
+            unlockRequest,
         };
 
         QString toString( Value val );

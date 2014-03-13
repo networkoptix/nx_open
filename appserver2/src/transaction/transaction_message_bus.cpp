@@ -108,6 +108,11 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     // process special transactions
     switch(tran.command)
     {
+    case ApiCommand::lockRequest:
+    case ApiCommand::lockResponse:
+    case ApiCommand::unlockRequest:
+        onGotDistributedMutexTransaction(tran, stream);
+
     case ApiCommand::tranSyncRequest:
         onGotTransactionSyncRequest(sender, stream);
         return;
@@ -155,6 +160,7 @@ void QnTransactionMessageBus::sendTransactionInternal(const QnAbstractTransactio
 
 // ------------------ QnTransactionMessageBus::CustomHandler -------------------
 
+
 template <class T>
 template <class T2>
 bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbstractTransaction&  abstractTran, InputBinaryStream<QByteArray>& stream)
@@ -171,6 +177,23 @@ bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbst
         return false;
 
     return true;
+}
+
+void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, InputBinaryStream<QByteArray>& stream)
+{
+    ApiLockData params;
+    if (!deserialize(params, &stream)) {
+        qWarning() << "Bad stream! Ignore transaction " << ApiCommand::toString(tran.command);
+    }
+
+    if(tran.command == ApiCommand::lockRequest)
+        emit gotLockRequest(params);
+    else if(tran.command == ApiCommand::unlockRequest)
+        emit gotUnlockRequest(params);
+    else if(tran.command == ApiCommand::lockResponse)
+        emit gotLockResponse(params);
+    else
+        Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid command type!");
 }
 
 void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>&)
