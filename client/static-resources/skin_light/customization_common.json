@@ -178,7 +178,7 @@
         "frameColors": {
             "normal": "#808080c0",
             "active": "#c0c0c0c0",
-            "selected": "opaqueSelection"
+            "selected": "selection"
         }
     },
 
