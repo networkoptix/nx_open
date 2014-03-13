@@ -1,5 +1,5 @@
-#ifndef QN_PTZ_HANDLER_H
-#define QN_PTZ_HANDLER_H
+#ifndef QN_PTZ_REST_HANDLER_H
+#define QN_PTZ_REST_HANDLER_H
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QMutex>
@@ -60,4 +60,4 @@ private:
     QMutex m_sequenceMutex;
 };
 
-#endif // QN_PTZ_HANDLER_H
+#endif // QN_PTZ_REST_HANDLER_H

@@ -1,5 +1,5 @@
-#ifndef QN_REST_PING__HANDLER_H
-#define QN_REST_PING__HANDLER_H
+#ifndef QN_PING_REST_HANDLER_H
+#define QN_PING_REST_HANDLER_H
 
 #include "rest/server/request_handler.h"
 
@@ -15,4 +15,4 @@ protected:
     virtual QString description() const;
 };
 
-#endif // QN_REST_PING__HANDLER_H
+#endif // QN_PING_REST_HANDLER_H

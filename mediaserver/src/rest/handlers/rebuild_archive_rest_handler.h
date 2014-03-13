@@ -1,5 +1,5 @@
-#ifndef QN_REBUILD_ARCHIVE__HANDLER_H
-#define QN_REBUILD_ARCHIVE__HANDLER_H
+#ifndef QN_REBUILD_ARCHIVE_REST_HANDLER_H
+#define QN_REBUILD_ARCHIVE_REST_HANDLER_H
 
 #include "rest/server/request_handler.h"
 
@@ -14,4 +14,4 @@ protected:
     virtual QString description() const;
 };
 
-#endif // QN_REBUILD_ARCHIVE__HANDLER_H
+#endif // QN_REBUILD_ARCHIVE_REST_HANDLER_H

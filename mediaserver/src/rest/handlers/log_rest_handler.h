@@ -1,12 +1,12 @@
-#ifndef QN_FAV_ICON__HANDLER_H
-#define QN_FAV_ICON__HANDLER_H
+#ifndef QN_LOG_REST_HANDLER_H
+#define QN_LOG_REST_HANDLER_H
 
 #include "rest/server/request_handler.h"
 
-class QnFavIconRestHandler: public QnRestRequestHandler
+class QnLogRestHandler: public QnRestRequestHandler
 {
 public:
-    QnFavIconRestHandler();
+    QnLogRestHandler();
 
 protected:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
@@ -14,4 +14,4 @@ protected:
     virtual QString description() const override;
 };
 
-#endif // QN_FAV_ICON__HANDLER_H
+#endif // QN_LOG_REST_HANDLER_H

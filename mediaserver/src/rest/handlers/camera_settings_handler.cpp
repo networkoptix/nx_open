@@ -27,11 +27,11 @@ namespace HttpStatusCode
     };
 }
 
-QnCameraSettingsHandler::QnCameraSettingsHandler()
+QnCameraSettingsRestHandler::QnCameraSettingsRestHandler()
 {
 }
 
-int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType)
+int QnCameraSettingsRestHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType)
 {
     Q_UNUSED(contentType)
     enum CmdType
@@ -188,7 +188,7 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
     return HttpStatusCode::ok;
 }
 
-int QnCameraSettingsHandler::executePost( const QString& /*path*/, const QnRequestParamList& /*params*/, const QByteArray& /*body*/, QByteArray& /*responseMessageBody*/, QByteArray& /*contentType*/)
+int QnCameraSettingsRestHandler::executePost( const QString& /*path*/, const QnRequestParamList& /*params*/, const QByteArray& /*body*/, QByteArray& /*responseMessageBody*/, QByteArray& /*contentType*/)
 {
     //TODO/IMPL
     return 0;
@@ -220,7 +220,7 @@ int QnCameraSettingsHandler::executePost( const QString& /*path*/, const QnReque
 //
 //}
 
-void QnCameraSettingsHandler::asyncParamGetComplete(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result )
+void QnCameraSettingsRestHandler::asyncParamGetComplete(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result )
 {
     QMutexLocker lk( &m_mutex );
 
@@ -245,13 +245,13 @@ void QnCameraSettingsHandler::asyncParamGetComplete(const QnResourcePtr &resourc
     m_cond.wakeAll();
 }
 
-void QnCameraSettingsHandler::asyncParamSetComplete(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result )
+void QnCameraSettingsRestHandler::asyncParamSetComplete(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result )
 {
     //processing is identical to the previous method
     asyncParamGetComplete(resource, paramName, paramValue, result);
 }
 
-QString QnSetCameraParamHandler::description() const
+QString QnSetCameraParamRestHandler::description() const
 {
     return
         "Sets values of several camera parameters.<BR>"
@@ -259,7 +259,7 @@ QString QnSetCameraParamHandler::description() const
         "Returns OK if all parameters have been set, otherwise returns error 500 (Internal server error) and result of setting every param<BR>";
 }
 
-QString QnGetCameraParamHandler::description() const
+QString QnGetCameraParamRestHandler::description() const
 {
     return
         "Returns list of camera parameters.<BR>"

@@ -1,5 +1,5 @@
-#ifndef QN_STORAGE_STATISTICS_HANDLER_H
-#define QN_STORAGE_STATISTICS_HANDLER_H
+#ifndef QN_STORAGE_SPACE_REST_HANDLER_H
+#define QN_STORAGE_SPACE_REST_HANDLER_H
 
 #include <rest/server/json_rest_handler.h>
 
@@ -17,4 +17,4 @@ protected:
     QnPlatformMonitor *m_monitor;
 };
 
-#endif // QN_STORAGE_STATISTICS_HANDLER_H
+#endif // QN_STORAGE_SPACE_REST_HANDLER_H

@@ -1,5 +1,5 @@
-#ifndef QN_REST_IMAGE_HANDLER_H
-#define QN_REST_IMAGE_HANDLER_H
+#ifndef QN_IMAGE_REST_HANDLER_H
+#define QN_IMAGE_REST_HANDLER_H
 
 #include <QtCore/QByteArray>
 #include "rest/server/request_handler.h"
@@ -22,4 +22,4 @@ private:
     bool m_detectAvailableOnly;
 };
 
-#endif // QN_REST_IMAGE_HANDLER_H
+#endif // QN_IMAGE_REST_HANDLER_H

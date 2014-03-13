@@ -841,8 +841,8 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnStorageStatusRestHandler());
     QnRestConnectionProcessor::registerHandler("api/storageSpace", new QnStorageSpaceRestHandler());
     QnRestConnectionProcessor::registerHandler("api/statistics", new QnStatisticsRestHandler());
-    QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
-    QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
+    QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamRestHandler());
     QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionRestHandler());
     QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzRestHandler());
     QnRestConnectionProcessor::registerHandler("api/image", new QnImageRestHandler());

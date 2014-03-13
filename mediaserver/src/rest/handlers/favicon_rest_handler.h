@@ -1,22 +1,17 @@
-#ifndef QN_STATISTICS_HANDLER_H
-#define QN_STATISTICS_HANDLER_H
+#ifndef QN_FAVICON_REST_HANDLER_H
+#define QN_FAVICON_REST_HANDLER_H
 
 #include "rest/server/request_handler.h"
 
-class QnGlobalMonitor;
-
-class QnStatisticsRestHandler: public QnRestRequestHandler {
-    Q_OBJECT
+class QnFavIconRestHandler: public QnRestRequestHandler
+{
 public:
-    QnStatisticsRestHandler();
-    virtual ~QnStatisticsRestHandler();
+    QnFavIconRestHandler();
 
+protected:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
     virtual QString description() const override;
-
-private:
-    QnGlobalMonitor *m_monitor;
 };
 
-#endif // QN_STATISTICS_HANDLER_H
+#endif // QN_FAVICON_REST_HANDLER_H

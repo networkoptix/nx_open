@@ -1,5 +1,5 @@
-#ifndef QN_FILE_SYSTEM_HANDLER_H
-#define QN_FILE_SYSTEM_HANDLER_H
+#ifndef QN_STORAGE_STATUS_REST_HANDLER_H
+#define QN_STORAGE_STATUS_REST_HANDLER_H
 
 #include <rest/server/json_rest_handler.h>
 
@@ -12,4 +12,4 @@ protected:
     virtual QString description() const override;
 };
 
-#endif // QN_FILE_SYSTEM_HANDLER_H
+#endif // QN_STORAGE_STATUS_REST_HANDLER_H

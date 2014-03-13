@@ -42,14 +42,14 @@
     \a res_id - unique id of camera
     If failed to set just one param, response status code is set to 500 (Internal Server Error), in other case - 200 (OK)
 */
-class QnCameraSettingsHandler
+class QnCameraSettingsRestHandler
 :
     public QnRestRequestHandler
 {
     Q_OBJECT
 
 public:
-    QnCameraSettingsHandler();
+    QnCameraSettingsRestHandler();
 
     //!Implementation of QnRestRequestHandler::executeGet
     virtual int executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType);
@@ -82,9 +82,9 @@ private slots:
 /*!
     Derived only to allow correct description. All request processing is done in \a QnCameraSettingsHandler class
 */
-class QnSetCameraParamHandler
+class QnSetCameraParamRestHandler
 :
-    public QnCameraSettingsHandler
+    public QnCameraSettingsRestHandler
 {
 public:
     //!Implementation of QnRestRequestHandler::description
@@ -95,9 +95,9 @@ public:
 /*!
     Derived only to allow correct description. All request processing is done in \a QnCameraSettingsHandler class
 */
-class QnGetCameraParamHandler
+class QnGetCameraParamRestHandler
 :
-    public QnCameraSettingsHandler
+    public QnCameraSettingsRestHandler
 {
 public:
     //!Implementation of QnRestRequestHandler::description
