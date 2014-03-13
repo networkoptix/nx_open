@@ -99,28 +99,20 @@ public:
 
         updatePartitions();
 
-        struct timespec time;
-        memset(&time, 0, sizeof(time));
-        clock_gettime(CLOCK_MONOTONIC, &time);
-        if(!lastDiskUsageUpdateTime.tv_sec) { /* It can overflow and become 0. In this case we will skip one calculation. Nothing serious... */
-            lastDiskUsageUpdateTime = time;
-            return zeroLoad(); /* First time doing nothing. */
+        const qint64 elapsed = m_hddStatCalcTimer.elapsed();
+        if( !m_hddStatCalcTimer.isValid() || elapsed == 0 )
+        {
+            m_hddStatCalcTimer.restart();
+            return zeroLoad();
         }
-
-        /* Calculate elapsed time. */
-        unsigned int elapsed = (time.tv_sec - lastDiskUsageUpdateTime.tv_sec) * 1000;
-        if(time.tv_nsec >= lastDiskUsageUpdateTime.tv_nsec)
-            elapsed += (time.tv_nsec - lastDiskUsageUpdateTime.tv_nsec) / 1000000;
-        else
-            elapsed -= (lastDiskUsageUpdateTime.tv_nsec - time.tv_nsec) / 1000000;
-        if(elapsed == 0)
-            return zeroLoad(); /* No point to update. */
-        lastDiskUsageUpdateTime = time;
 
         /* Reading current disk statistics. */
         FILE *file = fopen("/proc/diskstats", "r");
         if(!file)
+        {
+            m_hddStatCalcTimer.restart();
             return zeroLoad();
+        }
 
         QHash<int, unsigned int> diskTimeById;
         char line[MAX_LINE_LENGTH];
@@ -163,6 +155,7 @@ public:
         lastDiskTimeById = diskTimeById;
 
         fclose(file);
+        m_hddStatCalcTimer.restart();
 
         return result;
     }
@@ -350,6 +343,7 @@ private:
     QHash<int, unsigned int> lastDiskTimeById;
     std::map<QString, InterfaceStatisticsContext> m_ifNameToStatistics;
     QElapsedTimer m_networkStatCalcTimer;
+    QElapsedTimer m_hddStatCalcTimer;
 
     time_t lastPartitionsUpdateTime;
     struct timespec lastDiskUsageUpdateTime;
