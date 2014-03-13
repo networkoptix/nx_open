@@ -59,8 +59,8 @@ libavdevice.so.54.0.100 \
 libavfilter.so.2.77.100 \
 libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
-libcommon.so.220.0.0 \
-libappserver2.so.2.2.0 \
+libcommon.so.230.0.0 \
+libappserver2.so.2.3.0 \
 libpostproc.so.52.0.100 \
 libQt5Concurrent.so.5.2.1 \
 libQt5Core.so.5.2.1 \
@@ -79,7 +79,7 @@ libswscale.so.2.1.100 )
 
 rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR/$PREFIX_DIR
-echo "$VERSION" > $BUILD_DIR/$PREFIX_DIR/VERSION
+echo "$VERSION" > $BUILD_DIR/$PREFIX_DIR/version.txt
 
 #copying libs
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
