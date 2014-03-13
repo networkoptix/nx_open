@@ -53,7 +53,7 @@ public:
     //!Implementation of QnJoinable::wait()
     virtual void wait() override;
 
-    bool start( const QSettings& settings );
+    bool start( const QString& mirrorListUrl );
 
     applauncher::api::InstallationStatus::Value getStatus() const;
     //!Returns installation progress (percents)

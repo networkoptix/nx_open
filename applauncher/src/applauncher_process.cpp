@@ -15,14 +15,17 @@
 
 #include "process_utils.h"
 
+
 ApplauncherProcess::ApplauncherProcess(
     QSettings* const settings,
     InstallationManager* const installationManager,
-    bool quitMode )
+    bool quitMode,
+    const QString& mirrorListUrl )
 :
     m_terminated( false ),
     m_installationManager( installationManager ),
     m_quitMode( quitMode ),
+    m_mirrorListUrl( mirrorListUrl ),
     m_taskServer( this ),
     m_settings( settings ),
     m_bindTriesCount( 0 ),
@@ -330,7 +333,7 @@ bool ApplauncherProcess::startApplication(
             environment) )
     {
         NX_LOG( QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG1 );
-        m_settings->setValue( QLatin1String("previousLaunchedVersion"), task->version );
+        m_settings->setValue( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME, task->version );
         response->result = applauncher::api::ResultType::ok;
         return true;
     }
@@ -386,7 +389,7 @@ bool ApplauncherProcess::startInstallation(
         task->module,
         targetDir,
         task->autoStart ) );
-    if( !installationProcess->start( *m_settings ) )
+    if( !installationProcess->start( m_mirrorListUrl ) )
     {
         response->result = applauncher::api::ResultType::ioError;
         return true;

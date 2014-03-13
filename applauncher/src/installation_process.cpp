@@ -56,9 +56,8 @@ void InstallationProcess::wait()
 }
 
 static const QString MIRROR_LIST_URL_PARAM_NAME( "mirrorListUrl" );
-static const QString DEFAULT_MIRROR_LIST_URL( "http://networkoptix.com/archive/hdw_mirror_list.xml" );
 
-bool InstallationProcess::start( const QSettings& settings )
+bool InstallationProcess::start( const QString& mirrorListUrl )
 {
     if( !m_httpClient )
     {
@@ -71,7 +70,6 @@ bool InstallationProcess::start( const QSettings& settings )
 
     m_state = State::downloadMirrorList;
     m_status = applauncher::api::InstallationStatus::inProgress;
-    QString mirrorListUrl = settings.value(MIRROR_LIST_URL_PARAM_NAME, DEFAULT_MIRROR_LIST_URL).toString();
     if( !m_httpClient->doGet(QUrl(mirrorListUrl)) )
     {
         m_state = State::init;
