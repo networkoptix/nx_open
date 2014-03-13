@@ -168,6 +168,7 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
             this,
             SLOT(asyncParamSetComplete(const QnResourcePtr &, const QString&, const QVariant&, bool)) );
 
+    // TODO: #Elric use JSON here
     {
         //serializing answer
         for( std::map<QString, std::pair<QVariant, bool> >::const_iterator

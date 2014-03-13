@@ -10,28 +10,19 @@
 
 #include "rest/server/request_handler.h"
 
-// TODO: #Elric this is a part of ACTi plugin implementation actually.
-// Rename to ACTi-something
+// TODO: #Elric rename RestHandler
 
-//!Receives events from cameras (Aacti at the moment) and dispatches it to corresponding resource
+// TODO: #Elric this is a part of ACTi plugin implementation actually.
+// Rename to ACTi-something, move to ACTi plugin folder
+
+//!Receives events from cameras (Acti at the moment) and dispatches it to corresponding resource
 class QnCameraEventHandler
 :
     public QnRestRequestHandler
 {
 public:
-    //!Implementation of QnRestRequestHandler::executeGet
-    virtual int executeGet(
-        const QString& path,
-        const QnRequestParamList& params,
-        QByteArray& responseMessageBody,
-        QByteArray& contentType );
-    //!Implementation of QnRestRequestHandler::executePost
-    virtual int executePost(
-        const QString& path,
-        const QnRequestParamList& params,
-        const QByteArray& requestBody,
-        QByteArray& responseMessageBody,
-        QByteArray& contentType );
+    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType) override;
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& requestBody, QByteArray& responseMessageBody, QByteArray& contentType) override;
 };
 
 #endif // #ifdef ENABLE_ACTI

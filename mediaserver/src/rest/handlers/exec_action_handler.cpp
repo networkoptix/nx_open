@@ -50,5 +50,5 @@ int QnExecActionHandler::executePost(const QString& path, const QnRequestParamLi
 
 QString QnExecActionHandler::description() const
 {
-    return "Execute business action. Action specified in POST request body at binary protobuf format. \n";
+    return "Execute business action. Action specified in POST request body in binary protobuf format. \n";
 }

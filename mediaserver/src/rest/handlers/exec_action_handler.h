@@ -5,6 +5,8 @@
 
 class QnGlobalMonitor;
 
+// TODO: #Elric rename business action rest handler
+
 class QnExecActionHandler: public QnRestRequestHandler {
 public:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);

@@ -79,16 +79,6 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
         return CODE_INVALID_PARAMETER;
     }
 
-    /*
-    QList<QnAbstractBusinessActionPtr> actions = qnEventsDB->getActions(
-        period, 
-        res ? res->getId() : QnId(), 
-        eventType, 
-        actionType,
-        businessRuleId);
-    QnApiPbSerializer serializer;
-    serializer.serializeBusinessActionList(actions, result);
-    */
     qnEventsDB->getAndSerializeActions(
         result,
         period, 
@@ -96,7 +86,6 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
         eventType, 
         actionType,
         businessRuleId);
-
 
     contentType = "application/octet-stream";
     return CODE_OK;
@@ -111,9 +100,9 @@ int QnRestEventsHandler::executePost(const QString& path, const QnRequestParamLi
 QString QnRestEventsHandler::description() const
 {
     return 
-        "Returns events log"
-        "<BR>Param <b>from</b> - start of time period at ms sicnec 1.1.1970 (UTC format)"
-        "<BR>Param <b>to</b> - end of time period at ms sicnec 1.1.1970 (UTC format). Optional"
+        "Returns event log"
+        "<BR>Param <b>from</b> - start of time period at ms since 1.1.1970 (UTC format)"
+        "<BR>Param <b>to</b> - end of time period at ms since 1.1.1970 (UTC format). Optional"
         "<BR>Param <b>format</b> - allowed values: <b>text</b>, <b>protobuf. Optional</b>"
         "<BR>Param <b>event</b> - event type. Optional</b>"
         "<BR>Param <b>action</b> - action type. Optional</b>"

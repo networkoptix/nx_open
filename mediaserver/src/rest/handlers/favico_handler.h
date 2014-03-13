@@ -3,7 +3,9 @@
 
 #include "rest/server/request_handler.h"
 
-// TODO: #Elric misspelled, FavicoNNNNNN
+// TODO: #Elric misspelled, rename fav icon rest handler
+
+
 class QnRestFavicoHandler: public QnRestRequestHandler
 {
 public:

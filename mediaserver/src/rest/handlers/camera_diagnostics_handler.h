@@ -14,6 +14,8 @@
 
 class QnVideoCamera;
 
+// TODO: #Elric rename RestHandler
+
 class QnCameraDiagnosticsHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:

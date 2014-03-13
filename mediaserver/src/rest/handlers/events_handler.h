@@ -3,6 +3,8 @@
 
 #include "rest/server/request_handler.h"
 
+// TODO: #Elric rename business event log rest handler
+
 class QnRestEventsHandler: public QnRestRequestHandler
 {
 public:

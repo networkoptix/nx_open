@@ -3,7 +3,7 @@
 
 #include "rest/server/request_handler.h"
 
-// TODO: rename to QnTimeHandler, there are no other handlers with 'Get' prefix.
+
 class QnRestPingHandler: public QnRestRequestHandler
 {
 public:
