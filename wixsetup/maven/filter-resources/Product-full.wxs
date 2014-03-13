@@ -671,7 +671,7 @@
                                 </Component>
 
                                 <Component Id="VmaxProxyQTLibraries">
-                                    <File Id="VmaxProxyQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)/vmaxproxy/Qt5Core$(var.suffix).dll"  />
+                                    <File Id="VmaxProxyQt5Core$(var.suffix).dll" Name="qtcore$(var.suffix)4.dll" Source="$(var.SourceDir)/vmaxproxy/qtcore$(var.suffix)4.dll"  />
                                 </Component>
                             </Directory>
 

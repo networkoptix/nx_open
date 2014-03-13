@@ -263,9 +263,9 @@
                     <classifier>${profile.classifier}</classifier>
                 </dependency>
                 <dependency>                
-                    <groupId>com.digitalwatchdog.dvr</groupId>
-                    <artifactId>vmax-integration</artifactId>
-                    <version>1.0-SNAPSHOT</version>
+                    <groupId>com.networkoptix.hdwitness</groupId>
+                    <artifactId>vmaxproxy</artifactId>
+                    <version>2.1-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>               

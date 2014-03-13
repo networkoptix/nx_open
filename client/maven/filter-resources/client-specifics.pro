@@ -28,3 +28,7 @@ mac {
     OBJECTIVE_SOURCES += ${basedir}/src/ui/workaround/mac_utils.mm
     LIBS += -lobjc -framework Foundation -framework AudioUnit -framework AppKit
 }
+
+!win32 {
+    QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
+}
