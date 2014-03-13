@@ -4,12 +4,10 @@
 #include <QtCore/QByteArray>
 #include "rest/server/request_handler.h"
 
-// TODO: #Elric rename image rest handler
-
-class QnImageHandler: public QnRestRequestHandler
+class QnImageRestHandler: public QnRestRequestHandler
 {
 public:
-    QnImageHandler();
+    QnImageRestHandler();
     enum RoundMethod { IFrameBeforeTime, Precise, IFrameAfterTime };
 
 protected:

@@ -4,12 +4,12 @@
 #include "utils/common/util.h"
 #include <media_server/serverutil.h>
 
-QnRestPingHandler::QnRestPingHandler()
+QnPingRestHandler::QnPingRestHandler()
 {
 
 }
 
-int QnRestPingHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnPingRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
     Q_UNUSED(params)
@@ -19,13 +19,13 @@ int QnRestPingHandler::executeGet(const QString& path, const QnRequestParamList&
     return CODE_OK;
 }
 
-int QnRestPingHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnPingRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 
-QString QnRestPingHandler::description() const
+QString QnPingRestHandler::description() const
 {
     return "Returns server ping message";
 }

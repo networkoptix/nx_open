@@ -8,12 +8,12 @@
 #include "recorder/device_file_catalog.h"
 #include "recorder/storage_manager.h"
 
-QnRestRebuildArchiveHandler::QnRestRebuildArchiveHandler()
+QnRebuildArchiveRestHandler::QnRebuildArchiveRestHandler()
 {
 
 }
 
-int QnRestRebuildArchiveHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
     Q_UNUSED(params)
@@ -78,13 +78,13 @@ int QnRestRebuildArchiveHandler::executeGet(const QString& path, const QnRequest
     return CODE_OK;
 }
 
-int QnRestRebuildArchiveHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnRebuildArchiveRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
         return executeGet(path, params, result, contentType);
 }
 
-QString QnRestRebuildArchiveHandler::description() const
+QString QnRebuildArchiveRestHandler::description() const
 {
     return 
         "Start or stop rebuilding of media server archive.\n"

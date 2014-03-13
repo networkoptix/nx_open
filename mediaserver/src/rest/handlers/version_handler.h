@@ -3,7 +3,7 @@
 
 #include "rest/server/request_handler.h"
 
-class QnVersionHandler: public QnRestRequestHandler
+class QnVersionRestHandler: public QnRestRequestHandler
 {
 public:
 protected:

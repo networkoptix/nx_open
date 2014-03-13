@@ -837,28 +837,28 @@ void QnMain::initTcpListener()
 {
     int rtspPort = MSSettings::roSettings()->value("rtspPort", DEFAUT_RTSP_PORT).toInt();
 #ifdef USE_SINGLE_STREAMING_PORT
-    QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
-    QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnStorageStatusHandler());
-    QnRestConnectionProcessor::registerHandler("api/storageSpace", new QnStorageSpaceHandler());
-    QnRestConnectionProcessor::registerHandler("api/statistics", new QnStatisticsHandler());
+    QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnStorageStatusRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/storageSpace", new QnStorageSpaceRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/statistics", new QnStatisticsRestHandler());
     QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
-    QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());
-    QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzHandler());
-    QnRestConnectionProcessor::registerHandler("api/image", new QnImageHandler());
-    QnRestConnectionProcessor::registerHandler("api/execAction", new QnExecActionHandler());
+    QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/image", new QnImageRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/execAction", new QnBusinessActionRestHandler());
     QnRestConnectionProcessor::registerHandler("api/onEvent", new QnExternalBusinessEventHandler());
-    QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeHandler());
-    QnRestConnectionProcessor::registerHandler("api/ping", new QnRestPingHandler());
-    QnRestConnectionProcessor::registerHandler("api/rebuildArchive", new QnRestRebuildArchiveHandler());
-    QnRestConnectionProcessor::registerHandler("api/events", new QnRestEventsHandler());
-    QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
-    QnRestConnectionProcessor::registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsHandler());
+    QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/ping", new QnPingRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/events", new QnBusinessEventLogRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/showLog", new QnLogRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
-    QnRestConnectionProcessor::registerHandler("api/camera_event", new QnCameraEventHandler());  //used to receive event from acti camera. TODO: remove this from api
+    QnRestConnectionProcessor::registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
 #endif
-    QnRestConnectionProcessor::registerHandler("favicon.ico", new QnRestFavicoHandler());
+    QnRestConnectionProcessor::registerHandler("favicon.ico", new QnFavIconRestHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->enableSSLMode();

@@ -3,7 +3,7 @@
 
 #include <rest/server/json_rest_handler.h>
 
-class QnStorageStatusHandler: public QnJsonRestHandler {
+class QnStorageStatusRestHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
 

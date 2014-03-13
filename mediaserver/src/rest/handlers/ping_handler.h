@@ -4,10 +4,10 @@
 #include "rest/server/request_handler.h"
 
 
-class QnRestPingHandler: public QnRestRequestHandler
+class QnPingRestHandler: public QnRestRequestHandler
 {
 public:
-    QnRestPingHandler();
+    QnPingRestHandler();
 
 protected:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);

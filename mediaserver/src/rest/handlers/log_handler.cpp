@@ -11,12 +11,12 @@
 
 static const int READ_BLOCK_SIZE = 1024*512;
 
-QnRestLogHandler::QnRestLogHandler()
+QnLogRestHandler::QnLogRestHandler()
 {
 
 }
 
-int QnRestLogHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
 
@@ -83,13 +83,13 @@ int QnRestLogHandler::executeGet(const QString& path, const QnRequestParamList& 
     return CODE_OK;
 }
 
-int QnRestLogHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnLogRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 
-QString QnRestLogHandler::description() const
+QString QnLogRestHandler::description() const
 {
     return 
         "Returns tail of the server log file"

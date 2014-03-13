@@ -10,10 +10,10 @@
 
 #include <rest/server/json_rest_handler.h>
 
-class QnPtzHandler: public QnJsonRestHandler {
+class QnPtzRestHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
-    QnPtzHandler();
+    QnPtzRestHandler();
 
 protected:
     virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) override;

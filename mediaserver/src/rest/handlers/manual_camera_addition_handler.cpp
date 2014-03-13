@@ -14,11 +14,11 @@ namespace {
     static const int searchThreadCount = 4;
 }
 
-QnManualCameraAdditionHandler::QnManualCameraAdditionHandler()
+QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler()
 {
 }
 
-QnManualCameraAdditionHandler::~QnManualCameraAdditionHandler() {
+QnManualCameraAdditionRestHandler::~QnManualCameraAdditionRestHandler() {
     foreach (QnManualCameraSearcher* process, m_searchProcesses) {
         process->cancel();
         delete process;
@@ -29,7 +29,7 @@ static void searchResourcesAsync(QnManualCameraSearcher* searcher, const QString
     searcher->run(startAddr, endAddr, auth, port);
 }
 
-int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParams &params,  QnJsonRestResult &result)
+int QnManualCameraAdditionRestHandler::searchStartAction(const QnRequestParams &params,  QnJsonRestResult &result)
 {
     QAuthenticator auth;
     auth.setUser(params.value("user", "admin"));
@@ -62,7 +62,7 @@ int QnManualCameraAdditionHandler::searchStartAction(const QnRequestParams &para
     return CODE_OK;
 }
 
-int QnManualCameraAdditionHandler::searchStatusAction(const QnRequestParams &params, QnJsonRestResult &result) {
+int QnManualCameraAdditionRestHandler::searchStatusAction(const QnRequestParams &params, QnJsonRestResult &result) {
     QUuid processUuid = QUuid(params.value("uuid"));
 
     if (processUuid.isNull())
@@ -78,7 +78,7 @@ int QnManualCameraAdditionHandler::searchStatusAction(const QnRequestParams &par
 }
 
 
-int QnManualCameraAdditionHandler::searchStopAction(const QnRequestParams &params, QnJsonRestResult &result) {
+int QnManualCameraAdditionRestHandler::searchStopAction(const QnRequestParams &params, QnJsonRestResult &result) {
     QUuid processUuid = QUuid(params.value("uuid"));
 
     if (processUuid.isNull())
@@ -110,7 +110,7 @@ int QnManualCameraAdditionHandler::searchStopAction(const QnRequestParams &param
 }
 
 
-int QnManualCameraAdditionHandler::addCamerasAction(const QnRequestParams &params, QnJsonRestResult &result)
+int QnManualCameraAdditionRestHandler::addCamerasAction(const QnRequestParams &params, QnJsonRestResult &result)
 {
     QAuthenticator auth;
     auth.setUser(params.value("user"));
@@ -140,7 +140,7 @@ int QnManualCameraAdditionHandler::addCamerasAction(const QnRequestParams &param
     return registered ? CODE_OK : CODE_INTERNAL_ERROR;
 }
 
-int QnManualCameraAdditionHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnManualCameraAdditionRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
     QString action = extractAction(path);
     if (action == "search")
         return searchStartAction(params, result);
@@ -154,7 +154,7 @@ int QnManualCameraAdditionHandler::executeGet(const QString &path, const QnReque
         return CODE_NOT_FOUND;
 }
 
-QnManualCameraSearchProcessStatus QnManualCameraAdditionHandler::getSearchStatus(const QUuid &searchProcessUuid) {
+QnManualCameraSearchProcessStatus QnManualCameraAdditionRestHandler::getSearchStatus(const QUuid &searchProcessUuid) {
     QMutexLocker lock(&m_searchProcessMutex);
 
     if (!m_searchProcesses.contains(searchProcessUuid))
@@ -163,12 +163,12 @@ QnManualCameraSearchProcessStatus QnManualCameraAdditionHandler::getSearchStatus
     return m_searchProcesses[searchProcessUuid]->status();
 }
 
-bool QnManualCameraAdditionHandler::isSearchActive(const QUuid &searchProcessUuid) {
+bool QnManualCameraAdditionRestHandler::isSearchActive(const QUuid &searchProcessUuid) {
     QMutexLocker lock(&m_searchProcessMutex);
     return m_searchProcesses.contains(searchProcessUuid);
 }
 
-QString QnManualCameraAdditionHandler::description() const
+QString QnManualCameraAdditionRestHandler::description() const
 {
     return 
             "Search or manual add cameras found in the specified range.<BR>\n"

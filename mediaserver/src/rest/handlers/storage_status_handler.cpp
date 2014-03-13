@@ -10,7 +10,7 @@
 #include "recorder/storage_manager.h"
 #include "api/model/storage_status_reply.h"
 
-int QnStorageStatusHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result)
+int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result)
 {
     QString storageUrl;
     if(!requireParameter(params, lit("path"), result, &storageUrl))
@@ -45,7 +45,7 @@ int QnStorageStatusHandler::executeGet(const QString &, const QnRequestParams &p
     return CODE_OK;
 }
 
-QString QnStorageStatusHandler::description() const
+QString QnStorageStatusRestHandler::description() const
 {
     return 
         "Returns 'OK' if specified folder may be used for writing on mediaServer. Otherwise returns 'FAIL' \n"

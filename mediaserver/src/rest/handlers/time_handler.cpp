@@ -6,9 +6,9 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 
-QnTimeHandler::QnTimeHandler() {}
+QnTimeRestHandler::QnTimeRestHandler() {}
 
-int QnTimeHandler::executeGet(const QString &, const QnRequestParams &, QnJsonRestResult &result) {
+int QnTimeRestHandler::executeGet(const QString &, const QnRequestParams &, QnJsonRestResult &result) {
     QnTimeReply reply;
     reply.timeZoneOffset = currentTimeZone() * 1000ll;
     reply.utcTime = qnSyncTime->currentMSecsSinceEpoch();
@@ -17,6 +17,6 @@ int QnTimeHandler::executeGet(const QString &, const QnRequestParams &, QnJsonRe
     return CODE_OK;
 }
 
-QString QnTimeHandler::description() const {
+QString QnTimeRestHandler::description() const {
     return "Returns server UTC time and time zone";
 }

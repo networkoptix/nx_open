@@ -11,7 +11,7 @@
 #include "api/serializer/serializer.h"
 
 
-QRect QnRecordedChunksHandler::deserializeMotionRect(const QString& rectStr)
+QRect QnRecordedChunksRestHandler::deserializeMotionRect(const QString& rectStr)
 {
     QList<QString> params = rectStr.split(",");
     if (params.size() != 4)
@@ -20,7 +20,7 @@ QRect QnRecordedChunksHandler::deserializeMotionRect(const QString& rectStr)
         return QRect(params[0].toInt(), params[1].toInt(), params[2].toInt(), params[3].toInt());
 }
 
-int QnRecordedChunksHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
     qint64 startTime = -1, endTime = 1, detailLevel = -1;
@@ -145,40 +145,13 @@ int QnRecordedChunksHandler::executeGet(const QString& path, const QnRequestPara
     return CODE_OK;
 }
 
-int QnRecordedChunksHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnRecordedChunksRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 
-int QnXsdHelperHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
-{
-    Q_UNUSED(params)
-    Q_UNUSED(contentType)
-    //QString method = path.mid(path.lastIndexOf('/')+1);
-    QString method = QnFile::baseName(path);
-
-    QFile f(QString(":/xsd/api/") + method);
-    f.open(QFile::ReadOnly);
-    QByteArray data = f.readAll();
-    if (!data.isEmpty()) 
-    {
-        result.append(data);
-        return CODE_OK;
-    }
-    else {
-        result.append("<root>XSD scheme not found </root>");
-        return CODE_NOT_FOUND;
-    }
-}
-
-int QnXsdHelperHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
-{
-    Q_UNUSED(body)
-    return executeGet(path, params, result, contentType);
-}
-
-QString QnRecordedChunksHandler::description() const
+QString QnRecordedChunksRestHandler::description() const
 {
     return 
         "Return recorded chunk info by specified cameras\n"

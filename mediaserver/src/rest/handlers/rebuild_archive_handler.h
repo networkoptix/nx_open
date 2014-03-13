@@ -3,10 +3,10 @@
 
 #include "rest/server/request_handler.h"
 
-class QnRestRebuildArchiveHandler: public QnRestRequestHandler
+class QnRebuildArchiveRestHandler: public QnRestRequestHandler
 {
 public:
-    QnRestRebuildArchiveHandler();
+    QnRebuildArchiveRestHandler();
 
 protected:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);

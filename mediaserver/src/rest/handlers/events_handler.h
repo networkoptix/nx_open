@@ -1,14 +1,12 @@
-#ifndef QN_REST_EVENTS__HANDLER_H
-#define QN_REST_EVENTS__HANDLER_H
+#ifndef QN_BUSINESS_EVENT_LOG_REST_HANDLER
+#define QN_BUSINESS_EVENT_LOG_REST_HANDLER
 
 #include "rest/server/request_handler.h"
 
-// TODO: #Elric rename business event log rest handler
-
-class QnRestEventsHandler: public QnRestRequestHandler
+class QnBusinessEventLogRestHandler: public QnRestRequestHandler
 {
 public:
-    QnRestEventsHandler();
+    QnBusinessEventLogRestHandler();
 
 protected:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
@@ -16,4 +14,4 @@ protected:
     virtual QString description() const override;
 };
 
-#endif // QN_REST_EVENTS__HANDLER_H
+#endif // QN_BUSINESS_EVENT_LOG_REST_HANDLER

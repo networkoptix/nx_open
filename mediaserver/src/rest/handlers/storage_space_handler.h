@@ -5,10 +5,10 @@
 
 class QnPlatformMonitor;
 
-class QnStorageSpaceHandler: public QnJsonRestHandler {
+class QnStorageSpaceRestHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
-    QnStorageSpaceHandler();
+    QnStorageSpaceRestHandler();
 
 protected:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;

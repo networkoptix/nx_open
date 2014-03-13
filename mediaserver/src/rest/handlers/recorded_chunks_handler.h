@@ -5,7 +5,7 @@
 
 #include "rest/server/request_handler.h"
 
-class QnRecordedChunksHandler: public QnRestRequestHandler
+class QnRecordedChunksRestHandler: public QnRestRequestHandler
 {
 	enum ChunkFormat {ChunkFormat_Unknown, ChunkFormat_Binary, ChunkFormat_XML, ChunkFormat_Json, ChunkFormat_Text}; // TODO: Json, not Jason
 
@@ -17,10 +17,5 @@ private:
     QRect deserializeMotionRect(const QString& rectStr);
 };
 
-class QnXsdHelperHandler: public QnRestRequestHandler
-{
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
-};
 
 #endif // QN_RECORDED_CHUNKS_HANDLER_H

@@ -23,11 +23,11 @@ namespace {
 
 } // anonymous namespace
 
-QnStorageSpaceHandler::QnStorageSpaceHandler():
+QnStorageSpaceRestHandler::QnStorageSpaceRestHandler():
     m_monitor(qnPlatform->monitor()) 
 {}
 
-int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParams &, QnJsonRestResult &result) {
+int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams &, QnJsonRestResult &result) {
     QnStorageSpaceReply reply;
 
     QList<QnPlatformMonitor::PartitionSpace> partitions = m_monitor->totalPartitionSpaceInfo(QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition);
@@ -115,7 +115,7 @@ int QnStorageSpaceHandler::executeGet(const QString &, const QnRequestParams &, 
     return CODE_OK;
 }
 
-QString QnStorageSpaceHandler::description() const {
+QString QnStorageSpaceRestHandler::description() const {
     return 
         "Returns a list of all server storages.<br>"
         "No parameters.<br>";

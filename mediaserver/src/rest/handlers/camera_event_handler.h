@@ -10,13 +10,8 @@
 
 #include "rest/server/request_handler.h"
 
-// TODO: #Elric rename RestHandler
-
-// TODO: #Elric this is a part of ACTi plugin implementation actually.
-// Rename to ACTi-something, move to ACTi plugin folder
-
 //!Receives events from cameras (Acti at the moment) and dispatches it to corresponding resource
-class QnCameraEventHandler
+class QnActiEventRestHandler
 :
     public QnRestRequestHandler
 {

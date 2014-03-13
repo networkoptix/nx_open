@@ -3,8 +3,8 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef CAMERA_DIAGNOSTICS_HANDLER_H
-#define CAMERA_DIAGNOSTICS_HANDLER_H
+#ifndef QN_CAMERA_DIAGNOSTICS_REST_HANDLER_H
+#define QN_CAMERA_DIAGNOSTICS_REST_HANDLER_H
 
 #include <core/resource/resource_fwd.h>
 #include <utils/camera/camera_diagnostics.h>
@@ -14,12 +14,10 @@
 
 class QnVideoCamera;
 
-// TODO: #Elric rename RestHandler
-
-class QnCameraDiagnosticsHandler: public QnJsonRestHandler {
+class QnCameraDiagnosticsRestHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
-    QnCameraDiagnosticsHandler();
+    QnCameraDiagnosticsRestHandler();
 
 protected:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
@@ -31,4 +29,4 @@ private:
     CameraDiagnostics::Result checkCameraMediaStreamForErrors( QnResourcePtr res );
 };
 
-#endif  //CAMERA_DIAGNOSTICS_HANDLER_H
+#endif  //QN_CAMERA_DIAGNOSTICS_REST_HANDLER_H

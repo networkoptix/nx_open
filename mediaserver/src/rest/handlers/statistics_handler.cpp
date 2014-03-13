@@ -6,15 +6,15 @@
 
 #include "rest/server/rest_server.h"
 
-QnStatisticsHandler::QnStatisticsHandler() {
+QnStatisticsRestHandler::QnStatisticsRestHandler() {
     m_monitor = qnPlatform->monitor();
 }
 
-QnStatisticsHandler::~QnStatisticsHandler() {
+QnStatisticsRestHandler::~QnStatisticsRestHandler() {
     return;
 }
 
-int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
+int QnStatisticsRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
 {
     Q_UNUSED(params)
     Q_UNUSED(path)
@@ -69,13 +69,13 @@ int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamLis
     return CODE_OK;
 }
 
-int QnStatisticsHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnStatisticsRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 
-QString QnStatisticsHandler::description() const
+QString QnStatisticsRestHandler::description() const
 {
     return "Returns server info: CPU usage, HDD usage e.t.c \n";
 }

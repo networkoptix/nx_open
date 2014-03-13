@@ -5,11 +5,11 @@
 
 class QnGlobalMonitor;
 
-class QnStatisticsHandler: public QnRestRequestHandler {
+class QnStatisticsRestHandler: public QnRestRequestHandler {
     Q_OBJECT
 public:
-    QnStatisticsHandler();
-    virtual ~QnStatisticsHandler();
+    QnStatisticsRestHandler();
+    virtual ~QnStatisticsRestHandler();
 
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);

@@ -13,11 +13,11 @@
 static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
 
-QnPtzHandler::QnPtzHandler() {
+QnPtzRestHandler::QnPtzRestHandler() {
     return;
 }
 
-void QnPtzHandler::cleanupOldSequence()
+void QnPtzRestHandler::cleanupOldSequence()
 {
     QMap<QString, SequenceInfo>::iterator itr = m_sequencedRequests.begin();
     while ( itr != m_sequencedRequests.end())
@@ -30,7 +30,7 @@ void QnPtzHandler::cleanupOldSequence()
     }
 }
 
-bool QnPtzHandler::checkSequence(const QString& id, int sequence)
+bool QnPtzRestHandler::checkSequence(const QString& id, int sequence)
 {
     QMutexLocker lock(&m_sequenceMutex);
     cleanupOldSequence();
@@ -44,7 +44,7 @@ bool QnPtzHandler::checkSequence(const QString& id, int sequence)
     return true;
 }
 
-int QnPtzHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
+int QnPtzRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
     QString sequenceId;
     int sequenceNumber = -1;
     Qn::PtzCommand command;
@@ -102,7 +102,7 @@ int QnPtzHandler::executePost(const QString &path, const QnRequestParams &params
     }
 }
 
-int QnPtzHandler::executeContinuousMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeContinuousMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     qreal xSpeed, ySpeed, zSpeed;
     if(
         !requireParameter(params, lit("xSpeed"), result, &xSpeed) || 
@@ -119,7 +119,7 @@ int QnPtzHandler::executeContinuousMove(const QnPtzControllerPtr &controller, co
     return CODE_OK;
 }
 
-int QnPtzHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     Qn::PtzCommand command;
     qreal xPos, yPos, zPos, speed;
     if(
@@ -139,7 +139,7 @@ int QnPtzHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, cons
     return CODE_OK;
 }
 
-int QnPtzHandler::executeViewportMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeViewportMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     qreal viewportTop, viewportLeft, viewportBottom, viewportRight, aspectRatio, speed;
     if(
         !requireParameter(params, lit("viewportTop"),       result, &viewportTop) || 
@@ -159,7 +159,7 @@ int QnPtzHandler::executeViewportMove(const QnPtzControllerPtr &controller, cons
     return CODE_OK;
 }
 
-int QnPtzHandler::executeGetPosition(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeGetPosition(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     Qn::PtzCommand command;
     if(!requireParameter(params, lit("command"), result, &command))
         return CODE_INVALID_PARAMETER;
@@ -172,7 +172,7 @@ int QnPtzHandler::executeGetPosition(const QnPtzControllerPtr &controller, const
     return CODE_OK;
 }
 
-int QnPtzHandler::executeCreatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeCreatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     QString presetId, presetName;
     if(!requireParameter(params, lit("presetId"), result, &presetId) || !requireParameter(params, lit("presetName"), result, &presetName))
         return CODE_INVALID_PARAMETER;
@@ -184,7 +184,7 @@ int QnPtzHandler::executeCreatePreset(const QnPtzControllerPtr &controller, cons
     return CODE_OK;
 }
 
-int QnPtzHandler::executeUpdatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeUpdatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     QString presetId, presetName;
     if(!requireParameter(params, lit("presetId"), result, &presetId) || !requireParameter(params, lit("presetName"), result, &presetName))
         return CODE_INVALID_PARAMETER;
@@ -196,7 +196,7 @@ int QnPtzHandler::executeUpdatePreset(const QnPtzControllerPtr &controller, cons
     return CODE_OK;
 }
 
-int QnPtzHandler::executeRemovePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeRemovePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     QString presetId;
     if(!requireParameter(params, lit("presetId"), result, &presetId))
         return CODE_INVALID_PARAMETER;
@@ -207,7 +207,7 @@ int QnPtzHandler::executeRemovePreset(const QnPtzControllerPtr &controller, cons
     return CODE_OK;
 }
 
-int QnPtzHandler::executeActivatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeActivatePreset(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     QString presetId;
     qreal speed;
     if(!requireParameter(params, lit("presetId"), result, &presetId) || !requireParameter(params, lit("speed"), result, &speed))
@@ -219,7 +219,7 @@ int QnPtzHandler::executeActivatePreset(const QnPtzControllerPtr &controller, co
     return CODE_OK;
 }
 
-int QnPtzHandler::executeGetPresets(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeGetPresets(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result) {
     QnPtzPresetList presets;
     if(!controller->getPresets(&presets))
         return CODE_INTERNAL_ERROR;
@@ -228,7 +228,7 @@ int QnPtzHandler::executeGetPresets(const QnPtzControllerPtr &controller, const 
     return CODE_OK;
 }
 
-int QnPtzHandler::executeCreateTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeCreateTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
     QnPtzTour tour;
     if(!QJson::deserialize(body, &tour))
         return CODE_INVALID_PARAMETER;
@@ -239,7 +239,7 @@ int QnPtzHandler::executeCreateTour(const QnPtzControllerPtr &controller, const 
     return CODE_OK;
 }
 
-int QnPtzHandler::executeRemoveTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeRemoveTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     QString tourId;
     if(!requireParameter(params, lit("tourId"), result, &tourId))
         return CODE_INVALID_PARAMETER;
@@ -250,7 +250,7 @@ int QnPtzHandler::executeRemoveTour(const QnPtzControllerPtr &controller, const 
     return CODE_OK;
 }
 
-int QnPtzHandler::executeActivateTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeActivateTour(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     QString tourId;
     if(!requireParameter(params, lit("tourId"), result, &tourId))
         return CODE_INVALID_PARAMETER;
@@ -261,7 +261,7 @@ int QnPtzHandler::executeActivateTour(const QnPtzControllerPtr &controller, cons
     return CODE_OK;
 }
 
-int QnPtzHandler::executeGetTours(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeGetTours(const QnPtzControllerPtr &controller, const QnRequestParams &, QnJsonRestResult &result) {
     QnPtzTourList tours;
     if(!controller->getTours(&tours))
         return CODE_INTERNAL_ERROR;
@@ -270,7 +270,7 @@ int QnPtzHandler::executeGetTours(const QnPtzControllerPtr &controller, const Qn
     return CODE_OK;
 }
 
-int QnPtzHandler::executeGetActiveObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeGetActiveObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     QnPtzObject activeObject;
     if(!controller->getActiveObject(&activeObject))
         return CODE_INTERNAL_ERROR;
@@ -279,7 +279,7 @@ int QnPtzHandler::executeGetActiveObject(const QnPtzControllerPtr &controller, c
     return CODE_OK;
 }
 
-int QnPtzHandler::executeUpdateHomeObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeUpdateHomeObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     Qn::PtzObjectType objectType;
     QString objectId;
     if(!requireParameter(params, lit("objectType"), result, &objectType) || !requireParameter(params, lit("objectId"), result, &objectId))
@@ -291,7 +291,7 @@ int QnPtzHandler::executeUpdateHomeObject(const QnPtzControllerPtr &controller, 
     return CODE_OK;
 }
 
-int QnPtzHandler::executeGetHomeObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeGetHomeObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     QnPtzObject homeObject;
     if(!controller->getHomeObject(&homeObject))
         return CODE_INTERNAL_ERROR;
@@ -300,7 +300,7 @@ int QnPtzHandler::executeGetHomeObject(const QnPtzControllerPtr &controller, con
     return CODE_OK;
 }
 
-int QnPtzHandler::executeGetData(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeGetData(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     Qn::PtzDataFields query;
     if(!requireParameter(params, lit("query"), result, &query))
         return CODE_INVALID_PARAMETER;
@@ -313,7 +313,7 @@ int QnPtzHandler::executeGetData(const QnPtzControllerPtr &controller, const QnR
     return CODE_OK;
 }
 
-QString QnPtzHandler::description() const
+QString QnPtzRestHandler::description() const
 {
     return "\
         There are several ptz commands: <BR>\

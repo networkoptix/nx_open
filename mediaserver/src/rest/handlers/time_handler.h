@@ -3,9 +3,9 @@
 
 #include <rest/server/json_rest_handler.h>
 
-class QnTimeHandler: public QnJsonRestHandler {
+class QnTimeRestHandler: public QnJsonRestHandler {
 public:
-    QnTimeHandler();
+    QnTimeRestHandler();
 
 protected:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;

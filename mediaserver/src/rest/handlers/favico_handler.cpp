@@ -10,12 +10,12 @@
 
 static const int READ_BLOCK_SIZE = 1024*512;
 
-QnRestFavicoHandler::QnRestFavicoHandler()
+QnFavIconRestHandler::QnFavIconRestHandler()
 {
 
 }
 
-int QnRestFavicoHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnFavIconRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(params)
     Q_UNUSED(path)
@@ -33,13 +33,13 @@ int QnRestFavicoHandler::executeGet(const QString& path, const QnRequestParamLis
     }
 }
 
-int QnRestFavicoHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnFavIconRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 
-QString QnRestFavicoHandler::description() const
+QString QnFavIconRestHandler::description() const
 {
     return "Returns favico";
 }

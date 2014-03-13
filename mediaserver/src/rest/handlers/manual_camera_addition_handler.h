@@ -10,10 +10,10 @@
 
 #include <rest/server/json_rest_handler.h>
 
-class QnManualCameraAdditionHandler: public QnJsonRestHandler {
+class QnManualCameraAdditionRestHandler: public QnJsonRestHandler {
 public:
-    QnManualCameraAdditionHandler();
-    ~QnManualCameraAdditionHandler();
+    QnManualCameraAdditionRestHandler();
+    ~QnManualCameraAdditionRestHandler();
 
 protected:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;

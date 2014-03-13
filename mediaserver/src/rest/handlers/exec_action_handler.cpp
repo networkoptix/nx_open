@@ -5,7 +5,7 @@
 #include <api/serializer/pb_serializer.h>
 #include "core/resource_management/resource_pool.h"
 
-int QnExecActionHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
+int QnBusinessActionRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
 {
     Q_UNUSED(params)
     Q_UNUSED(path)
@@ -18,7 +18,7 @@ int QnExecActionHandler::executeGet(const QString& path, const QnRequestParamLis
     return CODE_NOT_IMPLEMETED;
 }
 
-int QnExecActionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnBusinessActionRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(params)
     Q_UNUSED(path)
@@ -48,7 +48,7 @@ int QnExecActionHandler::executePost(const QString& path, const QnRequestParamLi
     return action ? CODE_OK : CODE_INVALID_PARAMETER;
 }
 
-QString QnExecActionHandler::description() const
+QString QnBusinessActionRestHandler::description() const
 {
     return "Execute business action. Action specified in POST request body in binary protobuf format. \n";
 }

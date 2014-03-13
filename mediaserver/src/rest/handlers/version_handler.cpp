@@ -4,7 +4,7 @@
 #include "utils/common/util.h"
 #include "version.h"
 
-int QnVersionHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnVersionRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
     Q_UNUSED(params)
@@ -14,12 +14,12 @@ int QnVersionHandler::executeGet(const QString& path, const QnRequestParamList& 
     return CODE_OK;
 }
 
-int QnVersionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray&, QByteArray& result, QByteArray& contentType)
+int QnVersionRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray&, QByteArray& result, QByteArray& contentType)
 {
     return executeGet(path, params, result, contentType);
 }
 
-QString QnVersionHandler::description() const
+QString QnVersionRestHandler::description() const
 {
     return "Returns server version";
 }

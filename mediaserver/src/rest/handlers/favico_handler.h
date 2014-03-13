@@ -3,13 +3,10 @@
 
 #include "rest/server/request_handler.h"
 
-// TODO: #Elric misspelled, rename fav icon rest handler
-
-
-class QnRestFavicoHandler: public QnRestRequestHandler
+class QnFavIconRestHandler: public QnRestRequestHandler
 {
 public:
-    QnRestFavicoHandler();
+    QnFavIconRestHandler();
 
 protected:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);

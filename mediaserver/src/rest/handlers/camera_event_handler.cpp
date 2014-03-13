@@ -15,7 +15,7 @@
 #include <utils/network/http/httptypes.h>
 
 
-int QnCameraEventHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &responseMessageBody, QByteArray &contentType)
+int QnActiEventRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &responseMessageBody, QByteArray &contentType)
 {
     Q_UNUSED(responseMessageBody)
     Q_UNUSED(contentType)
@@ -39,7 +39,7 @@ int QnCameraEventHandler::executeGet(const QString &path, const QnRequestParamLi
     return nx_http::StatusCode::ok;
 }
 
-int QnCameraEventHandler::executePost(const QString &, const QnRequestParamList &, const QByteArray &, QByteArray &, QByteArray &)
+int QnActiEventRestHandler::executePost(const QString &, const QnRequestParamList &, const QByteArray &, QByteArray &, QByteArray &)
 {
     return nx_http::StatusCode::notImplemented;
 }

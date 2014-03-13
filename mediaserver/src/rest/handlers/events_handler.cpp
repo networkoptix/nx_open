@@ -15,12 +15,12 @@
 
 #include <media_server/serverutil.h>
 
-QnRestEventsHandler::QnRestEventsHandler()
+QnBusinessEventLogRestHandler::QnBusinessEventLogRestHandler()
 {
 
 }
 
-int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
     Q_UNUSED(params)
@@ -91,13 +91,13 @@ int QnRestEventsHandler::executeGet(const QString& path, const QnRequestParamLis
     return CODE_OK;
 }
 
-int QnRestEventsHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnBusinessEventLogRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 
-QString QnRestEventsHandler::description() const
+QString QnBusinessEventLogRestHandler::description() const
 {
     return 
         "Returns event log"

@@ -17,11 +17,11 @@
 static const QLatin1String resIDParamName("res_id");
 static const QLatin1String diagnosticsTypeParamName("type");
 
-QnCameraDiagnosticsHandler::QnCameraDiagnosticsHandler()
+QnCameraDiagnosticsRestHandler::QnCameraDiagnosticsRestHandler()
 {
 }
 
-int QnCameraDiagnosticsHandler::executeGet(
+int QnCameraDiagnosticsRestHandler::executeGet(
     const QString& /*path*/,
     const QnRequestParams &params,
     QnJsonRestResult& result )
@@ -71,7 +71,7 @@ int QnCameraDiagnosticsHandler::executeGet(
     return nx_http::StatusCode::ok;
 }
 
-QString QnCameraDiagnosticsHandler::description() const
+QString QnCameraDiagnosticsRestHandler::description() const
 {
     QString diagnosticsTypeStrList;
     for( int i = CameraDiagnostics::Step::none+1; i < CameraDiagnostics::Step::end; ++i )
@@ -88,7 +88,7 @@ QString QnCameraDiagnosticsHandler::description() const
     ).arg(resIDParamName).arg(diagnosticsTypeParamName).arg(diagnosticsTypeStrList);
 }
 
-CameraDiagnostics::Result QnCameraDiagnosticsHandler::checkCameraAvailability( const QnSecurityCamResourcePtr& cameraRes )
+CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraAvailability( const QnSecurityCamResourcePtr& cameraRes )
 {
     if( !cameraRes->ping() )
         return CameraDiagnostics::CannotEstablishConnectionResult( cameraRes->httpPort() );
@@ -99,7 +99,7 @@ CameraDiagnostics::Result QnCameraDiagnosticsHandler::checkCameraAvailability( c
     return cameraRes->prevInitializationResult();
 }
 
-CameraDiagnostics::Result QnCameraDiagnosticsHandler::tryAcquireCameraMediaStream(
+CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::tryAcquireCameraMediaStream(
     const QnSecurityCamResourcePtr& cameraRes,
     QnVideoCamera* videoCamera )
 {
@@ -111,7 +111,7 @@ CameraDiagnostics::Result QnCameraDiagnosticsHandler::tryAcquireCameraMediaStrea
     return streamReader->diagnoseMediaStreamConnection();
 }
 
-CameraDiagnostics::Result QnCameraDiagnosticsHandler::checkCameraMediaStreamForErrors( QnResourcePtr res )
+CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraMediaStreamForErrors( QnResourcePtr res )
 {
     return res->getLastMediaIssue();
 }

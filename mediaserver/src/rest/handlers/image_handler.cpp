@@ -22,7 +22,7 @@ extern "C"
 static const int MAX_GOP_LEN = 100;
 static const qint64 LATEST_IMAGE = -1;
 
-QnImageHandler::QnImageHandler()
+QnImageRestHandler::QnImageRestHandler()
 {
 
 }
@@ -55,7 +55,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
     return video;
 }
 
-int QnImageHandler::noVideoError(QByteArray& result, qint64 time)
+int QnImageRestHandler::noVideoError(QByteArray& result, qint64 time)
 {
     result.append("<root>\n");
     result.append("No video for time ");
@@ -67,7 +67,7 @@ int QnImageHandler::noVideoError(QByteArray& result, qint64 time)
     return CODE_INVALID_PARAMETER;
 }
 
-int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
 
@@ -283,13 +283,13 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
 
 }
 
-int QnImageHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnImageRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 
-QString QnImageHandler::description() const
+QString QnImageRestHandler::description() const
 {
     return 
         "Return image from camera <BR>"
