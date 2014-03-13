@@ -308,36 +308,47 @@ void QnProxyConnectionProcessor::doSmartProxy()
             if (isFullMessage(d->clientRequest)) 
             {
                 parseRequest();
-                QUrl dstUrl;
-                QString xServerGUID;
-                updateClientRequest(dstUrl, xServerGUID);
-                bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
-                bool isSameAddr = d->lastConnectedUrl == xServerGUID || d->lastConnectedUrl == dstUrl;
-                if (isSameAddr) 
+                QString path = d->request.requestLine.url.path();
+                bool isProxyPattern = path.startsWith("/proxy") || path.startsWith("proxy");
+                if (!isProxyPattern) 
                 {
+                    // process next request without parsing
                     d->dstSocket->send(d->clientRequest);
-                    if (isWebSocket) 
-                    {
-                        if (!doProxyData(&read_set, d->dstSocket.data(), d->socket.data(), buffer, sizeof(buffer)))
-                            break; // send rest of data
-                        doRawProxy(); // switch to binary mode
-                        return;
-                    }
                 }
-                else {
-                    // new server
-                    d->lastConnectedUrl = connectToRemoteHost(xServerGUID , dstUrl);
-                    if (d->lastConnectedUrl.isEmpty()) {
-                        d->socket->close();
-                        return; // invalid dst address
-                    }
-
-                    d->dstSocket->send(d->clientRequest.data(), d->clientRequest.size());
-
-                    if (isWebSocket) 
+                else 
+                {
+                    // parse next request and change dst if required
+                    QUrl dstUrl;
+                    QString xServerGUID;
+                    updateClientRequest(dstUrl, xServerGUID);
+                    bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
+                    bool isSameAddr = d->lastConnectedUrl == xServerGUID || d->lastConnectedUrl == dstUrl;
+                    if (isSameAddr) 
                     {
-                        doRawProxy(); // switch to binary mode
-                        return;
+                        d->dstSocket->send(d->clientRequest);
+                        if (isWebSocket) 
+                        {
+                            if (!doProxyData(&read_set, d->dstSocket.data(), d->socket.data(), buffer, sizeof(buffer)))
+                                break; // send rest of data
+                            doRawProxy(); // switch to binary mode
+                            return;
+                        }
+                    }
+                    else {
+                        // new server
+                        d->lastConnectedUrl = connectToRemoteHost(xServerGUID , dstUrl);
+                        if (d->lastConnectedUrl.isEmpty()) {
+                            d->socket->close();
+                            return; // invalid dst address
+                        }
+
+                        d->dstSocket->send(d->clientRequest.data(), d->clientRequest.size());
+
+                        if (isWebSocket) 
+                        {
+                            doRawProxy(); // switch to binary mode
+                            return;
+                        }
                     }
                 }
                 d->clientRequest.clear();
