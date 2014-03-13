@@ -21,5 +21,5 @@ public:
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& requestBody, QByteArray& responseMessageBody, QByteArray& contentType) override;
 };
 
-#endif // #ifdef ENABLE_ACTI
-#endif  //CAMERA_EVENT_HANDLER_H
+#endif // ENABLE_ACTI
+#endif // CAMERA_EVENT_HANDLER_H
