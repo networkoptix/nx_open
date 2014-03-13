@@ -128,11 +128,13 @@ void QnWorkbenchUserInactivityWatcher::setMainWindow(QWidget *widget) {
     if (m_mainWindow)
         m_mainWindow->removeEventFilter(this);
 
-    m_mainWindowMinimizedTime = widget->windowState().testFlag(Qt::WindowMinimized)
+    m_mainWindow = widget;
+    if (!widget)
+        return;
+
+    m_mainWindowMinimizedTime = m_mainWindow->isMinimized()
                                 ? QDateTime::currentDateTime()
                                 : QDateTime();
-
-    m_mainWindow = widget;
     m_mainWindow->installEventFilter(this);
 }
 
@@ -143,7 +145,7 @@ bool QnWorkbenchUserInactivityWatcher::eventFilter(QObject *object, QEvent *even
     if (event->type() != QEvent::WindowStateChange)
         return false;
 
-    m_mainWindowMinimizedTime = m_mainWindow->windowState().testFlag(Qt::WindowMinimized)
+    m_mainWindowMinimizedTime = m_mainWindow->isMinimized()
                                 ? QDateTime::currentDateTime()
                                 : QDateTime();
 

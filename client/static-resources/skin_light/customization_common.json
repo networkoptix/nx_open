@@ -178,7 +178,7 @@
         "frameColors": {
             "normal": "#808080c0",
             "active": "#c0c0c0c0",
-            "selected": "opaqueSelection"
+            "selected": "selection"
         }
     },
 
@@ -269,8 +269,8 @@
     },
     
     "QnGraphicsMessageBox": {
-        "frameColor": "opaqueSelection.darker()",
-        "windowColor": "opaqueSelection",
+        "frameColor": "opaqueSelection",
+        "windowColor": "selection.darker(100)",
         "textColor": "#a0a0a0ff"
     },
 

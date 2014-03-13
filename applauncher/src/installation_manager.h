@@ -39,6 +39,8 @@ public:
         QString rootPath() const;
         QString executablePath() const;
         QString libraryPath() const;
+
+        bool verifyInstallation() const;
     };
 
     InstallationManager( QObject* const parent = NULL );
