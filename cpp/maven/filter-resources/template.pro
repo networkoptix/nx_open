@@ -142,12 +142,13 @@ unix: {
 
 ## LINUX
 unix:!mac {
-  LIBS += ${linux.oslibs}
   !arm {
+    LIBS += ${linux.oslibs}
     QMAKE_CXXFLAGS += -msse2
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedefs
   } else {
     LIBS -= -lssl
+    LIBS += ${linux.arm.oslibs}
   } 
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
