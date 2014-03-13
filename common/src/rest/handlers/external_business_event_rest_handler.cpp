@@ -1,4 +1,4 @@
-#include "ext_bevent_handler.h"
+#include "external_business_event_rest_handler.h"
 
 #include <QtCore/QFileInfo>
 
@@ -10,7 +10,7 @@
 #include "utils/common/synctime.h"
 #include <business/business_event_connector.h>
 
-QnExternalBusinessEventHandler::QnExternalBusinessEventHandler()
+QnExternalBusinessEventRestHandler::QnExternalBusinessEventRestHandler()
 {
     QnBusinessEventConnector* connector = qnBusinessRuleConnector;
     connect(this, SIGNAL(mserverFailure(QnResourcePtr, qint64, QnBusiness::EventReason)),
@@ -18,7 +18,7 @@ QnExternalBusinessEventHandler::QnExternalBusinessEventHandler()
             SLOT(at_mserverFailure(QnResourcePtr, qint64, QnBusiness::EventReason)));
 }
 
-int QnExternalBusinessEventHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
     Q_UNUSED(contentType)
@@ -78,13 +78,13 @@ int QnExternalBusinessEventHandler::executeGet(const QString& path, const QnRequ
     return CODE_OK;
 }
 
-int QnExternalBusinessEventHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnExternalBusinessEventRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 
-QString QnExternalBusinessEventHandler::description() const
+QString QnExternalBusinessEventRestHandler::description() const
 {
     return QLatin1String(
         "Process external business event\n"
