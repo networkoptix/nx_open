@@ -228,7 +228,6 @@ static ec2::AbstractECConnectionPtr currentlyUsedEc2Connection;
 void QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr ec2Connection )
 {
     currentlyUsedEc2Connection = ec2Connection;
-    QnCommonMessageProcessor::instance()->init(ec2Connection);
 }
 
 ec2::AbstractECConnectionPtr QnAppServerConnectionFactory::getConnection2()

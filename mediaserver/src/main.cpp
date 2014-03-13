@@ -1055,6 +1055,7 @@ void QnMain::run()
     }
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
+    QnCommonMessageProcessor::instance()->init(ec2Connection);
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
 

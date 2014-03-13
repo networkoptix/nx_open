@@ -1511,7 +1511,10 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
         menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectionInfoRole, loginDialog()->currentInfo()));
 }
 
-void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
+void QnWorkbenchActionHandler::at_reconnectAction_triggered() 
+{
+    QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
+
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     const QnConnectionData connectionData = qnSettings->lastUsedConnection();
