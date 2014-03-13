@@ -37,6 +37,7 @@ public:
     QnAbstractArchiveReader(QnResourcePtr dev);
     virtual ~QnAbstractArchiveReader();
 
+    QnAbstractNavigator *navDelegate() const;
     void setNavDelegate(QnAbstractNavigator* navDelegate);
 
     QnAbstractArchiveDelegate* getArchiveDelegate() const;
