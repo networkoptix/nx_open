@@ -298,8 +298,24 @@ bool ApplauncherProcess::startApplication(
         return false;
     }
 
-    if( task->version != m_installationManager->getMostRecentVersion() )
+    if( task->version != m_installationManager->getMostRecentVersion() ) {
         task->appArgs += QString::fromLatin1(" ") + m_settings->value( NON_RECENT_VERSION_ARGS_PARAM_NAME, NON_RECENT_VERSION_ARGS_DEFAULT_VALUE ).toString();
+
+        if (!appData.verifyInstallation()) {
+            NX_LOG( QString::fromLatin1("Verification failed for version %1 (path %2)").arg(appData.version()).arg(appData.rootPath()), cl_logDEBUG1 );
+            response->result = applauncher::api::ResultType::ioError;
+
+            if( task->autoRestore )
+            {
+                applauncher::api::StartInstallationResponse startInstallationResponse;
+                startInstallation(
+                    std::make_shared<applauncher::api::StartInstallationTask>( task->version, true ),
+                    &startInstallationResponse );
+            }
+
+            return false;
+        }
+    }
 
     //TODO/IMPL start process asynchronously ?
 

@@ -93,6 +93,7 @@ private:
     std::map<QString, int64_t> m_unfinishedFilesBytesDownloaded;
     int64_t m_totalBytesToDownload;
     bool m_autoStartNeeded;
+    QMap<QString, qint64> m_fileSizeByEntry;
 
     //!Implementation of RDirSyncher::EventReceiver::overrallDownloadSizeKnown
     virtual void overrallDownloadSizeKnown(
@@ -104,19 +105,21 @@ private:
         const QString& filePath,
         int64_t remoteFileSize,
         int64_t bytesDownloaded ) override;
-    //!Implementation of RDirSyncher::EventReceiver::fileProgress
+    //!Implementation of RDirSyncher::EventReceiver::fileDone
     virtual void fileDone(
         const std::shared_ptr<RDirSyncher>& syncher,
         const QString& filePath ) override;
-    //!Implementation of RDirSyncher::EventReceiver::fileProgress
+    //!Implementation of RDirSyncher::EventReceiver::finished
     virtual void finished(
         const std::shared_ptr<RDirSyncher>& syncher,
         bool result ) override;
-    //!Implementation of RDirSyncher::EventReceiver::fileProgress
+    //!Implementation of RDirSyncher::EventReceiver::failed
     virtual void failed(
         const std::shared_ptr<RDirSyncher>& syncher,
         const QString& failedFilePath,
         const QString& errorText ) override;
+
+    bool writeInstallationSummary();
 
 private slots:
     void onHttpDone( nx_http::AsyncHttpClientPtr );
