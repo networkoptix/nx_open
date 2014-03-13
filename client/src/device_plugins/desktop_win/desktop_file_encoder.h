@@ -8,9 +8,6 @@
 #include <QtCore/QIODevice>
 #include <QtMultimedia/QAudioInput>
 
-#include <windows.h>
-#include <mmsystem.h>
-
 #include <dsp_effects/speex/speex_preprocess.h>
 #include "core/datapacket/media_data_packet.h"
 #include "utils/common/long_runnable.h"
@@ -21,12 +18,9 @@
 
 class CaptureAudioStream;
 
-class QnDesktopFileEncoder: public QnLongRunnable
-{
+class QnDesktopFileEncoder: public QnLongRunnable {
     Q_OBJECT
 
-private:
-    enum {BLOCK_SIZE = 1460};
 public:
     QnDesktopFileEncoder( const QString& fileName,
                         int desktopNum,           // = 0,

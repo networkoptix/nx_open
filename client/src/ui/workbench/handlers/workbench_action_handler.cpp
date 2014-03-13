@@ -85,6 +85,7 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
+#include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 
@@ -963,7 +964,31 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
         return;
     parameters.setResources(filtered);
 
-    menu()->trigger(Qn::OpenInLayoutAction, parameters);
+    QnWorkbenchStreamSynchronizer *synchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+
+    if (synchronizer->isRunning() && !navigator()->isLive() && parameters.widgets().isEmpty()) {
+        // split resources in two groups: local and non-local and specify different initial time for them
+        // TODO: #dklychkov add ability to specify different time for resources and then simplify the code below
+        QnResourceList resources = parameters.resources();
+        QnResourceList localResources;
+        foreach (const QnResourcePtr &resource, resources) {
+            if (resource->flags().testFlag(QnResource::local)) {
+                localResources.append(resource);
+                resources.removeOne(resource);
+            }
+        }
+        if (!localResources.isEmpty()) {
+            parameters.setResources(localResources);
+            menu()->trigger(Qn::OpenInLayoutAction, parameters);
+        }
+        if (!resources.isEmpty()) {
+            parameters.setResources(resources);
+            parameters.setArgument(Qn::ItemTimeRole, navigator()->timeSlider()->sliderPosition());
+            menu()->trigger(Qn::OpenInLayoutAction, parameters);
+        }
+    } else {
+        menu()->trigger(Qn::OpenInLayoutAction, parameters);
+    }
 }
 
 void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
