@@ -350,6 +350,7 @@ bool ApplauncherProcess::startApplication(
     {
         NX_LOG( QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG1 );
         m_settings->setValue( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME, task->version );
+        m_settings->sync();
         response->result = applauncher::api::ResultType::ok;
         return true;
     }
