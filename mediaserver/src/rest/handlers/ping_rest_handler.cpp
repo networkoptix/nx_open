@@ -1,13 +1,8 @@
-#include "ping_handler.h"
+#include "ping_rest_handler.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include <media_server/serverutil.h>
-
-QnPingRestHandler::QnPingRestHandler()
-{
-
-}
 
 int QnPingRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {

@@ -13,9 +13,6 @@
 class QnPtzRestHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
-    QnPtzRestHandler();
-
-protected:
     virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) override;
     virtual QString description() const;
 

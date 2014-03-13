@@ -1,4 +1,4 @@
-#include "ptz_handler.h"
+#include "ptz_rest_handler.h"
 
 #include <utils/common/json.h>
 #include <utils/common/lexical.h>
@@ -12,10 +12,6 @@
 
 static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
-
-QnPtzRestHandler::QnPtzRestHandler() {
-    return;
-}
 
 void QnPtzRestHandler::cleanupOldSequence()
 {

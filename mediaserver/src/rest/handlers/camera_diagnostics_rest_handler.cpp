@@ -3,7 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#include "camera_diagnostics_handler.h"
+#include "camera_diagnostics_rest_handler.h"
 
 #include <api/model/camera_diagnostics_reply.h>
 #include <core/dataprovider/spush_media_stream_provider.h>
@@ -16,10 +16,6 @@
 
 static const QLatin1String resIDParamName("res_id");
 static const QLatin1String diagnosticsTypeParamName("type");
-
-QnCameraDiagnosticsRestHandler::QnCameraDiagnosticsRestHandler()
-{
-}
 
 int QnCameraDiagnosticsRestHandler::executeGet(
     const QString& /*path*/,

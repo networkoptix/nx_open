@@ -49,8 +49,6 @@ class QnCameraSettingsRestHandler
     Q_OBJECT
 
 public:
-    QnCameraSettingsRestHandler();
-
     //!Implementation of QnRestRequestHandler::executeGet
     virtual int executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType);
     //!Implementation of QnRestRequestHandler::executePost
@@ -86,6 +84,7 @@ class QnSetCameraParamRestHandler
 :
     public QnCameraSettingsRestHandler
 {
+    Q_OBJECT
 public:
     //!Implementation of QnRestRequestHandler::description
     virtual QString description() const override;
@@ -99,6 +98,7 @@ class QnGetCameraParamRestHandler
 :
     public QnCameraSettingsRestHandler
 {
+    Q_OBJECT
 public:
     //!Implementation of QnRestRequestHandler::description
     virtual QString description() const override;

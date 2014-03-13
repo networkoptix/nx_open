@@ -17,9 +17,6 @@ class QnVideoCamera;
 class QnCameraDiagnosticsRestHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
-    QnCameraDiagnosticsRestHandler();
-
-protected:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
     virtual QString description() const override;
 

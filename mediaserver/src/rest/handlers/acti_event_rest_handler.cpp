@@ -6,7 +6,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "camera_event_handler.h"
+#include "acti_event_rest_handler.h"
 
 #include <QStringList>
 

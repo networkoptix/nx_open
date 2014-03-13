@@ -1,4 +1,4 @@
-#include "manual_camera_addition_handler.h"
+#include "manual_camera_addition_rest_handler.h"
 
 #include <QtNetwork/QAuthenticator>
 #include <QtConcurrent/QtConcurrentRun>

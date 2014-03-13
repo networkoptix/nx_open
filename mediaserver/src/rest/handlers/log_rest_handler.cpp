@@ -1,4 +1,4 @@
-#include "log_handler.h"
+#include "log_rest_handler.h"
 
 #include <QtCore/QFile>
 
@@ -10,11 +10,6 @@
 #include <media_server/serverutil.h>
 
 static const int READ_BLOCK_SIZE = 1024*512;
-
-QnLogRestHandler::QnLogRestHandler()
-{
-
-}
 
 int QnLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {

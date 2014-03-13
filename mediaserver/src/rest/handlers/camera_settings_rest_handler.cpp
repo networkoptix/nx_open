@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "camera_settings_handler.h"
+#include "camera_settings_rest_handler.h"
 
 #include <algorithm>
 
@@ -25,10 +25,6 @@ namespace HttpStatusCode
         badRequest = 400,
         notFound = 404
     };
-}
-
-QnCameraSettingsRestHandler::QnCameraSettingsRestHandler()
-{
 }
 
 int QnCameraSettingsRestHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType)

@@ -1,4 +1,4 @@
-#include "events_handler.h"
+#include "business_event_log_rest_handler.h"
 
 #include "api/serializer/pb_serializer.h"
 
@@ -14,11 +14,6 @@
 #include "utils/common/util.h"
 
 #include <media_server/serverutil.h>
-
-QnBusinessEventLogRestHandler::QnBusinessEventLogRestHandler()
-{
-
-}
 
 int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {

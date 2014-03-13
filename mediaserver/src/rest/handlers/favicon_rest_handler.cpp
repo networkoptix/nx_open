@@ -1,4 +1,4 @@
-#include "favico_handler.h"
+#include "favicon_rest_handler.h"
 
 #include <QtCore/QFile>
 
@@ -9,11 +9,6 @@
 #include <media_server/serverutil.h>
 
 static const int READ_BLOCK_SIZE = 1024*512;
-
-QnFavIconRestHandler::QnFavIconRestHandler()
-{
-
-}
 
 int QnFavIconRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {

@@ -11,11 +11,11 @@
 #include <rest/server/json_rest_handler.h>
 
 class QnManualCameraAdditionRestHandler: public QnJsonRestHandler {
+    Q_OBJECT
 public:
     QnManualCameraAdditionRestHandler();
     ~QnManualCameraAdditionRestHandler();
 
-protected:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
     virtual QString description() const;
 

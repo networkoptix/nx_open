@@ -1,4 +1,4 @@
-#include "rebuild_archive_handler.h"
+#include "rebuild_archive_rest_handler.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
@@ -7,11 +7,6 @@
 #include <media_server/settings.h>
 #include "recorder/device_file_catalog.h"
 #include "recorder/storage_manager.h"
-
-QnRebuildArchiveRestHandler::QnRebuildArchiveRestHandler()
-{
-
-}
 
 int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {

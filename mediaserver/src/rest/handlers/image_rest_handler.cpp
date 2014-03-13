@@ -1,4 +1,4 @@
-#include "image_handler.h"
+#include "image_rest_handler.h
 
 extern "C"
 {
@@ -21,11 +21,6 @@ extern "C"
 
 static const int MAX_GOP_LEN = 100;
 static const qint64 LATEST_IMAGE = -1;
-
-QnImageRestHandler::QnImageRestHandler()
-{
-
-}
 
 QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serverDelegate, qint64 ceilTime)
 {
