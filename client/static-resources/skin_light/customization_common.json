@@ -221,6 +221,14 @@
         "palette": { "default": { "windowText": "opaqueSelection.darker()" } }
     },
     
+    "QnResourceBrowserToolTipWidget": {
+        "palette": { "default": { "windowText": "#000000" } }
+    },
+    
+    "QnNotificationToolTipWidget": {
+        "palette": { "default": { "windowText": "#000000" } }
+    },
+
     "QnGridItem": {
         "colors": {
             "grid": "darkGrey.setAlpha(64)",
