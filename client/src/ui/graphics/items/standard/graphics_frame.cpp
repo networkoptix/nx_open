@@ -143,10 +143,8 @@ void GraphicsFrame::setFrameRect(const QRectF &r)
     setContentsMargins(cr.left(), cr.top(), rect().right() - cr.right(), rect().bottom() - cr.bottom());
 }
 
-void GraphicsFrame::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
+void GraphicsFrame::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    Q_UNUSED(option)
-
     Q_D(GraphicsFrame);
 
     QStyleOptionFrameV3 opt;
