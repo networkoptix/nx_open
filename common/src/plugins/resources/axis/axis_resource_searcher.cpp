@@ -223,7 +223,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
 template <class T>
 void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
 {
-    QnPlAxisResourcePtr firstResource = result.first().dynamicCast<QnPlAxisResource>();
+    QnPlAxisResourcePtr firstResource = result.first().template dynamicCast<QnPlAxisResource>();
 
     int channels = 1;
     if (firstResource->hasParam(QLatin1String("channelsAmount")))
