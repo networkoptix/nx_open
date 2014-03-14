@@ -9,12 +9,12 @@ Also EC machine no longer needs to be able to connect to each MS. In order for c
     - Continius sound action on "Motion on camera" and "Input signal on camera" (action lasts as long as event lasts)
     - Disk is full (If user assined storage with no space in it for recording he will get red notification about it)
     - "Media server is started" diagnostic event 
-5. Added a checkbox into installer "Allow server to optimize cameras settings". Enabled by default. If it's enabled than MS can changed stream settings for all new cameras. It gives an abbility to useres to prevent server changing cameras settings at all.
+5. Added a checkbox into installer "Allow server to optimize cameras settings". Enabled by default. If it's enabled than MS can changed stream settings for all new cameras. It gives an abbility to prevent server changing cameras settings at all.
    Also it can be changed for the current camera in "Camera settings" dialog.
 6. A simple way to restore archive( in case if data was moved from one place to another or due to partial HDD failure): 
     - Added a new button to "Server settings" dialog. 
     - Archive can be restored without stopping recording.
-7. Improved compatibility mode: added possibility to download of old versions of client.
+7. Improved compatibility mode: added possibility to download old versions of client. If you user client and server versions are different, proper client version will be downloaded automatically(except for the MacOS).
 8. Desktop cameras: Displays local desktop. Video can be recorded. All settings are from Screen recording settings.
 9. Auto detection of new layout aspect ratio.
    - Default layout aspect ration is 16:9
@@ -22,7 +22,7 @@ Also EC machine no longer needs to be able to connect to each MS. In order for c
    - if multiple items are added, than layout AR ia a peek the most common AR among this new items
 10. Added possibility to fix aspect ratio for video resource: Added checkbox on "Camera settings -> Expert".
 11. Generic http plugin.
-12. Export progress dialog is not modal.
+12. Export progress dialog is not modal. (User can do other things while exporting operation is in progress.)
 13. Added a possibility to choose corner where to place the timestamp:
    - For screenshots. User click on button "Screenshot", dialog "Save Screenshot as" appears.
      There is Drop-Down List "Timestamps" at the bottom of dialog window. User can choose one of next value: No timestamp, Top left corner, Top right corner, Bottom left corner, Bottom right corner. 
@@ -39,12 +39,12 @@ Improvements:
 4. Dewarping is improved. Added a new additional tab to adjust center and radius of the dewarping.
 5. A new DB is created, if installation fails due to failed migration DB.
 6. Improved manual camera addition dialog (added sane progress in manual camera addition dialog, found cameras display in the list while searching)
-7. Added a server external guid. It prevents the server cloning issue. 
-8. Changed warning message, if activate licenses with differ customization
+7. Added a server external guid. It prevents the server cloning issue.
+8. Improved warning messages about any license activation issues.
 9. Health monitoring improvements: 
    - Added a server up time to Health monitoring.
    - Displays only 10 characters of the network connection name
-   - Message "No is replaced by "Server offline"
+   - Message "No Signal" is replaced by "Server offline"
 11. Event and Actions -> Camera list. 
     - All cameras that don't support I/O are highlighted in red.
     - Added tooltips with error description
@@ -61,23 +61,23 @@ Improvements:
    - Dialog "License Expiration"is displayed only for Administrator
    - Dialog "License Expiration" is displayed once per day per client place on 15, 10, 5, 3, 2, 1 day before license will be expired.
    - Dialog is displayed only once after license is expired.
-19. Changed default events accumulation time for default rules from "instant" to "30 second".
+19. Changed default events accumulation time for default rules from "instant" to "30 second". It makes notification pannel much more useful.
 20. The last minute of archive displays differently.
 21. Introduced a setting in a software for video timeout:
     - Added checkbox "Auto pause video" on "System settings -> General"
-    - if checkbox is on, video is paused if user does not move mouse
+    - if checkbox is on, video is paused if user does not move mouse. It saves traffic.
 22. Android. Added audio for rtsp transport (only for AAC encoding)
 23. Client only installer. Added parameter "Launch DW Spectrum when set up exist" at the last page.
-24. Screen shot makes always in HQ.
+24. Screen shot makes always in HQ, even if taken while displaying LQ.
 25. Added a new button to open client log containing folder.
-26. Added a new action "Zoom to selection" to the context menu.
+26. Added a new action "Zoom to selection" to the timeline context menu.
     If click on it, the selection has been zoomed. If there are no selection on timeline, "Zoom to selection" is not available.
 27. Ability to view client logs and clear cache.
     
 Bugs:
 1. Tray tool. Incorrect EC port in the list if it has been changed.Fixed.
 2. After upgrade MS, an old version displays in "About". Fixed.
-3. If there are more than 3000 resource, EC cannot be restarted.Fixed.
+3. If there are more than 3000 resource, EC cannot be restarted.Fixed. In general EC is well optimized and works ~10 times faster.
 4. "Say" is renamed to "Speak".
 5. "Change Camera Aspect Ratio" is removed from camera's context menu
 6. MS server log file size limits is increased in 5 times.
@@ -103,14 +103,15 @@ Bugs:
 26. Top panel isn't appeared after back from window mode.
 27. "IP address" in Media Server Settings is disabled for changing.
 28. Multiple select hours in calendar doesn't work. Fixed.
+29. Axis encoder PTZ issues are resolved.
 
 Removed features:
-1.Hardware acceleration has been removed.
-2. Panic recording has been removed.
+1.Hardware acceleration has been removed. 
+2. Panic recording buuton from front pannel has been removed.
 3. Analog licenses has been removed.
 
 New cameras supported
-Arecont cameras: AV2256PM, AV2256PM-H.
+Arecont cameras: MegaBalls2 & MegaDomes2.
 Samsung caemras: SND-5061, SND-7061
 
 ----------------------------------------------2.1.0.xxxx-------------------------------------------
