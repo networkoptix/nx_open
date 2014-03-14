@@ -72,15 +72,15 @@ namespace {
     const QSizeF headerButtonSize = QSizeF(24, 24);
 
     /** Background color for overlay panels. */
-    const QColor overlayBackgroundColor = QColor(0, 0, 0, 96);
+    const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); // TODO: #Elric #customization
 
-    const QColor overlayTextColor = QColor(255, 255, 255, 160);
+    const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #Elric #customization
 
     /** Static text should be rescaled no more often than once in this period */
     const qint64 minTextRescaleDelay = 1000;
 
     //Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
-    std::shared_ptr<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() );
+    std::shared_ptr<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() ); // TODO: #Elric get rid of this
 
     void splitFormat(const QString &format, QString *left, QString *right) {
         int index = format.indexOf(QLatin1Char('\t'));
@@ -113,8 +113,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_enclosingAspectRatio(1.0),
     m_frameOpacity(1.0),
     m_frameWidth(-1.0),
-    m_titleTextFormat(QLatin1String("%1")),
-    m_infoTextFormat(QLatin1String("%1")),
+    m_titleTextFormat(lit("%1")),
+    m_infoTextFormat(lit("%1")),
     m_titleTextFormatHasPlaceholder(true),
     m_infoTextFormatHasPlaceholder(true),
     m_overlayVisible(0),
@@ -136,18 +136,18 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     /* Set up overlay widgets. */
     QFont font = this->font();
-    font.setPixelSize(20);
+    font.setPixelSize(20); 
     setFont(font);
     setPaletteColor(this, QPalette::WindowText, overlayTextColor);
 
     /* Header overlay. */
     m_headerLeftLabel = new GraphicsLabel();
     m_headerLeftLabel->setAcceptedMouseButtons(0);
-    m_headerLeftLabel->setPerformanceHint(QStaticText::AggressiveCaching);
+    m_headerLeftLabel->setPerformanceHint(GraphicsLabel::AggressiveCaching);
 
     m_headerRightLabel = new GraphicsLabel();
     m_headerRightLabel->setAcceptedMouseButtons(0);
-    m_headerRightLabel->setPerformanceHint(QStaticText::AggressiveCaching);
+    m_headerRightLabel->setPerformanceHint(GraphicsLabel::AggressiveCaching);
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
     closeButton->setIcon(qnSkin->icon("item/close.png"));
