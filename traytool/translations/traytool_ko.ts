@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ko" sourcelanguage="en">
+<TS version="2.0" language="ko" sourcelanguage="en">
 <context>
     <name>ConnectionTestingDialog</name>
     <message>
@@ -48,12 +48,12 @@ Application will now quit.</source>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="70"/>
         <source>Request timed out.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="98"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="101"/>
@@ -61,12 +61,12 @@ Application will now quit.</source>
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="106"/>
         <source>You are trying to connect to incompatible Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="111"/>
@@ -74,7 +74,7 @@ If this error persists, please contact your VMS administrator.</source>
  - Client version: %1.
  - EC version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="120"/>
@@ -82,7 +82,7 @@ Compatibility mode for versions lower than %3 is not supported.</source>
  - Client version: %1.
  - EC version: %2.
 You will be asked to restart the client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="133"/>
@@ -112,11 +112,11 @@ You will be asked to restart the client in compatibility mode.</source>
     <name>QnSystrayWindow</name>
     <message>
         <source>Port</source>
-        <translation type="vanished">포트</translation>
+        <translation>포트</translation>
     </message>
     <message>
         <source>VMS settings</source>
-        <translation type="vanished">VMS 설정</translation>
+        <translation>VMS 설정</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="145"/>
@@ -127,50 +127,51 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>The requested access was denied</source>
-        <translation type="vanished">요청된 접근이 거부됨</translation>
+        <translation>요청된 접근이 거부됨</translation>
     </message>
     <message>
         <source>The specified database does not exist.</source>
-        <translation type="vanished">지정한 데이터베이스가 존재하지 않습니다.</translation>
+        <translation>지정한 데이터베이스가 존재하지 않습니다.</translation>
     </message>
     <message>
         <source>A specified parameter is invalid.</source>
-        <translation type="vanished">지정된 변수가 유효하지 않습니다.</translation>
+        <translation>지정된 변수가 유효하지 않습니다.</translation>
     </message>
     <message>
         <source>Insufficient permissions to start/stop services</source>
-        <translation type="vanished">시작/정지 서비스를 위한 권한이 부족</translation>
+        <translation>시작/정지 서비스를 위한 권한이 부족</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="126"/>
         <source>%1 Tray Assistant</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 트레이 도움창</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="232"/>
         <source>Access denied.</source>
-        <translation type="unfinished"></translation>
+        <translation>요청된 접근이 거부됨</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="235"/>
         <source>Specified database does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>지정한 데이터베이스가 존재하지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="238"/>
         <source>Specified parameter is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>지정된 변수가 유효하지 않습니다.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="242"/>
         <source>Could not access installed services</source>
-        <translation type="unfinished"></translation>
+        <translation>설치된 서비스에 접근할 수 없습니다.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="242"/>
         <source>An error has occurred while trying to access installed services:
  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>설치된 서비스에 접근을 시도하는 동안 오류가 발생 함:
+ %1</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="260"/>
@@ -235,21 +236,21 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/systraywindow.cpp" line="641"/>
         <source>Show &amp;Media Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;저장 서버 로그 보기</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="646"/>
         <source>Show &amp;Enterprise Controller Log</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;제어 서버 로그 보기</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="989"/>
         <source>%1 port is already used by another process</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 포트는 다른 프로세서에 의해 사용 중임</translation>
     </message>
     <message>
         <source>Systray</source>
-        <translation type="vanished">트레이</translation>
+        <translation>트레이</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="541"/>
@@ -268,11 +269,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>&amp;Show Media Server Log</source>
-        <translation type="vanished">&amp;저장 서버 로그 보기</translation>
+        <translation>&amp;저장 서버 로그 보기</translation>
     </message>
     <message>
         <source>&amp;Show Enterprise Controller Log</source>
-        <translation type="vanished">&amp;제어 서버 로그 보기</translation>
+        <translation>&amp;제어 서버 로그 보기</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="651"/>
@@ -331,15 +332,15 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>media proxy</source>
-        <translation type="vanished">저장 중계</translation>
+        <translation>저장 중계</translation>
     </message>
     <message>
         <source>media server RTSP</source>
-        <translation type="vanished">저장 서버 RTSP</translation>
+        <translation>저장 서버 RTSP</translation>
     </message>
     <message>
         <source>media server API</source>
-        <translation type="vanished">저장 서버 API</translation>
+        <translation>저장 서버 API</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="979"/>
@@ -348,7 +349,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>%1 port already used by another process</source>
-        <translation type="vanished">%1 포트는 다른 프로세서에 의해 사용 중임</translation>
+        <translation>%1 포트는 다른 프로세서에 의해 사용 중임</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="996"/>
@@ -370,7 +371,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <name>SettingsDialog</name>
     <message>
         <source>HDWitness settings</source>
-        <translation type="vanished">TriumN Spectrum 설정</translation>
+        <translation>TriumN Spectrum 설정</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="36"/>
@@ -384,11 +385,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Login</source>
-        <translation type="vanished">로그인</translation>
+        <translation>로그인</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="vanished">비밀번호</translation>
+        <translation>비밀번호</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="92"/>
@@ -397,7 +398,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Port</source>
-        <translation type="vanished">포트</translation>
+        <translation>포트</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="69"/>
@@ -407,23 +408,23 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="80"/>
         <source>Host:</source>
-        <translation type="unfinished"></translation>
+        <translation>호스트:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="108"/>
         <location filename="../src/settings.ui" line="338"/>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>포트:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="130"/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>로그인:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="140"/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>비밀번호:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="165"/>
@@ -433,11 +434,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="185"/>
         <source>Cameras RTP transport:</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라 RTP 전송</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation type="vanished">호스트</translation>
+        <translation>호스트</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="179"/>
@@ -446,15 +447,15 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>RTSP port</source>
-        <translation type="vanished">RTSP 포트</translation>
+        <translation>RTSP 포트</translation>
     </message>
     <message>
         <source>API port</source>
-        <translation type="vanished">API 포트</translation>
+        <translation>API 포트</translation>
     </message>
     <message>
         <source>Cameras RTP transport</source>
-        <translation type="vanished">카메라 RTP 전송</translation>
+        <translation>카메라 RTP 전송</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="195"/>
@@ -478,7 +479,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Use specified IP or host name</source>
-        <translation type="vanished">지정된 IP 또는 호스트 이름 사용</translation>
+        <translation>지정된 IP 또는 호스트 이름 사용</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="253"/>
@@ -490,7 +491,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/settings.ui" line="263"/>
         <location filename="../src/settings.ui" line="357"/>
         <source>Use specified IP or host name:</source>
-        <translation type="unfinished"></translation>
+        <translation>지정된 IP 또는 호스트 이름 사용</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="290"/>
@@ -504,7 +505,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Media proxy port</source>
-        <translation type="vanished">중계 서버 포트</translation>
+        <translation>중계 서버 포트</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="348"/>

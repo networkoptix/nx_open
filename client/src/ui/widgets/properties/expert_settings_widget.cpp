@@ -147,8 +147,15 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
     if (sameArOverride) {
         ui->arOverrideCheckBox->setChecked(!arOverride.isEmpty());
 
-        qreal ar = arOverride.toDouble();
-        int idx = ui->arComboBox->findData(ar, Qt::UserRole, Qt::MatchExactly);
+        // float is important here
+        float ar = arOverride.toFloat();
+        int idx = -1;
+        for (int i = 0; i < ui->arComboBox->count(); ++i) {
+            if (qFuzzyEquals(ar, ui->arComboBox->itemData(i).toFloat())) {
+                idx = i;
+                break;
+            }
+        }
         ui->arComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
     }
     else
