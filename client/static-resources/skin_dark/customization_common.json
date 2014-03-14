@@ -8,7 +8,7 @@
         "custom_green":             "#8ABF22",
         "darkGrey":                 "#231F20",
         "opaqueSelection":          "custom_blue",
-        "ptz":                      "#opaqueSelection",
+        "ptz":                      "opaqueSelection",
         "selection":                "opaqueSelection.setAlpha(110)",
         "exShadowColor":            "#ff0000"
     },
