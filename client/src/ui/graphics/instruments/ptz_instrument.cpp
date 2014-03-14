@@ -486,7 +486,7 @@ void PtzInstrument::startDrag(DragInfo *) {
         selectionItem()->setOpacity(1.0);
         break;
     case VirtualMovement:
-        m_itemDeltaCompensation = QPointF();
+        m_pendingMouseReturn = false;
         target()->setCursor(Qt::BlankCursor);
         break;
     default:
@@ -528,8 +528,12 @@ void PtzInstrument::dragMove(DragInfo *info) {
         selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
         break;
     case VirtualMovement: {
-        QPointF delta = m_itemDeltaCompensation + info->mouseItemPos() - info->lastMouseItemPos();
-        m_itemDeltaCompensation = QPointF();
+        if(m_pendingMouseReturn && (info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() < 64) {
+            m_pendingMouseReturn = false;
+            break;
+        }
+
+        QPointF delta = info->mouseItemPos() - info->lastMouseItemPos();
 
         qreal scale = target()->size().width() / 2.0;
         QPointF shift(delta.x() / scale, -delta.y() / scale);
@@ -544,14 +548,9 @@ void PtzInstrument::dragMove(DragInfo *info) {
         /* Calling setPos on each move event causes serious lags which I so far
          * was unable to explain. This is worked around by invoking it not that frequently. 
          * Note that we don't account for screen-relative position. */
-        if((info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() > 128) {
+        if(!m_pendingMouseReturn && (info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() > 128) {
+            m_pendingMouseReturn = true;
             QCursor::setPos(info->mousePressScreenPos()); // TODO: #PTZ #Elric this still looks bad, but not as bad as it looked without this hack.
-
-            if(m_viewport) {
-                QGraphicsView *view = this->view(m_viewport.data());
-
-                m_itemDeltaCompensation = info->mouseItemPos() - target()->mapFromScene(view->mapToScene(view->mapFromGlobal(info->mousePressScreenPos())));
-            }
         }
         break;
     }
