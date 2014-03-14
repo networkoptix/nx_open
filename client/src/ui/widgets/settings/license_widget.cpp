@@ -99,7 +99,16 @@ void QnLicenseWidget::setSerialKey(const QString &serialKey) {
 }
 
 QByteArray QnLicenseWidget::activationKey() const {
-    return ui->activationKeyTextEdit->toPlainText().toLatin1();
+    QStringList lines = ui->activationKeyTextEdit->toPlainText().split(QLatin1Char('\n'));
+    QStringList filtered_lines;
+    foreach(QString line, lines) {
+        line = line.trimmed();
+        if (!line.isEmpty()) {
+            filtered_lines.append(line);
+        }
+    }
+
+    return filtered_lines.join(QLatin1Char('\n')).toLatin1();
 }
 
 void QnLicenseWidget::updateControls() {
