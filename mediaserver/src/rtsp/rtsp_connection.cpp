@@ -956,7 +956,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_camera_disabledChanged()), Qt::DirectConnection);
                 connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
-                d->liveDpHi->startIfNotRunning(true);
+                d->liveDpHi->startIfNotRunning();
             }
         }
         if (!d->liveDpLow && d->liveDpHi)
@@ -970,7 +970,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             {
                 d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
                 if (d->liveDpLow)
-                    d->liveDpLow->startIfNotRunning(true);
+                    d->liveDpLow->startIfNotRunning();
             }
         }
     }
