@@ -83,7 +83,7 @@
 
     <build>
         <defaultGoal>install</defaultGoal>
-        <finalName>${finalName}</finalName>
+        <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -146,6 +146,7 @@
                 <executions>
                     <execution>
                         <id>copy-project-resources</id>
+                        <!-- This variable is for Android. Resources for all modules should be copied on the "generate-sources" phase. However Android should copy resources at "validate" -->
                         <phase>${resources.phase}</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -188,25 +189,24 @@
 
     <profiles>
         <profile>
-            <id>build-env</id>
-            <activation>
-                <property>
-                    <name>!skipBuildenv</name>
-                </property>
+            <id>build-env-win</id>
+            <!-- preparing build-environment only if it is not ready. The last operation is installing llutil to x64 python virtualenv so it can be used as a criteria -->
+            <activation>        
+                <file>
+                    <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
+                    <missing>build_environment/target/buildenv.timestamp</missing>
+                </file> 
             </activation>
             <modules>	
-                <module>build_environment</module>       
+                <module>build_environment</module>
             </modules>	
         </profile>     
-
+        
         <profile>
             <id>quicksync</id>
             <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
                 <property>
-                    <name>!quicksync</name>
+                    <name>quicksync</name>
                     <value>true</value>
                 </property>
             </activation>
@@ -226,12 +226,6 @@
                 <module>build_variables</module>
                 <module>appserver</module>
                 <module>common</module>
-                <!--<module>plugins/axiscamplugin</module>-->
-                <module>plugins/genericrtspplugin</module>
-                <module>plugins/image_library_plugin</module>
-                <module>plugins/mjpg_link</module>
-                <module>mediaserver</module>
-                <module>mediaproxy</module>
                 <module>hole_punching_mediator</module>
                 <!-- <module>testcamera</module> -->
             </modules>
@@ -244,6 +238,15 @@
                     <family>!mac</family>
                 </os> 
             </activation>
+            <modules>
+                <!--<module>plugins/axiscamplugin</module>-->
+                <module>plugins/genericrtspplugin</module>
+                <module>plugins/image_library_plugin</module>
+                <module>plugins/mjpg_link</module>
+                <module>mediaserver</module>
+                <module>mediaproxy</module>
+                <!-- <module>testcamera</module> -->
+            </modules>            
             <properties>
                 <additional.compiler>${compiler}</additional.compiler>         
             </properties>
@@ -275,14 +278,16 @@
             <modules>
                 <module>plugins/image_library_plugin</module>                
                 <module>traytool</module>
-                <module>vmaxproxy</module>	
+                <!-- Vmaxproxy	module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
+                <!--<module>vmaxproxy</module>	-->
                 <module>client</module>		                
                 <module>wixsetup/wixsetup-full</module>
                 <module>wixsetup/wixsetup-client-only</module>
             </modules>
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
-                <python.dir>${environment.dir}/python/${arch}</python.dir>	
+                <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
+                <python.dir>${libdir}/${arch}/python/scripts</python.dir>                
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
                 <compiler>msvc2012u3</compiler>
@@ -304,7 +309,8 @@
             </activation>
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
-                <python.dir>${environment.dir}/python/bin</python.dir>		
+                <init.python.dir>${environment.dir}/python/bin</init.python.dir>				
+                <python.dir>${libdir}/${arch}/python/bin</python.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
@@ -340,14 +346,11 @@
                     <family>mac</family>
                 </os> 
             </activation>
-            <properties>
-                <environment.dir>${env.environment}</environment.dir>
-                <python.dir>${env.environment}/python/bin/</python.dir>				
+            <properties>		
                 <platform>macosx</platform>
-                <compiler>gcc</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <arch>x64</arch>
-                <qt.spec>macx-clang</qt.spec>
+                <qt.spec>macx-clang-libc++</qt.spec>
                 <qtlib11>PrintSupport</qtlib11>
             </properties>
             <modules>
@@ -451,17 +454,6 @@
             </modules>
         </profile>
         <profile>
-            <id>beta</id>
-            <activation>
-                <property>
-                    <name>!beta</name>
-                </property>
-            </activation>
-            <properties>
-                <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>    
-            </properties>
-        </profile>	      
-        <profile>
             <id>nobeta</id>
             <activation>
                 <property>
@@ -470,8 +462,8 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>    
-            </properties>       
-        </profile>	        
+                <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>
+            </properties>
+        </profile>	      
     </profiles>	
 </project>

@@ -89,7 +89,7 @@ static QString get_window_title (Window win) {
 
     char *wm_name = reinterpret_cast<char *>(get_property(win, XA_STRING, "WM_NAME"));
     if (wm_name) {
-        title = QString::fromLatin1(wm_name);
+        title = QLatin1String(wm_name);
         XFree(wm_name);
     }
 

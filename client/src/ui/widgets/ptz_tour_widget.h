@@ -19,10 +19,12 @@ public:
     ~QnPtzTourWidget();
 
     const QnPtzTourSpotList &spots() const;
-    void setSpots(const QnPtzTourSpotList &spots);
+    Q_SLOT void setSpots(const QnPtzTourSpotList &spots);
 
     const QnPtzPresetList &presets() const;
-    void setPresets(const QnPtzPresetList &presets);
+    Q_SLOT void setPresets(const QnPtzPresetList &presets);
+
+    QnPtzTourSpot currentTourSpot() const;
 
 signals:
     void tourSpotsChanged(const QnPtzTourSpotList &spots);

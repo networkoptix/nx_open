@@ -6,6 +6,10 @@
 #include <QtCore/QPointer>
 #include <QtCore/QElapsedTimer>
 
+#include <client/client_color_types.h>
+
+#include <utils/common/connective.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
 
@@ -31,32 +35,33 @@ class QnImageButtonBar;
 
 class GraphicsLabel;
 
-class QnResourceWidget: public Shaded<Animated<Instrumented<GraphicsWidget> > >, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
+class QnResourceWidget: public Shaded<Animated<Instrumented<Connective<GraphicsWidget>>>>, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
-    Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor NOTIFY frameColorChanged)
+    Q_PROPERTY(QnResourceWidgetFrameColors frameColors READ frameColors WRITE setFrameColors)
+    Q_PROPERTY(QColor frameDistinctionColor READ frameDistinctionColor WRITE setFrameDistinctionColor NOTIFY frameDistinctionColorChanged)
     Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement)
     Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry)
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio)
     Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
     Q_FLAGS(Options Option)
 
-    typedef Shaded<Animated<Instrumented<GraphicsWidget> > > base_type;
+    typedef Shaded<Animated<Instrumented<Connective<GraphicsWidget>>>> base_type;
 
 public:
     enum Option {
-        DisplayActivity             = 0x0001,    /**< Whether the paused overlay icon should be displayed. */
-        DisplaySelection            = 0x0002,    /**< Whether selected / not selected state should be displayed. */
-        DisplayMotion               = 0x0004,    /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
-        DisplayButtons              = 0x0008,    /**< Whether item buttons are to be displayed. */
-        DisplayMotionSensitivity    = 0x0010,    /**< Whether a grid with motion region sensitivity is to be displayed. */
-        DisplayCrosshair            = 0x0020,    /**< Whether PTZ crosshair is to be displayed. */
-        DisplayInfo                 = 0x0040,    /** Whether info panel is to be displayed. */
+        DisplayActivity             = 0x0001,   /**< Whether the paused overlay icon should be displayed. */
+        DisplaySelection            = 0x0002,   /**< Whether selected / not selected state should be displayed. */
+        DisplayMotion               = 0x0004,   /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
+        DisplayButtons              = 0x0008,   /**< Whether item buttons are to be displayed. */
+        DisplayMotionSensitivity    = 0x0010,   /**< Whether a grid with motion region sensitivity is to be displayed. */
+        DisplayCrosshair            = 0x0020,   /**< Whether PTZ crosshair is to be displayed. */
+        DisplayInfo                 = 0x0040,   /**< Whether info panel is to be displayed. */
+        DisplayDewarped             = 0x0080,   /**< Whether the video is to be dewarped. */
 
-        ControlPtz                  = 0x0100,    /**< Whether PTZ state can be controlled with mouse. */
-        ControlZoomWindow           = 0x0200,    /**< Whether zoom windows can be created by dragging the mouse. */
-        VirtualZoomWindow           = 0x0400,    /**< Whether zoom windows is fisheye shader. */
+        ControlPtz                  = 0x0100,   /**< Whether PTZ state can be controlled with mouse. */
+        ControlZoomWindow           = 0x0200,   /**< Whether zoom windows can be created by dragging the mouse. */
 
         WindowRotationForbidden     = 0x1000
     };
@@ -138,17 +143,11 @@ public:
      */
     void setFrameWidth(qreal frameWidth);
 
-    /**
-     * \returns                         Frame color of this widget.
-     */
-    QColor frameColor() const {
-        return m_frameColor;
-    }
+    QColor frameDistinctionColor() const;
+    void setFrameDistinctionColor(const QColor &frameColor);
 
-    /**
-     * \param frameColor                New frame color for this widget.
-     */
-    void setFrameColor(const QColor &frameColor);
+    const QnResourceWidgetFrameColors &frameColors() const;
+    void setFrameColors(const QnResourceWidgetFrameColors &frameColors);
 
     virtual void setGeometry(const QRectF &geometry) override;
 
@@ -288,7 +287,7 @@ signals:
     void optionsChanged();
     void zoomRectChanged();
     void zoomTargetWidgetChanged();
-    void frameColorChanged();
+    void frameDistinctionColorChanged();
     void rotationStartRequested();
     void rotationStopRequested();
 
@@ -366,9 +365,6 @@ protected:
 
     void ensureAboutToBeDestroyedEmitted();
 
-    QColor activeFrameColor() const;
-    QColor selectedFrameColor() const;
-
 private:
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);
@@ -418,7 +414,9 @@ private:
     qreal m_frameWidth;
 
     /** Base frame color */
-    QColor m_frameColor;
+    QColor m_frameDistinctionColor;
+
+    QnResourceWidgetFrameColors m_frameColors;
 
     QString m_titleTextFormat, m_infoTextFormat;
     bool m_titleTextFormatHasPlaceholder, m_infoTextFormatHasPlaceholder;

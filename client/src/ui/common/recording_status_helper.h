@@ -7,7 +7,7 @@
 
 class QnWorkbenchContext;
 
-// TODO: #Elric rename, *helper suffix usually means "I can't think of a meaningful name, so I'll just call it helper".
+// TODO: #Elric #TR rename, *helper suffix usually means "I can't think of a meaningful name, so I'll just call it helper".
 
 class QnRecordingStatusHelper: public QObject {
     Q_OBJECT

@@ -267,7 +267,7 @@ public:
         ItemImageDewarpingRole,                     /**< Role for item's image dewarping params. Value of type QnItemDewarpingParams. */
         ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
         ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
-        ItemFrameColorRole,                         /**< Role for item's frame color. Value of type QColor. */
+        ItemFrameDistinctionColorRole,              /**< Role for item's frame distinction color. Value of type QColor. */
         ItemFlipRole,                               /**< Role for item's flip state. Value of type bool. */
 
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
@@ -275,7 +275,15 @@ public:
         ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
         ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
         ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
-        ItemCheckedButtonsRole,                     /**< Role for buttons that a checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
+        ItemCheckedButtonsRole,                     /**< Role for buttons that are checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
+        ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
+
+        /* Ptz-based. */
+        PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
+        PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */
+        PtzObjectIdRole,                            /**< Role for PTZ tour/preset id. Value of type QString. */
+        PtzObjectNameRole,                          /**< Role for PTZ tour/preset name. Value of type QString. */
+        PtzTourSpotRole,                            /**< Role for PTZ tour spot. Value of type QnPtzTourSpot. */
 
         /* Context-based. */
         CurrentLayoutResourceRole,
@@ -299,11 +307,7 @@ public:
 
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
-        PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
-        PtzPresetIdRole,                            /**< Role for PTZ preset id. Value of type QString. */
-        PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */
-        PtzTourIdRole,                              /**< Role for PTZ tour id. Value of type QString. */
-        PtzTourSpotRole,                            /**< Role for PTZ tour spot. Value of type QnPtzTourSpot. */
+        
         TranslationRole,                            /**< Role for translations. Value of type QnTranslation. */
 
         ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */

@@ -26,6 +26,12 @@
 #include <utils/common/environment.h>
 #include <utils/common/warnings.h>
 
+//#define QN_SCREENSHOT_DEBUG
+#ifdef QN_SCREENSHOT_DEBUG
+#   define TRACE(...) qDebug() << __VA_ARGS__
+#else
+#   define TRACE(...)
+#endif
 
 namespace {
     void drawTimeStamp(QImage &image, Qn::Corner position, const QString &timestamp) {
@@ -82,6 +88,10 @@ QString QnScreenshotParameters::timeString() const {
     return QTime().addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
 }
 
+
+// -------------------------------------------------------------------------- //
+// QnScreenshotLoader
+// -------------------------------------------------------------------------- //
 QnScreenshotLoader::QnScreenshotLoader(const QnScreenshotParameters& parameters, QObject *parent):
     QnImageProvider(parent),
     m_parameters(parameters),
@@ -89,7 +99,9 @@ QnScreenshotLoader::QnScreenshotLoader(const QnScreenshotParameters& parameters,
 {
 }
 
-QnScreenshotLoader::~QnScreenshotLoader() {}
+QnScreenshotLoader::~QnScreenshotLoader() {
+    return;
+}
 
 void QnScreenshotLoader::setBaseProvider(QnImageProvider *imageProvider) {
     m_baseProvider.reset(imageProvider);
@@ -116,10 +128,14 @@ void QnScreenshotLoader::setParameters(const QnScreenshotParameters &parameters)
 
 void QnScreenshotLoader::doLoadAsync() {
     m_isReady = true;
-    if (image().isNull())
-        return;
+
+    QImage img = image();
 
     emit imageChanged(image());
+
+    if (img.isNull())
+        return;
+
     m_isReady = false;
 }
 
@@ -130,8 +146,10 @@ void QnScreenshotLoader::at_imageLoaded(const QImage &image) {
     m_isReady = false;
 }
 
-//---------------- QnWorkbenchScreenshotHandler --------------------------
 
+// -------------------------------------------------------------------------- //
+// QnWorkbenchScreenshotHandler
+// -------------------------------------------------------------------------- //
 QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent): 
     QObject(parent), 
     QnWorkbenchContextAware(parent) 
@@ -145,16 +163,14 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScre
 
     QList<QImage> images;
 
+    TRACE("SCREENSHOT DEWARPING" << parameters.itemDewarpingParams.enabled << parameters.itemDewarpingParams.xAngle << parameters.itemDewarpingParams.yAngle << parameters.itemDewarpingParams.fov);
+
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
-    bool anyQuality = layout->channelCount() > 1;   //screenshots for the panoramica cameras will be done localy
+    bool anyQuality = layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
     for (int i = 0; i < layout->channelCount(); ++i) {
-        QImage channelImage = display->camDisplay()->getScreenshot(i,
-                                                                   parameters.imageCorrectionParams,
-                                                                   parameters.mediaDewarpingParams,
-                                                                   parameters.itemDewarpingParams,
-                                                                   anyQuality);
+        QImage channelImage = display->camDisplay()->getScreenshot(i, parameters.imageCorrectionParams, parameters.mediaDewarpingParams, parameters.itemDewarpingParams, anyQuality);
         if (channelImage.isNull())
-            return NULL;    // async remote screenshoy provider will be used
+            return NULL;    // async remote screenshot provider will be used
         images.push_back(channelImage);
     }
     QSize channelSize = images[0].size();
@@ -197,13 +213,10 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.isUtc = widget->resource()->toResource()->flags() & QnResource::utc;
     parameters.filename = actionParameters.argument<QString>(Qn::FileNameRole);
     parameters.timestampPosition = qnSettings->timestampCorner();
-    if (widget->item()->zoomTargetItem())
-        parameters.itemDewarpingParams = widget->item()->zoomTargetItem()->dewarpingParams();
-    else
-        parameters.itemDewarpingParams = widget->item()->dewarpingParams();
+    parameters.itemDewarpingParams = widget->item()->dewarpingParams();
     parameters.mediaDewarpingParams = widget->dewarpingParams();
     parameters.imageCorrectionParams = widget->item()->imageEnhancement();
-    parameters.zoomRect = widget->zoomRect();
+    parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
 
     QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, display.data());
     if (!imageProvider)
@@ -243,15 +256,14 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         dialog->setAcceptMode(QFileDialog::AcceptSave);
 
         QComboBox* comboBox = new QComboBox(dialog.data());
-        comboBox->addItem(tr("No timestamp"), Qn::NoCorner);
-        comboBox->addItem(tr("Top left corner"), Qn::TopLeftCorner);
-        comboBox->addItem(tr("Top right corner"), Qn::TopRightCorner);
-        comboBox->addItem(tr("Bottom left corner"), Qn::BottomLeftCorner);
-        comboBox->addItem(tr("Bottom right corner"), Qn::BottomRightCorner);
+        comboBox->addItem(tr("No timestamp"), static_cast<int>(Qn::NoCorner));
+        comboBox->addItem(tr("Top left corner"), static_cast<int>(Qn::TopLeftCorner));
+        comboBox->addItem(tr("Top right corner"), static_cast<int>(Qn::TopRightCorner));
+        comboBox->addItem(tr("Bottom left corner"), static_cast<int>(Qn::BottomLeftCorner));
+        comboBox->addItem(tr("Bottom right corner"), static_cast<int>(Qn::BottomRightCorner));
         comboBox->setCurrentIndex(comboBox->findData(parameters.timestampPosition, Qt::UserRole, Qt::MatchExactly));
 
-        dialog->addWidget(new QLabel(tr("Timestamp:"), dialog.data()));
-        dialog->addWidget(comboBox, false);
+        dialog->addWidget(tr("Timestamp:"), comboBox);
 
         if (!dialog->exec())
             return;
@@ -288,7 +300,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         }
 
         parameters.filename = fileName;
-        parameters.timestampPosition = comboBox->itemData(comboBox->currentIndex()).value<Qn::Corner>();
+        parameters.timestampPosition = static_cast<Qn::Corner>(comboBox->itemData(comboBox->currentIndex()).value<int>());
         loader->setParameters(parameters); //update changed fields
     }
     loader->loadAsync();

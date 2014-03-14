@@ -32,6 +32,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/style/noptix_style.h>
+#include <ui/widgets/storage_space_slider.h>
 #include <ui/workbench/workbench_context.h>
 
 #include "storage_url_dialog.h"
@@ -59,135 +60,17 @@ namespace {
         ColumnCount
     };
 
-    QString formatStorageSize(qint64 size) {
-        return formatFileSize(size, 1, 10);
-    }
-
-    class ArchiveSpaceSlider: public QSlider {
-        Q_DECLARE_TR_FUNCTIONS(ArchiveSpaceSlider)
-        typedef QSlider base_type;
-    public:
-        ArchiveSpaceSlider(QWidget *parent = NULL):
-            base_type(parent),
-            m_color(Qt::white)
-        {
-            setOrientation(Qt::Horizontal);
-            setMouseTracking(true);
-            setProperty(Qn::SliderLength, 0);
-
-            setTextFormat(QLatin1String("%1"));
-
-            connect(this, SIGNAL(sliderPressed()), this, SLOT(update()));
-            connect(this, SIGNAL(sliderReleased()), this, SLOT(update()));
-        }
-
-        const QColor &color() const {
-            return m_color;
-        }
-
-        void setColor(const QColor &color) {
-            m_color = color;
-        }
-
-        QString text() const {
-            if(!m_textFormatHasPlaceholder) {
-                return m_textFormat;
-            } else {
-                if(isSliderDown()) {
-                    return formatStorageSize(sliderPosition() * bytesInMiB);
-                } else {
-                    return tr("%1%").arg(static_cast<int>(relativePosition() * 100));
-                }
-            }
-        }
-
-        QString textFormat() const {
-            return m_textFormat;
-        }
-
-        void setTextFormat(const QString &textFormat) {
-            if(m_textFormat == textFormat)
-                return;
-
-            m_textFormat = textFormat;
-            m_textFormatHasPlaceholder = textFormat.contains(QLatin1String("%1"));
-            update();
-        }
-
-    protected:
-        virtual void mouseMoveEvent(QMouseEvent *event) override {
-            base_type::mouseMoveEvent(event);
-
-            if(!isEmpty()) {
-                int x = handlePos();
-                if(qAbs(x - event->pos().x()) < 6) {
-                    setCursor(Qt::SplitHCursor);
-                } else {
-                    unsetCursor();
-                }
-            }
-        }
-
-        virtual void leaveEvent(QEvent *event) override {
-            unsetCursor();
-
-            base_type::leaveEvent(event);
-        }
-
-        virtual void paintEvent(QPaintEvent *) override {
-            QPainter painter(this);
-            QRect rect = this->rect();
-
-            painter.fillRect(rect, palette().color(backgroundRole()));
-
-            if(!isEmpty()) {
-                int x = handlePos();
-                painter.fillRect(QRect(QPoint(0, 0), QPoint(x, rect.bottom())), m_color);
-
-                painter.setPen(withAlpha(m_color.lighter(), 128));
-                painter.drawLine(QPoint(x, 0), QPoint(x, rect.bottom()));
-            }
-
-            const int textMargin = style()->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, this) + 1;
-            QRect textRect = rect.adjusted(textMargin, 0, -textMargin, 0);
-            painter.setPen(palette().color(QPalette::WindowText));
-            painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, text());
-        }
-
-    private:
-        qreal relativePosition() const {
-            return isEmpty() ? 0.0 : static_cast<double>(sliderPosition() - minimum()) / (maximum() - minimum());
-        }
-
-        int handlePos() const {
-            return rect().width() * relativePosition();
-        }
-
-        bool isEmpty() const {
-            return maximum() == minimum();
-        }
-
-    private:
-        QColor m_color;
-        QString m_textFormat;
-        bool m_textFormatHasPlaceholder;
-    };
-
     class ArchiveSpaceItemDelegate: public QStyledItemDelegate {
         typedef QStyledItemDelegate base_type;
     public:
-        ArchiveSpaceItemDelegate(QObject *parent = NULL): base_type(parent) {
-            m_color = toTransparent(withAlpha(qnGlobals->selectionColor(), 255), 0.25);
-        }
+        ArchiveSpaceItemDelegate(QObject *parent = NULL): base_type(parent) {}
 
         virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const {
-            ArchiveSpaceSlider *result = new ArchiveSpaceSlider(parent);
-            result->setColor(m_color);
-            return result;
+            return new QnStorageSpaceSlider(parent);
         }
 
         virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override {
-            ArchiveSpaceSlider *slider = dynamic_cast<ArchiveSpaceSlider *>(editor);
+            QnStorageSpaceSlider *slider = dynamic_cast<QnStorageSpaceSlider *>(editor);
             if(!slider) {
                 base_type::setEditorData(editor, index);
                 return;
@@ -201,7 +84,7 @@ namespace {
         }
 
         virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
-            ArchiveSpaceSlider *slider = dynamic_cast<ArchiveSpaceSlider *>(editor);
+            QnStorageSpaceSlider *slider = dynamic_cast<QnStorageSpaceSlider *>(editor);
             if(!slider) {
                 base_type::setModelData(editor, model, index);
                 return;
@@ -211,9 +94,6 @@ namespace {
             qint64 videoSpace = slider->value() * bytesInMiB;
             model->setData(index, totalSpace - videoSpace, ReservedSpaceRole);
         }
-
-    private:
-        QColor m_color;
     };
 
 } // anonymous namespace
@@ -247,12 +127,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     signalizer->setEventType(QEvent::ContextMenu);
     ui->storagesTable->installEventFilter(signalizer);
     connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_storagesTable_contextMenuEvent(QObject *, QEvent *)));
-#ifdef Q_OS_MACX
-    ui->rebuildGroupBox->setVisible(false);
-#else
     connect(m_server, SIGNAL(statusChanged(QnResourcePtr)), this, SLOT(at_updateRebuildInfo()));
     connect(m_server, SIGNAL(serverIfFound(QnMediaServerResourcePtr, QString, QString)), this, SLOT(at_updateRebuildInfo()));
-#endif
 
     /* Set up context help. */
     setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
@@ -263,10 +139,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
     connect(ui->pingButton,             SIGNAL(clicked()),              this,   SLOT(at_pingButton_clicked()));
 
-#ifndef Q_OS_MACX
     connect(ui->rebuildStartButton,     SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
     connect(ui->rebuildStopButton,      SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
-#endif
 
     updateFromResources();
 }
@@ -313,7 +187,7 @@ void QnServerSettingsDialog::addTableItem(const QnStorageSpaceData &item) {
 
     QTableWidgetItem *capacityItem = new QTableWidgetItem();
     capacityItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-    capacityItem->setData(Qt::DisplayRole, item.totalSpace == -1 ? tr("Not available") : formatStorageSize(item.totalSpace));
+    capacityItem->setData(Qt::DisplayRole, item.totalSpace == -1 ? tr("Not available") : QnStorageSpaceSlider::formatSize(item.totalSpace));
 
 #ifdef QN_SHOW_ARCHIVE_SPACE_COLUMN
     QTableWidgetItem *archiveSpaceItem = new QTableWidgetItem();
@@ -382,12 +256,10 @@ QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
 void QnServerSettingsDialog::updateFromResources() 
 {
     m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
-#ifndef Q_OS_MACX
     updateRebuildUi(RebuildState::Invalid);
 
     if (m_server->getStatus() == QnResource::Online)
         sendNextArchiveRequest();
-#endif
 
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
@@ -526,7 +398,6 @@ void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent
     }
 }
 
-#ifndef Q_OS_MACX
 void QnServerSettingsDialog::at_rebuildButton_clicked()
 {
     RebuildAction action;
@@ -593,7 +464,7 @@ void QnServerSettingsDialog::updateRebuildUi(RebuildState newState, int progress
 void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int handle)
 {
     Q_UNUSED(handle)
-   RebuildState state = RebuildState::Invalid;
+    RebuildState state = RebuildState::Invalid;
 
     if (status == 0) {
         switch (reply.state()) {
@@ -612,7 +483,6 @@ void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildA
     if (reply.state() == QnRebuildArchiveReply::Started)
         QTimer::singleShot(500, this, SLOT(sendNextArchiveRequest()));
 }
-#endif
 
 void QnServerSettingsDialog::at_pingButton_clicked() {
     menu()->trigger(Qn::PingAction, QnActionParameters(m_server));

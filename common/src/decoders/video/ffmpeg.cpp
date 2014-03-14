@@ -250,7 +250,7 @@ void CLFFmpegVideoDecoder::resetDecoder(QnConstCompressedVideoDataPtr data)
 
     if (m_passedContext && data->context->ctx())
         avcodec_copy_context(m_passedContext, data->context->ctx());
-    if (m_passedContext && m_passedContext->width && m_passedContext->height)
+    if (m_passedContext && m_passedContext->width > 8 && m_passedContext->height > 8 && m_currentWidth == -1)
     {
         m_currentWidth = m_passedContext->width;
         m_currentHeight = m_passedContext->height;

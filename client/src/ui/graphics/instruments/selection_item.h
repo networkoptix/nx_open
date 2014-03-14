@@ -3,9 +3,10 @@
 
 #include <ui/graphics/items/standard/graphics_path_item.h>
 
-class SelectionItem: public GraphicsPathItem {
-    Q_OBJECT;
+// TODO: #Elric move to items/generic?
 
+class SelectionItem: public GraphicsPathItem {
+    Q_OBJECT
     typedef GraphicsPathItem base_type;
 
 public:
@@ -53,7 +54,7 @@ private:
 
 
 class FixedArSelectionItem: public SelectionItem {
-    Q_OBJECT;
+    Q_OBJECT
     typedef SelectionItem base_type;
 
 public:

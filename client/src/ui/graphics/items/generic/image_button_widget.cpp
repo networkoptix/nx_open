@@ -11,6 +11,7 @@
 
 #include <client/client_settings.h>
 
+#include <ui/workaround/gl_native_painting.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -52,7 +53,7 @@ namespace {
     }
 
     QPixmap bestPixmap(const QIcon &icon, QIcon::Mode mode, QIcon::State state) {
-        return qnSkin->pixmap(icon, QSize(1024, 1024), mode, state);
+        return icon.pixmap(QSize(1024, 1024), mode, state);
     }
 
     void glDrawTexturedRect(const QRectF &rect) {
@@ -253,15 +254,15 @@ void QnImageButtonWidget::setIcon(const QIcon &icon) {
     for(int i = 0; i <= FLAGS_MAX; i++)
         m_pixmaps[i] = QPixmap();
 
-    setPixmap(0,                            bestPixmap(icon, QIcon::Normal, QIcon::Off));
-    setPixmap(HOVERED,                      bestPixmap(icon, QIcon::Active, QIcon::Off));
-    setPixmap(DISABLED,                     bestPixmap(icon, QIcon::Disabled, QIcon::Off));
-    setPixmap(PRESSED,                      bestPixmap(icon, QnSkin::Pressed, QIcon::Off));
+    setPixmap(0,                            bestPixmap(icon, QnIcon::Normal, QnIcon::Off));
+    setPixmap(HOVERED,                      bestPixmap(icon, QnIcon::Active, QnIcon::Off));
+    setPixmap(DISABLED,                     bestPixmap(icon, QnIcon::Disabled, QnIcon::Off));
+    setPixmap(PRESSED,                      bestPixmap(icon, QnIcon::Pressed, QnIcon::Off));
 
-    setPixmap(CHECKED,                      bestPixmap(icon, QIcon::Normal, QIcon::On));
-    setPixmap(CHECKED | HOVERED,            bestPixmap(icon, QIcon::Active, QIcon::On));
-    setPixmap(CHECKED | DISABLED,           bestPixmap(icon, QIcon::Disabled, QIcon::On));
-    setPixmap(CHECKED | PRESSED,            bestPixmap(icon, QnSkin::Pressed, QIcon::On));
+    setPixmap(CHECKED,                      bestPixmap(icon, QnIcon::Normal, QnIcon::On));
+    setPixmap(CHECKED | HOVERED,            bestPixmap(icon, QnIcon::Active, QnIcon::On));
+    setPixmap(CHECKED | DISABLED,           bestPixmap(icon, QnIcon::Disabled, QnIcon::On));
+    setPixmap(CHECKED | PRESSED,            bestPixmap(icon, QnIcon::Pressed, QnIcon::On));
 
     m_actionIconOverridden = true;
 }
@@ -377,7 +378,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         return;
     }
 
-    painter->beginNativePainting();
+    QnGlNativePainting::begin(painter);
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -409,7 +410,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
 
     glDisable(GL_BLEND);
     glDisable(GL_TEXTURE_2D);
-    painter->endNativePainting();
+    QnGlNativePainting::end(painter);
 }
 
 void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {

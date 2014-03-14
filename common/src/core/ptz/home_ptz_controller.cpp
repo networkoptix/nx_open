@@ -11,21 +11,20 @@
 #include "ptz_controller_pool.h"
 #include "home_ptz_executor.h"
 
-#define QN_NEW_PRESET_IS_HOME
-
-
 QnHomePtzController::QnHomePtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzObject>(baseController->resource(), lit("ptzHomeObject"), QnPtzObject(), this)),
+    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzObject>(lit("ptzHomeObject"), QnPtzObject(), this)),
     m_executor(new QnHomePtzExecutor(baseController))
 {
     assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
-
-    m_executor->moveToThread(qnPtzPool->executorThread());
-    m_executor->setHomePosition(m_adaptor->value());
-    m_executor->restart();
-
     assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
+
+    m_adaptor->setResource(baseController->resource());
+    m_executor->moveToThread(qnPtzPool->executorThread());
+
+    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnHomePtzController::at_adaptor_valueChanged);
+
+    at_adaptor_valueChanged();
 }
 
 QnHomePtzController::~QnHomePtzController() {
@@ -67,16 +66,6 @@ bool QnHomePtzController::viewportMove(qreal aspectRatio, const QRectF &viewport
     return true;
 }
 
-bool QnHomePtzController::createPreset(const QnPtzPreset &preset) {
-    if(!base_type::createPreset(preset))
-        return false;
-
-#ifdef QN_NEW_PRESET_IS_HOME
-    updateHomeObject(QnPtzObject(Qn::PresetPtzObject, preset.id));
-#endif
-    return true;
-}
-
 bool QnHomePtzController::activatePreset(const QString &presetId, qreal speed) {
     if(!base_type::activatePreset(presetId, speed))
         return false;
@@ -100,23 +89,18 @@ bool QnHomePtzController::updateHomeObject(const QnPtzObject &homeObject) {
     if(homeObject.type == Qn::TourPtzObject && !(capabilities & Qn::ToursPtzCapability))
         return false;
 
-    QMutexLocker locker(&m_mutex);
-
-    if(homeObject == m_adaptor->value())
-        return true; /* Nothing to update. */
     m_adaptor->setValue(homeObject);
-
-    m_executor->setHomePosition(homeObject);
-    m_executor->restart();
-
     return true;
 }
 
 bool QnHomePtzController::getHomeObject(QnPtzObject *homeObject) {
-    QMutexLocker locker(&m_mutex);
-
     *homeObject = m_adaptor->value();
-
     return true;
 }
 
+void QnHomePtzController::at_adaptor_valueChanged() {
+    m_executor->setHomePosition(m_adaptor->value());
+    m_executor->restart();
+
+    emit changed(Qn::HomeObjectPtzField);
+}

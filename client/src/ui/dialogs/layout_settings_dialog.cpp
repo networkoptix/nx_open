@@ -17,8 +17,10 @@
 #include <core/resource/layout_resource.h>
 
 #include <ui/common/geometry.h>
+#include <ui/common/image_processing.h>
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
@@ -27,7 +29,6 @@
 #include <utils/threaded_image_loader.h>
 #include <utils/app_server_image_cache.h>
 #include <utils/local_file_cache.h>
-#include <utils/image_transformations.h>
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
@@ -208,7 +209,7 @@ void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout)
     }
     ui->lockedCheckBox->setChecked(layout->locked());
 
-    if (layout->cellAspectRatio() > 0) {
+    if (layout->hasCellAspectRatio()) {
         qreal cellWidth = 1.0 + layout->cellSpacing().width();
         qreal cellHeight = 1.0 / layout->cellAspectRatio() + layout->cellSpacing().height();
         d->cellAspectRatio = cellWidth / cellHeight;
@@ -314,7 +315,7 @@ void QnLayoutSettingsDialog::updateControls() {
         image = (d->canChangeAspectRatio() && ui->cropToMonitorCheckBox->isChecked())
                 ? d->croppedPreview
                 : d->preview;
-        ui->imageLabel->setPixmap(QPixmap::fromImage(image.scaled(ui->imageLabel->size(), Qt::KeepAspectRatio, Qt::FastTransformation)));
+        ui->imageLabel->setPixmap(QPixmap::fromImage(image.scaled(ui->imageLabel->contentSize(), Qt::KeepAspectRatio, Qt::FastTransformation)));
     }
 
     qreal targetAspectRatio = bestAspectRatioForCells();
@@ -459,7 +460,7 @@ void QnLayoutSettingsDialog::loadPreview() {
     QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
     loader->setInput(d->imageSourcePath);
     loader->setTransformationMode(Qt::FastTransformation);
-    loader->setSize(ui->imageLabel->size());
+    loader->setSize(ui->imageLabel->contentSize());
     loader->setFlags(Qn::TouchSizeFromOutside);
     connect(loader, SIGNAL(finished(QImage)), this, SLOT(setPreview(QImage)));
     loader->start();
@@ -487,18 +488,22 @@ void QnLayoutSettingsDialog::viewFile() {
 void QnLayoutSettingsDialog::selectFile() {
     Q_D(QnLayoutSettingsDialog);
 
+    QStringList extensions;
+
     QString nameFilter;
     foreach (const QByteArray &format, QImageReader::supportedImageFormats()) {
         if (!nameFilter.isEmpty())
             nameFilter += QLatin1Char(' ');
         nameFilter += QLatin1String("*.") + QLatin1String(format);
+        extensions.append(QLatin1String(format));
     }
     nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
 
-    QString fileName = QFileDialog::getOpenFileName(this,
+    QString fileName = QnFileDialog::getOpenFileName(this,
                                  tr("Open file"),
                                  qnSettings->backgroundsFolder(),
                                  tr("Pictures %1").arg(nameFilter),
+                                 extensions,
                                  0,
                                  QnCustomFileDialog::fileDialogOptions());
 
@@ -537,7 +542,7 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
     /* Disable cropping for images that are quite well aspected. */
     qreal imageAspectRatio = (qreal)image.width() / (qreal)image.height();
     if (qAbs(imageAspectRatio - screenAspectRatio()) > aspectRatioVariation) {
-        d->croppedPreview = cropImageToAspectRatio(image, screenAspectRatio());
+        d->croppedPreview = cropToAspectRatio(image, screenAspectRatio());
     }
     else {
         d->croppedPreview = QImage();

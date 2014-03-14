@@ -27,16 +27,19 @@ namespace {
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent): 
-    base_type(parent),
-    m_disabledVendorsAdaptor(NULL),
-    m_cameraSettingsOptimizationAdaptor(NULL)
+    base_type(parent)
 {
     assert(qnResPool);
-        
-    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnGlobalSettings::at_resourcePool_resourceAdded);
-    connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
+    
+    m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(lit("disabledVendors"), QString(), this);
+    m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(lit("cameraSettingsOptimization"), true, this);
+    connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
+    connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
+
+    connect(qnResPool,                              &QnResourcePool::resourceAdded,                     this,   &QnGlobalSettings::at_resourcePool_resourceAdded);
+    connect(qnResPool,                              &QnResourcePool::resourceRemoved,                   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
     foreach(const QnResourcePtr &resource, qnResPool->getResources())
-        at_resourcePool_resourceRemoved(resource);
+        at_resourcePool_resourceAdded(resource);
 }
 
 QnGlobalSettings::~QnGlobalSettings() {
@@ -46,9 +49,7 @@ QnGlobalSettings::~QnGlobalSettings() {
 }
 
 QString QnGlobalSettings::disabledVendors() const {
-    QMutexLocker locker(&m_mutex);
-    
-    return m_disabledVendorsAdaptor ? m_disabledVendorsAdaptor->value() : lit("all");
+    return m_disabledVendorsAdaptor->value();
 }
 
 QSet<QString> QnGlobalSettings::disabledVendorsSet() const {
@@ -56,23 +57,15 @@ QSet<QString> QnGlobalSettings::disabledVendorsSet() const {
 }
 
 void QnGlobalSettings::setDisabledVendors(QString disabledVendors) {
-    QMutexLocker locker(&m_mutex);
-
-    if(m_disabledVendorsAdaptor)
-        m_disabledVendorsAdaptor->setValue(disabledVendors);
+    m_disabledVendorsAdaptor->setValue(disabledVendors);
 }
 
 bool QnGlobalSettings::isCameraSettingsOptimizationEnabled() const {
-    QMutexLocker locker(&m_mutex);
-
-    return m_cameraSettingsOptimizationAdaptor ? m_cameraSettingsOptimizationAdaptor->value() : true;
+    return m_cameraSettingsOptimizationAdaptor->value();
 }
 
 void QnGlobalSettings::setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled) {
-    QMutexLocker locker(&m_mutex);
-
-    if(m_cameraSettingsOptimizationAdaptor)
-        m_cameraSettingsOptimizationAdaptor->setValue(cameraSettingsOptimizationEnabled);
+    m_cameraSettingsOptimizationAdaptor->setValue(cameraSettingsOptimizationEnabled);
 }
 
 void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -86,19 +79,9 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     if(!user->isAdmin())
         return;
 
-    {
-        QMutexLocker locker(&m_mutex);
-        m_admin = user;
-        m_disabledVendorsAdaptor.reset(new QnLexicalResourcePropertyAdaptor<QString>(m_admin, lit("disabledVendors"), lit(""), this));
-        m_cameraSettingsOptimizationAdaptor.reset(new QnLexicalResourcePropertyAdaptor<bool>(m_admin, lit("cameraSettingsOptimization"), true, this));
-    }
-
-    connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
-    connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
-
-    /* Just fire the signals blindly, don't check for actual changes. */ 
-    emit disabledVendorsChanged();
-    emit cameraSettingsOptimizationChanged();
+    m_admin = user;
+    m_disabledVendorsAdaptor->setResource(user);;
+    m_cameraSettingsOptimizationAdaptor->setResource(user);;
 }
 
 void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
@@ -106,9 +89,7 @@ void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &reso
         QMutexLocker locker(&m_mutex);
 
         m_admin.reset();
-        m_disabledVendorsAdaptor.reset();
-        m_cameraSettingsOptimizationAdaptor.reset();
-
-        /* Note that we don't emit changed signals here. This is for a reason. */
+        m_disabledVendorsAdaptor->setResource(QnResourcePtr());
+        m_cameraSettingsOptimizationAdaptor->setResource(QnResourcePtr());
     }
 }

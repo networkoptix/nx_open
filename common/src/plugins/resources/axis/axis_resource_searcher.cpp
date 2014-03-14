@@ -24,21 +24,21 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, cons
 
     if (resourceType.isNull())
     {
-        qDebug() << "No resource type for ID = " << resourceTypeId;
+        NX_LOG(lit("No resource type for ID %1").arg(resourceTypeId.toString()), cl_logDEBUG1);
 
         return result;
     }
 
     if (resourceType->getManufacture() != manufacture())
     {
-        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
         return result;
     }
 
     result = QnVirtualCameraResourcePtr( new QnPlAxisResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Axis camera resource. TypeID" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    NX_LOG(lit("Create Axis camera resource. TypeID %1, Parameters %2.").arg(resourceTypeId.toString()).arg(toDebugString(parameters)), cl_logDEBUG1);
+
     result->deserialize(parameters);
 
     return result;
@@ -61,7 +61,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     if (host.isEmpty())
         host = url.toString(); // in case if url just host address without protocol and port
 
-    int timeout = 4000;
+    int timeout = 4000; // TODO: #Elric we should probably increase this one. In some cases 4 secs is not enough.
 
 
     if (port < 0)
@@ -210,25 +210,23 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
     local_results.push_back(resource);
 
 
-    
-
-    int channesl = 1;
+    int channels = 1;
 
     if (resource->hasParam(QLatin1String("channelsAmount")))
     {
         QVariant val;
         resource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
-        channesl = val.toUInt();
+        channels = val.toUInt();
     }
 
-    if (channesl > 1) //
+    if (channels > 1)
     {
         resource->setGroupName(resource->getPhysicalId());
         resource->setGroupId(resource->getPhysicalId());
 
         resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(1));
 
-        for (int i = 2; i <= channesl; ++i)
+        for (int i = 2; i <= channels; ++i)
         {
             QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 

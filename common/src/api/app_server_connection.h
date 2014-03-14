@@ -216,7 +216,7 @@ private:
 class QN_EXPORT QnAppServerConnectionFactory 
 {
 public:
-    QnAppServerConnectionFactory(): m_defaultMediaProxyPort(0), m_allowCameraChanges(true) {}
+    QnAppServerConnectionFactory(): m_defaultMediaProxyPort(0) {}
 
     static QString authKey();
     static QString clientGuid();
@@ -257,7 +257,6 @@ private:
     QnSoftwareVersion m_currentVersion;
     QnResourceFactory *m_resourceFactory;
     QnApiPbSerializer m_serializer;
-    bool m_allowCameraChanges;
 };
 
 bool initResourceTypes(QnAppServerConnectionPtr appServerConnection);

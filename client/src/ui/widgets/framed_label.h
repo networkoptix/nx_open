@@ -14,35 +14,33 @@
  *
  * Width of the frame is controlled through standard property lineWidth().
  * Frame is not painted if lineWidth() is 0.
- *
  */
 class QnFramedLabel: public QLabel {
-    typedef QLabel base_type;
-
     Q_OBJECT
     Q_PROPERTY(qreal opacity READ opacity WRITE setOpacity)
     Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor)
+    typedef QLabel base_type;
 
 public:
-    explicit QnFramedLabel(QWidget* parent = 0);
+    explicit QnFramedLabel(QWidget *parent = NULL);
     virtual ~QnFramedLabel();
 
-    /** \reimp
-     * Label size without frame.
+    /** 
+     * \returns                         Size of label's contents (without frame).
      */
-    QSize size() const;
+    QSize contentSize() const;
 
     qreal opacity() const;
     void setOpacity(qreal value);
 
     QColor frameColor() const;
     void setFrameColor(const QColor color);
+
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
 
 private:
     qreal m_opacity;
-    QColor m_frameColor;
 };
 
 #endif // FRAMED_LABEL_H

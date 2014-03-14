@@ -8,8 +8,14 @@
 
 #include <Windows.h>
 
+/* The following definition is from <dwmapi.h>. 
+ * It's here so that everything would compile even if we don't have that include file. */
+#define WM_DWMCOMPOSITIONCHANGED        0x031E
+
+
 enum QnWindowsNotifierInvocation {
-    UpdateTimeInvocation = 0x8954
+    UpdateTimeInvocation = 0x8954,
+    CompositionChangeInvocation = 0x6591
 };
 
 LPCWSTR qn_windowsNotifierWindowClassName = L"QnWindowsNotifierWidget";
@@ -85,9 +91,11 @@ LRESULT CALLBACK qn_windowsNotifierWidgetProc(HWND hWnd, UINT message, WPARAM wP
     case WM_TIMECHANGE:
         QCoreApplication::postEvent(qn_windowsNotifierWindow(), new QnInvocationEvent(UpdateTimeInvocation));
         return 0;
+    case WM_DWMCOMPOSITIONCHANGED:
+        QCoreApplication::postEvent(qn_windowsNotifierWindow(), new QnInvocationEvent(CompositionChangeInvocation));
+        return 0;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
-        break;
     }
 }
 
@@ -123,19 +131,29 @@ void QnWindowsNotifier::updateTime(bool notify) {
     if(timeZoneOffset != m_timeZoneOffset) {
         m_timeZoneOffset = timeZoneOffset;
         if(notify)
-            emit timeZoneChanged();
+            this->notify(TimeZoneValue);
     }
 
     if(notify)
-        emit timeChanged();
+        this->notify(TimeValue);
 }
 
 bool QnWindowsNotifier::eventFilter(QObject *watched, QEvent *event) {
-    if(event->type() == QnEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == UpdateTimeInvocation) {
-        updateTime(true);
+    if(event->type() == QnEvent::Invocation) {
+        QnInvocationEvent *e = static_cast<QnInvocationEvent *>(event);
+        if(e->id() == UpdateTimeInvocation) {
+            updateTime(true);
+        } else if(e->id() == CompositionChangeInvocation) {
+            notify(CompositionValue);
+        }
         return false;
     } else {
         return base_type::eventFilter(watched, event);
     }
 }
 
+void QnWindowsNotifier::notify(int value) {
+    base_type::notify(value);
+    if(value == CompositionValue)
+        emit compositionChanged();
+}

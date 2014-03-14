@@ -18,6 +18,8 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0) override;
 
 protected:
+    GraphicsScrollBar(GraphicsScrollBarPrivate &dd, Qt::Orientation orientation, QGraphicsItem *parent);
+
     virtual bool event(QEvent *event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *) override;

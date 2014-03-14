@@ -282,7 +282,7 @@ public:
             if(m_isSizeCorrected) {
                 qreal logScale, powFactor;
                 calculateRelativeScale(&logScale, &powFactor);
-                if(!qFuzzyBetween(logScale, m_stickyLogScaleLo, m_stickyLogScaleHi) && !qFuzzyCompare(logScale, logOldScale)) {
+                if(!qFuzzyBetween(m_stickyLogScaleLo, logScale, m_stickyLogScaleHi) && !qFuzzyCompare(logScale, logOldScale)) {
                     qreal logFactor = calculateCorrection(logOldScale, logScale, m_stickyLogScaleLo, m_stickyLogScaleHi);
 
                     scaleViewport(m_view, std::exp(logFactor * powFactor));

@@ -51,7 +51,7 @@ namespace Qn {
 class QnMessage
 {
 public:
-    QnMessage(): messageType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online), allowCameraChanges(-1) {}
+    QnMessage(): messageType(Qn::Message_Type_Initial), seqNumber(0), resourceDisabled(false), resourceStatus(QnResource::Online) {}
 
     enum Command {
         Reboot = 0
@@ -81,18 +81,13 @@ public:
     QnCameraHistoryList cameraServerItems;
 
     QString systemName;
-    QByteArray oldHardwareId;
-    QByteArray hardwareId1;
-    QByteArray hardwareId2;
     QByteArray sessionKey;
-    QByteArray hardwareId3;
+    QList<QByteArray> mainHardwareIds;
+    QList<QByteArray> compatibleHardwareIds;
 
 
     QString filename;
     QString publicIp;
-
-    // -1 if unset
-    int allowCameraChanges;
 
     QnKvPairListsById kvPairs;
 

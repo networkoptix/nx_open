@@ -104,20 +104,20 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
 {
     if( !resource )
     {
-        cl_log.log( QString::fromLatin1("Received BA_CameraOutput with no resource reference. Ignoring..."), cl_logWARNING );
+        cl_log.log( lit("Received BA_CameraOutput with no resource reference. Ignoring..."), cl_logWARNING );
         return false;
     }
     QnSecurityCamResourcePtr securityCam = resource.dynamicCast<QnSecurityCamResource>();
     if( !securityCam )
     {
-        cl_log.log( QString::fromLatin1("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
+        cl_log.log( lit("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
             arg(resource->getId()), cl_logWARNING );
         return false;
     }
     QString relayOutputId = action->getRelayOutputId();
     //if( relayOutputId.isEmpty() )
     //{
-    //    cl_log.log( QString::fromLatin1("Received BA_CameraOutput action without required parameter relayOutputID. Ignoring..."), cl_logWARNING );
+    //    cl_log.log( lit("Received BA_CameraOutput action without required parameter relayOutputID. Ignoring..."), cl_logWARNING );
     //    return false;
     //}
 

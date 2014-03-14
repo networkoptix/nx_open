@@ -9,12 +9,7 @@ class QnGlWidgetFactory {
 public:
     template<class Widget>
     static Widget *create(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) {
-        QGLFormat format;
-        format.setOption(QGL::SampleBuffers); /* Multisampling. */
-        format.setDoubleBuffer(qnSettings->isGlDoubleBuffer());
-        /* Unfortunately, in Qt5 this function is broken :( */
-        // format.setSwapInterval(1);
-        return create<Widget>(format, parent, windowFlags);
+        return create<Widget>(createDefaultFormat(), parent, windowFlags);
     }
 
     template<class Widget>
@@ -28,21 +23,11 @@ public:
             enableVSync(widget);
         }
 
-        /**
-         * Workaround against bug #2828
-         * Uniform matrix should be saved by QT but it does not for OpenGL v4
-         * Setting CompatibilityProfile in constructor is skipped (as almost all values there)
-         * @see qtbase\src\opengl\gl2paintengineex\qpaintengineex_opengl2.cpp:543
-         */ 
-        QGLFormat fmt = widget->format();
-        if (fmt.majorVersion() > 3) {
-            fmt.setProfile(QGLFormat::CompatibilityProfile);
-            widget->setFormat(fmt);
-        }
         return widget;
     }
 
 private:
+    static QGLFormat createDefaultFormat();
     static void enableVSync(QGLWidget *widget);
 };
 

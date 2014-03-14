@@ -19,7 +19,7 @@
 #include <ui/help/help_topics.h>
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent):
-    QDialog(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
+    QDialog(parent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
 #ifdef Q_OS_MAC
     | Qt::Tool
 #endif
@@ -27,7 +27,8 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     QnWorkbenchContextAware(parent),
     ui(new Ui::CameraListDialog),
     m_model(new QnCameraListModel(this)),
-    m_resourceSearch(new QnResourceSearchProxyModel(this))
+    m_resourceSearch(new QnResourceSearchProxyModel(this)),
+    m_pendingWindowTitleUpdate(false)
 {
     ui->setupUi(this);
 
@@ -39,32 +40,34 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     m_model->setResources(qnResPool->getAllEnabledCameras());
     */
 
-    connect(m_model,  &QnCameraListModel::serverChanged, this, &QnCameraListDialog::at_modelChanged);
-    connect(m_resourceSearch,  SIGNAL(criteriaChanged()), this, SLOT(at_modelChanged()) );
-    connect(m_resourceSearch,  SIGNAL(modelReset()), this, SLOT(at_modelChanged()) );
     m_resourceSearch->setSourceModel(m_model);
     m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(lit("*"),Qt::CaseInsensitive, QRegExp::Wildcard)));
 
-    connect(ui->SearchString, SIGNAL(textChanged(const QString &)), this, SLOT(at_searchStringChanged(const QString &)));
-    connect(ui->gridCameras,  SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(at_customContextMenuRequested(const QPoint &)));
-    connect(ui->gridCameras,  SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(at_gridDoubleClicked(const QModelIndex &)));
+    connect(m_resourceSearch,   &QAbstractItemModel::rowsInserted,              this,   &QnCameraListDialog::updateWindowTitleLater);
+    connect(m_resourceSearch,   &QAbstractItemModel::rowsRemoved,               this,   &QnCameraListDialog::updateWindowTitleLater);
+    connect(m_resourceSearch,   &QAbstractItemModel::modelReset,                this,   &QnCameraListDialog::updateWindowTitleLater);
+    connect(this,               &QnCameraListDialog::updateWindowTitleQueued,   this,   &QnCameraListDialog::updateWindowTitle, Qt::QueuedConnection);
 
-    ui->gridCameras->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->gridCameras->setModel(m_resourceSearch);
+    ui->camerasView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->camerasView->setModel(m_resourceSearch);
+    connect(ui->filterEdit,     &QLineEdit::textChanged,                        this,   &QnCameraListDialog::updateCriterion);
+    connect(ui->camerasView,    &QTableView::customContextMenuRequested,        this,   &QnCameraListDialog::at_camerasView_customContextMenuRequested);
+    connect(ui->camerasView,    &QTableView::doubleClicked,                     this,   &QnCameraListDialog::at_camerasView_doubleClicked);
+
 
     m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
-    ui->gridCameras->addAction(m_clipboardAction);
+    ui->camerasView->addAction(m_clipboardAction);
 
     m_exportAction      = new QAction(tr("Export Selection to File..."), this);
     m_selectAllAction   = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(QKeySequence::SelectAll);
 
-    connect(m_clipboardAction,      SIGNAL(triggered()),                this, SLOT(at_copyToClipboard()));
-    connect(m_exportAction,         SIGNAL(triggered()),                this, SLOT(at_exportAction()));
-    connect(m_selectAllAction,      SIGNAL(triggered()),                ui->gridCameras, SLOT(selectAll()));
+    connect(m_clipboardAction,  &QAction::triggered,                            this,   &QnCameraListDialog::at_clipboardAction_triggered);
+    connect(m_exportAction,     &QAction::triggered,                            this,   &QnCameraListDialog::at_exportAction_triggered);
+    connect(m_selectAllAction,  &QAction::triggered,                            ui->camerasView, &QTableView::selectAll);
 
-    ui->gridCameras->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->camerasView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     setHelpTopic(this, Qn::CameraList_Help);
 }
@@ -79,13 +82,30 @@ QnMediaServerResourcePtr QnCameraListDialog::server() const {
     return m_model->server();
 }
 
-void QnCameraListDialog::at_searchStringChanged(const QString& text) {
+void QnCameraListDialog::updateWindowTitleLater() {
+    if(m_pendingWindowTitleUpdate)
+        return;
+
+    m_pendingWindowTitleUpdate = true;
+    updateWindowTitleQueued();
+}
+
+void QnCameraListDialog::updateWindowTitle() {
+    m_pendingWindowTitleUpdate = false;
+    
+    if (!m_model->server())
+        setWindowTitle(tr("Camera List - %n camera(s) found", "", m_resourceSearch->rowCount()));
+    else
+        setWindowTitle(tr("Camera List for '%1' - %n camera(s) found", "", m_resourceSearch->rowCount()).arg(getFullResourceName(m_model->server(), true)));
+}
+
+void QnCameraListDialog::updateCriterion(const QString& text) {
     QString searchString = QString(lit("*%1*")).arg(text);
     m_resourceSearch->clearCriteria();
     m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(searchString, Qt::CaseInsensitive, QRegExp::Wildcard)));
 }
 
-void QnCameraListDialog::at_gridDoubleClicked(const QModelIndex &index) {
+void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) {
     if (!index.isValid())
         return;
 
@@ -94,55 +114,40 @@ void QnCameraListDialog::at_gridDoubleClicked(const QModelIndex &index) {
         context()->menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnActionParameters(resource));
 }
 
-void QnCameraListDialog::at_customContextMenuRequested(const QPoint &pos) {
-    Q_UNUSED(pos);
+void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint &) {
+    QnResourceList resources;
+    foreach(QModelIndex idx, ui->camerasView->selectionModel()->selectedRows())
+        if (QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>())
+            resources.push_back(resource);
 
-    QModelIndexList list = ui->gridCameras->selectionModel()->selectedRows();
-    QnResourceList resList;
-    foreach(QModelIndex idx, list)
-    {
-        QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if (resource)
-            resList << resource;
-    }
-
-    QMenu* menu = NULL;
-    QnActionManager* manager = context()->menu();
-
-    if (!resList.isEmpty()) {
-        menu = manager->newMenu(Qn::TreeScope, this, QnActionParameters(resList));
-        foreach(QAction* action, menu->actions())
+    QScopedPointer<QMenu> menu;
+    if (!resources.isEmpty()) {
+        menu.reset(context()->menu()->newMenu(Qn::TreeScope, this, resources, QnActionManager::DontReuseActions)); /* We'll be changing hotkeys, so we cannot reuse global actions. */
+        foreach(QAction *action, menu->actions())
             action->setShortcut(QKeySequence());
     }
 
-    if (menu)
+    if (menu) {
         menu->addSeparator();
-    else
-        menu = new QMenu(this);
+    } else {
+        menu.reset(new QMenu(this));
+    }
 
-    m_clipboardAction->setEnabled(ui->gridCameras->selectionModel()->hasSelection());
-    m_exportAction->setEnabled(ui->gridCameras->selectionModel()->hasSelection());
+    m_clipboardAction->setEnabled(ui->camerasView->selectionModel()->hasSelection());
+    m_exportAction->setEnabled(ui->camerasView->selectionModel()->hasSelection());
 
     menu->addAction(m_selectAllAction);
     menu->addAction(m_exportAction);
     menu->addAction(m_clipboardAction);
 
     menu->exec(QCursor::pos());
-    menu->deleteLater();
 }
 
-void QnCameraListDialog::at_exportAction() {
-    QnGridWidgetHelper::exportToFile(ui->gridCameras, this, tr("Export selected cameras to file"));
+void QnCameraListDialog::at_exportAction_triggered() {
+    QnGridWidgetHelper::exportToFile(ui->camerasView, this, tr("Export selected cameras to file"));
 }
 
-void QnCameraListDialog::at_copyToClipboard() {
-    QnGridWidgetHelper::copyToClipboard(ui->gridCameras);
-}
-
-void QnCameraListDialog::at_modelChanged() {
-    if (!m_model->server())
-        setWindowTitle(tr("Camera List - %n camera(s) found", "", m_resourceSearch->rowCount()));
-    else
-        setWindowTitle(tr("Camera List for '%1' - %n camera(s) found", "", m_resourceSearch->rowCount()).arg(getFullResourceName(m_model->server(), true)));
+void QnCameraListDialog::at_clipboardAction_triggered() {
+    QnGridWidgetHelper::copyToClipboard(ui->camerasView);
 }
 

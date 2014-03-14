@@ -93,19 +93,20 @@ message InitialMessage {
         required InitialMessage message = 105;
     }
 
-    repeated ResourceType resourceType         = 1;
-    repeated Resource resource                 = 2;
-    repeated License license                   = 3;
-    repeated CameraServerItem cameraServerItem = 4;
-    optional string hardwareId1                = 5;
-    optional string oldHardwareId              = 6;
-    optional string hardwareId2                = 7;
-    optional string publicIp                   = 8;
-    optional string systemName                 = 9;
-    optional string hardwareId3                = 10;
-    optional string sessionKey                 = 11;
-    optional bool allowCameraChanges           = 12;
-    repeated KvPair kvPair                     = 13;
+    repeated ResourceType resourceType          = 1;
+    repeated Resource resource                  = 2;
+    repeated License license                    = 3;
+    repeated CameraServerItem cameraServerItem  = 4;
+    optional string hardwareId1                 = 5;
+    optional string oldHardwareId               = 6;
+    optional string hardwareId2                 = 7;
+    optional string publicIp                    = 8;
+    optional string systemName                  = 9;
+    optional string hardwareId3                 = 10;
+    optional string sessionKey                  = 11;
+    optional bool allowCameraChanges_deprecated = 12;
+    repeated KvPair kvPair                      = 13;
+    repeated string compatibleHardwareId        = 14;
 }
 
 message FileAddMessage {
@@ -137,10 +138,12 @@ message RuntimeInfoChangeMessage {
         required RuntimeInfoChangeMessage message = 109;
     }
 
-    optional string publicIp = 1;
-    optional string systemName = 2;
-    optional string sessionKey = 3;
-    optional bool allowCameraChanges = 4;
+    optional string publicIp                    = 1;
+    optional string systemName                  = 2;
+    optional string sessionKey                  = 3;
+    optional bool allowCameraChanges_deprecated = 4;
+    repeated string mainHardwareId              = 5;
+    repeated string compatibleHardwareId        = 6;
 }
 
 message BusinessRuleResetMessage {

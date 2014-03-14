@@ -8,6 +8,11 @@
 
 #include <QtCore/QCoreApplication>
 
+#include "enum_name_mapper.h"
+
+QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(QnEmail, ConnectionType);
+QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnEmail::ConnectionType);
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnEmail::SmtpServerPreset, (server)(connectionType)(port))
 
 namespace {
     typedef QHash<QString, QnEmail::SmtpServerPreset> QnSmtpPresets;
@@ -164,3 +169,4 @@ void QnEmail::initSmtpPresets() const {
         qWarning() << "Smtp Presets file could not be parsed!";
     smtpInitialized = true;
 }
+

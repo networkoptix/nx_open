@@ -15,7 +15,7 @@ class QnPtzPresetDialog: public QnAbstractPtzDialog {
 
     typedef QnAbstractPtzDialog base_type;
 public:
-    QnPtzPresetDialog(const QnPtzControllerPtr &controller, QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    QnPtzPresetDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnPtzPresetDialog();
 
     QnAbstractPtzHotkeyDelegate* hotkeysDelegate() const;
@@ -25,6 +25,7 @@ protected:
     virtual void loadData(const QnPtzData &data) override;
     virtual void saveData() override;
     virtual Qn::PtzDataFields requiredFields() const override;
+    virtual void updateFields(Qn::PtzDataFields fields) override;
 
 protected:
     int hotkey() const;

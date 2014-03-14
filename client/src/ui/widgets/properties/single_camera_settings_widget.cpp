@@ -76,7 +76,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 
     /* Set up context help. */
     setHelpTopic(this,                                                      Qn::CameraSettings_Help);
-    setHelpTopic(ui->checkBoxDewarping,                                     Qn::CameraSettings_Dewarping_Help);
+    setHelpTopic(ui->fisheyeCheckBox,                                     Qn::CameraSettings_Dewarping_Help);
     setHelpTopic(ui->nameLabel,         ui->nameEdit,                       Qn::CameraSettings_General_Name_Help);
     setHelpTopic(ui->modelLabel,        ui->modelEdit,                      Qn::CameraSettings_General_Model_Help);
     setHelpTopic(ui->firmwareLabel,     ui->firmwareEdit,                   Qn::CameraSettings_General_Firmware_Help);
@@ -94,7 +94,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->nameEdit,               SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->enableAudioCheckBox,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
-    connect(ui->checkBoxDewarping,      SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
+    connect(ui->fisheyeCheckBox,        SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
 
@@ -120,7 +120,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->expertSettingsWidget,   SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
 
     connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_fisheyeSettingsChanged()));
-    connect(ui->checkBoxDewarping,      &QCheckBox::toggled,                    this,   &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
+    connect(ui->fisheyeCheckBox,        &QCheckBox::toggled,                    this,   &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
 
     updateFromResource();
 }
@@ -150,7 +150,7 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
     QStackedLayout* advancedLayout = 0;
     setAnyCameraChanges(false);
 
-    if (m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
+    if (m_camera && m_camera->getParam(lit("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
     {
         if (!m_widgetsRecreator)
         {
@@ -167,7 +167,7 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
 
             advancedTreeWidget = new QTreeWidget();
             advancedTreeWidget->setColumnCount(1);
-            advancedTreeWidget->setHeaderLabel(QString::fromLatin1("Category"));
+            advancedTreeWidget->setHeaderLabel(lit("Category")); // TODO: #TR #Elric
 
             QWidget* advancedWidget = new QWidget();
             advancedLayout = new QStackedLayout(advancedWidget);
@@ -224,7 +224,7 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
     initAdvancedTab();
 
     QVariant id;
-    if (m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
+    if (m_camera && m_camera->getParam(lit("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
     {
         QnMediaServerConnectionPtr serverConnection = getServerConnection();
         if (serverConnection.isNull()) {
@@ -369,7 +369,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
 
         QnMediaDewarpingParams dewarpingParams = m_camera->getDewarpingParams();
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
-        dewarpingParams.enabled = ui->checkBoxDewarping->isChecked();
+        dewarpingParams.enabled = ui->fisheyeCheckBox->isChecked();
         m_camera->setDewarpingParams(dewarpingParams);
 
         setHasDbChanges(false);
@@ -409,7 +409,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->firmwareEdit->clear();
         ui->vendorEdit->clear();
         ui->enableAudioCheckBox->setChecked(false);
-        ui->checkBoxDewarping->setChecked(false);
+        ui->fisheyeCheckBox->setChecked(false);
         ui->macAddressEdit->clear();
         ui->loginEdit->clear();
         ui->passwordEdit->clear();
@@ -433,11 +433,13 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->firmwareEdit->setText(m_camera->getFirmware());
         ui->vendorEdit->setText(m_camera->getVendor());
         ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
-        ui->checkBoxDewarping->setChecked(m_camera->getDewarpingParams().enabled);
+        ui->fisheyeCheckBox->setChecked(m_camera->getDewarpingParams().enabled);
         ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported());
 
-        Qn::PtzCapabilities ptzCaps = m_camera->getPtzCapabilities();
-        ui->checkBoxDewarping->setEnabled(ptzCaps == 0 || (ptzCaps & Qn::VirtualPtzCapability));
+        /* There are fisheye cameras on the market that report themselves as PTZ.
+         * We still want to be able to toggle them as fisheye instead, 
+         * so this checkbox must always be enabled, even for PTZ cameras. */
+        ui->fisheyeCheckBox->setEnabled(true);
 
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
         ui->loginEdit->setText(m_camera->getAuth().user());
@@ -494,7 +496,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         }
     }
 
-    ui->tabWidget->setTabEnabled(Qn::FisheyeCameraSettingsTab, ui->checkBoxDewarping->isChecked());
+    ui->tabWidget->setTabEnabled(Qn::FisheyeCameraSettingsTab, ui->fisheyeCheckBox->isChecked());
 
     updateMotionWidgetFromResource();
     updateMotionAvailability();
@@ -557,7 +559,7 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
     using ::setReadOnly;
     setReadOnly(ui->nameEdit, readOnly);
     setReadOnly(ui->enableAudioCheckBox, readOnly);
-    setReadOnly(ui->checkBoxDewarping, readOnly);
+    setReadOnly(ui->fisheyeCheckBox, readOnly);
     setReadOnly(ui->loginEdit, readOnly);
     setReadOnly(ui->passwordEdit, readOnly);
     setReadOnly(ui->cameraScheduleWidget, readOnly);
@@ -629,7 +631,7 @@ void QnSingleCameraSettingsWidget::updateMotionWidgetNeedControlMaxRect() {
     if(!m_motionWidget)
         return;
     bool hwMotion = m_camera && (m_camera->supportedMotionType() & (Qn::MT_HardwareGrid | Qn::MT_MotionWindow));
-    m_motionWidget->setNeedControlMaxRects(m_cameraSupportsMotion && hwMotion && !ui->softwareMotionButton->isChecked());
+    m_motionWidget->setControlMaxRects(m_cameraSupportsMotion && hwMotion && !ui->softwareMotionButton->isChecked());
 }
 
 void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
@@ -706,12 +708,12 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int status, const Q
 
     if (!m_widgetsRecreator) {
         qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: widgets creator ptr is null, camera id: "
-            << (m_camera == 0? QString::fromLatin1("unknown"): m_camera->getUniqueId());
+            << (m_camera == 0? lit("unknown"): m_camera->getUniqueId());
         return;
     }
     if (status != 0) {
         qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: http status code is not OK: " << status
-            << ". Camera id: " << (m_camera == 0? QString::fromLatin1("unknown"): m_camera->getUniqueId());
+            << ". Camera id: " << (m_camera == 0? lit("unknown"): m_camera->getUniqueId());
         return;
     }
 
@@ -795,7 +797,9 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
 
 void QnSingleCameraSettingsWidget::updateIpAddressText() {
     if(m_camera) {
-        ui->ipAddressEdit->setText(m_camera->getUrl());
+        QString urlString = m_camera->getUrl();
+        QUrl url = QUrl::fromUserInput(urlString);
+        ui->ipAddressEdit->setText(!url.isEmpty() && url.isValid() ? url.host() : urlString);
     } else {
         ui->ipAddressEdit->clear();
     }
@@ -873,7 +877,7 @@ void QnSingleCameraSettingsWidget::at_dbDataChanged() {
     if (m_updating)
         return;
 
-    ui->tabWidget->setTabEnabled(Qn::FisheyeCameraSettingsTab, ui->checkBoxDewarping->isChecked());
+    ui->tabWidget->setTabEnabled(Qn::FisheyeCameraSettingsTab, ui->fisheyeCheckBox->isChecked());
     setHasDbChanges(true);
 }
 
@@ -950,7 +954,7 @@ void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged() {
     if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget)) {
         QnMediaDewarpingParams dewarpingParams = mediaWidget->dewarpingParams();
         ui->fisheyeSettingsWidget->submitToParams(dewarpingParams);
-        dewarpingParams.enabled = ui->checkBoxDewarping->isChecked();
+        dewarpingParams.enabled = ui->fisheyeCheckBox->isChecked();
         mediaWidget->setDewarpingParams(dewarpingParams);
 
         QnWorkbenchItem *item = mediaWidget->item();

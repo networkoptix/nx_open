@@ -9,6 +9,7 @@
 namespace {
     const int noDataValue = -1;
     const int defaultUpdatePeriod = 500;
+    const int retryTimeoutMs = 5000;  // resend request if we are not receiving replies for this time
 
     /**
      * Set size of values to pointsLimit. Fill by noDataValue or cut from the beginning if needed.
@@ -21,16 +22,17 @@ namespace {
     }
 }
 
-QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, int pointsLimit, QObject *parent):
+QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServerResourcePtr &server, int pointsLimit, QObject *parent):
     QObject(parent),
-    m_alreadyUpdating(false),
+    m_updateRequests(0),
+    m_updateRequestHandle(0),
     m_lastId(-1),
     m_timeStamp(0),
     m_listeners(0),
     m_pointsLimit(pointsLimit),
     m_updatePeriod(defaultUpdatePeriod),
     m_uptimeMs(0),
-    m_apiConnection(apiConnection),
+    m_server(server),
     m_timer(new QTimer())
 {
     connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -71,7 +73,7 @@ void QnMediaServerStatisticsStorage::setFlagsFilter(QnStatisticsDeviceType devic
 }
 
 void QnMediaServerStatisticsStorage::update() {
-    if (!m_listeners || m_alreadyUpdating) {
+    if (!m_listeners || m_updateRequests > 0) {
         m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
         m_lastId++;
 
@@ -84,18 +86,22 @@ void QnMediaServerStatisticsStorage::update() {
 
     emit statisticsChanged();
 
-    if (!m_listeners || m_alreadyUpdating)
+    if (!m_listeners)
         return;
 
-    m_apiConnection->getStatisticsAsync(this, SLOT(at_statisticsReceived(int, const QnStatisticsReply &, int)));
-
-    m_alreadyUpdating = true;
+    if (m_updateRequests == 0 ||
+            m_updateRequests * m_updatePeriod > retryTimeoutMs) {
+        m_updateRequestHandle = m_server->apiConnection()->getStatisticsAsync(this, SLOT(at_statisticsReceived(int, const QnStatisticsReply &, int)));
+        m_updateRequests = 0;
+    }
+    m_updateRequests++;
 }
 
 void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnStatisticsReply &reply, int handle) {
-    Q_UNUSED(handle)
+    if (handle != m_updateRequestHandle)
+        return;
 
-    m_alreadyUpdating = false;
+    m_updateRequests = 0;
     if(status != 0)
         return;
 
@@ -138,8 +144,5 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnS
         if (stats.values.count(noDataValue) == stats.values.size())
             m_history.remove(id);
     }
-
-
-//    emit statisticsChanged();
 }
 

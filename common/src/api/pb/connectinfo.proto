@@ -16,5 +16,6 @@ message ConnectInfo {
     optional string hardwareId2                    = 8;
     optional string brand                          = 9;
     optional string hardwareId3                    = 10;
-    optional bool allowCameraChanges               = 11;
+    repeated string compatibleHardwareId           = 11;
+    optional bool allowCameraChanges_deprecated    = 12;
 }

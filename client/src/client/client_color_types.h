@@ -4,7 +4,7 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QColor>
 
-#include <utils/common/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 struct QnTimeSliderColors {
 public:
@@ -35,9 +35,13 @@ public:
     QColor futureLastMinute;
 };
 
-Q_DECLARE_METATYPE(QnTimeSliderColors)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnTimeSliderColors)
+struct QnTimeScrollBarColors {
+    QnTimeScrollBarColors();
 
+    QColor indicator;
+    QColor border;
+    QColor handle;
+};
 
 struct QnBackgroundColors {
     QnBackgroundColors();
@@ -45,10 +49,6 @@ struct QnBackgroundColors {
     QColor normal;
     QColor panic;
 };
-
-Q_DECLARE_METATYPE(QnBackgroundColors)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnBackgroundColors)
-
 
 struct QnCalendarColors {
     QnCalendarColors();
@@ -65,10 +65,6 @@ struct QnCalendarColors {
     QColor secondary(int fillType) const;
 };
 
-Q_DECLARE_METATYPE(QnCalendarColors)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnCalendarColors)
-
-
 struct QnStatisticsColors {
     QnStatisticsColors();
 
@@ -76,16 +72,9 @@ struct QnStatisticsColors {
     QColor frame;
     QColor cpu;
     QColor ram;
-    QColor networkLimit;
     QVector<QColor> hdds;
     QVector<QColor> network;
-
-    QColor hddByKey(const QString &key) const;
-    QColor networkByKey(const QString &key) const;
 };
-
-Q_DECLARE_METATYPE(QnStatisticsColors)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStatisticsColors)
 
 struct QnScheduleGridColors {
 public:
@@ -97,10 +86,6 @@ public:
     QColor disabledLabel;
 };
 
-Q_DECLARE_METATYPE(QnScheduleGridColors)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnScheduleGridColors)
-
-
 struct QnGridColors {
     QnGridColors();
 
@@ -109,8 +94,36 @@ struct QnGridColors {
     QColor disallowed;
 };
 
-Q_DECLARE_METATYPE(QnGridColors)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnGridColors)
+struct QnPtzManageModelColors {
+    QnPtzManageModelColors();
 
+    QColor title;
+    QColor invalid;
+    QColor warning;
+};
+
+struct QnHistogramColors {
+    QnHistogramColors();
+
+    QColor background;
+    QColor border;
+    QColor histogram;
+    QColor selection;
+    QColor grid;
+    QColor text;
+};
+
+struct QnResourceWidgetFrameColors {
+    QnResourceWidgetFrameColors();
+
+    QColor normal;
+    QColor active;
+    QColor selected;
+};
+
+QN_DECLARE_FUNCTIONS_FOR_TYPES(
+    (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors)(QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors)(QnHistogramColors)(QnResourceWidgetFrameColors), 
+    (metatype)(json)
+);
 
 #endif // QN_CLIENT_COLOR_TYPES

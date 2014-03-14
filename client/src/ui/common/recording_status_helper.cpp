@@ -15,6 +15,9 @@ int QnRecordingStatusHelper::currentRecordingMode(QnWorkbenchContext *context, Q
     if(!camera)
         return Qn::RecordingType_Never;
 
+    if (camera->isScheduleDisabled())
+        return Qn::RecordingType_Never;
+
     // TODO: #Elric this should be a resource parameter that is updated from the server.
     QnMediaResourcePtr mediaRes = camera;
     QDateTime dateTime = qnSyncTime->currentDateTime().addMSecs(context->instance<QnWorkbenchServerTimeWatcher>()->localOffset(mediaRes, 0));

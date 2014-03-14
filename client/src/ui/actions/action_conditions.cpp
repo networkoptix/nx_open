@@ -24,6 +24,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/dialogs/ptz_manage_dialog.h>
 
 #include "action_parameter_types.h"
 #include "action_manager.h"
@@ -63,6 +64,66 @@ Qn::ActionVisibility QnActionCondition::check(const QnActionParameters &paramete
         qnWarning("Invalid action condition parameter type '%1'.", parameters.items().typeName());
         return Qn::InvisibleAction;
     }
+}
+
+QnConjunctionActionCondition::QnConjunctionActionCondition(const QList<QnActionCondition *> conditions, QObject *parent) :
+    QnActionCondition(parent),
+    m_conditions(conditions)
+{}
+
+QnConjunctionActionCondition::QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QObject *parent) :
+    QnActionCondition(parent)
+{
+    m_conditions.append(condition1);
+    m_conditions.append(condition2);
+}
+
+QnConjunctionActionCondition::QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QObject *parent) :
+    QnActionCondition(parent)
+{
+    m_conditions.append(condition1);
+    m_conditions.append(condition2);
+    m_conditions.append(condition3);
+}
+
+Qn::ActionVisibility QnConjunctionActionCondition::check(const QnActionParameters &parameters) {
+    Qn::ActionVisibility result = Qn::EnabledAction;
+    foreach (QnActionCondition *condition, m_conditions)
+        result = qMin(result, condition->check(parameters));
+
+    return result;
+}
+
+Qn::ActionVisibility QnConjunctionActionCondition::check(const QnResourceList &resources) {
+    Qn::ActionVisibility result = Qn::EnabledAction;
+    foreach (QnActionCondition *condition, m_conditions)
+        result = qMin(result, condition->check(resources));
+
+    return result;
+}
+
+Qn::ActionVisibility QnConjunctionActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
+    Qn::ActionVisibility result = Qn::EnabledAction;
+    foreach (QnActionCondition *condition, m_conditions)
+        result = qMin(result, condition->check(layoutItems));
+
+    return result;
+}
+
+Qn::ActionVisibility QnConjunctionActionCondition::check(const QnResourceWidgetList &widgets) {
+    Qn::ActionVisibility result = Qn::EnabledAction;
+    foreach (QnActionCondition *condition, m_conditions)
+        result = qMin(result, condition->check(widgets));
+
+    return result;
+}
+
+Qn::ActionVisibility QnConjunctionActionCondition::check(const QnWorkbenchLayoutList &layouts) {
+    Qn::ActionVisibility result = Qn::EnabledAction;
+    foreach (QnActionCondition *condition, m_conditions)
+        result = qMin(result, condition->check(layouts));
+
+    return result;
 }
 
 Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetList &widgets) {
@@ -543,6 +604,9 @@ Qn::ActionVisibility QnPtzActionCondition::check(const QnResourceList &resources
         if(!check(qnPtzPool->controller(resource)))
             return Qn::InvisibleAction;
 
+    if (m_disableIfPtzDialogVisible && QnPtzManageDialog::instance() && QnPtzManageDialog::instance()->isVisible())
+        return Qn::DisabledAction;
+
     return Qn::EnabledAction;
 }
 
@@ -556,9 +620,21 @@ Qn::ActionVisibility QnPtzActionCondition::check(const QnResourceWidgetList &wid
             return Qn::InvisibleAction;
     }
 
+    if (m_disableIfPtzDialogVisible && QnPtzManageDialog::instance() && QnPtzManageDialog::instance()->isVisible())
+        return Qn::DisabledAction;
+
     return Qn::EnabledAction;
 }
 
 bool QnPtzActionCondition::check(const QnPtzControllerPtr &controller) {
     return controller && controller->hasCapabilities(m_capabilities);
+}
+
+Qn::ActionVisibility QnLightModeCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
+
+    if (qnSettings->lightMode() & m_lightModeFlags)
+        return Qn::InvisibleAction;
+
+    return Qn::EnabledAction;
 }

@@ -32,15 +32,17 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     m_hasScheduleChanges(false),
     m_hasScheduleControlsChanges(false),
     m_readOnly(false),
-    m_inUpdateMaxFps(false)
+    m_inUpdateMaxFps(false),
+    m_loginWasEmpty(true),
+    m_passwordWasEmpty(true)
 {
     ui->setupUi(this);
 
     ui->cameraScheduleWidget->setContext(context());
 
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
-    connect(ui->checkBoxEnableAudio,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
-    connect(ui->checkBoxEnableAudio,    SIGNAL(clicked()),                      this,   SLOT(at_enableAudioCheckBox_clicked()));
+    connect(ui->enableAudioCheckBox,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
+    connect(ui->enableAudioCheckBox,    SIGNAL(clicked()),                      this,   SLOT(at_enableAudioCheckBox_clicked()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(at_cameraScheduleWidget_gridParamsChanged()));
@@ -135,17 +137,17 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
 
     foreach(QnVirtualCameraResourcePtr camera, m_cameras) {
         QString cameraLogin = camera->getAuth().user();
-        if (!login.isEmpty())
+        if (!login.isEmpty() || !m_loginWasEmpty)
             cameraLogin = login;
 
         QString cameraPassword = camera->getAuth().password();
-        if (!password.isEmpty())
+        if (!password.isEmpty() || !m_passwordWasEmpty)
             cameraPassword = password;
 
         camera->setAuth(cameraLogin, cameraPassword);
 
-        if (ui->checkBoxEnableAudio->checkState() != Qt::PartiallyChecked && ui->checkBoxEnableAudio->isEnabled()) 
-            camera->setAudioEnabled(ui->checkBoxEnableAudio->isChecked());
+        if (ui->enableAudioCheckBox->checkState() != Qt::PartiallyChecked && ui->enableAudioCheckBox->isEnabled()) 
+            camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
 
         if (m_hasScheduleEnabledChanges)
             camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
@@ -171,7 +173,7 @@ bool QnMultipleCameraSettingsWidget::licensedParametersModified() const
 void QnMultipleCameraSettingsWidget::updateFromResources() {
     if(m_cameras.empty()) {
         ui->loginEdit->setText(QString());
-        ui->checkBoxEnableAudio->setCheckState(Qt::Unchecked);
+        ui->enableAudioCheckBox->setCheckState(Qt::Unchecked);
         ui->loginEdit->setPlaceholderText(QString());
         ui->passwordEdit->setText(QString());
         ui->passwordEdit->setPlaceholderText(QString());
@@ -186,7 +188,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
         QSet<QString> logins, passwords;
         
-        ui->checkBoxEnableAudio->setEnabled(true);
+        ui->enableAudioCheckBox->setEnabled(true);
     
         ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, true);
         ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, true);
@@ -198,7 +200,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             passwords.insert(camera->getAuth().password());
 
             if (!camera->isAudioSupported())
-                ui->checkBoxEnableAudio->setEnabled(false);
+                ui->enableAudioCheckBox->setEnabled(false);
 
             if (camera->isDtsBased()) {
                 ui->tabWidget->setTabEnabled(Qn::RecordingSettingsTab, false);
@@ -207,9 +209,9 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
             Qt::CheckState audioState = camera->isAudioEnabled() ? Qt::Checked : Qt::Unchecked;
             if (firstCamera) {
-                ui->checkBoxEnableAudio->setCheckState(audioState);
-            } else if (audioState != ui->checkBoxEnableAudio->checkState()) {
-                ui->checkBoxEnableAudio->setCheckState(Qt::PartiallyChecked);
+                ui->enableAudioCheckBox->setCheckState(audioState);
+            } else if (audioState != ui->enableAudioCheckBox->checkState()) {
+                ui->enableAudioCheckBox->setCheckState(Qt::PartiallyChecked);
             }
 
             firstCamera = false;
@@ -254,6 +256,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             ui->loginEdit->setText(QString());
             ui->loginEdit->setPlaceholderText(tr("<multiple values>", "LoginEdit"));
         }
+        m_loginWasEmpty = ui->loginEdit->text().isEmpty();
 
         if (passwords.size() == 1) {
             ui->passwordEdit->setText(*passwords.begin());
@@ -262,6 +265,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             ui->passwordEdit->setText(QString());
             ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
         }
+        m_passwordWasEmpty = ui->passwordEdit->text().isEmpty();
 
     }
 
@@ -281,7 +285,7 @@ void QnMultipleCameraSettingsWidget::setReadOnly(bool readOnly) {
 
     using ::setReadOnly;
     setReadOnly(ui->loginEdit, readOnly);
-    setReadOnly(ui->checkBoxEnableAudio, readOnly);
+    setReadOnly(ui->enableAudioCheckBox, readOnly);
     setReadOnly(ui->passwordEdit, readOnly);
     setReadOnly(ui->cameraScheduleWidget, readOnly);
     m_readOnly = readOnly;
@@ -339,11 +343,11 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesAppl
 }
 
 void QnMultipleCameraSettingsWidget::at_enableAudioCheckBox_clicked() {
-    Qt::CheckState state = ui->checkBoxEnableAudio->checkState();
+    Qt::CheckState state = ui->enableAudioCheckBox->checkState();
 
-    ui->checkBoxEnableAudio->setTristate(false);
+    ui->enableAudioCheckBox->setTristate(false);
     if (state == Qt::PartiallyChecked)
-        ui->checkBoxEnableAudio->setCheckState(Qt::Checked);
+        ui->enableAudioCheckBox->setCheckState(Qt::Checked);
 }
 
 void QnMultipleCameraSettingsWidget::updateMaxFPS(){

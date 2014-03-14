@@ -81,7 +81,7 @@ namespace detail
     private:
         const QString m_localTargetDirPath;
         nx_http::AsyncHttpClientPtr m_httpClient;
-        int64_t m_totalSize;
+        int64_t m_totalsize;
         std::list<detail::RDirEntry> m_entries;
         QUrl m_downloadUrl;
 

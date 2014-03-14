@@ -4,6 +4,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QThread>
 #include <QtCore/QLibrary>
+#include <QtCore/QFile>
 
 #include "warnings.h"
 
@@ -108,5 +109,28 @@ qint64 QnPerformance::currentCpuFrequency() {
     return *qn_estimatedCpuFrequency();
 #else
     return -1;
+#endif
+}
+
+QString QnPerformance::cpuName() {
+#ifdef Q_OS_LINUX
+    QFile cpuInfo(QLatin1String("/proc/cpuinfo"));
+    if (!cpuInfo.open(QFile::ReadOnly))
+        return QString();
+
+    QString content = QLatin1String(cpuInfo.readAll());
+    cpuInfo.close();
+
+    /* Information about cores is separated by empty lines */
+//        int coreNum = content.count("\n\n") + 1;
+
+    QRegExp modelNameRegExp(QLatin1String("model name\\s+: (.*)\n"));
+    modelNameRegExp.setMinimal(true);
+    QString modelName;
+    if (modelNameRegExp.indexIn(content) != -1)
+        modelName = modelNameRegExp.cap(1);
+    return modelName;
+#else
+    return QString();
 #endif
 }

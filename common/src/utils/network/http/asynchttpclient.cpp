@@ -95,7 +95,7 @@ namespace nx_http
                         case PollSet::etReadTimedOut:
                         case PollSet::etWriteTimedOut:
                         case PollSet::etError:
-                            NX_LOG( QString::fromLatin1("Failed to connect to %1:%2").arg(m_url.host()).arg(m_url.port()), cl_logDEBUG1 );
+                            NX_LOG( lit("Failed to connect to %1:%2").arg(m_url.host()).arg(m_url.port()), cl_logDEBUG1 );
                             if( reconnectIfAppropriate() )
                                 break;
                             m_state = sFailed;
@@ -117,12 +117,12 @@ namespace nx_http
                         {
                             if( reconnectIfAppropriate() )
                                 break;
-                            NX_LOG( QString::fromLatin1("Error sending http request to %1. %2").
+                            NX_LOG( lit("Error sending http request to %1. %2").
                                 arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
                         }
                         else
                         {
-                            NX_LOG( QString::fromLatin1("Error sending http request from %1. Socket write operation has timed out").
+                            NX_LOG( lit("Error sending http request from %1. Socket write operation has timed out").
                                 arg(m_url.toString()), cl_logDEBUG1 );
                         }
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
@@ -134,7 +134,7 @@ namespace nx_http
 
                     if( !sendRequest() )
                     {
-                        NX_LOG( QString::fromLatin1("Failed to send request to %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
+                        NX_LOG( lit("Failed to send request to %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
                         m_state = sFailed;
                         aio::AIOService::instance()->removeFromWatch( m_socket.get(), PollSet::etWrite );
                         lk.unlock();
@@ -144,7 +144,7 @@ namespace nx_http
                     }
                     if( (int)m_requestBytesSent == m_requestBuffer.size() )
                     {
-                        NX_LOG( QString::fromLatin1("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG2 );
+                        NX_LOG( lit("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG2 );
                         m_state = sReceivingResponse;
                         aio::AIOService::instance()->removeFromWatch( m_socket.get(), PollSet::etWrite );
                         m_socket->setRecvTimeout( DEFAULT_RESPONSE_READ_TIMEOUT );
@@ -161,12 +161,12 @@ namespace nx_http
                         {
                             if( reconnectIfAppropriate() )
                                 break;
-                            NX_LOG( QString::fromLatin1("Error reading http response from %1. %2").
+                            NX_LOG( lit("Error reading http response from %1. %2").
                                 arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
                         }
                         else
                         {
-                            NX_LOG( QString::fromLatin1("Error reading http response from %1. Socket read operation has timed out").
+                            NX_LOG( lit("Error reading http response from %1. Socket read operation has timed out").
                                 arg(m_url.toString()), cl_logDEBUG1 );
                         }
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
@@ -193,7 +193,7 @@ namespace nx_http
                     //read http message headers
                     if( m_httpStreamReader.message().type != nx_http::MessageType::response )
                     {
-                        NX_LOG( QString::fromLatin1("Unexpectedly received request from %1:%2 while expecting response! Ignoring...").
+                        NX_LOG( lit("Unexpectedly received request from %1:%2 while expecting response! Ignoring...").
                             arg(m_url.host()).arg(m_url.port()), cl_logDEBUG1 );
                         m_state = sFailed;
                         lk.unlock();
@@ -203,7 +203,7 @@ namespace nx_http
                     }
 
                     //response read
-                    NX_LOG( QString::fromLatin1("Http response from %1 has been successfully read. Status line: %2(%3)").
+                    NX_LOG( lit("Http response from %1 has been successfully read. Status line: %2(%3)").
                         arg(m_url.toString()).arg(m_httpStreamReader.message().response->statusLine.statusCode).
                         arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG2 );
 
@@ -270,7 +270,7 @@ namespace nx_http
                     {
                         if( reconnectIfAppropriate() )
                             break;
-                        NX_LOG( QString::fromLatin1("Error reading http response message body from %1").arg(m_url.toString()), cl_logDEBUG1 );
+                        NX_LOG( lit("Error reading http response message body from %1").arg(m_url.toString()), cl_logDEBUG1 );
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
                         emit done( sharedThis );
@@ -428,7 +428,7 @@ namespace nx_http
         if( !m_socket->setNonBlockingMode( true ) ||
             !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) )
         {
-            NX_LOG( QString::fromLatin1("Failed to put socket to non blocking mode. %1").
+            NX_LOG( lit("Failed to put socket to non blocking mode. %1").
                 arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
             m_socket.reset();
             return false;
@@ -437,7 +437,7 @@ namespace nx_http
         //starting async connect
         if( !m_socket->connect( url.host(), url.port(DEFAULT_HTTP_PORT), 0 ) )
         {
-            NX_LOG( QString::fromLatin1("Failed to perform async connect to %1:%2. %3").
+            NX_LOG( lit("Failed to perform async connect to %1:%2. %3").
                 arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
             m_socket.reset();
             return false;
@@ -449,7 +449,7 @@ namespace nx_http
         //connect is done if socket is available for write
         if( !aio::AIOService::instance()->watchSocket( m_socket.get(), PollSet::etWrite, this ) )
         {
-            NX_LOG( QString::fromLatin1("Failed to add socket (connecting to %1:%2) to aio service. %3").
+            NX_LOG( lit("Failed to add socket (connecting to %1:%2) to aio service. %3").
                 arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
             m_socket.reset();
             return false;
@@ -465,7 +465,7 @@ namespace nx_http
         {
             if( SystemError::getLastOSErrorCode() == SystemError::wouldBlock )
                 return 0;
-            NX_LOG( QString::fromLatin1("AsyncHttpClient. Error reading socket (%1). Url %2").
+            NX_LOG( lit("AsyncHttpClient. Error reading socket (%1). Url %2").
                 arg(SystemError::getLastOSErrorText()).arg(m_url.toString()), cl_logERROR );
             m_state = sFailed;
             return -1;
@@ -487,7 +487,7 @@ namespace nx_http
 
         if( !m_httpStreamReader.parseBytes( m_responseBuffer, bytesRead ) )
         {
-            NX_LOG( QString::fromLatin1("Error parsing http response from %1. %2").
+            NX_LOG( lit("Error parsing http response from %1. %2").
                 arg(m_url.toString()).arg(m_httpStreamReader.errorText()), cl_logDEBUG1 );
             m_state = sFailed;
             return -1;

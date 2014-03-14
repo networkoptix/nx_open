@@ -47,7 +47,12 @@ protected:
 
 private:
     bool initialize();
-    void updateCacheLocked(const QnPtzData &data);
+    
+    template<class T>
+    Qn::PtzDataFields updateCacheLocked(Qn::PtzDataField field, T QnPtzData::*member, const T &value);
+    template<class T>
+    Qn::PtzDataFields updateCacheLocked(Qn::PtzDataField field, T QnPtzData::*member, const QVariant &value);
+    Qn::PtzDataFields updateCacheLocked(const QnPtzData &data);
 
 private:
     bool m_initialized;

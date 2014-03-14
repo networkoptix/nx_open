@@ -65,5 +65,5 @@ SocketAddress::SocketAddress( const QString& addrStr )
 
 QString SocketAddress::toString() const
 {
-    return QString::fromLatin1("%1:%2").arg(address.toString()).arg(port);
+    return lit("%1:%2").arg(address.toString()).arg(port);
 }

@@ -25,7 +25,7 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     m_mediaDewarpingParams(widget->dewarpingParams()),
     m_itemDewarpingParams(widget->item()->dewarpingParams())
 {
-    m_unitSpeed = QVector3D(60.0, 60.0, -30.0);
+    m_unitSpeed = QVector3D(60.0, 60.0, 30.0);
 
     m_widget = widget;
     m_widget->registerAnimation(this);
@@ -38,8 +38,8 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     connect(m_widget->item(),   &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnFisheyePtzController::updateItemDewarpingParams);
 
     updateAspectRatio();
-    updateLimits();
     updateCapabilities();
+    updateLimits();
 }
 
 QnFisheyePtzController::~QnFisheyePtzController() {
@@ -100,7 +100,8 @@ void QnFisheyePtzController::updateLimits() {
         m_limits.maxTilt = 90.0;
     }
 
-    absoluteMoveInternal(boundedPosition(getPositionInternal()));
+    if (m_capabilities != Qn::NoPtzCapabilities)
+        absoluteMoveInternal(boundedPosition(getPositionInternal()));
 }
 
 void QnFisheyePtzController::updateCapabilities() {
@@ -226,6 +227,7 @@ bool QnFisheyePtzController::getFlip(Qt::Orientations *flip) {
 
 bool QnFisheyePtzController::continuousMove(const QVector3D &speed) {
     m_speed = speed;
+    m_speed.setZ(-m_speed.z()); /* Positive speed means that fov should decrease. */
 
     if(qFuzzyIsNull(speed)) {
         stopListening();
@@ -264,11 +266,10 @@ bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QV
 
         m_progress = 0.0;
 
-        /* This is not 100% correct, a better way would be to calculate combined 
-         * pan-tilt time. */ // TODO: #Elric #PTZ
         QVector3D distance = m_endPosition - m_startPosition;
-        QVector3D times = QVector3D(qAbs(distance.x() / m_unitSpeed.x()), qAbs(distance.y() / m_unitSpeed.y()), qAbs(distance.z() / m_unitSpeed.z()));
-        m_relativeSpeed = 1.0 / qMax(qMax(times.x(), times.y()), times.z());
+        qreal panTiltTime = QVector2D(distance.x() / m_unitSpeed.x(), distance.y() / m_unitSpeed.y()).length();
+        qreal zoomTime = distance.z() / m_unitSpeed.z();
+        m_relativeSpeed = 1.0 / qMax(panTiltTime, zoomTime);
         
         startListening();
     }
@@ -284,3 +285,35 @@ bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D
 
     return true;
 }
+
+QVector3D QnFisheyePtzController::positionFromRect(const QnMediaDewarpingParams &dewarpingParams, const QRectF &rect) {
+    // TODO: #PTZ 
+    // implement support for x/y displacement
+
+    QPointF center = rect.center() - QPointF(0.5, 0.5);
+    qreal fov = rect.width() * M_PI;
+
+    if (dewarpingParams.viewMode == QnMediaDewarpingParams::Horizontal) {
+        qreal x = center.x() * M_PI;
+        qreal y = -center.y() * M_PI;
+        return QVector3D(qRadiansToDegrees(x), qRadiansToDegrees(y), qRadiansToDegrees(fov));
+    } else {
+        qreal x = -(std::atan2(center.y(), center.x()) - M_PI / 2.0);
+        qreal y = 0;
+        
+        if (qAbs(center.x()) > qAbs(center.y())) {
+            if (center.x() > 0)
+                y = (1.0 - rect.right()) *  M_PI;
+            else
+                y = rect.left() * M_PI;
+        } else {
+            if (center.y() > 0)
+                y = (1.0 - rect.bottom()) * M_PI;
+            else
+                y = rect.top() * M_PI;
+        }
+
+        return QVector3D(qRadiansToDegrees(x), qRadiansToDegrees(y), qRadiansToDegrees(fov));
+    }
+}
+

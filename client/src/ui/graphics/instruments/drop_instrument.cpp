@@ -106,8 +106,21 @@ bool DropInstrument::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
     return this->sceneEvent(watched, event);
 }
 
+#include "ui/workaround/mac_utils.h"
+
 bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
-    QnResourceList resources = QnWorkbenchResource::deserializeResources(event->mimeData());
+    const QMimeData *mimeData = event->mimeData();
+
+#ifdef Q_OS_MAC
+    if (mimeData->hasUrls()) {
+        foreach(QUrl url, mimeData->urls()) {
+            mac_saveFileBookmark(url.path());
+            qDebug() << "URL: " << url.path();
+        }
+    }
+#endif
+
+    QnResourceList resources = QnWorkbenchResource::deserializeResources(mimeData);
     QnResourceList media;   // = resources.filtered<QnMediaResource>();
     QnResourceList layouts; // = resources.filtered<QnLayoutResource>();
     QnResourceList servers; // = resources.filtered<QnMediaServerResource>();
