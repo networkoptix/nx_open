@@ -2,6 +2,8 @@
 
 #include <boost/type_traits/is_same.hpp>
 
+#include <atomic>
+
 #include <utils/common/warnings.h>
 #include <utils/common/stdext.h>
 #include <utils/network/ssl_socket.h>
@@ -587,9 +589,11 @@ class CommunicatingSocketPrivate
 public:
     std::unique_ptr<AbstractCommunicatingSocket::AbstractAsyncIOHandler> recvHandler;
     nx::Buffer* recvBuffer;
+    std::atomic<size_t> recvAsyncCallCounter;
     std::unique_ptr<AbstractCommunicatingSocket::AbstractAsyncIOHandler> sendHandler;
     const nx::Buffer* sendBuffer;
     size_t sendBufPos;
+    std::atomic<size_t> sendAsyncCallCounter;
 
     CommunicatingSocketPrivate()
     :
@@ -601,10 +605,34 @@ public:
 
     virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) override
     {
+        const size_t recvAsyncCallCounterBak = recvAsyncCallCounter;
+        auto __finally_read = [this, recvAsyncCallCounterBak, sock](CommunicatingSocketPrivate* /*pThis*/)
+        {
+            if( recvAsyncCallCounterBak == recvAsyncCallCounter )
+            {
+                recvBuffer = nullptr;
+                recvHandler.reset();
+                aio::AIOService::instance()->removeFromWatch( sock, PollSet::etRead );
+            }
+        };
+
+        const size_t sendAsyncCallCounterBak = sendAsyncCallCounter;
+        auto __finally_write = [this, sendAsyncCallCounterBak, sock](CommunicatingSocketPrivate* /*pThis*/)
+        {
+            if( sendAsyncCallCounterBak == sendAsyncCallCounter )
+            {
+                sendBuffer = nullptr;
+                sendHandler.reset();
+                aio::AIOService::instance()->removeFromWatch( sock, PollSet::etWrite );
+            }
+        };
+
         switch( eventType )
         {
             case PollSet::etRead:
             {
+                std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_read)> cleanupGuard( this, __finally_read );
+
                 assert( recvHandler );
 
                 //reading to buffer
@@ -624,15 +652,13 @@ public:
                         recvBuffer->resize( bufSizeBak + bytesRead );   //shrinking buffer
                     recvHandler->done( SystemError::noError, bytesRead );
                 }
-
-                recvBuffer = nullptr;
-                recvHandler.reset();
-                aio::AIOService::instance()->removeFromWatch( sock, PollSet::etRead );
                 break;
             }
 
             case PollSet::etWrite:
             {
+                std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_write)> cleanupGuard( this, __finally_write );
+
                 assert( sendHandler );
                 const int bytesWritten = dynamic_cast<AbstractCommunicatingSocket*>(sock)->send(
                     sendBuffer->constData() + sendBufPos,
@@ -642,9 +668,6 @@ public:
                     sendHandler->done(
                         bytesWritten == 0 ? SystemError::connectionReset : SystemError::getLastOSErrorCode(),
                         sendBufPos );
-                    sendHandler.reset();
-                    sendBuffer = nullptr;
-                    aio::AIOService::instance()->removeFromWatch( sock, PollSet::etWrite );
                     break;
                 }
 
@@ -652,44 +675,37 @@ public:
                 if( sendBufPos == sendBuffer->size() )
                 {
                     sendHandler->done( SystemError::noError, sendBufPos );
-                    sendHandler.reset();
-                    sendBuffer = nullptr;
                     sendBufPos = 0;
-                    aio::AIOService::instance()->removeFromWatch( sock, PollSet::etWrite );
                 }
                 break;
             }
 
             case PollSet::etReadTimedOut:
+            {
+                std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_read)> cleanupGuard( this, __finally_read );
                 recvHandler->done( SystemError::timedOut, (size_t)-1 );
-                recvHandler.reset();
-                recvBuffer = nullptr;
-                aio::AIOService::instance()->removeFromWatch( sock, PollSet::etRead );
                 break;
+            }
 
             case PollSet::etWriteTimedOut:
+            {
+                std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_write)> cleanupGuard( this, __finally_write );
                 sendHandler->done( SystemError::timedOut, (size_t)-1 );
-                sendHandler.reset();
-                sendBuffer = nullptr;
-                aio::AIOService::instance()->removeFromWatch( sock, PollSet::etWrite );
                 break;
+            }
 
             case PollSet::etError:
                 //TODO/IMPL distinguish read and write
                 //TODO/IMPL get correct socket error
                 if( recvHandler )
                 {
+                    std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_read)> cleanupGuard( this, __finally_read );
                     recvHandler->done( SystemError::notConnected, (size_t)-1 );
-                    recvHandler.reset();
-                    recvBuffer = nullptr;
-                    aio::AIOService::instance()->removeFromWatch( sock, PollSet::etRead );
                 }
                 if( sendHandler )
                 {
+                    std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_write)> cleanupGuard( this, __finally_write );
                     sendHandler->done( SystemError::notConnected, (size_t)-1 );
-                    sendHandler.reset();
-                    sendBuffer = nullptr;
-                    aio::AIOService::instance()->removeFromWatch( sock, PollSet::etWrite );
                 }
                 break;
 
@@ -996,6 +1012,7 @@ bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::unique_ptr<
         buf->reserve( DEFAULT_RESERVE_SIZE );
     d->recvBuffer = buf;
     d->recvHandler = std::move(handler);
+    ++d->recvAsyncCallCounter;
     return aio::AIOService::instance()->watchSocket( this, PollSet::etRead, d );
 }
 
@@ -1006,6 +1023,7 @@ bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::unique_ptr<
     d->sendBuffer = &buf;
     d->sendHandler = std::move(handler);
     d->sendBufPos = 0;
+    ++d->sendAsyncCallCounter;
     return aio::AIOService::instance()->watchSocket( this, PollSet::etWrite, d );
 }
 
@@ -1123,6 +1141,7 @@ class TCPServerSocketPrivate
 public:
     std::unique_ptr<AbstractStreamServerSocket::AbstractAsyncAcceptHandler> acceptHandler;
     int socketHandle;
+    std::atomic<int> acceptAsyncCallCount;
 
     TCPServerSocketPrivate()
     :
@@ -1133,6 +1152,8 @@ public:
     virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) override
     {
         assert( acceptHandler );
+
+        const int acceptAsyncCallCountBak = acceptAsyncCallCount;
 
         switch( eventType )
         {
@@ -1160,7 +1181,10 @@ public:
                 break;
         }
 
-        //TODO: #ak SHOULD avoid unneccessary watchSocket and removeFromWatch calls and unnecessary handler deletion
+        //if asyncAccept has been called from onNewConnection, no need to call removeFromWatch
+        if( acceptAsyncCallCount > acceptAsyncCallCountBak )
+            return;
+
         aio::AIOService::instance()->removeFromWatch( sock, PollSet::etRead );
         acceptHandler.reset();
     }
@@ -1213,6 +1237,8 @@ int TCPServerSocket::accept(int sockDesc)
 bool TCPServerSocket::acceptAsyncImpl( std::unique_ptr<AbstractStreamServerSocket::AbstractAsyncAcceptHandler> handler )
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>( impl() );
+
+    ++d->acceptAsyncCallCount;
 
     d->acceptHandler = std::move(handler);
     //TODO: #ak usually acceptAsyncImpl will be called constantly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
