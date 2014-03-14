@@ -220,6 +220,14 @@
         "palette": { "default": { "windowText": "opaqueSelection" } }
     },
     
+    "QnResourceBrowserToolTipWidget": {
+        "palette": { "default": { "windowText": "#f0f0f0" } }
+    },
+    
+    "QnNotificationToolTipWidget": {
+        "palette": { "default": { "windowText": "#f0f0f0" } }
+    },
+    
     "QnGridItem": {
         "colors": {
             "grid": "QColor(0, 240, 240, 128)",
