@@ -143,11 +143,11 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     /* Header overlay. */
     m_headerLeftLabel = new GraphicsLabel();
     m_headerLeftLabel->setAcceptedMouseButtons(0);
-    m_headerLeftLabel->setPerformanceHint(GraphicsLabel::AggressiveCaching);
+    m_headerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     m_headerRightLabel = new GraphicsLabel();
     m_headerRightLabel->setAcceptedMouseButtons(0);
-    m_headerRightLabel->setPerformanceHint(GraphicsLabel::AggressiveCaching);
+    m_headerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
     closeButton->setIcon(qnSkin->icon("item/close.png"));
@@ -212,9 +212,11 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     /* Footer overlay. */
     m_footerLeftLabel = new GraphicsLabel();
     m_footerLeftLabel->setAcceptedMouseButtons(0);
+    m_footerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     m_footerRightLabel = new GraphicsLabel();
     m_footerRightLabel->setAcceptedMouseButtons(0);
+    m_footerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     QGraphicsLinearLayout *footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     footerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
