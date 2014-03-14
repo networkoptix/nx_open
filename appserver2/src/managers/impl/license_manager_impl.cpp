@@ -47,7 +47,7 @@ namespace ec2
         license.toResource(qlicense);
 
 #ifdef __arm__
-        if (qlicense.type() != LICENSE_TYPE_EDGE)
+        if (qlicense.type() != QnLicense::EdgeLicense)
             return false;
 #endif
         return qlicense.isValid(m_hardwareIds, m_brand);

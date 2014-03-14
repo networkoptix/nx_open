@@ -27,6 +27,7 @@ public:
         TrialLicense,
         AnalogLicense,
         ProfessionalLicense,
+        EdgeLicense,
         TypeCount,
         Invalid
     };
