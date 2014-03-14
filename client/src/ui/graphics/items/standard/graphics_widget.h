@@ -81,10 +81,6 @@ public:
     void setHandlingFlags(HandlingFlags handlingFlags);
     void setHandlingFlag(HandlingFlag flag, bool value);
 
-    GraphicsStyle *style() const;
-    void setStyle(GraphicsStyle *style);
-    using base_type::setStyle;
-
     TransformOrigin transformOrigin() const;
     void setTransformOrigin(TransformOrigin transformOrigin);
 

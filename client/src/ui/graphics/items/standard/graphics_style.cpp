@@ -1,120 +1,19 @@
-
 #include "graphics_style.h"
-#include <cassert>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QGraphicsWidget>
-#include <QtWidgets/QWidget>
-#include <utils/common/scoped_value_rollback.h>
 
-
-GraphicsStyle::GraphicsStyle():
-    m_graphicsWidget(NULL)
-{}
+GraphicsStyle::GraphicsStyle() {
+    return;
+}
 
 GraphicsStyle::~GraphicsStyle() {
     return;
 }
 
-QStyle *GraphicsStyle::baseStyle() const {
-    if (!m_baseStyle)
-        const_cast<GraphicsStyle *>(this)->setBaseStyle(0); /* Will reinit base style with QApplication's style. */
-    return m_baseStyle.data();
+void GraphicsStyle::polish(QGraphicsWidget *) {
+    return;
 }
 
-void GraphicsStyle::setBaseStyle(QStyle *style) {
-    if(style) {
-        m_baseStyle = style;
-    } else {
-        m_baseStyle = QApplication::style();
-    }
-}
-
-const QObject *GraphicsStyle::currentTarget(const QWidget *widget) const {
-    if(widget) {
-        return widget;
-    } else {
-        return m_graphicsWidget;
-    }
-}
-
-void GraphicsStyle::polish(QGraphicsWidget *widget) {
-    QnScopedValueRollback<const QGraphicsWidget *> rollback(&m_graphicsWidget, widget);
-
-    return baseStyle()->polish(static_cast<QWidget *>(NULL));
-}
-
-void GraphicsStyle::unpolish(QGraphicsWidget *widget) {
-    QnScopedValueRollback<const QGraphicsWidget *> rollback(&m_graphicsWidget, widget);
-
-    return baseStyle()->unpolish(static_cast<QWidget *>(NULL));
-}
-
-void GraphicsStyle::polish(QPalette &palette) {
-    baseStyle()->polish(palette);
-}
-
-QPixmap GraphicsStyle::standardPixmap(QStyle::StandardPixmap standardPixmap, const QStyleOption *option, const QGraphicsWidget *widget) const {
-    QN_SCOPED_VALUE_ROLLBACK(&m_graphicsWidget, widget);
-
-    return baseStyle()->standardPixmap(standardPixmap, option, NULL);
-}
-
-void GraphicsStyle::drawComplexControl(QStyle::ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QGraphicsWidget *widget) const {
-    QN_SCOPED_VALUE_ROLLBACK(&m_graphicsWidget, widget);
-
-    baseStyle()->drawComplexControl(control, option, painter, NULL);
-}
-
-void GraphicsStyle::drawControl(QStyle::ControlElement element, const QStyleOption *option, QPainter *painter, const QGraphicsWidget *widget) const {
-    QN_SCOPED_VALUE_ROLLBACK(&m_graphicsWidget, widget);
-
-    baseStyle()->drawControl(element, option, painter, NULL);
-}
-
-void GraphicsStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QGraphicsWidget *widget) const {
-    QN_SCOPED_VALUE_ROLLBACK(&m_graphicsWidget, widget);
-
-    baseStyle()->drawPrimitive(element, option, painter, NULL);
-}
-
-QStyle::SubControl GraphicsStyle::hitTestComplexControl(QStyle::ComplexControl control, const QStyleOptionComplex *option, const QPoint &position, const QGraphicsWidget *widget) const {
-    QN_SCOPED_VALUE_ROLLBACK(&m_graphicsWidget, widget);
-
-    return baseStyle()->hitTestComplexControl(control, option, position, NULL);
-}
-
-int GraphicsStyle::pixelMetric(QStyle::PixelMetric metric, const QStyleOption *option, const QGraphicsWidget *widget) const {
-    QN_SCOPED_VALUE_ROLLBACK(&m_graphicsWidget, widget);
-
-    return baseStyle()->pixelMetric(metric, option, NULL);
-}
-
-QSize GraphicsStyle::sizeFromContents(QStyle::ContentsType type, const QStyleOption *option, const QSize &contentsSize, const QGraphicsWidget *widget) const {
-    QN_SCOPED_VALUE_ROLLBACK(&m_graphicsWidget, widget);
-
-    return baseStyle()->sizeFromContents(type, option, contentsSize, NULL);
-}
-
-int GraphicsStyle::styleHint(QStyle::StyleHint hint, const QStyleOption *option, const QGraphicsWidget *widget, QStyleHintReturn *returnData) const {
-    QN_SCOPED_VALUE_ROLLBACK(&m_graphicsWidget, widget);
-
-    return baseStyle()->styleHint(hint, option, NULL, returnData);
-}
-
-QRect GraphicsStyle::subControlRect(QStyle::ComplexControl control, const QStyleOptionComplex *option, QStyle::SubControl subControl, const QGraphicsWidget *widget) const {
-    QN_SCOPED_VALUE_ROLLBACK(&m_graphicsWidget, widget);
-
-    return baseStyle()->subControlRect(control, option, subControl, NULL);
-}
-
-QRect GraphicsStyle::subElementRect(QStyle::SubElement element, const QStyleOption *option, const QGraphicsWidget *widget) const {
-    QN_SCOPED_VALUE_ROLLBACK(&m_graphicsWidget, widget);
-
-    return baseStyle()->subElementRect(element, option, NULL);
-}
-
-QStyle::SubControl GraphicsStyle::hitTestComplexControl(QStyle::ComplexControl control, const QStyleOptionComplex *option, const QPointF &position, const QGraphicsWidget *widget) const {
-    return hitTestComplexControl(control, option, position.toPoint(), widget);
+void GraphicsStyle::unpolish(QGraphicsWidget *) {
+    return;
 }
 
 qreal GraphicsStyle::sliderPositionFromValue(qint64 min, qint64 max, qint64 logicalValue, qreal span, bool upsideDown, bool bound) {

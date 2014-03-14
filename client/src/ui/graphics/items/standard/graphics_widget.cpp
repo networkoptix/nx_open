@@ -36,7 +36,6 @@ GraphicsWidgetPrivate::GraphicsWidgetPrivate():
     handlingFlags(0), 
     transformOrigin(GraphicsWidget::Legacy), 
     resizeEffectRadius(qn_graphicsWidget_defaultResizeEffectRadius), 
-    style(NULL), 
     inSetGeometry(false),
     windowData(NULL) 
 {};
@@ -89,7 +88,7 @@ void GraphicsWidgetPrivate::initStyleOptionTitleBar(QStyleOptionTitleBar *option
 
     q->initStyleOption(option);
 
-    option->rect.setHeight(q->style()->pixelMetric(QStyle::PM_TitleBarHeight, option, q));
+    option->rect.setHeight(q->style()->pixelMetric(QStyle::PM_TitleBarHeight, option, NULL));
     option->titleBarFlags = q->windowFlags();
     option->subControls = QStyle::SC_TitleBarCloseButton | QStyle::SC_TitleBarLabel | QStyle::SC_TitleBarSysMenu;
     if(windowData->closeButtonHovered) {
@@ -110,7 +109,7 @@ void GraphicsWidgetPrivate::initStyleOptionTitleBar(QStyleOptionTitleBar *option
         option->titleBarState = Qt::WindowNoState;
     }
     QFont windowTitleFont = QApplication::font("QWorkspaceTitleBar");
-    QRect textRect = q->style()->subControlRect(QStyle::CC_TitleBar, option, QStyle::SC_TitleBarLabel, q);
+    QRect textRect = q->style()->subControlRect(QStyle::CC_TitleBar, option, QStyle::SC_TitleBarLabel, NULL);
     option->text = QFontMetrics(windowTitleFont).elidedText(q->windowTitle(), Qt::ElideRight, textRect.width());
 }
 
@@ -125,7 +124,7 @@ void GraphicsWidgetPrivate::mapToFrame(QStyleOptionTitleBar *option) {
 
     option->rect = q->windowFrameRect().toRect();
     option->rect.moveTo(0, 0);
-    option->rect.setHeight(q->style()->pixelMetric(QStyle::PM_TitleBarHeight, option, q));
+    option->rect.setHeight(q->style()->pixelMetric(QStyle::PM_TitleBarHeight, option, NULL));
 }
 
 QPointF GraphicsWidgetPrivate::calculateTransformOrigin() const {
@@ -189,24 +188,6 @@ GraphicsWidget::~GraphicsWidget() {
         sd->pendingLayoutWidgets.remove(this);
 }
 
-GraphicsStyle *GraphicsWidget::style() const {
-    Q_D(const GraphicsWidget);
-
-    if(!d->style) {
-        d->style = dynamic_cast<GraphicsStyle *>(base_type::style());
-
-        if(!d->style) {
-            if(!d->reserveStyle)
-                d->reserveStyle.reset(new GraphicsStyle());
-
-            d->reserveStyle->setBaseStyle(base_type::style());
-            d->style = d->reserveStyle.data();
-        }
-    }
-
-    return d->style;
-}
-
 void GraphicsWidget::initStyleOption(QStyleOption *option) const {
     base_type::initStyleOption(option);
 }
@@ -231,10 +212,6 @@ void GraphicsWidget::setHandlingFlags(HandlingFlags handlingFlags) {
 
 void GraphicsWidget::setHandlingFlag(HandlingFlag flag, bool value) {
     setHandlingFlags(value ? d_func()->handlingFlags | flag : d_func()->handlingFlags & ~flag);
-}
-
-void GraphicsWidget::setStyle(GraphicsStyle *style) {
-    setStyle(style->baseStyle());
 }
 
 GraphicsWidget::TransformOrigin GraphicsWidget::transformOrigin() const {
@@ -420,16 +397,12 @@ bool GraphicsWidget::event(QEvent *event) {
 void GraphicsWidget::polishEvent() {
     base_type::polishEvent();
 
-    style()->polish(this); // TODO: #Elric unpolish?
+    if(GraphicsStyle *style = dynamic_cast<GraphicsStyle *>(this->style()))
+        style->polish(this); // TODO: #Elric unpolish?
 }
 
 void GraphicsWidget::changeEvent(QEvent *event) {
-    Q_D(GraphicsWidget);
-
     base_type::changeEvent(event);
-
-    if(event->type() == QEvent::StyleChange)
-        d->style = NULL;
 }
 
 void GraphicsWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
@@ -642,7 +615,7 @@ bool GraphicsWidgetPrivate::windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *
         initStyleOptionTitleBar(&option);
         mapToFrame(&option);
 
-        windowData->closeButtonRect = mapFromFrame(q->style()->subControlRect(QStyle::CC_TitleBar, &option, QStyle::SC_TitleBarCloseButton, q));
+        windowData->closeButtonRect = mapFromFrame(q->style()->subControlRect(QStyle::CC_TitleBar, &option, QStyle::SC_TitleBarCloseButton, NULL));
         windowData->closeButtonHovered = windowData->closeButtonRect.contains(event->pos());
     }
     windowData->hoveredSection = section;
