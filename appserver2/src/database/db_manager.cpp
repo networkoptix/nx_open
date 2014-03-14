@@ -1611,7 +1611,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicense
         return ErrorCode::failure;
     }
 
-    QN_QUERY_TO_DATA_OBJECT(query, ApiLicense, data.data, ApiLicenseFields);
+    QN_QUERY_TO_DATA_OBJECT_FILTERED(query, ApiLicense, data.data, ApiLicenseFields, m_licenseManagerImpl->validateLicense);
 
     // m_licenseManagerImpl->getLicenses( &data );
     return ErrorCode::ok;

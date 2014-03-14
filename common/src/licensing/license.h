@@ -15,6 +15,9 @@
 class QnLicense;
 typedef QSharedPointer<QnLicense> QnLicensePtr;
 
+const QString LICENSE_TYPE_PROFESSIONAL = lit("digital");
+const QString LICENSE_TYPE_ANALOG = lit("analog");
+const QString LICENSE_TYPE_EDGE = lit("edge");
 
 class QnLicense {
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
