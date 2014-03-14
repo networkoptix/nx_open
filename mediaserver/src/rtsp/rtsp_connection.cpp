@@ -119,6 +119,7 @@ public:
         metadataChannelNum(7),
         audioEnabled(false),
 		wasDualStreaming(false),
+        wasCameraControlDisabled(false),
         tcpMode(true),
         transcodedVideoSize(640, 480)
     {
@@ -196,6 +197,7 @@ public:
     int metadataChannelNum;
     bool audioEnabled;
 	bool wasDualStreaming;
+    bool wasCameraControlDisabled;
     bool tcpMode;
     QSize transcodedVideoSize;
 };
@@ -916,11 +918,10 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged()
 
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
     if (cameraResource) {
-        if (cameraResource->isAudioEnabled() != d->audioEnabled) {
-            m_needStop = true;
-            d->socket->close();
-        }
-		if (cameraResource->hasDualStreaming2() != d->wasDualStreaming) {
+        if (cameraResource->isAudioEnabled() != d->audioEnabled ||
+		    cameraResource->hasDualStreaming2() != d->wasDualStreaming ||
+            !cameraResource->isCameraControlDisabled() && d->wasCameraControlDisabled) 
+        {
 			m_needStop = true;
 			d->socket->close();
 		}
@@ -1012,8 +1013,10 @@ void QnRtspConnectionProcessor::checkQuality()
         }
     }
 	QnVirtualCameraResourcePtr cameraRes = d->mediaRes.dynamicCast<QnVirtualCameraResource>();
-	if (cameraRes)
+	if (cameraRes) {
 		d->wasDualStreaming = cameraRes->hasDualStreaming2();
+        d->wasCameraControlDisabled = cameraRes->isCameraControlDisabled();
+    }
 }
 
 void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayoutPtr videoLayout)
