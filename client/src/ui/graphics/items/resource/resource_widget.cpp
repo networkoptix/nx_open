@@ -27,8 +27,6 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
-#include <ui/graphics/painters/loading_progress_painter.h>
-#include <ui/graphics/painters/paused_painter.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
