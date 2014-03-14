@@ -128,10 +128,14 @@ void QnScreenshotLoader::setParameters(const QnScreenshotParameters &parameters)
 
 void QnScreenshotLoader::doLoadAsync() {
     m_isReady = true;
-    if (image().isNull())
-        return;
+
+    QImage img = image();
 
     emit imageChanged(image());
+
+    if (img.isNull())
+        return;
+
     m_isReady = false;
 }
 

@@ -63,11 +63,7 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
     case Qt::DecorationRole:
         switch(index.column()) {
         case RecordingColumn: 
-            {
-                int recordingMode = camera->isScheduleDisabled() ? -1 : Qn::RecordingType_Never;
-                recordingMode = QnRecordingStatusHelper::currentRecordingMode(context(), camera);
-                return QnRecordingStatusHelper::icon(recordingMode);
-            }
+            return QnRecordingStatusHelper::icon(QnRecordingStatusHelper::currentRecordingMode(context(), camera));
         case NameColumn: 
             return qnResIconCache->icon(camera->flags(), camera->getStatus());
         case ServerColumn:
@@ -80,11 +76,7 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
     case Qt::DisplayRole:
         switch (index.column()) {
         case RecordingColumn: 
-            {
-                int recordingMode = camera->isScheduleDisabled() ? -1 : Qn::RecordingType_Never;
-                recordingMode = QnRecordingStatusHelper::currentRecordingMode(context(), camera);
-                return QnRecordingStatusHelper::shortTooltip(recordingMode);
-            }
+            return QnRecordingStatusHelper::shortTooltip(QnRecordingStatusHelper::currentRecordingMode(context(), camera));
         case NameColumn:
             return camera->getName();
         case VendorColumn:

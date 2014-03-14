@@ -157,8 +157,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bo
     result = fetchStreamUrl( soapWrapper, info.profileToken, isPrimary, streamUrl );
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
-    qDebug() << "got stream URL for camera" << m_resource->getUrl() << "for profile" << info.profileToken;
-    qDebug() << "rtsp=" << *streamUrl;
+    NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(*streamUrl).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
     return result;
 }
 

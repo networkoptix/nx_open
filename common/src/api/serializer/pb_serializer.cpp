@@ -104,6 +104,8 @@ void parseCamera(QnNetworkResourcePtr& camera, const pb::Resource& pb_cameraReso
 
     parameters["disabled"] = QString::number((int)pb_cameraResource.disabled());
     parameters["parentId"] = QString::number(pb_cameraResource.parentid());
+    parameters["vendor"] = QString::fromUtf8(pb_camera.vendor().c_str());
+    parameters["model"] = QString::fromUtf8(pb_camera.model().c_str());
 
     camera = resourceFactory.createResource(pb_cameraResource.resourcetypeid(), parameters).dynamicCast<QnNetworkResource>();
     if (camera.isNull())

@@ -189,9 +189,9 @@
 
     <profiles>
         <profile>
-            <id>build-env</id>
+            <id>build-env-win</id>
             <!-- preparing build-environment only if it is not ready. The last operation is installing llutil to x64 python virtualenv so it can be used as a criteria -->
-            <activation>
+            <activation>        
                 <file>
                     <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
                     <missing>build_environment/target/buildenv.timestamp</missing>
@@ -205,9 +205,6 @@
         <profile>
             <id>quicksync</id>
             <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
                 <property>
                     <name>quicksync</name>
                     <value>true</value>
@@ -280,7 +277,8 @@
             <modules>
                 <module>plugins/image_library_plugin</module>                
                 <module>traytool</module>
-                <module>vmaxproxy</module>	
+                <!-- Vmaxproxy	module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
+                <!--<module>vmaxproxy</module>	-->
                 <module>client</module>		                
                 <module>wixsetup/wixsetup-full</module>
                 <module>wixsetup/wixsetup-client-only</module>
@@ -468,4 +466,3 @@
         </profile>	      
     </profiles>	
 </project>
-

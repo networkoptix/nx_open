@@ -13,15 +13,19 @@
 #include <utils/common/log.h>
 #include <utils/common/process.h>
 
+#include "process_utils.h"
+
 
 ApplauncherProcess::ApplauncherProcess(
     QSettings* const settings,
     InstallationManager* const installationManager,
-    bool quitMode )
+    bool quitMode,
+    const QString& mirrorListUrl )
 :
     m_terminated( false ),
     m_installationManager( installationManager ),
     m_quitMode( quitMode ),
+    m_mirrorListUrl( mirrorListUrl ),
     m_taskServer( this ),
     m_settings( settings ),
     m_bindTriesCount( 0 ),
@@ -294,19 +298,59 @@ bool ApplauncherProcess::startApplication(
         return false;
     }
 
-    if( task->version != m_installationManager->getMostRecentVersion() )
+    if( task->version != m_installationManager->getMostRecentVersion() ) {
         task->appArgs += QString::fromLatin1(" ") + m_settings->value( NON_RECENT_VERSION_ARGS_PARAM_NAME, NON_RECENT_VERSION_ARGS_DEFAULT_VALUE ).toString();
+
+        if (!appData.verifyInstallation()) {
+            NX_LOG( QString::fromLatin1("Verification failed for version %1 (path %2)").arg(appData.version()).arg(appData.rootPath()), cl_logDEBUG1 );
+            response->result = applauncher::api::ResultType::ioError;
+
+            if( task->autoRestore )
+            {
+                applauncher::api::StartInstallationResponse startInstallationResponse;
+                startInstallation(
+                    std::make_shared<applauncher::api::StartInstallationTask>( task->version, true ),
+                    &startInstallationResponse );
+            }
+
+            return false;
+        }
+    }
 
     //TODO/IMPL start process asynchronously ?
 
-    const QString binPath = appData.installationDirectory + "/" + APPLICATION_BIN_NAME;
+    const QString binPath = appData.executablePath();
+
+    QStringList environment = QProcess::systemEnvironment();
+#ifdef Q_OS_LINUX
+    QString variableValue = appData.libraryPath();
+    if (!variableValue.isEmpty() && QFile::exists(variableValue)) {
+        const QString variableName = "LD_LIBRARY_PATH";
+
+        QRegExp varRegExp(QString("%1=(.+)").arg(variableName));
+
+        auto it = environment.begin();
+        for (; it != environment.end(); ++it) {
+            if (varRegExp.exactMatch(*it)) {
+                *it = QString("%1=%2:%3").arg(variableName, variableValue, varRegExp.cap(1));
+                break;
+            }
+        }
+        if (it == environment.end())
+            environment.append(QString("%1=%2").arg(variableName, variableValue));
+    }
+#endif
+
     NX_LOG( QString::fromLatin1("Launching version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG2 );
-    if( QProcess::startDetached(
+    if( ProcessUtils::startProcessDetached(
             binPath,
-            task->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts) ) )
+            task->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts),
+            QString(),
+            environment) )
     {
         NX_LOG( QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG1 );
-        m_settings->setValue( QLatin1String("previousLaunchedVersion"), task->version );
+        m_settings->setValue( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME, task->version );
+        m_settings->sync();
         response->result = applauncher::api::ResultType::ok;
         return true;
     }
@@ -362,7 +406,7 @@ bool ApplauncherProcess::startInstallation(
         task->module,
         targetDir,
         task->autoStart ) );
-    if( !installationProcess->start( *m_settings ) )
+    if( !installationProcess->start( m_mirrorListUrl ) )
     {
         response->result = applauncher::api::ResultType::ioError;
         return true;
@@ -474,6 +518,7 @@ void ApplauncherProcess::onInstallationDone( InstallationProcess* installationPr
     if( installationProcess->getStatus() == applauncher::api::InstallationStatus::success )
     {
         m_installationManager->updateInstalledVersionsInformation();
+        m_installationManager->createLatestVersionGhostForVersion(installationProcess->getVersion());
         if( installationProcess->autoStartNeeded() )
         {
             applauncher::api::Response response;

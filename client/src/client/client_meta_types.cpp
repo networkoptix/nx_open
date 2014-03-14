@@ -4,17 +4,20 @@
 
 #include <utils/color_space/image_correction.h>
 #include <utils/common/json_serializer.h>
+#include <utils/ping_utility.h>
 
 #include <camera/thumbnail.h>
+
 #include <ui/actions/actions.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/common/weak_graphics_item_pointer.h>
 #include <ui/customization/customization.h>
 #include <ui/customization/palette_data.h>
+#include <ui/customization/pen_data.h>
 
 #include "client_globals.h"
 #include "client_model_types.h"
 #include "client_color_types.h"
-#include "ui/common/weak_graphics_item_pointer.h"
 
 namespace {
     volatile bool qn_clientMetaTypes_initialized = false;
@@ -61,6 +64,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnWeakObjectHash>();
     qRegisterMetaType<WeakGraphicsItemPointerList>();
     qRegisterMetaType<QnCustomization>();
+    qRegisterMetaType<QnPingUtility::PingResponce>();
 
     qRegisterMetaType<QnTimeSliderColors>();
     qRegisterMetaType<QnTimeScrollBarColors>();
@@ -70,6 +74,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnScheduleGridColors>();
     qRegisterMetaType<QnGridColors>();
     qRegisterMetaType<QnHistogramColors>();
+    qRegisterMetaType<QnResourceWidgetFrameColors>();
 
     QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
     QnJsonSerializer::registerSerializer<QnTimeScrollBarColors>();
@@ -79,8 +84,10 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnScheduleGridColors>();
     QnJsonSerializer::registerSerializer<QnGridColors>();
     QnJsonSerializer::registerSerializer<QnHistogramColors>();
+    QnJsonSerializer::registerSerializer<QnResourceWidgetFrameColors>();
 
     QnJsonSerializer::registerSerializer<QnPaletteData>();
+    QnJsonSerializer::registerSerializer<QnPenData>();
     QnJsonSerializer::registerSerializer<QVector<QColor> >();
     QnJsonSerializer::registerSerializer<QVector<QUuid> >();
 

@@ -9,16 +9,14 @@
  * <tt>QObject</tt>.
  */
 class AbstractGraphicsShapeItem: public QGraphicsObject {
-    Q_OBJECT;
-
+    Q_OBJECT
+    Q_PROPERTY(QPen pen READ pen WRITE setPen)
+    Q_PROPERTY(QBrush brush READ brush WRITE setBrush)
     typedef QGraphicsObject base_type;
 
 public:
     AbstractGraphicsShapeItem(QGraphicsItem *parent = NULL);
     virtual ~AbstractGraphicsShapeItem();
-
-    QColor color() const;
-    void setColor(const QColor &color);
 
     QPen pen() const;
     void setPen(const QPen &pen);

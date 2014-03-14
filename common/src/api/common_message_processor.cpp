@@ -41,7 +41,12 @@ void QnCommonMessageProcessor::loadRuntimeInfo(const QnMessage &message) {
 }
 
 void QnCommonMessageProcessor::handleConnectionOpened(const QnMessage &message) {
-    Q_UNUSED(message)
+    // TODO: #Elric this is a hack to update system name before emitting connectionOpened
+    // as it is used in handers.
+
+    if(message.messageType == Qn::Message_Type_Initial)
+        loadRuntimeInfo(message); 
+
     emit connectionOpened();
 }
 

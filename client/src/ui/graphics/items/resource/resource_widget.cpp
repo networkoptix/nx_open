@@ -113,7 +113,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_enclosingAspectRatio(1.0),
     m_frameOpacity(1.0),
     m_frameWidth(-1.0),
-    m_frameColor(qnGlobals->frameColor()),
     m_titleTextFormat(QLatin1String("%1")),
     m_infoTextFormat(QLatin1String("%1")),
     m_titleTextFormatHasPlaceholder(true),
@@ -130,8 +129,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setTransformOrigin(Center);
 
     /* Set up shadow. */
-    if (shadowItem())
-        shadowItem()->setColor(qnGlobals->shadowColor());
     setShadowDisplacement(defaultShadowDisplacement);
 
     /* Set up frame. */
@@ -304,13 +301,25 @@ void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     invalidateShadowShape();
 }
 
-void QnResourceWidget::setFrameColor(const QColor &frameColor) {
-    if(m_frameColor == frameColor)
+QColor QnResourceWidget::frameDistinctionColor() const {
+    return m_frameDistinctionColor;
+}
+
+void QnResourceWidget::setFrameDistinctionColor(const QColor &frameColor) {
+    if(m_frameDistinctionColor == frameColor)
         return;
 
-    m_frameColor = frameColor;
+    m_frameDistinctionColor = frameColor;
 
-    emit frameColorChanged();
+    emit frameDistinctionColorChanged();
+}
+
+const QnResourceWidgetFrameColors &QnResourceWidget::frameColors() const {
+    return m_frameColors;
+}
+
+void QnResourceWidget::setFrameColors(const QnResourceWidgetFrameColors &frameColors) {
+    m_frameColors = frameColors;
 }
 
 void QnResourceWidget::setAspectRatio(qreal aspectRatio) {
@@ -856,7 +865,23 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
     qreal w = size.width();
     qreal h = size.height();
     qreal fw = m_frameWidth;
-    QColor color = isSelected() ? selectedFrameColor() : isLocalActive() ? activeFrameColor() : frameColor();
+    
+    QColor color;
+    if(isSelected()) {
+        color = m_frameColors.selected;
+    } else if(isLocalActive()) {
+        if(m_frameDistinctionColor.isValid()) {
+            color = m_frameDistinctionColor.lighter();
+        } else {
+            color = m_frameColors.active;
+        }
+    } else {
+        if(m_frameDistinctionColor.isValid()) {
+            color = m_frameDistinctionColor;
+        } else {
+            color = m_frameColors.normal;
+        }
+    }
 
     QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
@@ -873,7 +898,7 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
     if(!(m_options & DisplaySelection))
         return;
 
-    painter->fillRect(rect, qnGlobals->selectionColor());
+    painter->fillRect(rect, palette().color(QPalette::Highlight));
 }
 
 
@@ -951,14 +976,3 @@ void QnResourceWidget::at_infoButton_toggled(bool toggled){
     setInfoVisible(toggled);
     setOverlayVisible(toggled || m_mouseInWidget);
 }
-
-QColor QnResourceWidget::activeFrameColor() const {
-    return m_frameColor.lighter();
-}
-
-QColor QnResourceWidget::selectedFrameColor() const {
-    //qreal a = 0.7;
-    //return linearCombine(1.0 - a, m_frameColor, a, qnGlobals->selectedFrameColor());
-    return qnGlobals->selectedFrameColor();
-}
-

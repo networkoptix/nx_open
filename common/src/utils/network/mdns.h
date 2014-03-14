@@ -4,7 +4,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QVector>
 
-
+// TODO: #Elric move to resource/mdns
 struct MDNSPacket
 {
     struct Query

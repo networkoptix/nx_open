@@ -80,7 +80,11 @@ private:
 };
 
 QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
-    base_type(parent, Qt::Dialog | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint),
+    base_type(parent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
+#ifdef Q_OS_MAC
+    | Qt::Tool
+#endif
+    ),
     ui(new Ui::PtzManageDialog),
     m_model(new QnPtzManageModel(this)),
     m_adaptor(new QnPtzHotkeysResourcePropertyAdaptor(this)),

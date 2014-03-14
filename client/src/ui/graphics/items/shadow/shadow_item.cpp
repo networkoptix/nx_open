@@ -7,7 +7,7 @@
 
 QnShadowItem::QnShadowItem(QGraphicsItem *parent):
     base_type(parent),
-    m_color(QColor(Qt::black)),
+    m_color(QColor(0, 0, 0, 128)),
     m_shapeProvider(NULL),
     m_shapeValid(false),
     m_parametersValid(false)

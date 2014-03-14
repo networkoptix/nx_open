@@ -35,30 +35,34 @@ static QString SERVICE_NAME = QString::fromLatin1("%1%2").arg(QLatin1String(QN_C
 static void printHelp( const InstallationManager& installationManager )
 {
     std::cout<<
-        "Arguments:"<<std::endl<<
-        "  --log-level={log level}. Can be ERROR, WARN, INFO, DEBUG, DEBUG2. By default, WARN"<<std::endl<<
-        "  --log-file=/path/to/log/file. If not specified, no log is written"<<std::endl<<
-        "  quit. Tells another running launcher to terminate"<<std::endl<<
-        std::endl<<
-        "  --rsync Enable directory synchronization mode"<<std::endl<<
-        "  --dir={local path} Path to local directory to sync"<<std::endl<<
-        "  --url={http url} Url of remote http directory to sync with"<<std::endl<<
-        std::endl<<
-        "  --install Run in installation mode (install version specified by following parameters)"<<std::endl<<
-        "  --version= Mandatory in installation mode"<<std::endl<<
-        "  --product-name= Optional. By default, \""<<QN_PRODUCT_NAME_SHORT<<"\""<<std::endl<<
-        "  --customization= Optional. By default, \""<<QN_CUSTOMIZATION_NAME<<"\""<<std::endl<<
-        "  --module= Optional. By default, \"client\""<<std::endl<<
-        "  --install-path= Optional. By default, "<<installationManager.getRootInstallDirectory().toStdString()<<"/{version}"<<std::endl<<
-        std::endl<<
-        "  --help. This help message"<<std::endl<<
-        std::endl;
+        "Arguments:\n"
+        "  Default mode (launches compatibility client)\n"
+        "    --log-level={log level}. Can be ERROR, WARN, INFO, DEBUG, DEBUG2. By default, WARN\n"
+        "    --log-file=/path/to/log/file. If not specified, no log is written\n"
+        "    --mirror-list-url={url to mirrorList.xml} Overrides url found in conf file\n"
+        "    quit. Tells another running launcher to terminate\n"
+        "\n"
+        "  Directory synchronization mode\n"
+        "    --rsync Enable directory synchronization mode\n"
+        "    --dir={local path} Path to local directory to sync\n"
+        "    --url={http url} Url of remote http directory to sync with\n"
+        "\n"
+        "  Installation mode (installs requested version)\n"
+        "    --install Run in installation mode (install version specified by following parameters)\n"
+        "    --version= Mandatory in installation mode\n"
+        "    --product-name= Optional. By default, \""<<QN_PRODUCT_NAME_SHORT<<"\"\n"
+        "    --customization= Optional. By default, \""<<QN_CUSTOMIZATION_NAME<<"\"\n"
+        "    --module= Optional. By default, \"client\"\n"
+        "    --install-path= Optional. By default, "<<installationManager.getRootInstallDirectory().toStdString()<<"/{version}\n"
+        "\n"
+        "  --help. This help message\n"
+        "\n";
 }
 
 int syncDir( const QString& localDir, const QString& remoteUrl );
 int doInstallation(
     const InstallationManager& installationManager,
-    const QSettings& settings,
+    const QString& mirrorListUrl,
     const QString& productName,
     const QString& customization,
     const QString& version,
@@ -75,6 +79,7 @@ int main( int argc, char* argv[] )
 
     QString logLevel = "WARN";
     QString logFilePath;
+    QString mirrorListUrl;
     bool quitMode = false;
     bool displayHelp = false;
 
@@ -91,6 +96,7 @@ int main( int argc, char* argv[] )
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter( &logLevel, "--log-level", NULL, QString() );
     commandLineParser.addParameter( &logFilePath, "--log-file", NULL, QString() );
+    commandLineParser.addParameter( &mirrorListUrl, "--mirror-list-url", NULL, QString() );
     commandLineParser.addParameter( &quitMode, "quit", NULL, QString(), QVariant(true) );
     commandLineParser.addParameter( &displayHelp, "--help", NULL, QString(), QVariant(true) );
     commandLineParser.addParameter( &syncMode, "--rsync", NULL, QString(), QVariant(true) );
@@ -107,8 +113,12 @@ int main( int argc, char* argv[] )
     QtSingleApplication app( SERVICE_NAME, argc, argv );
     QDir::setCurrent( QCoreApplication::applicationDirPath() );
 
-    QSettings settings( QSettings::UserScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
+    QSettings globalSettings( QSettings::SystemScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
+    QSettings userSettings( QSettings::UserScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
     InstallationManager installationManager;
+
+    if( mirrorListUrl.isEmpty() )
+        mirrorListUrl = globalSettings.value( "mirrorListUrl", ProductParameters::mirrorUrl ).toString();
 
     if( displayHelp )
     {
@@ -132,7 +142,7 @@ int main( int argc, char* argv[] )
     if( installMode )
         return doInstallation(
             installationManager,
-            settings,
+            mirrorListUrl,
             productNameToInstall,
             customizationToInstall,
             versionToInstall,
@@ -140,9 +150,10 @@ int main( int argc, char* argv[] )
             installationPath );
 
     ApplauncherProcess applauncherProcess(
-        &settings,
+        &userSettings,
         &installationManager,
-        quitMode );
+        quitMode,
+        mirrorListUrl );
 
 #ifdef _WIN32
     applauncherProcessInstance = &applauncherProcess;
@@ -210,7 +221,7 @@ int syncDir( const QString& localDir, const QString& remoteUrl )
 
 int doInstallation(
     const InstallationManager& installationManager,
-    const QSettings& settings,
+    const QString& mirrorListUrl,
     const QString& productName,
     const QString& customization,
     const QString& version,
@@ -239,7 +250,7 @@ int doInstallation(
         module,
         effectiveInstallationPath,
         false );
-    if( !installationProcess.start( settings ) )
+    if( !installationProcess.start( mirrorListUrl ) )
     {
         std::cerr<<"FAILURE. Cannot start installation. "<<installationProcess.errorText().toStdString()<<std::endl;
         return 1;

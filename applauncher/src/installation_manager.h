@@ -6,10 +6,10 @@
 #define INSTALLATION_MANAGER_H
 
 #include <functional>
-#include <map>
 #include <mutex>
 
-#include <QObject>
+#include <QtCore/QObject>
+#include <QtCore/QMap>
 
 
 //!Provides access to installed versions information
@@ -28,25 +28,30 @@ class InstallationManager
 public:
     struct AppData
     {
-        QString rootDir;
-        QString installationDirectory;
+        QString m_version;
 
-        AppData()
-        {
-        }
-        AppData(
-            const QString& _rootDir,
-            const QString& _installationDirectory )
-        :
-            rootDir( _rootDir ),
-            installationDirectory( _installationDirectory )
-        {
-        }
+        QString m_rootPath;
+        QString m_binaryPath;
+        QString m_libPath;
+
+        bool exists() const;
+        QString version() const;
+        QString rootPath() const;
+        QString executablePath() const;
+        QString libraryPath() const;
+
+        bool verifyInstallation() const;
     };
 
     InstallationManager( QObject* const parent = NULL );
 
+    AppData getAppData(const QString &rootPath) const;
+
     void updateInstalledVersionsInformation();
+    /*! Create an empty directory with name as the latest version is.
+     *  It is needed to signalize client <= 2.1 about version installed in a standard way (not in compatibility folder). */
+    void createLatestVersionGhosts();
+    void createLatestVersionGhostForVersion(const QString &version);
     //!Returns number of installed versions
     int count() const;
     QString getMostRecentVersion() const;
@@ -67,13 +72,15 @@ public:
 private:
     QString m_errorString;
     //!map<version, AppData>. Most recent version first
-    mutable std::map<QString, AppData, std::greater<QString> > m_installedProductsByVersion;
+    mutable QMap<QString, AppData> m_installedProductsByVersion;
     std::list<QString> m_rootInstallDirectoryList;
     //QString m_rootInstallDirectory;
     QString m_defaultDirectoryForNewInstallations;
     mutable std::mutex m_mutex;
 
     void setErrorString( const QString& _errorString );
+    void doCreateLatestVersionGhost(const AppData &appData, const QString &version);
+    void doCreateLatestVersionGhost(const QString &path, const QString &version);
 };
 
 #endif  //INSTALLATION_MANAGER_H

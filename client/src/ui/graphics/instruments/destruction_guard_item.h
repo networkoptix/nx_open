@@ -33,7 +33,7 @@ public:
             guarded->setParentItem(this);
 
             if(guarded->toGraphicsObject())
-                connect(guarded->toGraphicsObject(), SIGNAL(zChanged()), this, SLOT(at_guarded_zValueChanged()));
+                connect(guarded->toGraphicsObject(), &QGraphicsObject::zChanged, this, &DestructionGuardItem::at_guarded_zValueChanged);
         }
     }
 
