@@ -28,6 +28,7 @@ public:
 
     virtual bool dataCanBeAccepted() const;
 
+    int processorsCount() const;
     void addDataProcessor(QnAbstractDataReceptor* dp);
     void removeDataProcessor(QnAbstractDataReceptor* dp);
 

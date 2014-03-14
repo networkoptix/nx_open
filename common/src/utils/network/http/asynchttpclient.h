@@ -165,7 +165,7 @@ namespace nx_http
         */
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
-        bool resendRequestWithAuthorization( const nx_http::HttpResponse& response );
+        bool resendRequestWithAuthorization( const nx_http::Response& response );
         void eventTriggeredPrivate( AbstractSocket* sock, PollSet::EventType eventType );
 
         static const char* toString( State state );

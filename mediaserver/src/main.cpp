@@ -101,6 +101,8 @@
 #include <rest/server/rest_connection_processor.h>
 #include <rest/server/rest_server.h>
 
+#include <streaming/hls/hls_server.h>
+
 #include <rtsp/rtsp_connection.h>
 #include <rtsp/rtsp_listener.h>
 

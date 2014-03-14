@@ -170,7 +170,7 @@ void StreamingChunkTranscoderThread::run()
 #ifdef SAVE_INPUT_STREAM_TO_FILE
         m_inputFile.write( srcMediaData->data.constData(), srcMediaData->data.size() );
 #endif
-        int res = transcodeIter->second->transcoder->transcodePacket( srcMediaData, resultStream );
+        int res = transcodeIter->second->transcoder->transcodePacket( srcMediaData, &resultStream );
         if( res )
         {
             NX_LOG( QString::fromLatin1("Error transcoding resource %1 data, error code %2. Transcoded %3 ms of source data").
@@ -205,7 +205,7 @@ void StreamingChunkTranscoderThread::run()
             for( ;; )
             {
                 resultStream.clear();
-                int res = transcodeIter->second->transcoder->transcodePacket( QnAbstractMediaDataPtr( new QnEmptyMediaData() ), resultStream );
+                int res = transcodeIter->second->transcoder->transcodePacket( QnAbstractMediaDataPtr( new QnEmptyMediaData() ), &resultStream );
                 if( res || resultStream.size() == 0 )
                     break;
                 transcodeIter->second->chunk->appendData( QByteArray::fromRawData(resultStream.constData(), resultStream.size()) );

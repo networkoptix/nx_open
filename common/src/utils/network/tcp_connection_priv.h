@@ -60,8 +60,8 @@ public:
 public:
     QSharedPointer<AbstractStreamSocket> socket;
 #ifdef USE_NX_HTTP
-    nx_http::HttpRequest request;
-    nx_http::HttpResponse response;
+    nx_http::Request request;
+    nx_http::Response response;
 #else
     QHttpRequestHeader requestHeaders;
     QHttpResponseHeader responseHeaders;

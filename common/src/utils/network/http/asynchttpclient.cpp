@@ -503,6 +503,8 @@ namespace nx_http
     {
         const bool useHttp11 = true;   //TODO/IMPL check. if we need it (e.g. we using keep-alive or requesting live capture)
 
+        m_request.headers.clear();
+
         m_request.requestLine.method = nx_http::Method::GET;
         m_request.requestLine.url = m_url.path() + (m_url.hasQuery() ? (QLatin1String("?") + m_url.query()) : QString());
         m_request.requestLine.version = useHttp11 ? nx_http::Version::http_1_1 : nx_http::Version::http_1_0;
@@ -510,14 +512,14 @@ namespace nx_http
             m_request.headers.insert( std::make_pair("User-Agent", m_userAgent.toLatin1()) );
         if( useHttp11 )
         {
-            m_request.headers["Accept"] = "*/*";
+            m_request.headers.insert( std::make_pair("Accept", "*/*") );
             if( m_contentEncodingUsed )
-                m_request.headers["Accept-Encoding"] = "gzip;q=1.0, identity;q=0.5, *;q=0";
+                m_request.headers.insert( std::make_pair("Accept-Encoding", "gzip;q=1.0, identity;q=0.5, *;q=0") );
             else
-                m_request.headers["Accept-Encoding"] = "identity;q=1.0, *;q=0";
-            m_request.headers["Cache-Control"] = "max-age=0";
-            //m_request.headers["Connection"] = "keep-alive";
-            m_request.headers["Host"] = m_url.host().toLatin1();
+                m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
+            m_request.headers.insert( std::make_pair("Cache-Control", "max-age=0") );
+            //m_request.headers.insert( std::make_pair("Connection", "keep-alive") );
+            m_request.headers.insert( std::make_pair("Host", m_url.host().toLatin1()) );
         }
         //adding user credentials
         if( (!m_userName.isEmpty() || !m_userPassword.isEmpty())
@@ -561,7 +563,7 @@ namespace nx_http
         return false;
     }
 
-    bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::HttpResponse& response )
+    bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::Response& response )
     {
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
         Q_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized );

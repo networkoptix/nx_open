@@ -87,7 +87,7 @@ void QnTCPConnectionProcessor::parseRequest()
 //    qDebug() << d->clientRequest;
 
 #ifdef USE_NX_HTTP
-    d->request = nx_http::HttpRequest();
+    d->request = nx_http::Request();
     if( !d->request.parse( d->clientRequest ) )
     {
         qWarning() << Q_FUNC_INFO << "Invalid request format.";
@@ -204,7 +204,6 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
 #endif
         data += sended;
         size -= sended;
-        bytesSent += sended;
     }
     return d->socket->isConnected();
 }
@@ -351,32 +350,7 @@ int QnTCPConnectionProcessor::getSocketTimeout()
 int QnTCPConnectionProcessor::readSocket( quint8* buffer, int bufSize )
 {
     Q_D(QnTCPConnectionProcessor);
-
-    if (d->owner->getOpenSSLContext() && !d->ssl)
-    {
-        d->ssl = SSL_new((SSL_CTX*) d->owner->getOpenSSLContext());  // get new SSL state with context 
-        if (!SSL_set_fd(d->ssl, d->socket->handle()))    // set connection to SSL state 
-            return false;
-        if (SSL_accept(d->ssl) != 1) 
-            return false; // ssl error
-    }
-
-    if( !d->clientRequest.isEmpty() )
-    {
-        const size_t bytesToCopy = std::min<>( bufSize, d->clientRequest.size() - d->clientRequestOffset );
-        memcpy( buffer, d->clientRequest.data() + d->clientRequestOffset, bytesToCopy );
-        d->clientRequestOffset += bytesToCopy;
-        if( d->clientRequestOffset == d->clientRequest.size() )
-        {
-            d->clientRequestOffset = 0;
-            d->clientRequest.clear();
-        }
-        return bytesToCopy;
-    }
-
-    return d->ssl
-        ? SSL_read(d->ssl, buffer, bufSize )
-        : d->socket->recv( buffer, bufSize );
+    return d->socket->recv( buffer, bufSize );
 }
 
 bool QnTCPConnectionProcessor::readRequest()
@@ -385,8 +359,8 @@ bool QnTCPConnectionProcessor::readRequest()
 
     //QElapsedTimer globalTimeout;
 #ifdef USE_NX_HTTP
-    d->request = nx_http::HttpRequest();
-    d->response = nx_http::HttpResponse();
+    d->request = nx_http::Request();
+    d->response = nx_http::Response();
 #else
     d->requestHeaders = QHttpRequestHeader();
     d->responseHeaders = QHttpResponseHeader();
@@ -448,10 +422,10 @@ void QnTCPConnectionProcessor::execute(QMutex& mutex)
     mutex.lock();
 }
 
-QString QnTCPConnectionProcessor::remoteHostAddress() const
+SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
 {
     Q_D(const QnTCPConnectionProcessor);
-    return d->socket ? d->socket->getPeerAddress() : QString();
+    return d->socket ? d->socket->getPeerAddress() : SocketAddress();
 }
 
 void QnTCPConnectionProcessor::releaseSocket()

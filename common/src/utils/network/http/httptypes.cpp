@@ -209,11 +209,6 @@ namespace nx_http
                     return StringType("Unknown_") + StringType::number(val);
             }
         }
-
-        StringType toString( int val )
-        {
-            return toString( (Value)val );
-        }
     }
 
 

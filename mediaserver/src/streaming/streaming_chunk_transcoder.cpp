@@ -7,7 +7,7 @@
 #include <QMutexLocker>
 
 #include <core/dataprovider/h264_mp4_to_annexb.h>
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_resource.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <transcoding/ffmpeg_transcoder.h>
@@ -70,7 +70,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqId( transcodeParams.srcResourceUniqueID() );
     if( !resource )
     {
-        NX_LOG( QString::fromAscii("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 not found").
+        NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 not found").
             arg(transcodeParams.srcResourceUniqueID()), cl_logDEBUG1 );
         return false;
     }
@@ -78,12 +78,12 @@ bool StreamingChunkTranscoder::transcodeAsync(
     QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
     if( !mediaResource )
     {
-        NX_LOG( QString::fromAscii("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 is not media resource").
+        NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 is not media resource").
             arg(transcodeParams.srcResourceUniqueID()), cl_logDEBUG1 );
         return false;
     }
 
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera( mediaResource );
+    QnVideoCamera* camera = qnCameraPool->getVideoCamera( resource );
     Q_ASSERT( camera );
 
     //validating transcoding parameters
@@ -145,7 +145,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     }
 
     //creating archive reader
-    QSharedPointer<QnAbstractStreamDataProvider> dp( mediaResource->createDataProvider( QnResource::Role_Archive ) );
+    QSharedPointer<QnAbstractStreamDataProvider> dp( mediaResource->toResource()->createDataProvider( QnResource::Role_Archive ) );
     if( !dp )
     {
         NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Failed (1) to create archive data provider (resource %1)").
@@ -183,7 +183,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     }
 
     NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Failed to find source. "
-        "Resource %1, statTime %2, duration %3").arg(mediaResource->getUniqueId()).
+        "Resource %1, statTime %2, duration %3").arg(mediaResource->toResource()->getUniqueId()).
         arg(transcodeParams.startTimestamp()).arg(transcodeParams.endTimestamp()), cl_logWARNING );
 
     m_transcodings.erase( p.first );
@@ -220,7 +220,7 @@ void StreamingChunkTranscoder::onTimer( const quint64& timerID )
     }
 
     NX_LOG( QString("StreamingChunkTranscoder::onTimer. Received timer event with id %1. Resource %1").
-        arg(timerID).arg(transcodeIter->second.mediaResource->getUniqueId()), cl_logDEBUG1 );
+        arg(timerID).arg(transcodeIter->second.mediaResource->toResource()->getUniqueId()), cl_logDEBUG1 );
 
     //starting transcoding
     if( !startTranscoding(
@@ -231,7 +231,7 @@ void StreamingChunkTranscoder::onTimer( const quint64& timerID )
             transcodeIter->second.chunk ) )
     {
         NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::onTimer. Failed to start transcoding (resource %1)").
-            arg(transcodeIter->second.mediaResource->getUniqueId()), cl_logWARNING );
+            arg(transcodeIter->second.mediaResource->toResource()->getUniqueId()), cl_logWARNING );
         transcodeIter->second.chunk->doneModification( StreamingChunk::rcError );
     }
 }
@@ -274,7 +274,7 @@ bool StreamingChunkTranscoder::startTranscoding(
         if( codecID == CODEC_ID_NONE )
         {
             NX_LOG( QString::fromLatin1("Cannot start transcoding of streaming chunk of resource %1. No codec %2 found in FFMPEG library").
-                arg(mediaResource->getUniqueId()).arg(transcodeParams.videoCodec()), cl_logWARNING );
+                arg(mediaResource->toResource()->getUniqueId()).arg(transcodeParams.videoCodec()), cl_logWARNING );
             return false;
         }
         transcodeMethod = codecID == resourceVideoStreamCodecID ?
@@ -283,7 +283,7 @@ bool StreamingChunkTranscoder::startTranscoding(
         if( transcodeParams.pictureSizePixels().isValid() )
             videoResolution = transcodeParams.pictureSizePixels();
     }
-    if( transcoder->setVideoCodec( codecID, transcodeMethod, videoResolution ) != 0 )
+    if( transcoder->setVideoCodec( codecID, transcodeMethod, Qn::QualityNormal, videoResolution ) != 0 )
     {
         NX_LOG( QString::fromLatin1("Failed to create transcoder with video codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
             arg(transcodeParams.videoCodec()).arg(transcodeParams.startTimestamp()).

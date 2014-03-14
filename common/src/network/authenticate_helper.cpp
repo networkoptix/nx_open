@@ -37,7 +37,7 @@ QnAuthHelper* QnAuthHelper::instance()
     return m_instance;
 }
 
-bool QnAuthHelper::authenticate(const nx_http::HttpRequest& request, nx_http::HttpResponse& response)
+bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response)
 {
     QString cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
     int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
@@ -107,7 +107,7 @@ static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter
     return rez;
 }
 
-bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::HttpResponse& responseHeaders)
+bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders)
 {
     const QList<QByteArray>& authParams = smartSplit(authData, ',');
 
@@ -171,7 +171,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     return false;
 }
 
-bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::HttpResponse& /*response*/)
+bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*response*/)
 {
     QByteArray digest = QByteArray::fromBase64(authData);
     int pos = digest.indexOf(':');
@@ -199,7 +199,7 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::HttpResponse
     return false;
 }
 
-bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, nx_http::HttpResponse& /*response*/, const QByteArray& sesionKey)
+bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, nx_http::Response& /*response*/, const QByteArray& sesionKey)
 {
     QByteArray digestBin = QByteArray::fromHex(authData);
     QByteArray sessionKeyBin = QByteArray::fromHex(sesionKey);
@@ -216,7 +216,7 @@ bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, nx_http::Ht
     return false;
 }
 
-void QnAuthHelper::addAuthHeader(nx_http::HttpResponse& response)
+void QnAuthHelper::addAuthHeader(nx_http::Response& response)
 {
     QString auth(lit("Digest realm=\"%1\",nonce=\"%2\""));
     response.headers.insert( nx_http::HttpHeader( "WWW-Authenticate", auth.arg(REALM).arg(QLatin1String(getNonce())).toLatin1() ) );

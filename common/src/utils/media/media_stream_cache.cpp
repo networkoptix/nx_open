@@ -88,7 +88,7 @@ void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
     QMutexLocker lk( &m_mutex );
 
     QnAbstractMediaDataPtr mediaPacket = data.dynamicCast<QnAbstractMediaData>();
-    const bool isKeyFrame = mediaPacket && (mediaPacket->flags & QnAbstractMediaData::MediaFlags_Key);
+    const bool isKeyFrame = mediaPacket && (mediaPacket->flags & QnAbstractMediaData::MediaFlags_AVKey);
     if( m_packetsByTimestamp.empty() && !isKeyFrame )
         return; //cache data MUST start with key frame
 

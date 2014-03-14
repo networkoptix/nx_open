@@ -60,12 +60,13 @@ protected:
         \note Usage of this method MUST NOT be mixed with usage of \a readRequest / \a parseRequest
     */
     int readSocket( quint8* buffer, int bufSize );
+    SocketAddress remoteHostAddress() const;
 
     QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, QSharedPointer<AbstractStreamSocket> socket);
 
-private:
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
+
 protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);
 

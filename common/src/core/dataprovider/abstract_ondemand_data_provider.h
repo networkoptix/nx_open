@@ -8,14 +8,12 @@
 #include <QObject>
 
 #include "../datapacket/abstract_data_packet.h"
-#include "../../utils/network/aio/selfremovable.h"
 
 
 //!Interface of class, providing data on demand (pull mode)
 class AbstractOnDemandDataProvider
 :
-    public QObject,
-    public SelfRemovable
+    public QObject
 {
     Q_OBJECT
 

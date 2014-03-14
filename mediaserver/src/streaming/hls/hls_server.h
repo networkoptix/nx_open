@@ -33,12 +33,12 @@ namespace nx_hls
     */
     class QnHttpLiveStreamingProcessor
     :
-        virtual public QnTCPConnectionProcessor
+        public QnTCPConnectionProcessor
     {
         Q_OBJECT
 
     public:
-        QnHttpLiveStreamingProcessor( TCPSocket* socket, QnTcpListener* owner );
+        QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner );
         virtual ~QnHttpLiveStreamingProcessor();
 
     protected:

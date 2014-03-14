@@ -225,7 +225,7 @@ void UPNPDeviceSearcher::eventTriggered( AbstractSocket* sock, PollSet::EventTyp
         return;
     }
 
-    nx_http::HttpRequest foundDeviceReply;
+    nx_http::Request foundDeviceReply;
     QString remoteHost;
 
     AbstractDatagramSocket* udpSock = dynamic_cast<AbstractDatagramSocket*>( sock );

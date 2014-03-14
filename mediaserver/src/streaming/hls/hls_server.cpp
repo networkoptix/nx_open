@@ -8,8 +8,9 @@
 #include <limits>
 #include <map>
 
-#include <core/resource_managment/resource_pool.h>
+#include <core/resource_management/resource_pool.h>
 #include <utils/common/log.h>
+#include <utils/common/systemerror.h>
 #include <utils/media/media_stream_cache.h>
 #include <version.h>
 
@@ -39,9 +40,9 @@ namespace nx_hls
     static const quint64 MS_IN_SEC = 1000;
     static const quint64 MICROS_IN_MS = 1000;
 
-    QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( TCPSocket* socket, QnTcpListener* owner )
+    QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner )
     :
-        QnTCPConnectionProcessor( socket, owner ),
+        QnTCPConnectionProcessor( socket ),
         m_state( sReceiving ),
         m_currentChunk( NULL ),
         m_switchToChunkedTransfer( false ),
@@ -87,7 +88,7 @@ namespace nx_hls
                     if( bytesSent < 0 )
                     {
                         NX_LOG( QString::fromLatin1("Error sending data to %1 (%2). Terminating connection...").
-                            arg(remoteHostAddress()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                            arg(remoteHostAddress().toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
                         m_state = sDone;
                         break;
                     }
@@ -97,7 +98,7 @@ namespace nx_hls
                     if( !prepareDataToSend() )
                     {
                         NX_LOG( QString::fromLatin1("Finished uploading %1 data to %2. Closing connection...").
-                            arg(QLatin1String("entity_path")).arg(remoteHostAddress()), cl_logDEBUG1 );
+                            arg(QLatin1String("entity_path")).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
                         //sending empty chunk to signal EOF
                         if( m_useChunkedTransfer )
                             sendChunk( QByteArray() );
@@ -108,7 +109,7 @@ namespace nx_hls
                 }
 
                 case sDone:
-                    NX_LOG( QString::fromLatin1("Done request to %1. Closing connection...").arg(remoteHostAddress()), cl_logDEBUG1 );
+                    NX_LOG( QString::fromLatin1("Done request to %1. Closing connection...").arg(remoteHostAddress().toString()), cl_logDEBUG1 );
                     return;
             }
         }
@@ -123,12 +124,12 @@ namespace nx_hls
             if( bytesRead < 0 )
             {
                 NX_LOG( QString::fromLatin1("Error reading socket from %1 (%2). Terminating connection...").
-                    arg(remoteHostAddress()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                    arg(remoteHostAddress().toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
                 return false;
             }
             if( bytesRead == 0 )
             {
-                NX_LOG( QString::fromLatin1("Client %1 closed connection").arg(remoteHostAddress()), cl_logINFO );
+                NX_LOG( QString::fromLatin1("Client %1 closed connection").arg(remoteHostAddress().toString()), cl_logINFO );
                 return false; 
             }
             m_readBuffer.resize( bytesRead );
@@ -138,7 +139,7 @@ namespace nx_hls
         if( !m_httpStreamReader.parseBytes( m_readBuffer, m_readBuffer.size(), &bytesProcessed ) )
         {
             NX_LOG( QString::fromLatin1("Error parsing http message from %1 (%2). Terminating connection...").
-                arg(remoteHostAddress()).arg(m_httpStreamReader.errorText()), cl_logWARNING );
+                arg(remoteHostAddress().toString()).arg(m_httpStreamReader.errorText()), cl_logWARNING );
             return false;
         }
         if( bytesProcessed == (size_t)m_readBuffer.size() )
@@ -158,13 +159,13 @@ namespace nx_hls
                 if( requestsLog )
                     requestsLog->log( QString::fromLatin1("Received %1 from %2:\n%3-------------------\n\n\n").
                         arg(nx_http::MessageType::toString(m_httpStreamReader.message().type)).
-                        arg(remoteHostAddress()).
+                        arg(remoteHostAddress().toString()).
                         arg(QString::fromLatin1(m_httpStreamReader.message().toString())), cl_logDEBUG1 );
 
                 if( m_httpStreamReader.message().type != MessageType::request )
                 {
                     NX_LOG( QString::fromLatin1("Received %1 from %2 while expecting request. Terminating connection...").
-                        arg(MessageType::toString(m_httpStreamReader.message().type)).arg(remoteHostAddress()), cl_logWARNING );
+                        arg(MessageType::toString(m_httpStreamReader.message().type)).arg(remoteHostAddress().toString()), cl_logWARNING );
                     return false;
                 }
                 m_state = sProcessingMessage;
@@ -175,7 +176,7 @@ namespace nx_hls
             case HttpStreamReader::parseError:
                 //bad request format, terminating connection...
                 NX_LOG( QString::fromLatin1("Error parsing http message from %1 (%2). Terminating connection...").
-                    arg(remoteHostAddress()).arg(m_httpStreamReader.errorText()), cl_logWARNING );
+                    arg(remoteHostAddress().toString()).arg(m_httpStreamReader.errorText()), cl_logWARNING );
                 return false;
 
             default:
@@ -280,7 +281,7 @@ namespace nx_hls
 
         if( requestsLog )
             requestsLog->log( QString::fromLatin1("Sending response to %1:\n%2-------------------\n\n\n").
-                arg(remoteHostAddress()).
+                arg(remoteHostAddress().toString()).
                 arg(QString::fromLatin1(m_writeBuffer)), cl_logDEBUG1 );
 
         m_state = sSending;
@@ -451,7 +452,7 @@ namespace nx_hls
         QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqId( uniqueResourceID.toString() );
         if( !resource )
         {
-            NX_LOG( QString::fromAscii("QnHttpLiveStreamingProcessor::getHLSPlaylist. Requested resource %1 not found").
+            NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getHLSPlaylist. Requested resource %1 not found").
                 arg(QString::fromRawData(uniqueResourceID.data(), uniqueResourceID.size())), cl_logDEBUG1 );
             return nx_http::StatusCode::notFound;
         }
@@ -459,7 +460,7 @@ namespace nx_hls
         QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
         if( !mediaResource )
         {
-            NX_LOG( QString::fromAscii("QnHttpLiveStreamingProcessor::getHLSPlaylist. Requested resource %1 is not media resource").
+            NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getHLSPlaylist. Requested resource %1 is not media resource").
                 arg(QString::fromRawData(uniqueResourceID.data(), uniqueResourceID.size())), cl_logDEBUG1 );
             return nx_http::StatusCode::notFound;
         }
@@ -482,7 +483,7 @@ namespace nx_hls
                 &isPlaylistClosed );
         if( playlistResult != nx_http::StatusCode::ok )
         {
-            NX_LOG( QString::fromAscii("QnHttpLiveStreamingProcessor::getHLSPlaylist. Failed to compose playlist for resource %1 streaming").
+            NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getHLSPlaylist. Failed to compose playlist for resource %1 streaming").
                 arg(QString::fromRawData(uniqueResourceID.data(), uniqueResourceID.size())), cl_logDEBUG1 );
             return playlistResult;
         }
@@ -532,7 +533,7 @@ namespace nx_hls
             nx_hls::Chunk hlsChunk;
             hlsChunk.duration = chunkList[i].duration / 1000000.0;
             hlsChunk.url = baseChunkUrl;
-            hlsChunk.url.setPath( HLS_PREFIX + mediaResource->getUniqueId() );
+            hlsChunk.url.setPath( HLS_PREFIX + mediaResource->toResource()->getUniqueId() );
             foreach( RequestParamsType::value_type param, commonChunkParams )
                 hlsChunk.url.addQueryItem( param.first, param.second );
             hlsChunk.url.addQueryItem( StreamingParams::START_TIMESTAMP_PARAM_NAME, QString::number(chunkList[i].startTimestamp) );
@@ -559,14 +560,14 @@ namespace nx_hls
         QnVideoCamera* camera = qnCameraPool->getVideoCamera( mediaResource );
         if( !camera )
         {
-            NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 which is not camera").arg(mediaResource->getUniqueId()), cl_logWARNING );
+            NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 which is not camera").arg(mediaResource->toResource()->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::forbidden;
         }
 
         //starting live caching, if it is not started
         if( !camera->ensureLiveCacheStarted() )
         {
-            NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 with no live cache").arg(mediaResource->getUniqueId()), cl_logWARNING );
+            NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 with no live cache").arg(mediaResource->toResource()->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::internalServerError;
         }
 
@@ -576,11 +577,11 @@ namespace nx_hls
         const unsigned int chunksGenerated = camera->hlsLivePlaylistManager()->generateChunkList( chunkList, NULL );
         if( chunksGenerated == 0 )
         {
-            NX_LOG( QString::fromLatin1("Failed to get live chunks of resource %1").arg(mediaResource->getUniqueId()), cl_logWARNING );
+            NX_LOG( QString::fromLatin1("Failed to get live chunks of resource %1").arg(mediaResource->toResource()->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::noContent;
         }
 
-        NX_LOG( QString::fromLatin1("Prepared live playlist of resource %1 (%2 chunks)").arg(mediaResource->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
+        NX_LOG( QString::fromLatin1("Prepared live playlist of resource %1 (%2 chunks)").arg(mediaResource->toResource()->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
 
         return nx_http::StatusCode::ok;
     }
@@ -599,7 +600,7 @@ namespace nx_hls
         QnVideoCamera* camera = qnCameraPool->getVideoCamera( mediaResource );
         if( !camera )
         {
-            NX_LOG( QString::fromLatin1("Error. Requested hls playlist of resource %1 which is not camera").arg(mediaResource->getUniqueId()), cl_logWARNING );
+            NX_LOG( QString::fromLatin1("Error. Requested hls playlist of resource %1 which is not camera").arg(mediaResource->toResource()->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::forbidden;
         }
 
@@ -608,11 +609,11 @@ namespace nx_hls
         const unsigned int chunksGenerated = session->playlistManager()->generateChunkList( chunkList, isPlaylistClosed );
         if( chunksGenerated == 0 )
         {
-            NX_LOG( QString::fromLatin1("Failed to get archive chunks of resource %1").arg(mediaResource->getUniqueId()), cl_logWARNING );
+            NX_LOG( QString::fromLatin1("Failed to get archive chunks of resource %1").arg(mediaResource->toResource()->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::noContent;
         }
 
-        NX_LOG( QString::fromLatin1("Prepared archive playlist of resource %1 (%2 chunks)").arg(mediaResource->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
+        NX_LOG( QString::fromLatin1("Prepared archive playlist of resource %1 (%2 chunks)").arg(mediaResource->toResource()->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
 
         return nx_http::StatusCode::ok;
     }
@@ -675,7 +676,7 @@ namespace nx_hls
         if( !chunk )
         {
             NX_LOG( QString::fromLatin1("Could not get chunk %1 of resource %2 requested by %3").
-                arg(QLatin1String(request.requestLine.url.encodedQuery())).arg(uniqueResourceID.toString()).arg(remoteHostAddress()), cl_logDEBUG1 );
+                arg(QLatin1String(request.requestLine.url.encodedQuery())).arg(uniqueResourceID.toString()).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
             return nx_http::StatusCode::notFound;
         }
 
