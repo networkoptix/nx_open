@@ -83,6 +83,8 @@ namespace ec2
         void locked(QByteArray name);
         void lockTimeout(QByteArray name);
     private:
+        qint64 newTimestamp();
+    private:
         friend class QnDistributedMutex;
 
         void at_gotLockRequest(ApiLockData lockInfo);
@@ -94,6 +96,7 @@ namespace ec2
     private:
         QMap<QByteArray, QnDistributedMutexPtr> m_mutexList;
         mutable QMutex m_mutex;
+        qint64 m_timestamp;
     };
 
 }
