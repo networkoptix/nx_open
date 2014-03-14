@@ -1585,9 +1585,6 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicense>&
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicenseList>& tran)
 {
-    return m_licenseManagerImpl->addLicenses( tran.params );
-
-
     foreach (const ApiLicense& license, tran.params.data) {
         ErrorCode result = saveLicense(license);
         if (result != ErrorCode::ok) {
@@ -1596,12 +1593,12 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicenseLi
     }
 
     return ErrorCode::ok;
+
+//    return m_licenseManagerImpl->addLicenses( tran.params );
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseList& data)
 {
-    return m_licenseManagerImpl->getLicenses( &data );
-
     QSqlQuery query(m_sdb);
 
     QString q = QString(lit("SELECT license_key as key, license_block as licenseBlock from vms_license"));
@@ -1616,6 +1613,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicense
 
     QN_QUERY_TO_DATA_OBJECT(query, ApiLicense, data.data, ApiLicenseFields);
 
+    // m_licenseManagerImpl->getLicenses( &data );
     return ErrorCode::ok;
 }
 
