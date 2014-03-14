@@ -10,6 +10,7 @@ namespace Qn {
     enum FrameShape {
         NoFrame,
         RectangularFrame,
+        RoundedRectangularFrame,
         EllipticalFrame,
     };
 }
@@ -40,9 +41,10 @@ public:
     QColor windowColor() const;
     void setWindowColor(const QColor &windowColor);
 
-protected:
-    QPainterPath framePath(const QRectF &rect) const;
+    qreal roundingRadius() const;
+    void setRoundingRadius(qreal roundingRadius);
 
+protected:
     void paintFrame(QPainter *painter, const QRectF &rect);
 
     void initSelf(QGraphicsWidget *self);
@@ -50,6 +52,7 @@ protected:
 private:
     QGraphicsWidget *m_self;
     qreal m_frameWidth;
+    qreal m_roundingRadius;
     Qt::PenStyle m_frameStyle;
     Qn::FrameShape m_frameShape;
 };
@@ -82,6 +85,7 @@ class QnFramedWidget: public Framed<GraphicsWidget> {
     Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor)
     Q_PROPERTY(QBrush windowBrush READ windowBrush WRITE setWindowBrush)
     Q_PROPERTY(QColor windowColor READ windowColor WRITE setWindowColor)
+    Q_PROPERTY(qreal roundingRadius READ roundingRadius WRITE setRoundingRadius)
     typedef Framed<GraphicsWidget> base_type;
 
 public:

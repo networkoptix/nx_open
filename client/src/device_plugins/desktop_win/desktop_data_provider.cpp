@@ -3,6 +3,8 @@
 #ifdef Q_OS_WIN
 
 #include <intrin.h>
+#include <windows.h>
+#include <mmsystem.h>
 
 
 static const int DEFAULT_VIDEO_STREAM_ID = 0;
@@ -23,7 +25,7 @@ extern "C"
 }
 
 #include "core/datapacket/media_data_packet.h"
-#include "win_audio_helper.h"
+#include "win_audio_device_info.h"
 #include "decoders/audio/ffmpeg_audio.h"
 #include "utils/common/synctime.h"
 #include "utils/media/ffmpeg_helper.h"
@@ -277,7 +279,7 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupPostProcess()
             return false;
     }
 
-    WinAudioExtendInfo extInfo(m_audioDevice.deviceName());
+    QnWinAudioDeviceInfo extInfo(m_audioDevice.deviceName());
     if (extInfo.isMicrophone())
     {
         m_speexPreprocess = speex_preprocess_state_init(m_owner->m_audioCodecCtx->frame_size * m_owner->m_audioCodecCtx->channels, m_owner->m_audioCodecCtx->sample_rate);
@@ -587,7 +589,6 @@ int QnDesktopDataProvider::processData(bool flush)
     if (m_initTime == AV_NOPTS_VALUE)
         m_initTime = qnSyncTime->currentUSecsSinceEpoch();
 
-    AVPacket videoPkt;
     if (out_size > 0)
     {
 
@@ -628,7 +629,6 @@ int QnDesktopDataProvider::processData(bool flush)
 
         m_audioFramesCount++;
 
-        AVPacket audioPacket;
         ai->m_audioQueue.pop(audioData);
 
         // todo: add audio resample here
@@ -679,6 +679,7 @@ int QnDesktopDataProvider::processData(bool flush)
             //audio->timestamp = av_rescale_q(m_audioCodecCtx->coded_frame->pts, m_audioCodecCtx->time_base, timeBaseNative) + m_initTime;
             audio->flags |= QnAbstractMediaData::MediaFlags_LIVE;
             audio->dataProvider = this;
+            audio->channelNumber = 1;
             putData(audio);
         }
     }
@@ -793,6 +794,31 @@ void QnDesktopDataProvider::closeStream()
     foreach(EncodedAudioInfo* audioChannel, m_audioInfo)
         delete audioChannel;
     m_audioInfo.clear();
+}
+
+class QnDesktopDataProvider::QnDesktopAudioLayout: public QnResourceAudioLayout
+{
+public:
+    QnDesktopAudioLayout(): QnResourceAudioLayout(), m_channels(0) {}
+    virtual int channelCount() const override { return m_channels; }
+    virtual AudioTrack getAudioTrackInfo(int /*index*/) const override { return m_audioTrack; }
+    void setAudioTrackInfo(const AudioTrack& info) { m_audioTrack = info; m_channels = 1;}
+private:
+    AudioTrack m_audioTrack;
+    int m_channels;
+};
+
+QnConstResourceAudioLayoutPtr QnDesktopDataProvider::getAudioLayout()
+{
+    if (!audioLayout)
+        audioLayout.reset(new QnDesktopAudioLayout() );
+    if (m_audioCodecCtx && audioLayout->channelCount() == 0)
+    {
+        QnResourceAudioLayout::AudioTrack track;
+        track.codecContext = QnAbstractMediaContextPtr(new QnMediaContext(m_audioCodecCtx));
+        audioLayout->setAudioTrackInfo(track);
+    }
+    return audioLayout;
 }
 
 qint64 QnDesktopDataProvider::currentTime() const

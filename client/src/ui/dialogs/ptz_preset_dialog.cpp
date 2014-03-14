@@ -13,8 +13,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-QnPtzPresetDialog::QnPtzPresetDialog(const QnPtzControllerPtr &controller, QWidget *parent, Qt::WindowFlags windowFlags):
-    base_type(controller, parent, windowFlags),
+QnPtzPresetDialog::QnPtzPresetDialog(QWidget *parent, Qt::WindowFlags windowFlags):
+    base_type(parent, windowFlags),
     ui(new Ui::PtzPresetDialog())
 {
     ui->setupUi(this);
@@ -46,6 +46,12 @@ void QnPtzPresetDialog::loadData(const QnPtzData &data) {
             continue;
         hotkeys.removeOne(key);
     }
+    foreach (const QnPtzTour &tour, data.tours) {
+        int key = usedHotkeys.key(tour.id, QnPtzHotkey::NoHotkey);
+        if (key == QnPtzHotkey::NoHotkey)
+            continue;
+        hotkeys.removeOne(key);
+    }
 
     int currentHotkey = hotkey();
     ui->hotkeyComboBox->clear();
@@ -70,7 +76,11 @@ void QnPtzPresetDialog::saveData() {
 }
 
 Qn::PtzDataFields QnPtzPresetDialog::requiredFields() const {
-    return Qn::PresetsPtzField;
+    return Qn::PresetsPtzField | Qn::ToursPtzField;
+}
+
+void QnPtzPresetDialog::updateFields(Qn::PtzDataFields fields) {
+    Q_UNUSED(fields)
 }
 
 QnAbstractPtzHotkeyDelegate* QnPtzPresetDialog::hotkeysDelegate() const {

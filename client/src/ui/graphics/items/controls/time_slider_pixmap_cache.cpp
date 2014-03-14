@@ -14,7 +14,7 @@ QnTimeSliderPixmapCache::QnTimeSliderPixmapCache(QObject *parent):
     m_pixmapByShortPositionKey(64 * 1024 * 1024), /* These are frequently reused, so we want the cache to be big. */
     m_pixmapByLongPositionKey(2 * 1024 * 1024) /* These are rarely reused once out of scope, so we don't want the cache to be large. */
 {
-    connect(qnPlatform->notifier(), SIGNAL(timeZoneChanged()), this, SLOT(clear()));
+    connect(qnPlatform->notifier(), &QnPlatformNotifier::timeZoneChanged, this, &QnTimeSliderPixmapCache::clear);
 }
 
 QnTimeSliderPixmapCache::~QnTimeSliderPixmapCache() {
@@ -35,35 +35,48 @@ void QnTimeSliderPixmapCache::setFont(const QFont &font) {
     clear();
 }
 
-const QPixmap &QnTimeSliderPixmapCache::positionShortPixmap(qint64 position, int height, const QnTimeStep &step, const QColor &color) {
-    qint32 key = shortCacheKey(position, height, step); // TODO: #Elric #customization color is not used
+const QColor &QnTimeSliderPixmapCache::color() const {
+    return m_color;
+}
+
+void QnTimeSliderPixmapCache::setColor(const QColor &color) {
+    if(m_color == color)
+        return;
+
+    m_color = color;
+
+    clear();
+}
+
+const QPixmap &QnTimeSliderPixmapCache::positionShortPixmap(qint64 position, int height, const QnTimeStep &step) {
+    qint32 key = shortCacheKey(position, height, step);
 
     const QPixmap *result = m_pixmapByShortPositionKey.object(key);
     if(result)
         return *result;
 
-    result = new QPixmap(textPixmap(toShortString(position, step), height, color));
+    result = new QPixmap(textPixmap(toShortString(position, step), height));
     m_pixmapByShortPositionKey.insert(key, result, result->width() * result->height() * result->depth() / 8);
     return *result;
 }
 
-const QPixmap &QnTimeSliderPixmapCache::positionLongPixmap(qint64 position, int height, const QnTimeStep &step, const QColor &color) {
-    QnTimeStepLongCacheKey key = longCacheKey(position, height, step); // TODO: #Elric #customization color is not used
+const QPixmap &QnTimeSliderPixmapCache::positionLongPixmap(qint64 position, int height, const QnTimeStep &step) {
+    QnTimeStepLongCacheKey key = longCacheKey(position, height, step);
 
     const QPixmap *result = m_pixmapByLongPositionKey.object(key);
     if(result)
         return *result;
 
-    result = new QPixmap(textPixmap(toLongString(position, step), height, color));
+    result = new QPixmap(textPixmap(toLongString(position, step), height));
     m_pixmapByLongPositionKey.insert(key, result, result->width() * result->height() * result->depth() / 8);
     return *result;
 }
 
-const QPixmap &QnTimeSliderPixmapCache::textPixmap(const QString &text, int height, const QColor &color) {
+const QPixmap &QnTimeSliderPixmapCache::textPixmap(const QString &text, int height) {
     QFont localFont = m_font;
     localFont.setPixelSize(height);
     
-    return m_cache->pixmap(text, localFont, color);
+    return m_cache->pixmap(text, localFont, m_color);
 }
 
 void QnTimeSliderPixmapCache::clear() {

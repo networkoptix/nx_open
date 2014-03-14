@@ -254,7 +254,7 @@ void QnLog::log(QnLogLevel logLevel, const char* format, ...) {
 }
 
 void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg) {
-    //TODO: ak use ctx
+    //TODO: #Elric use ctx
 
     QnLogLevel logLevel;
     switch (type) {

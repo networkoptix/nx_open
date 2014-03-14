@@ -8,6 +8,7 @@ import sys
 
 from os.path import join
 
+
 def change_dep_path(binary, xfrom, relative_to):
     subprocess.call(['install_name_tool', '-change', xfrom, '@executable_path/../Frameworks/' + relative_to, binary])
 
@@ -46,10 +47,11 @@ def prepare(binary, sbindir, tlibdir):
         tfolder = join(tbindir, subfolder)
         shutil.copytree(join(sbindir, subfolder), tfolder, ignore=ignore_debug)
         for f in os.listdir(tfolder):
-            yield join(tfolder, f)
+            dep = join(tfolder, f)
+            os.chmod(dep, 0644)
+            yield dep
 
     shutil.copytree(join(sbindir, 'vox'), join(tbindir, 'vox'))
-        
 
 
 def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
@@ -70,6 +72,7 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
             tpath = join(tlibdir, name)
             if not os.path.exists(tpath):
                 shutil.copy(fpath, tlibdir)
+                os.chmod(tpath, 0644)
                 fix_binary(tpath, bindir, libdir, qlibdir, tlibdir)
             change_dep_path(binary, full_name, name)
         elif name.startswith('Q'):
@@ -83,7 +86,10 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
                     fpath = join(qlibdir, folder, name)
                     tfolder = join(tlibdir, folder)
                     tpath = join(tfolder, name)
+
+                    # Copy framework binary
                     shutil.copy(fpath, tfolder)
+                    os.chmod(tpath, 0644)
                     shutil.copytree(join(qlibdir, framework_name, 'Contents'), join(tlibdir, framework_name, 'Contents'))
                     fix_binary(tpath, bindir, libdir, qlibdir, tlibdir)
                 change_dep_path(binary, full_name, join(folder, name))

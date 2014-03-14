@@ -13,15 +13,19 @@
 #include <utils/common/log.h>
 #include <utils/common/process.h>
 
+#include "process_utils.h"
+
 
 ApplauncherProcess::ApplauncherProcess(
     QSettings* const settings,
     InstallationManager* const installationManager,
-    bool quitMode )
+    bool quitMode,
+    const QString& mirrorListUrl )
 :
     m_terminated( false ),
     m_installationManager( installationManager ),
     m_quitMode( quitMode ),
+    m_mirrorListUrl( mirrorListUrl ),
     m_taskServer( this ),
     m_settings( settings ),
     m_bindTriesCount( 0 ),
@@ -120,9 +124,19 @@ int ApplauncherProcess::run()
     if( getVersionToLaunch( &versionToLaunch, &appArgs ) )
     {
         applauncher::api::Response response;
-        startApplication(
-            std::make_shared<applauncher::api::StartApplicationTask>(versionToLaunch, appArgs),
-            &response );
+        for( int i = 0; i < 2; ++i )
+        {
+            if( startApplication(
+                    std::make_shared<applauncher::api::StartApplicationTask>(versionToLaunch, appArgs),
+                    &response ) )
+                break;
+
+            //failed to start, trying to restore version
+            if( !blockingRestoreVersion( versionToLaunch ) )
+                versionToLaunch = m_installationManager->getMostRecentVersion();
+        }
+
+        //if( response.result != applauncher::api::ResultType::ok )
     }
 
     std::unique_lock<std::mutex> lk( m_mutex );
@@ -132,7 +146,7 @@ int ApplauncherProcess::run()
     m_taskServer.pleaseStop();
     m_taskServer.wait();
 
-    //interrupting running installation tasks. With taskserver down noone can modify m_activeInstallations
+    //interrupting running installation tasks. With taskserver down no one can modify m_activeInstallations
     for( auto installationIter: m_activeInstallations )
         installationIter.second->pleaseStop();
 
@@ -159,7 +173,9 @@ bool ApplauncherProcess::sendTaskToRunningLauncherInstance()
             return false;
         }
 
-        serializedTask = applauncher::api::StartApplicationTask(versionToLaunch, appArgs).serialize();
+        applauncher::api::StartApplicationTask startTask(versionToLaunch, appArgs);
+        startTask.autoRestore = true;
+        serializedTask = startTask.serialize();
     }
     else
     {
@@ -282,19 +298,59 @@ bool ApplauncherProcess::startApplication(
         return false;
     }
 
-    if( task->version != m_installationManager->getMostRecentVersion() )
+    if( task->version != m_installationManager->getMostRecentVersion() ) {
         task->appArgs += QString::fromLatin1(" ") + m_settings->value( NON_RECENT_VERSION_ARGS_PARAM_NAME, NON_RECENT_VERSION_ARGS_DEFAULT_VALUE ).toString();
+
+        if (!appData.verifyInstallation()) {
+            NX_LOG( QString::fromLatin1("Verification failed for version %1 (path %2)").arg(appData.version()).arg(appData.rootPath()), cl_logDEBUG1 );
+            response->result = applauncher::api::ResultType::ioError;
+
+            if( task->autoRestore )
+            {
+                applauncher::api::StartInstallationResponse startInstallationResponse;
+                startInstallation(
+                    std::make_shared<applauncher::api::StartInstallationTask>( task->version, true ),
+                    &startInstallationResponse );
+            }
+
+            return false;
+        }
+    }
 
     //TODO/IMPL start process asynchronously ?
 
-    const QString binPath = appData.installationDirectory + "/" + APPLICATION_BIN_NAME;
+    const QString binPath = appData.executablePath();
+
+    QStringList environment = QProcess::systemEnvironment();
+#ifdef Q_OS_LINUX
+    QString variableValue = appData.libraryPath();
+    if (!variableValue.isEmpty() && QFile::exists(variableValue)) {
+        const QString variableName = "LD_LIBRARY_PATH";
+
+        QRegExp varRegExp(QString("%1=(.+)").arg(variableName));
+
+        auto it = environment.begin();
+        for (; it != environment.end(); ++it) {
+            if (varRegExp.exactMatch(*it)) {
+                *it = QString("%1=%2:%3").arg(variableName, variableValue, varRegExp.cap(1));
+                break;
+            }
+        }
+        if (it == environment.end())
+            environment.append(QString("%1=%2").arg(variableName, variableValue));
+    }
+#endif
+
     NX_LOG( QString::fromLatin1("Launching version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG2 );
-    if( QProcess::startDetached(
+    if( ProcessUtils::startProcessDetached(
             binPath,
-            task->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts) ) )
+            task->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts),
+            QString(),
+            environment) )
     {
         NX_LOG( QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG1 );
-        m_settings->setValue( QLatin1String("previousLaunchedVersion"), task->version );
+        m_settings->setValue( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME, task->version );
+        m_settings->sync();
         response->result = applauncher::api::ResultType::ok;
         return true;
     }
@@ -303,6 +359,15 @@ bool ApplauncherProcess::startApplication(
         //TODO/IMPL should mark version as not installed or corrupted?
         NX_LOG( QString::fromLatin1("Failed to launch version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG1 );
         response->result = applauncher::api::ResultType::ioError;
+
+        if( task->autoRestore )
+        {
+            applauncher::api::StartInstallationResponse startInstallationResponse;
+            startInstallation(
+                std::make_shared<applauncher::api::StartInstallationTask>( task->version, true ),
+                &startInstallationResponse );
+        }
+
         return false;
     }
 }
@@ -316,6 +381,8 @@ bool ApplauncherProcess::startInstallation(
         response->result = applauncher::api::ResultType::invalidVersionFormat;
         return true;
     }
+
+    //TODO/IMPL if installation of this version is already running, returning id of running installation
 
     //if already installed, running restore
     //if( m_installationManager->isVersionInstalled(task->version) )
@@ -337,8 +404,9 @@ bool ApplauncherProcess::startInstallation(
         QN_CUSTOMIZATION_NAME,
         task->version,
         task->module,
-        targetDir ) );
-    if( !installationProcess->start( *m_settings ) )
+        targetDir,
+        task->autoStart ) );
+    if( !installationProcess->start( m_mirrorListUrl ) )
     {
         response->result = applauncher::api::ResultType::ioError;
         return true;
@@ -347,7 +415,8 @@ bool ApplauncherProcess::startInstallation(
     response->installationID = ++m_prevInstallationID;
     m_activeInstallations.insert( std::make_pair( response->installationID, installationProcess ) );
 
-    connect( installationProcess.get(), SIGNAL(installationSucceeded()), this, SLOT(onInstallationSucceeded()), Qt::DirectConnection );
+    connect( installationProcess.get(), &InstallationProcess::installationDone,
+             this, &ApplauncherProcess::onInstallationDone, Qt::DirectConnection );
 
     response->result = applauncher::api::ResultType::ok;
     return true;
@@ -444,7 +513,50 @@ void ApplauncherProcess::onTimer( const quint64& timerID )
     killProcessByPid( task.processID );
 }
 
-void ApplauncherProcess::onInstallationSucceeded()
+void ApplauncherProcess::onInstallationDone( InstallationProcess* installationProcess )
 {
-    m_installationManager->updateInstalledVersionsInformation();
+    if( installationProcess->getStatus() == applauncher::api::InstallationStatus::success )
+    {
+        m_installationManager->updateInstalledVersionsInformation();
+        m_installationManager->createLatestVersionGhostForVersion(installationProcess->getVersion());
+        if( installationProcess->autoStartNeeded() )
+        {
+            applauncher::api::Response response;
+            startApplication(
+                std::make_shared<applauncher::api::StartApplicationTask>(installationProcess->getVersion(), QString()),
+                &response );
+        }
+    }
+}
+
+static const int INSTALLATION_CHECK_TIMEOUT_MS = 1000;
+
+bool ApplauncherProcess::blockingRestoreVersion( const QString& versionToLaunch )
+{
+    //trying to restore installed version
+    applauncher::api::StartInstallationResponse startInstallationResponse;
+    if( !startInstallation(
+            std::make_shared<applauncher::api::StartInstallationTask>( versionToLaunch ),
+            &startInstallationResponse ) )
+    {
+        return false;
+    }
+
+    applauncher::api::InstallationStatusResponse response;
+    for( ;; )
+    {
+        getInstallationStatus(
+            std::make_shared<applauncher::api::GetInstallationStatusRequest>( startInstallationResponse.installationID ),
+            &response );
+
+        if( response.status == applauncher::api::InstallationStatus::inProgress )
+        {
+            QThread::msleep( INSTALLATION_CHECK_TIMEOUT_MS );
+            continue;
+        }
+
+        break;
+    }
+
+    return response.status == applauncher::api::InstallationStatus::success;
 }

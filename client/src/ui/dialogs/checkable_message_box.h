@@ -45,6 +45,24 @@ public:
         QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Yes | QDialogButtonBox::No,
         QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::No);
 
+    static QDialogButtonBox::StandardButton
+    warning(QWidget *parent,
+        int helpTopicId,
+        const QString &title,
+        const QString &warning,
+        const QString &checkBoxText,
+        bool *checkBoxSetting,
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::Ok);
+
+    static QDialogButtonBox::StandardButton
+    warning(QWidget *parent,
+        const QString &title,
+        const QString &warning,
+        const QString &checkBoxText,
+        bool *checkBoxSetting,
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::Ok);
 
     QString text() const;
     void setText(const QString &);

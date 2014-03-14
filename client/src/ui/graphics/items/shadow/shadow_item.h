@@ -3,15 +3,20 @@
 
 #include <QtWidgets/QGraphicsObject>
 
+#include <ui/customization/customized.h>
+
 #include "shadow_shape_provider.h"
+
+// TODO: #Elric get rid of shape provider, inherit from PathItem.
 
 /**
  * An item that draws a polygonal shadow.
  */
-class QnShadowItem: public QGraphicsObject {
-    Q_OBJECT;
-    Q_PROPERTY(qreal softWidth READ softWidth WRITE setSoftWidth);
-    Q_PROPERTY(QColor color READ color WRITE setColor);
+class QnShadowItem: public Customized<QGraphicsObject> {
+    Q_OBJECT
+    Q_PROPERTY(QColor color READ color WRITE setColor)
+    typedef Customized<QGraphicsObject> base_type;
+
 public:
     QnShadowItem(QGraphicsItem *parent = NULL);
     virtual ~QnShadowItem();
@@ -25,16 +30,6 @@ public:
      * \param provider                  New shape provider for this shadow item.
      */
     void setShapeProvider(QnShadowShapeProvider *provider);
-
-    /**
-     * \returns                         Width of the soft shadow band.
-     */
-    qreal softWidth() const;
-
-    /**
-     * \param softWidth                 Width of the soft shadow band that is drawn outside the shadowed polygon.
-     */
-    void setSoftWidth(qreal softWidth);
 
     /**
      * \returns                         Color that shadow is drawn with.
@@ -61,7 +56,6 @@ protected:
 
 private:
     QColor m_color;
-    qreal m_softWidth;
     QnShadowShapeProvider *m_shapeProvider;
 
     mutable bool m_shapeValid;

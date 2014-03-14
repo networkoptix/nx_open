@@ -3,6 +3,8 @@
 #ifdef Q_OS_WIN
 
 #include <intrin.h>
+#include <windows.h>
+#include <mmsystem.h>
 
 static const int DEFAULT_VIDEO_STREAM_ID = 0;
 static const int DEFAULT_AUDIO_STREAM_ID = 1;
@@ -22,7 +24,7 @@ extern "C"
 }
 
 #include "core/datapacket/media_data_packet.h"
-#include "win_audio_helper.h"
+#include "win_audio_device_info.h"
 #include "decoders/audio/ffmpeg_audio.h"
 
 // mux audio 1 and audio 2 to audio1 buffer
@@ -345,7 +347,7 @@ bool QnDesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
             return false;
     }
 
-    WinAudioExtendInfo extInfo(m_audioDevice.deviceName());
+    QnWinAudioDeviceInfo extInfo(m_audioDevice.deviceName());
     if (extInfo.isMicrophone())
     {
         m_speexPreprocess = speex_preprocess_state_init(m_owner->m_audioCodecCtx->frame_size * m_owner->m_audioCodecCtx->channels, m_owner->m_audioCodecCtx->sample_rate);

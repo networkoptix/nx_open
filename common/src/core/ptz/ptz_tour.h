@@ -13,11 +13,11 @@ struct QnPtzTourSpot: public boost::equality_comparable1<QnPtzTourSpot> {
     QnPtzTourSpot(): stayTime(0), speed(1.0) {}
     QnPtzTourSpot(const QString &presetId, qint64 stayTime, qreal speed): presetId(presetId), stayTime(stayTime), speed(speed) {}
 
+    friend bool operator==(const QnPtzTourSpot &l, const QnPtzTourSpot &r);
+
     QString presetId;
     qint64 stayTime;
     qreal speed;
-
-    friend bool operator==(const QnPtzTourSpot &l, const QnPtzTourSpot &r);
 };
 
 
@@ -25,10 +25,6 @@ struct QnPtzTour: public boost::equality_comparable1<QnPtzTour> {
     QnPtzTour() {}
     QnPtzTour(const QnPtzTour &tour): id(tour.id), name(tour.name), spots(tour.spots) {}
     QnPtzTour(const QString &id, const QString &name, const QnPtzTourSpotList &spots): id(id), name(name), spots(spots) {}
-
-    QString id;
-    QString name;
-    QnPtzTourSpotList spots;
 
     friend bool operator==(const QnPtzTour &l, const QnPtzTour &r);
 
@@ -43,6 +39,11 @@ struct QnPtzTour: public boost::equality_comparable1<QnPtzTour> {
      * @brief optimize                  Fix whatever is fixable in this tour.
      */
     void optimize();
+
+
+    QString id;
+    QString name;
+    QnPtzTourSpotList spots;
 };
 
 Q_DECLARE_METATYPE(QnPtzTourSpot)

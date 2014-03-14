@@ -404,30 +404,26 @@ void QnNotificationsCollectionWidget::hideBusinessAction(const QnAbstractBusines
     if (!resource)
         return;
 
-    QnNotificationWidget* item = findItem(ruleId, resource);
+    // TODO: #GDM please review, there must be a better way to do this. 
+    // Probably PlaySoundRepeated is not the only action type. See #2812.
+    QnNotificationWidget* item = findItem(ruleId, resource, businessAction->actionType() != BusinessActionType::PlaySoundRepeated); /* Ignore resource for repeated sound actions. */
     if (!item)
         return;
     m_list->removeItem(item);
     m_itemsByBusinessRuleId.remove(ruleId, item);
 }
 
-QnNotificationWidget* QnNotificationsCollectionWidget::findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
-    QList<QnNotificationWidget*> items = m_itemsByMessageType.values(message);
-    foreach (QnNotificationWidget* item, items) {
-        if (resource != item->property(itemResourcePropertyName).value<QnResourcePtr>())
-            continue;
-        return item;
-    }
+QnNotificationWidget* QnNotificationsCollectionWidget::findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool useResource) {
+    foreach (QnNotificationWidget *item, m_itemsByMessageType.values(message))
+        if (!useResource || resource == item->property(itemResourcePropertyName).value<QnResourcePtr>())
+            return item;
     return NULL;
 }
 
-QnNotificationWidget* QnNotificationsCollectionWidget::findItem(int businessRuleId, const QnResourcePtr &resource) {
-    QList<QnNotificationWidget*> items = m_itemsByBusinessRuleId.values(businessRuleId);
-    foreach (QnNotificationWidget* item, items) {
-        if (resource != item->property(itemResourcePropertyName).value<QnResourcePtr>())
-            continue;
-        return item;
-    }
+QnNotificationWidget* QnNotificationsCollectionWidget::findItem(int businessRuleId, const QnResourcePtr &resource, bool useResource) {
+    foreach (QnNotificationWidget *item, m_itemsByBusinessRuleId.values(businessRuleId))
+        if (!useResource || resource == item->property(itemResourcePropertyName).value<QnResourcePtr>())
+            return item;
     return NULL;
 }
 
@@ -503,6 +499,10 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     item->setNotificationLevel(Qn::SystemNotification);
     item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
     setHelpTopic(item, QnBusiness::healthHelpId(message));
+
+    // TODO: #GDM please implement this properly. This code fixes #2892, but in a terribly wrong way =).
+    if(message == QnSystemHealth::ArchiveRebuildFinished)
+        item->setNotificationLevel(Qn::SoundNotification);
 
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)), Qt::QueuedConnection);

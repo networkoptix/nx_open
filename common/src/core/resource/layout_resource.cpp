@@ -232,6 +232,10 @@ void QnLayoutResource::setCellAspectRatio(qreal cellAspectRatio) {
     emit cellAspectRatioChanged(::toSharedPointer(this));
 }
 
+bool QnLayoutResource::hasCellAspectRatio() const {
+    return cellAspectRatio() > 0.0;
+}
+
 /********* Cell spacing property **********/
 QSizeF QnLayoutResource::cellSpacing() const {
     QMutexLocker locker(&m_mutex);

@@ -12,6 +12,7 @@ class QnFisheyeAnimatedCircle: public QObject {
     Q_OBJECT
     Q_PROPERTY(QPointF  center      READ center     WRITE setCenter)
     Q_PROPERTY(qreal    radius      READ radius     WRITE setRadius)
+
 public:
     explicit QnFisheyeAnimatedCircle(QObject *parent = 0):
         QObject(parent),

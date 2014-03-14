@@ -35,7 +35,7 @@ public:
     QnConstCompressedVideoDataPtr getLastVideoFrame(bool primaryLiveStream) const;
     QnConstCompressedVideoDataPtr getFrameByTime(bool primaryLiveStream, qint64 time, bool iFrameAfterTime) const;
     QnConstCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream) const;
-
+	Q_SLOT void at_camera_resourceChanged();
     void beforeStop();
 
     bool isSomeActivity() const;

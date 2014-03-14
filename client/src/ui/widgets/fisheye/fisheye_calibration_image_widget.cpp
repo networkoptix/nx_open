@@ -26,7 +26,7 @@ QnFisheyeCalibrationImageWidget::QnFisheyeCalibrationImageWidget(QWidget *parent
     QWidget(parent),
     m_dragProcessor(new DragProcessor(this)),
     m_frameColor(Qt::lightGray),
-    m_lineColor(qnGlobals->ptzColor()),
+    m_lineColor(QColor(128, 196, 255)),
     m_center(0.5, 0.5),
     m_radius(0.5),
     m_lineWidth(4)

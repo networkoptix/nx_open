@@ -611,7 +611,7 @@ void QnWorkbenchLayout::updateBoundingRectInternal() {
 
 void QnWorkbenchLayout::setCellAspectRatio(qreal cellAspectRatio) {
     if(cellAspectRatio < 0.0 || qFuzzyIsNull(cellAspectRatio)) /* Negative means 'use default value'. */
-        cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
+        cellAspectRatio = -1.0;
 
     if(qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
         return;
@@ -646,7 +646,7 @@ void QnWorkbenchLayout::setLocked(bool value) {
 }
 
 void QnWorkbenchLayout::initCellParameters() {
-    m_cellAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
+    m_cellAspectRatio = -1.0;
     m_cellSpacing = qnGlobals->defaultLayoutCellSpacing();
 }
 

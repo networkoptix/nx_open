@@ -35,18 +35,18 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     m_syncPlay = new QnArchiveSyncPlayWrapper(); // TODO: #Elric QnArchiveSyncPlayWrapper destructor doesn't get called, investigate.
 
     /* Connect to display. */
-    connect(display(),                  SIGNAL(widgetAdded(QnResourceWidget *)),                this,       SLOT(at_display_widgetAdded(QnResourceWidget *)));
-    connect(display(),                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),     this,       SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-    connect(workbench(),                SIGNAL(currentLayoutChanged()),                         this,       SLOT(at_workbench_currentLayoutChanged()));
+    connect(display(),                  &QnWorkbenchDisplay::widgetAdded,               this,       &QnWorkbenchStreamSynchronizer::at_display_widgetAdded);
+    connect(display(),                  &QnWorkbenchDisplay::widgetAboutToBeRemoved,    this,       &QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved);
+    connect(workbench(),                &QnWorkbench::currentLayoutChanged,             this,       &QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged);
     
     /* Prepare counter. */
     m_counter = new QnCounter(1); // TODO: #Elric this one also doesn't get destroyed.
-    connect(this,                       SIGNAL(destroyed()),                                    m_counter,  SLOT(decrement()));
-    connect(m_counter,                  SIGNAL(reachedZero()),                                  m_syncPlay, SLOT(deleteLater()));
-    connect(m_counter,                  SIGNAL(reachedZero()),                                  m_counter,  SLOT(deleteLater()));
+    connect(this,                       &QObject::destroyed,                            m_counter,  &QnCounter::decrement);
+    connect(m_counter,                  &QnCounter::reachedZero,                        m_syncPlay, &QnArchiveSyncPlayWrapper::deleteLater);
+    connect(m_counter,                  &QnCounter::reachedZero,                        m_counter,  &QnCounter::deleteLater);
 
     /* Prepare render watcher instance. */
-    connect(m_watcher,                  SIGNAL(displayingChanged(QnResourceDisplay *)),         this,       SLOT(at_renderWatcher_displayingChanged(QnResourceDisplay *)));
+    connect(m_watcher,                  &QnWorkbenchRenderWatcher::displayChanged,      this,       &QnWorkbenchStreamSynchronizer::at_renderWatcher_displayChanged);
 
     /* Run handlers for all widgets already on display. */
     foreach(QnResourceWidget *widget, display()->widgets())
@@ -161,7 +161,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
         emit effectiveChanged();
 }
 
-void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingChanged(QnResourceDisplay *display) {
+void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayChanged(QnResourceDisplay *display) {
     m_syncPlay->onConsumerBlocksReader(display->dataProvider(), !m_watcher->isDisplaying(display));
 }
 

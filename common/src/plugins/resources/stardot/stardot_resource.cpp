@@ -38,6 +38,7 @@ QnStardotResource::QnStardotResource():
     m_rtspTransport(lit("tcp")),
     m_motionMaskBinData(0)
 {
+    setVendor(lit("Stardot"));
     setAuth(lit("admin"), lit("admin"));
 }
 

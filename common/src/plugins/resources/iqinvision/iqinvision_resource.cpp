@@ -9,7 +9,8 @@ const char* QnPlIqResource::MANUFACTURE = "IqEye";
 
 QnPlIqResource::QnPlIqResource()
 {
-    setAuth(QLatin1String("root"), QLatin1String("system"));
+    setVendor(lit("IqEye"));
+    setAuth(lit("root"), lit("system"));
 }
 
 bool QnPlIqResource::isResourceAccessible()

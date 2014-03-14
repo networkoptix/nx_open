@@ -1,0 +1,19 @@
+{{#aggregated}}
+<div class="content">
+    <div class="callout">
+        <p>Conflit détecté à {{timestamp}} pour l'adresse {{cameraConflictAddress}}:</p>
+        <table class="details">
+            <tr>
+                <th>Nombre</th>
+                <th>ID Physique</th>
+            </tr>
+            {{#cameraConflicts}}
+                <tr>
+                    <td>{{number}}</td>
+                    <td>{{mac}}</td>
+                </tr>
+            {{/cameraConflicts}}
+        </table>
+    </div>
+</div>
+{{/aggregated}}

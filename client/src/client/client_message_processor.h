@@ -29,7 +29,7 @@ private slots:
 private:
     void init();
     void determineOptimalIF(const QnMediaServerResourcePtr &resource);
-    bool updateResource(QnResourcePtr resource, bool insert = true);
+    bool updateResource(QnResourcePtr resource, bool insert, bool updateLayouts);
     void processResources(const QnResourceList& resources);
     void processLicenses(const QnLicenseList& licenses);
     void processCameraServerItems(const QnCameraHistoryList& cameraHistoryList);

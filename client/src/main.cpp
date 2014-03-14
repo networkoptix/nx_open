@@ -84,6 +84,7 @@ extern "C"
     #include "ui/workaround/x11_launcher_workaround.h"
 #endif
 #include "utils/common/cryptographic_hash.h"
+#include "utils/performance_test.h"
 #include "ui/style/globals.h"
 #include "openal/qtvaudiodevice.h"
 #include "ui/workaround/fglrx_full_screen.h"
@@ -105,8 +106,11 @@ extern "C"
 #include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
 #include "core/ptz/client_ptz_controller_pool.h"
+#include "ui/dialogs/message_box.h"
 
-
+#ifdef Q_OS_MAC
+#include "ui/workaround/mac_utils.h"
+#endif
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -303,9 +307,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     int screen = -1;
     QString authenticationString, delayedDrop, instantDrop, logLevel;
     QString translationPath;
-    QString customizationPath = lit(":/skin");
+    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
     bool skipMediaFolderScan = false;
+#ifdef Q_OS_MAC
+    bool noFullScreen = true;
+#else
     bool noFullScreen = false;
+#endif
     bool noVersionMismatchCheck = false;
     QString lightMode;
     bool noVSync = false;
@@ -339,26 +347,38 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnSettings->setDevMode(true);
     }
 
-    if (!lightMode.isEmpty())
-        qnSettings->setLightMode(lightMode.toInt());
+    // TODO: #Elric why QString???
+    if (!lightMode.isEmpty()) {
+        bool ok;
+        int lightModeOverride = lightMode.toInt(&ok);
+        if (ok)
+            qnSettings->setLightModeOverride(lightModeOverride);
+    }
+
+    QnPerformanceTest::detectLightMode();
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
-    if(authentication.isValid()) {
+    if(authentication.isValid())
         qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
-    }
 
     qnSettings->setVSyncEnabled(!noVSync);
 
-    QScopedPointer<QnSkin> skin(new QnSkin(customizationPath));
-    QScopedPointer<QnCustomizer> customizer(new QnCustomizer(QnCustomization(customizationPath + lit("/customization.json"))));
+    QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
+
+    QnCustomization customization;
+    customization.add(QnCustomization(skin->path("customization_common.json")));
+    customization.add(QnCustomization(skin->path("customization_base.json")));
+    customization.add(QnCustomization(skin->path("customization_child.json")));
+
+    QScopedPointer<QnCustomizer> customizer(new QnCustomizer(customization));
     customizer->customize(qnGlobals);
 
     /* Initialize application instance. */
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
     application->setStartDragDistance(20);
-    application->setStyle(skin->style()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
+    application->setStyle(skin->newStyle()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
 #ifdef Q_OS_MACX
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
@@ -511,6 +531,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
     context->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
+    application->setActivationWindow(mainWindow.data());
 
     if(screen != -1) {
         QDesktopWidget *desktop = qApp->desktop();
@@ -647,6 +668,10 @@ int main(int argc, char **argv)
     QnSessionManager::instance();
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
+#ifdef Q_OS_MAC
+    mac_restoreFileAccess();
+#endif
+
     int result = runApplication(application.data(), argc, argv);
 
     delete QnResourcePool::instance();
@@ -654,6 +679,10 @@ int main(int argc, char **argv)
 
 #ifdef Q_OS_WIN
     QnDesktopResourceSearcher::initStaticInstance( NULL );
+#endif
+
+#ifdef Q_OS_MAC
+    mac_stopFileAccess();
 #endif
 
 //    qApp->processEvents(); //TODO: #Elric crashes

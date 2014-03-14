@@ -24,7 +24,7 @@ public:
     QnNetworkResource();
     virtual ~QnNetworkResource();
 
-    void deserialize(const QnResourceParameters& parameters);
+    virtual void deserialize(const QnResourceParameters& parameters) override;
 
     virtual QString getUniqueId() const;
 

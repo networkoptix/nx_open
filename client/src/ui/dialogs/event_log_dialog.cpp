@@ -39,7 +39,7 @@ namespace {
 
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
-    base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
+    base_type(parent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
 #ifdef Q_OS_MAC
     | Qt::Tool
 #endif
@@ -58,7 +58,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     setHelpTopic(this, Qn::MainWindow_Notifications_EventLog_Help);
 
     QList<QnEventLogModel::Column> columns;
-        columns << QnEventLogModel::DateTimeColumn << QnEventLogModel::EventColumn << QnEventLogModel::EventCameraColumn <<
+    columns << QnEventLogModel::DateTimeColumn << QnEventLogModel::EventColumn << QnEventLogModel::EventCameraColumn <<
         QnEventLogModel::ActionColumn << QnEventLogModel::ActionCameraColumn << QnEventLogModel::DescriptionColumn;
 
     m_model = new QnEventLogModel(this);
@@ -102,19 +102,19 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     }
 
     m_filterAction      = new QAction(tr("Filter Similar Rows"), this);
-    m_filterAction->setShortcut(Qt::CTRL + Qt::Key_F);
+    m_filterAction->setShortcut(Qt::ControlModifier + Qt::Key_F);
     m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
     m_exportAction      = new QAction(tr("Export Selection to File..."), this);
     m_selectAllAction   = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(QKeySequence::SelectAll);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
     m_resetFilterAction = new QAction(tr("Clear Filter"), this);
-    m_resetFilterAction->setShortcut(Qt::CTRL + Qt::Key_R); //TODO: #Elric shouldn't we use QKeySequence::Refresh instead (evaluates to F5 on win)? --gdm
+    m_resetFilterAction->setShortcut(Qt::ControlModifier + Qt::Key_R); //TODO: #Elric shouldn't we use QKeySequence::Refresh instead (evaluates to F5 on win)? --gdm
 
     QnSingleEventSignalizer *mouseSignalizer = new QnSingleEventSignalizer(this);
     mouseSignalizer->setEventType(QEvent::MouseButtonRelease);
     ui->gridEvents->viewport()->installEventFilter(mouseSignalizer);
-    connect(mouseSignalizer,       SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_mouseButtonRelease(QObject *, QEvent *)));
+    connect(mouseSignalizer, &QnAbstractEventSignalizer::activated, this, &QnEventLogDialog::at_mouseButtonRelease);
 
     ui->gridEvents->addAction(m_clipboardAction);
     ui->gridEvents->addAction(m_exportAction);
@@ -127,23 +127,23 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
     ui->eventRulesButton->setIcon(qnSkin->icon("tree/layout.png"));
     ui->loadingProgressBar->hide();
 
-    connect(m_filterAction,         SIGNAL(triggered()),                this, SLOT(at_filterAction()));
-    connect(m_resetFilterAction,    SIGNAL(triggered()),                this, SLOT(at_resetFilterAction()));
-    connect(m_clipboardAction,      SIGNAL(triggered()),                this, SLOT(at_copyToClipboard()));
-    connect(m_exportAction,         SIGNAL(triggered()),                this, SLOT(at_exportAction()));
-    connect(m_selectAllAction,      SIGNAL(triggered()),                ui->gridEvents, SLOT(selectAll()));
+    connect(m_filterAction,         &QAction::triggered,                this,   &QnEventLogDialog::at_filterAction_triggered);
+    connect(m_resetFilterAction,    &QAction::triggered,                this,   &QnEventLogDialog::at_resetFilterAction_triggered);
+    connect(m_clipboardAction,      &QAction::triggered,                this,   &QnEventLogDialog::at_clipboardAction_triggered);
+    connect(m_exportAction,         &QAction::triggered,                this,   &QnEventLogDialog::at_exportAction_triggered);
+    connect(m_selectAllAction,      &QAction::triggered,                ui->gridEvents, &QTableView::selectAll);
 
-    connect(ui->dateEditFrom,       SIGNAL(dateChanged(const QDate&)),  this, SLOT(updateData()) );
-    connect(ui->dateEditTo,         SIGNAL(dateChanged(const QDate&)),  this, SLOT(updateData()) );
-    connect(ui->eventComboBox,      SIGNAL(currentIndexChanged(int)),   this, SLOT(updateData()) );
-    connect(ui->actionComboBox,     SIGNAL(currentIndexChanged(int)),   this, SLOT(updateData()) );
-    connect(ui->refreshButton,      SIGNAL(clicked(bool)),              this, SLOT(updateData()) );
-    connect(ui->eventRulesButton,   SIGNAL(clicked(bool)),              this->context()->action(Qn::BusinessEventsAction), SIGNAL(triggered()));
+    connect(ui->dateEditFrom,       &QDateEdit::dateChanged,            this,   &QnEventLogDialog::updateData);
+    connect(ui->dateEditTo,         &QDateEdit::dateChanged,            this,   &QnEventLogDialog::updateData);
+    connect(ui->eventComboBox,      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),    this,   &QnEventLogDialog::updateData); // TODO: #Elric try to introduce better syntax for this
+    connect(ui->actionComboBox,     static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),    this,   &QnEventLogDialog::updateData);
+    connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnEventLogDialog::updateData);
+    connect(ui->eventRulesButton,   &QAbstractButton::clicked,          this->context()->action(Qn::BusinessEventsAction), &QAction::trigger);
 
-    connect(ui->cameraButton,       SIGNAL(clicked(bool)),              this, SLOT(at_cameraButtonClicked()) );
-    connect(ui->gridEvents,         SIGNAL(clicked(const QModelIndex&)),this, SLOT(at_itemClicked(const QModelIndex&)) );
-    connect(ui->gridEvents,         SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(at_customContextMenuRequested(const QPoint&)) );
-    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), m_model, SLOT(rebuild()) );
+    connect(ui->cameraButton,       &QAbstractButton::clicked,          this,   &QnEventLogDialog::at_cameraButton_clicked);
+    connect(ui->gridEvents,         &QTableView::clicked,               this,   &QnEventLogDialog::at_eventsGrid_clicked);
+    connect(ui->gridEvents,         &QTableView::customContextMenuRequested, this, &QnEventLogDialog::at_eventsGrid_customContextMenuRequested);
+    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridEvents, &QAbstractItemView::reset);
 
     ui->mainGridLayout->activate();
     updateHeaderWidth();
@@ -372,7 +372,7 @@ void QnEventLogDialog::requestFinished()
     ui->loadingProgressBar->hide();
 }
 
-void QnEventLogDialog::at_itemClicked(const QModelIndex& idx)
+void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
 {
     if (m_lastMouseButton == Qt::LeftButton && m_model->hasMotionUrl(idx))
     {
@@ -446,7 +446,7 @@ void QnEventLogDialog::setActionType(BusinessActionType::Value value)
         ui->actionComboBox->setCurrentIndex(int(value) + 1);
 }
 
-void QnEventLogDialog::at_resetFilterAction()
+void QnEventLogDialog::at_resetFilterAction_triggered()
 {
     disableUpdateData();
     setEventType(BusinessEventType::AnyBusinessEvent);
@@ -455,7 +455,7 @@ void QnEventLogDialog::at_resetFilterAction()
     enableUpdateData();
 }
 
-void QnEventLogDialog::at_filterAction()
+void QnEventLogDialog::at_filterAction_triggered()
 {
     QModelIndex idx = ui->gridEvents->currentIndex();
 
@@ -476,7 +476,7 @@ void QnEventLogDialog::at_filterAction()
     enableUpdateData();
 }
 
-void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
+void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
 {
     QMenu* menu = 0;
     QModelIndex idx = ui->gridEvents->currentIndex();
@@ -512,12 +512,12 @@ void QnEventLogDialog::at_customContextMenuRequested(const QPoint&)
     menu->deleteLater();
 }
 
-void QnEventLogDialog::at_exportAction()
+void QnEventLogDialog::at_exportAction_triggered()
 {
     QnGridWidgetHelper::exportToFile(ui->gridEvents, this, tr("Export selected events to file"));
 }
 
-void QnEventLogDialog::at_copyToClipboard()
+void QnEventLogDialog::at_clipboardAction_triggered()
 {
     QnGridWidgetHelper::copyToClipboard(ui->gridEvents);
 }
@@ -529,7 +529,7 @@ void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)
     m_lastMouseButton = me->button();
 }
 
-void QnEventLogDialog::at_cameraButtonClicked()
+void QnEventLogDialog::at_cameraButton_clicked()
 {
     QnResourceSelectionDialog dialog(this);
     dialog.setSelectedResources(m_filterCameraList);
@@ -555,6 +555,8 @@ void QnEventLogDialog::enableUpdateData()
 
 void QnEventLogDialog::setVisible(bool value)
 {
+    // TODO: #Elric use showEvent instead. 
+
     if (value && !isVisible())
         updateData();
     QDialog::setVisible(value);

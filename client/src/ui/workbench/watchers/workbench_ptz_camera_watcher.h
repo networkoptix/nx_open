@@ -8,6 +8,8 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+// TODO: #Elric this one is not used, remove?
+
 class QnWorkbenchPtzCameraWatcher: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:

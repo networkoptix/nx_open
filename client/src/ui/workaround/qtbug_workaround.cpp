@@ -44,15 +44,6 @@ bool QnQtbugWorkaround::nativeEventFilter(const QByteArray &, void *message, lon
         }
         return false;
 
-    /* QTBUG-32835: Qt does not react to system help query. */
-    case WM_SYSCOMMAND: 
-        if((msg->wParam & 0xfff0) == SC_CONTEXTHELP) {
-            *result = 0; /* An application should return zero if it processes this message. */
-            QWhatsThis::enterWhatsThisMode();
-            return true;
-        }
-        return false;
-
     /* QTBUG-28513: event loop starvation if event dispatching is done by the system. */
     case WM_ENTERSIZEMOVE:
         d->inSizeMove = true;

@@ -126,31 +126,31 @@ namespace DecoderParameter
 
 DecoderResourcesNameset::DecoderResourcesNameset()
 {
-    registerResource( DecoderParameter::decoderName, QString::fromLatin1("decoderName"), QVariant::String );
-    registerResource( DecoderParameter::osName, QString::fromLatin1("osName"), QVariant::String );
-    registerResource( DecoderParameter::architecture, QString::fromLatin1("architecture"), QVariant::String );
-    registerResource( DecoderParameter::cpuString, QString::fromLatin1("cpuString"), QVariant::String );
-    registerResource( DecoderParameter::cpuFamily, QString::fromLatin1("cpuFamily"), QVariant::String );
-    registerResource( DecoderParameter::cpuModel, QString::fromLatin1("cpuModel"), QVariant::String );
-    registerResource( DecoderParameter::cpuStepping, QString::fromLatin1("cpuStepping"), QVariant::String );
-    registerResource( DecoderParameter::displayAdapterDeviceString, QString::fromLatin1("displayAdapterDeviceString"), QVariant::String );
-    registerResource( DecoderParameter::gpuDeviceString, QString::fromLatin1("gpuDeviceString"), QVariant::String );
-    registerResource( DecoderParameter::driverVersion, QString::fromLatin1("driverVersion"), QVariant::String );
-    registerResource( DecoderParameter::gpuVendorId, QString::fromLatin1("gpuVendorId"), QVariant::UInt );
-    registerResource( DecoderParameter::gpuDeviceId, QString::fromLatin1("gpuDeviceId"), QVariant::UInt );
-    registerResource( DecoderParameter::gpuRevision, QString::fromLatin1("gpuRevision"), QVariant::UInt );
-    registerResource( DecoderParameter::sdkVersion, QString::fromLatin1("sdkVersion"), QVariant::String );
-    registerResource( DecoderParameter::framePictureWidth, QString::fromLatin1("framePictureWidth"), QVariant::Int );
-    registerResource( DecoderParameter::framePictureHeight, QString::fromLatin1("framePictureHeight"), QVariant::Int );
-    registerResource( DecoderParameter::framePictureSize, QString::fromLatin1("framePictureSize"), QVariant::UInt );
-    registerResource( DecoderParameter::fps, QString::fromLatin1("fps"), QVariant::Double );
-    registerResource( DecoderParameter::speed, QString::fromLatin1("speed"), QVariant::Double );
-    registerResource( DecoderParameter::pixelsPerSecond, QString::fromLatin1("pixelsPerSecond"), QVariant::ULongLong );
-    registerResource( DecoderParameter::videoMemoryUsage, QString::fromLatin1("videoMemoryUsage"), QVariant::ULongLong );
-    registerResource( DecoderParameter::availableVideoMemory, QString::fromLatin1("availableVideoMemory"), QVariant::ULongLong );
-    registerResource( DecoderParameter::simultaneousStreamCount, QString::fromLatin1("simultaneousStreamCount"), QVariant::Int );
-    registerResource( DecoderParameter::totalCurrentNumberOfDecoders, QString::fromLatin1("totalCurrentNumberOfDecoders"), QVariant::Int );
-    registerResource( DecoderParameter::graphicAdapterCount, QString::fromLatin1("graphicAdapterCount"), QVariant::UInt );
+    registerResource( DecoderParameter::decoderName,                lit("decoderName"),                 QVariant::String );
+    registerResource( DecoderParameter::osName,                     lit("osName"),                      QVariant::String );
+    registerResource( DecoderParameter::architecture,               lit("architecture"),                QVariant::String );
+    registerResource( DecoderParameter::cpuString,                  lit("cpuString"),                   QVariant::String );
+    registerResource( DecoderParameter::cpuFamily,                  lit("cpuFamily"),                   QVariant::String );
+    registerResource( DecoderParameter::cpuModel,                   lit("cpuModel"),                    QVariant::String );
+    registerResource( DecoderParameter::cpuStepping,                lit("cpuStepping"),                 QVariant::String );
+    registerResource( DecoderParameter::displayAdapterDeviceString, lit("displayAdapterDeviceString"),  QVariant::String );
+    registerResource( DecoderParameter::gpuDeviceString,            lit("gpuDeviceString"),             QVariant::String );
+    registerResource( DecoderParameter::driverVersion,              lit("driverVersion"),               QVariant::String );
+    registerResource( DecoderParameter::gpuVendorId,                lit("gpuVendorId"),                 QVariant::UInt );
+    registerResource( DecoderParameter::gpuDeviceId,                lit("gpuDeviceId"),                 QVariant::UInt );
+    registerResource( DecoderParameter::gpuRevision,                lit("gpuRevision"),                 QVariant::UInt );
+    registerResource( DecoderParameter::sdkVersion,                 lit("sdkVersion"),                  QVariant::String );
+    registerResource( DecoderParameter::framePictureWidth,          lit("framePictureWidth"),           QVariant::Int );
+    registerResource( DecoderParameter::framePictureHeight,         lit("framePictureHeight"),          QVariant::Int );
+    registerResource( DecoderParameter::framePictureSize,           lit("framePictureSize"),            QVariant::UInt );
+    registerResource( DecoderParameter::fps,                        lit("fps"),                         QVariant::Double );
+    registerResource( DecoderParameter::speed,                      lit("speed"),                       QVariant::Double );
+    registerResource( DecoderParameter::pixelsPerSecond,            lit("pixelsPerSecond"),             QVariant::ULongLong );
+    registerResource( DecoderParameter::videoMemoryUsage,           lit("videoMemoryUsage"),            QVariant::ULongLong );
+    registerResource( DecoderParameter::availableVideoMemory,       lit("availableVideoMemory"),        QVariant::ULongLong );
+    registerResource( DecoderParameter::simultaneousStreamCount,    lit("simultaneousStreamCount"),     QVariant::Int );
+    registerResource( DecoderParameter::totalCurrentNumberOfDecoders, lit("totalCurrentNumberOfDecoders"), QVariant::Int );
+    registerResource( DecoderParameter::graphicAdapterCount,        lit("graphicAdapterCount"),         QVariant::UInt );
 }
 
 MediaStreamParameterSumContainer::MediaStreamParameterSumContainer(

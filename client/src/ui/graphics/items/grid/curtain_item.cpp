@@ -1,5 +1,8 @@
 #include "curtain_item.h"
+
 #include <limits>
+
+#include <ui/workaround/gl_native_painting.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 
 QnCurtainItem::QnCurtainItem(QGraphicsItem *parent):
@@ -17,7 +20,7 @@ QRectF QnCurtainItem::boundingRect() const {
 }
 
 void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
-    painter->beginNativePainting();
+    QnGlNativePainting::begin(painter);
     glPushMatrix();
     glLoadIdentity();
 
@@ -34,5 +37,5 @@ void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
     glDisable(GL_BLEND); 
 
     glPopMatrix();
-    painter->endNativePainting();
+    QnGlNativePainting::end(painter);
 }

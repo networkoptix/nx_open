@@ -55,10 +55,14 @@ void GenericRTSPDiscoveryManager::getVendorName( char* buf ) const
 int GenericRTSPDiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr )
 {
 #if 0
-    strcpy( cameras[0].url, "rtsp://192.168.0.31:554/axis-media/media.amp" );
-    strcpy( cameras[0].uid, "TESt_CAM" );
-    strcpy( cameras[0].modelName, "rtsp://192.168.0.31:554/axis-media/media.amp" );
-    return 1;
+    strcpy( cameras[0].url, "rtsp://media-us-2.soundreach.net/slcn_sports.sdp" );
+    strcpy( cameras[0].uid, "HREN" );
+    strcpy( cameras[0].modelName, "BOLT" );
+    
+    strcpy( cameras[1].url, "rtsp://192.168.0.31:554/axis-media/media.amp" );
+    strcpy( cameras[1].uid, "TESt_CAM" );
+    strcpy( cameras[1].modelName, "rtsp://192.168.0.31:554/axis-media/media.amp" );
+    return 2;
 #else
     return 0;
 #endif

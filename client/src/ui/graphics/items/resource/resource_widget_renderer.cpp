@@ -344,7 +344,7 @@ void QnResourceWidgetRenderer::setFisheyeController(QnFisheyePtzController* cont
     }
 }
 
-void QnResourceWidgetRenderer::setHystogramConsumer(QnHistogramConsumer* value)
+void QnResourceWidgetRenderer::setHistogramConsumer(QnHistogramConsumer* value)
 {
     for (uint i = 0; i < m_channelRenderers.size(); ++i)
     {

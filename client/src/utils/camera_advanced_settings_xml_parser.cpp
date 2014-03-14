@@ -144,38 +144,38 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
 bool CameraSettingsWidgetsCreator::isEnabledByOtherSettings(const QString& id, const QString& /*parentId*/)
 {
     //ToDo: remove hardcode
-    if (!getCameraId().startsWith(QString::fromLatin1("DIGITALWATCHDOG"))) {
+    if (!getCameraId().startsWith(lit("DIGITALWATCHDOG"))) {
         return true;
     }
 
-    if (id == QString::fromLatin1("%%Imaging%%White Balance%%Kelvin") ||
-        id == QString::fromLatin1("%%Imaging%%White Balance%%Red") ||
-        id == QString::fromLatin1("%%Imaging%%White Balance%%Blue") )
+    if (id == lit("%%Imaging%%White Balance%%Kelvin") ||
+        id == lit("%%Imaging%%White Balance%%Red") ||
+        id == lit("%%Imaging%%White Balance%%Blue") )
     {
-        CameraSettings::Iterator settingIt = m_settings->find(QString::fromLatin1("%%Imaging%%White Balance%%Mode"));
+        CameraSettings::Iterator settingIt = m_settings->find(lit("%%Imaging%%White Balance%%Mode"));
         QString val = settingIt != m_settings->end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
-        if (val == QString::fromLatin1("MANUAL")) {
+        if (val == lit("MANUAL")) {
             return true;
         }
         return false;
     }
 
-    if (id == QString::fromLatin1("%%Imaging%%Exposure%%Shutter Speed") )
+    if (id == lit("%%Imaging%%Exposure%%Shutter Speed") )
     {
-        CameraSettings::Iterator settingIt = m_settings->find(QString::fromLatin1("%%Imaging%%Exposure%%Shutter Mode"));
+        CameraSettings::Iterator settingIt = m_settings->find(lit("%%Imaging%%Exposure%%Shutter Mode"));
         QString val = settingIt != m_settings->end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
-        if (val == QString::fromLatin1("MANUAL")) {
+        if (val == lit("MANUAL")) {
             return true;
         }
         return false;
     }
 
-    if (id == QString::fromLatin1("%%Imaging%%Day & Night%%Switching from Color to B/W") ||
-        id == QString::fromLatin1("%%Imaging%%Day & Night%%Switching from B/W to Color") )
+    if (id == lit("%%Imaging%%Day & Night%%Switching from Color to B/W") ||
+        id == lit("%%Imaging%%Day & Night%%Switching from B/W to Color") )
     {
-        CameraSettings::Iterator settingIt = m_settings->find(QString::fromLatin1("%%Imaging%%Day & Night%%Mode"));
+        CameraSettings::Iterator settingIt = m_settings->find(lit("%%Imaging%%Day & Night%%Mode"));
         QString val = settingIt != m_settings->end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
-        if (val == QString::fromLatin1("AUTO")) {
+        if (val == lit("AUTO")) {
             return true;
         }
         return false;

@@ -727,7 +727,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
             return CameraDiagnostics::NotAuthorisedResult( url );
         default:
             m_tcpSock->close();
-            return CameraDiagnostics::RequestFailedResult( QString::fromLatin1("DESCRIBE %1").arg(url), m_reasonPhrase );
+            return CameraDiagnostics::RequestFailedResult( lit("DESCRIBE %1").arg(url), m_reasonPhrase );
     }
 
     int sdp_index = response.indexOf(QLatin1String("\r\n\r\n"));
@@ -1570,17 +1570,17 @@ bool RTPSession::readTextResponce(QByteArray& response)
     for (int i = 0; i < 1000 && ignoreDataSize < 1024*1024*3 && m_tcpSock->isConnected(); ++i)
     {
         if (readMoreData) {
-            int readed = m_tcpSock->recv(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen));
+            int readed = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
             if (readed <= 0)
             {
                 if( readed == 0 )
                 {
-                    NX_LOG( QString::fromLatin1("RTSP connection to %1 has been unexpectedly closed").
+                    NX_LOG( lit("RTSP connection to %1 has been unexpectedly closed").
                         arg(m_tcpSock->getForeignAddress().toString()), cl_logINFO );
                 }
                 else
                 {
-                    NX_LOG( QString::fromLatin1("Error reading RTSP response from %1. %2").
+                    NX_LOG( lit("Error reading RTSP response from %1. %2").
                         arg(m_tcpSock->getForeignAddress().toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
                 }
                 return false;	//error occured or connection closed
@@ -1610,7 +1610,7 @@ bool RTPSession::readTextResponce(QByteArray& response)
         readMoreData = true;
         if (m_responseBufferLen == RTSP_BUFFER_LEN)
         {
-            NX_LOG( QString::fromLatin1("RTSP response from %1 has exceeded max response size (%2)").
+            NX_LOG( lit("RTSP response from %1 has exceeded max response size (%2)").
                 arg(m_tcpSock->getForeignAddress().toString()).arg(RTSP_BUFFER_LEN), cl_logINFO );
             return false;
         }

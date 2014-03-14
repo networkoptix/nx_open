@@ -37,6 +37,7 @@ private:
 
 class QnCameraAdditionDialog: public QDialog {
     Q_OBJECT
+    typedef QDialog base_type;
 public:
     enum State {
         NoServer,           /**< No server is selected. */

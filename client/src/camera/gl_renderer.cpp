@@ -166,14 +166,14 @@ void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hu
 
 Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &targetRect)
 {    
-    NX_LOG( QString::fromLatin1("Entered QnGLRenderer::paint"), cl_logDEBUG2 );
+    NX_LOG( lit("Entered QnGLRenderer::paint"), cl_logDEBUG2 );
 
     QOpenGLFunctions::initializeOpenGLFunctions();
 
     DecodedPictureToOpenGLUploader::ScopedPictureLock picLock( m_decodedPictureProvider );
     if( !picLock.get() )
     {
-        NX_LOG( QString::fromLatin1("Exited QnGLRenderer::paint (1)"), cl_logDEBUG2 );
+        NX_LOG( lit("Exited QnGLRenderer::paint (1)"), cl_logDEBUG2 );
         return Qn::NothingRendered;
     }
 
@@ -261,7 +261,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
         result = Qn::NothingRendered;
     }
 
-    NX_LOG( QString::fromLatin1("Exiting QnGLRenderer::paint (2)"), cl_logDEBUG2 );
+    NX_LOG( lit("Exiting QnGLRenderer::paint (2)"), cl_logDEBUG2 );
 
     return result;
 }
@@ -271,7 +271,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
     unsigned int tex0ID,
     const float* v_array )
 {
-    cl_log.log( QString::fromLatin1("QnGLRenderer::drawVideoTextureDirectly. texture %1").arg(tex0ID), cl_logDEBUG2 );
+    cl_log.log( lit("QnGLRenderer::drawVideoTextureDirectly. texture %1").arg(tex0ID), cl_logDEBUG2 );
 
     float tx_array[8] = {
         (float)tex0Coords.x(), (float)tex0Coords.y(),
@@ -329,7 +329,7 @@ void QnGLRenderer::drawYV12VideoTexture(
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
 
-    NX_LOG( QString::fromLatin1("Rendering YUV420 textures %1, %2, %3").
+    NX_LOG( lit("Rendering YUV420 textures %1, %2, %3").
         arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
 
     glEnable(GL_TEXTURE_2D);
@@ -495,7 +495,7 @@ void QnGLRenderer::drawYVA12VideoTexture(
         (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
 
-    NX_LOG( QString::fromLatin1("Rendering YUV420 textures %1, %2, %3").
+    NX_LOG( lit("Rendering YUV420 textures %1, %2, %3").
         arg(tex0ID).arg(tex1ID).arg(tex2ID), cl_logDEBUG2 );
 
     glEnable(GL_TEXTURE_2D);

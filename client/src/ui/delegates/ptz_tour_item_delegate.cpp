@@ -11,10 +11,10 @@
 
 QnPtzTourItemDelegate::QnPtzTourItemDelegate(QObject *parent) :
     base_type(parent)
-{
-}
+{}
 
 QnPtzTourItemDelegate::~QnPtzTourItemDelegate() {
+    return;
 }
 
 void QnPtzTourItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const  {
@@ -27,35 +27,31 @@ void QnPtzTourItemDelegate::initStyleOption(QStyleOptionViewItem *option, const 
 }
 
 QWidget* QnPtzTourItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const  {
-    const QnPtzTourSpotsModel* model = dynamic_cast<const QnPtzTourSpotsModel*>(index.model());
+    const QnPtzTourSpotsModel *model = dynamic_cast<const QnPtzTourSpotsModel*>(index.model());
     if (!model)
         return base_type::createEditor(parent, option, index);
 
     switch (index.column()) {
     case QnPtzTourSpotsModel::NameColumn:
     {
-        QComboBox* comboBox = new QComboBox(parent);
-        foreach (const QnPtzPreset &preset, model->sortedPresets()) {
+        QComboBox *comboBox = new QComboBox(parent);
+        foreach (const QnPtzPreset &preset, model->sortedPresets())
             comboBox->addItem(preset.name, preset.id);
-        }
         return comboBox;
     }
     case QnPtzTourSpotsModel::TimeColumn:
     {
-        QComboBox* comboBox = new QComboBox(parent);
-        foreach (quint64 time, QnPtzTourSpotsModel::stayTimeValues()) {
+        QComboBox *comboBox = new QComboBox(parent);
+        foreach (quint64 time, QnPtzTourSpotsModel::stayTimeValues())
             comboBox->addItem(QnPtzTourSpotsModel::timeToString(time), time);
-        }
         return comboBox;
     }
     case QnPtzTourSpotsModel::SpeedColumn:
     {
-        QComboBox* comboBox = new QComboBox(parent);
-        foreach (qreal speed, QnPtzTourSpotsModel::speedValues()) {
+        QComboBox *comboBox = new QComboBox(parent);
+        foreach (qreal speed, QnPtzTourSpotsModel::speedValues())
             comboBox->addItem(QnPtzTourSpotsModel::speedToString(speed), speed);
-        }
         return comboBox;
-
     }
     default:
         break;
@@ -70,13 +66,11 @@ void QnPtzTourItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
     case QnPtzTourSpotsModel::NameColumn:
     case QnPtzTourSpotsModel::TimeColumn:
     case QnPtzTourSpotsModel::SpeedColumn:
-    {
-        if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
+        if (QComboBox *comboBox = dynamic_cast<QComboBox *>(editor)) {
             comboBox->setCurrentIndex(comboBox->findData(index.data(Qt::EditRole)));
             connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
         }
         return;
-    }
     default:
         break;
     }
@@ -88,26 +82,36 @@ void QnPtzTourItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
     case QnPtzTourSpotsModel::NameColumn:
     case QnPtzTourSpotsModel::TimeColumn:
     case QnPtzTourSpotsModel::SpeedColumn:
-    {
-        if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
+        if (QComboBox *comboBox = dynamic_cast<QComboBox *>(editor))
             model->setData(index, comboBox->itemData(comboBox->currentIndex()));
-        }
         return;
-    }
     default:
         break;
     }
     base_type::setModelData(editor, model, index);
 }
 
+QSize QnPtzTourItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
+    QSize result = base_type::sizeHint(option, index);
+
+    switch (index.column()) {
+    case QnPtzTourSpotsModel::NameColumn:
+    case QnPtzTourSpotsModel::TimeColumn:
+    case QnPtzTourSpotsModel::SpeedColumn:
+        return result + QSize(48, 0); /* Some sane expansion to accommodate combo box contents. */
+    default:
+        return result;
+    }
+}
+
 bool QnPtzTourItemDelegate::eventFilter(QObject *object, QEvent *event) {
-    QComboBox *editor = qobject_cast<QComboBox*>(object);
+    QComboBox *editor = qobject_cast<QComboBox *>(object);
     if (editor && event->type() == QEvent::FocusOut)
         return false;
     return base_type::eventFilter(object, event);
 }
 
 void QnPtzTourItemDelegate::at_editor_commit() {
-    if (QWidget* w = dynamic_cast<QWidget*> (sender()))
-        emit commitData(w);
+    if (QWidget *widget = dynamic_cast<QWidget*>(sender()))
+        emit commitData(widget);
 }

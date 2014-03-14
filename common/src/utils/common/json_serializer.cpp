@@ -27,6 +27,7 @@ public:
         insert<unsigned long long>();
 
         insert<QColor>();
+        insert<QBrush>();
         insert<QFont>();
     }
 

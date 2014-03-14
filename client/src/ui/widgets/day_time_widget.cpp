@@ -95,7 +95,7 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     m_headerLabel->setAlignment(Qt::AlignCenter);
     
     m_tableWidget = new QnDayTimeTableWidget(this);
-    setPaletteColor(m_tableWidget, QPalette::Highlight, QColor(0, 0, 0, 255));
+    //setPaletteColor(m_tableWidget, QPalette::Highlight, QColor(0, 0, 0, 255));
     m_tableWidget->setRowCount(4);
     m_tableWidget->setColumnCount(6);
     for(int i = 0; i < 24; i++) {

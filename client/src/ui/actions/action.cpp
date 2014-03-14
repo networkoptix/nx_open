@@ -29,11 +29,11 @@ QnAction::QnAction(Qn::ActionId id, QObject *parent):
     QnWorkbenchContextAware(parent),
     m_id(id),
     m_flags(0),
-    m_toolTipMarker(QLatin1String("<b></b>"))
+    m_toolTipMarker(lit("<b></b>"))
 {
     setToolTip(m_toolTipMarker);
 
-    connect(this, SIGNAL(changed()), this, SLOT(updateToolTip()));
+    connect(this, &QAction::changed, this, &QnAction::updateToolTipSilent);
 }
 
 QnAction::~QnAction() {
@@ -77,9 +77,9 @@ void QnAction::setToggledText(const QString &toggledText) {
     m_toggledText = toggledText;
 
     if(m_toggledText.isEmpty()) {
-        disconnect(this, SIGNAL(toggled(bool)), this, SLOT(updateText()));
+        disconnect(this, &QAction::toggled, this, &QnAction::updateText);
     } else {
-        connect(this, SIGNAL(toggled(bool)), this, SLOT(updateText()), Qt::UniqueConnection);
+        connect(this, &QAction::toggled, this, &QnAction::updateText, Qt::UniqueConnection);
     }
 
     updateText();
@@ -263,13 +263,13 @@ void QnAction::updateToolTip(bool notify) {
 
     QString toolTip = toolTipFormat();
 
-    int nameIndex = toolTip.indexOf(QLatin1String("%n"));
+    int nameIndex = toolTip.indexOf(lit("%n"));
     if(nameIndex != -1) {
         QString name = !m_pulledText.isEmpty() ? m_pulledText : text();
         toolTip.replace(nameIndex, 2, name);
     }
 
-    int shortcutIndex = toolTip.indexOf(QLatin1String("%s"));
+    int shortcutIndex = toolTip.indexOf(lit("%s"));
     if(shortcutIndex != -1)
         toolTip.replace(shortcutIndex, 2, shortcut().toString(QKeySequence::NativeText));
 
@@ -277,6 +277,10 @@ void QnAction::updateToolTip(bool notify) {
 
     if(notify)
         blockSignals(signalsBlocked);
+}
+
+void QnAction::updateToolTipSilent() {
+    updateToolTip(false);
 }
 
 void QnAction::addConditionalText(QnActionCondition *condition, const QString &text) {

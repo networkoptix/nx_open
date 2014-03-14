@@ -6,23 +6,12 @@
 #include <utils/common/json.h>
 #include <utils/math/math.h>
 
-namespace {
-    int asciisum(const QString &value) {
-        int result = 0;
-        foreach (QChar c, value)
-            result += c.toLatin1();
-        return result;
-    }
-
-} // anonymous namespace
-
-
 QnTimeSliderColors::QnTimeSliderColors() {
     tickmark = QColor(255, 255, 255, 255);
     positionMarker = QColor(255, 255, 255, 196);
     indicator = QColor(128, 160, 192, 128);
 
-    selection = qnGlobals->selectionColor();
+    selection = QColor(0, 150, 255, 110);
     selectionMarker = selection.lighter();
 
     pastBackground = QColor(255, 255, 255, 24);
@@ -39,8 +28,14 @@ QnTimeSliderColors::QnTimeSliderColors() {
     dateOverlay = QColor(255, 255, 255, 48);
     dateOverlayAlternate = withAlpha(selection, 48);
 
-    pastLastMinute = pastBackground;
-    futureLastMinute = futureBackground;
+    pastLastMinute = QColor(24, 24, 24, 255);
+    futureLastMinute = QColor(0, 0, 0, 255);
+}
+
+QnTimeScrollBarColors::QnTimeScrollBarColors() {
+    indicator = QColor(255, 255, 255, 255);
+    border = QColor(255, 255, 255, 64);
+    handle = QColor(255, 255, 255, 48);
 }
 
 QnBackgroundColors::QnBackgroundColors() {
@@ -49,7 +44,7 @@ QnBackgroundColors::QnBackgroundColors() {
 }
 
 QnCalendarColors::QnCalendarColors() {
-    selection = withAlpha(qnGlobals->selectionColor(), 192);
+    selection = QColor(0, 150, 255, 192);
     primaryRecording = QColor(32, 128, 32, 255);
     secondaryRecording = QColor(32, 255, 32, 255);
     primaryMotion = QColor(128, 0, 0, 255);
@@ -62,7 +57,6 @@ QnStatisticsColors::QnStatisticsColors() {
     frame = QColor(66, 140, 237);
     cpu = QColor(66, 140, 237);
     ram = QColor(219, 59, 169);
-    networkLimit = QColor(Qt::white);
     
     hdds 
         << QColor(237, 237, 237)   // C: sda
@@ -82,34 +76,6 @@ QnStatisticsColors::QnStatisticsColors() {
         << QColor(255, 52, 132);
 }
 
-QColor QnStatisticsColors::hddByKey(const QString &key) const {
-    static int sda = asciisum(QLatin1String("sda"));
-    static int hda = asciisum(QLatin1String("hda"));
-
-    if(hdds.isEmpty())
-        return QColor();
-
-    int id = 0;
-    if (key.contains(QLatin1Char(':'))) {
-        // cutting keys like 'C:' to 'C'. Also works with complex keys such as 'C: E:'
-        id = key.at(0).toLatin1() - 'C';
-    } else if (key.startsWith(QLatin1String("sd"))) {
-        id = asciisum(key) - sda;
-    } else if (key.startsWith(QLatin1String("hd"))) {
-        id = asciisum(key) - hda;
-    }
-    return hdds[qMod(id, hdds.size())];
-}
-
-QColor QnStatisticsColors::networkByKey(const QString &key) const {
-    if(network.isEmpty())
-        return QColor();
-
-    int id = asciisum(key);
-    return network[qMod(id, network.size())];
-}
-
-
 QnScheduleGridColors::QnScheduleGridColors() {
     normalLabel =   QColor(255, 255, 255, 255);
     weekendLabel =  QColor(255, 128, 128, 255);
@@ -117,11 +83,31 @@ QnScheduleGridColors::QnScheduleGridColors() {
     disabledLabel = QColor(183, 183, 183, 255);
 }
 
-
 QnGridColors::QnGridColors() {
     grid = QColor(0, 240, 240, 128);
     allowed = QColor(0, 255, 0, 64);
     disallowed = QColor(255, 0, 0, 64);
+}
+
+QnPtzManageModelColors::QnPtzManageModelColors() {
+    title = QColor(64, 64, 64);
+    invalid = QColor(64, 16, 16);
+    warning = QColor(64, 64, 16);
+}
+
+QnHistogramColors::QnHistogramColors() {
+    background = QColor(0, 0, 0);
+    border = QColor(96, 96, 96);
+    histogram = QColor(192, 192, 192);
+    selection = QColor(0, 150, 255, 110);
+    grid = QColor(0, 128, 0, 128);
+    text = QColor(255, 255, 255);
+}
+
+QnResourceWidgetFrameColors::QnResourceWidgetFrameColors() {
+    normal = QColor(128, 128, 128, 196);
+    active = normal.lighter();
+    selected = QColor(64, 130, 180, 128);
 }
 
 
@@ -130,6 +116,12 @@ QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)
         (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)
         (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute), 
+    QJson::Optional
+)
+
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnTimeScrollBarColors, 
+    (indicator)(border)(handle), 
     QJson::Optional
 )
 
@@ -147,7 +139,7 @@ QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
 
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QnStatisticsColors, 
-    (grid)(frame)(cpu)(ram)(hdds), 
+    (grid)(frame)(cpu)(ram)(hdds)(network), 
     QJson::Optional
 )
 
@@ -163,6 +155,20 @@ QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QJson::Optional
 )
 
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnPtzManageModelColors, 
+    (title)(invalid)(warning), 
+    QJson::Optional
+)
 
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnHistogramColors, 
+    (background)(border)(histogram)(selection)(grid)(text), 
+    QJson::Optional
+)
 
-
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnResourceWidgetFrameColors, 
+    (normal)(active)(selected), 
+    QJson::Optional
+)

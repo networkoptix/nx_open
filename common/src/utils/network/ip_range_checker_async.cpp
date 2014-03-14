@@ -88,7 +88,7 @@ bool QnIpRangeCheckerAsync::launchHostCheck()
         httpClient.get(), SIGNAL(done( nx_http::AsyncHttpClientPtr )),
         this, SLOT(onDone( nx_http::AsyncHttpClientPtr )),
         Qt::DirectConnection );
-    if( !httpClient->doGet( QUrl( QString::fromLatin1("http://%1:%2/").arg(QHostAddress(ipToCheck).toString()).arg(m_portToScan) ) ) )
+    if( !httpClient->doGet( QUrl( lit("http://%1:%2/").arg(QHostAddress(ipToCheck).toString()).arg(m_portToScan) ) ) )
         return true;
  
     m_socketsBeingScanned.insert( httpClient );

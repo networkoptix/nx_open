@@ -32,11 +32,12 @@ public:
     virtual bool getTours(QnPtzTourList *tours) override;
 
 private:
-    bool createTourInternal(QnPtzTour tour);
+    void clearActiveTour();
 
 private:
     QMutex m_mutex;
     QnResourcePropertyAdaptor<QnPtzTourHash> *m_adaptor;
+    QnPtzTour m_activeTour;
     QnTourPtzExecutor *m_executor;
 };
 

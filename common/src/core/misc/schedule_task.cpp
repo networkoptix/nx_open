@@ -4,7 +4,7 @@
 
 bool QnScheduleTask::containTimeMs(int weekTimeMs) const
 {
-    return qBetween(weekTimeMs, startTimeMs(), startTimeMs() + durationMs());
+    return qBetween(startTimeMs(), weekTimeMs, startTimeMs() + durationMs());
 }
 
 int QnScheduleTask::durationMs() const

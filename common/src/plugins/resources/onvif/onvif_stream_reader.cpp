@@ -157,8 +157,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bo
     result = fetchStreamUrl( soapWrapper, info.profileToken, isPrimary, streamUrl );
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
-    qDebug() << "got stream URL for camera" << m_resource->getUrl() << "for profile" << info.profileToken;
-    qDebug() << "rtsp=" << *streamUrl;
+    NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(*streamUrl).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
     return result;
 }
 
@@ -436,10 +435,14 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapp
             return result;
     }
 
-    if (m_onvifRes->isCameraControlDisabled())
+    if (m_onvifRes->isCameraControlDisabled()) {
+        // TODO: #Elric need to untangle this evil.
+        m_onvifRes->setPtzProfileToken(QString::fromStdString(profile->token));
+
         return CameraDiagnostics::NoErrorResult();
-    else
+    } else {
         return sendProfileToCamera(info, profile);
+    }
 
 }
 
@@ -547,7 +550,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(CameraInfoPar
 
     if (getRole() == QnResource::Role_LiveVideo)
     {
-        if(!m_onvifRes->getPtzfUrl().isEmpty() && !m_onvifRes->getPtzConfigurationToken().isEmpty()) {
+        if(!m_onvifRes->getPtzUrl().isEmpty() && !m_onvifRes->getPtzConfigurationToken().isEmpty()) {
             bool ptzMatched = profile && profile->PTZConfiguration;
             if (!ptzMatched) {
                 AddPTZConfigReq request;

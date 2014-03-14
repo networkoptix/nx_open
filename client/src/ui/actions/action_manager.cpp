@@ -39,6 +39,19 @@ namespace {
         return dynamic_cast<QnAction *>(action);
     }
 
+    class QnMenu: public QMenu {
+        typedef QMenu base_type;
+    public:
+        explicit QnMenu(QWidget *parent = 0): base_type(parent) {}
+
+    protected:
+        virtual void mousePressEvent(QMouseEvent *event) override {
+            /* This prevents the click from propagating to the underlying widget. */
+            setAttribute(Qt::WA_NoMouseReplay);
+            base_type::mousePressEvent(event);
+        }
+    };
+
 } // anonymous namespace
 
 
@@ -422,17 +435,22 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Restart application"));
 
-    factory(Qn::PtzGoToPresetAction).
+    factory(Qn::PtzActivatePresetAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
         text(tr("Go To Saved Position")).
         requiredPermissions(Qn::WritePtzPermission).
-        condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
+        condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, false, this));
 
-    factory(Qn::PtzStartTourAction).
+    factory(Qn::PtzActivateTourAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
         text(tr("Activate PTZ Tour")).
         requiredPermissions(Qn::WritePtzPermission).
-        condition(new QnPtzActionCondition(Qn::ToursPtzCapability, this));
+        condition(new QnPtzActionCondition(Qn::ToursPtzCapability, false, this));
+
+    factory(Qn::PtzActivateObjectAction).
+        flags(Qn::SingleTarget | Qn::WidgetTarget).
+        text(tr("Activate PTZ object")).
+        requiredPermissions(Qn::WritePtzPermission);
 
     /* Context menu actions. */
 
@@ -474,7 +492,7 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Stop Panic Recording")).
         autoRepeat(false).
         shortcut(tr("Ctrl+P")).
-        icon(qnSkin->icon("titlebar/panic.png")).
+//        icon(qnSkin->icon("titlebar/panic.png")).
         //requiredPermissions(Qn::CurrentMediaServerResourcesRole, Qn::ReadWriteSavePermission).
         condition(new QnPanicActionCondition(this));
 
@@ -507,7 +525,8 @@ QnActionManager::QnActionManager(QObject *parent):
             text(tr("Window")).
             pulledText(tr("New Window")).
             shortcut(tr("Ctrl+N")).
-            autoRepeat(false);
+            autoRepeat(false).
+            condition(new QnLightModeCondition(Qn::LightModeNoNewWindow, this));
 
         factory(Qn::NewUserAction).
             flags(Qn::Main | Qn::Tree | Qn::NoTarget).
@@ -761,7 +780,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in New Window")).
         conditionalText(tr("Monitor in a New Window"), hasFlags(QnResource::server), Qn::All).
-        condition(new QnOpenInNewEntityActionCondition(this));
+        condition(new QnConjunctionActionCondition(
+                      new QnOpenInNewEntityActionCondition(this),
+                      new QnLightModeCondition(Qn::LightModeNoNewWindow, this),
+                      this));
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
@@ -776,11 +798,15 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenLayoutsInNewWindowAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Open Layout(s) in a New Window")). // TODO: #Elric split into sinle- & multi- action
-        condition(hasFlags(QnResource::layout));
+        condition(new QnConjunctionActionCondition(
+                      new QnResourceActionCondition(hasFlags(QnResource::layout), Qn::All, this),
+                      new QnLightModeCondition(Qn::LightModeNoNewWindow, this),
+                      this));
 
     factory(Qn::OpenCurrentLayoutInNewWindowAction).
         flags(Qn::NoTarget).
-        text(tr("Open Current Layout in a New Window"));
+        text(tr("Open Current Layout in a New Window")).
+        condition(new QnLightModeCondition(Qn::LightModeNoNewWindow, this));
 
     factory(Qn::OpenAnyNumberOfLayoutsAction).
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
@@ -889,7 +915,7 @@ QnActionManager::QnActionManager(QObject *parent):
         childFactory(new QnPtzPresetsToursActionFactory(this)).
         text(tr("PTZ...")).
         requiredPermissions(Qn::WritePtzPermission).
-        condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
+        condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, false, this));
 
     factory.beginSubMenu(); {
 
@@ -897,26 +923,20 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Scene | Qn::SingleTarget).
             text(tr("Save Current Position...")).
             requiredPermissions(Qn::WritePtzPermission).
-            condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
+            condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, true, this));
 
-        factory(Qn::PtzManagePresetsAction).
+        factory(Qn::PtzManageAction).
             flags(Qn::Scene | Qn::SingleTarget).
-            text(tr("Manage Saved Positions...")).
+            text(tr("Manage...")).
             requiredPermissions(Qn::WritePtzPermission).
-            condition(new QnPtzActionCondition(Qn::PresetsPtzCapability, this));
-
-        factory(Qn::PtzManageToursAction).
-            flags(Qn::Scene | Qn::SingleTarget).
-            text(tr("Manage Tours...")).
-            requiredPermissions(Qn::WritePtzPermission).
-            condition(new QnPtzActionCondition(Qn::ToursPtzCapability, this));
+            condition(new QnPtzActionCondition(Qn::ToursPtzCapability, false, this));
 
     } factory.endSubMenu();
 
     factory(Qn::PtzCalibrateFisheyeAction).
         flags(Qn::SingleTarget | Qn::WidgetTarget).
         text(tr("Calibrate Fisheye")).
-        condition(new QnPtzActionCondition(Qn::VirtualPtzCapability, this)); // TODO: #Elric fisheye cap
+        condition(new QnPtzActionCondition(Qn::VirtualPtzCapability, false, this));
 
 #if 0
     factory(Qn::ToggleRadassAction).
@@ -1489,26 +1509,26 @@ void QnActionManager::trigger(Qn::ActionId id, const QnActionParameters &paramet
     action->trigger();
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters) {
-    return newMenu(Qn::NoAction, scope, parent, parameters);
+QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options) {
+    return newMenu(Qn::NoAction, scope, parent, parameters, options);
 }
 
-QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters) {
+QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options) {
     QnAction *rootAction = rootId == Qn::NoAction ? m_root : action(rootId);
 
     QMenu *result = NULL;
     if(!rootAction) {
         qnWarning("No action exists for id '%1'.", static_cast<int>(rootId));
     } else {
-        result = newMenuRecursive(rootAction, scope, parameters, parent);
+        result = newMenuRecursive(rootAction, scope, parameters, parent, options);
         if (!result)
-            result = new QMenu(parent);
+            result = new QnMenu(parent);
     }
 
     if(result) {
         m_parametersByMenu[result] = parameters;
-        connect(result, SIGNAL(destroyed(QObject *)), this, SLOT(at_menu_destroyed(QObject *)));
-        connect(result, SIGNAL(aboutToShow()), this, SLOT(at_menu_aboutToShow()));
+        connect(result, &QObject::destroyed, this, &QnActionManager::at_menu_destroyed);
+        connect(result, &QMenu::aboutToShow, this, &QnActionManager::at_menu_aboutToShow);
     }
 
     return result;
@@ -1522,19 +1542,20 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
     dst->setChecked(src->isChecked());
     dst->setFont(src->font());
     dst->setIconText(src->iconText());
+    dst->setSeparator(src->isSeparator());
 
     dst->setProperty(sourceActionPropertyName, QVariant::fromValue<QnAction *>(src));
     foreach(const QByteArray &name, src->dynamicPropertyNames())
         dst->setProperty(name.data(), src->property(name.data()));
 
     if(forwardSignals) {
-        connect(dst, SIGNAL(triggered()),   src, SLOT(trigger()));
-        connect(dst, SIGNAL(toggled(bool)), src, SLOT(setChecked(bool)));
+        connect(dst, &QAction::triggered,   src, &QAction::trigger);
+        connect(dst, &QAction::toggled,     src, &QAction::setChecked);
     }
 }
 
-QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget) {
-    QMenu *result = new QMenu(parentWidget);
+QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options) {
+    QMenu *result = new QnMenu(parentWidget);
 
     if(!parent->children().isEmpty()) {
         foreach(QnAction *action, parent->children()) {
@@ -1547,8 +1568,8 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
             if(visibility == Qn::InvisibleAction)
                 continue;
 
-            QMenu *menu = newMenuRecursive(action, scope, parameters, parentWidget);
-            if((!menu || menu->isEmpty())  && (action->flags() & Qn::RequiresChildren))
+            QMenu *menu = newMenuRecursive(action, scope, parameters, parentWidget, options);
+            if((!menu || menu->isEmpty()) && (action->flags() & Qn::RequiresChildren))
                 continue;
 
             QString replacedText;
@@ -1565,13 +1586,13 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
             }
 
             if(menu)
-                connect(result, SIGNAL(destroyed()), menu, SLOT(deleteLater()));
+                connect(result, &QObject::destroyed, menu, &QObject::deleteLater);
 
             if (action->hasConditionalTexts())
                 replacedText = action->checkConditionalText(parameters);
 
             QAction *newAction = NULL;
-            if(!replacedText.isEmpty() || visibility == Qn::DisabledAction || menu != NULL) {
+            if(!replacedText.isEmpty() || visibility == Qn::DisabledAction || menu != NULL || (options & DontReuseActions)) {
                 newAction = new QAction(result);
                 copyAction(newAction, action);
 

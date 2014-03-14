@@ -12,8 +12,8 @@ class QnBusinessEventsFilterResourcePropertyAdaptor: public QnLexicalResourcePro
     typedef QnLexicalResourcePropertyAdaptor<quint64> base_type;
 
 public:
-    QnBusinessEventsFilterResourcePropertyAdaptor(const QnResourcePtr &resource, QObject *parent = NULL):
-        base_type(resource, lit("showBusinessEvents"), 0xFFFFFFFFFFFFFFFFull, parent)
+    QnBusinessEventsFilterResourcePropertyAdaptor(QObject *parent = NULL):
+        base_type(lit("showBusinessEvents"), 0xFFFFFFFFFFFFFFFFull, parent)
     {}
 
     bool isAllowed(BusinessEventType::Value eventType) const {
@@ -27,8 +27,8 @@ class QnPtzHotkeysResourcePropertyAdaptor: public QnJsonResourcePropertyAdaptor<
     typedef QnJsonResourcePropertyAdaptor<QnPtzHotkeyHash> base_type;
 
 public:
-    QnPtzHotkeysResourcePropertyAdaptor(const QnResourcePtr &resource, QObject *parent = NULL):
-        base_type(resource, lit("ptzHotkeys"), QnPtzHotkeyHash(), parent)
+    QnPtzHotkeysResourcePropertyAdaptor(QObject *parent = NULL):
+        base_type(lit("ptzHotkeys"), QnPtzHotkeyHash(), parent)
     {}
 };
 

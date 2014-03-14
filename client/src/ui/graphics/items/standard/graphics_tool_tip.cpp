@@ -229,8 +229,10 @@ void GraphicsToolTip::showText(const QString &text, QGraphicsView *view, QGraphi
 }
 
 void GraphicsToolTip::showText(const QString &text, QGraphicsItem *item, QPointF scenePos, QRectF sceneRect) {
-    if (GraphicsToolTipLabel::instance && GraphicsToolTipLabel::instance->isVisible()) { /* A tip does already exist. */
-        if (text.isEmpty()) { /* Empty text => hide current tip. */
+    if (GraphicsToolTipLabel::instance && GraphicsToolTipLabel::instance->isVisible() && !qFuzzyEquals(GraphicsToolTipLabel::instance->opacity(), 0.0)) { 
+        /* A tip does already exist. */
+        if (text.isEmpty()) { 
+            /* Empty text => hide current tip. */
             GraphicsToolTipLabel::instance->hideTip();
             return;
         } else {

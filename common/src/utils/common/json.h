@@ -185,11 +185,15 @@ namespace QJson {
     }
 
     template<class T>
-    bool deserialize(QnJsonContext *ctx, const QJsonObject &value, const QString &key, T *target, bool optional = false) {
+    bool deserialize(QnJsonContext *ctx, const QJsonObject &value, const QString &key, T *target, bool optional = false, bool *found = NULL) {
         QJsonObject::const_iterator pos = value.find(key);
         if(pos == value.end()) {
+            if(found)
+                *found = false;
             return optional;
         } else {
+            if(found)
+                *found = true;
             return QJson::deserialize(ctx, *pos, target);
         }
     }
@@ -305,6 +309,11 @@ namespace QJsonAccessors {
 
 
 namespace QJsonDetail {
+    struct TrueChecker {
+        template<class T>
+        bool operator()(const T &) const { return true; }
+    };
+
     template<class Class, class Getter>
     inline void serializeMember(QnJsonContext *ctx, const Class &object, const Getter &getter, const QString &key, QJsonObject *target, QJson::Options globalOptions, QJson::Options localOptions = 0) {
         using namespace QJsonAccessors;
@@ -313,30 +322,47 @@ namespace QJsonDetail {
         QJson::serialize(ctx, getMember(object, getter), key, target);
     }
 
+    template<class Class, class Getter, class Checker>
+    inline void serializeMember(QnJsonContext *ctx, const Class &object, const Getter &getter, const QString &key, QJsonObject *target, QJson::Options globalOptions, const Checker &checker, QJson::Options localOptions = 0) {
+        using namespace QJsonAccessors;
+        unused(globalOptions, localOptions);
+
+        if(getMember(object, checker))
+            QJson::serialize(ctx, getMember(object, getter), key, target);
+    }
+
     template<class Class, class Setter, class T>
-    inline bool deserializeMember(QnJsonContext *ctx, const QJsonObject &value, const QString &key, Class *object, const Setter &setter, QJson::Options options, const T *) {
+    inline bool deserializeMemberInternal(QnJsonContext *ctx, const QJsonObject &value, const QString &key, Class *object, const Setter &setter, QJson::Options options, const T *) {
         using namespace QJsonAccessors;
 
+        bool found = false;
         T member;
-        if(!QJson::deserialize(ctx, value, key, &member, options & QJson::Optional))
+        if(!QJson::deserialize(ctx, value, key, &member, options & QJson::Optional, &found))
             return false;
-        setMember(*object, setter, member);
+        if(found)
+            setMember(*object, setter, member);
         return true;
+    }
+
+    template<class Class, class Setter, class T>
+    inline bool deserializeMemberInternal(QnJsonContext *ctx, const QJsonObject &value, const QString &key, Class *object, T Class::*setter, QJson::Options options, const T *) {
+        return QJson::deserialize(ctx, value, key, &object->*setter, options & QJson::Optional);
     }
 
     template<class Class, class Setter, class Getter>
     inline bool deserializeMember(QnJsonContext *ctx, const QJsonObject &value, const QString &key, Class *object, const Getter &getter, const Setter &setter, QJson::Options globalOptions, QJson::Options localOptions = 0) {
+        return deserializeMember(ctx, value, key, object, getter, setter, globalOptions, TrueChecker(), localOptions);
+    }
+
+    template<class Class, class Setter, class Getter, class Checker>
+    inline bool deserializeMember(QnJsonContext *ctx, const QJsonObject &value, const QString &key, Class *object, const Getter &getter, const Setter &setter, QJson::Options globalOptions, const Checker &checker, QJson::Options localOptions = 0) {
         using namespace QJsonAccessors;
-        unused(getter);
+        unused(getter, checker);
 
         typedef typename boost::remove_reference<decltype(getMember(*object, getter))>::type member_type;
-        return deserializeMember(ctx, value, key, object, setter, globalOptions | localOptions, static_cast<const member_type *>(NULL));
+        return deserializeMemberInternal(ctx, value, key, object, setter, globalOptions | localOptions, static_cast<const member_type *>(NULL));
     }
 
-    template<class Class, class Setter, class T>
-    inline bool deserializeMember(QnJsonContext *ctx, const QJsonObject &value, const QString &key, Class *object, T Class::*setter, QJson::Options options, const T *) {
-        return QJson::deserialize(ctx, value, key, &object->*setter, options & QJson::Optional);
-    }
 
 } // namespace QJsonDetail
 
@@ -421,7 +447,7 @@ __VA_ARGS__ bool deserialize(QnJsonContext *, const QJsonValue &value, TYPE *tar
 
 #define QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */) \
     QN_DEFINE_ENUM_CAST_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)    \
-    QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)
+    QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__) // TODO: #Elric there is no support for Json int here!!!
 
 #define QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */) \
     QN_DEFINE_ENUM_MAPPED_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)  \

@@ -13,6 +13,7 @@ public:
     virtual ~QnImageProvider() {}
 
     virtual QImage image() const = 0;
+
 public slots:
     void loadAsync() {
         doLoadAsync();

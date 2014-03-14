@@ -5,13 +5,18 @@
 QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControllerPtr &baseController):
     base_type(baseController),
     m_mode(mode),
-    m_adaptor(NULL)
+    m_asynchronous(baseController->hasCapabilities(Qn::AsynchronousPtzCapability))
 {
-    if(m_mode != Local) {
-        m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(baseController->resource(), lit("ptzActiveObject"), QnPtzObject(), this);
-        m_adaptor->setValue(QnPtzObject());
-        connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });
-    }
+    m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(lit("ptzActiveObject"), QnPtzObject(), this);
+    m_adaptor->setValue(QnPtzObject());
+    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });
+
+    /* Adaptor is thread-safe and works even without resource, 
+     * exactly what we need for local mode. */
+    if(m_mode != Local)
+        m_adaptor->setResource(resource());
+
+    // TODO: #Elric #PTZ better async support
 }
 
 QnActivityPtzController::~QnActivityPtzController() {
@@ -34,7 +39,7 @@ bool QnActivityPtzController::continuousMove(const QVector3D &speed) {
         return false;
 
     if(m_mode != Client)
-        setActiveObject(QnPtzObject());
+        m_adaptor->setValue(QnPtzObject());
     return true;
 }
 
@@ -43,7 +48,7 @@ bool QnActivityPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const Q
         return false;
 
     if(m_mode != Client)
-        setActiveObject(QnPtzObject());
+        m_adaptor->setValue(QnPtzObject());
     return true;
 }
 
@@ -52,7 +57,15 @@ bool QnActivityPtzController::viewportMove(qreal aspectRatio, const QRectF &view
         return false;
 
     if(m_mode != Client)
-        setActiveObject(QnPtzObject());
+        m_adaptor->setValue(QnPtzObject());
+    return true;
+}
+
+bool QnActivityPtzController::removePreset(const QString &presetId) {
+    if(!base_type::removePreset(presetId))
+        return false;
+
+    m_adaptor->testAndSetValue(QnPtzObject(Qn::PresetPtzObject, presetId), QnPtzObject());
     return true;
 }
 
@@ -61,7 +74,16 @@ bool QnActivityPtzController::activatePreset(const QString &presetId, qreal spee
         return false;
 
     if(m_mode != Client)
-        setActiveObject(QnPtzObject(Qn::PresetPtzObject, presetId));
+        m_adaptor->setValue(QnPtzObject(Qn::PresetPtzObject, presetId));
+
+    return true;
+}
+
+bool QnActivityPtzController::removeTour(const QString &tourId) {
+    if(!base_type::removeTour(tourId))
+        return false;
+
+    m_adaptor->testAndSetValue(QnPtzObject(Qn::TourPtzObject, tourId), QnPtzObject());
     return true;
 }
 
@@ -70,29 +92,21 @@ bool QnActivityPtzController::activateTour(const QString &tourId) {
         return false;
 
     if(m_mode != Client)
-        setActiveObject(QnPtzObject(Qn::TourPtzObject, tourId));
+        m_adaptor->setValue(QnPtzObject(Qn::TourPtzObject, tourId));
     return true;
 }
 
 bool QnActivityPtzController::getActiveObject(QnPtzObject *activeObject) {
-    if(m_mode == Local) {
-        *activeObject = m_activeObject;
-    } else {
-        *activeObject = m_adaptor->value();
-    }
-
-    // TODO: #Elric #PTZ emit if asynchronous
-
+    *activeObject = m_adaptor->value();
     return true;
 }
 
-void QnActivityPtzController::setActiveObject(const QnPtzObject &activeObject) {
-    if(m_mode == Local) {
-        if(m_activeObject != activeObject) {
-            m_activeObject = activeObject;
-            emit changed(Qn::ActiveObjectPtzField);
-        }
+bool QnActivityPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
+    // TODO: #Elric #PTZ this is a hack. Need to do it better.
+    if(m_asynchronous) {
+        return baseController()->getData(query, data);
     } else {
-        m_adaptor->setValue(activeObject);
+        return base_type::getData(query, data);
     }
 }
+

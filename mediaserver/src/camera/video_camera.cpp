@@ -253,7 +253,7 @@ void QnVideoCamera::beforeStop()
     }
 
     if (m_secondaryReader) {
-        m_secondaryReader->removeDataProcessor(m_primaryGopKeeper);
+        m_secondaryReader->removeDataProcessor(m_secondaryGopKeeper);
         m_secondaryReader->pleaseStop();
     }
 }
@@ -275,27 +275,52 @@ QnVideoCamera::~QnVideoCamera()
     delete m_secondaryGopKeeper;
 }
 
+void QnVideoCamera::at_camera_resourceChanged()
+{
+	QMutexLocker lock(&m_getReaderMutex);
+
+	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
+	if ( cameraResource )
+	{
+		if ( !cameraResource->hasDualStreaming2() && m_secondaryReader )
+		{
+			if ( m_secondaryReader->isRunning() )
+				m_secondaryReader->pleaseStop();
+		}
+	}
+}
+
 void QnVideoCamera::createReader(QnResource::ConnectionRole role)
 {
     bool primaryLiveStream = role ==  QnResource::Role_LiveVideo;
+	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
+	
     QnLiveStreamProviderPtr &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
     if (reader == 0)
     {
-        QnAbstractStreamDataProvider* dataProvider = m_resource->createDataProvider(role);
-        reader = QnLiveStreamProviderPtr(dynamic_cast<QnLiveStreamProvider*>(dataProvider));
-        if (reader == 0)
-        {
-            delete dataProvider;
-            return;
-        }
+		QnAbstractStreamDataProvider* dataProvider = NULL;
+		if ( primaryLiveStream || (cameraResource && cameraResource->hasDualStreaming2()) )
+			dataProvider = m_resource->createDataProvider(role);
 
-        QnVideoCameraGopKeeper* gopKeeper = new QnVideoCameraGopKeeper(this, m_resource, role);
-        if (primaryLiveStream)
-            m_primaryGopKeeper = gopKeeper;
-        else
-            m_secondaryGopKeeper = gopKeeper;
-        reader->addDataProcessor(gopKeeper);
-
+		if ( dataProvider )
+		{
+			reader = QnLiveStreamProviderPtr(dynamic_cast<QnLiveStreamProvider*>(dataProvider));
+			if (reader == 0)
+			{
+				delete dataProvider;
+			} else
+			{
+				if ( role ==  QnResource::Role_LiveVideo )
+					connect(reader->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
+					
+				QnVideoCameraGopKeeper* gopKeeper = new QnVideoCameraGopKeeper(this, m_resource, role);
+				if (primaryLiveStream)
+					m_primaryGopKeeper = gopKeeper;
+				else
+					m_secondaryGopKeeper = gopKeeper;
+				reader->addDataProcessor(gopKeeper);
+			}			
+		}
     }
 }
 
@@ -313,7 +338,11 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnResource::ConnectionRole 
         if( m_primaryReader )
             ensureLiveCacheStarted( m_primaryReader );
     }
-
+	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
+	if ( cameraResource && !cameraResource->hasDualStreaming2() && role == QnResource::Role_SecondaryLiveVideo )
+	{
+		return QnLiveStreamProviderPtr();		
+	}
     return role == QnResource::Role_LiveVideo ? m_primaryReader : m_secondaryReader;
 }
 

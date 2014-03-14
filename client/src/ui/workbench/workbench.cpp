@@ -319,8 +319,11 @@ void QnWorkbench::at_layout_aboutToBeDestroyed() {
 
 void QnWorkbench::at_layout_cellAspectRatioChanged() {
     qreal unit = qnGlobals->workbenchUnitSize();
+    qreal cellAspectRatio = m_currentLayout->hasCellAspectRatio()
+                            ? m_currentLayout->cellAspectRatio()
+                            : qnGlobals->defaultLayoutCellAspectRatio();
 
-    m_mapper->setCellSize(unit, unit / m_currentLayout->cellAspectRatio());
+    m_mapper->setCellSize(unit, unit / cellAspectRatio);
 
     emit cellAspectRatioChanged();
 }

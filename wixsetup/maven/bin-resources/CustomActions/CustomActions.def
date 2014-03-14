@@ -16,3 +16,4 @@ DeleteDatabaseFile
 BackupDatabaseFile
 RestoreDatabaseFile
 PopulateRestoreVersions
+CAQuitExecAndWarn
