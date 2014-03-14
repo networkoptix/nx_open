@@ -19,4 +19,10 @@ HttpServerConnection::HttpServerConnection(
 void HttpServerConnection::processMessage( const nx_http::HttpMessage& request )
 {
     //TODO/IMPL
+
+    nx_http::HttpMessage response( nx_http::MessageType::response );
+    response.response->statusLine.version = request.request->requestLine.version;
+    response.response->statusLine.statusCode = nx_http::StatusCode::notFound;
+    response.response->statusLine.reasonPhrase = nx_http::StatusCode::toString( response.response->statusLine.statusCode );
+    sendMessage( response );
 }

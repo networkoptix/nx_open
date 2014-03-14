@@ -37,9 +37,10 @@ namespace nx_http
 
         switch( m_httpStreamReader.state() ) 
         {
+            case HttpStreamReader::readingMessageBody:
             case HttpStreamReader::messageDone:
                 *m_msg = m_httpStreamReader.message();
-               return ParserState::done;
+                return ParserState::done;
 
             case HttpStreamReader::parseError:
                 return ParserState::failed;
