@@ -94,7 +94,7 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
 QnGraphicsMessageBox::~QnGraphicsMessageBox() {
 }
 
-const QString &QnGraphicsMessageBox::text() const {
+QString QnGraphicsMessageBox::text() const {
     return m_label->text();
 }
 
