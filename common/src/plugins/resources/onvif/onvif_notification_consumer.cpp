@@ -46,15 +46,7 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
             continue;
         }
 
-        //if( !notification.oasisWsnB2__Topic ||
-        //    notification.oasisWsnB2__Topic->Dialect != "tns1:Device/Trigger/Relay" )
-        //{
-        //    NX_LOG( lit("Received notification with unknown topic: %1. Ignoring...").
-        //        arg(QString::fromStdString(notification.oasisWsnB2__Topic ? notification.oasisWsnB2__Topic->Dialect : string())), cl_logDEBUG1 );
-        //    continue;
-        //}
-
-        //TODO/IMPL searching for resource by address
+        //searching for resource by address
         auto it = m_notificationProducerAddressToResource.end();
         if( notification.oasisWsnB2__ProducerReference && notification.oasisWsnB2__ProducerReference->Address )
         {
@@ -77,7 +69,6 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
             }
         }
 
-        //TODO/IMPL get relay token and state from notification
         it->second->notificationReceived( notification );
     }
 
