@@ -150,6 +150,7 @@ private:
 
     QBasicTimer m_clickTimer;
     QPointF m_clickPos;
+    QPointF m_itemDeltaCompensation;
 
     QList<SplashItemAnimation> m_freeAnimations, m_activeAnimations;
 };

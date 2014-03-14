@@ -486,6 +486,7 @@ void PtzInstrument::startDrag(DragInfo *) {
         selectionItem()->setOpacity(1.0);
         break;
     case VirtualMovement:
+        m_itemDeltaCompensation = QPointF();
         target()->setCursor(Qt::BlankCursor);
         break;
     default:
@@ -526,26 +527,34 @@ void PtzInstrument::dragMove(DragInfo *info) {
         ensureSelectionItem();
         selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
         break;
-    case VirtualMovement:
-        if(info->mouseScreenPos() != info->mousePressScreenPos()) {
-            QPointF delta = info->mouseItemPos() - info->lastMouseItemPos();
-            qreal scale = target()->size().width() / 2.0;
-            QPointF shift(delta.x() / scale, -delta.y() / scale);
+    case VirtualMovement: {
+        QPointF delta = m_itemDeltaCompensation + info->mouseItemPos() - info->lastMouseItemPos();
+        m_itemDeltaCompensation = QPointF();
 
-            QVector3D position;
-            target()->ptzController()->getPosition(Qn::LogicalPtzCoordinateSpace, &position);
+        qreal scale = target()->size().width() / 2.0;
+        QPointF shift(delta.x() / scale, -delta.y() / scale);
+
+        QVector3D position;
+        target()->ptzController()->getPosition(Qn::LogicalPtzCoordinateSpace, &position);
             
-            qreal speed = 0.5 * position.z();
-            QVector3D positionDelta(shift.x() * speed, shift.y() * speed, 0.0);
-            target()->ptzController()->absoluteMove(Qn::LogicalPtzCoordinateSpace, position + positionDelta, 2.0); /* 2.0 means instant movement. */
+        qreal speed = 0.5 * position.z();
+        QVector3D positionDelta(shift.x() * speed, shift.y() * speed, 0.0);
+        target()->ptzController()->absoluteMove(Qn::LogicalPtzCoordinateSpace, position + positionDelta, 2.0); /* 2.0 means instant movement. */
 
-            /* Calling setPos on each move event causes serious lags which I've so far
-             * was unable to explain. This is worked around by invoking it not that frequently. 
-             * Note that we don't account for screen-relative position here. */
-            if((info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() > 128)
-                QCursor::setPos(info->mousePressScreenPos()); // TODO: #PTZ #Elric this still looks bad, but not as bad as it looked without this hack.
+        /* Calling setPos on each move event causes serious lags which I so far
+         * was unable to explain. This is worked around by invoking it not that frequently. 
+         * Note that we don't account for screen-relative position. */
+        if((info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() > 128) {
+            QCursor::setPos(info->mousePressScreenPos()); // TODO: #PTZ #Elric this still looks bad, but not as bad as it looked without this hack.
+
+            if(m_viewport) {
+                QGraphicsView *view = this->view(m_viewport.data());
+
+                m_itemDeltaCompensation = info->mouseItemPos() - target()->mapFromScene(view->mapToScene(view->mapFromGlobal(info->mousePressScreenPos())));
+            }
         }
         break;
+    }
     default:
         break;
     }
