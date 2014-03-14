@@ -7,6 +7,11 @@
 class QStyle;
 class QGraphicsWidget;
 
+// TODO: #Elric #2.3 this one is not needed actually.
+// We have QStyleOption::styleObject.
+// 
+// Remove!
+
 class GraphicsStyle {
 public:
     GraphicsStyle();
