@@ -105,7 +105,6 @@ namespace nx_api
 
         void readyToSendData()
         {
-            assert( m_writeBuffer.empty() );
             m_writeBuffer.clear();
 
             if( m_serializerState != SerializerState::needMoreBufferSpace )
