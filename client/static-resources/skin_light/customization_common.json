@@ -132,6 +132,7 @@
             "dateOverlay": "QColor(255, 255, 255, 48)",
             "dateOverlayAlternate": "selection.setAlpha(48)",
 
+            "_": "Do not touch two values below! They was set accurately with help of color-picker.",
             "pastLastMinute": "QColor(195, 195, 195, 255)",
             "futureLastMinute": "QColor(201, 201, 201, 255)"
         },
