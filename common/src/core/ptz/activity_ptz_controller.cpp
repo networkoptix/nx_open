@@ -7,8 +7,8 @@ QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControlle
     m_mode(mode),
     m_asynchronous(baseController->hasCapabilities(Qn::AsynchronousPtzCapability))
 {
-    m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(lit("ptzActiveObject"), QnPtzObject(), this);
-    m_adaptor->setValue(QnPtzObject());
+    //todo: #Elric: this setValue setter caused saving settings to a server on each constructor call. Check my refactor, i am not sure about it
+    m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(lit("ptzActiveObject"), QnPtzObject(), this, QVariant::fromValue(QnPtzObject()));
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });
 
     /* Adaptor is thread-safe and works even without resource, 

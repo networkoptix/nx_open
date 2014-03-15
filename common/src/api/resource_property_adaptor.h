@@ -99,7 +99,7 @@ class QnAbstractResourcePropertyAdaptor: public Connective<QObject> {
     typedef Connective<QObject> base_type;
 
 public:
-    QnAbstractResourcePropertyAdaptor(const QString &key, QnAbstractResourcePropertyHandler *handler, QObject *parent = NULL);
+    QnAbstractResourcePropertyAdaptor(const QString &key, QnAbstractResourcePropertyHandler *handler, QObject *parent = NULL, const QVariant& value = QVariant());
     virtual ~QnAbstractResourcePropertyAdaptor();
 
     const QString &key() const;
@@ -144,8 +144,8 @@ template<class T>
 class QnResourcePropertyAdaptor: public QnAbstractResourcePropertyAdaptor {
     typedef QnAbstractResourcePropertyAdaptor base_type;
 public:
-    QnResourcePropertyAdaptor(const QString &key, QnResourcePropertyHandler<T> *handler, const T &defaultValue = T(), QObject *parent = NULL): 
-        QnAbstractResourcePropertyAdaptor(key, handler, parent),
+    QnResourcePropertyAdaptor(const QString &key, QnResourcePropertyHandler<T> *handler, const T &defaultValue = T(), QObject *parent = NULL, const QVariant& initValue = QVariant()): 
+        QnAbstractResourcePropertyAdaptor(key, handler, parent, initValue),
         m_type(qMetaTypeId<T>()),
         m_defaultValue(defaultValue)
     {}
@@ -177,8 +177,8 @@ template<class T>
 class QnJsonResourcePropertyAdaptor: public QnResourcePropertyAdaptor<T> {
     typedef QnResourcePropertyAdaptor<T> base_type;
 public:
-    QnJsonResourcePropertyAdaptor(const QString &key, const T &defaultValue = T(), QObject *parent = NULL):
-        base_type(key, new QnJsonResourcePropertyHandler<T>(), defaultValue, parent)
+    QnJsonResourcePropertyAdaptor(const QString &key, const T &defaultValue = T(), QObject *parent = NULL, const QVariant& initValue = QVariant()):
+        base_type(key, new QnJsonResourcePropertyHandler<T>(), defaultValue, parent, initValue)
     {}
 };
 
