@@ -1284,6 +1284,7 @@ void QnMain::run()
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher( &cameraDriverRestrictionList ) );
     QnResourceDiscoveryManager::instance()->addDeviceServer(ThirdPartyResourceSearcher::instance());
+#ifndef EDGE_SERVER
 #ifdef ENABLE_ARECONT
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlArecontResourceSearcher::instance());
 #endif
@@ -1315,9 +1316,6 @@ void QnMain::run()
 #ifdef ENABLE_ISD
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlISDResourceSearcher::instance());
 #endif
-#ifdef ENABLE_DESKTOP_CAMERA
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopCameraResourceSearcher::instance());
-#endif  //ENABLE_DESKTOP_CAMERA
 
 #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
     QnPlVmax480ResourceSearcher::initStaticInstance( new QnPlVmax480ResourceSearcher() );
@@ -1329,7 +1327,11 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnFlexWatchResourceSearcher::instance());
     QnResourceDiscoveryManager::instance()->addDeviceServer(&OnvifResourceSearcher::instance());
 #endif //ENABLE_ONVIF
+#endif
 
+#ifdef ENABLE_DESKTOP_CAMERA
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopCameraResourceSearcher::instance());
+#endif  //ENABLE_DESKTOP_CAMERA
     
 
     // Roman asked Ivan to comment it for Brian

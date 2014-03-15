@@ -225,7 +225,15 @@ bool QnDbManager::createDatabase()
     {
         if (!execSQLFile(QLatin1String(":/createdb.sql")))
             return false;
-        
+
+#ifdef EDGE_SERVER
+        if (!execSQLFile(QLatin1String(":/insert_3thparty_vendor.sql")))
+            return false;
+#else
+        if (!execSQLFile(QLatin1String(":/insert_all_vendors.sql")))
+            return false;
+#endif
+
         if (!execSQLFile(QLatin1String(":/update_2.2_stage1.sql")))
             return false;
         if (!updateGuids())
