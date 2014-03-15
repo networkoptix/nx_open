@@ -138,7 +138,7 @@ signals:
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
-        QMap<QUuid, qint64> m_lastActivity;
+        QMap<QUuid, QElapsedTimer> m_lastActivity;
         //QMap<QUuid, qint64> m_peerTimeDiff;
     };
 }
