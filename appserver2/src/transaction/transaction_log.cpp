@@ -75,7 +75,8 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QU
     Q_ASSERT_X(!tran.id.peerGUID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
 
     QSqlQuery query(m_dbManager->getDB());
-    query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, sequence, timestamp, tran_guid, tran_data) values (?, ?, ?, ?, ?)");
+    //query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, sequence, timestamp, tran_guid, tran_data) values (?, ?, ?, ?, ?)");
+    query.prepare("INSERT OR REPLACE INTO transaction_log values (?, ?, ?, ?, ?)");
     query.bindValue(0, tran.id.peerGUID.toRfc4122());
     query.bindValue(1, tran.id.sequence);
     query.bindValue(2, tran.timestamp);
