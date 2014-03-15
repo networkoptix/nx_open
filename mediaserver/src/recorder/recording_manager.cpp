@@ -144,7 +144,7 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
 
     ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
     ec2::ErrorCode errCode = appServerConnection->getCameraManager()->addCameraHistoryItemSync(cameraHistoryItem);
-    if (errCode != ec2::ErrorCode::ok) {
+    if (errCode != ec2::ErrorCode::ok && errCode != ec2::ErrorCode::skipped) {
         qCritical() << "ECS server error during execute method addCameraHistoryItem: " << ec2::toString(errCode);
         return false;
     }

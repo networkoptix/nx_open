@@ -866,6 +866,16 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceP
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraServerItemData>& tran)
 {
+    QSqlQuery lastHistory(m_sdb);
+    lastHistory.prepare("SELECT server_guid, max(timestamp) FROM vms_cameraserveritem WHERE timestamp < ?");
+    lastHistory.addBindValue(tran.params.serverGuid);
+    if (!lastHistory.exec()) {
+        qWarning() << Q_FUNC_INFO << lastHistory.lastError().text();
+        return ErrorCode::failure;
+    }
+    if (lastHistory.next() && lastHistory.value(0).toString() == tran.params.serverGuid)
+        return ErrorCode::skipped;
+
     QSqlQuery query(m_sdb);
     query.prepare("INSERT INTO vms_cameraserveritem (server_guid, timestamp, physical_id) VALUES(:serverGuid, :timestamp, :physicalId)");
     tran.params.autoBindValues(query);
