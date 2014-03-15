@@ -69,12 +69,14 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& 
     }
 
     // proxy alive info from non-direct connected host
-    if (!m_alivePeers.contains(tran.params.serverId))
-    {
-        if (tran.params.isAlive)
-            emit peerFound(tran.params.serverId, tran.params.isClient, true);
-        else
-            emit peerLost(tran.params.serverId, tran.params.isClient, true);
+    AlivePeersMap::iterator itr = m_alivePeers.find(tran.params.serverId);
+    if (tran.params.isAlive && itr == m_alivePeers.end()) {
+        m_alivePeers.insert(tran.params.serverId, AlivePeerInfo(tran.params.isClient, true));
+        emit peerFound(tran.params.serverId, tran.params.isClient, true);
+    }
+    else if (!tran.params.isAlive && itr != m_alivePeers.end()) {
+        emit peerLost(tran.params.serverId, tran.params.isClient, true);
+        m_alivePeers.remove(tran.params.serverId);
     }
 }
 
@@ -95,9 +97,9 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
 
     qDebug() << "got transaction " << tran.command;
 
-    QMap<QUuid, QElapsedTimer>:: iterator itr = m_lastActivity.find(tran.id.peerGUID);
-    if (itr != m_lastActivity.end())
-        itr.value().restart();
+    AlivePeersMap:: iterator itr = m_alivePeers.find(tran.id.peerGUID);
+    if (itr != m_alivePeers.end())
+        itr.value().lastActivity.restart();
 
     // process special transactions
     switch(tran.command)
@@ -342,7 +344,7 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
 void QnTransactionMessageBus::connectToPeerLost(const QnId& id)
 {
     if (m_alivePeers.contains(id)) {
-        bool isClient = m_alivePeers.value(id);
+        bool isClient = m_alivePeers.value(id).isClient;
         m_alivePeers.remove(id);
         sendServerAliveMsg(id, false, isClient);
     }
@@ -351,9 +353,8 @@ void QnTransactionMessageBus::connectToPeerLost(const QnId& id)
 void QnTransactionMessageBus::connectToPeerEstablished(const QnId& id, bool isClient)
 {
     if (!m_alivePeers.contains(id)) {
-        m_alivePeers.insert(id, isClient);
+        m_alivePeers.insert(id, AlivePeerInfo(isClient, false));
         sendServerAliveMsg(id, true, isClient);
-        m_lastActivity.insert(id, QElapsedTimer()).value().restart();
     }
 }
 
@@ -477,9 +478,9 @@ void QnTransactionMessageBus::doPeriodicTasks()
         sendServerAliveMsg(qnCommon->moduleGUID(), true, qnCommon->isCloudMode());
 
     // check if some server not accessible any more
-    for (QMap<QUuid, QElapsedTimer>::iterator itr = m_lastActivity.begin(); itr != m_lastActivity.end(); )
+    for (AlivePeersMap::iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
-        if (itr.value().elapsed() > ALIVE_UPDATE_INTERVAL * 2) 
+        if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_INTERVAL * 2)
         {
             foreach(QSharedPointer<QnTransactionTransport> transport, m_connectingConnections) {
                 if (transport->remoteGuid() == itr.key())
@@ -490,12 +491,6 @@ void QnTransactionMessageBus::doPeriodicTasks()
                 if (transport->remoteGuid() == itr.key())
                     transport->setState(QnTransactionTransport::Error);
             }
-
-            emit peerLost(itr.key(), false, false);
-            itr = m_lastActivity.erase(itr);
-        }
-        else {
-            ++itr;
         }
     }
 }
