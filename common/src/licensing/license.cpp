@@ -184,8 +184,10 @@ QnLicense::Type QnLicense::type() const {
     if (!expiration().isEmpty())
         return TrialLicense;
 
-    if (xclass().toLower() == QLatin1String("analog"))
+    if (xclass().toLower() == LICENSE_TYPE_ANALOG)
         return AnalogLicense;
+    if (xclass().toLower() == LICENSE_TYPE_EDGE)
+        return EdgeLicense;
 
     return ProfessionalLicense;
 }
@@ -196,6 +198,7 @@ QString QnLicense::typeName() const {
     case TrialLicense:      return tr("Trial");
     case AnalogLicense:     return tr("Analog");
     case ProfessionalLicense:   return tr("Professional");
+    case EdgeLicense:       return tr("Edge");
     default:
         assert(false);
         return QString();

@@ -85,7 +85,7 @@ void doAutoBindOrdered(QSqlQuery& , int , const std::vector<T>& ) {
 #define DECLARE_FIELD_IDX(R, D, FIELD) int TO_IDX_VAR(FIELD) = rec.indexOf(QLatin1String(BOOST_PP_STRINGIZE(FIELD)));
 #define ASSIGN_FIELD(R, query, FIELD) if (TO_IDX_VAR(FIELD) >= 0) queryFieldToDataObj(query, TO_IDX_VAR(FIELD), value.FIELD);
 
-#define QN_QUERY_TO_DATA_OBJECT(query, TYPE, data, FIELD_SEQ, ...) \
+#define QN_QUERY_TO_DATA_OBJECT_FILTERED(query, TYPE, data, FIELD_SEQ, FILTER, ...) \
 { \
 	QSqlRecord rec = query.record();\
 	BOOST_PP_SEQ_FOR_EACH(DECLARE_FIELD_IDX, ~, FIELD_SEQ) \
@@ -93,9 +93,12 @@ void doAutoBindOrdered(QSqlQuery& , int , const std::vector<T>& ) {
 	{\
 		TYPE value;\
 		BOOST_PP_SEQ_FOR_EACH(ASSIGN_FIELD, query, FIELD_SEQ) \
-		data.push_back(value);\
+        if (FILTER(value)) \
+		    data.push_back(value);\
 	}\
 }
+
+#define QN_QUERY_TO_DATA_OBJECT(query, TYPE, data, FIELD_SEQ, ...) QN_QUERY_TO_DATA_OBJECT_FILTERED(query, TYPE, data, FIELD_SEQ, [] (const TYPE&) {return true;})
 
 #else // Q_MOC_RUN
 
@@ -105,6 +108,7 @@ void doAutoBindOrdered(QSqlQuery& , int , const std::vector<T>& ) {
 #define QN_DEFINE_STRUCT_SQL_BINDER(...)
 #define QN_DEFINE_STRUCT_SQL_BINDER(...)
 #define QN_DECLARE_STRUCT_SQL_BINDER(...)
+#define QN_QUERY_TO_DATA_OBJECT_FILTERED(...)
 
 #endif // Q_MOC_RUN
 
