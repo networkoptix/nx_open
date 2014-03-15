@@ -867,8 +867,9 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceP
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraServerItemData>& tran)
 {
     QSqlQuery lastHistory(m_sdb);
-    lastHistory.prepare("SELECT server_guid, max(timestamp) FROM vms_cameraserveritem WHERE timestamp < ?");
-    lastHistory.addBindValue(tran.params.serverGuid);
+    lastHistory.prepare("SELECT server_guid, max(timestamp) FROM vms_cameraserveritem WHERE physical_id = ? AND timestamp < ?");
+    lastHistory.addBindValue(tran.params.physicalId);
+    lastHistory.addBindValue(tran.params.timestamp);
     if (!lastHistory.exec()) {
         qWarning() << Q_FUNC_INFO << lastHistory.lastError().text();
         return ErrorCode::failure;
@@ -1179,6 +1180,12 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiIdData>& 
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeList& data)
 {
+    if (!m_cachedResTypes.data.empty())
+    {
+        data = m_cachedResTypes;
+        return ErrorCode::ok;
+    }
+
 	QSqlQuery queryTypes(m_sdb);
     queryTypes.setForwardOnly(true);
 	queryTypes.prepare("select rt.guid as id, rt.name, m.name as manufacture \
@@ -1219,6 +1226,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
     std::vector<ApiPropertyType> allProperties;
     QN_QUERY_TO_DATA_OBJECT(queryProperty, ApiPropertyType, allProperties, ApiPropertyTypeFields);
     mergeObjectListData(data.data, allProperties, &ApiResourceTypeData::propertyTypeList, &ApiPropertyType::resource_type_id);
+
+    m_cachedResTypes = data;
 
 	return ErrorCode::ok;
 }

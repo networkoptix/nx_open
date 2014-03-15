@@ -204,6 +204,7 @@ namespace ec2
         QnId m_cameraTypeId;
         QnId m_adminUserID;
         int m_adminUserInternalID;
+        ApiResourceTypeList m_cachedResTypes;
 
         void fillServerInfo( ServerInfo* const serverInfo );
     };
