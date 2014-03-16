@@ -213,12 +213,10 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
 
+    m_httpClient->setUserName("system");
+    m_httpClient->setUserPassword(qnCommon->getSystemPassword());
     if (!remoteAddr.userName().isEmpty())
     {
-        //m_httpClient->setUserName(remoteAddr.userName());
-        //m_httpClient->setUserPassword(remoteAddr.password());
-        m_httpClient->setUserName("system");
-        m_httpClient->setUserPassword(qnCommon->getSystemPassword());
         remoteAddr.setUserName(QString());
         remoteAddr.setPassword(QString());
     }
