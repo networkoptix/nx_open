@@ -128,41 +128,52 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
     QUrl url = d->request.requestLine.url;
     QString urlPath = url.path();
 
-    int proxyEndPos = urlPath.indexOf('/', 1); // remove proxy prefix
-    int protocolEndPos = urlPath.indexOf('/', proxyEndPos+1); // remove proxy prefix
-    if (protocolEndPos == -1)
-        return false;
-    int hostEndPos = urlPath.indexOf('/', protocolEndPos+1); // remove proxy prefix
-    if (hostEndPos == -1)
-        hostEndPos = urlPath.size();
+    if (urlPath.startsWith("proxy") || urlPath.startsWith("/proxy"))
+    {
+        int proxyEndPos = urlPath.indexOf('/', 1); // remove proxy prefix
+        int protocolEndPos = urlPath.indexOf('/', proxyEndPos+1); // remove proxy prefix
+        if (protocolEndPos == -1)
+            return false;
+        int hostEndPos = urlPath.indexOf('/', protocolEndPos+1); // remove proxy prefix
+        if (hostEndPos == -1)
+            hostEndPos = urlPath.size();
 
-    QString protocol = urlPath.mid(proxyEndPos+1, protocolEndPos - proxyEndPos-1);
-    QString host = urlPath.mid(protocolEndPos+1, hostEndPos - protocolEndPos-1);
-    if (host.startsWith("{"))
-        xServerGUID = host;
+        QString protocol = urlPath.mid(proxyEndPos+1, protocolEndPos - proxyEndPos-1);
+        QString host = urlPath.mid(protocolEndPos+1, hostEndPos - protocolEndPos-1);
+        if (host.startsWith("{"))
+            xServerGUID = host;
 
-    urlPath = urlPath.mid(hostEndPos);
-    if (urlPath.isEmpty())
-        urlPath = "/";
+        urlPath = urlPath.mid(hostEndPos);
+        if (urlPath.isEmpty())
+            urlPath = "/";
 
-    d->request.requestLine.url.setPath(urlPath);
+        d->request.requestLine.url.setPath(urlPath);
+
+        for (nx_http::HttpHeaders::iterator itr = d->request.headers.begin(); itr != d->request.headers.end(); ++itr)
+        {
+            if (itr->first.toLower() == "host")
+                itr->second = host.toUtf8();
+        }
+        d->clientRequest.clear();
+        d->request.serialize(&d->clientRequest);
+
+        // get dst ip and port
+        QStringList hostAndPort = host.split(':');
+        int port = hostAndPort.size() > 1 ? hostAndPort[1].toInt() : getDefaultPortByProtocol(protocol);
+
+        dstUrl = QUrl(lit("%1://%2:%3").arg(protocol).arg(hostAndPort[0]).arg(port));
+    }
+    else {
+        int defaultPort = getDefaultPortByProtocol(url.scheme());
+        dstUrl = QUrl(lit("%1://%2:%3").arg(url.scheme()).arg(url.host()).arg(url.port(defaultPort)));
+    }
 
     for (nx_http::HttpHeaders::iterator itr = d->request.headers.begin(); itr != d->request.headers.end(); ++itr)
     {
-        if (itr->first.toLower() == "host")
-            itr->second = host.toUtf8();
-        else if (itr->first == "x-server-guid")
+        if (itr->first == "x-server-guid")
             xServerGUID = itr->second;
     }
 
-    d->clientRequest.clear();
-    d->request.serialize(&d->clientRequest);
-
-    // get dst ip and port
-    QStringList hostAndPort = host.split(':');
-    int port = hostAndPort.size() > 1 ? hostAndPort[1].toInt() : getDefaultPortByProtocol(protocol);
-
-    dstUrl = QUrl(lit("%1://%2:%3").arg(protocol).arg(hostAndPort[0]).arg(port));
     return true;
 }
 
@@ -309,46 +320,37 @@ void QnProxyConnectionProcessor::doSmartProxy()
             {
                 parseRequest();
                 QString path = d->request.requestLine.url.path();
-                bool isProxyPattern = path.startsWith("/proxy") || path.startsWith("proxy");
-                if (!isProxyPattern) 
+                // parse next request and change dst if required
+                QUrl dstUrl;
+                QString xServerGUID;
+                updateClientRequest(dstUrl, xServerGUID);
+                bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
+                bool isSameAddr = d->lastConnectedUrl == xServerGUID || d->lastConnectedUrl == dstUrl;
+                if (isSameAddr) 
                 {
-                    // process next request without parsing
                     d->dstSocket->send(d->clientRequest);
-                }
-                else 
-                {
-                    // parse next request and change dst if required
-                    QUrl dstUrl;
-                    QString xServerGUID;
-                    updateClientRequest(dstUrl, xServerGUID);
-                    bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
-                    bool isSameAddr = d->lastConnectedUrl == xServerGUID || d->lastConnectedUrl == dstUrl;
-                    if (isSameAddr) 
+                    if (isWebSocket) 
                     {
-                        d->dstSocket->send(d->clientRequest);
-                        if (isWebSocket) 
-                        {
-                            if (!doProxyData(&read_set, d->dstSocket.data(), d->socket.data(), buffer, sizeof(buffer)))
-                                break; // send rest of data
-                            doRawProxy(); // switch to binary mode
-                            return;
-                        }
+                        if (!doProxyData(&read_set, d->dstSocket.data(), d->socket.data(), buffer, sizeof(buffer)))
+                            break; // send rest of data
+                        doRawProxy(); // switch to binary mode
+                        return;
                     }
-                    else {
-                        // new server
-                        d->lastConnectedUrl = connectToRemoteHost(xServerGUID , dstUrl);
-                        if (d->lastConnectedUrl.isEmpty()) {
-                            d->socket->close();
-                            return; // invalid dst address
-                        }
+                }
+                else {
+                    // new server
+                    d->lastConnectedUrl = connectToRemoteHost(xServerGUID , dstUrl);
+                    if (d->lastConnectedUrl.isEmpty()) {
+                        d->socket->close();
+                        return; // invalid dst address
+                    }
 
-                        d->dstSocket->send(d->clientRequest.data(), d->clientRequest.size());
+                    d->dstSocket->send(d->clientRequest.data(), d->clientRequest.size());
 
-                        if (isWebSocket) 
-                        {
-                            doRawProxy(); // switch to binary mode
-                            return;
-                        }
+                    if (isWebSocket) 
+                    {
+                        doRawProxy(); // switch to binary mode
+                        return;
                     }
                 }
                 d->clientRequest.clear();
