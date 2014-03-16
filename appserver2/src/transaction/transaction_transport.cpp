@@ -229,7 +229,8 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     }
     remoteAddr.setQuery(q);
     m_remoteAddr = remoteAddr;
-    m_httpClient->doGet(remoteAddr);
+    if (!m_httpClient->doGet(remoteAddr))
+        setState(Error);
 }
 
 void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr client)
@@ -309,7 +310,8 @@ void QnTransactionTransport::connectDone(const QnId& id)
 
 void QnTransactionTransport::repeatDoGet()
 {
-    m_httpClient->doGet(m_remoteAddr);
+    if (!m_httpClient->doGet(m_remoteAddr))
+        setState(Error);
 }
 
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
