@@ -233,33 +233,11 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
         setState(Error);
 }
 
-void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr client)
-{
-    nx_http::AsyncHttpClient::State state = client->state();
-    if (state == nx_http::AsyncHttpClient::sFailed)
-        setState(State::Error);
-}
-
-/*
-void QnTransactionTransport::getPeerInfo(const QnId& id, bool* isExist, bool* isConnecting)
-{
-    //QMutexLocker lock(&m_staticMutex);
-    *isExist = m_existConn.contains(id);
-    *isConnecting = m_connectingConn.contains(id);
-}
-
-
-
-void QnTransactionTransport::connectInProgress(const QnId& id)
-{
-    QMutexLocker lock(&m_staticMutex);
-    m_connectingConn << id;
-}
-*/
-
 bool QnTransactionTransport::tryAcquireConnecting(const QnId& remoteGuid, bool isOriginator)
 {
     QMutexLocker lock(&m_staticMutex);
+
+    Q_ASSERT(!remoteGuid.isNull());
 
     bool isExist = m_existConn.contains(remoteGuid);
     isExist |= isOriginator ?  m_connectingConn.value(remoteGuid).first : m_connectingConn.value(remoteGuid).second;
@@ -278,6 +256,11 @@ bool QnTransactionTransport::tryAcquireConnecting(const QnId& remoteGuid, bool i
 void QnTransactionTransport::connectingCanceled(const QnId& remoteGuid, bool isOriginator)
 {
     QMutexLocker lock(&m_staticMutex);
+    connectingCanceledNoLock(remoteGuid, isOriginator);
+}
+
+void QnTransactionTransport::connectingCanceledNoLock(const QnId& remoteGuid, bool isOriginator)
+{
     ConnectingInfoMap::iterator itr = m_connectingConn.find(remoteGuid);
     if (itr != m_connectingConn.end()) {
         if (isOriginator)
@@ -297,7 +280,7 @@ bool QnTransactionTransport::tryAcquireConnected(const QnId& remoteGuid, bool is
     bool fail = isExist || (isTowardConnecting && remoteGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
     if (!fail) {
         m_existConn << remoteGuid;
-        m_connectingConn.remove(remoteGuid);
+        connectingCanceledNoLock(remoteGuid, isOriginator);
     }
     return !fail;    
 }
@@ -311,7 +294,21 @@ void QnTransactionTransport::connectDone(const QnId& id)
 void QnTransactionTransport::repeatDoGet()
 {
     if (!m_httpClient->doGet(m_remoteAddr))
-        setState(Error);
+        cancelConnecting();
+}
+
+void QnTransactionTransport::cancelConnecting()
+{
+    if (getState() == ConnectingStage2)
+        QnTransactionTransport::connectingCanceled(m_remoteGuid, true);
+    setState(Error);
+}
+
+void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr client)
+{
+    nx_http::AsyncHttpClient::State state = client->state();
+    if (state == nx_http::AsyncHttpClient::sFailed)
+        cancelConnecting();
 }
 
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
@@ -321,18 +318,16 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
 
     if (itrGuid == client->response()->headers.end() || itrTime == client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
     {
-        if (getState() == ConnectingStage2)
-            QnTransactionTransport::connectingCanceled(m_remoteGuid, true);
-        setState(State::Error);
+        cancelConnecting();
         return;
     }
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
+    m_remoteGuid = itrGuid->second;
 
     if (getState() == ConnectingStage1) {
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remoteGuid, true);
         if (lockOK) {
-            m_remoteGuid = itrGuid->second;
             if (QnTransactionLog::instance()) {
                 qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
                 qint64 remoteTime = itrTime->second.toLongLong();
@@ -356,7 +351,7 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
             setState(QnTransactionTransport::Connected);
         }
         else {
-            setState(QnTransactionTransport::Error);
+            cancelConnecting();
         }
     }
 }
