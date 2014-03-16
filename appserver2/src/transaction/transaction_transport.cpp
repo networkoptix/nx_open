@@ -261,7 +261,7 @@ bool QnTransactionTransport::tryAcquireConnecting(const QnId& remoteGuid, bool i
     QMutexLocker lock(&m_staticMutex);
 
     bool isExist = m_existConn.contains(remoteGuid);
-    //bool isConnecting = m_connectingConn.contains(remoteGuid);
+    isExist |= isOriginator ?  m_connectingConn.value(remoteGuid).first : m_connectingConn.value(remoteGuid).second;
     bool isTowardConnecting = isOriginator ?  m_connectingConn.value(remoteGuid).second : m_connectingConn.value(remoteGuid).first;
     bool fail = isExist || (isTowardConnecting && remoteGuid.toRfc4122() > qnCommon->moduleGUID().toRfc4122());
     if (!fail) {

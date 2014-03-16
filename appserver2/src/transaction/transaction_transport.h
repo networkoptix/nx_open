@@ -86,7 +86,7 @@ private:
 
     static QSet<QUuid> m_existConn;
     typedef QMap<QUuid, QPair<bool, bool>> ConnectingInfoMap;
-    static ConnectingInfoMap m_connectingConn; // first - originator, second - non originator
+    static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
     static QMutex m_staticMutex;
 private:
     void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();

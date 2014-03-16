@@ -448,12 +448,13 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
 
 void QnTransactionMessageBus::at_timer()
 {
-    QMutexLocker lock(&m_mutex);
     doPeriodicTasks();
 }
 
 void QnTransactionMessageBus::doPeriodicTasks()
 {
+    QMutexLocker lock(&m_mutex);
+
     m_connectionsToRemove.clear();
 
     // add new outgoing connections
@@ -536,7 +537,7 @@ void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient
 {
     QMutexLocker lock(&m_mutex);
     m_removeUrls.insert(url, RemoveUrlConnectInfo(isClient));
-    doPeriodicTasks();
+    QTimer::singleShot(0, this, SLOT(doPeriodicTasks));
 }
 
 void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
