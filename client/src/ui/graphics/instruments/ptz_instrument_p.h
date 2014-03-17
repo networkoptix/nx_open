@@ -108,6 +108,10 @@ public:
         setStateOpacity(HOVERED, 0.7);
         setStateOpacity(PRESSED, 1.0);
 
+        QFont font = this->font();
+        font.setPixelSize(50);
+        setFont(font);
+
         setFrameColor(QColor(128, 196, 255, 192));
         setWindowColor(QColor(128, 196, 255, 64).lighter(120));
     }
