@@ -80,7 +80,6 @@
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/resource/layout_resource_widget.h>
 
 #include <ui/help/help_handler.h>
 
@@ -1157,26 +1156,7 @@ void QnWorkbenchController::at_item_doubleClicked(QnMediaResourceWidget *widget)
     at_item_doubleClicked(static_cast<QnResourceWidget *>(widget));
 }
 
-void QnWorkbenchController::at_item_doubleClicked(QnLayoutResourceWidget *widget) {
-    if (!widget)
-        return;
-
-    QnVideoWallItemIndexList indexes = widget->linkedVideoWalls();
-    if (indexes.isEmpty())
-        return;
-
-    context()->menu()->trigger(
-        Qn::StartVideoWallControlAction,
-        QnActionParameters(indexes)
-    );
-}
-
 void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget) {
-    if (widget->resource() && (widget->resource()->flags() & QnResource::layout)) {
-        at_item_doubleClicked(dynamic_cast<QnLayoutResourceWidget*>(widget));
-        return;
-    }
-
     display()->scene()->clearSelection();
     widget->setSelected(true);
 

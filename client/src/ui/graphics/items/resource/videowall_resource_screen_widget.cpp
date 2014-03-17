@@ -355,16 +355,8 @@ void QnVideowallResourceScreenWidget::updateLayout() {
     } else if (m_items.size() == 1 ) {    // can have only on item on several screens
         LayoutOverlayWidget *itemWidget = new LayoutOverlayWidget(m_videowall, m_items.first().uuid, this);
         itemWidget->setAcceptedMouseButtons(Qt::NoButton);
-
-         //TODO: #GDM VW maybe just place this item as an overlay?
         m_mainLayout->addAnchors(itemWidget, m_mainLayout, Qt::Horizontal | Qt::Vertical);
-
-    } else {
-        qWarning() << "inconsistent videowall or no items on screens";
     }
-
-
-
 
     m_layoutUpdateRequired = false;
 }

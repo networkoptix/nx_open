@@ -46,7 +46,6 @@ class QnWorkbenchLayout;
 class QnWorkbench;
 class QnResourceWidget;
 class QnMediaResourceWidget;
-class QnLayoutResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 class QnScreenRecorder;
@@ -155,7 +154,6 @@ protected slots:
     void at_item_middleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_doubleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_doubleClicked(QnMediaResourceWidget *widget);
-    void at_item_doubleClicked(QnLayoutResourceWidget *widget);
     void at_item_doubleClicked(QnResourceWidget *widget);
 
     void at_scene_clicked(QGraphicsView *view, const ClickInfo &info);
