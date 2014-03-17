@@ -71,6 +71,7 @@ public:
      * \returns                         Whether warnings related to unsupported function calls are enabled.
      */
     static bool isWarningsEnabled();
+
 private:
     QSharedPointer<QnGlFunctionsPrivate> d;
 };

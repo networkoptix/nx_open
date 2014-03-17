@@ -4,7 +4,15 @@
 
 #ifdef Q_OS_LINUX
 #include <unistd.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 #include <QtCore/QFile>
+
+void sig_child_handler(int signum) {
+    signal(signum, &sig_child_handler);
+    wait(NULL);
+}
 
 bool ProcessUtils::startProcessDetached(const QString &program, const QStringList &arguments, const QString &workingDirectory, const QStringList &environment) {
     /* prepare argv */
@@ -48,10 +56,16 @@ bool ProcessUtils::startProcessDetached(const QString &program, const QStringLis
     return childPid != -1;
 }
 
+void ProcessUtils::initialize() {
+    signal(SIGCHLD, &sig_child_handler);
+}
+
 #else
 
 bool ProcessUtils::startProcessDetached(const QString &program, const QStringList &arguments, const QString &workingDirectory, const QStringList &environment) {
     return QProcess::startDetached(program, arguments, workingDirectory);
 }
+
+void ProcessUtils::initialize() {}
 
 #endif
