@@ -4,12 +4,12 @@
 #include <QtCore/QAtomicInt>
 
 #include <utils/common/connective.h>
-#include <core/resource/resource_fwd.h>
-
 #include <utils/common/json.h>
 #include <utils/common/lexical.h>
-#include "nx_ec/impl/ec_api_impl.h"
 
+#include <core/resource/resource_fwd.h>
+
+#include <nx_ec/impl/ec_api_impl.h>
 
 // TODO: #Elric create meta_functions and move json_serializer, lexical_serializer, linear_combinator & magnitude_calculator there
 
@@ -99,7 +99,7 @@ class QnAbstractResourcePropertyAdaptor: public Connective<QObject> {
     typedef Connective<QObject> base_type;
 
 public:
-    QnAbstractResourcePropertyAdaptor(const QString &key, QnAbstractResourcePropertyHandler *handler, QObject *parent = NULL, const QVariant& value = QVariant());
+    QnAbstractResourcePropertyAdaptor(const QString &key, QnAbstractResourcePropertyHandler *handler, QObject *parent = NULL);
     virtual ~QnAbstractResourcePropertyAdaptor();
 
     const QString &key() const;
@@ -127,7 +127,8 @@ private:
     void setResourceInternal(const QnResourcePtr &resource, bool notify);
 
     Q_SLOT void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
-    Q_SLOT void at_paramsSaved(int, ec2::ErrorCode);
+    Q_SLOT void at_connection_propertiesSaved(int, ec2::ErrorCode);
+
 private:
     const QString m_key;
     const QScopedPointer<QnAbstractResourcePropertyHandler> m_handler;
@@ -144,8 +145,8 @@ template<class T>
 class QnResourcePropertyAdaptor: public QnAbstractResourcePropertyAdaptor {
     typedef QnAbstractResourcePropertyAdaptor base_type;
 public:
-    QnResourcePropertyAdaptor(const QString &key, QnResourcePropertyHandler<T> *handler, const T &defaultValue = T(), QObject *parent = NULL, const QVariant& initValue = QVariant()): 
-        QnAbstractResourcePropertyAdaptor(key, handler, parent, initValue),
+    QnResourcePropertyAdaptor(const QString &key, QnResourcePropertyHandler<T> *handler, const T &defaultValue = T(), QObject *parent = NULL): 
+        QnAbstractResourcePropertyAdaptor(key, handler, parent),
         m_type(qMetaTypeId<T>()),
         m_defaultValue(defaultValue)
     {}
@@ -177,8 +178,8 @@ template<class T>
 class QnJsonResourcePropertyAdaptor: public QnResourcePropertyAdaptor<T> {
     typedef QnResourcePropertyAdaptor<T> base_type;
 public:
-    QnJsonResourcePropertyAdaptor(const QString &key, const T &defaultValue = T(), QObject *parent = NULL, const QVariant& initValue = QVariant()):
-        base_type(key, new QnJsonResourcePropertyHandler<T>(), defaultValue, parent, initValue)
+    QnJsonResourcePropertyAdaptor(const QString &key, const T &defaultValue = T(), QObject *parent = NULL):
+        base_type(key, new QnJsonResourcePropertyHandler<T>(), defaultValue, parent)
     {}
 };
 
@@ -191,5 +192,6 @@ public:
         base_type(key, new QnLexicalResourcePropertyHandler<T>(), defaultValue, parent)
     {}
 };
+
 
 #endif // QN_RESOURCE_PROPERTY_ADAPTOR_H

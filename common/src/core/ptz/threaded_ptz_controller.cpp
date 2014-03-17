@@ -5,6 +5,8 @@
 
 #include <common/common_meta_types.h>
 
+#include "ptz_controller_pool.h"
+
 
 // -------------------------------------------------------------------------- //
 // QnPtzCommand
@@ -53,38 +55,6 @@ private:
 
 
 // -------------------------------------------------------------------------- //
-// QnPtzCommandThreadPool
-// -------------------------------------------------------------------------- //
-class QnPtzCommandThreadPool: public QThreadPool {
-public:
-    QnPtzCommandThreadPool() {
-        setMaxThreadCount(1024); /* Should be enough for our needs =). */
-    }
-};
-
-Q_GLOBAL_STATIC(QnPtzCommandThreadPool, qn_ptzCommandThreadPool_instance) // TODO: #Elric potential problem, move to controllerPool
-
-
-// -------------------------------------------------------------------------- //
-// QnThreadedPtzControllerPrivate
-// -------------------------------------------------------------------------- //
-class QnThreadedPtzControllerPrivate {
-public:
-    QnThreadedPtzControllerPrivate(): threadPool(NULL) {}
-
-    void init() {
-        threadPool = qn_ptzCommandThreadPool_instance();
-    }
-
-    QnThreadedPtzController *q;
-
-    QThreadPool *threadPool;
-    QMutex mutex;
-    QnPtzData data;
-};
-
-
-// -------------------------------------------------------------------------- //
 // QnThreadedPtzController
 // -------------------------------------------------------------------------- //
 // TODO: #Elric get rid of this macro hell
@@ -112,11 +82,8 @@ public:
 
 QnThreadedPtzController::QnThreadedPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    d(new QnThreadedPtzControllerPrivate)
-{
-    d->q = this;
-    d->init();
-}
+    m_threadPool(qnPtzPool->commandThreadPool())
+{}
 
 QnThreadedPtzController::~QnThreadedPtzController() {
     return;
@@ -133,7 +100,7 @@ void QnThreadedPtzController::runCommand(Qn::PtzCommand command, const Functor &
     runnable->setAutoDelete(true);
     connect(runnable, &QnAbstractPtzCommand::finished, this, &QnAbstractPtzController::finished, Qt::QueuedConnection);
 
-    d->threadPool->start(runnable);
+    m_threadPool->start(runnable);
 }
 
 Qn::PtzCapabilities QnThreadedPtzController::getCapabilities() {

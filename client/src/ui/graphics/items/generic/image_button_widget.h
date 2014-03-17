@@ -39,7 +39,7 @@ public:
         PRESSED = 0x2,      /**< Button is pressed. This is the state that the button enters when a mouse button is pressed over it, and leaves when the mouse button is released. */
         HOVERED = 0x4,      /**< Button is hovered over. */
         DISABLED = 0x8,     /**< Button is disabled. */
-        FLAGS_MAX = 0xF
+        FLAGS_MAX = 0xF // TODO: #Elric rename, use CamelCase like in Qt
     };
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
@@ -173,63 +173,5 @@ private:
     qreal m_rotation;
 };
 
-
-
-/**
- * An image button widget that can show text and draw a frame.
- */
-class QnTextButtonWidget: public Framed<QnImageButtonWidget> {
-    Q_OBJECT
-    Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
-    Q_PROPERTY(Qn::FrameShape frameShape READ frameShape WRITE setFrameShape)
-    Q_PROPERTY(Qt::PenStyle frameStyle READ frameStyle WRITE setFrameStyle)
-    Q_PROPERTY(QBrush frameBrush READ frameBrush WRITE setFrameBrush)
-    Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor)
-    Q_PROPERTY(QBrush windowBrush READ windowBrush WRITE setWindowBrush)
-    Q_PROPERTY(QColor windowColor READ windowColor WRITE setWindowColor)
-    Q_PROPERTY(QBrush textBrush READ textBrush WRITE setTextBrush)
-    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
-    Q_PROPERTY(QString text READ text WRITE setText)
-    Q_PROPERTY(qreal relativeFrameWidth READ relativeFrameWidth WRITE setRelativeFrameWidth)
-    typedef Framed<QnImageButtonWidget> base_type;
-
-public:
-    QnTextButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
-
-    const QString &text() const;
-    void setText(const QString &text);
-
-    QBrush textBrush() const;
-    void setTextBrush(const QBrush &textBrush);
-
-    QColor textColor() const;
-    void setTextColor(const QColor &textColor);
-
-    qreal relativeFrameWidth() const;
-    void setRelativeFrameWidth(qreal relativeFrameWidth);
-
-    qreal stateOpacity(StateFlags stateFlags) const;
-    void setStateOpacity(StateFlags stateFlags, qreal opacity);
-
-    virtual void setGeometry(const QRectF &geometry) override;
-
-protected:
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) override;
-
-    virtual void changeEvent(QEvent *event) override;
-
-    void invalidatePixmap();
-    void ensurePixmap();
-
-protected:
-    StateFlags validOpacityState(StateFlags flags) const;
-
-private:
-    QString m_text;
-    bool m_pixmapValid;
-    qreal m_relativeFrameWidth;
-    boost::array<qreal, FLAGS_MAX + 1> m_opacities;
-};
 
 #endif // QN_IMAGE_BUTTON_WIDGET_H

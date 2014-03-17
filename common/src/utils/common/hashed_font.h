@@ -41,10 +41,13 @@ public:
 
 private:
     static uint calculateHash(const QFont &font) {
+        /* Note that QFont::key returns a string concatenation of all
+         * QFont attributes. For the sake of hash calculation, our method
+         * is faster. */
         using ::qHash;
 
         /* |31    ...    16|15|14|13 12 11 10| 9  8| 7| 6  5  4| 3| 2| 1| 0| *
-         * | StyleStrategy |  |Fp| StyleHint |Style|Ls|  Caps  |Kr|St|Ov|Un| */
+         * | StyleStrategy |Rm|Fp| StyleHint |Style|Ls|  Caps  |Kr|St|Ov|Un| */
         quint32 flags = 
             (font.underline() << 0) | 
             (font.overline() << 1) |
@@ -55,13 +58,14 @@ private:
             (font.style() << 8) |
             (font.styleHint() << 10) |
             (font.fixedPitch() << 14) |
+            (font.rawMode() << 15) |
             (font.styleStrategy() << 16);
 
         /* All numbers in the combination are primes. */
         quint32 combination =
             (101081 * static_cast<int>(font.wordSpacing() * 100)) ^
             (88001  * static_cast<int>(font.letterSpacing() * 100)) ^
-            (10247  * font.pointSize()) ^
+            (10247  * static_cast<int>(font.pointSizeF() * 100)) ^
             (3533   * font.pixelSize()) ^
             (503    * font.weight()) ^
             (197    * font.stretch());

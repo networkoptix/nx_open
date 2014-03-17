@@ -4,6 +4,7 @@
 
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/common/geometry.h>
+#include <ui/workaround/gl_native_painting.h>
 
 QnShadowItem::QnShadowItem(QGraphicsItem *parent):
     base_type(parent),
@@ -96,7 +97,31 @@ QPainterPath QnShadowItem::shape() const {
 void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     ensureShadowShape();
 
+#if 0
     QN_SCOPED_PAINTER_BRUSH_ROLLBACK(painter, m_color);
     QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, Qt::NoPen);
     painter->drawPolygon(m_shadowShape);
+#else
+    /* This code actually works faster. 
+     * On a scene with 64 simple items I get 20-30% FPS increase. */
+
+    /* Color for drawing the shadow. */
+    QColor color = m_color;
+    color.setAlpha(color.alpha() * effectiveOpacity());
+
+    QnGlNativePainting::begin(painter);
+    //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
+    glEnable(GL_BLEND); 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+
+    /* Draw shadowed rect. */
+    glBegin(GL_TRIANGLE_FAN);
+    glColor(color);
+    glVertices(m_shadowShape);
+    glEnd();
+
+    glDisable(GL_BLEND); 
+    //glPopAttrib();
+    QnGlNativePainting::end(painter);
+#endif
 }

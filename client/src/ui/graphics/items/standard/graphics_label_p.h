@@ -13,12 +13,21 @@ class GraphicsLabelPrivate : public GraphicsFramePrivate
 public:
     void init();
 
-    void updateCachedData();
+    void updateSizeHint();
+    
+    void ensurePixmaps();
+    void ensureStaticText();
 
-    QStaticText::PerformanceHint performanceHint;
+    QColor textColor() const;
+
+    GraphicsLabel::PerformanceHint performanceHint;
+    Qt::Alignment alignment;
     QString text;
     QStaticText staticText;
+    QPixmap pixmap;
     QRectF rect;
+    bool staticTextDirty;
+    bool pixmapDirty;
 };
 
 #endif // GRAPHICSLABEL_P_H

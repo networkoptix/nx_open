@@ -10,14 +10,14 @@
     <scm>
         <connection>scm:hg:file:///${basedir}</connection>
         <developerConnection>scm:hg:file:///${basedir}</developerConnection>
-    </scm>	
+    </scm>  
 
     <distributionManagement>
         <repository>
             <id>nexus-snapshots</id>
             <url>https://noptix.enk.me/nexus/content/repositories/snapshots/</url>
         </repository>
-    </distributionManagement>	
+    </distributionManagement>   
 
     <properties>
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -37,6 +37,7 @@
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
         <beta>true</beta>
+        <box></box>
 
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
@@ -80,7 +81,7 @@
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
-        <qtplugin3/>	
+        <qtplugin3/>    
     </properties>
 
     <build>
@@ -140,7 +141,7 @@
                     <doCheck>false</doCheck>
                     <doUpdate>update</doUpdate>
                 </configuration>
-            </plugin>		
+            </plugin>       
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -161,7 +162,7 @@
                                 <resource>
                                     <directory>${basedir}/maven/filter-resources</directory>
                                     <filtering>true</filtering>
-                                </resource>	
+                                </resource> 
                                 <resource>
                                     <directory>${basedir}/maven/bin-resources</directory>
                                     <filtering>false</filtering>
@@ -173,20 +174,20 @@
                                         <exclude>**/_unused/**</exclude>
                                         <exclude>**/intro.*</exclude>
                                     </excludes>
-                                </resource>	   
+                                </resource>    
                                 <resource>
                                     <directory>${customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
                                     <excludes>
                                         <exclude>**/_unused/**</exclude>
                                     </excludes>
-                                </resource>	        	                                                             
+                                </resource>                                                                          
                             </resources>              
                         </configuration>            
                     </execution>
                 </executions>
-            </plugin>			
-        </plugins>			
+            </plugin>           
+        </plugins>          
     </build>
 
     <profiles>
@@ -199,9 +200,9 @@
                     <missing>build_environment/target/buildenv.timestamp</missing>
                 </file> 
             </activation>
-            <modules>	
+            <modules>   
                 <module>build_environment</module>
-            </modules>	
+            </modules>  
         </profile>     
         
         <profile>
@@ -212,9 +213,9 @@
                     <value>true</value>
                 </property>
             </activation>
-            <modules>	
+            <modules>   
                 <module>plugins/quicksyncdecoder</module>       
-            </modules>	
+            </modules>  
         </profile>   
 
         <profile>
@@ -261,10 +262,10 @@
                     <value>!arm</value>
                 </property>
             </activation>
-            <modules>		                
+            <modules>                       
                 <module>applauncher</module> 
-                <module>client</module>		
-            </modules>	
+                <module>client</module>     
+            </modules>  
         </profile>         
         <profile>
             <id>windows</id>
@@ -276,9 +277,9 @@
             <modules>
                 <module>plugins/image_library_plugin</module>                
                 <module>traytool</module>
-                <!-- Vmaxproxy	module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
-                <!--<module>vmaxproxy</module>	-->
-                <module>client</module>		                
+                <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
+                <!--<module>vmaxproxy</module>  -->
+                <module>client</module>                     
                 <module>wixsetup/wixsetup-full</module>
                 <module>wixsetup/wixsetup-client-only</module>
             </modules>
@@ -307,7 +308,7 @@
             </activation>
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
-                <init.python.dir>${environment.dir}/python/bin</init.python.dir>				
+                <init.python.dir>${environment.dir}/python/bin</init.python.dir>                
                 <python.dir>${libdir}/${arch}/python/bin</python.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
                 <common.platform>unix</common.platform>
@@ -325,7 +326,7 @@
                     <name>linux</name>
                 </os> 
             </activation>
-            <properties>			
+            <properties>            
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
             </properties>
@@ -335,7 +336,7 @@
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
             </modules>            
-        </profile>	
+        </profile>  
         <profile>
             <id>macosx</id>
             <activation>
@@ -343,7 +344,7 @@
                     <family>mac</family>
                 </os> 
             </activation>
-            <properties>		
+            <properties>        
                 <platform>macosx</platform>
                 <additional.compiler>clang</additional.compiler>
                 <arch>x64</arch>
@@ -380,7 +381,7 @@
             <modules>
                 <module>plugins/isd_native_plugin</module>
             </modules>
-        </profile>	
+        </profile>  
 
         <profile>
             <id>linux-arm-rpi</id>
@@ -438,7 +439,7 @@
             <properties>
                 <arch>x86</arch>
             </properties>
-        </profile>	
+        </profile>  
         <profile>
             <id>linux-x86-on-x64</id>
             <activation>
@@ -455,7 +456,7 @@
             <properties>
                 <qt.spec>linux-g++-32</qt.spec>
             </properties>
-        </profile>	        
+        </profile>          
         <profile>
             <id>android</id>
             <activation>
@@ -465,7 +466,7 @@
                 <module>android-client/protobuf-classes</module>
                 <module>android-client/android-main</module>
             </modules>
-        </profile>	
+        </profile>  
         <profile>
             <id>ios</id>
             <activation>
@@ -486,6 +487,6 @@
             <properties>
                 <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>
             </properties>
-        </profile>	      
-    </profiles>	
+        </profile>        
+    </profiles> 
 </project>

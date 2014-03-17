@@ -1,6 +1,8 @@
 
 #include "db_manager.h"
 
+#include "version.h"
+
 #include <QtSql/QtSql>
 
 #include "common/common_module.h"
@@ -1693,6 +1695,7 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFil
 
 void QnDbManager::fillServerInfo( ServerInfo* const serverInfo )
 {
+    serverInfo->armBox = QLatin1String(QN_ARM_BOX);
     m_licenseManagerImpl->getHardwareId( serverInfo );
 }
 

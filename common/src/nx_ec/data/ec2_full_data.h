@@ -30,7 +30,7 @@ namespace ec2
         void toResourceList(QnFullResourceData&, const ResourceContext&) const;
     };
 
-QN_DEFINE_STRUCT_SERIALIZATORS (ServerInfo, (mainHardwareIds) (compatibleHardwareIds) (publicIp) (systemName) (sessionKey) (allowCameraChanges) )
+QN_DEFINE_STRUCT_SERIALIZATORS (ServerInfo, (mainHardwareIds) (compatibleHardwareIds) (publicIp) (systemName) (sessionKey) (allowCameraChanges) (armBox))
 QN_DEFINE_STRUCT_SERIALIZATORS (ApiFullData, (resTypes) (servers) (cameras) (users) (layouts) (rules) (cameraHistory) (licenses) (serverInfo) )
 }
 

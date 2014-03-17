@@ -43,7 +43,7 @@ public:
     explicit QnGraphicsMessageBox(QGraphicsItem *parent = NULL, const QString &text = QString(), int timeoutMsec = 0);
     ~QnGraphicsMessageBox();
 
-    const QString &text() const;
+    QString text() const;
     void setText(const QString &text);
 
     const QColor &textColor() const;

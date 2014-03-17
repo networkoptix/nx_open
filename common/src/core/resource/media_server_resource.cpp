@@ -16,9 +16,9 @@ private:
 };
 
 QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
-    QnResource(),
-    m_panicMode(Qn::PM_None),
+    m_primaryIFSelected(false),
     m_serverFlags(Qn::SF_None),
+    m_panicMode(Qn::PM_None),
     m_guard(NULL)
 {
     setTypeId(resTypePool->getResourceTypeId(QString(), QLatin1String("Server")));

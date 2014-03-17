@@ -2,16 +2,16 @@
 
 #include <QtCore/QDir>
 
+#include <api/model/storage_space_reply.h>
+#include <platform/core_platform_abstraction.h>
 #include <utils/network/tcp_connection_priv.h> /* For CODE_OK. */
 #include <utils/common/json.h>
 
-#include <api/model/storage_space_reply.h>
-
-#include <platform/core_platform_abstraction.h>
-
-#include <recorder/storage_manager.h>
+#include "recorder/storage_manager.h"
+#include "media_server/settings.h"
 
 #include <version.h>
+
 
 namespace {
     QString toNativeDirPath(const QString &dirPath) {
@@ -59,7 +59,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         data.isWritable = storage->isStorageAvailableForWriting();
         data.isUsedForWriting = storage->isUsedForWriting();
 
-        if( data.totalSpace < QnStorageManager::DEFAULT_SPACE_LIMIT )
+        if( data.totalSpace < MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, QnStorageManager::DEFAULT_SPACE_LIMIT).toLongLong() )
             continue;
 
         // TODO: #Elric remove once UnknownSize is dropped.
@@ -92,7 +92,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
         data.isUsedForWriting = false;
 
-        if( data.totalSpace < QnStorageManager::DEFAULT_SPACE_LIMIT )
+        if( data.totalSpace < MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, QnStorageManager::DEFAULT_SPACE_LIMIT).toLongLong() )
             continue;
 
         QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.path, false));

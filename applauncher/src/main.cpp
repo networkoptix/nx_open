@@ -118,7 +118,10 @@ int main( int argc, char* argv[] )
     InstallationManager installationManager;
 
     if( mirrorListUrl.isEmpty() )
-        mirrorListUrl = globalSettings.value( "mirrorListUrl", ProductParameters::mirrorUrl ).toString();
+        mirrorListUrl = globalSettings.value( "mirrorListUrl", QN_MIRRORLIST_URL ).toString();
+
+    if (mirrorListUrl.isEmpty())
+        NX_LOG( "MirrorListUrl is empty", cl_logWARNING );
 
     if( displayHelp )
     {
