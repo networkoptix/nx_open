@@ -579,6 +579,7 @@ void initAppServerConnection(const QSettings &settings)
     QnAppServerConnectionFactory::setClientGuid(serverGuid());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
+    QnAppServerConnectionFactory::setBox(lit(QN_ARM_BOX));
 }
 
 void initAppServerEventConnection(const QSettings &settings, const QnMediaServerResourcePtr& mediaServer)

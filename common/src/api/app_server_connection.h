@@ -26,6 +26,7 @@ public:
     QnAppServerConnectionFactory();
     virtual ~QnAppServerConnectionFactory();
 
+    static QString box();
     static QString authKey();
     static QString clientGuid();
     static QUrl defaultUrl();
@@ -37,6 +38,7 @@ public:
     static QnSoftwareVersion currentVersion();
     static QnResourceFactory* defaultFactory();
 
+    static void setBox(const QString &box);
     static void setAuthKey(const QString &key);
     static void setClientGuid(const QString &guid);
     static void setDefaultUrl(const QUrl &url);
@@ -65,6 +67,7 @@ private:
     QString m_systemName;
     QByteArray m_sessionKey;
     QByteArray m_prevSessionKey;
+    QString m_box;
 
     int m_defaultMediaProxyPort;
     QnSoftwareVersion m_currentVersion;

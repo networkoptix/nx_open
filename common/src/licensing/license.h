@@ -40,7 +40,7 @@ public:
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(const QList<QByteArray>& hardwareIds, const QString& brand) const;
+    bool isValid(const QList<QByteArray> &hardwareIds, const QString &brand) const;
 
     /**
      * @returns                         Whether this license is for analog cameras.

@@ -16,6 +16,7 @@
 #include <common/common_globals.h>
 #include <utils/common/synctime.h>
 #include <utils/common/product_features.h>
+#include <api/app_server_connection.h>
 
 namespace {
     const char *networkOptixRSAPublicKey = "-----BEGIN PUBLIC KEY-----\n"
@@ -156,7 +157,11 @@ bool QnLicense::isValid(const QList<QByteArray>& hardwareIds, const QString& bra
     // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
     // We just allow empty brand for all, because we believe license is correct.
 
-    return (m_isValid1 || m_isValid2) && hardwareIds.contains(m_hardwareId) && (m_brand == brand || m_brand.isEmpty());
+    QString box = QnAppServerConnectionFactory::box();
+    // 1. edge licenses can be activated only if box is "isd"
+    // 2. if box is "isd" only edge licenses AND any trial can be activated
+    return (m_isValid1 || m_isValid2) && hardwareIds.contains(m_hardwareId) && (m_brand == brand || m_brand.isEmpty()) && \
+        ((box.isEmpty() && m_class != lit("edge")) || (box == lit("isd") && (m_class == lit("edge") || !m_expiration.isEmpty())));
 }
 
 bool QnLicense::isAnalog() const {
