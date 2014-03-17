@@ -5,7 +5,7 @@ Features:
 2. Added a new light skin. Introduced the option in System/Settings to switch between dark (regular) and light (introduced) skin.
 3. PTZ tours.
 4. Added a new events and actions:
-    - Continius sound action on "Motion on camera" and "Input signal on camera"
+    - Continuous sound action on "Motion on camera" and "Input signal on camera"
     - Disk is full
     - "Media server is started" diagnostic event
 5. Added a checkbox into installer "Allow server to optimize cameras settings". If it's on than MS can changed stream settings for all new cameras.
@@ -73,7 +73,7 @@ Improvements:
     If click on it, the selection has been zoomed. If there are no selection on timeline, "Zoom to selection" is not available.
 27. Ability to view client logs and clear cache.
     
-Bugs:
+Bugs Fixed:
 1. Tray tool. Incorrect EC port in the list if it has been changed.Fixed.
 2. After upgrade MS, an old version displays in "About". Fixed.
 3. If there are more than 3000 resource, EC cannot be restarted.Fixed.
@@ -106,7 +106,7 @@ Bugs:
 Removed features:
 1.Hardware acceleration has been removed.
 2. Panic recording has been removed.
-3. Analog licenses has been removed.
+3. Analog license message has been removed (old analog licenses still can be activated).
 
 New cameras supported
 Arecont cameras: AV2256PM, AV2256PM-H.
