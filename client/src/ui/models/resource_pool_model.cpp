@@ -614,11 +614,11 @@ void QnResourcePoolModel::at_resource_itemAdded(const QnLayoutResourcePtr &layou
     QnResourcePoolModelNode *node = this->node(item.uuid);
 
     QnResourcePtr resource;
-    //if(item.resource.id.isValid()) { // TODO: #EC2
-        //resource = resourcePool()->getResourceById(item.resource.id);
-    //} else {
+    if(item.resource.id.isValid()) { // TODO: #EC2
+        resource = resourcePool()->getResourceById(item.resource.id);
+    } else {
         resource = resourcePool()->getResourceByUniqId(item.resource.path);
-    //}
+    }
 
     node->setResource(resource);
     node->setParent(parentNode);
