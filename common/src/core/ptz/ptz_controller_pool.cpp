@@ -40,7 +40,7 @@ public:
     {}
 
     virtual void run() override {
-        emit m_pool->d->updateController(m_resource);
+        m_pool->d->updateController(m_resource);
     }
 
 private:
