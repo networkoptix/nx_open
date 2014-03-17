@@ -65,7 +65,8 @@ namespace ec2
             }
 
             // delivering transaction to remote peers
-            QnTransactionMessageBus::instance()->sendTransaction(tran, serializedTran);
+            if (!tran.localTransaction)
+                QnTransactionMessageBus::instance()->sendTransaction(tran, serializedTran);
         }
 
         template<class T> 

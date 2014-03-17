@@ -20,6 +20,7 @@
 namespace ec2
 {
     class LicenseManagerImpl;
+    class EmailManagerImpl;
 
     class QnDbManager: public QnDbHelper
     {
@@ -27,6 +28,7 @@ namespace ec2
 		QnDbManager(
             QnResourceFactory* factory,
             LicenseManagerImpl* const licenseManagerImpl,
+            EmailManagerImpl* const emailManagerImpl,
             const QString& dbFileName );
 		virtual ~QnDbManager();
 
@@ -132,6 +134,10 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicense>& tran);
 
 
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiEmailSettingsData>&) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiFullData>&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
@@ -199,6 +205,7 @@ namespace ec2
     private:
 		QnResourceFactory* m_resourceFactory;
         LicenseManagerImpl* const m_licenseManagerImpl;
+        EmailManagerImpl* const m_emailManagerImpl;
         QnId m_storageTypeId;
         QnId m_serverTypeId;
         QnId m_cameraTypeId;

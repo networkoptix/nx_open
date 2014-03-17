@@ -119,8 +119,8 @@ namespace ec2
         registerUpdateFuncHandler<ApiResetBusinessRuleData>( restProcessorPool, ApiCommand::resetBusinessRules );
         registerUpdateFuncHandler<ApiBusinessActionData>( restProcessorPool, ApiCommand::broadcastBusinessAction );
 
-        //TODO AbstractBusinessEventManager::testEmailSettings
-        //TODO AbstractBusinessEventManager::sendEmail
+        registerUpdateFuncHandler<ApiEmailSettingsData>( restProcessorPool, ApiCommand::testEmailSettings );
+        // registerUpdateFuncHandler<ApiEmailData>( restProcessorPool, ApiCommand::sendEmail );
 
 
         //AbstractUserManager::getUsers

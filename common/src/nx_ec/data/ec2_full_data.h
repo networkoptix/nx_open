@@ -11,6 +11,7 @@
 #include "nx_ec/ec_api.h"
 #include "camera_server_item_data.h"
 #include "ec2_resource_type_data.h"
+#include "ec2_email.h"
 
 namespace ec2 
 {

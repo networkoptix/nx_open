@@ -314,6 +314,10 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
         case ApiCommand::addLicenses:
             return deliveryTransaction<ApiLicenseList>(abstractTran, stream);
 
+        case ApiCommand::testEmailSettings:
+            abstractTran.localTransaction = true;
+            return deliveryTransaction<ApiEmailSettingsData>(abstractTran, stream);
+
         case ApiCommand::serverAliveInfo:
             break; // nothing to do
 

@@ -27,7 +27,6 @@ namespace ec2
         void fromResource( const QnLicense& lic );
         void toResource( QnLicense& license ) const;
     };
-
 	
 	#define ApiLicenseFields (key)(licenseBlock)
 	QN_DEFINE_STRUCT_SERIALIZATORS( ApiLicense, ApiLicenseFields )
