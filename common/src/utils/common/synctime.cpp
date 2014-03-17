@@ -36,6 +36,7 @@ private:
 // -------------------------------------------------------------------------- //
 QnSyncTime::QnSyncTime()
 {
+    m_lastReceivedTime = 0;
     reset();
 }
 
@@ -64,7 +65,6 @@ qint64 QnSyncTime::currentUSecsSinceEpoch()
 
 void QnSyncTime::reset()
 {
-    m_lastReceivedTime = 0;
     m_gotTimeTask = 0;
     m_lastWarnTime = 0;
     m_lastLocalTime = 0;
