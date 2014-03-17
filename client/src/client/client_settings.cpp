@@ -78,10 +78,11 @@ QnClientSettings::QnClientSettings(QObject *parent):
     setName(LAST_EXPORT_DIR,        lit("export/previousDir"));
 
     /* Set command line switch names. */
-    addArgumentName(SOFTWARE_YUV,          "--soft-yuv");
-    addArgumentName(OPEN_LAYOUTS_ON_LOGIN, "--open-layouts-on-login");
-    addArgumentName(MAX_SCENE_VIDEO_ITEMS, "--max-video-items");
-    addArgumentName(UPDATES_ENABLED,       "--updates-enabled");
+    addArgumentName(SOFTWARE_YUV,           "--soft-yuv");
+    addArgumentName(OPEN_LAYOUTS_ON_LOGIN,  "--open-layouts-on-login");
+    addArgumentName(MAX_SCENE_VIDEO_ITEMS,  "--max-video-items");
+    addArgumentName(UPDATES_ENABLED,        "--updates-enabled");
+    addArgumentName(RAINBOW_MODE,           "--rainbow");
 
     /* Load from internal resource. */
     QFile file(QLatin1String(":/globals.json"));

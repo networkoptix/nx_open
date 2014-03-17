@@ -59,6 +59,8 @@
 #include <ui/graphics/items/grid/grid_background_item.h>
 #include <ui/graphics/items/grid/grid_raised_cone_item.h>
 
+#include <ui/graphics/opengl/gl_hardware_checker.h>
+
 #include <ui/workaround/gl_widget_factory.h>
 #include <ui/workaround/gl_widget_workaround.h>
 
@@ -363,6 +365,7 @@ void QnWorkbenchDisplay::initSceneView() {
         m_view->setViewport(viewport);
 
         viewport->makeCurrent();
+        QnGlHardwareChecker::checkCurrentContext(true);
 
         /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
         DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(viewport);

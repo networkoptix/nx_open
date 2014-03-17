@@ -140,6 +140,8 @@ public:
         /** Flag that client is run in videowall mode */
         VIDEO_WALL_MODE,
 
+        RAINBOW_MODE,
+
         VARIABLE_COUNT
     };
 
@@ -231,6 +233,7 @@ private:
         QN_DECLARE_RW_PROPERTY(Qn::ClientSkin,              clientSkin,             setClientSkin,              CLIENT_SKIN,                Qn::DarkSkin)
         QN_DECLARE_RW_PROPERTY(QUuid,                       pcUuid,                 setPcUuid,                  PC_UUID,                    QUuid())
         QN_DECLARE_RW_PROPERTY(bool,                        isVideoWallMode,        setVideoWallMode,           VIDEO_WALL_MODE,            false)
+        QN_DECLARE_RW_PROPERTY(bool,                        isRainbowMode,          setRainbowMode,             RAINBOW_MODE,               false)
 
     QN_END_PROPERTY_STORAGE()
 
