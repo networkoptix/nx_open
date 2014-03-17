@@ -15,6 +15,12 @@
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/home_ptz_controller.h>
 
+QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent): 
+    base_type(parent) 
+{
+    setConstructionMode(ThreadedControllerConstruction);
+}
+
 void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) {
     // TODO: #Elric we're creating controller from main thread. 
     // Controller ctor may take some time (several seconds).
