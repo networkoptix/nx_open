@@ -78,6 +78,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_diagnosticsButton->setStateOpacity(QnImageButtonWidget::HOVERED, 0.7);
     m_diagnosticsButton->setStateOpacity(QnImageButtonWidget::PRESSED, 1.0);
     m_diagnosticsButton->setFont(m_staticFont);
+    //m_diagnosticsButton->setVisible(false);
 
     connect(m_diagnosticsButton, SIGNAL(clicked()), this, SIGNAL(diagnosticsRequested()));
 
