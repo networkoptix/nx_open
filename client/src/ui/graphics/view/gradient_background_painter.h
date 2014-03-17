@@ -54,7 +54,8 @@ protected:
     VariantAnimator *backgroundColorAnimator();
 
 protected slots:
-    void updateBackgroundColor(bool animate = true);
+    void updateBackgroundColor(bool animate);
+    void updateBackgroundColorAnimated() { updateBackgroundColor(true); }
 
 private:
     QScopedPointer<QnRadialGradientPainter> m_gradientPainter;
