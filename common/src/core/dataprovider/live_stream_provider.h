@@ -28,7 +28,7 @@ public:
     void setSecondaryQuality(Qn::SecondStreamQuality  quality);
     virtual void setQuality(Qn::StreamQuality q);
     Qn::StreamQuality getQuality() const;
-    void setCameraControlDisabled(bool value);
+    virtual void setCameraControlDisabled(bool value);
 
     // for live providers only 
     virtual void setFps(float f);

@@ -152,9 +152,11 @@ void QnServerStreamRecorder::updateStreamParams()
                 liveProvider->setFps(camera->getMaxFps()-5);
                 liveProvider->setQuality(Qn::QualityHighest);
             }
-            liveProvider->setSecondaryQuality(camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
-            liveProvider->setCameraControlDisabled(camera->isCameraControlDisabled());
         }
+        else {
+            liveProvider->setSecondaryQuality(camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
+        }
+        liveProvider->setCameraControlDisabled(camera->isCameraControlDisabled());
     }
 }
 
