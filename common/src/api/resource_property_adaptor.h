@@ -4,10 +4,10 @@
 #include <QtCore/QAtomicInt>
 
 #include <utils/common/connective.h>
-#include <core/resource/resource_fwd.h>
-
 #include <utils/common/json.h>
 #include <utils/common/lexical.h>
+
+#include <core/resource/resource_fwd.h>
 
 
 // TODO: #Elric create meta_functions and move json_serializer, lexical_serializer, linear_combinator & magnitude_calculator there
@@ -16,6 +16,8 @@
 
 class QnAbstractResourcePropertyHandler {
 public:
+    virtual ~QnAbstractResourcePropertyHandler() {}
+
     virtual bool serialize(const QVariant &value, QString *target) const = 0;
     virtual bool deserialize(const QString &value, QVariant *target) const = 0;
     virtual bool equals(const QVariant &l, const QVariant &r) const = 0;
