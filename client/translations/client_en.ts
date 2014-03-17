@@ -47,7 +47,7 @@
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="58"/>
         <source>GPU Information</source>
-        <translation type="unfinished"></translation>
+        <translation>GPU Details</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="77"/>
@@ -108,7 +108,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="48"/>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Keep camera stream and profile settings</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="70"/>
@@ -128,7 +128,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="128"/>
         <source>Don&apos;t use</source>
-        <translation type="unfinished"></translation>
+        <translation>Do not use</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="148"/>
@@ -186,7 +186,7 @@
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="42"/>
         <source>Interval of action :</source>
-        <translation type="unfinished"></translation>
+        <translation>Action interval:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="64"/>
@@ -204,7 +204,7 @@
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="34"/>
         <source>Event</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Trigger&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="51"/>
@@ -268,7 +268,7 @@
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="57"/>
         <source>Event log</source>
-        <translation type="unfinished"></translation>
+        <translation>Event Log</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="69"/>
@@ -458,7 +458,8 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_disconnected_business_event_widget.ui" line="32"/>
         <source>Event will be raised when any camera goes offline</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Event will be triggered when a camera goes offline.</translatorcomment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -474,7 +475,8 @@
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.ui" line="14"/>
         <source>Camera list</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Camera List</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.ui" line="22"/>
@@ -487,12 +489,14 @@
     <message>
         <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="20"/>
         <source>Enable camera auto discovery</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Enable automatic camera discovery</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="30"/>
         <source>Enable automatic camera settings optimization</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Enable automatic camera setting optimization</translatorcomment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -593,7 +597,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="546"/>
         <source>Pre-Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Pre-recording</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="553"/>
@@ -607,7 +611,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="569"/>
         <source>Post-Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Post-recording</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="608"/>
@@ -1178,7 +1182,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="14"/>
         <source>Camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Camera Settings</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="24"/>
@@ -1283,7 +1287,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.ui" line="52"/>
         <source>Go To Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Go to Position</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.ui" line="79"/>
@@ -1511,7 +1515,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="353"/>
         <source>Drop Resources into a New Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Drop Resources into New Layout</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="357"/>
@@ -1596,7 +1600,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="417"/>
         <source>Clear cache</source>
-        <translation type="unfinished"></translation>
+        <translation>Clear Cache</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="421"/>
@@ -1964,7 +1968,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="776"/>
         <source>Monitor in a New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Monitor in New Tab</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="781"/>
@@ -1974,12 +1978,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="782"/>
         <source>Monitor in a New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Monitor in New Window</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="790"/>
         <source>Open Layout in a New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Open Layout in New Tab</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="795"/>
@@ -1989,12 +1993,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="800"/>
         <source>Open Layout(s) in a New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Open Layout(s) in New Window</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="808"/>
         <source>Open Current Layout in a New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Open Current Layout in New Window</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="813"/>
@@ -2736,7 +2740,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/tests/auto_tester.cpp" line="32"/>
         <source>Substring that must be present in one of the resources.</source>
-        <translation type="unfinished"></translation>
+        <translation>A substring must be present in one of the resources.</translation>
     </message>
     <message>
         <location filename="../src/tests/auto_tester.cpp" line="33"/>
@@ -2796,7 +2800,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/business/business_resource_validation.cpp" line="18"/>
         <source>%n of %1 cameras</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2903,7 +2906,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="832"/>
         <source>Select a sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Select sound</translation>
     </message>
     <message>
         <location filename="../src/ui/models/business_rule_view_model.cpp" line="840"/>
@@ -3021,18 +3024,19 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="132"/>
         <source>Unsaved changes will be lost. Save?</source>
-        <translation type="unfinished"></translation>
+        <translation>Any unsaved changes will be lost. Save now?</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="236"/>
         <source>Confirm rules reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirm rule reset</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="237"/>
         <source>Are you sure you want to reset rules to the defaults?
 This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
+        <translation>Are you sure you want to reset all rules to default?
+This action CANNOT be undone!</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="256"/>
@@ -3043,17 +3047,17 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="256"/>
         <source>Error while receiving rules.</source>
-        <translation type="unfinished"></translation>
+        <translation>Error while receiving rules.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="259"/>
         <source>Error while saving rule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Error while saving a rule.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="279"/>
         <source>Error while deleting rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Error while deleting a rule.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="316"/>
@@ -3141,10 +3145,10 @@ This action CANNOT be undone!</source>
         <source>%n camera(s) added successfully.
 It might take a few moments to populate them in the tree.</source>
         <translation>
-            <numerusform>%n camera added successfully.
-It might take a few moments to populate the tree.</numerusform>
-            <numerusform>%n cameras added successfully.
-It might take a few moments to populate them in the tree.</numerusform>
+            <numerusform>%n camera(s) added successfully.
+It might take a few seconds for the cameras to populate in the tree.</numerusform>
+            <numerusform>%n camera(s) added successfully.
+It might take a few seconds for the cameras to populate in the tree.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -3167,7 +3171,7 @@ It might take a few moments to populate them in the tree.</numerusform>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="182"/>
         <source>select target mediaserver in the tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Select target Media Server in the tree</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="226"/>
@@ -3191,17 +3195,17 @@ Camera addition is possible for online servers only.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="535"/>
         <source>First address in range is greater than the last one.</source>
-        <translation type="unfinished"></translation>
+        <translation>The first address in the range is greater than the last one.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="541"/>
         <source>Specified IP address range contains more than 255 addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation>The specified IP address range contains more than 255 addresses.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="549"/>
         <source>Camera address field must contain valid URL, IP address or RTSP link.</source>
-        <translation type="unfinished"></translation>
+        <translation>The camera address field must contain a valid URL, IP address or RTSP link.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="572"/>
@@ -3232,12 +3236,12 @@ Camera addition is possible for online servers only.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="670"/>
         <source>Server went offline, search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Server has gone offline. Search aborted.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="677"/>
         <source>Server went offline, cameras can be added when the server will be available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Server has gone offline. Cameras can only be added when server is back online.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="704"/>
@@ -3248,17 +3252,17 @@ Camera addition is possible for online servers only.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="705"/>
         <source>Server was removed, search aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Server has been removed. Search aborted.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="711"/>
         <source>Server was removed, cameras cannot be added anymore.</source>
-        <translation type="unfinished"></translation>
+        <translation>Server has been removed. Cameras can no longer be added.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="726"/>
         <source>Error while searching cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>An error occurred while searching cameras.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="741"/>
@@ -3270,14 +3274,12 @@ Camera addition is possible for online servers only.</source>
         <source>Scanning hosts... (%1)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="747"/>
         <source>%n cameras found</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3302,7 +3304,6 @@ Camera addition is possible for online servers only.</source>
         <source>Error while adding camera(s).</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -3326,12 +3327,12 @@ Camera addition is possible for online servers only.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="116"/>
         <source>Checking that camera is accessible</source>
-        <translation type="unfinished"></translation>
+        <translation>Checking for camera accessibility</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="118"/>
         <source>Checking that camera provides media stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Checking for camera media stream</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="120"/>
@@ -3351,7 +3352,7 @@ Camera addition is possible for online servers only.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="149"/>
         <source>Diagnostics finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostic completed</translation>
     </message>
 </context>
 <context>
@@ -3368,7 +3369,6 @@ Camera addition is possible for online servers only.</source>
         <location filename="../src/business/business_resource_validation.cpp" line="61"/>
         <source>%1 have no input ports</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3402,7 +3402,6 @@ Camera addition is possible for online servers only.</source>
         <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="99"/>
         <source>Camera List for &apos;%1&apos; - %n camera(s) found</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3494,7 +3493,6 @@ Camera addition is possible for online servers only.</source>
         <source>Recording or motion detection is disabled for %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -3513,7 +3511,6 @@ Camera addition is possible for online servers only.</source>
         <source>%1 have no output relays</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -3523,7 +3520,6 @@ Camera addition is possible for online servers only.</source>
         <location filename="../src/business/business_resource_validation.cpp" line="93"/>
         <source>Recording is disabled for %1</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3612,14 +3608,12 @@ Camera addition is possible for online servers only.</source>
         <source>%n license(s) are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="655"/>
         <source>Activate %n more license(s).</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3632,7 +3626,6 @@ Camera addition is possible for online servers only.</source>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="662"/>
         <source>%n more license(s) will be used.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3647,7 +3640,7 @@ Camera addition is possible for online servers only.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="805"/>
         <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras&apos; motion setup page to ensure it is supported and enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Motion Recording is disabled or not supported by some of the selected cameras. Please go to camera motion setup page to ensure it is supported and enabled.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="808"/>
@@ -3662,7 +3655,7 @@ Camera addition is possible for online servers only.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="812"/>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the camera&apos;s motion area and sensitivity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Motion Recording is disabled. Please go to motion setup page to establish camera&apos;s motion areas and sensitivity.</translation>
     </message>
 </context>
 <context>
@@ -3670,7 +3663,7 @@ Camera addition is possible for online servers only.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="17"/>
         <source>Camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Camera Settings</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="26"/>
@@ -3999,14 +3992,12 @@ You will be asked to restart the client in compatibility mode.</source>
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="370"/>
         <source>Event log for %1 - %n event(s) found</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4019,7 +4010,6 @@ You will be asked to restart the client in compatibility mode.</source>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="410"/>
         <source>&lt;%n camera(s)&gt;</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4143,7 +4133,6 @@ You will be asked to restart the client in compatibility mode.</source>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="87"/>
         <source>%n license(s) will be used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4879,7 +4868,6 @@ Download version %3?</source>
         <source>%n more item(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -5292,7 +5280,6 @@ These tours will become invalid if you remove it.</source>
         <source>This preset will be activated after %n minutes of inactivity</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -5305,14 +5292,12 @@ These tours will become invalid if you remove it.</source>
         <source>Tour has %n identical positions</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/models/ptz_manage_model.cpp" line="703"/>
         <source>about %n minute(s)</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -5404,7 +5389,6 @@ These tours will become invalid if you remove it.</source>
         <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="86"/>
         <source>%n seconds</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -5611,7 +5595,6 @@ These tours will become invalid if you remove it.</source>
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="731"/>
         <source>%1 %2 (up %n days, %3)</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6059,7 +6042,6 @@ AVAILABLE</source>
         <source>%n of %1 additional E-Mail addresses are invalid</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -6072,7 +6054,6 @@ AVAILABLE</source>
         <source>%n User(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -6080,14 +6061,12 @@ AVAILABLE</source>
         <source>%1, %n additional</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="119"/>
         <source>%n of %1 users have invalid E-Mail address</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>

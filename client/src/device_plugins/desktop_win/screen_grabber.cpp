@@ -379,8 +379,8 @@ void QnScreenGrabber::drawCursor(quint32* data, int width, int height, int leftO
                 yPos = height - yPos;
 
             quint8 maskBits[MAX_CURSOR_SIZE*MAX_CURSOR_SIZE*2/8 * 16];
-            quint8 lpbiData[sizeof(BITMAPINFO) + 4]; // 2 additional colors
-            quint8 lpbiColorData[sizeof(BITMAPINFO) + 3*4]; // 4 additional colors
+            quint8 lpbiData[sizeof(BITMAPINFO) + 128]; // 2 additional colors
+            quint8 lpbiColorData[sizeof(BITMAPINFO) + 128]; // 4 additional colors
 
             BITMAPINFO* lpbi = (BITMAPINFO*) &lpbiData;
             BITMAPINFO* lpbiColor = (BITMAPINFO*) &lpbiColorData;

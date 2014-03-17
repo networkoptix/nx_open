@@ -64,12 +64,11 @@ namespace {
 
 }
 
-QnTwoStepFileDialog::QnTwoStepFileDialog(QWidget *parent, const QString &caption, const QString &initialFile, const QString &filter, const QStringList& extensions) :
+QnTwoStepFileDialog::QnTwoStepFileDialog(QWidget *parent, const QString &caption, const QString &initialFile, const QString &filter) :
     base_type(parent),
     ui(new Ui::QnTwoStepFileDialog),
     m_mode(QFileDialog::AnyFile),
-    m_filter(filter),
-    m_extensions(extensions)
+    m_filter(filter)
 {
     ui->setupUi(this);
     setWindowTitle(caption);
@@ -189,7 +188,6 @@ void QnTwoStepFileDialog::at_browseFileButton_clicked() {
                                                     tr("Select file..."),
                                                     ui->existingFileLabel->text(),
                                                     m_filter,
-                                                    m_extensions,
                                                     &m_selectedExistingFilter,
                                                     fileDialogOptions());
     if (fileName.isEmpty()) {

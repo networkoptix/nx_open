@@ -488,7 +488,7 @@ void initLog(const QString &logLevel) {
     if (!QDir().mkpath(logFileLocation))
         cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
     const QString& logFileName = logFileLocation + QLatin1String("/log_file");
-    if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
+    if (!cl_log.create(logFileName, 1024*1024*10, 25, cl_logDEBUG1))
         cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
     MSSettings::roSettings()->setValue("logFile", logFileName);
     cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);

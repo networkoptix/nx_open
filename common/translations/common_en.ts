@@ -5,7 +5,7 @@
     <name>CommunicatingSocket</name>
     <message>
         <location filename="../src/utils/network/system_socket.cpp" line="663"/>
-        <source>Couldn&apos;t connect to %1: %2.</source>
+        <source>Cannot connect to %1: %2.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -41,7 +41,7 @@
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="761"/>
-        <source>Could not deduce result type for operation %1(&apos;%2&apos;, &apos;%3&apos;).</source>
+        <source>Cannot deduce result type for operation %1(&apos;%2&apos;, &apos;%3&apos;).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -51,7 +51,7 @@
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="799"/>
-        <source>Could not deduce arithmetic supertype for type &apos;%1&apos;.</source>
+        <source>Cannot deduce arithmetic supertype for type &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -512,14 +512,12 @@
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_strings_helper.cpp" line="312"/>
         <source>No video frame received during last %n seconds.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -586,7 +584,8 @@
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="35"/>
         <source>Received bad response from media server %1: &quot;%2&quot;.
  Check if Media Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Received a bad response from Media Server %1: &quot;%2&quot;.
+Make sure Media Server is up and running with proper version.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="39"/>
@@ -608,7 +607,7 @@
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="53"/>
-        <source>Could not parse camera response. Url %1, request name %2.
+        <source>Cannot parse camera response. Url %1, request name %2.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -616,12 +615,13 @@
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="58"/>
         <source>No supported media tracks at url %1.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>No supported media tracks at URL %1.
+ Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="63"/>
         <source>Not authorized. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Not authorized. URL %1.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="67"/>
@@ -666,12 +666,12 @@
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="96"/>
         <source>Too many media errors. Please open camera issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>Too many media errors. Please open &quot;Camera Issues&quot; dialog for more details.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="99"/>
         <source>Media stream is opened but no media data was received.</source>
-        <translation type="unfinished"></translation>
+        <translation>Media stream is opened but no media data has been received.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="112"/>
@@ -713,7 +713,7 @@ Parameters: </source>
     </message>
     <message>
         <location filename="../src/utils/common/environment.cpp" line="58"/>
-        <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
+        <source>Cannot find explorer.exe in path to launch Windows Explorer.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -747,17 +747,17 @@ Parameters: </source>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="61"/>
-        <source>Could not find encoder for codec %1.</source>
+        <source>Cannot find encoder for codec %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="88"/>
-        <source>Could not initialize audio encoder.</source>
+        <source>Cannot initialize audio encoder.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="97"/>
-        <source>Could not initialize audio decoder.</source>
+        <source>Cannot initialize audio decoder.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -770,23 +770,23 @@ Parameters: </source>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="112"/>
-        <source>Could not create output context for format %1.</source>
+        <source>Cannot create output context for format %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="131"/>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="208"/>
-        <source>Could not allocate output stream for recording.</source>
+        <source>Cannot allocate output stream for recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="170"/>
-        <source>Could not perform direct stream copy because frame size is undefined.</source>
+        <source>Cannot perform direct stream copy because frame size is undefined.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="216"/>
-        <source>Could not find codec %1.</source>
+        <source>Cannot find codec %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -799,17 +799,17 @@ Parameters: </source>
     <name>QnFfmpegVideoTranscoder</name>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
-        <source>Could not allocate scaler context for resolution %1x%2.</source>
+        <source>Cannot allocate scaler context for resolution %1x%2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
-        <source>Could not find encoder for codec %1.</source>
+        <source>Cannot find encoder for codec %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
-        <source>Could not initialize video encoder.</source>
+        <source>Cannot initialize video encoder.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -971,17 +971,17 @@ Parameters: </source>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="28"/>
-        <source>Could not create output file for video recording.</source>
+        <source>Cannot create output file for video recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="29"/>
-        <source>Could not allocate output stream for recording.</source>
+        <source>Cannot allocate output stream for recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="30"/>
-        <source>Could not allocate output audio stream.</source>
+        <source>Cannot allocate output audio stream.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1045,7 +1045,7 @@ Parameters: </source>
     <message>
         <location filename="../src/health/system_health.cpp" line="22"/>
         <source>Rebuilding archive index is completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rebuilding archive index is complete.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="33"/>
@@ -1168,7 +1168,7 @@ You cannot record video from cameras.</source>
     <name>Socket</name>
     <message>
         <location filename="../src/utils/network/system_socket.cpp" line="524"/>
-        <source>Couldn&apos;t resolve %1: %2.</source>
+        <source>Cannot resolve %1: %2.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
