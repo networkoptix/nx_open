@@ -35,7 +35,8 @@ private:
     CLSimpleHTTPClient *newHttpClient() const;
     bool queryInternal(const QString &request, QByteArray *body = NULL);
     bool query(const QString &request, QByteArray *body = NULL);
-    bool query(const QString &request, QnAxisParameterMap *params);
+    bool query(const QString &request, QnAxisParameterMap *params, QByteArray *body = NULL);
+    bool query(const QString &request, int restries, QnAxisParameterMap *params, QByteArray *body = NULL);
     int channel();
     
     QByteArray getCookie() const;

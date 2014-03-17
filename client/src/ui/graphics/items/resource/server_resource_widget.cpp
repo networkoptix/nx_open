@@ -238,6 +238,15 @@ public:
         update();
     }
 
+    QColor color() const {
+        return m_color;
+    }
+
+    void setColor(const QColor &color) {
+        m_color = color;
+        update();
+    }
+
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override {
         switch (which) {
@@ -525,6 +534,7 @@ const QnStatisticsColors &QnServerResourceWidget::colors() const {
 
 void QnServerResourceWidget::setColors(const QnStatisticsColors &colors) {
     m_colors = colors;
+    updateColors();
 }
 
 QnServerResourceWidget::HealthMonitoringButtons QnServerResourceWidget::checkedHealthMonitoringButtons() const {
@@ -547,16 +557,16 @@ void QnServerResourceWidget::setCheckedHealthMonitoringButtons(const QnServerRes
     updateGraphVisibility();
 }
 
-QColor QnServerResourceWidget::nextColor(QnStatisticsDeviceType deviceType) {
+QColor QnServerResourceWidget::getColor(QnStatisticsDeviceType deviceType, int index) {
     switch (deviceType) {
     case CPU:
         return m_colors.cpu;
     case RAM:
         return m_colors.ram;
     case HDD:
-        return m_colors.hdds[qMod(m_hddCount++, m_colors.hdds.size())];
+        return m_colors.hdds[qMod(index, m_colors.hdds.size())];
     case NETWORK:
-        return m_colors.network[qMod(m_networkCount++, m_colors.network.size())];
+        return m_colors.network[qMod(index, m_colors.network.size())];
     default:
         return QColor(Qt::white);
     }
@@ -576,50 +586,7 @@ Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painte
 }
 
 void QnServerResourceWidget::drawBackground(const QRectF &rect, QPainter *painter) {
-
     painter->fillRect(rect, palette().color(QPalette::Window));
-
-#if 0
-    qreal width = rect.width();
-    qreal height = rect.height();
-    qreal min = qMin(width, height);
-
-    qreal offset = min / 20.0;
-
-    qreal oh = height - offset*2;
-    qreal ow = width - offset*2;
-
-    if (ow <= 0 || oh <= 0)
-        return;
-
-    QRectF inner(offset, offset, ow, oh);
-
-
-    /* Draw background */
-    if(!m_backgroundGradientPainter)
-        m_backgroundGradientPainter = qn_serverResourceWidget_backgroundGradientPainterStorage()->get(QGLContext::currentContext());
-
-    QnGlNativePainting::begin(painter);
-    {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        glColor(toTransparent(palette().color(QPalette::Window), painter->opacity()));
-        glBegin(GL_QUADS);
-        glVertices(rect);
-        glEnd();
-
-        glPushMatrix();
-        glTranslatef(inner.center().x(), inner.center().y(), 1.0);
-        qreal radius = min * 0.5 - offset;
-        glScale(radius, radius);
-        m_backgroundGradientPainter->paint(toTransparent(qnGlobals->backgroundGradientColor(), painter->opacity()));
-        glPopMatrix();
-
-        glDisable(GL_BLEND);
-    }
-    QnGlNativePainting::begin(end);
-#endif
 }
 
 void QnServerResourceWidget::addOverlays() {
@@ -661,6 +628,8 @@ QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDevic
 }
 
 void QnServerResourceWidget::updateLegend() {
+    QHash<QnStatisticsDeviceType, int> indexes;
+
     foreach (QString key, m_sortedKeys) {
         QnStatisticsData &stats = m_history[key];
 
@@ -669,12 +638,13 @@ void QnServerResourceWidget::updateLegend() {
             data.bar = m_legendButtonBar[buttonBarByDeviceType(stats.deviceType)];
             data.mask = data.bar->unusedMask();
             data.visible = true;
-            data.color = nextColor(stats.deviceType);
+            data.color = getColor(stats.deviceType, indexes[stats.deviceType]++);
 
             LegendButtonWidget* newButton = new LegendButtonWidget(key, data.color);
             newButton->setProperty(legendKeyPropertyName, key);
             HealthMonitoringButtons checkedData = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
             newButton->setChecked(checkedData.value(key, true));
+            m_legendButtonByKey.insert(key, newButton);
 
             connect(newButton, &QnImageButtonWidget::toggled, this, [this, key](bool toggled) {
                 HealthMonitoringButtons value = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
@@ -727,6 +697,21 @@ void QnServerResourceWidget::updateInfoOpacity() {
     m_infoOpacity = headerOverlayWidget()->opacity();
     for (int i = 0; i < ButtonBarCount; i++)
         m_legendButtonBar[i]->setOpacity(m_infoOpacity);
+}
+
+void QnServerResourceWidget::updateColors() {
+    QHash<QnStatisticsDeviceType, int> indexes;
+
+    foreach (QString key, m_sortedKeys) {
+        QnStatisticsData &stats = m_history[key];
+
+        if (m_graphDataByKey.contains(key)) {
+            GraphData &data = m_graphDataByKey[key];
+            data.color = getColor(stats.deviceType, indexes[stats.deviceType]++);
+            if (LegendButtonWidget *legendButton = dynamic_cast<LegendButtonWidget *>(m_legendButtonByKey[key]))
+                legendButton->setColor(data.color);
+        }
+    }
 }
 
 void QnServerResourceWidget::updateHoverKey() {

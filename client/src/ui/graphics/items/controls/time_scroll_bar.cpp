@@ -61,7 +61,7 @@ void QnTimeScrollBar::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
     painter->drawRect(rect());
 
     /* Draw scrollbar handle. */
-    QRect handleRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, this);
+    QRect handleRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, NULL);
     painter->setPen(QPen(m_colors.border, 0));
     painter->setBrush(m_colors.handle);
     painter->drawRect(handleRect);
@@ -108,13 +108,13 @@ void QnTimeScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 
     if (!(event->buttons() & Qt::LeftButton
           ||  ((event->buttons() & Qt::MidButton)
-               && style()->styleHint(QStyle::SH_ScrollBar_MiddleClickAbsolutePosition, &opt, this))))
+               && style()->styleHint(QStyle::SH_ScrollBar_MiddleClickAbsolutePosition, &opt, NULL))))
         return;
 
     if (d->pressedControl == QStyle::SC_ScrollBarSlider) {
-        QRectF sliderRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, this);
+        QRectF sliderRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, NULL);
         qint64 newPosition = valueFromPosition(event->pos() - QnGeometry::cwiseMul(d->relativeClickOffset, sliderRect.size()));
-        int m = style()->pixelMetric(QStyle::PM_MaximumDragDistance, &opt, this);
+        int m = style()->pixelMetric(QStyle::PM_MaximumDragDistance, &opt, NULL);
         if (m >= 0) {
             QRectF r = rect();
             r.adjust(-m, -m, m, m);

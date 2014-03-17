@@ -6,6 +6,8 @@
 #include <QtCore/QPointer>
 #include <QtCore/QElapsedTimer>
 
+#include <client/client_color_types.h>
+
 #include <utils/common/connective.h>
 
 #include <core/resource/resource_fwd.h>
@@ -37,7 +39,8 @@ class QnResourceWidget: public Shaded<Animated<Instrumented<Connective<GraphicsW
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
-    Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor NOTIFY frameColorChanged)
+    Q_PROPERTY(QnResourceWidgetFrameColors frameColors READ frameColors WRITE setFrameColors)
+    Q_PROPERTY(QColor frameDistinctionColor READ frameDistinctionColor WRITE setFrameDistinctionColor NOTIFY frameDistinctionColorChanged)
     Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement)
     Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry)
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio)
@@ -140,17 +143,11 @@ public:
      */
     void setFrameWidth(qreal frameWidth);
 
-    /**
-     * \returns                         Frame color of this widget.
-     */
-    QColor frameColor() const {
-        return m_frameColor;
-    }
+    QColor frameDistinctionColor() const;
+    void setFrameDistinctionColor(const QColor &frameColor);
 
-    /**
-     * \param frameColor                New frame color for this widget.
-     */
-    void setFrameColor(const QColor &frameColor);
+    const QnResourceWidgetFrameColors &frameColors() const;
+    void setFrameColors(const QnResourceWidgetFrameColors &frameColors);
 
     virtual void setGeometry(const QRectF &geometry) override;
 
@@ -290,7 +287,7 @@ signals:
     void optionsChanged();
     void zoomRectChanged();
     void zoomTargetWidgetChanged();
-    void frameColorChanged();
+    void frameDistinctionColorChanged();
     void rotationStartRequested();
     void rotationStopRequested();
 
@@ -368,9 +365,6 @@ protected:
 
     void ensureAboutToBeDestroyedEmitted();
 
-    QColor activeFrameColor() const;
-    QColor selectedFrameColor() const;
-
     Q_SLOT virtual void at_itemDataChanged(int role);
 private:
     void setTitleTextInternal(const QString &titleText);
@@ -425,7 +419,9 @@ private:
     qreal m_frameWidth;
 
     /** Base frame color */
-    QColor m_frameColor;
+    QColor m_frameDistinctionColor;
+
+    QnResourceWidgetFrameColors m_frameColors;
 
     QString m_titleTextFormat, m_infoTextFormat;
     bool m_titleTextFormatHasPlaceholder, m_infoTextFormatHasPlaceholder;

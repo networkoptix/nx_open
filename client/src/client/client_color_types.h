@@ -113,8 +113,16 @@ struct QnHistogramColors {
     QColor text;
 };
 
+struct QnResourceWidgetFrameColors {
+    QnResourceWidgetFrameColors();
+
+    QColor normal;
+    QColor active;
+    QColor selected;
+};
+
 QN_DECLARE_FUNCTIONS_FOR_TYPES(
-    (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors)(QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors)(QnHistogramColors), 
+    (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors)(QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors)(QnHistogramColors)(QnResourceWidgetFrameColors), 
     (metatype)(json)
 );
 

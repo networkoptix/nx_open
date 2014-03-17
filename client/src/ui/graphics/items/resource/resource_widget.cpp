@@ -29,8 +29,6 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
-#include <ui/graphics/painters/loading_progress_painter.h>
-#include <ui/graphics/painters/paused_painter.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
@@ -74,15 +72,15 @@ namespace {
     const QSizeF headerButtonSize = QSizeF(24, 24);
 
     /** Background color for overlay panels. */
-    const QColor overlayBackgroundColor = QColor(0, 0, 0, 96);
+    const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); // TODO: #Elric #customization
 
-    const QColor overlayTextColor = QColor(255, 255, 255, 160);
+    const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #Elric #customization
 
     /** Static text should be rescaled no more often than once in this period */
     const qint64 minTextRescaleDelay = 1000;
 
     //Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
-    std::shared_ptr<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() );
+    std::shared_ptr<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() ); // TODO: #Elric get rid of this
 
     void splitFormat(const QString &format, QString *left, QString *right) {
         int index = format.indexOf(QLatin1Char('\t'));
@@ -115,9 +113,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_enclosingAspectRatio(1.0),
     m_frameOpacity(1.0),
     m_frameWidth(-1.0),
-    m_frameColor(qnGlobals->frameColor()),
-    m_titleTextFormat(QLatin1String("%1")),
-    m_infoTextFormat(QLatin1String("%1")),
+    m_titleTextFormat(lit("%1")),
+    m_infoTextFormat(lit("%1")),
     m_titleTextFormatHasPlaceholder(true),
     m_infoTextFormatHasPlaceholder(true),
     m_overlayVisible(0),
@@ -132,8 +129,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setTransformOrigin(Center);
 
     /* Set up shadow. */
-    if (shadowItem())
-        shadowItem()->setColor(qnGlobals->shadowColor());
     setShadowDisplacement(defaultShadowDisplacement);
 
     /* Set up frame. */
@@ -141,18 +136,18 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     /* Set up overlay widgets. */
     QFont font = this->font();
-    font.setPixelSize(20);
+    font.setPixelSize(20); 
     setFont(font);
     setPaletteColor(this, QPalette::WindowText, overlayTextColor);
 
     /* Header overlay. */
     m_headerLeftLabel = new GraphicsLabel();
     m_headerLeftLabel->setAcceptedMouseButtons(0);
-    m_headerLeftLabel->setPerformanceHint(QStaticText::AggressiveCaching);
+    m_headerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     m_headerRightLabel = new GraphicsLabel();
     m_headerRightLabel->setAcceptedMouseButtons(0);
-    m_headerRightLabel->setPerformanceHint(QStaticText::AggressiveCaching);
+    m_headerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
     closeButton->setIcon(qnSkin->icon("item/close.png"));
@@ -220,9 +215,11 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     /* Footer overlay. */
     m_footerLeftLabel = new GraphicsLabel();
     m_footerLeftLabel->setAcceptedMouseButtons(0);
+    m_footerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     m_footerRightLabel = new GraphicsLabel();
     m_footerRightLabel->setAcceptedMouseButtons(0);
+    m_footerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     QGraphicsLinearLayout *footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     footerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -314,13 +311,25 @@ void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     invalidateShadowShape();
 }
 
-void QnResourceWidget::setFrameColor(const QColor &frameColor) {
-    if(m_frameColor == frameColor)
+QColor QnResourceWidget::frameDistinctionColor() const {
+    return m_frameDistinctionColor;
+}
+
+void QnResourceWidget::setFrameDistinctionColor(const QColor &frameColor) {
+    if(m_frameDistinctionColor == frameColor)
         return;
 
-    m_frameColor = frameColor;
+    m_frameDistinctionColor = frameColor;
 
-    emit frameColorChanged();
+    emit frameDistinctionColorChanged();
+}
+
+const QnResourceWidgetFrameColors &QnResourceWidget::frameColors() const {
+    return m_frameColors;
+}
+
+void QnResourceWidget::setFrameColors(const QnResourceWidgetFrameColors &frameColors) {
+    m_frameColors = frameColors;
 }
 
 void QnResourceWidget::setAspectRatio(qreal aspectRatio) {
@@ -873,7 +882,23 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
     qreal w = size.width();
     qreal h = size.height();
     qreal fw = m_frameWidth;
-    QColor color = isSelected() ? selectedFrameColor() : isLocalActive() ? activeFrameColor() : frameColor();
+    
+    QColor color;
+    if(isSelected()) {
+        color = m_frameColors.selected;
+    } else if(isLocalActive()) {
+        if(m_frameDistinctionColor.isValid()) {
+            color = m_frameDistinctionColor.lighter();
+        } else {
+            color = m_frameColors.active;
+        }
+    } else {
+        if(m_frameDistinctionColor.isValid()) {
+            color = m_frameDistinctionColor;
+        } else {
+            color = m_frameColors.normal;
+        }
+    }
 
     QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
@@ -890,7 +915,7 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
     if(!(m_options & DisplaySelection))
         return;
 
-    painter->fillRect(rect, qnGlobals->selectionColor());
+    painter->fillRect(rect, palette().color(QPalette::Highlight));
 }
 
 
@@ -980,14 +1005,3 @@ void QnResourceWidget::at_buttonBar_checkedButtonsChanged() {
     item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(checkedButtons()));
     update();
 }
-
-QColor QnResourceWidget::activeFrameColor() const {
-    return m_frameColor.lighter();
-}
-
-QColor QnResourceWidget::selectedFrameColor() const {
-    //qreal a = 0.7;
-    //return linearCombine(1.0 - a, m_frameColor, a, qnGlobals->selectedFrameColor());
-    return qnGlobals->selectedFrameColor();
-}
-

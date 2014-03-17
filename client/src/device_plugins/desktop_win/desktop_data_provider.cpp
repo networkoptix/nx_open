@@ -3,6 +3,8 @@
 #ifdef Q_OS_WIN
 
 #include <intrin.h>
+#include <windows.h>
+#include <mmsystem.h>
 
 
 static const int DEFAULT_VIDEO_STREAM_ID = 0;

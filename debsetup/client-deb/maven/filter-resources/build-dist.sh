@@ -3,6 +3,7 @@
 COMPANY_NAME=${deb.customization.company.name}
 FULL_COMPANY_NAME="${company.name}"
 FULL_PRODUCT_NAME="${company.name} ${product.name} Client.conf"
+FULL_APPLAUNCHER_NAME="${company.name} Launcher.conf"
 
 PACKAGENAME=$COMPANY_NAME-client
 VERSION=${release.version}
@@ -47,6 +48,7 @@ mkdir -p $BGSTAGE
 mkdir -p $ICONSTAGE
 mkdir -p "$STAGE/etc/xdg/$FULL_COMPANY_NAME"
 mv -f debian/client.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_PRODUCT_NAME"
+mv -f debian/applauncher.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_APPLAUNCHER_NAME"
 mv -f usr/share/applications/icon.desktop usr/share/applications/${namespace.additional}.desktop
 
 # Copy client binary, old version libs
@@ -85,6 +87,7 @@ INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/VERSION/$VERSION/g" | sed "s/ARCHITECTURE/$ARCHITECTURE/g" > $STAGE/DEBIAN/control
 
 install -m 755 debian/prerm $STAGE/DEBIAN
+install -m 755 debian/postinst $STAGE/DEBIAN
 
 (cd $STAGE; find * -type f -not -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 

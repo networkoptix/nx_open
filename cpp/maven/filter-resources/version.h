@@ -44,7 +44,7 @@
 #define QN_SETTINGS_URL                 "${settings.url}"
 #define QN_PRODUCT_NAME_LONG            "${product.name}"
 #define QN_BUILDENV_PATH                "${environment.dir}"
-
+#define QN_MIRRORLIST_URL               "${mirrorListUrl}"
 /* 
  * These constants are here for windows resource file.
  *

@@ -31,7 +31,8 @@ QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
     CLServerPushStreamReader(res),
     m_multiCodec(res),
     m_cachedFps(-1),
-    m_cachedQuality(Qn::QualityNotDefined)
+    m_cachedQuality(Qn::QualityNotDefined),
+    m_cachedSecondaryQuality(Qn::QualityNotDefined)
 {
     m_onvifRes = getResource().dynamicCast<QnPlOnvifResource>();
     m_tmpH264Conf = new onvifXsd__H264Configuration();
@@ -97,12 +98,20 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStream()
     return result;
 }
 
+void QnOnvifStreamReader::setCameraControlDisabled(bool value)
+{
+    if (!value)
+        m_cachedQuality = Qn::QualityNotDefined;
+    CLServerPushStreamReader::setCameraControlDisabled(value);
+}
+
 CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QString* const streamUrl )
 {
     //QMutexLocker lock(m_onvifRes->getStreamConfMutex());
 
     int currentFps = getFps();
     Qn::StreamQuality currentQuality = getQuality();
+    Qn::StreamQuality secondaryQuality = m_onvifRes->getSecondaryStreamQuality();
 
     if (!m_streamUrl.isEmpty() && isCameraControlDisabled())
     {
@@ -111,7 +120,11 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
         return CameraDiagnostics::NoErrorResult();
     }
 
-    if (!m_streamUrl.isEmpty() && currentFps == m_cachedFps && currentQuality == m_cachedQuality && m_cachedTimer.elapsed() < MAX_CAHCE_URL_TIME)
+    if (!m_streamUrl.isEmpty() && 
+        currentFps == m_cachedFps && 
+        currentQuality == m_cachedQuality &&  
+        (secondaryQuality == m_cachedSecondaryQuality || getRole() != QnResource::Role_SecondaryLiveVideo) &&
+        m_cachedTimer.elapsed() < MAX_CAHCE_URL_TIME)
     {
         *streamUrl = m_streamUrl;
         return CameraDiagnostics::NoErrorResult();
@@ -127,6 +140,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( QS
         m_cachedQuality = currentQuality;
         m_cachedFps = currentFps;
         m_cachedTimer.restart();
+        m_cachedSecondaryQuality = secondaryQuality;
     }
     return result;
 }
@@ -157,8 +171,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bo
     result = fetchStreamUrl( soapWrapper, info.profileToken, isPrimary, streamUrl );
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
-    qDebug() << "got stream URL for camera" << m_resource->getUrl() << "for profile" << info.profileToken;
-    qDebug() << "rtsp=" << *streamUrl;
+    NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(*streamUrl).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
     return result;
 }
 

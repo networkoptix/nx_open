@@ -848,9 +848,9 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if(widgets(widget->resource()).size() == 1)
         connect(widget->resource(),     SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_resource_disabledChanged(const QnResourcePtr &)), Qt::QueuedConnection);
 
-    QColor frameColor = item->data(Qn::ItemFrameColorRole).value<QColor>();
+    QColor frameColor = item->data(Qn::ItemFrameDistinctionColorRole).value<QColor>();
     if(frameColor.isValid())
-        widget->setFrameColor(frameColor);
+        widget->setFrameDistinctionColor(frameColor);
 
     emit widgetAdded(widget);
 
@@ -869,11 +869,17 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 qint64 time = item->data(Qn::ItemTimeRole).toLongLong();
                 if (time > 0 && time != DATETIME_NOW)
                     time *= 1000;
-                if (time > 0)
-                    mediaWidget->display()->archiveReader()->jumpTo(time, time);
-                else
-                    if(m_widgets.size() == 1 && !mediaWidget->resource()->toResource()->hasFlags(QnResource::live)) 
+                if (time > 0) {
+                    // jump to time preventing synchronizer from touching other items
+                    QnAbstractArchiveReader *reader = mediaWidget->display()->archiveReader();
+                    QnAbstractNavigator *navDelegate = reader->navDelegate();
+                    reader->setNavDelegate(0);
+                    reader->jumpTo(time, time);
+                    reader->setNavDelegate(navDelegate);
+                } else {
+                    if(m_widgets.size() == 1 && !mediaWidget->resource()->toResource()->hasFlags(QnResource::live))
                         mediaWidget->display()->archiveReader()->jumpTo(0, 0);
+                }
             }
         }
     }

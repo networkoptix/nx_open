@@ -15,7 +15,7 @@ void GraphicsFramePrivate::updateStyledFrameWidths()
     opt.lineWidth = lineWidth;
     opt.midLineWidth = midLineWidth;
 
-    const QRect cr = q->style()->subElementRect(QStyle::SE_ShapedFrameContents, &opt, q);
+    const QRect cr = q->style()->subElementRect(QStyle::SE_ShapedFrameContents, &opt, NULL);
     leftFrameWidth = cr.left() - opt.rect.left();
     topFrameWidth = cr.top() - opt.rect.top();
     rightFrameWidth = opt.rect.right() - cr.right(),
@@ -143,10 +143,8 @@ void GraphicsFrame::setFrameRect(const QRectF &r)
     setContentsMargins(cr.left(), cr.top(), rect().right() - cr.right(), rect().bottom() - cr.bottom());
 }
 
-void GraphicsFrame::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
+void GraphicsFrame::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    Q_UNUSED(option)
-
     Q_D(GraphicsFrame);
 
     QStyleOptionFrameV3 opt;
@@ -178,7 +176,7 @@ void GraphicsFrame::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
         break;
     }
 
-    style()->drawControl(QStyle::CE_ShapedFrame, &opt, painter, this);
+    style()->drawControl(QStyle::CE_ShapedFrame, &opt, painter, NULL);
 }
 
 void GraphicsFrame::initStyleOption(QStyleOption *option) const

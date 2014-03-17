@@ -202,7 +202,7 @@ namespace nx_http
                 case notImplemented:
                     return StringType("Not Implemented");
                 default:
-                    return lit( "Unknown_%1" ).arg(val).toLatin1(); // TODO: #Elric implement without QString
+                    return StringType("Unknown_") + StringType::number(val);
             }
         }
     }

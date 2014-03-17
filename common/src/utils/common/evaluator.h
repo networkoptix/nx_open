@@ -200,7 +200,7 @@ namespace Qee {
         QString m_name;
     };
 
-    typedef QVariant (*Function)(const ParameterPack &);
+    typedef QVariant (*Function)(const ParameterPack &); 
 
     
     class Resolver {

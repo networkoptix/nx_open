@@ -95,7 +95,10 @@ private:
 };
 
 /**
- * Condition wich is a conjunction of two or more conditions
+ * Condition wich is a conjunction of two or more conditions.
+ * It acts like logical AND, e.g. an action is enabled if the all conditions in the conjunction is true.
+ * But the result (Qn::ActionVisibility) may have 3 values: [Invisible, Disabled, Enabled], so this action condition chooses
+ * the minimal value from its conjuncts.
  */
 class QnConjunctionActionCondition: public QnActionCondition {
 public:

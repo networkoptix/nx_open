@@ -7,6 +7,8 @@
 
 #include <QtOpenGL/QGLWidget>
 
+#include <core/resource/camera_resource.h>
+
 #include "utils/common/checked_cast.h"
 
 #include "ui/graphics/view/graphics_view.h"
@@ -32,9 +34,9 @@
 
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent): 
-    QWidget(parent),
+    base_type(parent),
     m_readOnly(false),
-    m_needControlMaxRects(false)
+    m_controlMaxRects(false)
 {
     init();
 }
@@ -84,10 +86,10 @@ void QnCameraMotionMaskWidget::init() {
     m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::Item, this);
     display->instrumentManager()->installInstrument(m_clickInstrument);
 
-    disconnect(m_motionSelectionInstrument, NULL,                                                                                   m_controller.data(),            NULL); // TODO: #Elric controller flags?
-    connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                               this,                           SLOT(at_itemClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(m_motionSelectionInstrument,  SIGNAL(motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)),    this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)));
-    connect(m_motionSelectionInstrument,  SIGNAL(motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)),                    this,                           SLOT(at_motionRegionCleared()));
+    disconnect(m_motionSelectionInstrument, NULL,                                                       m_controller,   NULL); // TODO: #Elric controller flags?
+    connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),   this,           SLOT(at_itemClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
+    connect(m_motionSelectionInstrument,  &MotionSelectionInstrument::motionRegionSelected,             this,           &QnCameraMotionMaskWidget::at_motionRegionSelected);
+    connect(m_motionSelectionInstrument,  &MotionSelectionInstrument::motionRegionCleared,              this,           &QnCameraMotionMaskWidget::at_motionRegionCleared);
 
     /* Set up UI. */
     QVBoxLayout *layout = new QVBoxLayout();
@@ -164,8 +166,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
     emit motionRegionListChanged();
 }
 
-void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &region, const QnMotionRegion::RegionValid kind)
-{
+void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &region, const QnMotionRegion::RegionValid kind) {
     switch(kind){
         case QnMotionRegion::WINDOWS:
             QMessageBox::warning(
@@ -199,28 +200,28 @@ void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &r
     }
 }
 
-void QnCameraMotionMaskWidget::setNeedControlMaxRects(bool value)
-{
-    m_needControlMaxRects = value;
+void QnCameraMotionMaskWidget::setControlMaxRects(bool controlMaxRects) {
+    m_controlMaxRects = controlMaxRects;
 };
 
-int QnCameraMotionMaskWidget::motionSensitivity() const 
-{
+bool QnCameraMotionMaskWidget::isControlMaxRects() const {
+    return m_controlMaxRects;
+}
+
+int QnCameraMotionMaskWidget::motionSensitivity() const {
     return m_motionSensitivity;
 }
 
-void QnCameraMotionMaskWidget::setMotionSensitivity(int motionSensitivity) 
-{
+void QnCameraMotionMaskWidget::setMotionSensitivity(int motionSensitivity) {
     m_motionSensitivity = motionSensitivity;
 }
 
-void QnCameraMotionMaskWidget::clearMotion() 
-{
+void QnCameraMotionMaskWidget::clearMotion() {
     at_motionRegionCleared();
 }
 
 bool QnCameraMotionMaskWidget::isValidMotionRegion() {
-    if (m_resourceWidget && m_needControlMaxRects) {
+    if (m_resourceWidget && m_controlMaxRects) {
         QnConstResourceVideoLayoutPtr layout = m_camera->getVideoLayout();
         const QList<QnMotionRegion> &regions = m_resourceWidget->motionSensitivity();
         for (int i = 0; i < qMin(regions.size(), layout->channelCount()); ++i) {

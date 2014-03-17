@@ -89,6 +89,7 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
+#include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 
@@ -205,9 +206,12 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
     connect(action(Qn::ShowcaseAction),                         SIGNAL(triggered()),    this,   SLOT(at_showcaseAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
-    connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
-    connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
-    connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
+    /* These actions may be activated via context menu. In this case the topmost event loop will be finishing and this somehow affects runModal method of NSSavePanel in MacOS.
+     * File dialog execution will be failed. (see a comment in qcocoafiledialoghelper.mm)
+     * To make dialogs work we're using queued connection here. */
+    connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()), Qt::QueuedConnection);
+    connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()), Qt::QueuedConnection);
+    connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()), Qt::QueuedConnection);
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::PreferencesGeneralTabAction),            SIGNAL(triggered()),    this,   SLOT(at_preferencesGeneralTabAction_triggered()));
     connect(action(Qn::PreferencesLicensesTabAction),           SIGNAL(triggered()),    this,   SLOT(at_preferencesLicensesTabAction_triggered()));
@@ -388,8 +392,8 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.contrastParams = params.contrastParams;
     data.dewarpingParams = params.dewarpingParams;
     data.dataByRole[Qn::ItemTimeRole] = params.time;
-    if(params.frameColor.isValid())
-        data.dataByRole[Qn::ItemFrameColorRole] = params.frameColor;
+    if(params.frameDistinctionColor.isValid())
+        data.dataByRole[Qn::ItemFrameDistinctionColorRole] = params.frameDistinctionColor;
     if(params.usePosition) {
         data.combinedGeometry = QRectF(params.position, params.position); /* Desired position is encoded into a valid rect. */
     } else {
@@ -920,7 +924,31 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
-    menu()->trigger(Qn::OpenInLayoutAction, parameters);
+    QnWorkbenchStreamSynchronizer *synchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+
+    if (synchronizer->isRunning() && !navigator()->isLive() && parameters.widgets().isEmpty()) {
+        // split resources in two groups: local and non-local and specify different initial time for them
+        // TODO: #dklychkov add ability to specify different time for resources and then simplify the code below
+        QnResourceList resources = parameters.resources();
+        QnResourceList localResources;
+        foreach (const QnResourcePtr &resource, resources) {
+            if (resource->flags().testFlag(QnResource::local)) {
+                localResources.append(resource);
+                resources.removeOne(resource);
+            }
+        }
+        if (!localResources.isEmpty()) {
+            parameters.setResources(localResources);
+            menu()->trigger(Qn::OpenInLayoutAction, parameters);
+        }
+        if (!resources.isEmpty()) {
+            parameters.setResources(resources);
+            parameters.setArgument(Qn::ItemTimeRole, navigator()->timeSlider()->sliderPosition());
+            menu()->trigger(Qn::OpenInLayoutAction, parameters);
+        }
+    } else {
+        menu()->trigger(Qn::OpenInLayoutAction, parameters);
+    }
 }
 
 void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
@@ -2358,7 +2386,7 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     addParams.zoomWindow = rect;
     addParams.dewarpingParams.enabled = widget->dewarpingParams().enabled;
     addParams.zoomUuid = widget->item()->uuid();
-    addParams.frameColor = params.argument<QColor>(Qn::ItemFrameColorRole);
+    addParams.frameDistinctionColor = params.argument<QColor>(Qn::ItemFrameDistinctionColorRole);
     addParams.rotation = widget->item()->rotation();
 
     addToLayout(workbench()->currentLayout()->resource(), widget->resource()->toResourcePtr(), addParams);

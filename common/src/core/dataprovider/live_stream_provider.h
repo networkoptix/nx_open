@@ -28,6 +28,7 @@ public:
     void setSecondaryQuality(Qn::SecondStreamQuality  quality);
     virtual void setQuality(Qn::StreamQuality q);
     Qn::StreamQuality getQuality() const;
+    virtual void setCameraControlDisabled(bool value);
 
     // for live providers only 
     virtual void setFps(float f);
@@ -54,7 +55,7 @@ public:
         Start provider if not running yet.
         @param canTouchCameraSettings can control camera settings if true
     */
-    void startIfNotRunning(bool canTouchCameraSettings);
+    void startIfNotRunning();
 
     bool isCameraControlDisabled() const;
     void filterMotionByMask(QnMetaDataV1Ptr motion);
@@ -78,8 +79,8 @@ protected:
 private:
     //int m_NumaberOfVideoChannels;
     Qn::StreamQuality m_quality;
+    bool m_prevCameraControlDisabled;
     bool m_qualityUpdatedAtLeastOnce;
-    bool m_canTouchCameraSettings;
 
     mutable float m_fps; //used only for live providers
     unsigned int m_framesSinceLastMetaData; // used only for live providers
