@@ -106,6 +106,7 @@ public:
      *                                  Pass -1 to disable duration overriding.
      */
     void setDurationOverride(int durationOverride);
+
 public slots:
     /**
      * Starts this animator.
