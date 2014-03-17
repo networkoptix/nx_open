@@ -1209,10 +1209,6 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         layout->setData(Qn::VideoWallResourceRole, qVariantFromValue(videoWall));
         resourcePool()->addResource(layout);
 
-        connect(videoWall, &QnVideoWallResource::itemAdded,     this, &QnWorkbenchVideoWallHandler::at_videoWall_itemAdded_inReviewMode);
-        connect(videoWall, &QnVideoWallResource::itemChanged,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_inReviewMode);
-        connect(videoWall, &QnVideoWallResource::itemRemoved,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_inReviewMode);
-
 //        QRect boundingRect;
 
         foreach (const QnVideoWallPcData &pc, videoWall->getPcs()) {
@@ -1396,12 +1392,6 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr
                 m_savingReviews.remove(key);
                 key = m_savingReviews.key(layout, -1);
             }
-
-            if (QnVideoWallResourcePtr videoWall = layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>()) {
-                disconnect(videoWall, &QnVideoWallResource::itemAdded,     this, &QnWorkbenchVideoWallHandler::at_videoWall_itemAdded_inReviewMode);
-                disconnect(videoWall, &QnVideoWallResource::itemChanged,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_inReviewMode);
-                disconnect(videoWall, &QnVideoWallResource::itemRemoved,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_inReviewMode);
-            }
         }
 
         if (QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>()) {
@@ -1425,55 +1415,6 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved(const QnVideoWallReso
     if (videoWall->getGuid() != m_videoWallMode.guid.toString() || item.uuid != m_videoWallMode.instanceGuid)
         return;
     closeInstance();
-}
-
-void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded_inReviewMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
-    QnWorkbenchLayout* layout = findReviewModeLayout(videoWall);
-    assert(false); //TODO: #GDM VW this should be reimplemented for sure
-
-    if (!layout)
-        return;
-
-
-}
-
-void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_inReviewMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
-    QnWorkbenchLayout* layout = findReviewModeLayout(videoWall);
-    assert(false); //TODO: #GDM VW this should be reimplemented for sure
-
-    if (!layout)
-        return;
-
-    //TODO: #GDM VW reimplement
-//    foreach (QnWorkbenchItem* workbenchItem, layout->items()) {
-//        if (workbenchItem->data(Qn::VideoWallItemGuidRole).toUuid() != item.uuid)
-//            continue;
-//        QRect oldGeometry = workbenchItem->geometry();
-//        layout->removeItem(workbenchItem);
-//        QRect boundingRect = layout->boundingRect();
-//        addScreenToReviewLayout(item, layout->resource(), boundingRect, oldGeometry);
-//        break;
-//    }
-
-
-}
-
-void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_inReviewMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
-    QnWorkbenchLayout* layout = findReviewModeLayout(videoWall);
-    assert(false); //TODO: #GDM VW this should be reimplemented for sure
-
-    if (!layout)
-        return;
-
-    //TODO: #GDM VW reimplement
-
-//    foreach (QnWorkbenchItem* workbenchItem, layout->items()) {
-//        if (workbenchItem->data(Qn::VideoWallItemGuidRole).toUuid() != item.uuid)
-//            continue;
-//        layout->removeItem(workbenchItem);
-//        break;
-//    }
-
 }
 
 void QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived(const QnVideoWallControlMessage &message) {

@@ -20,31 +20,42 @@
 #include <ui/style/skin.h>
 
 #include <utils/common/warnings.h>
+#include <utils/common/container.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 
 // -------------------------------------------------------------------------- //
 // StatisticsOverlayWidget
 // -------------------------------------------------------------------------- //
-class LayoutOverlayWidget: public GraphicsWidget {
-    typedef GraphicsWidget base_type;
+class LayoutOverlayWidget: public Connective<GraphicsWidget> {
+    typedef Connective<GraphicsWidget> base_type;
 public:
-    LayoutOverlayWidget(const QnLayoutResourcePtr &layout, QnVideowallResourceScreenWidget *parent, Qt::WindowFlags windowFlags = 0):
+    LayoutOverlayWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallResourceScreenWidget *parent, Qt::WindowFlags windowFlags = 0):
         base_type(parent, windowFlags),
         m_widget(parent),
-        m_layout(layout)
+        m_videowall(videowall),
+        m_itemUuid(itemUuid)
     {
+        connect(m_videowall, &QnVideoWallResource::itemChanged, this, &LayoutOverlayWidget::at_videoWall_itemChanged);
 
+        updateLayout();
+        updateInfo();
     }
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override {
         Q_UNUSED(widget)
+        QRectF paintRect = option->rect;
+        if (!paintRect.isValid())
+            return;
+
         if (!m_layout) {
-            painter->fillRect(option->rect, Qt::red);
+            painter->fillRect(paintRect, Qt::red);
         }
         else {
-            painter->fillRect(option->rect, Qt::blue);
+            //TODO: #GDM VW paint background and calculate its size in bounding geometry
+
+            painter->fillRect(paintRect, Qt::blue);
 
             QRectF bounding;
             foreach (const QnLayoutItemData &data, m_layout->getItems()) {
@@ -57,29 +68,29 @@ protected:
             if (bounding.isNull())
                 return;
 
-            qreal x = option->rect.left();
-            qreal y = option->rect.top();
+            qreal x = paintRect.left();
+            qreal y = paintRect.top();
 
             qreal xspace = m_layout->cellSpacing().width() * 0.5;
             qreal yspace = m_layout->cellSpacing().height() * 0.5;
 
             qreal xscale, yscale, xoffset, yoffset;
             qreal sourceAr = m_layout->cellAspectRatio() * bounding.width() / bounding.height();
-            qreal targetAr = option->rect.width() / option->rect.height();
+            qreal targetAr = paintRect.width() / paintRect.height();
             if (sourceAr > targetAr) {
-                xscale = option->rect.width() / bounding.width();
+                xscale = paintRect.width() / bounding.width();
                 yscale = xscale / m_layout->cellAspectRatio();
                 xoffset = 0;
 
                 qreal h = bounding.height() * yscale;
-                yoffset = (option->rect.height() - h) * 0.5 + option->rect.top();
+                yoffset = (paintRect.height() - h) * 0.5 + paintRect.top();
             } else {
-                yscale = option->rect.height() / bounding.height();
+                yscale = paintRect.height() / bounding.height();
                 xscale = yscale * m_layout->cellAspectRatio();
                 yoffset = 0;
 
                 qreal w = bounding.width() * xscale;
-                xoffset = (option->rect.width() - w) * 0.5 + option->rect.top();
+                xoffset = (paintRect.width() - w) * 0.5 + paintRect.top();
             }
 
         #ifdef RECT_DEBUG
@@ -108,6 +119,48 @@ protected:
     }
 
 private:
+    void at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
+        Q_UNUSED(videoWall)
+        if (item.uuid != m_itemUuid)
+            return;
+        updateLayout();
+        updateInfo();
+    }
+
+    void updateLayout() {
+        QnVideoWallItem item = m_videowall->getItem(m_itemUuid);
+        QnLayoutResourcePtr layout = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
+        if (m_layout == layout)
+            return;
+
+        if (m_layout) {
+            disconnect(m_layout, NULL, this, NULL);
+        }
+        m_layout = layout;
+        if (m_layout) {
+            connect(m_layout, &QnLayoutResource::itemAdded,                 this, &LayoutOverlayWidget::updateView);
+            connect(m_layout, &QnLayoutResource::itemChanged,               this, &LayoutOverlayWidget::updateView);
+            connect(m_layout, &QnLayoutResource::itemRemoved,               this, &LayoutOverlayWidget::updateView);
+            connect(m_layout, &QnLayoutResource::cellAspectRatioChanged,    this, &LayoutOverlayWidget::updateView);
+            connect(m_layout, &QnLayoutResource::cellSpacingChanged,        this, &LayoutOverlayWidget::updateView);
+            connect(m_layout, &QnLayoutResource::backgroundImageChanged,    this, &LayoutOverlayWidget::updateView);
+            connect(m_layout, &QnLayoutResource::backgroundSizeChanged,     this, &LayoutOverlayWidget::updateView);
+            connect(m_layout, &QnLayoutResource::backgroundOpacityChanged,  this, &LayoutOverlayWidget::updateView);
+
+            connect(m_layout, &QnResource::nameChanged,                     this, &LayoutOverlayWidget::updateInfo);
+        }
+    }
+
+    void updateView() {
+        update(); //direct connect is not so convinient because of overloaded function
+    }
+
+    void updateInfo() {
+        //TODO: #GDM VW update title text
+
+        qDebug() << "info updated";
+    }
+
     void paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data) {
         QnResourcePtr resource = (data.resource.id.isValid())
                 ? qnResPool->getResourceById(data.resource.id)
@@ -165,7 +218,10 @@ private:
 
 private:
     QnVideowallResourceScreenWidget* m_widget;
-    const QnLayoutResourcePtr m_layout;
+    const QnVideoWallResourcePtr m_videowall;
+    const QUuid m_itemUuid;
+
+    QnLayoutResourcePtr m_layout;
 };
 
 
@@ -174,22 +230,30 @@ private:
 // -------------------------------------------------------------------------- //
 
 QnVideowallResourceScreenWidget::QnVideowallResourceScreenWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
-    base_type(context, item, parent)
+    base_type(context, item, parent),
+    m_mainLayout(NULL),
+    m_layoutUpdateRequired(true)
 {
     setOption(QnResourceWidget::WindowRotationForbidden, true);
 
     m_videowall = base_type::resource().dynamicCast<QnVideoWallResource>(); //TODO: #GDM VW check null in all usage places
-    if(!m_videowall)
+    if(!m_videowall) {
         qnCritical("QnVideowallResourceScreenWidget was created with a non-videowall resource.");
+        return;
+    }
 
-    QUuid pcUuid = item->data(Qn::VideoWallPcGuidRole).value<QUuid>();
-    QnVideoWallPcData pc = m_videowall->getPc(pcUuid);  //TODO: #GDM VW check null in all usage places
+    connect(m_videowall, &QnVideoWallResource::itemAdded,     this, &QnVideowallResourceScreenWidget::at_videoWall_itemAdded);
+    connect(m_videowall, &QnVideoWallResource::itemChanged,   this, &QnVideowallResourceScreenWidget::at_videoWall_itemChanged);
+    connect(m_videowall, &QnVideoWallResource::itemRemoved,   this, &QnVideowallResourceScreenWidget::at_videoWall_itemRemoved);
+
+
+    m_pcUuid = item->data(Qn::VideoWallPcGuidRole).value<QUuid>();
+    QnVideoWallPcData pc = m_videowall->getPc(m_pcUuid);  //TODO: #GDM VW check null in all usage places
 
     QList<int> screenIndices = item->data(Qn::VideoWallPcScreenIndicesRole).value<QList<int> >();
     qDebug() << screenIndices;
 
     //TODO: #GDM VW if pc list updated or a single pc changed, videowall review layout must be invalidated
-//    connect(m_videowall, &QnVideoWallResource::pcChanged)
 
     foreach(const QnVideoWallPcData::PcScreen &screen, pc.screens) {
         if (!screenIndices.contains(screen.index))
@@ -202,13 +266,8 @@ QnVideowallResourceScreenWidget::QnVideowallResourceScreenWidget(QnWorkbenchCont
         setAspectRatio((qreal)m_desktopGeometry.width() / m_desktopGeometry.height());
 
     foreach (const QnVideoWallItem &item, m_videowall->getItems()) {
-        if (item.pcUuid != pcUuid)
-            continue;
-        if (!m_desktopGeometry.contains(item.geometry))
-            continue;
-        m_items << item;
+        at_videoWall_itemAdded(m_videowall, item);
     }
-    updateLayout();
 
     m_thumbnailManager = new QnCameraThumbnailManager(this);
     connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this, &QnVideowallResourceScreenWidget::at_thumbnailReady);
@@ -232,6 +291,8 @@ Qn::RenderStatus QnVideowallResourceScreenWidget::paintChannelBackground(QPainte
     if (!paintRect.isValid())
         return Qn::NothingRendered;
 
+    updateLayout();
+
     painter->fillRect(paintRect, Qt::black);
 //    qreal offset = qMin(paintRect.width(), paintRect.height()) * 0.02;
 //    QRectF contentsRect = paintRect.adjusted(offset, offset, -offset, -offset);
@@ -242,58 +303,118 @@ Qn::RenderStatus QnVideowallResourceScreenWidget::paintChannelBackground(QPainte
 }
 
 void QnVideowallResourceScreenWidget::updateLayout() {
+    if (!m_layoutUpdateRequired)
+        return;
 
-    QGraphicsAnchorLayout *layout = new QGraphicsAnchorLayout();
-    layout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
-    layout->setSpacing(0.5);
+    if (!m_mainLayout) {
+        m_mainLayout = new QGraphicsAnchorLayout();
+        m_mainLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
+        m_mainLayout->setSpacing(0.5);
+
+        QGraphicsWidget* mainOverlayWidget = new QnViewportBoundWidget(this);
+        mainOverlayWidget->setLayout(m_mainLayout);
+        mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
+        mainOverlayWidget->setOpacity(1.0);
+        addOverlayWidget(mainOverlayWidget, UserVisible, true);
+    }
+
+    while (m_mainLayout->count() > 0) {
+        QGraphicsLayoutItem* item = m_mainLayout->itemAt(0);
+        m_mainLayout->removeAt(0);
+        delete item;
+    }
 
     // can have several items on a single screen
     if (m_screens.size() == 1) {
         foreach (const QnVideoWallItem &item, m_items) {
-            LayoutOverlayWidget *itemWidget = new LayoutOverlayWidget(qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>(), this);
+            LayoutOverlayWidget *itemWidget = new LayoutOverlayWidget(m_videowall, item.uuid, this);
             itemWidget->setAcceptedMouseButtons(Qt::NoButton);
 
             if (item.geometry.left() == m_desktopGeometry.left())
-                layout->addAnchor(itemWidget, Qt::AnchorLeft, layout, Qt::AnchorLeft);
+                m_mainLayout->addAnchor(itemWidget, Qt::AnchorLeft, m_mainLayout, Qt::AnchorLeft);
             else
-                layout->addAnchor(itemWidget, Qt::AnchorLeft, layout, Qt::AnchorHorizontalCenter);
+                m_mainLayout->addAnchor(itemWidget, Qt::AnchorLeft, m_mainLayout, Qt::AnchorHorizontalCenter);
 
             if (item.geometry.top() == m_desktopGeometry.top())
-                layout->addAnchor(itemWidget, Qt::AnchorTop, layout, Qt::AnchorTop);
+                m_mainLayout->addAnchor(itemWidget, Qt::AnchorTop, m_mainLayout, Qt::AnchorTop);
             else
-                layout->addAnchor(itemWidget, Qt::AnchorTop, layout, Qt::AnchorVerticalCenter);
+                m_mainLayout->addAnchor(itemWidget, Qt::AnchorTop, m_mainLayout, Qt::AnchorVerticalCenter);
 
             if (item.geometry.right() == m_desktopGeometry.right())
-                layout->addAnchor(itemWidget, Qt::AnchorRight, layout, Qt::AnchorRight);
+                m_mainLayout->addAnchor(itemWidget, Qt::AnchorRight, m_mainLayout, Qt::AnchorRight);
             else
-                layout->addAnchor(itemWidget, Qt::AnchorRight, layout, Qt::AnchorHorizontalCenter);
+                m_mainLayout->addAnchor(itemWidget, Qt::AnchorRight, m_mainLayout, Qt::AnchorHorizontalCenter);
 
             if (item.geometry.bottom() == m_desktopGeometry.bottom())
-                layout->addAnchor(itemWidget, Qt::AnchorBottom, layout, Qt::AnchorBottom);
+                m_mainLayout->addAnchor(itemWidget, Qt::AnchorBottom, m_mainLayout, Qt::AnchorBottom);
             else
-                layout->addAnchor(itemWidget, Qt::AnchorBottom, layout, Qt::AnchorVerticalCenter);
+                m_mainLayout->addAnchor(itemWidget, Qt::AnchorBottom, m_mainLayout, Qt::AnchorVerticalCenter);
 
         }
     } else if (m_items.size() == 1 ) {    // can have only on item on several screens
-        LayoutOverlayWidget *itemWidget = new LayoutOverlayWidget(qnResPool->getResourceById(m_items.first().layout).dynamicCast<QnLayoutResource>(), this);
+        LayoutOverlayWidget *itemWidget = new LayoutOverlayWidget(m_videowall, m_items.first().uuid, this);
         itemWidget->setAcceptedMouseButtons(Qt::NoButton);
 
          //TODO: #GDM VW maybe just place this item as an overlay?
-        layout->addAnchors(itemWidget, layout, Qt::Horizontal | Qt::Vertical);
+        m_mainLayout->addAnchors(itemWidget, m_mainLayout, Qt::Horizontal | Qt::Vertical);
 
     } else {
         qWarning() << "inconsistent videowall or no items on screens";
     }
 
 
-    QnViewportBoundWidget *mainOverlayWidget = new QnViewportBoundWidget(this);
-    mainOverlayWidget->setLayout(layout);
-    mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
-    mainOverlayWidget->setOpacity(1.0);
-    addOverlayWidget(mainOverlayWidget, UserVisible, true);
+
+
+    m_layoutUpdateRequired = false;
 }
+
 
 void QnVideowallResourceScreenWidget::at_thumbnailReady(int resourceId, const QPixmap &thumbnail) {
     m_thumbs[resourceId] = thumbnail;
+    update();
+}
+
+void QnVideowallResourceScreenWidget::at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
+    Q_UNUSED(videoWall)
+    if (item.pcUuid != m_pcUuid)
+        return;
+
+    if (!m_desktopGeometry.contains(item.geometry))
+        return;
+
+    m_items << item;
+    m_layoutUpdateRequired = true;
+    update();
+}
+
+void QnVideowallResourceScreenWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
+    Q_UNUSED(videoWall)
+    if (item.pcUuid != m_pcUuid)
+        return;
+
+    int idx = qnIndexOf(m_items, [&](const QnVideoWallItem &i) {return item.uuid == i.uuid; });
+    if (idx < 0)
+        return; // item on another screen
+
+    QnVideoWallItem oldItem = m_items[idx];
+    m_items[idx] = item;
+    if (item.geometry == oldItem.geometry)
+       return;
+
+    m_layoutUpdateRequired = true;
+    update();
+}
+
+void QnVideowallResourceScreenWidget::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
+    Q_UNUSED(videoWall)
+    if (item.pcUuid != m_pcUuid)
+        return;
+
+    int idx = qnIndexOf(m_items, [&](const QnVideoWallItem &i) {return item.uuid == i.uuid; });
+    if (idx < 0)
+        return; // item on another screen
+
+    m_items.removeAt(idx);
+    m_layoutUpdateRequired = true;
     update();
 }
