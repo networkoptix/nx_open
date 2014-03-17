@@ -93,8 +93,8 @@ namespace {
             return "ItemSpeedRole";
         case Qn::ItemCheckedButtonsRole:
             return "ItemCheckedButtonsRole";
-        case Qn::ItemFrameColorRole:
-            return "ItemFrameColorRole";
+        case Qn::ItemFrameDistinctionColorRole:
+            return "ItemFrameDistinctionColorRole";
         case Qn::ItemSliderWindowRole:
             return "ItemSliderWindowRole";
         case Qn::ItemSliderSelectionRole:
@@ -591,7 +591,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
             workbench()->currentLayout()->item(uuid)->setData(role, data);
             break;
         }
-        case Qn::ItemFrameColorRole:
+        case Qn::ItemFrameDistinctionColorRole:
         {
             QColor data = QJson::deserialized<QColor>(value);
             workbench()->currentLayout()->item(uuid)->setData(role, data);
@@ -1717,7 +1717,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(int role) {
         QJson::serialize(value, &json);
         break;
     }
-    case Qn::ItemFrameColorRole:
+    case Qn::ItemFrameDistinctionColorRole:
     {
         QColor value = data.value<QColor>();
 #ifdef SENDER_DEBUG
