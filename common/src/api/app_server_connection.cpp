@@ -132,6 +132,15 @@ QString QnAppServerConnectionFactory::authKey()
     return QString();
 }
 
+QString QnAppServerConnectionFactory::box()
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        return factory->m_box;
+    }
+
+    return QString();
+}
+
 QString QnAppServerConnectionFactory::clientGuid()
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
@@ -157,6 +166,13 @@ QUrl QnAppServerConnectionFactory::publicUrl()
     }
 
     return QUrl();
+}
+
+void QnAppServerConnectionFactory::setBox(const QString &box)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_box = box;
+    }
 }
 
 void QnAppServerConnectionFactory::setAuthKey(const QString &authKey)
