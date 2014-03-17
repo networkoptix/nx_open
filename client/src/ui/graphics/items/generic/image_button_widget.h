@@ -39,7 +39,7 @@ public:
         PRESSED = 0x2,      /**< Button is pressed. This is the state that the button enters when a mouse button is pressed over it, and leaves when the mouse button is released. */
         HOVERED = 0x4,      /**< Button is hovered over. */
         DISABLED = 0x8,     /**< Button is disabled. */
-        FLAGS_MAX = 0xF
+        FLAGS_MAX = 0xF // TODO: #Elric rename, use CamelCase like in Qt
     };
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
