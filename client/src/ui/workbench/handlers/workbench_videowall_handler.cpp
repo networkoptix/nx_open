@@ -113,6 +113,8 @@ namespace {
 
     const int identifyTimeout  = 5000;
     const int identifyFontSize = 100;
+
+    const qreal defaultReviewAR = 1920.0 / 1080.0;
 }
 
 QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
@@ -958,7 +960,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     newLayout->setBackgroundOpacity(layout->backgroundOpacity());
     newLayout->setBackgroundSize(layout->backgroundSize());
     newLayout->setUserCanEdit(true);
-    context()->resourcePool()->addResource(newLayout);
+    resourcePool()->addResource(newLayout);
 
     QnLayoutItemDataList items = layout->getItems().values();
     QHash<QUuid, QUuid> newUuidByOldUuid;
@@ -1203,13 +1205,10 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         if(context()->user())
             layout->setParentId(context()->user()->getId());
 
-//        layout->setCellAspectRatio(1.0);
         layout->setCellSpacing(0.0, 0.0);
+        layout->setCellAspectRatio(defaultReviewAR);
         layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission | Qn::WritePermission));
         layout->setData(Qn::VideoWallResourceRole, qVariantFromValue(videoWall));
-        resourcePool()->addResource(layout);
-
-//        QRect boundingRect;
 
         foreach (const QnVideoWallPcData &pc, videoWall->getPcs()) {
 
@@ -1238,62 +1237,14 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
                 if (firstScreen < 0)
                     continue;
 
-                //TODO: #GDM VW here we should read desktopGeometry field and set it to items
-                /*
-                QRect united = pc.unitedGeometry();
-
-                QSet<int> leftSet, topSet;
-                foreach(QnVideoWallPcData::PcScreen screen, pc.screens) {
-                    int w = screen.geometry.width() / 2;
-                    int h = screen.geometry.height() / 2;
-                    leftSet << screen.geometry.left() << screen.geometry.left() + w + 1;
-                    topSet << screen.geometry.top() << screen.geometry.top() + h + 1;
-                }
-
-                int xsnaps = leftSet.size();
-                int ysnaps = topSet.size();
-
-                qreal xstep = (qreal)united.width() / xsnaps;
-                qreal ystep = (qreal)united.height() / ysnaps;
-                if (pc.geometry.width() > 0 && pc.geometry.height() > 0) {
-                    xstep /= pc.geometry.width();
-                    ystep /= pc.geometry.height();
-                }
-
-                int x = qRound(qreal(source.geometry.left() - united.left()) / xstep);
-                int y = qRound(qreal(source.geometry.top() - united.top()) / ystep);
-
-                if (!geometry.isValid()) {
-                    int w = qRound(qreal(source.geometry.width()) / xstep);
-                    int h = qRound(qreal(source.geometry.height()) / ystep);
-
-                    if (!pc.geometry.isValid()) {
-                        if (boundingRect.isValid()) {
-                            if (boundingRect.width() > boundingRect.height()) {
-                                pc.geometry.setLeft(boundingRect.left());
-                                pc.geometry.setTop(boundingRect.top() + boundingRect.height() + 1);
-                            } else {
-                                pc.geometry.setLeft(boundingRect.left() + boundingRect.width() + 1);
-                                pc.geometry.setTop(boundingRect.top());
-                            }
-                        }
-                        pc.geometry.setWidth(1);
-                        pc.geometry.setHeight(1);
-                        videoWall->updatePc(pc.uuid, pc);
-                    }
-                    boundingRect = boundingRect.united(QRect(pc.geometry.left(), pc.geometry.top(), united.width() / xstep, united.height() / ystep));
-
-                    geometry = QRect(x, y, w, h);
-                    geometry.adjust(pc.geometry.left(), pc.geometry.top(), pc.geometry.left(), pc.geometry.top());
-                }
-                */
-
                 QnLayoutItemData itemData;
-//                itemData.flags = Qn::Pinned;
-                itemData.flags = Qn::PendingGeometryAdjustment;
                 itemData.uuid = QUuid::createUuid();
                 itemData.combinedGeometry = pc.screens[firstScreen].layoutGeometry;
-                itemData.resource.id = videoWall->getId(); //source.layout;
+                if (itemData.combinedGeometry.isValid())
+                    itemData.flags = Qn::Pinned;
+                else
+                    itemData.flags = Qn::PendingGeometryAdjustment;
+                itemData.resource.id = videoWall->getId();
                 itemData.dataByRole[Qn::VideoWallPcGuidRole] = qVariantFromValue<QUuid>(pc.uuid);
                 itemData.dataByRole[Qn::VideoWallPcScreenIndicesRole] = qVariantFromValue<QList<int> >(screens);
                 layout->addItem(itemData);
@@ -1302,36 +1253,34 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
 
         }
 
-
+        resourcePool()->addResource(layout);
         menu()->trigger(Qn::OpenSingleLayoutAction, layout);
     }
 }
 
 void QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered() {
-  /*  QnWorkbenchLayout* layout = context()->workbench()->currentLayout();
-    QnVideoWallResourcePtr videoWall = layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
-    if (!videoWall)
+    QnWorkbenchLayout* layout = workbench()->currentLayout();
+    QnVideoWallResourcePtr videowall =  layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
+    if (!videowall)
         return;
 
-    QSet<QUuid> movedPcs;
-
-    foreach (QnWorkbenchItem* item, layout->items()) {
-        QUuid itemUuid = item->data(Qn::VideoWallItemGuidRole).value<QUuid>();
-        QUuid pcUuid = videoWall->getItem(itemUuid).pcUuid;
-        if (movedPcs.contains(pcUuid))
+    foreach(QnWorkbenchItem *item, layout->items()) {
+        QnLayoutItemData data = item->data();
+        QUuid pcUuid = data.dataByRole[Qn::VideoWallPcGuidRole].value<QUuid>();
+        if (!videowall->hasPc(pcUuid))
             continue;
-        movedPcs << pcUuid;
+        QnVideoWallPcData pc = videowall->getPc(pcUuid);
 
-        QPoint screenPosition = item->data(Qn::ItemScreenPositionRole).value<QPoint>();
-        QnVideoWallPcData pc = videoWall->getPc(pcUuid);
-        pc.geometry.moveTopLeft(item->geometry().topLeft() - screenPosition);
-        videoWall->updatePc(pcUuid, pc);
+        QList<int> screenIndices = data.dataByRole[Qn::VideoWallPcScreenIndicesRole].value<QList<int> >();
+        if (screenIndices.size() < 1)
+            continue;
+        pc.screens[screenIndices.first()].layoutGeometry = data.combinedGeometry.toRect();
+        videowall->updatePc(pcUuid, pc);
     }
 
-
-    context()->snapshotManager()->setFlags(layout->resource(), context()->snapshotManager()->flags(layout->resource()) | Qn::ResourceIsBeingSaved);
-    int handle = connection()->saveAsync(videoWall, this, SLOT(at_videoWall_saved(int,QnResourceList,int)));
-    m_savingReviews[handle] = layout->resource();*/
+    snapshotManager()->setFlags(layout->resource(), snapshotManager()->flags(layout->resource()) | Qn::ResourceIsBeingSaved);
+    int handle = connection()->saveAsync(videowall, this, SLOT(at_videoWall_saved(int,QnResourceList,int)));
+    m_savingReviews[handle] = layout->resource();
 
 }
 
@@ -1341,10 +1290,10 @@ void QnWorkbenchVideoWallHandler::at_videoWall_saved(int status, const QnResourc
         return;
 
     QnLayoutResourcePtr layout = m_savingReviews.take(handle);
-    context()->snapshotManager()->setFlags(layout, context()->snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
+    snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
 
     if (status == 0)
-        context()->snapshotManager()->setFlags(layout, context()->snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
+        snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_layout_saved(int status, const QnResourceList &resources, int handle) {

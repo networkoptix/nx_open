@@ -1,5 +1,7 @@
 #include "videowall_resource_screen_widget.h"
 
+#include <QtGui/QPainter>
+
 #include <QtWidgets/QGraphicsAnchorLayout>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
@@ -57,19 +59,16 @@ protected:
         painter->fillRect(paintRect, Qt::black);
 
         if (!m_layout) {
-//            painter->fillRect(paintRect, Qt::red);
+            //TODO #GDM VW add status overlay widgets
+            painter->drawPixmap(paintRect, qnSkin->pixmap("events/thumb_no_data.png").scaled(paintRect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation), QRectF());
         }
         else {
-            //TODO: #GDM VW paint background and calculate its size in bounding geometry
-
-
-
-
+            //TODO: #GDM VW paint layout background and calculate its size in bounding geometry
             QRectF bounding;
             foreach (const QnLayoutItemData &data, m_layout->getItems()) {
                 QRectF itemRect = data.combinedGeometry;
                 if (!itemRect.isValid())
-                    continue;
+                    continue; //TODO: #GDM VW some items can be not placed yet, wtf
                 bounding = bounding.united(itemRect);
             }
 
@@ -226,6 +225,7 @@ private:
 
 private:
     QnVideowallResourceScreenWidget* m_widget;
+
     const QnVideoWallResourcePtr m_videowall;
     const QUuid m_itemUuid;
 
@@ -259,7 +259,6 @@ QnVideowallResourceScreenWidget::QnVideowallResourceScreenWidget(QnWorkbenchCont
     QnVideoWallPcData pc = m_videowall->getPc(m_pcUuid);  //TODO: #GDM VW check null in all usage places
 
     QList<int> screenIndices = item->data(Qn::VideoWallPcScreenIndicesRole).value<QList<int> >();
-    qDebug() << screenIndices;
 
     //TODO: #GDM VW if pc list updated or a single pc changed, videowall review layout must be invalidated
 
