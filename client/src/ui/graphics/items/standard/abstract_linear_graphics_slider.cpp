@@ -36,8 +36,8 @@ void AbstractLinearGraphicsSliderPrivate::ensureMapper() const {
     q->initStyleOption(&opt);
     upsideDown = opt.upsideDown;
 
-    QRect grooveRect = q->style()->subControlRect(control, &opt, grooveSubControl, q);
-    QRect handleRect = q->style()->subControlRect(control, &opt, handleSubControl, q);
+    QRect grooveRect = q->style()->subControlRect(control, &opt, grooveSubControl, NULL);
+    QRect handleRect = q->style()->subControlRect(control, &opt, handleSubControl, NULL);
 
     if (q->orientation() == Qt::Horizontal) {
         pixelPosMin = grooveRect.x();

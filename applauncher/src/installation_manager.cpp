@@ -28,6 +28,8 @@ static QString installationPathPrefix = ".local/share";
 static QString installationPathPrefix = "AppData/Local";
 #endif
 
+static const QString INSTALLATION_DATA_FILE( "install.dat" );
+
 
 bool InstallationManager::AppData::exists() const {
     return !m_binaryPath.isEmpty() && QFile::exists(executablePath());
@@ -47,6 +49,34 @@ QString InstallationManager::AppData::executablePath() const {
 
 QString InstallationManager::AppData::libraryPath() const {
     return m_libPath.isEmpty() ? QString() : m_rootPath + "/" + m_libPath;
+}
+
+bool InstallationManager::AppData::verifyInstallation() const
+{
+    NX_LOG(QString::fromLatin1("Entered VerifyInstallation"), cl_logDEBUG1);
+
+    QMap<QString, qint64> fileSizeByEntry;
+    QDir rootDir(m_rootPath);
+
+    {
+        QFile file(rootDir.absoluteFilePath(INSTALLATION_DATA_FILE));
+        if (!file.open(QFile::ReadOnly))
+            return false;
+
+        QDataStream stream(&file);
+        stream >> fileSizeByEntry;
+        file.close();
+    }
+
+    if (fileSizeByEntry.isEmpty())
+        return false;
+
+    for (auto it = fileSizeByEntry.begin(); it != fileSizeByEntry.end(); ++it) {
+        if (QFile(rootDir.absoluteFilePath(it.key())).size() != it.value())
+            return false;
+    }
+
+    return true;
 }
 
 

@@ -8,7 +8,7 @@
         "custom_green":             "#8ABF22",
         "darkGrey":                 "#231F20",
         "opaqueSelection":          "custom_blue",
-        "ptz":                      "#opaqueSelection",
+        "ptz":                      "opaqueSelection",
         "selection":                "opaqueSelection.setAlpha(110)",
         "exShadowColor":            "#ff0000"
     },
@@ -131,6 +131,7 @@
             "dateOverlay": "QColor(255, 255, 255, 48)",
             "dateOverlayAlternate": "selection.setAlpha(48)",
 
+            "_": "Do not touch two values below! They was set accurately with help of color-picker.",
             "pastLastMinute": "QColor(24, 24, 24, 255)",
             "futureLastMinute": "QColor(0, 0, 0, 255)"
         },
@@ -177,7 +178,7 @@
         "frameColors": {
             "normal": "#808080c0",
             "active": "#c0c0c0c0",
-            "selected": "opaqueSelection"
+            "selected": "selection"
         }
     },
     
@@ -203,7 +204,7 @@
 
     "QnStatusOverlayWidget": {
         "palette": { "default": {
-            "window": "#000000",
+            "window": "#00000080",
             "windowText": "#801010c0"
         }},
         "diagnosticsButton": { 
@@ -217,6 +218,14 @@
         "windowColor": "QColor(0, 0, 0, 255)",
         "frameColor": "QColor(203, 210, 233, 128)",
         "palette": { "default": { "windowText": "opaqueSelection" } }
+    },
+    
+    "QnResourceBrowserToolTipWidget": {
+        "palette": { "default": { "windowText": "#f0f0f0" } }
+    },
+    
+    "QnNotificationToolTipWidget": {
+        "palette": { "default": { "windowText": "#f0f0f0" } }
     },
     
     "QnGridItem": {
@@ -268,8 +277,8 @@
     },
     
     "QnGraphicsMessageBox": {
-        "frameColor": "opaqueSelection.darker()",
-        "windowColor": "opaqueSelection",
+        "frameColor": "opaqueSelection",
+        "windowColor": "selection.darker(100)",
         "textColor": "#a0a0a0ff"
     },
     

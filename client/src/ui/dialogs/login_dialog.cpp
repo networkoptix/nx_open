@@ -401,6 +401,21 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
             m_restartPending = false;
         }
 
+        if (connectionInfo->version > QnSoftwareVersion(QN_ENGINE_VERSION)) {
+            QnMessageBox::warning(
+                this,
+                Qn::VersionMismatch_Help,
+                tr("Could not connect to Enterprise Controller"),
+                tr("Selected Enterprise controller has a different version:\n"
+                    " - Client version: %1.\n"
+                    " - EC version: %2.\n"
+                    "An error has occurred while trying to restart in compatibility mode."
+                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                QMessageBox::Ok
+            );
+            m_restartPending = false;
+        }
+
         if(m_restartPending) {
             for( ;; )
             {

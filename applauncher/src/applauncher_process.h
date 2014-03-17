@@ -34,9 +34,10 @@ class ApplauncherProcess
 
 public:
     ApplauncherProcess(
-        QSettings* const settings,
+        QSettings* const userSettings,
         InstallationManager* const installationManager,
-        bool quitMode );
+        bool quitMode,
+        const QString& mirrorListUrl );
 
     //!Implementation of \a ApplauncherProcess::pleaseStop()
     virtual void pleaseStop() override;
@@ -63,6 +64,7 @@ private:
     bool m_terminated;
     InstallationManager* const m_installationManager;
     const bool m_quitMode;
+    const QString m_mirrorListUrl;
     TaskServerNew m_taskServer;
     QSettings* const m_settings;
     int m_bindTriesCount;

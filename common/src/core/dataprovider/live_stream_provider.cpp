@@ -7,7 +7,6 @@ QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
     m_livemutex(QMutex::Recursive),
     m_quality(Qn::QualityNormal),
     m_qualityUpdatedAtLeastOnce(false),
-    m_canTouchCameraSettings(true),
     m_fps(-1.0),
     m_framesSinceLastMetaData(0),
     m_softMotionRole(QnResource::Role_Default),
@@ -24,6 +23,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
     m_layout = 0;
     m_cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
     Q_ASSERT(m_cameraRes);
+    m_prevCameraControlDisabled = m_cameraRes->isCameraControlDisabled();
     m_layout = m_cameraRes->getVideoLayout();
     m_isPhysicalResource = res.dynamicCast<QnPhysicalCameraResource>();
 }
@@ -73,6 +73,13 @@ QnResource::ConnectionRole QnLiveStreamProvider::getRole() const
 {
     QMutexLocker mtx(&m_livemutex);
     return m_role;
+}
+
+void QnLiveStreamProvider::setCameraControlDisabled(bool value)
+{
+    if (!value && m_prevCameraControlDisabled)
+        updateStreamParamsBasedOnQuality();
+    m_prevCameraControlDisabled = value;
 }
 
 void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
@@ -338,25 +345,22 @@ bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResourcePtr netRes)
     return rez;
 }
 
-void QnLiveStreamProvider::startIfNotRunning(bool canTouchCameraSettings)
+void QnLiveStreamProvider::startIfNotRunning()
 {
     QMutexLocker mtx(&m_mutex);
     if (!isRunning())    
     {
-        m_canTouchCameraSettings = canTouchCameraSettings;
         start();
     }
-    else if (!m_canTouchCameraSettings && canTouchCameraSettings) {
-        m_canTouchCameraSettings = canTouchCameraSettings; // now we can control camera settings
-        updateStreamParamsBasedOnFps();
-    }
 }
+
 
 bool QnLiveStreamProvider::isCameraControlDisabled() const
 {
     QnVirtualCameraResourcePtr camRes = m_resource.dynamicCast<QnVirtualCameraResource>();
-    return (camRes && camRes->isCameraControlDisabled()) || !m_canTouchCameraSettings;
+    return camRes && camRes->isCameraControlDisabled();
 }
+
 
 void QnLiveStreamProvider::filterMotionByMask(QnMetaDataV1Ptr motion)
 {

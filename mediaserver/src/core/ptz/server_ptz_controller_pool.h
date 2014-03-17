@@ -8,7 +8,7 @@ class QnServerPtzControllerPool: public QnPtzControllerPool {
     typedef QnPtzControllerPool base_type;
 
 public:
-    QnServerPtzControllerPool(QObject *parent = NULL): base_type(parent) {}
+    QnServerPtzControllerPool(QObject *parent = NULL);
 
 protected:
     virtual void registerResource(const QnResourcePtr &resource) override;

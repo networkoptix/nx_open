@@ -3,6 +3,8 @@
 
 #include "proxy_ptz_controller.h"
 
+class QThreadPool;
+
 class QnThreadedPtzControllerPrivate;
 
 class QnPtzCommandBase: public QObject {
@@ -53,7 +55,7 @@ private:
     void runCommand(Qn::PtzCommand command, const Functor &functor) const;
 
 private:
-    QScopedPointer<QnThreadedPtzControllerPrivate> d;
+    QThreadPool *m_threadPool;
 };
 
 #endif // QN_THREADED_PTZ_CONTROLLER_H
