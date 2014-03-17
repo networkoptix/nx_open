@@ -86,7 +86,7 @@ private:
 
     static QSet<QUuid> m_existConn;
     typedef QMap<QUuid, QPair<bool, bool>> ConnectingInfoMap;
-    static ConnectingInfoMap m_connectingConn; // first - originator, second - non originator
+    static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
     static QMutex m_staticMutex;
 private:
     void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
@@ -95,6 +95,8 @@ private:
     int getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size);
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
+    void cancelConnecting();
+    static void connectingCanceledNoLock(const QnId& remoteGuid, bool isOriginator);
 private slots:
     void at_responseReceived( nx_http::AsyncHttpClientPtr );
     void at_httpClientDone(nx_http::AsyncHttpClientPtr);

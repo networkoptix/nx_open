@@ -5,6 +5,7 @@
 
 #include "license_manager_impl.h"
 #include "llutil/hardware_id.h"
+#include "version.h"
 
 
 static const char TEST_LICENSE_NX[] = 
@@ -20,7 +21,7 @@ static const char TEST_LICENSE_NX[] =
     "SIGNATURE2=n2uJGJ9f/La1GgO7SHkxdTrErcs0NvK7PbYbdkUmJWAUXItKCudMNi6YPQMqG4aCc2F5XnfdWNGAPLlELVjnng==\n";
 
 static const char TEST_LICENSE_DW[] = 
-    "NAME=dwspectrum\n"
+    "NAME=dwspectrum\n" 
     "SERIAL=EWXZ-OXEW-NTRP-T8RP\n"
     "HWID=0333333333333333333333333333333333\n"
     "COUNT=100\n"
@@ -36,6 +37,20 @@ namespace ec2
 {
     LicenseManagerImpl::LicenseManagerImpl()
     {
+        // TODO: #Ivan, support compatibility mode
+        m_hardwareIds = LLUtil::getMainHardwareIds(0);
+        m_brand = lit(QN_PRODUCT_NAME_SHORT);
+    }
+
+    bool LicenseManagerImpl::validateLicense(const ApiLicense& license) const {
+        QnLicense qlicense;
+        license.toResource(qlicense);
+
+#ifdef __arm__
+        if (qlicense.type() != QnLicense::EdgeLicense)
+            return false;
+#endif
+        return qlicense.isValid(m_hardwareIds, m_brand);
     }
 
     ErrorCode LicenseManagerImpl::getLicenses( ApiLicenseList* const licList )
@@ -61,11 +76,6 @@ namespace ec2
 
     void LicenseManagerImpl::getHardwareId( ServerInfo* const serverInfo )
     {
-        serverInfo->mainHardwareIds << QByteArray( "0333333333333333333333333333333333" );
-        serverInfo->compatibleHardwareIds << QByteArray( "0333333333333333333333333333333333" );
-        return;
-
-
         int guidCompatibility = 0;
 
         // TODO: #Ivan, add guidCompatibility to settings

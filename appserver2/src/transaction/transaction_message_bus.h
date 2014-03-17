@@ -58,8 +58,15 @@ namespace ec2
             sendTransactionInternal(tran, buffer, dstPeer);
         }
 
-        /* map: peer, isClient */
-        QMap<QnId, bool> alivePeers() const { return m_alivePeers; }
+        struct AlivePeerInfo
+        {
+            AlivePeerInfo(bool isClient = false, bool isProxy = false): isClient(isClient), isProxy(isProxy) { lastActivity.restart(); }
+            bool isClient;
+            bool isProxy;
+            QElapsedTimer lastActivity;
+        };
+        typedef QMap<QnId, AlivePeerInfo> AlivePeersMap;
+        AlivePeersMap alivePeers() const { return m_alivePeers; }
 signals:
         void peerLost(QnId, bool isClient, bool isProxy);
         void peerFound(QnId, bool isClient, bool isProxy);
@@ -132,14 +139,13 @@ signals:
         QMutex m_mutex;
         QThread *m_thread;
         QnConnectionMap m_connections;
-        QMap<QnId, bool> m_alivePeers;
+
+        AlivePeersMap m_alivePeers;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectionsToRemove;
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
-        QMap<QUuid, qint64> m_lastActivity;
-        //QMap<QUuid, qint64> m_peerTimeDiff;
     };
 }
 #define qnTransactionBus QnTransactionMessageBus::instance()

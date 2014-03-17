@@ -225,7 +225,15 @@ bool QnDbManager::createDatabase()
     {
         if (!execSQLFile(QLatin1String(":/createdb.sql")))
             return false;
-        
+
+#ifdef EDGE_SERVER
+        if (!execSQLFile(QLatin1String(":/insert_3thparty_vendor.sql")))
+            return false;
+#else
+        if (!execSQLFile(QLatin1String(":/insert_all_vendors.sql")))
+            return false;
+#endif
+
         if (!execSQLFile(QLatin1String(":/update_2.2_stage1.sql")))
             return false;
         if (!updateGuids())
@@ -858,6 +866,17 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceP
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraServerItemData>& tran)
 {
+    QSqlQuery lastHistory(m_sdb);
+    lastHistory.prepare("SELECT server_guid, max(timestamp) FROM vms_cameraserveritem WHERE physical_id = ? AND timestamp < ?");
+    lastHistory.addBindValue(tran.params.physicalId);
+    lastHistory.addBindValue(tran.params.timestamp);
+    if (!lastHistory.exec()) {
+        qWarning() << Q_FUNC_INFO << lastHistory.lastError().text();
+        return ErrorCode::failure;
+    }
+    if (lastHistory.next() && lastHistory.value(0).toString() == tran.params.serverGuid)
+        return ErrorCode::skipped;
+
     QSqlQuery query(m_sdb);
     query.prepare("INSERT INTO vms_cameraserveritem (server_guid, timestamp, physical_id) VALUES(:serverGuid, :timestamp, :physicalId)");
     tran.params.autoBindValues(query);
@@ -1161,6 +1180,12 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiIdData>& 
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeList& data)
 {
+    if (!m_cachedResTypes.data.empty())
+    {
+        data = m_cachedResTypes;
+        return ErrorCode::ok;
+    }
+
 	QSqlQuery queryTypes(m_sdb);
     queryTypes.setForwardOnly(true);
 	queryTypes.prepare("select rt.guid as id, rt.name, m.name as manufacture \
@@ -1201,6 +1226,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
     std::vector<ApiPropertyType> allProperties;
     QN_QUERY_TO_DATA_OBJECT(queryProperty, ApiPropertyType, allProperties, ApiPropertyTypeFields);
     mergeObjectListData(data.data, allProperties, &ApiResourceTypeData::propertyTypeList, &ApiPropertyType::resource_type_id);
+
+    m_cachedResTypes = data;
 
 	return ErrorCode::ok;
 }
@@ -1585,9 +1612,6 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicense>&
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicenseList>& tran)
 {
-    return m_licenseManagerImpl->addLicenses( tran.params );
-
-
     foreach (const ApiLicense& license, tran.params.data) {
         ErrorCode result = saveLicense(license);
         if (result != ErrorCode::ok) {
@@ -1596,12 +1620,12 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicenseLi
     }
 
     return ErrorCode::ok;
+
+//    return m_licenseManagerImpl->addLicenses( tran.params );
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseList& data)
 {
-    return m_licenseManagerImpl->getLicenses( &data );
-
     QSqlQuery query(m_sdb);
 
     QString q = QString(lit("SELECT license_key as key, license_block as licenseBlock from vms_license"));
@@ -1614,8 +1638,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicense
         return ErrorCode::failure;
     }
 
-    QN_QUERY_TO_DATA_OBJECT(query, ApiLicense, data.data, ApiLicenseFields);
+    QN_QUERY_TO_DATA_OBJECT_FILTERED(query, ApiLicense, data.data, ApiLicenseFields, m_licenseManagerImpl->validateLicense);
 
+    // m_licenseManagerImpl->getLicenses( &data );
     return ErrorCode::ok;
 }
 

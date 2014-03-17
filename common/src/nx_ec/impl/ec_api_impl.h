@@ -97,6 +97,7 @@ namespace ec2
         unauthorized,
         //!Response parse error
         badResponse,
+        skipped,
         //!Method is not implemented yet
         notImplemented
     };

@@ -69,12 +69,14 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& 
     }
 
     // proxy alive info from non-direct connected host
-    if (!m_alivePeers.contains(tran.params.serverId))
-    {
-        if (tran.params.isAlive)
-            emit peerFound(tran.params.serverId, tran.params.isClient, true);
-        else
-            emit peerLost(tran.params.serverId, tran.params.isClient, true);
+    AlivePeersMap::iterator itr = m_alivePeers.find(tran.params.serverId);
+    if (tran.params.isAlive && itr == m_alivePeers.end()) {
+        m_alivePeers.insert(tran.params.serverId, AlivePeerInfo(tran.params.isClient, true));
+        emit peerFound(tran.params.serverId, tran.params.isClient, true);
+    }
+    else if (!tran.params.isAlive && itr != m_alivePeers.end()) {
+        emit peerLost(tran.params.serverId, tran.params.isClient, true);
+        m_alivePeers.remove(tran.params.serverId);
     }
 }
 
@@ -95,15 +97,9 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
 
     qDebug() << "got transaction " << tran.command;
 
-    QMap<QUuid, qint64>:: iterator itr = m_lastActivity.find(tran.id.peerGUID);
-    if (itr == m_lastActivity.end()) {
-        Q_ASSERT(!tran.id.peerGUID.isNull());
-        m_lastActivity.insert(tran.id.peerGUID, qnSyncTime->currentMSecsSinceEpoch());
-        emit peerFound(tran.id.peerGUID, itr.value(), true);
-    }
-    else {
-        *itr = qnSyncTime->currentMSecsSinceEpoch();
-    }
+    AlivePeersMap:: iterator itr = m_alivePeers.find(tran.id.peerGUID);
+    if (itr != m_alivePeers.end())
+        itr.value().lastActivity.restart();
 
     // process special transactions
     switch(tran.command)
@@ -348,7 +344,7 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
 void QnTransactionMessageBus::connectToPeerLost(const QnId& id)
 {
     if (m_alivePeers.contains(id)) {
-        bool isClient = m_alivePeers.value(id);
+        bool isClient = m_alivePeers.value(id).isClient;
         m_alivePeers.remove(id);
         sendServerAliveMsg(id, false, isClient);
     }
@@ -357,7 +353,7 @@ void QnTransactionMessageBus::connectToPeerLost(const QnId& id)
 void QnTransactionMessageBus::connectToPeerEstablished(const QnId& id, bool isClient)
 {
     if (!m_alivePeers.contains(id)) {
-        m_alivePeers.insert(id, isClient);
+        m_alivePeers.insert(id, AlivePeerInfo(isClient, false));
         sendServerAliveMsg(id, true, isClient);
     }
 }
@@ -452,12 +448,13 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
 
 void QnTransactionMessageBus::at_timer()
 {
-    QMutexLocker lock(&m_mutex);
     doPeriodicTasks();
 }
 
 void QnTransactionMessageBus::doPeriodicTasks()
 {
+    QMutexLocker lock(&m_mutex);
+
     m_connectionsToRemove.clear();
 
     // add new outgoing connections
@@ -482,14 +479,19 @@ void QnTransactionMessageBus::doPeriodicTasks()
         sendServerAliveMsg(qnCommon->moduleGUID(), true, qnCommon->isCloudMode());
 
     // check if some server not accessible any more
-    for (QMap<QUuid, qint64>::iterator itr = m_lastActivity.begin(); itr != m_lastActivity.end(); )
+    for (AlivePeersMap::iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
-        if (currentTime - itr.value() > ALIVE_UPDATE_INTERVAL * 2) {
-            emit peerLost(itr.key(), itr.value(), false);
-            itr = m_lastActivity.erase(itr);
-        }
-        else {
-            ++itr;
+        if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_INTERVAL * 2)
+        {
+            foreach(QSharedPointer<QnTransactionTransport> transport, m_connectingConnections) {
+                if (transport->remoteGuid() == itr.key())
+                    transport->setState(QnTransactionTransport::Error);
+            }
+
+            foreach(QSharedPointer<QnTransactionTransport> transport, m_connections.values()) {
+                if (transport->remoteGuid() == itr.key())
+                    transport->setState(QnTransactionTransport::Error);
+            }
         }
     }
 }
@@ -527,12 +529,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     
     QMutexLocker lock(&m_mutex);
     if (m_connections[remoteGuid]) 
-    {
         m_connectionsToRemove << m_connections[remoteGuid];
-        //Q_ASSERT_X(0, Q_FUNC_INFO, "We shouldn't be here! Check sync algorpthm!");
-        //return; // connection already established. Ignore incoming connection
-        //m_connectionsToRemove << m_connections[remoteGuid];
-    }
     m_connections[remoteGuid] = transport;
 }
 
@@ -540,7 +537,7 @@ void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient
 {
     QMutexLocker lock(&m_mutex);
     m_removeUrls.insert(url, RemoveUrlConnectInfo(isClient));
-    doPeriodicTasks();
+    QTimer::singleShot(0, this, SLOT(doPeriodicTasks));
 }
 
 void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
@@ -553,20 +550,7 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
         if (getUrlAddr(transport->remoteAddr()) == urlStr)
             transport->setState(QnTransactionTransport::Error);
     }
-    /*
-    QSharedPointer<QnTransactionTransport> transport = m_remoteUrls.value(url);
-    if (transport)
-        transport->setState(QnTransactionTransport::Closed);
-    m_remoteUrls.remove(url);
-    */
 }
-
-/*
-void QnTransactionMessageBus::gotTransaction(const QnId& remoteGuid, bool isConnectionOriginator, const QByteArray& data)
-{
-    emit sendGotTransaction(remoteGuid, isConnectionOriginator, data);
-}
-*/
 
 template class QnTransactionMessageBus::CustomHandler<RemoteEC2Connection>;
 template class QnTransactionMessageBus::CustomHandler<Ec2DirectConnection>;
