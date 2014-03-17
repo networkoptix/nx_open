@@ -299,13 +299,7 @@ Qn::RenderStatus QnVideowallResourceScreenWidget::paintChannelBackground(QPainte
         return Qn::NothingRendered;
 
     updateLayout();
-
-    painter->fillRect(paintRect, Qt::black);
-//    qreal offset = qMin(paintRect.width(), paintRect.height()) * 0.02;
-//    QRectF contentsRect = paintRect.adjusted(offset, offset, -offset, -offset);
-//    painter->fillRect(contentsRect, Qt::black);
-
-
+    painter->fillRect(paintRect, Qt::transparent);
     return Qn::NewFrameRendered;
 }
 
