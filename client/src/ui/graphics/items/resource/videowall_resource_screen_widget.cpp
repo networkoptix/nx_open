@@ -49,13 +49,21 @@ protected:
         if (!paintRect.isValid())
             return;
 
+        qreal offset = qMin(paintRect.width(), paintRect.height()) * 0.02;
+        painter->fillRect(paintRect, Qt::black);
+        paintRect.adjust(offset, offset, -offset, -offset);
+        painter->fillRect(paintRect, Qt::lightGray);
+        paintRect.adjust(offset, offset, -offset, -offset);
+        painter->fillRect(paintRect, Qt::black);
+
         if (!m_layout) {
-            painter->fillRect(paintRect, Qt::red);
+//            painter->fillRect(paintRect, Qt::red);
         }
         else {
             //TODO: #GDM VW paint background and calculate its size in bounding geometry
 
-            painter->fillRect(paintRect, Qt::blue);
+
+
 
             QRectF bounding;
             foreach (const QnLayoutItemData &data, m_layout->getItems()) {
