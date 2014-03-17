@@ -18,7 +18,7 @@ class QnAdjustVideoDialog : public QDialog {
     typedef QDialog base_type;
 
 public:
-    explicit QnAdjustVideoDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
+    explicit QnAdjustVideoDialog(QWidget *parent = NULL);
     virtual ~QnAdjustVideoDialog();
 
     ImageCorrectionParams params() const;

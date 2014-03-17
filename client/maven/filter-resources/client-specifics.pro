@@ -29,6 +29,6 @@ mac {
     LIBS += -lobjc -framework Foundation -framework AudioUnit -framework AppKit
 }
 
-!win32 {
+unix:!mac {
     QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 }

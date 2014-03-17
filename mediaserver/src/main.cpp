@@ -307,7 +307,7 @@ QnStorageResourcePtr createStorage(const QString& path)
     QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
     storage->setUrl(path);
-    storage->setSpaceLimit( QnStorageManager::DEFAULT_SPACE_LIMIT );
+    storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, QnStorageManager::DEFAULT_SPACE_LIMIT).toLongLong() );
     storage->setUsedForWriting(storage->isStorageAvailableForWriting());
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     Q_ASSERT(resType);
@@ -488,7 +488,7 @@ void initLog(const QString &logLevel) {
     if (!QDir().mkpath(logFileLocation))
         cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
     const QString& logFileName = logFileLocation + QLatin1String("/log_file");
-    if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
+    if (!cl_log.create(logFileName, 1024*1024*10, 25, cl_logDEBUG1))
         cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
     MSSettings::roSettings()->setValue("logFile", logFileName);
     cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
@@ -1229,7 +1229,7 @@ void QnMain::run()
         QnStorageResourcePtr newStorage = QnStorageResourcePtr(new QnFileStorageResource());
         newStorage->setId(QnId::createUuid());
         newStorage->setUrl(path);
-        newStorage->setSpaceLimit(QnStorageManager::DEFAULT_SPACE_LIMIT);
+        newStorage->setSpaceLimit( settings->value(nx_ms_conf::MIN_STORAGE_SPACE, QnStorageManager::DEFAULT_SPACE_LIMIT).toLongLong() );
         newStorage->setUsedForWriting(false);
         newStorage->addFlags(QnResource::deprecated);
 

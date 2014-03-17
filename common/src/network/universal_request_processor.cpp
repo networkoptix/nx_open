@@ -123,6 +123,7 @@ void QnUniversalRequestProcessor::processRequest()
 {
     Q_D(QnUniversalRequestProcessor);
     QList<QByteArray> header = d->clientRequest.left(d->clientRequest.indexOf('\n')).split(' ');
+
     if (header.size() > 2) 
     {
         QByteArray protocol = header[2].split('/')[0].toUpper();

@@ -239,7 +239,7 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
                 }
                 recorderHiRes->start();
             }
-            providerHi->startIfNotRunning(true);
+            providerHi->startIfNotRunning();
         }
 
         if (providerLow && recorderHiRes) {
@@ -256,7 +256,7 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
                     }
                     recorderLowRes->start();
                 }
-                providerLow->startIfNotRunning(true);
+                providerLow->startIfNotRunning();
             }
             else {
                 if (recorderLowRes)
