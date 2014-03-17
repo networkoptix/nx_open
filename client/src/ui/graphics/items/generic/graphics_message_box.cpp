@@ -63,6 +63,7 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
     base_type(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool)
 {
     m_label = new GraphicsLabel(this);
+    m_label->setAlignment(Qt::AlignCenter);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Horizontal);
     layout->addItem(m_label);

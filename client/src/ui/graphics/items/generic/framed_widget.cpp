@@ -110,7 +110,7 @@ void FramedBase::paintFrame(QPainter *painter, const QRectF &rect) {
     if(m_frameShape == Qn::NoFrame)
         return;
 
-    QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush(), m_frameWidth, m_frameStyle));
+    QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush(), m_frameWidth, m_frameStyle, Qt::SquareCap, Qt::MiterJoin));
     QnScopedPainterBrushRollback brushRollback(painter, windowBrush());
 
     qreal d = m_frameWidth / 2.0;

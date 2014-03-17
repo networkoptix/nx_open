@@ -18,6 +18,7 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/animation_event.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
