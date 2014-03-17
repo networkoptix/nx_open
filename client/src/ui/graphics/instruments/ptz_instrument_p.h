@@ -7,6 +7,7 @@
 #include <ui/customization/customized.h>
 #include <ui/graphics/items/standard/graphics_path_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/text_button_widget.h>
 #include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/graphics/items/generic/framed_widget.h>
 #include <ui/graphics/items/generic/splash_item.h>
