@@ -4,6 +4,11 @@
 #include <QtCore/QSettings>
 
 
+namespace nx_ms_conf
+{
+    static const QLatin1String MIN_STORAGE_SPACE( "minStorageSpace" );
+}
+
 /*!
     QSettings instance is initialized in \a initializeROSettingsFromConfFile or \a initializeRunTimeSettingsFromConfFile call or on first demand
 */
