@@ -144,12 +144,12 @@ void QnPtzControllerPoolPrivate::updateController(const QnResourcePtr &resource)
      * to executor thread. Note that controllers don't run synchronous requests 
      * in their associated thread, so this won't present any problems for
      * other users of the executor thread. */
-    while(true) {
+    while(controller) {
         controller->moveToThread(executorThread);
         if(QnProxyPtzControllerPtr proxyController = controller.dynamicCast<QnProxyPtzController>()) {
             controller = proxyController->baseController();
         } else {
-            break;
+            controller.clear();
         }
     }
 
