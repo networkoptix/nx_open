@@ -95,7 +95,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     }
     tran.timestamp -= sender->timeDiff();
 
-    qDebug() << "got transaction " << ApiCommand::Value(tran.command);
+    qDebug() << "got transaction " << ApiCommand::toString(tran.command);
 
     AlivePeersMap:: iterator itr = m_alivePeers.find(tran.id.peerGUID);
     if (itr != m_alivePeers.end())
@@ -493,9 +493,10 @@ void QnTransactionMessageBus::doPeriodicTasks()
             }
 
             foreach(QSharedPointer<QnTransactionTransport> transport, m_connections.values()) {
-                if (transport->remoteGuid() == itr.key())
+                if (transport->remoteGuid() == itr.key()) {
                     qWarning() << "No alive info during timeout. reconnect to peer" << transport->remoteGuid();
                     transport->setState(QnTransactionTransport::Error);
+                }
             }
         }
     }
