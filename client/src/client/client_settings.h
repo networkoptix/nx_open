@@ -132,6 +132,8 @@ public:
 
         CLIENT_SKIN,
 
+        RAINBOW_MODE,
+
         VARIABLE_COUNT
     };
 
@@ -221,6 +223,7 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         lightMode,              setLightMode,               LIGHT_MODE,                 0)  //int because of intended flags system
         QN_DECLARE_RW_PROPERTY(int,                         lightModeOverride,      setLightModeOverride,       LIGHT_MODE_OVERRIDE,        -1)
         QN_DECLARE_RW_PROPERTY(Qn::ClientSkin,              clientSkin,             setClientSkin,              CLIENT_SKIN,                Qn::DarkSkin)
+        QN_DECLARE_RW_PROPERTY(bool,                        isRainbowMode,          setRainbowMode,             RAINBOW_MODE,               false)
     QN_END_PROPERTY_STORAGE()
 
 private:

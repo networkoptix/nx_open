@@ -10,6 +10,8 @@ public:
             const QStringList &arguments = QStringList(),
             const QString &workingDirectory = QString(),
             const QStringList &environment = QStringList());
+
+    static void initialize();
 };
 
 #endif // PROCESS_UTILS_H

@@ -72,7 +72,7 @@ void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr 
         }
 
         m_resource = resource;
-
+        
         if(m_resource)
             connect(resource, &QnResource::propertyChanged, this, &QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged);
 

@@ -95,6 +95,7 @@ private:
     qint64 m_lastMediaTime;
     QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;
     bool m_diskErrorWarned;
+    bool m_rebuildBlocked;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__
