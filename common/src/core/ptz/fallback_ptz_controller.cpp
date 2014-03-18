@@ -13,25 +13,24 @@ QnFallbackPtzController::QnFallbackPtzController(const QnPtzControllerPtr &mainC
     m_mainController(mainController),
     m_fallbackController(fallbackController)
 {
-    assert(qnHasEventLoop(thread()));
-
     if(mainController->resource() != fallbackController->resource())
         qnWarning("Fallback controller was created with two different resources ('%1' != '%2').", mainController->resource()->getName(), fallbackController->resource()->getName());
 
     connect(mainController,     &QnAbstractPtzController::finished,             this, &QnFallbackPtzController::baseFinished);
     connect(fallbackController, &QnAbstractPtzController::finished,             this, &QnFallbackPtzController::baseFinished);
-    connect(mainController,     &QnAbstractPtzController::capabilitiesChanged,  this, &QnFallbackPtzController::baseCapabilitiesChanged);
-    connect(fallbackController, &QnAbstractPtzController::capabilitiesChanged,  this, &QnFallbackPtzController::baseCapabilitiesChanged);
+    connect(mainController,     &QnAbstractPtzController::changed,              this, &QnFallbackPtzController::baseChanged);
+    connect(fallbackController, &QnAbstractPtzController::changed,              this, &QnFallbackPtzController::baseChanged);
 
-    baseCapabilitiesChanged();
+    baseChanged(Qn::CapabilitiesPtzField);
 }
 
 QnFallbackPtzController::~QnFallbackPtzController() {
     return;
 }
 
-void QnFallbackPtzController::baseCapabilitiesChanged() {
-    m_mainIsValid = m_mainController->getCapabilities() != Qn::NoPtzCapabilities;
+void QnFallbackPtzController::baseChanged(Qn::PtzDataFields fields) {
+    if(fields & Qn::CapabilitiesPtzField)
+        m_mainIsValid = m_mainController->getCapabilities() != Qn::NoPtzCapabilities;
 
-    emit capabilitiesChanged();
+    emit changed(fields);
 }

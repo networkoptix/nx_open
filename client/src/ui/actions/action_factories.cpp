@@ -3,8 +3,7 @@
 #include <QtWidgets/QAction>
 
 #include <utils/common/string.h>
-
-#include <core/kvpair/ptz_hotkey_kvpair_adapter.h>
+#include <utils/resource_property_adaptors.h>
 
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_preset.h>
@@ -20,11 +19,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_layout.h>
-
-namespace {
-    const char *ptzPresetIdPropertyName = "_qn_ptzPresetId";
-    const char *ptzTourIdPropertyName = "_qn_ptzTourId";
-}
 
 QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnActionParameters &, QObject *parent) {
     QnLayoutResourceList layouts = resourcePool()->getResourcesWithParentId(QnId()).filtered<QnLayoutResource>(); /* Multi-videos will go here. */
@@ -44,7 +38,7 @@ QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnAction
         QAction *action = new QAction(parent);
         action->setText(layout->getName());
         action->setData(QVariant::fromValue<QnLayoutResourcePtr>(layout));
-        connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
+        connect(action, &QAction::triggered, this, &QnOpenCurrentUserLayoutActionFactory::at_action_triggered);
 
         result.push_back(action);
     }
@@ -64,91 +58,94 @@ void QnOpenCurrentUserLayoutActionFactory::at_action_triggered() {
 }
 
 
-QList<QAction *> QnPtzGoToPresetActionFactory::newActions(const QnActionParameters &parameters, QObject *parent) {
+QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParameters &parameters, QObject *parent) {
     QList<QAction *> result;
-    QnPtzPresetList presets;
 
-    QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
-    if (!widget || !widget->ptzController() || !widget->ptzController()->getPresets(&presets))
+    QnMediaResourceWidget* widget = parameters.widget<QnMediaResourceWidget>();
+    if (!widget)
         return result;
+
+    QnPtzPresetList presets;
+    QnPtzTourList tours;
+    QnPtzObject activeObject;
+    widget->ptzController()->getPresets(&presets);
+    widget->ptzController()->getTours(&tours);
+    widget->ptzController()->getActiveObject(&activeObject);
 
     qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
         return naturalStringCaseInsensitiveLessThan(l.name, r.name);
     });
-
-    QnPtzHotkeyKvPairAdapter adapter(widget->resource()->toResourcePtr());
-
-    foreach(const QnPtzPreset &preset, presets) {
-        QAction *action = new QAction(parent);
-        action->setText(preset.name);
-
-        int hotkey = adapter.hotkeyByPresetId(preset.id);
-        if(hotkey >= 0)
-            action->setShortcut(Qt::Key_0 + hotkey);
-
-        action->setData(QVariant::fromValue<QnMediaResourceWidget*>(widget));
-        action->setProperty(ptzPresetIdPropertyName, preset.id);
-        connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
-
-        result.push_back(action);
-    }
-    return result;
-}
-
-void QnPtzGoToPresetActionFactory::at_action_triggered() {
-    QAction *action = dynamic_cast<QAction *>(sender());
-    if(!action)
-        return;
-
-    QnMediaResourceWidget* widget = action->data().value<QnMediaResourceWidget*>();
-    QString presetId = action->property(ptzPresetIdPropertyName).toString();
-    if(!widget || presetId.isEmpty())
-        return;
-
-    context()->menu()->trigger(Qn::PtzGoToPresetAction, QnActionParameters(widget).withArgument(Qn::PtzPresetIdRole, presetId));
-}
-
-QList<QAction *> QnPtzStartTourActionFactory::newActions(const QnActionParameters &parameters, QObject *parent) {
-    QList<QAction *> result;
-    QnPtzPresetList presets;
-    QnPtzTourList tours;
-
-    QnMediaResourceWidget* widget = parameters.widget<QnMediaResourceWidget>();
-    if (!widget ||
-            !widget->ptzController() ||
-            !widget->ptzController()->getPresets(&presets) ||
-            !widget->ptzController()->getTours(&tours))
-        return result;
-
     qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
         return naturalStringCaseInsensitiveLessThan(l.name, r.name);
     });
+
+    QnPtzHotkeysResourcePropertyAdaptor adaptor;
+    adaptor.setResource(widget->resource()->toResourcePtr());
+    QnPtzHotkeyHash idByHotkey = adaptor.value();
+
+    foreach(const QnPtzPreset &preset, presets) {
+        QAction *action = new QAction(parent);
+        if(activeObject.type == Qn::PresetPtzObject && activeObject.id == preset.id) {
+            action->setText(tr("%1 (active)", "Template for active PTZ preset").arg(preset.name));
+        } else {
+            action->setText(preset.name);
+        }
+
+        int hotkey = idByHotkey.key(preset.id, QnPtzHotkey::NoHotkey);
+        if(hotkey != QnPtzHotkey::NoHotkey)
+            action->setShortcut(Qt::Key_0 + hotkey);
+
+        action->setData(QVariant::fromValue(
+            QnActionParameters(parameters)
+                .withArgument(Qn::PtzObjectIdRole, preset.id)
+                .withArgument(Qn::ActionIdRole, static_cast<int>(Qn::PtzActivatePresetAction))
+        ));
+        connect(action, &QAction::triggered, this, &QnPtzPresetsToursActionFactory::at_action_triggered);
+
+        result.push_back(action);
+    }
+
+    if(!result.isEmpty()) {
+        QAction *separator = new QAction(parent);
+        separator->setSeparator(true);
+        result.push_back(separator);
+    }
 
     foreach(const QnPtzTour &tour, tours) {
         if (!tour.isValid(presets))
             continue;
 
         QAction *action = new QAction(parent);
-        action->setText(tour.name);
+        if(activeObject.type == Qn::TourPtzObject && activeObject.id == tour.id) {
+            action->setText(tr("%1 (active)", "Template for active PTZ tour").arg(tour.name));
+        } else {
+            action->setText(tour.name);
+        }
 
-        action->setData(QVariant::fromValue<QnMediaResourceWidget*>(widget));
-        action->setProperty(ptzTourIdPropertyName, tour.id);
-        connect(action, SIGNAL(triggered()), this, SLOT(at_action_triggered()));
+        int hotkey = idByHotkey.key(tour.id, QnPtzHotkey::NoHotkey);
+        if(hotkey != QnPtzHotkey::NoHotkey)
+            action->setShortcut(Qt::Key_0 + hotkey);
+
+        action->setData(QVariant::fromValue(
+            QnActionParameters(parameters)
+                .withArgument(Qn::PtzObjectIdRole, tour.id)
+                .withArgument(Qn::ActionIdRole, static_cast<int>(Qn::PtzActivateTourAction))
+        ));
+        connect(action, &QAction::triggered, this, &QnPtzPresetsToursActionFactory::at_action_triggered);
 
         result.push_back(action);
     }
+
     return result;
 }
 
-void QnPtzStartTourActionFactory::at_action_triggered() {
+void QnPtzPresetsToursActionFactory::at_action_triggered() {
     QAction *action = dynamic_cast<QAction *>(sender());
     if(!action)
         return;
 
-    QnMediaResourceWidget* widget = action->data().value<QnMediaResourceWidget*>();
-    QString tourId = action->property(ptzTourIdPropertyName).toString();
-    if(!widget || tourId.isEmpty())
-        return;
+    QnActionParameters parameters = action->data().value<QnActionParameters>();
+    Qn::ActionId actionId = static_cast<Qn::ActionId>(parameters.argument<int>(Qn::ActionIdRole, Qn::NoAction));
 
-    context()->menu()->trigger(Qn::PtzStartTourAction, QnActionParameters(widget).withArgument(Qn::PtzTourIdRole, tourId));
+    context()->menu()->trigger(actionId, parameters);
 }

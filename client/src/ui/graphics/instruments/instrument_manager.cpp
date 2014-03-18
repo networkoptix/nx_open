@@ -202,7 +202,7 @@ void InstrumentManagerPrivate::unregisterSceneInternal() {
 void InstrumentManagerPrivate::registerViewInternal(QGraphicsView *view) {
     views.insert(view);
     view->installEventFilter(viewDispatcher);
-    QObject::connect(view, SIGNAL(destroyed(QObject *)), q_func(), SLOT(at_view_destroyed(QObject *)));
+    QObject::connect(view, &QObject::destroyed, q_func(), &InstrumentManager::at_view_destroyed);
     viewDispatcher->registerTarget(view);
 
     registerViewportInternal(view);
@@ -226,7 +226,7 @@ void InstrumentManagerPrivate::unregisterViewInternal(QObject *view, bool viewIs
 void InstrumentManagerPrivate::registerViewportInternal(QGraphicsView *view) {
     view->viewport()->installEventFilter(viewportDispatcher);
     
-    QObject::connect(view->viewport(), SIGNAL(destroyed(QObject *)), q_func(), SLOT(at_viewport_destroyed(QObject *)));
+    QObject::connect(view->viewport(), &QObject::destroyed, q_func(), &InstrumentManager::at_viewport_destroyed);
 
     QWidget *viewport = view->viewport();
     addSyncedViewport(viewport);
@@ -237,7 +237,7 @@ void InstrumentManagerPrivate::registerViewportInternal(QGraphicsView *view) {
      * that may get into our handlers and mess everything up. */
     QObject *viewportWatcher = new QObject(view->viewport());
     viewportWatcher->setObjectName(QLatin1String(viewportWatcherName));
-    QObject::connect(viewportWatcher, SIGNAL(destroyed(QObject *)), q_func(), SLOT(at_viewportWatcher_destroyed(QObject *)));
+    QObject::connect(viewportWatcher, &QObject::destroyed, q_func(), &InstrumentManager::at_viewportWatcher_destroyed);
 }
 
 void InstrumentManagerPrivate::unregisterViewportInternal(QObject *viewport) {

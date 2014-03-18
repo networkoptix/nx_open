@@ -64,6 +64,7 @@ private slots:
     void updateHoverKey();
     void updateGraphVisibility();
     void updateInfoOpacity();
+    void updateColors();
 
 private:
     enum LegendButtonBar {
@@ -81,7 +82,7 @@ private:
 
     void updateLegend();
 
-    QColor deviceColor(QnStatisticsDeviceType deviceType, const QString &key) const;
+    QColor getColor(QnStatisticsDeviceType deviceType, int index);
 
 private:
     //TODO: #GDM move all required fields to inner class
@@ -110,7 +111,7 @@ private:
     /** Id of the our widget in the statistics manager. */
     int m_statisticsId;
 
-    /** Number of successfull responces received, required to smooth scroll. */
+    /** Number of successful responses received, required to smooth scroll. */
     int m_counter;
 
     /** Number of data points displayed simultaneously. */
@@ -131,6 +132,8 @@ private:
     /** Button bars with corresponding buttons */
     QnImageButtonBar *m_legendButtonBar[ButtonBarCount];
 
+    QHash<QString, QnImageButtonWidget *> m_legendButtonByKey;
+
     struct GraphData {
         GraphData(): bar(NULL), button(NULL), mask(0), visible(false), opacity(1.0) {}
 
@@ -139,6 +142,7 @@ private:
         int mask;
         bool visible;
         qreal opacity;
+        QColor color;
     };
 
     /** Which buttons are checked on each button bar */
@@ -147,6 +151,9 @@ private:
     QString m_hoveredKey;
 
     qreal m_infoOpacity;
+
+    int m_hddCount;
+    int m_networkCount;
 };
 
 Q_DECLARE_METATYPE(QnServerResourceWidget *)

@@ -101,7 +101,7 @@ void QnUniversalRequestProcessor::run()
             isKeepAlive = nx_http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive" && d->protocol.toLower() == "http";
             if (isKeepAlive) {
                 d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
-                d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", QString::fromLatin1("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
+                d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
             }
             processRequest();
         }
@@ -123,6 +123,7 @@ void QnUniversalRequestProcessor::processRequest()
 {
     Q_D(QnUniversalRequestProcessor);
     QList<QByteArray> header = d->clientRequest.left(d->clientRequest.indexOf('\n')).split(' ');
+
     if (header.size() > 2) 
     {
         QByteArray protocol = header[2].split('/')[0].toUpper();

@@ -57,7 +57,7 @@
     <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">Place Shortcut on Desktop</String>
     
     <!-- DowngradeWarningDlg -->
-    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">A later version of [ProductName] is already installed.</String> 
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">A latter version of [ProductName] is already installed.</String> 
 
     <!-- EmptyPasswordDlg -->
     <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">Invalid Password</String>
@@ -75,7 +75,7 @@
     <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">Passwords should be the same and not empty</String>    
 
     <!-- MediaDirDlg -->
-    <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">Click Next to use default folder or click Change to choose another.</String>
+    <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">Click Next to use default folder or click Change to choose another-one.</String>
     <String Id="MediaDirDlg_MediaFolder"                            Overridable="yes">Media Root Folder</String>
     <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">Please Select Media Root Folder:</String>
     <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Login</String>    
@@ -139,6 +139,7 @@
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Previous version detected</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Installation Type</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Your system is going to be upgraded</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Your database has been corrupted and cannot be recovered. The fresh database has been installed. To access the system use login "admin" and password "admin". Please change the credentials after the first login.</String>    
 
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>    
@@ -149,4 +150,10 @@
     <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">Rolling back Windows Firewall configuration</String>    
     <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">Uninstalling Windows Firewall configuration</String>    
     
+    <!-- WixInstallDirDlgTitle -->
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">[ProductName] Setup</String>
+    <String Id="InstallDirDlgChange"                                Overridable="yes">&amp;Change...</String>
+    <String Id="InstallDirDlgTitle"                                 Overridable="yes">{\WixUI_Font_Title}Destination Folder</String>
+    <String Id="InstallDirDlgDescription"                           Overridable="yes">Click Next to install by default or Change to choose another.</String>
+    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Install [ProductName] to:</String>    
 </WixLocalization>

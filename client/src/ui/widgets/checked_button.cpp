@@ -4,8 +4,9 @@
 #include <QtGui/QPainter>
 
 #include "utils/math/color_transformations.h"
+#include <utils/math/linear_combination.h>
 
-QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QColor &insideColor, bool hovered, bool checked) 
+QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QColor &insideColor, bool hovered, bool checked, bool enabled)
 {
     QPixmap result(size, size);
     result.fill(QColor(Qt::gray));
@@ -15,16 +16,18 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
     
     QColor brushClr(hovered ? color.lighter() : color);
     if (!isEnabled())
-        brushClr = shiftColor(brushClr, -64, -64, -64);
+        brushClr = toGrayscale(linearCombine(0.5, brushClr, 0.5, palette().color(QPalette::Disabled, QPalette::Background)));
+        //brushClr = shiftColor(brushClr, -64, -64, -64);
     painter.setBrush(brushClr);
-    int offset = checked ? 4 : 0;
+    int offset = checked && enabled ? 4 : 0;
     painter.drawRect(offset, offset, result.width() - offset * 2, result.height() - offset * 2);
 
     if (insideColor.toRgb() != color.toRgb()) 
     {
         brushClr = QColor(hovered ? insideColor.lighter() : insideColor);
         if (!isEnabled())
-            brushClr = shiftColor(brushClr, -64, -64, -64);
+            brushClr = toGrayscale(linearCombine(0.5, brushClr, 0.5, palette().color(QPalette::Disabled, QPalette::Background)));
+            //brushClr = shiftColor(brushClr, -64, -64, -64);
         painter.setBrush(brushClr);
         //offset = result.width()/3;
         //painter.drawRect(offset, offset, result.width() - offset * 2, result.height() - offset * 2);
@@ -58,18 +61,21 @@ void QnCheckedButton::updateIcon() {
     QIcon icon;
 
     const int size = 64;
-    QPixmap normal          = generatePixmap(size, m_color,           m_insideColorDefined ? m_insideColor : m_color, false,  false);
-    QPixmap normalHovered   = generatePixmap(size, m_color,           m_insideColorDefined ? m_insideColor : m_color, true,   false);
-    QPixmap checked         = generatePixmap(size, m_checkedColor,    m_insideColorDefined ? m_insideColor : m_checkedColor, false,  true);
-    QPixmap checkedHovered  = generatePixmap(size, m_checkedColor,    m_insideColorDefined ? m_insideColor : m_checkedColor, true,   true);
+    QPixmap normal          = generatePixmap(size, m_color,           m_insideColorDefined ? m_insideColor : m_color, false,  false, true);
+    QPixmap normalDisabled  = generatePixmap(size, m_color,           m_insideColorDefined ? m_insideColor : m_color, false,  false, false);
+    QPixmap normalHovered   = generatePixmap(size, m_color,           m_insideColorDefined ? m_insideColor : m_color, true,   false, true);
+
+    QPixmap checked         = generatePixmap(size, m_checkedColor,    m_insideColorDefined ? m_insideColor : m_checkedColor, false,  true, true);
+    QPixmap checkedDisabled = generatePixmap(size, m_checkedColor,    m_insideColorDefined ? m_insideColor : m_checkedColor, false,  true, false);
+    QPixmap checkedHovered  = generatePixmap(size, m_checkedColor,    m_insideColorDefined ? m_insideColor : m_checkedColor, true,   true, true);
 
     icon.addPixmap(normal, QIcon::Normal, QIcon::Off);
-    icon.addPixmap(normal, QIcon::Disabled, QIcon::Off);
+    icon.addPixmap(normalDisabled, QIcon::Disabled, QIcon::Off);
     icon.addPixmap(normalHovered, QIcon::Active, QIcon::Off);
     icon.addPixmap(normal, QIcon::Selected, QIcon::Off);
 
     icon.addPixmap(checked, QIcon::Normal, QIcon::On);
-    icon.addPixmap(checked, QIcon::Disabled, QIcon::On);
+    icon.addPixmap(checkedDisabled, QIcon::Disabled, QIcon::On);
     icon.addPixmap(checkedHovered, QIcon::Active, QIcon::On);
     icon.addPixmap(checked, QIcon::Selected, QIcon::On);
 

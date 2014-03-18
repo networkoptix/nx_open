@@ -118,6 +118,8 @@ public:
         prevEndTime(AV_NOPTS_VALUE),
         metadataChannelNum(7),
         audioEnabled(false),
+		wasDualStreaming(false),
+        wasCameraControlDisabled(false),
         tcpMode(true),
         transcodedVideoSize(640, 480)
     {
@@ -194,6 +196,8 @@ public:
     qint64 prevEndTime;
     int metadataChannelNum;
     bool audioEnabled;
+	bool wasDualStreaming;
+    bool wasCameraControlDisabled;
     bool tcpMode;
     QSize transcodedVideoSize;
 };
@@ -914,10 +918,13 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged()
 
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
     if (cameraResource) {
-        if (cameraResource->isAudioEnabled() != d->audioEnabled) {
-            m_needStop = true;
-            d->socket->close();
-        }
+        if (cameraResource->isAudioEnabled() != d->audioEnabled ||
+		    cameraResource->hasDualStreaming2() != d->wasDualStreaming ||
+            !cameraResource->isCameraControlDisabled() && d->wasCameraControlDisabled) 
+        {
+			m_needStop = true;
+			d->socket->close();
+		}
     }
 }
 
@@ -950,7 +957,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_camera_disabledChanged()), Qt::DirectConnection);
                 connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
-                d->liveDpHi->startIfNotRunning(true);
+                d->liveDpHi->startIfNotRunning();
             }
         }
         if (!d->liveDpLow && d->liveDpHi)
@@ -964,7 +971,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             {
                 d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
                 if (d->liveDpLow)
-                    d->liveDpLow->startIfNotRunning(true);
+                    d->liveDpLow->startIfNotRunning();
             }
         }
     }
@@ -1004,6 +1011,11 @@ void QnRtspConnectionProcessor::checkQuality()
             d->quality = MEDIA_Quality_High;
             qWarning() << "Primary stream has big fps for camera" << d->mediaRes->toResource()->getUniqueId() << ". Secondary stream is disabled.";
         }
+    }
+	QnVirtualCameraResourcePtr cameraRes = d->mediaRes.dynamicCast<QnVirtualCameraResource>();
+	if (cameraRes) {
+		d->wasDualStreaming = cameraRes->hasDualStreaming2();
+        d->wasCameraControlDisabled = cameraRes->isCameraControlDisabled();
     }
 }
 

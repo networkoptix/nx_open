@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-COMPANY_NAME=networkoptix
+COMPANY_NAME=${deb.customization.company.name}
 
 . /usr/share/debconf/confmodule
 

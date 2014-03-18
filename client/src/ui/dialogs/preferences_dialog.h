@@ -15,7 +15,7 @@ namespace Ui {
     class PreferencesDialog;
 }
 
-class QnPreferencesDialog: public QnButtonBoxDialog, protected QnWorkbenchContextAware {
+class QnPreferencesDialog: public QnButtonBoxDialog, public QnWorkbenchContextAware {
     Q_OBJECT
 
     typedef QnButtonBoxDialog base_type;

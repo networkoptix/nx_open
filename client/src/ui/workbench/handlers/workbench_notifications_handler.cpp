@@ -7,8 +7,6 @@
 
 #include <business/business_strings_helper.h>
 
-#include <core/kvpair/business_events_filter_kvpair_adapter.h>
-
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -17,13 +15,16 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <utils/resource_property_adaptors.h>
 #include <utils/app_server_notification_cache.h>
 #include <utils/common/email.h>
 #include <utils/media/audio_player.h>
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent) :
     QObject(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this)),
+    m_popupSystemHealthFilter(qnSettings->popupSystemHealth())
 {
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
     connect(m_userEmailWatcher, &QnWorkbenchUserEmailWatcher::userEmailValidityChanged,     this,   &QnWorkbenchNotificationsHandler::at_userEmailValidityChanged);
@@ -79,7 +80,8 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     if (!context()->user())
         return;
 
-    if (!QnBusinessEventsFilterKvPairAdapter::eventAllowed(context()->user(), eventType))
+    const bool soundAction = businessAction->actionType() == BusinessActionType::PlaySoundRepeated;
+    if (!soundAction && !m_adaptor->isAllowed(eventType))
         return;
 
     emit businessActionAdded(businessAction);
@@ -112,6 +114,7 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     case QnSystemHealth::EmailSendError:
     case QnSystemHealth::StoragesNotConfigured:
     case QnSystemHealth::StoragesAreFull:
+    case QnSystemHealth::ArchiveRebuildFinished:
         return true;
 
     default:
@@ -165,6 +168,8 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth
 void QnWorkbenchNotificationsHandler::at_context_userChanged() {
     requestSmtpSettings();
     at_licensePool_licensesChanged();
+
+    m_adaptor->setResource(context()->user());
 }
 
 void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message) {
@@ -193,6 +198,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         return;
 
     case QnSystemHealth::StoragesNotConfigured:
+    case QnSystemHealth::ArchiveRebuildFinished:
         return;
 
     default:
@@ -265,12 +271,18 @@ void QnWorkbenchNotificationsHandler::at_licensePool_licensesChanged() {
 void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id) {
     if (id != QnClientSettings::POPUP_SYSTEM_HEALTH)
         return;
-    quint64 visible = qnSettings->popupSystemHealth();
+    quint64 filter = qnSettings->popupSystemHealth();
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+        bool oldVisible = (m_popupSystemHealthFilter &  (1ull << i));
+        bool newVisible = (filter &  (1ull << i));
+        if (oldVisible == newVisible)
+            continue;
+
         QnSystemHealth::MessageType message = QnSystemHealth::MessageType(i);
-        if (visible & (1ull << i))
+        if (newVisible)
             checkAndAddSystemHealthMessage(message);
         else
             setSystemHealthEventVisible(message, false);
     }
+    m_popupSystemHealthFilter = filter;
 }

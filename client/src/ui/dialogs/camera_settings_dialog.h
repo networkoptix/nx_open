@@ -15,7 +15,7 @@ class QAbstractButton;
 class QnCameraSettingsWidget;
 class QnWorkbenchContext;
 
-class QnCameraSettingsDialog: public QDialog, protected QnWorkbenchContextAware {
+class QnCameraSettingsDialog: public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
     QnCameraSettingsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags =  

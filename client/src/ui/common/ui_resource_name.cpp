@@ -14,10 +14,11 @@ QString getResourceName(const QnResourcePtr &resource) {
     return getFullResourceName(resource, qnSettings->isIpShownInTree());
 }
 
-QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &baseName) {
+QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &defaultName, const QString &nameTemplate) {
     QStringList usedNames;
     QnId parentId = user ? user->getId() : QnId();
     foreach(const QnLayoutResourcePtr &resource, qnResPool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>())
         usedNames.push_back(resource->getName().toLower());
-    return generateUniqueString(usedNames, baseName);
+
+    return generateUniqueString(usedNames, defaultName, nameTemplate);
 }

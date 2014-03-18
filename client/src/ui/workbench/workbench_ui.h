@@ -41,7 +41,6 @@ class QnFramedWidget;
 class QnLayoutTabBar;
 class QnActionManager;
 class QnLayoutTabBar;
-class QnWorkbenchMotionDisplayWatcher;
 class QnGraphicsMessageBoxItem;
 class QnNotificationsCollectionWidget;
 class QnDayTimeWidget;
@@ -210,14 +209,15 @@ protected:
     bool isThumbnailsVisible() const;
     void setThumbnailsVisible(bool visible);
 
+    bool isHovered() const;
+
 private:
     Panels openedPanels() const;
     void setOpenedPanels(Panels panels, bool animate = true, bool save = true);
 
     void initGraphicsMessageBox();
-private slots:
-    void updateHelpContext();
 
+private slots:
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);
@@ -225,6 +225,14 @@ private slots:
     void updateCalendarOpacity(bool animate = true);
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
+    
+    void updateTreeOpacityAnimated() { updateTreeOpacity(true); }
+    void updateSliderOpacityAnimated() { updateSliderOpacity(true); }
+    void updateTitleOpacityAnimated() { updateTitleOpacity(true); }
+    void updateNotificationsOpacityAnimated() { updateNotificationsOpacity(true); }
+    void updateCalendarOpacityAnimated() { updateCalendarOpacity(true); }
+    void updateCalendarVisibilityAnimated() { updateCalendarVisibility(true); }
+    void updateControlsVisibilityAnimated() { updateControlsVisibility(true); }
 
     void setTreeShowButtonUsed(bool used = true);
     void setNotificationsShowButtonUsed(bool used = true);
@@ -453,8 +461,6 @@ private:
     VariantAnimator *m_notificationsXAnimator;
 
     AnimatorGroup *m_notificationsOpacityAnimatorGroup;
-
-    QnWorkbenchMotionDisplayWatcher *m_motionDisplayWatcher;
 
 
     /* Calendar window-related state. */

@@ -4,6 +4,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
+#include <QtCore/QDebug>
 
 enum QnLogLevel { cl_logUNKNOWN, cl_logALWAYS, cl_logERROR, cl_logWARNING, cl_logINFO, cl_logDEBUG1, cl_logDEBUG2 };
 
@@ -17,7 +18,7 @@ public:
     QnLogLevel logLevel() const;
 
     void log(const QString &msg, QnLogLevel logLevel);
-    void log(QnLogLevel logLevel, const char* format, ...);
+    void log(QnLogLevel logLevel, const char *format, ...);
 
 #define QN_LOG_BODY(ARGS)                                                       \
         if(!isActive(logLevel))                                                 \
@@ -54,9 +55,9 @@ public:
     /*!
         Introduced to allow logging in dynamically loaded plugins
     */
-    static void initLog(QnLog* externalInstance);
+    static void initLog(QnLog *externalInstance);
     static QString logFileName();
-    static QnLog* instance();
+    static QnLog *instance();
     
     static QnLogLevel logLevelFromString(const QString &value);
     static QString logLevelToString(QnLogLevel value);
@@ -85,5 +86,14 @@ private:
 #define cl_log (*QnLog::instance())
 
 QN_EXPORT void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg);
+
+
+template<class T>
+QString toDebugString(const T &value) {
+    QString result;
+    QDebug stream(&result);
+    stream << value;
+    return result;
+}
 
 #endif // QN_LOG_H

@@ -35,6 +35,14 @@ public slots:
     virtual void reject() override;
 
 private:
+    enum RebuildState {
+        Invalid,
+        Ready,
+        Starting,
+        InProgress,
+        Stopping
+    };
+
     void updateFromResources();
     void submitToResources();
 
@@ -47,20 +55,21 @@ private:
     QString bottomLabelText() const;
     int dataRowCount() const;
 
+    void updateRebuildUi(RebuildState newState, int progress = -1);
+
 private slots:
     void at_tableBottomLabel_linkActivated();
     void at_storagesTable_cellChanged(int row, int column);
     void at_storagesTable_contextMenuEvent(QObject *watched, QEvent *event);
     void at_pingButton_clicked();
-#ifndef Q_OS_MACX
     void at_rebuildButton_clicked();
 
     void at_archiveRebuildReply(int status, const QnRebuildArchiveReply& reply, int);
     void sendNextArchiveRequest();
     void at_updateRebuildInfo();
-#endif
 
     void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
+
 private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
@@ -69,9 +78,8 @@ private:
     QAction *m_removeAction;
 
     bool m_hasStorageChanges;
-#ifndef Q_OS_MACX
-    QnRebuildArchiveReply m_lastRebuildReply;
-#endif
+
+    RebuildState m_rebuildState;
 };
 
 #endif // SERVER_SETTINGS_DIALOG_H

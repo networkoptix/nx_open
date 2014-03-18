@@ -12,7 +12,7 @@ output_pro_file='${project.artifactId}.pro'
 translations_dir='${basedir}/translations'
 translations_target_dir='${project.build.directory}/resources/translations'
 ldpath='${qt.dir}/lib'
-translations=['${translation1}','${translation2}','${translation3}','${translation4}','${translation5}','${translation6}','${translation7}']
+translations=['${translation1}','${translation2}','${translation3}','${translation4}','${translation5}','${translation6}','${translation7}','${translation8}','${translation9}']
 os.environ["DYLD_FRAMEWORK_PATH"] = '${qt.dir}/lib'
 os.environ["DYLD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
 os.environ["LD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
@@ -121,7 +121,7 @@ if __name__ == '__main__':
                     else:
 	                os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
   
-    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${customization.dir}/icons'], [''],'vmsclient.png')  
+    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${project.basedir}/static-resources','${customization.dir}/icons'], [''],'vmsclient.png')  
     
     if os.path.exists(os.path.join(r'${project.build.directory}', template_file)):
         f = open(output_pro_file, "w")

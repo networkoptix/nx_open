@@ -5,7 +5,7 @@
 
 #include <core/ptz/ptz_fwd.h>
 
-class QnPtzTourModel;
+class QnPtzTourSpotsModel;
 
 namespace Ui {
     class PtzTourWidget;
@@ -18,14 +18,16 @@ public:
     explicit QnPtzTourWidget(QWidget *parent = 0);
     ~QnPtzTourWidget();
 
-    // TODO: #GDM where are getters? Symmetry breaking.
+    const QnPtzTourSpotList &spots() const;
+    Q_SLOT void setSpots(const QnPtzTourSpotList &spots);
 
-    void setPtzTour(const QnPtzTour &tour);
-    void setPtzPresets(const QnPtzPresetList &presets);
+    const QnPtzPresetList &presets() const;
+    Q_SLOT void setPresets(const QnPtzPresetList &presets);
 
-    // TODO: #GDM signal is never emitted. Is it needed?
+    QnPtzTourSpot currentTourSpot() const;
+
 signals:
-    void tourChanged(const QnPtzTour &tour); 
+    void tourSpotsChanged(const QnPtzTourSpotList &spots);
 
 private slots:
     void at_addSpotButton_clicked();
@@ -36,7 +38,7 @@ private slots:
     void at_tableViewport_resizeEvent();
 private:
     QScopedPointer<Ui::PtzTourWidget> ui;
-    QnPtzTourModel *m_model;
+    QnPtzTourSpotsModel *m_model;
 };
 
 #endif // PTZ_TOUR_WIDGET_H

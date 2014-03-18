@@ -28,7 +28,7 @@
 #include <client/client_message_processor.h>
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
-    base_type(parent, Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
+    base_type(parent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
 #ifdef Q_OS_MAC
     | Qt::Tool
 #endif
@@ -117,26 +117,15 @@ void QnBusinessRulesDialog::setFilter(const QString &filter) {
     ui->filterLineEdit->setText(filter);
 }
 
-void QnBusinessRulesDialog::accept()
-{
-    if (!saveAll())
-        return;
-
-    base_type::accept();
-}
-
-void QnBusinessRulesDialog::reject() {
-
+bool QnBusinessRulesDialog::canClose() {
     bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
     bool loaded = m_rulesViewModel->isLoaded();
     bool hasChanges = hasRights && loaded && (
                 !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
                 ); //TODO: #GDM calculate once and use anywhere
-    if (!hasChanges) {
-        base_type::reject();
-        return;
-    }
+    if (!hasChanges)
+        return true;
 
     QMessageBox::StandardButton btn =  QMessageBox::question(this,
                       tr("Confirm exit"),
@@ -147,14 +136,30 @@ void QnBusinessRulesDialog::reject() {
     switch (btn) {
     case QMessageBox::Yes:
         if (!saveAll())
-            return;
+            return false;   // Cancel was pressed in the confirmation dialog
         break;
     case QMessageBox::No:
         m_rulesViewModel->reloadData();
         break;
     default:
-        return;
+        return false;   // Cancel was pressed
     }
+
+    return true;
+}
+
+void QnBusinessRulesDialog::accept()
+{
+    if (!saveAll())
+        return;
+
+    base_type::accept();
+}
+
+void QnBusinessRulesDialog::reject() {
+    if (!canClose())
+        return;
+
     base_type::reject();
 }
 
@@ -271,7 +276,7 @@ void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& respon
         return;
 
     if(response.status != 0) {
-        QMessageBox::critical(this, tr("Error while deleting rule"), QString::fromLatin1(response.errorString));
+        QMessageBox::critical(this, tr("Error while deleting rule"), QLatin1String(response.errorString));
         m_pendingDeleteRules.append(m_deleting[handle]);
         return;
     }
@@ -361,9 +366,11 @@ bool QnBusinessRulesDialog::saveAll() {
     foreach (QModelIndex idx, modified) {
         m_rulesViewModel->saveRule(idx.row());
     }
+
+    //TODO: #GDM replace with QnAppServerReplyProcessor
     foreach (int id, m_pendingDeleteRules) {
         int handle = QnAppServerConnectionFactory::createConnection()->deleteRuleAsync(
-                    id, this, SLOT(at_resources_deleted(const QnHTTPRawResponse&, int)));
+                    id, this, "at_resources_deleted");
         m_deleting[handle] = id;
     }
     m_pendingDeleteRules.clear();

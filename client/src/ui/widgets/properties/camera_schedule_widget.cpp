@@ -157,17 +157,17 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
     // init buttons
     ui->recordAlwaysButton->setColor(qnGlobals->recordAlwaysColor());
-    ui->recordAlwaysButton->setCheckedColor(shiftColor(qnGlobals->recordAlwaysColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
+    ui->recordAlwaysButton->setCheckedColor(qnGlobals->recordAlwaysColor().lighter());
 
     ui->recordMotionButton->setColor(qnGlobals->recordMotionColor());
-    ui->recordMotionButton->setCheckedColor(shiftColor(qnGlobals->recordMotionColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
+    ui->recordMotionButton->setCheckedColor(qnGlobals->recordMotionColor().lighter());
 
-    ui->recordMotionPlusLQButton->setColor(shiftColor(qnGlobals->recordMotionColor(),0,1,0));
-    ui->recordMotionPlusLQButton->setCheckedColor(shiftColor(qnGlobals->recordMotionColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
-    ui->recordMotionPlusLQButton->setInsideColor(qnGlobals->recordAlwaysColor()); // inside color
+    ui->recordMotionPlusLQButton->setColor(qnGlobals->recordMotionColor());
+    ui->recordMotionPlusLQButton->setCheckedColor(qnGlobals->recordMotionColor().lighter());
+    ui->recordMotionPlusLQButton->setInsideColor(qnGlobals->recordAlwaysColor());
 
     ui->noRecordButton->setColor(qnGlobals->noRecordColor());
-    ui->noRecordButton->setCheckedColor(shiftColor(qnGlobals->noRecordColor(), SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA));
+    ui->noRecordButton->setCheckedColor(qnGlobals->noRecordColor().lighter());
 
     connect(ui->recordAlwaysButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));
     connect(ui->recordMotionButton,      SIGNAL(toggled(bool)),             this,   SLOT(updateGridParams()));

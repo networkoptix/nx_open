@@ -12,10 +12,20 @@
 #include <core/ptz/workaround_ptz_controller.h>
 #include <core/ptz/preset_ptz_controller.h>
 #include <core/ptz/tour_ptz_controller.h>
+#include <core/ptz/activity_ptz_controller.h>
+#include <core/ptz/home_ptz_controller.h>
 
+QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent): 
+    base_type(parent) 
+{
+    setConstructionMode(ThreadedControllerConstruction);
+}
 
 void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) {
-    connect(resource, &QnResource::initialized, this, &QnServerPtzControllerPool::updateController, Qt::QueuedConnection);
+    // TODO: #Elric we're creating controller from main thread. 
+    // Controller ctor may take some time (several seconds).
+    // => main thread will stall.
+    connect(resource, &QnResource::initializedChanged, this, &QnServerPtzControllerPool::updateController, Qt::QueuedConnection);
     base_type::registerResource(resource);
 }
 
@@ -25,6 +35,9 @@ void QnServerPtzControllerPool::unregisterResource(const QnResourcePtr &resource
 }
 
 QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourcePtr &resource) const {
+    if(resource->flags() & QnResource::foreigner)
+        return QnPtzControllerPtr(); /* That's not our resource! */
+
     if(!resource->isInitialized())
         return QnPtzControllerPtr();
 
@@ -48,6 +61,12 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
 
     if(QnTourPtzController::extends(controller->getCapabilities()))
         controller.reset(new QnTourPtzController(controller));
+
+    if(QnActivityPtzController::extends(controller->getCapabilities()))
+        controller.reset(new QnActivityPtzController(QnActivityPtzController::Server, controller));
+
+    if(QnHomePtzController::extends(controller->getCapabilities()))
+        controller.reset(new QnHomePtzController(controller));
 
     if(QnWorkaroundPtzController::extends(controller->getCapabilities()))
         controller.reset(new QnWorkaroundPtzController(controller));

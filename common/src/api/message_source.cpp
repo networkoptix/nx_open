@@ -87,7 +87,6 @@ QnMessageSource::QnMessageSource(QUrl url, int retryTimeout):
 }
 
 QnMessageSource::~QnMessageSource() {
-    // qWarning is issued here: QObject::startTimer: QTimer can only be used with threads started with QThread
     return;
 }
 

@@ -1,5 +1,5 @@
-#ifndef __EVENT_LOG_DIALOG_H__
-#define __EVENT_LOG_DIALOG_H__
+#ifndef QN_EVENT_LOG_DIALOG_H
+#define QN_EVENT_LOG_DIALOG_H
 
 #include <QtWidgets/QDialog>
 #include <QtGui/QStandardItem>
@@ -37,20 +37,22 @@ public:
     void setCameraList(const QnResourceList &cameras);
     void setActionType(BusinessActionType::Value value);
     void setEventType(BusinessEventType::Value value);
+
 protected:
     void setVisible(bool value) override;
+
 private slots:
     void updateData();
     void at_gotEvents(int httpStatus, const QnBusinessActionDataListPtr& events, int requestNum);
-    void at_itemClicked(const QModelIndex & index);
-    void at_customContextMenuRequested(const QPoint& screenPos);
-    void at_cameraButtonClicked();
-    void at_filterAction();
-    void at_resetFilterAction();
-    void at_selectAllAction();
-    void at_copyToClipboard();
-    void at_exportAction();
+    void at_eventsGrid_clicked(const QModelIndex & index);
+    void at_eventsGrid_customContextMenuRequested(const QPoint& screenPos);
+    void at_cameraButton_clicked();
+    void at_filterAction_triggered();
+    void at_resetFilterAction_triggered();
+    void at_clipboardAction_triggered();
+    void at_exportAction_triggered();
     void at_mouseButtonRelease(QObject* sender, QEvent* event);
+
 private:
     QList<QnMediaServerResourcePtr> getServerList() const;
     QString getTextForNCameras(int n) const;
@@ -63,17 +65,14 @@ private:
     void updateActionList(bool instantOnly);
 
     /**
-    * Get data from media server
-    * \param fromMsec start date. UTC msecs
-    * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
-    * \param camRes optional camera resource
-    */
-    void query(qint64 fromMsec, qint64 toMsec,
-               BusinessEventType::Value eventType,
-               BusinessActionType::Value actionType);
-private:
-    Q_DISABLE_COPY(QnEventLogDialog)
+     * Get data from media server
+     * 
+     * \param fromMsec start date. UTC msecs
+     * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
+     */
+    void query(qint64 fromMsec, qint64 toMsec, BusinessEventType::Value eventType, BusinessActionType::Value actionType);
 
+private:
     QScopedPointer<Ui::EventLogDialog> ui;
 
     QnEventLogModel *m_model;
@@ -87,12 +86,12 @@ private:
     bool m_updateDisabled;
     bool m_dirty;
 
-    QAction* m_filterAction;
-    QAction* m_resetFilterAction;
-    QAction* m_selectAllAction;
-    QAction* m_exportAction;
-    QAction* m_clipboardAction;
+    QAction *m_filterAction;
+    QAction *m_resetFilterAction;
+    QAction *m_selectAllAction;
+    QAction *m_exportAction;
+    QAction *m_clipboardAction;
     Qt::MouseButton m_lastMouseButton;
 };
 
-#endif // __EVENT_LOG_DIALOG_H____
+#endif // QN_EVENT_LOG_DIALOG_H

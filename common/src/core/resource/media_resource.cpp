@@ -119,12 +119,12 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractSt
     }
 }
 
-void QnMediaResource::setCustomVideoLayout(QnConstCustomResourceVideoLayoutPtr newLayout)
+void QnMediaResource::setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLayout)
 {
-    if (!m_customVideoLayout)
-        m_customVideoLayout.reset( new QnCustomResourceVideoLayout(newLayout->size()) );
+    //if (!m_customVideoLayout)
+        //m_customVideoLayout.reset( new QnCustomResourceVideoLayout(newLayout->size()) );
 
-    *m_customVideoLayout = *newLayout;
+    m_customVideoLayout = newLayout;
     toResource()->setParam(QLatin1String("VideoLayout"), newLayout->toString(), QnDomainMemory);
 }
 
@@ -148,14 +148,7 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
     if (m_dewarpingParams == params)
         return;
 
-    //bool capsChanged = params.enabled != m_dewarpingParams.enabled;
     m_dewarpingParams = params;
-    /*if (capsChanged) {
-        if (params.enabled)
-            toResource()->setPtzCapabilities(Qn::FisheyePtzCapabilities); // TODO: #PTZ this is not the right place?
-        else
-            toResource()->setPtzCapabilities(Qn::NoPtzCapabilities);
-    }*/
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 

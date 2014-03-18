@@ -4,6 +4,8 @@
 #include <utils/common/enum_name_mapper.h>
 #include <utils/math/math.h>
 
+#include "ptz_math.h"
+
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, ExtrapolationMode)
 QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::ExtrapolationMode)
 
@@ -12,15 +14,6 @@ QN_DEFINE_NAME_MAPPED_ENUM(AngleSpace,
     ((Mm35EquivSpace,   "35MmEquiv"))
 )
 QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(AngleSpace)
-
-
-/**
- * \param mm35Equiv                 Width-based 35mm-equivalent focal length.
- * \returns                         Width-based FOV in degrees.
- */
-static qreal mm35EquivToDegrees(qreal mm35Equiv) {
-    return qRadiansToDegrees(std::atan((36.0 / 2.0) / mm35Equiv) * 2.0);
-}
 
 typedef boost::array<QnSpaceMapperPtr<qreal>, 3> PtzMapperPart;
 
@@ -32,12 +25,12 @@ QnPtzMapper::QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &inputMapper, const Q
     /* OK, I know that this check sucks, but I really didn't want to
      * extend the space mapper interface to make it simpler. */
     qreal minPan = 36000.0, maxPan = -36000.0;
-    for(int pan = 0; pan <= 360; pan++) {
+    for(int pan = -360; pan <= 360; pan++) {
         QVector3D pos = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(QVector3D(pan, 0, 0)));
         minPan = qMin(pos.x(), minPan);
         maxPan = qMax(pos.x(), maxPan);
     }
-    if(qFuzzyCompare(maxPan - minPan, 360.0)) {
+    if(qFuzzyCompare(maxPan - minPan, 720.0)) {
         /* There are no limits for pan. */
         m_logicalLimits.minPan = 0.0;
         m_logicalLimits.maxPan = 360.0;
@@ -68,7 +61,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<q
     /* Note: source == device space, target == logical space. */
 
     Qn::ExtrapolationMode extrapolationMode;
-    QList<qreal> device, logical;
+    QVector<qreal> device, logical;
     qreal deviceMultiplier = 1.0, logicalMultiplier = 1.0; 
     AngleSpace space = DegreesSpace;
     if(
@@ -89,9 +82,19 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<q
         device[i] = deviceMultiplier * device[i];
     }
 
-    if(space == Mm35EquivSpace)
+    if(space == Mm35EquivSpace) {
+        /* What is linear in 35mm-equiv space is non-linear in degrees, 
+         * so we compensate by inserting additional data points. */
+        while(logical.size() < 16) {
+            for(int i = logical.size() - 2; i >= 0; i--) {
+                logical.insert(i + 1, (logical[i] + logical[i + 1]) / 2.0);
+                device.insert(i + 1, (device[i] + device[i + 1]) / 2.0);
+            }
+        }
+
         for(int i = 0; i < logical.size(); i++)
-            logical[i] = mm35EquivToDegrees(logical[i]);
+            logical[i] = q35mmEquivToDegrees(logical[i]);
+    }
 
     QVector<QPair<qreal, qreal> > sourceToTarget;
     for(int i = 0; i < logical.size(); i++)

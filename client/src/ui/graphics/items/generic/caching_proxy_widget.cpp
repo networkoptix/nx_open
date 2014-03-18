@@ -15,22 +15,12 @@
 #include <ui/graphics/opengl/gl_functions.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
+
 #include <ui/common/geometry.h>
+#include <ui/workaround/gl_native_painting.h>
+#include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/opengl/gl_functions.h>
 
-namespace {
-
-    int checkOpenGLError() {
-   /*     int error = glGetError();
-        if (error != GL_NO_ERROR) {
-            const char *errorString = reinterpret_cast<const char *>(gluErrorString(error));
-            if (errorString)
-                qnWarning("OpenGL Error: %1.", errorString);
-        }
-        return error;*/
-        return 0;
-    }
-
-} // anonymous namespace
 
 CachingProxyWidget::CachingProxyWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     QGraphicsProxyWidget(parent, windowFlags),
@@ -83,7 +73,7 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
         return;
 
     return;
-    painter->beginNativePainting();
+    QnGlNativePainting::begin(painter);
     //glPushAttrib(GL_COLOR_BUFFER_BIT | GL_TEXTURE_BIT);
 
     ensureTextureSynchronized();
@@ -116,7 +106,7 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
     glDisable(GL_TEXTURE_2D);
 
     //glPopAttrib();
-    painter->endNativePainting();
+    QnGlNativePainting::end(painter);
 }
 
 bool CachingProxyWidget::eventFilter(QObject *object, QEvent *event) {

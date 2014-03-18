@@ -15,7 +15,7 @@ namespace Ui {
 
 class QnDwm;
 
-class QnRecordingSettingsWidget : public QnAbstractPreferencesWidget, protected QnWorkbenchContextAware
+class QnRecordingSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef QnAbstractPreferencesWidget base_type;

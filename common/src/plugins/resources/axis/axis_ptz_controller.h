@@ -28,24 +28,29 @@ public:
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
 
-    virtual bool synchronize(Qn::PtzDataFields fields) override;
-
 private:
     void updateState();
     void updateState(const QnAxisParameterMap &params);
 
     CLSimpleHTTPClient *newHttpClient() const;
-    bool query(const QString &request, QByteArray *body = NULL) const;
-    bool query(const QString &request, QnAxisParameterMap *params) const;
-    QString getCameraNum();
+    bool queryInternal(const QString &request, QByteArray *body = NULL);
+    bool query(const QString &request, QByteArray *body = NULL);
+    bool query(const QString &request, QnAxisParameterMap *params, QByteArray *body = NULL);
+    bool query(const QString &request, int restries, QnAxisParameterMap *params, QByteArray *body = NULL);
+    int channel();
     
+    QByteArray getCookie() const;
+    void setCookie(const QByteArray &cookie);
+
 private:
     QnPlAxisResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
     Qt::Orientations m_flip;
     QnPtzLimits m_limits;
-    QnLinearFunction m_logicalToCameraZoom, m_cameraToLogicalZoom;
-    mutable QByteArray ptz_ctl_id; // TODO: #Elric wtf?
+    QnLinearFunction m_35mmEquivToCameraZoom, m_cameraTo35mmEquivZoom;
+
+    mutable QMutex m_mutex;
+    QByteArray m_cookie;
 };
 
 #endif // #ifdef ENABLE_AXIS

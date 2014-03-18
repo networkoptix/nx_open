@@ -100,7 +100,7 @@ void PluginManager::loadPlugins( PluginManager::PluginType pluginsToLoad )
 #endif
 
     //directoriesToSearchForPlugins.insert( QDir(QDir::currentPath()).absolutePath() );
-    directoriesToSearchForPlugins.insert( QDir(QCoreApplication::applicationDirPath()).absolutePath() + QString::fromLatin1("/plugins/") );
+    directoriesToSearchForPlugins.insert( QDir(QCoreApplication::applicationDirPath()).absolutePath() + lit("/plugins/") );
 
     for( std::set<QString>::const_iterator
         it = directoriesToSearchForPlugins.begin();
@@ -123,10 +123,10 @@ void PluginManager::loadPluginsFromDir( const QString& dirToSearchIn, PluginType
             continue;
 
         if( pluginsToLoad & QtPlugin )
-            loadQtPlugin( pluginDir.path() + QString::fromLatin1("/") + entry );
+            loadQtPlugin( pluginDir.path() + lit("/") + entry );
 
         if( pluginsToLoad & NxPlugin )
-            loadNxPlugin( pluginDir.path() + QString::fromLatin1("/") + entry );
+            loadNxPlugin( pluginDir.path() + lit("/") + entry );
     }
 }
 
@@ -135,7 +135,7 @@ bool PluginManager::loadQtPlugin( const QString& fullFilePath )
     QSharedPointer<QPluginLoader> plugin( new QPluginLoader( fullFilePath ) );
     if( !plugin->load() )
     {
-        cl_log.log( QString::fromLatin1("Library %1 is not plugin").arg(fullFilePath), cl_logDEBUG1 );
+        cl_log.log( lit("Library %1 is not plugin").arg(fullFilePath), cl_logDEBUG1 );
         return false;
     }
 
@@ -146,11 +146,11 @@ bool PluginManager::loadQtPlugin( const QString& fullFilePath )
     clientPlugin->initializeLog( QnLog::instance() );
     if( !clientPlugin->initialized() )
     {
-        cl_log.log( QString::fromLatin1("Failed to initialize plugin %1").arg(fullFilePath), cl_logERROR );
+        cl_log.log( lit("Failed to initialize plugin %1").arg(fullFilePath), cl_logERROR );
         return false;
     }
 
-    cl_log.log( QString::fromLatin1("Successfully loaded plugin %1").arg(fullFilePath), cl_logWARNING );
+    cl_log.log( lit("Successfully loaded plugin %1").arg(fullFilePath), cl_logWARNING );
     m_qtPlugins.push_back( plugin );
 
     emit pluginLoaded();
@@ -177,7 +177,7 @@ bool PluginManager::loadNxPlugin( const QString& fullFilePath )
         return false;
     }
 
-    cl_log.log( QString::fromLatin1("Successfully loaded NX plugin %1").arg(fullFilePath), cl_logWARNING );
+    cl_log.log( lit("Successfully loaded NX plugin %1").arg(fullFilePath), cl_logWARNING );
     m_nxPlugins.push_back( obj );
 
     emit pluginLoaded();

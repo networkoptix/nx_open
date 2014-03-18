@@ -19,6 +19,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/warning_style.h>
@@ -55,8 +56,10 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
 
     setWarningStyle(ui->downmixWarningLabel);
     setWarningStyle(ui->languageWarningLabel);
+    setWarningStyle(ui->skinWarningLabel);
     ui->languageWarningLabel->setVisible(false);
     ui->downmixWarningLabel->setVisible(false);
+    ui->skinWarningLabel->setVisible(false);
     ui->idleTimeoutWidget->setEnabled(false);
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
@@ -70,6 +73,7 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
 
     connect(ui->downmixAudioCheckBox,                   SIGNAL(toggled(bool)),                                      this,   SLOT(at_downmixAudioCheckBox_toggled(bool)));
     connect(ui->languageComboBox,                       SIGNAL(currentIndexChanged(int)),                           this,   SLOT(at_languageComboBox_currentIndexChanged(int)));
+    connect(ui->skinComboBox,                           SIGNAL(currentIndexChanged(int)),                           this,   SLOT(at_skinComboBox_currentIndexChanged(int)));
     connect(ui->pauseOnInactivityCheckBox,              SIGNAL(toggled(bool)),                                      ui->idleTimeoutWidget, SLOT(setEnabled(bool)));
 }
 
@@ -84,9 +88,8 @@ void QnGeneralPreferencesWidget::submitToSettings() {
     qnSettings->setIpShownInTree(ui->showIpInTreeCheckBox->isChecked());
     qnSettings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
     qnSettings->setAutoStart(ui->autoStartCheckBox->isChecked());
-    qnSettings->setUserIdleTimeoutMSecs(ui->pauseOnInactivityCheckBox->isChecked()
-                                         ? ui->idleTimeoutSpinBox->value() * 60 * 1000 // convert to milliseconds
-                                         : 0);
+    qnSettings->setUserIdleTimeoutMSecs(ui->pauseOnInactivityCheckBox->isChecked() ? ui->idleTimeoutSpinBox->value() * 60 * 1000 : 0);
+    qnSettings->setClientSkin(static_cast<Qn::ClientSkin>(ui->skinComboBox->itemData(ui->skinComboBox->currentIndex()).toInt()));
 
     QStringList extraMediaFolders;
     for(int i = 0; i < ui->extraMediaFoldersList->count(); i++)
@@ -112,6 +115,9 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
 
     m_oldDownmix = qnSettings->isAudioDownmixed();
     ui->downmixAudioCheckBox->setChecked(m_oldDownmix);
+
+    m_oldSkin = ui->skinComboBox->findData(qnSettings->clientSkin());
+    ui->skinComboBox->setCurrentIndex(m_oldSkin);
 
     ui->tourCycleTimeSpinBox->setValue(qnSettings->tourCycleTime() / 1000);
     ui->showIpInTreeCheckBox->setChecked(qnSettings->isIpShownInTree());
@@ -145,14 +151,16 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
 
 bool QnGeneralPreferencesWidget::confirm() {
     if (m_oldDownmix != ui->downmixAudioCheckBox->isChecked() ||
-        m_oldLanguage != ui->languageComboBox->currentIndex()) {
-        switch(QMessageBox::information(
-                    this,
-                    tr("Information"),
-                    tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
-                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                    QMessageBox::Yes
-        )) {
+        m_oldLanguage != ui->languageComboBox->currentIndex() ||
+        m_oldSkin != ui->skinComboBox->currentIndex())
+    {
+        QMessageBox::StandardButton result = QMessageBox::information(
+                 this,
+                 tr("Information"),
+                 tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
+                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                 QMessageBox::Yes);
+        switch (result) {
         case QMessageBox::Cancel:
             return false;
         case QMessageBox::Yes:
@@ -172,11 +180,12 @@ void QnGeneralPreferencesWidget::initTranslations() {
     ui->languageComboBox->setModel(model);
 }
 
+#include "ui/workaround/mac_utils.h"
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked() {
-    QString dirName = QFileDialog::getExistingDirectory(this,
+    QString dirName = QnFileDialog::getExistingDirectory(this,
                                                         tr("Select folder..."),
                                                         ui->mainMediaFolderLabel->text(),
                                                         QnCustomFileDialog::directoryDialogOptions());
@@ -189,7 +198,7 @@ void QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked() {
     QString initialDir = ui->extraMediaFoldersList->count() == 0
             ? ui->mainMediaFolderLabel->text()
             : ui->extraMediaFoldersList->item(0)->text();
-    QString dirName = QFileDialog::getExistingDirectory(this,
+    QString dirName = QnFileDialog::getExistingDirectory(this,
                                                         tr("Select folder..."),
                                                         initialDir,
                                                         QnCustomFileDialog::directoryDialogOptions());
@@ -225,6 +234,10 @@ void QnGeneralPreferencesWidget::at_downmixAudioCheckBox_toggled(bool checked) {
 
 void QnGeneralPreferencesWidget::at_languageComboBox_currentIndexChanged(int index) {
     ui->languageWarningLabel->setVisible(m_oldLanguage != index);
+}
+
+void QnGeneralPreferencesWidget::at_skinComboBox_currentIndexChanged(int index) {
+    ui->skinWarningLabel->setVisible(m_oldSkin != index);
 }
 
 void QnGeneralPreferencesWidget::at_browseLogsButton_clicked() {

@@ -321,7 +321,7 @@ void UPNPDeviceSearcher::startFetchDeviceXml( const QByteArray& uuidStr, const Q
     info.uuid = uuidStr;
     info.descriptionUrl = descriptionUrl;
 
-    std::shared_ptr<nx_http::AsyncHttpClient> httpClient;
+    nx_http::AsyncHttpClientPtr httpClient;
     //checking, whether new http request is needed
     {
         QMutexLocker lk( &m_mutex );
@@ -430,26 +430,25 @@ void UPNPDeviceSearcher::updateItemInCache( const DiscoveredDeviceInfo& devInfo 
 void UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient )
 {
     DiscoveredDeviceInfo* ctx = NULL;
-    std::shared_ptr<nx_http::AsyncHttpClient> httpClientPtr;
     {
         QMutexLocker lk( &m_mutex );
         HttpClientsDict::iterator it = m_httpClients.find( httpClient );
         if (it == m_httpClients.end())
             return;
-        httpClientPtr = it->first;
         ctx = &it->second;
     }
 
-    if( httpClientPtr->response() && httpClientPtr->response()->statusLine.statusCode == nx_http::StatusCode::ok )
+    if( httpClient->response() && httpClient->response()->statusLine.statusCode == nx_http::StatusCode::ok )
     {
         //TODO: #ak check content type. Must be text/xml; charset="utf-8"
         //reading message body
-        const nx_http::BufferType& msgBody = httpClientPtr->fetchMessageBodyBuffer();
+        const nx_http::BufferType& msgBody = httpClient->fetchMessageBodyBuffer();
         processDeviceXml( *ctx, msgBody );
     }
 
     QMutexLocker lk( &m_mutex );
     if( m_terminated )
         return;
-    m_httpClients.erase( httpClientPtr );
+    httpClient->terminate();
+    m_httpClients.erase( httpClient );
 }

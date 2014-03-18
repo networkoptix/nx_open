@@ -25,6 +25,7 @@ struct QnScreenshotParameters {
     QnMediaDewarpingParams mediaDewarpingParams;
     ImageCorrectionParams imageCorrectionParams;
     QRectF zoomRect;
+
     QString timeString() const;
 };
 
@@ -54,7 +55,7 @@ private:
 /**
  * @brief The QnWorkbenchScreenshotHandler class            Handler for the screenshots related actions.
  */
-class QnWorkbenchScreenshotHandler: public QObject, protected QnWorkbenchContextAware {
+class QnWorkbenchScreenshotHandler: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
     QnWorkbenchScreenshotHandler(QObject *parent = NULL);

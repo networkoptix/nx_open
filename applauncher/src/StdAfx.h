@@ -1,5 +1,6 @@
+//#define QT_NO_CAST_FROM_ASCII // TODO: #Elric
 
-#ifndef STDAFX_H
-#define STDAFX_H
-
-#endif	//STDAFX_H
+#include <common/config.h>
+#ifdef __cplusplus
+#   include <common/common_globals.h>
+#endif

@@ -1,0 +1,19 @@
+﻿{{#aggregated}}
+<div class="content">
+    <div class="callout">
+        <p>Обнаружен конфликт для адреся {{cameraConflictAddress}} в {{timestamp}}:</p>
+        <table class="details">
+            <tr>
+                <th>Номер</th>
+                <th>Физический IP адрес</th>
+            </tr>
+            {{#cameraConflicts}}
+                <tr>
+                    <td>{{number}}</td>
+                    <td>{{mac}}</td>
+                </tr>
+            {{/cameraConflicts}}
+        </table>
+    </div>
+</div>
+{{/aggregated}}

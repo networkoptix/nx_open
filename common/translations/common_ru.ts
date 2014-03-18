@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru" sourcelanguage="en">
+<TS version="2.0" language="ru" sourcelanguage="en">
 <context>
     <name>CommunicatingSocket</name>
     <message>
@@ -10,7 +10,7 @@
     <message>
         <location filename="../src/utils/network/system_socket.cpp" line="663"/>
         <source>Couldn&apos;t connect to %1: %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно соединиться с %1:%2.</translation>
     </message>
 </context>
 <context>
@@ -19,11 +19,6 @@
         <location filename="../src/utils/network/foundenterprisecontrollersmodel.cpp" line="109"/>
         <source>Enterprise Controller addresses</source>
         <translation>Адреса Enterprise Controller&apos;а</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/network/foundenterprisecontrollersmodel.cpp" line="240"/>
-        <source>Port: %1, IP: %2</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Port </source>
@@ -129,52 +124,62 @@
 <context>
     <name>Qee::Evaluator</name>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="470"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="555"/>
         <source>Invalid stack size after program evaluation: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="509"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="597"/>
         <source>Could not deduce result type for operation %1(&apos;%2&apos;, &apos;%3&apos;).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="543"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="625"/>
+        <source>Invalid parameter type for operation %1(&apos;%2&apos;, &apos;%2&apos;)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/common/evaluator.cpp" line="635"/>
         <source>Could not deduce arithmetic supertype for type &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="563"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="657"/>
+        <source>Invalid parameter type for operation %1(&apos;%2&apos;)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/common/evaluator.cpp" line="665"/>
         <source>Argument number for %1 instruction has invalid type &apos;%2&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="567"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="669"/>
         <source>Argument number for %1 instruction is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="572"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="674"/>
         <source>Stack underflow during execution of %1 instruction.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="576"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="678"/>
         <source>Function name for %1 instruction has invalid type &apos;%2&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="587"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="689"/>
         <source>Function or variable &apos;%1&apos; is not defined.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="593"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="695"/>
         <source>Variable &apos;%1&apos; is not a function and cannot be called.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="605"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="707"/>
         <source>Stack underflow during program evaluation.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -182,7 +187,7 @@
 <context>
     <name>Qee::Lexer</name>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="100"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="112"/>
         <source>Unexpected symbol &apos;%1&apos; at position %2.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -190,23 +195,23 @@
 <context>
     <name>Qee::ParameterPack</name>
     <message>
-        <location filename="../src/utils/common/evaluator.h" line="159"/>
-        <location filename="../src/utils/common/evaluator.h" line="166"/>
+        <location filename="../src/utils/common/evaluator.h" line="167"/>
+        <location filename="../src/utils/common/evaluator.h" line="174"/>
         <source>Parameter %2 is not specified for function &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.h" line="169"/>
+        <location filename="../src/utils/common/evaluator.h" line="177"/>
         <source>Parameter %2 of function &apos;%1&apos; is of type &apos;%3&apos;, but type &apos;%4&apos; was expected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.h" line="175"/>
+        <location filename="../src/utils/common/evaluator.h" line="183"/>
         <source>Function &apos;%1&apos; is expected to have %3 arguments, %2 provided.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.h" line="180"/>
+        <location filename="../src/utils/common/evaluator.h" line="188"/>
         <source>Function &apos;%1&apos; is expected to have %3-%4 arguments, %2 provided.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -214,17 +219,17 @@
 <context>
     <name>Qee::Parser</name>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="166"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="178"/>
         <source>Unexpected token %1 (&apos;%2&apos;) at position %3.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="223"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="235"/>
         <source>Invalid color constant &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="268"/>
+        <location filename="../src/utils/common/evaluator.cpp" line="280"/>
         <source>Invalid number constant &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -435,97 +440,97 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="37"/>
         <source>Camera output</source>
-        <translation type="unfinished">Отображение камеры</translation>
+        <translation>Тревожный выход</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="38"/>
         <source>Camera output for 30 sec</source>
-        <translation type="unfinished">Отображение камеры в течение 30 секунд</translation>
+        <translation>Тревожный выход в течение 30 секунд</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="39"/>
         <source>Bookmark</source>
-        <translation type="unfinished">Закладка</translation>
+        <translation>Закладка</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="40"/>
         <source>Camera recording</source>
-        <translation type="unfinished">Запись с камеры</translation>
+        <translation>Запись с камеры</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="41"/>
         <source>Panic recording</source>
-        <translation type="unfinished">Запись по тревоге</translation>
+        <translation>Запись по тревоге</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="42"/>
         <source>Send mail</source>
-        <translation type="unfinished">Отправить письмо</translation>
+        <translation>Отправить письмо</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="43"/>
         <source>Write to log</source>
-        <translation type="unfinished"></translation>
+        <translation>Записать в журнал</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="44"/>
         <source>Show notification</source>
-        <translation type="unfinished">Показать предупреждение</translation>
+        <translation>Показать оповещение</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="45"/>
         <source>Play sound</source>
-        <translation type="unfinished">Воспроизвести звук</translation>
+        <translation>Воспроизвести звук</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="46"/>
         <source>Repeat sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Повторить звук</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="47"/>
         <source>Speak</source>
-        <translation type="unfinished"></translation>
+        <translation>Произнести</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="49"/>
         <source>Unknown (%1)</source>
-        <translation type="unfinished">Неизвестно (%1)</translation>
+        <translation>Неизвестно (%1)</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="67"/>
         <source>Media Server Started</source>
-        <translation type="unfinished"></translation>
+        <translation>Медиа Сервер запущен</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="68"/>
         <source>Any Camera Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>Любая проблема с камерой</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="69"/>
         <source>Any Server Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>Любая проблема с сервером</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="70"/>
         <source>Any Event</source>
-        <translation type="unfinished"></translation>
+        <translation>Любое событие</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="81"/>
         <source>Undefined event has occurred on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Неопределённое событие возникло на %1</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="108"/>
         <source>Media Server &quot;%1&quot; Started</source>
-        <translation type="unfinished"></translation>
+        <translation>Медиа Сервер %1 запущен</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="113"/>
         <source>Unknown event has occurred</source>
-        <translation type="unfinished"></translation>
+        <translation>Произошло неизвестное событие</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="129"/>
@@ -593,65 +598,65 @@
         <location filename="../src/business/business_strings_helper.cpp" line="292"/>
         <source>First occurrence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Первое проявление: %2 %1 (всего %n раз)</numerusform>
+            <numerusform>Первое проявление: %2 %1 (всего %n раза)</numerusform>
+            <numerusform>Первое проявление: %2 %1 (всего %n раз)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_strings_helper.cpp" line="312"/>
         <source>No video frame received during last %n seconds.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>В течение %n с не было получено ни одного кадра.</numerusform>
+            <numerusform>В течение %n с не было получено ни одного кадра.</numerusform>
+            <numerusform>В течение %n с не было получено ни одного кадра.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="318"/>
         <source>Connection to camera primary stream was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Соединение с основным потоком камеры было внезапно прервано.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="320"/>
         <source>Connection to camera secondary stream was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Соединение с вторым потоком камеры было внезапно прервано.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="326"/>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-        <translation type="unfinished">Обнаружена потеря RTP пакетов, предыдущий пакет%1, следующий пакет %2. {1 ?}</translation>
+        <translation>Обнаружена потеря RTP пакетов, предыдущий пакет%1, следующий пакет %2.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="328"/>
         <source>RTP packet loss detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Обнаружена потеря RTP пакетов.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="332"/>
         <source>Server terminated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер завершил работу.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="336"/>
         <source>Server started after crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер запустился после сбоя.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="341"/>
         <source>I/O error has occurred at %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка ввода/вывода на %1.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="346"/>
         <source>Not enough HDD/SSD speed for recording to %1.</source>
-        <translation type="unfinished">Не хватает скорости HDD/SSD для записи на %1.</translation>
+        <translation>Не хватает скорости HDD/SSD для записи на %1.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="351"/>
         <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
-        <translation type="unfinished"></translation>
+        <translation>Диск %1 переполнен. Диск содержит слишком много данных, не относящихся к системе.</translation>
     </message>
     <message numerus="yes">
         <source>First occurence: %1 on %2 (%n times total)</source>
@@ -723,7 +728,7 @@
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="27"/>
         <source>OK</source>
-        <translation type="unfinished">ОК</translation>
+        <translation>ОК</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="39"/>
@@ -735,82 +740,91 @@
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="43"/>
         <source>Cannot open media url %1. Failed to connect to media port %2.
  Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозвожно открыть адрес %1. Невозможно подключиться к медиа порту %2.
+ Убедитесь, что порт %2 доступен (проброшен, и т.п.). Попробуйте перезагрузить камеру, а затем сбросить к заводским настройкам через web-интерфейс.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="48"/>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
  Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозвожно открыть адрес %1. Подключение к порту %2 было сброшено.
+ Убедитесь, что камера подключена к сети. Попробуйте перезагрузить камеру.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="53"/>
         <source>Could not parse camera response. Url %1, request name %2.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не распознан ответ от камерв. Адрес %1, запрос %2.
+ Попробуйте перезагрузить камеру, затем восстановить заводские настройки или обновить прошивку. Если проблема сохранится, свяжитесь с техподдержкой.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="58"/>
         <source>No supported media tracks at url %1.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Неподдерживаемый поток по адресу %1.
+ Попробуйте перезагрузить камеру, затем восстановить заводские настройки или обновить прошивку. Если проблема сохранится, свяжитесь с техподдержкой.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="63"/>
         <source>Not authorized. Url %1.</source>
-        <translation type="unfinished">Ошибка авторизации. Адрес %1.</translation>
+        <translation>Ошибка авторизации. Адрес %1.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="67"/>
         <source>Cannot open media url %1. Unsupported media protocol %2.
  Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно открыть адрес %1. Протокол %2 не поддерживается.
+ Попробуйте перезагрузить камеру, затем восстановить заводские настройки или обновить прошивку. Если проблема сохранится, свяжитесь с техподдержкой.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="72"/>
         <source>Failed to configure parameter %1.
  First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно настроить параметр %1.
+ Попробуйте включить запись (если она отключена) и уменьшить частоту кадров в настройках камеры. Если это не помогло, восстановите заводские настройки в веб-интерфейсе камеры. Если проблема сохранится, свяжитесь с техподдержкой.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="77"/>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрос &quot;%1&quot; завершился ошибкой &quot;%2&quot;.
+ Попробуйте перезагрузить камеру, затем восстановить заводские настройки или обновить прошивку. Если проблема сохранится, свяжитесь с техподдержкой.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="82"/>
         <source>Unknown Camera Issue.
  Please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Неизвестная проблема с камерой.
+ Пожалуйста, свяжитесь с техподдержкой.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="86"/>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.
  Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка ввода/вывода. Сообщение ОС: &quot;%1&quot;.
+ Убедитесь, что камера подключена к сети. Попробуйте перезагрузить камеру.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="93"/>
         <source>Invalid data was received from the camera: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Некорректные данные получены от камеры %1.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="96"/>
         <source>Too many media errors. Please open camera issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>Слишком много ошибок потока. Откройте диалог ошибок камеры, чтобы получить подробную информацию.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="99"/>
         <source>Media stream is opened but no media data was received.</source>
-        <translation type="unfinished"></translation>
+        <translation>Поток подключен, но данные не поступают.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="114"/>
         <source>
 
 Parameters: </source>
-        <translation type="unfinished"></translation>
+        <translation>Параметры: </translation>
     </message>
     <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.
@@ -964,22 +978,22 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="47"/>
         <source>Audio context was not specified.</source>
-        <translation type="unfinished"></translation>
+        <translation>Аудиопоток не был определён.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="61"/>
         <source>Could not find encoder for codec %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не найден кодировщик для кодек %1.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="88"/>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно инициализировать аудио кодировщик.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="97"/>
         <source>Could not initialize audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно инициализировать аудио декодер.</translation>
     </message>
 </context>
 <context>
@@ -1011,33 +1025,33 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="104"/>
         <source>Container %1 was not found in FFMPEG library.</source>
-        <translation type="unfinished"></translation>
+        <translation>Контейнер %1 не был найден в библиотеке FFMPEG.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="112"/>
         <source>Could not create output context for format %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно создать выходной поток для формата %1.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="131"/>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="208"/>
         <source>Could not allocate output stream for recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно создать буфер для записи потока.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="170"/>
         <source>Could not perform direct stream copy because frame size is undefined.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка перекодировщика: для прямого копирования потока должен быть задан размер кадра.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="216"/>
         <source>Could not find codec %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не найден кодек %1.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="251"/>
         <source>Video or audio codec is incompatible with container %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Видео или аудио кодек несовместим с форматом %1.</translation>
     </message>
 </context>
 <context>
@@ -1057,17 +1071,17 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
         <source>Could not allocate scaler context for resolution %1x%2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно создать буфер для сжатия потока разрешением %1x%2.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
         <source>Could not find encoder for codec %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не найден кодировщик для кодекa %1.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно инициализировать видео кодировщик.</translation>
     </message>
 </context>
 <context>
@@ -1232,7 +1246,7 @@ Parameters: </source>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="27"/>
         <source>Corresponding container in FFMPEG library was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Контейнер  не был найден в библиотеке FFMPEG.</translation>
     </message>
     <message>
         <source>Can&apos;t allocate output stream for recording.</source>
@@ -1245,27 +1259,27 @@ Parameters: </source>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="28"/>
         <source>Could not create output file for video recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно создать файл для записи видео.</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="29"/>
         <source>Could not allocate output stream for recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно создать буфер для записи потока.</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="30"/>
         <source>Could not allocate output audio stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно создать буфер для звукового  потока.</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="31"/>
         <source>Invalid audio codec information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверная информация о звуковом кодеке.</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="32"/>
         <source>Video or audio codec is incompatible with the selected format.</source>
-        <translation type="unfinished"></translation>
+        <translation>Видео или аудио кодек несовместим с выбранным форматом.</translation>
     </message>
     <message>
         <source>Internal server error: invalid audio codec information</source>
@@ -1280,7 +1294,7 @@ Parameters: </source>
         <translation type="obsolete">Видео или аудио кодек несовместим с форматом %1. Попробуйте другой формат.</translation>
     </message>
     <message>
-        <location filename="../src/recording/stream_recorder.cpp" line="771"/>
+        <location filename="../src/recording/stream_recorder.cpp" line="782"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>Ошибка при генерации водяного знака для файла %1.</translation>
     </message>
@@ -1328,33 +1342,38 @@ Parameters: </source>
         <translation>Хранилища не настроены</translation>
     </message>
     <message>
-        <location filename="../src/health/system_health.cpp" line="31"/>
+        <location filename="../src/health/system_health.cpp" line="22"/>
+        <source>Rebuilding archive index is completed.</source>
+        <translation>Восстановление архива завершено.</translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="33"/>
         <source>E-Mail address is not set for user %1</source>
         <translation>Не задан e-mail для пользователя %1</translation>
     </message>
     <message>
-        <location filename="../src/health/system_health.cpp" line="41"/>
+        <location filename="../src/health/system_health.cpp" line="43"/>
         <source>E-Mail address is not set.
 You cannot receive system notifications via E-Mail.</source>
         <translation>Не задан e-mail.
 Вы не сможете получать системные уведомления по e-mail.</translation>
     </message>
     <message>
-        <location filename="../src/health/system_health.cpp" line="43"/>
+        <location filename="../src/health/system_health.cpp" line="45"/>
         <source>E-Mail server is not set.
 You cannot receive system notifications via E-Mail.</source>
         <translation>Не задан e-mail сервер.
 Вы не сможете получать системные уведомления по e-mail.</translation>
     </message>
     <message>
-        <location filename="../src/health/system_health.cpp" line="45"/>
+        <location filename="../src/health/system_health.cpp" line="47"/>
         <source>Some users have not set their E-Mail addresses.
 They cannot receive system notifications via E-Mail.</source>
         <translation>Некоторые пользователи не указали свои e-mail адреса.
 Они  не смогут получать системные уведомления по e-mail.</translation>
     </message>
     <message>
-        <location filename="../src/health/system_health.cpp" line="47"/>
+        <location filename="../src/health/system_health.cpp" line="49"/>
         <source>Storages are full on the following Media Server:
 %1.</source>
         <translatorcomment>Множественное или единственное число тут?</translatorcomment>
@@ -1362,18 +1381,24 @@ They cannot receive system notifications via E-Mail.</source>
 %1.</translation>
     </message>
     <message>
-        <location filename="../src/health/system_health.cpp" line="49"/>
+        <location filename="../src/health/system_health.cpp" line="51"/>
         <source>Storages are not configured on the following Media Server:
 %1.</source>
         <translation>Хранилища не настроены на следующем Медиа Сервере:
 %1.</translation>
     </message>
     <message>
-        <location filename="../src/health/system_health.cpp" line="51"/>
+        <location filename="../src/health/system_health.cpp" line="53"/>
         <source>You have no licenses.
 You cannot record video from cameras.</source>
         <translation>У вас нет лицензий.
 Вы не можете записывать видео с камер.</translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="55"/>
+        <source>Rebuilding archive index is completed on the following Media Server:
+%1.</source>
+        <translation>Восстановление архива завершено для Медиа Сервера %1.</translation>
     </message>
 </context>
 <context>
@@ -1421,12 +1446,12 @@ You cannot record video from cameras.</source>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="300"/>
         <source>OpenCL transcoding is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenCL кодирование не реализовано.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="303"/>
         <source>Unknown transcoding method.</source>
-        <translation type="unfinished"></translation>
+        <translation>Неизвестный метод перекодирования.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="334"/>

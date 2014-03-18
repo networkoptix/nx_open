@@ -17,6 +17,11 @@ QnAbstractArchiveReader::~QnAbstractArchiveReader()
     delete m_delegate;
 }
 
+QnAbstractNavigator *QnAbstractArchiveReader::navDelegate() const
+{
+    return m_navDelegate;
+}
+
 // ------------------- Audio tracks -------------------------
 
 unsigned int QnAbstractArchiveReader::getCurrentAudioChannel() const

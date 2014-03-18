@@ -67,11 +67,14 @@ install -m 755 $PROXY_BIN_PATH/mediaproxy $BINSTAGE/mediaproxy-bin
 cp -P $PROXY_LIB_PATH/*.so* $LIBSTAGE
 
 # Strip and remove rpath
-for f in `find $LIBSTAGE -type f`
-do
+if [ '${build.configuration}' == 'release' ]
+then
+  for f in `find $LIBSTAGE -type f`
+  do
     strip $f
     chrpath -d $f
-done
+  done
+fi
 
 find $SHARESTAGE -name \*.pyc -delete
 

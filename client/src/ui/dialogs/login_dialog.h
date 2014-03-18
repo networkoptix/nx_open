@@ -80,8 +80,8 @@ private slots:
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
     void at_connectFinished(int status, QnConnectionInfoPtr connectionInfo, int requestHandle);
 
-    void at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed);
-    void at_entCtrlFinder_remoteModuleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed );
+    void at_moduleFinder_moduleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed);
+    void at_moduleFinder_moduleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed );
 
 private:
     QScopedPointer<Ui::LoginDialog> ui;
@@ -94,7 +94,7 @@ private:
     QnConnectionInfoPtr m_connectInfo;
 
     QnRenderingWidget *m_renderingWidget;
-    NetworkOptixModuleFinder *m_entCtrlFinder;
+    NetworkOptixModuleFinder *m_moduleFinder;
 
     struct QnEcData {
         QUrl url;

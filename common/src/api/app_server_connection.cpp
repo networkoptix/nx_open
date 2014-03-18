@@ -432,6 +432,10 @@ int QnAppServerConnection::saveServer(const QnMediaServerResourcePtr &serverPtr,
     QByteArray data;
     m_serializer.serialize(serverPtr, data);
 
+    if (serverPtr->getStatus() != 2) {
+        qWarning() << "XYZ1: (!!!!) QnAppServerConnection::saveServer() " << serverPtr->getId().toString() << " to " << QString::number(serverPtr->getStatus());
+    }
+
     QnServersReply reply;
     int status = sendSyncRequest(QNetworkAccessManager::PostOperation, ServerAuthObject, m_requestHeaders, m_requestParams, data, &reply);
     if (status == 0) {
@@ -600,6 +604,19 @@ int QnAppServerConnection::getServers(QnMediaServerResourceList &servers)
     return status;
 }
 
+int QnAppServerConnection::getKvPairs(QnKvPairList& kvPairs, const QnResourcePtr &resource)
+{
+    QnKvPairListsById reply;
+    QnRequestParamList params(m_requestParams);
+    params.append(QnRequestParam("resource_id", resource->getId().toString()));
+    int status = sendSyncGetRequest(KvPairObject, m_requestHeaders, m_requestParams, &reply);
+    QnKvPairListsById::const_iterator citer = reply.constFind(resource->getId().toInt());
+    if (citer != reply.cend())
+        kvPairs = citer.value();
+
+    return status;
+}
+
 int QnAppServerConnection::getCameras(QnVirtualCameraResourceList &cameras, QnId mediaServerId)
 {
     QnRequestParamList params = m_requestParams;
@@ -643,6 +660,20 @@ int QnAppServerConnection::getCameraHistoryList(QnCameraHistoryList &cameraHisto
 int QnAppServerConnection::getBusinessRules(QnBusinessEventRuleList &businessRules)
 {
     return sendSyncGetRequest(BusinessRuleObject, m_requestHeaders, m_requestParams, &businessRules);
+}
+
+
+int QnAppServerConnection::saveSync(int resourceId, const QnKvPair &kvPair)
+{
+    return saveSync(resourceId, QnKvPairList() << kvPair);
+}
+
+int QnAppServerConnection::saveSync(int resourceId, const QnKvPairList &kvPairs)
+{
+    QByteArray data;
+    m_serializer.serializeKvPairs(resourceId, kvPairs, data);
+
+    return addObject(KvPairObject, data, 0);
 }
 
 int QnAppServerConnection::saveSync(const QnMediaServerResourcePtr &server)
@@ -814,6 +845,8 @@ int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnReso
     requestParams.append(QnRequestParam("id", resourceId.toString()));
     requestParams.append(QnRequestParam("status", QString::number(status)));
 
+    qWarning() << "XYZ1: QnAppServerConnection::setResourceStatusAsync(): Setting status of " << resourceId.toString() << " to " << QString::number(status);
+
     return QnSessionManager::instance()->sendAsyncPostRequest(url(), nameMapper()->name(StatusObject), requestHeaders, requestParams, "", target, slot);
 }
 
@@ -828,6 +861,7 @@ int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resourc
         requestParams.append(QnRequestParam(QString(QLatin1String("id%1")).arg(n), resource->getId().toString()));
         requestParams.append(QnRequestParam(QString(QLatin1String("status%1")).arg(n), QString::number(resource->getStatus())));
 
+        qWarning() << "XYZ1: QnAppServerConnection::setResourcesStatusAsync(): Setting status of " << resource->getId().toString() << " to " << QString::number(resource->getStatus());
         n++;
     }
 
@@ -841,6 +875,8 @@ int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource:
 
     requestParams.append(QnRequestParam("id", resourceId.toString()));
     requestParams.append(QnRequestParam("status", QString::number(status)));
+
+    qWarning() << "XYZ1: QnAppServerConnection::setResourceStatus(): Setting status of " << resourceId.toString() << " to " << QString::number(status);
 
     QnHTTPRawResponse response;
     return QnSessionManager::instance()->sendSyncPostRequest(url(), nameMapper()->name(StatusObject), requestHeaders, requestParams, "", response);

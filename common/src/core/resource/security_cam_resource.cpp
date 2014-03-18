@@ -108,10 +108,6 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other) {
     }
 }
 
-QString QnSecurityCamResource::getVendorInternal() const {
-    return getDriverName();
-}
-
 int QnSecurityCamResource::getMaxFps() const {
     QVariant val;
     if (!getParam(lit("MaxFPS"), val, QnDomainMemory))
@@ -469,10 +465,13 @@ void QnSecurityCamResource::setFirmware(const QString &firmware) {
 }
 
 QString QnSecurityCamResource::getVendor() const {
-    SAFE(if (!m_vendor.isEmpty()) return m_vendor)    //calculated on the server
+    SAFE(return m_vendor);
 
-    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(getTypeId());
-    return resourceType ? resourceType->getManufacture() : QString(); //estimated value
+    // This code is commented for a reason. We want to know if vendor is empty. --Elric
+    //SAFE(if (!m_vendor.isEmpty()) return m_vendor)    //calculated on the server
+    //
+    //QnResourceTypePtr resourceType = qnResTypePool->getResourceType(getTypeId());
+    //return resourceType ? resourceType->getManufacture() : QString(); //estimated value
 }
 
 void QnSecurityCamResource::setVendor(const QString& value) {
@@ -577,7 +576,7 @@ void QnSecurityCamResource::removeStatusFlags(StatusFlags value) {
 
 
 bool QnSecurityCamResource::needCheckIpConflicts() const {
-    return getChannel() == 0 && !hasCameraCapabilities(Qn::shareIpCapability);
+    return getChannel() == 0 && !hasCameraCapabilities(Qn::ShareIpCapability);
 }
 
 QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(

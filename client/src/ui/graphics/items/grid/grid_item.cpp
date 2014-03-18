@@ -23,18 +23,15 @@ namespace {
     const char *animatorPropertyName = "_qn_itemAnimator";
 }
 
-class QWidget;
-
 QnGridItem::QnGridItem(QGraphicsItem *parent):
     base_type(parent),
-    m_color(QColor(0, 0, 0, 0)),
     m_lineWidth(0.0)
 {
     qreal d = std::numeric_limits<qreal>::max() / 4;
     m_boundingRect = QRectF(QPointF(-d, -d), QPointF(d, d));
 
-    setStateColor(ALLOWED, QColor(0, 255, 0, 64));
-    setStateColor(DISALLOWED, QColor(255, 0, 0, 64));
+    setStateColor(Allowed, QColor(0, 255, 0, 64));
+    setStateColor(Disallowed, QColor(255, 0, 0, 64));
 
     setAcceptedMouseButtons(0);
     
@@ -56,6 +53,96 @@ void QnGridItem::setMapper(QnWorkbenchGridMapper *mapper) {
 
 QRectF QnGridItem::boundingRect() const {
     return m_boundingRect;
+}
+
+const QnGridColors &QnGridItem::colors() const {
+    return m_colors;
+}
+
+void QnGridItem::setColors(const QnGridColors &colors) {
+    m_colors = colors;
+
+    setStateColor(Allowed, colors.allowed);
+    setStateColor(Disallowed, colors.disallowed);
+}
+
+qreal QnGridItem::lineWidth() const {
+    return m_lineWidth;
+}
+
+void QnGridItem::setLineWidth(qreal lineWidth) {
+    m_lineWidth = lineWidth;
+}
+
+QColor QnGridItem::stateColor(int cellState) const {
+    return m_colorByState.value(cellState, QColor(0, 0, 0, 0));
+}
+
+void QnGridItem::setStateColor(int cellState, const QColor &color) {
+    if(cellState == Initial) {
+        qnWarning("Cannot change color for initial cell state.");
+        return;
+    }
+
+    m_colorByState[cellState] = color;
+
+    if(cellState == Allowed) {
+        m_colors.allowed = color;
+    } else if(cellState == Disallowed) {
+        m_colors.disallowed = color;
+    }
+}
+
+int QnGridItem::cellState(const QPoint &cell) const {
+    QHash<QPoint, PointData>::const_iterator pos = m_dataByCell.find(cell);
+    if(pos == m_dataByCell.end())
+        return Initial;
+
+    return pos->state;
+}
+
+void QnGridItem::setCellState(const QPoint &cell, int cellState) {
+    if(mapper() == NULL)
+        return;
+
+    PointData &data = m_dataByCell[cell];
+    if(data.state == cellState)
+        return;
+    data.state = cellState;
+
+    if(data.item == NULL) {
+        data.item = newHighlightItem();
+
+        qreal d =  m_lineWidth / 2; 
+        data.item->setRect(QnGeometry::dilated(mapper()->mapFromGrid(QRect(cell, cell)), mapper()->spacing() / 2).adjusted(d, d, -d, -d));
+        setItemCell(data.item, cell);
+    }
+
+    VariantAnimator *animator = itemAnimator(data.item);
+    animator->pause();
+
+    QColor targetColor = stateColor(cellState);
+    if(data.item->color().alpha() == 0)
+        data.item->setColor(toTransparent(targetColor));
+    animator->setTargetValue(targetColor);
+
+    animator->start();
+}
+
+void QnGridItem::setCellState(const QSet<QPoint> &cells, int cellState) {
+    foreach(const QPoint &cell, cells)
+        setCellState(cell, cellState);
+}
+
+void QnGridItem::setCellState(const QRect &cells, int cellState) {
+    for (int r = cells.top(); r <= cells.bottom(); r++) 
+        for (int c = cells.left(); c <= cells.right(); c++) 
+            setCellState(QPoint(c, r), cellState);
+}
+
+void QnGridItem::setCellState(const QList<QRect> &cells, int cellState) {
+    foreach(const QRect &rect, cells)
+        setCellState(rect, cellState);
 }
 
 void QnGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
@@ -80,7 +167,7 @@ void QnGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     );
 
     /* Draw! */
-    QnScopedPainterPenRollback penRollback(painter, QPen(m_color, m_lineWidth));
+    QnScopedPainterPenRollback penRollback(painter, QPen(m_colors.grid, m_lineWidth));
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
     QPointF topLeft = mapper()->mapFromGrid(gridRect.topLeft()) - QnGeometry::toPoint(mapper()->spacing()) / 2;
     QPointF delta = QnGeometry::toPoint(mapper()->step());
@@ -102,19 +189,6 @@ void QnGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     }
 }
 
-QColor QnGridItem::stateColor(int cellState) const {
-    return m_colorByState.value(cellState, QColor(0, 0, 0, 0));
-}
-
-void QnGridItem::setStateColor(int cellState, const QColor &color) {
-    if(cellState == INITIAL) {
-        qnWarning("Cannot change color for initial cell state.");
-        return;
-    }
-
-    m_colorByState[cellState] = color;
-}
-
 QnGridHighlightItem *QnGridItem::newHighlightItem() {
     if(!m_freeItems.empty())
         return m_freeItems.takeLast();
@@ -134,7 +208,6 @@ VariantAnimator *QnGridItem::itemAnimator(QnGridHighlightItem *item) {
     VariantAnimator *animator = item->property(animatorPropertyName).value<VariantAnimator *>();
     if(animator != NULL)
         return animator;
-    
 
     animator = new VariantAnimator(item);
     animator->setTargetObject(item);
@@ -154,61 +227,11 @@ void QnGridItem::at_itemAnimator_finished() {
 
     QPoint cell = itemCell(item);
     PointData &data = m_dataByCell[cell];
-    if(data.state == INITIAL) {
+    if(data.state == Initial) {
         data.item = NULL;
         m_freeItems.push_back(item);
         setItemCell(item, QPoint(0, 0));
     }
 }
 
-int QnGridItem::cellState(const QPoint &cell) const {
-    QHash<QPoint, PointData>::const_iterator pos = m_dataByCell.find(cell);
-    if(pos == m_dataByCell.end())
-        return INITIAL;
 
-    return pos->state;
-}
-
-void QnGridItem::setCellState(const QPoint &cell, int cellState) {
-    if(mapper() == NULL)
-        return;
-    
-    PointData &data = m_dataByCell[cell];
-    if(data.state == cellState)
-        return;
-    data.state = cellState;
-
-    if(data.item == NULL) {
-        data.item = newHighlightItem();
-
-        qreal d =  m_lineWidth / 2; 
-        data.item->setRect(QnGeometry::dilated(mapper()->mapFromGrid(QRect(cell, cell)), mapper()->spacing() / 2).adjusted(d, d, -d, -d));
-        setItemCell(data.item, cell);
-    }
-
-    VariantAnimator *animator = itemAnimator(data.item);
-    animator->pause();
-    
-    QColor targetColor = stateColor(cellState);
-    if(data.item->color().alpha() == 0)
-        data.item->setColor(toTransparent(targetColor));
-    animator->setTargetValue(targetColor);
-    
-    animator->start();
-}
-
-void QnGridItem::setCellState(const QSet<QPoint> &cells, int cellState) {
-    foreach(const QPoint &cell, cells)
-        setCellState(cell, cellState);
-}
-
-void QnGridItem::setCellState(const QRect &cells, int cellState) {
-    for (int r = cells.top(); r <= cells.bottom(); r++) 
-        for (int c = cells.left(); c <= cells.right(); c++) 
-            setCellState(QPoint(c, r), cellState);
-}
-
-void QnGridItem::setCellState(const QList<QRect> &cells, int cellState) {
-    foreach(const QRect &rect, cells)
-        setCellState(rect, cellState);
-}

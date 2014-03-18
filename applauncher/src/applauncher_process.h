@@ -23,17 +23,6 @@
 #include "task_server_new.h"
 #include "version.h"
 
-
-#ifdef AK_DEBUG
-#ifdef _WIN32
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String("client.exe")) );
-#else
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String("client")) );
-#endif
-#else
-static const QString APPLICATION_BIN_NAME( QString::fromLatin1("/%1").arg(QLatin1String(QN_CLIENT_EXECUTABLE_NAME)) );
-#endif
-
 class ApplauncherProcess
 :
     public QObject,
@@ -45,9 +34,10 @@ class ApplauncherProcess
 
 public:
     ApplauncherProcess(
-        QSettings* const settings,
+        QSettings* const userSettings,
         InstallationManager* const installationManager,
-        bool quitMode );
+        bool quitMode,
+        const QString& mirrorListUrl );
 
     //!Implementation of \a ApplauncherProcess::pleaseStop()
     virtual void pleaseStop() override;
@@ -74,6 +64,7 @@ private:
     bool m_terminated;
     InstallationManager* const m_installationManager;
     const bool m_quitMode;
+    const QString m_mirrorListUrl;
     TaskServerNew m_taskServer;
     QSettings* const m_settings;
     int m_bindTriesCount;
@@ -105,11 +96,12 @@ private:
     bool addProcessKillTimer(
         const std::shared_ptr<applauncher::api::AddProcessKillTimerRequest>& request,
         applauncher::api::AddProcessKillTimerResponse* const response );
+    bool blockingRestoreVersion( const QString& versionToLaunch );
 
     virtual void onTimer( const quint64& timerID ) override;
 
 private slots:
-    void onInstallationSucceeded();
+    void onInstallationDone( InstallationProcess* installationProcess );
 };
 
 #endif  //APPLAUNCHER_PROCESS_H

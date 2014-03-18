@@ -9,12 +9,7 @@ class QnGlWidgetFactory {
 public:
     template<class Widget>
     static Widget *create(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) {
-        QGLFormat format;
-        format.setOption(QGL::SampleBuffers); /* Multisampling. */
-        format.setDoubleBuffer(qnSettings->isGlDoubleBuffer());
-        /* Unfortunately, in Qt5 this function is broken :( */
-        format.setSwapInterval(0);
-        return create<Widget>(format, parent, windowFlags);
+        return create<Widget>(createDefaultFormat(), parent, windowFlags);
     }
 
     template<class Widget>
@@ -26,16 +21,14 @@ public:
             /* In Qt5 QGLContext uses QOpenGLContext internally. But QOpenGLContext hasn't support for
                swap interval setting (up to and including Qt5.2). So we have to implement vsync manually. */
             enableVSync(widget);
-        } else {
-            disableVSync(widget);
         }
 
         return widget;
     }
 
 private:
+    static QGLFormat createDefaultFormat();
     static void enableVSync(QGLWidget *widget);
-    static void disableVSync(QGLWidget *widget);
 };
 
 #endif // QN_GL_WIDGET_FACTORY_H

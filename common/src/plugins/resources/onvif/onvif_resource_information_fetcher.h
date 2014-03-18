@@ -62,6 +62,7 @@ public:
 
     void pleaseStop();
     static bool ignoreCamera(const QString& manufacturer, const QString& name);
+    static bool isModelSupported(const QString& manufacturer, const QString& modelNamee);
 private:
 
 

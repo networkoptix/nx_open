@@ -8,6 +8,7 @@
 #include <stack>
 
 #include <QtCore/QDateTime>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QtCore/QPair>
@@ -159,8 +160,8 @@ public:
     QString getImagingUrl() const;
     void setImagingUrl(const QString& src);
 
-    QString getPtzfUrl() const;
-    void setPtzfUrl(const QString& src);
+    QString getPtzUrl() const;
+    void setPtzUrl(const QString& src);
 
     QString getPtzConfigurationToken() const;
     void setPtzConfigurationToken(const QString &src);
@@ -185,7 +186,12 @@ public:
 
     //!Relay input with token \a relayToken has changed its state to \a active
     //void notificationReceived( const std::string& relayToken, bool active );
-    void notificationReceived( const oasisWsnB2__NotificationMessageHolderType& notification );
+    /*!
+        Notifications with timestamp earlier than \a minNotificationTime are ignored
+    */
+    void notificationReceived(
+        const oasisWsnB2__NotificationMessageHolderType& notification,
+        time_t minNotificationTime = (time_t)-1 );
     //!Implementation of TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID );
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
@@ -196,7 +202,7 @@ public:
 
     bool detectVideoSourceCount();
 
-    CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder) const;
+    CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
     bool secondaryResolutionIsLarge() const;
     virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
 
@@ -251,7 +257,7 @@ private:
 
 
     void updateVideoSource(VideoSource* source, const QRect& maxRect) const;
-    CameraDiagnostics::Result sendVideoSourceToCamera(VideoSource* source) const;
+    CameraDiagnostics::Result sendVideoSourceToCamera(VideoSource* source);
 
     QRect getVideoSourceMaxSize(const QString& configToken);
 
@@ -425,6 +431,8 @@ private:
     int m_streamConfCounter;
     CameraDiagnostics::Result m_prevOnvifResultCode; 
     QString m_onvifNotificationSubscriptionReference;
+    QElapsedTimer m_monotonicClock;
+    qint64 m_prevRequestSendClock;
 
     bool createPullPointSubscription();
     bool pullMessages();

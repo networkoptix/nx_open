@@ -57,8 +57,6 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
     m_globals(qnGlobals),
     m_customizer(qnCustomizer)
 {
-    GraphicsStyle::setBaseStyle(this);
-
     m_branchClosed = m_skin->icon("tree/branch_closed.png");
     m_branchOpen = m_skin->icon("tree/branch_open.png");
     m_closeTab = m_skin->icon("titlebar/close_tab.png");
@@ -94,14 +92,12 @@ QPixmap QnNoptixStyle::generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &
 }
 
 int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const {
-    const QObject *target = currentTarget(widget);
-
     switch(metric) {
     case PM_ToolBarIconSize:
         return 18;
     case PM_SliderLength:
-        if(target) {
-            int result = qvariant_cast<int>(target->property(Qn::SliderLength), -1);
+        if(option->styleObject) {
+            int result = qvariant_cast<int>(option->styleObject->property(Qn::SliderLength), -1);
             if(result >= 0)
                 return result;
         }
@@ -240,19 +236,30 @@ void QnNoptixStyle::unpolish(QApplication *application) {
 }
 
 void QnNoptixStyle::polish(QWidget *widget) {
-    if(widget)
-        base_type::polish(widget);
+    base_type::polish(widget);
 
-    if(QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(widget)) {
-        itemView->setIconSize(QSize(18, 18)); // TODO: #Elric move to customization?
-    }
+    // TODO: #Elric #2.3 remove this line in 2.3, looks like it's not needed.
+    if(QAbstractItemView *itemView = dynamic_cast<QAbstractItemView *>(widget))
+        itemView->setIconSize(QSize(18, 18)); 
 
-    m_customizer->customize(const_cast<QObject *>(currentTarget(widget)));
+    if(QAbstractButton *button = dynamic_cast<QAbstractButton *>(widget))
+        button->setIcon(m_skin->icon(button->icon()));
+
+    m_customizer->customize(widget);
 }
 
 void QnNoptixStyle::unpolish(QWidget *widget) {
-    if(widget)
-        base_type::unpolish(widget);
+    base_type::unpolish(widget);
+}
+
+void QnNoptixStyle::polish(QGraphicsWidget *widget) {
+    GraphicsStyle::polish(widget);
+
+    m_customizer->customize(widget);
+}
+
+void QnNoptixStyle::unpolish(QGraphicsWidget *widget) {
+    GraphicsStyle::unpolish(widget);
 }
 
 bool QnNoptixStyle::scrollBarSubControlRect(const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget, QRect *result) const {
@@ -286,7 +293,7 @@ bool QnNoptixStyle::scrollBarSubControlRect(const QStyleOptionComplex *option, S
             if (sliderLength > grooveLength) {
                 sliderLength = grooveLength;
             } else {
-                int minimalLength = proxy()->pixelMetric(PM_ScrollBarSliderMin, sliderOption, widget);;
+                int minimalLength = proxy()->pixelMetric(PM_ScrollBarSliderMin, sliderOption, widget);
                 if (sliderLength < minimalLength)
                     sliderLength = minimalLength;
             }
@@ -601,17 +608,17 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
 
     QIcon::Mode mode;
     if(!(option->state & State_Enabled)) {
-        mode = QIcon::Disabled;
+        mode = QnIcon::Disabled;
     } else if(option->state & State_Selected) {
-        mode = QIcon::Selected;
+        mode = QnIcon::Selected;
     } else if(option->state & State_Sunken) {
-        mode = QnSkin::Pressed;
+        mode = QnIcon::Pressed;
         k = 1.0;
         stopHoverTracking(widget);
     } else if(option->state & State_MouseOver) {
-        mode = QIcon::Active;
+        mode = QnIcon::Active;
     } else {
-        mode = QIcon::Normal;
+        mode = QnIcon::Normal;
     }
     QIcon::State state = option->state & State_On ? QIcon::On : QIcon::Off;
 
@@ -644,7 +651,7 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
         painter->drawPixmap(rect, pixmap1, pixmap1.rect());
         painter->setOpacity(o);
     } else {
-        QPixmap pixmap = m_skin->pixmap(buttonOption->icon, rect.toAlignedRect().size(), mode, state);
+        QPixmap pixmap = buttonOption->icon.pixmap(rect.toAlignedRect().size(), mode, state);
         painter->drawPixmap(rect, pixmap, pixmap.rect());
     }
     return true;

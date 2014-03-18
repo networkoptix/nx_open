@@ -273,8 +273,12 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
             m_customVideoLayout = QnCustomResourceVideoLayout::fromString(vLayout);
 
             QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource> (resource);
-            if (mediaRes)
-                mediaRes->setCustomVideoLayout(m_customVideoLayout);
+            if (mediaRes) {
+                // TODO: 
+                // #Elric we need to create another layout instance, but
+                // there is no need to reparse it!
+                mediaRes->setCustomVideoLayout(QnCustomResourceVideoLayout::fromString(vLayout));
+            }
         }
     }
 
@@ -642,7 +646,7 @@ QnResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
         for (QMap<int, QnFfmpegRtpParserPtr>::const_iterator itr = m_parsers.begin(); itr != m_parsers.end(); ++itr)
         {
             QnMediaContextPtr context = itr.value()->mediaContext();
-            if (context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO)
+            if (context && context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO)
                 m_audioLayout->addAudioTrack(QnResourceAudioLayout::AudioTrack(context, getAudioCodecDescription(context->ctx())));
         }
     }

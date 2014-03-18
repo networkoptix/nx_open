@@ -2,23 +2,11 @@
 #define QN_CUSTOMIZATION_H
 
 #include <QtCore/QMetaType>
-#include <QtCore/QVariant>
-
-class QApplication;
-
-// TODO: #Elric:
-// use three customization files:
-// 
-// customization_common
-// customization_base
-// customization_child
-// 
-// Add QnCustomization::add(const QnCustomization &other) method that would merge'em.
+#include <QtCore/QJsonObject>
 
 class QnCustomization {
 public:
-    QnCustomization();
-    explicit QnCustomization(const QString &fileName);
+    explicit QnCustomization(const QString &fileName = QString());
 
     bool isNull() const {
         return m_data.isEmpty();
@@ -27,6 +15,8 @@ public:
     const QJsonObject &data() const {
         return m_data;
     }
+
+    void add(const QnCustomization &data);
 
 private:
     QJsonObject m_data;

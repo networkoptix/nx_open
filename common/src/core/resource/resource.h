@@ -238,11 +238,7 @@ public:
     virtual QnResourcePtr updateResource() { return QnResourcePtr(0); }
     //=============
 
-    //QnParamList& getDeviceParamList();// returns params that can be changed on device level
-    //const QnParamList& getDeviceParamList() const;
     QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
-
-    //virtual const CLDeviceVideoLayout* getVideoLayout(QnAbstractStreamDataProvider* reader);
 
     QString getUrl() const;
     virtual void setUrl(const QString &url);
@@ -266,13 +262,13 @@ public:
     bool hasPtzCapabilities(Qn::PtzCapabilities capabilities) const;
     void setPtzCapabilities(Qn::PtzCapabilities capabilities);
     void setPtzCapability(Qn::PtzCapabilities capability, bool value);
-
     QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here
 
     /* Note that these functions hide property API inherited from QObject.
      * This is intended as this API cannot be used with QnResource anyway 
      * because of threading issues. */
 
+    bool hasProperty(const QString &key) const;
     QString getProperty(const QString &key, const QString &defaultValue = QString()) const;
     void setProperty(const QString &key, const QString &value);
     QnKvPairList getProperties() const;
@@ -289,6 +285,7 @@ signals:
     void ptzCapabilitiesChanged(const QnResourcePtr &resource);
     void mediaDewarpingParamsChanged(const QnResourcePtr &resource);
     void propertyChanged(const QnResourcePtr &resource, const QString &key);
+    void initializedChanged(const QnResourcePtr &resource);
 
     //!Emitted on completion of every async get started with getParamAsync
     /*!
@@ -304,8 +301,7 @@ signals:
     */
     void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 
-    void initAsyncFinished(const QnResourcePtr &resource, bool initialized); // TODO: #Elric remove bool param
-    void initialized(const QnResourcePtr &resource); // TODO: #Elric merge signals, convert to initializedChanged
+    void initAsyncFinished(const QnResourcePtr &resource, bool initialized); // TODO: #Elric remove signal
 
 
 public:

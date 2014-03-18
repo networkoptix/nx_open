@@ -7,16 +7,17 @@
 #include <ui/dialogs/button_box_dialog.h>
 
 namespace Ui {
-class QnTwoStepFileDialog;
+    class QnTwoStepFileDialog;
 }
 
 class QnTwoStepFileDialog : public QnButtonBoxDialog
 {
     Q_OBJECT
-
     typedef QnButtonBoxDialog base_type;
+
 public:
-    explicit QnTwoStepFileDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &initialFile = QString(), const QString &filter = QString());
+    explicit QnTwoStepFileDialog(QWidget *parent = 0, const QString &caption = QString(),
+                                 const QString &initialFile = QString(), const QString &filter = QString());
     ~QnTwoStepFileDialog();
 
     void setOptions(QFileDialog::Options options);
@@ -28,13 +29,14 @@ public:
 
     static QFileDialog::Options fileDialogOptions() { return 0; }
     static QFileDialog::Options directoryDialogOptions() { return QFileDialog::ShowDirsOnly; }
+
 signals:
     void filterSelected(const QString &filter);
 
 protected:
     virtual bool event(QEvent *event) override;
 
-    QGridLayout* customizedLayout() const;
+    QGridLayout *customizedLayout() const;
     void setNameFilters(const QStringList &filters);
     void updateMode();
 

@@ -24,7 +24,7 @@ namespace detail
 
         \code {*.xml}
         <?xml version="1.0" encoding="UTF-8"?>
-        <contents totalSize="123456" validation="md5">
+        <contents totalsize="123456" validation="md5">
             <directory>client</directory>
             <directory>mediaserver</directory>
             <directory>appserver</directory>
@@ -37,11 +37,11 @@ namespace detail
         public QXmlDefaultHandler
     {
     public:
-        int64_t totalSize;
+        int64_t totalsize;
 
         ContentsXmlSaxHandler( std::list<detail::RDirEntry>* const entries )
         :
-            totalSize( -1 ),
+            totalsize( -1 ),
             m_readingContents( false ),
             m_entries( entries )
         {
@@ -56,9 +56,9 @@ namespace detail
             {
                 if( m_readingContents )
                     return false;
-                int totalSizeArgPos = atts.index(QString::fromLatin1("totalSize"));
-                if( totalSizeArgPos >= 0 )
-                    totalSize = atts.value(totalSizeArgPos).toLongLong();
+                int totalsizeArgPos = atts.index(QString::fromLatin1("totalsize"));
+                if( totalsizeArgPos >= 0 )
+                    totalsize = atts.value(totalsizeArgPos).toLongLong();
                 m_readingContents = true;
                 return true;
             }
@@ -165,7 +165,7 @@ namespace detail
             _handler ),
         m_localTargetDirPath( localTargetDirPath ),
         m_httpClient( new nx_http::AsyncHttpClient() ),
-        m_totalSize( -1 )
+        m_totalsize( -1 )
     {
         connect(
             m_httpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClientPtr)),
@@ -213,7 +213,7 @@ namespace detail
 
     int64_t ListDirectoryOperation::totalDirSize() const
     {
-        return m_totalSize;
+        return m_totalsize;
     }
 
     void ListDirectoryOperation::onResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
@@ -270,7 +270,7 @@ namespace detail
             return;
         }
 
-        m_totalSize = xmlHandler.totalSize;
+        m_totalsize = xmlHandler.totalsize;
 
         //TODO/IMPL asynchronously creating directory
         QDir(m_localTargetDirPath).mkdir( entryPath );

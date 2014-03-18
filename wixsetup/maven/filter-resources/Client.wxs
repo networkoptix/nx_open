@@ -26,12 +26,16 @@
                                  Key="Software\[Manufacturer]\${applauncher.name}">
                             <RegistryValue Type="string" Name="previousLaunchedVersion" Value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}"/>
                         </RegistryKey>
+                        <RegistryKey Root="HKLM"
+                                 Key="Software\[Manufacturer]\${applauncher.name}">
+                            <RegistryValue Type="string" Name="mirrorListUrl" Value="${mirrorListUrl}"/>
+                        </RegistryKey>                        
                     </Component>                                
 
                     <Component Id="DefaultLanguage" Permanent="yes">
                         <RegistryKey Root="HKCU"
                                  Key="Software\[Manufacturer]\${client.name}">
-                            <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_${installer.language}.qm"/>
+                            <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_${translation1}.qm"/>
                         </RegistryKey>
                     </Component>    
 
@@ -124,9 +128,6 @@
             </Component>
             <Component>
                 <File Id="ClientVorbisEncDll" Name="libvorbisenc-2.dll" Source="$(var.SourceDir)/libvorbisenc-2.dll"/>
-            </Component>
-            <Component>
-                <File Id="ClientX264" Name="x264.exe" Source="$(var.SourceDir)/x264.exe"/>                                
             </Component>
         </ComponentGroup>
 

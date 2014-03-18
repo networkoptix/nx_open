@@ -7,13 +7,13 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/animation/opacity_animator.h>
+#include <ui/graphics/items/generic/text_button_widget.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
 #include <ui/graphics/opengl/gl_context_data.h>
-
-#include <ui/animation/opacity_animator.h>
 #include <ui/style/globals.h>
+#include <ui/workaround/gl_native_painting.h>
 
 
 /** @def QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
@@ -24,9 +24,6 @@
 // #define QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
 
 namespace {
-
-    /** Flashing text flash interval. */
-    static const int testFlashingPeriodMSec = 1000;
 
     class QnLoadingProgressPainterFactory {
     public:
@@ -40,9 +37,9 @@ namespace {
 
     Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_pausedPainterStorage);
 
-    const QColor textColor(255, 96, 96, 128);
-    const QColor buttonBaseColor(255, 32, 32, 160);
-    const QColor buttonBorderColor(255, 32, 32, 255);
+    const qreal staticFontSize = 50;
+
+    const int flashingPeriodMSec = 1000;
 
 } // anonymous namespace
 
@@ -55,30 +52,32 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     setAcceptedMouseButtons(0);
 
     /* Init static text. */
-    m_noDataStaticText.setText(tr("NO DATA"));
-    m_noDataStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
-    m_offlineStaticText.setText(tr("NO SIGNAL"));
-    m_offlineStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
-    m_serverOfflineStaticText.setText(tr("Server offline"));
-    m_serverOfflineStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
-    m_unauthorizedStaticText.setText(tr("Unauthorized"));
-    m_unauthorizedStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
-    m_unauthorizedStaticSubText.setText(tr("Please check authentication information<br/>in camera settings"));
-    m_unauthorizedStaticSubText.setPerformanceHint(QStaticText::AggressiveCaching);
-    m_unauthorizedStaticSubText.setTextOption(QTextOption(Qt::AlignCenter));
-    m_loadingStaticText.setText(tr("Loading..."));
-    m_loadingStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+    m_staticFont.setPointSizeF(staticFontSize);
+    m_staticFont.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
+
+    m_staticTexts[NoDataText] = tr("NO DATA");
+    m_staticTexts[OfflineText] = tr("NO SIGNAL");
+    m_staticTexts[ServerOfflineText] = tr("Server offline");
+    m_staticTexts[UnauthorizedText] = tr("Unauthorized");
+    m_staticTexts[UnauthorizedSubText] = tr("Please check authentication information<br/>in camera settings");
+    m_staticTexts[LoadingText] = tr("Loading...");
+
+    for(int i = 0; i < m_staticTexts.size(); i++) {
+        m_staticTexts[i].setPerformanceHint(QStaticText::AggressiveCaching);
+        m_staticTexts[i].setTextOption(QTextOption(Qt::AlignCenter));
+        m_staticTexts[i].prepare(QTransform(), m_staticFont);
+    }
 
     /* Init buttons. */
     m_diagnosticsButton = new QnTextButtonWidget(this);
+    m_diagnosticsButton->setObjectName(lit("diagnosticsButton"));
     m_diagnosticsButton->setText(tr("Diagnose..."));
     m_diagnosticsButton->setFrameShape(Qn::RectangularFrame);
     m_diagnosticsButton->setRelativeFrameWidth(1.0 / 16.0);
     m_diagnosticsButton->setStateOpacity(0, 0.4);
     m_diagnosticsButton->setStateOpacity(QnImageButtonWidget::HOVERED, 0.7);
     m_diagnosticsButton->setStateOpacity(QnImageButtonWidget::PRESSED, 1.0);
-    m_diagnosticsButton->setWindowColor(buttonBaseColor);
-    m_diagnosticsButton->setFrameColor(buttonBorderColor);
+    m_diagnosticsButton->setFont(m_staticFont);
 
     connect(m_diagnosticsButton, SIGNAL(clicked()), this, SIGNAL(diagnosticsRequested()));
 
@@ -157,12 +156,12 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
     QRectF rect = this->rect();
 
-    painter->fillRect(rect, QColor(0, 0, 0, 128));
+    painter->fillRect(rect, palette().color(QPalette::Window));
 
     if(m_statusOverlay == Qn::LoadingOverlay || m_statusOverlay == Qn::PausedOverlay || m_statusOverlay == Qn::EmptyOverlay) {
         qreal unit = qnGlobals->workbenchUnitSize();
 
-        painter->beginNativePainting();
+        QnGlNativePainting::begin(painter);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -189,30 +188,30 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 //        glPopMatrix();
 
         glDisable(GL_BLEND);
-        painter->endNativePainting();
+        QnGlNativePainting::end(painter);
 
         if(m_statusOverlay == Qn::LoadingOverlay) {
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
-            paintFlashingText(painter, m_loadingStaticText, 0.125, QPointF(0.0, 0.15));
+            paintFlashingText(painter, m_staticTexts[LoadingText], 0.125, QPointF(0.0, 0.15));
 #else
-            paintFlashingText(painter, m_loadingStaticText, 0.125);
+            paintFlashingText(painter, m_staticTexts[LoadingText], 0.125);
 #endif
         }
     }
 
     switch (m_statusOverlay) {
     case Qn::NoDataOverlay:
-        paintFlashingText(painter, m_noDataStaticText, 0.125);
+        paintFlashingText(painter, m_staticTexts[NoDataText], 0.125);
         break;
     case Qn::OfflineOverlay:
-        paintFlashingText(painter, m_offlineStaticText, 0.125);
+        paintFlashingText(painter, m_staticTexts[OfflineText], 0.125);
         break;
     case Qn::UnauthorizedOverlay:
-        paintFlashingText(painter, m_unauthorizedStaticText, 0.125);
-        paintFlashingText(painter, m_unauthorizedStaticSubText, 0.05, QPointF(0.0, 0.25));
+        paintFlashingText(painter, m_staticTexts[UnauthorizedText], 0.125);
+        paintFlashingText(painter, m_staticTexts[UnauthorizedSubText], 0.05, QPointF(0.0, 0.25));
         break;
     case Qn::ServerOfflineOverlay:
-        paintFlashingText(painter, m_serverOfflineStaticText, 0.125);
+        paintFlashingText(painter, m_staticTexts[ServerOfflineText], 0.125);
         break;
     default:
         break;
@@ -224,23 +223,19 @@ void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, const QStaticTe
     QRectF rect = this->rect();
     qreal unit = qMin(rect.width(), rect.height());
 
-    QFont font;
-    font.setPointSizeF(textSize * 1000);
-    font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
-
-    QnScopedPainterFontRollback fontRollback(painter, font);
-    QnScopedPainterPenRollback penRollback(painter, textColor);
+    QnScopedPainterFontRollback fontRollback(painter, m_staticFont);
+    QnScopedPainterPenRollback penRollback(painter, palette().color(QPalette::WindowText));
     QnScopedPainterTransformRollback transformRollback(painter);
 
     qreal opacity = painter->opacity();
-    painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(testFlashingPeriodMSec * 2) * M_PI)));
+    painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(flashingPeriodMSec * 2) * M_PI)));
     painter->translate(rect.center() + offset * unit);
-    painter->scale(unit / 1000, unit / 1000);
+    painter->scale(textSize * unit / staticFontSize, textSize * unit / staticFontSize);
 
     painter->drawStaticText(-toPoint(text.size() / 2), text);
     painter->setOpacity(opacity);
 
     Q_UNUSED(transformRollback)
     Q_UNUSED(penRollback)
-    Q_UNUSED(fontRollback)
+    Q_UNUSED(fontRollback) // TODO: #Elric remove
 }

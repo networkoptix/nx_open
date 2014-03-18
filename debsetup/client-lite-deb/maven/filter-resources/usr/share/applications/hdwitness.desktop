@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=${product.name} Lite
-Comment=${product.name} Client Lite
-Exec=/opt/${deb.customization.company.name}/client-lite/bin/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/applauncher
-Icon=vmsclient-${customization}.png
-Terminal=false
-Type=Application
-StartupNotify=true

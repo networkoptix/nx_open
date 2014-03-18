@@ -11,7 +11,7 @@
 /**
  * @brief The QnWorkbenchExportHandler class            Handler for video and layout export related actions.
  */
-class QnWorkbenchExportHandler: public QObject, protected QnWorkbenchContextAware
+class QnWorkbenchExportHandler: public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 

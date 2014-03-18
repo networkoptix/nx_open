@@ -123,7 +123,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         if (url.isEmpty())
         {
             qWarning() << "Invalid answer from DLink camera " << m_resource->getUrl() << ". Expecting non empty rtsl url.";
-            return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), QString::fromLatin1("config/rtspurl.cgi?profileid=%1").arg(dlinkProfile) );
+            return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), lit("config/rtspurl.cgi?profileid=%1").arg(dlinkProfile) );
         }
 
         m_rtpReader.setRequest(url);
@@ -148,6 +148,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
 
         if (url.length() > 1 && url.at(0)==QLatin1Char('/'))
             url = url.mid(1);
+        NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(url).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
 
         mHttpClient = new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth());
         const CLHttpStatus status = mHttpClient->doGET(url);

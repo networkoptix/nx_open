@@ -50,6 +50,10 @@ class PasswordHelper
     static const char* UBIQUITI_MANUFACTURER;
     static const char* CAMERA_MANUFACTURER;
 
+    static const char* DVTEL_MANUFACTURER;
+    static const char* FLIR_MANUFACTURER;
+    static const char* SENTRY_MANUFACTURER;
+
     //QHash<Manufacturer, Passwords>
     typedef QHash<QString, PasswordList> ManufacturerPasswords;
 

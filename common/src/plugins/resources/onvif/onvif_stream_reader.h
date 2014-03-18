@@ -41,6 +41,7 @@ protected:
     virtual CameraDiagnostics::Result openStream() override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
+    virtual void setCameraControlDisabled(bool value) override;
 
 
     virtual void updateStreamParamsBasedOnQuality() override;
@@ -102,6 +103,7 @@ private:
     int m_cachedFps;
     Qn::StreamQuality m_cachedQuality;
     QElapsedTimer m_cachedTimer;
+    Qn::StreamQuality m_cachedSecondaryQuality;
 };
 
 #endif //ENABLE_ONVIF

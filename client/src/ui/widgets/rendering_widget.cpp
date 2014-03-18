@@ -12,7 +12,7 @@
 
 
 QnRenderingWidget::QnRenderingWidget(const QGLFormat &format, QWidget *parent, QGLWidget *shareWidget, Qt::WindowFlags f):
-    QGLWidget(format, parent, shareWidget, f),
+    QnGLWidget(format, parent, shareWidget, f),
     m_display(NULL),
     m_renderer(NULL)
 {

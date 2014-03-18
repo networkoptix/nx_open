@@ -30,10 +30,6 @@ public:
     virtual bool getPresets(QnPtzPresetList *presets) override;
 
 private:
-    Q_SIGNAL void finishedLater(Qn::PtzCommand command, const QVariant &data);
-
-private:
-    bool m_asynchronous;
     QMutex m_mutex;
     QnResourcePropertyAdaptor<QnPtzPresetRecordHash> *m_adaptor;
 };

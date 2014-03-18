@@ -110,8 +110,7 @@ void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem *option, c
         }
         option->palette.setColor(QPalette::Highlight, qnGlobals->businessRuleDisabledHighlightColor());
     } else if (!index.data(Qn::ValidRole).toBool()) {
-        QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
-        option->palette.setColor(QPalette::Highlight, clr.lighter());
+        option->palette.setColor(QPalette::Highlight, qnGlobals->businessRuleInvalidHighlightColor());
     }
 }
 
