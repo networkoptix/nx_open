@@ -266,9 +266,7 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
         }
 
         if (existing.rowType != InvalidRow) {
-            // TODO: #GDM _OH_ _MY_ _FUCKING_ _GOD_
-            // Popping up a dialog in model class is a really bad idea. 
-            // Please implement properly.
+            // TODO: #dklychkov move it out of here (to item delegate maybe)
 
             QString message = (existing.rowType == PresetRow)
                               ? tr("This hotkey is used by preset \"%1\"").arg(existing.presetModel.preset.name)
