@@ -20,6 +20,8 @@
 #include "core/resource/resource.h"
 
 DeviceFileCatalog::RebuildMethod DeviceFileCatalog::m_rebuildArchive = DeviceFileCatalog::Rebuild_None;
+QMutex DeviceFileCatalog::m_rebuildMutex;
+QSet<void*> DeviceFileCatalog::m_pauseList;
 
 QString DeviceFileCatalog::prefixForRole(QnResource::ConnectionRole role)
 {
@@ -332,11 +334,32 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(QnStorageResourcePtr s
     return chunk;
 }
 
+void DeviceFileCatalog::rebuildPause(void* value)
+{
+    QMutexLocker lock(&m_rebuildMutex);
+    m_pauseList << value;
+}
+
+void DeviceFileCatalog::rebuildResume(void* value)
+{
+    QMutexLocker lock(&m_rebuildMutex);
+    m_pauseList.remove(value);
+}
+
+bool DeviceFileCatalog::needRebuildPause()
+{
+    QMutexLocker lock(&m_rebuildMutex);
+    return !m_pauseList.isEmpty();
+}
+
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList)
 {
     QDir dir(folder);
     foreach(const QFileInfo& fi, dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name))
     {
+        while (m_rebuildArchive != Rebuild_None && needRebuildPause())
+            QnLongRunnable::msleep(100);
+
         if (m_rebuildArchive == Rebuild_None)
             return; // cancceled
 

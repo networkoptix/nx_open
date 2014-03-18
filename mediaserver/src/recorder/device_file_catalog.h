@@ -88,6 +88,12 @@ public:
 
     static void setRebuildArchive(RebuildMethod value);
     static void cancelRebuildArchive();
+    static bool needRebuildPause();
+    static void rebuildPause(void*);
+    static void rebuildResume(void*);
+    static QMutex m_rebuildMutex;
+    static QSet<void*> m_pauseList;
+
     void beforeRebuildArchive();
 
     bool readCatalog();
