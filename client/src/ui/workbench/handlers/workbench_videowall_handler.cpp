@@ -1397,7 +1397,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_pcAdded(const QnVideoWallResource
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_pcChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc) {
-    //TODO: #GDM VW implement
+    //TODO: #GDM VW implement screen size changes handling
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc) {
@@ -1405,15 +1405,18 @@ void QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved(const QnVideoWallResour
     if (!layout)
         return;
 
+    QList<QnWorkbenchItem*> itemsToDelete;
     foreach(QnWorkbenchItem *workbenchItem, layout->items()) {
         QnLayoutItemData data = workbenchItem->data();
         QUuid pcUuid = data.dataByRole[Qn::VideoWallPcGuidRole].value<QUuid>();
         if (pcUuid != pc.uuid)
             continue;
 
-        layout->removeItem(workbenchItem);
-        return;
+        itemsToDelete << workbenchItem;
     }
+
+    foreach(QnWorkbenchItem *workbenchItem, itemsToDelete)
+        layout->removeItem(workbenchItem);
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
@@ -1446,11 +1449,48 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
-    //TODO: #GDM VW implement
+    //TODO: #GDM VW implement screen size changes handling
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
-    //TODO: #GDM VW implement
+    QnWorkbenchLayout* layout = findReviewModeLayout(videoWall);
+    if (!layout)
+        return;
+
+    if (!videoWall->hasPc(item.pcUuid))
+        return;
+
+    QnVideoWallPcData pc = videoWall->getPc(item.pcUuid);
+
+    foreach(QnWorkbenchItem *workbenchItem, layout->items()) {
+        QnLayoutItemData data = workbenchItem->data();
+        QUuid pcUuid = data.dataByRole[Qn::VideoWallPcGuidRole].value<QUuid>();
+        if (pcUuid != item.pcUuid)
+            continue;
+
+        QRectF combinedGeometry;
+        QList<int> screenIndices = data.dataByRole[Qn::VideoWallPcScreenIndicesRole].value<QList<int> >();
+        foreach(const QnVideoWallPcData::PcScreen &screen, pc.screens) {
+            if (!screenIndices.contains(screen.index))
+                continue;
+            combinedGeometry = combinedGeometry.united(screen.desktopGeometry);
+        }
+
+        if (!combinedGeometry.contains(item.geometry))
+            continue;
+
+        // we found the widget containing removed item
+        foreach (const QnVideoWallItem &existingItem, videoWall->getItems()) {
+            if (existingItem.pcUuid != item.pcUuid)
+                continue;
+
+            if (combinedGeometry.contains(existingItem.geometry))
+                return; //that wasn't last item
+        }
+
+        layout->removeItem(workbenchItem);
+        return; // no need to check other items
+    }
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_activeMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {

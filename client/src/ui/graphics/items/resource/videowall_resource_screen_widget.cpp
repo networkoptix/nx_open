@@ -262,8 +262,6 @@ QnVideowallResourceScreenWidget::QnVideowallResourceScreenWidget(QnWorkbenchCont
     QnVideoWallPcData pc = m_videowall->getPc(m_pcUuid);
     QList<int> screenIndices = item->data(Qn::VideoWallPcScreenIndicesRole).value<QList<int> >();
 
-    //TODO: #GDM VW if pc list updated or a single pc changed, videowall review layout must be invalidated
-
     foreach(const QnVideoWallPcData::PcScreen &screen, pc.screens) {
         if (!screenIndices.contains(screen.index))
             continue;
