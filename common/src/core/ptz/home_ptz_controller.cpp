@@ -100,7 +100,10 @@ bool QnHomePtzController::getHomeObject(QnPtzObject *homeObject) {
 
 void QnHomePtzController::at_adaptor_valueChanged() {
     m_executor->setHomePosition(m_adaptor->value());
-    m_executor->restart();
+    
+    /* Restart only if it's running right now. */
+    if(m_executor->isRunning())
+        m_executor->restart(); 
 
     emit changed(Qn::HomeObjectPtzField);
 }
