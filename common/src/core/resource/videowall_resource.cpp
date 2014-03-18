@@ -125,11 +125,19 @@ void QnVideoWallResource::removeItemUnderLock(const QUuid &itemUuid) {
         return;
 
     QnVideoWallItem item = *pos;
+    QUuid pcUuid = item.pcUuid;
     m_itemByUuid.erase(pos);
 
     m_mutex.unlock();
     emit itemRemoved(::toSharedPointer(this), item);
     m_mutex.lock();
+
+    foreach(const QnVideoWallItem &item, m_itemByUuid)
+        if (item.pcUuid == pcUuid)
+            return;
+
+    //removed last item from this pc
+    removePcUnderLock(pcUuid);
 }
 
 //------------ Pc methods ------------------------------------------------
