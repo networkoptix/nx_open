@@ -72,7 +72,7 @@ void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr 
         }
 
         m_resource = resource;
-
+        
         if(m_resource)
             connect(resource, &QnResource::propertyChanged, this, &QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged);
 
@@ -97,6 +97,7 @@ QString QnAbstractResourcePropertyAdaptor::serializedValue() const {
 }
 
 void QnAbstractResourcePropertyAdaptor::setValue(const QVariant &value) {
+    bool save = false;
     {
         QMutexLocker locker(&m_mutex);
 
@@ -107,14 +108,18 @@ void QnAbstractResourcePropertyAdaptor::setValue(const QVariant &value) {
 
         if(!m_handler->serialize(m_value, &m_serializedValue))
             m_serializedValue = QString();
+        
+        save = m_resource;
     }
     
-    enqueueSaveRequest();
+    if(save)
+        enqueueSaveRequest();
 
     emit valueChanged();
 }
 
 bool QnAbstractResourcePropertyAdaptor::testAndSetValue(const QVariant &expectedValue, const QVariant &newValue) {
+    bool save = false;
     {
         QMutexLocker locker(&m_mutex);
 
@@ -128,9 +133,12 @@ bool QnAbstractResourcePropertyAdaptor::testAndSetValue(const QVariant &expected
 
         if(!m_handler->serialize(m_value, &m_serializedValue))
             m_serializedValue = QString();
+
+        save = m_resource;
     }
 
-    enqueueSaveRequest();
+    if(save)
+        enqueueSaveRequest();
 
     emit valueChanged();
     return true;
