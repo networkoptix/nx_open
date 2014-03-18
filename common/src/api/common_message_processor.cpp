@@ -10,6 +10,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include "common/common_module.h"
+#include "utils/common/synctime.h"
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     QObject(parent)
@@ -272,4 +273,42 @@ void QnCommonMessageProcessor::afterRemovingResource(const QnId& id)
             emit businessRuleChanged(updatedRule);
         }
     }
+}
+
+void QnCommonMessageProcessor::updateHardwareIds(const ec2::QnFullResourceData& fullData)
+{
+    qnLicensePool->setMainHardwareIds(fullData.serverInfo.mainHardwareIds);
+    qnLicensePool->setCompatibleHardwareIds(fullData.serverInfo.compatibleHardwareIds);
+}
+
+void QnCommonMessageProcessor::processResources(const QnResourceList& resources)
+{
+    qnResPool->beginTran();
+    foreach (const QnResourcePtr& resource, resources)
+        updateResource(resource);
+    qnResPool->commit();
+}
+
+void QnCommonMessageProcessor::processLicenses(const QnLicenseList& licenses)
+{
+    qnLicensePool->replaceLicenses(licenses);
+}
+
+void QnCommonMessageProcessor::processCameraServerItems(const QnCameraHistoryList& cameraHistoryList)
+{
+    foreach(QnCameraHistoryPtr history, cameraHistoryList)
+        QnCameraHistoryPool::instance()->addCameraHistory(history);
+}
+
+
+void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
+{
+    QnAppServerConnectionFactory::setBox(fullData.serverInfo.armBox);
+
+    updateHardwareIds(fullData);
+    processResources(fullData.resources);
+    processLicenses(fullData.licenses);
+    processCameraServerItems(fullData.cameraHistory);
+
+    qnSyncTime->reset();
 }
