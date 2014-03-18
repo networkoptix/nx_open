@@ -49,8 +49,8 @@
 #include <utils/common/json_functions.h>
 #include <utils/common/string.h>
 
-#define SENDER_DEBUG
-#define RECEIVER_DEBUG
+//#define SENDER_DEBUG
+//#define RECEIVER_DEBUG
 
 namespace {
     #define PARAM_KEY(KEY) const QLatin1String KEY##Key(BOOST_PP_STRINGIZE(KEY));
@@ -372,7 +372,6 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
         connection()->saveAsync(videoWall);
 }
 
-//TODO: #GDM VW use action
 void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args) {
     QStringList arguments = args;
 
@@ -385,8 +384,8 @@ void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args) {
 
 #ifdef SENDER_DEBUG
     qDebug() << "arguments" << arguments;
-#endif
     //--videowall {1f91dc77-229a-4b1e-9b07-99a5c2650a5a} --auth https://127.0.0.1:7011
+#endif
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
 }
 
@@ -755,7 +754,7 @@ void QnWorkbenchVideoWallHandler::setReviewMode(bool active) {
     if (m_reviewMode.active == active)
         return;
     m_reviewMode.active = active;
-    //TODO: #GDM VW what should we update or notify?
+    //TODO: #GDM VW what should we update or notify? Is it still required?
 }
 
 
@@ -1297,12 +1296,12 @@ void QnWorkbenchVideoWallHandler::at_videoWall_saved(int status, const QnResourc
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_layout_saved(int status, const QnResourceList &resources, int handle) {
-    //TODO: #GDM VW remove handle from maps in case of unsuccessful requests
-    if (status != 0)
+    if (status != 0 || resources.size() == 0) {
+        m_attaching.remove(handle);
+        m_resetting.remove(handle);
+        //TODO: #GDM VW should we display an error message?
         return;
-
-    if (resources.size() == 0)
-        return;
+    }
 
     QnLayoutResourcePtr layout = resources.first().dynamicCast<QnLayoutResource>();
     if (!layout)

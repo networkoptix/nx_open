@@ -165,7 +165,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     m_filterTimerId(0),
     m_tooltipWidget(NULL),
     m_hoverProcessor(NULL),
-    m_thumbnailManager(new QnCameraThumbnailManager(this))
+    m_thumbnailManager(context->instance<QnCameraThumbnailManager>())
 {
     ui->setupUi(this);
 

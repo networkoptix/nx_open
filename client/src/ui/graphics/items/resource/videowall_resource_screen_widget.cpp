@@ -17,6 +17,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 
 #include <ui/style/skin.h>
@@ -244,7 +245,7 @@ QnVideowallResourceScreenWidget::QnVideowallResourceScreenWidget(QnWorkbenchCont
 {
     setOption(QnResourceWidget::WindowRotationForbidden, true);
 
-    m_videowall = base_type::resource().dynamicCast<QnVideoWallResource>(); //TODO: #GDM VW check null in all usage places
+    m_videowall = base_type::resource().dynamicCast<QnVideoWallResource>();
     if(!m_videowall) {
         qnCritical("QnVideowallResourceScreenWidget was created with a non-videowall resource.");
         return;
@@ -254,10 +255,11 @@ QnVideowallResourceScreenWidget::QnVideowallResourceScreenWidget(QnWorkbenchCont
     connect(m_videowall, &QnVideoWallResource::itemChanged,   this, &QnVideowallResourceScreenWidget::at_videoWall_itemChanged);
     connect(m_videowall, &QnVideoWallResource::itemRemoved,   this, &QnVideowallResourceScreenWidget::at_videoWall_itemRemoved);
 
-
     m_pcUuid = item->data(Qn::VideoWallPcGuidRole).value<QUuid>();
-    QnVideoWallPcData pc = m_videowall->getPc(m_pcUuid);  //TODO: #GDM VW check null in all usage places
+    if (!m_videowall->hasPc(m_pcUuid))
+        return;
 
+    QnVideoWallPcData pc = m_videowall->getPc(m_pcUuid);
     QList<int> screenIndices = item->data(Qn::VideoWallPcScreenIndicesRole).value<QList<int> >();
 
     //TODO: #GDM VW if pc list updated or a single pc changed, videowall review layout must be invalidated
@@ -269,14 +271,13 @@ QnVideowallResourceScreenWidget::QnVideowallResourceScreenWidget(QnWorkbenchCont
         m_desktopGeometry = m_desktopGeometry.united(screen.desktopGeometry);
     }
 
-    if (m_desktopGeometry.isValid())    //TODO: #GDM VW and if not?
+    if (m_desktopGeometry.isValid())
         setAspectRatio((qreal)m_desktopGeometry.width() / m_desktopGeometry.height());
 
-    foreach (const QnVideoWallItem &item, m_videowall->getItems()) {
+    foreach (const QnVideoWallItem &item, m_videowall->getItems())
         at_videoWall_itemAdded(m_videowall, item);
-    }
 
-    m_thumbnailManager = new QnCameraThumbnailManager(this);
+    m_thumbnailManager = context->instance<QnCameraThumbnailManager>();
     connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this, &QnVideowallResourceScreenWidget::at_thumbnailReady);
 
     updateButtonsVisibility();
