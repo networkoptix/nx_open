@@ -662,6 +662,25 @@ Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnResourceL
     return Qn::InvisibleAction;
 }
 
+Qn::ActionVisibility QnAttachVideoWallLayoutActionCondition::check(const QnActionParameters &parameters) {
+    if (!context()->user() || !parameters.resource()->hasFlags(QnResource::videowall))
+        return Qn::InvisibleAction;
+
+    QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole,
+                                                                          workbench()->currentLayout()->resource());
+
+    if (layout->data().contains(Qn::VideoWallResourceRole))
+        return Qn::InvisibleAction;
+
+    if (snapshotManager()->isFile(layout))
+        return Qn::InvisibleAction;
+
+    if (accessController()->globalPermissions() & Qn::GlobalEditVideoWallPermission)
+        return Qn::EnabledAction;
+
+    return Qn::InvisibleAction;
+}
+
 Qn::ActionVisibility QnResetVideoWallLayoutActionCondition::check(const QnActionParameters &parameters) {
     if (!context()->user() || parameters.videoWallItems().isEmpty())
         return Qn::InvisibleAction;
@@ -669,6 +688,9 @@ Qn::ActionVisibility QnResetVideoWallLayoutActionCondition::check(const QnAction
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole,
                                                                           workbench()->currentLayout()->resource());
     if (layout->data().contains(Qn::VideoWallResourceRole))
+        return Qn::InvisibleAction;
+
+    if (snapshotManager()->isFile(layout))
         return Qn::InvisibleAction;
 
     if (accessController()->globalPermissions() & Qn::GlobalEditVideoWallPermission)

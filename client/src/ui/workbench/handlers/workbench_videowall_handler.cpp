@@ -935,21 +935,14 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
 }
 
 void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
-    if (!context()->user())
-        return;
+    QnActionParameters parameters = menu()->currentParameters(sender());
 
-    QnVideoWallResourcePtr videoWall = menu()->currentParameters(sender()).resource().dynamicCast<QnVideoWallResource>();
+    QnVideoWallResourcePtr videoWall = parameters.resource().dynamicCast<QnVideoWallResource>();
     if(videoWall.isNull())
         return;    // TODO: #GDM VW implement videoWall selection / creation dialog
 
-    // TODO: #GDM VW ugly copypaste, make common check in action_conditions
-    QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
-    if (snapshotManager()->isFile(layout))
-        return; // TODO: #GDM VW action should not be available
-
-    // attaching review layouts is disallowed
-    if (layout->data().contains(Qn::VideoWallResourceRole))
-        return;  // TODO: #GDM VW action should not be available
+    QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole,
+                                                                          workbench()->currentLayout()->resource());
 
     //TODO: #GDM VW extract copy layout method
     QnLayoutResourcePtr newLayout(new QnLayoutResource());
@@ -962,7 +955,6 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     newLayout->setBackgroundOpacity(layout->backgroundOpacity());
     newLayout->setBackgroundSize(layout->backgroundSize());
     newLayout->setUserCanEdit(true);
-    resourcePool()->addResource(newLayout);
 
     QnLayoutItemDataList items = layout->getItems().values();
     QHash<QUuid, QUuid> newUuidByOldUuid;
@@ -975,6 +967,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
         items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QUuid());
     newLayout->setItems(items);
 
+    resourcePool()->addResource(newLayout);
     int requestId = snapshotManager()->save(newLayout, this, SLOT(at_videoWall_layout_saved(int, const QnResourceList &, int)));
     m_attaching.insert(requestId, videoWall);
 }
@@ -1006,14 +999,6 @@ void QnWorkbenchVideoWallHandler::at_resetVideoWallLayoutAction_triggered() {
     QnVideoWallItemIndexList items = parameters.videoWallItems();
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole,
                                                                           workbench()->currentLayout()->resource());
-
-    // TODO: #GDM VW ugly copypaste, make common check in action_conditions
-    if (snapshotManager()->isFile(layout))
-        return; // TODO: #GDM VW action should not be available
-
-    // attaching review layouts is disallowed
-    if (layout->data().contains(Qn::VideoWallResourceRole))
-        return;  // TODO: #GDM VW action should not be available
 
     layout->setCellSpacing(QSizeF(0.0, 0.0));
     layout->setUserCanEdit(true);

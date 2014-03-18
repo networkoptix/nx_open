@@ -869,7 +869,7 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::SavePermission). //TODO: #GDM VW what if current layout is already saved and not ours?
         text(tr("Attach to Video Wall")).
         autoRepeat(false).
-        condition(hasFlags(QnResource::videowall));
+        condition(new QnAttachVideoWallLayoutActionCondition(this));
 
     factory(Qn::StartVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
