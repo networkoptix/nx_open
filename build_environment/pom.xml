@@ -300,7 +300,7 @@
             </dependencies>           
         </profile>
         <profile>
-            <id>noarm</id>
+            <id>desktop</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>

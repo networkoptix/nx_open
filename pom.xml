@@ -254,7 +254,7 @@
             </properties>
         </profile>  
         <profile>        
-            <id>noarm</id>
+            <id>desktop</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
@@ -357,7 +357,7 @@
         </profile>        
 
         <profile>
-            <id>linux-arm-isd</id>
+            <id>linux-isd-jaguar</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -371,7 +371,8 @@
             </activation>
             <properties>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-                <toolchain.version>2013.11</toolchain.version>
+                <toolchain.version>codesourcery-2013.11</toolchain.version>
+                <qt.dir>${environment.dir}/qt5/qtbase-${arch}-${toolchain.version}</qt.dir>
                 <compiler>2011.09</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
@@ -381,7 +382,32 @@
             <modules>
                 <module>plugins/isd_native_plugin</module>
             </modules>
-        </profile>  
+        </profile> 
+
+        <profile>
+            <id>linux-isd-s2</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os> 
+                <property>
+                    <name>box</name>
+                    <value>isd_s2</value>
+                </property>
+            </activation>
+            <properties>
+                <toolchain.version>linaro-multilib-2013.09</toolchain.version>
+                <compiler>${toolchain.version}</compiler>
+                <qt.dir>${environment.dir}/qt5/qtbase-${arch}-${toolchain.version}</qt.dir>
+                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
+                <openssl.version>1.0.1f-SNAPSHOT</openssl.version>
+                <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
+                <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER</additional.defines>
+            </properties>
+        </profile>
 
         <profile>
             <id>linux-arm-rpi</id>
@@ -397,9 +423,10 @@
                 </property>
             </activation>
             <properties>
-                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
+                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
+                <qt.dir>${environment.dir}/qt5/qtbase-${arch}-${toolchain.version}</qt.dir>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
                 <additional.defines>DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA</additional.defines>
