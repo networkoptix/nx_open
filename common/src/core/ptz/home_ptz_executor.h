@@ -17,6 +17,7 @@ public:
 
     void restart();
     void stop();
+    bool isRunning();
     
     void setHomePosition(const QnPtzObject &homePosition);
     QnPtzObject homePosition() const;
