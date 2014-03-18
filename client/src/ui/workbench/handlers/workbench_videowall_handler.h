@@ -78,8 +78,16 @@ private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
 
+    void at_videoWall_pcAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc);
+    void at_videoWall_pcChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc);
+    void at_videoWall_pcRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc);
+
+    void at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
+
+    void at_videoWall_itemChanged_activeMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
+    void at_videoWall_itemRemoved_activeMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 
     void at_eventManager_controlMessageReceived(const QnVideoWallControlMessage &message);
 
@@ -160,7 +168,6 @@ private:
     static ScreenSnap findNearest(const QList<ScreenSnap> &snaps, int value);
     static ScreenSnap findEdge(const QList<ScreenSnap> &snaps, QList<int> screens, bool backward = false);
     static QList<int> getScreensByItem(const ScreenSnaps &snaps, const QRect &source);
-
 private:
     typedef QHash<qint64, QnVideoWallControlMessage> StoredMessagesHash;
 

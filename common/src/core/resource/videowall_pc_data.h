@@ -38,14 +38,6 @@ public:
     QUuid uuid;
     QList<PcScreen> screens;
 
-//    QRect unitedGeometry() const {
-//        QRect result;
-//        foreach (PcScreen screen, screens) {
-//            result = result.united(screen.geometry);
-//        }
-//        return result;
-//    }
-
     friend bool operator==(const QnVideoWallPcData &l, const QnVideoWallPcData &r) {
         return (l.uuid == r.uuid &&
                 l.screens == r.screens);
