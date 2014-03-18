@@ -407,6 +407,9 @@
                 <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER</additional.defines>
             </properties>
+            <modules>
+                <module>plugins/isd_native_plugin</module>
+            </modules>
         </profile>
 
         <profile>
