@@ -372,6 +372,12 @@ protected:
     mutable QnParamList m_resourceParamList;
 
     static bool m_appStopping;
+
+    /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
+    QnId m_parentId;
+
+    /** Name of this resource. */
+    QString m_name;
 private:
     /** Resource pool this this resource belongs to. */
     QnResourcePool *m_resourcePool;
@@ -382,18 +388,12 @@ private:
     /** Globally unique identifier ot this resource. */
     QString m_guid;
 
-    /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
-    QnId m_parentId;
-
     /** Identifier of the type of this resource. */
     QnId m_typeId;
 
     /** Flags of this resource that determine its type. */
     Flags m_flags;
     
-    /** Name of this resource. */
-    QString m_name;
-
     /** Disable flag of the resource. */
     bool m_disabled;
 

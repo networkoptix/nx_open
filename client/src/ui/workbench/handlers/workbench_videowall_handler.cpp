@@ -944,29 +944,11 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole,
                                                                           workbench()->currentLayout()->resource());
 
-    //TODO: #GDM VW extract copy layout method
-    QnLayoutResourcePtr newLayout(new QnLayoutResource());
-    newLayout->setGuid(QUuid::createUuid().toString());
+    QnLayoutResourcePtr newLayout = layout->clone();
     newLayout->setName(generateUniqueLayoutName(context()->user(), tr("VideoWall Layout"),  tr("VideoWall Layout %1")));
     newLayout->setParentId(context()->user()->getId());
     newLayout->setCellSpacing(QSizeF(0.0, 0.0));
-    newLayout->setCellAspectRatio(layout->cellAspectRatio());
-    newLayout->setBackgroundImageFilename(layout->backgroundImageFilename());
-    newLayout->setBackgroundOpacity(layout->backgroundOpacity());
-    newLayout->setBackgroundSize(layout->backgroundSize());
     newLayout->setUserCanEdit(true);
-
-    QnLayoutItemDataList items = layout->getItems().values();
-    QHash<QUuid, QUuid> newUuidByOldUuid;
-    for(int i = 0; i < items.size(); i++) {
-        QUuid newUuid = QUuid::createUuid();
-        newUuidByOldUuid[items[i].uuid] = newUuid;
-        items[i].uuid = newUuid;
-    }
-    for(int i = 0; i < items.size(); i++)
-        items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QUuid());
-    newLayout->setItems(items);
-
     resourcePool()->addResource(newLayout);
     int requestId = snapshotManager()->save(newLayout, this, SLOT(at_videoWall_layout_saved(int, const QnResourceList &, int)));
     m_attaching.insert(requestId, videoWall);

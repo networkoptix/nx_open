@@ -23,6 +23,34 @@ QnLayoutResource::QnLayoutResource():
     addFlags(QnResource::layout);
 }
 
+QnLayoutResourcePtr QnLayoutResource::clone() const {
+    QMutexLocker locker(&m_mutex);
+
+    QnLayoutResourcePtr result(new QnLayoutResource());
+    result->setGuid(QUuid::createUuid().toString());
+    result->setName(m_name);
+    result->setParentId(m_parentId);
+    result->setCellSpacing(m_cellSpacing);
+    result->setCellAspectRatio(m_cellAspectRatio);
+    result->setBackgroundImageFilename(m_backgroundImageFilename);
+    result->setBackgroundOpacity(m_backgroundOpacity);
+    result->setBackgroundSize(m_backgroundSize);
+    result->setUserCanEdit(m_userCanEdit);
+
+    QnLayoutItemDataList items = m_itemByUuid.values();
+    QHash<QUuid, QUuid> newUuidByOldUuid;
+    for(int i = 0; i < items.size(); i++) {
+        QUuid newUuid = QUuid::createUuid();
+        newUuidByOldUuid[items[i].uuid] = newUuid;
+        items[i].uuid = newUuid;
+    }
+    for(int i = 0; i < items.size(); i++)
+        items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QUuid());
+    result->setItems(items);
+
+    return result;
+}
+
 void QnLayoutResource::setItems(const QnLayoutItemDataList& items) {
     QnLayoutItemDataMap map;
     foreach(const QnLayoutItemData &item, items)
