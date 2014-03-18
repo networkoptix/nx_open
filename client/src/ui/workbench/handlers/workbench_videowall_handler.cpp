@@ -147,8 +147,6 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     m_controlMode.active = false;
     m_controlMode.sequence = 0;
 
-    m_reviewMode.active = false;
-
     QUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull()) {
         pcUuid = QUuid::createUuid();
@@ -767,24 +765,12 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
     }
 }
 
-void QnWorkbenchVideoWallHandler::setReviewMode(bool active) {
-    if (m_reviewMode.active == active)
-        return;
-    m_reviewMode.active = active;
-    //TODO: #GDM VW what should we update or notify? Is it still required?
-}
-
-
 void QnWorkbenchVideoWallHandler::updateMode() {
     QnWorkbenchLayout* layout = workbench()->currentLayout();
 
     QUuid itemUuid = layout->data(Qn::VideoWallItemGuidRole).value<QUuid>();
     bool control = !itemUuid.isNull();
     setControlMode(control);
-
-    QnVideoWallResourcePtr videoWall = layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
-    bool review = !videoWall.isNull();
-    setReviewMode(review);
 }
 
 void QnWorkbenchVideoWallHandler::submitDelayedItemOpen() {

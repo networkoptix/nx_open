@@ -40,7 +40,6 @@ private:
     void sendInstanceGuid();
 
     void setControlMode(bool active);
-    void setReviewMode(bool active);
     void updateMode();
 
     void sendMessage(QnVideoWallControlMessage message);
@@ -187,11 +186,6 @@ private:
         QString pcUuid;
         qint64 sequence;
     } m_controlMode;
-
-    struct {
-        bool active;
-    } m_reviewMode;
-
 
     QHash<QUuid, ScreenSnaps> m_screenSnapsByUuid;
 

@@ -1364,7 +1364,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
 
     bool sliderVisible =
         navigator()->currentWidget() != NULL &&
-        !(navigator()->currentWidget()->resource()->flags() & (QnResource::still_image | QnResource::server | QnResource::layout)) &&
+        !(navigator()->currentWidget()->resource()->flags() & (QnResource::still_image | QnResource::server | QnResource::videowall)) &&
         ((accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) || !(navigator()->currentWidget()->resource()->flags() & QnResource::live)) &&
         !action(Qn::ToggleTourModeAction)->isChecked();
 
