@@ -95,7 +95,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     }
     tran.timestamp -= sender->timeDiff();
 
-    qDebug() << "got transaction " << ApiCommand::Value(tran.command);
+    qDebug() << "got transaction " << ApiCommand::toString(tran.command);
 
     AlivePeersMap:: iterator itr = m_alivePeers.find(tran.id.peerGUID);
     if (itr != m_alivePeers.end())
