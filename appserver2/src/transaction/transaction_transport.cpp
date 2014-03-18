@@ -229,8 +229,10 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     }
     remoteAddr.setQuery(q);
     m_remoteAddr = remoteAddr;
-    if (!m_httpClient->doGet(remoteAddr))
+    if (!m_httpClient->doGet(remoteAddr)) {
+        qWarning() << Q_FUNC_INFO << "Failed to execute m_httpClient->doGet. Reconnect transaction transport";
         setState(Error);
+    }
 }
 
 bool QnTransactionTransport::tryAcquireConnecting(const QnId& remoteGuid, bool isOriginator)
@@ -301,6 +303,7 @@ void QnTransactionTransport::cancelConnecting()
 {
     if (getState() == ConnectingStage2)
         QnTransactionTransport::connectingCanceled(m_remoteGuid, true);
+    qWarning() << Q_FUNC_INFO << "Connection canceled from state " << getState();
     setState(Error);
 }
 
