@@ -6,8 +6,8 @@
 #include "ptz_object.h"
 
 namespace {
-    //int homeTimeout = 5 * 60 * 1000;
-    int homeTimeout = 10 * 1000;
+    int homeTimeout = 2 * 60 * 1000;
+    //int homeTimeout = 10 * 1000;
 }
 
 // -------------------------------------------------------------------------- //
