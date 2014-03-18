@@ -59,9 +59,9 @@ if __name__ == '__main__':
             
     if get_platform() == 'windows':        
         for arch in ('x86', 'x64'):
-            plugin_source_dir = '${qt.dir}/plugins' % arch
-            lib_source_dir = '${qt.dir}/bin' % arch
-            pdb_source_dir = '${qt.dir}/lib' % arch
+            plugin_source_dir = '${environment.dir}/qt5/qtbase-%s/plugins' % arch
+            lib_source_dir = '${environment.dir}/qt5/qtbase-%s/bin' % arch
+            pdb_source_dir = '${environment.dir}/qt5/qtbase-%s/lib' % arch
             target_dir = join('${project.build.directory}', arch, 'bin')
             lib_target_dir = join('${project.build.directory}', arch, 'lib')
             help_dir = join('${project.build.directory}', arch, 'bin/help')
