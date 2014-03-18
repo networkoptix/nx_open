@@ -201,6 +201,8 @@ void QnFisheyeCalibrator::findCircleParams()
         qSwap(a2, a3);
     else if (a2.x() == a3.x())
         qSwap(a1, a3);
+    else if (a1.y() == a2.y())
+        qSwap(a1, a3);
 
     qreal ma = (a2.y() - a1.y()) / (a2.x() - a1.x());
     qreal mb = (a3.y() - a2.y()) / (a3.x() - a2.x());
@@ -292,6 +294,31 @@ int QnFisheyeCalibrator::findYThreshold(QImage frame)
 
 int QnFisheyeCalibrator::findYThreshold(QImage frame)
 {
+    int w = frame.width();
+    int h = frame.height();
+    static const int MAX_Y_THRESHOLD = 64;
+    static const int DETECT_BORDER_DELTA = 10;
+    QVector<int> borders;
+    for (int y = 0; y < frame.height(); ++y)
+    {
+        const quint8* line = frame.bits() + y * frame.bytesPerLine();
+        for (int x = 0; x < frame.width() - 1; ++x)
+        {
+            if (line[x] >= MAX_Y_THRESHOLD)
+                break;
+            else if (line[x+1] - line[x] > DETECT_BORDER_DELTA) {
+                borders <<(line[x+1] - line[x])/2 + line[x];
+                break;
+            }
+        }
+    }
+    if (borders.isEmpty())
+        return MAX_Y_THRESHOLD; // default value
+    qSort(borders);
+    int result = borders[borders.size()/2];
+    return qBound(28, result, MAX_Y_THRESHOLD);
+
+#if 0
     // Use adaptive binarisation to find optimal YThreshold value
 
     // 1. build hystogram
@@ -342,6 +369,7 @@ int QnFisheyeCalibrator::findYThreshold(QImage frame)
         return -1;
     else
         return qBound(28, result, 64);
+#endif
 }
 
 void QnFisheyeCalibrator::analyseFrameAsync(QImage frame)
