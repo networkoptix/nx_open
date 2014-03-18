@@ -70,45 +70,6 @@ void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr
     resource->determineOptimalNetIF();
 }
 
-void QnClientMessageProcessor::processResources(const QnResourceList& resources)
-{
-    qnResPool->beginTran();
-    foreach (const QnResourcePtr& resource, resources)
-        updateResource(resource);
-    qnResPool->commit();
-}
-
-void QnClientMessageProcessor::processLicenses(const QnLicenseList& licenses)
-{
-    qnLicensePool->replaceLicenses(licenses);
-}
-
-void QnClientMessageProcessor::updateHardwareIds(const ec2::QnFullResourceData& fullData)
-{
-    qnLicensePool->setMainHardwareIds(fullData.serverInfo.mainHardwareIds);
-    qnLicensePool->setCompatibleHardwareIds(fullData.serverInfo.compatibleHardwareIds);
-}
-
-void QnClientMessageProcessor::processCameraServerItems(const QnCameraHistoryList& cameraHistoryList)
-{
-    foreach(QnCameraHistoryPtr history, cameraHistoryList)
-        QnCameraHistoryPool::instance()->addCameraHistory(history);
-}
-
-void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
-{
-    QnAppServerConnectionFactory::setBox(fullData.serverInfo.armBox);
-
-    updateHardwareIds(fullData);
-    processResources(fullData.resources);
-    processLicenses(fullData.licenses);
-    processCameraServerItems(fullData.cameraHistory);
-
-    QnResourceDiscoveryManager::instance()->setReady(true);
-    qnSyncTime->reset();
-    //emit connectionOpened();
-}
-
 void QnClientMessageProcessor::updateTmpStatus(const QnId& id, QnResource::Status status)
 {
     QnResourcePtr server = qnResPool->getResourceById(id);
@@ -149,4 +110,11 @@ void QnClientMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool is
         foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras())
             res->setStatus(QnResource::Offline);
     }
+}
+
+void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
+{
+    QnCommonMessageProcessor::onGotInitialNotification(fullData);
+    QnResourceDiscoveryManager::instance()->setReady(true);
+    //emit connectionOpened();
 }

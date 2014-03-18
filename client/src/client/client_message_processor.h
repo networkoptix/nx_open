@@ -25,10 +25,6 @@ private slots:
     void at_remotePeerLost(QnId id, bool isClient, bool isProxy);
 private:
     void determineOptimalIF(const QnMediaServerResourcePtr &resource);
-    void processLicenses(const QnLicenseList& licenses);
-    void processResources(const QnResourceList& resources);
-    void updateHardwareIds(const ec2::QnFullResourceData& fullData);
-    void processCameraServerItems(const QnCameraHistoryList& cameraHistoryList);
     void updateTmpStatus(const QnId& id, QnResource::Status status);
 };
 
