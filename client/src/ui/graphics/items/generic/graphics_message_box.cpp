@@ -1,11 +1,13 @@
 #include "graphics_message_box.h"
 
+#include <QtCore/QTimer>
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QStyleOption>
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
 
 #include <utils/common/scoped_painter_rollback.h>
+#include <client/client_settings.h>
 
 #include <ui/common/palette.h>
 #include <ui/animation/opacity_animator.h>
@@ -84,12 +86,16 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
     setWindowColor(QColor(33, 33, 80));
 
     setAcceptedMouseButtons(Qt::NoButton);
-    setOpacity(0.0);
 
-    VariantAnimator *animator = opacityAnimator(this);
-    animator->setEasingCurve(QEasingCurve::Linear);
-    animator->animateTo(1.0);
-    connect(animator, &AbstractAnimator::finished, this, &QnGraphicsMessageBox::at_animationIn_finished);
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation) {
+        QTimer::singleShot(m_timeout, this, SLOT(hideImmideately()));
+    } else {
+        setOpacity(0.0);
+        VariantAnimator *animator = opacityAnimator(this);
+        animator->setEasingCurve(QEasingCurve::Linear);
+        animator->animateTo(1.0);
+        connect(animator, &AbstractAnimator::finished, this, &QnGraphicsMessageBox::at_animationIn_finished);
+    }
 }
 
 QnGraphicsMessageBox::~QnGraphicsMessageBox() {
