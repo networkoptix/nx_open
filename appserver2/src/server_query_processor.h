@@ -13,6 +13,7 @@
 
 #include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
+#include "managers/aux_manager.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
 
@@ -57,6 +58,10 @@ namespace ec2
             QByteArray serializedTran;
             OutputBinaryStream<QByteArray> stream( &serializedTran );
             serialize( tran, &stream );
+
+            errorCode = auxManager->executeTransaction(tran);
+            if( errorCode != ErrorCode::ok )
+                return;
 
             if (tran.persistent) {
                 errorCode = dbManager->executeTransaction( tran, serializedTran);

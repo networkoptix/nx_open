@@ -101,12 +101,11 @@ void QnSmtpSettingsWidget::updateFromSettings() {
 void QnSmtpSettingsWidget::submitToSettings() {
     QnEmail::Settings result = settings();
     QnWorkbenchNotificationsHandler* notificationsHandler = context()->instance<QnWorkbenchNotificationsHandler>();
-    QnKvPairList serializedSettings = result.serialized();
-    auto saveSettingsHandler = [notificationsHandler, serializedSettings]( int reqID, ec2::ErrorCode errorCode ){
-        notificationsHandler->updateSmtpSettings( reqID, errorCode, serializedSettings );
+    auto saveSettingsHandler = [notificationsHandler, result]( int reqID, ec2::ErrorCode errorCode ){
+        notificationsHandler->updateSmtpSettings( reqID, errorCode, result );
     };
     QnAppServerConnectionFactory::getConnection2()->saveSettingsAsync(
-        serializedSettings,
+        result,
         notificationsHandler,
         saveSettingsHandler );
 }
@@ -285,7 +284,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     m_timeoutTimer->start();
 
     m_testHandle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->testEmailSettings(
-        result.serialized(),
+        result,
         this,
         &QnSmtpSettingsWidget::at_finishedTestEmailSettings );
     ui->stackedWidget->setCurrentIndex(TestingPage);
@@ -321,12 +320,12 @@ void QnSmtpSettingsWidget::at_okTestButton_clicked() {
                                        : SimplePage);
 }
 
-void QnSmtpSettingsWidget::at_settings_received( int handle, ec2::ErrorCode errorCode, const QnKvPairList& values ) {
+void QnSmtpSettingsWidget::at_settings_received( int handle, ec2::ErrorCode errorCode, const QnEmail::Settings& settings) {
     if (handle != m_requestHandle)
         return;
 
     m_requestHandle = -1;
-    context()->instance<QnWorkbenchNotificationsHandler>()->updateSmtpSettings(handle, errorCode, values);
+    context()->instance<QnWorkbenchNotificationsHandler>()->updateSmtpSettings(handle, errorCode, settings);
 
     bool success = (errorCode == ec2::ErrorCode::ok);
     if(!success) {
@@ -335,7 +334,6 @@ void QnSmtpSettingsWidget::at_settings_received( int handle, ec2::ErrorCode erro
         return;
     }
 
-    QnEmail::Settings settings(values);
     loadSettings(settings.server, settings.connectionType, settings.port);
     ui->userLineEdit->setText(settings.user);
     ui->simpleEmailLineEdit->setText(settings.user);

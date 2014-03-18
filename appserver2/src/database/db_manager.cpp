@@ -7,7 +7,6 @@
 
 #include "common/common_module.h"
 #include "managers/impl/license_manager_impl.h"
-#include "managers/impl/email_manager_impl.h"
 #include "nx_ec/data/ec2_business_rule_data.h"
 
 
@@ -65,12 +64,10 @@ QnId QnDbManager::getType(const QString& typeName)
 QnDbManager::QnDbManager(
     QnResourceFactory* factory,
     LicenseManagerImpl* const licenseManagerImpl,
-    EmailManagerImpl* const emailManagerImpl,
     const QString& dbFilePath )
 :
     QnDbHelper(),
-    m_licenseManagerImpl( licenseManagerImpl ),
-    m_emailManagerImpl( emailManagerImpl )
+    m_licenseManagerImpl( licenseManagerImpl )
 {
     m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
@@ -1563,6 +1560,11 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiParamLi
     if (rez == ErrorCode::ok)
         data.data = params.params;
     return rez;
+}
+
+
+// getSettings
+ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiEmailSettingsData& data) {
 }
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran)

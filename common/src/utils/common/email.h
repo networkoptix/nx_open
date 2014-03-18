@@ -37,7 +37,7 @@ public:
 
     struct Settings {
         Settings();
-        Settings(const QnKvPairList &values);
+        // Settings(const QnKvPairList &values);
         ~Settings();
 
         bool isNull() const {

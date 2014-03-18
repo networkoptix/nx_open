@@ -18,8 +18,8 @@ namespace ec2
         m_dbManager( new QnDbManager(
             resCtx.resFactory,
             &m_licenseManagerImpl,
-            &m_emailManagerImpl,
             dbFilePath) ),
+        m_auxManager(new QnAuxManager(&m_emailManagerImpl)),
         m_transactionLog( new QnTransactionLog(m_dbManager.get() )),
         m_connectionInfo( connectionInfo )
     {

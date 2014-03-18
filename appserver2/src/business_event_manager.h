@@ -17,7 +17,7 @@ namespace ec2
 
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) override;
 
-        virtual int testEmailSettings( const QnKvPairList& settings, impl::SimpleHandlerPtr handler ) override;
+        virtual int testEmailSettings( const QnEmail::Settings& settings, impl::SimpleHandlerPtr handler ) override;
         virtual int sendEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, const QnEmailAttachmentList& attachments, impl::SimpleHandlerPtr handler ) override;
         virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) override;
         virtual int deleteRule( QnId ruleId, impl::SimpleHandlerPtr handler ) override;
@@ -59,6 +59,7 @@ namespace ec2
         QnTransaction<ApiBusinessRuleData> prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
         QnTransaction<ApiBusinessActionData> prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource );
+        QnTransaction<ApiEmailSettingsData> prepareTransaction( ApiCommand::Value command, const QnEmail::Settings& resource );
     };
 }
 
