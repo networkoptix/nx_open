@@ -1137,11 +1137,12 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::RenameAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::VideoWallItemTarget).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget |  Qn::ResourceTarget | Qn::VideoWallItemTarget).
         requiredPermissions(Qn::WritePermission | Qn::WriteNamePermission).
         text(tr("Rename")).
         shortcut(tr("F2")).
-        autoRepeat(false);
+        autoRepeat(false).
+        condition(new QnRenameActionCondition(this));
 
     factory().
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
