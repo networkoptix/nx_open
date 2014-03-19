@@ -2095,7 +2095,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         return;
 
     Qn::NodeType nodeType = parameters.hasArgument(Qn::NodeTypeRole)
-            ? static_cast<Qn::NodeType>(parameters.argument(Qn::NodeTypeRole).toInt())
+            ? parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>()
             : Qn::ResourceNode;
 
     QnVirtualCameraResourcePtr camera;
