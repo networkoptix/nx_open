@@ -18,6 +18,7 @@
 #include <media_server/serverutil.h>
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/resource.h"
+#include "utils/common/synctime.h"
 
 DeviceFileCatalog::RebuildMethod DeviceFileCatalog::m_rebuildArchive = DeviceFileCatalog::Rebuild_None;
 QMutex DeviceFileCatalog::m_rebuildMutex;
@@ -74,7 +75,8 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
     //m_duplicateName(false),
     m_role(role),
     m_lastAddIndex(-1),
-    m_lastRecordRecording(false)
+    m_lastRecordRecording(false),
+    m_rebuildStartTime(0)
 {
     QString devTitleFile = closeDirPath(getDataDirectory()) + QString("record_catalog/media/");
     devTitleFile += prefixForRole(role) + "/";
@@ -367,7 +369,10 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourceP
             scanMediaFiles(fi.absoluteFilePath(), storage, allChunks, emptyFileList);
         else {
             Chunk chunk = chunkFromFile(storage, fi.absoluteFilePath());
-            
+
+            if (chunk.startTimeMs >= m_rebuildStartTime - (QnRecordingManager::RECORDING_CHUNK_LEN * 1250))
+                return; // do not rebuild archive after rebuild start point
+
             if (chunk.durationMs > 0 && chunk.startTimeMs > 0) {
                 QMap<qint64, Chunk>::iterator itr = allChunks.insert(chunk.startTimeMs, chunk);
                 if (itr != allChunks.begin())
@@ -402,6 +407,7 @@ bool DeviceFileCatalog::doRebuildArchive()
     QElapsedTimer t;
     t.restart();
     qWarning() << "start rebuilding archive for camera " << m_macAddress << prefixForRole(m_role);
+    m_rebuildStartTime = qnSyncTime->currentMSecsSinceEpoch();
 
     QMap<qint64, Chunk> allChunks;
 //    bool canceled = false;
@@ -412,6 +418,9 @@ bool DeviceFileCatalog::doRebuildArchive()
         QStringList emptyFileList;
         readStorageData(storage, m_role, allChunks, emptyFileList);
 
+        foreach(const QString& fileName, emptyFileList)
+            qnFileDeletor->deleteFile(fileName);
+        /*
         int lastIndex = emptyFileList.size();
         QnResourcePtr res = qnResPool->getResourceByUniqId(m_macAddress);
         if (res && res->getStatus() == QnResource::Recording)
@@ -420,7 +429,7 @@ bool DeviceFileCatalog::doRebuildArchive()
         {
             qnFileDeletor->deleteFile(emptyFileList[i]);
         }
-        
+        */
     }
 
     /*

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US" sourcelanguage="en">
+<TS version="2.0" language="en_US" sourcelanguage="en">
 <context>
     <name>CommunicatingSocket</name>
     <message>
         <source>Connect failed (connect()). %1</source>
-        <translation type="vanished">連線失敗 (連線())。%1</translation>
+        <translation>連線失敗 (連線())。%1</translation>
     </message>
     <message>
         <location filename="../src/utils/network/system_socket.cpp" line="663"/>
         <source>Couldn&apos;t connect to %1: %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法連線至 %1：%2。</translation>
     </message>
 </context>
 <context>
@@ -22,11 +22,11 @@
     </message>
     <message>
         <source>Port </source>
-        <translation type="vanished">通訊埠</translation>
+        <translation>通訊埠</translation>
     </message>
     <message>
         <source>, Ip: </source>
-        <translation type="vanished">, IP:</translation>
+        <translation>, IP:</translation>
     </message>
 </context>
 <context>
@@ -35,7 +35,7 @@
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>國語</translation>
+        <translation>繁体中文</translation>
     </message>
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="156"/>
@@ -48,77 +48,77 @@
     <name>QDnsLookup</name>
     <message>
         <source>Operation cancelled</source>
-        <translation type="vanished">操作取消</translation>
+        <translation>操作取消</translation>
     </message>
 </context>
 <context>
     <name>QDnsLookupRunnable</name>
     <message>
         <source>Invalid domain name</source>
-        <translation type="vanished">無效網域名稱</translation>
+        <translation>無效網域名稱</translation>
     </message>
     <message>
         <source>Server could not process query</source>
-        <translation type="vanished">伺服器無法處理查詢</translation>
+        <translation>伺服器無法處理查詢</translation>
     </message>
     <message>
         <source>Server failure</source>
-        <translation type="vanished">伺服器故障</translation>
+        <translation>伺服器故障</translation>
     </message>
     <message>
         <source>Non existent domain</source>
-        <translation type="vanished">不存在的網域</translation>
+        <translation>不存在的網域</translation>
     </message>
     <message>
         <source>Server refused to answer</source>
-        <translation type="vanished">伺服器拒絕回應</translation>
+        <translation>伺服器拒絕回應</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Camera output</source>
-        <translation type="vanished">顯示攝影機</translation>
+        <translation>顯示攝影機</translation>
     </message>
     <message>
         <source>Camera output for 30 sec</source>
-        <translation type="vanished">顯示攝影機30秒</translation>
+        <translation>顯示攝影機30秒</translation>
     </message>
     <message>
         <source>Bookmark</source>
-        <translation type="vanished">書籤</translation>
+        <translation>書籤</translation>
     </message>
     <message>
         <source>Camera recording</source>
-        <translation type="vanished">攝影機錄影</translation>
+        <translation>攝影機錄影</translation>
     </message>
     <message>
         <source>Panic recording</source>
-        <translation type="vanished">緊急錄影</translation>
+        <translation>緊急錄影</translation>
     </message>
     <message>
         <source>Send mail</source>
-        <translation type="vanished">傳送郵件</translation>
+        <translation>傳送郵件</translation>
     </message>
     <message>
         <source>Diagnostics</source>
-        <translation type="vanished">診斷</translation>
+        <translation>診斷</translation>
     </message>
     <message>
         <source>Show notification</source>
-        <translation type="vanished">顯示通知</translation>
+        <translation>顯示通知</translation>
     </message>
     <message>
         <source>Play sound</source>
-        <translation type="vanished">播放聲音</translation>
+        <translation>播放聲音</translation>
     </message>
     <message>
         <source>Say</source>
-        <translation type="vanished">說 (語音)</translation>
+        <translation>說 (語音)</translation>
     </message>
     <message>
         <source>Unknown (%1)</source>
-        <translation type="vanished">未知 (%1)</translation>
+        <translation>未知 (%1)</translation>
     </message>
 </context>
 <context>
@@ -126,62 +126,62 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="555"/>
         <source>Invalid stack size after program evaluation: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="597"/>
         <source>Could not deduce result type for operation %1(&apos;%2&apos;, &apos;%3&apos;).</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="625"/>
         <source>Invalid parameter type for operation %1(&apos;%2&apos;, &apos;%2&apos;)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="635"/>
         <source>Could not deduce arithmetic supertype for type &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="657"/>
         <source>Invalid parameter type for operation %1(&apos;%2&apos;)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="665"/>
         <source>Argument number for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="669"/>
         <source>Argument number for %1 instruction is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="674"/>
         <source>Stack underflow during execution of %1 instruction.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="678"/>
         <source>Function name for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="689"/>
         <source>Function or variable &apos;%1&apos; is not defined.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="695"/>
         <source>Variable &apos;%1&apos; is not a function and cannot be called.</source>
-        <translation type="unfinished"></translation>
+        <translation>Variable &apos;%1&apos; is not a function and cannot be called.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="707"/>
         <source>Stack underflow during program evaluation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Stack underflow during program evaluation.</translation>
     </message>
 </context>
 <context>
@@ -189,7 +189,7 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="112"/>
         <source>Unexpected symbol &apos;%1&apos; at position %2.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -198,22 +198,22 @@
         <location filename="../src/utils/common/evaluator.h" line="167"/>
         <location filename="../src/utils/common/evaluator.h" line="174"/>
         <source>Parameter %2 is not specified for function &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="177"/>
         <source>Parameter %2 of function &apos;%1&apos; is of type &apos;%3&apos;, but type &apos;%4&apos; was expected.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="183"/>
         <source>Function &apos;%1&apos; is expected to have %3 arguments, %2 provided.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="188"/>
         <source>Function &apos;%1&apos; is expected to have %3-%4 arguments, %2 provided.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -221,17 +221,17 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="178"/>
         <source>Unexpected token %1 (&apos;%2&apos;) at position %3.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="235"/>
         <source>Invalid color constant &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="280"/>
         <source>Invalid number constant &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -315,17 +315,17 @@
         <translation>無法解析串聯化的連線資訊。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="792"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="793"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation>無法解析串聯化的事件/動作規則。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="801"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="802"/>
         <source>Cannot parse serialized action.</source>
         <translation>無法解析串聯化的動作。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="810"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="811"/>
         <source>Cannot parse serialized actions.</source>
         <translation>無法解析串聯化的行動。</translation>
     </message>
@@ -379,19 +379,19 @@
     </message>
     <message>
         <source>Any camera issue</source>
-        <translation type="vanished">任何攝影機問題</translation>
+        <translation>任何攝影機問題</translation>
     </message>
     <message>
         <source>Any server issue</source>
-        <translation type="vanished">任何伺服器問題</translation>
+        <translation>任何伺服器問題</translation>
     </message>
     <message>
         <source>Any event</source>
-        <translation type="vanished">任何事件</translation>
+        <translation>任何事件</translation>
     </message>
     <message>
         <source>Undefined event has occured on %1</source>
-        <translation type="vanished">未定義事件發生在 %1</translation>
+        <translation>未定義事件發生在 %1</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="84"/>
@@ -435,102 +435,102 @@
     </message>
     <message>
         <source>Unknown Event has occured</source>
-        <translation type="vanished">發生未知事件</translation>
+        <translation>發生未知事件</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="37"/>
         <source>Camera output</source>
-        <translation type="unfinished">顯示攝影機</translation>
+        <translation>顯示攝影機</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="38"/>
         <source>Camera output for 30 sec</source>
-        <translation type="unfinished">顯示攝影機30秒</translation>
+        <translation>顯示攝影機30秒</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="39"/>
         <source>Bookmark</source>
-        <translation type="unfinished">書籤</translation>
+        <translation>書籤</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="40"/>
         <source>Camera recording</source>
-        <translation type="unfinished">攝影機錄影</translation>
+        <translation>攝影機錄影</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="41"/>
         <source>Panic recording</source>
-        <translation type="unfinished">緊急錄影</translation>
+        <translation>緊急錄影</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="42"/>
         <source>Send mail</source>
-        <translation type="unfinished">傳送郵件</translation>
+        <translation>傳送郵件</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="43"/>
         <source>Write to log</source>
-        <translation type="unfinished"></translation>
+        <translation>寫入至記錄</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="44"/>
         <source>Show notification</source>
-        <translation type="unfinished">顯示通知</translation>
+        <translation>顯示通知</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="45"/>
         <source>Play sound</source>
-        <translation type="unfinished">播放聲音</translation>
+        <translation>播放聲音</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="46"/>
         <source>Repeat sound</source>
-        <translation type="unfinished"></translation>
+        <translation>重複播放聲音</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="47"/>
         <source>Speak</source>
-        <translation type="unfinished"></translation>
+        <translation>說</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="49"/>
         <source>Unknown (%1)</source>
-        <translation type="unfinished">未知 (%1)</translation>
+        <translation>未知 (%1)</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="67"/>
         <source>Media Server Started</source>
-        <translation type="unfinished"></translation>
+        <translation>媒體伺服器已啟動</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="68"/>
         <source>Any Camera Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>任何攝影機問題</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="69"/>
         <source>Any Server Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>任何伺服器問題</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="70"/>
         <source>Any Event</source>
-        <translation type="unfinished"></translation>
+        <translation>任何事件</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="81"/>
         <source>Undefined event has occurred on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>未定義事件發生在 %1</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="108"/>
         <source>Media Server &quot;%1&quot; Started</source>
-        <translation type="unfinished"></translation>
+        <translation>媒體伺服器 &quot;%1&quot; 已啟動</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="113"/>
         <source>Unknown event has occurred</source>
-        <translation type="unfinished"></translation>
+        <translation>發生未知事件</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="129"/>
@@ -597,99 +597,99 @@
         <location filename="../src/business/business_strings_helper.cpp" line="292"/>
         <source>First occurrence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>第一次出現: %1 在 %2 ( %n 出現 次)</numerusform>
+            <numerusform>第一次發生於：%1在%2。(共發生%n次)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_strings_helper.cpp" line="312"/>
         <source>No video frame received during last %n seconds.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>在過去的 %n 秒 無接收的影像</numerusform>
+            <numerusform>在過去的 %n 秒 無接收的影像</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="318"/>
         <source>Connection to camera primary stream was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>連線至攝影機之第一串流意外被關閉。</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="320"/>
         <source>Connection to camera secondary stream was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>連線至攝影機之第二串流意外被關閉。</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="326"/>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-        <translation type="unfinished">RTP 封包遺失偵測，前一個 seq.=%1 下一個 seq.=%2. {1 ?}</translation>
+        <translation>RTP 封包遺失偵測，前一個 seq.=%1 下一個 seq.=%2.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="328"/>
         <source>RTP packet loss detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>RTP 封包遺失偵測</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="332"/>
         <source>Server terminated.</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器中斷</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="336"/>
         <source>Server started after crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器崩潰後啟動.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="341"/>
         <source>I/O error has occurred at %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O 錯誤於 %1。</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="346"/>
         <source>Not enough HDD/SSD speed for recording to %1.</source>
-        <translation type="unfinished">錄影到 %1.</translation>
+        <translation>HDD/SSD %1 速度不足以錄影。</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="351"/>
         <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
-        <translation type="unfinished"></translation>
+        <translation>HDD/SSD 硬碟 %1 已滿。磁碟內包含太多非本軟體管理之資料。</translation>
     </message>
     <message numerus="yes">
         <source>First occurence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="vanished">
+        <translation>
             <numerusform>第一次出現: %1 在 %2 ( %n出現 次)</numerusform>
             <numerusform>First occurence: %1 on %2 (%n times total)</numerusform>
         </translation>
     </message>
     <message>
         <source>No video frame received during last %1 seconds</source>
-        <translation type="vanished">在過去的 %1 秒 無接收的影像</translation>
+        <translation>在過去的 %1 秒 無接收的影像</translation>
     </message>
     <message>
         <source>Connection to camera was unexpectedly closed</source>
-        <translation type="vanished">攝影機的連線被意外的關閉</translation>
+        <translation>攝影機的連線被意外的關閉</translation>
     </message>
     <message>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2</source>
-        <translation type="vanished">RTP 封包遺失偵測，前一個 seq.=%1 下一個 seq.=%2</translation>
+        <translation>RTP 封包遺失偵測，前一個 seq.=%1 下一個 seq.=%2</translation>
     </message>
     <message>
         <source>Server terminated</source>
-        <translation type="vanished">伺服器中斷</translation>
+        <translation>伺服器中斷</translation>
     </message>
     <message>
         <source>Server started after crash</source>
-        <translation type="vanished">伺服器崩潰後啟動</translation>
+        <translation>伺服器崩潰後啟動</translation>
     </message>
     <message>
         <source>I/O Error occured at %1</source>
-        <translation type="vanished">I/O 錯誤發生於 %1</translation>
+        <translation>I/O 錯誤發生於 %1</translation>
     </message>
     <message>
         <source>Not enough HDD/SSD speed for recording to %1</source>
-        <translation type="vanished">錄影到 %1</translation>
+        <translation>錄影到 %1</translation>
     </message>
 </context>
 <context>
@@ -697,7 +697,7 @@
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="27"/>
         <source>OK</source>
-        <translation type="unfinished">確定</translation>
+        <translation>確定</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="31"/>
@@ -709,93 +709,104 @@
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="35"/>
         <source>Received bad response from media server %1: &quot;%2&quot;.
  Check if Media Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>收到媒體服務器 %1不良回應：&quot;%2&quot;。
+請確認媒體伺服器是否已啟動且為適用版本。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="43"/>
         <source>Cannot open media url %1. Failed to connect to media port %2.
  Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法開啟媒體網址 %1。連線至媒體通訊埠 %2 失敗。
+請確認通訊埠 %2 允許存取 (轉發等)。請嘗試重新啟動攝影機，再從網頁上恢復出廠預設值。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="48"/>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
  Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法開啟媒體網址 %1。連線至通訊埠 %2 突然中斷。
+請確認攝影機是否在網路上。請嘗試重新啟動攝影機。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="53"/>
         <source>Could not parse camera response. Url %1, request name %2.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法解析攝影機回應。網址 %1，需求名稱 %2。請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="58"/>
         <source>No supported media tracks at url %1.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>不支援網址 %1 的媒體軌。
+請嘗試重新啟動攝影機，再於攝影機的網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="63"/>
         <source>Not authorized. Url %1.</source>
-        <translation type="unfinished">未經授權。網址 %1.</translation>
+        <translation>未經授權。網址 %1.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="67"/>
         <source>Cannot open media url %1. Unsupported media protocol %2.
  Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法開啟媒體網址 %1。不支援的媒體協定 %2。
+請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="72"/>
         <source>Failed to configure parameter %1.
  First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法設定參數 %1。
+首先，請先嘗試開啟錄影 (如果現在是停止的) 並降低攝影機的 FPS 設定。如果不成功，請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="77"/>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>攝影機要求 &quot;%1&quot;失敗，錯誤 &quot;%2&quot;。
+請請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="82"/>
         <source>Unknown Camera Issue.
  Please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>未知攝影機故障。
+請尋求您購買的廠商解決方案。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="86"/>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.
  Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>發生輸入/輸出錯誤。作業系統訊息：&quot;%1&quot;。
+請確認攝影機是否已連接至網路，嘗試重新啟動攝影機</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="93"/>
         <source>Invalid data was received from the camera: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>從攝影機：%1 端接收到無效資料</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="96"/>
         <source>Too many media errors. Please open camera issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>過多媒體錯誤. 請開啟攝影機問題診斷功能查看詳細資訊。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="99"/>
         <source>Media stream is opened but no media data was received.</source>
-        <translation type="unfinished"></translation>
+        <translation>媒體串流已開啟但沒有接收到媒體資料。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="114"/>
         <source>
 
 Parameters: </source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+參數：</translation>
     </message>
     <message>
         <source>Received bad response from media server %1: &quot;%2&quot;.
  Check media server&apos;s version.</source>
-        <translation type="vanished">從媒體伺服器 %1 收到不良回應：&quot;%2&quot;。請確認媒體伺服器版本。</translation>
+        <translation>從媒體伺服器 %1 收到不良回應：&quot;%2&quot;。請確認媒體伺服器版本。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="39"/>
@@ -806,51 +817,51 @@ Parameters: </source>
     <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.
  Make sure port %2 is accessible (forwarded etc). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="vanished">無法開啟媒體網址 %1。連線至媒體通訊埠 %2 失敗。請確認通訊埠 %2 允許存取 (轉發等)。請嘗試重新啟動攝影機，再從網頁上恢復出廠預設值。</translation>
+        <translation>無法開啟媒體網址 %1。連線至媒體通訊埠 %2 失敗。請確認通訊埠 %2 允許存取 (轉發等)。請嘗試重新啟動攝影機，再從網頁上恢復出廠預設值。</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
  Make sure the camera is plugged into the network. Try to reboot camera.</source>
-        <translation type="vanished">無法開啟媒體網址 %1。連線至通訊埠 %2 突然中斷。請確認攝影機是否在網路上。請嘗試重新啟動攝影機。</translation>
+        <translation>無法開啟媒體網址 %1。連線至通訊埠 %2 突然中斷。請確認攝影機是否在網路上。請嘗試重新啟動攝影機。</translation>
     </message>
     <message>
         <source>Error parsing camera response. Url %1, request name %2.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
-        <translation type="vanished">解析攝影機回應錯誤。網址 %1，需求名稱 %2。請嘗試重新啟動攝影機，再於攝影機的網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案</translation>
+        <translation>解析攝影機回應錯誤。網址 %1，需求名稱 %2。請嘗試重新啟動攝影機，再於攝影機的網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案</translation>
     </message>
     <message>
         <source>No supported media track(s) at url %1.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support</source>
-        <translation type="vanished">不支援網址 %1 的媒體軌。請嘗試重新啟動攝影機，再於攝影機的網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案</translation>
+        <translation>不支援網址 %1 的媒體軌。請嘗試重新啟動攝影機，再於攝影機的網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案</translation>
     </message>
     <message>
         <source>Not authorized. Url %1</source>
-        <translation type="vanished">未經授權。網址 %1</translation>
+        <translation>未經授權。網址 %1</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Unsupported media protocol %2.
  Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
-        <translation type="vanished">無法開啟媒體網址 %1。不支援的媒體協定 %2。請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案。</translation>
+        <translation>無法開啟媒體網址 %1。不支援的媒體協定 %2。請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案。</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.
  First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If no success, restore factory defaults on the camera web-page. If the problem persists, contact support.</source>
-        <translation type="vanished">無法設定參數 %1。首先，請先嘗試開啟錄影 (如果現在是停止的) 並降低攝影機的 FPS 設定。如果不成功，請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案。</translation>
+        <translation>無法設定參數 %1。首先，請先嘗試開啟錄影 (如果現在是停止的) 並降低攝影機的 FPS 設定。如果不成功，請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案。</translation>
     </message>
     <message>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, contact support.</source>
-        <translation type="vanished">攝影機要求 &quot;%1&quot;失敗，錯誤 &quot;%2&quot;。請請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案。</translation>
+        <translation>攝影機要求 &quot;%1&quot;失敗，錯誤 &quot;%2&quot;。請請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案。</translation>
     </message>
     <message>
         <source>Unknown Camera Issue.
  Please, contact support.</source>
-        <translation type="vanished">未知攝影機故障。請尋求您購買的廠商解決方案。</translation>
+        <translation>未知攝影機故障。請尋求您購買的廠商解決方案。</translation>
     </message>
     <message>
         <source>I/O error. OS message: &quot;%1&quot;.
  Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="vanished">I/O 錯誤。作業系統訊息：&quot;%1&quot;。請確認攝影機已經接上網路。嘗試重新啟動攝影機。</translation>
+        <translation>I/O 錯誤。作業系統訊息：&quot;%1&quot;。請確認攝影機已經接上網路。嘗試重新啟動攝影機。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="89"/>
@@ -859,7 +870,7 @@ Parameters: </source>
     </message>
     <message>
         <source>Invalid data received from camera: %1</source>
-        <translation type="vanished">從攝影機：%1 端接收到無效資料</translation>
+        <translation>從攝影機：%1 端接收到無效資料</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="112"/>
@@ -868,7 +879,7 @@ Parameters: </source>
     </message>
     <message>
         <source> Parameters: </source>
-        <translation type="vanished">參數:</translation>
+        <translation>參數:</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="127"/>
@@ -927,127 +938,127 @@ Parameters: </source>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
         <source>Audio context must be specified</source>
-        <translation type="vanished">聲音前後內容必須被指定</translation>
+        <translation>聲音前後內容必須被指定</translation>
     </message>
     <message>
         <source>Transcoder error: can&apos;t find encoder for codec %1</source>
-        <translation type="vanished">轉碼錯誤：找不到 %1 編碼的編碼器</translation>
+        <translation>轉碼錯誤：找不到 %1 編碼的編碼器</translation>
     </message>
     <message>
         <source>Can&apos;t initialize audio encoder</source>
-        <translation type="vanished">無法初始化聲音編碼器</translation>
+        <translation>無法初始化聲音編碼器</translation>
     </message>
     <message>
         <source>Can&apos;t initialize audio decoder</source>
-        <translation type="vanished">無法初始化聲音解碼器</translation>
+        <translation>無法初始化聲音解碼器</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="47"/>
         <source>Audio context was not specified.</source>
-        <translation type="unfinished"></translation>
+        <translation>未指定聲音內容。</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="61"/>
         <source>Could not find encoder for codec %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>找不到 %1 編碼的編碼器</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="88"/>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法初始化聲音編碼器。</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="97"/>
         <source>Could not initialize audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法初始化聲音解碼器。</translation>
     </message>
 </context>
 <context>
     <name>QnFfmpegTranscoder</name>
     <message>
         <source>No %1 container in FFMPEG library.</source>
-        <translation type="vanished">在 FFMPEG 函式庫沒有 %1 容器 (container)。</translation>
+        <translation>在 FFMPEG 函式庫沒有 %1 容器 (container)。</translation>
     </message>
     <message>
         <source>Can&apos;t create output context for format %1</source>
-        <translation type="vanished">無法建立輸出內容給格式 %1</translation>
+        <translation>無法建立輸出內容給格式 %1</translation>
     </message>
     <message>
         <source>Can&apos;t allocate output stream for recording.</source>
-        <translation type="vanished">無法分配輸出串流給錄影。</translation>
+        <translation>無法分配輸出串流給錄影。</translation>
     </message>
     <message>
         <source>Transcoder error: for direct stream copy video frame size must exists</source>
-        <translation type="vanished">轉碼錯誤：必須存在直接串流複製影像圖框</translation>
+        <translation>轉碼錯誤：必須存在直接串流複製影像圖框</translation>
     </message>
     <message>
         <source>Transcoder error: can&apos;t find codec</source>
-        <translation type="vanished">轉碼錯誤：找不到編碼</translation>
+        <translation>轉碼錯誤：找不到編碼</translation>
     </message>
     <message>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
-        <translation type="vanished">影像或聲音編碼無法相容於 %1 格式。請嘗試其他格式。</translation>
+        <translation>影像或聲音編碼無法相容於 %1 格式。請嘗試其他格式。</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="104"/>
         <source>Container %1 was not found in FFMPEG library.</source>
-        <translation type="unfinished"></translation>
+        <translation>在 FFMPEG 函示庫內找不到容器 %1 。</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="112"/>
         <source>Could not create output context for format %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法建立格式 %1 的輸出內容。</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="131"/>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="208"/>
         <source>Could not allocate output stream for recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法分配錄影用的輸出串流。</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="170"/>
         <source>Could not perform direct stream copy because frame size is undefined.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法進行直接串流複製，因為未定憶定義圖框尺寸大小。</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="216"/>
         <source>Could not find codec %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>找不到 %1 編碼。</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="251"/>
         <source>Video or audio codec is incompatible with container %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>影像說聲音編碼與容器 %1 不相容。</translation>
     </message>
 </context>
 <context>
     <name>QnFfmpegVideoTranscoder</name>
     <message>
         <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
-        <translation type="vanished">無法分配 scaler context 給解析度 %1x%2</translation>
+        <translation>無法分配 scaler context 給解析度 %1x%2</translation>
     </message>
     <message>
         <source>Transcoder error: can&apos;t find encoder for codec %1</source>
-        <translation type="vanished">轉碼錯誤：無法發現編碼 %1 的編碼器</translation>
+        <translation>轉碼錯誤：無法發現編碼 %1 的編碼器</translation>
     </message>
     <message>
         <source>Can&apos;t initialize video encoder</source>
-        <translation type="vanished">無法初始化影像編碼器</translation>
+        <translation>無法初始化影像編碼器</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
         <source>Could not allocate scaler context for resolution %1x%2.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法分配 scaler context 給解析度 %1x%2</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
         <source>Could not find encoder for codec %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>找不到 %1 編碼的編碼器</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法初始化影像編碼器。</translation>
     </message>
 </context>
 <context>
@@ -1203,61 +1214,61 @@ Parameters: </source>
     <name>QnStreamRecorder</name>
     <message>
         <source>No %1 container in FFMPEG library.</source>
-        <translation type="vanished">在 FFMPEG 函式庫沒有 %1 容器 (container)。</translation>
+        <translation>在 FFMPEG 函式庫沒有 %1 容器 (container)。</translation>
     </message>
     <message>
         <source>Can&apos;t create output file &apos;%1&apos; for video recording.</source>
-        <translation type="vanished">無法建立影像錄影輸出檔案 &apos;%1&apos;。</translation>
+        <translation>無法建立影像錄影輸出檔案 &apos;%1&apos;。</translation>
     </message>
     <message>
         <source>Can&apos;t allocate output stream for recording.</source>
-        <translation type="vanished">無法分配輸出串流給錄影。</translation>
+        <translation>無法分配輸出串流給錄影。</translation>
     </message>
     <message>
         <source>Can&apos;t allocate output audio stream.</source>
-        <translation type="vanished">無法分配輸出聲音串流。</translation>
+        <translation>無法分配輸出聲音串流。</translation>
     </message>
     <message>
         <source>Internal server error: invalid audio codec information</source>
-        <translation type="vanished">內部伺服器錯誤：無效的聲音編碼資訊</translation>
+        <translation>內部伺服器錯誤：無效的聲音編碼資訊</translation>
     </message>
     <message>
         <source>Can&apos;t create output file &apos;%1&apos;.</source>
-        <translation type="vanished">無法建立輸出檔案 &apos;%1&apos;。</translation>
+        <translation>無法建立輸出檔案 &apos;%1&apos;。</translation>
     </message>
     <message>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
-        <translation type="vanished">影像聲音編碼不相容於 %1 格式。請嘗試其他格式。</translation>
+        <translation>影像聲音編碼不相容於 %1 格式。請嘗試其他格式。</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="27"/>
         <source>Corresponding container in FFMPEG library was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>找不到相對應的 FFMPEG 函式庫。</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="28"/>
         <source>Could not create output file for video recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法建立錄影用的輸出檔案。</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="29"/>
         <source>Could not allocate output stream for recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法分配錄影用的輸出串流。</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="30"/>
         <source>Could not allocate output audio stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>無法分配聲音輸出串流。</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="31"/>
         <source>Invalid audio codec information.</source>
-        <translation type="unfinished"></translation>
+        <translation>無效的聲音編碼資訊。</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="32"/>
         <source>Video or audio codec is incompatible with the selected format.</source>
-        <translation type="unfinished"></translation>
+        <translation>影像或聲音編碼無法相容於選擇的格式。</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="782"/>
@@ -1310,7 +1321,7 @@ Parameters: </source>
     <message>
         <location filename="../src/health/system_health.cpp" line="22"/>
         <source>Rebuilding archive index is completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>重新建立索引檔完成。</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="33"/>
@@ -1357,7 +1368,8 @@ You cannot record video from cameras.</source>
         <location filename="../src/health/system_health.cpp" line="55"/>
         <source>Rebuilding archive index is completed on the following Media Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>重新建立以下媒體伺服器的索引檔已完成:
+%1.</translation>
     </message>
 </context>
 <context>
@@ -1397,7 +1409,7 @@ You cannot record video from cameras.</source>
     <name>QnTestCameraResourceSearcher</name>
     <message>
         <source>TestCameraLive</source>
-        <translation type="vanished">測試攝影機即時畫面</translation>
+        <translation>測試攝影機即時畫面</translation>
     </message>
 </context>
 <context>
@@ -1405,12 +1417,12 @@ You cannot record video from cameras.</source>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="300"/>
         <source>OpenCL transcoding is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenCL 轉碼未執行</translation>
     </message>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="303"/>
         <source>Unknown transcoding method.</source>
-        <translation type="unfinished"></translation>
+        <translation>未知轉碼模式。</translation>
     </message>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="334"/>
@@ -1440,7 +1452,7 @@ You cannot record video from cameras.</source>
     <name>Socket</name>
     <message>
         <source>WSACleanup() failed.</source>
-        <translation type="vanished">WSA 清除() 失敗。</translation>
+        <translation>WSA 清除() 失敗。</translation>
     </message>
     <message>
         <location filename="../src/utils/network/system_socket.cpp" line="524"/>
@@ -1452,7 +1464,7 @@ You cannot record video from cameras.</source>
     <name>UDPSocket</name>
     <message>
         <source>Disconnect failed (connect()).</source>
-        <translation type="vanished">中斷連線失敗 (連線())。</translation>
+        <translation>中斷連線失敗 (連線())。</translation>
     </message>
 </context>
 </TS>

@@ -37,14 +37,6 @@ class QnPtzToursDialogItemDelegate: public QStyledItemDelegate {
 public:
     explicit QnPtzToursDialogItemDelegate(QObject *parent = 0): base_type(parent) {}
     ~QnPtzToursDialogItemDelegate() {}
-protected:
-    virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
-        base_type::initStyleOption(option, index);
-        if (!index.data(Qn::ValidRole).toBool()) {
-            QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
-            option->palette.setColor(QPalette::Highlight, clr.lighter());
-        }
-    }
 
     virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
         if (index.column() == QnPtzManageModel::HotkeyColumn)
@@ -142,6 +134,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
 }
 
 QnPtzManageDialog::~QnPtzManageDialog() {
+    return;
 }
 
 void QnPtzManageDialog::keyPressEvent(QKeyEvent *event) {

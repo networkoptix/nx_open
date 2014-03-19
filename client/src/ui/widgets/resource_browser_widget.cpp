@@ -317,10 +317,6 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
         manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
     }
 
-    /* Do not show 'Rename' on the recorder when it contains only one camera. */
-    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) == Qn::RecorderNode)
-        manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
-
     if(menu->isEmpty())
         return;
 
