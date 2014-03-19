@@ -156,9 +156,7 @@ namespace ec2
         ErrorCode deleteResourceTable(const qint32 id);
         ErrorCode removeResource(const QnId& id);
 
-        ErrorCode insertAddParamsHerlper(const std::vector<ApiResourceParam>& params, qint32 internalId, const char* op);
         ErrorCode insertAddParams(const std::vector<ApiResourceParam>& params, qint32 internalId);
-        ErrorCode insertOrUpdateAddParams(const std::vector<ApiResourceParam>& params, qint32 internalId);
         ErrorCode deleteAddParams(qint32 resourceId);
 
         ErrorCode saveCamera(const ApiCameraData& params);

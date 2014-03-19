@@ -260,11 +260,11 @@ QnDbManager* QnDbManager::instance()
     return globalInstance;
 }
 
-ErrorCode QnDbManager::insertAddParamsHerlper(const std::vector<ApiResourceParam>& params, qint32 internalId, const char* op)
+ErrorCode QnDbManager::insertAddParams(const std::vector<ApiResourceParam>& params, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
     //insQuery.prepare("INSERT INTO vms_kvpair (resource_id, name, value) VALUES(:resourceId, :name, :value)");
-    insQuery.prepare(QLatin1String(op) + " INTO vms_kvpair VALUES(?, NULL, ?, ?)");
+    insQuery.prepare("INSERT INTO vms_kvpair VALUES(?, NULL, ?, ?)");
     insQuery.bindValue(0, internalId);
     foreach(const ApiResourceParam& param, params) {
         param.autoBindValuesOrdered(insQuery, 1);
@@ -274,16 +274,6 @@ ErrorCode QnDbManager::insertAddParamsHerlper(const std::vector<ApiResourceParam
         }        
     }
     return ErrorCode::ok;
-}
-
-ErrorCode QnDbManager::insertAddParams(const std::vector<ApiResourceParam>& params, qint32 internalId)
-{
-    return insertAddParamsHerlper(params, internalId, "INSERT");
-}
-
-ErrorCode QnDbManager::insertOrUpdateAddParams(const std::vector<ApiResourceParam>& params, qint32 internalId)
-{
-    return insertAddParamsHerlper(params, internalId, "INSERT OR REPLACE");
 }
 
 ErrorCode QnDbManager::deleteAddParams(qint32 resourceId)
@@ -1594,7 +1584,11 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResetBusi
 // save settings
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiParamList>& tran)
 {
-    return insertOrUpdateAddParams(tran.params.data, m_adminUserInternalID);
+    ErrorCode result = deleteAddParams(m_adminUserInternalID);
+    if (result != ErrorCode::ok)
+        return result;
+
+    return insertAddParams(tran.params.data, m_adminUserInternalID);
 }
 
 
