@@ -2186,7 +2186,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
             cam->setGroupName(name);
             modified << cam;
         }
-        connection()->saveAsync(modified, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+        // connection2()->saveAsync(modified, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
     } else {
         resource->setName(name);
         connection2()->getResourceManager()->save( resource, this,
