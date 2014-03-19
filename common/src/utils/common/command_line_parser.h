@@ -9,6 +9,8 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 
+// TODO: #Elric rework with QCommandLineParser
+
 class QTextStream;
 
 struct QnCommandLineDefaultImpliedValue {};
@@ -90,6 +92,11 @@ private:
 class QN_EXPORT QnCommandLineParser {
     Q_DECLARE_TR_FUNCTIONS(QnCommandLineParser);
 public:
+    enum ParameterPreservationMode {
+        RemoveParsedParameters,
+        PreserveParsedParameters
+    };
+
     QnCommandLineParser() {}
 
     void addParameter(const QnCommandLineParameter &parameter);
@@ -108,8 +115,8 @@ public:
 
     void clear();
 
-    bool parse(int &argc, char **argv, FILE *errorFile);
-    bool parse(int &argc, char **argv, QTextStream *errorStream);
+    bool parse(int &argc, char **argv, FILE *errorFile, ParameterPreservationMode preservationMode = RemoveParsedParameters);
+    bool parse(int &argc, char **argv, QTextStream *errorStream, ParameterPreservationMode preservationMode = RemoveParsedParameters);
 
 private:
     void addName(int index, const QString &name);
