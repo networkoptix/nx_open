@@ -39,7 +39,7 @@ private slots:
     void at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 
 private:
-    friend class LayoutOverlayWidget;
+    friend class QnLayoutResourceOverlayWidget;
 
     QnVideoWallResourcePtr m_videowall;
     QUuid m_pcUuid;
