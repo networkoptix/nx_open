@@ -208,7 +208,7 @@
             "window": "#ffffff80",
             "windowText": "#801010c0"
         }},
-        "diagnosticsButton": { 
+        "#diagnosticsButton": { 
             "windowColor": "#801010c0",
             "frameColor": "#801010ff",
             "textColor": "#ffffffff"
