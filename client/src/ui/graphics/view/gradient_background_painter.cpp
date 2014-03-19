@@ -142,45 +142,47 @@ void QnGradientBackgroundPainter::drawLayer(QPainter *painter, const QRectF &rec
 
     qreal radius = qMin(rect.width(), rect.height()) / 1.4142;
 
-#ifdef QN_BACKGROUND_PAINTER_NO_OPENGL
-    {
-        QRadialGradient radialGrad(center1, radius);
-        radialGrad.setColorAt(0, color);
-        radialGrad.setColorAt(1, QColor(0, 0, 0, 0));
-        painter->fillRect(rect, radialGrad);
+    if(!m_gradientPainter)
+        m_gradientPainter.reset(new QnRadialGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), QGLContext::currentContext()));
+
+    if(m_gradientPainter->isAvailable()) {
+        QnGlNativePainting::begin(painter);
+        {
+            if(!m_gradientPainter)
+                m_gradientPainter.reset(new QnRadialGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), QGLContext::currentContext()));
+
+            //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+            glPushMatrix();
+            glTranslate(center1);
+            glScale(radius, radius);
+            m_gradientPainter->paint(color);
+            glPopMatrix();
+
+            glPushMatrix();
+            glTranslate(center2);
+            glScale(radius, radius);
+            m_gradientPainter->paint(color);
+            glPopMatrix();
+
+            glDisable(GL_BLEND);
+            //glPopAttrib();
+        }
+        QnGlNativePainting::end(painter);
+    } else {
+        {
+            QRadialGradient gradient(center1, radius);
+            gradient.setColorAt(0, color);
+            gradient.setColorAt(1, QColor(0, 0, 0, 0));
+            painter->fillRect(rect, gradient);
+        }
+        {
+            QRadialGradient gradient(center2, radius);
+            gradient.setColorAt(0, color);
+            gradient.setColorAt(1, QColor(0, 0, 0, 0));
+            painter->fillRect(rect, gradient);
+        }
     }
-
-    {
-        QRadialGradient radialGrad(center2, radius);
-        radialGrad.setColorAt(0, color);
-        radialGrad.setColorAt(1, QColor(0, 0, 0, 0));
-        painter->fillRect(rect, radialGrad);
-    }
-#else
-    QnGlNativePainting::begin(painter);
-    {
-        if(!m_gradientPainter)
-            m_gradientPainter.reset(new QnRadialGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), QGLContext::currentContext()));
-
-        //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        glPushMatrix();
-        glTranslate(center1);
-        glScale(radius, radius);
-        m_gradientPainter->paint(color);
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslate(center2);
-        glScale(radius, radius);
-        m_gradientPainter->paint(color);
-        glPopMatrix();
-
-        glDisable(GL_BLEND);
-        //glPopAttrib();
-    }
-    QnGlNativePainting::end(painter);
-#endif
 }

@@ -63,6 +63,9 @@ void ProcessUtils::initialize() {
 #else
 
 bool ProcessUtils::startProcessDetached(const QString &program, const QStringList &arguments, const QString &workingDirectory, const QStringList &environment) {
+    if(program.isEmpty())
+        return false; /* This prevents a crash in QProcess::startDetached. */
+
     return QProcess::startDetached(program, arguments, workingDirectory);
 }
 

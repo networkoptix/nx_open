@@ -375,7 +375,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
     QnCompatibilityChecker remoteChecker(connectionInfo->compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
 
-    QnCompatibilityChecker* compatibilityChecker;
+    QnCompatibilityChecker *compatibilityChecker;
     if (remoteChecker.size() > localChecker.size()) {
         compatibilityChecker = &remoteChecker;
     } else {
