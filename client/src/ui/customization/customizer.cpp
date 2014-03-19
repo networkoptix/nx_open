@@ -343,8 +343,9 @@ void QnCustomizerPrivate::customize(QObject *object) {
         metaObject = metaObject->superClass();
     }
 
+    QnPropertyAccessor *accessor = this->accessor(object);
     for(int i = classNames.size() - 1; i >= 0; i--)
-        customize(object, accessor(object), classNames[i]);
+        customize(object, accessor, classNames[i]);
 }
 
 void QnCustomizerPrivate::customize(QObject *object, QnPropertyAccessor *accessor, const char *className) {
