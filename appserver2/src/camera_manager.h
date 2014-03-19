@@ -39,8 +39,10 @@ namespace ec2
                 tran.params.typeId,
                 QnResourceParams(tran.params.url, tran.params.vendor) ).dynamicCast<QnVirtualCameraResource>();
             Q_ASSERT(cameraRes);
-            tran.params.toResource( cameraRes );
-            emit cameraAddedOrUpdated( cameraRes );
+            if (cameraRes) {
+                tran.params.toResource( cameraRes );
+                emit cameraAddedOrUpdated( cameraRes );
+            }
         }
 
         void triggerNotification( const QnTransaction<ApiCameraDataList>& tran )

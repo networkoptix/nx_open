@@ -95,7 +95,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     }
     tran.timestamp -= sender->timeDiff();
 
-    qDebug() << "got transaction " << tran.command;
+    qDebug() << "got transaction " << ApiCommand::toString(tran.command);
 
     AlivePeersMap:: iterator itr = m_alivePeers.find(tran.id.peerGUID);
     if (itr != m_alivePeers.end())
@@ -126,6 +126,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
         return;
 
     if (m_handler && !m_handler->processByteArray(sender, serializedTran)) {
+        qWarning() << "Can't handle transaction" << ApiCommand::Value(tran.command) << "reopen connection";
         sender->setState(QnTransactionTransport::Error);
         return;
     }
@@ -487,14 +488,19 @@ void QnTransactionMessageBus::doPeriodicTasks()
     {
         if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_INTERVAL * 2)
         {
+            itr.value().lastActivity.restart();
             foreach(QSharedPointer<QnTransactionTransport> transport, m_connectingConnections) {
-                if (transport->remoteGuid() == itr.key())
+                if (transport->remoteGuid() == itr.key()) {
+                    qWarning() << "No alive info during timeout. reconnect to peer" << transport->remoteGuid();
                     transport->setState(QnTransactionTransport::Error);
+                }
             }
 
             foreach(QSharedPointer<QnTransactionTransport> transport, m_connections.values()) {
-                if (transport->remoteGuid() == itr.key())
+                if (transport->remoteGuid() == itr.key()) {
+                    qWarning() << "No alive info during timeout. reconnect to peer" << transport->remoteGuid();
                     transport->setState(QnTransactionTransport::Error);
+                }
             }
         }
     }
@@ -551,8 +557,10 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
     QString urlStr = getUrlAddr(url);
     foreach(QnTransactionTransportPtr transport, m_connections.values())
     {
-        if (getUrlAddr(transport->remoteAddr()) == urlStr)
+        if (getUrlAddr(transport->remoteAddr()) == urlStr) {
+            qWarning() << "Disconnected from peer" << url;
             transport->setState(QnTransactionTransport::Error);
+        }
     }
 }
 

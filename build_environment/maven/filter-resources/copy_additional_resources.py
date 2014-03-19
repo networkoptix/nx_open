@@ -114,7 +114,7 @@ if __name__ == '__main__':
     else:     
         lib_source_dir = '${qt.dir}/lib'
         lib_target_dir = join('${project.build.directory}', 'lib')
-        plugin_source_dir = '${environment.dir}/qt5/qtbase-${arch}/plugins'	
+        plugin_source_dir = '${qt.dir}/plugins'	
         target_dir = join('${project.build.directory}', 'bin')
         help_dir = join('${project.build.directory}', 'bin/help')
         

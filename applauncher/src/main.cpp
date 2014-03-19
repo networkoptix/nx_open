@@ -15,6 +15,7 @@
 #include "applauncher_process.h"
 #include "installation_process.h"
 #include "rdir_syncher.h"
+#include "process_utils.h"
 #include "version.h"
 
 #ifdef _WIN32
@@ -151,6 +152,8 @@ int main( int argc, char* argv[] )
             versionToInstall,
             moduleToInstall,
             installationPath );
+
+    ProcessUtils::initialize();
 
     ApplauncherProcess applauncherProcess(
         &userSettings,

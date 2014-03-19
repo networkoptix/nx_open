@@ -2143,24 +2143,50 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
     if(!resource)
         return;
 
+    Qn::NodeType nodeType = parameters.hasArgument(Qn::NodeTypeRole)
+            ? static_cast<Qn::NodeType>(parameters.argument(Qn::NodeTypeRole).toInt())
+            : Qn::ResourceNode;
+
+    QnVirtualCameraResourcePtr camera;
+    if (nodeType == Qn::RecorderNode) {
+        camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            return;
+    }
+
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
+    QString oldName = nodeType == Qn::RecorderNode
+            ? camera->getGroupName()
+            : resource->getName();
+
     if(name.isEmpty()) {
         bool ok = false;
         name = QInputDialog::getText(mainWindow(),
                                      tr("Rename"),
                                      tr("Enter new name for the selected item:"),
                                      QLineEdit::Normal,
-                                     resource->getName(),
+                                     oldName,
                                      &ok);
         if (!ok || name.isEmpty())
             return;
     }
 
-    if(name == resource->getName())
+    if(name == oldName)
         return;
 
     if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         context()->instance<QnWorkbenchLayoutsHandler>()->renameLayout(layout, name);
+    } else if (nodeType == Qn::RecorderNode) {
+        QString groupId = camera->getGroupId();
+        QnVirtualCameraResourceList modified;
+        foreach(const QnResourcePtr &resource, qnResPool->getResources()) {
+            QnVirtualCameraResourcePtr cam = resource.dynamicCast<QnVirtualCameraResource>();
+            if (!cam || cam->getGroupId() != groupId)
+                continue;
+            cam->setGroupName(name);
+            modified << cam;
+        }
+        connection()->saveAsync(modified, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
     } else {
         resource->setName(name);
         connection2()->getResourceManager()->save( resource, this,

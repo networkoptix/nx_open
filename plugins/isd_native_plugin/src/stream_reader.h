@@ -11,7 +11,9 @@
 #include <memory>
 #include <mutex>
 
+#ifndef NO_ISD_AUDIO
 #include <isd/amux/amux_iface.h>
+#endif
 #include <isd/vmux/vmux_iface.h>
 
 #include <plugins/camera_plugin.h>
@@ -69,18 +71,20 @@ private:
     nxcip::UsecUTCTimestamp m_lastMotionTime;
     Vmux* m_vmux;
     Vmux* m_vmux_motion;
+#ifndef NO_ISD_AUDIO
     amux_info_t m_audioInfo;
     Amux* m_amux;
+    bool m_audioEnabled;
     nxcip::CompressionType m_audioCodec;
-    mutable std::mutex m_mutex;
     std::unique_ptr<nxcip::AudioFormat> m_audioFormat;
+#endif
+    mutable std::mutex m_mutex;
     
     vmux_stream_info_t motion_stream_info;
     ISDMotionEstimation m_motionEstimation;
     int64_t m_firstFrameTime;
     unsigned int m_prevPts;
     int64_t m_ptsDelta;
-    bool m_audioEnabled;
     QnRtspTimeHelper m_timeHelper;
     RtspStatistic m_timeStatistics;
 
@@ -90,12 +94,14 @@ private:
 #endif
 
     int initializeVMux();
-    int initializeAMux();
     int getVideoPacket( nxcip::MediaDataPacket** packet );
-    int getAudioPacket( nxcip::MediaDataPacket** packet );
     bool registerFD( int fd );
     void unregisterFD( int fd );
+#ifndef NO_ISD_AUDIO
+    int initializeAMux();
+    int getAudioPacket( nxcip::MediaDataPacket** packet );
     void fillAudioFormat( const ISDAudioPacket& audioPacket );
+#endif
     int64_t calcNextTimestamp( unsigned int pts );
 };
 

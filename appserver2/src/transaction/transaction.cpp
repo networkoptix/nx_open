@@ -110,6 +110,8 @@ namespace ec2
                     return "tranSyncRequest";
                 case tranSyncResponse:
                     return "tranSyncResponse";
+                case serverAliveInfo:
+                    return "serverAliveInfo";
 
                 case getSettings:
                     return "getSettings";

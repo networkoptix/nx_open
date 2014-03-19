@@ -860,12 +860,7 @@ void QnResourceWidget::paintChannelForeground(QPainter *, int, const QRectF &) {
 void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     if(qFuzzyIsNull(m_frameOpacity))
         return;
-
-    QSizeF size = this->size();
-    qreal w = size.width();
-    qreal h = size.height();
-    qreal fw = m_frameWidth;
-    
+   
     QColor color;
     if(isSelected()) {
         color = m_frameColors.selected;
@@ -882,6 +877,11 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
             color = m_frameColors.normal;
         }
     }
+
+    QSizeF size = this->size();
+    qreal w = size.width();
+    qreal h = size.height();
+    qreal fw = m_frameWidth;
 
     QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */

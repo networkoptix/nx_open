@@ -24,7 +24,7 @@
         <product.title>${appserver2.name}</product.title>  
         <!--Global libs-->		
         <qt.libs>core network xml sql concurrent</qt.libs>
-        <global.libs>-lcommon -lpostproc -lprotobuf</global.libs>
+        <global.libs>-lcommon -lpostproc</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
         <linux.oslibs>-lssl -lcrypto</linux.oslibs>

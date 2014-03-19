@@ -37,10 +37,15 @@ signals:
     void businessRuleReset(QnBusinessEventRuleList rules);
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
 protected:
-    virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) = 0;
+    virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
     virtual void onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status) = 0;
     
     virtual void afterRemovingResource(const QnId& id);
+
+    void updateHardwareIds(const ec2::QnFullResourceData& fullData);
+    void processResources(const QnResourceList& resources);
+    void processLicenses(const QnLicenseList& licenses);
+    void processCameraServerItems(const QnCameraHistoryList& cameraHistoryList);
 public slots:
     void on_businessEventAddedOrUpdated( QnBusinessEventRulePtr camera );
 private slots:

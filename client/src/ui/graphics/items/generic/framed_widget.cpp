@@ -117,9 +117,25 @@ void FramedBase::paintFrame(QPainter *painter, const QRectF &rect) {
     QRectF frameRect = rect.adjusted(d, d, -d, -d);
 
     switch (m_frameShape) {
-    case Qn::RectangularFrame:
-        painter->drawRect(frameRect);
+    case Qn::RectangularFrame: {
+        QBrush frameBrush = this->frameBrush();
+        QBrush windowBrush = this->windowBrush();
+        if(frameBrush.style() == Qt::SolidPattern && windowBrush.style() == Qt::SolidPattern) {
+            /* For some reason this code works WAY faster. */
+            qreal l = rect.left(), t = rect.top(), w = rect.width(), h = rect.height();
+            qreal fw = m_frameWidth;
+
+            painter->setPen(Qt::NoPen);
+            painter->fillRect(QRectF(l + fw,        t + fw,     w - 2 * fw, h - 2 * fw), windowBrush);
+            painter->fillRect(QRectF(l,             t,          w,          fw),         frameBrush);
+            painter->fillRect(QRectF(l,             t + h - fw, w,          fw),         frameBrush);
+            painter->fillRect(QRectF(l,             t + fw,     fw,         h - 2 * fw), frameBrush);
+            painter->fillRect(QRectF(l + w - fw,    t + fw,     fw,         h - 2 * fw), frameBrush);
+        } else {
+            painter->drawRect(rect);
+        }
         break;
+    }
     case Qn::RoundedRectangularFrame:
         painter->drawRoundedRect(rect, m_roundingRadius, m_roundingRadius, Qt::AbsoluteSize);
         break;

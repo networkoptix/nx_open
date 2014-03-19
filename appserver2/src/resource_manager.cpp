@@ -142,7 +142,7 @@ namespace ec2
         QnTransaction<ApiResourceParams> tran(command, true);
         tran.params.params.reserve(kvPairs.size());
         foreach(const QnKvPair& pair, kvPairs)
-            tran.params.params.push_back(ApiResourceParam(pair.name(), pair.value()));
+            tran.params.params.push_back(ApiResourceParam(pair.name(), pair.value(), false));
         tran.params.id = id;
         return tran;
     }

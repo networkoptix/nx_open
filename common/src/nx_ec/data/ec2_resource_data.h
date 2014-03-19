@@ -16,15 +16,16 @@ namespace ec2
     struct ApiResourceParam: public ApiData
     {
         ApiResourceParam() {}
-        ApiResourceParam(const QString& name, const QString& value): value(value), name(name) {}
+        ApiResourceParam(const QString& name, const QString& value, bool isResTypeParam): value(value), name(name), isResTypeParam(isResTypeParam) {}
 
         QString value;
         QString name;
+        bool isResTypeParam;
 
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define ApiResourceParamFields (value) (name)
+    #define ApiResourceParamFields (value) (name) (isResTypeParam)
     QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiResourceParam, ApiResourceParamFields )
 
     struct ApiParamList

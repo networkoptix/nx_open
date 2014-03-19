@@ -208,7 +208,7 @@
             "window": "#ffffff80",
             "windowText": "#801010c0"
         }},
-        "diagnosticsButton": { 
+        "#diagnosticsButton": { 
             "windowColor": "#801010c0",
             "frameColor": "#801010ff",
             "textColor": "#ffffffff"
@@ -314,7 +314,15 @@
         "pen": { "color": "ptz.setAlpha(192)" },
         "brush": "ptz.setAlpha(64).lighter(120)"
     },
-    
+        
+    "QnPtzManageModel": {
+        "colors": {
+            "title": "#a0a0a0",
+            "invalid": "#ffa0a0",
+            "warning": "#ffffa0"
+        }
+    },
+
     "QnShadowItem": {
         "color": "#00000000"
     }
