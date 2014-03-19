@@ -212,6 +212,16 @@ public:
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
+/**
+ * Condition for resource rename.
+ */
+class QnRenameActionCondition: public QnActionCondition {
+public:
+    QnRenameActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 
 /**
  * Condition for removal of a layout item.

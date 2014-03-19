@@ -289,6 +289,20 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
 }
 
 
+Qn::ActionVisibility QnRenameActionCondition::check(const QnActionParameters &parameters) {
+    Qn::NodeType nodeType = parameters.hasArgument(Qn::NodeTypeRole)
+            ? static_cast<Qn::NodeType>(parameters.argument(Qn::NodeTypeRole).toInt())
+            : Qn::ResourceNode;
+
+    if (nodeType == Qn::RecorderNode)
+        return Qn::EnabledAction;
+
+    return parameters.resources().size() == 1
+            ? Qn::EnabledAction
+            : Qn::InvisibleAction;
+}
+
+
 Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
     foreach(const QnLayoutItemIndex &item, layoutItems)
         if(!accessController()->hasPermissions(item.layout(), Qn::WritePermission | Qn::AddRemoveItemsPermission))
