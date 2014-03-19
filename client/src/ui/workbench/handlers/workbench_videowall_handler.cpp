@@ -986,7 +986,7 @@ void QnWorkbenchVideoWallHandler::at_resetVideoWallLayoutAction_triggered() {
     layout->setUserCanEdit(true);
 
     if (snapshotManager()->isLocal(layout) || snapshotManager()->isModified(layout)) {
-        int requestId = snapshotManager()->save(workbench()->currentLayout()->resource(), this, SLOT(at_videoWall_layout_saved(int, const QnResourceList &, int)));
+        int requestId = snapshotManager()->save(layout, this, SLOT(at_videoWall_layout_saved(int, const QnResourceList &, int)));
         m_resetting.insert(requestId, items);
         return;
     }

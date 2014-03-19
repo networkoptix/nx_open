@@ -63,9 +63,6 @@ void QnLayoutResourceOverlayWidget::paint(QPainter *painter, const QStyleOptionG
         if (bounding.isNull())
             return;
 
-        qreal x = paintRect.left();
-        qreal y = paintRect.top();
-
         qreal xspace = m_layout->cellSpacing().width() * 0.5;
         qreal yspace = m_layout->cellSpacing().height() * 0.5;
 
@@ -75,17 +72,17 @@ void QnLayoutResourceOverlayWidget::paint(QPainter *painter, const QStyleOptionG
         if (sourceAr > targetAr) {
             xscale = paintRect.width() / bounding.width();
             yscale = xscale / m_layout->cellAspectRatio();
-            xoffset = 0;
+            xoffset = paintRect.left();
 
             qreal h = bounding.height() * yscale;
             yoffset = (paintRect.height() - h) * 0.5 + paintRect.top();
         } else {
             yscale = paintRect.height() / bounding.height();
             xscale = yscale * m_layout->cellAspectRatio();
-            yoffset = 0;
+            yoffset = paintRect.top();
 
             qreal w = bounding.width() * xscale;
-            xoffset = (paintRect.width() - w) * 0.5 + paintRect.top();
+            xoffset = (paintRect.width() - w) * 0.5 + paintRect.left();
         }
 
 #ifdef RECT_DEBUG
@@ -105,9 +102,9 @@ void QnLayoutResourceOverlayWidget::paint(QPainter *painter, const QStyleOptionG
             qreal w1 = (itemRect.width() - xspace*2) * xscale;
             qreal h1 = (itemRect.height() - yspace*2) * yscale;
 
-            paintItem(painter, QRectF(x + x1, y + y1, w1, h1), data);
+            paintItem(painter, QRectF(x1, y1, w1, h1), data);
 #ifdef RECT_DEBUG
-            painter->drawRect(QRectF(x + x1, y + y1, w1, h1));
+            painter->drawRect(QRectF(x1, y1, w1, h1));
 #endif
         }
     }
