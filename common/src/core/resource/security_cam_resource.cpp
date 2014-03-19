@@ -437,7 +437,14 @@ QString QnSecurityCamResource::getGroupName() const {
 }
 
 void QnSecurityCamResource::setGroupName(const QString& value) {
-    SAFE(m_groupName = value)
+    {
+        QMutexLocker locker(&m_mutex);
+        if(m_groupName == value)
+            return;
+        m_groupName = value;
+    }
+
+    emit groupNameChanged(::toSharedPointer(this));
 }
 
 QString QnSecurityCamResource::getGroupId() const {
@@ -591,4 +598,26 @@ QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(
     Q_UNUSED( detailLevel );
 
     return QnTimePeriodList();
+}
+
+bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) {
+    QnSecurityCamResourcePtr camera = source.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return false;
+
+    bool result = base_type::mergeResourcesIfNeeded(source);
+
+    if (getGroupId() != camera->getGroupId())
+    {
+        setGroupId(camera->getGroupId());
+        result = true; // groupID can be changed for onvif resource because if not auth info, maxChannels is not accessible
+    }
+
+    if (getGroupName().isEmpty() && getGroupName() != camera->getGroupName())
+    {
+        setGroupName(camera->getGroupName());
+        result = true;
+    }
+
+    return result;
 }

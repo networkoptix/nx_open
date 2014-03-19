@@ -359,7 +359,7 @@ public:
                 result |= Qt::ItemIsDragEnabled;
             break;
         case Qn::RecorderNode:
-            result |= Qt::ItemIsDragEnabled;
+            result |= Qt::ItemIsDragEnabled | Qt::ItemIsEditable;
             break;
         default:
             break;
@@ -448,7 +448,21 @@ public:
         if(role != Qt::EditRole)
             return false;
 
-        m_model->context()->menu()->trigger(Qn::RenameAction, QnActionParameters(m_resource).withArgument(Qn::ResourceNameRole, value.toString()));
+        QnActionParameters parameters;
+        if (m_type == Qn::RecorderNode) {
+            //sending first camera to get groupId and check WriteName permission
+            if (this->children().isEmpty())
+                return false;
+            Node* child = this->child(0);
+            if (!child->resource())
+                return false;
+            parameters = QnActionParameters(child->resource()).withArgument(Qn::ResourceNameRole, value.toString());
+        }
+        else
+            parameters = QnActionParameters(m_resource).withArgument(Qn::ResourceNameRole, value.toString());
+        parameters.setArgument(Qn::NodeTypeRole, static_cast<int>(m_type));
+
+        m_model->context()->menu()->trigger(Qn::RenameAction, parameters);
         return true;
     }
 
@@ -468,9 +482,6 @@ public:
     // TODO: #GDM
     // This is a node construction method, so it does not really belong here.
     // See other node construction methods, QnResourcePoolModel::node(...).
-    // 
-    // I see we already have a m_recorderNodeByResource for that, we only need
-    // a better type for it, e.g. QHash<QPair<QnResource *, QString>, Node *>.
     Node *recorder(const QString &groupId, const QString &groupName) {
         if (m_recorders.contains(groupId))
             return m_recorders[groupId];
@@ -525,6 +536,9 @@ protected:
     }
 
 private:
+    //TODO: #GDM need complete recorder nodes structure refactor to get rid of this shit
+    friend class QnResourcePoolModel;
+
     /* Node state. */
 
     /** Model that this node belongs to. */
@@ -952,6 +966,11 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         connect(layout.data(), SIGNAL(itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &)),  this, SLOT(at_resource_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &)));
     }
 
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if(camera) {
+        connect(camera.data(), &QnVirtualCameraResource::groupNameChanged, this, &QnResourcePoolModel::at_camera_groupNameChanged);
+    }
+
     Node *node = this->node(resource);
     node->setResource(resource);
 
@@ -1021,18 +1040,15 @@ void QnResourcePoolModel::at_resource_itemRemoved(const QnLayoutResourcePtr &, c
     deleteNode(node(item.uuid));
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//TODO: #GDM need complete recorder nodes structure refactor to get rid of this shit
+void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera) {
+    const QString groupId = camera->getGroupId();
+    foreach (Node* node, m_resourceNodeByResource) {
+        if (!node->m_recorders.contains(groupId))
+            continue;
+        node->m_recorders[groupId]->m_name = camera->getGroupName();
+        node->m_recorders[groupId]->m_displayName = camera->getGroupName();
+        node->changeInternal();
+    }
+}
 

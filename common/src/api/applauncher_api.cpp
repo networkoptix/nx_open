@@ -499,7 +499,7 @@ namespace applauncher
         ////////////////////////////////////////////////////////////
         CancelInstallationRequest::CancelInstallationRequest()
         :
-            BaseTask( TaskType::getInstallationStatus ),
+            BaseTask( TaskType::cancelInstallation ),
             installationID( 0 )
         {
         }

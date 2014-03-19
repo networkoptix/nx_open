@@ -173,6 +173,9 @@ public:
         qint64 msEndTime,
         int detailLevel );
     
+    // in some cases I just want to update couple of field from just discovered resource
+    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -184,6 +187,7 @@ signals:
     void scheduleDisabledChanged(const QnSecurityCamResourcePtr &resource);
     void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
     void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+    void groupNameChanged(const QnSecurityCamResourcePtr &resource);
 
     //!Emitted on camera input port state has been changed
     /*!

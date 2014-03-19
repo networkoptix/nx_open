@@ -72,6 +72,7 @@ private slots:
     void at_resource_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
     void at_resource_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
 
+    void at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera);
 private:
     /** Root nodes array */
     Node *m_rootNodes[Qn::NodeTypeCount];
@@ -81,9 +82,6 @@ private:
 
     /** Mapping for resource nodes, by resource. */
     QHash<QnResource *, Node *> m_resourceNodeByResource;
-
-    /** Mapping for recorder nodes, by resource. */
-    QHash<QnResource *, QHash<int, Node *> > m_recorderNodeByResource;
 
     /** Mapping for item nodes, by item id. */
     QHash<QUuid, Node *> m_itemNodeByUuid;
