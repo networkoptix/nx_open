@@ -292,9 +292,8 @@ public:
     int customizationHashType;
     
     QnCustomization customization;
-    QList<QByteArray> classNames;
     QHash<QLatin1String, QnCustomizationData> dataByClassName;
-    QHash<QString, QnCustomizationData> dataByObjectName;
+    QList<QByteArray> classNames;
     QHash<QLatin1String, QnCustomizationAccessor *> accessorByClassName;
     QScopedPointer<QnCustomizationAccessor> defaultAccessor;
     QScopedPointer<QnCustomizationColorSerializer> colorSerializer;
@@ -353,13 +352,6 @@ void QnCustomizerPrivate::customize(QObject *object) {
     QnCustomizationAccessor *accessor = this->accessor(object);
     for(int i = classNames.size() - 1; i >= 0; i--)
         customize(object, accessor, classNames[i]);
-
-    QString objectName = object->objectName();
-    if(!objectName.isEmpty()) {
-        auto pos = dataByObjectName.find(objectName);
-        if(pos != dataByObjectName.end())
-            customize(object, &*pos, accessor, classNames[0]);
-    }
 
     customObjects.insert(object);
     QObject::connect(object, &QObject::destroyed, q, [this](QObject *object){ customObjects.remove(object); });
@@ -466,14 +458,9 @@ void QnCustomizer::setCustomization(const QnCustomization &customization) {
 
     const QJsonObject &object = customization.data();
     for(auto pos = object.begin(); pos != object.end(); pos++) {
-        QString name = pos.key();
-        if(name.startsWith(L'#')) {
-            d->dataByObjectName[name.mid(1)] = QnCustomizationData(*pos);
-        } else {
-            QByteArray className = name.toLatin1();
-            d->classNames.push_back(className);
-            d->dataByClassName[QLatin1String(className)] = QnCustomizationData(*pos);
-        }
+        QByteArray className = pos.key().toLatin1();
+        d->classNames.push_back(className);
+        d->dataByClassName[QLatin1String(className)] = QnCustomizationData(*pos);
     }
 
     /* Load globals. */
