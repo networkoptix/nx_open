@@ -4,14 +4,16 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/layout_item_data.h>
+#include <core/resource/videowall_item_index.h>
 
 #include <ui/graphics/items/standard/graphics_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
 
 class QnVideowallResourceScreenWidget;
 
-class QnLayoutResourceOverlayWidget : public Connective<GraphicsWidget> {
+class QnLayoutResourceOverlayWidget : public Connective<GraphicsWidget>, public QnWorkbenchContextAware {
     typedef Connective<GraphicsWidget> base_type;
     Q_OBJECT
 
@@ -21,8 +23,14 @@ public:
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event) override;
+    virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event) override;
+    virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event) override;
+    virtual void dropEvent(QGraphicsSceneDragDropEvent *event) override;
+
 private:
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
+
     void updateLayout();
     void updateView();
     void updateInfo();
@@ -38,6 +46,11 @@ private:
     const QUuid m_itemUuid;
 
     QnLayoutResourcePtr m_layout;
+
+    struct {
+        QnResourceList resources;
+        QnVideoWallItemIndexList videoWallItems;
+    } m_dragged;
 };
 
 #endif // LAYOUT_RESOURCE_OVERLAY_WIDGET_H

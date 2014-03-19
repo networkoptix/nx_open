@@ -31,6 +31,8 @@ QnVideowallResourceScreenWidget::QnVideowallResourceScreenWidget(QnWorkbenchCont
     m_mainLayout(NULL),
     m_layoutUpdateRequired(true)
 {
+    setAcceptDrops(true);
+
     setOption(QnResourceWidget::WindowRotationForbidden, true);
 
     m_videowall = base_type::resource().dynamicCast<QnVideoWallResource>();

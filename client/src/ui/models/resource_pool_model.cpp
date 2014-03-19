@@ -429,6 +429,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
                 medias << res;
         }
 
+        //TODO: #GDM VW make the same way as in QnLayoutResourceOverlayWidget
         //dropping layouts
         QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
 

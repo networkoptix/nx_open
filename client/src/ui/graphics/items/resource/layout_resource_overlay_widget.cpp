@@ -4,21 +4,28 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
+#include <core/resource/media_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
 
+#include <ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/videowall_resource_screen_widget.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench_resource.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 
 QnLayoutResourceOverlayWidget::QnLayoutResourceOverlayWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallResourceScreenWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
+    QnWorkbenchContextAware(parent),
     m_widget(parent),
     m_videowall(videowall),
     m_itemUuid(itemUuid)
 {
+    setAcceptDrops(true);
+
     connect(m_videowall, &QnVideoWallResource::itemChanged, this, &QnLayoutResourceOverlayWidget::at_videoWall_itemChanged);
 
     updateLayout();
@@ -104,6 +111,94 @@ void QnLayoutResourceOverlayWidget::paint(QPainter *painter, const QStyleOptionG
 #endif
         }
     }
+}
+
+void QnLayoutResourceOverlayWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event) {
+    const QMimeData *mimeData = event->mimeData();
+
+    QnResourceList resources = QnWorkbenchResource::deserializeResources(mimeData);
+    QnResourceList media;
+    QnResourceList layouts;
+    QnResourceList servers;
+
+    m_dragged.resources.clear();
+    m_dragged.videoWallItems.clear();
+
+    foreach( QnResourcePtr res, resources )
+    {
+        if( dynamic_cast<QnMediaResource*>(res.data()) )
+            media.push_back( res );
+        if( res.dynamicCast<QnLayoutResource>() )
+            layouts.push_back( res );
+        if( res.dynamicCast<QnMediaServerResource>() )
+            servers.push_back( res );
+    }
+
+//    if (layouts.size() > 1)
+//        return;
+
+//    if (layouts.size() == 1 && (media.size() > 0 || servers.size() > 0))
+//        return;
+
+    m_dragged.resources = media;
+    m_dragged.resources << layouts;
+    m_dragged.resources << servers;
+
+    if (event->mimeData()->hasFormat(QnVideoWallItem::mimeType())) {
+        QByteArray data = event->mimeData()->data(QnVideoWallItem::mimeType());
+        QDataStream stream(&data, QIODevice::ReadOnly);
+        QList<QString> videoWallItemUuids;
+        stream >> videoWallItemUuids;
+
+        foreach (QString uuid, videoWallItemUuids) {
+            QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(uuid);
+            if (!index.isNull())
+                m_dragged.videoWallItems << index;
+        }
+    }
+
+    if (m_dragged.resources.empty() && m_dragged.videoWallItems.empty())
+        return;
+
+    event->acceptProposedAction();
+}
+
+void QnLayoutResourceOverlayWidget::dragMoveEvent(QGraphicsSceneDragDropEvent *event) {
+    if(m_dragged.resources.empty() && m_dragged.videoWallItems.empty())
+        return;
+
+    event->acceptProposedAction();
+}
+
+void QnLayoutResourceOverlayWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent *event) {
+//    if(m_dragged.resources.empty() && m_dragged.videoWallItems.empty())
+//        return;
+
+//    event->acceptProposedAction();
+}
+
+void QnLayoutResourceOverlayWidget::dropEvent(QGraphicsSceneDragDropEvent *event) {
+
+    //TODO: #GDM VW permissions check
+    QnLayoutResourceList layouts = m_dragged.resources.filtered<QnLayoutResource>();
+
+    QnVideoWallItemIndexList indexes;
+    indexes << QnVideoWallItemIndex(m_videowall, m_itemUuid);
+
+    if (!m_dragged.videoWallItems.isEmpty()) {
+        QnVideoWallItemIndex idx = m_dragged.videoWallItems.first();
+        QnVideoWallItem item = m_videowall->getItem(m_itemUuid);
+        item.layout = idx.videowall()->getItem(idx.uuid()).layout;
+        m_videowall->updateItem(m_itemUuid, item);
+        //TODO: #GDM do through action to save the videowall at once
+    } else if (!layouts.isEmpty()) {
+        //TODO: #GDM VW combine layouts?
+        menu()->trigger(Qn::ResetVideoWallLayoutAction, QnActionParameters(indexes).withArgument(Qn::LayoutResourceRole, layouts.first()));
+    } else {
+        //TODO: #GDM VW create a layout
+    }
+
+    event->acceptProposedAction();
 }
 
 

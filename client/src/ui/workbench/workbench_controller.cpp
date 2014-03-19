@@ -289,7 +289,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(ptzInstrument);
     m_manager->installInstrument(zoomWindowInstrument);
 
-    display()->setLayer(m_dropInstrument->surface(), Qn::UiLayer);
+    display()->setLayer(m_dropInstrument->surface(), Qn::BackLayer);
 
     connect(m_itemLeftClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemLeftClickInstrument,  SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
