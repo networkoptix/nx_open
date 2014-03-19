@@ -50,7 +50,7 @@ namespace ec2
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
         virtual int restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) override;
         virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) override;
-        virtual int saveSettingsAsync( const QnEmail::Settings& settings, impl::SimpleHandlerPtr handler ) override;
+        virtual int saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
 
         virtual void addRemotePeer(const QUrl& url, bool isClient) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
@@ -162,12 +162,15 @@ namespace ec2
                 m_storedFileManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiEmailSettingsData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiParamList>& tran ) {
             if( tran.command == ApiCommand::saveSettings ) {
-                QnEmail::Settings newSettings;
-                tran.params.toResource(newSettings);
+                QnKvPairList newSettings;
+                tran.params.toResourceList(newSettings);
                 emit settingsChanged(newSettings);
             }
+        }
+
+        void triggerNotification( const QnTransaction<ApiEmailSettingsData>& tran ) {
         }
 
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }

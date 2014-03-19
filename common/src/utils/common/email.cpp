@@ -98,7 +98,7 @@ QnEmail::Settings::Settings():
     simple(true)
 {}
 
-/* QnEmail::Settings::Settings(const QnKvPairList &values):
+QnEmail::Settings::Settings(const QnKvPairList &values):
     port(0),
     timeout(TIMEOUT),
     simple(true)
@@ -133,7 +133,7 @@ QnEmail::Settings::Settings():
               : QnEmail::Unsecure;
     if (port == defaultPort(connectionType))
         port = 0;
-} */
+}
 
 QnEmail::Settings::~Settings() {
 }

@@ -144,23 +144,23 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiEmailSettingsData& settings) {
-            QnEmail::Settings outData;
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiParamList& settings) {
+            QnKvPairList outData;
             if( errorCode == ErrorCode::ok )
-                settings.toResource(outData);
+                settings.toResourceList(outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiEmailSettingsData, decltype(queryDoneHandler)> ( ApiCommand::getSettings, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiParamList, decltype(queryDoneHandler)> ( ApiCommand::getSettings, nullptr, queryDoneHandler);
         return reqID;
     }
 
     template<class T>
-    int BaseEc2Connection<T>::saveSettingsAsync( const QnEmail::Settings& settings, impl::SimpleHandlerPtr handler )
+    int BaseEc2Connection<T>::saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
-        QnTransaction<ApiEmailSettingsData> tran(ApiCommand::saveSettings, true);
-        tran.params.fromResource(settings);
+        QnTransaction<ApiParamList> tran(ApiCommand::saveSettings, true);
+        tran.params.fromResourceList(kvPairs);
 
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1) );

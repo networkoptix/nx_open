@@ -664,8 +664,8 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int saveSettingsAsync( const QnEmail::Settings& settings, TargetType* target, HandlerType handler ) {
-            return saveSettingsAsync( settings, 
+        template<class TargetType, class HandlerType> int saveSettingsAsync( const QnKvPairList& kvPairs, TargetType* target, HandlerType handler ) {
+            return saveSettingsAsync( kvPairs, 
                 std::static_pointer_cast<impl::SimpleHandler>(
                     std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -693,7 +693,7 @@ namespace ec2
         void remotePeerFound(QnId id, bool isClient, bool isProxy);
         void remotePeerLost(QnId id, bool isClient, bool isProxy);
 
-        void settingsChanged(QnEmail::Settings settings);
+        void settingsChanged(QnKvPairList settings);
         void panicModeChanged(Qn::PanicMode mode);
 
     protected:
@@ -702,7 +702,7 @@ namespace ec2
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
         virtual int restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) = 0;
-        virtual int saveSettingsAsync( const QnEmail::Settings& settings, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
     };  
 
     typedef std::shared_ptr<AbstractECConnection> AbstractECConnectionPtr;

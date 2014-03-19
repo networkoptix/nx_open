@@ -151,8 +151,8 @@ namespace ec2
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeStoredFile );
 
         //ApiResourceParamList
-        registerGetFuncHandler<nullptr_t, ApiEmailSettingsData>( restProcessorPool, ApiCommand::getSettings );
-        registerUpdateFuncHandler<ApiEmailSettingsData>( restProcessorPool, ApiCommand::saveSettings );
+        registerGetFuncHandler<nullptr_t, ApiParamList>( restProcessorPool, ApiCommand::getSettings );
+        registerUpdateFuncHandler<ApiParamList>( restProcessorPool, ApiCommand::saveSettings );
 
         //AbstractECConnection
         registerGetFuncHandler<nullptr_t, qint64>( restProcessorPool, ApiCommand::getCurrentTime );

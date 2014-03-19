@@ -101,11 +101,12 @@ void QnSmtpSettingsWidget::updateFromSettings() {
 void QnSmtpSettingsWidget::submitToSettings() {
     QnEmail::Settings result = settings();
     QnWorkbenchNotificationsHandler* notificationsHandler = context()->instance<QnWorkbenchNotificationsHandler>();
-    auto saveSettingsHandler = [notificationsHandler, result]( int reqID, ec2::ErrorCode errorCode ){
-        notificationsHandler->updateSmtpSettings( reqID, errorCode, result );
+    QnKvPairList serializedSettings = result.serialized();
+    auto saveSettingsHandler = [notificationsHandler, serializedSettings]( int reqID, ec2::ErrorCode errorCode ){
+        notificationsHandler->updateSmtpSettings( reqID, errorCode, serializedSettings );
     };
     QnAppServerConnectionFactory::getConnection2()->saveSettingsAsync(
-        result,
+        serializedSettings,
         notificationsHandler,
         saveSettingsHandler );
 }
@@ -284,7 +285,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     m_timeoutTimer->start();
 
     m_testHandle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->testEmailSettings(
-        result,
+        result.serialized(),
         this,
         &QnSmtpSettingsWidget::at_finishedTestEmailSettings );
     ui->stackedWidget->setCurrentIndex(TestingPage);
