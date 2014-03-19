@@ -664,7 +664,7 @@ void QnResourcePoolModel::at_resource_itemRemoved(const QnLayoutResourcePtr &, c
 //TODO: #GDM need complete recorder nodes structure refactor to get rid of this shit
 void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera) {
     const QString groupId = camera->getGroupId();
-    foreach (Node* node, m_resourceNodeByResource) {
+    foreach (QnResourcePoolModelNode* node, m_resourceNodeByResource) {
         if (!node->m_recorders.contains(groupId))
             continue;
         node->m_recorders[groupId]->m_name = camera->getGroupName();
