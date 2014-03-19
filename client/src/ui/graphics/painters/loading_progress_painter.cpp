@@ -65,7 +65,7 @@ void QnLoadingProgressPainter::paint() {
 }
 
 void QnLoadingProgressPainter::paint(qreal progress, qreal opacity) {
-    if(!m_initialized)
+    if(!m_initialized || !isAvailable())
         return;
 
     glPushMatrix();
@@ -89,4 +89,8 @@ void QnLoadingProgressPainter::paint(qreal progress, qreal opacity) {
     m_shader->release();
 
     glPopMatrix();
+}
+
+bool QnLoadingProgressPainter::isAvailable() const {
+    return hasOpenGLFeature(QOpenGLFunctions::Shaders) && hasOpenGLFeature(QOpenGLFunctions::Buffers);
 }
