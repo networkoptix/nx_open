@@ -111,16 +111,16 @@ void QnCommandLineParser::print(QTextStream &stream) const {
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, char **argv, FILE *errorFile) {
+bool QnCommandLineParser::parse(int &argc, char **argv, FILE *errorFile, ParameterPreservationMode preservationMode) {
     if(errorFile) {
         QTextStream errorStream(errorFile);
-        return parse(argc, argv, &errorStream);
+        return parse(argc, argv, &errorStream, preservationMode);
     } else {
-        return parse(argc, argv, static_cast<QTextStream *>(NULL));
+        return parse(argc, argv, static_cast<QTextStream *>(NULL), preservationMode);
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream) {
+bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream, ParameterPreservationMode preservationMode) {
     bool result = true;
     int pos = 0, skipped = 0;
 
@@ -131,7 +131,8 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
 
         int index = m_indexByName.value(name, -1);
         if(index == -1) {
-            argv[skipped] = argv[pos];
+            if(preservationMode == RemoveParsedParameters)
+                argv[skipped] = argv[pos];
 
             pos++;
             skipped++;
@@ -184,6 +185,7 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
         pos++;
     }
 
-    argc = skipped;
+    if(preservationMode == RemoveParsedParameters)
+        argc = skipped;
     return result;
 }

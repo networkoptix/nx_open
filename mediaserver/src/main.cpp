@@ -1574,7 +1574,7 @@ int main(int argc, char* argv[])
     commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL, QString());
     commandLineParser.addParameter(&showVersion, "--version", NULL, QString(), true);
     commandLineParser.addParameter(&showHelp, "--help", NULL, QString(), true);
-    commandLineParser.parse(argc, argv, stderr);
+    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
 
     if( showVersion )
     {
