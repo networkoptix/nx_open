@@ -465,11 +465,18 @@ bool ApplauncherProcess::isVersionInstalled(
 }
 
 bool ApplauncherProcess::cancelInstallation(
-    const std::shared_ptr<applauncher::api::CancelInstallationRequest>& /*request*/,
+    const std::shared_ptr<applauncher::api::CancelInstallationRequest>& request,
     applauncher::api::CancelInstallationResponse* const response )
 {
-    //TODO/IMPL cancelling by id request->installationID
-    response->result = applauncher::api::ResultType::otherError;
+    auto it = m_activeInstallations.find(request->installationID);
+    if (it == m_activeInstallations.end()) {
+        response->result = applauncher::api::ResultType::otherError;
+        return true;
+    }
+
+    it->second->cancel();
+
+    response->result = applauncher::api::ResultType::ok;
     return true;
 }
 
