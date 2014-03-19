@@ -282,27 +282,19 @@ public:
     void customize(QObject *object, QnCustomizationData *data, QnCustomizationAccessor *accessor, const char *className);
     void customize(QObject *object, const QString &key, QnCustomizationData *data, QnCustomizationAccessor *accessor, const char *className);
 
-    void recustomize();
-
     QnCustomizationAccessor *accessor(QObject *object) const;
-
-public:
-    QnCustomizer *q;
 
     int customizationHashType;
     
     QnCustomization customization;
-    QList<QByteArray> classNames;
     QHash<QLatin1String, QnCustomizationData> dataByClassName;
-    QHash<QString, QnCustomizationData> dataByObjectName;
+    QList<QByteArray> classNames;
     QHash<QLatin1String, QnCustomizationAccessor *> accessorByClassName;
     QScopedPointer<QnCustomizationAccessor> defaultAccessor;
     QScopedPointer<QnCustomizationColorSerializer> colorSerializer;
     QScopedPointer<QnJsonSerializer> customizationHashSerializer;
     QnFlatMap<int, QnJsonSerializer *> serializerByType;
     QnJsonContext serializationContext;
-
-    QSet<QObject *> customObjects;
 };
 
 QnCustomizerPrivate::QnCustomizerPrivate() {
@@ -353,16 +345,6 @@ void QnCustomizerPrivate::customize(QObject *object) {
     QnCustomizationAccessor *accessor = this->accessor(object);
     for(int i = classNames.size() - 1; i >= 0; i--)
         customize(object, accessor, classNames[i]);
-
-    QString objectName = object->objectName();
-    if(!objectName.isEmpty()) {
-        auto pos = dataByObjectName.find(objectName);
-        if(pos != dataByObjectName.end())
-            customize(object, &*pos, accessor, classNames[0]);
-    }
-
-    customObjects.insert(object);
-    QObject::connect(object, &QObject::destroyed, q, [this](QObject *object){ customObjects.remove(object); });
 }
 
 void QnCustomizerPrivate::customize(QObject *object, QnCustomizationAccessor *accessor, const char *className) {
@@ -435,10 +417,6 @@ void QnCustomizerPrivate::customize(QObject *object, const QString &key, QnCusto
         qnWarning("Could not customize property '%1' of class '%2'. Property writing has failed.", key, className);
 }
 
-void QnCustomizerPrivate::recustomize() {
-    foreach(QObject *object, customObjects)
-        customize(object);
-}
 
 // -------------------------------------------------------------------------- //
 // QnCustomizer
@@ -452,8 +430,6 @@ QnCustomizer::QnCustomizer(const QnCustomization &customization, QObject *parent
     QObject(parent),
     d(new QnCustomizerPrivate())
 {
-    d->q = this;
-
     setCustomization(customization);
 }
 
@@ -466,14 +442,9 @@ void QnCustomizer::setCustomization(const QnCustomization &customization) {
 
     const QJsonObject &object = customization.data();
     for(auto pos = object.begin(); pos != object.end(); pos++) {
-        QString name = pos.key();
-        if(name.startsWith(L'#')) {
-            d->dataByObjectName[name.mid(1)] = QnCustomizationData(*pos);
-        } else {
-            QByteArray className = name.toLatin1();
-            d->classNames.push_back(className);
-            d->dataByClassName[QLatin1String(className)] = QnCustomizationData(*pos);
-        }
+        QByteArray className = pos.key().toLatin1();
+        d->classNames.push_back(className);
+        d->dataByClassName[QLatin1String(className)] = QnCustomizationData(*pos);
     }
 
     /* Load globals. */
@@ -486,9 +457,6 @@ void QnCustomizer::setCustomization(const QnCustomization &customization) {
             d->colorSerializer->setGlobals(globals);
         }
     }
-
-    /* Apply the new customization. */
-    d->recustomize();
 }
 
 const QnCustomization &QnCustomizer::customization() const {
