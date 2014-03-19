@@ -283,7 +283,12 @@ public:
     void customize(QObject *object, QnCustomizationData *data, QnPropertyAccessor *accessor, const char *className);
     void customize(QObject *object, const QString &key, QnCustomizationData *data, QnPropertyAccessor *accessor, const char *className);
 
+    void recustomize();
+
     QnPropertyAccessor *accessor(QObject *object) const;
+
+public:
+    QnCustomizer *q;
 
     int customizationHashType;
     
@@ -296,6 +301,8 @@ public:
     QScopedPointer<QnJsonSerializer> customizationHashSerializer;
     QnFlatMap<int, QnJsonSerializer *> serializerByType;
     QnJsonContext serializationContext;
+
+    QSet<QObject *> customObjects;
 };
 
 QnCustomizerPrivate::QnCustomizerPrivate() {
@@ -346,6 +353,9 @@ void QnCustomizerPrivate::customize(QObject *object) {
     QnPropertyAccessor *accessor = this->accessor(object);
     for(int i = classNames.size() - 1; i >= 0; i--)
         customize(object, accessor, classNames[i]);
+
+    customObjects.insert(object);
+    QObject::connect(object, &QObject::destroyed, q, [this](QObject *object){ customObjects.remove(object); });
 }
 
 void QnCustomizerPrivate::customize(QObject *object, QnPropertyAccessor *accessor, const char *className) {
@@ -424,6 +434,10 @@ void QnCustomizerPrivate::customize(QObject *object, const QString &key, QnCusto
     }
 }
 
+void QnCustomizerPrivate::recustomize() {
+    foreach(QObject *object, customObjects)
+        customize(object);
+}
 
 // -------------------------------------------------------------------------- //
 // QnCustomizer
@@ -437,6 +451,8 @@ QnCustomizer::QnCustomizer(const QnCustomization &customization, QObject *parent
     QObject(parent),
     d(new QnCustomizerPrivate())
 {
+    d->q = this;
+
     setCustomization(customization);
 }
 
@@ -464,6 +480,9 @@ void QnCustomizer::setCustomization(const QnCustomization &customization) {
             d->colorSerializer->setGlobals(globals);
         }
     }
+
+    /* Apply the new customization. */
+    d->recustomize();
 }
 
 const QnCustomization &QnCustomizer::customization() const {
