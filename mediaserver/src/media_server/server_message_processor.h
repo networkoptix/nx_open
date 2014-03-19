@@ -21,7 +21,6 @@ public:
 
 protected:
     virtual void onResourceStatusChanged(QnResourcePtr , QnResource::Status ) override;
-    virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
     virtual void init(ec2::AbstractECConnectionPtr connection);
     virtual void afterRemovingResource(const QnId& id) override;
 private slots:

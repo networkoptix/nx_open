@@ -93,6 +93,7 @@ public:
     static void rebuildResume(void*);
     static QMutex m_rebuildMutex;
     static QSet<void*> m_pauseList;
+    qint64 m_rebuildStartTime;
 
     void beforeRebuildArchive();
 

@@ -376,7 +376,7 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
         result |= Qt::ItemIsEditable;    //TODO: #GDM VW we should be able to rename it only if we have permissions
         break;
     case Qn::RecorderNode:
-        result |= Qt::ItemIsDragEnabled;
+        result |= Qt::ItemIsDragEnabled | Qt::ItemIsEditable;
         break;
     default:
         break;
@@ -476,9 +476,19 @@ bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int colum
             return false;
         parameters = QnActionParameters(QnVideoWallItemIndexList() << index).withArgument(Qn::ResourceNameRole, value.toString());
 #endif
+    } else if (m_type == Qn::RecorderNode) {
+        //sending first camera to get groupId and check WriteName permission
+        if (this->children().isEmpty())
+            return false;
+        QnResourcePoolModelNode* child = this->child(0);
+        if (!child->resource())
+            return false;
+        parameters = QnActionParameters(child->resource()).withArgument(Qn::ResourceNameRole, value.toString());
     } else {
         parameters = QnActionParameters(m_resource).withArgument(Qn::ResourceNameRole, value.toString());
     }
+    parameters.setArgument(Qn::NodeTypeRole, static_cast<int>(m_type));
+
     m_model->context()->menu()->trigger(Qn::RenameAction, parameters);
     return true;
 }
@@ -499,9 +509,6 @@ void QnResourcePoolModelNode::setModified(bool modified) {
 // TODO: #GDM
 // This is a node construction method, so it does not really belong here.
 // See other node construction methods, QnResourcePoolModel::node(...).
-//
-// I see we already have a m_recorderNodeByResource for that, we only need
-// a better type for it, e.g. QHash<QPair<QnResource *, QString>, Node *>.
 QnResourcePoolModelNode* QnResourcePoolModelNode::recorder(const QString &groupId, const QString &groupName) {
     if (m_recorders.contains(groupId))
         return m_recorders[groupId];

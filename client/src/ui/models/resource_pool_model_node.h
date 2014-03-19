@@ -95,9 +95,6 @@ public:
     // TODO: #GDM
     // This is a node construction method, so it does not really belong here.
     // See other node construction methods, QnResourcePoolModel::node(...).
-    //
-    // I see we already have a m_recorderNodeByResource for that, we only need
-    // a better type for it, e.g. QHash<QPair<QnResource *, QString>, Node *>.
     QnResourcePoolModelNode *recorder(const QString &groupId, const QString &groupName) ;
 
 protected:
@@ -106,6 +103,9 @@ protected:
     void changeInternal();
 
 private:
+    //TODO: #GDM need complete recorder nodes structure refactor to get rid of this shit
+    friend class QnResourcePoolModel;
+
     /* Node state. */
 
     /** Model that this node belongs to. */

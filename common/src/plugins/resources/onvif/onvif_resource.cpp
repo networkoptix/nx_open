@@ -1147,18 +1147,6 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
 
     bool result = QnPhysicalCameraResource::mergeResourcesIfNeeded(source);
 
-    if (getGroupId() != onvifR->getGroupId())
-    {
-        setGroupId(onvifR->getGroupId());
-        result = true; // groupID can be changed for onvif resource because if not auth info, maxChannels is not accessible
-    }
-
-    if (getGroupName().isEmpty() && getGroupName() != onvifR->getGroupName())
-    {
-        setGroupName(onvifR->getGroupName());
-        result = true;
-    }
-
     if (onvifUrlSource.size() != 0 && QUrl(onvifUrlSource).host().size() != 0 && getDeviceOnvifUrl() != onvifUrlSource)
     {
         setDeviceOnvifUrl(onvifUrlSource);

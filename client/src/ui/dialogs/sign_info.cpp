@@ -8,7 +8,6 @@ QnSignInfo::QnSignInfo(QWidget* parent): QLabel(parent)
     m_textureWidth = 1920.0;
     m_textureHeight = 1080.0; // default aspect ratio 16:9 (exact size is not important here)
     m_progress = 0;
-    m_signHelper.setLogo(qnSkin->pixmap("logo_1920_1080.png"));
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
     m_timer.start(16);
     m_DrawDetailText = false;
