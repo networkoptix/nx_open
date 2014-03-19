@@ -20,7 +20,7 @@ void ApiResourceData::fromResource(const QnResourcePtr& resource)
     foreach(const QnParam& param, resource->getResourceParamList().list())
     {
         if (param.domain() == QnDomainDatabase)
-            addParams.push_back(ApiResourceParam(param.name(), param.value().toString()));
+            addParams.push_back(ApiResourceParam(param.name(), param.value().toString(), true));
     }
 }
 
@@ -35,8 +35,10 @@ void ApiResourceData::toResource(QnResourcePtr resource) const
 	resource->setStatus(status, true);
 	resource->setDisabled(disabled);
 
-    foreach(const ApiResourceParam& param, addParams)
-        resource->setParam(param.name, param.value, QnDomainDatabase);
+    foreach(const ApiResourceParam& param, addParams) {
+        if (param.isResTypeParam)
+            resource->setParam(param.name, param.value, QnDomainDatabase);
+    }
 }
 
 void ApiResourceDataList::loadFromQuery(QSqlQuery& /*query*/)
@@ -64,6 +66,7 @@ void ApiParamList::fromResourceList(const QnKvPairList& resources)
     {
         data[i].name = resources[i].name();
         data[i].value = resources[i].value();
+        data[i].isResTypeParam = false;
     }
 }
 

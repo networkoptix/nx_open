@@ -34,3 +34,5 @@ CREATE UNIQUE INDEX idx_transaction_hash  ON transaction_log(tran_guid);
 CREATE INDEX idx_transaction_time  ON transaction_log(timestamp);
 
 CREATE TABLE "vms_storedFiles" (path VARCHAR PRIMARY KEY, data BLOB);
+CREATE UNIQUE INDEX idx_kvpair_name ON vms_kvpair (resource_id, name);
+ALTER TABLE vms_kvpair ADD isResTypeParam BOOL;

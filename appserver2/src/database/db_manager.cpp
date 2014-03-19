@@ -264,7 +264,7 @@ ErrorCode QnDbManager::insertAddParams(const std::vector<ApiResourceParam>& para
 {
     QSqlQuery insQuery(m_sdb);
     //insQuery.prepare("INSERT INTO vms_kvpair (resource_id, name, value) VALUES(:resourceId, :name, :value)");
-    insQuery.prepare("INSERT INTO vms_kvpair VALUES(?, NULL, ?, ?)");
+    insQuery.prepare("INSERT OR REPLACE INTO vms_kvpair VALUES(?, NULL, ?, ?, ?)");
     insQuery.bindValue(0, internalId);
     foreach(const ApiResourceParam& param, params) {
         param.autoBindValuesOrdered(insQuery, 1);
@@ -341,11 +341,12 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 
     if (!data.addParams.empty()) 
     {
+        /*
         ErrorCode result = deleteAddParams(*internalId);
         if (result != ErrorCode::ok)
             return result;
-
-        result = insertAddParams(data.addParams, *internalId);
+        */
+        ErrorCode result = insertAddParams(data.addParams, *internalId);
         if (result != ErrorCode::ok)
             return result;
     }
@@ -368,11 +369,12 @@ ErrorCode QnDbManager::updateResource(const ApiResourceData& data, qint32 intern
 
     if (!data.addParams.empty()) 
     {
+        /*
         ErrorCode result = deleteAddParams(internalId);
         if (result != ErrorCode::ok)
             return result;
-
-        result = insertAddParams(data.addParams, internalId);
+        */
+        ErrorCode result = insertAddParams(data.addParams, internalId);
         if (result != ErrorCode::ok)
             return result;
     }
@@ -859,10 +861,11 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLayoutDat
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceParams>& tran)
 {
     qint32 internalId = getResourceInternalId(tran.params.id);
+    /*
     ErrorCode result = deleteAddParams(internalId);
     if (result != ErrorCode::ok)
         return result;
-
+    */
     return insertAddParams(tran.params.params, internalId);
 }
 
@@ -1311,6 +1314,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraDataList& c
                                  FROM vms_kvpair kv \
                                  JOIN vms_camera c on c.resource_ptr_id = kv.resource_id \
                                  JOIN vms_resource r on r.id = kv.resource_id \
+                                 WHERE kv.isResTypeParam = 1 \
                                  %1 ORDER BY kv.resource_id").arg(filterStr2));
 
 	if (!queryCameras.exec()) {
@@ -1419,6 +1423,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList
                                 FROM vms_kvpair kv \
                                 JOIN auth_user u on u.id = kv.resource_id \
                                 JOIN vms_resource r on r.id = kv.resource_id \
+                                WHERE kv.isResTypeParam = 1 \
                                 ORDER BY kv.resource_id"));
 
     if (!queryParams.exec()) {
@@ -1535,6 +1540,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullData& data)
     queryParams.prepare(QString("SELECT r.guid as resourceId, kv.value, kv.name \
                                 FROM vms_kvpair kv \
                                 JOIN vms_resource r on r.id = kv.resource_id \
+                                WHERE kv.isResTypeParam = 1 \
                                 ORDER BY kv.resource_id"));
     if (!queryParams.exec())
         return ErrorCode::failure;
@@ -1584,10 +1590,11 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResetBusi
 // save settings
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiParamList>& tran)
 {
+    /*
     ErrorCode result = deleteAddParams(m_adminUserInternalID);
     if (result != ErrorCode::ok)
         return result;
-
+    */
     return insertAddParams(tran.params.data, m_adminUserInternalID);
 }
 
