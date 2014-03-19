@@ -132,7 +132,7 @@ private:
     QString m_lastErrorStr;
     bool m_capturingStopped;
     const QPixmap m_logo;
-    friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance,  DWORD dwParam1, DWORD dwParam2);
+    friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,  DWORD_PTR dwParam1, DWORD_PTR dwParam2);
 };
 
 #endif // Q_OS_WIN
