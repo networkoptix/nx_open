@@ -545,6 +545,11 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         connect(user.data(), SIGNAL(videoWallItemRemoved(QnUserResourcePtr, QUuid)),         this, SLOT(at_user_videoWallItemRemoved(QnUserResourcePtr, QUuid)));
     }
 
+QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if(camera) {
+        connect(camera.data(), &QnVirtualCameraResource::groupNameChanged, this, &QnResourcePoolModel::at_camera_groupNameChanged);
+    }
+
     QnResourcePoolModelNode *node = this->node(resource);
     node->setResource(resource);
 
@@ -662,4 +667,16 @@ void QnResourcePoolModel::at_user_videoWallItemAdded(const QnUserResourcePtr &us
 
 void QnResourcePoolModel::at_user_videoWallItemRemoved(const QnUserResourcePtr &user, const QUuid &uuid) {
     deleteNode(node(Qn::UserVideoWallItemNode, uuid, user));
+}
+
+//TODO: #GDM need complete recorder nodes structure refactor to get rid of this shit
+void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera) {
+    const QString groupId = camera->getGroupId();
+    foreach (Node* node, m_resourceNodeByResource) {
+        if (!node->m_recorders.contains(groupId))
+            continue;
+        node->m_recorders[groupId]->m_name = camera->getGroupName();
+        node->m_recorders[groupId]->m_displayName = camera->getGroupName();
+        node->changeInternal();
+    }
 }

@@ -689,7 +689,7 @@ QnPtzManageModel::TourState QnPtzManageModel::tourState(const QnPtzTourItemModel
             int count = i < j ? j - i : j - i + spots.size();
             if(count >= 2) {
                 if (stateString)
-                    *stateString = tr("Tour has %n identical positions", 0, count).arg(i);
+                    *stateString = tr("Tour has %n identical positions", 0, count);
                 return DuplicatedLinesTour;
             }
         }

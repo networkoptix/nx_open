@@ -48,7 +48,7 @@ QnRadialGradientPainter::~QnRadialGradientPainter() {
 }
 
 void QnRadialGradientPainter::paint(const QColor &colorMultiplier) {
-    if(!m_initialized)
+    if(!m_initialized || !isAvailable())
         return;
 
     m_shader->bind();
@@ -71,4 +71,8 @@ void QnRadialGradientPainter::paint(const QColor &colorMultiplier) {
 
 void QnRadialGradientPainter::paint() {
     paint(Qt::white);
+}
+
+bool QnRadialGradientPainter::isAvailable() const {
+    return hasOpenGLFeature(QOpenGLFunctions::Shaders) && hasOpenGLFeature(QOpenGLFunctions::Buffers);
 }

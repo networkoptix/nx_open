@@ -314,6 +314,14 @@
         "brush": "ptz.setAlpha(64).lighter(120)"
     },
     
+    "QnPtzManageModel": {
+        "colors": {
+            "title": "#404040",
+            "invalid": "#401010",
+            "warning": "#404010"
+        }
+    },
+    
     "QnShadowItem": {
         "color": "#00000080"
     }

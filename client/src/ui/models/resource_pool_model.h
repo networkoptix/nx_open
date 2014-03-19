@@ -81,6 +81,7 @@ private slots:
     void at_user_videoWallItemAdded(const QnUserResourcePtr &user, const QUuid &uuid);
     void at_user_videoWallItemRemoved(const QnUserResourcePtr &user, const QUuid &uuid);
 
+	void at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera);
 private:
     friend class QnResourcePoolModelNode;
 
@@ -97,9 +98,6 @@ private:
 
     /** Mapping for resource nodes, by resource. */
     QHash<QnResourcePtr, QnResourcePoolModelNode *> m_resourceNodeByResource;
-
-    /** Mapping for recorder nodes, by resource. */
-    QHash<QnResourcePtr, QHash<int, QnResourcePoolModelNode *> > m_recorderNodeByResource;
 
     /** Mapping for item nodes, by item id. */
     QHash<QUuid, QnResourcePoolModelNode *> m_itemNodeByUuid;
