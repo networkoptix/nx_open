@@ -610,7 +610,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
                 QLatin1String(QN_BETA) == QLatin1String("true"))
             context->action(Qn::BetaVersionMessageAction)->trigger();
 
-    if (argc <= 1) {
+        //TODO: #GDM VW make sure this will not spoil various "Open new Window" and "Open .. in new window" actions
+//    if (argc <= 1) {
         /* If no input files were supplied --- open connection settings dialog. */
         if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
             context->menu()->trigger(Qn::ConnectToServerAction,
@@ -618,7 +619,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         } else if (instantDrop.isEmpty()) {
             context->menu()->trigger(Qn::ReconnectAction);
         }
-    }
+//    }
 
     if (!videoWallGuid.isNull()) {
         context->menu()->trigger(Qn::DelayedOpenVideoWallItemAction, QnActionParameters()
