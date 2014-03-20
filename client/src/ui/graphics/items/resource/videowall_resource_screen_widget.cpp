@@ -118,7 +118,6 @@ void QnVideowallResourceScreenWidget::updateLayout() {
     if (m_screens.size() == 1) {
         foreach (const QnVideoWallItem &item, m_items) {
             QnLayoutResourceOverlayWidget *itemWidget = new QnLayoutResourceOverlayWidget(m_videowall, item.uuid, this);
-            itemWidget->setAcceptedMouseButtons(Qt::NoButton);
 
             if (item.geometry.left() == m_desktopGeometry.left())
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorLeft, m_mainLayout, Qt::AnchorLeft);

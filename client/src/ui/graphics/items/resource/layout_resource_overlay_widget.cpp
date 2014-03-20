@@ -25,8 +25,12 @@ QnLayoutResourceOverlayWidget::QnLayoutResourceOverlayWidget(const QnVideoWallRe
     m_itemUuid(itemUuid)
 {
     setAcceptDrops(true);
+    setAcceptedMouseButtons(Qt::LeftButton);
+    setClickableButtons(Qt::LeftButton);
+    setAcceptHoverEvents(true);
 
     connect(m_videowall, &QnVideoWallResource::itemChanged, this, &QnLayoutResourceOverlayWidget::at_videoWall_itemChanged);
+    connect(this, &QnClickableWidget::doubleClicked, this, &QnLayoutResourceOverlayWidget::at_doubleClicked);
 
     updateLayout();
     updateInfo();
@@ -198,13 +202,20 @@ void QnLayoutResourceOverlayWidget::dropEvent(QGraphicsSceneDragDropEvent *event
     event->acceptProposedAction();
 }
 
-
 void QnLayoutResourceOverlayWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     Q_UNUSED(videoWall)
     if (item.uuid != m_itemUuid)
         return;
     updateLayout();
     updateInfo();
+}
+
+void QnLayoutResourceOverlayWidget::at_doubleClicked(Qt::MouseButton button) {
+    Q_UNUSED(button)
+    menu()->trigger(
+        Qn::StartVideoWallControlAction,
+        QnActionParameters(QnVideoWallItemIndexList() << QnVideoWallItemIndex(m_videowall, m_itemUuid))
+    );
 }
 
 void QnLayoutResourceOverlayWidget::updateLayout() {

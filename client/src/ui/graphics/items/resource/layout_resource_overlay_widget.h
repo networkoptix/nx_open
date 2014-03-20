@@ -7,14 +7,16 @@
 #include <core/resource/videowall_item_index.h>
 
 #include <ui/graphics/items/standard/graphics_widget.h>
+#include <ui/graphics/items/generic/clickable_widgets.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
 
 class QnVideowallResourceScreenWidget;
 
-class QnLayoutResourceOverlayWidget : public Connective<GraphicsWidget>, public QnWorkbenchContextAware {
-    typedef Connective<GraphicsWidget> base_type;
+class QnLayoutResourceOverlayWidget : public Connective<QnClickableWidget>, public QnWorkbenchContextAware {
+    typedef Connective<QnClickableWidget> base_type;
     Q_OBJECT
 
 public:
@@ -30,6 +32,7 @@ protected:
 
 private:
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
+    void at_doubleClicked(Qt::MouseButton button);
 
     void updateLayout();
     void updateView();
