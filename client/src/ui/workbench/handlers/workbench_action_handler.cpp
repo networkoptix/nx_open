@@ -7,7 +7,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 #include <QtGui/QDesktopServices>
-#include <QtWidgets/QFileDialog>
 #include <QtGui/QImage>
 #include <QtWidgets/QWhatsThis>
 #include <QtWidgets/QInputDialog>
@@ -1178,12 +1177,12 @@ void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
     filters << tr("Layouts (*.layout)");
     filters << tr("All files (*.*)");
 
-    QString fileName = QFileDialog::getOpenFileName(mainWindow(),
-                                                    tr("Open file"),
-                                                    QString(),
-                                                    filters.join(lit(";;")),
-                                                    0,
-                                                    QnCustomFileDialog::fileDialogOptions());
+    QString fileName = QnFileDialog::getOpenFileName(mainWindow(),
+                                                     tr("Open file"),
+                                                     QString(),
+                                                     filters.join(lit(";;")),
+                                                     0,
+                                                     QnCustomFileDialog::fileDialogOptions());
 
     if(!fileName.isEmpty())
         menu()->trigger(Qn::DropResourcesAction, addToResourcePool(fileName).filtered<QnLayoutResource>());

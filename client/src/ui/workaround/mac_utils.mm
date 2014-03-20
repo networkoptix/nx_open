@@ -186,6 +186,27 @@ QStringList mac_getOpenFileNames(QWidget *parent, const QString &caption, const 
     return QStringList();
 }
 
+QString mac_getSaveFileName(QWidget *parent, const QString &caption, const QString &dir, const QStringList &extensions, QFileDialog::Options options) {
+    NSSavePanel *panel = [NSSavePanel openPanel];
+    [panel setTitle:fromQString(caption)];
+    [panel setCanCreateDirectories:YES];
+    if (extensions.size() != 0)
+        [panel setAllowedFileTypes:fromQStringList(extensions)];
+    [panel setAllowsOtherFileTypes:YES];
+    if (!dir.isEmpty())
+        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
+
+    if ([panel runModal] == NSOKButton) {
+        if (isSandboxed()) {
+            saveFileBookmark(panel.URL.path);
+        }
+
+        return toQString(panel.URL.path);
+    }
+
+    return QString();
+}
+
 extern "C" {
 void disable_animations(void *);
 void enable_animations(void *);

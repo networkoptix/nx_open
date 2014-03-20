@@ -3,7 +3,6 @@
 #include <QtCore/QSettings>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QFileDialog>
 #include <QtMultimedia/QAudioDeviceInfo>
 
 #ifdef Q_OS_WIN

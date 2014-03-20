@@ -51,6 +51,15 @@ QString QnFileDialog::getOpenFileName(QWidget *parent,
 #endif
 }
 
+QString QnFileDialog::getSaveFileName(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options)
+{
+#ifdef Q_OS_MAC
+    return mac_getSaveFileName(parent, caption, dir, getExtensionsFromFilter(filter), options);
+#else
+    return QFileDialog::getSaveFileName(parent, caption, dir, filter, selectedFilter, options);
+#endif
+}
+
 QStringList QnFileDialog::getOpenFileNames(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options)
 {
 #ifdef Q_OS_MAC

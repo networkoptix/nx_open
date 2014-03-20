@@ -15,7 +15,6 @@
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QFileInfo>
 #include <QtCore/QSettings>
-#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsProxyWidget>
 
 #include <utils/common/util.h>
@@ -43,6 +42,7 @@
 
 #include "ui/dialogs/sign_dialog.h" // TODO: move out.
 #include <ui/dialogs/custom_file_dialog.h>  //for QnCustomFileDialog::fileDialogOptions() constant
+#include <ui/dialogs/file_dialog.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -648,7 +648,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
     QString previousDir = qnSettings->lastRecordingDir();
     QString selectedFilter;
     while (true) {
-        QString filePath = QFileDialog::getSaveFileName(
+        QString filePath = QnFileDialog::getSaveFileName(
             display()->view(),
             tr("Save Recording As..."),
             previousDir + QLatin1Char('/') + suggetion,

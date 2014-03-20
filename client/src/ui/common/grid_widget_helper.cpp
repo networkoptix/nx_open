@@ -6,8 +6,9 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QApplication>
 
-#include "client/client_settings.h"
-#include "ui/dialogs/custom_file_dialog.h"
+#include <client/client_settings.h>
+#include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/file_dialog.h>
 
 #include <utils/common/string.h>
 
@@ -20,7 +21,7 @@ void QnGridWidgetHelper::exportToFile(QTableView *grid, QWidget *parent, const Q
     while (true) 
     {
         QString selectedFilter;
-        fileName = QFileDialog::getSaveFileName(parent,
+        fileName = QnFileDialog::getSaveFileName(parent,
                                                 caption,
                                                 previousDir,
                                                 tr("HTML file (*.html);;Spread Sheet (CSV) File(*.csv)"),
