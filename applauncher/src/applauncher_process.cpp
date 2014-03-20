@@ -158,6 +158,14 @@ int ApplauncherProcess::run()
     return 0;
 }
 
+QString ApplauncherProcess::devModeKey() const {
+    return m_devModeKey;
+}
+
+void ApplauncherProcess::setDevModeKey(const QString &devModeKey) {
+    m_devModeKey = devModeKey;
+}
+
 bool ApplauncherProcess::sendTaskToRunningLauncherInstance()
 {
     NX_LOG( QString::fromLatin1("Entered AddingTaskToNamedPipe"), cl_logDEBUG1 );
@@ -341,10 +349,14 @@ bool ApplauncherProcess::startApplication(
     }
 #endif
 
+    QStringList arguments = task->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts);
+    if (!m_devModeKey.isEmpty())
+        arguments.append(QString::fromLatin1("--dev-mode-key=%1").arg(devModeKey()));
+
     NX_LOG( QString::fromLatin1("Launching version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG2 );
     if( ProcessUtils::startProcessDetached(
             binPath,
-            task->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts),
+            arguments,
             QString(),
             environment) )
     {
@@ -465,11 +477,18 @@ bool ApplauncherProcess::isVersionInstalled(
 }
 
 bool ApplauncherProcess::cancelInstallation(
-    const std::shared_ptr<applauncher::api::CancelInstallationRequest>& /*request*/,
+    const std::shared_ptr<applauncher::api::CancelInstallationRequest>& request,
     applauncher::api::CancelInstallationResponse* const response )
 {
-    //TODO/IMPL cancelling by id request->installationID
-    response->result = applauncher::api::ResultType::otherError;
+    auto it = m_activeInstallations.find(request->installationID);
+    if (it == m_activeInstallations.end()) {
+        response->result = applauncher::api::ResultType::otherError;
+        return true;
+    }
+
+    it->second->cancel();
+
+    response->result = applauncher::api::ResultType::ok;
     return true;
 }
 

@@ -221,7 +221,6 @@ protected:
     qint64 m_minAudioDetectJumpInterval;
     qint64 m_videoQueueDuration;
     bool m_useMTRealTimeDecode; // multi thread decode for live temporary allowed
-    bool m_forceMtDecoding; // force multi thread decode in any case
 
     mutable QMutex m_timeMutex;
     QnMediaResourcePtr m_resource;

@@ -41,7 +41,7 @@ public:
     // resolution (0,0) - use default(native resolution)
     // negative resolution - use specified scale factor
 
-    QnScreenGrabber(int displayNumber, int poolSize, Qn::CaptureMode mode, bool captureCursor,
+    QnScreenGrabber(bool captureCursor,
                     const QSize& captureResolution, QWidget* widget);
     virtual ~QnScreenGrabber();
 
@@ -64,7 +64,6 @@ public:
 private:
     HRESULT        InitD3D(HWND hWnd);
     bool dataToFrame(quint8* data, int dataStride, int width, int height, AVFrame* pFrame);
-    bool direct3DDataToFrame(void* opaque, AVFrame* pFrame);
     Q_INVOKABLE void captureFrameOpenGL(CaptureInfoPtr data);
     void drawCursor(quint32* data, int dataStride, int height, int leftOffset, int topOffset, bool flip) const;
     void drawLogo(quint8* data, int width, int height);
@@ -72,27 +71,21 @@ private:
 
 private:
     QPixmap m_logo;
-    int m_displayNumber;
 
     IDirect3D9*                        m_pD3D;
     IDirect3DDevice9*        m_pd3dDevice;
-    QVector<IDirect3DSurface9*>        m_pSurface;
-    QVector<quint8*>        m_openGLData;
+    quint8* m_openGLData;
     RECT                m_rect;
     HRESULT m_initialized;
     D3DDISPLAYMODE        m_ddm;
     QTime m_timer;
     unsigned m_frameNum;
-    int m_currentIndex;
 
     static QMutex m_instanceMutex;
     static int m_aeroInstanceCounter;
-    Qn::CaptureMode m_mode;
-    int m_poolSize;
     bool m_captureCursor;
     HDC m_cursorDC;
     QSize m_captureResolution;
-    bool m_needRescale;
     SwsContext* m_scaleContext;
     int m_outWidth;
     int m_outHeight;

@@ -3,7 +3,6 @@
 #include <QtCore/QSettings>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QFileDialog>
 #include <QtMultimedia/QAudioDeviceInfo>
 
 #ifdef Q_OS_WIN
@@ -170,16 +169,6 @@ void QnVideoRecorderSettings::setCaptureCursor(bool yes)
     settings.setValue(QLatin1String("captureCursor"), yes);
 }
 
-Qn::CaptureMode QnVideoRecorderSettings::captureMode() const
-{
-    return (Qn::CaptureMode) settings.value(QLatin1String("captureMode")).toInt();
-}
-
-void QnVideoRecorderSettings::setCaptureMode(Qn::CaptureMode captureMode)
-{
-    settings.setValue(QLatin1String("captureMode"), captureMode);
-}
-
 Qn::DecoderQuality QnVideoRecorderSettings::decoderQuality() const
 {
     if (!settings.contains(QLatin1String("decoderQuality")))
@@ -207,28 +196,6 @@ Qn::Resolution QnVideoRecorderSettings::resolution() const
 void QnVideoRecorderSettings::setResolution(Qn::Resolution resolution)
 {
     settings.setValue(QLatin1String("resolution"), resolution);
-}
-
-int QnVideoRecorderSettings::screen() const
-{
-    int oldScreen = settings.value(QLatin1String("screen")).toInt();
-    QRect geometry = settings.value(QLatin1String("screenResolution")).toRect();
-    QDesktopWidget *desktop = qApp->desktop();
-    if (desktop->screen(oldScreen)->geometry() == geometry) {
-        return oldScreen;
-    } else {
-        for (int i = 0; i < desktop->screenCount(); i++) {
-            if (desktop->screen(i)->geometry() == geometry)
-                return i;
-        }
-    }
-    return desktop->primaryScreen();
-}
-
-void QnVideoRecorderSettings::setScreen(int screen)
-{
-    settings.setValue(QLatin1String("screen"), screen);
-    settings.setValue(QLatin1String("screenResolution"),  qApp->desktop()->screen(screen)->geometry());
 }
 
 QString QnVideoRecorderSettings::recordingFolder() const {

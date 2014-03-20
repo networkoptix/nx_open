@@ -50,78 +50,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="captureModeGroupBox">
-     <property name="title">
-      <string>Capture Mode</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
-      <property name="leftMargin">
-       <number>12</number>
-      </property>
-      <property name="topMargin">
-       <number>12</number>
-      </property>
-      <property name="rightMargin">
-       <number>12</number>
-      </property>
-      <property name="bottomMargin">
-       <number>12</number>
-      </property>
-      <item row="0" column="0">
-       <widget class="QRadioButton" name="fullscreenButton">
-        <property name="toolTip">
-         <string comment="Grabs video from entire screen"/>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Fullscreen</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QRadioButton" name="windowButton">
-        <property name="toolTip">
-         <string comment="Grabs Eve window"/>
-        </property>
-        <property name="text">
-         <string>Application Window</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="screenComboBox">
-        <property name="toolTip">
-         <string comment="Use this to change grabbed screen"/>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <widget class="QGroupBox" name="additionalGroupBox">
      <property name="title">
       <string>Additional Options</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item>
-       <widget class="QCheckBox" name="disableAeroCheckBox">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Disable Aero</string>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QCheckBox" name="captureCursorCheckBox">
         <property name="text">

@@ -338,7 +338,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString());
     commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
 
-    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
+    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
     initLog(logLevel);
 
@@ -356,6 +356,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     QnPerformanceTest::detectLightMode();
+
+#ifdef Q_OS_MACX
+    if (mac_isSandboxed())
+        qnSettings->setLightMode(qnSettings->lightMode() | Qn::LightModeNoNewWindow);
+#endif
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
