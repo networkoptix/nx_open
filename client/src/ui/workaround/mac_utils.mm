@@ -113,21 +113,21 @@ void mac_stopFileAccess() {
     }
 }
 
-QString mac_getExistingDirectory(QWidget *parent,
-                                    const QString &caption,
-                                    const QString &dir,
-                                    QFileDialog::Options options) {
+QString mac_getExistingDirectory(const QString &caption, const QString &dir) {
+    bool sandboxed = mac_isSandboxed();
+
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     [panel setTitle:fromQString(caption)];
     [panel setCanChooseDirectories:YES];
     [panel setCanCreateDirectories:YES];
     [panel setAllowsMultipleSelection:NO];
     [panel setCanChooseFiles:NO];
+    if (!sandboxed && !dir.isEmpty())
+        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
     if ([panel runModal] == NSOKButton) {
-        if (mac_isSandboxed()) {
+        if (sandboxed)
             saveFileBookmark(panel.URL.path);
-        }
 
         return toQString(panel.URL.path);
     }
@@ -135,11 +135,8 @@ QString mac_getExistingDirectory(QWidget *parent,
     return QString();
 }
 
-QString mac_getOpenFileName(QWidget *parent,
-                                 const QString &caption,
-                                 const QString &dir,
-                                 const QStringList &extensions,
-                                 QFileDialog::Options options) {
+QString mac_getOpenFileName(const QString &caption, const QString &dir, const QStringList &extensions) {
+    bool sandboxed = mac_isSandboxed();
 
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     [panel setTitle:fromQString(caption)];
@@ -149,11 +146,12 @@ QString mac_getOpenFileName(QWidget *parent,
     [panel setCanChooseFiles:YES];
     if (extensions.size() != 0)
         [panel setAllowedFileTypes:fromQStringList(extensions)];
+    if (!sandboxed && !dir.isEmpty())
+        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
     if ([panel runModal] == NSOKButton) {
-        if (mac_isSandboxed()) {
+        if (sandboxed)
             saveFileBookmark(panel.URL.path);
-        }
 
         return toQString(panel.URL.path);
     }
@@ -161,7 +159,9 @@ QString mac_getOpenFileName(QWidget *parent,
     return QString();
 }
 
-QStringList mac_getOpenFileNames(QWidget *parent, const QString &caption, const QString &dir, const QStringList &extensions, QFileDialog::Options options) {
+QStringList mac_getOpenFileNames(const QString &caption, const QString &dir, const QStringList &extensions) {
+    bool sandboxed = mac_isSandboxed();
+
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     [panel setTitle:fromQString(caption)];
     [panel setCanChooseDirectories:NO];
@@ -170,15 +170,16 @@ QStringList mac_getOpenFileNames(QWidget *parent, const QString &caption, const 
     [panel setCanChooseFiles:YES];
     if (extensions.size() != 0)
         [panel setAllowedFileTypes:fromQStringList(extensions)];
+    if (!sandboxed && !dir.isEmpty())
+        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
     if ([panel runModal] == NSOKButton) {
         QStringList urls;
         for (int i = 0; i < panel.URLs.count; ++i)
             urls.append(toQString([[[panel URLs] objectAtIndex:i] path]));
 
-        if (mac_isSandboxed()) {
+        if (sandboxed)
             saveFileBookmark(panel.URL.path);
-        }
 
         return urls;
     }
@@ -186,20 +187,22 @@ QStringList mac_getOpenFileNames(QWidget *parent, const QString &caption, const 
     return QStringList();
 }
 
-QString mac_getSaveFileName(QWidget *parent, const QString &caption, const QString &dir, const QStringList &extensions, QFileDialog::Options options) {
+
+QString mac_getSaveFileName(const QString &caption, const QString &dir, const QStringList &extensions) {
+    bool sandboxed = mac_isSandboxed();
+
     NSSavePanel *panel = [NSSavePanel openPanel];
     [panel setTitle:fromQString(caption)];
     [panel setCanCreateDirectories:YES];
     if (extensions.size() != 0)
         [panel setAllowedFileTypes:fromQStringList(extensions)];
     [panel setAllowsOtherFileTypes:YES];
-    if (!dir.isEmpty())
+    if (!sandboxed && !dir.isEmpty())
         [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
     if ([panel runModal] == NSOKButton) {
-        if (mac_isSandboxed()) {
+        if (sandboxed)
             saveFileBookmark(panel.URL.path);
-        }
 
         return toQString(panel.URL.path);
     }
