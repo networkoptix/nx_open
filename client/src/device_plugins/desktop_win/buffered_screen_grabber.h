@@ -18,10 +18,8 @@ public:
     static const int DEFAULT_QUEUE_SIZE = 8;
     static const int DEFAULT_FRAME_RATE = 0;
 
-    QnBufferedScreenGrabber(int displayNumber = D3DADAPTER_DEFAULT,
-                            int queueSize = DEFAULT_QUEUE_SIZE,
+    QnBufferedScreenGrabber(int queueSize = DEFAULT_QUEUE_SIZE,
                             int frameRate = DEFAULT_FRAME_RATE,
-                            Qn::CaptureMode mode = Qn::FullScreenNoAeroMode,
                             bool captureCursor = true,
                             const QSize& captureResolution = QSize(0, 0),
                             QWidget* widget = 0);

@@ -374,6 +374,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QnPerformanceTest::detectLightMode();
 
+#ifdef Q_OS_MACX
+    if (mac_isSandboxed())
+        qnSettings->setLightMode(qnSettings->lightMode() | Qn::LightModeNoNewWindow);
+#endif
+
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
     if(authentication.isValid())

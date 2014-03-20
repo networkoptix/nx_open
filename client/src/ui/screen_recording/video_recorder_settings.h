@@ -8,12 +8,7 @@
 #include "qnaudio_device_info.h"
 
 namespace Qn {
-    enum CaptureMode { 
-        FullScreenMode, 
-        FullScreenNoAeroMode,
-        WindowMode 
-    };
-
+    
     enum DecoderQuality { 
         BestQuality, 
         BalancedQuality, 
@@ -51,17 +46,11 @@ public:
     bool captureCursor() const;
     void setCaptureCursor(bool yes);
 
-    Qn::CaptureMode captureMode() const;
-    void setCaptureMode(Qn::CaptureMode c);
-
     Qn::DecoderQuality decoderQuality() const;
     void setDecoderQuality(Qn::DecoderQuality q);
 
     Qn::Resolution resolution() const;
     void setResolution(Qn::Resolution r);
-
-    int screen() const;
-    void setScreen(int screen);
 
     QString recordingFolder() const;
     void setRecordingFolder(QString folder);

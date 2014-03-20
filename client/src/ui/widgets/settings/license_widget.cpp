@@ -4,7 +4,6 @@
 #include <QtCore/QFile>
 #include <QtCore/QUrl>
 
-#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
 
 #include <QtNetwork/QNetworkAccessManager>
