@@ -1161,12 +1161,12 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     //filters << tr("Layouts (*.layout)"); // TODO
     filters << tr("All files (*.*)");
 
-    QStringList files = QFileDialog::getOpenFileNames(mainWindow(),
-                                                      tr("Open file"),
-                                                      QString(),
-                                                      filters.join(lit(";;")),
-                                                      0,
-                                                      QnCustomFileDialog::fileDialogOptions());
+    QStringList files = QnFileDialog::getOpenFileNames(mainWindow(),
+                                                       tr("Open file"),
+                                                       QString(),
+                                                       filters.join(lit(";;")),
+                                                       0,
+                                                       QnCustomFileDialog::fileDialogOptions());
 
     if (!files.isEmpty())
         menu()->trigger(Qn::DropResourcesAction, addToResourcePool(files));

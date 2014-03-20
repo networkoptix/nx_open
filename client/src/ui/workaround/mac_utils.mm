@@ -161,6 +161,31 @@ QString mac_getOpenFileName(QWidget *parent,
     return QString();
 }
 
+QStringList mac_getOpenFileNames(QWidget *parent, const QString &caption, const QString &dir, const QStringList &extensions, QFileDialog::Options options) {
+    NSOpenPanel *panel = [NSOpenPanel openPanel];
+    [panel setTitle:fromQString(caption)];
+    [panel setCanChooseDirectories:NO];
+    [panel setCanCreateDirectories:YES];
+    [panel setAllowsMultipleSelection:YES];
+    [panel setCanChooseFiles:YES];
+    if (extensions.size() != 0)
+        [panel setAllowedFileTypes:fromQStringList(extensions)];
+
+    if ([panel runModal] == NSOKButton) {
+        QStringList urls;
+        for (int i = 0; i < panel.URLs.count; ++i)
+            urls.append(toQString([[[panel URLs] objectAtIndex:i] path]));
+
+        if (isSandboxed()) {
+            saveFileBookmark(panel.URL.path);
+        }
+
+        return urls;
+    }
+
+    return QStringList();
+}
+
 extern "C" {
 void disable_animations(void *);
 void enable_animations(void *);
