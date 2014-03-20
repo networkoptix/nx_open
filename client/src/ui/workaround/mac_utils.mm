@@ -32,7 +32,7 @@ static inline QString toQString(NSString *string)
     return QString::fromUtf8([string UTF8String]);
 }
 
-BOOL isSandboxed() {
+bool mac_isSandboxed() {
     NSDictionary* environ = [[NSProcessInfo processInfo] environment];
     return (nil != [environ objectForKey:@"APP_SANDBOX_CONTAINER_ID"]);
 }
@@ -64,7 +64,7 @@ void saveFileBookmark(NSString *path) {
 }
 
 void mac_saveFileBookmark(const QString& qpath) {
-    if (!isSandboxed())
+    if (!mac_isSandboxed())
         return;
 
     NSString *path = fromQString(qpath);
@@ -73,7 +73,7 @@ void mac_saveFileBookmark(const QString& qpath) {
 }
 
 void mac_restoreFileAccess() {
-    if (!isSandboxed())
+    if (!mac_isSandboxed())
         return;
 
     NSArray *path = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
@@ -97,7 +97,7 @@ void mac_restoreFileAccess() {
 }
 
 void mac_stopFileAccess() {
-    if (!isSandboxed())
+    if (!mac_isSandboxed())
         return;
 
     NSUserDefaults* prefs = [NSUserDefaults standardUserDefaults];
@@ -125,7 +125,7 @@ QString mac_getExistingDirectory(QWidget *parent,
     [panel setCanChooseFiles:NO];
 
     if ([panel runModal] == NSOKButton) {
-        if (isSandboxed()) {
+        if (mac_isSandboxed()) {
             saveFileBookmark(panel.URL.path);
         }
 
@@ -151,7 +151,7 @@ QString mac_getOpenFileName(QWidget *parent,
         [panel setAllowedFileTypes:fromQStringList(extensions)];
 
     if ([panel runModal] == NSOKButton) {
-        if (isSandboxed()) {
+        if (mac_isSandboxed()) {
             saveFileBookmark(panel.URL.path);
         }
 
@@ -176,7 +176,7 @@ QStringList mac_getOpenFileNames(QWidget *parent, const QString &caption, const 
         for (int i = 0; i < panel.URLs.count; ++i)
             urls.append(toQString([[[panel URLs] objectAtIndex:i] path]));
 
-        if (isSandboxed()) {
+        if (mac_isSandboxed()) {
             saveFileBookmark(panel.URL.path);
         }
 
@@ -197,7 +197,7 @@ QString mac_getSaveFileName(QWidget *parent, const QString &caption, const QStri
         [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
     if ([panel runModal] == NSOKButton) {
-        if (isSandboxed()) {
+        if (mac_isSandboxed()) {
             saveFileBookmark(panel.URL.path);
         }
 

@@ -10,6 +10,8 @@ void mac_saveFileBookmark(const QString& path);
 void mac_restoreFileAccess();
 void mac_stopFileAccess();
 
+bool mac_isSandboxed();
+
 QString mac_getExistingDirectory(QWidget *parent,
                                     const QString &caption,
                                     const QString &dir,
