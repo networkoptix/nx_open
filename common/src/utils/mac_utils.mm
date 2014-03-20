@@ -4,5 +4,5 @@
 #import <Cocoa/Cocoa.h>
 
 QString mac_getMoviesDir() {
-    return QString::fromUtf8([NSHomeDirectory() UTF8String]);
+    return QString::fromUtf8([[NSHomeDirectory() stringByAppendingPathComponent:@"/Movies"] UTF8String]);
 }
