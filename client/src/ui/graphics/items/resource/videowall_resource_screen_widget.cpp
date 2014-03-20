@@ -33,8 +33,6 @@ QnVideowallResourceScreenWidget::QnVideowallResourceScreenWidget(QnWorkbenchCont
 {
     setAcceptDrops(true);
 
-    setOption(QnResourceWidget::WindowRotationForbidden, true);
-
     m_videowall = base_type::resource().dynamicCast<QnVideoWallResource>();
     if(!m_videowall) {
         qnCritical("QnVideowallResourceScreenWidget was created with a non-videowall resource.");
@@ -71,6 +69,11 @@ QnVideowallResourceScreenWidget::QnVideowallResourceScreenWidget(QnWorkbenchCont
     updateButtonsVisibility();
     updateTitleText();
     updateInfoText();
+
+    setOption(QnResourceWidget::WindowRotationForbidden, true);
+    setOption(QnResourceWidget::DisplayInfo, true);
+    setInfoVisible(true, false);
+    setOverlayVisible(true, false);
 }
 
 QnVideowallResourceScreenWidget::~QnVideowallResourceScreenWidget() {
@@ -92,14 +95,18 @@ Qn::RenderStatus QnVideowallResourceScreenWidget::paintChannelBackground(QPainte
     return Qn::NewFrameRendered;
 }
 
+QnResourceWidget::Buttons QnVideowallResourceScreenWidget::calculateButtonsVisibility() const {
+    return 0;
+}
+
 void QnVideowallResourceScreenWidget::updateLayout() {
     if (!m_layoutUpdateRequired)
         return;
 
     if (!m_mainLayout) {
         m_mainLayout = new QGraphicsAnchorLayout();
-        m_mainLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
-        m_mainLayout->setSpacing(0.5);
+        m_mainLayout->setContentsMargins(3.0, 20.0, 3.0, 3.0);
+        m_mainLayout->setSpacing(0.0);
 
         QGraphicsWidget* mainOverlayWidget = new QnViewportBoundWidget(this);
         mainOverlayWidget->setLayout(m_mainLayout);

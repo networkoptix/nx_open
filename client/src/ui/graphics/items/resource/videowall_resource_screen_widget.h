@@ -29,6 +29,7 @@ public:
 protected:
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
 
+    virtual Buttons calculateButtonsVisibility() const;
 private:
     void updateLayout();
 private slots:

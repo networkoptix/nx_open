@@ -1174,7 +1174,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         if(context()->user())
             layout->setParentId(context()->user()->getId());
 
-        layout->setCellSpacing(0.0, 0.0);
+        layout->setCellSpacing(0.1, 0.1);
         layout->setCellAspectRatio(defaultReviewAR);
         layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission | Qn::WritePermission));
         layout->setData(Qn::VideoWallResourceRole, qVariantFromValue(videoWall));
