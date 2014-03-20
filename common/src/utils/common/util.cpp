@@ -14,6 +14,7 @@
 #include <QtNetwork/QHostInfo>
 
 #include <common/common_globals.h>
+#include <utils/mac_utils.h>
 #include "version.h"
 
 
@@ -53,8 +54,13 @@ QString fromNativePath(const QString &path)
 
 QString getMoviesDirectory()
 {
+#ifdef Q_OS_MACX
+    QString homeDir = mac_getMoviesDir();
+    return homeDir.isEmpty() ? QString() : homeDir + QLatin1String("/") + QLatin1String(QN_MEDIA_FOLDER_NAME);
+#else
     const QStringList& moviesDirs = QStandardPaths::standardLocations(QStandardPaths::MoviesLocation);
     return moviesDirs.isEmpty() ? QString() : (moviesDirs[0] + QLatin1String("/") + QLatin1String(QN_MEDIA_FOLDER_NAME) );
+#endif
 }
 
 QString getBackgroundsDirectory() {

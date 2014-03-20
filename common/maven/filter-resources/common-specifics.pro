@@ -10,7 +10,7 @@ unix {
 }
 
 mac {
-  LIBS += -L/usr/X11/lib/
+  LIBS += -lobjc -framework Foundation
 }
 
 pb.name = Generating code from ${QMAKE_FILE_IN} to ${QMAKE_FILE_BASE}
