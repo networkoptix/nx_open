@@ -1,5 +1,10 @@
 #include "layout_resource_overlay_widget.h"
 
+#include <QtCore/QMimeData>
+#include <QtGui/QDrag>
+
+#include <common/common_globals.h>
+
 #include <camera/camera_thumbnail_manager.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -12,6 +17,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/videowall_resource_screen_widget.h>
+#include <ui/graphics/instruments/drop_instrument.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_resource.h>
@@ -155,18 +161,7 @@ void QnLayoutResourceOverlayWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *
     m_dragged.resources << layouts;
     m_dragged.resources << servers;
 
-    if (event->mimeData()->hasFormat(QnVideoWallItem::mimeType())) {
-        QByteArray data = event->mimeData()->data(QnVideoWallItem::mimeType());
-        QDataStream stream(&data, QIODevice::ReadOnly);
-        QList<QString> videoWallItemUuids;
-        stream >> videoWallItemUuids;
-
-        foreach (QString uuid, videoWallItemUuids) {
-            QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(uuid);
-            if (!index.isNull())
-                m_dragged.videoWallItems << index;
-        }
-    }
+    m_dragged.videoWallItems = qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
 
     if (m_dragged.resources.empty() && m_dragged.videoWallItems.empty())
         return;
@@ -210,6 +205,17 @@ void QnLayoutResourceOverlayWidget::dropEvent(QGraphicsSceneDragDropEvent *event
     }
 
     event->acceptProposedAction();
+}
+
+void QnLayoutResourceOverlayWidget::pressedNotify(QGraphicsSceneMouseEvent *event) {
+    QDrag *drag = new QDrag(this);
+    QMimeData *mimeData = new QMimeData();
+
+    QnVideoWallItem::serializeUuids(QList<QUuid>() << m_itemUuid, mimeData);
+    mimeData->setData(Qn::NoSceneDrop, QByteArray());
+
+    drag->setMimeData(mimeData);
+    drag->exec();
 }
 
 void QnLayoutResourceOverlayWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {

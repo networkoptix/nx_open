@@ -519,3 +519,13 @@ QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QUuid &uuid) c
     }
     return QnVideoWallItemIndex();
 }
+
+QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<QUuid> &uuids) const {
+    QnVideoWallItemIndexList result;
+    foreach (const QUuid &uuid, uuids) {
+        QnVideoWallItemIndex index = getVideoWallItemByUuid(uuid);
+        if (!index.isNull())
+            result << index;
+    }
+    return result;
+}

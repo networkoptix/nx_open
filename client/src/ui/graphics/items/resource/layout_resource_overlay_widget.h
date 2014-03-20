@@ -30,6 +30,8 @@ protected:
     virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event) override;
     virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event) override;
     virtual void dropEvent(QGraphicsSceneDragDropEvent *event) override;
+
+    virtual void pressedNotify(QGraphicsSceneMouseEvent *event) override;
 private:
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_doubleClicked(Qt::MouseButton button);

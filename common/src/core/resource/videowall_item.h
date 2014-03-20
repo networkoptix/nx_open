@@ -8,6 +8,8 @@
 
 #include <utils/common/id.h>
 
+class QMimeData;
+
 /**
  * @brief The QnVideoWallItem class         Single videowall item. Can take part of the real system
  *                                          screen or even some of them. Can have a layout.
@@ -43,9 +45,11 @@ public:
      */
     QRect geometry;
 
-    static QString mimeType() {
-        return QLatin1String("application/x-noptix-videowall-items");
-    }
+    static QString mimeType();
+
+    static void serializeUuids(const QList<QUuid> &uuids, QMimeData *mimeData);
+
+    static QList<QUuid> deserializeUuids(const QMimeData *mimeData);
 
     friend bool operator==(const QnVideoWallItem &l, const QnVideoWallItem &r) {
         return (l.layout == r.layout &&
@@ -61,6 +65,7 @@ Q_DECLARE_TYPEINFO(QnVideoWallItem, Q_MOVABLE_TYPE);
 
 typedef QList<QnVideoWallItem> QnVideoWallItemList;
 typedef QHash<QUuid, QnVideoWallItem> QnVideoWallItemMap;
+
 
 Q_DECLARE_METATYPE(QnVideoWallItemList)
 Q_DECLARE_METATYPE(QnVideoWallItemMap)

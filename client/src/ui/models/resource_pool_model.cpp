@@ -355,22 +355,16 @@ QMimeData *QnResourcePoolModel::mimeData(const QModelIndexList &indexes) const {
         }
 
         if (types.contains(QnVideoWallItem::mimeType())) {
-            QSet<QString> uuids;
+            QSet<QUuid> uuids;
             foreach (const QModelIndex &index, indexes) {
                 QnResourcePoolModelNode *node = this->node(index);
 
                 if (node && (node->type() == Qn::VideoWallItemNode || node->type() == Qn::UserVideoWallItemNode)) {
-                    uuids << node->uuid().toString();
+                    uuids << node->uuid();
                 }
             }
+            QnVideoWallItem::serializeUuids(uuids.toList(), mimeData);
 
-            if (!uuids.isEmpty()) {
-                QByteArray result;
-                QDataStream stream(&result, QIODevice::WriteOnly);
-                stream << uuids.toList();
-
-                mimeData->setData(QnVideoWallItem::mimeType(), result);
-            }
         }
 
         if(types.contains(QLatin1String(pureTreeResourcesOnlyMimeType)))
@@ -446,6 +440,13 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         }
         else if (layouts.size() == 1) {
             menu()->trigger(Qn::ResetVideoWallLayoutAction, QnActionParameters(indexes).withArgument(Qn::LayoutResourceRole, layouts.first()));
+        } else if (mimeData->hasFormat(QnVideoWallItem::mimeType())) {
+            QList<QUuid> videoWallItemUuids = QnVideoWallItem::deserializeUuids(mimeData);
+            if (!videoWallItemUuids.isEmpty()) {
+                item.layout = index.videowall()->getItem(videoWallItemUuids.first()).layout;
+                index.videowall()->updateItem(index.uuid(), item);
+                //TODO: #GDM do through action to save the videowall at once
+            }
         }
     } else 
     if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
@@ -460,18 +461,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {
 
         if (mimeData->hasFormat(QnVideoWallItem::mimeType())) {
-            QByteArray data = mimeData->data(QnVideoWallItem::mimeType());
-            QDataStream stream(&data, QIODevice::ReadOnly);
-            QList<QString> videoWallItemUuids;
-            stream >> videoWallItemUuids;
-
-            QnVideoWallItemIndexList indexes;
-            foreach (QString uuid, videoWallItemUuids) {
-                QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(uuid);
-                if (!index.isNull())
-                    indexes << index;
-            }
-
+            QnVideoWallItemIndexList indexes = qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
             if (!indexes.isEmpty()) {
                 menu()->trigger(Qn::AddVideoWallItemsToUserAction,
                                 QnActionParameters(indexes).withArgument(Qn::UserResourceRole, user));

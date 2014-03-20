@@ -6,6 +6,8 @@
 #include <QtWidgets/QGraphicsItem>
 #include <QtCore/QMimeData>
 
+#include <common/common_globals.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -112,7 +114,12 @@ bool DropInstrument::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
 #include "ui/workaround/mac_utils.h"
 
 bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
+    m_resources.clear();
+    m_videoWallItems.clear();
+
     const QMimeData *mimeData = event->mimeData();
+    if (mimeData->hasFormat(Qn::NoSceneDrop))
+        return false;
 
 #ifdef Q_OS_MAC
     if (mimeData->hasUrls()) {
@@ -146,19 +153,7 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
     m_resources << servers;
     m_resources << videowalls;
 
-    m_videoWallItems.clear();
-    if (event->mimeData()->hasFormat(QnVideoWallItem::mimeType())) {
-        QByteArray data = event->mimeData()->data(QnVideoWallItem::mimeType());
-        QDataStream stream(&data, QIODevice::ReadOnly);
-        QList<QString> videoWallItemUuids;
-        stream >> videoWallItemUuids;
-
-        foreach (QString uuid, videoWallItemUuids) {
-            QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(uuid);
-            if (!index.isNull())
-                m_videoWallItems << index;
-        }
-    }
+    m_videoWallItems = qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
 
     if (m_resources.empty() && m_videoWallItems.empty())
         return false;

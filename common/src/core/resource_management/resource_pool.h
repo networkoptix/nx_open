@@ -97,6 +97,13 @@ public:
      */
     QnVideoWallItemIndex getVideoWallItemByUuid(const QUuid &uuid) const;
 
+    /**
+     * @brief getVideoWallItemsByUuid           Find list of videowall items by their uuid.
+     * @param uuids                             Unique ids of the items.
+     * @return                                  List of pairs of videowall containing the item and item's uuid.
+     */
+    QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QUuid> &uuids) const;
+
     QStringList allTags() const;
 
     int activeCamerasByClass(bool analog) const;
