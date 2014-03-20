@@ -208,6 +208,12 @@ void QnLayoutResourceOverlayWidget::dropEvent(QGraphicsSceneDragDropEvent *event
 }
 
 void QnLayoutResourceOverlayWidget::pressedNotify(QGraphicsSceneMouseEvent *event) {
+    if (event->type() == QEvent::GraphicsSceneMouseDoubleClick) {
+        //TODO #GDM VW: hack because we do not receive mouseReleaseEvent
+        emit doubleClicked(Qt::LeftButton);
+        return;
+    }
+
     QDrag *drag = new QDrag(this);
     QMimeData *mimeData = new QMimeData();
 
