@@ -996,21 +996,35 @@ void QnWorkbenchVideoWallHandler::at_resetVideoWallLayoutAction_triggered() {
 }
 
 void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered() {
-    QnVideoWallItemIndexList items = menu()->currentParameters(sender()).videoWallItems();
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnVideoWallItemIndexList items = parameters.videoWallItems();
+    Qn::NodeType nodeType = parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>();
+    switch (nodeType) {
+    case Qn::VideoWallItemNode: {
+        QList<QnVideoWallResourcePtr> videoWalls;
 
-    QList<QnVideoWallResourcePtr> videoWalls;
+        foreach (const QnVideoWallItemIndex &item, items) {
+            if (!item.videowall())
+                continue;
+            item.videowall()->removeItem(item.uuid());
+            if (!videoWalls.contains(item.videowall()))
+                videoWalls << item.videowall();
 
-    foreach (const QnVideoWallItemIndex &item, items) {
-        if (!item.videowall())
-            continue;
-        item.videowall()->removeItem(item.uuid());
-        if (!videoWalls.contains(item.videowall()))
-            videoWalls << item.videowall();
+        }
 
+        foreach (const QnVideoWallResourcePtr& videoWall, videoWalls)
+            connection()->saveAsync(videoWall);
+        break;
+    }
+    case Qn::UserVideoWallItemNode: {
+        //TODO: #GDM VW how to determine from which user should we delete this screen?
+        break;
+    }
+    default:
+        break;
     }
 
-    foreach (const QnVideoWallResourcePtr& videoWall, videoWalls)
-        connection()->saveAsync(videoWall);
+
 }
 
 void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered() {
