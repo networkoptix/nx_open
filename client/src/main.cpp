@@ -338,7 +338,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString());
     commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
 
-    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
+    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
     initLog(logLevel);
 
