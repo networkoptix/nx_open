@@ -93,6 +93,7 @@ int main( int argc, char* argv[] )
     QString customizationToInstall( QString::fromUtf8(QN_CUSTOMIZATION_NAME) );
     QString moduleToInstall( QString::fromLatin1("client") );
     QString installationPath;
+    QString devModeKey;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter( &logLevel, "--log-level", NULL, QString() );
@@ -109,6 +110,7 @@ int main( int argc, char* argv[] )
     commandLineParser.addParameter( &customizationToInstall, "--customization", NULL, QString(), QString() );
     commandLineParser.addParameter( &moduleToInstall, "--module", NULL, QString(), QString() );
     commandLineParser.addParameter( &installationPath, "--install-path", NULL, QString(), QString() );
+    commandLineParser.addParameter( &devModeKey, "--dev-mode-key", NULL, QString(), QString() );
     commandLineParser.parse( argc, argv, stderr );
 
     QtSingleApplication app( SERVICE_NAME, argc, argv );
@@ -160,6 +162,8 @@ int main( int argc, char* argv[] )
         &installationManager,
         quitMode,
         mirrorListUrl );
+
+    applauncherProcess.setDevModeKey(devModeKey);
 
 #ifdef _WIN32
     applauncherProcessInstance = &applauncherProcess;
