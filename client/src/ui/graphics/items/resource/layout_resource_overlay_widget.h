@@ -13,6 +13,7 @@
 
 #include <utils/common/connective.h>
 
+class HoverFocusProcessor;
 class QnVideowallResourceScreenWidget;
 
 class QnLayoutResourceOverlayWidget : public Connective<QnClickableWidget>, public QnWorkbenchContextAware {
@@ -29,7 +30,6 @@ protected:
     virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event) override;
     virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event) override;
     virtual void dropEvent(QGraphicsSceneDragDropEvent *event) override;
-
 private:
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_doubleClicked(Qt::MouseButton button);
@@ -44,6 +44,7 @@ private:
     friend class QnVideowallResourceScreenWidget;
 
     QnVideowallResourceScreenWidget* m_widget;
+    HoverFocusProcessor* m_hoverProcessor;
 
     const QnVideoWallResourcePtr m_videowall;
     const QUuid m_itemUuid;

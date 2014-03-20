@@ -12,6 +12,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/videowall_resource_screen_widget.h>
+#include <ui/processors/hover_processor.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_resource.h>
 
@@ -27,10 +28,16 @@ QnLayoutResourceOverlayWidget::QnLayoutResourceOverlayWidget(const QnVideoWallRe
     setAcceptDrops(true);
     setAcceptedMouseButtons(Qt::LeftButton);
     setClickableButtons(Qt::LeftButton);
-    setAcceptHoverEvents(true);
 
     connect(m_videowall, &QnVideoWallResource::itemChanged, this, &QnLayoutResourceOverlayWidget::at_videoWall_itemChanged);
     connect(this, &QnClickableWidget::doubleClicked, this, &QnLayoutResourceOverlayWidget::at_doubleClicked);
+
+    m_hoverProcessor = new HoverFocusProcessor(this);
+    m_hoverProcessor->addTargetItem(this);
+    m_hoverProcessor->setHoverEnterDelay(50);
+    m_hoverProcessor->setHoverLeaveDelay(50);
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered, this, &QnLayoutResourceOverlayWidget::updateView);
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this, &QnLayoutResourceOverlayWidget::updateView);
 
     updateLayout();
     updateInfo();
@@ -46,7 +53,10 @@ void QnLayoutResourceOverlayWidget::paint(QPainter *painter, const QStyleOptionG
     qreal offset = qMin(paintRect.width(), paintRect.height()) * 0.02;
     painter->fillRect(paintRect, Qt::black);
     paintRect.adjust(offset, offset, -offset, -offset);
-    painter->fillRect(paintRect, Qt::lightGray);
+    if (m_hoverProcessor->isHovered())
+        painter->fillRect(paintRect, Qt::blue);
+    else
+        painter->fillRect(paintRect, Qt::lightGray);
     paintRect.adjust(offset, offset, -offset, -offset);
     painter->fillRect(paintRect, Qt::black);
 
