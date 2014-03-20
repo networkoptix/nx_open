@@ -10,6 +10,7 @@ unix {
 }
 
 mac {
+  OBJECTIVE_SOURCES += ${basedir}/utils/mac_utils.mm
   LIBS += -lobjc -framework Foundation
 }
 
