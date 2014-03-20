@@ -50,10 +50,15 @@ int QnBusinessEventManager<T>::testEmailSettings( const QnEmail::Settings& setti
 }
 
 template<class T>
-int QnBusinessEventManager<T>::sendEmail(const QStringList& /*to*/, const QString& /*subject*/, const QString& /*message*/, int /*timeout*/, const QnEmailAttachmentList& /*attachments*/, impl::SimpleHandlerPtr /*handler*/ )
+int QnBusinessEventManager<T>::sendEmail(const ApiEmailData& data, impl::SimpleHandlerPtr handler )
 {
-    //Q_ASSERT_X(0, Q_FUNC_INFO, "todo: implement me!!!");
-    return INVALID_REQ_ID;
+    const int reqID = generateRequestID();
+
+    auto tran = prepareTransaction( ApiCommand::sendEmail, data );
+
+    m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, std::placeholders::_1 ) );
+    
+    return reqID;
 }
 
 template<class T>
@@ -129,7 +134,17 @@ QnTransaction<ApiEmailSettingsData> QnBusinessEventManager<T>::prepareTransactio
     QnTransaction<ApiEmailSettingsData> tran(command, true);
     tran.params.fromResource(resource);
     tran.persistent = false;
-    tran.localTransaction = false;
+    tran.localTransaction = true;
+    return tran;
+}
+
+template<class T>
+QnTransaction<ApiEmailData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const ApiEmailData& data )
+{
+    QnTransaction<ApiEmailData> tran(command, true);
+    tran.params = data;
+    tran.persistent = false;
+    tran.localTransaction = true;
     return tran;
 }
 

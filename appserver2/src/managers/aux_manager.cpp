@@ -37,4 +37,8 @@ ErrorCode QnAuxManager::executeTransaction(const QnTransaction<ApiEmailSettingsD
     return m_emailManagerImpl->testConnection(settings) ? ErrorCode::ok : ErrorCode::failure;
 }
 
+ErrorCode QnAuxManager::executeTransaction(const QnTransaction<ApiEmailData>& tran)
+{
+    return m_emailManagerImpl->sendEmail(tran.params) ? ErrorCode::ok : ErrorCode::failure;
+}
 } // namespace ec2

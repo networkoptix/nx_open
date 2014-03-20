@@ -5,6 +5,7 @@
 
 #include "api_data.h"
 #include "utils/common/email.h"
+#include <api/model/email_attachment.h>
 
 
 namespace ec2
@@ -29,24 +30,31 @@ namespace ec2
 	#define ApiEmailSettingsFields (host)(port)(user)(password)(connectionType)
 	QN_DEFINE_STRUCT_SERIALIZATORS( ApiEmailSettingsData, ApiEmailSettingsFields )
 	
-    /* class ApiEmailSettingsData
-    :
-        public ApiData
-    {
-    };
-
-    class ApiLicenseList
+    class ApiEmailData
     :
         public ApiData
     {
     public:
-        std::vector<ApiLicense> data;
+        ApiEmailData() {}
 
-        void fromResourceList( const QnLicenseList& licList );
-        void toResourceList( QnLicenseList& licenseList ) const;
+        ApiEmailData (const QStringList& to_, const QString& subject_, const QString& body_, int timeout_, const QnEmailAttachmentList& attachments_)
+            : to(to_),
+            subject(subject_),
+            body(body_),
+            timeout(timeout_),
+            attachments(attachments_)
+        {}
+
+        QStringList to;
+        QString subject;
+        QString body;
+        int timeout;
+
+        QnEmailAttachmentList attachments;
     };
 
-	QN_DEFINE_STRUCT_SERIALIZATORS( ApiLicenseList, (data) ) */
+	#define ApiEmailFields (to)(subject)(body)(timeout)
+	QN_DEFINE_STRUCT_SERIALIZATORS( ApiEmailData, ApiEmailFields )
 }
 
 #endif // __EC2__EMAIL_DATA_H_

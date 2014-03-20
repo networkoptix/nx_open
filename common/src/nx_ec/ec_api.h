@@ -9,6 +9,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 
+#include "nx_ec/data/ec2_email.h"
 #include "api/model/connection_info.h"
 #include "api/model/email_attachment.h"
 #include "data/ec2_runtime_info.h"
@@ -361,14 +362,10 @@ namespace ec2
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int sendEmail(
-            const QStringList& to,
-            const QString& subject,
-            const QString& message,
-            int timeout,
-            const QnEmailAttachmentList& attachments,
+            const ApiEmailData& data,
             TargetType* target, HandlerType handler )
         {
-            return sendEmail( to, subject, message, timeout, attachments, 
+            return sendEmail( data, 
                 std::static_pointer_cast<impl::SimpleHandler>(
                     std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -411,13 +408,7 @@ namespace ec2
     private:
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
         virtual int testEmailSettings( const QnEmail::Settings& settings, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int sendEmail(
-            const QStringList& to,
-            const QString& subject,
-            const QString& message,
-            int timeout,
-            const QnEmailAttachmentList& attachments,
-            impl::SimpleHandlerPtr handler ) = 0;
+        virtual int sendEmail(const ApiEmailData& data, impl::SimpleHandlerPtr handler ) = 0;
         virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) = 0;
         virtual int deleteRule( QnId ruleId, impl::SimpleHandlerPtr handler ) = 0;
         virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) = 0;

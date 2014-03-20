@@ -325,15 +325,14 @@ void QnSmtpSettingsWidget::at_settings_received( int handle, ec2::ErrorCode erro
     if (handle != m_requestHandle)
         return;
 
-    m_requestHandle = -1;
-    context()->instance<QnWorkbenchNotificationsHandler>()->updateSmtpSettings(handle, errorCode, settings);
-
-    bool success = (errorCode == ec2::ErrorCode::ok);
-    if(!success) {
+    if(errorCode != ec2::ErrorCode::ok) {
         QMessageBox::critical(this, tr("Error"), tr("Could not read settings from Enterprise Controller."));
         m_settingsReceived = true;
         return;
     }
+
+    m_requestHandle = -1;
+    context()->instance<QnWorkbenchNotificationsHandler>()->updateSmtpSettings(handle, errorCode, settings);
 
     loadSettings(settings.server, settings.connectionType, settings.port);
     ui->userLineEdit->setText(settings.user);

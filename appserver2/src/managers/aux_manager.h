@@ -29,6 +29,7 @@ namespace ec2
         }
 
         ErrorCode executeTransaction(const QnTransaction<ApiEmailSettingsData>& tran);
+        ErrorCode executeTransaction(const QnTransaction<ApiEmailData>& tran);
     private:
         EmailManagerImpl* const m_emailManagerImpl;
     };

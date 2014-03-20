@@ -1,5 +1,7 @@
 #include "email_manager_impl.h"
 
+#include "nx_ec/data/ec2_email.h"
+
 namespace ec2
 {
     EmailManagerImpl::EmailManagerImpl()
@@ -35,22 +37,22 @@ namespace ec2
         return result;
     }
 
-    bool EmailManagerImpl::sendEmail(const QStringList &to, const QString& subject, const QString& body, int timeout, const QnEmailAttachmentList& attachments) {
+    bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
         MimeMessage message;
         message.setSender(new EmailAddress(m_from));
-        foreach (const QString &recipient, to) {
+        foreach (const QString &recipient, data.to) {
             message.addRecipient(new EmailAddress(recipient));
         }
     
-        message.setSubject(subject);
+        message.setSubject(data.subject);
 
-        MimeText text(body);
+        MimeText text(data.body);
         message.addPart(&text);
 
-        foreach (QnEmailAttachmentPtr attachment, attachments) {
+/*        foreach (QnEmailAttachmentPtr attachment, data.attachments) {
             MimeAttachment mat(attachment->content, attachment->filename);
             message.addPart(&mat);
-        }
+        } */
 
         // Actually send
         int port = m_settings.port ? m_settings.port : QnEmail::defaultPort(m_settings.connectionType);
@@ -67,6 +69,6 @@ namespace ec2
 
         smtp.quit();
 
-        return true;
+        return result;
     }
 }

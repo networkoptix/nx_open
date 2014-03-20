@@ -120,7 +120,7 @@ namespace ec2
         registerUpdateFuncHandler<ApiBusinessActionData>( restProcessorPool, ApiCommand::broadcastBusinessAction );
 
         registerUpdateFuncHandler<ApiEmailSettingsData>( restProcessorPool, ApiCommand::testEmailSettings );
-        // registerUpdateFuncHandler<ApiEmailData>( restProcessorPool, ApiCommand::sendEmail );
+        registerUpdateFuncHandler<ApiEmailData>( restProcessorPool, ApiCommand::sendEmail );
 
 
         //AbstractUserManager::getUsers

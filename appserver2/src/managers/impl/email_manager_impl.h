@@ -7,13 +7,15 @@
 
 namespace ec2
 {
+    class ApiEmailData;
+
     class EmailManagerImpl
     {
     public:
         EmailManagerImpl();
 
         void configure(const QnEmail::Settings&, const QString&);
-        bool sendEmail(const QStringList& to, const QString& subject, const QString& message, int timeout, const QnEmailAttachmentList&);
+        bool sendEmail(const ApiEmailData& message);
 
         bool testConnection(const QnEmail::Settings&);
 

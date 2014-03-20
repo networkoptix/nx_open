@@ -173,6 +173,9 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiEmailSettingsData>& tran ) {
         }
 
+        void triggerNotification( const QnTransaction<ApiEmailData>& tran ) {
+        }
+
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
     protected:
         QueryProcessorType* m_queryProcessor;

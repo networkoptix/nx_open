@@ -24,6 +24,7 @@
 #include "business_strings_helper.h"
 #include "version.h"
 
+#include "nx_ec/data/ec2_email.h"
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
 
@@ -472,11 +473,11 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     QString messageBody = renderTemplateFromFile(lit(":/email_templates"), lit("container.mustache"), contextMap);
 
     if (QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->sendEmail(
-                recipients,
-                QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
-                messageBody,
-                EMAIL_SEND_TIMEOUT,
-                attachments,
+                ec2::ApiEmailData(recipients,
+                    QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
+                    messageBody,
+                    EMAIL_SEND_TIMEOUT,
+                    attachments),
                 this,
                 &QnBusinessRuleProcessor::at_sendEmailFinished ) == ec2::INVALID_REQ_ID)
         return false;
