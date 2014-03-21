@@ -46,13 +46,17 @@ namespace ec2
     
         message.setSubject(data.subject);
 
-        MimeText text(data.body);
+        MimeHtml text(data.body);
         message.addPart(&text);
 
-/*        foreach (QnEmailAttachmentPtr attachment, data.attachments) {
-            MimeAttachment mat(attachment->content, attachment->filename);
-            message.addPart(&mat);
-        } */
+        // Need to store all attachements as smtp client operates on attachment pointers
+        typedef std::shared_ptr<MimeInlineFile> MimeInlineFilePtr; 
+        std::vector<MimeInlineFilePtr> attachments;
+        foreach (QnEmailAttachmentPtr attachment, data.attachments) {
+            MimeInlineFilePtr att(new MimeInlineFile(attachment->content, attachment->filename, attachment->mimetype));
+            attachments.push_back(att);
+            message.addPart(att.get());
+        }
 
         // Actually send
         int port = m_settings.port ? m_settings.port : QnEmail::defaultPort(m_settings.connectionType);

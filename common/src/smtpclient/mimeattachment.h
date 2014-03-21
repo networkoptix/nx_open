@@ -21,7 +21,7 @@
 
 #include <QFile>
 #include "mimepart.h"
-#include "mimefile.h"
+#include "mimeinlinefile.h"
 
 class MimeAttachment : public MimeFile
 {
@@ -31,7 +31,7 @@ public:
     /* [1] Constructors and Destructors */
 
     MimeAttachment(QFile* file);
-    MimeAttachment(const QByteArray& stream, const QString& fileName);
+    MimeAttachment(const QByteArray& stream, const QString& fileName, const QString& contentType);
 
     ~MimeAttachment();
 

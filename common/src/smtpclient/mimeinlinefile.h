@@ -28,6 +28,7 @@ public:
     /* [1] Constructors and Destructors */
 
     MimeInlineFile(QFile *f);
+    MimeInlineFile(const QByteArray& stream, const QString& fileName, const QString& contentType);
     ~MimeInlineFile();
 
     /* [1] --- */
