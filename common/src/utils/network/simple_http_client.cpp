@@ -120,6 +120,8 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
 
         QByteArray request;
         request.append("POST ");
+        if( !requestStr.startsWith('/') )
+            request.append('/');
         request.append(requestStr);
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");
@@ -139,7 +141,7 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            request.append(digestAccess(QLatin1String(request)));
+            request.append(digestAccess(lit("POST"), QLatin1String(requestStr)));
         }
 
         request.append("Content-Length: ");
@@ -317,7 +319,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            request.append(digestAccess(QLatin1String(requestStr)));
+            request.append(digestAccess(lit("GET"), QLatin1String(requestStr)));
         }
 
         request.append("\r\n");
@@ -516,9 +518,9 @@ QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QStri
 
 }
 
-QString CLSimpleHTTPClient::digestAccess(const QString& request) const
+QString CLSimpleHTTPClient::digestAccess(const QString& method, const QString& url) const
 {
-    return digestAccess(m_auth, mRealm, mNonce, QLatin1String("GET"), QLatin1Char('/') + request);
+    return digestAccess(m_auth, mRealm, mNonce, method, url);
 }
 
 void CLSimpleHTTPClient::addExtraHeaders(QByteArray& request)

@@ -91,7 +91,7 @@ private:
     void getAuthInfo();
 
     QByteArray basicAuth() const;
-    QString digestAccess(const QString&) const;
+    QString digestAccess(const QString& method, const QString& url) const;
 
     int readHeaders();
     void addExtraHeaders(QByteArray& request);
