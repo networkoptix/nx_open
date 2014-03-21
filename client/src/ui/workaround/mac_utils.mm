@@ -191,7 +191,7 @@ QStringList mac_getOpenFileNames(const QString &caption, const QString &dir, con
 QString mac_getSaveFileName(const QString &caption, const QString &dir, const QStringList &extensions) {
     bool sandboxed = mac_isSandboxed();
 
-    NSSavePanel *panel = [NSSavePanel openPanel];
+    NSSavePanel *panel = [NSSavePanel savePanel];
     [panel setTitle:fromQString(caption)];
     [panel setCanCreateDirectories:YES];
     if (extensions.size() != 0)
