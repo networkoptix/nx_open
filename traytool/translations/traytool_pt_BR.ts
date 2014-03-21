@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt_BR" sourcelanguage="pt_BR">
+<TS version="2.0" language="pt_BR" sourcelanguage="pt_BR">
 <context>
     <name>ConnectionTestingDialog</name>
     <message>
@@ -47,12 +47,12 @@ A aplicação será terminada.</translation>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="70"/>
         <source>Request timed out.</source>
-        <translation type="unfinished"></translation>
+        <translation>Requisição vencida.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="98"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuário ou senha incorretos, por favor tente novamente.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="101"/>
@@ -60,12 +60,15 @@ A aplicação será terminada.</translation>
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não pôde ser estabilizada a conexão com o Controlador Enterprise.
+Detalhes da conexão estão incorretos, por favor tente novamente.
+
+Se o erro persistir, por favor contate seu administrador do VMS.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="106"/>
         <source>You are trying to connect to incompatible Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation>Você está tentando conexão com um Controlador Enterprise incompatível.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="111"/>
@@ -73,7 +76,10 @@ If this error persists, please contact your VMS administrator.</source>
  - Client version: %1.
  - EC version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>O Controlador Enterprise tem uma versão diferente:
+ - Versão Client: %1.
+ - Versão CE: %2.
+Modo de compatibilidade para versões abaixo de %3 não são suportadas.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="120"/>
@@ -81,7 +87,10 @@ Compatibility mode for versions lower than %3 is not supported.</source>
  - Client version: %1.
  - EC version: %2.
 You will be asked to restart the client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>O Controlador Enterprise tem uma versão diferente:
+ - Versão Client: %1.
+ - Versão CE: %2.
+Será pedido para reiniciar o client em modo de compatibilidade.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="133"/>
@@ -111,7 +120,7 @@ You will be asked to restart the client in compatibility mode.</source>
     <name>QnSystrayWindow</name>
     <message>
         <source>Port</source>
-        <translation type="vanished">Porta</translation>
+        <translation>Porta</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="651"/>
@@ -150,11 +159,11 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>Insufficient permissions to start/stop services</source>
-        <translation type="vanished">Permissões insuficientes para iniciar/parar os serviços</translation>
+        <translation>Permissões insuficientes para iniciar/parar os serviços</translation>
     </message>
     <message>
         <source>&amp;Show Enterprise Controller Log</source>
-        <translation type="vanished">&amp;Mostar Log do Controlador Enterprise</translation>
+        <translation>&amp;Mostar Log do Controlador Enterprise</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="1067"/>
@@ -163,7 +172,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>media proxy</source>
-        <translation type="vanished">mídia proxy</translation>
+        <translation>mídia proxy</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="541"/>
@@ -172,7 +181,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>The specified database does not exist.</source>
-        <translation type="vanished">O banco de dados especificado não existe.</translation>
+        <translation>O banco de dados especificado não existe.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="436"/>
@@ -187,43 +196,44 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="126"/>
         <source>%1 Tray Assistant</source>
-        <translation type="unfinished"></translation>
+        <translation>Assitente %1</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="232"/>
         <source>Access denied.</source>
-        <translation type="unfinished"></translation>
+        <translation>Acesso proibido.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="235"/>
         <source>Specified database does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>O banco de dados especificado não existe.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="238"/>
         <source>Specified parameter is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Um parâmetro específico está inválido.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="242"/>
         <source>Could not access installed services</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possivel acessar os serviços instalados</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="242"/>
         <source>An error has occurred while trying to access installed services:
  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Um erro ocorreu na tentativa de acesso aos serviços instalados:
+ %1</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="641"/>
         <source>Show &amp;Media Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar relatório do Servido de &amp;Mídia</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="646"/>
         <source>Show &amp;Enterprise Controller Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostar Relatório do Controlador &amp;Enterprise</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="669"/>
@@ -233,7 +243,7 @@ You will be asked to restart the client in compatibility mode.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="989"/>
         <source>%1 port is already used by another process</source>
-        <translation type="unfinished"></translation>
+        <translation>Porta %1 já usada por outro processo</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="996"/>
@@ -242,11 +252,11 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>media server API</source>
-        <translation type="vanished">API servidor de mídia</translation>
+        <translation>API servidor de mídia</translation>
     </message>
     <message>
         <source>&amp;Show Media Server Log</source>
-        <translation type="vanished">&amp;Mostrar Log do Servidor de Mídia</translation>
+        <translation>&amp;Mostrar Log do Servidor de Mídia</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="478"/>
@@ -295,7 +305,7 @@ You will be asked to restart the client in compatibility mode.</source>
     </message>
     <message>
         <source>The requested access was denied</source>
-        <translation type="vanished">O acesso requisitado foi proibido</translation>
+        <translation>O acesso requisitado foi proibido</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="510"/>
@@ -313,7 +323,7 @@ Construído para %5-%6 com %7.&lt;br/&gt;
     </message>
     <message>
         <source>VMS settings</source>
-        <translation type="vanished">Ajsutes VMS</translation>
+        <translation>Ajsutes VMS</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="486"/>
@@ -327,7 +337,7 @@ Construído para %5-%6 com %7.&lt;br/&gt;
     </message>
     <message>
         <source>Systray</source>
-        <translation type="vanished">Barradosistema</translation>
+        <translation>Barradosistema</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="462"/>
@@ -336,7 +346,7 @@ Construído para %5-%6 com %7.&lt;br/&gt;
     </message>
     <message>
         <source>A specified parameter is invalid.</source>
-        <translation type="vanished">Um parâmetro específico está inválido.</translation>
+        <translation>Um parâmetro específico está inválido.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="635"/>
@@ -350,7 +360,7 @@ Construído para %5-%6 com %7.&lt;br/&gt;
     </message>
     <message>
         <source>%1 port already used by another process</source>
-        <translation type="vanished">Porta %1 já usada por outro processo</translation>
+        <translation>Porta %1 já usada por outro processo</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="1067"/>
@@ -359,7 +369,7 @@ Construído para %5-%6 com %7.&lt;br/&gt;
     </message>
     <message>
         <source>media server RTSP</source>
-        <translation type="vanished">RTSP servidor de mídia</translation>
+        <translation>RTSP servidor de mídia</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="563"/>
@@ -382,28 +392,28 @@ Construído para %5-%6 com %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="80"/>
         <source>Host:</source>
-        <translation type="unfinished"></translation>
+        <translation>Host:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="108"/>
         <location filename="../src/settings.ui" line="338"/>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>Porta:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="130"/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>Login:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="140"/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Senha:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="185"/>
         <source>Cameras RTP transport:</source>
-        <translation type="unfinished"></translation>
+        <translation>Transporte RTP de câmeras:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="195"/>
@@ -417,11 +427,11 @@ Construído para %5-%6 com %7.&lt;br/&gt;
     </message>
     <message>
         <source>Host</source>
-        <translation type="vanished">Host</translation>
+        <translation>Host</translation>
     </message>
     <message>
         <source>Port</source>
-        <translation type="vanished">Porta</translation>
+        <translation>Porta</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="165"/>
@@ -432,7 +442,7 @@ Construído para %5-%6 com %7.&lt;br/&gt;
         <location filename="../src/settings.ui" line="263"/>
         <location filename="../src/settings.ui" line="357"/>
         <source>Use specified IP or host name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Use IP específico ou nome host:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="407"/>
@@ -441,11 +451,11 @@ Construído para %5-%6 com %7.&lt;br/&gt;
     </message>
     <message>
         <source>Login</source>
-        <translation type="vanished">Login</translation>
+        <translation>Login</translation>
     </message>
     <message>
         <source>Media proxy port</source>
-        <translation type="vanished">Porta de mída Proxy</translation>
+        <translation>Porta de mída Proxy</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="348"/>
@@ -459,11 +469,11 @@ Construído para %5-%6 com %7.&lt;br/&gt;
     </message>
     <message>
         <source>Cameras RTP transport</source>
-        <translation type="vanished">Transporte RTP de câmeras</translation>
+        <translation>Transporte RTP de câmeras</translation>
     </message>
     <message>
         <source>API port</source>
-        <translation type="vanished">Porta API</translation>
+        <translation>Porta API</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="417"/>
@@ -477,7 +487,7 @@ Construído para %5-%6 com %7.&lt;br/&gt;
     </message>
     <message>
         <source>RTSP port</source>
-        <translation type="vanished">Porta RTSP</translation>
+        <translation>Porta RTSP</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="42"/>
@@ -486,7 +496,7 @@ Construído para %5-%6 com %7.&lt;br/&gt;
     </message>
     <message>
         <source>Password</source>
-        <translation type="vanished">Senha</translation>
+        <translation>Senha</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="440"/>
@@ -506,7 +516,7 @@ Construído para %5-%6 com %7.&lt;br/&gt;
     </message>
     <message>
         <source>HDWitness settings</source>
-        <translation type="vanished">Ajustes HDWitness</translation>
+        <translation>Ajustes HDWitness</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="302"/>
@@ -515,7 +525,7 @@ Construído para %5-%6 com %7.&lt;br/&gt;
     </message>
     <message>
         <source>Use specified IP or host name</source>
-        <translation type="vanished">Use IP específico ou nome host</translation>
+        <translation>Use IP específico ou nome host</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="429"/>
