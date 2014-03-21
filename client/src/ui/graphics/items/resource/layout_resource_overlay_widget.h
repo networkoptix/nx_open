@@ -8,15 +8,17 @@
 
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
+#include <ui/processors/drag_process_handler.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
 
+class DragProcessor;
 class HoverFocusProcessor;
 class QnVideowallResourceScreenWidget;
 
-class QnLayoutResourceOverlayWidget : public Connective<QnClickableWidget>, public QnWorkbenchContextAware {
+class QnLayoutResourceOverlayWidget : public Connective<QnClickableWidget>, protected DragProcessHandler, public QnWorkbenchContextAware {
     typedef Connective<QnClickableWidget> base_type;
     Q_OBJECT
 
@@ -28,10 +30,13 @@ protected:
 
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event) override;
     virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event) override;
-    virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event) override;
     virtual void dropEvent(QGraphicsSceneDragDropEvent *event) override;
 
-    virtual void pressedNotify(QGraphicsSceneMouseEvent *event) override;
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+
+    virtual void startDrag(DragInfo *info) override;
 private:
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_doubleClicked(Qt::MouseButton button);
@@ -46,6 +51,8 @@ private:
     friend class QnVideowallResourceScreenWidget;
 
     QnVideowallResourceScreenWidget* m_widget;
+
+    DragProcessor *m_dragProcessor;
     HoverFocusProcessor* m_hoverProcessor;
 
     const QnVideoWallResourcePtr m_videowall;

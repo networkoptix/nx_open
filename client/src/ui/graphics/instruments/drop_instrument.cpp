@@ -182,6 +182,10 @@ bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *eve
     if(context == NULL)
         return true;
 
+    const QMimeData *mimeData = event->mimeData();
+    if (mimeData->hasFormat(Qn::NoSceneDrop))
+        return false;
+
     if (!m_videoWallItems.empty()) {
         context->menu()->trigger(
             Qn::StartVideoWallControlAction,

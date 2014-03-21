@@ -2,6 +2,7 @@
 
 #include <QtCore/QMimeData>
 #include <QtGui/QDrag>
+#include <QtWidgets/QApplication>
 
 #include <common/common_globals.h>
 
@@ -18,6 +19,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/videowall_resource_screen_widget.h>
 #include <ui/graphics/instruments/drop_instrument.h>
+#include <ui/processors/drag_processor.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_resource.h>
@@ -37,6 +39,9 @@ QnLayoutResourceOverlayWidget::QnLayoutResourceOverlayWidget(const QnVideoWallRe
 
     connect(m_videowall, &QnVideoWallResource::itemChanged, this, &QnLayoutResourceOverlayWidget::at_videoWall_itemChanged);
     connect(this, &QnClickableWidget::doubleClicked, this, &QnLayoutResourceOverlayWidget::at_doubleClicked);
+
+    m_dragProcessor = new DragProcessor(this);
+    m_dragProcessor->setHandler(this);
 
     m_hoverProcessor = new HoverFocusProcessor(this);
     m_hoverProcessor->addTargetItem(this);
@@ -176,13 +181,6 @@ void QnLayoutResourceOverlayWidget::dragMoveEvent(QGraphicsSceneDragDropEvent *e
     event->acceptProposedAction();
 }
 
-void QnLayoutResourceOverlayWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent *event) {
-//    if(m_dragged.resources.empty() && m_dragged.videoWallItems.empty())
-//        return;
-
-//    event->acceptProposedAction();
-}
-
 void QnLayoutResourceOverlayWidget::dropEvent(QGraphicsSceneDragDropEvent *event) {
 
     QnActionParameters parameters;
@@ -196,12 +194,24 @@ void QnLayoutResourceOverlayWidget::dropEvent(QGraphicsSceneDragDropEvent *event
     event->acceptProposedAction();
 }
 
-void QnLayoutResourceOverlayWidget::pressedNotify(QGraphicsSceneMouseEvent *event) {
-    if (event->type() == QEvent::GraphicsSceneMouseDoubleClick) {
-        //TODO #GDM VW: hack because we do not receive mouseReleaseEvent
-        emit doubleClicked(Qt::LeftButton);
-        return;
-    }
+void QnLayoutResourceOverlayWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+    base_type::mousePressEvent(event);
+    m_dragProcessor->mousePressEvent(this, event);
+}
+
+
+void QnLayoutResourceOverlayWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+    base_type::mouseMoveEvent(event);
+    m_dragProcessor->mouseMoveEvent(this, event);
+}
+
+void QnLayoutResourceOverlayWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+    base_type::mouseReleaseEvent(event);
+    m_dragProcessor->mouseReleaseEvent(this, event);
+}
+
+void QnLayoutResourceOverlayWidget::startDrag(DragInfo *info) {
+    Q_UNUSED(info)
 
     QDrag *drag = new QDrag(this);
     QMimeData *mimeData = new QMimeData();
@@ -211,6 +221,8 @@ void QnLayoutResourceOverlayWidget::pressedNotify(QGraphicsSceneMouseEvent *even
 
     drag->setMimeData(mimeData);
     drag->exec();
+
+    m_dragProcessor->reset();
 }
 
 void QnLayoutResourceOverlayWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
