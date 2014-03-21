@@ -31,11 +31,12 @@ Also EC machine no longer needs to be able to connect to each MS. In order for c
 14. A simple way to disable auto discovery: Added a new checkbox "Enable auto discovery" on "System settings -> Server"
 15. Added a possibility to resize resource tree panel.
 16. Added ability to calibrate fish-eye cameras. Calibration can be done automatically.
+17. Added ability to run client in configuration mode. This mode is activated automatically if the client is rum on a weak PC (in terms of CPU and/or video adapter). This mode is restricted (all animations are turned off, there are no notifications and only one video can be viewed in the same time)
 
 
 Improvements:
 1. Added more default cameras' passwords for auto-discovery.
-2. Fish eye flag is always available now. If enable "fish eye" flag, than PTZ is disabled for this camera.
+2. Fish eye flag is always available now. If enable "fish eye" flag, then PTZ is disabled for this camera.
 3. Added vendor name to "Camera settings" and "Cameras' list".
 4. Dewarping is improved. Added a new additional tab to adjust center and radius of the dewarping.
 5. A new DB is created, if installation fails due to failed migration DB.
@@ -50,30 +51,29 @@ Improvements:
     - All cameras that don't support I/O are highlighted in red.
     - Added tooltips with error description
     - "Once per" has been changed to "No more than once per"
-12. Added audio-support for some Acti cameras E-,D-, T-, K-, B-, I-series.
-13. Increased max fps up to 30 fps for http&rtsp plugin.
-14. Added a zoom combination "ALT+MW" to enable/disable mouse wheel zooming on scene.
-16. Incompatible auto-found ECs in the Login Dialog is highlighted and EC version is displayed.
-17. Added more informative messages on login gialog:
+12. Increased max fps up to 30 fps for http&rtsp plugin.
+13. Added a zoom combination "ALT+MW" to enable/disable mouse wheel zooming on scene.
+14. Incompatible auto-found ECs in the Login Dialog is highlighted and EC version is displayed.
+15. Added more informative messages on login dialog:
    - "You are trying to connect to incompatible Enterprise Controller.", If connect with different costomizations.
    - "Wrong user or password", If connect with incorrect password/login.
    - If connection cannot be established, than leave the old message.
-18. Improved license expiration warning message:
+16. Improved license expiration warning message:
    - Dialog "License Expiration"is displayed only for Administrator
    - Dialog "License Expiration" is displayed once per day per client place on 15, 10, 5, 3, 2, 1 day before license will be expired.
    - Dialog is displayed only once after license is expired.
-19. Changed default events accumulation time for default rules from "instant" to "30 second". It makes notification pannel much more useful.
-20. The last minute of archive displays differently.
-21. Introduced a setting in a software for video timeout:
+17. Changed default events accumulation time for default rules from "instant" to "30 second". It makes notification pannel much more useful.
+18. The last minute of archive displays differently.
+19. Introduced a setting in a software for video timeout:
     - Added checkbox "Auto pause video" on "System settings -> General"
     - if checkbox is on, video is paused if user does not move mouse. It saves traffic.
-22. Android. Added audio for rtsp transport (only for AAC encoding)
-23. Client only installer. Added parameter "Launch DW Spectrum when set up exist" at the last page.
-24. Screen shot makes always in HQ, even if taken while displaying LQ.
-25. Added a new button to open client log containing folder.
-26. Added a new action "Zoom to selection" to the timeline context menu.
+20. Android. Added audio for rtsp transport (only for AAC encoding)
+21. Client only installer. Added parameter "Launch DW Spectrum when set up exist" at the last page.
+22. Screen shot makes always in HQ, even if taken while displaying LQ.
+23. Added a new button to open client log containing folder.
+24. Added a new action "Zoom to selection" to the timeline context menu.
     If click on it, the selection has been zoomed. If there are no selection on timeline, "Zoom to selection" is not available.
-27. Ability to view client logs and clear cache.
+25. Ability to view client logs and clear cache.
     
 Bugs Fixed:
 1. Tray tool. Incorrect EC port in the list if it has been changed.Fixed.
@@ -107,13 +107,15 @@ Bugs Fixed:
 29. Axis encoder PTZ issues are resolved.
 
 Removed features:
-1.Hardware acceleration has been removed. 
+1. Hardware acceleration has been removed. 
 2. Panic recording buuton from front pannel has been removed.
 3. Analog license message has been removed (old analog licenses still can be activated).
+4. Capture Mode is removed from the Screen Recording settings. Right now only application window can be recorded.
 
 New cameras supported
 Arecont cameras: MegaBalls2 & MegaDomes2.
 Samsung caemras: SND-5061, SND-7061
+Added audio-support for some Acti cameras E-,D-, T-, K-, B-, I-series.
 
 ----------------------------------------------2.1.0.xxxx-------------------------------------------
 
