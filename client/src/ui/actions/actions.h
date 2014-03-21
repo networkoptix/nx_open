@@ -190,6 +190,11 @@ namespace Qn {
         StartVideoWallControlAction,
 
         /**
+         * Sets up desktop camera as a layout for all items in the provided QnVideoWallItemIndexList.
+         */
+        PushMyScreenToVideowallAction,
+
+        /**
          * Saves current videowall review layout.
          */
         SaveVideoWallReviewAction,

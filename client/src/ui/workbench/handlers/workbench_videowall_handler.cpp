@@ -1,6 +1,7 @@
 #include "workbench_videowall_handler.h"
 
 #include <QtCore/QProcess>
+#include <QtCore/QRegExp>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
@@ -12,6 +13,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
@@ -196,6 +198,8 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(action(Qn::OpenVideoWallsReviewAction),     &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered);
         connect(action(Qn::SaveVideoWallReviewAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered);
         connect(action(Qn::DropOnVideoWallItemAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered);
+        connect(action(Qn::PushMyScreenToVideowallAction),  &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered);
+
 
 
         connect(display(),     &QnWorkbenchDisplay::widgetAdded,                        this,   &QnWorkbenchVideoWallHandler::at_display_widgetAdded);
@@ -1369,6 +1373,39 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
         menu()->trigger(Qn::ResetVideoWallLayoutAction,
                         QnActionParameters(QnVideoWallItemIndexList() << index).withArgument(Qn::LayoutResourceRole, targetLayout));
 
+}
+
+void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
+    //TODO: #GDM VW move to action condition
+    if (!context()->user())
+        return;
+
+    // Desktop_camera_{e87e9b3d-facf-4870-abef-455861829ed3}_admin
+    //TODO: #GDM VW ask Roma to do some more stable way to find correct desktop camera
+    QRegExp desktopCameraNameRegExp(QString(lit("Desktop_camera_\\{.{36,36}\\}_%1")).arg(context()->user()->getName()));
+    QnVirtualCameraResourcePtr desktopCamera;
+
+    foreach (const QnResourcePtr &resource, qnResPool->getAllEnabledCameras()) {
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            continue;
+        qDebug() << camera->getPhysicalId();
+        if (!desktopCameraNameRegExp.exactMatch(camera->getPhysicalId()))
+            continue;
+        desktopCamera = camera;
+        break;
+    }
+    if (!desktopCamera)
+        return;
+
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnVideoWallItemIndexList videoWallItems = parameters.videoWallItems();
+
+    foreach (const QnVideoWallItemIndex &index, videoWallItems) {
+        parameters = QnActionParameters(desktopCamera);
+        parameters.setArgument(Qn::VideoWallItemGuidRole, index.uuid());
+        menu()->trigger(Qn::DropOnVideoWallItemAction, parameters);
+    }
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_saved(int status, const QnResourceList &resources, int handle) {

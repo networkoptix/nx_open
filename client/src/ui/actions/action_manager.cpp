@@ -440,9 +440,15 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Assign Screen to User"));
 
+    //TODO: #GDM VW check permissions
     factory(Qn::StartVideoWallControlAction).
-        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
+        flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         text(tr("Start Videowall control"));
+
+    //TODO: #GDM VW check permissions and destop camera availability
+    factory(Qn::PushMyScreenToVideowallAction).
+        flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
+        text(tr("Push my screen"));
 
     factory(Qn::QueueAppRestartAction).
         flags(Qn::NoTarget).
