@@ -91,12 +91,32 @@ Qn::RenderStatus QnVideowallResourceScreenWidget::paintChannelBackground(QPainte
         return Qn::NothingRendered;
 
     updateLayout();
-    painter->fillRect(paintRect, Qt::transparent);
+    painter->fillRect(paintRect, palette().color(QPalette::Window));
     return Qn::NewFrameRendered;
 }
 
 QnResourceWidget::Buttons QnVideowallResourceScreenWidget::calculateButtonsVisibility() const {
     return 0;
+}
+
+QString QnVideowallResourceScreenWidget::calculateTitleText() const {
+    QStringList pcUuids;
+    foreach (const QUuid &uuid, m_videowall->getPcs().keys())
+        pcUuids.append(uuid.toString());
+    pcUuids.sort(Qt::CaseInsensitive);
+    int idx = pcUuids.indexOf(m_pcUuid.toString());
+    if (idx < 0)
+        idx = 0;
+
+    QString base = tr("Pc %1").arg(idx);
+    if (m_screens.isEmpty())
+        return base;
+
+    QStringList screenIndices;
+    foreach (QnVideoWallPcData::PcScreen screen, m_screens)
+        screenIndices.append(QString::number(screen.index));
+
+    return tr("Pc %1 - Screens %2", "", m_screens.size()).arg(idx).arg(screenIndices.join(lit(" ,")));
 }
 
 void QnVideowallResourceScreenWidget::updateLayout() {
@@ -149,7 +169,6 @@ void QnVideowallResourceScreenWidget::updateLayout() {
         }
     } else if (m_items.size() == 1 ) {    // can have only on item on several screens
         QnLayoutResourceOverlayWidget *itemWidget = new QnLayoutResourceOverlayWidget(m_videowall, m_items.first().uuid, this);
-        itemWidget->setAcceptedMouseButtons(Qt::NoButton);
         m_mainLayout->addAnchors(itemWidget, m_mainLayout, Qt::Horizontal | Qt::Vertical);
     }
 

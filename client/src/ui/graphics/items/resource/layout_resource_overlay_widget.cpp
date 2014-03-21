@@ -157,12 +157,6 @@ void QnLayoutResourceOverlayWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *
             servers.push_back( res );
     }
 
-//    if (layouts.size() > 1)
-//        return;
-
-//    if (layouts.size() == 1 && (media.size() > 0 || servers.size() > 0))
-//        return;
-
     m_dragged.resources = media;
     m_dragged.resources << layouts;
     m_dragged.resources << servers;
@@ -206,9 +200,6 @@ void QnLayoutResourceOverlayWidget::mousePressEvent(QGraphicsSceneMouseEvent *ev
 
 void QnLayoutResourceOverlayWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     base_type::mouseMoveEvent(event);
-    if (event->button() != Qt::LeftButton)
-        return;
-
     m_dragProcessor->mouseMoveEvent(this, event);
 }
 
@@ -294,8 +285,6 @@ void QnLayoutResourceOverlayWidget::updateView() {
 
 void QnLayoutResourceOverlayWidget::updateInfo() {
     //TODO: #GDM VW update title text
-
-    qDebug() << "info updated";
 }
 
 void QnLayoutResourceOverlayWidget::paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data) {
