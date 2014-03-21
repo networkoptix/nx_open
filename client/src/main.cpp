@@ -344,7 +344,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&sVideoWallGuid,         "--videowall",                  NULL,   QString());
     commandLineParser.addParameter(&sVideoWallItemGuid,     "--videowall-instance",         NULL,   QString());
 
-    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
+    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
     initLog(logLevel);
 

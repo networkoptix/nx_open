@@ -30,7 +30,8 @@ Also EC machine no longer needs to be able to connect to each MS. In order for c
      Drop-Down List "Timestamps" is disabled for .exe format.
 14. A simple way to disable auto discovery: Added a new checkbox "Enable auto discovery" on "System settings -> Server"
 15. Added a possibility to resize resource tree panel.
-16. Added possibility to change client customization at startup time by passing a customization path
+16. Added ability to calibrate fish-eye cameras. Calibration can be done automatically.
+
 
 Improvements:
 1. Added more default cameras' passwords for auto-discovery.

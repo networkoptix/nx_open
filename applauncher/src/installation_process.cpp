@@ -318,6 +318,10 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
         return;
     }
 
+    QFileInfo fileInfo(m_installationDirectory);
+    if (fileInfo.exists() && !fileInfo.isDir()) // if there is a ghost file remove it
+        QFile::remove(fileInfo.absolutePath());
+
     if( !QDir().mkpath(m_installationDirectory) )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
