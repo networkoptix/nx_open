@@ -119,7 +119,7 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
         }
 
         QByteArray request;
-        request.append("POST /");
+        request.append("POST ");
         request.append(requestStr);
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");
