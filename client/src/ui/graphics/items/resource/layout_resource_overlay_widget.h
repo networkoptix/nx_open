@@ -37,6 +37,8 @@ protected:
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
     virtual void startDrag(DragInfo *info) override;
+
+    virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
 private:
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_doubleClicked(Qt::MouseButton button);
@@ -46,20 +48,28 @@ private:
     void updateInfo();
 
     void paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data);
-
 private:
     friend class QnVideowallResourceScreenWidget;
 
+    /** Parent widget */
     QnVideowallResourceScreenWidget* m_widget;
 
     DragProcessor *m_dragProcessor;
     HoverFocusProcessor* m_hoverProcessor;
 
+    /** Parent videowall resource. */
     const QnVideoWallResourcePtr m_videowall;
+
+    /** Uuid of the current screen instance. */
     const QUuid m_itemUuid;
 
+    /** Cached field to be used as action parameters source. */
+    const QnVideoWallItemIndexList m_indices;
+
+    /** Attached layout resource (if any). */
     QnLayoutResourcePtr m_layout;
 
+    /** Drag'n'drop support structure. */
     struct {
         QnResourceList resources;
         QnVideoWallItemIndexList videoWallItems;

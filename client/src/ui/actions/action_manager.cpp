@@ -861,7 +861,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnOpenInFolderActionCondition(this));
 
     factory(Qn::IdentifyVideoWallAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::VideoWallItemTarget).
+        flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::VideoWallItemTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission). //TODO: #GDM VW may be this action should be attached to the screens and require user permission?
         text(tr("Identify")).
         autoRepeat(false).

@@ -31,11 +31,12 @@ QnLayoutResourceOverlayWidget::QnLayoutResourceOverlayWidget(const QnVideoWallRe
     QnWorkbenchContextAware(parent),
     m_widget(parent),
     m_videowall(videowall),
-    m_itemUuid(itemUuid)
+    m_itemUuid(itemUuid),
+    m_indices(QnVideoWallItemIndexList() << QnVideoWallItemIndex(m_videowall, m_itemUuid))
 {
     setAcceptDrops(true);
-    setAcceptedMouseButtons(Qt::LeftButton);
-    setClickableButtons(Qt::LeftButton);
+    setAcceptedMouseButtons(Qt::LeftButton | Qt::RightButton);
+    setClickableButtons(Qt::LeftButton | Qt::RightButton);
 
     connect(m_videowall, &QnVideoWallResource::itemChanged, this, &QnLayoutResourceOverlayWidget::at_videoWall_itemChanged);
     connect(this, &QnClickableWidget::doubleClicked, this, &QnLayoutResourceOverlayWidget::at_doubleClicked);
@@ -196,17 +197,26 @@ void QnLayoutResourceOverlayWidget::dropEvent(QGraphicsSceneDragDropEvent *event
 
 void QnLayoutResourceOverlayWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     base_type::mousePressEvent(event);
+    if (event->button() != Qt::LeftButton)
+        return;
+
     m_dragProcessor->mousePressEvent(this, event);
 }
 
 
 void QnLayoutResourceOverlayWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     base_type::mouseMoveEvent(event);
+    if (event->button() != Qt::LeftButton)
+        return;
+
     m_dragProcessor->mouseMoveEvent(this, event);
 }
 
 void QnLayoutResourceOverlayWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     base_type::mouseReleaseEvent(event);
+    if (event->button() != Qt::LeftButton)
+        return;
+
     m_dragProcessor->mouseReleaseEvent(this, event);
 }
 
@@ -225,6 +235,17 @@ void QnLayoutResourceOverlayWidget::startDrag(DragInfo *info) {
     m_dragProcessor->reset();
 }
 
+void QnLayoutResourceOverlayWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
+    if (event->button() != Qt::RightButton)
+        return;
+
+    QScopedPointer<QMenu> popupMenu(menu()->newMenu(Qn::SceneScope, mainWindow(), QnActionParameters(m_indices)));
+    if(popupMenu->isEmpty())
+        return;
+
+    popupMenu->exec(event->screenPos());
+}
+
 void QnLayoutResourceOverlayWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     Q_UNUSED(videoWall)
     if (item.uuid != m_itemUuid)
@@ -234,10 +255,12 @@ void QnLayoutResourceOverlayWidget::at_videoWall_itemChanged(const QnVideoWallRe
 }
 
 void QnLayoutResourceOverlayWidget::at_doubleClicked(Qt::MouseButton button) {
-    Q_UNUSED(button)
+    if (button != Qt::LeftButton)
+        return;
+
     menu()->trigger(
         Qn::StartVideoWallControlAction,
-        QnActionParameters(QnVideoWallItemIndexList() << QnVideoWallItemIndex(m_videowall, m_itemUuid))
+        QnActionParameters(m_indices)
     );
 }
 
