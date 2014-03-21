@@ -2186,7 +2186,13 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
             cam->setGroupName(name);
             modified << cam;
         }
-        connection()->saveAsync(modified, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+        connection2()->getCameraManager()->save(modified, this, 
+            [this, modified]( int reqID, ec2::ErrorCode errorCode ) {
+                at_resources_saved( reqID, errorCode, modified );
+            } );
+
+
+
     } else {
         resource->setName(name);
         connection2()->getResourceManager()->save( resource, this,
