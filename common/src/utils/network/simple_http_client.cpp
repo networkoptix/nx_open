@@ -98,12 +98,12 @@ void CLSimpleHTTPClient::addHeader(const QByteArray& key, const QByteArray& valu
     m_additionHeaders[key] = value;
 }
 
-CLHttpStatus CLSimpleHTTPClient::doPOST(const QString& requestStr, const QString& body)
+CLHttpStatus CLSimpleHTTPClient::doPOST(const QString& requestStr, const QString& body, bool recursive)
 {
-    return doPOST(requestStr.toUtf8(), body);
+    return doPOST(requestStr.toUtf8(), body, recursive);
 }
 
-CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QString& body)
+CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QString& body, bool recursive)
 {
     if (!m_sock)
         return CL_TRANSPORT_ERROR;
@@ -178,7 +178,10 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
             case CL_HTTP_AUTH_REQUIRED:
             {
                 getAuthInfo();
-                return CL_HTTP_AUTH_REQUIRED;
+                if (recursive)
+                    return doGET(requestStr, false);
+                else
+                    return CL_HTTP_AUTH_REQUIRED;
             }
 
             default:
