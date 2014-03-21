@@ -310,7 +310,7 @@ bool ApplauncherProcess::startApplication(
         task->appArgs += QString::fromLatin1(" ") + m_settings->value( NON_RECENT_VERSION_ARGS_PARAM_NAME, NON_RECENT_VERSION_ARGS_DEFAULT_VALUE ).toString();
 
         if (!appData.verifyInstallation()) {
-            NX_LOG( QString::fromLatin1("Verification failed for version %1 (path %2)").arg(appData.version()).arg(appData.rootPath()), cl_logDEBUG1 );
+            NX_LOG( QString::fromLatin1("Verification failed for version %1 (path %2)").arg(appData.version().toString(QnSoftwareVersion::MinorFormat)).arg(appData.rootPath()), cl_logDEBUG1 );
             response->result = applauncher::api::ResultType::ioError;
 
             if( task->autoRestore )
@@ -327,7 +327,7 @@ bool ApplauncherProcess::startApplication(
 
     //TODO/IMPL start process asynchronously ?
 
-    const QString binPath = appData.executablePath();
+    const QString binPath = appData.executableFilePath();
 
     QStringList environment = QProcess::systemEnvironment();
 #ifdef Q_OS_LINUX
@@ -537,7 +537,6 @@ void ApplauncherProcess::onInstallationDone( InstallationProcess* installationPr
     if( installationProcess->getStatus() == applauncher::api::InstallationStatus::success )
     {
         m_installationManager->updateInstalledVersionsInformation();
-        m_installationManager->createLatestVersionGhostForVersion(installationProcess->getVersion());
         if( installationProcess->autoStartNeeded() )
         {
             applauncher::api::Response response;
