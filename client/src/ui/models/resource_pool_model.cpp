@@ -399,55 +399,13 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         node = node->parent(); /* Dropping into a server item is the same as dropping into a server */
 
     if (node->type() == Qn::VideoWallItemNode) {
-        QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(node->uuid());
-
-        if (index.isNull())
-            return true;
-
-        // layout that is already attached to this screen (if any)
-        QnVideoWallItem item = index.videowall()->getItem(node->uuid());
-
-        QnLayoutResourcePtr layout = item.layout.isValid()
-                ? qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>()
-                : QnLayoutResourcePtr();
-
-        // index for actions
-        QnVideoWallItemIndexList indexes;
-        indexes << index;
-
-        // dropping resources
-        QnResourceList medias;
-        foreach( QnResourcePtr res, resources )
-        {
-            if(res.dynamicCast<QnMediaResource>())
-                medias << res;
-        }
-
-        //TODO: #GDM VW make the same way as in QnLayoutResourceOverlayWidget
-        //dropping layouts
-        QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
-
-        if (medias.size() > 0) {
-            if (layout) {
-                menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutResourceRole, layout));
-            }
-            else {
-                //TODO: #GDM VW combine into single action
-                menu()->trigger(Qn::OpenNewTabAction);
-                menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(medias));
-                menu()->trigger(Qn::ResetVideoWallLayoutAction, QnActionParameters(indexes));
-            }
-        }
-        else if (layouts.size() == 1) {
-            menu()->trigger(Qn::ResetVideoWallLayoutAction, QnActionParameters(indexes).withArgument(Qn::LayoutResourceRole, layouts.first()));
-        } else if (mimeData->hasFormat(QnVideoWallItem::mimeType())) {
-            QList<QUuid> videoWallItemUuids = QnVideoWallItem::deserializeUuids(mimeData);
-            if (!videoWallItemUuids.isEmpty()) {
-                item.layout = index.videowall()->getItem(videoWallItemUuids.first()).layout;
-                index.videowall()->updateItem(index.uuid(), item);
-                //TODO: #GDM do through action to save the videowall at once
-            }
-        }
+        QnActionParameters parameters;
+        if (mimeData->hasFormat(QnVideoWallItem::mimeType()))
+            parameters = QnActionParameters(qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData)));
+        else
+            parameters = QnActionParameters(resources);
+        parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
+        menu()->trigger(Qn::DropOnVideoWallItemAction, parameters);
     } else 
     if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
         QnResourceList medias;

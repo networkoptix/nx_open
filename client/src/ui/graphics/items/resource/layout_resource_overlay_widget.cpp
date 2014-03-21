@@ -185,24 +185,13 @@ void QnLayoutResourceOverlayWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent *
 
 void QnLayoutResourceOverlayWidget::dropEvent(QGraphicsSceneDragDropEvent *event) {
 
-    //TODO: #GDM VW permissions check
-    QnLayoutResourceList layouts = m_dragged.resources.filtered<QnLayoutResource>();
-
-    QnVideoWallItemIndexList indexes;
-    indexes << QnVideoWallItemIndex(m_videowall, m_itemUuid);
-
-    if (!m_dragged.videoWallItems.isEmpty()) {
-        QnVideoWallItemIndex idx = m_dragged.videoWallItems.first();
-        QnVideoWallItem item = m_videowall->getItem(m_itemUuid);
-        item.layout = idx.videowall()->getItem(idx.uuid()).layout;
-        m_videowall->updateItem(m_itemUuid, item);
-        //TODO: #GDM do through action to save the videowall at once
-    } else if (!layouts.isEmpty()) {
-        //TODO: #GDM VW combine layouts?
-        menu()->trigger(Qn::ResetVideoWallLayoutAction, QnActionParameters(indexes).withArgument(Qn::LayoutResourceRole, layouts.first()));
-    } else {
-        //TODO: #GDM VW create a layout
-    }
+    QnActionParameters parameters;
+    if (!m_dragged.videoWallItems.isEmpty())
+        parameters = QnActionParameters(m_dragged.videoWallItems);
+    else
+        parameters = QnActionParameters(m_dragged.resources);
+    parameters.setArgument(Qn::VideoWallItemGuidRole, m_itemUuid);
+    menu()->trigger(Qn::DropOnVideoWallItemAction, parameters);
 
     event->acceptProposedAction();
 }

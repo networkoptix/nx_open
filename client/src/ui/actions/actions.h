@@ -195,6 +195,12 @@ namespace Qn {
         SaveVideoWallReviewAction,
 
         /**
+         * Handles resources drop on the selected videowall item.
+         */
+        DropOnVideoWallItemAction,
+
+
+        /**
          * Tries to restart the application as soon as all modal dialogs are closed.
          * Parameters:
          * <tt>QnSoftwareVersion  SoftwareVersionRole</tt>  --- application version that should be started.

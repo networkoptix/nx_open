@@ -612,6 +612,10 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnVideoWallReviewModeCondition(false, this));
 
+    factory(Qn::DropOnVideoWallItemAction).
+        flags(Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::LayoutTarget | Qn::VideoWallItemTarget | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Drop Resources"));
+
     factory().
         flags(Qn::Main).
         separator();

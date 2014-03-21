@@ -51,6 +51,8 @@ private:
     QnVideoWallItemIndexList targetList() const;
 
     QnWorkbenchLayout* findReviewModeLayout(const QnVideoWallResourcePtr &videoWall) const;
+    QnLayoutResourcePtr findExistingResourceLayout(const QnResourcePtr &resource) const;
+    QnLayoutResourcePtr constructLayout(const QnResourceList &resources) const;
 
 private slots:
     void at_connection_opened();
@@ -70,6 +72,7 @@ private slots:
     void at_startVideoWallControlAction_triggered();
     void at_openVideoWallsReviewAction_triggered();
     void at_saveVideoWallReviewAction_triggered();
+    void at_dropOnVideoWallItemAction_triggered();
 
     void at_videoWall_saved(int status, const QnResourceList &resources, int handle);
     void at_videoWall_layout_saved(int status, const QnResourceList &resources, int handle);
