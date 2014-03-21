@@ -443,7 +443,9 @@ void QnMainWindow::toggleTitleVisibility() {
 void QnMainWindow::handleMessage(const QString &message) {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     
-    menu()->trigger(Qn::DropResourcesAction, QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files)));
+    QnResourceList resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files));
+    if (!resources.isEmpty())
+        menu()->trigger(Qn::DropResourcesAction, resources);
 }
 
 QnMainWindow::Options QnMainWindow::options() const {
