@@ -625,6 +625,9 @@ bool QnResourceWidget::isInfoVisible() const {
 }
 
 void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
+    if (isInfoVisible() == visible)
+        return;
+
     setOption(DisplayInfo, visible);
 
     qreal opacity = visible ? 1.0 : 0.0;
