@@ -131,6 +131,7 @@ namespace {
         else
             itemData.flags = Qn::PendingGeometryAdjustment;
         itemData.resource.id = videoWall->getId();
+        itemData.resource.path = videoWall->getUniqueId();
         itemData.dataByRole[Qn::VideoWallPcGuidRole] = qVariantFromValue<QUuid>(pc.uuid);
         itemData.dataByRole[Qn::VideoWallPcScreenIndicesRole] = qVariantFromValue<QList<int> >(screens);
         layout->addItem(itemData);
