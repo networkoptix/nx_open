@@ -198,6 +198,14 @@
         "palette": { "default": { "window": "black" } }
     },
     
+    "QnVideowallResourceScreenWidget": {
+        "palette": { "default": { "window": "#000000ff" } }
+    },
+    
+    "QnLayoutResourceOverlayWidget": {
+        "palette": { "default": { "window": "#000000ff" } }
+    },
+    
     "ZoomWindowInstrument": {
         "colors": ["#c02020", "#20c020", "#4040ff"]
     },
