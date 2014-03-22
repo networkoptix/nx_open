@@ -55,6 +55,15 @@ QnLayoutResourceOverlayWidget::QnLayoutResourceOverlayWidget(const QnVideoWallRe
     updateInfo();
 }
 
+const QnResourceWidgetFrameColors &QnLayoutResourceOverlayWidget::frameColors() const {
+    return m_frameColors;
+}
+
+void QnLayoutResourceOverlayWidget::setFrameColors(const QnResourceWidgetFrameColors &frameColors) {
+    m_frameColors = frameColors;
+    update();
+}
+
 
 void QnLayoutResourceOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(widget)
@@ -63,14 +72,8 @@ void QnLayoutResourceOverlayWidget::paint(QPainter *painter, const QStyleOptionG
         return;
 
     qreal offset = qMin(paintRect.width(), paintRect.height()) * 0.02;
-    painter->fillRect(paintRect, Qt::black);
-    paintRect.adjust(offset, offset, -offset, -offset);
-    if (m_hoverProcessor->isHovered())
-        painter->fillRect(paintRect, Qt::blue);
-    else
-        painter->fillRect(paintRect, Qt::lightGray);
-    paintRect.adjust(offset, offset, -offset, -offset);
-    painter->fillRect(paintRect, Qt::black);
+    paintRect.adjust(offset*2, offset*2, -offset*2, -offset*2);
+    painter->fillRect(paintRect, palette().color(QPalette::Window));
 
     if (!m_layout) {
         //TODO #GDM VW add status overlay widgets
@@ -111,12 +114,6 @@ void QnLayoutResourceOverlayWidget::paint(QPainter *painter, const QStyleOptionG
             xoffset = (paintRect.width() - w) * 0.5 + paintRect.left();
         }
 
-#ifdef RECT_DEBUG
-        QPen pen(Qt::red);
-        pen.setWidth(15);
-        painter->setPen(pen);
-#endif
-
         foreach (const QnLayoutItemData &data, m_layout->getItems()) {
             QRectF itemRect = data.combinedGeometry;
             if (!itemRect.isValid())
@@ -129,11 +126,47 @@ void QnLayoutResourceOverlayWidget::paint(QPainter *painter, const QStyleOptionG
             qreal h1 = (itemRect.height() - yspace*2) * yscale;
 
             paintItem(painter, QRectF(x1, y1, w1, h1), data);
-#ifdef RECT_DEBUG
-            painter->drawRect(QRectF(x1, y1, w1, h1));
-#endif
         }
     }
+
+    paintFrame(painter, paintRect);
+}
+
+void QnLayoutResourceOverlayWidget::paintFrame(QPainter *painter, const QRectF &paintRect) {
+    if (!paintRect.isValid())
+        return;
+
+    qreal offset = qMin(paintRect.width(), paintRect.height()) * 0.02;
+//    painter->fillRect(paintRect, Qt::black);
+//    paintRect.adjust(offset, offset, -offset, -offset);
+//    if (m_hoverProcessor->isHovered())
+//        painter->fillRect(paintRect, m_frameColors.selected);
+//    else
+//        painter->fillRect(paintRect, m_frameColors.normal);
+
+    qreal m_frameOpacity = 1.0;
+    qreal m_frameWidth = offset;
+
+    QColor color;
+    if(m_hoverProcessor->isHovered())
+        color = m_frameColors.selected;
+    else
+        color = m_frameColors.normal;
+
+    QSizeF size = paintRect.size();
+    qreal w = size.width();
+    qreal h = size.height();
+    qreal fw = m_frameWidth;
+    qreal x = paintRect.x();
+    qreal y = paintRect.y();
+
+    QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
+    painter->fillRect(QRectF(x - fw,    y - fw,  w + fw * 2,  fw), color);
+    painter->fillRect(QRectF(x - fw,    y + h,   w + fw * 2,  fw), color);
+    painter->fillRect(QRectF(x - fw,    y,       fw,          h),  color);
+    painter->fillRect(QRectF(x + w,     y,       fw,          h),  color);
+
 }
 
 void QnLayoutResourceOverlayWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event) {

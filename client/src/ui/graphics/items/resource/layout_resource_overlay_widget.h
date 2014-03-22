@@ -1,6 +1,8 @@
 #ifndef LAYOUT_RESOURCE_OVERLAY_WIDGET_H
 #define LAYOUT_RESOURCE_OVERLAY_WIDGET_H
 
+#include <client/client_color_types.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/layout_item_data.h>
@@ -22,11 +24,17 @@ class QnLayoutResourceOverlayWidget : public Connective<QnClickableWidget>, prot
     typedef Connective<QnClickableWidget> base_type;
     Q_OBJECT
 
+    Q_PROPERTY(QnResourceWidgetFrameColors frameColors READ frameColors WRITE setFrameColors)
+
 public:
     explicit QnLayoutResourceOverlayWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallResourceScreenWidget *parent, Qt::WindowFlags windowFlags = 0);
 
+    const QnResourceWidgetFrameColors &frameColors() const;
+    void setFrameColors(const QnResourceWidgetFrameColors &frameColors);
+
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual void paintFrame(QPainter *painter, const QRectF &paintRect);
 
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event) override;
     virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event) override;
@@ -74,6 +82,8 @@ private:
         QnResourceList resources;
         QnVideoWallItemIndexList videoWallItems;
     } m_dragged;
+
+    QnResourceWidgetFrameColors m_frameColors;
 };
 
 #endif // LAYOUT_RESOURCE_OVERLAY_WIDGET_H

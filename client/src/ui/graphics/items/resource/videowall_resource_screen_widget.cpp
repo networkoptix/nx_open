@@ -145,6 +145,7 @@ void QnVideowallResourceScreenWidget::updateLayout() {
     if (m_screens.size() == 1) {
         foreach (const QnVideoWallItem &item, m_items) {
             QnLayoutResourceOverlayWidget *itemWidget = new QnLayoutResourceOverlayWidget(m_videowall, item.uuid, this);
+            itemWidget->setFrameColors(frameColors());
 
             if (item.geometry.left() == m_desktopGeometry.left())
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorLeft, m_mainLayout, Qt::AnchorLeft);
@@ -169,6 +170,8 @@ void QnVideowallResourceScreenWidget::updateLayout() {
         }
     } else if (m_items.size() == 1 ) {    // can have only on item on several screens
         QnLayoutResourceOverlayWidget *itemWidget = new QnLayoutResourceOverlayWidget(m_videowall, m_items.first().uuid, this);
+        itemWidget->setFrameColors(frameColors());
+
         m_mainLayout->addAnchors(itemWidget, m_mainLayout, Qt::Horizontal | Qt::Vertical);
     }
 
