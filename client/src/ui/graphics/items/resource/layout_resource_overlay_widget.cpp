@@ -17,14 +17,33 @@
 #include <core/resource/videowall_resource.h>
 
 #include <ui/actions/action_manager.h>
+#include <ui/animation/variant_animator.h>
 #include <ui/graphics/items/resource/videowall_resource_screen_widget.h>
+#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/drop_instrument.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/processors/hover_processor.h>
+#include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_resource.h>
 
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/math/linear_combination.h>
+
+class QnLayoutResourceOverlayWidgetHoverProgressAccessor: public AbstractAccessor {
+    virtual QVariant get(const QObject *object) const override {
+        return static_cast<const QnLayoutResourceOverlayWidget *>(object)->m_hoverProgress;
+    }
+
+    virtual void set(QObject *object, const QVariant &value) const override {
+        QnLayoutResourceOverlayWidget *widget = static_cast<QnLayoutResourceOverlayWidget *>(object);
+        if(qFuzzyCompare(widget->m_hoverProgress, value.toReal()))
+            return;
+
+        widget->m_hoverProgress = value.toReal();
+        widget->update();
+    }
+};
 
 QnLayoutResourceOverlayWidget::QnLayoutResourceOverlayWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallResourceScreenWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
@@ -32,7 +51,8 @@ QnLayoutResourceOverlayWidget::QnLayoutResourceOverlayWidget(const QnVideoWallRe
     m_widget(parent),
     m_videowall(videowall),
     m_itemUuid(itemUuid),
-    m_indices(QnVideoWallItemIndexList() << QnVideoWallItemIndex(m_videowall, m_itemUuid))
+    m_indices(QnVideoWallItemIndexList() << QnVideoWallItemIndex(m_videowall, m_itemUuid)),
+    m_hoverProgress(0.0)
 {
     setAcceptDrops(true);
     setAcceptedMouseButtons(Qt::LeftButton | Qt::RightButton);
@@ -44,12 +64,18 @@ QnLayoutResourceOverlayWidget::QnLayoutResourceOverlayWidget(const QnVideoWallRe
     m_dragProcessor = new DragProcessor(this);
     m_dragProcessor->setHandler(this);
 
+    m_frameColorAnimator = new VariantAnimator(this);
+    m_frameColorAnimator->setTargetObject(this);
+    m_frameColorAnimator->setAccessor(new QnLayoutResourceOverlayWidgetHoverProgressAccessor());
+    m_frameColorAnimator->setSpeed(1000.0 / qnGlobals->opacityChangePeriod());
+    m_frameColorAnimator->setTimer(InstrumentManager::animationTimer(scene()));
+
     m_hoverProcessor = new HoverFocusProcessor(this);
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->setHoverEnterDelay(50);
     m_hoverProcessor->setHoverLeaveDelay(50);
-    connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered, this, &QnLayoutResourceOverlayWidget::updateView);
-    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this, &QnLayoutResourceOverlayWidget::updateView);
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered,   this, [&](){ m_frameColorAnimator->animateTo(1.0); });
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft,      this, [&](){ m_frameColorAnimator->animateTo(0.0); });
 
     updateLayout();
     updateInfo();
@@ -137,25 +163,13 @@ void QnLayoutResourceOverlayWidget::paintFrame(QPainter *painter, const QRectF &
         return;
 
     qreal offset = qMin(paintRect.width(), paintRect.height()) * 0.02;
-//    painter->fillRect(paintRect, Qt::black);
-//    paintRect.adjust(offset, offset, -offset, -offset);
-//    if (m_hoverProcessor->isHovered())
-//        painter->fillRect(paintRect, m_frameColors.selected);
-//    else
-//        painter->fillRect(paintRect, m_frameColors.normal);
-
     qreal m_frameOpacity = 1.0;
     qreal m_frameWidth = offset;
 
-    QColor color;
-    if(m_hoverProcessor->isHovered())
-        color = m_frameColors.selected;
-    else
-        color = m_frameColors.normal;
+    QColor color = linearCombine(m_hoverProgress, m_frameColors.selected, 1 - m_hoverProgress, m_frameColors.normal);
 
-    QSizeF size = paintRect.size();
-    qreal w = size.width();
-    qreal h = size.height();
+    qreal w = paintRect.width();
+    qreal h = paintRect.height();
     qreal fw = m_frameWidth;
     qreal x = paintRect.x();
     qreal y = paintRect.y();
@@ -206,7 +220,12 @@ void QnLayoutResourceOverlayWidget::dragMoveEvent(QGraphicsSceneDragDropEvent *e
     if(m_dragged.resources.empty() && m_dragged.videoWallItems.empty())
         return;
 
+    m_hoverProcessor->forceHoverEnter();
     event->acceptProposedAction();
+}
+
+void QnLayoutResourceOverlayWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent *event) {
+    m_hoverProcessor->forceHoverLeave();
 }
 
 void QnLayoutResourceOverlayWidget::dropEvent(QGraphicsSceneDragDropEvent *event) {

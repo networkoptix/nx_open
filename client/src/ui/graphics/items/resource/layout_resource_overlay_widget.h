@@ -19,6 +19,7 @@
 class DragProcessor;
 class HoverFocusProcessor;
 class QnVideowallResourceScreenWidget;
+class VariantAnimator;
 
 class QnLayoutResourceOverlayWidget : public Connective<QnClickableWidget>, protected DragProcessHandler, public QnWorkbenchContextAware {
     typedef Connective<QnClickableWidget> base_type;
@@ -38,6 +39,7 @@ protected:
 
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event) override;
     virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event) override;
+    virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event) override;
     virtual void dropEvent(QGraphicsSceneDragDropEvent *event) override;
 
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -58,6 +60,7 @@ private:
     void paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data);
 private:
     friend class QnVideowallResourceScreenWidget;
+    friend class QnLayoutResourceOverlayWidgetHoverProgressAccessor;
 
     /** Parent widget */
     QnVideowallResourceScreenWidget* m_widget;
@@ -84,6 +87,9 @@ private:
     } m_dragged;
 
     QnResourceWidgetFrameColors m_frameColors;
+
+    VariantAnimator* m_frameColorAnimator;
+    qreal m_hoverProgress;
 };
 
 #endif // LAYOUT_RESOURCE_OVERLAY_WIDGET_H
