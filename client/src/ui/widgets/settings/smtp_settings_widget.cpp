@@ -321,21 +321,19 @@ void QnSmtpSettingsWidget::at_okTestButton_clicked() {
                                        : SimplePage);
 }
 
-void QnSmtpSettingsWidget::at_settings_received( int handle, ec2::ErrorCode errorCode, const QnKvPairList& values ) {
+void QnSmtpSettingsWidget::at_settings_received( int handle, ec2::ErrorCode errorCode, const QnEmail::Settings& settings) {
     if (handle != m_requestHandle)
         return;
 
-    m_requestHandle = -1;
-    context()->instance<QnWorkbenchNotificationsHandler>()->updateSmtpSettings(handle, errorCode, values);
-
-    bool success = (errorCode == ec2::ErrorCode::ok);
-    if(!success) {
+    if(errorCode != ec2::ErrorCode::ok) {
         QMessageBox::critical(this, tr("Error"), tr("Could not read settings from Enterprise Controller."));
         m_settingsReceived = true;
         return;
     }
 
-    QnEmail::Settings settings(values);
+    m_requestHandle = -1;
+    context()->instance<QnWorkbenchNotificationsHandler>()->updateSmtpSettings(handle, errorCode, settings);
+
     loadSettings(settings.server, settings.connectionType, settings.port);
     ui->userLineEdit->setText(settings.user);
     ui->simpleEmailLineEdit->setText(settings.user);

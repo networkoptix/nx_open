@@ -110,7 +110,7 @@ LIBS += -L$$EVETOOLS_DIR/lib
 PROTOC_FILE = $$EVETOOLS_DIR/bin/protoc
 
 unix {
-    LIBS += -lprotobuf -L/usr/lib
+    LIBS += -L/usr/lib
     QMAKE_CXXFLAGS += -I$$/usr/include
     PROTOC_FILE = /usr/bin/protoc
 }

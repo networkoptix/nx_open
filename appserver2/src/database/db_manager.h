@@ -24,11 +24,11 @@ namespace ec2
     class QnDbManager: public QnDbHelper
     {
     public:
-		QnDbManager(
+        QnDbManager(
             QnResourceFactory* factory,
             LicenseManagerImpl* const licenseManagerImpl,
             const QString& dbFileName );
-		virtual ~QnDbManager();
+        virtual ~QnDbManager();
 
         bool init();
 
@@ -48,7 +48,7 @@ namespace ec2
         }
 
 
-		// --------- get methods ---------------------
+        // --------- get methods ---------------------
 
         template <class T1, class T2>
         ErrorCode doQuery(const T1& t1, T2& t2)
@@ -66,7 +66,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileData& data);
 
         //getResourceTypes
-		ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeList& resourceTypeList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeList& resourceTypeList);
 
         //getCameras
         ErrorCode doQueryNoLock(const QnId& mServerId, ApiCameraDataList& cameraList);
@@ -132,6 +132,14 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicense>& tran);
 
 
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiEmailSettingsData>&) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiEmailData>&) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiFullData>&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
@@ -146,7 +154,7 @@ namespace ec2
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
         ErrorCode updateResource(const ApiResourceData& data, qint32 internalId);
-		ErrorCode insertResource(const ApiResourceData& data, qint32* internalId);
+        ErrorCode insertResource(const ApiResourceData& data, qint32* internalId);
         ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
         //ErrorCode insertOrReplaceResource(const ApiResourceData& data);
         ErrorCode deleteResourceTable(const qint32 id);
@@ -185,7 +193,7 @@ namespace ec2
 
         ErrorCode saveLicense(const ApiLicense& license);
 
-		bool createDatabase();
+        bool createDatabase();
         
         void mergeRuleResource(QSqlQuery& query, ApiBusinessRuleDataList& data, std::vector<qint32> ApiBusinessRuleData::*resList);
 
@@ -197,7 +205,7 @@ namespace ec2
         bool updateGuids();
         QnId getType(const QString& typeName);
     private:
-		QnResourceFactory* m_resourceFactory;
+        QnResourceFactory* m_resourceFactory;
         LicenseManagerImpl* const m_licenseManagerImpl;
         QnId m_storageTypeId;
         QnId m_serverTypeId;

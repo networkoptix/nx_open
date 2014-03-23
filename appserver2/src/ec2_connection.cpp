@@ -19,11 +19,23 @@ namespace ec2
             resCtx.resFactory,
             &m_licenseManagerImpl,
             dbFilePath) ),
+        m_auxManager(new QnAuxManager(&m_emailManagerImpl)),
         m_transactionLog( new QnTransactionLog(m_dbManager.get() )),
         m_connectionInfo( connectionInfo )
     {
         m_dbManager->init();
         m_transactionLog->init();
+
+        QString from;
+
+        ApiParamList paramList;
+        m_dbManager->doQueryNoLock(nullptr, paramList);
+
+        QnKvPairList kvPairs;
+        paramList.toResourceList(kvPairs);
+        QnEmail::Settings settings(kvPairs);
+
+        m_emailManagerImpl.configure(settings, "ivigasin@gmail.com");
         QnTransactionMessageBus::instance()->setHandler(this);
     }
 

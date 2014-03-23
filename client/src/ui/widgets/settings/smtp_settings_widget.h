@@ -41,7 +41,7 @@ private slots:
 
     void at_timer_timeout();
 
-    void at_settings_received( int handle, ec2::ErrorCode errorCode, const QnKvPairList& values );
+    void at_settings_received( int handle, ec2::ErrorCode errorCode, const QnEmail::Settings& settings );
 
     void at_finishedTestEmailSettings(int handle, ec2::ErrorCode errorCode);
 
