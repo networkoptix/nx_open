@@ -447,7 +447,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     QnPartialInfo partialInfo(action->getRuntimeParams().getEventType());
 
     assert(!partialInfo.attrName.isEmpty());
-    contextMap[partialInfo.attrName] = lit("true");
+//    contextMap[partialInfo.attrName] = lit("true");
 
     QnEmailAttachmentList attachments;
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
@@ -470,7 +470,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
         }
     }
 
-    QString messageBody = renderTemplateFromFile(lit(":/email_templates"), lit("container.mustache"), contextMap);
+    QString messageBody = renderTemplateFromFile(lit(":/email_templates"), partialInfo.attrName + lit(".mustache"), contextMap);
 
     if (QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->sendEmail(
                 ec2::ApiEmailData(recipients,
