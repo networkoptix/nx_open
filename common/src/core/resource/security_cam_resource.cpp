@@ -232,21 +232,21 @@ bool QnSecurityCamResource::hasDualStreaming() const {
     QVariant val;
     if (!getParam(lit("hasDualStreaming"), val, QnDomainMemory))
         return false;
-    return val.toInt();
+    return val.toBool();
 }
 
 bool QnSecurityCamResource::isDtsBased() const {
     QVariant val;
     if (!getParam(lit("dts"), val, QnDomainMemory))
         return false;
-    return val.toInt();
+    return val.toBool();
 }
 
 bool QnSecurityCamResource::isAnalog() const {
     QVariant val;
     if (!getParam(lit("analog"), val, QnDomainMemory))
         return false;
-    return val.toInt();
+    return val.toBool();
 }
 
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {
