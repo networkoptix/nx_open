@@ -547,7 +547,7 @@ void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient
 {
     QMutexLocker lock(&m_mutex);
     m_removeUrls.insert(url, RemoveUrlConnectInfo(isClient));
-    QTimer::singleShot(0, this, SLOT(doPeriodicTasks));
+    QTimer::singleShot(0, this, SLOT(doPeriodicTasks()));
 }
 
 void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
