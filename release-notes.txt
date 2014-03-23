@@ -55,7 +55,7 @@ Improvements:
 13. Added a zoom combination "ALT+MW" to enable/disable mouse wheel zooming on scene.
 14. Incompatible auto-found ECs in the Login Dialog is highlighted and EC version is displayed.
 15. Added more informative messages on login dialog:
-   - "You are trying to connect to incompatible Enterprise Controller.", If connect with different costomizations.
+   - "You are trying to connect to incompatible Enterprise Controller.", If connect with different customizations.
    - "Wrong user or password", If connect with incorrect password/login.
    - If connection cannot be established, than leave the old message.
 16. Improved license expiration warning message:
