@@ -348,7 +348,7 @@ bool QnPlOnvifResource::hasDualStreaming() const
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
     this_casted->getParam(DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toInt();
+    return mediaVariant.toBool();
 }
 
 const QSize QnPlOnvifResource::getVideoSourceSize() const

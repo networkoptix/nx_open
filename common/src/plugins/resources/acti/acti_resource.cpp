@@ -543,7 +543,7 @@ bool QnActiResource::hasDualStreaming() const
     QVariant mediaVariant;
     QnActiResource* this_casted = const_cast<QnActiResource*>(this);
     this_casted->getParam(DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toInt();
+    return mediaVariant.toBool();
 }
 
 QnAbstractPtzController *QnActiResource::createPtzControllerInternal()
