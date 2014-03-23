@@ -709,7 +709,8 @@ namespace nx_http
         const BufferType& ha1 = md5HashCalc.result().toHex();
         //HA2, qop=auth-int is not supported
         md5HashCalc.reset();
-        md5HashCalc.addData( "GET:" );
+        md5HashCalc.addData( m_request.requestLine.method );
+        md5HashCalc.addData( ":" );
         md5HashCalc.addData( m_url.path().toLatin1() );
         const BufferType& ha2 = md5HashCalc.result().toHex();
         //response
