@@ -28,6 +28,7 @@
 #include <utils/common/email.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
+#include <utils/mac_utils.h>
 
 #include <api/session_manager.h>
 
@@ -462,7 +463,11 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
 
     qDebug() << "Starting new instance with args" << arguments;
 
+#ifdef Q_OS_MACX
+    mac_startDetached(qApp->applicationFilePath(), arguments);
+#else
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
+#endif
 }
 
 void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) {
