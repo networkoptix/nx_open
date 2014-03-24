@@ -136,13 +136,18 @@ InstallationManager::AppData InstallationManager::getAppData(const QString &root
 
 void InstallationManager::updateInstalledVersionsInformation()
 {
+    NX_LOG("Entered update installed versions", cl_logDEBUG1);
     QMap<QnSoftwareVersion, AppData> tempInstalledProductsByVersion;
 
     // detect current installation
+    NX_LOG(QString::fromLatin1("Checking current version (%1)").arg(QN_APPLICATION_VERSION), cl_logDEBUG1);
     AppData current = getAppData(QCoreApplication::applicationDirPath());
-    if (current.exists())
+    if (current.exists()) {
         current.m_version = QnSoftwareVersion(QN_APPLICATION_VERSION);
-    tempInstalledProductsByVersion.insert(current.version(), current);
+        tempInstalledProductsByVersion.insert(current.version(), current);
+    } else {
+        NX_LOG(QString::fromLatin1("Can't find client binary in %1").arg(current.rootPath()), cl_logWARNING);
+    }
 
     // find other versions
     foreach (const QString &rootPath, m_rootInstallDirectoryList) {
@@ -160,6 +165,7 @@ void InstallationManager::updateInstalledVersionsInformation()
             appData.m_version = QnSoftwareVersion(entry);
 
             tempInstalledProductsByVersion.insert(appData.version(), appData);
+            NX_LOG(QString::fromLatin1("Compatibility version %1 found").arg(entry), cl_logDEBUG1);
         }
     }
 
@@ -233,7 +239,6 @@ int InstallationManager::count() const
 QString InstallationManager::getMostRecentVersion() const
 {
     std::unique_lock<std::mutex> lk( m_mutex );
-    //TODO/IMPL numeric sorting of versions is required
     return m_installedProductsByVersion.empty() ? QString() : m_installedProductsByVersion.lastKey().toString(QnSoftwareVersion::MinorFormat);
 }
 
