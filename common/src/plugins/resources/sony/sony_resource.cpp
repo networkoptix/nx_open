@@ -26,7 +26,7 @@ QnPlSonyResource::~QnPlSonyResource() {
 CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
 {
     CameraDiagnostics::Result result = QnPlOnvifResource::updateResourceCapabilities();
-    if (!result)
+    if (!result || isCameraControlDisabled())
         return result;
 
     std::string confToken = getPrimaryVideoEncoderId().toStdString();
