@@ -155,6 +155,10 @@ void QnImageButtonWidget::setPixmap(StateFlags flags, const QPixmap &pixmap) {
     update();
 }
 
+const QIcon &QnImageButtonWidget::icon() const {
+    return QIcon(); // TODO: #Elric
+}
+
 void QnImageButtonWidget::setIcon(const QIcon &icon) {
     for(int i = 0; i <= FLAGS_MAX; i++)
         m_pixmaps[i] = QPixmap();
