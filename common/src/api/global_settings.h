@@ -26,9 +26,13 @@ public:
     bool isCameraSettingsOptimizationEnabled() const;
     void setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled);
 
+    QString systemName() const;
+    void setSystemName(const QString& systemName);
+
 signals:
     void disabledVendorsChanged();
     void cameraSettingsOptimizationChanged();
+    void systemNameChanged();
 
 private:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
@@ -37,6 +41,7 @@ private:
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_systemNameAdaptor;
 
     mutable QMutex m_mutex;
     QnUserResourcePtr m_admin;

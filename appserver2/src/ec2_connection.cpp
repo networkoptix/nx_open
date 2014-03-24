@@ -26,8 +26,6 @@ namespace ec2
         m_dbManager->init();
         m_transactionLog->init();
 
-        QString from;
-
         ApiParamList paramList;
         m_dbManager->doQueryNoLock(nullptr, paramList);
 

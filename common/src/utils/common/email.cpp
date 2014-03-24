@@ -32,7 +32,7 @@ namespace {
     const QLatin1String nameSsl("EMAIL_USE_SSL");
     const QLatin1String nameSimple("EMAIL_SIMPLE");
     const QLatin1String nameTimeout("EMAIL_TIMEOUT");
-    const QLatin1String nameSignature("EMAIL_SIGNATURE");
+    const QLatin1String nameSignature("systemName");
     const int TIMEOUT = 20; //seconds
 
     static QnSmtpPresets smtpServerPresetPresets;
