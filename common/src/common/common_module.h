@@ -37,8 +37,8 @@ public:
     QUrl moduleUrl() const { return m_url; }
     void setModuleUlr(const QUrl& url) { m_url = url; }
 
-    void setSystemName(const QString& value) { m_systemName = value; }
-    QString systemName() { return m_systemName; }
+    void setLocalSystemName(const QString& value) { m_localSystemName = value; }
+    QString localSystemName() { return m_localSystemName; }
     QByteArray getSystemPassword() { return "{61D85D22-E7AA-44EC-B5EC-1BEAC9FE19C5}"; }
     void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
@@ -49,7 +49,7 @@ protected:
 private:
     QnSessionManager *m_sessionManager;
     QnResourceDataPool *m_dataPool;
-    QString m_systemName;
+    QString m_localSystemName;
     QUuid m_uuid;
     QUrl m_url;
     bool m_cloudMode;

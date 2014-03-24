@@ -33,8 +33,11 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(lit("disabledVendors"), QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(lit("cameraSettingsOptimization"), true, this);
+    m_systemNameAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(lit("systemName"), QString(), this);
+
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
+    connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
 
     connect(qnResPool,                              &QnResourcePool::resourceAdded,                     this,   &QnGlobalSettings::at_resourcePool_resourceAdded);
     connect(qnResPool,                              &QnResourcePool::resourceRemoved,                   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
@@ -68,6 +71,14 @@ void QnGlobalSettings::setCameraSettingsOptimizationEnabled(bool cameraSettingsO
     m_cameraSettingsOptimizationAdaptor->setValue(cameraSettingsOptimizationEnabled);
 }
 
+QString QnGlobalSettings::systemName() const {
+    return m_systemNameAdaptor->value();
+}
+
+void QnGlobalSettings::setSystemName(const QString& systemName) {
+    m_systemNameAdaptor->setValue(systemName);
+}
+
 void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     if(m_admin)
         return;
@@ -82,6 +93,7 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     m_admin = user;
     m_disabledVendorsAdaptor->setResource(user);;
     m_cameraSettingsOptimizationAdaptor->setResource(user);;
+    m_systemNameAdaptor->setResource(user);
 }
 
 void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {

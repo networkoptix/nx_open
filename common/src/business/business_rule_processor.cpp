@@ -4,6 +4,7 @@
 
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
+#include <api/global_settings.h>
 
 #include <business/business_action_factory.h>
 #include <business/business_event_rule.h>
@@ -457,7 +458,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     contextMap[tpCompanyName] = lit(QN_ORGANIZATION_NAME);
     contextMap[tpCompanyUrl] = lit(QN_COMPANY_URL);
     contextMap[tpSupportEmail] = lit(QN_SUPPORT_MAIL_ADDRESS);
-    contextMap[tpSystemName] = QnAppServerConnectionFactory::systemName();
+    contextMap[tpSystemName] = QnGlobalSettings::instance()->systemName();
     attachments.append(partialInfo.attachments);
 
     QImage screenshot = this->getEventScreenshot(action->getRuntimeParams(), QSize(640, 480));

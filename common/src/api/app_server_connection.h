@@ -33,7 +33,6 @@ public:
     static QUrl publicUrl();
     static QByteArray prevSessionKey();
     static QByteArray sessionKey();
-    static QString systemName();
     static int defaultMediaProxyPort();
     static QnSoftwareVersion currentVersion();
     static QnResourceFactory* defaultFactory();
@@ -46,7 +45,6 @@ public:
     static void setDefaultMediaProxyPort(int port);
     static void setCurrentVersion(const QnSoftwareVersion &version);
     static void setPublicIp(const QString &publicIp);
-    static void setSystemName(const QString& systemName);
 
     static void setSessionKey(const QByteArray& sessionKey);
 
@@ -64,7 +62,6 @@ private:
     QString m_authKey;
     QUrl m_defaultUrl;
     QUrl m_publicUrl;
-    QString m_systemName;
     QByteArray m_sessionKey;
     QByteArray m_prevSessionKey;
     QString m_box;

@@ -38,6 +38,8 @@ void ApiResourceData::toResource(QnResourcePtr resource) const
     foreach(const ApiResourceParam& param, addParams) {
         if (param.isResTypeParam)
             resource->setParam(param.name, param.value, QnDomainDatabase);
+        else
+            resource->setProperty(param.name, param.value);
     }
 }
 

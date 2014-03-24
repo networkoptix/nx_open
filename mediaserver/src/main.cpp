@@ -836,7 +836,7 @@ void QnMain::at_peerFound(
     bool isLocal,
     const QString& moduleSeed )
 {
-    if (moduleVersion == QN_APPLICATION_VERSION && systemName == qnCommon->systemName()) 
+    if (moduleVersion == QN_APPLICATION_VERSION && systemName == qnCommon->localSystemName()) 
     {
         int port = moduleParameters.value("port").toInt();
         QString url = QString(lit("http://%1:%2")).arg(remoteHostAddress).arg(port);
@@ -1031,7 +1031,7 @@ void QnMain::run()
     connect(QnStorageManager::instance(), SIGNAL(rebuildFinished()), this, SLOT(at_storageManager_rebuildFinished()));
 
     qnCommon->setModuleGUID(serverGuid());
-    qnCommon->setSystemName(settings->value("systemName").toString());
+    qnCommon->setLocalSystemName(settings->value("systemName").toString());
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
 
