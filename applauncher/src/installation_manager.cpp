@@ -16,19 +16,22 @@
 #include "version.h"
 
 
-#ifdef AK_DEBUG
-static QRegExp versionDirMatch( ".*" );
-#else
-static QRegExp versionDirMatch( "\\d+\\.\\d+.*" );
-#endif
+namespace {
+    QRegExp versionDirMatch( "\\d+\\.\\d+.*" );
 
 #ifdef Q_OS_LINUX
-static QString installationPathPrefix = ".local/share";
+    QString installationPathPrefix = ".local/share";
 #else
-static QString installationPathPrefix = "AppData/Local";
+    QString installationPathPrefix = "AppData/Local";
 #endif
 
-static const QString INSTALLATION_DATA_FILE( "install.dat" );
+    const QString INSTALLATION_DATA_FILE( "install.dat" );
+
+    QnSoftwareVersion toMinorVersion(const QnSoftwareVersion &version) {
+        return QnSoftwareVersion(version.major(), version.minor(), 0, 0);
+    }
+
+} // anonymous namespace
 
 
 bool InstallationManager::AppData::exists() const {
@@ -84,9 +87,7 @@ bool InstallationManager::AppData::verifyInstallation() const
 }
 
 
-InstallationManager::InstallationManager( QObject* const parent )
-:
-    QObject( parent )
+InstallationManager::InstallationManager(QObject *parent): QObject(parent)
 {
     //TODO/IMPL disguise writable install directories for different modules
 
@@ -96,12 +97,9 @@ InstallationManager::InstallationManager( QObject* const parent )
 //    appDir.cdUp();
 //    m_rootInstallDirectoryList.push_back( appDir.absolutePath() );
 
-    m_defaultDirectoryForNewInstallations = QStandardPaths::writableLocation( QStandardPaths::HomeLocation );
-    if( !m_defaultDirectoryForNewInstallations.isEmpty() )
-    {
-        m_defaultDirectoryForNewInstallations += QString::fromLatin1("/%1/%2/compatibility/%3/").arg(installationPathPrefix, QN_ORGANIZATION_NAME, QN_CUSTOMIZATION_NAME);
-        m_rootInstallDirectoryList.push_back( m_defaultDirectoryForNewInstallations );
-    }
+    m_defaultDirectoryForNewInstallations = defaultDirectoryForInstallations();
+    if (!m_defaultDirectoryForNewInstallations.isEmpty())
+        m_rootInstallDirectoryList.append(m_defaultDirectoryForNewInstallations);
 
     updateInstalledVersionsInformation();
 }
@@ -136,13 +134,18 @@ InstallationManager::AppData InstallationManager::getAppData(const QString &root
 
 void InstallationManager::updateInstalledVersionsInformation()
 {
+    NX_LOG("Entered update installed versions", cl_logDEBUG1);
     QMap<QnSoftwareVersion, AppData> tempInstalledProductsByVersion;
 
     // detect current installation
+    NX_LOG(QString::fromLatin1("Checking current version (%1)").arg(QN_APPLICATION_VERSION), cl_logDEBUG1);
     AppData current = getAppData(QCoreApplication::applicationDirPath());
-    if (current.exists())
-        current.m_version = QnSoftwareVersion(QN_APPLICATION_VERSION);
-    tempInstalledProductsByVersion.insert(current.version(), current);
+    if (current.exists()) {
+        current.m_version = toMinorVersion(QnSoftwareVersion(QN_APPLICATION_VERSION));
+        tempInstalledProductsByVersion.insert(current.version(), current);
+    } else {
+        NX_LOG(QString::fromLatin1("Can't find client binary in %1").arg(current.rootPath()), cl_logWARNING);
+    }
 
     // find other versions
     foreach (const QString &rootPath, m_rootInstallDirectoryList) {
@@ -157,9 +160,10 @@ void InstallationManager::updateInstalledVersionsInformation()
             if (!appData.exists())
                 continue;
 
-            appData.m_version = QnSoftwareVersion(entry);
+            appData.m_version = toMinorVersion(QnSoftwareVersion(entry));
 
             tempInstalledProductsByVersion.insert(appData.version(), appData);
+            NX_LOG(QString::fromLatin1("Compatibility version %1 found").arg(entry), cl_logDEBUG1);
         }
     }
 
@@ -233,7 +237,6 @@ int InstallationManager::count() const
 QString InstallationManager::getMostRecentVersion() const
 {
     std::unique_lock<std::mutex> lk( m_mutex );
-    //TODO/IMPL numeric sorting of versions is required
     return m_installedProductsByVersion.empty() ? QString() : m_installedProductsByVersion.lastKey().toString(QnSoftwareVersion::MinorFormat);
 }
 
@@ -292,6 +295,15 @@ QString InstallationManager::errorString() const
 bool InstallationManager::isValidVersionName( const QString& version )
 {
     return versionDirMatch.exactMatch(version);
+}
+
+QString InstallationManager::defaultDirectoryForInstallations()
+{
+    QString defaultDirectoryForNewInstallations = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+    if (!defaultDirectoryForNewInstallations.isEmpty())
+        defaultDirectoryForNewInstallations += QString::fromLatin1("/%1/%2/compatibility/%3/").arg(installationPathPrefix, QN_ORGANIZATION_NAME, QN_CUSTOMIZATION_NAME);
+
+    return defaultDirectoryForNewInstallations;
 }
 
 void InstallationManager::setErrorString( const QString& _errorString )
