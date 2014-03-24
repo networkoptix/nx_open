@@ -84,9 +84,7 @@ bool InstallationManager::AppData::verifyInstallation() const
 }
 
 
-InstallationManager::InstallationManager( QObject* const parent )
-:
-    QObject( parent )
+InstallationManager::InstallationManager(QObject *parent): QObject(parent)
 {
     //TODO/IMPL disguise writable install directories for different modules
 
@@ -96,12 +94,9 @@ InstallationManager::InstallationManager( QObject* const parent )
 //    appDir.cdUp();
 //    m_rootInstallDirectoryList.push_back( appDir.absolutePath() );
 
-    m_defaultDirectoryForNewInstallations = QStandardPaths::writableLocation( QStandardPaths::HomeLocation );
-    if( !m_defaultDirectoryForNewInstallations.isEmpty() )
-    {
-        m_defaultDirectoryForNewInstallations += QString::fromLatin1("/%1/%2/compatibility/%3/").arg(installationPathPrefix, QN_ORGANIZATION_NAME, QN_CUSTOMIZATION_NAME);
-        m_rootInstallDirectoryList.push_back( m_defaultDirectoryForNewInstallations );
-    }
+    m_defaultDirectoryForNewInstallations = defaultDirectoryForInstallations();
+    if (!m_defaultDirectoryForNewInstallations.isEmpty())
+        m_rootInstallDirectoryList.append(m_defaultDirectoryForNewInstallations);
 
     updateInstalledVersionsInformation();
 }
@@ -297,6 +292,15 @@ QString InstallationManager::errorString() const
 bool InstallationManager::isValidVersionName( const QString& version )
 {
     return versionDirMatch.exactMatch(version);
+}
+
+QString InstallationManager::defaultDirectoryForInstallations()
+{
+    QString defaultDirectoryForNewInstallations = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+    if (!defaultDirectoryForNewInstallations.isEmpty())
+        defaultDirectoryForNewInstallations += QString::fromLatin1("/%1/%2/compatibility/%3/").arg(installationPathPrefix, QN_ORGANIZATION_NAME, QN_CUSTOMIZATION_NAME);
+
+    return defaultDirectoryForNewInstallations;
 }
 
 void InstallationManager::setErrorString( const QString& _errorString )

@@ -46,7 +46,7 @@ public:
         bool verifyInstallation() const;
     };
 
-    InstallationManager( QObject* const parent = NULL );
+    InstallationManager(QObject *parent = NULL );
 
     AppData getAppData(const QString &rootPath) const;
 
@@ -71,6 +71,8 @@ public:
     QString errorString() const;
 
     static bool isValidVersionName( const QString& version );
+
+    static QString defaultDirectoryForInstallations();
 
 private:
     QString m_errorString;
