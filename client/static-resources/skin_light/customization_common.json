@@ -280,7 +280,7 @@
     "QnGraphicsMessageBox": {
         "frameColor": "opaqueSelection",
         "windowColor": "selection.darker(100)",
-        "textColor": "#a0a0a0ff"
+        "textColor": "#000000ff"
     },
 
     "QnFisheyeCalibrationImageWidget": {
