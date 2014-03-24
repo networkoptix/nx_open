@@ -170,10 +170,10 @@ namespace ec2
             }
         }
 
-        void triggerNotification( const QnTransaction<ApiEmailSettingsData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiEmailSettingsData>&  ) {
         }
 
-        void triggerNotification( const QnTransaction<ApiEmailData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiEmailData>&  ) {
         }
 
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }

@@ -8,9 +8,13 @@ namespace ec2
     {
     }
 
-    void EmailManagerImpl::configure(const QnEmail::Settings &settings, const QString &from) {
-        m_settings = settings;
-        m_from = from;
+    void EmailManagerImpl::configure(const QnKvPairList& kvPairs) {
+        m_settings = QnEmail::Settings(kvPairs);
+
+        foreach(const QnKvPair& kvPair, kvPairs) {
+            if (kvPair.name() == lit("EMAIL_FROM"))
+                m_from = kvPair.value();
+        }
     }
 
     SmtpClient::ConnectionType smtpConnectionType(QnEmail::ConnectionType ct) {

@@ -154,9 +154,9 @@ protected:
 
     /* [5] Protected methods */
 
-    void waitForResponse() throw (ResponseTimeoutException);
+    void waitForResponse();
 
-    void sendMessage(QString text) throw (SendMessageTimeoutException);
+    void sendMessage(QString text);
 
     /* [5] --- */
 

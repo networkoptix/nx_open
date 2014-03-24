@@ -421,7 +421,7 @@ void SmtpClient::quit()
 
 /* [4] Protected methods */
 
-void SmtpClient::waitForResponse() throw (ResponseTimeoutException)
+void SmtpClient::waitForResponse()
 {
     do {
         if (!socket->waitForReadyRead(responseTimeout))
@@ -448,7 +448,7 @@ void SmtpClient::waitForResponse() throw (ResponseTimeoutException)
     } while (true);
 }
 
-void SmtpClient::sendMessage(QString text) throw (SendMessageTimeoutException)
+void SmtpClient::sendMessage(QString text)
 {
     socket->write(text.toUtf8() + "\r\n");
     if (! socket->waitForBytesWritten(sendMessageTimeout))
@@ -463,11 +463,11 @@ void SmtpClient::sendMessage(QString text) throw (SendMessageTimeoutException)
 
 /* [5] Slots for the socket's signals */
 
-void SmtpClient::socketStateChanged(QAbstractSocket::SocketState state)
+void SmtpClient::socketStateChanged(QAbstractSocket::SocketState )
 {
 }
 
-void SmtpClient::socketError(QAbstractSocket::SocketError socketError)
+void SmtpClient::socketError(QAbstractSocket::SocketError )
 {
 }
 

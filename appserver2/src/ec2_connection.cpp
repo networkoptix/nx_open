@@ -33,9 +33,8 @@ namespace ec2
 
         QnKvPairList kvPairs;
         paramList.toResourceList(kvPairs);
-        QnEmail::Settings settings(kvPairs);
 
-        m_emailManagerImpl.configure(settings, "ivigasin@gmail.com");
+        m_emailManagerImpl.configure(kvPairs);
         QnTransactionMessageBus::instance()->setHandler(this);
     }
 

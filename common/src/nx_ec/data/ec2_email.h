@@ -18,6 +18,7 @@ namespace ec2
         QString host;
         int port;
         QString user;
+        QString from;
         QString password;
         QnEmail::ConnectionType connectionType;
 
