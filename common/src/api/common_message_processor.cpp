@@ -105,7 +105,6 @@ void QnCommonMessageProcessor::on_gotInitialNotification(ec2::QnFullResourceData
 
 void QnCommonMessageProcessor::on_runtimeInfoChanged( const ec2::QnRuntimeInfo& runtimeInfo )
 {
-    QnAppServerConnectionFactory::setSystemName(runtimeInfo.systemName);
     QnAppServerConnectionFactory::setPublicIp(runtimeInfo.publicIp);
     QnAppServerConnectionFactory::setSessionKey(runtimeInfo.sessionKey);
 }

@@ -47,23 +47,6 @@ void QnAppServerConnectionFactory::setCurrentVersion(const QnSoftwareVersion &ve
     }
 }
 
-void QnAppServerConnectionFactory::setSystemName(const QString& systemName)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_systemName = systemName.trimmed();
-    }
-}
-
-QString QnAppServerConnectionFactory::systemName()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        if (!factory->m_systemName.isEmpty())
-            return factory->m_systemName;
-    }
-
-    return QString();
-}
-
 QByteArray QnAppServerConnectionFactory::prevSessionKey()
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())

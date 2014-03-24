@@ -148,7 +148,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     if (userName == "system")
     {
         QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-        md5Hash.addData(qnCommon->systemName().toUtf8());
+        md5Hash.addData(qnCommon->localSystemName().toUtf8());
         md5Hash.addData(":NetworkOptix:");
         md5Hash.addData(qnCommon->getSystemPassword());
 

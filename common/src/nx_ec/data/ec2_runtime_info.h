@@ -18,7 +18,6 @@ namespace ec2
     {
     public:
         QString publicIp;
-        QString systemName;
         QByteArray sessionKey;
         bool allowCameraChanges;
     };

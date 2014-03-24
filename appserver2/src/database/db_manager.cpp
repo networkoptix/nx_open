@@ -1429,7 +1429,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList
                                 FROM vms_kvpair kv \
                                 JOIN auth_user u on u.id = kv.resource_id \
                                 JOIN vms_resource r on r.id = kv.resource_id \
-                                WHERE kv.isResTypeParam = 1 \
+                                WHERE kv.isResTypeParam = 0 \
                                 ORDER BY kv.resource_id"));
 
     if (!queryParams.exec()) {
@@ -1441,7 +1441,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList
     
     std::vector<ApiResourceParamWithRef> params;
     QN_QUERY_TO_DATA_OBJECT(queryParams, ApiResourceParamWithRef, params, ApiResourceParamFields (resourceId));
-    mergeObjectListData<ApiUserData>(userList.data, params, &ApiCameraData::addParams, &ApiResourceParamWithRef::resourceId);
+    mergeObjectListData<ApiUserData>(userList.data, params, &ApiUserData::addParams, &ApiResourceParamWithRef::resourceId);
     
     return ErrorCode::ok;
 }
