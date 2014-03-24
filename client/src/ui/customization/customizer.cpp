@@ -3,6 +3,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsObject>
 
+#include <ui/style/skin.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/json.h>
 #include <utils/common/json_serializer.h>
@@ -196,15 +198,39 @@ void serialize(QnJsonContext *, const QnCustomizationData &, QJsonValue *) {
 
 
 // --------------------------------------------------------------------------- //
-// QnCustomizationColorSerializer
+// QnCustomizationSerializer
 // --------------------------------------------------------------------------- //
-class QnCustomizationColorSerializer: public QObject, public QnJsonSerializer, public Qee::Resolver {
+Q_DECLARE_METATYPE(QnSkin *)
+
+QVariant eval_skin(const Qee::ParameterPack &args) {
+    args.requireSize(0, 0);
+
+    return QVariant::fromValue(qnSkin);
+}
+
+QVariant eval_QnSkin_icon(const Qee::ParameterPack &args) {
+    args.requireSize(2, 3);
+    
+    QnSkin *skin = args.get<QnSkin *>(0);
+    if(!skin)
+        throw Qee::NullPointerException(QObject::tr("Parameter 1 is null."));
+
+    if(args.size() == 1) {
+        return skin->icon(args.get<QString>(1));
+    } else {
+        return skin->icon(args.get<QString>(1), args.get<QString>(2));
+    }
+}
+
+class QnCustomizationSerializer: public QObject, public QnJsonSerializer, public Qee::Resolver {
 public:
-    QnCustomizationColorSerializer(QObject *parent = NULL): 
+    QnCustomizationSerializer(int type, QObject *parent = NULL): 
         QObject(parent),
-        QnJsonSerializer(QMetaType::QColor)
+        QnJsonSerializer(type)
     {
-        m_evaluator.registerFunctions(Qee::ColorFunctions);
+        m_evaluator.registerFunctions(Qee::ColorFunctions | Qee::ColorNames);
+        m_evaluator.registerFunction(lit("skin"), &eval_skin);
+        m_evaluator.registerFunction(lit("QnSkin::icon"), &eval_QnSkin_icon); // TODO: #Elric this won't work because the underlying type is 'QnSkin*'.
         m_evaluator.setResolver(this);
     }
 
@@ -222,6 +248,9 @@ protected:
     }
 
     virtual bool deserializeInternal(QnJsonContext *ctx, const QJsonValue &value, void *target) const override {
+        // TODO: #Elric use the easy way only for color codes. 
+        // We want to be able to override standard color names!
+
         if(QJson::deserialize(value, static_cast<QColor *>(target)))
             return true; /* Try the easy way first. */
 
@@ -245,7 +274,7 @@ protected:
     }
 
     virtual QVariant resolveConstant(const QString &name) const override {
-        auto pos = const_cast<QnCustomizationColorSerializer *>(this)->m_globals.find(name);
+        auto pos = const_cast<QnCustomizationSerializer *>(this)->m_globals.find(name);
         if(pos == m_globals.end())
             return QVariant();
 
@@ -297,7 +326,7 @@ public:
     QHash<QString, QnCustomizationData> dataByObjectName;
     QHash<QLatin1String, QnCustomizationAccessor *> accessorByClassName;
     QScopedPointer<QnCustomizationAccessor> defaultAccessor;
-    QScopedPointer<QnCustomizationColorSerializer> colorSerializer;
+    QScopedPointer<QnCustomizationSerializer> colorSerializer;
     QScopedPointer<QnJsonSerializer> customizationHashSerializer;
     QnFlatMap<int, QnJsonSerializer *> serializerByType;
     QnJsonContext serializationContext;
@@ -309,7 +338,7 @@ QnCustomizerPrivate::QnCustomizerPrivate() {
     customizationHashType = qMetaTypeId<QnCustomizationDataHash>();
 
     defaultAccessor.reset(new QnCustomizationAccessorWrapper<QnObjectCustomizationAccessor>());
-    colorSerializer.reset(new QnCustomizationColorSerializer());
+    colorSerializer.reset(new QnCustomizationSerializer(QMetaType::QColor));
     customizationHashSerializer.reset(new QnDefaultJsonSerializer<QnCustomizationDataHash>());
     
     accessorByClassName.insert(QLatin1String("QApplication"), new QnCustomizationAccessorWrapper<QnApplicationCustomizationAccessor>());
