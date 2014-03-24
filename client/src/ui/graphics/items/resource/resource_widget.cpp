@@ -458,6 +458,9 @@ QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
 }
 
 void QnResourceWidget::updateCheckedButtons() {
+    if (!item())
+        return;
+
     setCheckedButtons(static_cast<Buttons>(item()->data(Qn::ItemCheckedButtonsRole).toInt()));
 }
 
@@ -1005,6 +1008,9 @@ void QnResourceWidget::at_infoButton_toggled(bool toggled){
 }
 
 void QnResourceWidget::at_buttonBar_checkedButtonsChanged() {
+    if (!item())
+        return;
+
     item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(checkedButtons()));
     update();
 }
