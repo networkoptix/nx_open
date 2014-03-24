@@ -333,7 +333,7 @@ bool QnSecurityCamResource::isAudioSupported() const {
     QVariant val;
     if (!getParam(lit("isAudioSupported"), val, QnDomainMemory))
         return false;
-    return val.toUInt() > 0;
+    return val.toBool();
 }
 
 Qn::MotionType QnSecurityCamResource::getCameraBasedMotionType() const {

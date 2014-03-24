@@ -49,6 +49,10 @@ inline void doAutoBind(QSqlQuery& query, const char* fieldName, const QString& f
 	query.bindValue(QString::fromLatin1(fieldName), field.isNull() ? QString(QLatin1String("")) : field);
 }
 
+inline void doAutoBind(QSqlQuery& query, const char* fieldName, const bool& field) {
+    query.bindValue(QString::fromLatin1(fieldName), field ? 1 : 0);
+}
+
 inline void doAutoBind(QSqlQuery& query, const char* fieldName, const QnId& field) {
     query.bindValue(QString::fromLatin1(fieldName), field.toRfc4122());
 }
@@ -65,6 +69,10 @@ void doAutoBindOrdered(QSqlQuery& query, int idx, const T& field) {
 
 inline void doAutoBindOrdered(QSqlQuery& query, int idx, const QString& field) {
     query.bindValue(idx, field.isNull() ? QString(QLatin1String("")) : field);
+}
+
+inline void doAutoBindOrdered(QSqlQuery& query, int idx, const bool& field) {
+    query.bindValue(idx, field ? 1 : 0);
 }
 
 inline void doAutoBindOrdered(QSqlQuery& query, int idx, const QnId& field) {
