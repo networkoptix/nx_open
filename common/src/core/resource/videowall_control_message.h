@@ -31,6 +31,7 @@ public:
 
         SynchronizationChanged,
         MotionSelectionChanged,
+        MediaDewarpingParamsChanged,
 
         Count
     };

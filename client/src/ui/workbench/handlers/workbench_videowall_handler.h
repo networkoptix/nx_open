@@ -96,7 +96,9 @@ private slots:
 
     void at_display_widgetAdded(QnResourceWidget* widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget* widget);
+
     void at_widget_motionSelectionChanged();
+    void at_widget_dewarpingParamsChanged();
 
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();

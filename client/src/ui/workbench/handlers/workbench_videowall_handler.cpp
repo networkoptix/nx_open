@@ -701,10 +701,18 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
     {
         QByteArray value = message[valueKey].toUtf8();
         QList<QRegion> regions = QJson::deserialized<QList<QRegion> >(value);
-        QUuid uuid(message[uuidKey]);
-        QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(uuid));
+        QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(QUuid(message[uuidKey])));
         if (widget)
             widget->setMotionSelection(regions);
+        break;
+    }
+    case QnVideoWallControlMessage::MediaDewarpingParamsChanged:
+    {
+        QByteArray value = message[valueKey].toUtf8();
+        QnMediaDewarpingParams params = QJson::deserialized<QnMediaDewarpingParams>(value);
+        QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(QUuid(message[uuidKey])));
+        if (widget)
+            widget->setDewarpingParams(params);
         break;
     }
     case QnVideoWallControlMessage::Identify:
@@ -1663,6 +1671,7 @@ void QnWorkbenchVideoWallHandler::at_display_widgetAdded(QnResourceWidget* widge
     if (widget->resource()->flags() & QnResource::sync) {
         if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
             connect(mediaWidget, &QnMediaResourceWidget::motionSelectionChanged, this, &QnWorkbenchVideoWallHandler::at_widget_motionSelectionChanged);
+            connect(mediaWidget, &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnWorkbenchVideoWallHandler::at_widget_dewarpingParamsChanged);
         }
     }
 }
@@ -1682,6 +1691,20 @@ void QnWorkbenchVideoWallHandler::at_widget_motionSelectionChanged() {
     QnVideoWallControlMessage message(QnVideoWallControlMessage::MotionSelectionChanged);
     message[uuidKey] = widget->item()->uuid().toString();
     message[valueKey] = QString::fromUtf8(QJson::serialized<QList<QRegion> >(widget->motionSelection()));
+    sendMessage(message);
+}
+
+void QnWorkbenchVideoWallHandler::at_widget_dewarpingParamsChanged() {
+    QnMediaResourceWidget* widget = checked_cast<QnMediaResourceWidget *>(sender());
+    if (!widget)
+        return;
+
+    if (!m_controlMode.active)
+        return;
+
+    QnVideoWallControlMessage message(QnVideoWallControlMessage::MediaDewarpingParamsChanged);
+    message[uuidKey] = widget->item()->uuid().toString();
+    message[valueKey] = QString::fromUtf8(QJson::serialized(widget->dewarpingParams()));
     sendMessage(message);
 }
 
