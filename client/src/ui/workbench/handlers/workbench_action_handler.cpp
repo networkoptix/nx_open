@@ -228,9 +228,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenInCurrentLayoutAction),              SIGNAL(triggered()),    this,   SLOT(at_openInCurrentLayoutAction_triggered()));
     connect(action(Qn::OpenInNewLayoutAction),                  SIGNAL(triggered()),    this,   SLOT(at_openInNewLayoutAction_triggered()));
     connect(action(Qn::OpenInNewWindowAction),                  SIGNAL(triggered()),    this,   SLOT(at_openInNewWindowAction_triggered()));
-    connect(action(Qn::MonitorInCurrentLayoutAction),           SIGNAL(triggered()),    this,   SLOT(at_monitorInCurrentLayoutAction_triggered()));
-    connect(action(Qn::MonitorInNewLayoutAction),               SIGNAL(triggered()),    this,   SLOT(at_monitorInNewLayoutAction_triggered()));
-    connect(action(Qn::MonitorInNewWindowAction),               SIGNAL(triggered()),    this,   SLOT(at_monitorInNewWindowAction_triggered()));
     connect(action(Qn::OpenSingleLayoutAction),                 SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenMultipleLayoutsAction),              SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(Qn::OpenAnyNumberOfLayoutsAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
@@ -926,46 +923,9 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
     }
 }
 
-void QnWorkbenchActionHandler::at_monitorInCurrentLayoutAction_triggered() {
-    QnActionParameters parameters = menu()->currentParameters(sender());
-    parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
-
-    QnResourceList servers = parameters.resources().filtered<QnMediaServerResource>();
-    if (servers.isEmpty())
-        return;
-    parameters.setResources(servers);
-
-    menu()->trigger(Qn::OpenInLayoutAction, parameters);
-}
-
-void QnWorkbenchActionHandler::at_monitorInNewLayoutAction_triggered() {
-    menu()->trigger(Qn::OpenNewTabAction);
-    menu()->trigger(Qn::MonitorInCurrentLayoutAction, menu()->currentParameters(sender()));
-}
-
-void QnWorkbenchActionHandler::at_monitorInNewWindowAction_triggered() {
-    QnActionParameters parameters = menu()->currentParameters(sender());
-    parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
-
-    QnResourceList servers = parameters.resources().filtered<QnMediaServerResource>();
-    if (servers.isEmpty())
-        return;
-
-    openResourcesInNewWindow(servers);
-}
-
 void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
-
-    QnResourceList filtered;
-    foreach (const QnResourcePtr &resource, parameters.resources()) {
-        if (!resource->hasFlags(QnResource::server))    //servers are handled in "Monitor" action set
-            filtered << resource;
-    }
-    if (filtered.isEmpty())
-        return;
-    parameters.setResources(filtered);
 
     QnWorkbenchStreamSynchronizer *synchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
 
@@ -1005,7 +965,7 @@ void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
 
     QnResourceList filtered;
     foreach (const QnResourcePtr &resource, parameters.resources()) {
-        if (resource->hasFlags(QnResource::media))    //servers are handled in "Monitor" action set
+        if (resource->hasFlags(QnResource::media | QnResource::server))    //servers are handled in "Monitor" action set
             filtered << resource;
     }
     if (filtered.isEmpty())
@@ -1147,9 +1107,8 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
 
     if (!resources.empty()) {
         parameters.setResources(resources);
-        if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters) || menu()->canTrigger(Qn::MonitorInCurrentLayoutAction, parameters)) {
+        if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters)) {
             menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
-            menu()->trigger(Qn::MonitorInCurrentLayoutAction, parameters);
         } else {
             QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
             if (layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout)) {
@@ -1984,8 +1943,7 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
-    QnMediaServerResourceList servers = menu()->currentParameters(sender()).resources().filtered<QnMediaServerResource>();
-    QnMediaServerResourcePtr server = servers.isEmpty() ? QnMediaServerResourcePtr() : servers.first();
+    QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
     if(!server)
         return;
 
@@ -2002,8 +1960,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
-    QnMediaServerResourceList servers = menu()->currentParameters(sender()).resources().filtered<QnMediaServerResource>();
-    QnMediaServerResourcePtr server = servers.isEmpty() ? QnMediaServerResourcePtr() : servers.first();
+    QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
     if(!server)
         return;
 
