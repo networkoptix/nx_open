@@ -1,6 +1,6 @@
-#include <QtCore/QString>
-#include <QtCore/QStringList>
-#include <QFileDialog>
+#include <QtCore/QAbstractEventDispatcher>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QFileDialog>
 
 #import <objc/runtime.h>
 #import <Cocoa/Cocoa.h>
@@ -125,7 +125,11 @@ QString mac_getExistingDirectory(const QString &caption, const QString &dir) {
     if (!sandboxed && !dir.isEmpty())
         [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
-    if ([panel runModal] == NSOKButton) {
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
+    bool ok = ([panel runModal] == NSOKButton);
+    QAbstractEventDispatcher::instance()->interrupt();
+
+    if (ok) {
         if (sandboxed)
             saveFileBookmark(panel.URL.path);
 
@@ -149,7 +153,11 @@ QString mac_getOpenFileName(const QString &caption, const QString &dir, const QS
     if (!sandboxed && !dir.isEmpty())
         [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
-    if ([panel runModal] == NSOKButton) {
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
+    bool ok = ([panel runModal] == NSOKButton);
+    QAbstractEventDispatcher::instance()->interrupt();
+
+    if (ok) {
         if (sandboxed)
             saveFileBookmark(panel.URL.path);
 
@@ -173,7 +181,11 @@ QStringList mac_getOpenFileNames(const QString &caption, const QString &dir, con
     if (!sandboxed && !dir.isEmpty())
         [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
-    if ([panel runModal] == NSOKButton) {
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
+    bool ok = ([panel runModal] == NSOKButton);
+    QAbstractEventDispatcher::instance()->interrupt();
+
+    if (ok) {
         QStringList urls;
         for (int i = 0; i < panel.URLs.count; ++i)
             urls.append(toQString([[[panel URLs] objectAtIndex:i] path]));
@@ -200,7 +212,11 @@ QString mac_getSaveFileName(const QString &caption, const QString &dir, const QS
     if (!sandboxed && !dir.isEmpty())
         [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
-    if ([panel runModal] == NSOKButton) {
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
+    bool ok = ([panel runModal] == NSOKButton);
+    QAbstractEventDispatcher::instance()->interrupt();
+
+    if (ok) {
         if (sandboxed)
             saveFileBookmark(panel.URL.path);
 
