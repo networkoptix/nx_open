@@ -12,6 +12,7 @@
 #include "database/db_manager.h"
 #include "server_query_processor.h"
 #include "managers/impl/license_manager_impl.h"
+#include "managers/impl/email_manager_impl.h"
 
 
 namespace ec2
@@ -35,7 +36,9 @@ namespace ec2
 
     private:
         LicenseManagerImpl m_licenseManagerImpl;
+        EmailManagerImpl m_emailManagerImpl;
 		std::unique_ptr<QnDbManager> m_dbManager;   //TODO: #ak not sure this is right place for QnDbManager instance
+        std::unique_ptr<QnAuxManager> m_auxManager;
         std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;
     };

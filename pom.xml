@@ -227,8 +227,9 @@
             </activation>
             <modules>
                 <module>build_variables</module>
-                <module>appserver2</module>
+                <module>build_environment</module>
                 <module>common</module>
+                <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
             </modules>
         </profile> 
@@ -246,7 +247,7 @@
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>mediaserver</module>
-                <module>mediaproxy</module>
+                <!--<module>mediaproxy</module> -->
                 <!-- <module>testcamera</module> -->
             </modules>            
             <properties>

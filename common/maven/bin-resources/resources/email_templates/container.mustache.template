@@ -64,37 +64,7 @@
                 </table>
             </div>
 
-            {{#typeCameraMotion}}
-                {{> camera_motion}}
-            {{/typeCameraMotion}}
-
-            {{#typeCameraDisconnect}}
-                {{> camera_disconnect}}
-            {{/typeCameraDisconnect}}
-
-            {{#typeStorageFailure}}
-                {{> storage_failure}}
-            {{/typeStorageFailure}}
-
-            {{#typeNetworkIssue}}
-                {{> network_issue}}
-            {{/typeNetworkIssue}}
-
-            {{#typeCameraIpConflict}}
-                {{> camera_ip_conflict}}
-            {{/typeCameraIpConflict}}
-        
-            {{#typeCameraInput}}
-                {{> camera_input}}
-            {{/typeCameraInput}}
-
-            {{#typeMediaServerFailure}}
-                {{> mediaserver_failure}}
-            {{/typeMediaServerFailure}}
-
-            {{#typeMediaServerConflict}}
-                {{> mediaserver_conflict}}
-            {{/typeMediaServerConflict}}
+            {{>body}}
 
             <div class="content">
                 <table > <!-- bgcolor="#FFFFFF" -->

@@ -7,6 +7,7 @@
 #include "nx_ec/binary_serialization_helper.h"
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/ec2_license.h"
+#include "nx_ec/data/ec2_email.h"
 
 
 namespace ec2
@@ -99,6 +100,12 @@ namespace ec2
             addLicenses,
             //!ApiLicenseList
             getLicenses,
+
+            // ApiEmailSettingsData
+            testEmailSettings,
+
+            // ApiEmailData
+            sendEmail,
 
             //!ApiResourceParamList
             getSettings,

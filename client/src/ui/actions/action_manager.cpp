@@ -755,7 +755,16 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Close All But This")).
         condition(new QnLayoutCountActionCondition(2, this));
 
+    factory().
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        childFactory(new QnEdgeNodeActionFactory(this)).
+        text(tr("Server...")).
+        condition(new QnTreeNodeTypeCondition(Qn::EdgeNode, this));
 
+    factory().
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        separator().
+        condition(new QnTreeNodeTypeCondition(Qn::EdgeNode, this));
 
     /* Resource actions. */
     factory(Qn::OpenInLayoutAction).
@@ -1056,7 +1065,8 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::WritePermission | Qn::WriteNamePermission).
         text(tr("Rename")).
         shortcut(tr("F2")).
-        autoRepeat(false);
+        autoRepeat(false).
+        condition(new QnEdgeServerCondition(false, this));
 
     factory().
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
@@ -1127,12 +1137,18 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ServerAddCameraManuallyAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Add Camera(s)...")).
-        condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
+        condition(new QnConjunctionActionCondition(
+                      new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this),
+                      new QnEdgeServerCondition(false, this),
+                      this));
 
     factory(Qn::CameraListByServerAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Camera(s) List by Server...")).
-        condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
+        condition(new QnConjunctionActionCondition(
+                      new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this),
+                      new QnEdgeServerCondition(false, this),
+                      this));
 
     factory(Qn::PingAction).
         flags(Qn::SingleTarget | Qn::ResourceTarget).
@@ -1555,6 +1571,12 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
 }
 
 QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options) {
+    if (parent->childFactory()) {
+        QMenu* childMenu = parent->childFactory()->newMenu(parameters, parentWidget);
+        if (childMenu)
+            return childMenu;
+    }
+
     QMenu *result = new QnMenu(parentWidget);
 
     if(!parent->children().isEmpty()) {

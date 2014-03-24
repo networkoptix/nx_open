@@ -19,19 +19,21 @@ namespace ec2
     {
         ApiResourceData::fromResource(resource);
         QString password = resource->getPassword();
-        QByteArray salt = QByteArray::number(rand(), 16);
         
-        QCryptographicHash md5(QCryptographicHash::Md5);
-        md5.addData(salt);
-        md5.addData(password.toUtf8());
-        hash = "md5$";
-        hash.append(salt);
-        hash.append("$");
-        hash.append(md5.result().toHex());
+        if (!password.isEmpty()) {
+            QByteArray salt = QByteArray::number(rand(), 16);
+            QCryptographicHash md5(QCryptographicHash::Md5);
+            md5.addData(salt);
+            md5.addData(password.toUtf8());
+            hash = "md5$";
+            hash.append(salt);
+            hash.append("$");
+            hash.append(md5.result().toHex());
         
-        md5.reset();
-        md5.addData(QString(lit("%1:NetworkOptix:%2")).arg(resource->getName(), password).toLatin1());
-        digest = md5.result().toHex();
+            md5.reset();
+            md5.addData(QString(lit("%1:NetworkOptix:%2")).arg(resource->getName(), password).toLatin1());
+            digest = md5.result().toHex();
+        }
 
         isAdmin = resource->isAdmin();
         rights = resource->getPermissions();

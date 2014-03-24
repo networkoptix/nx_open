@@ -96,6 +96,8 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiLayoutDataList>& )          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiLicenseList>&)              { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiBusinessActionData>& )      { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const QnTransaction<ApiEmailSettingsData>& )       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const QnTransaction<ApiEmailData>& )               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
         template <class DataList, class Data>
         ErrorCode saveMultiTransaction(const QnTransaction<DataList>& multiTran)

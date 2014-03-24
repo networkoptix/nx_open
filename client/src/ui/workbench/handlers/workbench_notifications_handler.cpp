@@ -126,13 +126,12 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     return false;
 }
 
-void QnWorkbenchNotificationsHandler::updateSmtpSettings( int handle, ec2::ErrorCode errorCode, const QnKvPairList &settings ) {
+void QnWorkbenchNotificationsHandler::updateSmtpSettings( int handle, ec2::ErrorCode errorCode, const QnEmail::Settings &settings ) {
     Q_UNUSED(handle)
     if (errorCode != ec2::ErrorCode::ok)
         return;
 
-    QnEmail::Settings email(settings);
-    bool isInvalid = email.server.isEmpty() || email.user.isEmpty() || email.password.isEmpty();
+    bool isInvalid = settings.server.isEmpty() || settings.user.isEmpty() || settings.password.isEmpty();
     setSystemHealthEventVisible(QnSystemHealth::SmtpIsNotSet, isInvalid);
 }
 
