@@ -1265,12 +1265,13 @@ void QnMain::run()
         SLOT(at_peerLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
         Qt::DirectConnection );
     QUrl url = ec2Connection->connectionInfo().ecUrl;
+#if 0
     if (url.scheme() == "file") {
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
         qnCommon->setCloudMode(true);
         m_moduleFinder->start();
     }
-
+#endif
     // ------------------------------------------
 
 
