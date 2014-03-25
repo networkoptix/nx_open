@@ -553,7 +553,8 @@ int64_t StreamReader::calcNextTimestamp( int32_t pts, int64_t absoluteSourceTime
         pts = m_prevPts + DEFAULT_FRAME_DURATION;
     }
 
-    m_currentTimestamp += (int64_t(pts - m_prevPts) * USEC_IN_SEC) / PTS_FREQUENCY; //TODO dword wrap ??? it seems ok - recheck
+    m_currentTimestamp = timeSyncData.baseClock + (int64_t)(pts - timeSyncData.ptsBase) * USEC_IN_SEC / PTS_FREQUENCY;
+    //m_currentTimestamp += (int64_t(pts - m_prevPts) * USEC_IN_SEC) / PTS_FREQUENCY; //TODO dword wrap ??? it seems ok - recheck
     m_prevPts = pts;
     newTs = m_currentTimestamp + m_timestampDelta;
 
@@ -569,7 +570,7 @@ void StreamReader::resyncTime( int32_t pts, int64_t absoluteSourceTimeMS )
     memset( &currentTime, 0, sizeof(currentTime) );
     gettimeofday( &currentTime, NULL );
 
-    if( timeSyncData.encoderThatInitializedThis == -1 ) //TODO add condition for resync
+    if( timeSyncData.encoderThatInitializedThis == -1 || timeSyncData.encoderThatInitializedThis == m_encoderNum ) //TODO add condition for resync
     {
         timeSyncData.ptsBase = pts;
         timeSyncData.baseClock = (qnSyncTime->currentMSecsSinceEpoch() - 
@@ -596,5 +597,6 @@ void StreamReader::resyncTime( int32_t pts, int64_t absoluteSourceTimeMS )
     }
 
     m_currentTimestamp = timeSyncData.baseClock + (int64_t)(pts - timeSyncData.ptsBase) * USEC_IN_SEC / PTS_FREQUENCY;
+    m_framesSinceTimeResync = 0;
     m_prevPts = pts;
 }
