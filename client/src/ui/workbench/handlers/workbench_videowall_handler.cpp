@@ -1433,7 +1433,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_layout_saved(int status, const Qn
     if (status != 0 || resources.size() == 0) {
         m_attaching.remove(handle);
         m_resetting.remove(handle);
-        //TODO: #GDM VW should we display an error message?
+        QMessageBox::warning(mainWindow(), tr("Error"), tr("Unexpected error has occurred. Changes cannot be saved."));
         return;
     }
 
