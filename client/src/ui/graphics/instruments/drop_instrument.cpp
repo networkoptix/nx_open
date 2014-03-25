@@ -23,6 +23,7 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
+#include <ui/workaround/mac_utils.h>
 
 #include "destruction_guard_item.h"
 
@@ -110,8 +111,6 @@ void DropInstrument::aboutToBeUninstalledNotify() {
 bool DropInstrument::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
     return this->sceneEvent(watched, event);
 }
-
-#include "ui/workaround/mac_utils.h"
 
 bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
     m_resources.clear();

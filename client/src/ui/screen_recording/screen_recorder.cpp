@@ -61,7 +61,7 @@ void QnScreenRecorder::startRecording() {
         secondAudioDevice = QnAudioDeviceInfo();
     }
 
-    QnDesktopResourcePtr res = qnResPool->getResourceByGuid(QnDesktopResource().getGuid()).dynamicCast<QnDesktopResource>();
+    QnDesktopResourcePtr res = qnResPool->getResourceByGuid(QnDesktopResource::getDesktopResourceUuid().toString()).dynamicCast<QnDesktopResource>();
     if (!res) {
         emit error(tr("Screen capturing subsystem is not initialized yet. Please try again later."));
         return;
