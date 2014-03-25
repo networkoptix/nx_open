@@ -1,6 +1,7 @@
 #include <QtCore/QAbstractEventDispatcher>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QFileDialog>
+#include <QtCore/QFile>
 
 #import <objc/runtime.h>
 #import <Cocoa/Cocoa.h>
@@ -46,6 +47,7 @@ void saveFileBookmark(NSString *path) {
     NSData *data = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope includingResourceValuesForKeys:nil relativeToURL:nil error:&error];
     if (error) {
         NSLog(@"Error securing bookmark for url %@ %@", url, error);
+        return;
     }
 
     NSLog(@"Data length: %d", data.length);
@@ -217,8 +219,17 @@ QString mac_getSaveFileName(const QString &caption, const QString &dir, const QS
     QAbstractEventDispatcher::instance()->interrupt();
 
     if (ok) {
-        if (sandboxed)
+        if (sandboxed) {
+            // This is a hack! We cannot save bookmark for an inexistent file. So we create it before bookmark saving...
+            QFile file(toQString(panel.URL.path));
+            file.open(QFile::WriteOnly);
+            file.close();
+
             saveFileBookmark(panel.URL.path);
+
+            // ... and remove after
+            file.remove();
+        }
 
         return toQString(panel.URL.path);
     }
