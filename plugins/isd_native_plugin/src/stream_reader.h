@@ -82,7 +82,6 @@ private:
     int64_t m_currentTimestamp;
     unsigned int m_prevPts;
     int64_t m_timestampDelta;
-    QnRtspTimeHelper m_timeHelper;
     int m_framesSinceTimeResync;
     int m_epollFD;
 

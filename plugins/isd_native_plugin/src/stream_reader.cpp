@@ -51,7 +51,7 @@ static const int MAX_FRAMES_BETWEEN_TIME_RESYNC = 300;
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     int encoderNum,
-    const char* cameraUid )
+    const char* /*cameraUid*/ )
 :
     m_refManager( parentRefManager ),
     m_encoderNum( encoderNum ),
@@ -67,10 +67,8 @@ StreamReader::StreamReader(
 #endif
     m_prevPts(0),
     m_timestampDelta(std::numeric_limits<int64_t>::max()),
-    m_timeHelper( QString::fromLatin1(cameraUid) ),
     m_framesSinceTimeResync(0),
-    m_epollFD(-1),
-    m_currentMotionData(nullptr)
+    m_epollFD(-1)
 {
 }
 
@@ -187,6 +185,8 @@ void StreamReader::setAudioEnabled( bool audioEnabled )
 {
 #ifndef NO_ISD_AUDIO
     m_audioEnabled = audioEnabled;
+#else
+    Q_UNUSED( audioEnabled )
 #endif
 }
 
@@ -201,6 +201,7 @@ int StreamReader::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
     *audioFormat = *m_audioFormat.get();
     return nxcip::NX_NO_ERROR;
 #else
+    Q_UNUSED( audioFormat )
     return nxcip::NX_UNSUPPORTED_CODEC;
 #endif
 }
@@ -534,7 +535,6 @@ static TimeSyncData timeSyncData;
 int64_t StreamReader::calcNextTimestamp( int32_t pts, int64_t absoluteSourceTimeMS )
 {
     qint64 newTs = 0;
-    qint64 currentLocalTime = 0;
 
     QMutexLocker lk( &timestampSynchronizationMutex );
     
@@ -558,7 +558,7 @@ int64_t StreamReader::calcNextTimestamp( int32_t pts, int64_t absoluteSourceTime
     newTs = m_currentTimestamp + m_timestampDelta;
 
 #ifdef DEBUG_OUTPUT
-    std::cout<<"pts "<<pts<<", timestamp "<<newTs<<", currentLocalTime "<<currentLocalTime*USEC_IN_MSEC<<", "<<(m_encoderNum == 0 ? "hgh" : "low")<<std::endl;
+    std::cout<<"pts "<<pts<<", timestamp "<<newTs<<", "<<(m_encoderNum == 0 ? "hgh" : "low")<<std::endl;
 #endif
     return newTs;
 }
