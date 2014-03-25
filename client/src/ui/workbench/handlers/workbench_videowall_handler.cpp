@@ -1398,7 +1398,6 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
         if (!camera)
             continue;
-        qDebug() << camera->getPhysicalId();
         if (!desktopCameraNameRegExp.exactMatch(camera->getPhysicalId()))
             continue;
         desktopCamera = camera;
