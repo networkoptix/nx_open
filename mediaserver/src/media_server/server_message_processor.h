@@ -14,11 +14,10 @@ class QnServerMessageProcessor : public QnCommonMessageProcessor
 public:
     QnServerMessageProcessor();
 
-#ifdef PROXY_STRICT_IP
     bool isKnownAddr(const QString& addr) const;
-#endif
     virtual void updateResource(QnResourcePtr resource) override;
-
+    static bool isProxy(void* opaque, const QUrl& url);
+    bool isProxy(const QUrl& url);
 protected:
     virtual void onResourceStatusChanged(QnResourcePtr , QnResource::Status ) override;
     virtual void init(ec2::AbstractECConnectionPtr connection);
@@ -27,17 +26,14 @@ private slots:
     void at_remotePeerFound(QnId id, bool isClient, bool isProxy);
     void at_remotePeerLost(QnId id, bool isClient, bool isProxy);
 private:
-#ifdef PROXY_STRICT_IP
     void updateAllIPList(const QnId& id, const QList<QHostAddress>& addrList);
     void updateAllIPList(const QnId& id, const QList<QString>& addr);
     void updateAllIPList(const QnId& id, const QString& addr);
-#endif
+    void removeIPList(const QnId& id);
 private:
-#ifdef PROXY_STRICT_IP
     mutable QMutex m_mutexAddrList;
     QHash<QString, int> m_allIPAddress;
     QHash<QnId, QList<QString> > m_addrById;
-#endif
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H

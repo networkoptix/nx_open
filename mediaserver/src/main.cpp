@@ -1136,6 +1136,7 @@ void QnMain::run()
     ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
 
     initTcpListener();
+    m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>(messageProcessor.data(), QnServerMessageProcessor::isProxy);
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 
