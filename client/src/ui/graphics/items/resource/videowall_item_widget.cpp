@@ -18,6 +18,8 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/animation/variant_animator.h>
+#include <ui/animation/opacity_animator.h>
+#include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/resource/videowall_screen_widget.h>
 #include <ui/graphics/instruments/drop_instrument.h>
 #include <ui/processors/drag_processor.h>
@@ -76,6 +78,10 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
     connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered,   this, [&](){ m_frameColorAnimator->animateTo(1.0); });
     connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft,      this, [&](){ m_frameColorAnimator->animateTo(0.0); });
 
+    /* Status overlay. */
+    m_statusOverlayWidget = new QnStatusOverlayWidget(this);
+    addOverlayWidget(m_statusOverlayWidget, UserVisible, true);
+
     updateLayout();
     updateInfo();
 }
@@ -101,8 +107,7 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     painter->fillRect(paintRect, palette().color(QPalette::Window));
 
     if (!m_layout) {
-        //TODO #GDM VW add status overlay widgets
-        painter->drawPixmap(paintRect, qnSkin->pixmap("events/thumb_no_data.png").scaled(paintRect.size().toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation), QRectF());
+        updateStatusOverlay(Qn::NoDataOverlay);
     }
     else {
         //TODO: #GDM VW paint layout background and calculate its size in bounding geometry
@@ -114,8 +119,10 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             bounding = bounding.united(itemRect);
         }
 
-        if (bounding.isNull())
+        if (bounding.isNull()) {
+            updateStatusOverlay(Qn::NoDataOverlay);
             return;
+        }
 
         qreal xspace = m_layout->cellSpacing().width() * 0.5;
         qreal yspace = m_layout->cellSpacing().height() * 0.5;
@@ -139,6 +146,7 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             xoffset = (paintRect.width() - w) * 0.5 + paintRect.left();
         }
 
+        bool allItemsAreLoaded = true;
         foreach (const QnLayoutItemData &data, m_layout->getItems()) {
             QRectF itemRect = data.combinedGeometry;
             if (!itemRect.isValid())
@@ -150,8 +158,14 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             qreal w1 = (itemRect.width() - xspace*2) * xscale;
             qreal h1 = (itemRect.height() - yspace*2) * yscale;
 
-            paintItem(painter, QRectF(x1, y1, w1, h1), data);
+            if (!paintItem(painter, QRectF(x1, y1, w1, h1), data))
+                allItemsAreLoaded = false;
         }
+
+        if (allItemsAreLoaded)
+             updateStatusOverlay(Qn::EmptyOverlay);
+        else
+             updateStatusOverlay(Qn::LoadingOverlay);
     }
 
     paintFrame(painter, paintRect);
@@ -224,6 +238,7 @@ void QnVideowallItemWidget::dragMoveEvent(QGraphicsSceneDragDropEvent *event) {
 }
 
 void QnVideowallItemWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent *event) {
+    Q_UNUSED(event)
     m_hoverProcessor->forceHoverLeave();
 }
 
@@ -338,7 +353,19 @@ void QnVideowallItemWidget::updateInfo() {
     //TODO: #GDM VW update title text
 }
 
-void QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data) {
+void QnVideowallItemWidget::updateStatusOverlay(Qn::ResourceStatusOverlay overlay) {
+    if (m_statusOverlayWidget->statusOverlay() == overlay)
+        return;
+    m_statusOverlayWidget->setStatusOverlay(overlay);
+
+    if(overlay == Qn::EmptyOverlay)
+        opacityAnimator(m_statusOverlayWidget)->animateTo(0.0);
+    else 
+        opacityAnimator(m_statusOverlayWidget)->animateTo(1.0);
+}
+
+
+bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data) {
     QnResourcePtr resource = (data.resource.id.isValid())
             ? qnResPool->getResourceById(data.resource.id)
             : qnResPool->getResourceByUniqId(data.resource.path);
@@ -380,13 +407,15 @@ void QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
         } else {
             painter->drawPixmap(QRectF(x, y, w, h).toRect(), pixmap);
         }
-        return;
+        return true;
     }
 
     if (resource && (resource->flags() & QnResource::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
         m_widget->m_thumbnailManager->selectResource(resource);
+        return false;
     }
 
+    return true;
     {
         //            QnScopedPainterPenRollback(painter, QPen(Qt::gray, 15));
         //            painter->drawRect(paintRect);

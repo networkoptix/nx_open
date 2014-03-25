@@ -11,6 +11,7 @@
 #include <ui/animation/animated.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
+#include <ui/graphics/items/overlays/overlayed.h>
 #include <ui/processors/drag_process_handler.h>
 
 #include <ui/workbench/workbench_context_aware.h>
@@ -21,9 +22,10 @@ class DragProcessor;
 class HoverFocusProcessor;
 class QnVideowallScreenWidget;
 class VariantAnimator;
+class QnStatusOverlayWidget;
 
-class QnVideowallItemWidget : public Animated<Connective<QnClickableWidget> >, protected DragProcessHandler, public QnWorkbenchContextAware {
-    typedef Animated<Connective<QnClickableWidget> > base_type;
+class QnVideowallItemWidget : public Overlayed<Animated<Connective<QnClickableWidget>>>, protected DragProcessHandler, public QnWorkbenchContextAware {
+    typedef Overlayed<Animated<Connective<QnClickableWidget>>> base_type;
     Q_OBJECT
 
     Q_PROPERTY(QnResourceWidgetFrameColors frameColors READ frameColors WRITE setFrameColors)
@@ -57,8 +59,10 @@ private:
     void updateLayout();
     void updateView();
     void updateInfo();
+    void updateStatusOverlay(Qn::ResourceStatusOverlay overlay);
 
-    void paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data);
+    /** \returns false if item image is still loading */
+    bool paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data);
 private:
     friend class QnVideowallScreenWidget;
     friend class QnVideowallItemWidgetHoverProgressAccessor;
@@ -91,6 +95,9 @@ private:
 
     VariantAnimator* m_frameColorAnimator;
     qreal m_hoverProgress;
+
+    /** Status overlay. */
+    QnStatusOverlayWidget* m_statusOverlayWidget;
 };
 
 #endif // LAYOUT_RESOURCE_OVERLAY_WIDGET_H

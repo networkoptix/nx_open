@@ -246,7 +246,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     /* Status overlay. */
     m_statusOverlayWidget = new QnStatusOverlayWidget(this);
-    addOverlayWidget(m_statusOverlayWidget, UserVisible, true, false, false);
+    addOverlayWidget(m_statusOverlayWidget, UserVisible, true);
 
 
     /* Initialize resource. */
