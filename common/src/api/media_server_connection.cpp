@@ -23,6 +23,7 @@
 #include <api/serializer/serializer.h>
 #include <event_log/events_serializer.h>
 
+#include "network_proxy_factory.h"
 #include "session_manager.h"
 
 namespace {
@@ -88,6 +89,7 @@ namespace {
  * Note that instance of this class will be used from several threads, and
  * must therefore be thread-safe.
  */
+/*
 class QnNetworkProxyFactory: public QObject, public QNetworkProxyFactory {
 public:
     QnNetworkProxyFactory()
@@ -168,7 +170,7 @@ Q_GLOBAL_STATIC(QnNetworkProxyFactory, qn_reserveProxyFactory);
 QPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
     QnNetworkProxyFactory *result(new QnNetworkProxyFactory());
 
-    /* Qt will take ownership of the supplied instance. */
+    // Qt will take ownership of the supplied instance. 
     QNetworkProxyFactory::setApplicationProxyFactory(result); // TODO: #Elric we have a race if this code is run several times from different threads.
 
     return result;
@@ -187,7 +189,7 @@ QnNetworkProxyFactory *QnNetworkProxyFactory::instance()
 }
 
 
-
+*/
 
 // -------------------------------------------------------------------------- //
 // QnMediaServerReplyProcessor

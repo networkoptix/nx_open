@@ -17,6 +17,12 @@
     
     "version": "1.0",
     "data": [
+		{
+            "keys": [
+                "*|*"
+            ],
+            "show_url": true
+        },
         {
             "keys": [
                 "VIVOTEK|SD8362", "VIVOTEK|SD83X3", "VIVOTEK|SD81X1", "VIVOTEK|SD83X1"
