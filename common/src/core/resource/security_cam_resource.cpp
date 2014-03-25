@@ -262,6 +262,18 @@ Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
     return Qn::sharePixels;
 }
 
+void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value) 
+{
+    QString strVal;
+    if (value == Qn::shareFps)
+        strVal = lit("shareFps");
+    else if (value == Qn::noSharing)
+        strVal = lit("noSharing");
+    else
+        strVal = lit("sharePixels");
+    setParam(lit("streamFpsSharing"), strVal, QnDomainDatabase);
+}
+
 QStringList QnSecurityCamResource::getRelayOutputList() const {
     return QStringList();
 }

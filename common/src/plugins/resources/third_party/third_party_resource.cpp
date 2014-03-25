@@ -354,10 +354,12 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     }
     else
         setMotionType( Qn::MT_SoftwareGrid );
-    //if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
-    //    setCameraCapability( Qn:: );
-    //if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
-    //    setCameraCapability( Qn:: );
+    if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
+		setStreamFpsSharingMethod(Qn::shareFps);
+    else if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
+		setStreamFpsSharingMethod(Qn::sharePixels);
+    else 
+        setStreamFpsSharingMethod(Qn::noSharing);
 
     QVector<EncoderData> encoderDataTemp;
     encoderDataTemp.resize( m_encoderCount );
