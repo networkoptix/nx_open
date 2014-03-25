@@ -702,28 +702,28 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
         break;
     }
     case Qt::Key_Up:
-        if(e->modifiers() == 0)
-            moveCursor(QPoint(0, -1), QPoint(-1, 0));
-        if(e->modifiers() & Qt::AltModifier)
+        if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(0, -15));
+        else
+            moveCursor(QPoint(0, -1), QPoint(-1, 0));
         break;
     case Qt::Key_Down:
-        if(e->modifiers() == 0)
-            moveCursor(QPoint(0, 1), QPoint(1, 0));
-        if(e->modifiers() & Qt::AltModifier)
+        if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(0, 15));
+        else
+            moveCursor(QPoint(0, 1), QPoint(1, 0));
         break;
     case Qt::Key_Left:
-        if(e->modifiers() == 0)
-            moveCursor(QPoint(-1, 0), QPoint(0, -1));
-        if(e->modifiers() & Qt::AltModifier)
+        if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(-15, 0));
+        else
+            moveCursor(QPoint(-1, 0), QPoint(0, -1));
         break;
     case Qt::Key_Right:
-        if(e->modifiers() == 0)
-            moveCursor(QPoint(1, 0), QPoint(0, 1));
-        if(e->modifiers() & Qt::AltModifier)
+        if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(15, 0));
+        else
+            moveCursor(QPoint(1, 0), QPoint(0, 1));
         break;
     case Qt::Key_Plus:
     case Qt::Key_Equal:
