@@ -34,6 +34,7 @@
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
+#include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/help/help_topics.h>
 #include <utils/math/color_transformations.h>
 #include <ui/style/globals.h>
@@ -50,7 +51,6 @@
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 
-#include "resource_status_overlay_widget.h"
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
 
