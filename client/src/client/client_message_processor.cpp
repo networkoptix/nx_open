@@ -54,6 +54,37 @@ void QnClientMessageProcessor::updateResource(QnResourcePtr resource)
 
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
+
+    checkForTmpStatus(resource);
+}
+
+void QnClientMessageProcessor::processResources(const QnResourceList& resources)
+{
+    QnCommonMessageProcessor::processResources(resources);
+    foreach(const QnResourcePtr& resource, resources)
+        checkForTmpStatus(resource);
+}
+
+void QnClientMessageProcessor::checkForTmpStatus(QnResourcePtr resource)
+{
+    // process tmp status
+    if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) 
+    {
+        if (mediaServer->getStatus() == QnResource::Offline)
+            updateServerTmpStatus(mediaServer->getId(), QnResource::Offline);
+        else
+            updateServerTmpStatus(mediaServer->getId(), QnResource::NotDefined);
+    }
+    else if (QnServerCameraPtr serverCamera = resource.dynamicCast<QnServerCamera>()) 
+    {
+        QnMediaServerResourcePtr mediaServer = qnResPool->getResourceById(serverCamera->getParentId()).dynamicCast<QnMediaServerResource>();
+        if (mediaServer) {
+            if (mediaServer->getStatus() ==QnResource::Offline)
+                serverCamera->setTmpStatus(QnResource::Offline);
+            else
+                serverCamera->setTmpStatus(QnResource::NotDefined);
+        }
+    }
 }
 
 void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr &resource)
@@ -70,7 +101,7 @@ void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr
     resource->determineOptimalNetIF();
 }
 
-void QnClientMessageProcessor::updateTmpStatus(const QnId& id, QnResource::Status status)
+void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource::Status status)
 {
     QnResourcePtr server = qnResPool->getResourceById(id);
     if (!server)
@@ -85,7 +116,7 @@ void QnClientMessageProcessor::updateTmpStatus(const QnId& id, QnResource::Statu
 void QnClientMessageProcessor::at_remotePeerFound(QnId id, bool isClient, bool isProxy)
 {
     if (isProxy) {
-        updateTmpStatus(id, QnResource::NotDefined);
+        //updateTmpStatus(id, QnResource::NotDefined);
         return;
     }
 
@@ -98,7 +129,7 @@ void QnClientMessageProcessor::at_remotePeerFound(QnId id, bool isClient, bool i
 void QnClientMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool isProxy)
 {
     if (isProxy) {
-        updateTmpStatus(id, QnResource::Offline);
+        //updateTmpStatus(id, QnResource::Offline);
         return;
     }
 

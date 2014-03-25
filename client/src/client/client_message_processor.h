@@ -18,6 +18,7 @@ protected:
     virtual void onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status) override;
     virtual void updateResource(QnResourcePtr resource) override;
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
+    virtual void processResources(const QnResourceList& resources) override;
 private:
     bool m_opened;
 private slots:
@@ -25,7 +26,8 @@ private slots:
     void at_remotePeerLost(QnId id, bool isClient, bool isProxy);
 private:
     void determineOptimalIF(const QnMediaServerResourcePtr &resource);
-    void updateTmpStatus(const QnId& id, QnResource::Status status);
+    void updateServerTmpStatus(const QnId& id, QnResource::Status status);
+    void checkForTmpStatus(QnResourcePtr resource);
 };
 
 #endif // _client_event_manager_h
