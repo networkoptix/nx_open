@@ -117,11 +117,11 @@ signals:
         void sendServerAliveMsg(const QnId& id, bool isAlive, bool isClient);
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream);
-        void doPeriodicTasks();
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
         void at_gotTransaction(QByteArray serializedTran, QSet<QnId> processedPeers);
+        void doPeriodicTasks();
     private:
         QnTransactionTransportSerializer m_serializer;
         //typedef QMap<QUrl, QSharedPointer<QnTransactionTransport>> RemoveUrlMap;
