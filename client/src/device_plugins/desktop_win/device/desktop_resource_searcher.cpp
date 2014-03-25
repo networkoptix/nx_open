@@ -51,7 +51,7 @@ QString QnDesktopResourceSearcher::manufacture() const {
 }
 
 QnResourceList QnDesktopResourceSearcher::findResources() {
-#ifdef Q_OS_WIN
+#if 0
     QnResourceList result;
     if (m_pD3D == 0)
         return result;
