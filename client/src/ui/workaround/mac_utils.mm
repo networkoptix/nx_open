@@ -2,6 +2,10 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QFileDialog>
 #include <QtCore/QFile>
+#include <QtCore/QDebug>
+#include <QtCore/qmath.h>
+
+#include <sys/resource.h>
 
 #import <objc/runtime.h>
 #import <Cocoa/Cocoa.h>
@@ -315,4 +319,19 @@ bool mac_isFullscreen(void *winId) {
 
     bool isFullScreen = [nswindow styleMask] & NSFullScreenWindowMask;
     return isFullScreen;
+}
+
+void mac_setLimits() {
+    /* In MacOS the default limit to maximum number of file descriptors is 256.
+     * It is NOT enough for our program. Manual tests showed that 4096 was enough
+     * for the scene full of identical elements.
+     * But let it be twice more, just to be sure... */
+    const rlim_t wantedLimit = 8192;
+
+    struct rlimit limit;
+    getrlimit(RLIMIT_NOFILE, &limit);
+
+    if (limit.rlim_cur < wantedLimit)
+        limit.rlim_cur = qMin(wantedLimit, limit.rlim_max);
+    setrlimit(RLIMIT_NOFILE, &limit);
 }

@@ -654,6 +654,10 @@ int main(int argc, char **argv)
     win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
 
+#ifdef Q_OS_MAC
+    mac_setLimits();
+#endif
+
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
 
     // this is neccessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created
