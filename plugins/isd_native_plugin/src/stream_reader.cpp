@@ -65,9 +65,9 @@ StreamReader::StreamReader(
     m_audioCodec(nxcip::CODEC_ID_NONE),
 #endif
     m_prevPts(0),
-    m_timestampDelta(std::numeric_limits::max<int64_t>()),
-    m_framesSinceTimeResync(0),
+    m_timestampDelta(std::numeric_limits<int64_t>::max()),
     m_timeHelper( QString::fromLatin1(cameraUid) ),
+    m_framesSinceTimeResync(0),
     m_epollFD(-1)
 #ifdef DUPLICATE_MOTION_TO_HIGH_STREAM
     , m_currentMotionData(nullptr)
@@ -538,10 +538,9 @@ public:
     :
 #ifdef USE_OWN_TIMESTAMP_GENERATION
         ptsBase( 0 ),
-        baseClock( 0 )
-#else
-        encoderThatInitializedThis( -1 )
+        baseClock( 0 ),
 #endif
+        encoderThatInitializedThis( -1 )
     {
     }
 };
@@ -561,11 +560,15 @@ int64_t StreamReader::calcNextTimestamp( int32_t pts
     if( (timeSyncData.encoderThatInitializedThis == -1) ||
         (timeSyncData.encoderThatInitializedThis == m_encoderNum && m_framesSinceTimeResync >= MAX_FRAMES_BETWEEN_TIME_RESYNC)
 #ifdef USE_OWN_TIMESTAMP_GENERATION
-        || (m_timestampDelta == std::numeric_limits::max<int64_t>())
+        || (m_timestampDelta == std::numeric_limits<int64_t>::max())
 #endif
         )
     {
-        resyncTime();
+        resyncTime( pts 
+#ifdef ABSOLUTE_FRAME_TIME_PRESENT
+             , absoluteSourceTimeMS
+#endif
+             );
     }
     ++m_framesSinceTimeResync;
 
@@ -592,14 +595,15 @@ int64_t StreamReader::calcNextTimestamp( int32_t pts
 void StreamReader::resyncTime( int32_t pts
 #ifdef ABSOLUTE_FRAME_TIME_PRESENT
      , int64_t absoluteSourceTimeMS
-#endif )
+#endif
+      )
 {
-    timeSyncData.rtcpTimeStatistics.timestamp = pts;
     struct timeval currentTime;
     memset( &currentTime, 0, sizeof(currentTime) );
     gettimeofday( &currentTime, NULL );
 
 #ifndef USE_OWN_TIMESTAMP_GENERATION
+    timeSyncData.rtcpTimeStatistics.timestamp = pts;
     //timeSyncData.rtcpTimeStatistics.nptTime = ((int64_t)currentTime.tv_sec*MSEC_IN_SEC + currentTime.tv_usec/USEC_IN_MSEC) / (double)MSEC_IN_SEC;
 #ifdef ABSOLUTE_FRAME_TIME_PRESENT
     timeSyncData.rtcpTimeStatistics.nptTime = absoluteSourceTimeMS / (double)MSEC_IN_SEC;
@@ -630,6 +634,9 @@ void StreamReader::resyncTime( int32_t pts
         //std::cout<<"1: m_sharedStreamData.ptsBase = "<<m_sharedStreamData.ptsBase<<", "<<m_sharedStreamData.baseClock<<"\n";
         timeSyncData.encoderThatInitializedThis = m_encoderNum;
         m_timestampDelta = 0;
+
+        std::cout<<"Current local time "<<currentTime.tv_sec<<":"<<currentTime.tv_usec<<", frame time "<<(absoluteSourceTimeMS/1000)<<":"<<(absoluteSourceTimeMS%1000)*1000<<", "
+            "baseClock "<<timeSyncData.baseClock<<", ptsBase "<<timeSyncData.ptsBase<<std::endl;
     }
     else
     {
@@ -638,11 +645,13 @@ void StreamReader::resyncTime( int32_t pts
         //m_timestampDelta = ((pts - timeSyncData.ptsBase) * USEC_IN_SEC) / PTS_FREQUENCY +
         //    ((qnSyncTime->currentMSecsSinceEpoch() * USEC_IN_MSEC) - m_sharedStreamData.baseClock);
         //std::cout<<"2: PTS = "<<pts<<", delta "<<m_timestampDelta<<"\n";
+
+        std::cout<<"Secondary time sync. timeSyncData.baseClock "<<timeSyncData.baseClock<<", timeSyncData.ptsBase "<<timeSyncData.ptsBase<<", pts "<<pts<<std::endl;
     }
 
 #ifdef ABSOLUTE_FRAME_TIME_PRESENT
     //m_currentTimestamp = absoluteSourceTimeMS * USEC_IN_MSEC;
-    m_currentTimestamp = timeSyncData.baseClock + (pts - timeSyncData.ptsBase) * USEC_IN_SEC / PTS_FREQUENCY;
+    m_currentTimestamp = timeSyncData.baseClock + (int64_t)(pts - timeSyncData.ptsBase) * USEC_IN_SEC / PTS_FREQUENCY;
 #else
     m_currentTimestamp = qnSyncTime->currentMSecsSinceEpoch() * USEC_IN_MSEC;
 #endif
