@@ -12,15 +12,15 @@ class QnCameraThumbnailManager;
 class QGraphicsAnchorLayout;
 
 /** Class for displaying single screen of the videowall resource on the scene. */
-class QnVideowallResourceScreenWidget : public QnResourceWidget
+class QnVideowallScreenWidget : public QnResourceWidget
 {
     Q_OBJECT
     typedef QnResourceWidget base_type;
 
 public:
-    QnVideowallResourceScreenWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
+    QnVideowallScreenWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
 
-    virtual ~QnVideowallResourceScreenWidget();
+    virtual ~QnVideowallScreenWidget();
 
     /**
      * \returns                         Videowall associated with this widget.
@@ -41,7 +41,7 @@ private slots:
     void at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 
 private:
-    friend class QnLayoutResourceOverlayWidget;
+    friend class QnVideowallItemWidget;
 
     QnVideoWallResourcePtr m_videowall;
     QUuid m_pcUuid;

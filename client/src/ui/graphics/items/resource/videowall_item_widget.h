@@ -19,17 +19,17 @@
 
 class DragProcessor;
 class HoverFocusProcessor;
-class QnVideowallResourceScreenWidget;
+class QnVideowallScreenWidget;
 class VariantAnimator;
 
-class QnLayoutResourceOverlayWidget : public Animated<Connective<QnClickableWidget> >, protected DragProcessHandler, public QnWorkbenchContextAware {
+class QnVideowallItemWidget : public Animated<Connective<QnClickableWidget> >, protected DragProcessHandler, public QnWorkbenchContextAware {
     typedef Animated<Connective<QnClickableWidget> > base_type;
     Q_OBJECT
 
     Q_PROPERTY(QnResourceWidgetFrameColors frameColors READ frameColors WRITE setFrameColors)
 
 public:
-    explicit QnLayoutResourceOverlayWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallResourceScreenWidget *parent, Qt::WindowFlags windowFlags = 0);
+    explicit QnVideowallItemWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallScreenWidget *parent, Qt::WindowFlags windowFlags = 0);
 
     const QnResourceWidgetFrameColors &frameColors() const;
     void setFrameColors(const QnResourceWidgetFrameColors &frameColors);
@@ -60,11 +60,11 @@ private:
 
     void paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data);
 private:
-    friend class QnVideowallResourceScreenWidget;
-    friend class QnLayoutResourceOverlayWidgetHoverProgressAccessor;
+    friend class QnVideowallScreenWidget;
+    friend class QnVideowallItemWidgetHoverProgressAccessor;
 
     /** Parent widget */
-    QnVideowallResourceScreenWidget* m_widget;
+    QnVideowallScreenWidget* m_widget;
 
     DragProcessor *m_dragProcessor;
     HoverFocusProcessor* m_hoverProcessor;

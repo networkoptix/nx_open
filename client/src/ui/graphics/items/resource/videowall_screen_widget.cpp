@@ -1,4 +1,4 @@
-#include "videowall_resource_screen_widget.h"
+#include "videowall_screen_widget.h"
 
 #include <QtGui/QPainter>
 
@@ -17,7 +17,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
-#include <ui/graphics/items/resource/layout_resource_overlay_widget.h>
+#include <ui/graphics/items/resource/videowall_item_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 
@@ -26,7 +26,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/container.h>
 
-QnVideowallResourceScreenWidget::QnVideowallResourceScreenWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
+QnVideowallScreenWidget::QnVideowallScreenWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     base_type(context, item, parent),
     m_mainLayout(NULL),
     m_layoutUpdateRequired(true)
@@ -35,13 +35,13 @@ QnVideowallResourceScreenWidget::QnVideowallResourceScreenWidget(QnWorkbenchCont
 
     m_videowall = base_type::resource().dynamicCast<QnVideoWallResource>();
     if(!m_videowall) {
-        qnCritical("QnVideowallResourceScreenWidget was created with a non-videowall resource.");
+        qnCritical("QnVideowallScreenWidget was created with a non-videowall resource.");
         return;
     }
 
-    connect(m_videowall, &QnVideoWallResource::itemAdded,     this, &QnVideowallResourceScreenWidget::at_videoWall_itemAdded);
-    connect(m_videowall, &QnVideoWallResource::itemChanged,   this, &QnVideowallResourceScreenWidget::at_videoWall_itemChanged);
-    connect(m_videowall, &QnVideoWallResource::itemRemoved,   this, &QnVideowallResourceScreenWidget::at_videoWall_itemRemoved);
+    connect(m_videowall, &QnVideoWallResource::itemAdded,     this, &QnVideowallScreenWidget::at_videoWall_itemAdded);
+    connect(m_videowall, &QnVideoWallResource::itemChanged,   this, &QnVideowallScreenWidget::at_videoWall_itemChanged);
+    connect(m_videowall, &QnVideoWallResource::itemRemoved,   this, &QnVideowallScreenWidget::at_videoWall_itemRemoved);
 
     m_pcUuid = item->data(Qn::VideoWallPcGuidRole).value<QUuid>();
     if (!m_videowall->hasPc(m_pcUuid))
@@ -64,7 +64,7 @@ QnVideowallResourceScreenWidget::QnVideowallResourceScreenWidget(QnWorkbenchCont
         at_videoWall_itemAdded(m_videowall, item);
 
     m_thumbnailManager = context->instance<QnCameraThumbnailManager>();
-    connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this, &QnVideowallResourceScreenWidget::at_thumbnailReady);
+    connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this, &QnVideowallScreenWidget::at_thumbnailReady);
 
     updateButtonsVisibility();
     updateTitleText();
@@ -76,14 +76,14 @@ QnVideowallResourceScreenWidget::QnVideowallResourceScreenWidget(QnWorkbenchCont
     setOverlayVisible(true, false);
 }
 
-QnVideowallResourceScreenWidget::~QnVideowallResourceScreenWidget() {
+QnVideowallScreenWidget::~QnVideowallScreenWidget() {
 }
 
-const QnVideoWallResourcePtr &QnVideowallResourceScreenWidget::videowall() const {
+const QnVideoWallResourcePtr &QnVideowallScreenWidget::videowall() const {
     return m_videowall;
 }
 
-Qn::RenderStatus QnVideowallResourceScreenWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
+Qn::RenderStatus QnVideowallScreenWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
     Q_UNUSED(channel)
     Q_UNUSED(channelRect)
 
@@ -95,11 +95,11 @@ Qn::RenderStatus QnVideowallResourceScreenWidget::paintChannelBackground(QPainte
     return Qn::NewFrameRendered;
 }
 
-QnResourceWidget::Buttons QnVideowallResourceScreenWidget::calculateButtonsVisibility() const {
+QnResourceWidget::Buttons QnVideowallScreenWidget::calculateButtonsVisibility() const {
     return 0;
 }
 
-QString QnVideowallResourceScreenWidget::calculateTitleText() const {
+QString QnVideowallScreenWidget::calculateTitleText() const {
     QStringList pcUuids;
     foreach (const QUuid &uuid, m_videowall->getPcs().keys())
         pcUuids.append(uuid.toString());
@@ -119,7 +119,7 @@ QString QnVideowallResourceScreenWidget::calculateTitleText() const {
     return tr("Pc %1 - Screens %2", "", m_screens.size()).arg(idx).arg(screenIndices.join(lit(" ,")));
 }
 
-void QnVideowallResourceScreenWidget::updateLayout() {
+void QnVideowallScreenWidget::updateLayout() {
     if (!m_layoutUpdateRequired)
         return;
 
@@ -144,7 +144,7 @@ void QnVideowallResourceScreenWidget::updateLayout() {
     // can have several items on a single screen
     if (m_screens.size() == 1) {
         foreach (const QnVideoWallItem &item, m_items) {
-            QnLayoutResourceOverlayWidget *itemWidget = new QnLayoutResourceOverlayWidget(m_videowall, item.uuid, this);
+            QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, item.uuid, this);
             itemWidget->setFrameColors(frameColors());
 
             if (item.geometry.left() == m_desktopGeometry.left())
@@ -169,7 +169,7 @@ void QnVideowallResourceScreenWidget::updateLayout() {
 
         }
     } else if (m_items.size() == 1 ) {    // can have only on item on several screens
-        QnLayoutResourceOverlayWidget *itemWidget = new QnLayoutResourceOverlayWidget(m_videowall, m_items.first().uuid, this);
+        QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, m_items.first().uuid, this);
         itemWidget->setFrameColors(frameColors());
 
         m_mainLayout->addAnchors(itemWidget, m_mainLayout, Qt::Horizontal | Qt::Vertical);
@@ -179,12 +179,12 @@ void QnVideowallResourceScreenWidget::updateLayout() {
 }
 
 
-void QnVideowallResourceScreenWidget::at_thumbnailReady(int resourceId, const QPixmap &thumbnail) {
+void QnVideowallScreenWidget::at_thumbnailReady(int resourceId, const QPixmap &thumbnail) {
     m_thumbs[resourceId] = thumbnail;
     update();
 }
 
-void QnVideowallResourceScreenWidget::at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
+void QnVideowallScreenWidget::at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     Q_UNUSED(videoWall)
     if (item.pcUuid != m_pcUuid)
         return;
@@ -197,7 +197,7 @@ void QnVideowallResourceScreenWidget::at_videoWall_itemAdded(const QnVideoWallRe
     update();
 }
 
-void QnVideowallResourceScreenWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
+void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     Q_UNUSED(videoWall)
     if (item.pcUuid != m_pcUuid)
         return;
@@ -215,7 +215,7 @@ void QnVideowallResourceScreenWidget::at_videoWall_itemChanged(const QnVideoWall
     update();
 }
 
-void QnVideowallResourceScreenWidget::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
+void QnVideowallScreenWidget::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     Q_UNUSED(videoWall)
     if (item.pcUuid != m_pcUuid)
         return;

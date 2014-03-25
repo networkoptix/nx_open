@@ -198,11 +198,11 @@
         "palette": { "default": { "window": "black" } }
     },
     
-    "QnVideowallResourceScreenWidget": {
+    "QnVideowallScreenWidget": {
         "palette": { "default": { "window": "#000000ff" } }
     },
     
-    "QnLayoutResourceOverlayWidget": {
+    "QnVideowallItemWidget": {
         "palette": { "default": { "window": "#000000ff" } }
     },
     

@@ -49,7 +49,7 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/resource/videowall_resource_screen_widget.h>
+#include <ui/graphics/items/resource/videowall_screen_widget.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/graphics/items/grid/curtain_item.h>
@@ -787,7 +787,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     }
     else
     if (resource->hasFlags(QnResource::videowall)) {
-        widget = new QnVideowallResourceScreenWidget(context(), item);
+        widget = new QnVideowallScreenWidget(context(), item);
     }
     else
     if (resource->hasFlags(QnResource::media)) {

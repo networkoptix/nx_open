@@ -1,4 +1,4 @@
-#include "layout_resource_overlay_widget.h"
+#include "videowall_item_widget.h"
 
 #include <QtCore/QMimeData>
 #include <QtGui/QDrag>
@@ -18,7 +18,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/animation/variant_animator.h>
-#include <ui/graphics/items/resource/videowall_resource_screen_widget.h>
+#include <ui/graphics/items/resource/videowall_screen_widget.h>
 #include <ui/graphics/instruments/drop_instrument.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/processors/hover_processor.h>
@@ -29,13 +29,13 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/linear_combination.h>
 
-class QnLayoutResourceOverlayWidgetHoverProgressAccessor: public AbstractAccessor {
+class QnVideowallItemWidgetHoverProgressAccessor: public AbstractAccessor {
     virtual QVariant get(const QObject *object) const override {
-        return static_cast<const QnLayoutResourceOverlayWidget *>(object)->m_hoverProgress;
+        return static_cast<const QnVideowallItemWidget *>(object)->m_hoverProgress;
     }
 
     virtual void set(QObject *object, const QVariant &value) const override {
-        QnLayoutResourceOverlayWidget *widget = static_cast<QnLayoutResourceOverlayWidget *>(object);
+        QnVideowallItemWidget *widget = static_cast<QnVideowallItemWidget *>(object);
         if(qFuzzyCompare(widget->m_hoverProgress, value.toReal()))
             return;
 
@@ -44,7 +44,7 @@ class QnLayoutResourceOverlayWidgetHoverProgressAccessor: public AbstractAccesso
     }
 };
 
-QnLayoutResourceOverlayWidget::QnLayoutResourceOverlayWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallResourceScreenWidget *parent, Qt::WindowFlags windowFlags):
+QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallScreenWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
     QnWorkbenchContextAware(parent),
     m_widget(parent),
@@ -57,15 +57,15 @@ QnLayoutResourceOverlayWidget::QnLayoutResourceOverlayWidget(const QnVideoWallRe
     setAcceptedMouseButtons(Qt::LeftButton | Qt::RightButton);
     setClickableButtons(Qt::LeftButton | Qt::RightButton);
 
-    connect(m_videowall, &QnVideoWallResource::itemChanged, this, &QnLayoutResourceOverlayWidget::at_videoWall_itemChanged);
-    connect(this, &QnClickableWidget::doubleClicked, this, &QnLayoutResourceOverlayWidget::at_doubleClicked);
+    connect(m_videowall, &QnVideoWallResource::itemChanged, this, &QnVideowallItemWidget::at_videoWall_itemChanged);
+    connect(this, &QnClickableWidget::doubleClicked, this, &QnVideowallItemWidget::at_doubleClicked);
 
     m_dragProcessor = new DragProcessor(this);
     m_dragProcessor->setHandler(this);
 
     m_frameColorAnimator = new VariantAnimator(this);
     m_frameColorAnimator->setTargetObject(this);
-    m_frameColorAnimator->setAccessor(new QnLayoutResourceOverlayWidgetHoverProgressAccessor());
+    m_frameColorAnimator->setAccessor(new QnVideowallItemWidgetHoverProgressAccessor());
     m_frameColorAnimator->setSpeed(1000.0 / qnGlobals->opacityChangePeriod());
     registerAnimation(m_frameColorAnimator);
 
@@ -80,17 +80,17 @@ QnLayoutResourceOverlayWidget::QnLayoutResourceOverlayWidget(const QnVideoWallRe
     updateInfo();
 }
 
-const QnResourceWidgetFrameColors &QnLayoutResourceOverlayWidget::frameColors() const {
+const QnResourceWidgetFrameColors &QnVideowallItemWidget::frameColors() const {
     return m_frameColors;
 }
 
-void QnLayoutResourceOverlayWidget::setFrameColors(const QnResourceWidgetFrameColors &frameColors) {
+void QnVideowallItemWidget::setFrameColors(const QnResourceWidgetFrameColors &frameColors) {
     m_frameColors = frameColors;
     update();
 }
 
 
-void QnLayoutResourceOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(widget)
     QRectF paintRect = option->rect;
     if (!paintRect.isValid())
@@ -157,7 +157,7 @@ void QnLayoutResourceOverlayWidget::paint(QPainter *painter, const QStyleOptionG
     paintFrame(painter, paintRect);
 }
 
-void QnLayoutResourceOverlayWidget::paintFrame(QPainter *painter, const QRectF &paintRect) {
+void QnVideowallItemWidget::paintFrame(QPainter *painter, const QRectF &paintRect) {
     if (!paintRect.isValid())
         return;
 
@@ -182,7 +182,7 @@ void QnLayoutResourceOverlayWidget::paintFrame(QPainter *painter, const QRectF &
 
 }
 
-void QnLayoutResourceOverlayWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event) {
+void QnVideowallItemWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event) {
     const QMimeData *mimeData = event->mimeData();
 
     QnResourceList resources = QnWorkbenchResource::deserializeResources(mimeData);
@@ -215,7 +215,7 @@ void QnLayoutResourceOverlayWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *
     event->acceptProposedAction();
 }
 
-void QnLayoutResourceOverlayWidget::dragMoveEvent(QGraphicsSceneDragDropEvent *event) {
+void QnVideowallItemWidget::dragMoveEvent(QGraphicsSceneDragDropEvent *event) {
     if(m_dragged.resources.empty() && m_dragged.videoWallItems.empty())
         return;
 
@@ -223,11 +223,11 @@ void QnLayoutResourceOverlayWidget::dragMoveEvent(QGraphicsSceneDragDropEvent *e
     event->acceptProposedAction();
 }
 
-void QnLayoutResourceOverlayWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent *event) {
+void QnVideowallItemWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent *event) {
     m_hoverProcessor->forceHoverLeave();
 }
 
-void QnLayoutResourceOverlayWidget::dropEvent(QGraphicsSceneDragDropEvent *event) {
+void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event) {
 
     QnActionParameters parameters;
     if (!m_dragged.videoWallItems.isEmpty())
@@ -240,7 +240,7 @@ void QnLayoutResourceOverlayWidget::dropEvent(QGraphicsSceneDragDropEvent *event
     event->acceptProposedAction();
 }
 
-void QnLayoutResourceOverlayWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+void QnVideowallItemWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     base_type::mousePressEvent(event);
     if (event->button() != Qt::LeftButton)
         return;
@@ -249,12 +249,12 @@ void QnLayoutResourceOverlayWidget::mousePressEvent(QGraphicsSceneMouseEvent *ev
 }
 
 
-void QnLayoutResourceOverlayWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+void QnVideowallItemWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     base_type::mouseMoveEvent(event);
     m_dragProcessor->mouseMoveEvent(this, event);
 }
 
-void QnLayoutResourceOverlayWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+void QnVideowallItemWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     base_type::mouseReleaseEvent(event);
     if (event->button() != Qt::LeftButton)
         return;
@@ -262,7 +262,7 @@ void QnLayoutResourceOverlayWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *
     m_dragProcessor->mouseReleaseEvent(this, event);
 }
 
-void QnLayoutResourceOverlayWidget::startDrag(DragInfo *info) {
+void QnVideowallItemWidget::startDrag(DragInfo *info) {
     Q_UNUSED(info)
 
     QDrag *drag = new QDrag(this);
@@ -277,7 +277,7 @@ void QnLayoutResourceOverlayWidget::startDrag(DragInfo *info) {
     m_dragProcessor->reset();
 }
 
-void QnLayoutResourceOverlayWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
+void QnVideowallItemWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
     if (event->button() != Qt::RightButton)
         return;
 
@@ -288,7 +288,7 @@ void QnLayoutResourceOverlayWidget::clickedNotify(QGraphicsSceneMouseEvent *even
     popupMenu->exec(event->screenPos());
 }
 
-void QnLayoutResourceOverlayWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
+void QnVideowallItemWidget::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     Q_UNUSED(videoWall)
     if (item.uuid != m_itemUuid)
         return;
@@ -296,7 +296,7 @@ void QnLayoutResourceOverlayWidget::at_videoWall_itemChanged(const QnVideoWallRe
     updateInfo();
 }
 
-void QnLayoutResourceOverlayWidget::at_doubleClicked(Qt::MouseButton button) {
+void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button) {
     if (button != Qt::LeftButton)
         return;
 
@@ -306,7 +306,7 @@ void QnLayoutResourceOverlayWidget::at_doubleClicked(Qt::MouseButton button) {
     );
 }
 
-void QnLayoutResourceOverlayWidget::updateLayout() {
+void QnVideowallItemWidget::updateLayout() {
     QnVideoWallItem item = m_videowall->getItem(m_itemUuid);
     QnLayoutResourcePtr layout = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
     if (m_layout == layout)
@@ -317,28 +317,28 @@ void QnLayoutResourceOverlayWidget::updateLayout() {
     }
     m_layout = layout;
     if (m_layout) {
-        connect(m_layout, &QnLayoutResource::itemAdded,                 this, &QnLayoutResourceOverlayWidget::updateView);
-        connect(m_layout, &QnLayoutResource::itemChanged,               this, &QnLayoutResourceOverlayWidget::updateView);
-        connect(m_layout, &QnLayoutResource::itemRemoved,               this, &QnLayoutResourceOverlayWidget::updateView);
-        connect(m_layout, &QnLayoutResource::cellAspectRatioChanged,    this, &QnLayoutResourceOverlayWidget::updateView);
-        connect(m_layout, &QnLayoutResource::cellSpacingChanged,        this, &QnLayoutResourceOverlayWidget::updateView);
-        connect(m_layout, &QnLayoutResource::backgroundImageChanged,    this, &QnLayoutResourceOverlayWidget::updateView);
-        connect(m_layout, &QnLayoutResource::backgroundSizeChanged,     this, &QnLayoutResourceOverlayWidget::updateView);
-        connect(m_layout, &QnLayoutResource::backgroundOpacityChanged,  this, &QnLayoutResourceOverlayWidget::updateView);
+        connect(m_layout, &QnLayoutResource::itemAdded,                 this, &QnVideowallItemWidget::updateView);
+        connect(m_layout, &QnLayoutResource::itemChanged,               this, &QnVideowallItemWidget::updateView);
+        connect(m_layout, &QnLayoutResource::itemRemoved,               this, &QnVideowallItemWidget::updateView);
+        connect(m_layout, &QnLayoutResource::cellAspectRatioChanged,    this, &QnVideowallItemWidget::updateView);
+        connect(m_layout, &QnLayoutResource::cellSpacingChanged,        this, &QnVideowallItemWidget::updateView);
+        connect(m_layout, &QnLayoutResource::backgroundImageChanged,    this, &QnVideowallItemWidget::updateView);
+        connect(m_layout, &QnLayoutResource::backgroundSizeChanged,     this, &QnVideowallItemWidget::updateView);
+        connect(m_layout, &QnLayoutResource::backgroundOpacityChanged,  this, &QnVideowallItemWidget::updateView);
 
-        connect(m_layout, &QnResource::nameChanged,                     this, &QnLayoutResourceOverlayWidget::updateInfo);
+        connect(m_layout, &QnResource::nameChanged,                     this, &QnVideowallItemWidget::updateInfo);
     }
 }
 
-void QnLayoutResourceOverlayWidget::updateView() {
+void QnVideowallItemWidget::updateView() {
     update(); //direct connect is not so convinient because of overloaded function
 }
 
-void QnLayoutResourceOverlayWidget::updateInfo() {
+void QnVideowallItemWidget::updateInfo() {
     //TODO: #GDM VW update title text
 }
 
-void QnLayoutResourceOverlayWidget::paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data) {
+void QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data) {
     QnResourcePtr resource = (data.resource.id.isValid())
             ? qnResPool->getResourceById(data.resource.id)
             : qnResPool->getResourceByUniqId(data.resource.path);
