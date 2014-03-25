@@ -34,6 +34,7 @@
 #include "isd_audio_packet.h"
 
 #define USE_OWN_TIMESTAMP_GENERATION
+//#define DEBUG_OUTPUT
 
 
 static const int HIGH_QUALITY_ENCODER = 0;
@@ -588,7 +589,9 @@ int64_t StreamReader::calcNextTimestamp( int32_t pts
         m_currentTimestamp + m_timestampDelta;
 #endif
 
+#ifdef DEBUG_OUTPUT
     std::cout<<"pts "<<pts<<", timestamp "<<newTs<<", currentLocalTime "<<currentLocalTime*USEC_IN_MSEC<<", "<<(m_encoderNum == 0 ? "hgh" : "low")<<std::endl;
+#endif
     return newTs;
 }
 
@@ -617,8 +620,10 @@ void StreamReader::resyncTime( int32_t pts
 
 #ifdef ABSOLUTE_FRAME_TIME_PRESENT
     currentLocalTime = qnSyncTime->currentMSecsSinceEpoch();
+#ifdef DEBUG_OUTPUT
     std::cout<<"Current local time "<<currentTime.tv_sec<<":"<<currentTime.tv_usec<<", frame time "<<(absoluteSourceTimeMS/1000)<<":"<<(absoluteSourceTimeMS%1000)*1000<<", "
         "RTCP local time "<<std::fixed<<timeSyncData.rtcpTimeStatistics.localtime<<", pts "<<timeSyncData.rtcpTimeStatistics.timestamp<<std::endl;
+#endif
 #endif
 
 #else
@@ -635,8 +640,10 @@ void StreamReader::resyncTime( int32_t pts
         timeSyncData.encoderThatInitializedThis = m_encoderNum;
         m_timestampDelta = 0;
 
+#ifdef DEBUG_OUTPUT
         std::cout<<"Current local time "<<currentTime.tv_sec<<":"<<currentTime.tv_usec<<", frame time "<<(absoluteSourceTimeMS/1000)<<":"<<(absoluteSourceTimeMS%1000)*1000<<", "
             "baseClock "<<timeSyncData.baseClock<<", ptsBase "<<timeSyncData.ptsBase<<std::endl;
+#endif
     }
     else
     {
@@ -646,7 +653,9 @@ void StreamReader::resyncTime( int32_t pts
         //    ((qnSyncTime->currentMSecsSinceEpoch() * USEC_IN_MSEC) - m_sharedStreamData.baseClock);
         //std::cout<<"2: PTS = "<<pts<<", delta "<<m_timestampDelta<<"\n";
 
+#ifdef DEBUG_OUTPUT
         std::cout<<"Secondary time sync. timeSyncData.baseClock "<<timeSyncData.baseClock<<", timeSyncData.ptsBase "<<timeSyncData.ptsBase<<", pts "<<pts<<std::endl;
+#endif
     }
 
 #ifdef ABSOLUTE_FRAME_TIME_PRESENT
