@@ -86,7 +86,7 @@ private:
     unsigned int m_prevPts;
     int64_t m_ptsDelta;
     QnRtspTimeHelper m_timeHelper;
-    RtspStatistic m_timeStatistics;
+    int m_framesSinceTimeResync;
 
     int m_epollFD;
 #ifdef DUPLICATE_MOTION_TO_HIGH_STREAM
@@ -102,7 +102,11 @@ private:
     int getAudioPacket( nxcip::MediaDataPacket** packet );
     void fillAudioFormat( const ISDAudioPacket& audioPacket );
 #endif
-    int64_t calcNextTimestamp( unsigned int pts );
+    int64_t calcNextTimestamp( int32_t pts
+#ifdef ABSOLUTE_FRAME_TIME_PRESENT
+        , int64_t absoluteTimeMS
+#endif
+         );
 };
 
 #endif  //ILP_STREAM_READER_H
