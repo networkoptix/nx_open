@@ -8,6 +8,7 @@
 #include <core/resource/layout_item_data.h>
 #include <core/resource/videowall_item_index.h>
 
+#include <ui/animation/animated.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/processors/drag_process_handler.h>
@@ -21,8 +22,8 @@ class HoverFocusProcessor;
 class QnVideowallResourceScreenWidget;
 class VariantAnimator;
 
-class QnLayoutResourceOverlayWidget : public Connective<QnClickableWidget>, protected DragProcessHandler, public QnWorkbenchContextAware {
-    typedef Connective<QnClickableWidget> base_type;
+class QnLayoutResourceOverlayWidget : public Animated<Connective<QnClickableWidget> >, protected DragProcessHandler, public QnWorkbenchContextAware {
+    typedef Animated<Connective<QnClickableWidget> > base_type;
     Q_OBJECT
 
     Q_PROPERTY(QnResourceWidgetFrameColors frameColors READ frameColors WRITE setFrameColors)

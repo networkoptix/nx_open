@@ -19,7 +19,6 @@
 #include <ui/actions/action_manager.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/items/resource/videowall_resource_screen_widget.h>
-#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/drop_instrument.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/processors/hover_processor.h>
@@ -68,7 +67,7 @@ QnLayoutResourceOverlayWidget::QnLayoutResourceOverlayWidget(const QnVideoWallRe
     m_frameColorAnimator->setTargetObject(this);
     m_frameColorAnimator->setAccessor(new QnLayoutResourceOverlayWidgetHoverProgressAccessor());
     m_frameColorAnimator->setSpeed(1000.0 / qnGlobals->opacityChangePeriod());
-    m_frameColorAnimator->setTimer(InstrumentManager::animationTimer(scene()));
+    registerAnimation(m_frameColorAnimator);
 
     m_hoverProcessor = new HoverFocusProcessor(this);
     m_hoverProcessor->addTargetItem(this);
