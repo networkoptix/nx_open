@@ -22,7 +22,7 @@ namespace ec2
         bool allowCameraChanges;
     };
 
-    QN_DEFINE_STRUCT_SERIALIZATORS( QnRuntimeInfo, (publicIp)(systemName)(sessionKey)(allowCameraChanges) )
+    QN_DEFINE_STRUCT_SERIALIZATORS( QnRuntimeInfo, (publicIp)(sessionKey)(allowCameraChanges) )
 }
 
 #endif  //EC2_RUNTIME_INFO_H
