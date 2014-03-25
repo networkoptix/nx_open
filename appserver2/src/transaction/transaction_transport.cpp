@@ -334,7 +334,8 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
             if (QnTransactionLog::instance()) {
                 qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
                 qint64 remoteTime = itrTime->second.toLongLong();
-                setTimeDiff(localTime - remoteTime);
+                if (remoteTime != -1)
+                    setTimeDiff(localTime - remoteTime);
             }
             setState(ConnectingStage2);
         }

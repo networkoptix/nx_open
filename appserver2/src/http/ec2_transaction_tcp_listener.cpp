@@ -50,8 +50,13 @@ void QnTransactionTcpProcessor::run()
     bool isClient = query.hasQueryItem("isClient");
     QUuid remoteGuid  = query.queryItemValue(lit("guid"));
     qint64 removeTime  = query.queryItemValue(lit("time")).toLongLong();
-    qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
-    qint64 timeDiff = removeTime - localTime;
+    qint64 localTime = -1;
+    qint64 timeDiff = 0;
+    if (QnTransactionLog::instance()) {
+        localTime = QnTransactionLog::instance()->getRelativeTime();
+        if (removeTime != -1)
+            timeDiff = removeTime - localTime;
+    }
 
     if (remoteGuid.isNull()) {
         qWarning() << "Invalid incoming request. GUID must be filled!";
