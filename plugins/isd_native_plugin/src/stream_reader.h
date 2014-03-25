@@ -82,9 +82,9 @@ private:
     
     vmux_stream_info_t motion_stream_info;
     ISDMotionEstimation m_motionEstimation;
-    int64_t m_firstFrameTime;
+    int64_t m_currentTimestamp;
     unsigned int m_prevPts;
-    int64_t m_ptsDelta;
+    int64_t m_timestampDelta;
     QnRtspTimeHelper m_timeHelper;
     int m_framesSinceTimeResync;
 
@@ -107,6 +107,11 @@ private:
         , int64_t absoluteTimeMS
 #endif
          );
+    void resyncTime( int32_t pts
+#ifdef ABSOLUTE_FRAME_TIME_PRESENT
+         , int64_t absoluteSourceTimeMS
+#endif
+     );
 };
 
 #endif  //ILP_STREAM_READER_H
