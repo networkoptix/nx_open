@@ -6,10 +6,10 @@
 #ifndef ILP_STREAM_READER_H
 #define ILP_STREAM_READER_H
 
+#include <memory>
 #include <stdint.h>
 
-#include <memory>
-#include <mutex>
+#include <QtCore/QMutex>
 
 #ifndef NO_ISD_AUDIO
 #include <isd/amux/amux_iface.h>
@@ -18,11 +18,8 @@
 
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
-#include <utils/network/rtpsession.h>
 
 #include "isd_motion_estimation.h"
-
-//#define DUPLICATE_MOTION_TO_HIGH_STREAM
 
 
 class ISDAudioPacket;
@@ -78,20 +75,15 @@ private:
     nxcip::CompressionType m_audioCodec;
     std::unique_ptr<nxcip::AudioFormat> m_audioFormat;
 #endif
-    mutable std::mutex m_mutex;
+    mutable QMutex m_mutex;
     
     vmux_stream_info_t motion_stream_info;
     ISDMotionEstimation m_motionEstimation;
     int64_t m_currentTimestamp;
     unsigned int m_prevPts;
     int64_t m_timestampDelta;
-    QnRtspTimeHelper m_timeHelper;
     int m_framesSinceTimeResync;
-
     int m_epollFD;
-#ifdef DUPLICATE_MOTION_TO_HIGH_STREAM
-    MotionDataPicture* m_currentMotionData;
-#endif
 
     int initializeVMux();
     int getVideoPacket( nxcip::MediaDataPacket** packet );
@@ -102,16 +94,8 @@ private:
     int getAudioPacket( nxcip::MediaDataPacket** packet );
     void fillAudioFormat( const ISDAudioPacket& audioPacket );
 #endif
-    int64_t calcNextTimestamp( int32_t pts
-#ifdef ABSOLUTE_FRAME_TIME_PRESENT
-        , int64_t absoluteTimeMS
-#endif
-         );
-    void resyncTime( int32_t pts
-#ifdef ABSOLUTE_FRAME_TIME_PRESENT
-         , int64_t absoluteSourceTimeMS
-#endif
-     );
+    int64_t calcNextTimestamp( int32_t pts, int64_t absoluteTimeMS );
+    void resyncTime( int32_t pts, int64_t absoluteSourceTimeMS );
 };
 
 #endif  //ILP_STREAM_READER_H
