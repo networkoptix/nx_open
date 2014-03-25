@@ -11,7 +11,7 @@ unix {
 
 mac {
   OBJECTIVE_SOURCES += ${basedir}/src/utils/mac_utils.mm
-  LIBS += -lobjc -framework Foundation
+  LIBS += -lobjc -framework Foundation -framework AppKit
 }
 
 pb.name = Generating code from ${QMAKE_FILE_IN} to ${QMAKE_FILE_BASE}

@@ -26,6 +26,7 @@ public:
                         int desktopNum,           // = 0,
                         const QnAudioDeviceInfo* audioDevice,
                         const QnAudioDeviceInfo* audioDevice2,
+                        Qn::CaptureMode mode,
                         bool captureCursor,
                         const QSize& captureResolution,
                         float encodeQualuty, // in range 0.0 .. 1.0
@@ -122,6 +123,7 @@ private:
     int m_maxAudioJitter;
     QVector <EncodedAudioInfo*> m_audioInfo;
 
+    Qn::CaptureMode m_captureMode;
     bool m_captureCursor;
     QSize m_captureResolution;
     float m_encodeQualuty;

@@ -11,6 +11,7 @@
 #endif
 
 #include <utils/common/string.h>
+#include <utils/mac_utils.h>
 
 
 QString QnEnvironment::searchInPath(QString executable) {
@@ -66,18 +67,7 @@ void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
     QProcess::startDetached(explorer, params);
 #elif defined(Q_OS_MAC)
     Q_UNUSED(parent);
-    
-    QStringList scriptArgs;
-    scriptArgs 
-        << lit("-e")
-        << lit("tell application \"Finder\" to reveal POSIX file \"%1\"").arg(checkedPath);
-    QProcess::execute(lit("/usr/bin/osascript"), scriptArgs);
-    
-    scriptArgs.clear();
-    scriptArgs 
-        << lit("-e")
-        << lit("tell application \"Finder\" to activate");
-    QProcess::execute(lit("/usr/bin/osascript"), scriptArgs);
+    mac_openInFinder(path);
 #else
     Q_UNUSED(parent)
     QDesktopServices::openUrl(QUrl(lit("file:///") + QFileInfo(path).path(), QUrl::TolerantMode));
