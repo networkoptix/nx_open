@@ -2,18 +2,19 @@
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
+#include <QtCore/QUrl>
 
 #import <objc/runtime.h>
 #import <Cocoa/Cocoa.h>
 
-static inline NSString* fromQString(const QString &string)
+static NSString* fromQString(const QString &string)
 {
     const QByteArray utf8 = string.toUtf8();
     const char* cString = utf8.constData();
     return [[NSString alloc] initWithUTF8String:cString];
 }
 
-static inline NSArray *fromQStringList(const QStringList &strings) {
+static NSArray *fromQStringList(const QStringList &strings) {
     NSMutableArray *array = [NSMutableArray array];
 
     foreach (const QString& item, strings) {
@@ -21,6 +22,14 @@ static inline NSArray *fromQStringList(const QStringList &strings) {
     }
 
     return array;
+}
+
+static QString toQString(NSString *string)
+{
+    if (!string)
+        return QString();
+
+    return QString::fromUtf8([string UTF8String]);
 }
 
 QString mac_getMoviesDir() {
@@ -32,4 +41,10 @@ bool mac_startDetached(const QString &path, const QStringList &arguments) {
        but we can't call 'release' here because this object will receive a message when the process will finish. */
     NSTask *task = [NSTask launchedTaskWithLaunchPath:fromQString(path) arguments:fromQStringList(arguments)];
     return task != NULL;
+}
+
+
+void mac_openInFinder(const QString &path) {
+    NSURL *fileUrl = [NSURL fileURLWithPath:fromQString(path)];
+    [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:[NSArray arrayWithObjects:fileUrl, nil]];
 }

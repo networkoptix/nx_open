@@ -7,14 +7,14 @@
 
 #import "mac_utils.h"
 
-static inline NSString* fromQString(const QString &string)
+static NSString* fromQString(const QString &string)
 {
     const QByteArray utf8 = string.toUtf8();
     const char* cString = utf8.constData();
     return [[NSString alloc] initWithUTF8String:cString];
 }
 
-static inline NSArray *fromQStringList(const QStringList &strings) {
+static NSArray *fromQStringList(const QStringList &strings) {
     NSMutableArray *array = [NSMutableArray array];
 
     foreach (const QString& item, strings) {
@@ -24,7 +24,7 @@ static inline NSArray *fromQStringList(const QStringList &strings) {
     return array;
 }
 
-static inline QString toQString(NSString *string)
+static QString toQString(NSString *string)
 {
     if (!string)
         return QString();
