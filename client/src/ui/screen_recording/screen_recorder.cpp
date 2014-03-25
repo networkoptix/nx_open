@@ -49,6 +49,7 @@ void QnScreenRecorder::startRecording() {
         return;
     }
 
+#ifdef Q_OS_WIN
     QnVideoRecorderSettings recorderSettings;
 
     QString filePath = recorderSettings.recordingFolder() + QLatin1String("/video_recording.avi");
@@ -89,6 +90,7 @@ void QnScreenRecorder::startRecording() {
     m_recorder->start();
     m_recording = true;
     emit recordingStarted();
+#endif
 }
 
 void QnScreenRecorder::cleanupRecorder()
