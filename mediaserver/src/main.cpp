@@ -1056,7 +1056,6 @@ void QnMain::run()
     }
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
-    QnCommonMessageProcessor::instance()->init(ec2Connection);
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
 
@@ -1248,6 +1247,9 @@ void QnMain::run()
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
+
+    QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
+
 
     m_moduleFinder = new NetworkOptixModuleFinder(false);
     //if (cmdLineArguments.devModeKey == lit("raz-raz-raz"))
