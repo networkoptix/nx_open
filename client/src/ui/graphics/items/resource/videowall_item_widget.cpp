@@ -92,11 +92,11 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
     connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered,   this, [&](){ m_frameColorAnimator->animateTo(1.0); setOverlayVisible(true); });
     connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft,      this, [&](){ m_frameColorAnimator->animateTo(0.0); if (!m_infoVisible) setOverlayVisible(false); });
 
-    initInfoOverlay();
-
     /* Status overlay. */
     m_statusOverlayWidget = new QnStatusOverlayWidget(this);
     addOverlayWidget(m_statusOverlayWidget, UserVisible, true);
+
+    initInfoOverlay();
 
     updateLayout();
     updateInfo();
@@ -106,24 +106,24 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
 void QnVideowallItemWidget::initInfoOverlay() {
     /* Set up overlay widgets. */
     QFont font = this->font();
-    font.setPixelSize(2);
+    font.setPixelSize(20);
     setFont(font);
     setPaletteColor(this, QPalette::WindowText, overlayTextColor);
 
     /* Header overlay. */
     m_headerLabel = new GraphicsLabel();
     m_headerLabel->setAcceptedMouseButtons(0);
-    //m_headerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+    m_headerLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     m_infoButton = new QnImageButtonWidget();
     m_infoButton->setIcon(qnSkin->icon("item/info.png"));
     m_infoButton->setCheckable(true);
     m_infoButton->setToolTip(tr("Information"));
-    m_infoButton->setFixedSize(1.5);
+    m_infoButton->setFixedSize(24);
     connect(m_infoButton, &QnImageButtonWidget::toggled, this, &QnVideowallItemWidget::at_infoButton_toggled);
 
     m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    m_headerLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
+    m_headerLayout->setContentsMargins(10.0, 5.0, 5.0, 10.0);
     m_headerLayout->setSpacing(0.2);
     m_headerLayout->addItem(m_headerLabel);
     m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
@@ -136,9 +136,13 @@ void QnVideowallItemWidget::initInfoOverlay() {
     setPaletteColor(m_headerWidget, QPalette::Window, overlayBackgroundColor);
 
     QGraphicsLinearLayout *headerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    headerOverlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    headerOverlayLayout->setContentsMargins(10.0, 5.0, 5.0, 10.0);
     headerOverlayLayout->addItem(m_headerWidget);
     headerOverlayLayout->addStretch(0x1000);
+
+    QGraphicsWidget* headerStretch = new QGraphicsWidget();
+    headerStretch->setMinimumHeight(300);
+    headerOverlayLayout->addItem(headerStretch);
 
     m_headerOverlayWidget = new QnViewportBoundWidget(m_parentWidget);
     m_headerOverlayWidget->setLayout(headerOverlayLayout);
@@ -149,10 +153,10 @@ void QnVideowallItemWidget::initInfoOverlay() {
     /* Footer overlay. */
     m_footerLabel = new GraphicsLabel();
     m_footerLabel->setAcceptedMouseButtons(0);
- //   m_footerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+    m_footerLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     QGraphicsLinearLayout *footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    footerLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
+    footerLayout->setContentsMargins(10.0, 5.0, 5.0, 10.0);
     footerLayout->addItem(m_footerLabel);
     footerLayout->addStretch(0x1000);
 
@@ -163,8 +167,12 @@ void QnVideowallItemWidget::initInfoOverlay() {
     setPaletteColor(m_footerWidget, QPalette::Window, overlayBackgroundColor);
     m_footerWidget->setOpacity(0.0);
 
+    QGraphicsWidget* footerStretch = new QGraphicsWidget();
+    footerStretch->setMinimumHeight(300);
+
     QGraphicsLinearLayout *footerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    footerOverlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    footerOverlayLayout->setContentsMargins(10.0, 5.0, 5.0, 10.0);
+    footerOverlayLayout->addItem(footerStretch);
     footerOverlayLayout->addStretch(0x1000);
     footerOverlayLayout->addItem(m_footerWidget);
 
@@ -193,6 +201,7 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         return;
 
     qreal offset = qMin(paintRect.width(), paintRect.height()) * 0.02;
+
     paintRect.adjust(offset*2, offset*2, -offset*2, -offset*2);
     painter->fillRect(paintRect, palette().color(QPalette::Window));
 
@@ -211,6 +220,7 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
         if (bounding.isNull()) {
             updateStatusOverlay(Qn::NoDataOverlay);
+            paintFrame(painter, paintRect);
             return;
         }
 
@@ -445,6 +455,7 @@ void QnVideowallItemWidget::updateInfo() {
     else
         m_footerLabel->setText(QString());
     m_headerLabel->setText(m_videowall->getItem(m_itemUuid).name);
+    //TODO: #GDM VW update layout in case of transition "long name -> short name"
 }
 
 void QnVideowallItemWidget::updateStatusOverlay(Qn::ResourceStatusOverlay overlay) {
