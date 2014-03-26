@@ -57,7 +57,8 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompre
     m_forceSliceDecoding(-1),
     m_swDecoderCount(swDecoderCount),
     m_prevSampleAspectRatio( 1.0 ),
-    m_forcedMtDecoding(false)
+    m_forcedMtDecoding(false),
+    m_prevTimestamp(false)
 {
     m_mtDecoding = mtDecoding;
 
@@ -485,8 +486,18 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSha
                 avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
         }
 
-        if (got_picture)
-            forceMtDecoding(m_context->width > 3500);
+        if (got_picture) 
+        {
+            if (m_context->width <= 3500)
+                forceMtDecoding(false);
+            else 
+            {
+                qint64 frameDistance = data->timestamp - m_prevTimestamp;
+                if (frameDistance > 0 && frameDistance < 50000)
+                    forceMtDecoding(true); // high fps and high resolution
+            }            
+            m_prevTimestamp = data->timestamp;
+        }
 
         // sometimes ffmpeg can't decode image files. Try to decode in QT
         m_usedQtImage = false;
