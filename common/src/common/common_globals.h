@@ -277,6 +277,7 @@ public:
         ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
         ItemCheckedButtonsRole,                     /**< Role for buttons that are checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
+        ItemServerDisabledGraphsRole,               /**< Role for graphs that are disabled in server item. Value of type QSet<QString>. */
 
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */

@@ -28,6 +28,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_item.h>
 
 namespace {
     /** Convert angle from radians to degrees */
@@ -609,19 +610,23 @@ QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDevic
 void QnServerResourceWidget::updateLegend() {
     QHash<QnStatisticsDeviceType, int> indexes;
 
-    foreach (QString key, m_sortedKeys) {
+    QSet<QString> disabledGraphs;
+    if (item())
+        disabledGraphs = item()->data<QSet<QString> >(Qn::ItemServerDisabledGraphsRole);
+
+    foreach (const QString &key, m_sortedKeys) {
         QnStatisticsData &stats = m_history[key];
 
         if (!m_graphDataByKey.contains(key)) {
             GraphData &data = m_graphDataByKey[key];
             data.bar = m_legendButtonBar[buttonBarByDeviceType(stats.deviceType)];
             data.mask = data.bar->unusedMask();
-            data.visible = true;
+            data.visible = !disabledGraphs.contains(key);
             data.color = getColor(stats.deviceType, indexes[stats.deviceType]++);
 
             LegendButtonWidget* newButton = new LegendButtonWidget(key, data.color);
             newButton->setProperty(legendKeyPropertyName, key);
-            newButton->setChecked(true);
+            newButton->setChecked(data.visible);
             m_legendButtonByKey.insert(key, newButton);
 
 
@@ -659,11 +664,19 @@ void QnServerResourceWidget::updateLegend() {
 }
 
 void QnServerResourceWidget::updateGraphVisibility() {
+    QSet<QString> disabledGraphs;
+
     for(QHash<QString, GraphData>::iterator pos = m_graphDataByKey.begin(); pos != m_graphDataByKey.end(); pos++) {
         GraphData &data = *pos;
 
         data.visible = data.bar->checkedButtons() & data.mask;
+
+        if (!data.visible)
+            disabledGraphs.insert(pos.key());
     }
+
+    if (item())
+        item()->setData(Qn::ItemServerDisabledGraphsRole, disabledGraphs);
 }
 
 void QnServerResourceWidget::updateInfoOpacity() {

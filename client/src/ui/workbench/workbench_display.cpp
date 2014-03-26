@@ -1611,6 +1611,12 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         qSort(widgets.begin(), widgets.end(), WidgetPositionLess());
 
     for(int i = 0; i < widgets.size(); i++) {
+        QnResourceWidget *resourceWidget = widgets[i];
+
+        int checkedButtons = resourceWidget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
+        if(checkedButtons != -1)
+            resourceWidget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
+
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[i]);
         if(!widget)
             continue;
@@ -1656,10 +1662,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             QString timeString = (widget->resource()->toResource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(lit("hh:mm:ss"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
-
-        int checkedButtons = widget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
-        if(checkedButtons != -1)
-            widget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
 
         if(thumbnailed)
             widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(QnMediaResourceWidget::PtzButton));
