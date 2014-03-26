@@ -271,8 +271,8 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         videoEncoderCodecCtx->codec_id = (format == "jpg" || format == "jpeg") ? CODEC_ID_MJPEG : CODEC_ID_PNG;
         videoEncoderCodecCtx->pix_fmt = updatePixelFormat((PixelFormat) outFrame->format);
-        videoEncoderCodecCtx->width = roundedWidth;
-        videoEncoderCodecCtx->height = roundedHeight;
+        videoEncoderCodecCtx->width = dstSize.width();
+        videoEncoderCodecCtx->height = dstSize.height();
         videoEncoderCodecCtx->bit_rate = roundedWidth*roundedHeight;
         videoEncoderCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
         videoEncoderCodecCtx->time_base.num = 1;
