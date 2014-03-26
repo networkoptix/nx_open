@@ -161,10 +161,11 @@ bool QnLicense::isValid(const QList<QByteArray>& hardwareIds, const QString& bra
     // 1. edge licenses can be activated only if box is "isd"
     // 2. if box is "isd" only edge licenses AND any trial can be activated
 
+    //TODO: may be better check edge flag?
     bool isISDBox = box == lit("isd") || box == lit("isd_s2");
     
     return (m_isValid1 || m_isValid2) && hardwareIds.contains(m_hardwareId) && (m_brand == brand || m_brand.isEmpty()) && \
-        ((box.isEmpty() && m_class != lit("edge")) || (isISDBox && (m_class == lit("edge") || !m_expiration.isEmpty())));
+        (((box.isEmpty() || box == lit("rpi")) && m_class != lit("edge")) || (isISDBox && (m_class == lit("edge") || !m_expiration.isEmpty())));
 }
 
 bool QnLicense::isAnalog() const {
