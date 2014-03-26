@@ -312,7 +312,9 @@ Qn::ActionVisibility QnRenameActionCondition::check(const QnActionParameters &pa
 
     return parameters.resources().size() == 1
             ? Qn::EnabledAction
-            : Qn::InvisibleAction;
+            : parameters.videoWallItems().size() == 1
+                ? Qn::EnabledAction
+                : Qn::InvisibleAction;
 }
 
 
