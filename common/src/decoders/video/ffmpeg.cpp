@@ -56,7 +56,8 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompre
     m_checkH264ResolutionChange(false),
     m_forceSliceDecoding(-1),
     m_swDecoderCount(swDecoderCount),
-    m_prevSampleAspectRatio( 1.0 )
+    m_prevSampleAspectRatio( 1.0 ),
+    m_forcedMtDecoding(false)
 {
     m_mtDecoding = mtDecoding;
 
@@ -144,8 +145,10 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
 {
     if (m_context->thread_count == 1) {
         m_context->thread_count = qMin(MAX_DECODE_THREAD, QThread::idealThreadCount() + 1);
+        if (m_forcedMtDecoding)
+            m_context->thread_count = qMin(m_context->thread_count, 3);
     }
-    if (!m_mtDecoding)
+    if (!m_mtDecoding && !m_forcedMtDecoding)
         m_context->thread_count = 1;
 
     if (m_forceSliceDecoding == -1 && data && data->data.data() && m_context->codec_id == CODEC_ID_H264) 
@@ -177,7 +180,7 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
                 m_forceSliceDecoding = 1; // multislice frame. Use multislice decoding if slice count 4 or above
         }
     }
-    m_context->thread_type = m_mtDecoding && (m_forceSliceDecoding != 1) ? FF_THREAD_FRAME : FF_THREAD_SLICE;
+    m_context->thread_type = m_context->thread_count > 1 && (m_forceSliceDecoding != 1) ? FF_THREAD_FRAME : FF_THREAD_SLICE;
 
     if (m_context->codec_id == CODEC_ID_H264 && m_context->thread_type == FF_THREAD_SLICE)
     {
@@ -220,11 +223,11 @@ void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr data)
     //av_log_set_callback(FffmpegLog::av_log_default_callback_impl);
 
     determineOptimalThreadType(data);
+    
+    m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
-    m_checkH264ResolutionChange = m_mtDecoding && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
-
-    cl_log.log(QLatin1String("Creating ") + QLatin1String(m_mtDecoding ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
+    cl_log.log(QLatin1String("Creating ") + QLatin1String(m_context->thread_count > 1 ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
     // TODO: #vasilenko check return value
     if (avcodec_open2(m_context, m_codec, NULL) < 0)
     {
@@ -276,7 +279,7 @@ void CLFFmpegVideoDecoder::resetDecoder(QnConstCompressedVideoDataPtr data)
     //m_context->thread_count = qMin(5, QThread::idealThreadCount() + 1);
     //m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
     // ensure that it is H.264 with nal prefixes
-    m_checkH264ResolutionChange = m_mtDecoding && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0); 
+    m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0); 
 
     avcodec_open2(m_context, m_codec, NULL);
 
@@ -338,6 +341,17 @@ void CLFFmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressed
         m_currentHeight = height;
         m_needRecreate = false;
         resetDecoder(data);
+    }
+}
+
+void CLFFmpegVideoDecoder::forceMtDecoding(bool value)
+{
+    if (value != m_forcedMtDecoding) 
+    {
+        bool oldMtDecoding = m_mtDecoding || m_forcedMtDecoding;
+        bool newMtDecoding = m_mtDecoding || value;
+        m_forcedMtDecoding = value;
+        m_needRecreate = oldMtDecoding != newMtDecoding;
     }
 }
 
@@ -471,6 +485,9 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSha
                 avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
         }
 
+        if (got_picture)
+            forceMtDecoding(m_context->width > 3500);
+
         // sometimes ffmpeg can't decode image files. Try to decode in QT
         m_usedQtImage = false;
         if (!got_picture && (data->flags & QnAbstractMediaData::MediaFlags_StillImage))
@@ -516,7 +533,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSha
             outFrame->reallocate(m_context->width, m_context->height, m_context->pix_fmt, m_frame->linesize[0]);
         }
 
-        if (m_frame->interlaced_frame && m_mtDecoding)
+        if (m_frame->interlaced_frame && m_context->thread_count > 1)
         {
 
             if (m_deinterlacedFrame->width != m_context->width || m_deinterlacedFrame->height != m_context->height)

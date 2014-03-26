@@ -60,7 +60,7 @@ public:
     */
     virtual unsigned int getDecoderCaps() const;
     virtual void setSpeed( float newValue ) override;
-
+    void forceMtDecoding(bool value);
 private:
     static AVCodec* findCodec(CodecID codecId);
 
@@ -110,6 +110,7 @@ private:
     MotionMap m_motionMap; 
     QAtomicInt* const m_swDecoderCount;
     mutable double m_prevSampleAspectRatio;
+    bool m_forcedMtDecoding;
 };
 
 #endif //cl_ffmpeg_h
