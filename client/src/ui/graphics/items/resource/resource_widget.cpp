@@ -62,22 +62,10 @@ namespace {
     const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION * 3;
 #endif
 
-    /** Default period of progress circle. */
-    const qint64 defaultProgressPeriodMSec = 1000;
-
-    /** Default duration of "fade-in" effect for overlay icons. */
-    const qint64 defaultOverlayFadeInDurationMSec = 500;
-
-    /** Default size of widget header buttons, in pixels. */
-    const QSizeF headerButtonSize = QSizeF(24, 24);
-
     /** Background color for overlay panels. */
     const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); // TODO: #Elric #customization
 
     const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #Elric #customization
-
-    /** Static text should be rescaled no more often than once in this period */
-    const qint64 minTextRescaleDelay = 1000;
 
     //Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
     std::shared_ptr<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() ); // TODO: #Elric get rid of this
