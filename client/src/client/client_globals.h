@@ -238,6 +238,7 @@ namespace Qn {
         LightModeNoMultisampling    = 0x0080,           /**< Disable OpenGL multisampling. */
         LightModeNoNewWindow        = 0x0100,           /**< Disable opening of new windows. */
         LightModeNoLayoutBackground = 0x0200,           /**< Disable layout background. */
+        LightModeNoZoomWindows      = 0x0400,           /**< Disable zoom windows. */
 
         LightModeFull               = 0xFFFFFFFF
 
