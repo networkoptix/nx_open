@@ -3,6 +3,8 @@
 #ifdef Q_OS_WIN
 
 #include <intrin.h>
+#include <windows.h>
+#include <mmsystem.h>
 
 static const int DEFAULT_VIDEO_STREAM_ID = 0;
 static const int DEFAULT_AUDIO_STREAM_ID = 1;
@@ -22,7 +24,7 @@ extern "C"
 }
 
 #include "core/datapacket/media_data_packet.h"
-#include "win_audio_helper.h"
+#include "win_audio_device_info.h"
 #include "decoders/audio/ffmpeg_audio.h"
 
 // mux audio 1 and audio 2 to audio1 buffer
@@ -201,9 +203,9 @@ int QnDesktopFileEncoder::EncodedAudioInfo::nameToWaveIndex()
 
 void QT_WIN_CALLBACK waveInProc(HWAVEIN /*hWaveIn*/,
                                 UINT uMsg,
-                                DWORD dwInstance,
-                                DWORD /*dwParam1*/,
-                                DWORD /*dwParam2*/)
+                                DWORD_PTR dwInstance,
+                                DWORD_PTR /*dwParam1*/,
+                                DWORD_PTR /*dwParam2*/)
 {
     QnDesktopFileEncoder::EncodedAudioInfo* audio = (QnDesktopFileEncoder::EncodedAudioInfo*) dwInstance;
     switch(uMsg)
@@ -345,7 +347,7 @@ bool QnDesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
             return false;
     }
 
-    WinAudioExtendInfo extInfo(m_audioDevice.deviceName());
+    QnWinAudioDeviceInfo extInfo(m_audioDevice.deviceName());
     if (extInfo.isMicrophone())
     {
         m_speexPreprocess = speex_preprocess_state_init(m_owner->m_audioCodecCtx->frame_size * m_owner->m_audioCodecCtx->channels, m_owner->m_audioCodecCtx->sample_rate);
@@ -364,7 +366,6 @@ QnDesktopFileEncoder::QnDesktopFileEncoder (
                    int desktopNum,
                    const QnAudioDeviceInfo* audioDevice,
                    const QnAudioDeviceInfo* audioDevice2,
-                   Qn::CaptureMode captureMode,
                    bool captureCursor,
                    const QSize& captureResolution,
                    float encodeQualuty, // in range 0.0 .. 1.0
@@ -389,7 +390,6 @@ QnDesktopFileEncoder::QnDesktopFileEncoder (
     m_storedAudioPts(0),
     m_maxAudioJitter(0),
 
-    m_captureMode(captureMode),
     m_captureCursor(captureCursor),
     m_captureResolution(captureResolution),
     m_encodeQualuty(encodeQualuty),
@@ -453,10 +453,8 @@ int QnDesktopFileEncoder::calculateBitrate()
 bool QnDesktopFileEncoder::init()
 {
     m_grabber = new QnBufferedScreenGrabber(
-            m_desktopNum,
             QnBufferedScreenGrabber::DEFAULT_QUEUE_SIZE,
             QnBufferedScreenGrabber::DEFAULT_FRAME_RATE,
-            m_captureMode,
             m_captureCursor,
             m_captureResolution,
             m_widget);

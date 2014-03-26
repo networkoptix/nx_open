@@ -16,7 +16,7 @@ namespace {
 }
 
 void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnResourceFactory& resourceFactory);
-void parseLicense(QnLicensePtr& license, const pb::License& pb_license, const QByteArray& oldHardwareId);
+void parseLicense(QnLicensePtr& license, const pb::License& pb_license);
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem);
 void parseBusinessRule(QnBusinessEventRulePtr& businessRule, const pb::BusinessRule& pb_businessRule);
 void parseBusinessRules(QnBusinessEventRuleList& businessRules, const PbBusinessRuleList& pb_businessRules);
@@ -50,7 +50,7 @@ namespace Qn {
         case Message_Type_KvPairChange:                 return QLatin1String("KvPairChang");
         case Message_Type_KvPairDelete:                 return QLatin1String("KvPairDelete");
         default:
-            return QString::fromLatin1("Unknown %1").arg((int)val);
+            return lit("Unknown %1").arg((int)val);
         }
     }
 } //Qn namespace
@@ -95,7 +95,7 @@ bool QnMessage::load(const pb::Message &message)
         case pb::Message_Type_License:
         {
             const pb::LicenseMessage& licenseMessage = message.GetExtension(pb::LicenseMessage::message);
-            parseLicense(license, licenseMessage.license(), qnLicensePool->oldHardwareId());
+            parseLicense(license, licenseMessage.license());
             break;
         }
         case pb::Message_Type_CameraServerItem:
@@ -109,10 +109,18 @@ bool QnMessage::load(const pb::Message &message)
             const pb::InitialMessage& initialMessage = message.GetExtension(pb::InitialMessage::message);
             systemName = QString::fromUtf8(initialMessage.systemname().c_str());
             sessionKey = initialMessage.sessionkey().c_str();
-            oldHardwareId = initialMessage.oldhardwareid().c_str();
-            hardwareId1 = initialMessage.hardwareid1().c_str();
-            hardwareId2 = initialMessage.hardwareid2().c_str();
-            hardwareId3 = initialMessage.hardwareid3().c_str();
+
+            mainHardwareIds << initialMessage.oldhardwareid().c_str()
+                << initialMessage.hardwareid1().c_str()
+                << initialMessage.hardwareid2().c_str();
+
+            if (initialMessage.has_hardwareid3())
+                mainHardwareIds << initialMessage.hardwareid3().c_str();
+
+            for (int n = 0; n < initialMessage.compatiblehardwareid_size(); n++) {
+                compatibleHardwareIds << initialMessage.compatiblehardwareid(n).c_str();
+            }
+            
             publicIp = QString::fromStdString(initialMessage.publicip());
 
             parseResourceTypes(resourceTypes, initialMessage.resourcetype());
@@ -171,6 +179,12 @@ bool QnMessage::load(const pb::Message &message)
                 systemName = QString::fromStdString(runtimeInfoChangeMessage.systemname());
             if (runtimeInfoChangeMessage.has_sessionkey())
                 sessionKey = runtimeInfoChangeMessage.sessionkey().c_str();
+
+            for (int n = 0; n < runtimeInfoChangeMessage.mainhardwareid_size(); n++)
+                mainHardwareIds << runtimeInfoChangeMessage.mainhardwareid(n).c_str();
+            for (int n = 0; n < runtimeInfoChangeMessage.compatiblehardwareid_size(); n++)
+                compatibleHardwareIds << runtimeInfoChangeMessage.compatiblehardwareid(n).c_str();
+
             break;
         }
         case pb::Message_Type_BusinessRuleReset:

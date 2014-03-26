@@ -3,7 +3,7 @@
 
 #include <QtMultimedia/QAudioDeviceInfo>
 
-
+// TODO: #Elric rename file, qn prefix.
 class QnAudioDeviceInfo: public QAudioDeviceInfo
 {
 public:

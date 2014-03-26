@@ -46,13 +46,18 @@ void QnPtzPresetDialog::loadData(const QnPtzData &data) {
             continue;
         hotkeys.removeOne(key);
     }
+    foreach (const QnPtzTour &tour, data.tours) {
+        int key = usedHotkeys.key(tour.id, QnPtzHotkey::NoHotkey);
+        if (key == QnPtzHotkey::NoHotkey)
+            continue;
+        hotkeys.removeOne(key);
+    }
 
-    int currentHotkey = hotkey();
     ui->hotkeyComboBox->clear();
     ui->hotkeyComboBox->addItem(tr("None"), QnPtzHotkey::NoHotkey);
     foreach(int hotkey, hotkeys)
         ui->hotkeyComboBox->addItem(QString::number(hotkey), hotkey);
-    setHotkey(currentHotkey);
+    setHotkey(hotkeys.isEmpty() ? -1 : hotkeys.first());
 }
 
 void QnPtzPresetDialog::saveData() {
@@ -70,11 +75,11 @@ void QnPtzPresetDialog::saveData() {
 }
 
 Qn::PtzDataFields QnPtzPresetDialog::requiredFields() const {
-    return Qn::PresetsPtzField;
+    return Qn::PresetsPtzField | Qn::ToursPtzField;
 }
 
 void QnPtzPresetDialog::updateFields(Qn::PtzDataFields fields) {
-
+    Q_UNUSED(fields)
 }
 
 QnAbstractPtzHotkeyDelegate* QnPtzPresetDialog::hotkeysDelegate() const {

@@ -15,8 +15,17 @@
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/home_ptz_controller.h>
 
+QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent): 
+    base_type(parent) 
+{
+    setConstructionMode(ThreadedControllerConstruction);
+}
+
 void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) {
-    connect(resource, &QnResource::initialized, this, &QnServerPtzControllerPool::updateController, Qt::QueuedConnection);
+    // TODO: #Elric we're creating controller from main thread. 
+    // Controller ctor may take some time (several seconds).
+    // => main thread will stall.
+    connect(resource, &QnResource::initializedChanged, this, &QnServerPtzControllerPool::updateController, Qt::QueuedConnection);
     base_type::registerResource(resource);
 }
 
@@ -26,6 +35,9 @@ void QnServerPtzControllerPool::unregisterResource(const QnResourcePtr &resource
 }
 
 QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourcePtr &resource) const {
+    if(resource->flags() & QnResource::foreigner)
+        return QnPtzControllerPtr(); /* That's not our resource! */
+
     if(!resource->isInitialized())
         return QnPtzControllerPtr();
 

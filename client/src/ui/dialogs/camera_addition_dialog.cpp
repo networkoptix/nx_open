@@ -108,7 +108,11 @@ void QnCheckBoxedHeaderView::at_sectionClicked(int logicalIndex) {
 // QnCameraAdditionDialog
 // -------------------------------------------------------------------------- //
 QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
-    QDialog(parent),
+    base_type(parent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
+#ifdef Q_OS_MAC
+    | Qt::Tool
+#endif
+    ),
     ui(new Ui::CameraAdditionDialog),
     m_state(NoServer),
     m_server(NULL),
@@ -207,6 +211,7 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->actionButtonsStackedWidget->setCurrentWidget(ui->scanButtonPage);
         ui->actionButtonsStackedWidget->setEnabled(true);
         ui->scanButton->setFocus();
+        ui->scanButton->setDefault(true);
         clearTable();
         break;
     case InitialOffline:

@@ -121,7 +121,7 @@ if __name__ == '__main__':
                     else:
 	                os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
   
-    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${customization.dir}/icons'], [''],'vmsclient.png')  
+    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${project.basedir}/static-resources','${customization.dir}/icons'], [''],'vmsclient.png')  
     
     if os.path.exists(os.path.join(r'${project.build.directory}', template_file)):
         f = open(output_pro_file, "w")

@@ -22,7 +22,7 @@ void GraphicsSliderPrivate::init()
     clickOffset = QPoint(0, 0);
     hoverControl = QStyle::SC_None;
 
-    q->setFocusPolicy(Qt::FocusPolicy(q->style()->styleHint(QStyle::SH_Button_FocusPolicy, NULL, q)));
+    q->setFocusPolicy(Qt::FocusPolicy(q->style()->styleHint(QStyle::SH_Button_FocusPolicy, NULL, NULL)));
     QSizePolicy sp(QSizePolicy::Expanding, QSizePolicy::Fixed, QSizePolicy::Slider);
     if (orientation == Qt::Vertical)
         sp.transpose();
@@ -48,9 +48,9 @@ QStyle::SubControl GraphicsSliderPrivate::newHoverControl(const QPoint &pos)
     QStyleOptionSlider opt;
     q->initStyleOption(&opt);
     opt.subControls = QStyle::SC_All;
-    hoverControl = q->style()->hitTestComplexControl(QStyle::CC_Slider, &opt, pos, q);
+    hoverControl = q->style()->hitTestComplexControl(QStyle::CC_Slider, &opt, pos, NULL);
     if (hoverControl != QStyle::SC_None)
-        hoverRect = q->style()->subControlRect(QStyle::CC_Slider, &opt, hoverControl, q);
+        hoverRect = q->style()->subControlRect(QStyle::CC_Slider, &opt, hoverControl, NULL);
     else
         hoverRect = QRect();
 
@@ -101,7 +101,7 @@ void GraphicsSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         opt.activeSubControls = d->hoverControl;
     }
 
-    style()->drawComplexControl(QStyle::CC_Slider, &opt, painter, this);
+    style()->drawComplexControl(QStyle::CC_Slider, &opt, painter, NULL);
 }
 
 bool GraphicsSlider::event(QEvent *event)
@@ -141,18 +141,18 @@ void GraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     QStyleOptionSlider opt;
     initStyleOption(&opt);
-    const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
+    const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, NULL);
     // to take half of the slider off for the setSliderPosition call we use the center - topLeft
     const QPoint center = sliderRect.center() - sliderRect.topLeft();
     const qint64 pressValue = valueFromPosition(event->pos().toPoint() - center);
 
     event->accept();
-    if ((event->button() & style()->styleHint(QStyle::SH_Slider_AbsoluteSetButtons, &opt, this)) != 0) {
+    if ((event->button() & style()->styleHint(QStyle::SH_Slider_AbsoluteSetButtons, &opt, NULL)) != 0) {
         d->pressedControl = QStyle::SC_SliderHandle;
         setSliderPosition(pressValue);
         triggerAction(SliderMove);
-    } else if ((event->button() & style()->styleHint(QStyle::SH_Slider_PageSetButtons, &opt, this)) != 0) {
-        d->pressedControl = style()->hitTestComplexControl(QStyle::CC_Slider, &opt, event->pos().toPoint(), this);
+    } else if ((event->button() & style()->styleHint(QStyle::SH_Slider_PageSetButtons, &opt, NULL)) != 0) {
+        d->pressedControl = style()->hitTestComplexControl(QStyle::CC_Slider, &opt, event->pos().toPoint(), NULL);
         if (d->pressedControl == QStyle::SC_SliderGroove) {
             d->pressValue = pressValue;
             if (d->pressValue > d->value) {
@@ -212,7 +212,7 @@ void GraphicsSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     QStyleOptionSlider opt;
     initStyleOption(&opt);
     opt.subControls = oldPressed;
-    update(style()->subControlRect(QStyle::CC_Slider, &opt, oldPressed, this));
+    update(style()->subControlRect(QStyle::CC_Slider, &opt, oldPressed, NULL));
 }
 
 void GraphicsSlider::initStyleOption(QStyleOption *option) const
@@ -237,7 +237,7 @@ QSizeF GraphicsSlider::sizeHint(Qt::SizeHint which, const QSizeF &constraint) co
         initStyleOption(&opt);
 
         const int SliderLength = 60, TickSpace = 5;
-        int thick = style()->pixelMetric(QStyle::PM_SliderThickness, &opt, this);
+        int thick = style()->pixelMetric(QStyle::PM_SliderThickness, &opt, NULL);
         if (d->tickPosition & TicksAbove)
             thick += TickSpace;
         if (d->tickPosition & TicksBelow)
@@ -248,10 +248,10 @@ QSizeF GraphicsSlider::sizeHint(Qt::SizeHint which, const QSizeF &constraint) co
             h = SliderLength;
         }
 
-        QSizeF sizeHint = QSizeF(style()->sizeFromContents(QStyle::CT_Slider, &opt, QSize(w, h), this)
+        QSizeF sizeHint = QSizeF(style()->sizeFromContents(QStyle::CT_Slider, &opt, QSize(w, h), NULL)
                                  .expandedTo(QApplication::globalStrut()));
         if (which == Qt::MinimumSize) {
-            int length = style()->pixelMetric(QStyle::PM_SliderLength, &opt, this);
+            int length = style()->pixelMetric(QStyle::PM_SliderLength, &opt, NULL);
             if (d->orientation == Qt::Horizontal)
                 sizeHint.setWidth(length);
             else

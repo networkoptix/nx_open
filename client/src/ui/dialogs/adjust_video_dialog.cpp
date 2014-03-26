@@ -7,8 +7,12 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent, Qt::WindowFlags windowFlags) :
-    base_type(parent, windowFlags),
+QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent) :
+    base_type(parent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
+#ifdef Q_OS_MAC
+    | Qt::Tool
+#endif
+    ),
     ui(new Ui::AdjustVideoDialog),
     m_updateDisabled(false),
     m_widget(0)
@@ -34,7 +38,7 @@ QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent, Qt::WindowFlags window
 QnAdjustVideoDialog::~QnAdjustVideoDialog() {
     if (m_widget) {
         m_widget->renderer()->disconnect(this);
-        m_widget->renderer()->setHystogramConsumer(0);
+        m_widget->renderer()->setHistogramConsumer(0);
     }
 }
 
@@ -43,12 +47,12 @@ void QnAdjustVideoDialog::setWidget(QnMediaResourceWidget* widget)
 {
     if (m_widget) {
         m_widget->renderer()->disconnect(this);
-        m_widget->renderer()->setHystogramConsumer(0);
+        m_widget->renderer()->setHistogramConsumer(0);
     }
     
     m_widget = widget;
     if (m_widget) {
-        m_widget->renderer()->setHystogramConsumer(histogramConsumer());
+        m_widget->renderer()->setHistogramConsumer(histogramConsumer());
         setParams(widget->imageEnhancement());
         m_widget->renderer()->disconnect(this);
         connect(m_widget->renderer(), SIGNAL(beforeDestroy()), this, SLOT(at_rendererDestryed()));

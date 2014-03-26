@@ -37,14 +37,6 @@ class QnPtzToursDialogItemDelegate: public QStyledItemDelegate {
 public:
     explicit QnPtzToursDialogItemDelegate(QObject *parent = 0): base_type(parent) {}
     ~QnPtzToursDialogItemDelegate() {}
-protected:
-    virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
-        base_type::initStyleOption(option, index);
-        if (!index.data(Qn::ValidRole).toBool()) {
-            QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
-            option->palette.setColor(QPalette::Highlight, clr.lighter());
-        }
-    }
 
     virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
         if (index.column() == QnPtzManageModel::HotkeyColumn)
@@ -80,7 +72,11 @@ private:
 };
 
 QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
-    base_type(parent, Qt::Dialog | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint),
+    base_type(parent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
+#ifdef Q_OS_MAC
+    | Qt::Tool
+#endif
+    ),
     ui(new Ui::PtzManageDialog),
     m_model(new QnPtzManageModel(this)),
     m_adaptor(new QnPtzHotkeysResourcePropertyAdaptor(this)),
@@ -138,6 +134,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
 }
 
 QnPtzManageDialog::~QnPtzManageDialog() {
+    return;
 }
 
 void QnPtzManageDialog::keyPressEvent(QKeyEvent *event) {
@@ -156,11 +153,12 @@ void QnPtzManageDialog::reject() {
     if (!checkForUnsavedChanges())
         return;
 
-    // ensure that no old data will stay in dialog
-    setController(QnPtzControllerPtr());
-    m_model->setPresets(QnPtzPresetList());
-    m_model->setTours(QnPtzTourList());
-    base_type::reject();
+    clear();
+}
+
+void QnPtzManageDialog::closeWithoutCancel() {
+    checkForUnsavedChanges(true);
+    clear();
 }
 
 void QnPtzManageDialog::loadData(const QnPtzData &data) {
@@ -262,6 +260,14 @@ void QnPtzManageDialog::enableDewarping() {
         params.enabled = true;
         widget->item()->setDewarpingParams(params);
     }
+}
+
+void QnPtzManageDialog::clear() {
+    // ensure that no old data will stay in dialog
+    setController(QnPtzControllerPtr());
+    m_model->setPresets(QnPtzPresetList());
+    m_model->setTours(QnPtzTourList());
+    base_type::reject();
 }
 
 void QnPtzManageDialog::saveData() {
@@ -613,15 +619,19 @@ bool QnPtzManageDialog::isModified() const {
     return !m_model->synchronized();
 }
 
-bool QnPtzManageDialog::checkForUnsavedChanges() {
+bool QnPtzManageDialog::checkForUnsavedChanges(bool dontShowCancel) {
     if (!isModified())
         return true;
 
+    QnMessageBox::StandardButtons buttons = QnMessageBox::Yes | QnMessageBox::No;
+    if (!dontShowCancel)
+        buttons |= QnMessageBox::Cancel;
+
     show();
     QnMessageBox::StandardButton button = QnMessageBox::question(this, 0, tr("PTZ configuration is not saved"), tr("Changes are not saved. Do you want to save them?"),
-                                                                 QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, QnMessageBox::Yes);
+                                                                 buttons, QnMessageBox::Yes);
     switch (button) {
-    case QnMessageBox::Ok:
+    case QnMessageBox::Yes:
         saveChanges();
         return true;
     case QnMessageBox::Cancel:
@@ -647,8 +657,8 @@ void QnPtzManageDialog::updateUi() {
     if (ui->previewGroupBox->isEnabled())
         m_cache->downloadFile(selectedRow.id());
     ui->deleteButton->setEnabled(isPreset || isTour);
-    ui->goToPositionButton->setEnabled(isPreset || isTour);
-    ui->startTourButton->setEnabled(isValidTour);
+    ui->goToPositionButton->setEnabled(isPreset || (isTour && !selectedRow.tourModel.tour.spots.isEmpty()));
+    ui->startTourButton->setEnabled(isValidTour && !selectedRow.tourModel.local);
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(isModified());
 }
 

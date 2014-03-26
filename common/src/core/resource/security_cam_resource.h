@@ -173,6 +173,9 @@ public:
         qint64 msEndTime,
         int detailLevel );
     
+    // in some cases I just want to update couple of field from just discovered resource
+    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -184,6 +187,7 @@ signals:
     void scheduleDisabledChanged(const QnSecurityCamResourcePtr &resource);
     void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
     void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+    void groupNameChanged(const QnSecurityCamResourcePtr &resource);
 
     //!Emitted on camera input port state has been changed
     /*!
@@ -202,12 +206,6 @@ protected slots:
     virtual void at_disabledChanged();
 
 protected:
-    //!Returns camera's vendor name
-    /*!
-        For onvif camera it returns real vendor name, not "onvif"
-    */
-    virtual QString getVendorInternal() const;
-
     void updateInner(QnResourcePtr other) override;
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role) override;
@@ -232,7 +230,6 @@ protected:
 
 protected:
     QList<QnMotionRegion> m_motionMaskList;
-    QString m_vendor;
 
 private:
     QnDataProviderFactory *m_dpFactory;
@@ -250,6 +247,7 @@ private:
     bool m_advancedWorking;
     bool m_manuallyAdded;
     QString m_model;
+    QString m_vendor;
     QString m_firmware;
 };
 

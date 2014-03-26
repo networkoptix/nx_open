@@ -98,6 +98,24 @@
 #include <rest/handlers/storage_space_handler.h>
 #include <rest/handlers/storage_status_handler.h>
 #include <rest/handlers/time_handler.h>
+#include <rest/handlers/acti_event_rest_handler.h>
+#include <rest/handlers/business_event_log_rest_handler.h>
+#include <rest/handlers/business_action_rest_handler.h>
+#include <rest/handlers/camera_diagnostics_rest_handler.h>
+#include <rest/handlers/camera_settings_rest_handler.h>
+#include <rest/handlers/external_business_event_rest_handler.h>
+#include <rest/handlers/favicon_rest_handler.h>
+#include <rest/handlers/image_rest_handler.h>
+#include <rest/handlers/log_rest_handler.h>
+#include <rest/handlers/manual_camera_addition_rest_handler.h>
+#include <rest/handlers/ping_rest_handler.h>
+#include <rest/handlers/ptz_rest_handler.h>
+#include <rest/handlers/rebuild_archive_rest_handler.h>
+#include <rest/handlers/recorded_chunks_rest_handler.h>
+#include <rest/handlers/statistics_rest_handler.h>
+#include <rest/handlers/storage_space_rest_handler.h>
+#include <rest/handlers/storage_status_rest_handler.h>
+#include <rest/handlers/time_rest_handler.h>
 #include <rest/handlers/upload_update_handler.h>
 #include <rest/handlers/update_handler.h>
 #include <rest/server/rest_connection_processor.h>
@@ -473,7 +491,7 @@ void initLog(const QString &logLevel) {
     if (!QDir().mkpath(logFileLocation))
         cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
     const QString& logFileName = logFileLocation + QLatin1String("/log_file");
-    if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
+    if (!cl_log.create(logFileName, 1024*1024*10, 25, cl_logDEBUG1))
         cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
     MSSettings::roSettings()->setValue("logFile", logFileName);
     cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
@@ -517,7 +535,7 @@ int serverMain(int argc, char *argv[])
     cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
-    if( cmdLineArguments.logLevel != QString::fromLatin1("none") )
+    if( cmdLineArguments.logLevel != lit("none") )
         defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
     qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
@@ -709,7 +727,7 @@ void QnMain::loadResourcesFromECS()
     QnMediaServerResourceList mediaServerList;
     while( appServerConnection->getServers( mediaServerList) != 0 )
     {
-        NX_LOG( QString::fromLatin1("QnMain::run(). Can't get media servers. Reason %1").arg(QLatin1String(appServerConnection->getLastError())), cl_logERROR );
+        NX_LOG( lit("QnMain::run(). Can't get media servers. Reason %1").arg(QLatin1String(appServerConnection->getLastError())), cl_logERROR );
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 
@@ -719,12 +737,13 @@ void QnMain::loadResourcesFromECS()
         if( mediaServer->getGuid() == serverGuid() )
             continue;
 
+        mediaServer->addFlags( QnResource::foreigner );  //marking resource as not belonging to us
         qnResPool->addResource( mediaServer );
         //requesting remote server cameras
         QnVirtualCameraResourceList cameras;
         while( appServerConnection->getCameras(cameras, mediaServer->getId()) != 0 )
         {
-            NX_LOG( QString::fromLatin1("QnMain::run(). Error retreiving server %1(%2) cameras from enterprise controller. %3").
+            NX_LOG( lit("QnMain::run(). Error retreiving server %1(%2) cameras from enterprise controller. %3").
                 arg(mediaServer->getId()).arg(mediaServer->getGuid()).arg(QLatin1String(appServerConnection->getLastError())), cl_logERROR );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
         }
@@ -838,6 +857,7 @@ void QnMain::initTcpListener()
 {
     int rtspPort = MSSettings::roSettings()->value("rtspPort", DEFAUT_RTSP_PORT).toInt();
 #ifdef USE_SINGLE_STREAMING_PORT
+<<<<<<< local
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
     QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnStorageStatusHandler());
     QnRestConnectionProcessor::registerHandler("api/storageSpace", new QnStorageSpaceHandler());
@@ -857,11 +877,30 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsHandler());
     QnRestConnectionProcessor::registerHandler("api/uploadUpdate", new QnRestUploadUpdateHandler());
     QnRestConnectionProcessor::registerHandler("api/update", new QnRestUpdateHandler());
+=======
+    QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnStorageStatusRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/storageSpace", new QnStorageSpaceRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/statistics", new QnStatisticsRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/image", new QnImageRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/execAction", new QnBusinessActionRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/onEvent", new QnExternalBusinessEventRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/ping", new QnPingRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/events", new QnBusinessEventLogRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/showLog", new QnLogRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
+>>>>>>> other
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
-    QnRestConnectionProcessor::registerHandler("api/camera_event", new QnCameraEventHandler());  //used to receive event from acti camera. TODO: remove this from api
+    QnRestConnectionProcessor::registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
 #endif
-    QnRestConnectionProcessor::registerHandler("favicon.ico", new QnRestFavicoHandler());
+    QnRestConnectionProcessor::registerHandler("favicon.ico", new QnFavIconRestHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->enableSSLMode();
@@ -1459,7 +1498,7 @@ int main(int argc, char* argv[])
     commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL, QString());
     commandLineParser.addParameter(&showVersion, "--version", NULL, QString(), true);
     commandLineParser.addParameter(&showHelp, "--help", NULL, QString(), true);
-    commandLineParser.parse(argc, argv, stderr);
+    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
 
     if( showVersion )
     {

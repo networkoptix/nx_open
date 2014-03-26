@@ -52,13 +52,16 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/graphics/items/grid/curtain_item.h>
+#include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/generic/splash_item.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
 #include <ui/graphics/items/grid/grid_raised_cone_item.h>
-#include <ui/graphics/items/standard/graphics_message_box.h>
+
+#include <ui/graphics/opengl/gl_hardware_checker.h>
 
 #include <ui/workaround/gl_widget_factory.h>
+#include <ui/workaround/gl_widget_workaround.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -329,7 +332,7 @@ void QnWorkbenchDisplay::deinitSceneView() {
 }
 
 QGLWidget *QnWorkbenchDisplay::newGlWidget(QWidget *parent, Qt::WindowFlags windowFlags) const {
-    return QnGlWidgetFactory::create<QGLWidget>(parent, windowFlags);
+    return QnGlWidgetFactory::create<QnGLWidget>(parent, windowFlags);
 }
 
 void QnWorkbenchDisplay::initSceneView() {
@@ -361,6 +364,7 @@ void QnWorkbenchDisplay::initSceneView() {
         m_view->setViewport(viewport);
 
         viewport->makeCurrent();
+        QnGlHardwareChecker::checkCurrentContext(true);
 
         /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
         DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(viewport);
@@ -839,9 +843,9 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if(widgets(widget->resource()).size() == 1)
         connect(widget->resource(),     SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_resource_disabledChanged(const QnResourcePtr &)), Qt::QueuedConnection);
 
-    QColor frameColor = item->data(Qn::ItemFrameColorRole).value<QColor>();
+    QColor frameColor = item->data(Qn::ItemFrameDistinctionColorRole).value<QColor>();
     if(frameColor.isValid())
-        widget->setFrameColor(frameColor);
+        widget->setFrameDistinctionColor(frameColor);
 
     emit widgetAdded(widget);
 
@@ -860,11 +864,17 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 qint64 time = item->data(Qn::ItemTimeRole).toLongLong();
                 if (time > 0 && time != DATETIME_NOW)
                     time *= 1000;
-                if (time > 0)
-                    mediaWidget->display()->archiveReader()->jumpTo(time, time);
-                else
-                    if(m_widgets.size() == 1 && !mediaWidget->resource()->toResource()->hasFlags(QnResource::live)) 
+                if (time > 0) {
+                    // jump to time preventing synchronizer from touching other items
+                    QnAbstractArchiveReader *reader = mediaWidget->display()->archiveReader();
+                    QnAbstractNavigator *navDelegate = reader->navDelegate();
+                    reader->setNavDelegate(0);
+                    reader->jumpTo(time, time);
+                    reader->setNavDelegate(navDelegate);
+                } else {
+                    if(m_widgets.size() == 1 && !mediaWidget->resource()->toResource()->hasFlags(QnResource::live))
                         mediaWidget->display()->archiveReader()->jumpTo(0, 0);
+                }
             }
         }
     }
@@ -1531,7 +1541,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
     foreach(QnResourceWidget *widget, widgets()) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
-            qint64 timeUSec = mediaWidget->display()->currentTimeUSec();
+            qint64 timeUSec = mediaWidget->display()->camera()->getCurrentTime();
             if((quint64)timeUSec != AV_NOPTS_VALUE)
                 mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : timeUSec / 1000);
 
@@ -1638,6 +1648,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         int checkedButtons = widget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
         if(checkedButtons != -1)
             widget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
+
+        if(thumbnailed)
+            widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(QnMediaResourceWidget::PtzButton));
     }
 
     QVector<QUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QUuid> >();

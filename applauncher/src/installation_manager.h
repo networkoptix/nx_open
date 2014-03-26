@@ -6,10 +6,12 @@
 #define INSTALLATION_MANAGER_H
 
 #include <functional>
-#include <map>
 #include <mutex>
 
-#include <QObject>
+#include <QtCore/QObject>
+#include <QtCore/QMap>
+
+#include <utils/common/software_version.h>
 
 
 //!Provides access to installed versions information
@@ -28,25 +30,31 @@ class InstallationManager
 public:
     struct AppData
     {
-        QString rootDir;
-        QString installationDirectory;
+        QnSoftwareVersion m_version;
 
-        AppData()
-        {
-        }
-        AppData(
-            const QString& _rootDir,
-            const QString& _installationDirectory )
-        :
-            rootDir( _rootDir ),
-            installationDirectory( _installationDirectory )
-        {
-        }
+        QString m_rootPath;
+        QString m_binaryPath;
+        QString m_libPath;
+
+        bool exists() const;
+        QnSoftwareVersion version() const;
+        QString rootPath() const;
+        QString binaryPath() const;
+        QString executableFilePath() const;
+        QString libraryPath() const;
+
+        bool verifyInstallation() const;
     };
 
-    InstallationManager( QObject* const parent = NULL );
+    InstallationManager(QObject *parent = NULL );
+
+    AppData getAppData(const QString &rootPath) const;
 
     void updateInstalledVersionsInformation();
+    /*! Create an empty directory with name as the latest version is.
+     *  It is needed to signalize client <= 2.1 about version installed in a standard way (not in compatibility folder). */
+    void createGhosts();
+    void createGhostsForVersion(const QnSoftwareVersion &version);
     //!Returns number of installed versions
     int count() const;
     QString getMostRecentVersion() const;
@@ -64,11 +72,12 @@ public:
 
     static bool isValidVersionName( const QString& version );
 
+    static QString defaultDirectoryForInstallations();
+
 private:
     QString m_errorString;
-    //!map<version, AppData>. Most recent version first
-    mutable std::map<QString, AppData, std::greater<QString> > m_installedProductsByVersion;
-    std::list<QString> m_rootInstallDirectoryList;
+    mutable QMap<QnSoftwareVersion, AppData> m_installedProductsByVersion;
+    QStringList m_rootInstallDirectoryList;
     //QString m_rootInstallDirectory;
     QString m_defaultDirectoryForNewInstallations;
     mutable std::mutex m_mutex;

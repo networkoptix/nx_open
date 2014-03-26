@@ -8,8 +8,7 @@
  * <tt>QObject</tt>.
  */
 class GraphicsPathItem: public AbstractGraphicsShapeItem {
-    Q_OBJECT;
-
+    Q_OBJECT
     typedef AbstractGraphicsShapeItem base_type;
 
 public:

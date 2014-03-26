@@ -11,12 +11,16 @@ class GraphicsLabel : public GraphicsFrame
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText)
-
+    Q_ENUMS(PerformanceHint)
     typedef GraphicsFrame base_type;
 
 public:
-    /** Don't use text-level caching when drawing graphics label. */
-    static const QStaticText::PerformanceHint NoCaching = static_cast<QStaticText::PerformanceHint>(-1);
+    enum PerformanceHint {
+        NoCaching,
+        ModerateCaching,
+        AggressiveCaching,
+        PixmapCaching
+    };
 
     explicit GraphicsLabel(QGraphicsItem *parent = 0, Qt::WindowFlags f = 0);
     explicit GraphicsLabel(const QString &text, QGraphicsItem *parent = 0, Qt::WindowFlags f = 0);
@@ -25,8 +29,11 @@ public:
     QString text() const;
     Q_SLOT void setText(const QString &text);
 
-    QStaticText::PerformanceHint performanceHint() const;
-    void setPerformanceHint(QStaticText::PerformanceHint performanceHint);
+    Qt::Alignment alignment() const;
+    void setAlignment(Qt::Alignment alignment);
+    
+    PerformanceHint performanceHint() const;
+    void setPerformanceHint(PerformanceHint performanceHint);
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 

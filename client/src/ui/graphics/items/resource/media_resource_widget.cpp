@@ -24,6 +24,7 @@
 #include <core/ptz/fallback_ptz_controller.h>
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/home_ptz_controller.h>
+#include <core/ptz/viewport_ptz_controller.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -142,10 +143,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     /* Set up PTZ controller. */
     QnPtzControllerPtr fisheyeController;
     fisheyeController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
+    fisheyeController.reset(new QnViewportPtzController(fisheyeController));
     fisheyeController.reset(new QnPresetPtzController(fisheyeController));
     fisheyeController.reset(new QnTourPtzController(fisheyeController));
-    fisheyeController.reset(new QnHomePtzController(fisheyeController));
     fisheyeController.reset(new QnActivityPtzController(QnActivityPtzController::Local, fisheyeController));
+    fisheyeController.reset(new QnHomePtzController(fisheyeController));
 
     if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {
         serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
@@ -504,9 +506,7 @@ void QnMediaResourceWidget::updateIconButton() {
         return;
     }
 
-    int recordingMode = Qn::RecordingType_Never;
-    if(m_camera->getStatus() == QnResource::Recording)
-        recordingMode =  QnRecordingStatusHelper::currentRecordingMode(context(), m_camera);
+    int recordingMode = QnRecordingStatusHelper::currentRecordingMode(context(), m_camera);
     QIcon recIcon = QnRecordingStatusHelper::icon(recordingMode);
     iconButton()->setVisible(!recIcon.isNull());
     iconButton()->setIcon(recIcon);
@@ -1099,7 +1099,11 @@ void QnMediaResourceWidget::updateFisheye() {
     item()->setData(Qn::ItemFlipRole, flip);
 
     updateAspectRatio();
+
     emit fisheyeChanged();
+
+    if(buttonBar()->visibleButtons() & PtzButton)
+        at_ptzButton_toggled(buttonBar()->checkedButtons() & PtzButton); // TODO: #Elric doesn't belong here, hack
 }
 
 void QnMediaResourceWidget::updateCustomAspectRatio() {

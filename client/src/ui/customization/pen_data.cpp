@@ -1,0 +1,83 @@
+#include "pen_data.h"
+
+#include <cassert>
+
+#include <utils/common/json_functions.h>
+#include <utils/common/enum_name_mapper.h>
+
+QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qt, PenStyle, static)
+QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qt, PenCapStyle, static)
+QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qt, PenJoinStyle, static)
+QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenStyle, static)
+QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenCapStyle, static)
+QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenJoinStyle, static)
+
+QnPenData::QnPenData(): 
+    m_fields(0), 
+    m_width(0.0), 
+    m_style(Qt::NoPen), 
+    m_capStyle(Qt::SquareCap), 
+    m_joinStyle(Qt::BevelJoin) 
+{}
+
+QnPenData::QnPenData(const QPen &pen):
+    m_fields(AllFields),
+    m_brush(pen.brush()),
+    m_width(pen.width()),
+    m_style(pen.style()),
+    m_capStyle(pen.capStyle()),
+    m_joinStyle(pen.joinStyle())
+{}
+
+void QnPenData::applyTo(QPen *pen) const {
+    assert(pen);
+
+    if(m_fields & Brush)        pen->setBrush(m_brush);
+    if(m_fields & Width)        pen->setWidthF(m_width);
+    if(m_fields & Style)        pen->setStyle(m_style);
+    if(m_fields & CapStyle)     pen->setCapStyle(m_capStyle);
+    if(m_fields & JoinStyle)    pen->setJoinStyle(m_joinStyle);
+}
+
+namespace QnPenDataDetail {
+    template<QnPenData::Field field>
+    struct Check {
+        bool operator()(const QnPenData &data) const {
+            return data.fields() & field;
+        }
+    };
+
+    QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS_EX(
+        QnPenData,
+        ((&QnPenData::brush,        &QnPenData::setBrush,       "brush",        Check<QnPenData::Brush>()))
+        ((&QnPenData::width,        &QnPenData::setWidth,       "width",        Check<QnPenData::Width>()))
+        ((&QnPenData::style,        &QnPenData::setStyle,       "style",        Check<QnPenData::Style>()))
+        ((&QnPenData::capStyle,     &QnPenData::setCapStyle,    "capStyle",     Check<QnPenData::CapStyle>()))
+        ((&QnPenData::joinStyle,    &QnPenData::setJoinStyle,   "joinStyle",    Check<QnPenData::JoinStyle>())),
+        QJson::Optional
+    )
+}
+
+void serialize(QnJsonContext *ctx, const QnPenData &value, QJsonValue *target) {
+    QnPenDataDetail::serialize(ctx, value, target);
+}
+
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnPenData *target) {
+    QJsonObject map;
+    if(!QJson::deserialize(ctx, value, &map))
+        return false;
+
+    QColor color;
+    bool hasColor = false;
+    if(!QJson::deserialize(ctx, map, lit("color"), &color, true, &hasColor))
+        return false;
+
+    if(!QnPenDataDetail::deserialize(ctx, value, target))
+        return false;
+
+    if(!(target->fields() & QnPenData::Brush) && hasColor)
+        target->setBrush(color);
+
+    return true;
+}
+

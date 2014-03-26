@@ -8,9 +8,6 @@
 #include <QtCore/QIODevice>
 #include <QtMultimedia/QAudioInput>
 
-#include <windows.h>
-#include <mmsystem.h>
-
 #include <dsp_effects/speex/speex_preprocess.h>
 #include "core/datapacket/media_data_packet.h"
 #include "utils/common/long_runnable.h"
@@ -21,18 +18,14 @@
 
 class CaptureAudioStream;
 
-class QnDesktopFileEncoder: public QnLongRunnable
-{
+class QnDesktopFileEncoder: public QnLongRunnable {
     Q_OBJECT
 
-private:
-    enum {BLOCK_SIZE = 1460};
 public:
     QnDesktopFileEncoder( const QString& fileName,
                         int desktopNum,           // = 0,
                         const QnAudioDeviceInfo* audioDevice,
                         const QnAudioDeviceInfo* audioDevice2,
-                        Qn::CaptureMode mode,
                         bool captureCursor,
                         const QSize& captureResolution,
                         float encodeQualuty, // in range 0.0 .. 1.0
@@ -129,7 +122,6 @@ private:
     int m_maxAudioJitter;
     QVector <EncodedAudioInfo*> m_audioInfo;
 
-    Qn::CaptureMode m_captureMode;
     bool m_captureCursor;
     QSize m_captureResolution;
     float m_encodeQualuty;
@@ -138,7 +130,7 @@ private:
     QString m_lastErrorStr;
     bool m_capturingStopped;
     const QPixmap m_logo;
-    friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance,  DWORD dwParam1, DWORD dwParam2);
+    friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,  DWORD_PTR dwParam1, DWORD_PTR dwParam2);
 };
 
 #endif // Q_OS_WIN

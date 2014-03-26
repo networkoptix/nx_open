@@ -250,7 +250,7 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
     } else if (role == Qt::EditRole && index.column() == HotkeyColumn) {
         bool ok = false;
         int hotkey = value.toInt(&ok);
-        if(!ok || hotkey > 9)
+        if(!ok || hotkey > 9 || hotkey < 0)
             return false;
 
         // preset that is assigned to this hotkey
@@ -266,9 +266,7 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
         }
 
         if (existing.rowType != InvalidRow) {
-            // TODO: #GDM _OH_ _MY_ _FUCKING_ _GOD_
-            // Popping up a dialog in model class is a really bad idea. 
-            // Please implement properly.
+            // TODO: #dklychkov move it out of here (to item delegate maybe)
 
             QString message = (existing.rowType == PresetRow)
                               ? tr("This hotkey is used by preset \"%1\"").arg(existing.presetModel.preset.name)
@@ -691,7 +689,7 @@ QnPtzManageModel::TourState QnPtzManageModel::tourState(const QnPtzTourItemModel
             int count = i < j ? j - i : j - i + spots.size();
             if(count >= 2) {
                 if (stateString)
-                    *stateString = tr("Tour has %n identical positions", 0, count).arg(i);
+                    *stateString = tr("Tour has %n identical positions", 0, count);
                 return DuplicatedLinesTour;
             }
         }

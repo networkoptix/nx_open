@@ -3,12 +3,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.2.0-SNAPSHOT</version>
+        <version>2.3.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.2.0-SNAPSHOT</version>
+    <version>2.3.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>build_environment</artifactId>
     <packaging>pom</packaging>
@@ -78,6 +78,12 @@
                         <configuration>
                             <excludeDefaultDirectories>true</excludeDefaultDirectories>
                             <filesets>
+                                <fileset>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>buildenv</include>
+                                    </includes>
+                                </fileset>   
                                 <fileset>
                                     <directory>${project.build.directory}/x86/python</directory>
                                     <followSymlinks>false</followSymlinks>
@@ -154,7 +160,7 @@
                             <skip>${unix}</skip>                            
                         </configuration>
                     </execution>
-  
+
                     <execution>
                         <id>virtualenv-unix</id>
                         <phase>generate-sources</phase>
@@ -257,9 +263,9 @@
                     <classifier>${profile.classifier}</classifier>
                 </dependency>
                 <dependency>                
-                    <groupId>com.digitalwatchdog.dvr</groupId>
-                    <artifactId>vmax-integration</artifactId>
-                    <version>1.0-SNAPSHOT</version>
+                    <groupId>com.networkoptix.hdwitness</groupId>
+                    <artifactId>vmaxproxy</artifactId>
+                    <version>2.1-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>               

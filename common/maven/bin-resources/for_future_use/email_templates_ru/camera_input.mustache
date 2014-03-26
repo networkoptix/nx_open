@@ -1,0 +1,15 @@
+﻿<div class="content">
+    <div class="callout">
+        <h4>Тревожный вход:</h4>
+        <table class="details">
+            <tr>
+                <th>Порт</th>
+                <th>Время</th>
+            </tr>
+            {{#aggregated}}
+                <tr><td>{{inputPort}}</td>
+                    <td><i>{{timestamp}}</i></td></tr>
+            {{/aggregated}}
+        </table>
+    </div>
+</div>

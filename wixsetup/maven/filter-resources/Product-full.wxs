@@ -23,7 +23,7 @@
         <?define LaunchClientChecBoxText="!(loc.Product_LaunchClient)" ?>
 
         <?if $(var.arch) = x86 ?>
-        <Condition Message="This package is designed for 32-bit OS. Setup will now exit.">
+        <Condition Message="!(loc.Product_ArchMismatch)">
             <![CDATA[ NOT VersionNT64 ]]>
         </Condition>
         <?endif?>
@@ -286,7 +286,7 @@
                             Win64="no"/>
         </Property>
 
-        <Binary Id="CustomActions.dll" SourceFile="CustomActions\${build.configuration}\CustomActions.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
 
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
@@ -382,7 +382,7 @@
 
         <MajorUpgrade AllowSameVersionUpgrades="yes"
             Schedule="afterInstallInitialize"
-            DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."
+            DowngradeErrorMessage="!(loc.DowngradeWarningDlg_DowngradeWarning)"
             MigrateFeatures="yes" />
 
         <!--        <Upgrade Id="${customization.clientUpgradeCode}">
@@ -671,7 +671,7 @@
                                 </Component>
 
                                 <Component Id="VmaxProxyQTLibraries">
-                                    <File Id="VmaxProxyQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)/Qt5Core$(var.suffix).dll"  />
+                                    <File Id="VmaxProxyQt5Core$(var.suffix).dll" Name="qtcore$(var.suffix)4.dll" Source="$(var.SourceDir)/vmaxproxy/qtcore$(var.suffix)4.dll"  />
                                 </Component>
                             </Directory>
 
@@ -852,7 +852,7 @@
         <DirectoryRef Id="TARGETDIR">
             <Merge Id="VCRedist1" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/>
             <!-- <Merge Id="VCRedist2" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_11_0_Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/> -->
-            <?if ${build.configuration} = Debug ?>
+            <?if ${build.configuration} = debug ?>
             <Merge Id="VCRedist3" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
             <!-- <Merge Id="VCRedist4" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_11_0_Microsoft_VC110_DebugCRT_${arch}.msm" DiskId="1" Language="0"/> -->
             <?endif?>
@@ -861,7 +861,7 @@
         <Feature Id="VCRedist" Title="Visual C++ 11.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
             <MergeRef Id="VCRedist1"/>
             <!-- <MergeRef Id="VCRedist2"/> -->
-            <?if ${build.configuration} = Debug ?>
+            <?if ${build.configuration} = debug ?>
             <MergeRef Id="VCRedist3"/>
             <!-- <MergeRef Id="VCRedist4"/> -->
             <?endif?>

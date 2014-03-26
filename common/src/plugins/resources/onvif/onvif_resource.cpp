@@ -5,6 +5,7 @@
 #include <climits>
 #include <cmath>
 #include <sstream>
+#include <type_traits>
 
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
@@ -220,8 +221,10 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_timerID( 0 ),
     m_renewSubscriptionTaskID(0),
     m_maxChannels(1),
-    m_streamConfCounter(0)
+    m_streamConfCounter(0),
+    m_prevRequestSendClock(0)
 {
+    m_monotonicClock.start();
 }
 
 QnPlOnvifResource::~QnPlOnvifResource()
@@ -496,7 +499,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     }
 
 #ifdef _DEBUG
-    startInputPortMonitoring();
+    //startInputPortMonitoring();
 #endif
 
     if (m_appStopping)
@@ -726,25 +729,27 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
 */
 //#define MONITOR_TRIGGER_RELAY_NOTIFICATION
 
-void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMessageHolderType& notification )
+void QnPlOnvifResource::notificationReceived(
+    const oasisWsnB2__NotificationMessageHolderType& notification,
+    time_t minNotificationTime )
 {
     if( !notification.Message.__any )
     {
-        NX_LOG( QString::fromLatin1("Received notification with empty message. Ignoring..."), cl_logDEBUG2 );
+        NX_LOG( lit("Received notification with empty message. Ignoring..."), cl_logDEBUG2 );
         return;
     }
 
     if( !notification.oasisWsnB2__Topic ||
         !notification.oasisWsnB2__Topic->__item )
     {
-        NX_LOG( QString::fromLatin1("Received notification with no topic specified. Ignoring..."), cl_logDEBUG2 );
+        NX_LOG( lit("Received notification with no topic specified. Ignoring..."), cl_logDEBUG2 );
         return;
     }
 
     if( std::strstr(notification.oasisWsnB2__Topic->__item, "Trigger/Relay") == nullptr &&
         std::strstr(notification.oasisWsnB2__Topic->__item, "IO/Port") == nullptr )
     {
-        NX_LOG( QString::fromLatin1("Received notification with unknown topic: %1. Ignoring...").
+        NX_LOG( lit("Received notification with unknown topic: %1. Ignoring...").
             arg(QLatin1String(notification.oasisWsnB2__Topic->__item)), cl_logDEBUG2 );
         return;
     }
@@ -761,7 +766,10 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
     if( !reader.parse( &xmlSrc ) )
         return;
 
-    //checking that there is single source is a port
+    if( (minNotificationTime != (time_t)-1) && (handler.utcTime.toTime_t() < minNotificationTime) )
+        return; //ignoring old notifications: DW camera can deliver old cached notifications
+
+    //checking that there is single source and this source is a relay port
     std::list<NotificationMessageParseHandler::SimpleItem>::const_iterator portSourceIter = handler.source.end();
     for( std::list<NotificationMessageParseHandler::SimpleItem>::const_iterator
         it = handler.source.begin();
@@ -1139,18 +1147,6 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
 
     bool result = QnPhysicalCameraResource::mergeResourcesIfNeeded(source);
 
-    if (getGroupId() != onvifR->getGroupId())
-    {
-        setGroupId(onvifR->getGroupId());
-        result = true; // groupID can be changed for onvif resource because if not auth info, maxChannels is not accessible
-    }
-
-    if (getGroupName().isEmpty() && getGroupName() != onvifR->getGroupName())
-    {
-        setGroupName(onvifR->getGroupName());
-        result = true;
-    }
-
     if (onvifUrlSource.size() != 0 && QUrl(onvifUrlSource).host().size() != 0 && getDeviceOnvifUrl() != onvifUrlSource)
     {
         setDeviceOnvifUrl(onvifUrlSource);
@@ -1229,7 +1225,7 @@ bool QnPlOnvifResource::fetchRelayInputInfo()
     m_prevSoapCallResult = soapWrapper.getDigitalInputs( request, response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
     {
-        NX_LOG( QString::fromLatin1("Failed to get relay digital input list. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
+        NX_LOG( lit("Failed to get relay digital input list. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
         return true;
     }
 
@@ -2133,7 +2129,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer()
     m_prevSoapCallResult = soapWrapper.renew( request, response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
     {
-        NX_LOG( QString::fromLatin1("Failed to renew subscription (endpoint %1). %2").
+        NX_LOG( lit("Failed to renew subscription (endpoint %1). %2").
             arg(QString::fromLatin1(soapWrapper.endpoint())).arg(m_prevSoapCallResult), cl_logDEBUG1 );
         //TODO/IMPL creating new subscription
         lk.unlock();
@@ -2426,7 +2422,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
     if( !sock->connect( eventServiceURL.host(), eventServiceURL.port(DEFAULT_HTTP_PORT) ) )
     {
-        NX_LOG( QString::fromLatin1("Failed to connect to %1:%2 to determine local address. %3").
+        NX_LOG( lit("Failed to connect to %1:%2 to determine local address. %3").
             arg(eventServiceURL.host()).arg(eventServiceURL.port()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
         return false;
     }
@@ -2465,7 +2461,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     m_prevSoapCallResult = soapWrapper.Subscribe( &request, &response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )    //TODO/IMPL find out which is error and which is not
     {
-        NX_LOG( QString::fromLatin1("Failed to subscribe in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logWARNING );
+        NX_LOG( lit("Failed to subscribe in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logWARNING );
         return false;
     }
 
@@ -2525,7 +2521,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
     m_eventMonitorType = emtNotification;
 
-    NX_LOG( QString::fromLatin1("Successfully registered in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
+    NX_LOG( lit("Successfully registered in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
     return true;
 }
 
@@ -2546,7 +2542,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
     m_prevSoapCallResult = soapWrapper.createPullPointSubscription( request, response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
     {
-        NX_LOG( QString::fromLatin1("Failed to subscribe in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logWARNING );
+        NX_LOG( lit("Failed to subscribe in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logWARNING );
         return false;
     }
 
@@ -2582,7 +2578,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
             : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
 
     m_eventMonitorType = emtPullPoint;
-
+    m_prevRequestSendClock = m_monotonicClock.elapsed();
     m_timerID = TimerManager::instance()->addTimer( this, PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND );
     return true;
 }
@@ -2590,6 +2586,14 @@ bool QnPlOnvifResource::createPullPointSubscription()
 bool QnPlOnvifResource::isInputPortMonitored() const
 {
     return m_timerID != 0;
+}
+
+template<class _NumericInt>
+_NumericInt roundUp( _NumericInt val, _NumericInt step, typename std::enable_if<std::is_integral<_NumericInt>::value>::type* = nullptr )
+{
+    if( step == 0 )
+        return val;
+    return (val + step - 1) / step * step;
 }
 
 bool QnPlOnvifResource::pullMessages()
@@ -2616,24 +2620,27 @@ bool QnPlOnvifResource::pullMessages()
     soapWrapper.getProxy()->soap->header = &header;
     soapWrapper.getProxy()->soap->header->subscriptionID = buf;
     _onvifEvents__PullMessagesResponse response;
+    const qint64 currentRequestSendClock = m_monotonicClock.elapsed();
     m_prevSoapCallResult = soapWrapper.pullMessages( request, response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
     {
-        NX_LOG( QString::fromLatin1("Failed to pull messages in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
+        NX_LOG( lit("Failed to pull messages in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
         m_timerID = TimerManager::instance()->addTimer( this, PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND );
         return false;
     }
 
+    const time_t minNotificationTime = response.CurrentTime - roundUp<qint64>(m_monotonicClock.elapsed() - m_prevRequestSendClock, 1000) / 1000;
     if( response.oasisWsnB2__NotificationMessage.size() > 0 )
     {
         for( size_t i = 0;
             i < response.oasisWsnB2__NotificationMessage.size();
             ++i )
         {
-            notificationReceived( *response.oasisWsnB2__NotificationMessage[i] );
+            notificationReceived( *response.oasisWsnB2__NotificationMessage[i], minNotificationTime );
         }
     }
 
+    m_prevRequestSendClock = currentRequestSendClock;
     m_timerID = TimerManager::instance()->addTimer( this, PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND );
     return true;
 }
@@ -2652,7 +2659,7 @@ bool QnPlOnvifResource::fetchRelayOutputs( std::vector<RelayOutputInfo>* const r
     m_prevSoapCallResult = soapWrapper.getRelayOutputs( request, response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
     {
-        NX_LOG( QString::fromLatin1("Failed to get relay input/output info. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
+        NX_LOG( lit("Failed to get relay input/output info. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
         return false;
     }
 
@@ -2669,7 +2676,7 @@ bool QnPlOnvifResource::fetchRelayOutputs( std::vector<RelayOutputInfo>* const r
     if( relayOutputs )
         *relayOutputs = m_relayOutputInfo;
 
-    NX_LOG( QString::fromLatin1("Successfully got device (%1) IO ports info. Found %2 digital input and %3 relay output").
+    NX_LOG( lit("Successfully got device (%1) IO ports info. Found %2 digital input and %3 relay output").
         arg(QString::fromLatin1(soapWrapper.endpoint())).arg(0).arg(m_relayOutputInfo.size()), cl_logDEBUG1 );
 
     return true;
@@ -2702,7 +2709,7 @@ bool QnPlOnvifResource::setRelayOutputSettings( const RelayOutputInfo& relayOutp
         auth.password(),
         m_timeDrift );
 
-    NX_LOG( QString::fromLatin1("Swiching camera %1 relay output %2 to monostable mode").
+    NX_LOG( lit("Swiching camera %1 relay output %2 to monostable mode").
         arg(QString::fromLatin1(soapWrapper.endpoint())).arg(QString::fromStdString(relayOutputInfo.token)), cl_logDEBUG1 );
 
     //switching to monostable mode
@@ -2717,7 +2724,7 @@ bool QnPlOnvifResource::setRelayOutputSettings( const RelayOutputInfo& relayOutp
     m_prevSoapCallResult = soapWrapper.setRelayOutputSettings( setOutputSettingsRequest, setOutputSettingsResponse );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
     {
-        NX_LOG( QString::fromLatin1("Failed to switch camera %1 relay output %2 to monostable mode. %3").
+        NX_LOG( lit("Failed to switch camera %1 relay output %2 to monostable mode. %3").
             arg(QString::fromLatin1(soapWrapper.endpoint())).arg(QString::fromStdString(relayOutputInfo.token)).arg(m_prevSoapCallResult), cl_logWARNING );
         return false;
     }
@@ -2752,7 +2759,7 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
     RelayOutputInfo relayOutputInfo;
     if( !fetchRelayOutputInfo( outputID.toStdString(), &relayOutputInfo ) )
     {
-        NX_LOG( QString::fromLatin1("Cannot change relay output %1 state. Failed to get relay output info").arg(outputID), cl_logWARNING );
+        NX_LOG( lit("Cannot change relay output %1 state. Failed to get relay output info").arg(outputID), cl_logWARNING );
         return false;
     }
 
@@ -2785,13 +2792,13 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
         relayOutputInfo.activeByDefault = false;
         if( !setRelayOutputSettings( relayOutputInfo ) )
         {
-            NX_LOG( QString::fromLatin1("Cannot set camera %1 output %2 to state %3 with timeout %4 msec. Cannot set mode to %5. %6").
+            NX_LOG( lit("Cannot set camera %1 output %2 to state %3 with timeout %4 msec. Cannot set mode to %5. %6").
                 arg(QString()).arg(QString::fromStdString(relayOutputInfo.token)).arg(QLatin1String(active ? "active" : "inactive")).arg(autoResetTimeoutMS).
                 arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")).arg(m_prevSoapCallResult), cl_logWARNING );
             return false;
         }
 
-        NX_LOG( QString::fromLatin1("Camera %1 output %2 has been switched to %3 mode").arg(QString()).arg(outputID).
+        NX_LOG( lit("Camera %1 output %2 has been switched to %3 mode").arg(QString()).arg(outputID).
             arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")), cl_logWARNING );
     }
 
@@ -2810,7 +2817,7 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
     m_prevSoapCallResult = soapWrapper.setRelayOutputState( request, response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
     {
-        NX_LOG( QString::fromLatin1("Failed to set relay %1 output state to %2. endpoint %3").
+        NX_LOG( lit("Failed to set relay %1 output state to %2. endpoint %3").
             arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logWARNING );
         return false;
     }
@@ -2825,7 +2832,7 @@ bool QnPlOnvifResource::setRelayOutputStateNonSafe(
     }
 #endif
 
-    NX_LOG( QString::fromLatin1("Successfully set relay %1 output state to %2. endpoint %3").
+    NX_LOG( lit("Successfully set relay %1 output state to %2. endpoint %3").
         arg(QString::fromStdString(relayOutputInfo.token)).arg(active).arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logWARNING );
     return true;
 }

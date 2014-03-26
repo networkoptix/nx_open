@@ -1,0 +1,19 @@
+﻿{{#aggregated}}
+<div class="content">
+    <div class="callout">
+        <p>Обнаружен конфликт в: {{timestamp}}</p>
+        <table class="details">
+            <tr>
+                <th>Номер</th>
+                <th>IP-адрес Enterprise Controller'а</th>
+            </tr>
+                {{#msConflicts}}
+                    <tr>
+                        <td>{{number}}</td>
+                        <td>{{ip}}</td>
+                    </tr>
+                {{/msConflicts}}
+        </table>
+    </div>
+</div>
+{{/aggregated}}

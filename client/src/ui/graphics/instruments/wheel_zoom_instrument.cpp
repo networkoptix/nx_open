@@ -11,6 +11,7 @@
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/animation/animation_event.h>
 #include <ui/animation/animation_timer.h>
+#include <ui/workbench/workbench.h>
 
 namespace {
     const qreal degreesFor2x = 180.0;
@@ -23,7 +24,8 @@ WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
         makeSet(QEvent::GraphicsSceneWheel),
         makeSet(),
         parent
-    )
+    ),
+    QnWorkbenchContextAware(parent)
 {
     KineticCuttingProcessor *processor = new KineticCuttingProcessor(QMetaType::QReal, this);
     processor->setHandler(this);
@@ -71,7 +73,7 @@ bool WheelZoomInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent 
     if(viewport == NULL)
         return false;
 
-    if(!event->modifiers().testFlag(Qt::AltModifier))
+    if(!workbench()->item(Qn::ZoomedRole) && !event->modifiers().testFlag(Qt::AltModifier))
         return false;
 
     /* delta() returns the distance that the wheel is rotated 

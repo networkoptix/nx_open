@@ -23,7 +23,8 @@ InstallationProcess::InstallationProcess(
     const QString& customization,
     const QString& version,
     const QString& module,
-    const QString& installationDirectory )
+    const QString& installationDirectory,
+    bool autoStartNeeded )
 :
     m_productName( productName ),
     m_customization( customization ),
@@ -33,7 +34,8 @@ InstallationProcess::InstallationProcess(
     m_state( State::init ),
     m_status( applauncher::api::InstallationStatus::init ),
     m_totalBytesDownloaded( 0 ),
-    m_totalBytesToDownload( 0 )
+    m_totalBytesToDownload( 0 ),
+    m_autoStartNeeded( autoStartNeeded )
 {
 }
 
@@ -54,9 +56,9 @@ void InstallationProcess::wait()
 }
 
 static const QString MIRROR_LIST_URL_PARAM_NAME( "mirrorListUrl" );
-static const QString DEFAULT_MIRROR_LIST_URL( "http://networkoptix.com/archive/hdw_mirror_list.xml" );
+static const QString INSTALLATION_DATA_FILE( "install.dat" );
 
-bool InstallationProcess::start( const QSettings& settings )
+bool InstallationProcess::start( const QString& mirrorListUrl )
 {
     if( !m_httpClient )
     {
@@ -67,9 +69,9 @@ bool InstallationProcess::start( const QSettings& settings )
             Qt::DirectConnection );
     }
 
+    m_fileSizeByEntry.clear();
     m_state = State::downloadMirrorList;
     m_status = applauncher::api::InstallationStatus::inProgress;
-    QString mirrorListUrl = settings.value(MIRROR_LIST_URL_PARAM_NAME, DEFAULT_MIRROR_LIST_URL).toString();
     if( !m_httpClient->doGet(QUrl(mirrorListUrl)) )
     {
         m_state = State::init;
@@ -101,10 +103,41 @@ float InstallationProcess::getProgress() const
     return percentCompleted > 100.0 ? 100.0 : percentCompleted;
 }
 
+bool InstallationProcess::autoStartNeeded() const
+{
+    return m_autoStartNeeded;
+}
+
 QString InstallationProcess::errorText() const
 {
     std::unique_lock<std::mutex> lk( m_mutex );
     return m_errorText;
+}
+
+QString InstallationProcess::getVersion() const
+{
+    return m_version;
+}
+
+void InstallationProcess::cancel()
+{
+    {
+        std::unique_lock<std::mutex> lk( m_mutex );
+
+        m_status = applauncher::api::InstallationStatus::cancelInProgress;
+
+        if (m_httpClient) {
+            m_httpClient->terminate();
+            m_httpClient.reset();
+        }
+
+        if (m_state == State::installing)
+            m_syncher->cancel();
+
+        m_status = applauncher::api::InstallationStatus::cancelled;
+    }
+
+    emit installationDone(this);
 }
 
 void InstallationProcess::overrallDownloadSizeKnown(
@@ -131,6 +164,8 @@ void InstallationProcess::fileDone(
 {
     std::unique_lock<std::mutex> lk( m_mutex );
 
+    m_fileSizeByEntry.insert(filePath, QFile(m_installationDirectory + "/" + filePath).size());
+
     auto it = m_unfinishedFilesBytesDownloaded.find( filePath );
     if( it == m_unfinishedFilesBytesDownloaded.end() )
         return;
@@ -144,15 +179,13 @@ void InstallationProcess::finished(
     bool result )
 {
     m_state = State::finished;
-    if( result )
-    {
+    if( result && writeInstallationSummary() ) {
         m_status = applauncher::api::InstallationStatus::success;
-        emit installationSucceeded();
-    }
-    else
-    {
+    } else {
         m_status = applauncher::api::InstallationStatus::failed;
     }
+
+    emit installationDone( this );
 }
 
 void InstallationProcess::failed(
@@ -161,6 +194,19 @@ void InstallationProcess::failed(
     const QString& errorText )
 {
     //TODO/IMPL
+}
+
+bool InstallationProcess::writeInstallationSummary()
+{
+    QFile file(m_installationDirectory + "/" + INSTALLATION_DATA_FILE);
+    if (!file.open(QFile::WriteOnly))
+        return false;
+
+    QDataStream stream(&file);
+    stream << m_fileSizeByEntry;
+    file.close();
+
+    return true;
 }
 
 void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
@@ -271,6 +317,10 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
         m_status = applauncher::api::InstallationStatus::failed;
         return;
     }
+
+    QFileInfo fileInfo(m_installationDirectory);
+    if (fileInfo.exists() && !fileInfo.isDir()) // if there is a ghost file remove it
+        QFile::remove(fileInfo.absolutePath());
 
     if( !QDir().mkpath(m_installationDirectory) )
     {

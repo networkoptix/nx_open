@@ -169,7 +169,7 @@ protected:
         QnByteArray* const resultPtr = (m_dataOutput.get() && m_dataOutput->packetsInQueue() > m_maxFramesToCacheBeforeDrop) ? NULL : &result;
         if( !resultPtr )
         {
-            NX_LOG( QString::fromLatin1("Insufficient bandwidth to %1. Skipping frame...").
+            NX_LOG( lit("Insufficient bandwidth to %1. Skipping frame...").
                 arg(m_owner->socket()->getForeignAddress().toString()), cl_logDEBUG2 );
         }
         int errCode = m_owner->getTranscoder()->transcodePacket(
@@ -241,7 +241,7 @@ protected:
         }
         else
         {
-            NX_LOG( QString::fromLatin1("Terminating progressive download (url %1) connection from %2 due to transcode error (%3)").
+            NX_LOG( lit("Terminating progressive download (url %1) connection from %2 due to transcode error (%3)").
                 arg(m_owner->getDecodedUrl().toString()).arg(m_owner->socket()->getForeignAddress().toString()).arg(errCode), cl_logDEBUG1 );
             m_needStop = true;
         }
@@ -334,7 +334,7 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointe
     d->foreignAddress = socket->getForeignAddress().address.toString();
     d->foreignPort = socket->getForeignAddress().port;
 
-    NX_LOG( QString::fromLatin1("Established new progressive downloading session by %1:%2. Current session count %3").
+    NX_LOG( lit("Established new progressive downloading session by %1:%2. Current session count %3").
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 
@@ -351,7 +351,7 @@ QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
 {
     Q_D(QnProgressiveDownloadingConsumer);
 
-    NX_LOG( QString::fromLatin1("Progressive downloading session %1:%2 disconnected. Current session count %3").
+    NX_LOG( lit("Progressive downloading session %1:%2 disconnected. Current session count %3").
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(-1)-1), cl_logDEBUG1 );
 
@@ -551,7 +551,7 @@ void QnProgressiveDownloadingConsumer::run()
             dataProvider = liveReader;
             if (liveReader) {
                 dataConsumer.copyLastGopFromCamera(camera);
-                liveReader->startIfNotRunning(true);
+                liveReader->startIfNotRunning();
                 camera->inUse(this);
             }
         }
@@ -654,11 +654,11 @@ void QnProgressiveDownloadingConsumer::run()
         while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
             readRequest(); // just reading socket to determine client connection is closed
 
-        NX_LOG( QString::fromLatin1("Done with progressive download (url %1) connection from %2. Reason: %3").
+        NX_LOG( lit("Done with progressive download (url %1) connection from %2. Reason: %3").
             arg(getDecodedUrl().toString()).arg(socket()->getForeignAddress().toString()).
-            arg((!dataConsumer.isRunning() ? QString::fromLatin1("Data consumer stopped") : 
-                (!d->socket->isConnected() ? QString::fromLatin1("Connection has been closed") :
-                 QString::fromLatin1("Terminated")))), cl_logDEBUG1 );
+            arg((!dataConsumer.isRunning() ? lit("Data consumer stopped") : 
+                (!d->socket->isConnected() ? lit("Connection has been closed") :
+                 lit("Terminated")))), cl_logDEBUG1 );
 
         dataConsumer.pleaseStop();
 

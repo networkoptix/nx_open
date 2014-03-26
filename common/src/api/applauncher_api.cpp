@@ -124,7 +124,8 @@ namespace applauncher
         ////////////////////////////////////////////////////////////
         StartApplicationTask::StartApplicationTask()
         :
-            BaseTask( TaskType::startApplication )
+            BaseTask( TaskType::startApplication ),
+            autoRestore( false )
         {
         }
 
@@ -134,7 +135,8 @@ namespace applauncher
         :
             BaseTask( TaskType::startApplication ),
             version( _version ),
-            appArgs( _appParams )
+            appArgs( _appParams ),
+            autoRestore( false )
         {
         }
 
@@ -144,13 +146,16 @@ namespace applauncher
         :
             BaseTask( TaskType::startApplication ),
             version( _version ),
-            appArgs( _appParams.join(QLatin1String(" ")) )
+            appArgs( _appParams.join(QLatin1String(" ")) ),
+            autoRestore( false )
         {
         }
 
         QByteArray StartApplicationTask::serialize() const
         {
-            return QString::fromLatin1("%1\n%2\n%3\n\n").arg(QLatin1String(TaskType::toString(type))).arg(version).arg(appArgs).toLatin1();
+            return lit("%1\n%2\n%3\n%4\n\n").arg(QLatin1String(TaskType::toString(type))).
+                arg(version).arg(appArgs).
+                arg(autoRestore ? QLatin1String("true") : QLatin1String("false")).toLatin1();
         }
 
         bool StartApplicationTask::deserialize( const QnByteArrayConstRef& data )
@@ -162,6 +167,8 @@ namespace applauncher
                 return false;
             version = QLatin1String(lines[1].toByteArrayWithRawData());
             appArgs = QLatin1String(lines[2].toByteArrayWithRawData());
+            if( lines.size() > 3 )
+                autoRestore = lines[3].toByteArrayWithRawData() == "true";
 
             return true;
         }
@@ -170,17 +177,29 @@ namespace applauncher
         ////////////////////////////////////////////////////////////
         //// class StartInstallationTask
         ////////////////////////////////////////////////////////////
+        static const QLatin1String DEFAULT_MODULE_NAME( "client" );
+
         StartInstallationTask::StartInstallationTask()
         :
             BaseTask( TaskType::install ),
-            module( QLatin1String("client") )
+            module( DEFAULT_MODULE_NAME ),
+            autoStart( false )
+        {
+        }
+
+        StartInstallationTask::StartInstallationTask( const QString& _version, bool _autoStart )
+        :
+            BaseTask( TaskType::install ),
+            version( _version ),
+            module( DEFAULT_MODULE_NAME ),
+            autoStart( _autoStart )
         {
         }
 
         //!Implementation of \a BaseTask::serialize()
         QByteArray StartInstallationTask::serialize() const
         {
-            return QString::fromLatin1("%1\n%2\n%3\n\n").arg(QLatin1String(TaskType::toString(type))).arg(version).arg(module).toLatin1();
+            return lit("%1\n%2\n%3\n\n").arg(QLatin1String(TaskType::toString(type))).arg(version).arg(module).toLatin1();
         }
 
         //!Implementation of \a BaseTask::deserialize()
@@ -208,7 +227,7 @@ namespace applauncher
 
         QByteArray QuitTask::serialize() const
         {
-            return QString::fromLatin1("%1\n\n").arg(QLatin1String(TaskType::toString(type))).toLatin1();
+            return lit("%1\n\n").arg(QLatin1String(TaskType::toString(type))).toLatin1();
         }
 
         bool QuitTask::deserialize( const QnByteArrayConstRef& data )
@@ -234,7 +253,7 @@ namespace applauncher
 
         QByteArray IsVersionInstalledRequest::serialize() const
         {
-            return QString::fromLatin1("%1\n%2\n\n").arg(QLatin1String(TaskType::toString(type))).arg(version).toLatin1();
+            return lit("%1\n%2\n\n").arg(QLatin1String(TaskType::toString(type))).arg(version).toLatin1();
         }
         
         bool IsVersionInstalledRequest::deserialize( const QnByteArrayConstRef& data )
@@ -357,9 +376,16 @@ namespace applauncher
         {
         }
 
+        GetInstallationStatusRequest::GetInstallationStatusRequest( unsigned int _installationID )
+        :
+            BaseTask( TaskType::getInstallationStatus ),
+            installationID( _installationID )
+        {
+        }
+
         QByteArray GetInstallationStatusRequest::serialize() const
         {
-            return QString::fromLatin1("%1\n%2\n\n").arg(QLatin1String(TaskType::toString(type))).arg(installationID).toLatin1();
+            return lit("%1\n%2\n\n").arg(QLatin1String(TaskType::toString(type))).arg(installationID).toLatin1();
         }
 
         bool GetInstallationStatusRequest::deserialize( const QnByteArrayConstRef& data )
@@ -389,6 +415,8 @@ namespace applauncher
                     return success;
                 else if( str == "failed" )
                     return failed;
+                else if( str == "cancelled" )
+                    return cancelled;
                 else
                     return unknown;
             }
@@ -405,6 +433,8 @@ namespace applauncher
                         return "success";
                     case failed:
                         return "failed";
+                    case cancelled:
+                        return "cancelled";
                     default:
                         return "unknown";
                 }
@@ -473,14 +503,14 @@ namespace applauncher
         ////////////////////////////////////////////////////////////
         CancelInstallationRequest::CancelInstallationRequest()
         :
-            BaseTask( TaskType::getInstallationStatus ),
+            BaseTask( TaskType::cancelInstallation ),
             installationID( 0 )
         {
         }
 
         QByteArray CancelInstallationRequest::serialize() const
         {
-            return QString::fromLatin1("%1\n%2\n\n").arg(QLatin1String(TaskType::toString(type))).arg(installationID).toLatin1();
+            return lit("%1\n%2\n\n").arg(QLatin1String(TaskType::toString(type))).arg(installationID).toLatin1();
         }
 
         bool CancelInstallationRequest::deserialize( const QnByteArrayConstRef& data )
@@ -508,7 +538,7 @@ namespace applauncher
 
         QByteArray AddProcessKillTimerRequest::serialize() const
         {
-            return QString::fromLatin1("%1\n%2\n%3\n\n").arg(QLatin1String(TaskType::toString(type))).arg(processID).arg(timeoutMillis).toLatin1();
+            return lit("%1\n%2\n%3\n\n").arg(QLatin1String(TaskType::toString(type))).arg(processID).arg(timeoutMillis).toLatin1();
         }
 
         bool AddProcessKillTimerRequest::deserialize( const QnByteArrayConstRef& data )

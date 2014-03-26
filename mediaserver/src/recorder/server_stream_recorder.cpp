@@ -30,7 +30,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     m_lastMotionState(false),
     m_queuedSize(0),
     m_lastMediaTime(AV_NOPTS_VALUE),
-    m_diskErrorWarned(false)
+    m_diskErrorWarned(false),
+    m_rebuildBlocked(false)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
@@ -102,6 +103,18 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr nonConstData)
     if (!isRunning()) 
         return;
 
+    bool halfQueueReached = m_queuedSize >= MAX_BUFFERED_SIZE/2 || m_dataQueue.size() >= 500;
+    if (!m_rebuildBlocked && halfQueueReached)
+    {
+        m_rebuildBlocked = true;
+        DeviceFileCatalog::rebuildPause(this);
+    }
+    else if (m_rebuildBlocked && !halfQueueReached)
+    {
+        m_rebuildBlocked = false;
+        DeviceFileCatalog::rebuildResume(this);
+    }
+
     bool rez = m_queuedSize <= MAX_BUFFERED_SIZE && m_dataQueue.size() < 1000;
     if (!rez) {
         emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIssueNotEnoughSpeed, m_storage);
@@ -152,8 +165,9 @@ void QnServerStreamRecorder::updateStreamParams()
                 liveProvider->setFps(camera->getMaxFps()-5);
                 liveProvider->setQuality(Qn::QualityHighest);
             }
-            liveProvider->setSecondaryQuality(liveProvider->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
+            liveProvider->setSecondaryQuality(camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
         }
+        liveProvider->setCameraControlDisabled(camera->isCameraControlDisabled());
     }
 }
 
@@ -476,6 +490,11 @@ void QnServerStreamRecorder::endOfRun()
     QnStreamRecorder::endOfRun();
     if(m_device->getStatus() == QnResource::Recording)
         m_device->setStatus(QnResource::Online);
+
+    if (m_rebuildBlocked) {
+        m_rebuildBlocked = false;
+        DeviceFileCatalog::rebuildResume(this);
+    }
 
     QMutexLocker lock(&m_queueSizeMutex);
     m_dataQueue.clear();

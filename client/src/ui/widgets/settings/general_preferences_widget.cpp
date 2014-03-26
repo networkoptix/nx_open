@@ -19,6 +19,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/warning_style.h>
@@ -150,14 +151,16 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
 
 bool QnGeneralPreferencesWidget::confirm() {
     if (m_oldDownmix != ui->downmixAudioCheckBox->isChecked() ||
-        m_oldLanguage != ui->languageComboBox->currentIndex()) {
-        switch(QMessageBox::information(
-                    this,
-                    tr("Information"),
-                    tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
-                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                    QMessageBox::Yes
-        )) {
+        m_oldLanguage != ui->languageComboBox->currentIndex() ||
+        m_oldSkin != ui->skinComboBox->currentIndex())
+    {
+        QMessageBox::StandardButton result = QMessageBox::information(
+                 this,
+                 tr("Information"),
+                 tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
+                 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                 QMessageBox::Yes);
+        switch (result) {
         case QMessageBox::Cancel:
             return false;
         case QMessageBox::Yes:
@@ -177,11 +180,12 @@ void QnGeneralPreferencesWidget::initTranslations() {
     ui->languageComboBox->setModel(model);
 }
 
+#include "ui/workaround/mac_utils.h"
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked() {
-    QString dirName = QFileDialog::getExistingDirectory(this,
+    QString dirName = QnFileDialog::getExistingDirectory(this,
                                                         tr("Select folder..."),
                                                         ui->mainMediaFolderLabel->text(),
                                                         QnCustomFileDialog::directoryDialogOptions());
@@ -194,7 +198,7 @@ void QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked() {
     QString initialDir = ui->extraMediaFoldersList->count() == 0
             ? ui->mainMediaFolderLabel->text()
             : ui->extraMediaFoldersList->item(0)->text();
-    QString dirName = QFileDialog::getExistingDirectory(this,
+    QString dirName = QnFileDialog::getExistingDirectory(this,
                                                         tr("Select folder..."),
                                                         initialDir,
                                                         QnCustomFileDialog::directoryDialogOptions());

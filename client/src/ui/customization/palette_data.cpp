@@ -163,11 +163,11 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnPaletteColors *t
 }
 
 void serialize(QnJsonContext *ctx, const QnPaletteData &value, QJsonValue *target) {
-    serialize(ctx, value.d->colors, target);
+    QJson::serialize(ctx, value.d->colors, target);
 }
 
 bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnPaletteData *target) {
     target->d.detach();
-    return deserialize(ctx, value, &target->d->colors);
+    return QJson::deserialize(ctx, value, &target->d->colors);
 }
 

@@ -123,6 +123,7 @@
 
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">Запустить ${product.name} по окончании установки.</String>    
+    <String Id="Product_ArchMismatch"                               Overridable="yes">Этот продукт предназначен для 32-разрядной ОС. Установка будет закончена.</String>    
 
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Хотя бы один компонент должен быть выбран</String>    
@@ -138,7 +139,7 @@
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Обнаружена предыдущая версия</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Способ установки</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Система будет обновлена</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Your database has been corrupted and cannot be recovered. The fresh database has been installed. To access the system use login "admin" and password "admin". Please change the credentials after the first login.</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">База данных повреждена и не может быть восстановлена. Была установлена "чистая" БД. Для доступа к системе используйте имя "admin" и пароль "admin". Рекомендуется сменить параметры доступа при первом входе в систему.</String>    
     
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Невозможно получить доступ к брандмауэру Windows.  ([2]   [3]   [4]   [5])</String>    
@@ -149,4 +150,10 @@
     <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">Выполняется откат настроек брандмауэра Windows</String>    
     <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">Выполняется удаление настроек брандмауэра Windows</String>    
     
+    <!-- WixInstallDirDlgTitle -->
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">Установка [ProductName]</String>
+    <String Id="InstallDirDlgChange"                                Overridable="yes">&amp;Изменить...</String>
+    <String Id="InstallDirDlgTitle"                                 Overridable="yes">{\WixUI_Font_Title}Каталог установки</String>
+    <String Id="InstallDirDlgDescription"                           Overridable="yes">Далее - установка по умолчанию, Изменить - выбор папки</String>
+    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Install [ProductName] to:</String>        
 </WixLocalization>

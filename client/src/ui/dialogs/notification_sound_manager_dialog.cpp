@@ -2,7 +2,6 @@
 #include "ui_notification_sound_manager_dialog.h"
 
 #include <QtCore/QFileInfo>
-#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
 
@@ -61,15 +60,16 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
 
     QString supportedFormats = tr("Sound files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
+    QStringList extensions = QStringList() << QLatin1String("wav") << QLatin1String("mp3") << QLatin1String("ogg") << QLatin1String("wma");
 
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file..."), qnSettings->mediaFolder(), supportedFormats));
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file..."), qnSettings->mediaFolder(), supportedFormats, extensions));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     int cropSoundSecs = 5;
     QString title;
 
     dialog->addSpinBox(tr("Clip sound up to %1 seconds").arg(QnCustomFileDialog::valueSpacer()), 1, 10, &cropSoundSecs);
-    dialog->addLineEdit(tr("Custom Title:"), &title);
+    dialog->addLineEdit(tr("Custom Title:"), &title); // TODO: #Elric #TR no caps in 2nd word
     if(!dialog->exec())
         return;
 

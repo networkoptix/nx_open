@@ -40,6 +40,8 @@ private:
     void reallocateMask(int width, int height);
     void postFiltering();
     void analizeMotionAmount(quint8* frame);
+	void scaleFrame(const uint8_t* data, int width, int height, int stride, uint8_t* frameBuffer,uint8_t* prevFrameBuffer, uint8_t* deltaBuffer);
+
 private:
     QMutex m_mutex;
     CLFFmpegVideoDecoder* m_decoder;
@@ -53,6 +55,7 @@ private:
     int m_xStep; // 8, 16, 24 e.t.c value
     int m_lastImgWidth;
     int m_lastImgHeight;
+	uint8_t* m_frameDeltaBuffer;
     quint8* m_frameBuffer[FRAMES_BUFFER_SIZE];
     quint8* m_filteredFrame;
     quint32* m_resultMotion;
@@ -67,6 +70,11 @@ private:
     //quint8 m_sadTransformMatrix[10][256];
 
     QSize m_videoResolution;
+
+	//double m_sumLogTime;
+	//int m_numFrame;
+	int m_scaleXStep;
+    int m_scaleYStep;
 };
 
 #endif  //ENABLE_SOFTWARE_MOTION_DETECTION

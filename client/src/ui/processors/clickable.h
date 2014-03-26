@@ -13,7 +13,7 @@
  * Registered clicks are to be processed by overriding the <tt>clickedNotify</tt> 
  * function in derived class.
  */
-template<class Base>
+template<class Base, class Derived = void>
 class Clickable: public Base {
 public:
     QN_FORWARD_CONSTRUCTOR(Clickable, Base, {m_clickableButtons = 0; m_isDoubleClick = false;})
@@ -55,11 +55,9 @@ protected:
         event->accept();
 
         if(m_isDoubleClick) {
-            emit doubleClicked();
-            emit doubleClicked(event->button());
+            emitDoubleClicked(static_cast<Derived *>(this), event);
         } else {
-            emit clicked();
-            emit clicked(event->button());
+            emitClicked(static_cast<Derived *>(this), event);
         }
 
         clickedNotify(event);
@@ -77,12 +75,21 @@ protected:
 
     virtual void releasedNotify(QGraphicsSceneMouseEvent *event) { Q_UNUSED(event); };
 
-    /* Virtual signals follow. These can be overridden in derived class with actual signals. */
+private:
+    /* We cannot implement these as virtual signals because virtual signals are
+     * not supported by new connect syntax. So we use CRTP. Nice bonus is that 
+     * there is no need to befriend base class as signals are public in Qt5. */
 
-    virtual void clicked() {}
-    virtual void clicked(Qt::MouseButton button) { Q_UNUSED(button); }
-    virtual void doubleClicked() {}
-    virtual void doubleClicked(Qt::MouseButton button) { Q_UNUSED(button); }
+    void clicked(Qt::MouseButton) {}
+    void doubleClicked(Qt::MouseButton) {}
+
+    template<class T>
+    void emitClicked(T *target, QGraphicsSceneMouseEvent *event) { target->clicked(event->button()); }
+    void emitClicked(void *, QGraphicsSceneMouseEvent *) {}
+
+    template<class T>
+    void emitDoubleClicked(T *target, QGraphicsSceneMouseEvent *event) { target->doubleClicked(event->button()); }
+    void emitDoubleClicked(void *, QGraphicsSceneMouseEvent *) {}
 
 private:
     Qt::MouseButtons m_clickableButtons;

@@ -9,21 +9,15 @@
 
 #include <utils/common/singleton.h>
 
+#include "icon.h"
+
 class QStyle;
+class QnNoptixIconLoader;
 
 class QnSkin: public QObject, public Singleton<QnSkin> {
     Q_OBJECT
 
 public:
-    static const QIcon::Mode Normal = QIcon::Normal;
-    static const QIcon::Mode Disabled = QIcon::Disabled;
-    static const QIcon::Mode Active = QIcon::Active;
-    static const QIcon::Mode Selected = QIcon::Selected;
-    static const QIcon::Mode Pressed = static_cast<QIcon::Mode>(0xF);
-
-    static const QIcon::State On = QIcon::On;
-    static const QIcon::State Off = QIcon::Off;
-
     QnSkin(QObject *parent = NULL);
     QnSkin(const QStringList &paths, QObject *parent = NULL);
     virtual ~QnSkin();
@@ -38,12 +32,10 @@ public:
 
     QIcon icon(const QString &name, const QString &checkedName = QString());
     QIcon icon(const char *name, const char *checkedName = NULL);
+    QIcon icon(const QIcon &icon);
 
     QPixmap pixmap(const QString &name, const QSize &size = QSize(), Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, Qt::TransformationMode mode = Qt::FastTransformation);
     QPixmap pixmap(const char *name, const QSize &size = QSize(), Qt::AspectRatioMode aspectMode = Qt::IgnoreAspectRatio, Qt::TransformationMode mode = Qt::FastTransformation);
-    QPixmap pixmap(const QIcon &icon, const QSize &size, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
-    QPixmap pixmap(const QIcon &icon, int w, int h, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
-    QPixmap pixmap(const QIcon &icon, int extent, QIcon::Mode mode = Normal, QIcon::State state = Off) const;
 
     QMovie *newMovie(const QString &name, QObject* parent = NULL);
     QMovie *newMovie(const char *name, QObject* parent = NULL);
@@ -55,8 +47,7 @@ private:
 
 private:
     QStringList m_paths;
-    QHash<QString, QIcon> m_iconByKey;
-    QHash<qint64, QIcon> m_pressedIconByCacheKey;
+    QnNoptixIconLoader *m_iconLoader;
 };
 
 #define qnSkin (QnSkin::instance())

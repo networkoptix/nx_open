@@ -24,8 +24,9 @@ public:
     ~QnLoadingProgressPainter();
 
     void paint();
-
     void paint(qreal progress, qreal opacity);
+
+    bool isAvailable() const;
 
 private:
     bool m_initialized;

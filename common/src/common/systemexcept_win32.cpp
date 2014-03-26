@@ -63,7 +63,7 @@ static void writeCrashInfo(
     const char* information )
 {
     const QFileInfo exeFileInfo( QCoreApplication::applicationFilePath() );
-    const QString exceptFileName = QString::fromLatin1("%1/%2_%3.except").arg(exeFileInfo.absoluteDir().absolutePath()).arg(exeFileInfo.baseName()).arg(GetCurrentProcessId());
+    const QString exceptFileName = lit("%1/%2_%3.except").arg(exeFileInfo.absoluteDir().absolutePath()).arg(exeFileInfo.baseName()).arg(GetCurrentProcessId());
 
     std::ofstream of( exceptFileName.toLatin1().constData() );
     of<<title<<"\n";

@@ -8,16 +8,17 @@
 #include <QtCore/QIODevice>
 #include <QtMultimedia/QAudioInput>
 
-#include <windows.h>
-#include <mmsystem.h>
+#include <utils/common/long_runnable.h>
+
+#include <core/datapacket/media_data_packet.h>
+#include <core/dataprovider/live_stream_provider.h>
+
+#include <ui/screen_recording/qnaudio_device_info.h>
 
 #include <dsp_effects/speex/speex_preprocess.h>
-#include "core/datapacket/media_data_packet.h"
-#include "utils/common/long_runnable.h"
+
 #include "screen_grabber.h"
 #include "buffered_screen_grabber.h"
-#include "ui/screen_recording/qnaudio_device_info.h"
-#include "core/dataprovider/live_stream_provider.h"
 
 class CaptureAudioStream;
 class QnAbstractDataConsumer;
@@ -26,14 +27,10 @@ class QnDesktopDataProvider: public QnAbstractMediaStreamDataProvider
 {
     Q_OBJECT
 
-private:
-    enum {BLOCK_SIZE = 1460};
 public:
     QnDesktopDataProvider(QnResourcePtr res,
-                        int desktopNum,           // = 0,
                         const QnAudioDeviceInfo* audioDevice,
                         const QnAudioDeviceInfo* audioDevice2,
-                        Qn::CaptureMode mode,
                         bool captureCursor,
                         const QSize& captureResolution,
                         float encodeQualuty, // in range 0.0 .. 1.0
@@ -48,11 +45,15 @@ public:
     void beforeDestroyDataProvider(QnAbstractDataConsumer* dataProviderWrapper);
 
     bool isInitialized() const;
+
+    QnConstResourceAudioLayoutPtr getAudioLayout();
+
 protected:
-    // QnLongRunnable runable
-    virtual void run();
+    virtual void run() override;
+
 private:
     bool init();
+
 private:
     friend class CaptureAudioStream;
 
@@ -63,6 +64,7 @@ private:
     int processData(bool flush);
     void stopCapturing();
     SpeexPreprocessState* createSpeexPreprocess();
+
 private:
     class EncodedAudioInfo
     {
@@ -103,7 +105,6 @@ private:
     AVCodecContext* m_videoCodecCtx;
     QnMediaContextPtr m_videoCodecCtxPtr;
     AVFrame* m_frame;
-    int m_desktopNum;
 
     QVector<quint8> m_buffer;
 
@@ -117,7 +118,6 @@ private:
     int m_maxAudioJitter;
     QVector <EncodedAudioInfo*> m_audioInfo;
 
-    Qn::CaptureMode m_captureMode;
     bool m_captureCursor;
     QSize m_captureResolution;
     float m_encodeQualuty;
@@ -131,7 +131,10 @@ private:
     bool m_started;
     bool m_isInitialized;
 
-    friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance,  DWORD dwParam1, DWORD dwParam2);
+    class QnDesktopAudioLayout;
+    std::shared_ptr<QnDesktopAudioLayout> audioLayout;
+
+    friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,  DWORD_PTR dwParam1, DWORD_PTR dwParam2);
 };
 
 #endif // Q_OS_WIN

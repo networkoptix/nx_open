@@ -4,7 +4,6 @@
 #include <QtCore/QFile>
 #include <QtCore/QUrl>
 
-#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
 
 #include <QtNetwork/QNetworkAccessManager>
@@ -14,6 +13,7 @@
 #include <utils/common/product_features.h>
 
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/file_dialog.h>
 
 #include <licensing/license.h>
 
@@ -98,7 +98,16 @@ void QnLicenseWidget::setSerialKey(const QString &serialKey) {
 }
 
 QByteArray QnLicenseWidget::activationKey() const {
-    return ui->activationKeyTextEdit->toPlainText().toLatin1();
+    QStringList lines = ui->activationKeyTextEdit->toPlainText().split(QLatin1Char('\n'));
+    QStringList filtered_lines;
+    foreach(QString line, lines) {
+        line = line.trimmed();
+        if (!line.isEmpty()) {
+            filtered_lines.append(line);
+        }
+    }
+
+    return filtered_lines.join(QLatin1Char('\n')).toLatin1();
 }
 
 void QnLicenseWidget::updateControls() {
@@ -140,7 +149,7 @@ void QnLicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
 }
 
 void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
-    QString fileName = QFileDialog::getOpenFileName(this,
+    QString fileName = QnFileDialog::getOpenFileName(this,
                                                     tr("Open License File"),
                                                     QString(),
                                                     tr("All files (*.*)"),
@@ -151,7 +160,7 @@ void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
 
     QFile file(fileName);
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        ui->activationKeyTextEdit->setPlainText(QString::fromLatin1(file.readAll()));
+        ui->activationKeyTextEdit->setPlainText(QLatin1String(file.readAll()));
         ui->licenseFileLabel->setText(file.fileName());
     }
 }

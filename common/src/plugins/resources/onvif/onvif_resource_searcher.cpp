@@ -154,6 +154,11 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 
         if (OnvifResourceInformationFetcher::ignoreCamera(manufacturer, modelName))
             return resList;
+        if (OnvifResourceInformationFetcher::isModelSupported(manufacturer, modelName)) {
+            qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << modelName;
+            return resList;
+        }
+
 
         int modelNamePos = modelName.indexOf(QLatin1String(" "));
         if (modelNamePos >= 0)
@@ -228,7 +233,7 @@ QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const Q
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
     if (resourceType.isNull())
     {
-        qDebug() << "OnvifResourceSearcher::createResource: no resource type for ID = " << resourceTypeId;
+        NX_LOG(lit("OnvifResourceSearcher::createResource: no resource type for ID = %1").arg(resourceTypeId.toString()), cl_logDEBUG1);
         return result;
     }
 
@@ -248,8 +253,7 @@ QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const Q
 
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "OnvifResourceSearcher::createResource: create ONVIF camera resource. TypeID: "
-             << resourceTypeId.toString() << ", Parameters: " << parameters;
+    NX_LOG(lit("OnvifResourceSearcher::createResource: create ONVIF camera resource. TypeID: %1, Parameters: %2.").arg(resourceTypeId.toString()).arg(toDebugString(parameters)), cl_logDEBUG1);
 
     result->deserialize(parameters);
 

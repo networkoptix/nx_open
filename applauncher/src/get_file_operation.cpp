@@ -53,21 +53,28 @@ namespace detail
 
     void GetFileOperation::pleaseStop()
     {
-        std::unique_lock<std::mutex> lk( m_mutex );
+        {
+            std::unique_lock<std::mutex> lk( m_mutex );
 
-        if( m_state >= State::sInterrupted )
-            return;
+            if( m_state >= State::sInterrupted )
+                return;
 
-        m_state = State::sInterrupted;
-        setResult( ResultCode::interrupted );
+            m_state = State::sInterrupted;
+            setResult( ResultCode::interrupted );
+        }
+
         if( m_httpClient )
         {
             m_httpClient->terminate();
             m_httpClient.reset();
         }
 
-        if( !m_fileWritePending )
-            m_outFile->closeAsync( this );
+        {
+            std::unique_lock<std::mutex> lk( m_mutex );
+
+            if( !m_fileWritePending && m_outFile )
+                m_outFile->closeAsync( this );
+        }
     }
 
     //!Implementation of RDirSynchronizationOperation::startAsync
@@ -151,7 +158,7 @@ namespace detail
 
 #ifndef _WIN32
         //setting execution rights to file
-        if( entryPath.endsWith(APPLICATION_BIN_NAME) )
+        if( entryPath.endsWith(QN_CLIENT_EXECUTABLE_NAME) )
             chmod( (m_localDirPath + "/" + entryPath).toUtf8().constData(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH );
 #endif
 
@@ -180,6 +187,9 @@ namespace detail
                 m_fileWritePending = 1;
                 break;
             }
+
+            case State::sInterrupted:
+                return;
 
             default:
                 assert( false );

@@ -33,8 +33,8 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 
 QnPlIsdResource::QnPlIsdResource()
 {
+    setVendor(lit("ISD"));
     setAuth(QLatin1String("root"), QLatin1String("admin"));
-    
 }
 
 bool QnPlIsdResource::isResourceAccessible()
@@ -112,7 +112,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
             tmp.setHeight( qPower2Ceil(static_cast<unsigned int>(resolutions[i].height() + 1), 8) );
             float ar2 = getResolutionAspectRatio(tmp);
 
-            if (!qBetween(bestAspectRatio, qMin(ar1,ar2), qMax(ar1,ar2)))
+            if (!qBetween(qMin(ar1,ar2), bestAspectRatio, qMax(ar1,ar2)))
             {
                 continue;
             }
@@ -179,10 +179,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     if (fpsList.size()<1)
         return CameraDiagnostics::UnknownErrorResult();
 
-    {
-        
-        setMaxFps(fpsList.at(0));
-    }
+    setMaxFps(fpsList.at(0));
 
     save();
 

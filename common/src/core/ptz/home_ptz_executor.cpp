@@ -6,8 +6,8 @@
 #include "ptz_object.h"
 
 namespace {
-    //int homeTimeout = 5 * 60 * 1000;
-    int homeTimeout = 10 * 1000;
+    int homeTimeout = 2 * 60 * 1000;
+    //int homeTimeout = 10 * 1000;
 }
 
 // -------------------------------------------------------------------------- //
@@ -15,7 +15,7 @@ namespace {
 // -------------------------------------------------------------------------- //
 class QnHomePtzExecutorPrivate {
 public:
-    QnHomePtzExecutorPrivate(): q(NULL) {}
+    QnHomePtzExecutorPrivate(): q(NULL), isRunning(0) {}
     virtual ~QnHomePtzExecutorPrivate() {}
 
     void restart();
@@ -26,6 +26,7 @@ public:
     QnHomePtzExecutor *q;
     QnPtzControllerPtr controller;
     QBasicTimer timer;
+    QAtomicInt isRunning;
 
     QMutex mutex;
     QnPtzObject homePosition;
@@ -82,11 +83,19 @@ QnHomePtzExecutor::~QnHomePtzExecutor() {
 }
 
 void QnHomePtzExecutor::restart() {
+    d->isRunning.storeRelease(1);
+
     emit restartRequested();
 }
 
 void QnHomePtzExecutor::stop() {
+    d->isRunning.storeRelease(0);
+
     emit stopRequested();
+}
+
+bool QnHomePtzExecutor::isRunning() {
+    return d->isRunning.loadAcquire() != 0;
 }
 
 void QnHomePtzExecutor::setHomePosition(const QnPtzObject &homePosition) {

@@ -15,7 +15,6 @@
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QFileInfo>
 #include <QtCore/QSettings>
-#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsProxyWidget>
 
 #include <utils/common/util.h>
@@ -43,6 +42,7 @@
 
 #include "ui/dialogs/sign_dialog.h" // TODO: move out.
 #include <ui/dialogs/custom_file_dialog.h>  //for QnCustomFileDialog::fileDialogOptions() constant
+#include <ui/dialogs/file_dialog.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -74,9 +74,9 @@
 #include <ui/graphics/instruments/zoom_window_instrument.h>
 
 #include <ui/graphics/items/grid/grid_item.h>
+#include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/standard/graphics_message_box.h>
 
 #include <ui/help/help_handler.h>
 
@@ -276,7 +276,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(sceneFocusSignalingInstrument);
 
     /* View/viewport instruments. */
-    m_manager->installInstrument(m_rotationInstrument, InstallationMode::InstallAfter, display()->transformationListenerInstrument());
+    m_manager->installInstrument(m_rotationInstrument);
     m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(m_resizingInstrument);
     m_manager->installInstrument(m_moveInstrument);
@@ -648,7 +648,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
     QString previousDir = qnSettings->lastRecordingDir();
     QString selectedFilter;
     while (true) {
-        QString filePath = QFileDialog::getSaveFileName(
+        QString filePath = QnFileDialog::getSaveFileName(
             display()->view(),
             tr("Save Recording As..."),
             previousDir + QLatin1Char('/') + suggetion,
@@ -1049,7 +1049,7 @@ void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, co
 }
 
 void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect) {
-    menu()->trigger(Qn::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ItemZoomRectRole, zoomRect).withArgument(Qn::ItemFrameColorRole, color));
+    menu()->trigger(Qn::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ItemZoomRectRole, zoomRect).withArgument(Qn::ItemFrameDistinctionColorRole, color));
     widget->setCheckedButtons(widget->checkedButtons() & ~QnMediaResourceWidget::ZoomWindowButton);
 }
 
@@ -1305,7 +1305,7 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
     QnResourceWidget *widget = widgets.at(0);
     if(widget->resource()->flags() & QnResource::network)
         return;
-    QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource()));
+    QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource(), mainWindow()));
     dialog->setModal(true);
     dialog->exec();
 }

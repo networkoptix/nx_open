@@ -108,10 +108,6 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other) {
     }
 }
 
-QString QnSecurityCamResource::getVendorInternal() const {
-    return getDriverName();
-}
-
 int QnSecurityCamResource::getMaxFps() const {
     QVariant val;
     if (!getParam(lit("MaxFPS"), val, QnDomainMemory))
@@ -441,7 +437,14 @@ QString QnSecurityCamResource::getGroupName() const {
 }
 
 void QnSecurityCamResource::setGroupName(const QString& value) {
-    SAFE(m_groupName = value)
+    {
+        QMutexLocker locker(&m_mutex);
+        if(m_groupName == value)
+            return;
+        m_groupName = value;
+    }
+
+    emit groupNameChanged(::toSharedPointer(this));
 }
 
 QString QnSecurityCamResource::getGroupId() const {
@@ -469,10 +472,13 @@ void QnSecurityCamResource::setFirmware(const QString &firmware) {
 }
 
 QString QnSecurityCamResource::getVendor() const {
-    SAFE(if (!m_vendor.isEmpty()) return m_vendor)    //calculated on the server
+    SAFE(return m_vendor);
 
-    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(getTypeId());
-    return resourceType ? resourceType->getManufacture() : QString(); //estimated value
+    // This code is commented for a reason. We want to know if vendor is empty. --Elric
+    //SAFE(if (!m_vendor.isEmpty()) return m_vendor)    //calculated on the server
+    //
+    //QnResourceTypePtr resourceType = qnResTypePool->getResourceType(getTypeId());
+    //return resourceType ? resourceType->getManufacture() : QString(); //estimated value
 }
 
 void QnSecurityCamResource::setVendor(const QString& value) {
@@ -592,4 +598,26 @@ QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(
     Q_UNUSED( detailLevel );
 
     return QnTimePeriodList();
+}
+
+bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) {
+    QnSecurityCamResourcePtr camera = source.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return false;
+
+    bool result = base_type::mergeResourcesIfNeeded(source);
+
+    if (getGroupId() != camera->getGroupId())
+    {
+        setGroupId(camera->getGroupId());
+        result = true; // groupID can be changed for onvif resource because if not auth info, maxChannels is not accessible
+    }
+
+    if (getGroupName().isEmpty() && getGroupName() != camera->getGroupName())
+    {
+        setGroupName(camera->getGroupName());
+        result = true;
+    }
+
+    return result;
 }

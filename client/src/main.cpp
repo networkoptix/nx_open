@@ -108,7 +108,9 @@ extern "C"
 #include "core/ptz/client_ptz_controller_pool.h"
 #include "ui/dialogs/message_box.h"
 
-
+#ifdef Q_OS_MAC
+#include "ui/workaround/mac_utils.h"
+#endif
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -307,7 +309,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QString translationPath;
     QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
     bool skipMediaFolderScan = false;
+#ifdef Q_OS_MAC
+    bool noFullScreen = true;
+#else
     bool noFullScreen = false;
+#endif
     bool noVersionMismatchCheck = false;
     QString lightMode;
     bool noVSync = false;
@@ -332,7 +338,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString());
     commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
 
-    commandLineParser.parse(argc, argv, stderr);
+    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
     initLog(logLevel);
 
@@ -341,6 +347,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnSettings->setDevMode(true);
     }
 
+    // TODO: #Elric why QString???
     if (!lightMode.isEmpty()) {
         bool ok;
         int lightModeOverride = lightMode.toInt(&ok);
@@ -349,6 +356,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     QnPerformanceTest::detectLightMode();
+
+#ifdef Q_OS_MACX
+    if (mac_isSandboxed())
+        qnSettings->setLightMode(qnSettings->lightMode() | Qn::LightModeNoNewWindow);
+#endif
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
@@ -661,6 +673,10 @@ int main(int argc, char **argv)
     QnSessionManager::instance();
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
+#ifdef Q_OS_MAC
+    mac_restoreFileAccess();
+#endif
+
     int result = runApplication(application.data(), argc, argv);
 
     delete QnResourcePool::instance();
@@ -668,6 +684,10 @@ int main(int argc, char **argv)
 
 #ifdef Q_OS_WIN
     QnDesktopResourceSearcher::initStaticInstance( NULL );
+#endif
+
+#ifdef Q_OS_MAC
+    mac_stopFileAccess();
 #endif
 
 //    qApp->processEvents(); //TODO: #Elric crashes

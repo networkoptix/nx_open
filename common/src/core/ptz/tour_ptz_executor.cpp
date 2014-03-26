@@ -119,9 +119,12 @@ QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate():
 {}
 
 QnTourPtzExecutorPrivate::~QnTourPtzExecutorPrivate() {
-    /* Release ownership, just to feel safe. */
-    if(usingThreadController)
+    if(usingThreadController) {
+        /* Base controller is owned both through a shared pointer and through
+         * a QObject hierarchy. To prevent double deletion, we have to release 
+         * QObject ownership. */
         baseController->setParent(NULL); 
+    }
 }
 
 void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller) {

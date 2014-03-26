@@ -9,12 +9,12 @@
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.2.0-SNAPSHOT</version>
+		<version>2.3.0-SNAPSHOT</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.2.0-SNAPSHOT</version>
+	<version>2.3.0-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>vmaxproxy</artifactId>
 	<packaging>pom</packaging>
@@ -29,9 +29,9 @@
         <qt.libs>core</qt.libs>
         <global.libs/>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
-        <windows.oslibs.release>-lacs_codec_mr -lacs_event_md -lacs_event_mr -lacs_export_mr -lacs_post_processing_mr -lacs_stream_source_mr</windows.oslibs.release> 
-        <windows.oslibs.debug>-lacs_codec_mdd -lacs_event_mdd -lacs_export_mdd -lacs_post_processing_mdd -lacs_stream_source_mdd</windows.oslibs.debug>
+        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm -lacs_codec_mr -lacs_event_md -lacs_event_mr -lacs_export_mr -lacs_post_processing_mr -lacs_stream_source_mr</windows.oslibs>
+        <windows.oslibs.release></windows.oslibs.release> 
+        <windows.oslibs.debug></windows.oslibs.debug>
         <linux.oslibs/>
         <mac.oslibs/>
         <!--Global defines-->

@@ -24,21 +24,21 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, cons
 
     if (resourceType.isNull())
     {
-        qDebug() << "No resource type for ID = " << resourceTypeId;
+        NX_LOG(lit("No resource type for ID %1").arg(resourceTypeId.toString()), cl_logDEBUG1);
 
         return result;
     }
 
     if (resourceType->getManufacture() != manufacture())
     {
-        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
         return result;
     }
 
     result = QnVirtualCameraResourcePtr( new QnPlAxisResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Axis camera resource. TypeID" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    NX_LOG(lit("Create Axis camera resource. TypeID %1, Parameters %2.").arg(resourceTypeId.toString()).arg(toDebugString(parameters)), cl_logDEBUG1);
+
     result->deserialize(parameters);
 
     return result;
@@ -54,14 +54,15 @@ QString QnPlAxisResourceSearcher::manufacture() const
 QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
+	
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
-
+		
     QString host = url.host();
     int port = url.port();
     if (host.isEmpty())
         host = url.toString(); // in case if url just host address without protocol and port
 
-    int timeout = 4000;
+    int timeout = 4000; // TODO: #Elric we should probably increase this one. In some cases 4 secs is not enough.
 
 
     if (port < 0)
@@ -121,6 +122,10 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     //resource->setDiscoveryAddr(iface.address);
     QList<QnResourcePtr> result;
     result << resource;
+
+    if (!isSearchAction)
+        addMultichannelResources(result);
+
     return result;
 }
 
@@ -207,51 +212,57 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
     resource->setModel(name);
     resource->setMAC(smac);
 
+
     local_results.push_back(resource);
 
 
+    addMultichannelResources(local_results);
     
+    return local_results;
+}
+template <class T>
+void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
+{
+    QnPlAxisResourcePtr firstResource = result.first().template dynamicCast<QnPlAxisResource>();
 
-    int channesl = 1;
-
-    if (resource->hasParam(QLatin1String("channelsAmount")))
+    int channels = 1;
+    if (firstResource->hasParam(QLatin1String("channelsAmount")))
     {
         QVariant val;
-        resource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
-        channesl = val.toUInt();
+        firstResource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
+        channels = val.toUInt();
     }
-
-    if (channesl > 1) //
+    if (channels > 1)
     {
-        resource->setGroupName(resource->getPhysicalId());
-        resource->setGroupId(resource->getPhysicalId());
+        QString physicalId = firstResource->getPhysicalId();
+        firstResource->setGroupName(physicalId);
+        firstResource->setGroupId(physicalId);
 
-        resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(1));
+        firstResource->setPhysicalId(physicalId + QLatin1String("_channel_") + QString::number(1));
 
-        for (int i = 2; i <= channesl; ++i)
+        for (int i = 2; i <= channels; ++i)
         {
             QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
-            QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
+            QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), firstResource->getName());
             if (!rt.isValid())
-                return local_results;
+                return;
 
             resource->setTypeId(rt);
-            resource->setName(name);
-            resource->setModel(name);
-            resource->setMAC(smac);
-            resource->setGroupName(resource->getPhysicalId());
-            resource->setGroupId(resource->getPhysicalId());
+            resource->setName(firstResource->getName());
+            resource->setModel(firstResource->getName());
+            resource->setMAC(firstResource->getMAC());
+            resource->setGroupName(physicalId);
+            resource->setGroupId(physicalId);
+            resource->setAuth(firstResource->getAuth());
+            resource->setUrl(firstResource->getUrl());
 
             resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(i));
 
-            local_results.push_back(resource);
+            result.push_back(resource);
 
         }
     }
-
-
-    return local_results;
 }
 
 #endif // #ifdef ENABLE_AXIS

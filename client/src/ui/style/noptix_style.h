@@ -36,6 +36,8 @@ public:
     virtual void unpolish(QApplication *application) override;
     virtual void polish(QWidget *widget) override;
     virtual void unpolish(QWidget *widget) override;
+    virtual void polish(QGraphicsWidget *widget) override;
+    virtual void unpolish(QGraphicsWidget *widget) override;
 
     using base_type::subControlRect;
     using base_type::sliderPositionFromValue;

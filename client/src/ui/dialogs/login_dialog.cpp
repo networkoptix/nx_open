@@ -375,7 +375,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
     QnCompatibilityChecker remoteChecker(connectionInfo->compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
 
-    QnCompatibilityChecker* compatibilityChecker;
+    QnCompatibilityChecker *compatibilityChecker;
     if (remoteChecker.size() > localChecker.size()) {
         compatibilityChecker = &remoteChecker;
     } else {
@@ -396,6 +396,21 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
                     " - EC version: %2.\n"
                     "Compatibility mode for versions lower than %3 is not supported."
                 ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()).arg(minSupportedVersion.toString()),
+                QMessageBox::Ok
+            );
+            m_restartPending = false;
+        }
+
+        if (connectionInfo->version > QnSoftwareVersion(QN_ENGINE_VERSION)) {
+            QnMessageBox::warning(
+                this,
+                Qn::VersionMismatch_Help,
+                tr("Could not connect to Enterprise Controller"),
+                tr("Selected Enterprise controller has a different version:\n"
+                    " - Client version: %1.\n"
+                    " - EC version: %2.\n"
+                    "An error has occurred while trying to restart in compatibility mode."
+                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
                 QMessageBox::Ok
             );
             m_restartPending = false;
@@ -624,7 +639,7 @@ void QnLoginDialog::at_moduleFinder_moduleFound(const QString& moduleID, const Q
     if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
         return;
 
-    QString host = isLocal ? QString::fromLatin1("127.0.0.1") : remoteHostAddress;
+    QString host = isLocal ? QLatin1String("127.0.0.1") : remoteHostAddress;
     QUrl url;
     url.setHost(host);
 

@@ -56,8 +56,9 @@ namespace {
 //    const char *qn_searchCriterionPropertyName = "_qn_searchCriterion";
 }
 
-/********** QnResourceBrowserToolTipWidget *********************/
-
+// -------------------------------------------------------------------------- //
+// QnResourceBrowserToolTipWidget
+// -------------------------------------------------------------------------- //
 QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem *parent):
     base_type(parent),
     m_textLabel(new QnProxyLabel(this)),
@@ -73,7 +74,7 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem *pa
     m_thumbnailLabel->setClickableButtons(Qt::LeftButton);
     m_thumbnailLabel->setVisible(false);
     setPaletteColor(m_thumbnailLabel, QPalette::Window, Qt::transparent);
-    connect(m_thumbnailLabel, SIGNAL(clicked()), this, SIGNAL(thumbnailClicked()));
+    connect(m_thumbnailLabel, &QnClickableProxyLabel::clicked, this, &QnResourceBrowserToolTipWidget::thumbnailClicked);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -316,10 +317,6 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
         manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
     }
 
-    /* Do not show 'Rename' on the recorder when it contains only one camera. */
-    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) == Qn::RecorderNode)
-        manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
-
     if(menu->isEmpty())
         return;
 
@@ -366,11 +363,13 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const {
                         result.append(resource);
                 }
             }
+            break;
         case Qn::ResourceNode: {
                 QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
                 if(resource && !result.contains(resource))
                     result.append(resource);
             }
+            break;
         case Qn::LocalNode:
         case Qn::ServersNode:
         case Qn::UsersNode:
@@ -704,8 +703,6 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
 
     emit currentTabChanged();
 }
-
-
 
 void QnResourceBrowserWidget::at_showUrlsInTree_changed() {
     bool urlsShown = qnSettings->isIpShownInTree();

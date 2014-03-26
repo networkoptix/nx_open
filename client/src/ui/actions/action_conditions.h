@@ -80,6 +80,29 @@ public:
 
 
 /**
+ * Condition wich is a conjunction of two or more conditions.
+ * It acts like logical AND, e.g. an action is enabled if the all conditions in the conjunction is true.
+ * But the result (Qn::ActionVisibility) may have 3 values: [Invisible, Disabled, Enabled], so this action condition chooses
+ * the minimal value from its conjuncts.
+ */
+class QnConjunctionActionCondition: public QnActionCondition {
+public:
+    QnConjunctionActionCondition(const QList<QnActionCondition*> conditions, QObject *parent = NULL);
+    QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QObject *parent = NULL);
+    QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QObject *parent = NULL);
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+    virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+    virtual Qn::ActionVisibility check(const QnWorkbenchLayoutList &layouts) override;
+
+private:
+    QList<QnActionCondition*> m_conditions;
+};
+
+
+/**
  * Condition for a single resource widget that checks its zoomed state.
  */
 class QnItemZoomedActionCondition: public QnActionCondition {
@@ -187,6 +210,16 @@ public:
     QnResourceRemovalActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+/**
+ * Condition for resource rename.
+ */
+class QnRenameActionCondition: public QnActionCondition {
+public:
+    QnRenameActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 
@@ -411,9 +444,11 @@ public:
 
 class QnPtzActionCondition: public QnActionCondition {
 public:
-    QnPtzActionCondition(Qn::PtzCapabilities capabilities, QObject* parent = NULL):
+    QnPtzActionCondition(Qn::PtzCapabilities capabilities, bool disableIfPtzDialogVisible = false, QObject* parent = NULL):
         QnActionCondition(parent),
-        m_capabilities(capabilities) {}
+        m_capabilities(capabilities),
+        m_disableIfPtzDialogVisible(disableIfPtzDialogVisible)
+    {}
     
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
@@ -423,6 +458,20 @@ private:
 
 private:
     Qn::PtzCapabilities m_capabilities;
+    bool m_disableIfPtzDialogVisible;
+};
+
+class QnLightModeCondition: public QnActionCondition {
+public:
+    QnLightModeCondition(Qn::LightModeFlags flags, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_lightModeFlags(flags)
+    {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+
+private:
+    Qn::LightModeFlags m_lightModeFlags;
 };
 
 #endif // QN_ACTION_CONDITIONS_H

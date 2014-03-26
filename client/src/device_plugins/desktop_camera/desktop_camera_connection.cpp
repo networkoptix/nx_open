@@ -40,7 +40,7 @@ protected:
         if (!media)
             return false;
 
-        int streamIndex = media->dataType == QnAbstractMediaData::VIDEO ? 0 : 1;
+        int streamIndex = media->channelNumber;
 
         m_serializers[streamIndex].setDataPacket(media);
         m_owner->sendLock();

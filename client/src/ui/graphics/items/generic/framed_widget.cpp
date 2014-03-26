@@ -10,6 +10,7 @@
 FramedBase::FramedBase():
     m_self(NULL),
     m_frameWidth(1.0),
+    m_roundingRadius(0.0),
     m_frameStyle(Qt::SolidLine),
     m_frameShape(Qn::RectangularFrame)
 {}
@@ -94,24 +95,54 @@ void FramedBase::setWindowColor(const QColor &windowColor) {
     setWindowBrush(windowColor);
 }
 
-QPainterPath FramedBase::framePath(const QRectF &rect) const {
-    qreal d = m_frameWidth / 2.0;
-    QRectF frameRect = rect.adjusted(d, d, -d, -d);
+qreal FramedBase::roundingRadius() const {
+    return m_roundingRadius;
+}
+void FramedBase::setRoundingRadius(qreal roundingRadius) {
+    if(qFuzzyCompare(m_roundingRadius, roundingRadius))
+        return;
 
-    QPainterPath path;
-    if(m_frameShape == Qn::RectangularFrame) {
-        path.addRect(frameRect);
-    } else {
-        path.addEllipse(frameRect);
-    }
-    return path;
+    m_roundingRadius = roundingRadius;
+    m_self->update();
 }
 
 void FramedBase::paintFrame(QPainter *painter, const QRectF &rect) {
     if(m_frameShape == Qn::NoFrame)
         return;
 
-    QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush(), m_frameWidth, m_frameStyle));
+    QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush(), m_frameWidth, m_frameStyle, Qt::SquareCap, Qt::MiterJoin));
     QnScopedPainterBrushRollback brushRollback(painter, windowBrush());
-    painter->drawPath(framePath(rect));
+
+    qreal d = m_frameWidth / 2.0;
+    QRectF frameRect = rect.adjusted(d, d, -d, -d);
+
+    switch (m_frameShape) {
+    case Qn::RectangularFrame: {
+        QBrush frameBrush = this->frameBrush();
+        QBrush windowBrush = this->windowBrush();
+        if(frameBrush.style() == Qt::SolidPattern && windowBrush.style() == Qt::SolidPattern) {
+            /* For some reason this code works WAY faster. */
+            qreal l = rect.left(), t = rect.top(), w = rect.width(), h = rect.height();
+            qreal fw = m_frameWidth;
+
+            painter->setPen(Qt::NoPen);
+            painter->fillRect(QRectF(l + fw,        t + fw,     w - 2 * fw, h - 2 * fw), windowBrush);
+            painter->fillRect(QRectF(l,             t,          w,          fw),         frameBrush);
+            painter->fillRect(QRectF(l,             t + h - fw, w,          fw),         frameBrush);
+            painter->fillRect(QRectF(l,             t + fw,     fw,         h - 2 * fw), frameBrush);
+            painter->fillRect(QRectF(l + w - fw,    t + fw,     fw,         h - 2 * fw), frameBrush);
+        } else {
+            painter->drawRect(rect);
+        }
+        break;
+    }
+    case Qn::RoundedRectangularFrame:
+        painter->drawRoundedRect(rect, m_roundingRadius, m_roundingRadius, Qt::AbsoluteSize);
+        break;
+    case Qn::EllipticalFrame:
+        painter->drawEllipse(frameRect);
+        break;
+    default:
+        break;
+    }
 }
