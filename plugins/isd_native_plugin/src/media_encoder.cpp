@@ -124,9 +124,9 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
 int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
 {
     if( m_encoderNum == PRIMARY_ENCODER_NUMBER )
-        *maxBitrate = 6*1024;
+        *maxBitrate = 15*1024;
     else if( m_encoderNum == SECONDARY_ENCODER_NUMBER )
-        *maxBitrate = 1*1024;
+        *maxBitrate = 2*1024;
     else
         *maxBitrate = 0;
     return nxcip::NX_NO_ERROR;
