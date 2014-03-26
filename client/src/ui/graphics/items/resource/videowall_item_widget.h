@@ -19,10 +19,16 @@
 #include <utils/common/connective.h>
 
 class DragProcessor;
-class HoverFocusProcessor;
-class QnVideowallScreenWidget;
 class VariantAnimator;
+class HoverFocusProcessor;
+
+class QnVideowallScreenWidget;
 class QnStatusOverlayWidget;
+class QnImageButtonWidget;
+class QnViewportBoundWidget;
+
+class GraphicsLabel;
+class GraphicsWidget;
 
 class QnVideowallItemWidget : public Overlayed<Animated<Connective<QnClickableWidget>>>, protected DragProcessHandler, public QnWorkbenchContextAware {
     typedef Overlayed<Animated<Connective<QnClickableWidget>>> base_type;
@@ -31,11 +37,13 @@ class QnVideowallItemWidget : public Overlayed<Animated<Connective<QnClickableWi
     Q_PROPERTY(QnResourceWidgetFrameColors frameColors READ frameColors WRITE setFrameColors)
 
 public:
-    explicit QnVideowallItemWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallScreenWidget *parent, Qt::WindowFlags windowFlags = 0);
+    explicit QnVideowallItemWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallScreenWidget *parent, QGraphicsWidget* parentWidget, Qt::WindowFlags windowFlags = 0);
 
     const QnResourceWidgetFrameColors &frameColors() const;
     void setFrameColors(const QnResourceWidgetFrameColors &frameColors);
 
+    bool isInfoVisible() const;
+    void setInfoVisible(bool visible, bool animate = true);
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintFrame(QPainter *painter, const QRectF &paintRect);
@@ -55,6 +63,9 @@ protected:
 private:
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_doubleClicked(Qt::MouseButton button);
+    void at_infoButton_toggled(bool toggled);
+
+    void initInfoOverlay();
 
     void updateLayout();
     void updateView();
@@ -68,6 +79,8 @@ private:
     friend class QnVideowallItemWidgetHoverProgressAccessor;
 
     /** Parent widget */
+    QGraphicsWidget* m_parentWidget;
+
     QnVideowallScreenWidget* m_widget;
 
     DragProcessor *m_dragProcessor;
@@ -98,6 +111,20 @@ private:
 
     /** Status overlay. */
     QnStatusOverlayWidget* m_statusOverlayWidget;
+
+    /** Info overlay */
+    bool m_infoVisible;
+
+    /* Widgets for overlaid stuff. */
+    QnViewportBoundWidget *m_headerOverlayWidget;
+    QGraphicsLinearLayout *m_headerLayout;
+    GraphicsWidget *m_headerWidget;
+    GraphicsLabel *m_headerLabel;
+    QnImageButtonWidget* m_infoButton;
+
+    QnViewportBoundWidget *m_footerOverlayWidget;
+    GraphicsWidget *m_footerWidget;
+    GraphicsLabel *m_footerLabel;
 };
 
 #endif // LAYOUT_RESOURCE_OVERLAY_WIDGET_H

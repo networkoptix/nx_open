@@ -128,11 +128,11 @@ void QnVideowallScreenWidget::updateLayout() {
         m_mainLayout->setContentsMargins(3.0, 20.0, 3.0, 3.0);
         m_mainLayout->setSpacing(0.0);
 
-        QGraphicsWidget* mainOverlayWidget = new QnViewportBoundWidget(this);
-        mainOverlayWidget->setLayout(m_mainLayout);
-        mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
-        mainOverlayWidget->setOpacity(1.0);
-        addOverlayWidget(mainOverlayWidget, UserVisible, true);
+        m_mainOverlayWidget = new QnViewportBoundWidget(this);
+        m_mainOverlayWidget->setLayout(m_mainLayout);
+        m_mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
+        m_mainOverlayWidget->setOpacity(1.0);
+        addOverlayWidget(m_mainOverlayWidget, UserVisible, true);
     }
 
     while (m_mainLayout->count() > 0) {
@@ -144,7 +144,7 @@ void QnVideowallScreenWidget::updateLayout() {
     // can have several items on a single screen
     if (m_screens.size() == 1) {
         foreach (const QnVideoWallItem &item, m_items) {
-            QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, item.uuid, this);
+            QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, item.uuid, this, m_mainOverlayWidget);
             itemWidget->setFrameColors(frameColors());
 
             if (item.geometry.left() == m_desktopGeometry.left())
@@ -169,7 +169,7 @@ void QnVideowallScreenWidget::updateLayout() {
 
         }
     } else if (m_items.size() == 1 ) {    // can have only on item on several screens
-        QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, m_items.first().uuid, this);
+        QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, m_items.first().uuid, this, m_mainOverlayWidget);
         itemWidget->setFrameColors(frameColors());
 
         m_mainLayout->addAnchors(itemWidget, m_mainLayout, Qt::Horizontal | Qt::Vertical);

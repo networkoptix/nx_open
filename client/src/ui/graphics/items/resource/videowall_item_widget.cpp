@@ -19,6 +19,11 @@
 #include <ui/actions/action_manager.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/animation/opacity_animator.h>
+#include <ui/common/palette.h>
+#include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/graphics/items/generic/image_button_bar.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/resource/videowall_screen_widget.h>
 #include <ui/graphics/instruments/drop_instrument.h>
@@ -30,6 +35,13 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/linear_combination.h>
+
+namespace {
+    /** Background color for overlay panels. */
+    const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); // TODO: #Elric #customization
+
+    const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #Elric #customization
+}
 
 class QnVideowallItemWidgetHoverProgressAccessor: public AbstractAccessor {
     virtual QVariant get(const QObject *object) const override {
@@ -46,14 +58,16 @@ class QnVideowallItemWidgetHoverProgressAccessor: public AbstractAccessor {
     }
 };
 
-QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallScreenWidget *parent, Qt::WindowFlags windowFlags):
-    base_type(parent, windowFlags),
+QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallScreenWidget *parent, QGraphicsWidget* parentWidget, Qt::WindowFlags windowFlags):
+    base_type(parentWidget, windowFlags),
     QnWorkbenchContextAware(parent),
+    m_parentWidget(parentWidget),
     m_widget(parent),
     m_videowall(videowall),
     m_itemUuid(itemUuid),
     m_indices(QnVideoWallItemIndexList() << QnVideoWallItemIndex(m_videowall, m_itemUuid)),
-    m_hoverProgress(0.0)
+    m_hoverProgress(0.0),
+    m_infoVisible(false)
 {
     setAcceptDrops(true);
     setAcceptedMouseButtons(Qt::LeftButton | Qt::RightButton);
@@ -75,8 +89,10 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->setHoverEnterDelay(50);
     m_hoverProcessor->setHoverLeaveDelay(50);
-    connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered,   this, [&](){ m_frameColorAnimator->animateTo(1.0); });
-    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft,      this, [&](){ m_frameColorAnimator->animateTo(0.0); });
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered,   this, [&](){ m_frameColorAnimator->animateTo(1.0); setOverlayVisible(true); });
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft,      this, [&](){ m_frameColorAnimator->animateTo(0.0); if (!m_infoVisible) setOverlayVisible(false); });
+
+    initInfoOverlay();
 
     /* Status overlay. */
     m_statusOverlayWidget = new QnStatusOverlayWidget(this);
@@ -85,6 +101,80 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
     updateLayout();
     updateInfo();
 }
+
+
+void QnVideowallItemWidget::initInfoOverlay() {
+    /* Set up overlay widgets. */
+    QFont font = this->font();
+    font.setPixelSize(2);
+    setFont(font);
+    setPaletteColor(this, QPalette::WindowText, overlayTextColor);
+
+    /* Header overlay. */
+    m_headerLabel = new GraphicsLabel();
+    m_headerLabel->setAcceptedMouseButtons(0);
+    //m_headerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+
+    m_infoButton = new QnImageButtonWidget();
+    m_infoButton->setIcon(qnSkin->icon("item/info.png"));
+    m_infoButton->setCheckable(true);
+    m_infoButton->setToolTip(tr("Information"));
+    m_infoButton->setFixedSize(1.5);
+    connect(m_infoButton, &QnImageButtonWidget::toggled, this, &QnVideowallItemWidget::at_infoButton_toggled);
+
+    m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    m_headerLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
+    m_headerLayout->setSpacing(0.2);
+    m_headerLayout->addItem(m_headerLabel);
+    m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
+    m_headerLayout->addItem(m_infoButton);
+
+    m_headerWidget = new GraphicsWidget();
+    m_headerWidget->setLayout(m_headerLayout);
+    m_headerWidget->setAcceptedMouseButtons(0);
+    m_headerWidget->setAutoFillBackground(true);
+    setPaletteColor(m_headerWidget, QPalette::Window, overlayBackgroundColor);
+
+    QGraphicsLinearLayout *headerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    headerOverlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    headerOverlayLayout->addItem(m_headerWidget);
+    headerOverlayLayout->addStretch(0x1000);
+
+    m_headerOverlayWidget = new QnViewportBoundWidget(m_parentWidget);
+    m_headerOverlayWidget->setLayout(headerOverlayLayout);
+    m_headerOverlayWidget->setAcceptedMouseButtons(0);
+    m_headerOverlayWidget->setOpacity(0.0);
+    addOverlayWidget(m_headerOverlayWidget, AutoVisible);
+
+    /* Footer overlay. */
+    m_footerLabel = new GraphicsLabel();
+    m_footerLabel->setAcceptedMouseButtons(0);
+ //   m_footerLeftLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
+
+    QGraphicsLinearLayout *footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    footerLayout->setContentsMargins(0.5, 0.5, 0.5, 0.5);
+    footerLayout->addItem(m_footerLabel);
+    footerLayout->addStretch(0x1000);
+
+    m_footerWidget = new GraphicsWidget();
+    m_footerWidget->setLayout(footerLayout);
+    m_footerWidget->setAcceptedMouseButtons(0);
+    m_footerWidget->setAutoFillBackground(true);
+    setPaletteColor(m_footerWidget, QPalette::Window, overlayBackgroundColor);
+    m_footerWidget->setOpacity(0.0);
+
+    QGraphicsLinearLayout *footerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    footerOverlayLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    footerOverlayLayout->addStretch(0x1000);
+    footerOverlayLayout->addItem(m_footerWidget);
+
+    m_footerOverlayWidget = new QnViewportBoundWidget(this);
+    m_footerOverlayWidget->setLayout(footerOverlayLayout);
+    m_footerOverlayWidget->setAcceptedMouseButtons(0);
+    m_footerOverlayWidget->setOpacity(0.0);
+    addOverlayWidget(m_footerOverlayWidget, AutoVisible);
+}
+
 
 const QnResourceWidgetFrameColors &QnVideowallItemWidget::frameColors() const {
     return m_frameColors;
@@ -346,11 +436,15 @@ void QnVideowallItemWidget::updateLayout() {
 }
 
 void QnVideowallItemWidget::updateView() {
-    update(); //direct connect is not so convinient because of overloaded function
+    update(); //direct connect is not so convenient because of overloaded function
 }
 
 void QnVideowallItemWidget::updateInfo() {
-    //TODO: #GDM VW update title text
+    if (m_layout)
+        m_footerLabel->setText(m_layout->getName());
+    else
+        m_footerLabel->setText(QString());
+    m_headerLabel->setText(m_videowall->getItem(m_itemUuid).name);
 }
 
 void QnVideowallItemWidget::updateStatusOverlay(Qn::ResourceStatusOverlay overlay) {
@@ -422,3 +516,28 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
     }
 }
 
+bool QnVideowallItemWidget::isInfoVisible() const {
+    return m_infoVisible;
+}
+
+void QnVideowallItemWidget::setInfoVisible(bool visible, bool animate) {
+    if (m_infoVisible == visible)
+        return;
+
+    m_infoVisible = visible;
+
+    qreal opacity = visible ? 1.0 : 0.0;
+
+    if(animate) {
+        opacityAnimator(m_footerWidget, 1.0)->animateTo(opacity);
+    } else {
+        m_footerWidget->setOpacity(opacity);
+    }
+
+    m_infoButton->setChecked(visible);
+}
+
+void QnVideowallItemWidget::at_infoButton_toggled(bool toggled) {
+    setInfoVisible(toggled);
+    setOverlayVisible(toggled || m_hoverProcessor->isHovered());
+}

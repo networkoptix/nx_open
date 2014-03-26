@@ -10,6 +10,7 @@
 class QnVideoWallItem;
 class QnCameraThumbnailManager;
 class QGraphicsAnchorLayout;
+class QGraphicsWidget;
 
 /** Class for displaying single screen of the videowall resource on the scene. */
 class QnVideowallScreenWidget : public QnResourceWidget
@@ -48,6 +49,7 @@ private:
     QList<QnVideoWallItem> m_items;
     QList<QnVideoWallPcData::PcScreen> m_screens;
 
+    QGraphicsWidget* m_mainOverlayWidget;
     QGraphicsAnchorLayout *m_mainLayout;
 
     /** Geometry of the target screen set. */
