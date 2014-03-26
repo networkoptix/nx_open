@@ -174,7 +174,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_view.reset(new QnGraphicsView(m_scene.data()));
     m_view->setAutoFillBackground(true);
 
-    if (!(qnSettings->lightMode() & Qn::LightModeNoBackground)) {
+    if (!(qnSettings->lightMode() & Qn::LightModeNoSceneBackground)) {
         m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
         m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
     }

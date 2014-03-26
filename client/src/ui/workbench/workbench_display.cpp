@@ -556,16 +556,22 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         /* Sync new & old geometry. */
         if(oldWidget != NULL) {
             synchronize(oldWidget, true);
-            ensureRaisedConeItem(oldWidget);
-            raisedConeItem(oldWidget)->setEffectEnabled(false);
-            setLayer(raisedConeItem(oldWidget), Qn::RaisedConeBgLayer);
+
+            if (!(qnSettings->lightMode() & Qn::LightModeNoLayoutBackground)) {
+                ensureRaisedConeItem(oldWidget);
+                raisedConeItem(oldWidget)->setEffectEnabled(false);
+                setLayer(raisedConeItem(oldWidget), Qn::RaisedConeBgLayer);
+            }
         }
 
         if(newWidget != NULL) {
             bringToFront(newWidget);
-            ensureRaisedConeItem(newWidget);
-            setLayer(raisedConeItem(newWidget), Qn::RaisedConeLayer);
-            raisedConeItem(newWidget)->setEffectEnabled(!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty());
+
+            if (!(qnSettings->lightMode() & Qn::LightModeNoLayoutBackground)) {
+                ensureRaisedConeItem(newWidget);
+                setLayer(raisedConeItem(newWidget), Qn::RaisedConeLayer);
+                raisedConeItem(newWidget)->setEffectEnabled(!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty());
+            }
 
             synchronize(newWidget, true);
         }
@@ -656,6 +662,9 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
 
 void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
     if (!layout)
+        return;
+
+    if (qnSettings->lightMode() & Qn::LightModeNoLayoutBackground)
         return;
 
     gridBackgroundItem()->update(layout);
@@ -1259,7 +1268,10 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
         QSizeF newWidgetSize = enclosingGeometry.size() * focusExpansion;
         QSizeF maxWidgetSize;
-        if(workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty()) {
+        if (
+            !(qnSettings->lightMode() & Qn::LightModeNoLayoutBackground) &&
+            (workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
+        ) {
             maxWidgetSize = viewportGeometry.size() * 0.33; // TODO: #Elric magic const
         } else {
             maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
