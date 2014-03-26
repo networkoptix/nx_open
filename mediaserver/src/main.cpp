@@ -80,24 +80,6 @@
 #include <recorder/recording_manager.h>
 #include <recorder/storage_manager.h>
 
-#include <rest/handlers/camera_diagnostics_handler.h>
-#include <rest/handlers/camera_event_handler.h>
-#include <rest/handlers/camera_settings_handler.h>
-#include <rest/handlers/events_handler.h>
-#include <rest/handlers/exec_action_handler.h>
-#include <rest/handlers/ext_bevent_handler.h>
-#include <rest/handlers/favico_handler.h>
-#include <rest/handlers/image_handler.h>
-#include <rest/handlers/log_handler.h>
-#include <rest/handlers/manual_camera_addition_handler.h>
-#include <rest/handlers/ping_handler.h>
-#include <rest/handlers/ptz_handler.h>
-#include <rest/handlers/rebuild_archive_handler.h>
-#include <rest/handlers/recorded_chunks_handler.h>
-#include <rest/handlers/statistics_handler.h>
-#include <rest/handlers/storage_space_handler.h>
-#include <rest/handlers/storage_status_handler.h>
-#include <rest/handlers/time_handler.h>
 #include <rest/handlers/acti_event_rest_handler.h>
 #include <rest/handlers/business_event_log_rest_handler.h>
 #include <rest/handlers/business_action_rest_handler.h>
@@ -857,27 +839,6 @@ void QnMain::initTcpListener()
 {
     int rtspPort = MSSettings::roSettings()->value("rtspPort", DEFAUT_RTSP_PORT).toInt();
 #ifdef USE_SINGLE_STREAMING_PORT
-<<<<<<< local
-    QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
-    QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnStorageStatusHandler());
-    QnRestConnectionProcessor::registerHandler("api/storageSpace", new QnStorageSpaceHandler());
-    QnRestConnectionProcessor::registerHandler("api/statistics", new QnStatisticsHandler());
-    QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
-    QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
-    QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());
-    QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzHandler());
-    QnRestConnectionProcessor::registerHandler("api/image", new QnImageHandler());
-    QnRestConnectionProcessor::registerHandler("api/execAction", new QnExecActionHandler());
-    QnRestConnectionProcessor::registerHandler("api/onEvent", new QnExternalBusinessEventHandler());
-    QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeHandler());
-    QnRestConnectionProcessor::registerHandler("api/ping", new QnRestPingHandler());
-    QnRestConnectionProcessor::registerHandler("api/rebuildArchive", new QnRestRebuildArchiveHandler());
-    QnRestConnectionProcessor::registerHandler("api/events", new QnRestEventsHandler());
-    QnRestConnectionProcessor::registerHandler("api/showLog", new QnRestLogHandler());
-    QnRestConnectionProcessor::registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsHandler());
-    QnRestConnectionProcessor::registerHandler("api/uploadUpdate", new QnRestUploadUpdateHandler());
-    QnRestConnectionProcessor::registerHandler("api/update", new QnRestUpdateHandler());
-=======
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
     QnRestConnectionProcessor::registerHandler("api/storageStatus", new QnStorageStatusRestHandler());
     QnRestConnectionProcessor::registerHandler("api/storageSpace", new QnStorageSpaceRestHandler());
@@ -895,7 +856,8 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/events", new QnBusinessEventLogRestHandler());
     QnRestConnectionProcessor::registerHandler("api/showLog", new QnLogRestHandler());
     QnRestConnectionProcessor::registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
->>>>>>> other
+    QnRestConnectionProcessor::registerHandler("api/uploadUpdate", new QnRestUploadUpdateHandler());
+    QnRestConnectionProcessor::registerHandler("api/update", new QnRestUpdateHandler());
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestConnectionProcessor::registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
