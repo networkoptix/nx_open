@@ -206,19 +206,6 @@ int StreamReader::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 #endif
 }
 
-struct SharedStreamData
-{
-    int64_t ptsBase;
-    int64_t baseClock;
-
-    SharedStreamData()
-    :
-        ptsBase( -1 ),
-        baseClock( -1 )
-    {
-    }
-};
-
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
     //std::cout << "ISD plugin getNextData started for encoder" << m_encoderNum << std::endl;
@@ -512,7 +499,6 @@ void StreamReader::unregisterFD( int fd )
 }
 
 
-static SharedStreamData m_sharedStreamData;
 static QMutex timestampSynchronizationMutex;
 
 class TimeSyncData
