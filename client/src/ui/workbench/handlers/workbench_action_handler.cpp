@@ -1550,7 +1550,13 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
-    if(context()->user() && !context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true))
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    bool force = parameters.hasArgument(Qn::ForceRole)
+        ? parameters.argument(Qn::ForceRole).toBool()
+        : false;
+
+    //closeAllLayouts should return true in case of force disconnect
+    if( context()->user() && !context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true, force)) 
         return;
 
     // TODO: #GDM Factor out common code from reconnect/disconnect/login actions.

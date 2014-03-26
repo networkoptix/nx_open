@@ -269,35 +269,37 @@ void QnWorkbenchLayoutsHandler::removeLayouts(const QnLayoutResourceList &layout
     }
 }
 
-bool QnWorkbenchLayoutsHandler::closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply) {
+bool QnWorkbenchLayoutsHandler::closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply, bool force) {
     QnLayoutResourceList resources;
     foreach(QnWorkbenchLayout *layout, layouts)
         resources.push_back(layout->resource());
 
-    return closeLayouts(resources, waitForReply);
+    return closeLayouts(resources, waitForReply, force);
 }
 
-bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resources, bool waitForReply) {
+bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resources, bool waitForReply, bool force) {
     if(resources.empty())
         return true;
 
     bool needToAsk = false;
     QnLayoutResourceList saveableResources, rollbackResources;
-    foreach(const QnLayoutResourcePtr &resource, resources) {
-        bool changed, saveable;
+    if (!force) {
+        foreach(const QnLayoutResourcePtr &resource, resources) {
+            bool changed, saveable;
 
-        Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
-        changed = flags & Qn::ResourceIsChanged;
-        saveable = accessController()->permissions(resource) & Qn::SavePermission;
+            Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
+            changed = flags & Qn::ResourceIsChanged;
+            saveable = accessController()->permissions(resource) & Qn::SavePermission;
 
-        if(changed && saveable)
-            needToAsk = true;
+            if(changed && saveable)
+                needToAsk = true;
 
-        if(changed) {
-            if(saveable) {
-                saveableResources.push_back(resource);
-            } else {
-                rollbackResources.push_back(resource);
+            if(changed) {
+                if(saveable) {
+                    saveableResources.push_back(resource);
+                } else {
+                    rollbackResources.push_back(resource);
+                }
             }
         }
     }
@@ -409,8 +411,8 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
     }
 }
 
-bool QnWorkbenchLayoutsHandler::closeAllLayouts(bool waitForReply) {
-    return closeLayouts(resourcePool()->getResources().filtered<QnLayoutResource>(), waitForReply);
+bool QnWorkbenchLayoutsHandler::closeAllLayouts(bool waitForReply, bool force) {
+    return closeLayouts(resourcePool()->getResources().filtered<QnLayoutResource>(), waitForReply, force);
 }
 
 // -------------------------------------------------------------------------- //
