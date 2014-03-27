@@ -18,6 +18,7 @@
 
 class QnWorkbenchItem;
 class QnResourceWidget;
+class QTimer;
 
 class QnWorkbenchVideoWallHandler : public Connective<QObject>, public QnWorkbenchContextAware
 {
@@ -42,7 +43,7 @@ private:
     void setControlMode(bool active);
     void updateMode();
 
-    void sendMessage(QnVideoWallControlMessage message);
+    void sendMessage(QnVideoWallControlMessage message, bool cached = false);
     void handleMessage(const QnVideoWallControlMessage &message, const QUuid &controllerUuid = QUuid(), qint64 sequence = -1 );
     void storeMessage(const QnVideoWallControlMessage &message, const QUuid &controllerUuid, qint64 sequence);
     void restoreMessages(const QUuid &controllerUuid, qint64 sequence);
@@ -116,6 +117,8 @@ private slots:
     void at_navigator_speedChanged();
 
     void at_workbenchStreamSynchronizer_runningChanged();
+
+    void at_controlModeCacheTimer_timeout();
 
     void submitDelayedItemOpen();
 
@@ -191,6 +194,8 @@ private:
         bool active;
         QString pcUuid;
         qint64 sequence;
+        QList<QnVideoWallControlMessage> cachedMessages;
+        QTimer* cacheTimer;
     } m_controlMode;
 
     QHash<QUuid, ScreenSnaps> m_screenSnapsByUuid;

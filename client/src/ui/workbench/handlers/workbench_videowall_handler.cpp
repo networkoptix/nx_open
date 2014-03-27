@@ -140,6 +140,8 @@ namespace {
     const int identifyTimeout  = 5000;
     const int identifyFontSize = 100;
 
+    const int cacheMessagesTimeoutMs = 500;
+
     const qreal defaultReviewAR = 1920.0 / 1080.0;
 }
 
@@ -153,6 +155,9 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
     m_controlMode.active = false;
     m_controlMode.sequence = 0;
+    m_controlMode.cacheTimer = new QTimer(this);
+    m_controlMode.cacheTimer->setInterval(cacheMessagesTimeoutMs);
+    connect(m_controlMode.cacheTimer, &QTimer::timeout, this, &QnWorkbenchVideoWallHandler::at_controlModeCacheTimer_timeout);
 
     QUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull()) {
@@ -447,8 +452,13 @@ void QnWorkbenchVideoWallHandler::sendInstanceGuid() {
     connection()->sendVideoWallInstanceId(m_videoWallMode.instanceGuid);
 }
 
-void QnWorkbenchVideoWallHandler::sendMessage(QnVideoWallControlMessage message) {
+void QnWorkbenchVideoWallHandler::sendMessage(QnVideoWallControlMessage message, bool cached) {
     Q_ASSERT(m_controlMode.active);
+
+    if (cached) {
+        m_controlMode.cachedMessages << message;
+        return;
+    }
 
     message[sequenceKey] = QString::number(m_controlMode.sequence++);
     message[pcUuidKey] = m_controlMode.pcUuid;
@@ -753,6 +763,8 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
     if (m_controlMode.active == active)
         return;
 
+    m_controlMode.cachedMessages.clear();
+
     QnWorkbenchLayout* layout = workbench()->currentLayout();
     if (active) {
         connect(workbench(),    &QnWorkbench::itemChanged,              this,   &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
@@ -766,7 +778,10 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
         }
 
         m_controlMode.active = active;
+        m_controlMode.cacheTimer->start();
         sendMessage(QnVideoWallControlMessage(QnVideoWallControlMessage::ControlStarted));
+
+
     } else {
         disconnect(workbench(),    &QnWorkbench::itemChanged,           this,   &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
         disconnect(layout,         &QnWorkbenchLayout::itemAdded,       this,   &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode);
@@ -780,6 +795,7 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
 
         sendMessage(QnVideoWallControlMessage(QnVideoWallControlMessage::ControlStopped));
         m_controlMode.active = active;
+        m_controlMode.cacheTimer->stop();
     }
 }
 
@@ -1821,6 +1837,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(int role) {
     QnWorkbenchItem* item = static_cast<QnWorkbenchItem *>(sender());
     QByteArray json;
     QVariant data = item->data(role);
+    bool cached = false;
 
     switch (role) {
     case Qn::ItemFlagsRole:                 // do not transfer flags, it may result of incorrect pending geometry adjustment
@@ -1853,6 +1870,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(int role) {
         qDebug() << "SENDER: Item"  << item->uuid() << debugRole(role) << "changed to" << value;
 #endif
         QJson::serialize(value, &json);
+        cached = true;
         break;
     }
 
@@ -1896,6 +1914,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(int role) {
 
     case Qn::ItemImageDewarpingRole:
         QJson::serialize(data.value<QnItemDewarpingParams>(), &json);
+        cached = true;
         break;
 
     case Qn::ItemHealthMonitoringButtonsRole:
@@ -1912,7 +1931,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayoutItem_dataChanged(int role) {
     message[roleKey] = QString::number(role);
     message[uuidKey] = item->uuid().toString();
     message[valueKey] = QString::fromUtf8(json);
-    sendMessage(message);
+    sendMessage(message, cached);
 }
 
 void QnWorkbenchVideoWallHandler::at_navigator_positionChanged() {
@@ -1950,4 +1969,24 @@ void QnWorkbenchVideoWallHandler::at_workbenchStreamSynchronizer_runningChanged(
     QnVideoWallControlMessage message(QnVideoWallControlMessage::SynchronizationChanged);
     message[valueKey] = QString::fromUtf8(QJson::serialized(context()->instance<QnWorkbenchStreamSynchronizer>()->state()));
     sendMessage(message);
+}
+
+void QnWorkbenchVideoWallHandler::at_controlModeCacheTimer_timeout() {
+    if (m_controlMode.cachedMessages.isEmpty())
+        return;
+
+    while (!m_controlMode.cachedMessages.isEmpty()) {
+        QnVideoWallControlMessage message = m_controlMode.cachedMessages.takeLast();
+        for (auto iter = m_controlMode.cachedMessages.begin(); iter != m_controlMode.cachedMessages.end();) {
+            if (
+                (iter->operation == message.operation) && 
+                (iter->params[roleKey] == message[roleKey]) &&
+                (iter->params[uuidKey] == message[uuidKey])
+                )
+                iter = m_controlMode.cachedMessages.erase(iter);
+            else
+                iter++;
+        }
+        sendMessage(message);
+    }
 }
