@@ -71,11 +71,11 @@ namespace ec2
             m_businessEventManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiCameraData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiCamera>& tran ) {
             m_cameraManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiCameraDataList>& tran ) {
+        void triggerNotification( const QnTransaction<ApiCameraList>& tran ) {
             m_cameraManager->triggerNotification( tran );
         }
 
@@ -107,7 +107,7 @@ namespace ec2
             m_mediaServerManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiResourceData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiResource>& tran ) {
             m_resourceManager->triggerNotification( tran );
         }
 

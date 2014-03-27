@@ -50,35 +50,25 @@ namespace ec2
 
     QN_DEFINE_STRUCT_SERIALIZATORS (ApiResourceParams,  (id) (params) )
 
-    struct ApiResourceData: public ApiData 
+    #include "ec2_resource_data_i.h"
+
+    struct ApiResource: public ApiResourceData 
     {
-        ApiResourceData(): status(QnResource::Offline), disabled(false) {}
-
-        QnId          id;
-        QnId          parentGuid;
-        QnResource::Status    status;
-        bool          disabled;
-        QString       name;
-        QString       url;
-        QnId          typeId;
-        std::vector<ApiResourceParam> addParams;
-
 	    void fromResource(const QnResourcePtr& resource);
 	    void toResource(QnResourcePtr resource) const;
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define ApiResourceDataFields (id) (parentGuid) (status) (disabled) (name) (url) (typeId) (addParams)
-    QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiResourceData,  ApiResourceDataFields )
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiResource,  ApiResourceFields)
 
-    struct ApiResourceDataList: public ApiData {
+    struct ApiResourceList: public ApiData {
 	    void loadFromQuery(QSqlQuery& query);
 	    void toResourceList( QnResourceFactory* resFactory, QnResourceList& resList ) const;
 
-	    std::vector<ApiResourceData> data;
+	    std::vector<ApiResource> data;
     };
 
-    QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ApiResourceDataList,  (data))
+    QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ApiResourceList,  (data))
 
     struct ApiSetResourceStatusData: public ApiData
     {

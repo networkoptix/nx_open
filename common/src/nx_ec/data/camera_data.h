@@ -11,31 +11,16 @@
 
 namespace ec2
 {
+    #include "camera_data_i.h"
 
-    struct ScheduleTask: public ApiData 
+    struct ScheduleTask: ScheduleTaskData
     {
-	    ScheduleTask(): startTime(0), endTime(0), doRecordAudio(false), recordType(Qn::RecordingType_Run), dayOfWeek(1), 
-					    beforeThreshold(0), afterThreshold(0), streamQuality(Qn::QualityNotDefined), fps(0.0) {}
-
-	    static ScheduleTask fromResource(const QnResourcePtr& cameraRes, const QnScheduleTask& resScheduleTask);
-	    QnScheduleTask toResource(const QnId& resourceId) const;
-
-        qint32   startTime;
-        qint32   endTime;
-        bool     doRecordAudio;
-        Qn::RecordingType   recordType;
-        qint8    dayOfWeek;
-        qint16   beforeThreshold;
-        qint16   afterThreshold;
-        Qn::StreamQuality  streamQuality;
-        qint16   fps;
+        static ScheduleTask fromResource(const QnResourcePtr& cameraRes, const QnScheduleTask& resScheduleTask);
+        QnScheduleTask toResource(const QnId& resourceId) const;
 
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
-
-    #define apiScheduleTaskFields (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) (beforeThreshold) (afterThreshold) (streamQuality) (fps) 
-    QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ScheduleTask, apiScheduleTaskFields)
-
+    QN_DEFINE_STRUCT_SQL_BINDER(ScheduleTask, apiScheduleTaskFields);
 
     struct ScheduleTaskWithRef: public ScheduleTask
     {
@@ -43,9 +28,9 @@ namespace ec2
     };
 
 
-    struct ApiCameraData: public ApiResourceData 
+    struct ApiCamera: public ApiResource 
     {
-        ApiCameraData(): scheduleDisabled(false), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryQuality(Qn::SSQualityNotDefined),
+        ApiCamera(): scheduleDisabled(false), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryQuality(Qn::SSQualityNotDefined),
                          controlDisabled(false), statusFlags(0) {}
 
         bool                scheduleDisabled;
@@ -64,31 +49,31 @@ namespace ec2
         QString             groupName;
         Qn::SecondStreamQuality    secondaryQuality;
         bool                controlDisabled;
-        qint32				statusFlags;
+        qint32              statusFlags;
         QByteArray          dewarpingParams;
         QString             vendor;
 
-	    void fromResource(const QnVirtualCameraResourcePtr& resource);
-	    void toResource(QnVirtualCameraResourcePtr resource) const;
+        void fromResource(const QnVirtualCameraResourcePtr& resource);
+        void toResource(QnVirtualCameraResourcePtr resource) const;
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
     #define apiCameraDataFields (scheduleDisabled) (motionType) (region) (mac) (login) (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) \
-							    (firmware) (groupId) (groupName) (secondaryQuality) (controlDisabled) (statusFlags) (dewarpingParams) (vendor)
-    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ApiCameraData, ec2::ApiResourceData, apiCameraDataFields)
+                                (firmware) (groupId) (groupName) (secondaryQuality) (controlDisabled) (statusFlags) (dewarpingParams) (vendor)
+    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ApiCamera, ec2::ApiResource, apiCameraDataFields)
 
 
-    struct ApiCameraDataList: public ApiData
+    struct ApiCameraList: public ApiData
     {
-	    std::vector<ApiCameraData> data;
-	
-	    void loadFromQuery(QSqlQuery& query);
+        std::vector<ApiCamera> data;
+    
+        void loadFromQuery(QSqlQuery& query);
 
-	    template <class T> void toResourceList(QList<T>& outData, QnResourceFactory* factory) const;
+        template <class T> void toResourceList(QList<T>& outData, QnResourceFactory* factory) const;
         void fromResourceList(const QList<QnVirtualCameraResourcePtr>& cameras);
     };
 
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiCameraDataList, (data) )
+    QN_DEFINE_STRUCT_SERIALIZATORS (ApiCameraList, (data) )
 }
 
 #endif // __API_CAMERA_DATA_H_

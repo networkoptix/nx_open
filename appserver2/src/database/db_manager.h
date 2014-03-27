@@ -69,7 +69,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeList& resourceTypeList);
 
         //getCameras
-        ErrorCode doQueryNoLock(const QnId& mServerId, ApiCameraDataList& cameraList);
+        ErrorCode doQueryNoLock(const QnId& mServerId, ApiCameraList& cameraList);
 
         //getServers
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
@@ -107,8 +107,8 @@ namespace ec2
 
         // ------------ transactions --------------------------------------
 
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraDataList>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCamera>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraList>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiMediaServerData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutDataList>& tran);
@@ -119,7 +119,7 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiPanicModeData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiStoredFileData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiStoredFilePath>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiResource>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiUserData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
@@ -153,19 +153,19 @@ namespace ec2
         ErrorCode deleteTableRecord(const QnId& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
-        ErrorCode updateResource(const ApiResourceData& data, qint32 internalId);
-        ErrorCode insertResource(const ApiResourceData& data, qint32* internalId);
-        ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
-        //ErrorCode insertOrReplaceResource(const ApiResourceData& data);
+        ErrorCode updateResource(const ApiResource& data, qint32 internalId);
+        ErrorCode insertResource(const ApiResource& data, qint32* internalId);
+        ErrorCode insertOrReplaceResource(const ApiResource& data, qint32* internalId);
+        //ErrorCode insertOrReplaceResource(const ApiResource& data);
         ErrorCode deleteResourceTable(const qint32 id);
         ErrorCode removeResource(const QnId& id);
 
         ErrorCode insertAddParams(const std::vector<ApiResourceParam>& params, qint32 internalId);
         ErrorCode deleteAddParams(qint32 resourceId);
 
-        ErrorCode saveCamera(const ApiCameraData& params);
-        ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
-        ErrorCode updateCameraSchedule(const ApiCameraData& data, qint32 internalId);
+        ErrorCode saveCamera(const ApiCamera& params);
+        ErrorCode insertOrReplaceCamera(const ApiCamera& data, qint32 internalId);
+        ErrorCode updateCameraSchedule(const ApiCamera& data, qint32 internalId);
         ErrorCode removeCamera(const QnId& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 

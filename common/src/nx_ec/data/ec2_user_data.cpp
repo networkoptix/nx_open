@@ -6,7 +6,7 @@ namespace ec2
 
     void ApiUserData::toResource(QnUserResourcePtr resource) const
     {
-        ApiResourceData::toResource(resource);
+        ApiResource::toResource(resource);
         resource->setAdmin(isAdmin);
         resource->setEmail(email);
         resource->setHash(hash);
@@ -17,7 +17,7 @@ namespace ec2
     
     void ApiUserData::fromResource(QnUserResourcePtr resource)
     {
-        ApiResourceData::fromResource(resource);
+        ApiResource::fromResource(resource);
         QString password = resource->getPassword();
         
         if (!password.isEmpty()) {
@@ -56,7 +56,7 @@ namespace ec2
 
     void ApiUserDataList::loadFromQuery(QSqlQuery& query)
     {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiUserData, data, ApiUserDataFields ApiResourceDataFields)
+        QN_QUERY_TO_DATA_OBJECT(query, ApiUserData, data, ApiUserDataFields ApiResourceFields)
     }
 
 }

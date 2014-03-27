@@ -8,7 +8,7 @@
 
 namespace ec2
 {
-    struct ApiStorageData: public ApiResourceData
+    struct ApiStorageData: public ApiResource
     {
         ApiStorageData(): spaceLimit(0), usedForWriting(0) {}
 
@@ -21,7 +21,7 @@ namespace ec2
     };
 
     #define ApiStorageDataFields  (spaceLimit) (usedForWriting)
-    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ApiStorageData, ec2::ApiResourceData, ApiStorageDataFields)
+    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ApiStorageData, ec2::ApiResource, ApiStorageDataFields)
 
 
     struct ApiStorageDataList: public ApiData {
@@ -33,7 +33,7 @@ namespace ec2
     QN_DEFINE_STRUCT_SERIALIZATORS (ApiStorageDataList, (data))
 
 
-    struct ApiMediaServerData: public ApiResourceData
+    struct ApiMediaServerData: public ApiResource
     {
         ApiMediaServerData(): flags(Qn::SF_None), panicMode(0) {}
 
@@ -52,7 +52,7 @@ namespace ec2
     };
 
     #define medisServerDataFields (apiUrl) (netAddrList) (flags) (panicMode) (streamingUrl) (version) (authKey) (storages)
-    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ApiMediaServerData, ec2::ApiResourceData, medisServerDataFields)
+    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ApiMediaServerData, ec2::ApiResource, medisServerDataFields)
 
 
     struct ApiPanicModeData: public ApiData

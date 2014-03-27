@@ -32,7 +32,7 @@ namespace ec2
         //!Implementation of AbstractResourceManager::remove
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
-        void triggerNotification( const QnTransaction<ApiResourceData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiResource>& tran ) {
             QnResourcePtr resource( new QnResource() );
             tran.params.toResource( resource );
             emit resourceChanged( resource );
@@ -66,7 +66,7 @@ namespace ec2
         QnTransaction<ApiSetResourceDisabledData> prepareTransaction( ApiCommand::Value command, const QnId& id, bool disabled );
         QnTransaction<ApiResourceParams> prepareTransaction(ApiCommand::Value cmd, const QnId& id, const QnKvPairList& kvPairs);
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value cmd, const QnId& id);
-        QnTransaction<ApiResourceData> prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource );
+        QnTransaction<ApiResource> prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource );
     };
 }
 

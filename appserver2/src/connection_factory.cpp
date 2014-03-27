@@ -70,7 +70,7 @@ namespace ec2
         //AbstractResourceManager::getResourceTypes
         registerGetFuncHandler<nullptr_t, ApiResourceTypeList>( restProcessorPool, ApiCommand::getResourceTypes );
         //AbstractResourceManager::getResource
-        //registerGetFuncHandler<nullptr_t, ApiResourceData>( restProcessorPool, ApiCommand::getResource );
+        //registerGetFuncHandler<nullptr_t, ApiResource>( restProcessorPool, ApiCommand::getResource );
         //AbstractResourceManager::setResourceStatus
         registerUpdateFuncHandler<ApiSetResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
         //AbstractResourceManager::setResourceDisabled
@@ -80,7 +80,7 @@ namespace ec2
         //AbstractResourceManager::save
         registerUpdateFuncHandler<ApiResourceParams>( restProcessorPool, ApiCommand::setResourceParams );
         //AbstractResourceManager::save
-        registerUpdateFuncHandler<ApiResourceData>( restProcessorPool, ApiCommand::saveResource );
+        registerUpdateFuncHandler<ApiResource>( restProcessorPool, ApiCommand::saveResource );
         //AbstractResourceManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeResource );
 
@@ -94,11 +94,11 @@ namespace ec2
 
 
         //AbstractCameraManager::addCamera
-        registerUpdateFuncHandler<ApiCameraData>( restProcessorPool, ApiCommand::saveCamera );
+        registerUpdateFuncHandler<ApiCamera>( restProcessorPool, ApiCommand::saveCamera );
         //AbstractCameraManager::save
-        registerUpdateFuncHandler<ApiCameraDataList>( restProcessorPool, ApiCommand::saveCameras );
+        registerUpdateFuncHandler<ApiCameraList>( restProcessorPool, ApiCommand::saveCameras );
         //AbstractCameraManager::getCameras
-        registerGetFuncHandler<QnId, ApiCameraDataList>( restProcessorPool, ApiCommand::getCameras );
+        registerGetFuncHandler<QnId, ApiCameraList>( restProcessorPool, ApiCommand::getCameras );
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
         //AbstractCameraManager::getCameraHistoryList

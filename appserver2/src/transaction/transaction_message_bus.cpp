@@ -264,16 +264,16 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
         case ApiCommand::setResourceParams:
             return deliveryTransaction<ApiResourceParams>(abstractTran, stream);
         case ApiCommand::saveResource:
-            return deliveryTransaction<ApiResourceData>(abstractTran, stream);
+            return deliveryTransaction<ApiResource>(abstractTran, stream);
         case ApiCommand::removeResource:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
         case ApiCommand::setPanicMode:
             return deliveryTransaction<ApiPanicModeData>(abstractTran, stream);
             
         case ApiCommand::saveCamera:
-            return deliveryTransaction<ApiCameraData>(abstractTran, stream);
+            return deliveryTransaction<ApiCamera>(abstractTran, stream);
         case ApiCommand::saveCameras:
-            return deliveryTransaction<ApiCameraDataList>(abstractTran, stream);
+            return deliveryTransaction<ApiCameraList>(abstractTran, stream);
         case ApiCommand::removeCamera:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
         case ApiCommand::addCameraHistoryItem:

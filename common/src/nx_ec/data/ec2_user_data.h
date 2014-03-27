@@ -7,7 +7,7 @@
 namespace ec2
 {
 
-    struct ApiUserData: public ApiResourceData
+    struct ApiUserData: public ApiResource
     {
         ApiUserData(): isAdmin(false), rights(0) {}
     
@@ -24,7 +24,7 @@ namespace ec2
     };
 
     #define ApiUserDataFields (isAdmin) (rights) (email) (digest) (hash)
-    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS(ApiUserData, ec2::ApiResourceData, ApiUserDataFields)
+    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS(ApiUserData, ec2::ApiResource, ApiUserDataFields)
 
 
     struct ApiUserDataList: public ApiData

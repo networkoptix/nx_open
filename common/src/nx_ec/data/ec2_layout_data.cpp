@@ -43,7 +43,7 @@ namespace ec2
 
     void ApiLayoutData::toResource(QnLayoutResourcePtr resource) const
     {
-        ApiResourceData::toResource(resource);
+        ApiResource::toResource(resource);
         resource->setCellAspectRatio(cellAspectRatio);
         resource->setCellSpacing(cellSpacingWidth, cellSpacingHeight);
         resource->setUserCanEdit(userCanEdit);
@@ -61,7 +61,7 @@ namespace ec2
 
     void ApiLayoutData::fromResource(QnLayoutResourcePtr resource)
     {
-        ApiResourceData::fromResource(resource);
+        ApiResource::fromResource(resource);
         cellAspectRatio = resource->cellAspectRatio();
         cellSpacingWidth = resource->cellSpacing().width();
         cellSpacingHeight = resource->cellSpacing().height();
@@ -98,7 +98,7 @@ namespace ec2
 
     void ApiLayoutDataList::loadFromQuery(QSqlQuery& query)
     {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiLayoutData, data, ApiLayoutDataFields ApiResourceDataFields)
+        QN_QUERY_TO_DATA_OBJECT(query, ApiLayoutData, data, ApiLayoutDataFields ApiResourceFields)
     }
 
 }

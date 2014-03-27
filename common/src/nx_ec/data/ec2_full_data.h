@@ -19,7 +19,7 @@ namespace ec2
     {
         ApiResourceTypeList resTypes;
         ApiMediaServerDataList servers;
-        ApiCameraDataList cameras;
+        ApiCameraList cameras;
         ApiUserDataList users;
         ApiLayoutDataList layouts;
         ApiBusinessRuleDataList rules;

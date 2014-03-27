@@ -27,26 +27,26 @@ static QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
 
 void ApiStorageData::fromResource(QnAbstractStorageResourcePtr resource)
 {
-    ApiResourceData::fromResource(resource);
+    ApiResource::fromResource(resource);
     spaceLimit = resource->getSpaceLimit();
     usedForWriting = resource->isUsedForWriting();
 }
 
 void ApiStorageData::toResource(QnAbstractStorageResourcePtr resource) const
 {
-    ApiResourceData::toResource(resource);
+    ApiResource::toResource(resource);
     resource->setSpaceLimit(spaceLimit);
     resource->setUsedForWriting(usedForWriting);
 }
 
 void ApiStorageDataList::loadFromQuery(QSqlQuery& query)
 {
-    QN_QUERY_TO_DATA_OBJECT(query, ApiStorageData, data, ApiStorageDataFields ApiResourceDataFields)
+    QN_QUERY_TO_DATA_OBJECT(query, ApiStorageData, data, ApiStorageDataFields ApiResourceFields)
 }
 
 void ApiMediaServerData::fromResource(QnMediaServerResourcePtr resource)
 {
-    ApiResourceData::fromResource(resource);
+    ApiResource::fromResource(resource);
 
     netAddrList = serializeNetAddrList(resource->getNetAddrList());
     apiUrl = resource->getApiUrl();
@@ -64,7 +64,7 @@ void ApiMediaServerData::fromResource(QnMediaServerResourcePtr resource)
 
 void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, const ResourceContext& ctx) const
 {
-    ApiResourceData::toResource(resource);
+    ApiResource::toResource(resource);
 
     QList<QHostAddress> resNetAddrList;
     deserializeNetAddrList(resNetAddrList, netAddrList);
@@ -107,7 +107,7 @@ template void ApiMediaServerDataList::toResourceList<QnMediaServerResourcePtr>(Q
 
 void ApiMediaServerDataList::loadFromQuery(QSqlQuery& query)
 {
-    QN_QUERY_TO_DATA_OBJECT(query, ApiMediaServerData, data, medisServerDataFields ApiResourceDataFields)
+    QN_QUERY_TO_DATA_OBJECT(query, ApiMediaServerData, data, medisServerDataFields ApiResourceFields)
 }
 
 }

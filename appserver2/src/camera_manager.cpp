@@ -60,13 +60,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-		auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraDataList& cameras) {
+		auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraList& cameras) {
 			QnVirtualCameraResourceList outData;
 			if( errorCode == ErrorCode::ok )
 				cameras.toResourceList(outData, m_resCtx.resFactory);
 			handler->done( reqID, errorCode, outData);
 		};
-		m_queryProcessor->template processQueryAsync<QnId, ApiCameraDataList, decltype(queryDoneHandler)>
+		m_queryProcessor->template processQueryAsync<QnId, ApiCameraList, decltype(queryDoneHandler)>
 			( ApiCommand::getCameras, mediaServerId, queryDoneHandler );
 		return reqID;
     }
@@ -124,21 +124,21 @@ namespace ec2
 
 
     template<class QueryProcessorType>
-    QnTransaction<ApiCameraData> QnCameraManager<QueryProcessorType>::prepareTransaction(
+    QnTransaction<ApiCamera> QnCameraManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
         const QnVirtualCameraResourcePtr& resource )
     {
-		QnTransaction<ApiCameraData> tran(command, true);
+		QnTransaction<ApiCamera> tran(command, true);
 		tran.params.fromResource(resource);
         return tran;
     }
 
     template<class QueryProcessorType>
-    QnTransaction<ApiCameraDataList> QnCameraManager<QueryProcessorType>::prepareTransaction(
+    QnTransaction<ApiCameraList> QnCameraManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
         const QnVirtualCameraResourceList& cameras )
     {
-        QnTransaction<ApiCameraDataList> tran(command, true);
+        QnTransaction<ApiCameraList> tran(command, true);
         tran.params.fromResourceList(cameras);
         return tran;
     }

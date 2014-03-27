@@ -23,7 +23,7 @@ namespace ec2
 
             //!ApiResourceTypeList
             getResourceTypes,
-            //!ApiResourceData
+            //!ApiResource
             getResource,
             //!ApiSetResourceStatusData
             setResourceStatus,
@@ -32,7 +32,7 @@ namespace ec2
             //!ApiResourceParams
             setResourceParams,
             getResourceParams,
-            //!ApiResourceData
+            //!ApiResource
             saveResource,
             removeResource,
             //!ApiPanicModeData
@@ -40,9 +40,9 @@ namespace ec2
             //!ApiFullData,
             getAllDataList,
             
-            //!ApiCameraData
+            //!ApiCamera
             saveCamera,
-            //!ApiCameraDataList
+            //!ApiCameraList
             saveCameras,
             //!ApiIdData
             removeCamera,

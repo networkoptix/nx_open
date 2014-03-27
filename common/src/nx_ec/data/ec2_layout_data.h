@@ -42,7 +42,7 @@ namespace ec2
         QnId layoutId;
     };
 
-    struct ApiLayoutData: public ApiResourceData
+    struct ApiLayoutData: public ApiResource
     {
         float cellAspectRatio;
         float cellSpacingWidth;
@@ -62,7 +62,7 @@ namespace ec2
     };
 
     #define ApiLayoutDataFields (cellAspectRatio) (cellSpacingWidth) (cellSpacingHeight) (items) (userCanEdit) (locked) (backgroundImageFilename) (backgroundWidth) (backgroundHeight) (backgroundOpacity) (userId)
-    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ApiLayoutData, ec2::ApiResourceData, ApiLayoutDataFields)
+    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ApiLayoutData, ec2::ApiResource, ApiLayoutDataFields)
 }
                                                                                 
 
