@@ -644,8 +644,7 @@ void QnServerResourceWidget::updateLegend() {
 
             LegendButtonWidget* newButton = new LegendButtonWidget(key, data.color);
             newButton->setProperty(legendKeyPropertyName, key);
-            HealthMonitoringButtons checkedData = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
-            newButton->setChecked(checkedData.value(key, true));
+            newButton->setChecked(data.visible);
 
             connect(newButton, &QnImageButtonWidget::toggled, this, [this, key](bool toggled) {
                 HealthMonitoringButtons value = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
