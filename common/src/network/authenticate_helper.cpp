@@ -8,6 +8,7 @@
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"
 #include "api/app_server_connection.h"
+#include "common/common_module.h"
 
 QnAuthHelper* QnAuthHelper::m_instance;
 
@@ -144,6 +145,27 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     md5Hash.addData(uri);
     QByteArray ha2 = md5Hash.result().toHex();
 
+    if (userName == "system")
+    {
+        QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+        md5Hash.addData(qnCommon->localSystemName().toUtf8());
+        md5Hash.addData(":NetworkOptix:");
+        md5Hash.addData(qnCommon->getSystemPassword());
+
+        QByteArray dbHash = md5Hash.result().toHex();
+        md5Hash.reset();
+        md5Hash.addData(dbHash);
+        md5Hash.addData(":");
+        md5Hash.addData(nonce);
+        md5Hash.addData(":");
+        md5Hash.addData(ha2);
+        QByteArray calcResponse = md5Hash.result().toHex();
+
+        if (calcResponse == response)
+            return true;
+    }
+
+
     if (isNonceValid(nonce)) 
     {
         QMutexLocker lock(&m_mutex);
@@ -151,7 +173,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
         {
             if (user->getName().toUtf8().toLower() == userName)
             {
-                QByteArray dbHash = user->getDigest().toUtf8();
+                QByteArray dbHash = user->getDigest();
 
                 QCryptographicHash md5Hash( QCryptographicHash::Md5 );
                 md5Hash.addData(dbHash);
@@ -180,11 +202,14 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
     QByteArray userName = digest.left(pos).toLower();
     QByteArray password = digest.mid(pos+1);
 
+    if (userName == "system" && password == qnCommon->getSystemPassword())
+        return true;
+
     foreach(QnUserResourcePtr user, m_users)
     {
         if (user->getName().toUtf8().toLower() == userName)
         {
-            QList<QByteArray> pswdData = user->getHash().toUtf8().split('$');
+            QList<QByteArray> pswdData = user->getHash().split('$');
             if (pswdData.size() == 3)
             {
                 QCryptographicHash md5Hash( QCryptographicHash::Md5 );
@@ -210,7 +235,7 @@ bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, nx_http::Re
 
     foreach(QnUserResourcePtr user, m_users)
     {
-        if (user->getDigest().toLatin1() == digest)
+        if (user->getDigest() == digest)
             return true;
     }
     return false;

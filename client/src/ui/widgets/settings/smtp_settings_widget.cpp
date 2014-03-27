@@ -94,15 +94,21 @@ QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
 void QnSmtpSettingsWidget::updateFromSettings() {
     m_settingsReceived = false;
 
-    m_requestHandle = QnAppServerConnectionFactory::createConnection()->getSettingsAsync(
-                this, SLOT(at_settings_received(int, const QnKvPairList&, int)));
+    m_requestHandle = QnAppServerConnectionFactory::getConnection2()->getSettingsAsync(
+        this, &QnSmtpSettingsWidget::at_settings_received );
 }
 
 void QnSmtpSettingsWidget::submitToSettings() {
     QnEmail::Settings result = settings();
-    QnAppServerConnectionFactory::createConnection()->saveSettingsAsync(result.serialized(),
-                                                                        context()->instance<QnWorkbenchNotificationsHandler>(),
-                                                                        SLOT(updateSmtpSettings(int, const QnKvPairList&, int)));
+    QnWorkbenchNotificationsHandler* notificationsHandler = context()->instance<QnWorkbenchNotificationsHandler>();
+    QnKvPairList serializedSettings = result.serialized();
+    auto saveSettingsHandler = [notificationsHandler, serializedSettings]( int reqID, ec2::ErrorCode errorCode ){
+        notificationsHandler->updateSmtpSettings( reqID, errorCode, serializedSettings );
+    };
+    QnAppServerConnectionFactory::getConnection2()->saveSettingsAsync(
+        serializedSettings,
+        notificationsHandler,
+        saveSettingsHandler );
 }
 
 void QnSmtpSettingsWidget::updateFocusedElement() {
@@ -278,8 +284,10 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     m_timeoutTimer->setInterval(result.timeout * 1000 / ui->testProgressBar->maximum());
     m_timeoutTimer->start();
 
-    m_testHandle = QnAppServerConnectionFactory::createConnection()->testEmailSettingsAsync(result.serialized(),
-                                                                                            this, SLOT(at_finishedTestEmailSettings(int, bool, int)));
+    m_testHandle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->testEmailSettings(
+        result.serialized(),
+        this,
+        &QnSmtpSettingsWidget::at_finishedTestEmailSettings );
     ui->stackedWidget->setCurrentIndex(TestingPage);
 }
 
@@ -297,16 +305,13 @@ void QnSmtpSettingsWidget::at_timer_timeout() {
     stopTesting(tr("Timed out"));
 }
 
-void QnSmtpSettingsWidget::at_finishedTestEmailSettings(int status, bool result, int handle) {
+void QnSmtpSettingsWidget::at_finishedTestEmailSettings( int handle, ec2::ErrorCode errorCode ) {
     if (handle != m_testHandle)
         return;
 
-    stopTesting(status != 0
+    stopTesting(errorCode != ec2::ErrorCode::ok
             ? tr("Error while testing settings")
-            : result
-              ? tr("Success")
-              : tr("Error")
-                );
+            : tr("Success") );
 }
 
 void QnSmtpSettingsWidget::at_okTestButton_clicked() {
@@ -316,21 +321,19 @@ void QnSmtpSettingsWidget::at_okTestButton_clicked() {
                                        : SimplePage);
 }
 
-void QnSmtpSettingsWidget::at_settings_received(int status, const QnKvPairList &values, int handle) {
+void QnSmtpSettingsWidget::at_settings_received( int handle, ec2::ErrorCode errorCode, const QnEmail::Settings& settings) {
     if (handle != m_requestHandle)
         return;
 
-    m_requestHandle = -1;
-    context()->instance<QnWorkbenchNotificationsHandler>()->updateSmtpSettings(status, values, handle);
-
-    bool success = (status == 0);
-    if(!success) {
+    if(errorCode != ec2::ErrorCode::ok) {
         QMessageBox::critical(this, tr("Error"), tr("Could not read settings from Enterprise Controller."));
         m_settingsReceived = true;
         return;
     }
 
-    QnEmail::Settings settings(values);
+    m_requestHandle = -1;
+    context()->instance<QnWorkbenchNotificationsHandler>()->updateSmtpSettings(handle, errorCode, settings);
+
     loadSettings(settings.server, settings.connectionType, settings.port);
     ui->userLineEdit->setText(settings.user);
     ui->simpleEmailLineEdit->setText(settings.user);

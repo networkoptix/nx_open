@@ -14,8 +14,10 @@
 class QnResourceModelPrivate;
 class QnResourcePool;
 class QnLayoutItemData;
+class QnVideoWallItem;
 class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotManager;
+class QnResourcePoolModelNode;
 
 class QnResourcePoolModel : public QAbstractItemModel, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -49,15 +51,16 @@ public:
 
     Qn::NodeType rootNodeType() const;
 private:
-    class Node;
-
-    Node *node(const QnResourcePtr &resource);
-    Node *node(const QUuid &uuid);
-    Node *node(const QModelIndex &index) const;
-    Node *expectedParent(Node *node);
+    QnResourcePoolModelNode *node(const QnResourcePtr &resource);
+    QnResourcePoolModelNode *node(const QUuid &uuid);
+    QnResourcePoolModelNode *node(const QModelIndex &index) const;
+    QnResourcePoolModelNode *node(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource);
+    QnResourcePoolModelNode *expectedParent(QnResourcePoolModelNode *node);
     bool isIgnored(const QnResourcePtr &resource) const;
 
-    void deleteNode(Node *node);
+    void deleteNode(QnResourcePoolModelNode *node);
+
+    void deleteNode(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource);
 
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
@@ -72,22 +75,37 @@ private slots:
     void at_resource_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
     void at_resource_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
 
-    void at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera);
+#ifdef QN_ENABLE_VIDEO_WALL
+    void at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
+    void at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
+
+    void at_user_videoWallItemAdded(const QnUserResourcePtr &user, const QUuid &uuid);
+    void at_user_videoWallItemRemoved(const QnUserResourcePtr &user, const QUuid &uuid);
+#endif
+
+	void at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera);
 private:
+    friend class QnResourcePoolModelNode;
+
+    typedef QPair<QnResourcePtr, QUuid> NodeKey;
+
     /** Root nodes array */
-    Node *m_rootNodes[Qn::NodeTypeCount];
+    QnResourcePoolModelNode *m_rootNodes[Qn::NodeTypeCount];
+
+    /** Generic node list */
+    QHash<NodeKey, QnResourcePoolModelNode*> m_nodes[Qn::NodeTypeCount];
 
     /** Set of top-level node types */
     QList<Qn::NodeType> m_rootNodeTypes;
 
     /** Mapping for resource nodes, by resource. */
-    QHash<QnResource *, Node *> m_resourceNodeByResource;
+    QHash<QnResourcePtr, QnResourcePoolModelNode *> m_resourceNodeByResource;
 
     /** Mapping for item nodes, by item id. */
-    QHash<QUuid, Node *> m_itemNodeByUuid;
+    QHash<QUuid, QnResourcePoolModelNode *> m_itemNodeByUuid;
 
     /** Mapping for item nodes, by resource id. Is managed by nodes. */
-    QHash<QnResource *, QList<Node *> > m_itemNodesByResource;
+    QHash<QnResourcePtr, QList<QnResourcePoolModelNode *> > m_itemNodesByResource;
 
     /** Whether item urls should be shown. */
     bool m_urlsShown;

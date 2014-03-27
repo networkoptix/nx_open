@@ -6,6 +6,7 @@
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <recording/time_period_list.h>
@@ -541,7 +542,7 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
         bool isServer = resource->hasFlags(QnResource::server);
         bool isMediaResource = resource->hasFlags(QnResource::media);
         bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
-                && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
+            && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
         bool allowed = isServer || isMediaResource;
         bool forbidden = isExportedLayout && (isServer || isLocalResource);
         if(allowed && !forbidden)
@@ -650,5 +651,12 @@ Qn::ActionVisibility QnLightModeCondition::check(const QnActionParameters &param
     if (qnSettings->lightMode() & m_lightModeFlags)
         return Qn::InvisibleAction;
 
+    return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resources) {
+    foreach (const QnResourcePtr &resource, resources)
+        if (m_isEdgeServer ^ QnMediaServerResource::isEdgeServer(resource))
+            return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }

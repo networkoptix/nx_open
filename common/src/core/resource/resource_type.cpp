@@ -34,7 +34,7 @@ bool QnResourceType::isCamera() const
 
     foreach (QnId parentId, allParentList())
     {
-        if (parentId.isValid())
+        if (!parentId.isNull())
         {
             QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId);
             if (parent->isCamera())

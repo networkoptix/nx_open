@@ -15,6 +15,9 @@
 class QnLicense;
 typedef QSharedPointer<QnLicense> QnLicensePtr;
 
+const QString LICENSE_TYPE_PROFESSIONAL = lit("digital");
+const QString LICENSE_TYPE_ANALOG = lit("analog");
+const QString LICENSE_TYPE_EDGE = lit("edge");
 
 class QnLicense {
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
@@ -24,15 +27,20 @@ public:
         TrialLicense,
         AnalogLicense,
         ProfessionalLicense,
-        TypeCount
+        EdgeLicense,
+        TypeCount,
+        Invalid
     };
 
+    QnLicense();
     QnLicense(const QByteArray& licenseBlock);
+
+    void loadLicenseBlock( const QByteArray& licenseBlock );
 
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(const QList<QByteArray>& hardwareIds, const QString& brand) const;
+    bool isValid(const QList<QByteArray> &hardwareIds, const QString &brand) const;
 
     /**
      * @returns                         Whether this license is for analog cameras.
@@ -84,7 +92,18 @@ private:
 
     // Is full license valid (signature2 is used)
     bool m_isValid2;
+
+    void parseLicenseBlock(
+        const QByteArray& licenseBlock,
+        QByteArray* const v1LicenseBlock,
+        QByteArray* const v2LicenseBlock );
+    void licenseBlockFromData(
+        QByteArray* const v1LicenseBlock,
+        QByteArray* const v2LicenseBlock );
+    void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
 };
+
+Q_DECLARE_METATYPE(QnLicensePtr)
 
 typedef QList<QnLicensePtr> QnLicenseList;
 typedef QMap<QByteArray, QnLicensePtr> QnLicenseDict;

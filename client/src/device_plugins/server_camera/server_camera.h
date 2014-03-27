@@ -17,7 +17,7 @@ class QnServerCamera: public QnVirtualCameraResource
 {
     Q_OBJECT
 public:
-    QnServerCamera();
+    QnServerCamera(const QnId& resourceTypeId);
 
     virtual bool isResourceAccessible() override;
     virtual bool updateMACAddress() override;
@@ -30,10 +30,14 @@ public:
     QString getUniqueIdForServer(const QnResourcePtr mServer) const;
 
     QnServerCameraPtr findEnabledSibling();
+    virtual Status getStatus() const override;
 
+    void setTmpStatus(Status value);
 protected:
     virtual QString getUniqueId() const override;
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
+private:
+    Status m_tmpStatus;
 
 private:
     QnServerCameraPtr m_activeCamera;
@@ -42,7 +46,7 @@ private:
 class QnServerCameraFactory : public QnResourceFactory
 {
 public:
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) override;
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params) override;
 
     static QnServerCameraFactory& instance();
 };

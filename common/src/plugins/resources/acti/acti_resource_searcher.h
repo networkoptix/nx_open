@@ -19,7 +19,7 @@ public:
     
     virtual ~QnActiResourceSearcher();
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
 
     virtual QString manufacture() const;
 

@@ -214,7 +214,7 @@ namespace QJsonDetail {
 /* Free-standing (de)serialization functions are picked up via ADL by
  * the actual implementation. Feel free to add them for your own types. */
 
-
+#ifndef Q_MOC_RUN
 #define QN_DEFINE_DIRECT_JSON_SERIALIZATION_FUNCTIONS(TYPE, JSON_TYPE, JSON_GETTER)  \
 inline void serialize(QnJsonContext *, const TYPE &value, QJsonValue *target) { \
     *target = QJsonValue(value);                                                \
@@ -289,6 +289,7 @@ QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QHash, (class T), (QString, T),
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Key, T), any_map);
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T), any_map);
 #undef QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS
+#endif // Q_MOC_RUN
 
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QColor)
 QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QBrush)

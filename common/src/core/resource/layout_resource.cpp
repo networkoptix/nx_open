@@ -5,7 +5,6 @@
 
 #include <utils/common/warnings.h>
 #include "plugins/storage/file_storage/layout_storage_resource.h"
-#include "api/serializer/pb_serializer.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource_management/resource_pool.h"
 
@@ -82,7 +81,7 @@ QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {
 
 QString QnLayoutResource::getUniqueId() const
 {
-    return getGuid();
+    return getGuid().toString();
 }
 
 void QnLayoutResource::updateInner(QnResourcePtr other) {

@@ -86,7 +86,6 @@ void QnTCPConnectionProcessor::parseRequest()
 //    qDebug() << "Client request from " << d->socket->getPeerAddress().address.toString();
 //    qDebug() << d->clientRequest;
 
-#ifdef USE_NX_HTTP
     d->request = nx_http::Request();
     if( !d->request.parse( d->clientRequest ) )
     {
@@ -96,55 +95,6 @@ void QnTCPConnectionProcessor::parseRequest()
     QList<QByteArray> versionParts = d->request.requestLine.version.split('/');
     d->protocol = versionParts[0];
     d->requestBody = d->request.messageBody;
-#else
-    QList<QByteArray> lines = d->clientRequest.split('\n');
-    bool firstLine = true;
-    foreach (const QByteArray& l, lines)
-    {
-        QByteArray line = l.trimmed();
-        if (line.isEmpty())
-            break;
-        if (firstLine)
-        {
-            QList<QByteArray> params = line.split(' ');
-            if (params.size() != 3)
-            {
-                qWarning() << Q_FUNC_INFO << "Invalid request format.";
-                return;
-            }
-            QList<QByteArray> version = params[2].split('/');
-            d->protocol = version[0];
-            int major = 1;
-            int minor = 0;
-            if (version.size() > 1)
-            {
-                QList<QByteArray> v = version[1].split('.');
-                major = v[0].toInt();
-                if (v.length() > 1)
-                    minor = v[1].toInt();
-            }
-            d->requestHeaders = QHttpRequestHeader(QLatin1String(params[0]), QLatin1String(params[1]), major, minor);
-            firstLine = false;
-        }
-        else
-        {
-            QByteArray headerName;
-            QByteArray headerValue;
-            nx_http::parseHeader( &headerName, &headerValue, line );
-            d->requestHeaders.addValue( QLatin1String(headerName), QLatin1String(headerValue) );
-        }
-    }
-    QByteArray delimiter = "\n";
-    int pos = d->clientRequest.indexOf(delimiter);
-    if (pos == -1)
-        return;
-    if (pos > 0 && d->clientRequest[pos-1] == '\r')
-        delimiter = "\r\n";
-    QByteArray dblDelim = delimiter + delimiter;
-    int bodyStart = d->clientRequest.indexOf(dblDelim);
-    if (bodyStart >= 0 && d->requestHeaders.value(QLatin1String("content-length")).toInt() > 0)
-        d->requestBody = d->clientRequest.mid(bodyStart + dblDelim.length());
-#endif
 }
 
 /*

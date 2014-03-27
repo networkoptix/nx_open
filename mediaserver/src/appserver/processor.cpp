@@ -9,7 +9,6 @@
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
     : m_serverId(serverId)
 {
-    m_appServer = QnAppServerConnectionFactory::createConnection();
     connect(qnResPool, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
 }
 
@@ -48,12 +47,12 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
         if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(cameraResource->getUrl()))
             continue; //race condition. manual camera just deleted
-
-        if (m_appServer->addCamera(cameraResource, cameras) != 0)
-        {
-            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << m_appServer->getLastError();
+        const ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addCameraSync( cameraResource, &cameras );
+        if( errorCode != ec2::ErrorCode::ok ) {
+            qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << ec2::toString(errorCode);
             continue;
         }
+
         if (cameras.isEmpty())
         {
             qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Unknown error code. Possible old ECS version is used!";
@@ -67,40 +66,36 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
 void QnAppserverResourceProcessor::updateResourceStatusAsync(const QnResourcePtr &resource)
 {
-    int handle = m_appServer->setResourceStatusAsync(resource->getId(), resource->getStatus(), this, "requestFinished");
-    m_handleToResource.insert(handle, resource);
+    if (!resource)
+        return;
+
+    m_setStatusInProgress.insert(resource->getId());
+    QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatus(resource->getId(), resource->getStatus(), this, &QnAppserverResourceProcessor::requestFinished2);
 }
 
-void QnAppserverResourceProcessor::requestFinished(const QnHTTPRawResponse& response, int handle)
+void QnAppserverResourceProcessor::requestFinished2(int /*reqID*/, ec2::ErrorCode errCode, const QnId& id)
 {
-    QnResourcePtr resource = m_handleToResource.value(handle);
-    if (resource && response.status != 0)
-        qCritical() << "Failed to update resource status" << resource->getId();
+    if (errCode != ec2::ErrorCode::ok)
+        qCritical() << "Failed to update resource status" << id.toString();
 
-    m_handleToResource.remove(handle);
-
-    if (m_awaitingSetStatus.contains(resource)) {
-        updateResourceStatusAsync(resource);
-        m_awaitingSetStatus.remove(resource);
+    m_setStatusInProgress.remove(id);
+    if (m_awaitingSetStatus.contains(id)) {
+        m_awaitingSetStatus.remove(id);
+        updateResourceStatusAsync(qnResPool->getResourceById(id));
     }
 }
 
 bool QnAppserverResourceProcessor::isSetStatusInProgress(const QnResourcePtr &resource)
 {
-    foreach(const QnResourcePtr& res, m_handleToResource.values())
-    {
-        if (res == resource)
-            return true;
-    }
-    return false;
+    return m_setStatusInProgress.contains(resource->getId());
 }
 
 void QnAppserverResourceProcessor::at_resource_statusChanged(const QnResourcePtr &resource)
 {
-    Q_ASSERT_X(!resource->hasFlags(QnResource::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
+    //Q_ASSERT_X(!resource->hasFlags(QnResource::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
 
     if (!isSetStatusInProgress(resource))
         updateResourceStatusAsync(resource);
     else
-        m_awaitingSetStatus << resource;
+        m_awaitingSetStatus << resource->getId();
 }

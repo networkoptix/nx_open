@@ -12,13 +12,16 @@
 // -------------------------------------------------------------------------- //
 // QnWorkbenchLayoutReplyProcessor
 // -------------------------------------------------------------------------- //
-void QnWorkbenchLayoutReplyProcessor::processReply(int status, const QnResourceList &, int handle) {
+void QnWorkbenchLayoutReplyProcessor::processReply( int handle, ec2::ErrorCode errorCode ) {
     /* Note that we may get reply of size 0 if EC is down.
      * This is why we use stored list of layouts. */
     if(m_manager)
-        m_manager.data()->processReply(status, m_resources, handle);
+        m_manager.data()->processReply((int)errorCode, m_resources, handle);
 
-    emitFinished(this, status, QnResourceList(m_resources), handle);
+    emitFinished(this, 
+        (int)errorCode, //TODO: #ak need to check all dependent places and change int to ec2::ErrorCode. 
+                        //But for now it's ok, since both status and errorCode use 0 for success
+        QnResourceList(m_resources), handle);
     deleteLater();
 }
 
@@ -49,8 +52,8 @@ QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager() {
     m_flagsByLayout.clear();
 }
 
-QnAppServerConnectionPtr QnWorkbenchLayoutSnapshotManager::connection() const {
-    return QnAppServerConnectionFactory::createConnection();
+ec2::AbstractECConnectionPtr QnWorkbenchLayoutSnapshotManager::connection2() const {
+    return QnAppServerConnectionFactory::getConnection2();
 }
 
 bool QnWorkbenchLayoutSnapshotManager::isFile(const QnLayoutResourcePtr &resource) {
@@ -122,7 +125,8 @@ void QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourceList &resource
 
     QnWorkbenchLayoutReplyProcessor *processor = new QnWorkbenchLayoutReplyProcessor(this, resources);
     processor->connect(SIGNAL(finished(int, const QnResourceList &, int)), object, slot);
-    connection()->saveAsync(resources, processor, SLOT(processReply(int, const QnResourceList &, int)));
+
+    connection2()->getLayoutManager()->save( resources, processor, &QnWorkbenchLayoutReplyProcessor::processReply );
 
     foreach(const QnLayoutResourcePtr &resource, resources)
         setFlags(resource, flags(resource) | Qn::ResourceIsBeingSaved);
@@ -194,7 +198,7 @@ void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr 
 Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::defaultFlags(const QnLayoutResourcePtr &resource) const {
     Qn::ResourceSavingFlags result;
 
-    if(resource->getId().isSpecial())
+    if(resource->flags() & QnResource::local)
         result |= Qn::ResourceIsLocal;
 
     return result;

@@ -474,4 +474,19 @@ private:
     Qn::LightModeFlags m_lightModeFlags;
 };
 
+class QnEdgeServerCondition: public QnActionCondition {
+public:
+    QnEdgeServerCondition(bool isEdgeServer, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_isEdgeServer(isEdgeServer)
+    {}
+    
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+private:
+    /** If this flag is true action is visible for edge servers only, 
+     *  in the other case - action is hidden for edge servers.
+     */
+    bool m_isEdgeServer;
+};
+
 #endif // QN_ACTION_CONDITIONS_H

@@ -50,7 +50,6 @@ extern "C"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
 #include "device_plugins/server_camera/server_camera.h"
-#include "device_plugins/server_camera/appserver.h"
 
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
@@ -107,6 +106,8 @@ extern "C"
 #include "ui/customization/customizer.h"
 #include "core/ptz/client_ptz_controller_pool.h"
 #include "ui/dialogs/message_box.h"
+#include <nx_ec/ec2_lib.h>
+#include <nx_ec/dummy_handler.h>
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
@@ -342,6 +343,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     initLog(logLevel);
 
+    ec2::DummyHandler dummyEc2RequestHandler;
+
     /* Dev mode. */
     if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
         qnSettings->setDevMode(true);
@@ -390,7 +393,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-    QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
@@ -422,6 +424,18 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Initialize connections. */
     initAppServerConnection();
+
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
+    ec2::ResourceContext resCtx(
+        &QnServerCameraFactory::instance(),
+        qnResPool,
+        qnResTypePool );
+	ec2ConnectionFactory->setContext( resCtx );
+    QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
+
+    QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
+    //clientMessageProcessor->init(QnAppServerConnectionFactory::getConnection2());
+
     qnSettings->save();
     if (!QDir(qnSettings->mediaFolder()).exists())
         QDir().mkpath(qnSettings->mediaFolder());
@@ -448,6 +462,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnSessionManager::instance()->start();
 
     ffmpegInit();
+
+    qnCommon->setModuleGUID(QUuid::createUuid());
 
     //===========================================================================
 
@@ -630,11 +646,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         cl_log.log(autoTester.message(), cl_logALWAYS);
     }
 
-    QnCommonMessageProcessor::instance()->stop();
     QnSessionManager::instance()->stop();
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance()->stop();
+
+    QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );
 
     /* Write out settings. */
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());

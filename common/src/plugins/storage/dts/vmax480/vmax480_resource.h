@@ -14,7 +14,7 @@ class QnPlVmax480Resource : public QnPhysicalCameraResource
     Q_OBJECT
 
 public:
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     QnPlVmax480Resource();
     virtual ~QnPlVmax480Resource();

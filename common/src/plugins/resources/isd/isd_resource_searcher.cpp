@@ -16,7 +16,7 @@ QnPlISDResourceSearcher& QnPlISDResourceSearcher::instance()
     return inst;
 }
 
-QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -38,8 +38,8 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const
     result = QnVirtualCameraResourcePtr( new QnPlIsdResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create ISD camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create ISD camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 
@@ -47,7 +47,7 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const
 
 QString QnPlISDResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlIsdResource::MANUFACTURE);
+    return QnPlIsdResource::MANUFACTURE;
 }
 
 static const QLatin1String DEFAULT_ISD_USERNAME( "root" );
@@ -123,7 +123,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
 
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
         return QList<QnResourcePtr>();
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
@@ -216,7 +216,7 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceLis
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
     {
         return local_result;
     }

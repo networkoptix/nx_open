@@ -17,11 +17,11 @@ namespace nx_http
     HttpStreamReader::HttpStreamReader()
     :
         m_state( waitingMessageStart ),
-        m_nextState( undefined ),
         m_contentLength( 0 ),
         m_isChunkedTransfer( false ),
         m_messageBodyBytesRead( 0 ),
         m_chunkStreamParseState( waitingChunkStart ),
+        m_nextState( undefined ),
         m_currentChunkSize( 0 ),
         m_currentChunkBytesRead( 0 ),
         m_prevChar( 0 ),

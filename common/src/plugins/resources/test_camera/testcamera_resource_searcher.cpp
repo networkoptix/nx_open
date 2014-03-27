@@ -95,7 +95,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                 QnTestCameraResourcePtr resource ( new QnTestCameraResource() );
 
                 QnId rt = qnResTypePool->getResourceTypeId(manufacture(), resName);
-                if (!rt.isValid())
+                if (rt.isNull())
                     continue;
 
                 QLatin1String s(params[j]);
@@ -124,7 +124,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
     return rez;
 }
 
-QnResourcePtr QnTestCameraResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnTestCameraResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -146,8 +146,8 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(QnId resourceTypeId, 
     result = QnVirtualCameraResourcePtr( new QnTestCameraResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create test camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create test camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 
@@ -155,7 +155,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(QnId resourceTypeId, 
 
 QString QnTestCameraResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnTestCameraResource::MANUFACTURE);
+    return QnTestCameraResource::MANUFACTURE;
 }
 
 QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)

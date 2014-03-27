@@ -16,7 +16,50 @@
 #include "request_handler.h"
 #include "network/authenticate_helper.h"
 
-QnRestConnectionProcessor::Handlers QnRestConnectionProcessor::m_handlers;
+
+void QnRestProcessorPool::registerHandler( const QString& path, QnRestRequestHandler* handler )
+{
+    m_handlers.insert(path, QnRestRequestHandlerPtr(handler));
+    handler->setPath(path);
+
+}
+
+QnRestRequestHandlerPtr QnRestProcessorPool::findHandler( QString path ) const
+{
+    if (path.startsWith(L'/'))
+        path = path.mid(1);
+    if (path.endsWith(L'/'))
+        path = path.left(path.length()-1);
+
+    Handlers::const_iterator i = m_handlers.upperBound(path);
+    if (i == m_handlers.begin())
+        return path.startsWith(i.key()) ? i.value() : QnRestRequestHandlerPtr();
+    while (i-- != m_handlers.begin()) 
+    {
+        if (path.startsWith(i.key()))
+            return i.value();
+    }
+
+    return QnRestRequestHandlerPtr();
+}
+
+const QnRestProcessorPool::Handlers& QnRestProcessorPool::handlers() const
+{
+    return m_handlers;
+}
+
+static QnRestProcessorPool* QnRestProcessorPool_instance = nullptr;
+
+void QnRestProcessorPool::initStaticInstance( QnRestProcessorPool* _instance )
+{
+    QnRestProcessorPool_instance = _instance;
+}
+
+QnRestProcessorPool* QnRestProcessorPool::instance()
+{
+    return QnRestProcessorPool_instance;
+}
+
 
 class QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
@@ -86,10 +129,9 @@ void QnRestConnectionProcessor::run()
     QUrl url = getDecodedUrl();
     QString path = url.path();
     QList<QPair<QString, QString> > params = QUrlQuery(url.query()).queryItems();
-#ifdef USE_NX_HTTP
     int rez = CODE_OK;
     QByteArray contentType = "application/xml";
-    QnRestRequestHandlerPtr handler = findHandler(url.path());
+    QnRestRequestHandlerPtr handler = QnRestProcessorPool::instance()->findHandler(url.path());
     if (handler) 
     {
         if (d->request.requestLine.method.toUpper() == "GET") {
@@ -98,22 +140,8 @@ void QnRestConnectionProcessor::run()
         else if (d->request.requestLine.method.toUpper() == "POST") {
             rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody, contentType);
         }
-#else
-    {
-        QList<QPair<QString, QString> > params = url.queryItems();
-        if (d->requestHeaders.method().toUpper() == QLatin1String("GET")) {
-            rez = handler->executeGet(url.path(), params, d->responseBody, contentType);
-        }
-        else if (d->requestHeaders.method().toUpper() == QLatin1String("POST")) {
-            rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody, contentType);
-        }
-#endif
         else {
-#ifdef USE_NX_HTTP
             qWarning() << "Unknown REST method " << d->request.requestLine.method;
-#else
-            qWarning() << "Unknown REST method " << d->requestHeaders.method();
-#endif
             contentType = "text/plain";
             d->responseBody = "Invalid HTTP method";
             rez = CODE_NOT_FOUND;
@@ -131,7 +159,10 @@ void QnRestConnectionProcessor::run()
         d->responseBody.append("<body>\n");
 
         d->responseBody.append("<TABLE BORDER=\"1\" CELLSPACING=\"0\">\n");
-        for(Handlers::const_iterator itr = m_handlers.begin(); itr != m_handlers.end(); ++itr)
+        for( QnRestProcessorPool::Handlers::const_iterator
+            itr = QnRestProcessorPool::instance()->handlers().begin();
+            itr != QnRestProcessorPool::instance()->handlers().end();
+            ++itr)
         {
             QString str = itr.key();
             if (str.startsWith(QLatin1String("api/")))
@@ -151,36 +182,9 @@ void QnRestConnectionProcessor::run()
         rez = CODE_NOT_FOUND;
     }
     QByteArray contentEncoding;
-#ifdef USE_NX_HTTP
     if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->responseBody.isEmpty()) {
-#else
-    if (d->requestHeaders.value(QLatin1String("Accept-Encoding")).toLower().contains(QLatin1String("gzip")) && !d->responseBody.isEmpty()) {
-#endif
         d->responseBody = compressData(d->responseBody);
         contentEncoding = "gzip";
     }
     sendResponse("HTTP", rez, contentType, contentEncoding, false);
-}
-
-void QnRestConnectionProcessor::registerHandler(const QString& path, QnRestRequestHandler* handler)
-{
-    m_handlers.insert(path, QnRestRequestHandlerPtr(handler));
-    handler->setPath(path);
-}
-
-QnRestRequestHandlerPtr QnRestConnectionProcessor::findHandler(QString path)
-{
-    if (path.startsWith(L'/'))
-        path = path.mid(1);
-    if (path.endsWith(L'/'))
-        path = path.left(path.length()-1);
-
-    for (Handlers::iterator i = m_handlers.begin();i != m_handlers.end(); ++i)
-    {
-        QRegExp expr(i.key(), Qt::CaseSensitive, QRegExp::Wildcard);
-        if (expr.indexIn(path) != -1)
-            return i.value();
-    }
-
-    return QnRestRequestHandlerPtr();
 }

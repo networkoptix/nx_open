@@ -17,6 +17,11 @@ QnMacAddress::QnMacAddress(const QLatin1String &mac) {
     init(mac);
 }
 
+QnMacAddress::QnMacAddress(const QByteArray &mac)
+{
+    init(QLatin1String(mac));
+}
+
 QnMacAddress::QnMacAddress(const QString &mac) {
     init(mac);
 }

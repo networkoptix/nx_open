@@ -3,7 +3,7 @@
 RETVAL=0
 
 SERVICE_NAME=mediaserver
-CUSTOMIZATION=networkoptix
+CUSTOMIZATION=${customization}
 PREFIX=/usr/local/apps/$CUSTOMIZATION/mediaserver/
 BIN_NAME=mediaserver
 BIN_PATH=$PREFIX/bin/$BIN_NAME
@@ -12,6 +12,13 @@ export LD_LIBRARY_PATH=$PREFIX/lib
 export VMS_PLUGIN_DIR=$PREFIX/plugins
 
 start() {
+    SERVICE_PID="`/bin/pidof $BIN_NAME`"
+    if [ ! -z "$SERVICE_PID" ]
+    then
+       echo "$SERVICE_NAME is already running with pid $SERVICE_PID"
+       exit 0
+    fi
+
     echo -n "Starting $BIN_NAME..... "
     $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf --log-level=none 2>/dev/null 1>&2&
     if [ `/bin/pidof $BIN_NAME` ]
@@ -53,8 +60,10 @@ case "$1" in
         if [ ! -z $SERVICE_PID ]
         then
             echo "$SERVICE_NAME is running with pid $SERVICE_PID"
+            exit 0
         else
             echo "$SERVICE_NAME is stopped"
+            exit 1
         fi
         ;;
     server_status)

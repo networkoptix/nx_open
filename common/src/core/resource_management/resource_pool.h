@@ -48,8 +48,10 @@ public:
     // keeps database ID ( if possible )
     void addResources(const QnResourceList &resources);
 
-    inline void addResource(const QnResourcePtr &resource)
-    { addResources(QnResourceList() << resource); }
+    void addResource(const QnResourcePtr &resource);
+
+    void beginTran();
+    void commit();
 
     void removeResources(const QnResourceList &resources);
     inline void removeResource(const QnResourcePtr &resource)
@@ -57,8 +59,8 @@ public:
 
     QnResourceList getResources() const;
 
-    QnResourcePtr getResourceById(QnId id, Filter searchFilter = OnlyFriends) const;
-    QnResourcePtr getResourceByGuid(QString guid) const;
+    QnResourcePtr getResourceById(QnId id) const;
+    QnResourcePtr getResourceByGuid(const QUuid& guid) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
     void updateUniqId(QnResourcePtr res, const QString &newUniqId);
@@ -76,7 +78,8 @@ public:
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
     QnNetworkResourcePtr getEnabledResourceByPhysicalId(const QString &mac) const;
-    QnResourceList getAllEnabledCameras(QnResourcePtr mServer = QnResourcePtr()) const;
+    QnResourceList getAllEnabledCameras(QnResourcePtr mServer = QnResourcePtr(), Filter searchFilter = OnlyFriends) const;
+    QnResourceList getResourcesByParentId(const QnId& parentId) const;
     QnResourcePtr getEnabledResourceByUniqueId(const QString &uniqueId) const;
 
     // returns list of resources with such flag
@@ -117,12 +120,9 @@ signals:
 private:
     mutable QMutex m_resourcesMtx;
     bool m_updateLayouts;
+    bool m_tranInProgress;
+    QnResourceList m_tmpResources;
     QHash<QString, QnResourcePtr> m_resources;
-    //!Resources with flag \a QnResource::foreign set
-    /*!
-        Using separate dictionary to minimize existing code modification
-    */
-    QHash<QString, QnResourcePtr> m_foreignResources;
 
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource

@@ -35,7 +35,6 @@ namespace {
 QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_id(0),
     m_modified(false),
     m_eventType(BusinessEventType::Camera_Disconnect),
     m_eventState(Qn::UndefinedState),
@@ -48,7 +47,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     m_actionTypesModel(new QStandardItemModel(this))
 {
 
-    for (int i = 0; i < BusinessEventType::Count; i++) {
+    for (int i = 1; i < BusinessEventType::Count; i++) {
         BusinessEventType::Value val = (BusinessEventType::Value)i;
 
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::eventName(val));
@@ -70,8 +69,10 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         m_eventStatesModel->appendRow(row);
     }
 
-    for (int i = 0; i < BusinessActionType::Count; i++) {
+    for (int i = 1; i < BusinessActionType::Count; i++) {
         BusinessActionType::Value val = (BusinessActionType::Value)i;
+        if (BusinessActionType::isNotImplemented(val))
+            continue;
 
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
         item->setData(val);
@@ -257,7 +258,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
     m_eventType = businessRule->eventType();
 
     m_eventResources.clear();
-    m_eventResources.append(businessRule->eventResources());
+    m_eventResources.append(businessRule->eventResourceObjects());
 
     m_eventParams = businessRule->eventParams();
 
@@ -266,7 +267,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
     m_actionType = businessRule->actionType();
 
     m_actionResources.clear();
-    m_actionResources.append(businessRule->actionResources());
+    m_actionResources.append(businessRule->actionResourceObjects());
 
     m_actionParams = businessRule->actionParams();
 
@@ -282,25 +283,34 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
     emit dataChanged(this, QnBusiness::AllFieldsMask);
 }
 
+static QVector<QnId> toIdList(const QnResourceList& list)
+{
+    QVector<QnId> result;
+    result.resize(list.size());
+    for (int i = 0; i < list.size(); ++i)
+        result << list[i]->getId();
+    return result;
+}
+
 QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
     QnBusinessEventRulePtr rule(new QnBusinessEventRule());
     rule->setId(m_id);
     rule->setEventType(m_eventType);
     if (BusinessEventType::requiresCameraResource(m_eventType))
-        rule->setEventResources(m_eventResources.filtered<QnVirtualCameraResource>());
+        rule->setEventResources(toIdList(m_eventResources.filtered<QnVirtualCameraResource>()));
     else if (BusinessEventType::requiresServerResource(m_eventType))
-        rule->setEventResources(m_eventResources.filtered<QnMediaServerResource>());
+        rule->setEventResources(toIdList(m_eventResources.filtered<QnMediaServerResource>()));
     else
-        rule->setEventResources(QnResourceList());
+        rule->setEventResources(QVector<QnId>());
     rule->setEventState(m_eventState);   //TODO: #GDM check
     rule->setEventParams(m_eventParams); //TODO: #GDM filtered
     rule->setActionType(m_actionType);
     if (BusinessActionType::requiresCameraResource(m_actionType))
-        rule->setActionResources(m_actionResources.filtered<QnVirtualCameraResource>());
+        rule->setActionResources(toIdList(m_actionResources.filtered<QnVirtualCameraResource>()));
     else if (BusinessActionType::requiresUserResource(m_actionType))
-        rule->setActionResources(m_actionResources.filtered<QnUserResource>());
+        rule->setActionResources(toIdList(m_actionResources.filtered<QnUserResource>()));
     else
-        rule->setActionResources(QnResourceList());
+        rule->setActionResources(QVector<QnId>());
     rule->setActionParams(m_actionParams); //TODO: #GDM filtered
     rule->setAggregationPeriod(m_aggregationPeriod);
     rule->setDisabled(m_disabled);
@@ -312,7 +322,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
 // setters and getters
 
 
-int QnBusinessRuleViewModel::id() const {
+QnId QnBusinessRuleViewModel::id() const {
     return m_id;
 }
 

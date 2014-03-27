@@ -6,6 +6,7 @@
 #include <QtGui/QImage>
 
 #include <core/resource/resource_fwd.h>
+#include "utils/common/id.h"
 
 class QnCameraThumbnailManager : public QObject
 {
@@ -17,14 +18,14 @@ public:
     void selectResource(const QnResourcePtr &resource);
     void setThumbnailSize(const QSize &size);
 signals:
-    void thumbnailReady(int resourceId, const QPixmap& thumbnail);
+    void thumbnailReady(QnId resourceId, const QPixmap& thumbnail);
 
 private slots:
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
     void at_thumbnailReceived(int status, const QImage& thumbnail, int handle);
 
 private:
-    Q_SIGNAL void thumbnailReadyDelayed(int resourceId, const QPixmap& thumbnail);
+    Q_SIGNAL void thumbnailReadyDelayed(QnId resourceId, const QPixmap& thumbnail);
     int loadThumbnailForResource(const QnResourcePtr &resource);
     void forceRefreshThumbnails();
 

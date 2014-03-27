@@ -21,7 +21,6 @@
 #include <utils/common/enum_name_mapper.h>
 
 #include <api/serializer/serializer.h>
-#include <api/serializer/pb_serializer.h>
 #include <event_log/events_serializer.h>
 
 #include "session_manager.h"
@@ -401,7 +400,7 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     setNameMapper(new QnEnumNameMapper(QnEnumNameMapper::create<RequestObject>())); // TODO: #Elric no new
 
     QnRequestHeaderList extraHeaders;
-    extraHeaders << QnRequestHeader(lit("x-server-guid"), mserver->getGuid());
+    extraHeaders << QnRequestHeader(lit("x-server-guid"), mserver->getGuid().toString());
     setExtraHeaders(extraHeaders);
 }
 
@@ -760,8 +759,8 @@ int QnMediaServerConnection::getEventLogAsync(
         if (camera)
             params << QnRequestParam( "res_id", camera->getPhysicalId() );
     }
-    if (businessRuleId.isValid())
-        params << QnRequestParam( "brule_id", businessRuleId.toInt() );
+    if (!businessRuleId.isNull())
+        params << QnRequestParam( "brule_id", businessRuleId );
     if (eventType != BusinessEventType::NotDefined)
         params << QnRequestParam( "event", (int) eventType);
     if (actionType != BusinessActionType::NotDefined)

@@ -4,7 +4,7 @@
 #include "pulse_resource.h"
 
 
-const char* QnPlPulseResource::MANUFACTURE = "Pulse";
+const QString QnPlPulseResource::MANUFACTURE(lit("Pulse"));
 
 
 QnPlPulseResource::QnPlPulseResource()
@@ -20,7 +20,7 @@ bool QnPlPulseResource::isResourceAccessible()
 
 QString QnPlPulseResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnPlPulseResource::setIframeDistance(int /*frames*/, int /*timems*/)

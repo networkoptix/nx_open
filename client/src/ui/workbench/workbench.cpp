@@ -292,7 +292,7 @@ void QnWorkbench::submit(QnWorkbenchState &state) {
     state.currentLayoutIndex = currentLayoutIndex();
     foreach(QnWorkbenchLayout *layout, m_layouts)
         if(layout->resource())
-            state.layoutUuids.push_back(layout->resource()->getGuid());
+            state.layoutUuids.push_back(layout->resource()->getGuid().toString());
 }
 
 

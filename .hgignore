@@ -67,6 +67,8 @@ appserver/setup/build
 appserver/version_maven.py
 appserver/version.py
 
+appserver2/arm
+
 applauncher/bin
 applauncher/build
 applauncher/src/Info.plist
@@ -269,7 +271,13 @@ nx_sdk/nx_sdk
 
 libonvif/.build/
 
+plugins/*/arm
+debsetup/*/arm
+edge_firmware/isd/*.tar.gz
+
 .vagrant
 **/Makefile
+
 android-client/android-main/AndroidManifest.xml
 android-client/android-main/res/**
+

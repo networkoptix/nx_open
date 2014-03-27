@@ -6,8 +6,6 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
 
-#include <licensing/license.h>
-
 class QnClientMessageProcessor : public QnCommonMessageProcessor
 {
     Q_OBJECT
@@ -15,28 +13,21 @@ class QnClientMessageProcessor : public QnCommonMessageProcessor
     typedef QnCommonMessageProcessor base_type;
 public:
     QnClientMessageProcessor();
-
-    virtual void run() override;
+    virtual void init(ec2::AbstractECConnectionPtr connection) override;
 protected:
-    virtual void loadRuntimeInfo(const QnMessage &message) override;
-    virtual void handleConnectionOpened(const QnMessage &message) override;
-    virtual void handleMessage(const QnMessage &message) override;
-
+    virtual void onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status) override;
+    virtual void updateResource(QnResourcePtr resource) override;
+    virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
+    virtual void processResources(const QnResourceList& resources) override;
+private:
+    bool m_opened;
 private slots:
-
-    void at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url, const QString& origApiUrl);
-
+    void at_remotePeerFound(QnId id, bool isClient, bool isProxy);
+    void at_remotePeerLost(QnId id, bool isClient, bool isProxy);
 private:
-    void init();
     void determineOptimalIF(const QnMediaServerResourcePtr &resource);
-    bool updateResource(QnResourcePtr resource, bool insert, bool updateLayouts);
-    void processResources(const QnResourceList& resources);
-    void processLicenses(const QnLicenseList& licenses);
-    void processCameraServerItems(const QnCameraHistoryList& cameraHistoryList);
-    void updateHardwareIds(const QnMessage& message);
-
-private:
-    quint32 m_seqNumber;
+    void updateServerTmpStatus(const QnId& id, QnResource::Status status);
+    void checkForTmpStatus(QnResourcePtr resource);
 };
 
 #endif // _client_event_manager_h

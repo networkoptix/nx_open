@@ -109,8 +109,6 @@ mac {
 }
 
 win32 {
-    LIBS += -llibprotobuf
-
     # Define QN_EXPORT only if common build is not static
     isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }
     !isEmpty(BUILDLIB) { DEFINES += QN_EXPORT= }
@@ -122,12 +120,8 @@ unix {
   DEFINES += QN_EXPORT=
 }
 
-mac {
-    LIBS += -lprotobuf
-}
-
 unix:!mac {
-    LIBS += -lprotobuf -lopenal
+    LIBS += -lopenal
 }
 
 DEFINES += __STDC_CONSTANT_MACROS

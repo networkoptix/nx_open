@@ -43,7 +43,7 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
 
     QnResourceList result;
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("SERVER_DESKTOP_CAMERA"));
-    if (!rt.isValid())
+    if (rt.isNull())
         return result;
 
     QMutexLocker lock(&m_mutex);
@@ -63,7 +63,7 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
     return result;
 }
 
-QnResourcePtr QnDesktopCameraResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnDesktopCameraResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -84,8 +84,8 @@ QnResourcePtr QnDesktopCameraResourceSearcher::createResource(QnId resourceTypeI
     result = QnVirtualCameraResourcePtr( new QnDesktopCameraResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Desktop camera resource. TypeID" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create Desktop camera resource. TypeID" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
     return result;
 }
 

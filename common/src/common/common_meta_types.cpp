@@ -17,7 +17,6 @@
 #include <api/model/servers_reply.h>
 #include <api/model/kvpair.h>
 #include <api/model/connection_info.h>
-#include <api/message.h>
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
@@ -38,6 +37,7 @@
 
 #include <business/actions/abstract_business_action.h>
 #include <business/events/abstract_business_event.h>
+#include <business/business_event_rule.h>
 #include <business/business_fwd.h>
 
 #include <licensing/license.h>
@@ -58,6 +58,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnConnectionInfoPtr>();
 
     qRegisterMetaType<QUuid>();
+    qRegisterMetaType<QnId>("QnId");
     qRegisterMetaType<QHostAddress>();
     qRegisterMetaType<QAuthenticator>();
     qRegisterMetaType<Qt::ConnectionType>();
@@ -82,11 +83,15 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnLayoutResourcePtr>();
     qRegisterMetaType<QnMediaServerResourcePtr>();
     qRegisterMetaType<QnVirtualCameraResourcePtr>();
+    qRegisterMetaType<QnVirtualCameraResourceList>();
     qRegisterMetaType<QnSecurityCamResourcePtr>();
     qRegisterMetaType<QnAbstractStorageResourcePtr>();
 
+    qRegisterMetaType<QnUserResourceList>();
+
     qRegisterMetaType<QnCameraHistoryList>();
 
+    qRegisterMetaType<QnLicensePtr>();
     qRegisterMetaType<QnLicenseList>();
 
     qRegisterMetaType<QnLayoutItemData>();
@@ -98,8 +103,6 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnRequestHeaderList>("QnRequestHeaderList"); /* The underlying type is identical to QnRequestParamList. */
     qRegisterMetaType<QnReplyHeaderList>();
     qRegisterMetaType<QnHTTPRawResponse>();
-
-    qRegisterMetaType<QnMessage>();
 
     qRegisterMetaType<Qn::TimePeriodContent>();
     qRegisterMetaType<QnTimePeriodList>();
@@ -152,6 +155,9 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<Qn::Corner>();
     qRegisterMetaTypeStreamOperators<Qn::Corner>();
+
+    qRegisterMetaType<QnConnectionInfo>();
+    qRegisterMetaType<Qn::PanicMode>();
 
     QnJsonSerializer::registerSerializer<QUuid>();
 

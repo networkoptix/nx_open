@@ -8,7 +8,6 @@ QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControlle
     m_asynchronous(baseController->hasCapabilities(Qn::AsynchronousPtzCapability))
 {
     m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(lit("ptzActiveObject"), QnPtzObject(), this);
-    m_adaptor->setValue(QnPtzObject());
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });
 
     /* Adaptor is thread-safe and works even without resource, 
