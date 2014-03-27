@@ -1050,6 +1050,9 @@ namespace Qn {
         /** Action can appear in scene context menu. */
         Scene                   = SceneScope | WidgetTarget,
 
+        /** Action can appear in scene context menu in videowall review mode (target elements are not resource widgets). */
+        VideoWallReviewScene    = SceneScope,
+
         /** Action can appear in tree context menu. */
         Tree                    = TreeScope,
 

@@ -442,12 +442,12 @@ QnActionManager::QnActionManager(QObject *parent):
 
     //TODO: #GDM VW check permissions
     factory(Qn::StartVideoWallControlAction).
-        flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
+        flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         text(tr("Start Videowall control"));
 
-    //TODO: #GDM VW check permissions and destop camera availability
+    //TODO: #GDM VW check permissions and desktop camera availability
     factory(Qn::PushMyScreenToVideowallAction).
-        flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
+        flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         text(tr("Push my screen"));
 
     factory(Qn::QueueAppRestartAction).
