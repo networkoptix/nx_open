@@ -33,9 +33,6 @@ private:
     int m_vertexOffset, m_colorOffset, m_vertexCount;
     int m_sectorCount;
     //QSharedPointer<QnColorShaderProgram> m_shader;
-
-    std::vector<float> m_vertexStream;
-    std::vector<float> m_colorStream;
 };
 
 #endif // QN_LOADING_PROGRESS_PAINTER_H

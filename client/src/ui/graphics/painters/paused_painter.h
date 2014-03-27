@@ -23,9 +23,6 @@ private:
     bool m_initialized;
     GLuint m_buffer;
     int m_vertexOffset, m_colorOffset, m_vertexCount;
-
-    std::vector<float> m_vertexStream;
-    std::vector<float> m_colorStream;
 };
 
 #endif // QN_PAUSED_PAINTER_H

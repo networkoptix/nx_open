@@ -362,17 +362,14 @@ public:
             size_t fillSize = qMax(textureSize.height(), textureSize.width()) * ROUND_COEFF * internalFormatPixelSize * 16;
             uchar *filler = m_renderer->filler(fillValue, fillSize);
 
+            GLint textureWidth = 0;
+            //                glGetTexLevelParameteriv( GL_TEXTURE_2D, 0,  GL_TEXTURE_WIDTH, &textureWidth );
+            GLint textureHeight = 0;
+            //                glGetTexLevelParameteriv( GL_TEXTURE_2D, 0,  GL_TEXTURE_HEIGHT, &textureHeight );
+            //Q_ASSERT( textureSize == QSize(textureWidth, textureHeight) );
+
+            glBindTexture(GL_TEXTURE_2D, m_id);
             if (roundedWidth < textureSize.width()) {
-                glBindTexture(GL_TEXTURE_2D, m_id);
-
-                GLint textureWidth = 0;
-//                glGetTexLevelParameteriv( GL_TEXTURE_2D, 0,  GL_TEXTURE_WIDTH, &textureWidth );
-                GLint textureHeight = 0;
-//                glGetTexLevelParameteriv( GL_TEXTURE_2D, 0,  GL_TEXTURE_HEIGHT, &textureHeight );
-                //Q_ASSERT( textureSize == QSize(textureWidth, textureHeight) );
-                
-
-
                 glTexSubImage2D(
                     GL_TEXTURE_2D, 
                     0,
@@ -384,11 +381,8 @@ public:
                     GL_UNSIGNED_BYTE, 
                     filler );
                 bitrateCalculator.bytesProcessed( qMin(ROUND_COEFF, textureSize.width() - roundedWidth)*textureSize.height()*internalFormatPixelSize );
-                glCheckError("glTexSubImage2D");
             }
-
             if (height < textureSize.height()) {
-                glBindTexture(GL_TEXTURE_2D, m_id);
                 glTexSubImage2D(
                     GL_TEXTURE_2D, 
                     0,
@@ -399,9 +393,9 @@ public:
                     internalFormat, 
                     GL_UNSIGNED_BYTE, 
                     filler );
-                bitrateCalculator.bytesProcessed( textureSize.width()*qMin(ROUND_COEFF, textureSize.height() - height)*4 );
-                glCheckError("glTexSubImage2D");
+                bitrateCalculator.bytesProcessed( textureSize.width()*qMin(ROUND_COEFF, textureSize.height() - height)*internalFormatPixelSize );
             }
+            glCheckError("glTexSubImage2D");
         }
 
         return result;
