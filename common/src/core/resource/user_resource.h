@@ -44,6 +44,7 @@ public:
 
 signals:
     void emailChanged(const QnUserResourcePtr &user);
+    void permissionsChanged(const QnUserResourcePtr &user);
 
     void videoWallItemAdded(const QnUserResourcePtr &user, const QUuid &uuid);
     void videoWallItemRemoved(const QnUserResourcePtr &user, const QUuid &uuid);

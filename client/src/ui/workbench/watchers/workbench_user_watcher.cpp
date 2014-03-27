@@ -1,13 +1,17 @@
 #include "workbench_user_watcher.h"
 
+#include <client/client_settings.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <ui/actions/action_manager.h>
+
 QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent)
 {
     connect(resourcePool(), &QnResourcePool::resourceAdded,     this,   &QnWorkbenchUserWatcher::at_resourcePool_resourceAdded);
@@ -25,7 +29,17 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
     if(m_user == user)
         return;
 
+    if (m_user)
+        disconnect(m_user, NULL, this, NULL);
+
     m_user = user;
+    m_userPasswordHash = user ? user->getHash() : QString();
+
+    if (m_user) {
+        connect(m_user, &QnResource::resourceChanged, this, &QnWorkbenchUserWatcher::at_user_resourceChanged);
+        connect(m_user, &QnUserResource::permissionsChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
+    }
+
 
     emit userChanged(user);
 }
@@ -76,3 +90,18 @@ void QnWorkbenchUserWatcher::at_resource_nameChanged(const QnResourcePtr &resour
     }
 }
 
+void QnWorkbenchUserWatcher::at_user_resourceChanged(const QnResourcePtr &resource) {
+    if (m_user->getName() == m_userName && m_user->getHash() == m_userPasswordHash)
+        return; // looks like nothing important has changed
+
+    //TODO: #Elric #TR add message box on next step of translations generating
+    menu()->trigger(Qn::DisconnectAction,
+        QnActionParameters().withArgument(Qn::ForceRole, true));
+    menu()->trigger(Qn::ConnectToServerAction);
+
+}
+
+void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnUserResourcePtr &user) {
+    Q_UNUSED(user)
+    menu()->trigger(Qn::ReconnectAction);
+}

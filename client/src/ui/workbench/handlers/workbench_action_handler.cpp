@@ -947,7 +947,8 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
         }
         if (!resources.isEmpty()) {
             parameters.setResources(resources);
-            parameters.setArgument(Qn::ItemTimeRole, navigator()->timeSlider()->sliderPosition());
+            if (!parameters.hasArgument(Qn::ItemTimeRole))  // TODO: #dklychkov be careful with existing parameters overwriting, @see bug #3112
+                parameters.setArgument(Qn::ItemTimeRole, navigator()->timeSlider()->sliderPosition());
             menu()->trigger(Qn::OpenInLayoutAction, parameters);
         }
     } else {
@@ -1566,7 +1567,13 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
-    if(context()->user() && !context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true))
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    bool force = parameters.hasArgument(Qn::ForceRole)
+        ? parameters.argument(Qn::ForceRole).toBool()
+        : false;
+
+    //closeAllLayouts should return true in case of force disconnect
+    if( context()->user() && !context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true, force)) 
         return;
 
     // TODO: #GDM Factor out common code from reconnect/disconnect/login actions.

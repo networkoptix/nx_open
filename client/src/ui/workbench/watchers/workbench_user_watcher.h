@@ -7,6 +7,8 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <utils/common/connective.h>
+
 /**
  * This class can be used for watching the resource pool for a user resource
  * that has a specific name.
@@ -15,8 +17,10 @@
  * is emitted. If its name changes, or if it is deleted from the pool,
  * <tt>userChanged</tt> signal will be emitted again, passing a null resource.
  */
-class QnWorkbenchUserWatcher: public QObject, public QnWorkbenchContextAware {
-    Q_OBJECT;
+class QnWorkbenchUserWatcher: public Connective<QObject>, public QnWorkbenchContextAware {
+    Q_OBJECT
+
+    typedef Connective<QObject> base_type;
 public:
     QnWorkbenchUserWatcher(QObject *parent = NULL);
 
@@ -40,12 +44,15 @@ private slots:
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_resource_nameChanged(const QnResourcePtr &resource);
 
+    void at_user_resourceChanged(const QnResourcePtr &resource);
+    void at_user_permissionsChanged(const QnUserResourcePtr &user);
 private:
     void setCurrentUser(const QnUserResourcePtr &currentUser);
 
 private:
     QnUserResourceList m_users;
     QString m_userName;
+    QString m_userPasswordHash;
     QnUserResourcePtr m_user;
 };
 

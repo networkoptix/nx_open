@@ -903,11 +903,13 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         result &= ~PtzButton;
     }
 
-    if(item()
-            && item()->layout()
-            && accessController()->hasPermissions(item()->layout()->resource(), Qn::WritePermission | Qn::AddRemoveItemsPermission)
-            )
-        result |= ZoomWindowButton;
+    if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows)) {
+        if(item()
+                && item()->layout()
+                && accessController()->hasPermissions(item()->layout()->resource(), Qn::WritePermission | Qn::AddRemoveItemsPermission)
+                )
+            result |= ZoomWindowButton;
+    }
 
     return result;
 }

@@ -630,14 +630,18 @@ QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDevic
 void QnServerResourceWidget::updateLegend() {
     QHash<QnStatisticsDeviceType, int> indexes;
 
-    foreach (QString key, m_sortedKeys) {
+    QSet<QString> disabledGraphs;
+    if (item())
+        disabledGraphs = item()->data<QSet<QString> >(Qn::ItemServerDisabledGraphsRole);
+
+    foreach (const QString &key, m_sortedKeys) {
         QnStatisticsData &stats = m_history[key];
 
         if (!m_graphDataByKey.contains(key)) {
             GraphData &data = m_graphDataByKey[key];
             data.bar = m_legendButtonBar[buttonBarByDeviceType(stats.deviceType)];
             data.mask = data.bar->unusedMask();
-            data.visible = true;
+            data.visible = !disabledGraphs.contains(key);
             data.color = getColor(stats.deviceType, indexes[stats.deviceType]++);
 
             LegendButtonWidget* newButton = new LegendButtonWidget(key, data.color);
@@ -686,11 +690,19 @@ void QnServerResourceWidget::updateLegend() {
 }
 
 void QnServerResourceWidget::updateGraphVisibility() {
+    QSet<QString> disabledGraphs;
+
     for(QHash<QString, GraphData>::iterator pos = m_graphDataByKey.begin(); pos != m_graphDataByKey.end(); pos++) {
         GraphData &data = *pos;
 
         data.visible = data.bar->checkedButtons() & data.mask;
+
+        if (!data.visible)
+            disabledGraphs.insert(pos.key());
     }
+
+    if (item())
+        item()->setData(Qn::ItemServerDisabledGraphsRole, disabledGraphs);
 }
 
 void QnServerResourceWidget::updateInfoOpacity() {

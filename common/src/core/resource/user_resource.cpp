@@ -54,10 +54,15 @@ quint64 QnUserResource::getPermissions() const
     return m_permissions;
 }
 
-void QnUserResource::setPermissions(quint64 rights)
+void QnUserResource::setPermissions(quint64 permissions)
 {
-    QMutexLocker locker(&m_mutex);
-    m_permissions = rights;
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_permissions == permissions)
+            return;
+        m_permissions = permissions;
+    }
+    emit permissionsChanged(::toSharedPointer(this));
 }
 
 bool QnUserResource::isAdmin() const
