@@ -6,4 +6,4 @@
         QnId id;
     };
 
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiIdData, (id) )
+    QN_DEFINE_STRUCT_SERIALIZATORS(ApiIdData, (id))
