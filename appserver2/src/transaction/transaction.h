@@ -53,12 +53,12 @@ namespace ec2
             addCameraHistoryItem,
 
             getMediaServerList,
-            //!ApiMediaServerData
+            //!ApiMediaServer
             saveMediaServer,
             //!ApiIdData
             removeMediaServer,
 
-            //!ApiUserData
+            //!ApiUser
             saveUser,
             getUserList,
             //!ApiIdData
@@ -76,11 +76,11 @@ namespace ec2
             //!ApiResetBusinessRuleData
             resetBusinessRules,
 
-            //!ApiLayoutData
+            //!ApiLayout
             saveLayouts,
-            //!ApiLayoutDataList
+            //!ApiLayoutList
             saveLayout,
-            //!ApiLayoutDataList
+            //!ApiLayoutList
             getLayoutList,
             //!ApiIdData
             removeLayout,

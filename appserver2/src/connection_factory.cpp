@@ -86,9 +86,9 @@ namespace ec2
 
 
         //AbstractMediaServerManager::getServers
-        registerGetFuncHandler<nullptr_t, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServerList );
+        registerGetFuncHandler<nullptr_t, ApiMediaServerList>( restProcessorPool, ApiCommand::getMediaServerList );
         //AbstractMediaServerManager::save
-        registerUpdateFuncHandler<ApiMediaServerData>( restProcessorPool, ApiCommand::saveMediaServer );
+        registerUpdateFuncHandler<ApiMediaServer>( restProcessorPool, ApiCommand::saveMediaServer );
         //AbstractMediaServerManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeMediaServer );
 
@@ -124,17 +124,17 @@ namespace ec2
 
 
         //AbstractUserManager::getUsers
-        registerGetFuncHandler<nullptr_t, ApiUserDataList>( restProcessorPool, ApiCommand::getUserList );
+        registerGetFuncHandler<nullptr_t, ApiUserList>( restProcessorPool, ApiCommand::getUserList );
         //AbstractUserManager::save
-        registerUpdateFuncHandler<ApiUserData>( restProcessorPool, ApiCommand::saveUser );
+        registerUpdateFuncHandler<ApiUser>( restProcessorPool, ApiCommand::saveUser );
         //AbstractUserManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeUser );
 
 
         //AbstractLayoutManager::getLayouts
-        registerGetFuncHandler<nullptr_t, ApiLayoutDataList>( restProcessorPool, ApiCommand::getLayoutList );
+        registerGetFuncHandler<nullptr_t, ApiLayoutList>( restProcessorPool, ApiCommand::getLayoutList );
         //AbstractLayoutManager::save
-        registerUpdateFuncHandler<ApiLayoutDataList>( restProcessorPool, ApiCommand::saveLayouts );
+        registerUpdateFuncHandler<ApiLayoutList>( restProcessorPool, ApiCommand::saveLayouts );
         //AbstractLayoutManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeLayout );
 

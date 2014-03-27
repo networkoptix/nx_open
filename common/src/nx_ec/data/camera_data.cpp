@@ -69,6 +69,7 @@ void ApiCamera::toResource(QnVirtualCameraResourcePtr resource) const
 	resource->setVendor(vendor);
 }
 
+
 void ApiCamera::fromResource(const QnVirtualCameraResourcePtr& resource)
 {
     ApiResource::fromResource(resource);

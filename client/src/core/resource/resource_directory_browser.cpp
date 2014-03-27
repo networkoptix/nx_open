@@ -129,14 +129,14 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     delete layoutFile;
     
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    ec2::ApiLayoutData apiLayout;
+    ec2::ApiLayout apiLayout;
     InputBinaryStream<QByteArray> stream(layoutData);
     if (deserialize(apiLayout, &stream))
         apiLayout.toResource(layout);
     else
         return QnLayoutResourcePtr();
     QnLayoutItemDataList orderedItems;
-    foreach(const ec2::ApiLayoutItemData& item, apiLayout.items) {
+    foreach(const ec2::ApiLayoutItem& item, apiLayout.items) {
         orderedItems << QnLayoutItemData();
         item.toResource(orderedItems.last());
     }

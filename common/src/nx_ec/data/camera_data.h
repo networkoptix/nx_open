@@ -11,6 +11,8 @@
 
 namespace ec2
 {
+    struct ScheduleTask;
+    typedef std::vector<ScheduleTask> ScheduleTaskVector;
     #include "camera_data_i.h"
 
     struct ScheduleTask: ScheduleTaskData
@@ -20,50 +22,25 @@ namespace ec2
 
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
+
     QN_DEFINE_STRUCT_SQL_BINDER(ScheduleTask, apiScheduleTaskFields);
 
-    struct ScheduleTaskWithRef: public ScheduleTask
+    struct ScheduleTaskWithRef: ScheduleTask
     {
         QnId sourceId;
     };
 
-
-    struct ApiCamera: public ApiResource 
+    struct ApiCamera: ApiCameraData, ApiResource
     {
-        ApiCamera(): scheduleDisabled(false), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryQuality(Qn::SSQualityNotDefined),
-                         controlDisabled(false), statusFlags(0) {}
-
-        bool                scheduleDisabled;
-        Qn::MotionType      motionType;
-        QByteArray          region;
-        QByteArray          mac;
-        QString             login;
-        QString             password;
-        std::vector<ScheduleTask> scheduleTask;
-        bool                audioEnabled;
-        QString             physicalId;
-        bool                manuallyAdded;
-        QString             model;
-        QString             firmware;
-        QString             groupId;
-        QString             groupName;
-        Qn::SecondStreamQuality    secondaryQuality;
-        bool                controlDisabled;
-        qint32              statusFlags;
-        QByteArray          dewarpingParams;
-        QString             vendor;
-
         void fromResource(const QnVirtualCameraResourcePtr& resource);
         void toResource(QnVirtualCameraResourcePtr resource) const;
+
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define apiCameraDataFields (scheduleDisabled) (motionType) (region) (mac) (login) (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) \
-                                (firmware) (groupId) (groupName) (secondaryQuality) (controlDisabled) (statusFlags) (dewarpingParams) (vendor)
-    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ApiCamera, ec2::ApiResource, apiCameraDataFields)
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiCamera, apiCameraDataFields);
 
-
-    struct ApiCameraList: public ApiData
+    struct ApiCameraList: ApiData
     {
         std::vector<ApiCamera> data;
     

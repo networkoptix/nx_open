@@ -49,8 +49,8 @@ namespace ec2
             return saveMultiTransaction<ApiLicenseList, ApiLicense>(multiTran);
         }
 
-        ErrorCode saveTransaction(const QnTransaction<ApiLayoutDataList>& multiTran, const QByteArray& /*serializedTran*/) {
-            return saveMultiTransaction<ApiLayoutDataList, ApiLayoutData>(multiTran);
+        ErrorCode saveTransaction(const QnTransaction<ApiLayoutList>& multiTran, const QByteArray& /*serializedTran*/) {
+            return saveMultiTransaction<ApiLayoutList, ApiLayout>(multiTran);
         }
 
         ErrorCode saveTransaction(const QnTransaction<ApiCameraList>& multiTran, const QByteArray& /*serializedTran*/) {
@@ -74,9 +74,9 @@ namespace ec2
         QUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
 
         QUuid transactionHash(const QnTransaction<ApiCamera>& tran)              { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiMediaServerData>& tran)         { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiUserData>& tran)                { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiLayoutData>& tran)              { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiMediaServer>& tran)         { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiUser>& tran)                { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiLayout>& tran)              { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiBusinessRuleData>& tran)        { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiIdData>& tran)                  { return makeHash(tran.params.id.toRfc4122(), "ApiIdData"); }
         QUuid transactionHash(const QnTransaction<ApiSetResourceDisabledData>& tran) { return makeHash(tran.params.id.toRfc4122(), "disabled"); }
@@ -93,7 +93,7 @@ namespace ec2
         
         QUuid transactionHash(const QnTransaction<ApiFullData>& )                { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiCameraList>& )          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
-        QUuid transactionHash(const QnTransaction<ApiLayoutDataList>& )          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const QnTransaction<ApiLayoutList>& )          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiLicenseList>&)              { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiBusinessActionData>& )      { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiEmailSettingsData>& )       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }

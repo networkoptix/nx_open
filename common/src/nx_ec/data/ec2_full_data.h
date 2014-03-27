@@ -18,10 +18,10 @@ namespace ec2
     struct ApiFullData: public ApiData 
     {
         ApiResourceTypeList resTypes;
-        ApiMediaServerDataList servers;
+        ApiMediaServerList servers;
         ApiCameraList cameras;
-        ApiUserDataList users;
-        ApiLayoutDataList layouts;
+        ApiUserList users;
+        ApiLayoutList layouts;
         ApiBusinessRuleDataList rules;
         ApiCameraServerItemDataList cameraHistory;
         ApiLicenseList licenses;

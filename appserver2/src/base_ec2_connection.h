@@ -103,7 +103,7 @@ namespace ec2
             }
         }
 
-        void triggerNotification( const QnTransaction<ApiMediaServerData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiMediaServer>& tran ) {
             m_mediaServerManager->triggerNotification( tran );
         }
 
@@ -127,7 +127,7 @@ namespace ec2
             return m_cameraManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiUserData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiUser>& tran ) {
             return m_userManager->triggerNotification( tran );
         }
 
@@ -135,11 +135,11 @@ namespace ec2
             return m_businessEventManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiLayoutData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiLayout>& tran ) {
             return m_layoutManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran ) {
+        void triggerNotification( const QnTransaction<ApiLayoutList>& tran ) {
             return m_layoutManager->triggerNotification( tran );
         }
 

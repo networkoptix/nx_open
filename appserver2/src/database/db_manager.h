@@ -72,19 +72,19 @@ namespace ec2
         ErrorCode doQueryNoLock(const QnId& mServerId, ApiCameraList& cameraList);
 
         //getServers
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerList& serverList);
 
         //getCameraServerItems
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
 
         //getUserList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserList& userList);
 
         //getBusinessRuleList
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutList& layoutList);
 
         //getResourceParams
         ErrorCode doQueryNoLock(const QnId& resourceId, ApiResourceParams& params);
@@ -109,9 +109,9 @@ namespace ec2
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiCamera>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraList>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiMediaServerData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutDataList>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiMediaServer>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayout>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutList>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceStatusData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceDisabledData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceParams>& tran);
@@ -121,7 +121,7 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiStoredFilePath>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResource>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiBusinessRuleData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiUserData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiUser>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiParamList>& tran); // save settings
 
@@ -169,22 +169,22 @@ namespace ec2
         ErrorCode removeCamera(const QnId& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
-        ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
-        ErrorCode updateStorages(const ApiMediaServerData&);
+        ErrorCode insertOrReplaceMediaServer(const ApiMediaServer& data, qint32 internalId);
+        ErrorCode updateStorages(const ApiMediaServer&);
         ErrorCode removeServer(const QnId& guid);
         ErrorCode removeLayout(const QnId& guid);
         ErrorCode removeLayout(qint32 id);
         ErrorCode removeStoragesByServer(const QnId& serverGUID);
 
         ErrorCode deleteLayoutItems(const qint32 id);
-        ErrorCode saveLayout(const ApiLayoutData& params);
-        ErrorCode insertOrReplaceLayout(const ApiLayoutData& data, qint32 internalId);
-        ErrorCode updateLayoutItems(const ApiLayoutData& data, qint32 internalLayoutId);
+        ErrorCode saveLayout(const ApiLayout& params);
+        ErrorCode insertOrReplaceLayout(const ApiLayout& data, qint32 internalId);
+        ErrorCode updateLayoutItems(const ApiLayout& data, qint32 internalLayoutId);
         ErrorCode removeLayoutItems(qint32 id);
 
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnId& guid );
-        ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
+        ErrorCode insertOrReplaceUser(const ApiUser& data, qint32 internalId);
 
         ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);

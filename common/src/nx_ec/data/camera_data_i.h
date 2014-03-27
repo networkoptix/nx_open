@@ -16,3 +16,33 @@
 
     #define apiScheduleTaskFields (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) (beforeThreshold) (afterThreshold) (streamQuality) (fps) 
     QN_DEFINE_STRUCT_SERIALIZATORS(ScheduleTaskData, apiScheduleTaskFields);
+
+    struct ApiCameraData: virtual ApiResourceData 
+    {
+        ApiCameraData(): scheduleDisabled(false), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryQuality(Qn::SSQualityNotDefined),
+                         controlDisabled(false), statusFlags(0) {}
+
+        bool                scheduleDisabled;
+        Qn::MotionType      motionType;
+        QByteArray          region;
+        QByteArray          mac;
+        QString             login;
+        QString             password;
+        ScheduleTaskVector  scheduleTask;
+        bool                audioEnabled;
+        QString             physicalId;
+        bool                manuallyAdded;
+        QString             model;
+        QString             firmware;
+        QString             groupId;
+        QString             groupName;
+        Qn::SecondStreamQuality    secondaryQuality;
+        bool                controlDisabled;
+        qint32              statusFlags;
+        QByteArray          dewarpingParams;
+        QString             vendor;
+    };
+
+    #define apiCameraDataFields (scheduleDisabled) (motionType) (region) (mac) (login) (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) \
+                                (firmware) (groupId) (groupName) (secondaryQuality) (controlDisabled) (statusFlags) (dewarpingParams) (vendor)
+    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiCameraData, ec2::ApiResourceData, apiCameraDataFields);

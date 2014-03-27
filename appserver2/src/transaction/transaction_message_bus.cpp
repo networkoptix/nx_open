@@ -280,12 +280,12 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
             return deliveryTransaction<ApiCameraServerItemData>(abstractTran, stream);
 
         case ApiCommand::saveMediaServer:
-            return deliveryTransaction<ApiMediaServerData>(abstractTran, stream);
+            return deliveryTransaction<ApiMediaServer>(abstractTran, stream);
         case ApiCommand::removeMediaServer:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
         case ApiCommand::saveUser:
-            return deliveryTransaction<ApiUserData>(abstractTran, stream);
+            return deliveryTransaction<ApiUser>(abstractTran, stream);
         case ApiCommand::removeUser:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
@@ -295,9 +295,9 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
         case ApiCommand::saveLayouts:
-            return deliveryTransaction<ApiLayoutDataList>(abstractTran, stream);
+            return deliveryTransaction<ApiLayoutList>(abstractTran, stream);
         case ApiCommand::saveLayout:
-            return deliveryTransaction<ApiLayoutData>(abstractTran, stream);
+            return deliveryTransaction<ApiLayout>(abstractTran, stream);
         case ApiCommand::removeLayout:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
             

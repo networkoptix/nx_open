@@ -5,7 +5,7 @@
 namespace ec2
 {
 
-    void ApiLayoutItemData::toResource(QnLayoutItemData& resource) const
+    void ApiLayoutItem::toResource(QnLayoutItemData& resource) const
     {
 
         resource.uuid = uuid;
@@ -20,7 +20,7 @@ namespace ec2
         resource.dewarpingParams = QJson::deserialized<QnItemDewarpingParams>(dewarpingParams);
     }
 
-    void ApiLayoutItemData::fromResource(const QnLayoutItemData& resource)
+    void ApiLayoutItem::fromResource(const QnLayoutItemData& resource)
     {
         uuid = resource.uuid.toByteArray();
         flags = resource.flags;
@@ -41,7 +41,7 @@ namespace ec2
     }
 
 
-    void ApiLayoutData::toResource(QnLayoutResourcePtr resource) const
+    void ApiLayout::toResource(QnLayoutResourcePtr resource) const
     {
         ApiResource::toResource(resource);
         resource->setCellAspectRatio(cellAspectRatio);
@@ -59,7 +59,7 @@ namespace ec2
         resource->setItems(outItems);
     }
 
-    void ApiLayoutData::fromResource(QnLayoutResourcePtr resource)
+    void ApiLayout::fromResource(QnLayoutResourcePtr resource)
     {
         ApiResource::fromResource(resource);
         cellAspectRatio = resource->cellAspectRatio();
@@ -76,14 +76,14 @@ namespace ec2
         items.reserve( layoutItems.size() );
         for( const QnLayoutItemData& item: layoutItems )
         {
-            items.push_back( ApiLayoutItemData() );
+            items.push_back( ApiLayoutItem() );
             items.back().fromResource( item );
         }
     }
 
 
     template <class T>
-    void ApiLayoutDataList::toResourceList(QList<T>& outData) const
+    void ApiLayoutList::toResourceList(QList<T>& outData) const
     {
         outData.reserve(outData.size() + data.size());
         for(int i = 0; i < data.size(); ++i)
@@ -93,12 +93,12 @@ namespace ec2
             outData << layout;
         }
     }
-    template void ApiLayoutDataList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData) const;
-    template void ApiLayoutDataList::toResourceList<QnLayoutResourcePtr>(QList<QnLayoutResourcePtr>& outData) const;
+    template void ApiLayoutList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData) const;
+    template void ApiLayoutList::toResourceList<QnLayoutResourcePtr>(QList<QnLayoutResourcePtr>& outData) const;
 
-    void ApiLayoutDataList::loadFromQuery(QSqlQuery& query)
+    void ApiLayoutList::loadFromQuery(QSqlQuery& query)
     {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiLayoutData, data, ApiLayoutDataFields ApiResourceFields)
+        QN_QUERY_TO_DATA_OBJECT(query, ApiLayout, data, ApiLayoutFields ApiResourceFields)
     }
 
 }
