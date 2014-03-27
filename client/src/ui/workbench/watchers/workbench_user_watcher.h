@@ -27,9 +27,13 @@ public:
     virtual ~QnWorkbenchUserWatcher();
 
     void setUserName(const QString &name);
-
     const QString &userName() const {
         return m_userName;
+    }
+
+    void setUserPassword(const QString &password);
+    const QString &userPassword() const {
+        return m_userPassword;
     }
 
     const QnUserResourcePtr &user() const {
@@ -48,10 +52,12 @@ private slots:
     void at_user_permissionsChanged(const QnUserResourcePtr &user);
 private:
     void setCurrentUser(const QnUserResourcePtr &currentUser);
+    bool reconnectRequired(const QnUserResourcePtr &user);
 
 private:
     QnUserResourceList m_users;
     QString m_userName;
+    QString m_userPassword;
     QString m_userPasswordHash;
     QnUserResourcePtr m_user;
 };

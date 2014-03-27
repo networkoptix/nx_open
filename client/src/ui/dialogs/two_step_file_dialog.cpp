@@ -174,6 +174,10 @@ void QnTwoStepFileDialog::updateMode() {
     ui->newFileWidget->setVisible(m_mode == QFileDialog::AnyFile);
 }
 
+void QnTwoStepFileDialog::updateCustomizedLayout() {
+    ui->optionsGroupBox->setVisible(ui->optionsLayout->isEmpty());
+}
+
 void QnTwoStepFileDialog::at_browseFolderButton_clicked() {
     QString dirName = QnFileDialog::getExistingDirectory(this,
                                                         tr("Select folder..."),

@@ -39,6 +39,7 @@ protected:
     QGridLayout *customizedLayout() const;
     void setNameFilters(const QStringList &filters);
     void updateMode();
+    void updateCustomizedLayout();
 
     Q_SLOT void updateFileExistsWarning();
     Q_SLOT void at_browseFolderButton_clicked();
