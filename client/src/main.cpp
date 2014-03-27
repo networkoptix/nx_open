@@ -254,11 +254,11 @@ void initAppServerConnection(const QUuid &videoWallGuid)
 }
 
 /** Initialize log. */
-void initLog(const QString &logLevel) {
+void initLog(const QString &logLevel, const QString fileNameSuffix) {
     QnLog::initLog(logLevel);
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     QString logFileLocation = dataLocation + QLatin1String("/log");
-    QString logFileName = logFileLocation + QLatin1String("/log_file");
+    QString logFileName = logFileLocation + QLatin1String("/log_file") + fileNameSuffix;
     if (!QDir().mkpath(logFileLocation))
         cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
     if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
@@ -346,8 +346,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
-    initLog(logLevel);
-
     /* Dev mode. */
     if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
         qnSettings->setDevMode(true);
@@ -356,13 +354,21 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QUuid videoWallGuid(sVideoWallGuid);
     QUuid videoWallItemGuid(sVideoWallItemGuid);
 
+    QString logFileNameSuffix;
     if (!videoWallGuid.isNull()) {
         qnSettings->setVideoWallMode(true);
         noSingleApplication = true;
         noFullScreen = true;
         noVersionMismatchCheck = true;
         qnSettings->setLightModeOverride(Qn::LightModeVideoWall);
+
+        logFileNameSuffix = videoWallItemGuid.isNull() 
+            ? videoWallGuid.toString() 
+            : videoWallItemGuid.toString();
+        logFileNameSuffix.replace(QRegExp(lit("[{}]")), lit("_"));
     }
+
+    initLog(logLevel, logFileNameSuffix);
 
 	// TODO: #Elric why QString???
     if (!lightMode.isEmpty()) {
