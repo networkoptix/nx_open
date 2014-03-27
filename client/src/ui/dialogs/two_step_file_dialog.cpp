@@ -106,6 +106,8 @@ void QnTwoStepFileDialog::setAcceptMode(QFileDialog::AcceptMode mode) {
 }
 
 QString QnTwoStepFileDialog::selectedFile() const {
+    if (ui->fileNameLineEdit->text().isEmpty())
+        return QString();
 
     QString fileName;
     switch (m_mode) {
