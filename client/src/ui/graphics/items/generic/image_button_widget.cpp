@@ -1,4 +1,5 @@
 #include "image_button_widget.h"
+#include "image_button_widget_p.h"
 
 #include <cassert>
 
@@ -9,12 +10,10 @@
 #include <QtGui/QPixmapCache>
 #include <QtOpenGL/QGLContext>
 
-#include <client/client_settings.h>
-
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/animation/variant_animator.h>
-#include <ui/style/skin.h>
 #include <ui/style/globals.h>
+#include <ui/style/icon.h>
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
@@ -81,100 +80,6 @@ namespace {
 
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
-    }
-
-    bool isValidElement(const QPixmap &pixmap) {
-        return !pixmap.isNull();
-    }
-
-    bool isValidElement(qreal opacity) {
-        return opacity >= 0;
-    }
-
-    template<class Container>
-    QnImageButtonWidget::StateFlags findValidState(QnImageButtonWidget::StateFlags flags, const Container &container) {
-        /* Some compilers don't allow expressions in case labels, so we have to
-         * precalculate them. */
-        enum LocalStateFlag {
-            CHECKED = QnImageButtonWidget::CHECKED,
-            HOVERED = QnImageButtonWidget::HOVERED,
-            DISABLED = QnImageButtonWidget::DISABLED,
-            PRESSED = QnImageButtonWidget::PRESSED
-        };
-
-        const LocalStateFlag
-        CHECKED_HOVERED_DISABLED_PRESSED =  LocalStateFlag (CHECKED | HOVERED | DISABLED | PRESSED),
-        CHECKED_HOVERED_DISABLED =          LocalStateFlag (CHECKED | HOVERED | DISABLED),
-        CHECKED_HOVERED =                   LocalStateFlag (CHECKED | HOVERED),
-        CHECKED_DISABLED =                  LocalStateFlag (CHECKED | DISABLED),
-        HOVERED_DISABLED =                  LocalStateFlag (HOVERED | DISABLED),
-        CHECKED_HOVERED_PRESSED =           LocalStateFlag (CHECKED | HOVERED | PRESSED),
-        CHECKED_DISABLED_PRESSED =          LocalStateFlag (CHECKED | DISABLED | PRESSED),
-        HOVERED_DISABLED_PRESSED =          LocalStateFlag (HOVERED | DISABLED | PRESSED),
-        CHECKED_PRESSED =                   LocalStateFlag (CHECKED | PRESSED),
-        HOVERED_PRESSED =                   LocalStateFlag (HOVERED | PRESSED),
-        DISABLED_PRESSED =                  LocalStateFlag (DISABLED | PRESSED);
-
-        switch(flags) {
-#define TRY(FLAGS)                                                              \
-            if(isValidElement(container[(FLAGS)]))                              \
-                return static_cast<QnImageButtonWidget::StateFlags>(FLAGS);
-        case CHECKED_HOVERED_DISABLED_PRESSED:
-            TRY(CHECKED | HOVERED | DISABLED | PRESSED);
-            /* Fall through. */
-        case CHECKED_HOVERED_DISABLED:
-            TRY(CHECKED | HOVERED | DISABLED);
-            TRY(CHECKED | DISABLED);
-            TRY(CHECKED);
-            return 0;
-        case CHECKED_HOVERED:
-            TRY(CHECKED | HOVERED);
-            TRY(CHECKED);
-            return 0;
-        case CHECKED_DISABLED_PRESSED:
-            TRY(CHECKED | DISABLED | PRESSED);
-            /* Fall through. */
-        case CHECKED_DISABLED:
-            TRY(CHECKED | DISABLED);
-            TRY(CHECKED);
-            return 0;
-        case HOVERED_DISABLED_PRESSED:
-            TRY(HOVERED | DISABLED | PRESSED);
-            /* Fall through. */
-        case HOVERED_DISABLED:
-            TRY(HOVERED | DISABLED);
-            TRY(DISABLED);
-            return 0;
-        case CHECKED_HOVERED_PRESSED:
-            TRY(CHECKED | HOVERED | PRESSED);
-            /* Fall through. */
-        case CHECKED_PRESSED:
-            TRY(CHECKED | PRESSED);
-            /* Fall through. */
-        case CHECKED:
-            TRY(CHECKED);
-            return 0;
-        case HOVERED:
-            TRY(HOVERED);
-            return 0;
-        case DISABLED_PRESSED:
-            TRY(DISABLED | PRESSED);
-            /* Fall through. */
-        case DISABLED:
-            TRY(DISABLED);
-            return 0;
-        case HOVERED_PRESSED:
-            TRY(HOVERED | PRESSED);
-            /* Fall through. */
-        case PRESSED:
-            TRY(PRESSED);
-            return 0;
-        case 0:
-            return 0;
-        default:
-            return 0;
-#undef TRY
-        }
     }
 
     typedef QnGlContextData<QnTextureTransitionShaderProgram, QnGlContextDataForwardingFactory<QnTextureTransitionShaderProgram> > QnTextureTransitionShaderProgramStorage;
@@ -248,6 +153,10 @@ void QnImageButtonWidget::setPixmap(StateFlags flags, const QPixmap &pixmap) {
 
     invalidatePixmapCache();
     update();
+}
+
+const QIcon &QnImageButtonWidget::icon() const {
+    return QIcon(); // TODO: #Elric
 }
 
 void QnImageButtonWidget::setIcon(const QIcon &icon) {
@@ -693,7 +602,7 @@ void QnImageButtonWidget::invalidatePixmapCache() {
 }
 
 QnImageButtonWidget::StateFlags QnImageButtonWidget::validPixmapState(StateFlags flags) const {
-    return findValidState(flags, m_pixmaps);
+    return findValidState(flags, m_pixmaps, [](const QPixmap &pixmap) { return !pixmap.isNull(); });
 }
 
 
@@ -721,154 +630,5 @@ void QnRotatingImageButtonWidget::paint(QPainter *painter, StateFlags startState
 void QnRotatingImageButtonWidget::tick(int deltaMSecs) {
     if(state() & CHECKED)
         m_rotation += m_rotationSpeed * deltaMSecs / 1000.0;
-}
-
-
-
-// -------------------------------------------------------------------------- //
-// QnTextButtonWidget
-// -------------------------------------------------------------------------- //
-QnTextButtonWidget::QnTextButtonWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
-    base_type(parent, windowFlags),
-    m_pixmapValid(false),
-    m_relativeFrameWidth(-1.0)
-{
-    setFrameShape(Qn::NoFrame);
-    qFill(m_opacities, -1.0);
-    m_opacities[0] = 1.0;
-}
-
-const QString &QnTextButtonWidget::text() const {
-    return m_text;
-}
-
-void QnTextButtonWidget::setText(const QString &text) {
-    if(m_text == text)
-        return;
-
-    m_text = text;
-
-    invalidatePixmap();
-}
-
-QBrush QnTextButtonWidget::textBrush() const {
-    return palette().brush(QPalette::WindowText);
-}
-
-void QnTextButtonWidget::setTextBrush(const QBrush &textBrush) {
-    setPaletteBrush(this, QPalette::WindowText, textBrush);
-}
-
-QColor QnTextButtonWidget::textColor() const {
-    return palette().color(QPalette::WindowText);
-}
-
-void QnTextButtonWidget::setTextColor(const QColor &textColor) {
-    setPaletteColor(this, QPalette::WindowText, textColor);
-}
-
-qreal QnTextButtonWidget::relativeFrameWidth() const {
-    return m_relativeFrameWidth;
-}
-
-void QnTextButtonWidget::setRelativeFrameWidth(qreal relativeFrameWidth) {
-    if(qFuzzyCompare(m_relativeFrameWidth, relativeFrameWidth))
-        return;
-
-    m_relativeFrameWidth = relativeFrameWidth;
-    update();
-}
-
-void QnTextButtonWidget::setGeometry(const QRectF &geometry) {
-    if(m_relativeFrameWidth < 0) {
-        base_type::setGeometry(geometry);
-    } else {
-        QSizeF oldSize = size();
-
-        base_type::setGeometry(geometry);
-
-        if(!qFuzzyEquals(oldSize, size()))
-            setFrameWidth(qMin(size().height(), size().width()) * m_relativeFrameWidth);
-    }
-}
-
-void QnTextButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    ensurePixmap();
-
-    /* Skip Framed implementation. */
-    QnImageButtonWidget::paint(painter, option, widget);
-}
-
-void QnTextButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
-    qreal opacity = painter->opacity();
-    painter->setOpacity(opacity * linearCombine(1.0 - progress, stateOpacity(startState), progress, stateOpacity(endState)));
-
-    /* Draw frame. */
-    paintFrame(painter, rect);
-
-    /* Draw image. */ 
-    QnImageButtonWidget::paint(painter, startState, endState, progress, widget, rect);
-}
-
-void QnTextButtonWidget::changeEvent(QEvent *event) {
-    base_type::changeEvent(event);
-
-    switch (event->type()) {
-    case QEvent::PaletteChange:
-    case QEvent::FontChange:
-        invalidatePixmap();
-        break;
-    default:
-        break;
-    }
-}
-
-void QnTextButtonWidget::invalidatePixmap() {
-    m_pixmapValid = false;
-}
-
-void QnTextButtonWidget::ensurePixmap() {
-    if(m_pixmapValid)
-        return;
-
-    if(m_text.isEmpty())
-        return;
-
-    // create caching image
-    const static int fontSize = 40;
-    const static qreal offset = 10 * 0.01; // border offset in percents
-
-    QFont font = this->font();
-    font.setPixelSize(fontSize);
-    QFontMetrics metrics(font);
-    QSize imageSize = metrics.size(0, m_text);
-    if (imageSize.width() == 0)
-        return; // font still not initialized
-
-    imageSize *= (1.0 + offset*2.0);
-
-    QPixmap pixmap(imageSize);
-    pixmap.fill(Qt::transparent);
-    {
-        QPainter painter(&pixmap);
-        painter.setFont(font);
-        painter.setPen(QPen(palette().brush(QPalette::WindowText), 0));
-        painter.drawText(imageSize.width()*offset, imageSize.height()*offset + metrics.ascent(), m_text);
-    }
-
-    setPixmap(0, pixmap);
-    m_pixmapValid = true;
-}
-
-QnTextButtonWidget::StateFlags QnTextButtonWidget::validOpacityState(StateFlags flags) const {
-    return findValidState(flags, m_opacities);
-}
-
-qreal QnTextButtonWidget::stateOpacity(StateFlags stateFlags) const {
-    return m_opacities[validOpacityState(stateFlags)];
-}
-
-void QnTextButtonWidget::setStateOpacity(StateFlags stateFlags, qreal opacity) {
-    m_opacities[stateFlags] = opacity;
 }
 

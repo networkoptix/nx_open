@@ -37,7 +37,7 @@ void makeUnixOpenFlags(
 		else
 			sysFlags = O_WRONLY | O_TRUNC;
         if( !(oflag & QIODevice::Append) )
-            sysFlags |= O_CREAT | O_EXCL;
+            sysFlags |= O_CREAT;
         if( !(oflag & QIODevice::Truncate))
 		{
 			sysFlags &= ~O_TRUNC;

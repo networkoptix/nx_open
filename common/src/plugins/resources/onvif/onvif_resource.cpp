@@ -5,6 +5,7 @@
 #include <climits>
 #include <cmath>
 #include <sstream>
+#include <type_traits>
 
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
@@ -220,8 +221,10 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_timerID( 0 ),
     m_renewSubscriptionTaskID(0),
     m_maxChannels(1),
-    m_streamConfCounter(0)
+    m_streamConfCounter(0),
+    m_prevRequestSendClock(0)
 {
+    m_monotonicClock.start();
 }
 
 QnPlOnvifResource::~QnPlOnvifResource()
@@ -496,7 +499,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     }
 
 #ifdef _DEBUG
-    startInputPortMonitoring();
+    //startInputPortMonitoring();
 #endif
 
     if (m_appStopping)
@@ -726,7 +729,9 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation(bool performSimpleCheck)
 */
 //#define MONITOR_TRIGGER_RELAY_NOTIFICATION
 
-void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMessageHolderType& notification )
+void QnPlOnvifResource::notificationReceived(
+    const oasisWsnB2__NotificationMessageHolderType& notification,
+    time_t minNotificationTime )
 {
     if( !notification.Message.__any )
     {
@@ -761,7 +766,10 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
     if( !reader.parse( &xmlSrc ) )
         return;
 
-    //checking that there is single source is a port
+    if( (minNotificationTime != (time_t)-1) && (handler.utcTime.toTime_t() < minNotificationTime) )
+        return; //ignoring old notifications: DW camera can deliver old cached notifications
+
+    //checking that there is single source and this source is a relay port
     std::list<NotificationMessageParseHandler::SimpleItem>::const_iterator portSourceIter = handler.source.end();
     for( std::list<NotificationMessageParseHandler::SimpleItem>::const_iterator
         it = handler.source.begin();
@@ -1138,18 +1146,6 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
     QString mediaUrlSource = onvifR->getMediaUrl();
 
     bool result = QnPhysicalCameraResource::mergeResourcesIfNeeded(source);
-
-    if (getGroupId() != onvifR->getGroupId())
-    {
-        setGroupId(onvifR->getGroupId());
-        result = true; // groupID can be changed for onvif resource because if not auth info, maxChannels is not accessible
-    }
-
-    if (getGroupName().isEmpty() && getGroupName() != onvifR->getGroupName())
-    {
-        setGroupName(onvifR->getGroupName());
-        result = true;
-    }
 
     if (onvifUrlSource.size() != 0 && QUrl(onvifUrlSource).host().size() != 0 && getDeviceOnvifUrl() != onvifUrlSource)
     {
@@ -2582,7 +2578,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
             : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
 
     m_eventMonitorType = emtPullPoint;
-
+    m_prevRequestSendClock = m_monotonicClock.elapsed();
     m_timerID = TimerManager::instance()->addTimer( this, PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND );
     return true;
 }
@@ -2590,6 +2586,14 @@ bool QnPlOnvifResource::createPullPointSubscription()
 bool QnPlOnvifResource::isInputPortMonitored() const
 {
     return m_timerID != 0;
+}
+
+template<class _NumericInt>
+_NumericInt roundUp( _NumericInt val, _NumericInt step, typename std::enable_if<std::is_integral<_NumericInt>::value>::type* = nullptr )
+{
+    if( step == 0 )
+        return val;
+    return (val + step - 1) / step * step;
 }
 
 bool QnPlOnvifResource::pullMessages()
@@ -2616,6 +2620,7 @@ bool QnPlOnvifResource::pullMessages()
     soapWrapper.getProxy()->soap->header = &header;
     soapWrapper.getProxy()->soap->header->subscriptionID = buf;
     _onvifEvents__PullMessagesResponse response;
+    const qint64 currentRequestSendClock = m_monotonicClock.elapsed();
     m_prevSoapCallResult = soapWrapper.pullMessages( request, response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
     {
@@ -2624,16 +2629,18 @@ bool QnPlOnvifResource::pullMessages()
         return false;
     }
 
+    const time_t minNotificationTime = response.CurrentTime - roundUp<qint64>(m_monotonicClock.elapsed() - m_prevRequestSendClock, 1000) / 1000;
     if( response.oasisWsnB2__NotificationMessage.size() > 0 )
     {
         for( size_t i = 0;
             i < response.oasisWsnB2__NotificationMessage.size();
             ++i )
         {
-            notificationReceived( *response.oasisWsnB2__NotificationMessage[i] );
+            notificationReceived( *response.oasisWsnB2__NotificationMessage[i], minNotificationTime );
         }
     }
 
+    m_prevRequestSendClock = currentRequestSendClock;
     m_timerID = TimerManager::instance()->addTimer( this, PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND );
     return true;
 }

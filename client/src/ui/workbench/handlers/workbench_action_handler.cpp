@@ -7,7 +7,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 #include <QtGui/QDesktopServices>
-#include <QtWidgets/QFileDialog>
 #include <QtGui/QImage>
 #include <QtWidgets/QWhatsThis>
 #include <QtWidgets/QInputDialog>
@@ -204,9 +203,12 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
     connect(action(Qn::ShowcaseAction),                         SIGNAL(triggered()),    this,   SLOT(at_showcaseAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
-    connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
-    connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
-    connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
+    /* These actions may be activated via context menu. In this case the topmost event loop will be finishing and this somehow affects runModal method of NSSavePanel in MacOS.
+     * File dialog execution will be failed. (see a comment in qcocoafiledialoghelper.mm)
+     * To make dialogs work we're using queued connection here. */
+    connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()), Qt::QueuedConnection);
+    connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()), Qt::QueuedConnection);
+    connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()), Qt::QueuedConnection);
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::PreferencesGeneralTabAction),            SIGNAL(triggered()),    this,   SLOT(at_preferencesGeneralTabAction_triggered()));
     connect(action(Qn::PreferencesLicensesTabAction),           SIGNAL(triggered()),    this,   SLOT(at_preferencesLicensesTabAction_triggered()));
@@ -1158,12 +1160,12 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     //filters << tr("Layouts (*.layout)"); // TODO
     filters << tr("All files (*.*)");
 
-    QStringList files = QFileDialog::getOpenFileNames(mainWindow(),
-                                                      tr("Open file"),
-                                                      QString(),
-                                                      filters.join(lit(";;")),
-                                                      0,
-                                                      QnCustomFileDialog::fileDialogOptions());
+    QStringList files = QnFileDialog::getOpenFileNames(mainWindow(),
+                                                       tr("Open file"),
+                                                       QString(),
+                                                       filters.join(lit(";;")),
+                                                       0,
+                                                       QnCustomFileDialog::fileDialogOptions());
 
     if (!files.isEmpty())
         menu()->trigger(Qn::DropResourcesAction, addToResourcePool(files));
@@ -1175,12 +1177,12 @@ void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
     filters << tr("Layouts (*.layout)");
     filters << tr("All files (*.*)");
 
-    QString fileName = QFileDialog::getOpenFileName(mainWindow(),
-                                                    tr("Open file"),
-                                                    QString(),
-                                                    filters.join(lit(";;")),
-                                                    0,
-                                                    QnCustomFileDialog::fileDialogOptions());
+    QString fileName = QnFileDialog::getOpenFileName(mainWindow(),
+                                                     tr("Open file"),
+                                                     QString(),
+                                                     filters.join(lit(";;")),
+                                                     0,
+                                                     QnCustomFileDialog::fileDialogOptions());
 
     if(!fileName.isEmpty())
         menu()->trigger(Qn::DropResourcesAction, addToResourcePool(fileName).filtered<QnLayoutResource>());
@@ -2075,24 +2077,50 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
     if(!resource)
         return;
 
+    Qn::NodeType nodeType = parameters.hasArgument(Qn::NodeTypeRole)
+            ? static_cast<Qn::NodeType>(parameters.argument(Qn::NodeTypeRole).toInt())
+            : Qn::ResourceNode;
+
+    QnVirtualCameraResourcePtr camera;
+    if (nodeType == Qn::RecorderNode) {
+        camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            return;
+    }
+
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
+    QString oldName = nodeType == Qn::RecorderNode
+            ? camera->getGroupName()
+            : resource->getName();
+
     if(name.isEmpty()) {
         bool ok = false;
         name = QInputDialog::getText(mainWindow(),
                                      tr("Rename"),
                                      tr("Enter new name for the selected item:"),
                                      QLineEdit::Normal,
-                                     resource->getName(),
+                                     oldName,
                                      &ok);
         if (!ok || name.isEmpty())
             return;
     }
 
-    if(name == resource->getName())
+    if(name == oldName)
         return;
 
     if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         context()->instance<QnWorkbenchLayoutsHandler>()->renameLayout(layout, name);
+    } else if (nodeType == Qn::RecorderNode) {
+        QString groupId = camera->getGroupId();
+        QnVirtualCameraResourceList modified;
+        foreach(const QnResourcePtr &resource, qnResPool->getResources()) {
+            QnVirtualCameraResourcePtr cam = resource.dynamicCast<QnVirtualCameraResource>();
+            if (!cam || cam->getGroupId() != groupId)
+                continue;
+            cam->setGroupName(name);
+            modified << cam;
+        }
+        connection()->saveAsync(modified, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
     } else {
         resource->setName(name);
         connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));

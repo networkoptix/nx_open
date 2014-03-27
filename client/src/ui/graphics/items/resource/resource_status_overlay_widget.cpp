@@ -8,7 +8,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <ui/animation/opacity_animator.h>
-#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/text_button_widget.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
 #include <ui/graphics/painters/paused_painter.h>
 #include <ui/graphics/opengl/gl_context_data.h>
@@ -77,6 +77,8 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_diagnosticsButton->setStateOpacity(0, 0.4);
     m_diagnosticsButton->setStateOpacity(QnImageButtonWidget::HOVERED, 0.7);
     m_diagnosticsButton->setStateOpacity(QnImageButtonWidget::PRESSED, 1.0);
+    m_diagnosticsButton->setFont(m_staticFont);
+    //m_diagnosticsButton->setVisible(false);
 
     connect(m_diagnosticsButton, SIGNAL(clicked()), this, SIGNAL(diagnosticsRequested()));
 

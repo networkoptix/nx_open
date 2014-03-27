@@ -17,6 +17,8 @@ public:
     void paint(const QColor &colorMultiplier);
     void paint();
 
+    bool isAvailable() const;
+
 private:
     bool m_initialized;
     GLuint m_buffer;

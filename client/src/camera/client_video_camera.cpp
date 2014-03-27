@@ -196,12 +196,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
     m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
     m_exportRecorder->setContainer(format);
 
-    {
-        m_exportRecorder->setNeedCalcSignature(true);
-#ifdef SIGN_FRAME_ENABLE
-        m_exportRecorder->setSignLogo(qnSkin->pixmap("logo_1920_1080.png").toImage());
-#endif
-    }
+    m_exportRecorder->setNeedCalcSignature(true);
 
     m_exportReader->addDataProcessor(m_exportRecorder);
     m_exportReader->jumpTo(startTime, startTime);

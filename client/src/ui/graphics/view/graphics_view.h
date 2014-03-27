@@ -7,6 +7,8 @@
 
 class QnGraphicsView;
 
+// TODO: #Elric get rid of layer painters, use items!
+
 /**
  * Base class for detached graphics scene layer painters.
  */

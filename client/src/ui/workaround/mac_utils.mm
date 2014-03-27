@@ -32,7 +32,7 @@ static inline QString toQString(NSString *string)
     return QString::fromUtf8([string UTF8String]);
 }
 
-BOOL isSandboxed() {
+bool mac_isSandboxed() {
     NSDictionary* environ = [[NSProcessInfo processInfo] environment];
     return (nil != [environ objectForKey:@"APP_SANDBOX_CONTAINER_ID"]);
 }
@@ -64,7 +64,7 @@ void saveFileBookmark(NSString *path) {
 }
 
 void mac_saveFileBookmark(const QString& qpath) {
-    if (!isSandboxed())
+    if (!mac_isSandboxed())
         return;
 
     NSString *path = fromQString(qpath);
@@ -73,7 +73,7 @@ void mac_saveFileBookmark(const QString& qpath) {
 }
 
 void mac_restoreFileAccess() {
-    if (!isSandboxed())
+    if (!mac_isSandboxed())
         return;
 
     NSArray *path = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
@@ -97,7 +97,7 @@ void mac_restoreFileAccess() {
 }
 
 void mac_stopFileAccess() {
-    if (!isSandboxed())
+    if (!mac_isSandboxed())
         return;
 
     NSUserDefaults* prefs = [NSUserDefaults standardUserDefaults];
@@ -113,21 +113,21 @@ void mac_stopFileAccess() {
     }
 }
 
-QString mac_getExistingDirectory(QWidget *parent,
-                                    const QString &caption,
-                                    const QString &dir,
-                                    QFileDialog::Options options) {
+QString mac_getExistingDirectory(const QString &caption, const QString &dir) {
+    bool sandboxed = mac_isSandboxed();
+
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     [panel setTitle:fromQString(caption)];
     [panel setCanChooseDirectories:YES];
     [panel setCanCreateDirectories:YES];
     [panel setAllowsMultipleSelection:NO];
     [panel setCanChooseFiles:NO];
+    if (!sandboxed && !dir.isEmpty())
+        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
     if ([panel runModal] == NSOKButton) {
-        if (isSandboxed()) {
+        if (sandboxed)
             saveFileBookmark(panel.URL.path);
-        }
 
         return toQString(panel.URL.path);
     }
@@ -135,11 +135,8 @@ QString mac_getExistingDirectory(QWidget *parent,
     return QString();
 }
 
-QString mac_getOpenFileName(QWidget *parent,
-                                 const QString &caption,
-                                 const QString &dir,
-                                 const QStringList &extensions,
-                                 QFileDialog::Options options) {
+QString mac_getOpenFileName(const QString &caption, const QString &dir, const QStringList &extensions) {
+    bool sandboxed = mac_isSandboxed();
 
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     [panel setTitle:fromQString(caption)];
@@ -149,11 +146,63 @@ QString mac_getOpenFileName(QWidget *parent,
     [panel setCanChooseFiles:YES];
     if (extensions.size() != 0)
         [panel setAllowedFileTypes:fromQStringList(extensions)];
+    if (!sandboxed && !dir.isEmpty())
+        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
     if ([panel runModal] == NSOKButton) {
-        if (isSandboxed()) {
+        if (sandboxed)
             saveFileBookmark(panel.URL.path);
-        }
+
+        return toQString(panel.URL.path);
+    }
+
+    return QString();
+}
+
+QStringList mac_getOpenFileNames(const QString &caption, const QString &dir, const QStringList &extensions) {
+    bool sandboxed = mac_isSandboxed();
+
+    NSOpenPanel *panel = [NSOpenPanel openPanel];
+    [panel setTitle:fromQString(caption)];
+    [panel setCanChooseDirectories:NO];
+    [panel setCanCreateDirectories:YES];
+    [panel setAllowsMultipleSelection:YES];
+    [panel setCanChooseFiles:YES];
+    if (extensions.size() != 0)
+        [panel setAllowedFileTypes:fromQStringList(extensions)];
+    if (!sandboxed && !dir.isEmpty())
+        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
+
+    if ([panel runModal] == NSOKButton) {
+        QStringList urls;
+        for (int i = 0; i < panel.URLs.count; ++i)
+            urls.append(toQString([[[panel URLs] objectAtIndex:i] path]));
+
+        if (sandboxed)
+            saveFileBookmark(panel.URL.path);
+
+        return urls;
+    }
+
+    return QStringList();
+}
+
+
+QString mac_getSaveFileName(const QString &caption, const QString &dir, const QStringList &extensions) {
+    bool sandboxed = mac_isSandboxed();
+
+    NSSavePanel *panel = [NSSavePanel savePanel];
+    [panel setTitle:fromQString(caption)];
+    [panel setCanCreateDirectories:YES];
+    if (extensions.size() != 0)
+        [panel setAllowedFileTypes:fromQStringList(extensions)];
+    [panel setAllowsOtherFileTypes:YES];
+    if (!sandboxed && !dir.isEmpty())
+        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
+
+    if ([panel runModal] == NSOKButton) {
+        if (sandboxed)
+            saveFileBookmark(panel.URL.path);
 
         return toQString(panel.URL.path);
     }

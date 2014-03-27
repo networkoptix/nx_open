@@ -1,11 +1,13 @@
 #include "graphics_message_box.h"
 
+#include <QtCore/QTimer>
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QStyleOption>
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
 
 #include <utils/common/scoped_painter_rollback.h>
+#include <client/client_settings.h>
 
 #include <ui/common/palette.h>
 #include <ui/animation/opacity_animator.h>
@@ -63,6 +65,7 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
     base_type(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool)
 {
     m_label = new GraphicsLabel(this);
+    m_label->setAlignment(Qt::AlignCenter);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Horizontal);
     layout->addItem(m_label);
@@ -83,18 +86,22 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
     setWindowColor(QColor(33, 33, 80));
 
     setAcceptedMouseButtons(Qt::NoButton);
-    setOpacity(0.0);
 
-    VariantAnimator *animator = opacityAnimator(this);
-    animator->setEasingCurve(QEasingCurve::Linear);
-    animator->animateTo(1.0);
-    connect(animator, &AbstractAnimator::finished, this, &QnGraphicsMessageBox::at_animationIn_finished);
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation) {
+        QTimer::singleShot(m_timeout, this, SLOT(hideImmideately()));
+    } else {
+        setOpacity(0.0);
+        VariantAnimator *animator = opacityAnimator(this);
+        animator->setEasingCurve(QEasingCurve::Linear);
+        animator->animateTo(1.0);
+        connect(animator, &AbstractAnimator::finished, this, &QnGraphicsMessageBox::at_animationIn_finished);
+    }
 }
 
 QnGraphicsMessageBox::~QnGraphicsMessageBox() {
 }
 
-const QString &QnGraphicsMessageBox::text() const {
+QString QnGraphicsMessageBox::text() const {
     return m_label->text();
 }
 

@@ -18,6 +18,7 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/animation_event.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
@@ -486,6 +487,7 @@ void PtzInstrument::startDrag(DragInfo *) {
         selectionItem()->setOpacity(1.0);
         break;
     case VirtualMovement:
+        m_pendingMouseReturn = false;
         target()->setCursor(Qt::BlankCursor);
         break;
     default:
@@ -526,26 +528,33 @@ void PtzInstrument::dragMove(DragInfo *info) {
         ensureSelectionItem();
         selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
         break;
-    case VirtualMovement:
-        if(info->mouseScreenPos() != info->mousePressScreenPos()) {
-            QPointF delta = info->mouseItemPos() - info->lastMouseItemPos();
-            qreal scale = target()->size().width() / 2.0;
-            QPointF shift(delta.x() / scale, -delta.y() / scale);
+    case VirtualMovement: {
+        if(m_pendingMouseReturn && (info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() < 64) {
+            m_pendingMouseReturn = false;
+            break;
+        }
 
-            QVector3D position;
-            target()->ptzController()->getPosition(Qn::LogicalPtzCoordinateSpace, &position);
+        QPointF delta = info->mouseItemPos() - info->lastMouseItemPos();
+
+        qreal scale = target()->size().width() / 2.0;
+        QPointF shift(delta.x() / scale, -delta.y() / scale);
+
+        QVector3D position;
+        target()->ptzController()->getPosition(Qn::LogicalPtzCoordinateSpace, &position);
             
-            qreal speed = 0.5 * position.z();
-            QVector3D positionDelta(shift.x() * speed, shift.y() * speed, 0.0);
-            target()->ptzController()->absoluteMove(Qn::LogicalPtzCoordinateSpace, position + positionDelta, 2.0); /* 2.0 means instant movement. */
+        qreal speed = 0.5 * position.z();
+        QVector3D positionDelta(shift.x() * speed, shift.y() * speed, 0.0);
+        target()->ptzController()->absoluteMove(Qn::LogicalPtzCoordinateSpace, position + positionDelta, 2.0); /* 2.0 means instant movement. */
 
-            /* Calling setPos on each move event causes serious lags which I've so far
-             * was unable to explain. This is worked around by invoking it not that frequently. 
-             * Note that we don't account for screen-relative position here. */
-            if((info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() > 128)
-                QCursor::setPos(info->mousePressScreenPos()); // TODO: #PTZ #Elric this still looks bad, but not as bad as it looked without this hack.
+        /* Calling setPos on each move event causes serious lags which I so far
+         * was unable to explain. This is worked around by invoking it not that frequently. 
+         * Note that we don't account for screen-relative position. */
+        if(!m_pendingMouseReturn && (info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() > 128) {
+            m_pendingMouseReturn = true;
+            QCursor::setPos(info->mousePressScreenPos()); // TODO: #PTZ #Elric this still looks bad, but not as bad as it looked without this hack.
         }
         break;
+    }
     default:
         break;
     }

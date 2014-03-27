@@ -119,6 +119,27 @@ QString InstallationProcess::getVersion() const
     return m_version;
 }
 
+void InstallationProcess::cancel()
+{
+    {
+        std::unique_lock<std::mutex> lk( m_mutex );
+
+        m_status = applauncher::api::InstallationStatus::cancelInProgress;
+
+        if (m_httpClient) {
+            m_httpClient->terminate();
+            m_httpClient.reset();
+        }
+
+        if (m_state == State::installing)
+            m_syncher->cancel();
+
+        m_status = applauncher::api::InstallationStatus::cancelled;
+    }
+
+    emit installationDone(this);
+}
+
 void InstallationProcess::overrallDownloadSizeKnown(
     const std::shared_ptr<RDirSyncher>& /*syncher*/,
     int64_t totalBytesToDownload )
@@ -296,6 +317,10 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
         m_status = applauncher::api::InstallationStatus::failed;
         return;
     }
+
+    QFileInfo fileInfo(m_installationDirectory);
+    if (fileInfo.exists() && !fileInfo.isDir()) // if there is a ghost file remove it
+        QFile::remove(fileInfo.absolutePath());
 
     if( !QDir().mkpath(m_installationDirectory) )
     {

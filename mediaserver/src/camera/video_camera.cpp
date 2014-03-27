@@ -210,7 +210,7 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
             m_camera->inUse(this);
             QnLiveStreamProviderPtr provider = m_camera->getLiveReader(m_role);
             if (provider)
-                provider->startIfNotRunning(false);
+                provider->startIfNotRunning();
         }
         else if (m_activityStarted && usecTime - m_activityStartTime > GET_FRAME_MAX_TIME )
         {

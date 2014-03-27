@@ -7,7 +7,6 @@ class QStyleOptionTitleBar;
 
 class ConstrainedGeometrically;
 
-class GraphicsStyle;
 class GraphicsWidgetSceneData;
 
 class GraphicsWidgetPrivate {
@@ -48,8 +47,6 @@ protected:
     GraphicsWidget::TransformOrigin transformOrigin;
     qreal resizeEffectRadius;
     QPointer<GraphicsWidgetSceneData> sceneData;
-    mutable GraphicsStyle *style;
-    mutable QScopedPointer<GraphicsStyle> reserveStyle;
     bool inSetGeometry;
 
     struct WindowData {

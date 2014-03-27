@@ -11,6 +11,9 @@
 
 class QnSplashItem: public Animated<QGraphicsObject>, public AnimationTimerListener {
     Q_OBJECT
+    Q_PROPERTY(QColor color READ color WRITE setColor)
+    Q_PROPERTY(SplashType splashType READ splashType WRITE setSplashType)
+    Q_ENUMS(SplashType)
     typedef Animated<QGraphicsObject> base_type;
 
 public:

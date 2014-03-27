@@ -53,12 +53,11 @@ void QnPtzPresetDialog::loadData(const QnPtzData &data) {
         hotkeys.removeOne(key);
     }
 
-    int currentHotkey = hotkey();
     ui->hotkeyComboBox->clear();
     ui->hotkeyComboBox->addItem(tr("None"), QnPtzHotkey::NoHotkey);
     foreach(int hotkey, hotkeys)
         ui->hotkeyComboBox->addItem(QString::number(hotkey), hotkey);
-    setHotkey(currentHotkey);
+    setHotkey(hotkeys.isEmpty() ? -1 : hotkeys.first());
 }
 
 void QnPtzPresetDialog::saveData() {

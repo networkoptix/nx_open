@@ -190,7 +190,7 @@ void NetworkOptixModuleFinder::run()
                 continue;
             }
 
-            if(!m_compatibilityMode && response.customization.toLower() != qnProductFeatures().customizationName.toLower() ) // TODO: #2.1 #Elric #AK check for "default" VS "Vms"
+            if(!m_compatibilityMode && response.customization.toLower() != qnProductFeatures().customizationName.toLower() )
             {
                 NX_LOG( lit("NetworkOptixModuleFinder. Ignoring %1 (%2:%3) with different customization %4 on local address %5").
                     arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2 );

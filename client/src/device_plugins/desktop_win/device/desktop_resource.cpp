@@ -69,38 +69,21 @@ void QnDesktopResource::createSharedDataProvider()
         audioDevice = QnAudioDeviceInfo(); // no audio devices
         secondAudioDevice = QnAudioDeviceInfo();
     }
-    int screen = QnVideoRecorderSettings::screenToAdapter(recorderSettings.screen());
+
     bool captureCursor = recorderSettings.captureCursor();
     QSize encodingSize = QnVideoRecorderSettings::resolutionToSize(recorderSettings.resolution());
     float encodingQuality = QnVideoRecorderSettings::qualityToNumeric(recorderSettings.decoderQuality());
-    Qn::CaptureMode captureMode = recorderSettings.captureMode();
-
-    QPixmap logo;
-#if defined(CL_TRIAL_MODE) || defined(CL_FORCE_LOGO)
-    //QString logoName = QString("logo_") + QString::number(encodingSize.width()) + QString("_") + QString::number(encodingSize.height()) + QString(".png");
-    QString logoName = QLatin1String("logo_1920_1080.png");
-    logo = qnSkin->pixmap(logoName); // hint: comment this line to remove logo
-#endif
 
     m_desktopDataProvider = new QnDesktopDataProvider(toSharedPointer(),
-        screen,
         audioDevice.isNull() ? 0 : &audioDevice,
         secondAudioDevice.isNull() ? 0 : &secondAudioDevice,
-        captureMode,
         captureCursor,
         encodingSize,
         encodingQuality,
         m_mainWidget,
-        logo);
+        QPixmap());
 #else
 #endif
-}
-
-bool QnDesktopResource::isRendererSlow() const
-{
-    QnVideoRecorderSettings recorderSettings;
-    Qn::CaptureMode captureMode = recorderSettings.captureMode();
-    return captureMode == Qn::FullScreenMode;
 }
 
 void QnDesktopResource::addConnection(QnMediaServerResourcePtr mServer)

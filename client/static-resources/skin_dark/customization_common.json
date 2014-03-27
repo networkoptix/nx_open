@@ -8,7 +8,7 @@
         "custom_green":             "#8ABF22",
         "darkGrey":                 "#231F20",
         "opaqueSelection":          "custom_blue",
-        "ptz":                      "#opaqueSelection",
+        "ptz":                      "opaqueSelection",
         "selection":                "opaqueSelection.setAlpha(110)",
         "exShadowColor":            "#ff0000"
     },
@@ -131,6 +131,7 @@
             "dateOverlay": "QColor(255, 255, 255, 48)",
             "dateOverlayAlternate": "selection.setAlpha(48)",
 
+            "_": "Do not touch two values below! They was set accurately with help of color-picker.",
             "pastLastMinute": "QColor(24, 24, 24, 255)",
             "futureLastMinute": "QColor(0, 0, 0, 255)"
         },
@@ -203,10 +204,10 @@
 
     "QnStatusOverlayWidget": {
         "palette": { "default": {
-            "window": "#000000",
+            "window": "#00000080",
             "windowText": "#801010c0"
         }},
-        "diagnosticsButton": { 
+        "#diagnosticsButton": { 
             "windowColor": "#801010c0",
             "frameColor": "#801010ff",
             "textColor": "#ffffffff"
@@ -217,6 +218,14 @@
         "windowColor": "QColor(0, 0, 0, 255)",
         "frameColor": "QColor(203, 210, 233, 128)",
         "palette": { "default": { "windowText": "opaqueSelection" } }
+    },
+    
+    "QnResourceBrowserToolTipWidget": {
+        "palette": { "default": { "windowText": "#f0f0f0" } }
+    },
+    
+    "QnNotificationToolTipWidget": {
+        "palette": { "default": { "windowText": "#f0f0f0" } }
     },
     
     "QnGridItem": {
@@ -303,6 +312,14 @@
     "PtzSelectionItem": {
         "pen": { "color": "ptz.setAlpha(192)" },
         "brush": "ptz.setAlpha(64).lighter(120)"
+    },
+    
+    "QnPtzManageModel": {
+        "colors": {
+            "title": "#404040",
+            "invalid": "#401010",
+            "warning": "#404010"
+        }
     },
     
     "QnShadowItem": {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN" sourcelanguage="en">
+<TS version="2.0" language="zh_CN" sourcelanguage="en">
 <context>
     <name>CommunicatingSocket</name>
     <message>
@@ -14,7 +14,7 @@
     <message>
         <location filename="../src/utils/network/system_socket.cpp" line="663"/>
         <source>Couldn&apos;t connect to %1: %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法连接%1:%2。</translation>
     </message>
 </context>
 <context>
@@ -525,62 +525,63 @@ They cannot receive system notifications via E-Mail</source>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="555"/>
         <source>Invalid stack size after program evaluation: %1.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>堆疊</translatorcomment>
+        <translation> 无效的堆叠量作业类型%1.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="597"/>
         <source>Could not deduce result type for operation %1(&apos;%2&apos;, &apos;%3&apos;).</source>
-        <translation type="unfinished"></translation>
+        <translation>无法推断算运作%1(%2, %3).</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="625"/>
         <source>Invalid parameter type for operation %1(&apos;%2&apos;, &apos;%2&apos;)</source>
-        <translation type="unfinished"></translation>
+        <translation> 无效的参数作业类型%1(%2,%2)</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="635"/>
         <source>Could not deduce arithmetic supertype for type &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法推断算术%1.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="657"/>
         <source>Invalid parameter type for operation %1(&apos;%2&apos;)</source>
-        <translation type="unfinished"></translation>
+        <translation>作业类型%1(%2) 无效的参数</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="665"/>
         <source>Argument number for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>爭议數字 %1 指令冲突类型 %2.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="669"/>
         <source>Argument number for %1 instruction is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>爭议數字 %1 指令无效.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="674"/>
         <source>Stack underflow during execution of %1 instruction.</source>
-        <translation type="unfinished"></translation>
+        <translation>執行%1 指令時根据流堆疊.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="678"/>
         <source>Function name for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>功能名称 %1 指令冲突类型 %2.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="689"/>
         <source>Function or variable &apos;%1&apos; is not defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>功能或是变量 %1 无法定义.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="695"/>
         <source>Variable &apos;%1&apos; is not a function and cannot be called.</source>
-        <translation type="unfinished"></translation>
+        <translation>变量 %1 不是一个函数并且不能被呼叫.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="707"/>
         <source>Stack underflow during program evaluation.</source>
-        <translation type="unfinished"></translation>
+        <translation>在系統项目评估時根据流堆疊</translation>
     </message>
 </context>
 <context>
@@ -588,7 +589,7 @@ They cannot receive system notifications via E-Mail</source>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="112"/>
         <source>Unexpected symbol &apos;%1&apos; at position %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>意想不到的符号&apos;％1&apos;在位置％2。</translation>
     </message>
 </context>
 <context>
@@ -597,22 +598,22 @@ They cannot receive system notifications via E-Mail</source>
         <location filename="../src/utils/common/evaluator.h" line="167"/>
         <location filename="../src/utils/common/evaluator.h" line="174"/>
         <source>Parameter %2 is not specified for function &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>参数％2不是函数&apos;％1&apos;指定</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="177"/>
         <source>Parameter %2 of function &apos;%1&apos; is of type &apos;%3&apos;, but type &apos;%4&apos; was expected.</source>
-        <translation type="unfinished"></translation>
+        <translation>功能参数 &apos;%1&apos; 的%2&apos;&apos;是&apos;%3&apos;&apos;类型, 但类型&apos;%4&apos;是&apos;预期的.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="183"/>
         <source>Function &apos;%1&apos; is expected to have %3 arguments, %2 provided.</source>
-        <translation type="unfinished"></translation>
+        <translation>功能 &apos;%1&apos;是預期有%3的论据, %2提供.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="188"/>
         <source>Function &apos;%1&apos; is expected to have %3-%4 arguments, %2 provided.</source>
-        <translation type="unfinished"></translation>
+        <translation>功能 &apos;%1&apos;是預期有%3-%4的论据, %2提供.</translation>
     </message>
 </context>
 <context>
@@ -620,17 +621,17 @@ They cannot receive system notifications via E-Mail</source>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="178"/>
         <source>Unexpected token %1 (&apos;%2&apos;) at position %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>意想不到的符号%1 (&apos;%2&apos;) 在位置 %3.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="235"/>
         <source>Invalid color constant &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos;无效颜色对比.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="280"/>
         <source>Invalid number constant &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos;无效數字对比.</translation>
     </message>
 </context>
 <context>
@@ -714,17 +715,17 @@ They cannot receive system notifications via E-Mail</source>
         <translation>无法解析序列化的连接信息。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="792"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="793"/>
         <source>Cannot parse serialized event/action rules.</source>
         <translation>无法解析序列化的事件/行动规则。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="801"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="802"/>
         <source>Cannot parse serialized action.</source>
         <translation>无法解析序列化的行动。</translation>
     </message>
     <message>
-        <location filename="../src/api/serializer/pb_serializer.cpp" line="810"/>
+        <location filename="../src/api/serializer/pb_serializer.cpp" line="811"/>
         <source>Cannot parse serialized actions.</source>
         <translation>无法解析序列化的行动。</translation>
     </message>
@@ -887,97 +888,97 @@ They cannot receive system notifications via E-Mail</source>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="37"/>
         <source>Camera output</source>
-        <translation type="unfinished">摄像机输出</translation>
+        <translation>摄像机输出</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="38"/>
         <source>Camera output for 30 sec</source>
-        <translation type="unfinished">摄相机输出30秒</translation>
+        <translation>摄相机输出30秒</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="39"/>
         <source>Bookmark</source>
-        <translation type="unfinished">书签</translation>
+        <translation>书签</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="40"/>
         <source>Camera recording</source>
-        <translation type="unfinished">摄像机录像</translation>
+        <translation>摄像机录像</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="41"/>
         <source>Panic recording</source>
-        <translation type="unfinished">危机录像</translation>
+        <translation>危机录像</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="42"/>
         <source>Send mail</source>
-        <translation type="unfinished">发送邮件</translation>
+        <translation>发送邮件</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="43"/>
         <source>Write to log</source>
-        <translation type="unfinished"></translation>
+        <translation>写入日志</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="44"/>
         <source>Show notification</source>
-        <translation type="unfinished">显示通知</translation>
+        <translation>显示通知</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="45"/>
         <source>Play sound</source>
-        <translation type="unfinished">播放音效</translation>
+        <translation>播放音效</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="46"/>
         <source>Repeat sound</source>
-        <translation type="unfinished"></translation>
+        <translation>重复声音</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="47"/>
         <source>Speak</source>
-        <translation type="unfinished"></translation>
+        <translation>说话</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="49"/>
         <source>Unknown (%1)</source>
-        <translation type="unfinished">未知 (%1)</translation>
+        <translation>未知 (%1)</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="67"/>
         <source>Media Server Started</source>
-        <translation type="unfinished"></translation>
+        <translation>媒体服务器已开始</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="68"/>
         <source>Any Camera Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>任何摄像机问题</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="69"/>
         <source>Any Server Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>任何服务器问题</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="70"/>
         <source>Any Event</source>
-        <translation type="unfinished"></translation>
+        <translation>任何事件</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="81"/>
         <source>Undefined event has occurred on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>未定义事件在 %1发生</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="108"/>
         <source>Media Server &quot;%1&quot; Started</source>
-        <translation type="unfinished"></translation>
+        <translation>媒体服务器&apos;%1&quot;已开始</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="113"/>
         <source>Unknown event has occurred</source>
-        <translation type="unfinished"></translation>
+        <translation>发生未定义事件</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="129"/>
@@ -1023,12 +1024,14 @@ They cannot receive system notifications via E-Mail</source>
         <location filename="../src/business/business_strings_helper.cpp" line="273"/>
         <source>%2 %1</source>
         <comment>%1 means time, %2 means date</comment>
+        <translatorcomment>%1 是时间, %2 是日期</translatorcomment>
         <translation>%2 %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_strings_helper.cpp" line="277"/>
         <source>%n times, first: %2 %1</source>
         <comment>%1 means time, %2 means date</comment>
+        <translatorcomment>%1 是时间, %2 是日期</translatorcomment>
         <translation>
             <numerusform>%n次, 首次: %2 %1</numerusform>
         </translation>
@@ -1037,57 +1040,59 @@ They cannot receive system notifications via E-Mail</source>
         <location filename="../src/business/business_strings_helper.cpp" line="288"/>
         <source>Time: %1 on %2</source>
         <comment>%1 means time, %2 means date</comment>
+        <translatorcomment>%1 是时间, %2 是日期</translatorcomment>
         <translation>%2 時間: %1 </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_strings_helper.cpp" line="292"/>
         <source>First occurrence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translatorcomment>%1 是时间, %2 是日期</translatorcomment>
+        <translation>
+            <numerusform>第一次出现: %1 在 %2 (%n 总次数）</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_strings_helper.cpp" line="312"/>
         <source>No video frame received during last %n seconds.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>在过去的 %n 秒中没有接收到视频帧.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="318"/>
         <source>Connection to camera primary stream was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>连接到相机的主要流被意外关闭。</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="320"/>
         <source>Connection to camera secondary stream was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>连接到相机次流被意外关闭.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="326"/>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-        <translation type="unfinished">侦测到RTP包丢失。前个seq.=%1，下个seq.=%2. {1 ?}</translation>
+        <translation>侦测到RTP包丢失。前个seq.=%1，下个seq.=%2.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="328"/>
         <source>RTP packet loss detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>侦测到RTP包丢失.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="341"/>
         <source>I/O error has occurred at %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>I / O错误发生在％1.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="346"/>
         <source>Not enough HDD/SSD speed for recording to %1.</source>
-        <translation type="unfinished">硬盘写入速度不足以录像至%1.。</translation>
+        <translation>硬盘写入速度不足以录像至%1.。</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="351"/>
         <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
-        <translation type="unfinished"></translation>
+        <translation>HDD / SSD磁盘%1已满.磁盘包含太多不是由VMS管理的数据.</translation>
     </message>
     <message numerus="yes">
         <source>First occurence: %1 on %2 (%n times total)</source>
@@ -1127,12 +1132,12 @@ They cannot receive system notifications via E-Mail</source>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="332"/>
         <source>Server terminated.</source>
-        <translation type="unfinished">服务器终止。</translation>
+        <translation>服务器终止.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="336"/>
         <source>Server started after crash.</source>
-        <translation type="unfinished">服务器终止后启动。</translation>
+        <translation>服务器终止后启动.</translation>
     </message>
     <message>
         <source>I/O Error occured at %1</source>
@@ -1256,7 +1261,7 @@ for recording to %1.</source>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="27"/>
         <source>OK</source>
-        <translation type="unfinished">好</translation>
+        <translation>好</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="35"/>
@@ -1275,82 +1280,93 @@ for recording to %1.</source>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="43"/>
         <source>Cannot open media url %1. Failed to connect to media port %2.
  Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法连接到媒体 url %1。无法连接到媒体端口 %2。
+确认访问端口 %2可以存取(转发等)。请尝试重新启动摄像机，然后在网页上复原为出厂默认值。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="48"/>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
  Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法连接到媒体 url %1。%2 端口上的连接被意外关闭。
+确认摄像机连上网络。尝试重新启动摄像机。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="53"/>
         <source>Could not parse camera response. Url %1, request name %2.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法解析相机响应。 URL%1，要求名称 %2。 
+ 请尝试重新启动相机，然后恢复出厂默认设置的网页上。最后，尝试更新固件。如果问题仍然存在，请联系技术支持.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="58"/>
         <source>No supported media tracks at url %1.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>没有支持的媒体轨道在URL%1。 
+ 请尝试重新启动相机，然后恢复出厂默认设置的网页上。最后，尝试更新固件。如果问题仍然存在，请联系技术支持。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="63"/>
         <source>Not authorized. Url %1.</source>
-        <translation type="unfinished">未经授权。Url %1.</translation>
+        <translation>未经授权。Url %1.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="67"/>
         <source>Cannot open media url %1. Unsupported media protocol %2.
  Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法打开媒体URL %1。不支持的媒体协议 %2。 
+ 请尝试恢复出厂默认值的网页上。最后，尝试更新固件。如果问题仍然存在，请联系技术支持。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="72"/>
         <source>Failed to configure parameter %1.
  First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法配置参数%1。 
+ 首先，尝试打开录音（如果它是关闭），并在相机设置降低FPS(每秒的帧速率)。如果没有帮助，恢复摄像机网页上的出厂默认值。如果问题仍然存在，请联系技术支持。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="77"/>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>相机的请求“％=%1”失败，错误“%2”。 
+ 请尝试重新启动相机，然后恢复出厂默认设置的网页上。最后，尝试更新固件。如果问题仍然存在，请联系技术支持。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="82"/>
         <source>Unknown Camera Issue.
  Please contact support.</source>
-        <translation type="unfinished"></translation>
+        <translation>未知相机问题。 
+ 请联系技术支持.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="86"/>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.
  Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>发生输入/输出错误。 OS消息：“%1”。 
+ 确保相机已连接到网络。尝试重新启动相机。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="93"/>
         <source>Invalid data was received from the camera: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1：有效数据被从照相机接收.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="96"/>
         <source>Too many media errors. Please open camera issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>过多的介质错误。请打开摄像头问题的更多细节对话框。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="99"/>
         <source>Media stream is opened but no media data was received.</source>
-        <translation type="unfinished"></translation>
+        <translation>媒体流被打开，但没有收到媒体数据。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="114"/>
         <source>
 
 Parameters: </source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+参数：</translation>
     </message>
     <message>
         <source>Cannot open media url %1. Failed to connect to media port %2.
@@ -1504,22 +1520,22 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="47"/>
         <source>Audio context was not specified.</source>
-        <translation type="unfinished"></translation>
+        <translation>音频内容尚未指定</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="61"/>
         <source>Could not find encoder for codec %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1无法发现音频编码器.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="88"/>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法初始化音频编码器.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="97"/>
         <source>Could not initialize audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法初始化音频解码器.</translation>
     </message>
 </context>
 <context>
@@ -1551,33 +1567,33 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="104"/>
         <source>Container %1 was not found in FFMPEG library.</source>
-        <translation type="unfinished"></translation>
+        <translation>容器%1不是在FFMPEG库中找到。</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="112"/>
         <source>Could not create output context for format %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法创建输出格式 %1.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="131"/>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="208"/>
         <source>Could not allocate output stream for recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法为录像分配输出流。</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="170"/>
         <source>Could not perform direct stream copy because frame size is undefined.</source>
-        <translation type="unfinished"></translation>
+        <translation>不能进行直接流副本，因为帧的大小是不确定的。</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="216"/>
         <source>Could not find codec %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1无法发现音频编码器.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="251"/>
         <source>Video or audio codec is incompatible with container %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>视频或音频编解码器与%1选定格式不兼容。</translation>
     </message>
 </context>
 <context>
@@ -1597,17 +1613,17 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="102"/>
         <source>Could not allocate scaler context for resolution %1x%2.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法分派分辨率级别 %1x%2.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="127"/>
         <source>Could not find encoder for codec %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1无法发现音频编码器.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="174"/>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法初始化视频编码器</translation>
     </message>
 </context>
 <context>
@@ -1791,7 +1807,7 @@ Parameters: </source>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="27"/>
         <source>Corresponding container in FFMPEG library was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>未找到FFMPEG库相应的容器。</translation>
     </message>
     <message>
         <source>Can&apos;t allocate output stream for recording.</source>
@@ -1804,27 +1820,27 @@ Parameters: </source>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="28"/>
         <source>Could not create output file for video recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法为视频录像创建输出文件.</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="29"/>
         <source>Could not allocate output stream for recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法为录像分配输出流。</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="30"/>
         <source>Could not allocate output audio stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法分配输出音频流。</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="31"/>
         <source>Invalid audio codec information.</source>
-        <translation type="unfinished"></translation>
+        <translation>无效的音频编解码器的信息。</translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="32"/>
         <source>Video or audio codec is incompatible with the selected format.</source>
-        <translation type="unfinished"></translation>
+        <translation>视频或音频编解码器与选定格式不兼容。</translation>
     </message>
     <message>
         <source>Internal server error: invalid audio codec information</source>
@@ -1897,7 +1913,7 @@ Parameters: </source>
     <message>
         <location filename="../src/health/system_health.cpp" line="22"/>
         <source>Rebuilding archive index is completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>重建归档索引完成.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="33"/>
@@ -1915,7 +1931,8 @@ You cannot receive system notifications via E-Mail.</source>
         <location filename="../src/health/system_health.cpp" line="55"/>
         <source>Rebuilding archive index is completed on the following Media Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>重建归档索引完成下列介质服务器上： 
+%1。</translation>
     </message>
     <message>
         <source>Your E-Mail address is not set.
@@ -2004,12 +2021,12 @@ You cannot record video from cameras.</source>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="300"/>
         <source>OpenCL transcoding is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenCLTranscode没有执行.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="303"/>
         <source>Unknown transcoding method.</source>
-        <translation type="unfinished"></translation>
+        <translation>未知编码转换方法.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="334"/>

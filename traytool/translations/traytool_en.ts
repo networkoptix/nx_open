@@ -55,7 +55,7 @@ Application will now quit.</source>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="101"/>
-        <source>Connection to the Enterprise Controller could not be established.
+        <source>Connection to the Enterprise Controller cannot be established.
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
@@ -64,7 +64,7 @@ If this error persists, please contact your VMS administrator.</source>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="106"/>
         <source>You are trying to connect to incompatible Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation>You are trying to connect to an incompatible Enterprise Controller.</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="111"/>
@@ -137,7 +137,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="242"/>
-        <source>Could not access installed services</source>
+        <source>Cannot access installed services</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -153,22 +153,22 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="403"/>
-        <source>Enterprise controller has been stopped</source>
+        <source>Enterprise Controller has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="410"/>
-        <source>Enterprise controller has been started</source>
+        <source>Enterprise Controller has been started</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="429"/>
-        <source>Media server has been stopped</source>
+        <source>Media Server has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="436"/>
-        <source>Media server has been started</source>
+        <source>Media Server has been started</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -208,12 +208,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="541"/>
-        <source>Media server is going to be stopped. Are you sure?</source>
+        <source>Media Server is going to be stopped. Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="563"/>
-        <source>Enterprise controller is going to be stopped. Are you sure?</source>
+        <source>Enterprise Controller is going to be stopped. Are you sure?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -263,17 +263,17 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="892"/>
-        <source>The changes you made require enterprise controller and media server to be restarted. Would you like to restart now?</source>
+        <source>The changes you made require Enterprise Controller and Media Server to be restarted. Would you like to restart now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="894"/>
-        <source>The changes you made require enterprise controller to be restarted. Would you like to restart now?</source>
+        <source>The changes you made require Enterprise Controller to be restarted. Would you like to restart now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="896"/>
-        <source>The changes you made require media server to be restarted. Would you like to restart now?</source>
+        <source>The changes you made require Media Server to be restarted. Would you like to restart now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -283,7 +283,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="965"/>
-        <source>enterprise controller</source>
+        <source>Enterprise Controller</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -309,7 +309,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/systraywindow.cpp" line="1067"/>
         <source>You have entered invalid URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>You have entered an invalid URL.</translation>
     </message>
 </context>
 <context>
@@ -321,7 +321,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/settings.ui" line="42"/>
-        <source>Enterprise controller connection</source>
+        <source>Enterprise Controller connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -362,7 +362,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/settings.ui" line="179"/>
-        <source>Media server network settings</source>
+        <source>Media Server network settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -387,7 +387,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/settings.ui" line="231"/>
-        <source>Allow access to media server via public IP address</source>
+        <source>Allow access to Media Server via public IP address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -409,12 +409,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/settings.ui" line="302"/>
-        <source>Enterprise controller network settings</source>
+        <source>Enterprise Controller network settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="348"/>
-        <source>Allow access to enterprise controller via public IP address</source>
+        <source>Allow access to Enterprise Controller via public IP address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

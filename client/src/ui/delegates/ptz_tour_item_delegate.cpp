@@ -31,30 +31,30 @@ QWidget* QnPtzTourItemDelegate::createEditor(QWidget *parent, const QStyleOption
     if (!model)
         return base_type::createEditor(parent, option, index);
 
+    QComboBox *comboBox = 0;
     switch (index.column()) {
     case QnPtzTourSpotsModel::NameColumn:
-    {
-        QComboBox *comboBox = new QComboBox(parent);
+        comboBox = new QComboBox(parent);
         foreach (const QnPtzPreset &preset, model->sortedPresets())
             comboBox->addItem(preset.name, preset.id);
-        return comboBox;
-    }
+        break;
     case QnPtzTourSpotsModel::TimeColumn:
-    {
-        QComboBox *comboBox = new QComboBox(parent);
+        comboBox = new QComboBox(parent);
         foreach (quint64 time, QnPtzTourSpotsModel::stayTimeValues())
             comboBox->addItem(QnPtzTourSpotsModel::timeToString(time), time);
-        return comboBox;
-    }
+        break;
     case QnPtzTourSpotsModel::SpeedColumn:
-    {
-        QComboBox *comboBox = new QComboBox(parent);
+        comboBox = new QComboBox(parent);
         foreach (qreal speed, QnPtzTourSpotsModel::speedValues())
             comboBox->addItem(QnPtzTourSpotsModel::speedToString(speed), speed);
-        return comboBox;
-    }
+        break;
     default:
         break;
+    }
+
+    if (comboBox) {
+        connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
+        return comboBox;
     }
 
     return base_type::createEditor(parent, option, index);
@@ -66,10 +66,8 @@ void QnPtzTourItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
     case QnPtzTourSpotsModel::NameColumn:
     case QnPtzTourSpotsModel::TimeColumn:
     case QnPtzTourSpotsModel::SpeedColumn:
-        if (QComboBox *comboBox = dynamic_cast<QComboBox *>(editor)) {
+        if (QComboBox *comboBox = dynamic_cast<QComboBox *>(editor))
             comboBox->setCurrentIndex(comboBox->findData(index.data(Qt::EditRole)));
-            connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
-        }
         return;
     default:
         break;

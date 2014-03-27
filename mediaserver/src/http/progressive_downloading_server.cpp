@@ -551,7 +551,7 @@ void QnProgressiveDownloadingConsumer::run()
             dataProvider = liveReader;
             if (liveReader) {
                 dataConsumer.copyLastGopFromCamera(camera);
-                liveReader->startIfNotRunning(true);
+                liveReader->startIfNotRunning();
                 camera->inUse(this);
             }
         }
