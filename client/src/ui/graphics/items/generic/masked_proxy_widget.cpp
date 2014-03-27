@@ -72,7 +72,7 @@ void QnMaskedProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 //#endif
     }
 
-   // painter->drawPixmap(renderRect, m_pixmap, QRectF(renderRect.topLeft() - rect().topLeft(), renderRect.size()));
+    painter->drawPixmap(renderRect, m_pixmap, QRectF(renderRect.topLeft() - rect().topLeft(), renderRect.size()));
 }
 
 bool QnMaskedProxyWidget::eventFilter(QObject *object, QEvent *event) {

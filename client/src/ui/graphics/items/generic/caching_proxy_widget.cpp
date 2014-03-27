@@ -20,7 +20,7 @@
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
-
+#include "opengl_renderer.h"
 
 CachingProxyWidget::CachingProxyWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     QGraphicsProxyWidget(parent, windowFlags),
@@ -42,7 +42,8 @@ void CachingProxyWidget::ensureTextureAllocated() {
 
     /* Set texture parameters. */
 //    glPushAttrib(GL_ENABLE_BIT);
-    glEnable(GL_TEXTURE_2D);
+    //Deprecated in OpenGL ES2.0
+    //glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, m_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -51,7 +52,7 @@ void CachingProxyWidget::ensureTextureAllocated() {
 //    glPopAttrib();
 }
 
-void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *) {
+void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * ) {
     if (painter->paintEngine() == NULL) {
         qnWarning("No OpenGL-compatible paint engine was found.");
         return;
@@ -61,7 +62,6 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
         qnWarning("Painting with the paint engine of type '%1' is not supported", static_cast<int>(painter->paintEngine()->type()));
         return;
     }
-
     ensureTextureAllocated();
     
     ensureCurrentWidgetSynchronized();
@@ -72,13 +72,13 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
     if (exposedWidgetRect.isEmpty())
         return;
 
-    return;
-    QnGlNativePainting::begin(painter);
+    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
     //glPushAttrib(GL_COLOR_BUFFER_BIT | GL_TEXTURE_BIT);
 
     ensureTextureSynchronized();
 
-    glEnable(GL_TEXTURE_2D);
+    //Deprecated in OpenGL ES2.0
+    //glEnable(GL_TEXTURE_2D);
 //    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); /* For opacity to work. */
 
     glBindTexture(GL_TEXTURE_2D, m_texture);
@@ -90,6 +90,9 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
         QPointF(0.0, 0.0),
         QnGeometry::cwiseDiv(vertexRect.size(), m_image.size())
     );
+
+    QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(QVector4D(1.0f, 1.0f, 1.0f, effectiveOpacity()));
+    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawBindedTextureOnQuad(rect(),QnGeometry::cwiseDiv(vertexRect.size(), m_image.size()));
  /*   glBegin(GL_QUADS);
     glColor(1.0, 1.0, 1.0, effectiveOpacity());
     glTexCoord(textureRect.topLeft());
@@ -103,7 +106,8 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
     glEnd();*/
 
     glDisable(GL_BLEND);
-    glDisable(GL_TEXTURE_2D);
+    //Deprecated in OpenGL ES2.0
+    // glDisable(GL_TEXTURE_2D);
 
     //glPopAttrib();
     QnGlNativePainting::end(painter);
@@ -161,8 +165,8 @@ void CachingProxyWidget::ensureTextureSynchronized() {
         return;
     
     currentWidget()->render(&m_image, QPoint(0, 0), currentWidget()->rect());
-
-    glEnable(GL_TEXTURE_2D);
+    //Deprecated in OpenGL ES2.0
+    //glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, m_texture);
 //    glPixelStorei(GL_UNPACK_ROW_LENGTH, m_image.bytesPerLine() * 8 / m_image.depth());
 

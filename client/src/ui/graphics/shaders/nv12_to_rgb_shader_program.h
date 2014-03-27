@@ -2,8 +2,9 @@
 #define QN_NV12_TO_RGB_SHADER_PROGRAM_H
 
 #include <QtOpenGL/QGLShaderProgram>
+#include "base_shader_program.h"
 
-class QnNv12ToRgbShaderProgram: public QGLShaderProgram {
+class QnNv12ToRgbShaderProgram: public QnAbstractBaseGLShaderProgramm {
     Q_OBJECT
 public:
     enum Colorspace {

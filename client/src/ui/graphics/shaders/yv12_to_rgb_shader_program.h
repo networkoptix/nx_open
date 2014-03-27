@@ -9,7 +9,9 @@
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
 
-class QnAbstractYv12ToRgbShaderProgram : public QGLShaderProgram {
+#include "base_shader_program.h"
+
+class QnAbstractYv12ToRgbShaderProgram : public QnAbstractBaseGLShaderProgramm {
     Q_OBJECT
 public:
     QnAbstractYv12ToRgbShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
@@ -37,7 +39,7 @@ private:
 };
 
 
-class QnAbstractRGBAShaderProgram : public QGLShaderProgram {
+class QnAbstractRGBAShaderProgram : public QnAbstractBaseGLShaderProgramm {
     Q_OBJECT
 public:
     QnAbstractRGBAShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, bool final = true);

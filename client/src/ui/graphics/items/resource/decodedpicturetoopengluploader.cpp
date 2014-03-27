@@ -76,7 +76,7 @@ extern "C"
 // TODO: #AK maybe it's time to remove them?
 //preceding bunch of macro will be removed after this functionality has been tested and works as expected
 
-//#define QN_DECODED_PICTURE_TO_OPENGL_UPLOADER_DEBUG
+#define QN_DECODED_PICTURE_TO_OPENGL_UPLOADER_DEBUG
 #ifdef QN_DECODED_PICTURE_TO_OPENGL_UPLOADER_DEBUG
 #   define glCheckError glCheckError
 #else
@@ -1899,6 +1899,27 @@ static bool isYuvFormat( PixelFormat format )
     return format == PIX_FMT_YUV422P || format == PIX_FMT_YUV420P || format == PIX_FMT_YUV444P;
 }
 
+void loadImageData( int width_to_load ,int w , int h , int gl_bytes_per_pixel , int gl_format , const uchar* pixels )
+{
+    if ( w == width_to_load )
+    {
+        glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0 , width_to_load, h, gl_format, GL_UNSIGNED_BYTE, pixels );
+    } else if (w > width_to_load)
+    {        
+        for( int y = 0; y < h; y++ )
+        {
+            const uchar *row = pixels + (y*w) * gl_bytes_per_pixel;
+            glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , width_to_load, 1, gl_format, GL_UNSIGNED_BYTE, row );
+        }
+    } else
+    {
+        qDebug()<<"Error! Bad using fuction loadImageData"<<w<<width_to_load;
+    }
+}
+
+        
+        
+
 static int glRGBFormat( PixelFormat format )
 {
     if( !isYuvFormat( format ) )
@@ -1918,6 +1939,26 @@ static int glRGBFormat( PixelFormat format )
         }
     }
     return GL_RGBA;
+}
+static int glBytesPerPixel( PixelFormat format )
+{
+    if( !isYuvFormat( format ) )
+    {
+        switch( format )
+        {
+        case PIX_FMT_RGBA:
+            return 4;
+        case PIX_FMT_BGRA:
+            return 4;
+        case PIX_FMT_RGB24:
+            return 3;
+            //            case PIX_FMT_BGR24:
+            //                return GL_BGR_EXT;
+        default:
+            break;
+        }
+    }
+    return 4;
 }
 
 #ifdef USE_PBO
@@ -2097,6 +2138,14 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 //            glPixelStorei(GL_UNPACK_ROW_LENGTH, lineSizes_i);
             glCheckError("glPixelStorei");
             Q_ASSERT( lineSizes_i >= qPower2Ceil(r_w_i,ROUND_COEFF) );
+
+            #ifndef USE_PBO
+				loadImageData(qPower2Ceil(r_w_i,ROUND_COEFF),lineSizes_i,h[i],1,GL_LUMINANCE,planes[i]);
+            #else
+				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,qPower2Ceil(r_w_i,ROUND_COEFF),h[i],GL_LUMINANCE, GL_UNSIGNED_BYTE, NULL);
+			#endif
+            
+            /*
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
                             qPower2Ceil(r_w_i,ROUND_COEFF),
@@ -2111,7 +2160,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 #else
                             NULL
 #endif
-                            );
+                            );*/
             glCheckError("glTexSubImage2D");
 
             bitrateCalculator.bytesProcessed( qPower2Ceil(r_w[i],ROUND_COEFF)*h[i] );
@@ -2145,12 +2194,19 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             glBindTexture( GL_TEXTURE_2D, texture->id() );
             const uchar* pixels = planes[i];
 //            glPixelStorei( GL_UNPACK_ROW_LENGTH, i == 0 ? lineSizes[0] : (lineSizes[1]/2) );
+
+            loadImageData(i == 0 ? qPower2Ceil(width,ROUND_COEFF) : width / 2,
+                          i == 0 ? lineSizes[0] : (lineSizes[1]/2),
+                          i == 0 ? height : height / 2,
+                          glBytesPerPixel(format),
+                          i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,pixels);
+            /*
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
                             i == 0 ? qPower2Ceil(width,ROUND_COEFF) : width / 2,
                             i == 0 ? height : height / 2,
                             i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,
-                            GL_UNSIGNED_BYTE, pixels );
+                            GL_UNSIGNED_BYTE, pixels );*/
             glCheckError("glTexSubImage2D");
             glBindTexture( GL_TEXTURE_2D, 0 );
             bitrateCalculator.bytesProcessed( (i == 0 ? qPower2Ceil(width,ROUND_COEFF) : width / 2)*(i == 0 ? height : height / 2) );
@@ -2250,12 +2306,14 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
 //        glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
         glCheckError("glPixelStorei");
+        int w = qPower2Ceil(r_w[0],ROUND_COEFF);
+        int gl_bytes_per_pixel = glBytesPerPixel(format);
+        int gl_format = glRGBFormat(format);
+        loadImageData(w,lineInPixelsSize,h[0],gl_bytes_per_pixel,gl_format,pixels);
 
-        glTexSubImage2D(GL_TEXTURE_2D, 0,
-            0, 0,
-            qPower2Ceil(r_w[0],ROUND_COEFF),
-            h[0],
-            glRGBFormat(format), GL_UNSIGNED_BYTE, pixels);
+        
+        //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, qPower2Ceil(r_w[0],ROUND_COEFF), h[0], glRGBFormat(format), GL_UNSIGNED_BYTE, pixels);
+        
         bitrateCalculator.bytesProcessed( qPower2Ceil(r_w[0],ROUND_COEFF)*h[0]*4 );
         glCheckError("glTexSubImage2D");
 

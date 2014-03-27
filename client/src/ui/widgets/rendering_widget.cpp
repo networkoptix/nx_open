@@ -9,7 +9,7 @@
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 
 #include "ui/graphics/opengl/gl_shortcuts.h"
-
+#include "opengl_renderer.h"
 
 QnRenderingWidget::QnRenderingWidget(const QGLFormat &format, QWidget *parent, QGLWidget *shareWidget, Qt::WindowFlags f):
     QnGLWidget(format, parent, shareWidget, f),
@@ -110,6 +110,10 @@ void QnRenderingWidget::initializeGL() {
 
 void QnRenderingWidget::resizeGL(int width, int height) {
     glViewport(0, 0, width, height);
+
+    QnOpenGLRendererManager::instance(context()).getProjectionMatrix().setToIdentity();
+    QnOpenGLRendererManager::instance(context()).getProjectionMatrix().translate(-1.0, 1.0, 0.0);
+    QnOpenGLRendererManager::instance(context()).getProjectionMatrix().scale(2.0 / width, -2.0 / height, 1.0);
 
     /*glMatrixMode(GL_PROJECTION);
     glLoadIdentity();

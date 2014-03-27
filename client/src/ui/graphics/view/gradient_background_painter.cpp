@@ -15,7 +15,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workaround/gl_native_painting.h>
-
+#include <opengl_renderer.h>
 
 QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent):
     base_type(parent),
@@ -137,29 +137,44 @@ void QnGradientBackgroundPainter::drawLayer(QPainter * painter, const QRectF & r
         painter->fillRect(rect, radialGrad);
     }
 #else
-    QnGlNativePainting::begin(painter);
+
+    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
     {
-       /* if(!m_gradientPainter)
-            m_gradientPainter.reset(new QnRadialGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), QGLContext::currentContext()));*/
+        if(!m_gradientPainter)
+            m_gradientPainter.reset(new QnRadialGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), QGLContext::currentContext()));
 
         //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
-      /*  glEnable(GL_BLEND);
+        glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        QMatrix4x4 m = QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix();
 
-        glPushMatrix();
-        glTranslate(center1);
-        glScale(radius, radius);
-        m_gradientPainter->paint(color);
-        glPopMatrix();
+        //glPushMatrix();
 
-        glPushMatrix();
-        glTranslate(center2);
-        glScale(radius, radius);
+        //qDebug()<<"model_view 1"<<QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix();
+        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().translate(center1.x(), center1.y());
+        //qDebug()<<"model_view translate"<<center1.x() <<center1.y()<<QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix();
+        //glTranslate(center1);
+        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().scale(radius, radius);
+        //qDebug()<<"model_view 3 scale"<<radius<<QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix();
+        //glScale(radius, radius);
         m_gradientPainter->paint(color);
-        glPopMatrix();
+        //glPopMatrix();
+        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix() = m;
+
+        //glPushMatrix();
+        
+        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().translate(center2.x(), center2.y());
+        //glTranslate(center2);
+        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().scale(radius, radius);
+        //glScale(radius, radius);
+        m_gradientPainter->paint(color);
+
+        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix() = m;
+        //glPopMatrix();
 
         glDisable(GL_BLEND);
-        //glPopAttrib();*/
+        //glPopAttrib();
     }
     QnGlNativePainting::end(painter);
 #endif

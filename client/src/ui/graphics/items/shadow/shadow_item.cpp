@@ -5,6 +5,7 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/common/geometry.h>
 #include <ui/workaround/gl_native_painting.h>
+#include "opengl_renderer.h"
 
 QnShadowItem::QnShadowItem(QGraphicsItem *parent):
     base_type(parent),
@@ -109,12 +110,14 @@ void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     QColor color = m_color;
     color.setAlpha(color.alpha() * effectiveOpacity());
 
-    QnGlNativePainting::begin(painter);
+    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
     //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND); 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
-
-    /* Draw shadowed rect. */
+   
+    QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(color);
+    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawColoredPolygon(m_shadowShape);
+   /* Draw shadowed rect. */
    /* glBegin(GL_TRIANGLE_FAN);
     glColor(color);
     glVertices(m_shadowShape);
