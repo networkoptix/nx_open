@@ -409,6 +409,13 @@ namespace nx_http
         dstBuffer->append( messageBody );
     }
 
+    BufferType Response::toString() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
+
 
     namespace MessageType
     {

@@ -4,6 +4,8 @@
 
 #include "hls_server.h"
 
+#include <QtCore/QUrlQuery>
+
 #include <algorithm>
 #include <limits>
 #include <map>
@@ -233,7 +235,7 @@ namespace nx_hls
         }
 
         //parsing request parameters
-        const QList<QPair<QString, QString> >& queryItemsList = request.requestLine.url.queryItems();
+        const QList<QPair<QString, QString> >& queryItemsList = QUrlQuery(request.requestLine.url.query()).queryItems();
         std::multimap<QString, QString> requestParams;
         //moving params to map for more convenient use
         for( QList<QPair<QString, QString> >::const_iterator
@@ -415,7 +417,7 @@ namespace nx_hls
         nx_hls::VariantPlaylistData playlistData;
         playlistData.url = baseUrl;
         playlistData.url.setPath( request.requestLine.url.path() );
-        QList<QPair<QString, QString> > queryItems = request.requestLine.url.queryItems();
+        QList<QPair<QString, QString> > queryItems = QUrlQuery(request.requestLine.url.query()).queryItems();
         //removing SESSION_ID_PARAM_NAME
         for( QList<QPair<QString, QString> >::iterator
             it = queryItems.begin();
@@ -427,9 +429,11 @@ namespace nx_hls
             else
                 ++it;
         }
-        playlistData.url.setQueryItems( queryItems );
-        playlistData.url.addQueryItem( StreamingParams::CHUNKED_PARAM_NAME, QString() );
-        playlistData.url.addQueryItem( StreamingParams::SESSION_ID_PARAM_NAME, session->id() );
+        QUrlQuery playlistDataQuery;
+        playlistDataQuery.setQueryItems( queryItems );
+        playlistDataQuery.addQueryItem( StreamingParams::CHUNKED_PARAM_NAME, QString() );
+        playlistDataQuery.addQueryItem( StreamingParams::SESSION_ID_PARAM_NAME, session->id() );
+        playlistData.url.setQuery(playlistDataQuery);
         playlist.playlists.push_back(playlistData);
 
         //TODO/IMPL/HLS adding low quality playlist url (if there is low quality stream for resource)
@@ -534,12 +538,14 @@ namespace nx_hls
             hlsChunk.duration = chunkList[i].duration / 1000000.0;
             hlsChunk.url = baseChunkUrl;
             hlsChunk.url.setPath( HLS_PREFIX + mediaResource->toResource()->getUniqueId() );
+            QUrlQuery hlsChunkUrlQuery( hlsChunk.url.query() );
             foreach( RequestParamsType::value_type param, commonChunkParams )
-                hlsChunk.url.addQueryItem( param.first, param.second );
-            hlsChunk.url.addQueryItem( StreamingParams::START_TIMESTAMP_PARAM_NAME, QString::number(chunkList[i].startTimestamp) );
-            hlsChunk.url.addQueryItem( StreamingParams::DURATION_MS_PARAM_NAME, QString::number(chunkList[i].duration) );
+                hlsChunkUrlQuery.addQueryItem( param.first, param.second );
+            hlsChunkUrlQuery.addQueryItem( StreamingParams::START_TIMESTAMP_PARAM_NAME, QString::number(chunkList[i].startTimestamp) );
+            hlsChunkUrlQuery.addQueryItem( StreamingParams::DURATION_MS_PARAM_NAME, QString::number(chunkList[i].duration) );
             if( session->isLive() )
-                hlsChunk.url.addQueryItem( StreamingParams::LIVE_PARAM_NAME, QString() );
+                hlsChunkUrlQuery.addQueryItem( StreamingParams::LIVE_PARAM_NAME, QString() );
+            hlsChunk.url.setQuery( hlsChunkUrlQuery );
             playlist.chunks.push_back( hlsChunk );
         }
 
@@ -557,7 +563,7 @@ namespace nx_hls
         const std::multimap<QString, QString>& /*requestParams*/,
         std::vector<nx_hls::AbstractPlaylistManager::ChunkData>* const chunkList )
     {
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera( mediaResource );
+        QnVideoCamera* camera = qnCameraPool->getVideoCamera( mediaResource->toResourcePtr() );
         if( !camera )
         {
             NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 which is not camera").arg(mediaResource->toResource()->getUniqueId()), cl_logWARNING );
@@ -597,7 +603,7 @@ namespace nx_hls
     {
         Q_ASSERT( session );
 
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera( mediaResource );
+        QnVideoCamera* camera = qnCameraPool->getVideoCamera( mediaResource->toResourcePtr() );
         if( !camera )
         {
             NX_LOG( QString::fromLatin1("Error. Requested hls playlist of resource %1 which is not camera").arg(mediaResource->toResource()->getUniqueId()), cl_logWARNING );
@@ -676,7 +682,7 @@ namespace nx_hls
         if( !chunk )
         {
             NX_LOG( QString::fromLatin1("Could not get chunk %1 of resource %2 requested by %3").
-                arg(QLatin1String(request.requestLine.url.encodedQuery())).arg(uniqueResourceID.toString()).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
+                arg(request.requestLine.url.query()).arg(uniqueResourceID.toString()).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
             return nx_http::StatusCode::notFound;
         }
 
