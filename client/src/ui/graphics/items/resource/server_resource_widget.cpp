@@ -628,11 +628,9 @@ QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDevic
 }
 
 void QnServerResourceWidget::updateLegend() {
-    QHash<QnStatisticsDeviceType, int> indexes;
+    HealthMonitoringButtons checkedData = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
 
-    QSet<QString> disabledGraphs;
-    if (item())
-        disabledGraphs = item()->data<QSet<QString> >(Qn::ItemServerDisabledGraphsRole);
+    QHash<QnStatisticsDeviceType, int> indexes;
 
     foreach (const QString &key, m_sortedKeys) {
         QnStatisticsData &stats = m_history[key];
@@ -641,20 +639,21 @@ void QnServerResourceWidget::updateLegend() {
             GraphData &data = m_graphDataByKey[key];
             data.bar = m_legendButtonBar[buttonBarByDeviceType(stats.deviceType)];
             data.mask = data.bar->unusedMask();
-            data.visible = !disabledGraphs.contains(key);
+            data.visible = checkedData.value(key, true);
             data.color = getColor(stats.deviceType, indexes[stats.deviceType]++);
 
             LegendButtonWidget* newButton = new LegendButtonWidget(key, data.color);
             newButton->setProperty(legendKeyPropertyName, key);
             HealthMonitoringButtons checkedData = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
             newButton->setChecked(checkedData.value(key, true));
-            m_legendButtonByKey.insert(key, newButton);
 
             connect(newButton, &QnImageButtonWidget::toggled, this, [this, key](bool toggled) {
                 HealthMonitoringButtons value = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
                 value[key] = toggled;
                 this->item()->setData(Qn::ItemHealthMonitoringButtonsRole, qVariantFromValue<HealthMonitoringButtons>(value));
             });
+
+            connect(newButton,  &QnImageButtonWidget::stateChanged, this, &QnServerResourceWidget::updateHoverKey);
 
             { // fix text length on already existing buttons and the new one
                 int mask = data.bar->visibleButtons();
@@ -683,26 +682,16 @@ void QnServerResourceWidget::updateLegend() {
 
             data.button = newButton;
             data.bar->addButton(data.mask, data.button);
-
-            connect(data.button, SIGNAL(stateChanged()), this, SLOT(updateHoverKey()));
+            
         }
     }
 }
 
 void QnServerResourceWidget::updateGraphVisibility() {
-    QSet<QString> disabledGraphs;
-
     for(QHash<QString, GraphData>::iterator pos = m_graphDataByKey.begin(); pos != m_graphDataByKey.end(); pos++) {
         GraphData &data = *pos;
-
         data.visible = data.bar->checkedButtons() & data.mask;
-
-        if (!data.visible)
-            disabledGraphs.insert(pos.key());
     }
-
-    if (item())
-        item()->setData(Qn::ItemServerDisabledGraphsRole, disabledGraphs);
 }
 
 void QnServerResourceWidget::updateInfoOpacity() {
