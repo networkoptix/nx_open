@@ -28,13 +28,12 @@
 #include <QMutexLocker>
 
 #include <plugins/resources/third_party/motion_data_picture.h>
+#include <utils/common/log.h>
 #include <utils/common/synctime.h>
 
 #include "ilp_video_packet.h"
 #include "ilp_empty_packet.h"
 #include "isd_audio_packet.h"
-
-//#define DEBUG_OUTPUT
 
 
 static const int HIGH_QUALITY_ENCODER = 0;
@@ -536,17 +535,19 @@ int64_t StreamReader::calcNextTimestamp( int32_t pts, int64_t absoluteSourceTime
     if( !((pts - m_prevPts < MAX_PTS_DRIFT) || (m_prevPts - pts < MAX_PTS_DRIFT)) )
     {
         //pts discontinuity
-        pts = m_prevPts + DEFAULT_FRAME_DURATION;
+        //pts = m_prevPts + DEFAULT_FRAME_DURATION;
+        m_prevPts = pts - DEFAULT_FRAME_DURATION;
+        NX_LOG( lit("Encoder %1. Pts overflow (current %2, prev %3)").arg(m_encoderNum).arg(pts).arg(m_prevPts), cl_logWARNING );
+
+        timeSyncData.encoderThatInitializedThis = m_encoderNum;
+        resyncTime( pts, absoluteSourceTimeMS );
     }
 
     m_currentTimestamp = timeSyncData.baseClock + (int64_t)(pts - timeSyncData.ptsBase) * USEC_IN_SEC / PTS_FREQUENCY;
-    //m_currentTimestamp += (int64_t(pts - m_prevPts) * USEC_IN_SEC) / PTS_FREQUENCY; //TODO dword wrap ??? it seems ok - recheck
     m_prevPts = pts;
     newTs = m_currentTimestamp + m_timestampDelta;
 
-#ifdef DEBUG_OUTPUT
-    std::cout<<"pts "<<pts<<", timestamp "<<newTs<<", "<<(m_encoderNum == 0 ? "hgh" : "low")<<std::endl;
-#endif
+    NX_LOG( lit("pts %1, timestamp %2, %3").arg(pts).arg(newTs).arg((m_encoderNum == 0 ? "hgh" : "low")), cl_logDEBUG2 );
     return newTs;
 }
 
@@ -564,10 +565,9 @@ void StreamReader::resyncTime( int32_t pts, int64_t absoluteSourceTimeMS )
         timeSyncData.encoderThatInitializedThis = m_encoderNum;
         m_timestampDelta = 0;
 
-#ifdef DEBUG_OUTPUT
-        std::cout<<"Current local time "<<currentTime.tv_sec<<":"<<currentTime.tv_usec<<", frame time "<<(absoluteSourceTimeMS/1000)<<":"<<(absoluteSourceTimeMS%1000)*1000<<", "
-            "baseClock "<<timeSyncData.baseClock<<", ptsBase "<<timeSyncData.ptsBase<<std::endl;
-#endif
+        NX_LOG( lit("Primary stream time sync. Current local time %1:%2, frame time %3:%4, "
+            "baseClock %5, ptsBase %6").arg(currentTime.tv_sec).arg(currentTime.tv_usec).arg((absoluteSourceTimeMS/1000)).
+                arg((absoluteSourceTimeMS%1000)*1000).arg(timeSyncData.baseClock).arg(timeSyncData.ptsBase), cl_logDEBUG2 );
     }
     else
     {
@@ -577,9 +577,8 @@ void StreamReader::resyncTime( int32_t pts, int64_t absoluteSourceTimeMS )
         //    ((qnSyncTime->currentMSecsSinceEpoch() * USEC_IN_MSEC) - m_sharedStreamData.baseClock);
         //std::cout<<"2: PTS = "<<pts<<", delta "<<m_timestampDelta<<"\n";
 
-#ifdef DEBUG_OUTPUT
-        std::cout<<"Secondary time sync. timeSyncData.baseClock "<<timeSyncData.baseClock<<", timeSyncData.ptsBase "<<timeSyncData.ptsBase<<", pts "<<pts<<std::endl;
-#endif
+        NX_LOG( lit("Secondary time sync. timeSyncData.baseClock %1, timeSyncData.ptsBase %2, pts %3").
+            arg(timeSyncData.baseClock).arg(timeSyncData.ptsBase).arg(pts), cl_logDEBUG2 );
     }
 
     m_currentTimestamp = timeSyncData.baseClock + (int64_t)(pts - timeSyncData.ptsBase) * USEC_IN_SEC / PTS_FREQUENCY;
