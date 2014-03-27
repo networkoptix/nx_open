@@ -113,6 +113,7 @@
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
 
+#include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/watchers/workbench_update_watcher.h>
@@ -2320,6 +2321,10 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
             QnConnectionData data = qnSettings->lastUsedConnection();
             data.url.setPassword(newPassword);
             qnSettings->setLastUsedConnection(data);
+
+            // TODO #elric: This is a totally evil hack. Store password hash/salt in user.
+            context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(newPassword);
+
 
             QnAppServerConnectionFactory::setDefaultUrl(data.url);
         }

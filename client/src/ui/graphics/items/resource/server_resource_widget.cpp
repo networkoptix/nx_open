@@ -537,6 +537,26 @@ void QnServerResourceWidget::setColors(const QnStatisticsColors &colors) {
     updateColors();
 }
 
+QnServerResourceWidget::HealthMonitoringButtons QnServerResourceWidget::checkedHealthMonitoringButtons() const {
+    HealthMonitoringButtons result;
+    for(QHash<QString, GraphData>::const_iterator pos = m_graphDataByKey.constBegin(); pos != m_graphDataByKey.constEnd(); pos++) {
+        GraphData data = *pos;
+        result[pos.key()] = (data.bar->checkedButtons() & data.mask);
+    }
+    return result;
+}
+
+void QnServerResourceWidget::setCheckedHealthMonitoringButtons(const QnServerResourceWidget::HealthMonitoringButtons &buttons) {
+    for(QHash<QString, GraphData>::iterator pos = m_graphDataByKey.begin(); pos != m_graphDataByKey.end(); pos++) {
+        GraphData &data = *pos;
+        QnImageButtonWidget* button = data.bar->button(data.mask);
+        if (!button)
+            continue;
+        button->setChecked(buttons.value(pos.key(), true));
+    }
+    updateGraphVisibility();
+}
+
 QColor QnServerResourceWidget::getColor(QnStatisticsDeviceType deviceType, int index) {
     switch (deviceType) {
     case CPU:
@@ -608,11 +628,9 @@ QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDevic
 }
 
 void QnServerResourceWidget::updateLegend() {
-    QHash<QnStatisticsDeviceType, int> indexes;
+    HealthMonitoringButtons checkedData = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
 
-    QSet<QString> disabledGraphs;
-    if (item())
-        disabledGraphs = item()->data<QSet<QString> >(Qn::ItemServerDisabledGraphsRole);
+    QHash<QnStatisticsDeviceType, int> indexes;
 
     foreach (const QString &key, m_sortedKeys) {
         QnStatisticsData &stats = m_history[key];
@@ -621,14 +639,20 @@ void QnServerResourceWidget::updateLegend() {
             GraphData &data = m_graphDataByKey[key];
             data.bar = m_legendButtonBar[buttonBarByDeviceType(stats.deviceType)];
             data.mask = data.bar->unusedMask();
-            data.visible = !disabledGraphs.contains(key);
+            data.visible = checkedData.value(key, true);
             data.color = getColor(stats.deviceType, indexes[stats.deviceType]++);
 
             LegendButtonWidget* newButton = new LegendButtonWidget(key, data.color);
             newButton->setProperty(legendKeyPropertyName, key);
             newButton->setChecked(data.visible);
-            m_legendButtonByKey.insert(key, newButton);
 
+            connect(newButton, &QnImageButtonWidget::toggled, this, [this, key](bool toggled) {
+                HealthMonitoringButtons value = item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>();
+                value[key] = toggled;
+                this->item()->setData(Qn::ItemHealthMonitoringButtonsRole, qVariantFromValue<HealthMonitoringButtons>(value));
+            });
+
+            connect(newButton,  &QnImageButtonWidget::stateChanged, this, &QnServerResourceWidget::updateHoverKey);
 
             { // fix text length on already existing buttons and the new one
                 int mask = data.bar->visibleButtons();
@@ -657,26 +681,16 @@ void QnServerResourceWidget::updateLegend() {
 
             data.button = newButton;
             data.bar->addButton(data.mask, data.button);
-
-            connect(data.button, SIGNAL(stateChanged()), this, SLOT(updateHoverKey()));
+            
         }
     }
 }
 
 void QnServerResourceWidget::updateGraphVisibility() {
-    QSet<QString> disabledGraphs;
-
     for(QHash<QString, GraphData>::iterator pos = m_graphDataByKey.begin(); pos != m_graphDataByKey.end(); pos++) {
         GraphData &data = *pos;
-
         data.visible = data.bar->checkedButtons() & data.mask;
-
-        if (!data.visible)
-            disabledGraphs.insert(pos.key());
     }
-
-    if (item())
-        item()->setData(Qn::ItemServerDisabledGraphsRole, disabledGraphs);
 }
 
 void QnServerResourceWidget::updateInfoOpacity() {
@@ -761,6 +775,17 @@ Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const
     if (m_resource->getStatus() == QnResource::Offline)
         return Qn::ServerOfflineOverlay;
     return base_type::calculateStatusOverlay();
+}
+
+void QnServerResourceWidget::updateCheckedHealthMonitoringButtons() {
+    setCheckedHealthMonitoringButtons(item()->data(Qn::ItemHealthMonitoringButtonsRole).value<HealthMonitoringButtons>());
+}
+
+void QnServerResourceWidget::at_itemDataChanged(int role) {
+    base_type::at_itemDataChanged(role);
+    if (role != Qn::ItemHealthMonitoringButtonsRole)
+        return;
+    updateCheckedHealthMonitoringButtons();
 }
 
 void QnServerResourceWidget::at_statistics_received() {

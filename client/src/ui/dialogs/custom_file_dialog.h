@@ -37,6 +37,7 @@ public:
 
 protected:
     QGridLayout *customizedLayout() const { return dynamic_cast<QGridLayout *>(layout()); }
+    void updateCustomizedLayout() {}
 };
 #endif
 
@@ -70,8 +71,7 @@ class QnCustomFileDialog : public QnSystemBasedCustomDialog
     typedef QnSystemBasedCustomDialog base_type;
 
 public:
-    explicit QnCustomFileDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &directory = QString(),
-                                const QString &filter = QString(), const QStringList &extensions = QStringList());
+    explicit QnCustomFileDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &directory = QString(), const QString &filter = QString());
     ~QnCustomFileDialog();
 
     // TODO: #GDM what is the ownership semantics for delegate here? I believe it must be owned by this dialog when passed in a call.

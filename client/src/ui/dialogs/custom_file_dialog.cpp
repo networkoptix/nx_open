@@ -5,8 +5,7 @@
 
 #include <utils/common/string.h>
 
-QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, const QString &directory,
-                                       const QString &filter, const QStringList &extensions):
+QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, const QString &directory, const QString &filter):
     base_type(parent, caption, directory, filter),
     m_currentColumn(0)
 {
@@ -85,6 +84,8 @@ void QnCustomFileDialog::addWidget(const QString &label, QWidget *widget, QnAbst
         delegate->disconnect();
         connect(this, &QnSystemBasedCustomDialog::filterSelected, delegate, &QnAbstractWidgetControlDelegate::updateWidget);
     }
+
+    updateCustomizedLayout();
 }
 
 void QnCustomFileDialog::at_accepted() {

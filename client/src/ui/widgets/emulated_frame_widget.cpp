@@ -38,7 +38,9 @@ void QnEmulatedFrameWidget::mousePressEvent(QMouseEvent *event) {
 
     Qt::WindowFrameSection section = windowFrameSectionAt(event->pos());
     if(section != Qt::NoSection) {
-        if(section != Qt::TitleBarArea) {
+        if (section == Qt::TitleBarArea) {
+            m_startPosition = pos();
+        } else {
             m_startPinPoint = Qn::calculatePinPoint(geometry(), section);
             m_startSize = size();
         }
@@ -71,7 +73,7 @@ void QnEmulatedFrameWidget::startDragProcess(DragInfo *) {
 
 void QnEmulatedFrameWidget::dragMove(DragInfo *info) {
     if(m_section == Qt::TitleBarArea) {
-        move(pos() + info->mouseScreenPos() - info->lastMouseScreenPos());
+        move(m_startPosition + info->mouseScreenPos() - info->mousePressScreenPos());
     } else {
         resize(m_startSize + Qn::calculateSizeDelta(info->mouseScreenPos() - info->mousePressScreenPos(), m_section));
         move(pos() + m_startPinPoint - Qn::calculatePinPoint(geometry(), m_section));

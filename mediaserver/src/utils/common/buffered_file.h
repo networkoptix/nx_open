@@ -13,8 +13,6 @@ class QBufferedFile;
 
 class QN_EXPORT QueueFileWriter: public QnLongRunnable
 {
-    Q_OBJECT;
-
 public:
     QueueFileWriter();
     virtual ~QueueFileWriter();

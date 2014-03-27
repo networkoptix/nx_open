@@ -45,6 +45,7 @@ private:
     DragProcessor *m_dragProcessor;
     Qt::WindowFrameSection m_section;
     QPoint m_startPinPoint;
+    QPoint m_startPosition;
     QSize m_startSize;
 
     QPoint m_lastMousePos;

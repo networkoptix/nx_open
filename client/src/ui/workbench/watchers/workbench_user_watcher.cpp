@@ -33,6 +33,7 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
         disconnect(m_user, NULL, this, NULL);
 
     m_user = user;
+    m_userPassword = QString();
     m_userPasswordHash = user ? user->getHash() : QString();
 
     if (m_user) {
@@ -52,6 +53,14 @@ void QnWorkbenchUserWatcher::setUserName(const QString &name) {
 
     foreach(const QnUserResourcePtr &user, m_users)
         at_resource_nameChanged(user);
+}
+
+void QnWorkbenchUserWatcher::setUserPassword(const QString &password) {
+    if (m_userPassword == password)
+        return;
+
+    m_userPassword = password;
+    m_userPasswordHash = QString(); //hash will be recalculated
 }
 
 void QnWorkbenchUserWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -90,9 +99,33 @@ void QnWorkbenchUserWatcher::at_resource_nameChanged(const QnResourcePtr &resour
     }
 }
 
+bool QnWorkbenchUserWatcher::reconnectRequired(const QnUserResourcePtr &user) {
+    if (user->getName() != m_userName)
+        return true;
+
+    if (m_userPassword.isEmpty())
+        return m_userPasswordHash != user->getHash();
+
+    // password was just changed by the user
+    QStringList values =  user->getHash().split(L'$');
+    if (values.size() != 3)
+        return true;
+
+    QByteArray salt = values[1].toUtf8();
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(salt);
+    md5.addData(m_userPassword.toUtf8());
+    if (md5.result().toHex() != values[2].toUtf8())
+        return true;
+
+    m_userPasswordHash = user->getHash();
+    m_userPassword = QString();
+    return false;
+}
+
 void QnWorkbenchUserWatcher::at_user_resourceChanged(const QnResourcePtr &resource) {
-    if (m_user->getName() == m_userName && m_user->getHash() == m_userPasswordHash)
-        return; // looks like nothing important has changed
+    if (!reconnectRequired(resource.dynamicCast<QnUserResource>()))
+        return;
 
     //TODO: #Elric #TR add message box on next step of translations generating
     menu()->trigger(Qn::DisconnectAction,

@@ -645,21 +645,19 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
     if (suggetion.isEmpty())
         suggetion = tr("Recorded Video");
 
-    QString previousDir = qnSettings->lastRecordingDir();
-    QString selectedFilter;
     while (true) {
-        QString filePath = QnFileDialog::getSaveFileName(
-            display()->view(),
-            tr("Save Recording As..."),
-            previousDir + QLatin1Char('/') + suggetion,
-            tr("AVI (Audio/Video Interleaved) (*.avi)"),
-            &selectedFilter,
-            QnCustomFileDialog::fileDialogOptions()
-        );
+        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
+                                                      display()->view(),
+                                                      tr("Save Recording As..."),
+                                                      qnSettings->lastRecordingDir() + QLatin1Char('/') + suggetion,
+                                                      tr("AVI (Audio/Video Interleaved) (*.avi)")));
+        dialog->exec();
 
+        QString filePath = dialog->selectedFile();
+        QString selectedExtension = dialog->selectedExtension();
         if (!filePath.isEmpty()) {
-            if (!filePath.endsWith(QLatin1String(".avi"), Qt::CaseInsensitive))
-                filePath += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 4);
+            if (!filePath.endsWith(selectedExtension, Qt::CaseInsensitive))
+                filePath += selectedExtension;
 
             QFile::remove(filePath);
             if (!QFile::rename(recordedFileName, filePath)) {

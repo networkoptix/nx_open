@@ -106,6 +106,8 @@ void QnTwoStepFileDialog::setAcceptMode(QFileDialog::AcceptMode mode) {
 }
 
 QString QnTwoStepFileDialog::selectedFile() const {
+    if (ui->fileNameLineEdit->text().isEmpty())
+        return QString();
 
     QString fileName;
     switch (m_mode) {
@@ -170,6 +172,10 @@ void QnTwoStepFileDialog::updateMode() {
 
     ui->existingFileWidget->setVisible(m_mode == QFileDialog::ExistingFile);
     ui->newFileWidget->setVisible(m_mode == QFileDialog::AnyFile);
+}
+
+void QnTwoStepFileDialog::updateCustomizedLayout() {
+    ui->optionsGroupBox->setVisible(ui->optionsLayout->isEmpty());
 }
 
 void QnTwoStepFileDialog::at_browseFolderButton_clicked() {
