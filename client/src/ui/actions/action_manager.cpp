@@ -344,6 +344,13 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Alt+F")).
         autoRepeat(false);
 
+    factory(Qn::ShowDebugOverlayAction).
+        flags(Qn::GlobalHotkey).
+        text(tr("Show Debug")).
+        toggledText(tr("Hide Debug")).
+        shortcut(tr("Ctrl+Alt+D")).
+        autoRepeat(false);
+
     factory(Qn::DropResourcesAction).
         flags(Qn::ResourceTarget | Qn::WidgetTarget | Qn::LayoutItemTarget | Qn::LayoutTarget | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Drop Resources"));

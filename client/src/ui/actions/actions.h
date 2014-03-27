@@ -55,6 +55,11 @@ namespace Qn {
          */
         ShowFpsAction,
 
+        /** 
+         * Shows / hides debug overlay.
+         */
+        ShowDebugOverlayAction,
+
         /**
          * Drops provided resources on the workbench.
          */

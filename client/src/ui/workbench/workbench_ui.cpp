@@ -241,6 +241,19 @@ namespace {
 
 } // anonymous namespace
 
+static QtMessageHandler previousMsgHandler = 0;
+static QnDebugProxyLabel* debugLabel = 0;
+
+static void uiMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
+{
+    if (previousMsgHandler) {
+        previousMsgHandler(type, ctx, msg);
+    } 
+    if (!debugLabel)
+        return;
+    debugLabel->appendTextQueued(msg);
+}
+
 
 QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     base_type(parent),
@@ -327,7 +340,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(action(Qn::ShowFpsAction),  &QAction::toggled,                                                                          this,                           &QnWorkbenchUi::setFpsVisible);
     connect(m_fpsItem,                  &QGraphicsWidget::geometryChanged,                                                          this,                           &QnWorkbenchUi::at_fpsItem_geometryChanged);
     setFpsVisible(false);
-
 
     /* Tree panel. */
     m_treeWidget = new QnResourceBrowserWidget(NULL, context());
@@ -697,6 +709,27 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(display(),                  &QnWorkbenchDisplay::viewportUngrabbed,     this,           &QnWorkbenchUi::enableProxyUpdates);
     connect(display(),                  &QnWorkbenchDisplay::widgetChanged,         this,           &QnWorkbenchUi::at_display_widgetChanged);
 
+
+    /* Debug overlay */
+    m_debugOverlayLabel = new QnDebugProxyLabel(m_controlsWidget);
+    m_debugOverlayLabel->setAcceptedMouseButtons(0);
+    m_debugOverlayLabel->setAcceptHoverEvents(false);
+    m_debugOverlayLabel->setMessagesLimit(40);
+    setPaletteColor(m_debugOverlayLabel, QPalette::Window, QColor(127, 127, 127, 60));
+    setPaletteColor(m_debugOverlayLabel, QPalette::WindowText,  QColor(63, 255, 216));
+    auto updateDebugGeometry = [&]() {
+        QPointF pos = QPointF(m_titleItem->geometry().bottomLeft());
+        if(qFuzzyEquals(pos, m_debugOverlayLabel->pos()))
+            return;
+        m_debugOverlayLabel->setPos(pos);
+    };
+    m_debugOverlayLabel->setVisible(false);
+    connect(m_titleItem, &QGraphicsWidget::geometryChanged, this, updateDebugGeometry);
+    debugLabel = m_debugOverlayLabel;
+    previousMsgHandler = qInstallMessageHandler(uiMsgHandler);
+
+    display()->view()->addAction(action(Qn::ShowDebugOverlayAction));
+    connect(action(Qn::ShowDebugOverlayAction),  &QAction::toggled,  this, [&](bool toggled){m_debugOverlayLabel->setVisible(toggled);});
 
     /* Init fields. */
     m_pinOffset = (24 - QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL)) / 2.0;
