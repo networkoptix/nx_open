@@ -12,7 +12,7 @@
 namespace ec2
 {
     struct ScheduleTask;
-    typedef std::vector<ScheduleTask> ScheduleTaskVector;
+    struct ApiCamera;
     #include "camera_data_i.h"
 
     struct ScheduleTask: ScheduleTaskData
@@ -40,17 +40,13 @@ namespace ec2
 
     QN_DEFINE_STRUCT_SQL_BINDER(ApiCamera, apiCameraDataFields);
 
-    struct ApiCameraList: ApiData
+    struct ApiCameraList: ApiCameraListData
     {
-        std::vector<ApiCamera> data;
-    
         void loadFromQuery(QSqlQuery& query);
 
         template <class T> void toResourceList(QList<T>& outData, QnResourceFactory* factory) const;
         void fromResourceList(const QList<QnVirtualCameraResourcePtr>& cameras);
     };
-
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiCameraList, (data) )
 }
 
 #endif // __API_CAMERA_DATA_H_

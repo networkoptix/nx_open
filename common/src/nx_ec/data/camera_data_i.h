@@ -28,7 +28,7 @@
         QByteArray          mac;
         QString             login;
         QString             password;
-        ScheduleTaskVector  scheduleTask;
+        std::vector<ScheduleTask>  scheduleTask;
         bool                audioEnabled;
         QString             physicalId;
         bool                manuallyAdded;
@@ -46,3 +46,5 @@
     #define apiCameraDataFields (scheduleDisabled) (motionType) (region) (mac) (login) (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) \
                                 (firmware) (groupId) (groupName) (secondaryQuality) (controlDisabled) (statusFlags) (dewarpingParams) (vendor)
     QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiCameraData, ApiResourceData, apiCameraDataFields);
+
+    QN_DEFINE_API_OBJECT_LIST_DATA(ApiCamera)

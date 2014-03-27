@@ -3,7 +3,7 @@
     };
 
     struct ApiIdData: public ApiData {
-        NSUUID *id;
+        QnId id;
     };
 
     QN_DEFINE_STRUCT_SERIALIZATORS(ApiIdData, (id))

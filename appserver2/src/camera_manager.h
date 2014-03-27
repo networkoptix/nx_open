@@ -64,7 +64,7 @@ namespace ec2
             emit cameraRemoved( QnId(tran.params.id) );
         }
 
-        void triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran )
+        void triggerNotification( const QnTransaction<ApiCameraServerItem>& tran )
         {
             QnCameraHistoryItemPtr cameraHistoryItem( new QnCameraHistoryItem(
                 tran.params.physicalId,
@@ -79,7 +79,7 @@ namespace ec2
 
         QnTransaction<ApiCamera> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourcePtr& resource );
         QnTransaction<ApiCameraList> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourceList& cameras );
-        QnTransaction<ApiCameraServerItemData> prepareTransaction( ApiCommand::Value cmd, const QnCameraHistoryItem& historyItem );
+        QnTransaction<ApiCameraServerItem> prepareTransaction( ApiCommand::Value cmd, const QnCameraHistoryItem& historyItem );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
     };
 }

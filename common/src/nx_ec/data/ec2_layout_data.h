@@ -7,7 +7,7 @@
 namespace ec2
 {
     struct ApiLayoutItem;
-    typedef std::vector<ApiLayoutItem> ApiLayoutItemVector;
+    struct ApiLayout;
     #include "ec2_layout_data_i.h"
 
     struct ApiLayoutItem: ApiLayoutItemData
@@ -41,10 +41,8 @@ namespace ec2
 
 namespace ec2
 {
-    struct ApiLayoutList: public ApiData
+    struct ApiLayoutList: public ApiLayoutListData
     {
-        std::vector<ApiLayout> data;
-
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData) const;
         template <class T> void fromResourceList(const QList<T>& srcData)
@@ -57,8 +55,6 @@ namespace ec2
             }
         }
     };
-
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiLayoutList, (data) )
 }
 
 #endif  //EC2_LAYOUT_DATA_H

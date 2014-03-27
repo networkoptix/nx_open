@@ -37,7 +37,7 @@ namespace ec2
             removeResource,
             //!ApiPanicModeData
             setPanicMode,
-            //!ApiFullData,
+            //!ApiFullInfo,
             getAllDataList,
             
             //!ApiCamera
@@ -47,9 +47,9 @@ namespace ec2
             //!ApiIdData
             removeCamera,
             getCameras,
-            //!ApiCameraServerItemDataList
+            //!ApiCameraServerItemList
             getCameraHistoryList,
-            //!ApiCameraServerItemData
+            //!ApiCameraServerItem
             addCameraHistoryItem,
 
             getMediaServerList,
@@ -64,9 +64,9 @@ namespace ec2
             //!ApiIdData
             removeUser,
 
-            //!ApiBusinessRuleDataList
+            //!ApiBusinessRuleList
             getBusinessRuleList,
-            //!ApiBusinessRuleData
+            //!ApiBusinessRule
             saveBusinessRule,
             //!ApiIdData
             removeBusinessRule,

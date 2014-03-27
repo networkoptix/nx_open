@@ -76,13 +76,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraServerItemDataList& cameraHistory) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraServerItemList& cameraHistory) {
             QnCameraHistoryList outData;
             if( errorCode == ErrorCode::ok )
                 cameraHistory.toResourceList(outData);
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> (
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiCameraServerItemList, decltype(queryDoneHandler)> (
             ApiCommand::getCameraHistoryList, nullptr, queryDoneHandler );
         return reqID;
     }
@@ -144,11 +144,11 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    QnTransaction<ApiCameraServerItemData> QnCameraManager<QueryProcessorType>::prepareTransaction(
+    QnTransaction<ApiCameraServerItem> QnCameraManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
         const QnCameraHistoryItem& historyItem )
     {
-        QnTransaction<ApiCameraServerItemData> tran(command, true);
+        QnTransaction<ApiCameraServerItem> tran(command, true);
         tran.params.fromResource(historyItem);
         return tran;
     }

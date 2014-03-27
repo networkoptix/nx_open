@@ -27,13 +27,13 @@ int QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandlerPt
 {
     const int reqID = generateRequestID();
 
-    auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiBusinessRuleDataList& rules) {
+    auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiBusinessRuleList& rules) {
         QnBusinessEventRuleList outData;
         if( errorCode == ErrorCode::ok )
             outData = rules.toResourceList(m_resCtx.pool);
         handler->done( reqID, errorCode, outData);
     };
-    m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiBusinessRuleDataList, decltype(queryDoneHandler)> ( ApiCommand::getBusinessRuleList, nullptr, queryDoneHandler);
+    m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiBusinessRuleList, decltype(queryDoneHandler)> ( ApiCommand::getBusinessRuleList, nullptr, queryDoneHandler);
     return reqID;
 }
 
@@ -121,9 +121,9 @@ QnTransaction<ApiBusinessActionData> QnBusinessEventManager<T>::prepareTransacti
 
 
 template<class T>
-QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource )
+QnTransaction<ApiBusinessRule> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource )
 {
-    QnTransaction<ApiBusinessRuleData> tran(command, true);
+    QnTransaction<ApiBusinessRule> tran(command, true);
     tran.params.fromResource(resource);
     return tran;
 }

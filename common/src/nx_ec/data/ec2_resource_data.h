@@ -14,7 +14,6 @@
 namespace ec2
 {
     struct ApiResourceParam;
-    typedef std::vector<ApiResourceParam> ApiResourceParamVector;
 
     #include "ec2_resource_data_i.h"
 

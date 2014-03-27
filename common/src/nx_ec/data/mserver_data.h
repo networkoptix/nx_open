@@ -8,7 +8,7 @@
 namespace ec2
 {
     struct ApiStorage;
-    typedef std::vector<ApiStorage> StorageVector;
+    struct ApiMediaServer;
 
     #include "mserver_data_i.h"
 
@@ -47,14 +47,10 @@ namespace ec2
     QN_DEFINE_STRUCT_SERIALIZATORS (ApiPanicModeData, (mode))
 
 
-    struct ApiMediaServerList: public ApiData {
-        std::vector<ApiMediaServer> data;
-
+    struct ApiMediaServerList: public ApiMediaServerListData {
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData, const ResourceContext& ctx) const;
     };
-
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiMediaServerList, (data))
 }
 
 #endif //MSERVER_DATA_H

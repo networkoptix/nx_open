@@ -21,7 +21,7 @@
         QString       name;
         QString       url;
         QnId          typeId;
-        ApiResourceParamVector addParams;
+        std::vector<ApiResourceParam> addParams;
     };
 
     #define ApiResourceFields (id) (parentGuid) (status) (disabled) (name) (url) (typeId) (addParams)

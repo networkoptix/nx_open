@@ -75,13 +75,13 @@ namespace ec2
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerList& serverList);
 
         //getCameraServerItems
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServerItemList& historyList);
 
         //getUserList
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserList& userList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleList& userList);
 
         //getBusinessRuleList
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutList& layoutList);
@@ -89,8 +89,8 @@ namespace ec2
         //getResourceParams
         ErrorCode doQueryNoLock(const QnId& resourceId, ApiResourceParams& params);
 
-        // ApiFullData
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiFullData& data);
+        // ApiFullInfo
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiFullInfo& data);
 
         //getLicenses
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseList& data);
@@ -115,12 +115,12 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceStatusData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceDisabledData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceParams>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraServerItemData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraServerItem>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiPanicModeData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiStoredFileData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiStoredFilePath>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResource>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiBusinessRuleData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiBusinessRule>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiUser>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiParamList>& tran); // save settings
@@ -140,7 +140,7 @@ namespace ec2
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiFullData>&) {
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiFullInfo>&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -186,16 +186,16 @@ namespace ec2
         ErrorCode removeUser( const QnId& guid );
         ErrorCode insertOrReplaceUser(const ApiUser& data, qint32 internalId);
 
-        ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
+        ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRule& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);
         ErrorCode removeBusinessRule( const QnId& id );
-        ErrorCode updateBusinessRule(const ApiBusinessRuleData& rule);
+        ErrorCode updateBusinessRule(const ApiBusinessRule& rule);
 
         ErrorCode saveLicense(const ApiLicense& license);
 
         bool createDatabase();
         
-        void mergeRuleResource(QSqlQuery& query, ApiBusinessRuleDataList& data, std::vector<qint32> ApiBusinessRuleData::*resList);
+        void mergeRuleResource(QSqlQuery& query, ApiBusinessRuleList& data, std::vector<qint32> ApiBusinessRule::*resList);
 
         qint32 getResourceInternalId( const QnId& guid );
         qint32 getBusinessRuleInternalId( const QnId& guid );

@@ -25,7 +25,7 @@ void ApiPropertyType::toResource(QnParamTypePtr resource) const
 }
 
 
-void ApiResourceTypeData::toResource(QnResourceTypePtr resource) const
+void ApiResourceType::toResource(QnResourceTypePtr resource) const
 {
 	resource->setId(id);
 	resource->setName(name);
@@ -44,12 +44,12 @@ void ApiResourceTypeData::toResource(QnResourceTypePtr resource) const
 
 void ApiResourceTypeList::loadFromQuery(QSqlQuery& query)
 {
-	QN_QUERY_TO_DATA_OBJECT(query, ApiResourceTypeData, data, (id) (name) (manufacture) );
+	QN_QUERY_TO_DATA_OBJECT(query, ApiResourceType, data, (id) (name) (manufacture) );
 }
 
 void ApiResourceTypeList::toResourceTypeList(QnResourceTypeList& resTypeList) const
 {
-	resTypeList.reserve(data.size());
+	resTypeList.reserve((int)data.size());
 	for(int i = 0; i < data.size(); ++i) {
 		QnResourceTypePtr resType(new QnResourceType());
 		data[i].toResource(resType);

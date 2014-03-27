@@ -639,7 +639,7 @@ ErrorCode QnDbManager::insertBRuleResource(const QString& tableName, const QnId&
     }
 }
 
-ErrorCode QnDbManager::updateBusinessRule(const ApiBusinessRuleData& rule)
+ErrorCode QnDbManager::updateBusinessRule(const ApiBusinessRule& rule)
 {
     ErrorCode rez = insertOrReplaceBusinessRuleTable(rule);
     if (rez != ErrorCode::ok)
@@ -668,7 +668,7 @@ ErrorCode QnDbManager::updateBusinessRule(const ApiBusinessRuleData& rule)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiBusinessRuleData>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiBusinessRule>& tran)
 {
     return updateBusinessRule(tran.params);
 }
@@ -796,7 +796,7 @@ ErrorCode QnDbManager::removeUser( const QnId& guid )
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule)
+ErrorCode QnDbManager::insertOrReplaceBusinessRuleTable( const ApiBusinessRule& businessRule)
 {
     QSqlQuery query(m_sdb);
     query.prepare(QString("INSERT OR REPLACE INTO vms_businessrule (guid, event_type, event_condition, event_state, action_type, \
@@ -875,7 +875,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceP
     return insertAddParams(tran.params.params, internalId);
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraServerItemData>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraServerItem>& tran)
 {
     QSqlQuery lastHistory(m_sdb);
     lastHistory.prepare("SELECT server_guid, max(timestamp) FROM vms_cameraserveritem WHERE physical_id = ? AND timestamp < ?");
@@ -1232,11 +1232,11 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
     }
 
 	data.loadFromQuery(queryTypes);
-    mergeIdListData(queryParents, data.data, &ApiResourceTypeData::parentId);
+    mergeIdListData(queryParents, data.data, &ApiResourceType::parentId);
 
     std::vector<ApiPropertyType> allProperties;
     QN_QUERY_TO_DATA_OBJECT(queryProperty, ApiPropertyType, allProperties, ApiPropertyTypeFields);
-    mergeObjectListData(data.data, allProperties, &ApiResourceTypeData::propertyTypeList, &ApiPropertyType::resource_type_id);
+    mergeObjectListData(data.data, allProperties, &ApiResourceType::propertyTypeList, &ApiPropertyType::resource_type_id);
 
     m_cachedResTypes = data;
 
@@ -1391,7 +1391,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerL
 }
 
 //getCameraServerItems
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServerItemList& historyList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -1447,7 +1447,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserList& us
 }
 
 //getBusinessRules
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& businessRuleList)
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleList& businessRuleList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -1479,8 +1479,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRule
 
     // merge data
 
-    mergeIdListData<ApiBusinessRuleData>(queryRuleEventRes, businessRuleList.data, &ApiBusinessRuleData::eventResource);
-    mergeIdListData<ApiBusinessRuleData>(queryRuleActionRes, businessRuleList.data, &ApiBusinessRuleData::actionResource);
+    mergeIdListData<ApiBusinessRule>(queryRuleEventRes, businessRuleList.data, &ApiBusinessRule::eventResource);
+    mergeIdListData<ApiBusinessRule>(queryRuleActionRes, businessRuleList.data, &ApiBusinessRule::actionResource);
 
     return ErrorCode::ok;
 }
@@ -1511,8 +1511,8 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, qint64& currentTime)
     return ErrorCode::ok;
 }
 
-// ApiFullData
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullData& data)
+// ApiFullInfo
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfo& data)
 {
     ErrorCode err;
 
@@ -1583,7 +1583,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResetBusi
     if (!execSQLQuery("DELETE FROM vms_businessrule"))
         return ErrorCode::failure;
 
-    foreach (const ApiBusinessRuleData& rule, tran.params.defaultRules.data)
+    foreach (const ApiBusinessRule& rule, tran.params.defaultRules.data)
     {
         ErrorCode rez = updateBusinessRule(rule);
         if (rez != ErrorCode::ok)

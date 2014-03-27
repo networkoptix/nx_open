@@ -123,7 +123,7 @@ namespace ec2
             m_resourceManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiCameraServerItem>& tran ) {
             return m_cameraManager->triggerNotification( tran );
         }
 
@@ -131,7 +131,7 @@ namespace ec2
             return m_userManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiBusinessRule>& tran ) {
             return m_businessEventManager->triggerNotification( tran );
         }
 
@@ -147,7 +147,7 @@ namespace ec2
             return m_storedFileManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiFullData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiFullInfo>& tran ) {
             QnFullResourceData fullResData;
             tran.params.toResourceList( fullResData, m_resCtx );
             emit initNotification(fullResData);

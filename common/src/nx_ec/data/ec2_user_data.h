@@ -6,6 +6,7 @@
 
 namespace ec2
 {
+    struct ApiUser;
     #include "ec2_user_data_i.h"
 
     struct ApiUser: ApiUserData, ApiResource
@@ -16,17 +17,11 @@ namespace ec2
     };
     QN_DEFINE_STRUCT_SQL_BINDER(ApiUser, ApiUserFields);
 
-
-
-    struct ApiUserList: public ApiData
+    struct ApiUserList: public ApiUserListData
     {
-        std::vector<ApiUser> data;
-
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData) const;
     };
-
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiUserList, (data) )
 }
 
 #endif // __EC2_USER_DATA_H_

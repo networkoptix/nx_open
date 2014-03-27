@@ -100,9 +100,9 @@ namespace ec2
         //AbstractCameraManager::getCameras
         registerGetFuncHandler<QnId, ApiCameraList>( restProcessorPool, ApiCommand::getCameras );
         //AbstractCameraManager::addCameraHistoryItem
-        registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
+        registerUpdateFuncHandler<ApiCameraServerItem>( restProcessorPool, ApiCommand::addCameraHistoryItem );
         //AbstractCameraManager::getCameraHistoryList
-        registerGetFuncHandler<nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryList );
+        registerGetFuncHandler<nullptr_t, ApiCameraServerItemList>( restProcessorPool, ApiCommand::getCameraHistoryList );
 
 
         //TODO AbstractLicenseManager
@@ -110,9 +110,9 @@ namespace ec2
 
 
         //AbstractBusinessEventManager::getBusinessRules
-        registerGetFuncHandler<nullptr_t, ApiBusinessRuleDataList>( restProcessorPool, ApiCommand::getBusinessRuleList );
+        registerGetFuncHandler<nullptr_t, ApiBusinessRuleList>( restProcessorPool, ApiCommand::getBusinessRuleList );
         //AbstractBusinessEventManager::save
-        registerUpdateFuncHandler<ApiBusinessRuleData>( restProcessorPool, ApiCommand::saveBusinessRule );
+        registerUpdateFuncHandler<ApiBusinessRule>( restProcessorPool, ApiCommand::saveBusinessRule );
         //AbstractBusinessEventManager::deleteRule
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeBusinessRule );
 

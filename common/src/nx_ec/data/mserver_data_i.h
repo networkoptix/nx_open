@@ -20,8 +20,10 @@
         QString      streamingUrl;
         QString      version; 
         QString      authKey;
-        StorageVector storages;
+        std::vector<ApiStorage> storages;
     };
 
     #define medisServerDataFields (apiUrl) (netAddrList) (flags) (panicMode) (streamingUrl) (version) (authKey) (storages)
     QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiMediaServerData, ApiResourceData, medisServerDataFields);
+
+    QN_DEFINE_API_OBJECT_LIST_DATA(ApiMediaServer)

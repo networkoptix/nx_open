@@ -24,7 +24,7 @@
         float cellAspectRatio;
         float cellSpacingWidth;
         float cellSpacingHeight;
-        ApiLayoutItemVector items;
+        std::vector<ApiLayoutItem> items;
         bool   userCanEdit;
         bool   locked;
         QString backgroundImageFilename;
@@ -36,3 +36,6 @@
 
     #define ApiLayoutFields (cellAspectRatio) (cellSpacingWidth) (cellSpacingHeight) (items) (userCanEdit) (locked) (backgroundImageFilename) (backgroundWidth) (backgroundHeight) (backgroundOpacity) (userId)
     QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiLayoutData, ApiResourceData, ApiLayoutFields);
+
+    QN_DEFINE_API_OBJECT_LIST_DATA(ApiLayout)
+

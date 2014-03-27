@@ -6,7 +6,7 @@ static const int KV_RESOURCE_PARAMS_COMMON_COUNT = 10;
 
 namespace ec2
 {
-    void ApiFullData::toResourceList(QnFullResourceData& outData, const ResourceContext& ctx) const
+    void ApiFullInfo::toResourceList(QnFullResourceData& outData, const ResourceContext& ctx) const
     {
         resTypes.toResourceTypeList(outData.resTypes);
         foreach(const QnResourceTypePtr& resType, outData.resTypes)

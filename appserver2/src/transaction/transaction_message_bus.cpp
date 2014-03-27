@@ -252,7 +252,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
     switch (abstractTran.command)
     {
         case ApiCommand::getAllDataList:
-            return deliveryTransaction<ApiFullData>(abstractTran, stream);
+            return deliveryTransaction<ApiFullInfo>(abstractTran, stream);
 
         //!ApiSetResourceStatusData
         case ApiCommand::setResourceStatus:
@@ -277,7 +277,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
         case ApiCommand::removeCamera:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
         case ApiCommand::addCameraHistoryItem:
-            return deliveryTransaction<ApiCameraServerItemData>(abstractTran, stream);
+            return deliveryTransaction<ApiCameraServerItem>(abstractTran, stream);
 
         case ApiCommand::saveMediaServer:
             return deliveryTransaction<ApiMediaServer>(abstractTran, stream);
@@ -290,7 +290,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
         case ApiCommand::saveBusinessRule:
-            return deliveryTransaction<ApiBusinessRuleData>(abstractTran, stream);
+            return deliveryTransaction<ApiBusinessRule>(abstractTran, stream);
         case ApiCommand::removeBusinessRule:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
@@ -508,7 +508,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& remoteGuid, qint64 timediff)
 {
-    QnTransaction<ApiFullData> tran;
+    QnTransaction<ApiFullInfo> tran;
     if (isClient) 
     {
         tran.command = ApiCommand::getAllDataList;
