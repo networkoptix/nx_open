@@ -107,11 +107,11 @@ void QnOpenGLRenderer::drawPerVertexColoredPolygon( const std::vector<float>& a_
         shader->setModelViewProjectionMatrix(m_projectionMatrix*m_modelViewMatrix);
         shader->setColor(m_color);
 
-        if ( shader->_first_bind )
+        if ( shader->wasBind() )
         {
             shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
             shader->bindAttributeLocation("aColor",VERTEX_COLOR_INDX);
-            shader->_first_bind = false;
+            shader->setWasBind(false);
         };
         
         glVertexAttribPointer(VERTEX_POS_INDX, VERTEX_POS_SIZE, GL_FLOAT, GL_FALSE, 0, &a_positions[0]);
@@ -145,10 +145,10 @@ void QnOpenGLRenderer::drawColoredQuad(const float* v_array, QnColorGLShaderProg
         shader->bind();
         shader->setModelViewProjectionMatrix(m_projectionMatrix*m_modelViewMatrix);
         shader->setColor(m_color);
-        if ( shader->_first_bind )
+        if ( shader->wasBind() )
         {
             shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
-            shader->_first_bind = false;
+            shader->setWasBind(false);
         };
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT,m_indices_for_render_quads);
@@ -189,11 +189,11 @@ void QnOpenGLRenderer::drawBindedTextureOnQuad( const float* v_array, const floa
         if (empty_shader)
             m_textureColorProgram->setColor(m_color);
         
-        if ( shader->_first_bind )
+        if ( shader->wasBind() )
         {
             shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
             shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
-            shader->_first_bind = false;
+            shader->setWasBind(false);
         };        
 
         if (empty_shader)
@@ -250,10 +250,10 @@ void    QnOpenGLRenderer:: drawColoredPolygon( const float* v_array, unsigned in
         shader->setColor(m_color);
         shader->setModelViewProjectionMatrix(m_projectionMatrix*m_modelViewMatrix);
         
-        if ( shader->_first_bind )
+        if ( shader->wasBind() )
         {
             shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
-            shader->_first_bind = false;
+            shader->setWasBind(false);
         };     
 
         glDrawArrays(GL_TRIANGLE_FAN,0,size);

@@ -19,18 +19,19 @@ public:
         }
         return rez;
     }
+    void setWasBind( bool bind ){ m_first_bind = bind; };
+    bool wasBind() const{ return m_first_bind; };
 
 protected:
     QnAbstractBaseGLShaderProgramm(const QGLContext *context = NULL, QObject *parent = NULL)
         : QGLShaderProgram(context,parent),
-          _first_bind(true)
+          m_first_bind(true)
     {
     };
-public:
-    bool _first_bind;
 private:
     int m_modelViewProjection;
     int m_vertices;
+    bool m_first_bind;
 };
 
 #endif // QN_COLOR_SHADER_PROGRAM_H
