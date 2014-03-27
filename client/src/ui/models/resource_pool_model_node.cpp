@@ -62,6 +62,8 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
     default:
         break;
     }
+
+    m_editable.checked = false;
 }
 
 /**
@@ -80,6 +82,8 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
     assert(model != NULL);
 
     setResource(resource);
+
+    m_editable.checked = false;
 }
 
 /**
@@ -97,6 +101,8 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
     m_checked(Qt::Unchecked)
 {
     assert(model != NULL);
+
+    m_editable.checked = false;
 }
 
 QnResourcePoolModelNode::~QnResourcePoolModelNode() {
@@ -336,7 +342,11 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
 
     switch(m_type) {
     case Qn::ResourceNode:
-        if(m_model->context()->menu()->canTrigger(Qn::RenameAction, QnActionParameters(m_resource)))
+        if (!m_editable.checked) {
+            m_editable.value = m_model->context()->menu()->canTrigger(Qn::RenameAction, QnActionParameters(m_resource));
+            m_editable.checked = true;
+        }
+        if(m_editable.value)
             result |= Qt::ItemIsEditable;
         /* Fall through. */
     case Qn::ItemNode:

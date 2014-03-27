@@ -161,6 +161,13 @@ private:
 
     /** Whether this resource is checked. */
     Qt::CheckState m_checked;
+
+    //TODO: #GDM implement cache invalidating in case of permissions change
+    /** Whether this resource can be renamed, cached value. */
+    mutable struct {
+        bool value;
+        bool checked;
+    } m_editable;
 };
 
 #endif // RESOURCE_POOL_MODEL_NODE_H
