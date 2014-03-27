@@ -7,7 +7,7 @@
     };
 
     #define ApiStorageFields  (spaceLimit) (usedForWriting)
-    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiStorageData, ec2::ApiResourceData, ApiStorageFields);
+    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiStorageData, ApiResourceData, ApiStorageFields);
 
     struct ApiMediaServerData: virtual ApiResourceData
     {
@@ -24,4 +24,4 @@
     };
 
     #define medisServerDataFields (apiUrl) (netAddrList) (flags) (panicMode) (streamingUrl) (version) (authKey) (storages)
-    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiMediaServerData, ec2::ApiResourceData, medisServerDataFields);
+    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiMediaServerData, ApiResourceData, medisServerDataFields);

@@ -35,4 +35,4 @@
     };
 
     #define ApiLayoutFields (cellAspectRatio) (cellSpacingWidth) (cellSpacingHeight) (items) (userCanEdit) (locked) (backgroundImageFilename) (backgroundWidth) (backgroundHeight) (backgroundOpacity) (userId)
-    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiLayoutData, ec2::ApiResourceData, ApiLayoutFields);
+    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiLayoutData, ApiResourceData, ApiLayoutFields);
