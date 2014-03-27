@@ -22,9 +22,12 @@ public:
 
 protected:
     QnAbstractBaseGLShaderProgramm(const QGLContext *context = NULL, QObject *parent = NULL)
-        : QGLShaderProgram(context,parent)
+        : QGLShaderProgram(context,parent),
+          _first_bind(true)
     {
     };
+public:
+    bool _first_bind;
 private:
     int m_modelViewProjection;
     int m_vertices;

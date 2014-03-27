@@ -370,6 +370,8 @@ public:
                 GLint textureHeight = 0;
 //                glGetTexLevelParameteriv( GL_TEXTURE_2D, 0,  GL_TEXTURE_HEIGHT, &textureHeight );
                 //Q_ASSERT( textureSize == QSize(textureWidth, textureHeight) );
+                
+
 
                 glTexSubImage2D(
                     GL_TEXTURE_2D, 

@@ -462,12 +462,29 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
 
 //        glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
         glCheckError("glPixelStorei");
-
+        int width = qPower2Ceil(r_w[0],ROUND_COEFF);
+        int height = h[0];
+        int gl_format = glRGBFormat(m_format);
+        if ( width == lineInPixelsSize )
+        {
+            glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0 , lineInPixelsSize, height, gl_format, GL_UNSIGNED_BYTE, pixels );
+        } else if (width > lineInPixelsSize)
+        {        
+            for( int y = 0; y < height; y++ )
+            {
+                const uchar *row = pixels + (y*width) * bytesPerPixel;
+                glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , lineInPixelsSize, 1, gl_format, GL_UNSIGNED_BYTE, row );
+            }
+        } else
+        {
+            qDebug()<<"Error! Bad using fuction loadImageData";
+        }
+        /*
         glTexSubImage2D(GL_TEXTURE_2D, 0,
             0, 0,
             qPower2Ceil(r_w[0],ROUND_COEFF),
             h[0],
-            glRGBFormat(m_format), GL_UNSIGNED_BYTE, pixels);
+            glRGBFormat(m_format), GL_UNSIGNED_BYTE, pixels);*/
         glCheckError("glTexSubImage2D");
 
 //        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
