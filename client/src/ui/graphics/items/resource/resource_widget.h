@@ -365,6 +365,7 @@ protected:
 
     void ensureAboutToBeDestroyedEmitted();
 
+    Q_SLOT virtual void at_itemDataChanged(int role);
 private:
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);
