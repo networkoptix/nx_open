@@ -970,9 +970,7 @@ void QnResourceWidget::optionsChangedNotify(Options changedFlags){
 }
 
 void QnResourceWidget::at_itemDataChanged(int role) {
-    if (role != Qn::ItemCheckedButtonsRole)
-        return;
-    updateCheckedButtons();
+    Q_UNUSED(role)
 }
 
 void QnResourceWidget::at_iconButton_visibleChanged() {
