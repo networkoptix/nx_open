@@ -85,22 +85,6 @@ void QnAppserverResourceProcessor::requestFinished2(int /*reqID*/, ec2::ErrorCod
     }
 }
 
-#ifdef OLD_EC
-void QnAppserverResourceProcessor::requestFinished(const QnHTTPRawResponse& response, int handle)
-{
-    QnResourcePtr resource = m_handleToResource.value(handle);
-    if (resource && response.status != 0)
-        qCritical() << "Failed to update resource status" << resource->getId();
-
-    m_handleToResource.remove(handle);
-
-    if (m_awaitingSetStatus.contains(resource)) {
-        updateResourceStatusAsync(resource);
-        m_awaitingSetStatus.remove(resource);
-    }
-}
-#endif
-
 bool QnAppserverResourceProcessor::isSetStatusInProgress(const QnResourcePtr &resource)
 {
     return m_setStatusInProgress.contains(resource->getId());

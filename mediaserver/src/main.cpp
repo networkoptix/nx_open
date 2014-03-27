@@ -1059,24 +1059,6 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
 
-#ifdef OLD_EC
-    while (!needToStop())
-    {
-        if (appServerConnection->connect(connectInfo) == 0)
-            break;
-        if (directConnectTried) {
-            directConnectTried = false;
-            initAppServerConnection(*MSSettings::roSettings(), directConnectTried);
-            appServerConnection->setUrl(QnAppServerConnectionFactory::defaultUrl());
-            continue;
-        }
-
-        cl_log.log("Can't connect to Enterprise Controller: ", appServerConnection->getLastError(), cl_logWARNING);
-        if (!needToStop())
-            QnSleep::msleep(1000);
-    }
-#endif
-
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
     QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
 
@@ -1105,21 +1087,10 @@ void QnMain::run()
         return;
     }
 
-#ifdef OLD_EC
-    while (!needToStop() && !initResourceTypes(appServerConnection))
-#else
     while (!needToStop() && !initResourceTypes(ec2Connection))
-#endif
     {
         QnSleep::msleep(1000);
     }
-
-#ifdef OLD_EC
-    while (!needToStop() && !initLicenses(appServerConnection))
-    {
-        QnSleep::msleep(1000);
-    }
-#endif
 
     if (needToStop())
         return;
@@ -1132,7 +1103,8 @@ void QnMain::run()
     QnRestProcessorPool restProcessorPool;
     QnRestProcessorPool::initStaticInstance( &restProcessorPool );
 
-    ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
+    if( QnAppServerConnectionFactory::defaultUrl().scheme().toLower() == lit("file") )
+        ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
 
     initTcpListener();
 

@@ -234,24 +234,6 @@ ec2::AbstractECConnectionPtr QnAppServerConnectionFactory::getConnection2()
     return currentlyUsedEc2Connection;
 }
 
-
-#ifdef OLD_EC
-bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
-{
-    QList<QnResourceTypePtr> resourceTypeList;
-
-    if (appServerConnection->getResourceTypes(resourceTypeList) != 0)
-    {
-        qWarning() << "Can't get resource types: " << appServerConnection->getLastError();
-        return false;
-    }
-
-    qnResTypePool->replaceResourceTypeList(resourceTypeList);
-
-    return true;
-}
-#endif
-
 bool initResourceTypes(ec2::AbstractECConnectionPtr ec2Connection)
 {
     QList<QnResourceTypePtr> resourceTypeList;
