@@ -619,7 +619,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSha
 
 double CLFFmpegVideoDecoder::getSampleAspectRatio() const
 {
-    if (!m_context || !m_context->width || !m_context->height)
+    if (!m_context || m_context->width <= 8 || m_context->height <= 8)
         return m_prevSampleAspectRatio;
 
     double result = av_q2d(m_context->sample_aspect_ratio);
