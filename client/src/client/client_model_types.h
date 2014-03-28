@@ -129,5 +129,35 @@ typedef QHash<int, QString> QnPtzHotkeyHash;
 Q_DECLARE_METATYPE(QnPtzHotkey);
 QN_DECLARE_FUNCTIONS(QnPtzHotkey, (json));
 
+// -------------------------------------------------------------------------- //
+// QnVideowallAttachSettings
+// -------------------------------------------------------------------------- //
+
+struct QnVideowallAttachSettings {
+    enum AttachMode {
+        AttachWindow,
+        AttachScreen,
+        AttachAll
+    };
+
+    enum LayoutMode {
+        LayoutNone,
+        LayoutClone,
+        LayoutCustom
+    };
+
+    AttachMode attachMode;
+    LayoutMode layoutMode;
+    int layoutId;               /**< for custom layout */
+    bool autoFill;
+    bool closeClient;
+
+    QnVideowallAttachSettings():
+        attachMode(AttachScreen),
+        layoutMode(LayoutClone),
+        layoutId(0),
+        autoFill(true),
+        closeClient(true){}
+};
 
 #endif // QN_CLIENT_MODEL_TYPES_H

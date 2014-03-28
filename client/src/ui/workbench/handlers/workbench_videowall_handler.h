@@ -7,8 +7,9 @@
 
 #include <api/app_server_connection.h>
 
-#include <core/resource/resource_fwd.h>
+#include <client/client_model_types.h>
 
+#include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_control_message.h>
 
@@ -32,7 +33,7 @@ public:
 private:
     QnAppServerConnectionPtr connection() const;
 
-    void attachLayout(const QnVideoWallResourcePtr &videoWall, const QnId &layoutId);
+    void attachLayout(const QnVideoWallResourcePtr &videoWall, const QnId &layoutId, const QnVideowallAttachSettings &settings);
     void resetLayout(const QnVideoWallItemIndexList &items, const QnId &layoutId);
 
     void openNewWindow(const QStringList &args);
@@ -203,6 +204,8 @@ private:
     QHash<int, QnVideoWallResourcePtr> m_attaching;
     QHash<int, QnVideoWallItemIndexList> m_resetting;
     QHash<int, QnLayoutResourcePtr> m_savingReviews;
+
+    QnVideowallAttachSettings m_attachSettings;
 };
 
 #endif // WORKBENCH_VIDEOWALL_HANDLER_H

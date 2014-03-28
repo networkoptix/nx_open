@@ -34,6 +34,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/dialogs/layout_name_dialog.h> //TODO: #GDM VW refactor
+#include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -341,7 +342,7 @@ QRect QnWorkbenchVideoWallHandler::calculateSnapGeometry(const QList<QnVideoWall
 
 }
 
-void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &videoWall, const QnId &layoutId) {
+void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &videoWall, const QnId &layoutId, const QnVideowallAttachSettings &settings) {
 
 
     QDesktopWidget* desktop = qApp->desktop();
@@ -1055,22 +1056,49 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
 
 void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
-
     QnVideoWallResourcePtr videoWall = parameters.resource().dynamicCast<QnVideoWallResource>();
     if(videoWall.isNull())
         return;    // TODO: #GDM VW implement videoWall selection / creation dialog
 
+    // create videowall item(s), save videowall(async), reset layout (possibly async), start? shutdown?
+
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole,
                                                                           workbench()->currentLayout()->resource());
 
-    QnLayoutResourcePtr newLayout = layout->clone();
-    newLayout->setName(generateUniqueLayoutName(context()->user(), tr("VideoWall Layout"),  tr("VideoWall Layout %1")));
-    newLayout->setParentId(context()->user()->getId());
-    newLayout->setCellSpacing(QSizeF(0.0, 0.0));
-    newLayout->setUserCanEdit(true);
-    resourcePool()->addResource(newLayout);
-    int requestId = snapshotManager()->save(newLayout, this, SLOT(at_videoWall_layout_saved(int, const QnResourceList &, int)));
-    m_attaching.insert(requestId, videoWall);
+    QnLayoutResourceList layouts = qnResPool->getResourcesWithParentId(context()->user()).filtered<QnLayoutResource>();
+
+    QScopedPointer<QnAttachToVideowallDialog> dialog(new QnAttachToVideowallDialog(mainWindow()));
+    dialog->loadLayoutsList(layouts);
+    dialog->loadSettings(m_attachSettings);
+    if (!dialog->exec())
+        return;
+    m_attachSettings = dialog->settings();
+
+    QnLayoutResourcePtr targetLayout;
+
+    switch (m_attachSettings.layoutMode) {
+    case QnVideowallAttachSettings::LayoutCustom:
+    {
+        int idx = qnIndexOf(layouts, [&](const QnLayoutResourcePtr &l){ return l->getId() == m_attachSettings.layoutId; });
+        if (idx >= 0)
+            targetLayout = layouts[idx];
+        break;
+    }
+    case QnVideowallAttachSettings::LayoutClone:
+    {
+        targetLayout = layout->clone();
+        targetLayout->setName(generateUniqueLayoutName(context()->user(), tr("VideoWall Layout"),  tr("VideoWall Layout %1")));
+        targetLayout->setParentId(context()->user()->getId());
+        targetLayout->setCellSpacing(QSizeF(0.0, 0.0));
+        targetLayout->setUserCanEdit(true);
+        resourcePool()->addResource(targetLayout);
+        break;
+    }
+    default:
+        break;
+    }
+
+    attachLayout(videoWall, targetLayout, m_attachSettings);
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered() {
