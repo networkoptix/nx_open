@@ -35,6 +35,9 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiResourceData>& tran ) {
             QnResourcePtr resource( new QnResource() );
             tran.params.toResource( resource );
+            QnResourcePtr existResource = m_resCtx.pool->getResourceById(tran.params.id);
+            if (existResource)
+                resource->setFlags(existResource->flags());
             emit resourceChanged( resource );
         }
 
