@@ -37,7 +37,6 @@ public:
 
 protected:
     QGridLayout *customizedLayout() const { return dynamic_cast<QGridLayout *>(layout()); }
-    void updateCustomizedLayout() {}
 };
 #endif
 
