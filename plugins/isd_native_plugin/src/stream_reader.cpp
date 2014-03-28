@@ -309,7 +309,7 @@ int StreamReader::initializeVMux()
         m_videoCodec = nxcip::CODEC_ID_MJPEG;
     else
     {
-        std::cerr<<"ISD plugin: unsupported video format "<<stream_info.enc_type<<"\n";
+        std::cerr<<"ISD plugin: unsupported video format "<<stream_info.enc_type << " for encoder " << m_encoderNum << "\n";
         return nxcip::NX_INVALID_ENCODER_NUMBER;
     }
 
