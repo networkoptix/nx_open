@@ -800,9 +800,9 @@ ErrorCode QnDbManager::insertOrReplaceBusinessRuleTable( const ApiBusinessRuleDa
 {
     QSqlQuery query(m_sdb);
     query.prepare(QString("INSERT OR REPLACE INTO vms_businessrule (guid, event_type, event_condition, event_state, action_type, \
-                          action_params, aggregation_period, disabled, comments, schedule) VALUES \
+                          action_params, aggregation_period, disabled, comments, schedule, system) VALUES \
                           (:id, :eventType, :eventCondition, :eventState, :actionType, \
-                          :actionParams, :aggregationPeriod, :disabled, :comments, :schedule)"));
+                          :actionParams, :aggregationPeriod, :disabled, :comments, :schedule, :system)"));
     businessRule.autoBindValues(query);
     if (query.exec()) {
         return ErrorCode::ok;
