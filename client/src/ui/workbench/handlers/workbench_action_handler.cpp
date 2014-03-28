@@ -948,8 +948,8 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
         }
         if (!resources.isEmpty()) {
             parameters.setResources(resources);
-            if (!parameters.hasArgument(Qn::ItemTimeRole))  // TODO: #dklychkov be careful with existing parameters overwriting, @see bug #3112
-                parameters.setArgument(Qn::ItemTimeRole, navigator()->timeSlider()->sliderPosition());
+            //if (!parameters.hasArgument(Qn::ItemTimeRole))  // TODO: #dklychkov be careful with existing parameters overwriting, @see bug #3112
+                //parameters.setArgument(Qn::ItemTimeRole, navigator()->timeSlider()->sliderPosition());
             menu()->trigger(Qn::OpenInLayoutAction, parameters);
         }
     } else {

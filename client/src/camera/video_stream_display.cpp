@@ -117,7 +117,7 @@ bool QnVideoStreamDisplay::allocScaleContext( const CLVideoDecoderOutput& outFra
                                     m_outputWidth, m_outputHeight, PIX_FMT_RGBA,
                                     SWS_POINT, NULL, NULL, NULL);
     // TODO: check this workaround. For some reason the function under fails in MacOS and returns '-1' instead of NULL
-    if (m_scaleContext != reinterpret_cast<SwsContext *>(-1))
+    if (m_scaleContext == reinterpret_cast<SwsContext *>(-1))
         m_scaleContext = 0;
     if (!m_scaleContext)
         cl_log.log(QLatin1String("Can't get swscale context"), cl_logERROR);
