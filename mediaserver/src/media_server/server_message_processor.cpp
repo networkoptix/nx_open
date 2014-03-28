@@ -21,7 +21,27 @@
 #include "utils/network/simple_http_client.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor():
-    base_type() {
+    base_type(),
+    m_thread(new QThread()) {
+
+    connect(this, SIGNAL(aboutToBeStarted()), this, SLOT(at_aboutToBeStarted()));
+    m_thread->setObjectName( QLatin1String("QnServerMessageProcessor") ); /* Name will be shown in debugger. */
+    this->moveToThread(m_thread.data());
+
+    m_thread->start();
+}
+
+void QnServerMessageProcessor::run() {
+    emit aboutToBeStarted();
+}
+
+void QnServerMessageProcessor::at_aboutToBeStarted() {
+    assert(QThread::currentThread() == this->thread());
+
+    // We need to be responsive
+    m_thread->setPriority(QThread::HighestPriority);
+
+    base_type::run();
 }
 
 void QnServerMessageProcessor::handleConnectionOpened(const QnMessage &message) {

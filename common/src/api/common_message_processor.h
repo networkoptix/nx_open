@@ -56,6 +56,11 @@ protected:
     QSharedPointer<QnMessageSource> m_source;
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
+
+private:
+    QUrl m_url;
+    QString m_authKey;
+    int m_reconnectTimeout;
 };
 
 #endif // COMMON_MESSAGE_PROCESSOR_H
