@@ -9,9 +9,12 @@ namespace ec2
 
 struct ApiLockData: public ApiData
 {
+    ApiLockData(): timestamp(0) {}
+
     QByteArray name;
     QnId peer;
     qint64 timestamp;
+    QByteArray userData;
 };
 QN_DEFINE_STRUCT_SERIALIZATORS (ApiLockData, (name) (peer) (timestamp))
 
