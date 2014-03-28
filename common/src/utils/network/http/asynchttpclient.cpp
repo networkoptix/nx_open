@@ -353,10 +353,10 @@ namespace nx_http
         resetDataBeforeNewRequest();
         m_url = url;
         composeRequest( nx_http::Method::POST );
-        m_request.headers["Content-Type"] = contentType;
-        m_request.headers["Content-Length"] = StringType::number(messageBody.size());
+        m_request.headers.insert( make_pair("Content-Type", contentType) );
+        m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
         //TODO/IMPL support chunked encoding & compression
-        m_request.headers["Content-Encoding"] = "identity";
+        m_request.headers.insert( make_pair("Content-Encoding", "identity") );
         m_request.messageBody = messageBody;
         return initiateHttpMessageDelivery( url );
     }
@@ -565,7 +565,7 @@ namespace nx_http
 
     void AsyncHttpClient::addRequestHeader(const StringType& key, const StringType& value)
     {
-        m_request.headers[key] = value;
+        m_request.headers.insert( make_pair(key, value) );
     }
 
     void AsyncHttpClient::serializeRequest()
@@ -747,7 +747,8 @@ namespace nx_http
 
         BufferType authorizationStr;
         digestAuthorizationHeader.serialize( &authorizationStr );
-        m_request.headers[Header::Authorization::NAME] = authorizationStr;
+        m_request.headers.erase( Header::Authorization::NAME );
+        m_request.headers.insert( make_pair(Header::Authorization::NAME, authorizationStr) );
 
         m_authorizationTried = true;
         return initiateHttpMessageDelivery( m_url );
