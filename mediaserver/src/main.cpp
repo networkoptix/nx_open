@@ -1220,9 +1220,6 @@ void QnMain::run()
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
-    QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
-
-
     m_moduleFinder = new NetworkOptixModuleFinder(false);
     //if (cmdLineArguments.devModeKey == lit("raz-raz-raz"))
         m_moduleFinder->setCompatibilityMode(true);
@@ -1328,6 +1325,8 @@ void QnMain::run()
         qWarning() << "Some autodiscovery is disabled: " << disabledVendors;
 
     connect(QnServerMessageProcessor::instance(), &QnServerMessageProcessor::connectionReset, this, &QnMain::loadResourcesFromECS);
+
+    QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
 
     /*
     QnScheduleTaskList scheduleTasks;

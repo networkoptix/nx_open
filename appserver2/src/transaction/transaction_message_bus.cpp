@@ -39,6 +39,12 @@ QnTransactionMessageBus::QnTransactionMessageBus():
     m_mutex(QMutex::Recursive),
     m_thread(nullptr)
 {
+}
+
+void QnTransactionMessageBus::start()
+{
+    if (m_thread)
+        return;
     m_thread = new QThread();
     m_thread->setObjectName("QnTransactionMessageBusThread");
     m_thread->start();

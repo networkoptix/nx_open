@@ -27,6 +27,8 @@ namespace ec2
         void removeConnectionFromPeer(const QUrl& url);
         void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& removeGuid, qint64 timediff);
         
+        void start();
+
         template <class T>
         void setHandler(T* handler) { 
             QMutexLocker lock(&m_mutex);
