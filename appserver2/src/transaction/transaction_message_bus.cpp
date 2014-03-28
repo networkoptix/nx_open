@@ -9,6 +9,7 @@
 #include "utils/common/synctime.h"
 #include "nx_ec/data/server_alive_data.h"
 #include "transaction_log.h"
+#include "api/app_server_connection.h"
 
 namespace ec2
 {
@@ -511,6 +512,10 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     QnTransaction<ApiFullData> tran;
     if (isClient) 
     {
+        QnResourcePtr res = qnResPool->getResourceById(remoteGuid);
+        if (res && res->getStatus() != QnResource::Online)
+            QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(remoteGuid, QnResource::Online);
+
         tran.command = ApiCommand::getAllDataList;
         tran.id.peerGUID = qnCommon->moduleGUID();
         const ErrorCode errorCode = dbManager->doQuery(nullptr, tran.params);

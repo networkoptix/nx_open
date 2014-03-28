@@ -106,7 +106,7 @@ bool QnDbManager::init()
 
 
     QSqlQuery queryServers(m_sdb);
-    queryServers.prepare("UPDATE vms_resource set status = ? WHERE xtype_guid = ?");
+    queryServers.prepare("UPDATE vms_resource set status = ? WHERE xtype_guid = ?"); // todo: only mserver without DB?
     queryServers.bindValue(0, QnResource::Offline);
     queryServers.bindValue(1, m_serverTypeId.toRfc4122());
     bool rez = queryServers.exec();
