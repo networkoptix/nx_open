@@ -9,9 +9,10 @@ namespace ec2
 
 static const qint64 NO_MUTEX_LOCK = INT64_MAX;
 
-QnDistributedMutexManager::QnDistributedMutexManager()
+QnDistributedMutexManager::QnDistributedMutexManager():
+    m_timestamp(1),
+    m_userDataHandler(0)
 {
-    m_timestamp = 1;
     connect(qnTransactionBus, &QnTransactionMessageBus::gotLockRequest,    this, &QnDistributedMutexManager::at_gotLockRequest, Qt::DirectConnection);
     connect(qnTransactionBus, &QnTransactionMessageBus::gotLockResponse,   this, &QnDistributedMutexManager::at_gotLockResponse, Qt::DirectConnection);
     connect(qnTransactionBus, &QnTransactionMessageBus::gotUnlockRequest,  this, &QnDistributedMutexManager::at_gotUnlockRequest, Qt::DirectConnection);
@@ -54,6 +55,8 @@ void QnDistributedMutexManager::at_gotLockRequest(ApiLockData lockData)
         tran.params.name = lockData.name;
         tran.params.timestamp = lockData.timestamp;
         tran.params.peer = qnCommon->moduleGUID();
+        if (m_userDataHandler)
+            tran.params.userData = m_userDataHandler->getUserData(lockData.name);
         qnTransactionBus->sendTransaction(tran);
     }
 }
@@ -117,6 +120,9 @@ void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCom
     tran.params.name = m_name;
     tran.params.peer = lockInfo.peer;
     tran.params.timestamp = lockInfo.timestamp;
+    if (m_owner->m_userDataHandler)
+        tran.params.userData = m_owner->m_userDataHandler->getUserData(lockInfo.name);
+
     qnTransactionBus->sendTransaction(tran, dstPeer);
 }
 
@@ -230,6 +236,20 @@ void QnDistributedMutex::checkForLocked()
         m_locked = true;
         emit locked(m_name);
     }
+}
+
+bool QnDistributedMutex::checkUserData() const
+{
+    QMutexLocker lock(&m_mutex);
+    if (!m_owner->m_userDataHandler)
+        return true;
+
+    foreach(const LockRuntimeInfo& info, m_peerLockInfo.keys())
+    {
+        if (!m_owner->m_userDataHandler->checkUserData(info.name, info.userData))
+            return false;
+    }
+    return true;
 }
 
 bool QnDistributedMutex::isLocking() const

@@ -24,6 +24,7 @@ void QnClientMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 void QnClientMessageProcessor::onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status)
 {
     resource->setStatus(status);
+    checkForTmpStatus(resource);
 }
 
 void QnClientMessageProcessor::updateResource(QnResourcePtr resource)

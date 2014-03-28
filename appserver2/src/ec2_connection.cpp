@@ -48,6 +48,6 @@ namespace ec2
 
     void Ec2DirectConnection::startReceivingNotifications( bool /*isClient*/)
     {
-        //TODO/IMPL
+        QnTransactionMessageBus::instance()->start();
     }
 }
