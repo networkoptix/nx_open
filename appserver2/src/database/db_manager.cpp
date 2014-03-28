@@ -1452,7 +1452,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRule
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare(QString("SELECT guid as id, event_type as eventType, event_condition as eventCondition, event_state as eventState, action_type as actionType, \
-                          action_params as actionParams, aggregation_period as aggregationPeriod, disabled, comments, schedule \
+                          action_params as actionParams, aggregation_period as aggregationPeriod, disabled, comments, schedule, system \
                           FROM vms_businessrule order by guid"));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
