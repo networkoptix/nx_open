@@ -281,7 +281,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         AVCodec* codec = avcodec_find_encoder_by_name(format == "jpg" || format == "jpeg" ? "mjpeg" : format.constData());
         if (avcodec_open2(videoEncoderCodecCtx, codec, NULL) < 0)
         {
-            qWarning() << "Can't initialize ffmpeg encoder for encoding image";
+            qWarning() << "Can't initialize ffmpeg encoder for encoding image to format " << format;
         }
         else {
             const static int MAX_VIDEO_FRAME = roundedWidth * roundedHeight * 3;
