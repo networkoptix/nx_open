@@ -14,11 +14,12 @@ QnAttachToVideowallDialog::QnAttachToVideowallDialog(QWidget *parent) :
 
 QnAttachToVideowallDialog::~QnAttachToVideowallDialog(){}
 
-QnAttachToVideowallDialog::AttachSettings QnAttachToVideowallDialog::settings() const {
-
+QnVideowallAttachSettings QnAttachToVideowallDialog::settings() const {
+    QnVideowallAttachSettings result;
+    return result;
 }
 
-void QnAttachToVideowallDialog::loadSettings(const QnAttachToVideowallDialog::AttachSettings &settings) {
+void QnAttachToVideowallDialog::loadSettings(const QnVideowallAttachSettings &settings) {
 
 }
 

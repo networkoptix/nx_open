@@ -33,7 +33,7 @@ public:
 private:
     QnAppServerConnectionPtr connection() const;
 
-    void attachLayout(const QnVideoWallResourcePtr &videoWall, const QnId &layoutId, const QnVideowallAttachSettings &settings);
+    void attachLayout(const QnVideoWallResourcePtr &videoWall, const QnLayoutResourcePtr &layout, const QnVideowallAttachSettings &settings);
     void resetLayout(const QnVideoWallItemIndexList &items, const QnId &layoutId);
 
     void openNewWindow(const QStringList &args);
@@ -201,7 +201,12 @@ private:
 
     QHash<QUuid, ScreenSnaps> m_screenSnapsByUuid;
 
-    QHash<int, QnVideoWallResourcePtr> m_attaching;
+    struct AttachData {
+        QnVideoWallItemIndexList items;
+        QnLayoutResourcePtr layout;
+    };
+    QHash<int, AttachData> m_attaching;
+
     QHash<int, QnVideoWallItemIndexList> m_resetting;
     QHash<int, QnLayoutResourcePtr> m_savingReviews;
 
