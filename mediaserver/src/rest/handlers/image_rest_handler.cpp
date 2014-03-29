@@ -254,7 +254,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     const int roundedWidth = qPower2Ceil((unsigned) dstSize.width(), 8);
     const int roundedHeight = qPower2Ceil((unsigned) dstSize.height(), 2);
 
-    if (format == "jpg" || format == "jpeg" || format == "png")
+    if (format == "jpg" || format == "jpeg")
     {
         // prepare image using ffmpeg encoder
 
