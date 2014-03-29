@@ -69,7 +69,7 @@ int64_t PtsToClockMapper::getTimestamp( pts_type pts )
         m_sharedSynchroModificationSequence = m_timeSynchro->modificationSequence();
     }
 
-    if( !((pts - m_prevPts < MAX_PTS_DRIFT) || (m_prevPts - pts < MAX_PTS_DRIFT)) )
+    if (qAbs((int32_t) (pts - m_prevPts)) > MAX_PTS_DRIFT)
     {
         //pts discontinuity
         NX_LOG( lit("Stream %1. Pts discontinuity (current %2, prev %3)").arg(m_sourceID).arg(pts).arg(m_prevPts), cl_logWARNING );
