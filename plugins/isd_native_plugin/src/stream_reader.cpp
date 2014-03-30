@@ -380,7 +380,7 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
         return nxcip::NX_IO_ERROR; // error
     }
 
-    std::cout<<"stream "<<m_encoderNum<<". Got frame. pic_type "<<frame.vmux_info.pic_type<<", size "<<frame.frame_size<<std::endl;
+    //std::cout<<"stream "<<m_encoderNum<<". Got frame. pic_type "<<frame.vmux_info.pic_type<<", size "<<frame.frame_size<<std::endl;
     if (frame.vmux_info.pic_type == 1) {
         //std::cout << "I-frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << std::endl;
     }
