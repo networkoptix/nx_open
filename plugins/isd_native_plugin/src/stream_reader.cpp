@@ -50,12 +50,12 @@ static const int HIGH_QUALITY_ENCODER = 0;
 static const int ENCODER_STREAM_TO_ADD_MOTION_TO = 1;   //1 - low stream
 static const int64_t MOTION_TIMEOUT_USEC = 1000ll * 300;
 static const int PTS_FREQUENCY = 90000;
-static const unsigned int MAX_PTS_DRIFT = 63000;    //700 ms
+static const unsigned int MAX_PTS_DRIFT = 90000 * 1.5;    //1500 ms
 static const unsigned int DEFAULT_FRAME_DURATION = 3000;    //30 fps
 static const int MSEC_IN_SEC = 1000;
 static const int USEC_IN_SEC = 1000*1000;
 static const int USEC_IN_MSEC = 1000;
-static const int MAX_FRAMES_BETWEEN_TIME_RESYNC = 50;
+static const int MAX_FRAMES_BETWEEN_TIME_RESYNC = 300;
 
 struct TimeSynchronizationData
 {
