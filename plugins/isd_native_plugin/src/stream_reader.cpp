@@ -37,7 +37,7 @@
 #include "isd_audio_packet.h"
 
 
-#define DUMP_VIDEO_STREAM
+//#define DUMP_VIDEO_STREAM
 #ifdef DUMP_VIDEO_STREAM
 #include <fcntl.h>
 
@@ -55,7 +55,7 @@ static const unsigned int DEFAULT_FRAME_DURATION = 3000;    //30 fps
 static const int MSEC_IN_SEC = 1000;
 static const int USEC_IN_SEC = 1000*1000;
 static const int USEC_IN_MSEC = 1000;
-static const int MAX_FRAMES_BETWEEN_TIME_RESYNC = 300;
+static const int MAX_FRAMES_BETWEEN_TIME_RESYNC = 50;
 
 struct TimeSynchronizationData
 {
@@ -191,7 +191,7 @@ MotionDataPicture* StreamReader::getMotionData()
             return nullptr; // error
         }
 
-        std::cout << "motion width=" << motion_stream_info.width << " height=" << motion_stream_info.height << " stride=" << motion_stream_info.pitch << std::endl;
+        //std::cout << "motion width=" << motion_stream_info.width << " height=" << motion_stream_info.height << " stride=" << motion_stream_info.pitch << std::endl;
 
         rv = m_vmux_motion->StartVideo (Y_STREAM_SMALL);
         if (rv) {
@@ -380,6 +380,7 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
         return nxcip::NX_IO_ERROR; // error
     }
 
+    std::cout<<"stream "<<m_encoderNum<<". Got frame. pic_type "<<frame.vmux_info.pic_type<<", size "<<frame.frame_size<<std::endl;
     if (frame.vmux_info.pic_type == 1) {
         //std::cout << "I-frame pts = " << frame.vmux_info.PTS << "pic_type=" << frame.vmux_info.pic_type << std::endl;
     }
@@ -571,7 +572,7 @@ void StreamReader::resyncTime( int64_t absoluteSourceTimeUSec )
     memset( &currentTime, 0, sizeof(currentTime) );
     gettimeofday( &currentTime, NULL );
     timeSyncData.timeSyncData.mapLocalTimeToSourceAbsoluteTime( 
-        qnSyncTime->currentMSecsSinceEpoch() - ((int64_t)currentTime.tv_sec*USEC_IN_SEC + currentTime.tv_usec - absoluteSourceTimeUSec),
+        qnSyncTime->currentMSecsSinceEpoch()*USEC_IN_MSEC - ((int64_t)currentTime.tv_sec*USEC_IN_SEC + currentTime.tv_usec - absoluteSourceTimeUSec),
         absoluteSourceTimeUSec );
 
     NX_LOG( lit("Primary stream time sync. Current local time %1:%2, frame time %3:%4").

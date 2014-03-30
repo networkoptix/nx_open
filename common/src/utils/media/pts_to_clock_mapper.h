@@ -47,7 +47,7 @@ public:
     PtsToClockMapper(
         pts_type ptsFrequency,
         TimeSynchronizationData* timeSynchro,
-        int sourceID = 0 );
+        int sourceID = -1 );
 
     /*!
         \return Synchronized absolute local time (usec) corresponding to frame generation
@@ -61,7 +61,7 @@ public:
 private:
     //void resyncTime( int32_t pts, int64_t absoluteSourceTimeUsec );
 
-    const pts_type m_ptsFrequency;
+    const int64_t m_ptsFrequency;
     TimeSynchronizationData* const m_timeSynchro;
     const int m_sourceID;
     pts_type m_prevPts;
@@ -69,6 +69,7 @@ private:
     int64_t m_baseClock;
     int64_t m_baseClockOnSource;
     size_t m_sharedSynchroModificationSequence;
+    bool m_prevPtsValid;
 };
 
 #endif  //PTS_TO_CLOCK_MAPPER_H
