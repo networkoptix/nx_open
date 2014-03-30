@@ -146,6 +146,11 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         return CODE_INVALID_PARAMETER;
     }
 
+#ifdef EDGE_SERVER
+    if (dstSize.width() < 1)
+        dstSize.setWidth(480); // default value
+#endif
+
     bool useHQ = true;
     if ((dstSize.width() > 0 && dstSize.width() <= 480) || (dstSize.height() > 0 && dstSize.height() <= 316))
         useHQ = false;
