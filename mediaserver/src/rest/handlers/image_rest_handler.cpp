@@ -147,8 +147,8 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     }
 
 #ifdef EDGE_SERVER
-    if (dstSize.width() < 1)
-        dstSize.setWidth(480); // default value
+    if (dstSize.height() < 1)
+        dstSize.setHeight(316); // default value
 #endif
 
     bool useHQ = true;
