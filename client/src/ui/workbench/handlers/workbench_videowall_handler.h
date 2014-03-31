@@ -34,7 +34,13 @@ private:
     QnAppServerConnectionPtr connection() const;
 
     void attachLayout(const QnVideoWallResourcePtr &videoWall, const QnLayoutResourcePtr &layout, const QnVideowallAttachSettings &settings);
-    void resetLayout(const QnVideoWallItemIndexList &items, const QnId &layoutId);
+    void resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout, bool closeClient);
+
+    /** Updates item's layout with provided value. Provided layout should be saved. */
+    void updateItemsLayout(const QnVideoWallItemIndexList &items, const QnId &layoutId);
+
+    bool startVideoWall(const QnVideoWallResourcePtr &videoWall);
+    void startVideowallAndExit(const QnVideoWallResourcePtr &videoWall);
 
     void openNewWindow(const QStringList &args);
     void openVideoWallItem(const QnVideoWallResourcePtr &videoWall);
@@ -204,10 +210,16 @@ private:
     struct AttachData {
         QnVideoWallItemIndexList items;
         QnLayoutResourcePtr layout;
+        bool closeClient;
     };
     QHash<int, AttachData> m_attaching;
 
-    QHash<int, QnVideoWallItemIndexList> m_resetting;
+    struct ResetData {
+        QnVideoWallItemIndexList items;
+        bool closeClient;
+    };
+    QHash<int, ResetData> m_resetting;
+
     QHash<int, QnLayoutResourcePtr> m_savingReviews;
 
     QnVideowallAttachSettings m_attachSettings;

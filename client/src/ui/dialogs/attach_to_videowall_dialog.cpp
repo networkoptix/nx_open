@@ -1,6 +1,7 @@
 #include "attach_to_videowall_dialog.h"
 #include "ui_attach_to_videowall_dialog.h"
 
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QRadioButton>
 
@@ -13,6 +14,7 @@ QnAttachToVideowallDialog::QnAttachToVideowallDialog(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->layoutsComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, [&](){ui->layoutCustom->setChecked(true);});
+    connect(ui->amAllRadioButton, &QRadioButton::toggled, ui->autoFillCheckBox, &QCheckBox::setDisabled);
 }
 
 QnAttachToVideowallDialog::~QnAttachToVideowallDialog(){}
@@ -26,6 +28,16 @@ QnVideowallAttachSettings QnAttachToVideowallDialog::settings() const {
     else
         result.layoutMode = QnVideowallAttachSettings::LayoutNone;
     result.layoutId = ui->layoutsComboBox->currentData().toInt();
+
+    if (ui->amAllRadioButton->isChecked())
+        result.attachMode = QnVideowallAttachSettings::AttachAll;
+    else if (ui->amScreenRadioButton->isChecked())
+        result.attachMode = QnVideowallAttachSettings::AttachScreen;
+    else
+        result.attachMode = QnVideowallAttachSettings::AttachWindow;
+
+    result.autoFill = ui->autoFillCheckBox->isChecked();
+    result.closeClient = ui->closeClientCheckBox->isChecked();
 
     return result;
 }
@@ -47,6 +59,23 @@ void QnAttachToVideowallDialog::loadSettings(const QnVideowallAttachSettings &se
     default:
         break;
     }
+
+    switch (settings.attachMode) {
+    case QnVideowallAttachSettings::AttachWindow:
+        ui->amWindowRadioButton->setChecked(true);
+        break;
+    case QnVideowallAttachSettings::AttachScreen:
+        ui->amScreenRadioButton->setChecked(true);
+        break;
+    case QnVideowallAttachSettings::AttachAll:
+        ui->amAllRadioButton->setChecked(true);
+        break;
+    default:
+        break;
+    }
+
+    ui->autoFillCheckBox->setChecked(settings.autoFill);
+    ui->closeClientCheckBox->setChecked(settings.closeClient);
 }
 
 void QnAttachToVideowallDialog::loadLayoutsList(const QnLayoutResourceList &layouts) {
