@@ -343,8 +343,6 @@ QRect QnWorkbenchVideoWallHandler::calculateSnapGeometry(const QList<QnVideoWall
 }
 
 void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &videoWall, const QnLayoutResourcePtr &layout, const QnVideowallAttachSettings &settings) {
-
-
     QDesktopWidget* desktop = qApp->desktop();
     QList<QnVideoWallPcData::PcScreen> localScreens;
     for (int i = 0; i < desktop->screenCount(); i++) {
@@ -355,7 +353,11 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
     }
 
     QnVideoWallItem data;
-//    data.layout = layoutId;
+
+    // if layout can be attached right now, do it
+    if (layout && !snapshotManager()->isLocal(layout))
+        data.layout = layout->getId();
+
     data.name = generateUniqueString([&videoWall] () {
         QStringList used;
         foreach (const QnVideoWallItem &item, videoWall->getItems())
@@ -381,10 +383,13 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
 
     int handle = connection()->saveAsync(videoWall, this, SLOT(at_videoWall_saved(int,QnResourceList,int)));
 
-    AttachData attachData;
-    attachData.layout = layout;
-    attachData.items << QnVideoWallItemIndex(videoWall, data.uuid);
-    m_attaching[handle] = attachData;
+    // If layout should be saved, attach it after videowall saving.
+    if (layout && !data.layout.isValid()) {
+        AttachData attachData;
+        attachData.layout = layout;
+        attachData.items << QnVideoWallItemIndex(videoWall, data.uuid);
+        m_attaching[handle] = attachData;
+    }
 }
 
 void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &items, const QnId &layoutId) {
