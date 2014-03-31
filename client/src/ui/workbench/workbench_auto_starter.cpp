@@ -40,7 +40,7 @@ bool QnWorkbenchAutoStarter::isAutoStartEnabled() {
     QSettings settings(registryPath, QSettings::NativeFormat);
 
     QString realPath = autoStartPath();
-    QString registryPath = fromRegistryFormat(settings.value(autoStartKey()).toString());
+    QString registryPath = settings.value(autoStartKey()).toString();
     
     return realPath == registryPath;
 #else
@@ -53,7 +53,7 @@ void QnWorkbenchAutoStarter::setAutoStartEnabled(bool autoStartEnabled) {
     QSettings settings(registryPath, QSettings::NativeFormat);
 
     if(autoStartEnabled) {
-        settings.setValue(autoStartKey(), toRegistryFormat(autoStartPath()));
+        settings.setValue(autoStartKey(), autoStartPath());
     } else {
         settings.remove(autoStartKey());
     }
@@ -79,7 +79,7 @@ QString QnWorkbenchAutoStarter::autoStartPath() const {
     QFileInfo launcherFile = QFileInfo(clientFile.dir(), lit(QN_APPLAUNCHER_EXECUTABLE_NAME));
 
     QFileInfo resultFile = launcherFile.exists() ? launcherFile : clientFile;
-    return QDir::toNativeSeparators(resultFile.canonicalFilePath()).toLower();
+    return toRegistryFormat(resultFile.canonicalFilePath());
 }
 
 QString QnWorkbenchAutoStarter::fromRegistryFormat(const QString &path) const {

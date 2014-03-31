@@ -170,8 +170,8 @@ protected:
         arguments << QLatin1String(url.toEncoded());
 
         QFileInfo clientFile = QFileInfo(qApp->applicationFilePath());
-        arguments.insert(0, QDir::toNativeSeparators(clientFile.canonicalFilePath()).toLower());
-        return arguments.join(L' ');
+        QString result = toRegistryFormat(clientFile.canonicalFilePath()) + L' ' + arguments.join(L' ');
+        return result;
     }
 
     virtual QString autoStartKey() const override { return lit(QN_APPLICATION_NAME) + L' ' + m_videoWallUuid; }
