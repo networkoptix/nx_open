@@ -928,7 +928,7 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
     QnWorkbenchStreamSynchronizer *synchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
 
-    if (synchronizer->isRunning() && !navigator()->isLive() && parameters.widgets().isEmpty()) {
+    if (!workbench()->currentLayout()->items().isEmpty() && synchronizer->isRunning() && !navigator()->isLive() && parameters.widgets().isEmpty()) {
         // split resources in two groups: local and non-local and specify different initial time for them
         // TODO: #dklychkov add ability to specify different time for resources and then simplify the code below
         QnResourceList resources = parameters.resources();
@@ -945,8 +945,8 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
         }
         if (!resources.isEmpty()) {
             parameters.setResources(resources);
-            //if (!parameters.hasArgument(Qn::ItemTimeRole))  // TODO: #dklychkov be careful with existing parameters overwriting, @see bug #3112
-                //parameters.setArgument(Qn::ItemTimeRole, navigator()->timeSlider()->sliderPosition());
+            if (!parameters.hasArgument(Qn::ItemTimeRole))  // TODO: #dklychkov be careful with existing parameters overwriting, @see bug #3112
+                parameters.setArgument(Qn::ItemTimeRole, navigator()->timeSlider()->sliderPosition());
             menu()->trigger(Qn::OpenInLayoutAction, parameters);
         }
     } else {
