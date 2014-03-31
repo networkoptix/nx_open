@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>457</width>
-    <height>302</height>
+    <height>325</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -118,12 +118,22 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="autoRunCheckBox">
+     <property name="text">
+      <string>Start videowall when the Windows starts</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QCheckBox" name="closeClientCheckBox">
      <property name="text">
       <string>Start the videowall and exit</string>
      </property>
      <property name="checked">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
    </item>

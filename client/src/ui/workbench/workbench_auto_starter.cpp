@@ -6,13 +6,21 @@
 
 #include "version.h"
 
+namespace {
+    const QString registryPath = lit("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run");
+}
+
 QnWorkbenchAutoStarter::QnWorkbenchAutoStarter(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
+
+    if (settingsKey() < 0)
+        return;
+
     /* Write out the setting first, then listen to changes. */
-    qnSettings->setAutoStart(isAutoStartEnabled());
-    connect(qnSettings->notifier(QnClientSettings::AUTO_START), SIGNAL(valueChanged(int)), this, SLOT(at_autoStartSetting_valueChanged()));
+    qnSettings->setValue(settingsKey(), isAutoStartEnabled());
+    connect(qnSettings->notifier(settingsKey()), &QnPropertyNotifier::valueChanged, this, &QnWorkbenchAutoStarter::at_autoStartSetting_valueChanged);
 }
 
 QnWorkbenchAutoStarter::~QnWorkbenchAutoStarter() {
@@ -29,10 +37,10 @@ bool QnWorkbenchAutoStarter::isSupported() const {
 
 bool QnWorkbenchAutoStarter::isAutoStartEnabled() {
 #ifdef Q_OS_WIN
-    QSettings settings(lit("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"), QSettings::NativeFormat);
+    QSettings settings(registryPath, QSettings::NativeFormat);
 
     QString realPath = autoStartPath();
-    QString registryPath = fromRegistryFormat(settings.value(lit(QN_APPLICATION_NAME)).toString());
+    QString registryPath = fromRegistryFormat(settings.value(autoStartKey()).toString());
     
     return realPath == registryPath;
 #else
@@ -42,12 +50,12 @@ bool QnWorkbenchAutoStarter::isAutoStartEnabled() {
 
 void QnWorkbenchAutoStarter::setAutoStartEnabled(bool autoStartEnabled) {
 #ifdef Q_OS_WIN
-    QSettings settings(lit("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"), QSettings::NativeFormat);
+    QSettings settings(registryPath, QSettings::NativeFormat);
 
     if(autoStartEnabled) {
-        settings.setValue(lit(QN_APPLICATION_NAME), toRegistryFormat(autoStartPath()));
+        settings.setValue(autoStartKey(), toRegistryFormat(autoStartPath()));
     } else {
-        settings.remove(lit(QN_APPLICATION_NAME));
+        settings.remove(autoStartKey());
     }
 #else
     Q_UNUSED(autoStartEnabled);
@@ -55,7 +63,15 @@ void QnWorkbenchAutoStarter::setAutoStartEnabled(bool autoStartEnabled) {
 }
 
 void QnWorkbenchAutoStarter::at_autoStartSetting_valueChanged() {
-    setAutoStartEnabled(qnSettings->autoStart());
+    setAutoStartEnabled(qnSettings->value(settingsKey()).toBool());
+}
+
+int QnWorkbenchAutoStarter::settingsKey() const {
+    return QnClientSettings::AUTO_START;
+}
+
+QString QnWorkbenchAutoStarter::autoStartKey() const {
+    return lit(QN_APPLICATION_NAME);
 }
 
 QString QnWorkbenchAutoStarter::autoStartPath() const {

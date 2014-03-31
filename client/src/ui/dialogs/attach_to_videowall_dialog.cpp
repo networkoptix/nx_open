@@ -15,6 +15,11 @@ QnAttachToVideowallDialog::QnAttachToVideowallDialog(QWidget *parent) :
 
     connect(ui->layoutsComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, [&](){ui->layoutCustom->setChecked(true);});
     connect(ui->amAllRadioButton, &QRadioButton::toggled, ui->autoFillCheckBox, &QCheckBox::setDisabled);
+
+#ifndef Q_OS_WIN
+    ui->autoRunCheckBox->setVisible(false);
+#endif // !Q_OS_WIN
+
 }
 
 QnAttachToVideowallDialog::~QnAttachToVideowallDialog(){}
@@ -38,6 +43,7 @@ QnVideowallAttachSettings QnAttachToVideowallDialog::settings() const {
 
     result.autoFill = ui->autoFillCheckBox->isChecked();
     result.closeClient = ui->closeClientCheckBox->isChecked();
+    result.autoRun = ui->autoRunCheckBox->isChecked();
 
     return result;
 }
@@ -76,6 +82,7 @@ void QnAttachToVideowallDialog::loadSettings(const QnVideowallAttachSettings &se
 
     ui->autoFillCheckBox->setChecked(settings.autoFill);
     ui->closeClientCheckBox->setChecked(settings.closeClient);
+    ui->autoRunCheckBox->setChecked(settings.autoRun);
 }
 
 void QnAttachToVideowallDialog::loadLayoutsList(const QnLayoutResourceList &layouts) {

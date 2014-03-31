@@ -47,6 +47,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
 #include <utils/color_space/image_correction.h>
@@ -55,6 +56,8 @@
 #include <utils/common/json.h>
 #include <utils/common/json_functions.h>
 #include <utils/common/string.h>
+
+#include "version.h"
 
 #define SENDER_DEBUG
 #define RECEIVER_DEBUG
@@ -145,6 +148,38 @@ namespace {
 
     const qreal defaultReviewAR = 1920.0 / 1080.0;
 }
+
+class QnVideowallAutoStarter: public QnWorkbenchAutoStarter {
+public:
+    QnVideowallAutoStarter(const QString &videowallUuid, QObject *parent = NULL): 
+        QnWorkbenchAutoStarter(parent),
+        m_videoWallUuid(videowallUuid) 
+    {}
+
+protected:
+    virtual int settingsKey() const override { return -1; }
+
+    virtual QString autoStartPath() const override {
+        QStringList arguments;
+        arguments << lit("--videowall");
+        arguments << m_videoWallUuid;
+        QUrl url = qnSettings->lastUsedConnection().url;
+        url.setUserName(QString());
+        url.setPassword(QString());
+        arguments << QLatin1String("--auth");
+        arguments << QLatin1String(url.toEncoded());
+
+        QFileInfo clientFile = QFileInfo(qApp->applicationFilePath());
+        arguments.insert(0, QDir::toNativeSeparators(clientFile.canonicalFilePath()).toLower());
+        return arguments.join(L' ');
+    }
+
+    virtual QString autoStartKey() const override { return lit(QN_APPLICATION_NAME) + L' ' + m_videoWallUuid; }
+private:
+    QString m_videoWallUuid;
+};
+
+
 
 QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     base_type(parent),
@@ -1245,6 +1280,10 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     }
 
     attachLayout(videoWall, targetLayout, m_attachSettings);
+
+    QnVideowallAutoStarter autostarter(videoWall->getGuid(), this);
+    if(autostarter.isSupported())
+        autostarter.setAutoStartEnabled(m_attachSettings.autoRun);
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered() {
