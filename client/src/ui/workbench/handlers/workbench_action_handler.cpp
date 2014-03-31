@@ -928,7 +928,16 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
     QnWorkbenchStreamSynchronizer *synchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
 
-    if (!workbench()->currentLayout()->items().isEmpty() && synchronizer->isRunning() && !navigator()->isLive() && parameters.widgets().isEmpty()) {
+    bool hasNonLocalItems = false;
+    foreach (QnWorkbenchItem *item, workbench()->currentLayout()->items()) {
+        QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
+        if (resource->hasFlags(QnResource::local)) {
+            hasNonLocalItems = true;
+            break;
+        }
+    }
+
+    if (hasNonLocalItems && synchronizer->isRunning() && !navigator()->isLive() && parameters.widgets().isEmpty()) {
         // split resources in two groups: local and non-local and specify different initial time for them
         // TODO: #dklychkov add ability to specify different time for resources and then simplify the code below
         QnResourceList resources = parameters.resources();
