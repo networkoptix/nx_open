@@ -883,10 +883,10 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::AttachToVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
-        requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::SavePermission). //TODO: #GDM VW what if current layout is already saved and not ours?
+//        requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::SavePermission). //TODO: #GDM VW what if current layout is already saved and not ours?
         text(tr("Attach to Video Wall")).
         autoRepeat(false).
-        condition(new QnAttachVideoWallLayoutActionCondition(this));
+        condition(hasFlags(QnResource::videowall));
 
     factory(Qn::StartVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).

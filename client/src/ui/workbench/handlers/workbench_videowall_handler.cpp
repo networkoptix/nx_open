@@ -1075,13 +1075,27 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
 
     // create videowall item(s), save videowall(async), reset layout (possibly async), start? shutdown?
 
-    QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole,
-                                                                          workbench()->currentLayout()->resource());
+    // Suggest any of the current user's layouts
+    QnLayoutResourceList layouts;
+    
+    foreach (const QnLayoutResourcePtr &layout, qnResPool->getResourcesWithParentId(context()->user()->getId()).filtered<QnLayoutResource>())
+        if (!snapshotManager()->isFile(layout) && !layout->data().contains(Qn::VideoWallResourceRole))
+            layouts << layout;
 
-    QnLayoutResourceList layouts = qnResPool->getResourcesWithParentId(context()->user()->getId()).filtered<QnLayoutResource>();
+    qSort(layouts.begin(), layouts.end(),  [](const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
+        return naturalStringCaseInsensitiveLessThan(l->getName(), r->getName());
+    });
+
+     QnLayoutResourcePtr currentLayout = workbench()->currentLayout()->resource();
+     bool canClone = layouts.contains(currentLayout);
+
+    // If selected layout is invalid, suggest current workbench layout as a default value
+    if (m_attachSettings.layoutId <= 0 || qnIndexOf(layouts, [&](const QnLayoutResourcePtr &layout) {return layout->getId() == m_attachSettings.layoutId;}) < 0)
+        m_attachSettings.layoutId = currentLayout->getId();
 
     QScopedPointer<QnAttachToVideowallDialog> dialog(new QnAttachToVideowallDialog(mainWindow()));
     dialog->loadLayoutsList(layouts);
+    dialog->setCanClone(canClone);
     dialog->loadSettings(m_attachSettings);
     if (!dialog->exec())
         return;
@@ -1099,7 +1113,10 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     }
     case QnVideowallAttachSettings::LayoutClone:
     {
-        targetLayout = layout->clone();
+        if (!canClone)
+            break;
+
+        targetLayout = currentLayout->clone();
         targetLayout->setName(generateUniqueLayoutName(context()->user(), tr("VideoWall Layout"),  tr("VideoWall Layout %1")));
         targetLayout->setParentId(context()->user()->getId());
         targetLayout->setCellSpacing(QSizeF(0.0, 0.0));

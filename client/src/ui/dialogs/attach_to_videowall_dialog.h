@@ -23,6 +23,7 @@ public:
 
     void loadLayoutsList(const QnLayoutResourceList &layouts);
 
+    void setCanClone(bool canClone);
 private:
     QScopedPointer<Ui::QnAttachToVideowallDialog> ui;
 };

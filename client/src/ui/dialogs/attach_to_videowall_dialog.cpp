@@ -12,7 +12,7 @@ QnAttachToVideowallDialog::QnAttachToVideowallDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
+    connect(ui->layoutsComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, [&](){ui->layoutCustom->setChecked(true);});
 }
 
 QnAttachToVideowallDialog::~QnAttachToVideowallDialog(){}
@@ -31,7 +31,22 @@ QnVideowallAttachSettings QnAttachToVideowallDialog::settings() const {
 }
 
 void QnAttachToVideowallDialog::loadSettings(const QnVideowallAttachSettings &settings) {
+    if (ui->layoutsComboBox->count() > 0)
+        ui->layoutsComboBox->setCurrentIndex(qMax(ui->layoutsComboBox->findData(settings.layoutId), 0));
 
+    switch (settings.layoutMode) {
+    case QnVideowallAttachSettings::LayoutNone:
+        ui->layoutNone->setChecked(true);
+        break;
+    case QnVideowallAttachSettings::LayoutClone:
+        ui->layoutClone->setChecked(ui->layoutClone->isEnabled());
+        break;
+    case QnVideowallAttachSettings::LayoutCustom:
+        ui->layoutCustom->setChecked(ui->layoutCustom->isEnabled());
+        break;
+    default:
+        break;
+    }
 }
 
 void QnAttachToVideowallDialog::loadLayoutsList(const QnLayoutResourceList &layouts) {
@@ -39,4 +54,8 @@ void QnAttachToVideowallDialog::loadLayoutsList(const QnLayoutResourceList &layo
         ui->layoutsComboBox->addItem(layout->getName(), layout->getId().toInt());
     }
     ui->layoutCustom->setEnabled(!layouts.isEmpty());
+}
+
+void QnAttachToVideowallDialog::setCanClone(bool canClone) {
+    ui->layoutClone->setEnabled(canClone);
 }

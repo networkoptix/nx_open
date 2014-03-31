@@ -58,15 +58,15 @@
         <property name="text">
          <string>None</string>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QRadioButton" name="layoutClone">
         <property name="text">
          <string>Clone current</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
         </property>
        </widget>
       </item>

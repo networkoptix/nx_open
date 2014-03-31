@@ -483,12 +483,6 @@ public:
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
-class QnAttachVideoWallLayoutActionCondition: public QnActionCondition {
-public:
-    QnAttachVideoWallLayoutActionCondition(QObject* parent): QnActionCondition(parent) {}
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
-};
-
 class QnResetVideoWallLayoutActionCondition: public QnActionCondition {
 public:
     QnResetVideoWallLayoutActionCondition(QObject* parent): QnActionCondition(parent) {}
