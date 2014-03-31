@@ -203,7 +203,7 @@ void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBus
 void QnCommonMessageProcessor::on_businessRuleReset( const QnBusinessEventRuleList& rules )
 {
     m_rules.clear();
-    foreach(QnBusinessEventRulePtr bRule, QnBusinessEventRule::getDefaultRules())
+    foreach(QnBusinessEventRulePtr bRule, rules)
         m_rules[bRule->id()] = bRule;
 
     emit businessRuleReset(rules);

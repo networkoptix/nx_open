@@ -38,7 +38,8 @@ namespace ec2
 
     Ec2DirectConnection::~Ec2DirectConnection()
     {
-        QnTransactionMessageBus::instance()->removeHandler(this);
+        if (QnTransactionMessageBus::instance())
+            QnTransactionMessageBus::instance()->removeHandler(this);
     }
 
     QnConnectionInfo Ec2DirectConnection::connectionInfo() const
@@ -48,6 +49,6 @@ namespace ec2
 
     void Ec2DirectConnection::startReceivingNotifications( bool /*isClient*/)
     {
-        //TODO/IMPL
+        QnTransactionMessageBus::instance()->start();
     }
 }

@@ -401,6 +401,32 @@ QnAbstractStorageResourceList createStorages()
     return storages;
 }
 
+void updateStorages(QnMediaServerResourcePtr mServer)
+{
+    qint64 bigStorageThreshold = 0;
+    foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages()) {
+        QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
+        if (!storage)
+            continue;
+        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
+        bigStorageThreshold = qMax(bigStorageThreshold, available);
+    }
+    bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
+
+    foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages()) {
+        QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
+        if (!storage)
+            continue;
+        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
+        if (available < bigStorageThreshold) {
+            if (storage->isUsedForWriting()) {
+                storage->setUsedForWriting(false);
+                qWarning() << "Disable writing to storage" << storage->getUrl() << "because of low storage size";
+            }
+        }
+    }
+}
+
 void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddress, int port)
 {
     if (server->getName().isEmpty())
@@ -1167,6 +1193,8 @@ void QnMain::run()
         QnAbstractStorageResourceList storages = server->getStorages();
         if (storages.isEmpty())
             server->setStorages(createStorages());
+        else
+            updateStorages(server);
 
         m_mediaServer = registerServer(ec2Connection, server);
         if (m_mediaServer.isNull())
@@ -1219,9 +1247,6 @@ void QnMain::run()
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
-
-    QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
-
 
     m_moduleFinder = new NetworkOptixModuleFinder(false);
     //if (cmdLineArguments.devModeKey == lit("raz-raz-raz"))
@@ -1328,6 +1353,8 @@ void QnMain::run()
         qWarning() << "Some autodiscovery is disabled: " << disabledVendors;
 
     connect(QnServerMessageProcessor::instance(), &QnServerMessageProcessor::connectionReset, this, &QnMain::loadResourcesFromECS);
+
+    QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
 
     /*
     QnScheduleTaskList scheduleTasks;

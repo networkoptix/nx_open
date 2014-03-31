@@ -12,26 +12,30 @@ namespace ec2
 {
     class QnDistributedMutexManager;
 
-    struct LockRuntimeInfo
+    struct LockRuntimeInfo: public ApiLockData
     {
-        LockRuntimeInfo(const QUuid& peer = QUuid(), qint64 timestamp = 0): peer(peer), timestamp(timestamp) {}
-        LockRuntimeInfo(const ApiLockData& data): peer(data.peer), timestamp(data.timestamp) {}
+        LockRuntimeInfo(const QUuid& _peer = QUuid(), qint64 _timestamp = 0) {
+            peer = _peer;
+            timestamp = _timestamp;
+        }
+        LockRuntimeInfo(const ApiLockData& data): ApiLockData(data) {}
 
         bool operator<(const LockRuntimeInfo& other) const  { return timestamp != other.timestamp ? timestamp < other.timestamp : peer < other.peer; }
         bool operator==(const LockRuntimeInfo& other) const { return timestamp == other.timestamp && timestamp < other.timestamp; }
         bool isEmpty() const { return peer.isNull(); }
         void clear()         { peer = QUuid(); }
-
-        QUuid peer;
-        qint64 timestamp;
     };
 
+    /*
+    * Ricart–Agrawala algorithm
+    */
 
     class QnDistributedMutex: public QObject
     {
         Q_OBJECT
     public:
         void unlock();
+        bool checkUserData() const;
         virtual ~QnDistributedMutex();
     private:
         friend class QnDistributedMutexManager;
@@ -69,8 +73,17 @@ namespace ec2
         bool m_locked;
         QQueue<ApiLockData> m_delayedResponse;
         QnDistributedMutexManager* m_owner;
+        QByteArray m_userData;
     };
     typedef QSharedPointer<QnDistributedMutex> QnDistributedMutexPtr;
+    
+    class QnMutexUserDataHandler
+    {
+    public:
+        virtual ~QnMutexUserDataHandler() {}
+        virtual QByteArray getUserData(const QString& name) = 0;
+        virtual bool checkUserData(const QString& name, const QByteArray& data) = 0;
+    };
 
     class QnDistributedMutexManager: public QObject
     {
@@ -97,6 +110,7 @@ namespace ec2
         QMap<QByteArray, QnDistributedMutexPtr> m_mutexList;
         mutable QMutex m_mutex;
         qint64 m_timestamp;
+        QnMutexUserDataHandler* m_userDataHandler;
     };
 
 }

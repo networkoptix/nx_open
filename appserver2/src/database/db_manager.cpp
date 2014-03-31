@@ -106,7 +106,7 @@ bool QnDbManager::init()
 
 
     QSqlQuery queryServers(m_sdb);
-    queryServers.prepare("UPDATE vms_resource set status = ? WHERE xtype_guid = ?");
+    queryServers.prepare("UPDATE vms_resource set status = ? WHERE xtype_guid = ?"); // todo: only mserver without DB?
     queryServers.bindValue(0, QnResource::Offline);
     queryServers.bindValue(1, m_serverTypeId.toRfc4122());
     bool rez = queryServers.exec();
@@ -800,9 +800,9 @@ ErrorCode QnDbManager::insertOrReplaceBusinessRuleTable( const ApiBusinessRule& 
 {
     QSqlQuery query(m_sdb);
     query.prepare(QString("INSERT OR REPLACE INTO vms_businessrule (guid, event_type, event_condition, event_state, action_type, \
-                          action_params, aggregation_period, disabled, comments, schedule) VALUES \
+                          action_params, aggregation_period, disabled, comments, schedule, system) VALUES \
                           (:id, :eventType, :eventCondition, :eventState, :actionType, \
-                          :actionParams, :aggregationPeriod, :disabled, :comments, :schedule)"));
+                          :actionParams, :aggregationPeriod, :disabled, :comments, :schedule, :system)"));
     businessRule.autoBindValues(query);
     if (query.exec()) {
         return ErrorCode::ok;
@@ -1452,7 +1452,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRule
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare(QString("SELECT guid as id, event_type as eventType, event_condition as eventCondition, event_state as eventState, action_type as actionType, \
-                          action_params as actionParams, aggregation_period as aggregationPeriod, disabled, comments, schedule \
+                          action_params as actionParams, aggregation_period as aggregationPeriod, disabled, comments, schedule, system \
                           FROM vms_businessrule order by guid"));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();

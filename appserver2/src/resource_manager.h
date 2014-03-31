@@ -5,6 +5,7 @@
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/ec2_resource_data.h"
 #include "transaction/transaction.h"
+#include <core/resource_management/resource_pool.h>
 
 
 namespace ec2
@@ -35,6 +36,9 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiResource>& tran ) {
             QnResourcePtr resource( new QnResource() );
             tran.params.toResource( resource );
+            QnResourcePtr existResource = m_resCtx.pool->getResourceById(tran.params.id);
+            if (existResource)
+                resource->setFlags(existResource->flags());
             emit resourceChanged( resource );
         }
 

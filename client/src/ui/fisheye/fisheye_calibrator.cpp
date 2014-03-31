@@ -28,8 +28,8 @@ QnFisheyeCalibrator::QnFisheyeCalibrator()
     m_grayImageBuffer = 0;
     m_width = 0;
     m_height = 0;
-    m_center = QPointF(0.5, 0.5);
-    m_radius = 0.5;
+    m_center = QPointF(0.0, 0.0);
+    m_radius = 0.0;
 }
 
 QnFisheyeCalibrator::~QnFisheyeCalibrator()
@@ -297,7 +297,8 @@ int QnFisheyeCalibrator::findYThreshold(QImage frame)
     int w = frame.width();
     int h = frame.height();
     static const int MAX_Y_THRESHOLD = 64;
-    static const int DETECT_BORDER_DELTA = 10;
+    static const int MIN_Y_THRESHOLD = 28;
+    static const int DETECT_BORDER_DELTA = 11;
     QVector<int> borders;
     for (int y = 0; y < frame.height(); ++y)
     {
@@ -316,7 +317,8 @@ int QnFisheyeCalibrator::findYThreshold(QImage frame)
         return MAX_Y_THRESHOLD; // default value
     qSort(borders);
     int result = borders[borders.size()/2];
-    return qBound(28, result, MAX_Y_THRESHOLD);
+
+    return qBound(MIN_Y_THRESHOLD, result, MAX_Y_THRESHOLD);
 
 #if 0
     // Use adaptive binarisation to find optimal YThreshold value
@@ -387,9 +389,6 @@ void QnFisheyeCalibrator::run()
 
 void QnFisheyeCalibrator::analyseFrame(QImage frame)
 {
-    m_center = QPointF(0.5, 0.5);
-    m_radius = 0.5;
-
     frame = frame.scaled(frame.width() / 2, frame.height() / 2); // addition filtering
 
     if (frame.format() != QImage::Format_Indexed8) 

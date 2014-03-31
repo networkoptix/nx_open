@@ -9,6 +9,7 @@
 #include "utils/common/synctime.h"
 #include "nx_ec/data/server_alive_data.h"
 #include "transaction_log.h"
+#include "api/app_server_connection.h"
 
 namespace ec2
 {
@@ -38,6 +39,12 @@ QnTransactionMessageBus::QnTransactionMessageBus():
     m_mutex(QMutex::Recursive),
     m_thread(nullptr)
 {
+}
+
+void QnTransactionMessageBus::start()
+{
+    if (m_thread)
+        return;
     m_thread = new QThread();
     m_thread->setObjectName("QnTransactionMessageBusThread");
     m_thread->start();
@@ -319,6 +326,9 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
             abstractTran.localTransaction = true;
             return deliveryTransaction<ApiEmailSettingsData>(abstractTran, stream);
 
+        case ApiCommand::resetBusinessRules:
+            return deliveryTransaction<ApiResetBusinessRuleData>(abstractTran, stream);
+
         case ApiCommand::serverAliveInfo:
             break; // nothing to do
 
@@ -511,6 +521,11 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     QnTransaction<ApiFullInfo> tran;
     if (isClient) 
     {
+        /*
+        QnResourcePtr res = qnResPool->getResourceById(remoteGuid);
+        if (res && res->getStatus() != QnResource::Online)
+            QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(remoteGuid, QnResource::Online);
+        */
         tran.command = ApiCommand::getAllDataList;
         tran.id.peerGUID = qnCommon->moduleGUID();
         const ErrorCode errorCode = dbManager->doQuery(nullptr, tran.params);
