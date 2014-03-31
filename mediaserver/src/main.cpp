@@ -1347,10 +1347,12 @@ void QnMain::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
+#ifndef EDGE_SERVER
     updateDisabledVendorsIfNeeded();
     QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
     if (disabledVendors .size() > 0)
         qWarning() << "Some autodiscovery is disabled: " << disabledVendors;
+#endif
 
     connect(QnServerMessageProcessor::instance(), &QnServerMessageProcessor::connectionReset, this, &QnMain::loadResourcesFromECS);
 
