@@ -30,6 +30,8 @@ public:
     static QFileDialog::Options fileDialogOptions() { return 0; }
     static QFileDialog::Options directoryDialogOptions() { return QFileDialog::ShowDirsOnly; }
 
+    virtual int exec() override;
+
 signals:
     void filterSelected(const QString &filter);
 

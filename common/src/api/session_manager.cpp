@@ -64,7 +64,11 @@ QnSessionManager::QnSessionManager(QObject *parent):
     m_thread->setObjectName( QLatin1String("QnSessionManagerThread") ); /* Name will be shown in debugger. */
     Q_ASSERT(parent == 0);
     this->moveToThread(m_thread.data());
+
     m_thread->start();
+
+    // SessionManager is not calculation intensive, but needs to be responsible
+    m_thread->setPriority(QThread::HighestPriority);
 }
 
 QnSessionManager::~QnSessionManager() {
@@ -206,6 +210,7 @@ void QnSessionManager::at_SyncRequestFinished(const QnHTTPRawResponse& response,
 {
     QMutexLocker lock(&m_syncReplyMutex);
     QnSessionManagerSyncReply* reply = m_syncReplyInProgress.value(handle);
+    assert(reply);
     if (reply)
         reply->requestFinished(response, handle);
 }

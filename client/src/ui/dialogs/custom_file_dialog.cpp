@@ -84,8 +84,6 @@ void QnCustomFileDialog::addWidget(const QString &label, QWidget *widget, QnAbst
         delegate->disconnect();
         connect(this, &QnSystemBasedCustomDialog::filterSelected, delegate, &QnAbstractWidgetControlDelegate::updateWidget);
     }
-
-    updateCustomizedLayout();
 }
 
 void QnCustomFileDialog::at_accepted() {

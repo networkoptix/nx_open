@@ -144,6 +144,11 @@ QString QnTwoStepFileDialog::selectedNameFilter() const {
     return QString();
 }
 
+int QnTwoStepFileDialog::exec() {
+    ui->optionsGroupBox->setVisible(!ui->optionsLayout->isEmpty());
+    return base_type::exec();
+}
+
 bool QnTwoStepFileDialog::event(QEvent *event) {
     bool result = base_type::event(event);
 
@@ -172,10 +177,6 @@ void QnTwoStepFileDialog::updateMode() {
 
     ui->existingFileWidget->setVisible(m_mode == QFileDialog::ExistingFile);
     ui->newFileWidget->setVisible(m_mode == QFileDialog::AnyFile);
-}
-
-void QnTwoStepFileDialog::updateCustomizedLayout() {
-    ui->optionsGroupBox->setVisible(ui->optionsLayout->isEmpty());
 }
 
 void QnTwoStepFileDialog::at_browseFolderButton_clicked() {

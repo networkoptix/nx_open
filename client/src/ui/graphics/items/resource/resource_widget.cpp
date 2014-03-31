@@ -604,7 +604,13 @@ void QnResourceWidget::setChannelScreenSize(const QSize &size) {
 }
 
 bool QnResourceWidget::isInfoVisible() const {
-    return (options() & DisplayInfo);
+    if (!options().testFlag(DisplayInfo))
+        return false;
+
+    if (QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
+        return infoButton->isChecked();
+
+    return true;
 }
 
 void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
@@ -815,7 +821,7 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 
 void QnResourceWidget::optionsChangedNotify(Options changedFlags){
     if((changedFlags & DisplayInfo) && (visibleButtons() & InfoButton)) {
-        bool visible = isInfoVisible();
+        bool visible = options().testFlag(DisplayInfo);
         setInfoVisible(visible);
         setOverlayVisible(visible || m_mouseInWidget);
     }
