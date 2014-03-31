@@ -33,7 +33,7 @@ void QnClientMessageProcessor::init()
 
     base_type::init(appServerEventsUrl, QString());
 
-    m_source->setVideoWallKey(QnAppServerConnectionFactory::videoWallKey());
+    m_videoWallKey = QnAppServerConnectionFactory::videoWallKey();
 }
 
 QnClientMessageProcessor::QnClientMessageProcessor():

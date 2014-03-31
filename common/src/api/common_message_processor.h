@@ -54,6 +54,7 @@ private slots:
 
 protected:
     QSharedPointer<QnMessageSource> m_source;
+    QString m_videoWallKey;
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
 

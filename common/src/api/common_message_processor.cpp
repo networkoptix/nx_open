@@ -15,6 +15,7 @@ QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
 void QnCommonMessageProcessor::run() {
     m_source = QSharedPointer<QnMessageSource>(new QnMessageSource(m_url, m_reconnectTimeout));
     m_source->setAuthKey(m_authKey);
+    m_source->setVideoWallKey(m_videoWallKey);
 
     connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
     connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
