@@ -309,13 +309,11 @@ QList<int> QnWorkbenchVideoWallHandler::getScreensByItem(const ScreenSnaps &snap
     return result;
 }
 
-QRect QnWorkbenchVideoWallHandler::calculateSnapGeometry(const QList<QnVideoWallPcData::PcScreen> &localScreens) {
-    QRect source = mainWindow()->geometry();
-
-    if (localScreens.isEmpty())
+QRect QnWorkbenchVideoWallHandler::calculateSnapGeometry(const QList<QnVideoWallPcData::PcScreen> &screens, const QRect &source) {
+    if (screens.isEmpty())
         return source;
 
-    ScreenSnaps localSnaps = calculateSnaps(qnSettings->pcUuid(), localScreens);
+    ScreenSnaps localSnaps = calculateSnaps(qnSettings->pcUuid(), screens);
 
     ScreenSnap left, top, right, bottom;
 
@@ -345,34 +343,97 @@ QRect QnWorkbenchVideoWallHandler::calculateSnapGeometry(const QList<QnVideoWall
 void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &videoWall, const QnLayoutResourcePtr &layout, const QnVideowallAttachSettings &settings) {
     QDesktopWidget* desktop = qApp->desktop();
     QList<QnVideoWallPcData::PcScreen> localScreens;
+    QRect unitedGeometry;
     for (int i = 0; i < desktop->screenCount(); i++) {
         QnVideoWallPcData::PcScreen screen;
         screen.index = i;
         screen.desktopGeometry = desktop->screenGeometry(i);
+        unitedGeometry = unitedGeometry.united(screen.desktopGeometry);
         localScreens << screen;
     }
-
-    QnVideoWallItem data;
-
-    // if layout can be attached right now, do it
-    if (layout && !snapshotManager()->isLocal(layout))
-        data.layout = layout->getId();
-
-    data.name = generateUniqueString([&videoWall] () {
-        QStringList used;
-        foreach (const QnVideoWallItem &item, videoWall->getItems())
-            used << item.name;
-        return used;
-    }(), tr("Screen"), tr("Screen %1") );
-    data.geometry = calculateSnapGeometry(localScreens);
-
-    action(Qn::EffectiveMaximizeAction)->setChecked(false);
-    mainWindow()->setGeometry(data.geometry);   // WYSIWYG
-
+    int currentScreen = desktop->screenNumber(mainWindow());
     QUuid pcUuid = qnSettings->pcUuid();
-    data.pcUuid = pcUuid;
-    data.uuid = QUuid::createUuid();
-    videoWall->addItem(data);
+    AttachData attachData;
+    attachData.closeClient = settings.closeClient;
+    attachData.layout = layout;
+
+    auto newItem = [&]() {
+        QnVideoWallItem result;
+
+        // if layout can be attached right now, do it
+        if (layout && !snapshotManager()->isLocal(layout))
+            result.layout = layout->getId();
+
+        result.name = generateUniqueString([&videoWall] () {
+            QStringList used;
+            foreach (const QnVideoWallItem &item, videoWall->getItems())
+                used << item.name;
+            return used;
+        }(), tr("Screen"), tr("Screen %1") );
+        result.pcUuid = pcUuid;
+        result.uuid = QUuid::createUuid();
+        return result;
+    };
+
+    QnVideoWallItem item = newItem();
+
+    switch (settings.attachMode) {
+    case QnVideowallAttachSettings::AttachAll:
+        item.geometry = unitedGeometry;
+        break;
+    case QnVideowallAttachSettings::AttachScreen:
+        item.geometry = desktop->screenGeometry(currentScreen);
+        break;
+    case QnVideowallAttachSettings::AttachWindow:
+        item.geometry = calculateSnapGeometry(localScreens, mainWindow()->geometry());
+        break;
+    default:
+        break;
+    }
+
+  //  action(Qn::EffectiveMaximizeAction)->setChecked(false);
+  //  mainWindow()->setGeometry(item.geometry);   // WYSIWYG
+
+    videoWall->addItem(item);
+    attachData.items << QnVideoWallItemIndex(videoWall, item.uuid);
+
+    if (settings.autoFill) {
+        switch (settings.attachMode) {
+        case QnVideowallAttachSettings::AttachScreen: 
+        {
+            for (int i = 0; i < desktop->screenCount(); i++) {
+                if (i == currentScreen)
+                    continue;
+                QnVideoWallItem fillItem = newItem();
+                fillItem.geometry = desktop->screenGeometry(i);
+                videoWall->addItem(fillItem);
+                attachData.items << QnVideoWallItemIndex(videoWall, fillItem.uuid);
+            }
+            break;
+        }
+        case QnVideowallAttachSettings::AttachWindow:
+        {
+            int w = item.geometry.width();
+            int h = item.geometry.height();
+            int xOffset = unitedGeometry.left();
+            int yOffset = unitedGeometry.top();
+            for (int x = 0; x < qRound((qreal)unitedGeometry.width() / w); x++) {
+                for (int y = 0; y < qRound((qreal)unitedGeometry.height() / h); y++) {
+                    QRect geometry = calculateSnapGeometry(localScreens, QRect(xOffset + x*w, yOffset + y*h, w, h));
+                    if (geometry == item.geometry)
+                        continue;   //TODO: #GDM VW check overlapping with existing items
+                    QnVideoWallItem fillItem = newItem();
+                    fillItem.geometry = geometry;
+                    videoWall->addItem(fillItem);
+                    attachData.items << QnVideoWallItemIndex(videoWall, fillItem.uuid);
+                }
+            }
+            break;
+        }
+        default:
+            break;
+        }
+    }
 
     QnVideoWallPcData pcData;
     pcData.uuid = pcUuid;
@@ -383,17 +444,12 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
     else
         videoWall->updatePc(pcUuid, pcData);
 
-    int handle = connection()->saveAsync(videoWall, this, SLOT(at_videoWall_saved(int,QnResourceList,int)));
-
-    AttachData attachData;
-    attachData.closeClient = settings.closeClient;
-
     // If layout should be saved, attach it after videowall saving.
-    
-    attachData.layout = layout;
-    attachData.items << QnVideoWallItemIndex(videoWall, data.uuid);
-    
+    int handle = connection()->saveAsync(videoWall, this, SLOT(at_videoWall_saved(int,QnResourceList,int)));
     m_attaching[handle] = attachData;
+
+    if (!settings.closeClient)
+        menu()->trigger(Qn::OpenVideoWallsReviewAction, QnActionParameters(videoWall));
 }
 
 void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout, bool closeClient) {
@@ -1738,7 +1794,7 @@ void QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived(const Q
     if (message.instanceGuid != m_videoWallMode.instanceGuid)
         return;
 
-    // Unorderer broadcast messages such as Exit or Identify
+    // Ignore order for broadcast messages such as Exit or Identify
     if (!message.params.contains(sequenceKey)) {
         handleMessage(message);
         return;

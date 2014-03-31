@@ -178,7 +178,7 @@ private:
     };
 
     ScreenSnaps calculateSnaps(const QUuid &pcUuid, const QList<QnVideoWallPcData::PcScreen> &screens);
-    QRect calculateSnapGeometry(const QList<QnVideoWallPcData::PcScreen> &localScreens);
+    QRect calculateSnapGeometry(const QList<QnVideoWallPcData::PcScreen> &screens, const QRect &source);
 
     static ScreenSnap findNearest(const QList<ScreenSnap> &snaps, int value);
     static ScreenSnap findEdge(const QList<ScreenSnap> &snaps, QList<int> screens, bool backward = false);
