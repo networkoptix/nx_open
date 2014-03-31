@@ -518,6 +518,12 @@ void QnTransactionMessageBus::doPeriodicTasks()
 
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& remoteGuid, qint64 timediff)
 {
+    if (!dbManager)
+    {
+        qWarning() << "This peer connected to remote EC. Ignoring incoming connection";
+        return;
+    }
+
     QnTransaction<ApiFullData> tran;
     if (isClient) 
     {
