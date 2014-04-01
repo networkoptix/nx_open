@@ -45,6 +45,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/workaround/gl_native_painting.h>
@@ -878,10 +879,15 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if (resource()->toResource()->hasFlags(QnResource::motion))
         result |= MotionSearchButton;
 
+    bool isExportedLayout = item() 
+        && item()->layout() 
+        && snapshotManager()->isFile(item()->layout()->resource());
+
     if(m_camera
         && m_camera->hasPtzCapabilities(Qn::ContinuousPtzCapabilities)
         && !m_camera->hasPtzCapabilities(Qn::VirtualPtzCapability)
         && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
+        && !isExportedLayout
     ) {
         result |= PtzButton;
     }
