@@ -931,7 +931,7 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     bool hasNonLocalItems = false;
     foreach (QnWorkbenchItem *item, workbench()->currentLayout()->items()) {
         QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
-        if (resource->hasFlags(QnResource::local)) {
+        if (!resource->hasFlags(QnResource::local)) {
             hasNonLocalItems = true;
             break;
         }
