@@ -60,6 +60,9 @@ case "$1" in
     startquiet)
         start
         ;;
+    start_console)
+        $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf --log-level=$LOG_LEVEL
+        ;;
     stop)
         stop
         ;;
