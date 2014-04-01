@@ -40,8 +40,4 @@
     #define ApiResourceTypeFields (id) (name) (manufacture) (parentId) (propertyTypeList)
     QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceTypeData, ApiResourceTypeFields);
 
-    struct ApiResourceTypeListData: public ApiData {
-	    std::vector<ApiResourceType> data;
-    };
-
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiResourceTypeListData, (data))
+    QN_DEFINE_API_OBJECT_LIST_DATA(ApiResourceType)
