@@ -314,6 +314,8 @@ protected:
     virtual QCursor calculateCursor() const;
     Q_SLOT void updateCursor();
 
+    void updateInfoVisiblity(bool animate = true);
+
     QnImageButtonBar *buttonBar() const {
         return m_buttonBar;
     }

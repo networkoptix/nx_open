@@ -509,7 +509,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
 
 void QnWorkbenchController::displayWidgetInfo(const QList<QnResourceWidget *> &widgets, bool display){
     foreach(QnResourceWidget *widget, widgets)
-        widget->setOption(QnResourceWidget::DisplayInfo, display);
+        widget->setInfoVisible(display);
 }
 
 void QnWorkbenchController::moveCursor(const QPoint &aAxis, const QPoint &bAxis) {
