@@ -614,7 +614,7 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
     setOption(DisplayInfo, visible);
     updateInfoVisiblity(animate);
 
-    setOverlayVisible(visible || m_mouseInWidget);
+    setOverlayVisible(visible || m_mouseInWidget, animate);
 }
 
 Qn::ResourceStatusOverlay QnResourceWidget::statusOverlay() const {
