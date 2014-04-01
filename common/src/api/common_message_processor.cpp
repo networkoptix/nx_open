@@ -195,7 +195,7 @@ void QnCommonMessageProcessor::on_businessEventRemoved( QnId id )
     emit businessRuleDeleted(id);
 }
 
-void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction )
+void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBusinessActionPtr& /* businessAction */ )
 {
     // nothing to do for a while
 }

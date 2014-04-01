@@ -6,7 +6,7 @@
 namespace ec2
 {
 
-void ApiBusinessRule::toResource(QnBusinessEventRulePtr resource, QnResourcePool* resourcePool) const
+void ApiBusinessRule::toResource(QnBusinessEventRulePtr resource, QnResourcePool* /* resourcePool */) const
 {
     resource->setId(id);
     resource->setEventType(eventType);
@@ -92,7 +92,7 @@ void ApiBusinessActionData::fromResource(const QnAbstractBusinessActionPtr& reso
     aggregationCount = resource->getAggregationCount();
 }
 
-QnAbstractBusinessActionPtr  ApiBusinessActionData::toResource(QnResourcePool* resourcePool) const
+QnAbstractBusinessActionPtr  ApiBusinessActionData::toResource(QnResourcePool* /* resourcePool */) const
 {
     QnBusinessParams bParams = deserializeBusinessParams(runtimeParams);
     QnAbstractBusinessActionPtr resource = QnBusinessActionFactory::createAction((BusinessActionType::Value) actionType, QnBusinessEventParameters::fromBusinessParams(bParams));

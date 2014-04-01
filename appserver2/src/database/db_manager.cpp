@@ -1232,7 +1232,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
     }
 
 	data.loadFromQuery(queryTypes);
-    mergeIdListData(queryParents, data.data, &ApiResourceType::parentId);
+    mergeIdListData<ApiResourceType>(queryParents, data.data, &ApiResourceType::parentId);
 
     std::vector<ApiPropertyType> allProperties;
     QN_QUERY_TO_DATA_OBJECT(queryProperty, ApiPropertyType, allProperties, ApiPropertyTypeFields);
