@@ -129,9 +129,9 @@ void QnServerMessageProcessor::afterRemovingResource(const QnId& id)
 
 void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 {
-    QnCommonMessageProcessor::init(connection);
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnServerMessageProcessor::at_remotePeerFound );
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnServerMessageProcessor::at_remotePeerLost );
+    QnCommonMessageProcessor::init(connection);
 }
 
 #ifdef PROXY_STRICT_IP

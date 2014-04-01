@@ -63,6 +63,7 @@ private slots:
         bool isLocal,
         const QString& moduleSeed );
 
+    void at_appStarted();
 private:
     void updateDisabledVendorsIfNeeded();
     void initTcpListener();

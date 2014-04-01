@@ -24,6 +24,7 @@ void QnClientMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 void QnClientMessageProcessor::onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status)
 {
     resource->setStatus(status);
+    checkForTmpStatus(resource);
 }
 
 void QnClientMessageProcessor::updateResource(QnResourcePtr resource)
@@ -115,6 +116,9 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource:
 
 void QnClientMessageProcessor::at_remotePeerFound(QnId id, bool isClient, bool isProxy)
 {
+    if (id == qnCommon->moduleGUID())
+        return;
+
     if (isProxy) {
         //updateTmpStatus(id, QnResource::NotDefined);
         return;

@@ -66,7 +66,7 @@ QnBusinessEventRuleList ApiBusinessRuleList::toResourceList(QnResourcePool* reso
 
 void ApiBusinessRuleList::fromResourceList(const QnBusinessEventRuleList& inData)
 {
-    data.resize(inData.size());
+    data.reserve(inData.size());
     foreach(const QnBusinessEventRulePtr& bRule, inData) {
         data.push_back(ApiBusinessRule());
         data.back().fromResource(bRule);

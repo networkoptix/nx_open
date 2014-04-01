@@ -401,6 +401,32 @@ QnAbstractStorageResourceList createStorages()
     return storages;
 }
 
+void updateStorages(QnMediaServerResourcePtr mServer)
+{
+    qint64 bigStorageThreshold = 0;
+    foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages()) {
+        QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
+        if (!storage)
+            continue;
+        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
+        bigStorageThreshold = qMax(bigStorageThreshold, available);
+    }
+    bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
+
+    foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages()) {
+        QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
+        if (!storage)
+            continue;
+        qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
+        if (available < bigStorageThreshold) {
+            if (storage->isUsedForWriting()) {
+                storage->setUsedForWriting(false);
+                qWarning() << "Disable writing to storage" << storage->getUrl() << "because of low storage size";
+            }
+        }
+    }
+}
+
 void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddress, int port)
 {
     if (server->getName().isEmpty())
@@ -1167,6 +1193,8 @@ void QnMain::run()
         QnAbstractStorageResourceList storages = server->getStorages();
         if (storages.isEmpty())
             server->setStorages(createStorages());
+        else
+            updateStorages(server);
 
         m_mediaServer = registerServer(ec2Connection, server);
         if (m_mediaServer.isNull())
@@ -1219,9 +1247,6 @@ void QnMain::run()
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
-
-    QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
-
 
     m_moduleFinder = new NetworkOptixModuleFinder(false);
     //if (cmdLineArguments.devModeKey == lit("raz-raz-raz"))
@@ -1322,12 +1347,16 @@ void QnMain::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
+#ifndef EDGE_SERVER
     updateDisabledVendorsIfNeeded();
     QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
     if (disabledVendors .size() > 0)
         qWarning() << "Some autodiscovery is disabled: " << disabledVendors;
+#endif
 
     connect(QnServerMessageProcessor::instance(), &QnServerMessageProcessor::connectionReset, this, &QnMain::loadResourcesFromECS);
+
+    //QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
 
     /*
     QnScheduleTaskList scheduleTasks;
@@ -1365,6 +1394,7 @@ void QnMain::run()
     timer.start(60 * 1000);
 
 
+    QTimer::singleShot(0, this, SLOT(at_appStarted()));
     exec();
 
     stopObjects();
@@ -1440,6 +1470,11 @@ void QnMain::run()
     QnSSLSocket::releaseSSLEngine();
     QnAuthHelper::initStaticInstance(NULL);
 }
+
+void QnMain::at_appStarted()
+{
+    QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
+};
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
 {
