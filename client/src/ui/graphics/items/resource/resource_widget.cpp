@@ -605,13 +605,7 @@ void QnResourceWidget::setChannelScreenSize(const QSize &size) {
 }
 
 bool QnResourceWidget::isInfoVisible() const {
-    if (!options().testFlag(DisplayInfo))
-        return false;
-
-    if (QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
-        return infoButton->isChecked();
-
-    return true;
+    return options().testFlag(DisplayInfo);
 }
 
 void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
@@ -619,17 +613,9 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
         return;
 
     setOption(DisplayInfo, visible);
+    updateInfoVisiblity(animate);
 
-    qreal opacity = visible ? 1.0 : 0.0;
-
-    if(animate) {
-        opacityAnimator(m_footerWidget, 1.0)->animateTo(opacity);
-    } else {
-        m_footerWidget->setOpacity(opacity);
-    }
-
-    if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
-        infoButton->setChecked(visible);
+    setOverlayVisible(visible || m_mouseInWidget);
 }
 
 Qn::ResourceStatusOverlay QnResourceWidget::statusOverlay() const {
@@ -824,6 +810,22 @@ void QnResourceWidget::updateOverlayWidgetsVisibility(bool animate) {
     }
 }
 
+void QnResourceWidget::updateInfoVisiblity(bool animate)
+{
+    bool visible = isInfoVisible();
+
+    qreal opacity = visible ? 1.0 : 0.0;
+
+    if(animate) {
+        opacityAnimator(m_footerWidget, 1.0)->animateTo(opacity);
+    } else {
+        m_footerWidget->setOpacity(opacity);
+    }
+
+    if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
+        infoButton->setChecked(visible);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Painting
@@ -968,11 +970,8 @@ QVariant QnResourceWidget::itemChange(QGraphicsItem::GraphicsItemChange change, 
 }
 
 void QnResourceWidget::optionsChangedNotify(Options changedFlags){
-    if((changedFlags & DisplayInfo) && (visibleButtons() & InfoButton)) {
-        bool visible = options().testFlag(DisplayInfo);
-        setInfoVisible(visible);
-        setOverlayVisible(visible || m_mouseInWidget);
-    }
+    if ((changedFlags & DisplayInfo) && (visibleButtons() & InfoButton))
+        updateInfoVisiblity();
 }
 
 void QnResourceWidget::at_itemDataChanged(int role) {
@@ -987,7 +986,6 @@ void QnResourceWidget::at_iconButton_visibleChanged() {
     }
 }
 
-void QnResourceWidget::at_infoButton_toggled(bool toggled){
+void QnResourceWidget::at_infoButton_toggled(bool toggled) {
     setInfoVisible(toggled);
-    setOverlayVisible(toggled || m_mouseInWidget);
 }

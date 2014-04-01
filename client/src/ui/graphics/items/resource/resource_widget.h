@@ -335,6 +335,8 @@ protected:
     void updateOverlayWidgetsGeometry();
     void updateOverlayWidgetsVisibility(bool animate = true);
 
+    void updateInfoVisiblity(bool animate = true);
+
     QnImageButtonBar *buttonBar() const {
         return m_buttonBar;
     }
