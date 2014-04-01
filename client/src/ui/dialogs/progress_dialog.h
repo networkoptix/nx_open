@@ -106,6 +106,8 @@ public:
     using QDialog::open;
     void open(QObject *receiver, const char *member);
 
+    void setAutoSize(bool autoSize);
+
 Q_SIGNALS:
     void canceled();
 

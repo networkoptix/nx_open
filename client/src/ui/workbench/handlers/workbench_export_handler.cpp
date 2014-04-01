@@ -142,6 +142,7 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
     exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(false);
+    exportProgressDialog->setAutoSize(false);
     exportProgressDialog->show();
 
     QnLayoutExportTool* tool = new QnLayoutExportTool(layout, exportPeriod, layoutFileName, mode, readOnly, this);
