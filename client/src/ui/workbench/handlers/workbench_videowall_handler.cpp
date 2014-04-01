@@ -1222,13 +1222,10 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnVideoWallResourcePtr videoWall = parameters.resource().dynamicCast<QnVideoWallResource>();
     if(videoWall.isNull())
-        return;    // TODO: #GDM VW implement videoWall selection / creation dialog
-
-    // create videowall item(s), save videowall(async), reset layout (possibly async), start? shutdown?
+        return;
 
     // Suggest any of the current user's layouts
     QnLayoutResourceList layouts;
-    
     foreach (const QnLayoutResourcePtr &layout, qnResPool->getResourcesWithParentId(context()->user()->getId()).filtered<QnLayoutResource>())
         if (!snapshotManager()->isFile(layout) && !layout->data().contains(Qn::VideoWallResourceRole))
             layouts << layout;
