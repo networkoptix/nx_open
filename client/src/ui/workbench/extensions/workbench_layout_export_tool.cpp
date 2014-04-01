@@ -174,16 +174,23 @@ bool QnLayoutExportTool::start() {
         }
     }
 
+
     if (!m_layout->backgroundImageFilename().isEmpty()) {
-        QnAppServerImageCache cache(this);
-        QImage backround(cache.getFullPath(m_layout->backgroundImageFilename()));
-        if (!backround.isNull()) {
+        bool exportedLayout = snapshotManager()->isFile(m_layout);  // we have changed background to an exported layout
+        QScopedPointer<QnAppServerImageCache> cache;
+        if (exportedLayout)
+            cache.reset(new QnLocalFileCache());
+        else
+            cache.reset(new QnAppServerImageCache());
+
+        QImage background(cache->getFullPath(m_layout->backgroundImageFilename()));
+        if (!background.isNull()) {
             device = m_storage->open(m_layout->backgroundImageFilename(), QIODevice::WriteOnly);
-            backround.save(device, "png");
+            background.save(device, "png");
             delete device;
 
-            QnLocalFileCache cache;
-            cache.storeImage(m_layout->backgroundImageFilename(), backround);
+            QnLocalFileCache localCache;
+            localCache.storeImage(m_layout->backgroundImageFilename(), background);
         }
     }
 
