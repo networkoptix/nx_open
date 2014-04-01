@@ -116,6 +116,9 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource:
 
 void QnClientMessageProcessor::at_remotePeerFound(QnId id, bool isClient, bool isProxy)
 {
+    if (id == qnCommon->moduleGUID())
+        return;
+
     if (isProxy) {
         //updateTmpStatus(id, QnResource::NotDefined);
         return;
