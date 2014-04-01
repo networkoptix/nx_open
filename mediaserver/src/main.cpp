@@ -1356,7 +1356,7 @@ void QnMain::run()
 
     connect(QnServerMessageProcessor::instance(), &QnServerMessageProcessor::connectionReset, this, &QnMain::loadResourcesFromECS);
 
-    QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
+    //QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
 
     /*
     QnScheduleTaskList scheduleTasks;
@@ -1394,6 +1394,7 @@ void QnMain::run()
     timer.start(60 * 1000);
 
 
+    QTimer::singleShot(0, this, SLOT(at_appStarted()));
     exec();
 
     stopObjects();
@@ -1469,6 +1470,11 @@ void QnMain::run()
     QnSSLSocket::releaseSSLEngine();
     QnAuthHelper::initStaticInstance(NULL);
 }
+
+void QnMain::at_appStarted()
+{
+    QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
+};
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
 {

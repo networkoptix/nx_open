@@ -39,22 +39,21 @@ QnTransactionMessageBus::QnTransactionMessageBus():
     m_mutex(QMutex::Recursive),
     m_thread(nullptr)
 {
-}
-
-void QnTransactionMessageBus::start()
-{
     if (m_thread)
         return;
     m_thread = new QThread();
     m_thread->setObjectName("QnTransactionMessageBusThread");
-    m_thread->start();
     moveToThread(m_thread);
-
     qRegisterMetaType<QnTransactionTransport::State>();
-
     m_timer = new QTimer();
     connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
     m_timer->start(500);
+}
+
+void QnTransactionMessageBus::start()
+{
+    if (!m_thread->isRunning())
+        m_thread->start();
 }
 
 QnTransactionMessageBus::~QnTransactionMessageBus()
