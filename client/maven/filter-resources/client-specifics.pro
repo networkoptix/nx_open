@@ -18,7 +18,9 @@ INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
 include($$ADDITIONAL_QT_INCLUDES/qtsingleapplication/src/qtsingleapplication.pri)
 
 mac {
-    INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers/
+    INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers/ \
+                   ${qt.dir}/lib/QtGui.framework/Headers/$$QT_VERSION/QtGui \
+                   ${qt.dir}/lib/QtWidgets.framework/Headers/$$QT_VERSION/QtWidgets
 }
 
 unix: !mac {
