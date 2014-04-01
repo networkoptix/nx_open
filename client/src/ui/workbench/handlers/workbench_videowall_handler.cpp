@@ -1281,9 +1281,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
 
     attachLayout(videoWall, targetLayout, m_attachSettings);
 
-    QnVideowallAutoStarter autostarter(videoWall->getGuid(), this);
-    if(autostarter.isSupported())
-        autostarter.setAutoStartEnabled(m_attachSettings.autoRun);
+    QnVideowallAutoStarter(videoWall->getGuid(), this).setAutoStartEnabled(m_attachSettings.autoRun);
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered() {
@@ -1691,6 +1689,8 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr
     if (m_videoWallMode.active) {
         if (resource->getGuid() != m_videoWallMode.guid.toString())
             return;
+
+        QnVideowallAutoStarter(resource->getGuid(), this).setAutoStartEnabled(false); //TODO: #GDM VW clean nonexistent videowalls sometimes
         closeInstance();
     } else {
         if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
@@ -1703,6 +1703,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr
 
         if (QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>()) {
             disconnect(videoWall, NULL, this, NULL);
+            QnVideowallAutoStarter(videoWall->getGuid(), this).setAutoStartEnabled(false); //TODO: #GDM VW clean nonexistent videowalls sometimes
         }
 
     }
