@@ -173,7 +173,22 @@ void CachingProxyWidget::ensureTextureSynchronized() {
     /* QImage's Format_ARGB32 corresponds to OpenGL's GL_BGRA on little endian architectures.
      * On big endian architectures, conversion is needed. */
     assert(QSysInfo::ByteOrder == QSysInfo::LittleEndian);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, m_image.bits());
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, m_image.bits());
+    unsigned int row_width = m_image.bytesPerLine() * 8 / m_image.depth();
+
+    if ( m_image.width() == row_width )
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, m_image.bits());
+    else
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, NULL);
+        for( int y = 0; y < m_image.height(); y++ )
+        {
+            const uchar *row = m_image.bits() + (y*row_width) * 4;
+            glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , m_image.width(), 1, GL_BGRA_EXT, GL_UNSIGNED_BYTE, row );
+        }
+    }
+
+
 
 //    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 
