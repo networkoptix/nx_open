@@ -148,7 +148,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     fisheyeController.reset(new QnPresetPtzController(fisheyeController));
     fisheyeController.reset(new QnTourPtzController(fisheyeController));
     fisheyeController.reset(new QnActivityPtzController(QnActivityPtzController::Local, fisheyeController));
-    fisheyeController.reset(new QnHomePtzController(fisheyeController));
+
+    // Small hack because widget's zoomRect is set only in Synchronize method, not instantly --gdm
+    if (item && item->zoomRect().isNull())  // zoom items are not allowed to return home
+        fisheyeController.reset(new QnHomePtzController(fisheyeController));
 
     if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {
         serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
