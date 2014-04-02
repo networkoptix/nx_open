@@ -379,6 +379,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_motionSelectionInstrument,    SLOT(recursiveEnable()));
     connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_itemLeftClickInstrument,      SLOT(recursiveDisable()));
     connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_itemLeftClickInstrument,      SLOT(recursiveEnable()));
+    connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         this,                           SLOT(at_ptzProcessStarted(QnMediaResourceWidget *)));
 
     connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessStarted(QnMediaResourceWidget *)),                                  m_handScrollInstrument,         SLOT(recursiveDisable()));
     connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessFinished(QnMediaResourceWidget *)),                                 m_handScrollInstrument,         SLOT(recursiveEnable()));
@@ -1449,4 +1450,19 @@ void QnWorkbenchController::updateLayoutInstruments(const QnLayoutResourcePtr &l
 
     m_moveInstrument->setEnabled(writable && !layout->locked());
     m_resizingInstrument->setEnabled(writable && !layout->locked());
+}
+
+void QnWorkbenchController::at_ptzProcessStarted(QnMediaResourceWidget *widget) {
+    if(widget == NULL)
+        return;
+
+    // skip method if current widget is already raised or zoomed
+    if (display()->widget(Qn::RaisedRole) == widget
+        || display()->widget(Qn::ZoomedRole) == widget)
+        return;
+
+    workbench()->setItem(Qn::RaisedRole, NULL); /* Un-raise currently raised item so that it doesn't interfere with ptz. */
+    display()->scene()->clearSelection();
+    widget->setSelected(true);
+    display()->bringToFront(widget);
 }
