@@ -974,8 +974,8 @@ void QnMediaResourceWidget::updateAspectRatio() {
 
     if(sourceSize.isEmpty()) {
         qreal aspectRatio = resourceId.isEmpty()
-                            ? -1.0
-                            : qnSettings->resourceAspectRatios().value(resourceId, -1.0);
+                            ? defaultAspectRatio()
+                            : qnSettings->resourceAspectRatios().value(resourceId, defaultAspectRatio());
 
         setAspectRatio(dewarpingRatio * aspectRatio);
     } else {

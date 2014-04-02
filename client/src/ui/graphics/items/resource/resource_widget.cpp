@@ -77,6 +77,8 @@ namespace {
     /** Static text should be rescaled no more often than once in this period */
     const qint64 minTextRescaleDelay = 1000;
 
+    const qreal noAspectRatio = -1.0;
+
     //Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
     std::shared_ptr<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() ); // TODO: #Elric get rid of this
 
@@ -107,7 +109,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_item(item),
     m_options(DisplaySelection | DisplayButtons),
     m_localActive(false),
-    m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
     m_frameOpacity(1.0),
     m_frameWidth(-1.0),
@@ -252,6 +253,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
     connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
     setChannelLayout(qn_resourceWidget_defaultContentLayout);
+
+    m_aspectRatio = defaultAspectRatio();
 
     connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
     /* Run handlers. */
@@ -911,6 +914,12 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
         return;
 
     painter->fillRect(rect, palette().color(QPalette::Highlight));
+}
+
+qreal QnResourceWidget::defaultAspectRatio() const {
+    if (item())
+        return item()->data(Qn::ItemAspectRatioRole, noAspectRatio);
+    return noAspectRatio;
 }
 
 
