@@ -876,7 +876,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if (!zoomRect().isNull())
         return result;
 
-    if (resource()->toResource()->hasFlags(QnResource::motion))
+    if (resource()->toResource()->hasFlags(QnResource::motion) && !(options() & DisplayDewarped))
         result |= MotionSearchButton;
 
     bool isExportedLayout = item() 
@@ -1029,11 +1029,15 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
     item()->setDewarpingParams(params); // TODO: #Elric #PTZ move to instrument
 
     setOption(DisplayDewarped, checked);
+    if (checked)
+        setOption(DisplayMotion, false);
 
     if(!checked) {
         /* Stop all ptz activity. */
         ptzController()->continuousMove(QVector3D(0, 0, 0));
     }
+
+    updateButtonsVisibility();
 }
 
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
