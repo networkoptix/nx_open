@@ -138,16 +138,20 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
     m_resources << layouts;
     m_resources << servers;
 
-    if (m_resources.empty())
+    if (m_resources.empty()) {
+        event->ignore();
         return false;
+    }
 
     event->acceptProposedAction();
     return true;
 }
 
 bool DropInstrument::dragMoveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
-    if(m_resources.empty())
+    if(m_resources.empty()) {
+        event->ignore();
         return false;
+    }
 
     event->acceptProposedAction();
     return true;
