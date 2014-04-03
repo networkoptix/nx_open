@@ -1,7 +1,7 @@
 #ifndef QN_TEXTURE_TRANSITION_SHADER_PROGRAM_H
 #define QN_TEXTURE_TRANSITION_SHADER_PROGRAM_H
 
-#ifndef QT_OPENGL_ES_2
+#ifdef QT_OPENGL_ES_2
 
 #include <QtOpenGL/QGLShaderProgram>
 #include "texture_color_shader_program.h"

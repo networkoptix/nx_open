@@ -1,7 +1,7 @@
 #ifndef QN_YV12_TO_RGB_SHADER_PROGRAM_H
 #define QN_YV12_TO_RGB_SHADER_PROGRAM_H
 
-#ifndef QT_OPENGL_ES_2
+#ifdef QT_OPENGL_ES_2
 
 #include "utils/color_space/image_correction.h"
 #include <QtOpenGL/QGLShaderProgram>
@@ -261,5 +261,5 @@ private:
     int m_aTextureLocation;
 };
 
-#endif QT_OPENGL_ES_2
+#endif //QT_OPENGL_ES_2
 #endif // QN_YV12_TO_RGB_SHADER_PROGRAM_H

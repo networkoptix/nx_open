@@ -1,4 +1,5 @@
-#ifndef QT_OPENGL_ES_2
+#ifdef QT_OPENGL_ES_2
+
 #include "per_vertex_colored_shader_program.h"
 #include "ui/graphics/shaders/shader_source.h"
 

@@ -1,4 +1,4 @@
-#ifndef QT_OPENGL_ES_2
+#ifdef QT_OPENGL_ES_2
 #include "color_shader_program.h"
 
 #include <ui/graphics/opengl/gl_context_data.h>
@@ -60,4 +60,5 @@ bool QnColorGLShaderProgramm::compile()
 
     return link();
 };
+
 #endif // QT_OPENGL_ES_2

@@ -1,4 +1,4 @@
-#ifndef QT_OPENGL_ES_2
+#ifdef QT_OPENGL_ES_2
 
 #include "texture_color_shader_program.h"
 #include "ui/graphics/shaders/shader_source.h"
@@ -33,5 +33,4 @@ bool QnTextureColorGLShaderProgramm::compile()
 
     return link();
 };
-
 #endif // QT_OPENGL_ES_2

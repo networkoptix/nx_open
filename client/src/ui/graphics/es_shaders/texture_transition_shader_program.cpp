@@ -1,4 +1,4 @@
-#ifndef QT_OPENGL_ES_2
+#ifdef QT_OPENGL_ES_2
 #include "texture_transition_shader_program.h"
 
 #include "shader_source.h"

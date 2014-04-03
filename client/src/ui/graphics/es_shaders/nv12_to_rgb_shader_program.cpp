@@ -1,4 +1,4 @@
-#ifndef QT_OPENGL_ES_2
+#ifdef QT_OPENGL_ES_2
 #include "nv12_to_rgb_shader_program.h"
 
 #include <utils/common/warnings.h>

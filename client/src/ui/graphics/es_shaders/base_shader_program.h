@@ -1,7 +1,7 @@
 #ifndef QN_BASE_SHADER_PROGRAM_H
 #define QN_BASE_SHADER_PROGRAM_H
 
-#ifndef QT_OPENGL_ES_2
+#ifdef QT_OPENGL_ES_2
 
 #include <QtOpenGL/QGLShaderProgram>
 
@@ -37,4 +37,5 @@ private:
 };
 
 #endif // QT_OPENGL_ES_2
+
 #endif // QN_COLOR_SHADER_PROGRAM_H
