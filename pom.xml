@@ -37,7 +37,7 @@
         <buildNumber>0</buildNumber>
         <beta>true</beta>
 
-        <qt.dir>${environment.dir}/qt5/qtbase-${arch}-angle</qt.dir>
+        <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${environment.dir}/help/${release.version}/${customization}</ClientHelpSourceDir>
@@ -59,7 +59,7 @@
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>        
 
-        <additional.defines></additional.defines>
+        <additional.defines>GL_GLEXT_PROTOTYPES</additional.defines>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
         <qtlib1>Core</qtlib1>

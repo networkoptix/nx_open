@@ -2,7 +2,8 @@
 
 #include "ui/graphics/opengl/gl_shortcuts.h"
 
-
+//#define GL_GLEXT_PROTOTYPES 1
+#include <QtGui/qopengl.h>
 
 QnOpenGLRenderer::QnOpenGLRenderer(const QGLContext* a_context , QObject *parent)
 {

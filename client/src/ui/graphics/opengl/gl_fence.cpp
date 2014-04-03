@@ -13,6 +13,7 @@
 //#else
 //#include <GL/glext.h>
 //#endif
+//#define GL_GLEXT_PROTOTYPES 1
 #include <QtGui/qopengl.h>
 #include <QtGui/QOpenGLFunctions_3_2_Core>
 
