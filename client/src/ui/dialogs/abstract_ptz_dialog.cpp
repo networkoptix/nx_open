@@ -6,6 +6,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QApplication>
 
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_data.h>
@@ -74,24 +75,32 @@ void QnAbstractPtzDialog::synchronize(const QString &title) {
 
         QList<QWidget*> disabled;
         QLayout* dialogLayout = this->layout();
+        QnDialogButtonBox *buttonBox = 0;
 
         for (int i = 0; i < dialogLayout->count(); i++) {
-            QWidget* widget = dialogLayout->itemAt(i)->widget();
+            QWidget *widget = dialogLayout->itemAt(i)->widget();
             if (!widget)
                 continue;
-            if (QnDialogButtonBox* buttonBox = dynamic_cast<QnDialogButtonBox*>(widget)) {
-                buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-                disabled << buttonBox->button(QDialogButtonBox::Ok);
-                connect(buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, &loop, &QEventLoop::quit);
-                buttonBox->showProgress(title);
-                connect(this, &QnAbstractPtzDialog::synchronized, buttonBox, &QnDialogButtonBox::hideProgress);
-            } else
-                disabled << widget;
+
+            if (buttonBox || !(buttonBox = qobject_cast<QnDialogButtonBox*>(widget)))
+                disabled.append(widget);
         }
+
         foreach (QWidget* widget, disabled)
             widget->setEnabled(false);
 
+        if (buttonBox) {
+            buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+            connect(buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, &loop, &QEventLoop::quit);
+            buttonBox->showProgress(title);
+        }
+
         loop.exec();
+
+        if (buttonBox) {
+            buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+            buttonBox->hideProgress();
+        }
 
         foreach (QWidget* widget, disabled)
             widget->setEnabled(true);
