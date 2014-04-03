@@ -1,4 +1,3 @@
-#ifndef QT_OPENGL_ES_2
 #include "texture_transition_shader_program.h"
 
 #include "shader_source.h"
@@ -38,4 +37,3 @@ bool QnTextureTransitionShaderProgram::compile()
     return link();
 }
 
-#endif // QT_OPENGL_ES_2

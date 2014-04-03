@@ -1,4 +1,3 @@
-#ifndef QT_OPENGL_ES_2
 #ifndef QN_COLOR_SHADER_PROGRAM_H
 #define QN_COLOR_SHADER_PROGRAM_H
 
@@ -67,4 +66,3 @@ private:
 
 
 #endif // QN_COLOR_SHADER_PROGRAM_H
-#endif // QT_OPENGL_ES_2

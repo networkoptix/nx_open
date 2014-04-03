@@ -2,11 +2,11 @@
 
 #include "ui/graphics/opengl/gl_shortcuts.h"
 
-//#define GL_GLEXT_PROTOTYPES 1
-#include <QtGui/qopengl.h>
+#include <QOpenGLFunctions>
 
 QnOpenGLRenderer::QnOpenGLRenderer(const QGLContext* a_context , QObject *parent)
 {
+    QOpenGLFunctions::initializeOpenGLFunctions();
     m_colorProgram.reset(new QnColorGLShaderProgramm(a_context,parent));
     m_colorProgram->compile();
     m_textureColorProgram.reset(new QnTextureColorGLShaderProgramm(a_context,parent));
@@ -15,7 +15,6 @@ QnOpenGLRenderer::QnOpenGLRenderer(const QGLContext* a_context , QObject *parent
     m_texturePerVertexColoredProgram.reset(new QnPerVertexColoredGLShaderProgramm(a_context,parent));
     m_texturePerVertexColoredProgram->compile();
 
-    
 
     m_indices_for_render_quads[0] = 0;
     m_indices_for_render_quads[1] = 1;

@@ -1,4 +1,3 @@
-#ifndef QT_OPENGL_ES_2
 #include "nv12_to_rgb_shader_program.h"
 
 #include <utils/common/warnings.h>
@@ -109,4 +108,3 @@ QMatrix4x4 QnNv12ToRgbShaderProgram::colorTransform(Colorspace colorspace, bool 
     return result;
 }
 
-#endif // QT_OPENGL_ES_2

@@ -1,5 +1,3 @@
-#ifndef QT_OPENGL_ES_2
-
 #include "base_shader_program.h"
 
 
@@ -7,4 +5,3 @@ void QnAbstractBaseGLShaderProgramm::setModelViewProjectionMatrix(const QMatrix4
 {
     setUniformValue(m_modelViewProjection, a_m);
 }
-#endif  //QT_OPENGL_ES_2

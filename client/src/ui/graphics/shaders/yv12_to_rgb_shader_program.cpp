@@ -1,4 +1,3 @@
-#ifndef QT_OPENGL_ES_2
 #include "yv12_to_rgb_shader_program.h"
 
 QnAbstractYv12ToRgbShaderProgram::QnAbstractYv12ToRgbShaderProgram(const QGLContext *context, QObject *parent):
@@ -643,4 +642,3 @@ QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(const QGLContext *context, 
 
     link();
 }
-#endif // QT_OPENGL_ES_2

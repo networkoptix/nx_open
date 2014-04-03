@@ -12,13 +12,10 @@
 #include <client/client_globals.h>
 
 #include <ui/graphics/opengl/gl_functions.h>
-#ifndef QT_OPENGL_ES_2
+
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/nv12_to_rgb_shader_program.h>
-#else 
-#include <ui/graphics/es_shaders/es_yv12_to_rgb_shader_program.h>
-#include <ui/graphics/es_shaders/es_nv12_to_rgb_shader_program.h>
-#endif
+
 
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 

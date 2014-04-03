@@ -1,4 +1,3 @@
-#ifndef QT_OPENGL_ES_2
 #ifndef QN_PER_VERTEX_COLORED_SHADER_PROGRAM_H
 #define QN_PER_VERTEX_COLORED_SHADER_PROGRAM_H
 
@@ -17,4 +16,3 @@ public:
 
 #endif
 
-#endif //QT_OPENGL_ES_2

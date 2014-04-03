@@ -1,4 +1,3 @@
-#ifndef QT_OPENGL_ES_2
 #ifndef QN_NV12_TO_RGB_SHADER_PROGRAM_H
 #define QN_NV12_TO_RGB_SHADER_PROGRAM_H
 
@@ -58,4 +57,3 @@ private:
 
 
 #endif // QN_NV12_TO_RGB_SHADER_PROGRAM_H
-#endif //QT_OPENGL_ES_2
