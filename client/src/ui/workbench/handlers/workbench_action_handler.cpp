@@ -374,7 +374,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
         bool isMediaResource = resource->hasFlags(QnResource::media);
         bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
                 && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
-        bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+        bool isExportedLayout = snapshotManager()->isFile(layout);
 
         bool allowed = isServer || isMediaResource || isVideowall;
         bool forbidden = isExportedLayout && (isServer || isLocalResource || isVideowall);
@@ -934,7 +934,7 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     bool hasNonLocalItems = false;
     foreach (QnWorkbenchItem *item, workbench()->currentLayout()->items()) {
         QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
-        if (resource->hasFlags(QnResource::local)) {
+        if (!resource->hasFlags(QnResource::local)) {
             hasNonLocalItems = true;
             break;
         }
