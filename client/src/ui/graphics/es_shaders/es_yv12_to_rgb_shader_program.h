@@ -1,17 +1,17 @@
-#ifndef QN_YV12_TO_RGB_SHADER_PROGRAM_H
-#define QN_YV12_TO_RGB_SHADER_PROGRAM_H
-
 #ifdef QT_OPENGL_ES_2
+#ifndef QN_ES_YV12_TO_RGB_SHADER_PROGRAM_H
+#define QN_ES_YV12_TO_RGB_SHADER_PROGRAM_H
+
 
 #include "utils/color_space/image_correction.h"
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtOpenGL/QtOpenGL>
-#include "shader_source.h"
+#include "../shaders/shader_source.h"
 
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
 
-#include "base_shader_program.h"
+#include "es_base_shader_program.h"
 
 class QnAbstractYv12ToRgbShaderProgram : public QnAbstractBaseGLShaderProgramm {
     Q_OBJECT
@@ -261,5 +261,7 @@ private:
     int m_aTextureLocation;
 };
 
-#endif //QT_OPENGL_ES_2
+
 #endif // QN_YV12_TO_RGB_SHADER_PROGRAM_H
+
+#endif //QT_OPENGL_ES_2

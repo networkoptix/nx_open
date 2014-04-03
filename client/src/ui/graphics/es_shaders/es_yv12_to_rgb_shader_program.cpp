@@ -1,6 +1,6 @@
 #ifdef QT_OPENGL_ES_2
 
-#include "yv12_to_rgb_shader_program.h"
+#include "es_yv12_to_rgb_shader_program.h"
 
 QnAbstractYv12ToRgbShaderProgram::QnAbstractYv12ToRgbShaderProgram(const QGLContext *context, QObject *parent):
     QnAbstractBaseGLShaderProgramm(context, parent) 

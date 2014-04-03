@@ -59,7 +59,7 @@
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>        
 
-        <additional.defines>QT_OPENGL_ES_2</additional.defines>
+        <additional.defines></additional.defines>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
         <qtlib1>Core</qtlib1>

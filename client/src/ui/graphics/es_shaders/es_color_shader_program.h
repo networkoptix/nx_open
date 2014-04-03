@@ -1,11 +1,13 @@
-#ifndef QN_COLOR_SHADER_PROGRAM_H
-#define QN_COLOR_SHADER_PROGRAM_H
-
 #ifdef QT_OPENGL_ES_2
+
+#ifndef QN_ES_COLOR_SHADER_PROGRAM_H
+#define QN_ES_COLOR_SHADER_PROGRAM_H
+
+
 
 #include <QtCore/QSharedPointer>
 #include <QtOpenGL/QGLShaderProgram>
-#include "base_shader_program.h"
+#include "es_base_shader_program.h"
 //
 //class QnColorShaderProgram: public QGLShaderProgram {
 //    Q_OBJECT
@@ -64,6 +66,7 @@ private:
     int m_color;
 };
 
-#endif // QT_OPENGL_ES_2
+
 
 #endif // QN_COLOR_SHADER_PROGRAM_H
+#endif // QT_OPENGL_ES_2

@@ -1,7 +1,8 @@
+#ifndef QT_OPENGL_ES_2
 #ifndef QN_NV12_TO_RGB_SHADER_PROGRAM_H
 #define QN_NV12_TO_RGB_SHADER_PROGRAM_H
 
-#ifndef QT_OPENGL_ES_2
+
 
 #include <QtOpenGL/QGLShaderProgram>
 #include "base_shader_program.h"
@@ -55,5 +56,6 @@ private:
     int m_opacityLocation;
 };
 
-#endif //QT_OPENGL_ES_2
+
 #endif // QN_NV12_TO_RGB_SHADER_PROGRAM_H
+#endif //QT_OPENGL_ES_2

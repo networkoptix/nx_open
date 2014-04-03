@@ -1,6 +1,6 @@
 #ifdef QT_OPENGL_ES_2
 
-#include "texture_color_shader_program.h"
+#include "es_texture_color_shader_program.h"
 #include "ui/graphics/shaders/shader_source.h"
 
 QnTextureColorGLShaderProgramm::QnTextureColorGLShaderProgramm(const QGLContext *context, QObject *parent)

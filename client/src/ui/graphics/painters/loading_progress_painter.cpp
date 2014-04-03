@@ -4,7 +4,7 @@
 
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_buffer_stream.h>
-#include <ui/graphics/shaders/color_shader_program.h>
+//#include <ui/graphics/shaders/color_shader_program.h>
 #include <utils/math/linear_combination.h>
 #include "opengl_renderer.h"
 

@@ -1,7 +1,8 @@
+#ifndef QT_OPENGL_ES_2
 #ifndef QN_TEXTURE_TRANSITION_SHADER_PROGRAM_H
 #define QN_TEXTURE_TRANSITION_SHADER_PROGRAM_H
 
-#ifndef QT_OPENGL_ES_2
+
 
 #include <QtOpenGL/QGLShaderProgram>
 #include "texture_color_shader_program.h"
@@ -37,5 +38,6 @@ private:
     int m_progressLocation;
 };
 
-#endif // QT_OPENGL_ES_2
+
 #endif //QN_TEXTURE_TRANSITION_SHADER_PROGRAM_H
+#endif // QT_OPENGL_ES_2

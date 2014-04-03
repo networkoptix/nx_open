@@ -1,7 +1,7 @@
 #ifdef QT_OPENGL_ES_2
-#include "texture_transition_shader_program.h"
+#include "es_texture_transition_shader_program.h"
 
-#include "shader_source.h"
+#include "../shaders/shader_source.h"
 
 QnTextureTransitionShaderProgram::QnTextureTransitionShaderProgram(const QGLContext *context, QObject *parent)
     : QnTextureColorGLShaderProgramm(context,parent)

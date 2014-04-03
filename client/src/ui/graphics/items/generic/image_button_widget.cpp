@@ -14,7 +14,12 @@
 #include <ui/animation/variant_animator.h>
 #include <ui/style/globals.h>
 #include <ui/style/icon.h>
+
+#ifdef QT_OPENGL_ES_2
+#include <ui/graphics/es_shaders/es_texture_transition_shader_program.h>
+#else
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
+#endif
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/common/geometry.h>

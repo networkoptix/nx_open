@@ -1,9 +1,9 @@
 #ifdef QT_OPENGL_ES_2
-#include "color_shader_program.h"
+#include "es_color_shader_program.h"
 
 #include <ui/graphics/opengl/gl_context_data.h>
 #include "ui/graphics/shaders/shader_source.h"
-#include "shader_source.h"
+#include "../shaders/shader_source.h"
 //
 //Q_GLOBAL_STATIC(QnGlContextData<QnColorShaderProgram>, qn_colorShaderProgram_instanceStorage);
 //

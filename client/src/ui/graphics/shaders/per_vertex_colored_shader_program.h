@@ -1,7 +1,8 @@
+#ifndef QT_OPENGL_ES_2
 #ifndef QN_PER_VERTEX_COLORED_SHADER_PROGRAM_H
 #define QN_PER_VERTEX_COLORED_SHADER_PROGRAM_H
 
-#ifndef QT_OPENGL_ES_2
+
 
 #include "color_shader_program.h"
 
@@ -14,5 +15,6 @@ public:
     virtual bool compile();
 };
 
-#endif //QT_OPENGL_ES_2
 #endif
+
+#endif //QT_OPENGL_ES_2

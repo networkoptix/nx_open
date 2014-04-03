@@ -1,9 +1,10 @@
-#ifndef QN_TEXTURE_COLOR_SHADER_PROGRAM_H
-#define QN_TEXTURE_COLOR_SHADER_PROGRAM_H
-
 #ifdef QT_OPENGL_ES_2
+#ifndef QN_ES_TEXTURE_COLOR_SHADER_PROGRAM_H
+#define QN_ES_TEXTURE_COLOR_SHADER_PROGRAM_H
 
-#include "color_shader_program.h"
+
+
+#include "es_color_shader_program.h"
 
 class QnTextureColorGLShaderProgramm : public QnColorGLShaderProgramm 
 {
@@ -28,5 +29,7 @@ private:
     int m_texture;
 };
 
-#endif //QT_OPENGL_ES_2
+
 #endif // QN_TEXTURE_COLOR_SHADER_PROGRAM_H
+
+#endif //QT_OPENGL_ES_2

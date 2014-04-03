@@ -1,9 +1,9 @@
 #ifdef QT_OPENGL_ES_2
-#include "nv12_to_rgb_shader_program.h"
+#include "es_nv12_to_rgb_shader_program.h"
 
 #include <utils/common/warnings.h>
 
-#include "shader_source.h"
+#include "../shaders/shader_source.h"
 
 namespace {
     /** 

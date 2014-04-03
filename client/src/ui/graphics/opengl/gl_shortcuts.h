@@ -4,7 +4,7 @@
 #include <QtOpenGL/QtOpenGL>
 
 #include <utils/math/coordinate_transformations.h>
-
+/*
 inline void glColor(float r, float g, float b, float a) {
 //    glColor4f(r, g, b, a);
 }
@@ -100,7 +100,7 @@ inline void glRotate(float angle, float x, float y, float z) {
 inline void glRotate(double angle, double x, double y, double z) {
 //    glRotated(angle, x, y, z);
 }
-
+*/
 /**
  * This function checks for OpenGL errors, and if the error did occur, writes
  * it out to log.

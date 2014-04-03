@@ -1,9 +1,10 @@
-#ifndef QN_PER_VERTEX_COLORED_SHADER_PROGRAM_H
-#define QN_PER_VERTEX_COLORED_SHADER_PROGRAM_H
-
 #ifdef QT_OPENGL_ES_2
+#ifndef QN_ES_PER_VERTEX_COLORED_SHADER_PROGRAM_H
+#define QN_ES_PER_VERTEX_COLORED_SHADER_PROGRAM_H
 
-#include "color_shader_program.h"
+
+
+#include "es_color_shader_program.h"
 
 class QnPerVertexColoredGLShaderProgramm : public QnColorGLShaderProgramm 
 {
@@ -14,5 +15,7 @@ public:
     virtual bool compile();
 };
 
-#endif // QT_OPENGL_ES_2
+
 #endif
+
+#endif // QT_OPENGL_ES_2

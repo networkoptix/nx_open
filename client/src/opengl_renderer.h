@@ -4,10 +4,18 @@
 #include <utils/common/singleton.h>
 #include <QtOpenGL/QGLShaderProgram>
 
+#ifndef QT_OPENGL_ES_2
 #include "ui/graphics/shaders/base_shader_program.h"
 #include "ui/graphics/shaders/color_shader_program.h"
 #include "ui/graphics/shaders/texture_color_shader_program.h"
 #include "ui/graphics/shaders/per_vertex_colored_shader_program.h"
+#else 
+#include "ui/graphics/es_shaders/es_base_shader_program.h"
+#include "ui/graphics/es_shaders/es_color_shader_program.h"
+#include "ui/graphics/es_shaders/es_texture_color_shader_program.h"
+#include "ui/graphics/es_shaders/es_per_vertex_colored_shader_program.h"
+#endif
+
 
 class QnOpenGLRenderer
 {
