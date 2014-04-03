@@ -156,7 +156,7 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
 
     m_videoWallItems = qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
 
-    if (m_resources.empty() && m_videoWallItems.empty())
+    if (m_resources.empty() && m_videoWallItems.empty()) {
         event->ignore();
         return false;
     }
