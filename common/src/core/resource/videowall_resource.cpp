@@ -5,7 +5,8 @@
 #include <utils/common/warnings.h>
 
 QnVideoWallResource::QnVideoWallResource() :
-    base_type()
+    base_type(),
+    m_autorun(false)
 {
     setStatus(Online, true);
     addFlags(QnResource::videowall | QnResource::remote);
@@ -23,6 +24,7 @@ void QnVideoWallResource::updateInner(QnResourcePtr other) {
     if(localOther) {
         setItems(localOther->getItems());
         setPcs(localOther->getPcs());
+        setAutorun(localOther->isAutorun());
     }
 }
 
@@ -243,4 +245,19 @@ void QnVideoWallResource::removePcUnderLock(const QUuid &pcUuid) {
     m_mutex.unlock();
     emit pcRemoved(::toSharedPointer(this), pc);
     m_mutex.lock();
+}
+
+bool QnVideoWallResource::isAutorun() const {
+    QMutexLocker locker(&m_mutex);
+    return m_autorun;
+}
+
+void QnVideoWallResource::setAutorun(bool value) {
+    {
+        QMutexLocker locker(&m_mutex);
+        if (m_autorun == value)
+            return;
+        m_autorun = value;
+    }
+    emit autorunChanged(::toSharedPointer(this), value);
 }

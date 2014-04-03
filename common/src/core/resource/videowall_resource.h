@@ -38,6 +38,10 @@ public:
     void removePc(const QUuid &pcUuid);
     void updatePc(const QUuid &pcUuid, const QnVideoWallPcData &pc);
 
+    /** \returns Whether the videowall should be started when the PC boots up. */
+    bool isAutorun() const;
+    void setAutorun(bool value);
+
 signals:
     void itemAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
     void itemRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
@@ -47,6 +51,7 @@ signals:
     void pcRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
     void pcChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
 
+    void autorunChanged(const QnVideoWallResourcePtr &resource, bool value);
 protected:
     virtual void updateInner(QnResourcePtr other) override;
 
@@ -62,6 +67,7 @@ private:
 private:
     QnVideoWallItemMap m_itemByUuid;
     QnVideoWallPcDataMap m_pcByUuid;
+    bool m_autorun;
 };
 
 Q_DECLARE_METATYPE(QnVideoWallResourcePtr)

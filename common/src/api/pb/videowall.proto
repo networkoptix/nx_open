@@ -47,7 +47,8 @@ message VideoWall {
     }
 
     repeated Item       item            = 1;
-    repeated Pc         pc              = 2;    
+    repeated Pc         pc              = 2;
+    required bool       autorun         = 3;    // whether the videowall should be started when the PC boots up
 }
 
 message VideoWallControl {
@@ -57,7 +58,7 @@ message VideoWallControl {
     }
 
     required string uuid                = 1;
-    required string item_uuid           = 2;    //id of the item instance that should receive the message
+    required string item_uuid           = 2;    // id of the item instance that should receive the message
     required int32  op_code             = 3;
     repeated Parameter param            = 4;
 }

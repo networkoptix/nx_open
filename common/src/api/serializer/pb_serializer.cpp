@@ -475,6 +475,8 @@ void parseVideoWall(QnVideoWallResourcePtr& videoWall, const pb::Resource& pb_vi
 
         videoWall->setPcs(pcs);
     }
+
+    videoWall->setAutorun(pb_videoWall.autorun());
 }
 
 void parseVideoWalls(QnVideoWallResourceList& videoWalls, const PbResourceList& pb_videoWalls) {
@@ -717,6 +719,7 @@ void serializeVideoWall_i(pb::Resource& pb_videoWallResource, const QnVideoWallR
     pb_videoWallResource.set_parentid(videoWallIn->getParentId().toInt());
     pb_videoWallResource.set_name(videoWallIn->getName().toUtf8().constData());
     pb_videoWallResource.set_guid(videoWallIn->getGuid().toUtf8().constData());
+    pb_videoWall.set_autorun(videoWallIn->isAutorun());
 
     if (!videoWallIn->getItems().isEmpty()) {
         foreach(const QnVideoWallItem& itemIn, videoWallIn->getItems()) {
