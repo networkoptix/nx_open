@@ -653,6 +653,9 @@ Qn::ActionVisibility QnPtzActionCondition::check(const QnResourceWidgetList &wid
         
         if(!check(mediaWidget->ptzController()))
             return Qn::InvisibleAction;
+
+        if (!mediaWidget->zoomRect().isNull())
+            return Qn::InvisibleAction;
     }
 
     if (m_disableIfPtzDialogVisible && QnPtzManageDialog::instance() && QnPtzManageDialog::instance()->isVisible())

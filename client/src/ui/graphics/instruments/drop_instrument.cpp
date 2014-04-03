@@ -117,8 +117,10 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
     m_videoWallItems.clear();
 
     const QMimeData *mimeData = event->mimeData();
-    if (mimeData->hasFormat(Qn::NoSceneDrop))
+    if (mimeData->hasFormat(Qn::NoSceneDrop)) {
+        event->ignore();
         return false;
+    }
 
 #ifdef Q_OS_MAC
     if (mimeData->hasUrls()) {
@@ -155,15 +157,19 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
     m_videoWallItems = qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
 
     if (m_resources.empty() && m_videoWallItems.empty())
+        event->ignore();
         return false;
+    }
 
     event->acceptProposedAction();
     return true;
 }
 
 bool DropInstrument::dragMoveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
-    if(m_resources.empty() && m_videoWallItems.empty())
+    if(m_resources.empty() && m_videoWallItems.empty()) {
+        event->ignore();
         return false;
+    }
 
     event->acceptProposedAction();
     return true;
