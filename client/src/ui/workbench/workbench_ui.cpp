@@ -764,6 +764,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 }
 
 QnWorkbenchUi::~QnWorkbenchUi() {
+    debugLabel = 0;
     /* The disconnect call is needed so that our methods don't get triggered while
      * the ui machinery is shutting down. */
     disconnectAll();
