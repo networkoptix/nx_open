@@ -148,4 +148,6 @@ mac {
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}
   CONFIG -= app_bundle objective_c
+
+  INCLUDEPATH += ${qt.dir}/lib/QtCore.framework/Headers/$$QT_VERSION/QtCore/
 }
