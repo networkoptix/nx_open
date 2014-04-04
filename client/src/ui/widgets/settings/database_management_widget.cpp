@@ -2,7 +2,6 @@
 #include "ui_database_management_widget.h"
 
 #include <QtWidgets/QMessageBox>
-#include <QtWidgets/QFileDialog>
 #include <QtCore/QFileInfo>
 
 #include "client/client_settings.h"
@@ -15,6 +14,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/file_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {
@@ -39,7 +39,15 @@ QnDatabaseManagementWidget::~QnDatabaseManagementWidget() {
 }
 
 void QnDatabaseManagementWidget::at_backupButton_clicked() {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QnCustomFileDialog::fileDialogOptions());
+    // TODO: #dklychkov file name filter string duplicates the value of dbExtension variable
+    QScopedPointer<QnCustomFileDialog> fileDialog(new QnCustomFileDialog(
+                                                      this,
+                                                      tr("Save Database Backup..."),
+                                                      qnSettings->lastDatabaseBackupDir(),
+                                                      tr("Database Backup Files (*.db)")));
+    fileDialog->exec();
+
+    QString fileName = fileDialog->selectedFile();
     if(fileName.isEmpty())
         return;
 
@@ -87,7 +95,7 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
 }
 
 void QnDatabaseManagementWidget::at_restoreButton_clicked() {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QnCustomFileDialog::fileDialogOptions());
+    QString fileName = QnFileDialog::getOpenFileName(this, tr("Open Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QnCustomFileDialog::fileDialogOptions());
     if(fileName.isEmpty())
         return;
     qnSettings->setLastDatabaseBackupDir(QFileInfo(fileName).absolutePath());

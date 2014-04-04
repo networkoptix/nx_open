@@ -603,6 +603,7 @@ void initAppServerConnection(const QSettings &settings)
     cl_log.log("Connect to enterprise controller server ", urlNoPassword.toString(), cl_logINFO);
     QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid());
+    QnAppServerConnectionFactory::setClientType(QLatin1String("server"));
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
     QnAppServerConnectionFactory::setBox(lit(QN_ARM_BOX));
@@ -612,6 +613,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
 {
     QUrl appServerEventsUrl;
 
+    //TODO: #GDM move to server_message_processor as in client
     // ### remove
     appServerEventsUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
     appServerEventsUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
@@ -624,6 +626,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     appServerEventsUrlQuery.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
     appServerEventsUrlQuery.addQueryItem("version", QN_ENGINE_VERSION);
     appServerEventsUrlQuery.addQueryItem("format", "pb");
+    appServerEventsUrlQuery.addQueryItem("ct", QnAppServerConnectionFactory::clientType());
     appServerEventsUrl.setQuery( appServerEventsUrlQuery );
 
     //QnServerMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
@@ -1241,6 +1244,7 @@ void QnMain::run()
     qnStorageMan->loadFullFileCatalog();
 
     initAppServerEventConnection(*MSSettings::roSettings(), m_mediaServer);
+    
 
     std::auto_ptr<QnAppserverResourceProcessor> m_processor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
 

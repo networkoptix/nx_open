@@ -18,6 +18,8 @@ class QnLayoutResource: public QnResource {
 public:
     QnLayoutResource();
 
+    QnLayoutResourcePtr clone() const;
+
     virtual QString getUniqueId() const override;
 
     void setItems(const QnLayoutItemDataList &items);

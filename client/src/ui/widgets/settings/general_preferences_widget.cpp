@@ -25,6 +25,7 @@
 #include <ui/style/warning_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_auto_starter.h>
+#include <ui/workaround/mac_utils.h>
 
 #include <utils/network/nettools.h>
 
@@ -150,6 +151,12 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
 }
 
 bool QnGeneralPreferencesWidget::confirm() {
+#ifdef Q_OS_MACX
+    // TODO: #dklychkov remove this if the way to restart the app will be found
+    if (mac_isSandboxed())
+        return true;
+#endif
+
     if (m_oldDownmix != ui->downmixAudioCheckBox->isChecked() ||
         m_oldLanguage != ui->languageComboBox->currentIndex() ||
         m_oldSkin != ui->skinComboBox->currentIndex())

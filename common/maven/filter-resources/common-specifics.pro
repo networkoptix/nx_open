@@ -4,7 +4,8 @@ QT += core gui network xml sql concurrent multimedia
 pb.commands = ${libdir}/bin/protoc.exe --proto_path=${project.build.sourceDirectory}/api/pb --cpp_out=$${MOC_DIR} ${project.build.sourceDirectory}/api/pb/${QMAKE_FILE_BASE}.proto
 
 mac {
-  LIBS += -L/usr/X11/lib/
+  OBJECTIVE_SOURCES += ${basedir}/src/utils/mac_utils.mm
+  LIBS += -lobjc -framework Foundation -framework AppKit
 }
 
 pb.name = Generating code from ${QMAKE_FILE_IN} to ${QMAKE_FILE_BASE}

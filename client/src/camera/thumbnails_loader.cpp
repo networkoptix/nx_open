@@ -33,7 +33,7 @@ extern "C"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
 namespace {
-    const qint64 defaultUpdateInterval = 30 * 1000; /* 30 seconds. */
+    const qint64 defaultUpdateInterval = 10 * 1000; /* 10 seconds. */
 
     const int maxStackSize = 1024;
 

@@ -30,6 +30,8 @@ public:
     static QFileDialog::Options fileDialogOptions() { return 0; }
     static QFileDialog::Options directoryDialogOptions() { return QFileDialog::ShowDirsOnly; }
 
+    virtual int exec() override;
+
 signals:
     void filterSelected(const QString &filter);
 
@@ -39,6 +41,7 @@ protected:
     QGridLayout *customizedLayout() const;
     void setNameFilters(const QStringList &filters);
     void updateMode();
+    void updateCustomizedLayout();
 
     Q_SLOT void updateFileExistsWarning();
     Q_SLOT void at_browseFolderButton_clicked();

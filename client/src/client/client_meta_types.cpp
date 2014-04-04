@@ -38,6 +38,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QVector<QUuid> >();
     qRegisterMetaType<QVector<QColor> >();
 
+    qRegisterMetaType<Qn::NodeType>();
     qRegisterMetaType<Qn::ItemRole>();
     qRegisterMetaType<QnThumbnail>();    
     qRegisterMetaType<QnWorkbenchState>();

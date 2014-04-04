@@ -415,6 +415,8 @@ namespace applauncher
                     return success;
                 else if( str == "failed" )
                     return failed;
+                else if( str == "cancelled" )
+                    return cancelled;
                 else
                     return unknown;
             }
@@ -431,6 +433,8 @@ namespace applauncher
                         return "success";
                     case failed:
                         return "failed";
+                    case cancelled:
+                        return "cancelled";
                     default:
                         return "unknown";
                 }

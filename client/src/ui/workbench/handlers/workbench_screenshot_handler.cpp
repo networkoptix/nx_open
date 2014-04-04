@@ -130,12 +130,11 @@ void QnScreenshotLoader::doLoadAsync() {
     m_isReady = true;
 
     QImage img = image();
-
-    emit imageChanged(image());
-
     if (img.isNull())
-        return;
+        return; //waiting for image to be loaded
 
+    // image is already loaded within base provider
+    emit imageChanged(img);
     m_isReady = false;
 }
 

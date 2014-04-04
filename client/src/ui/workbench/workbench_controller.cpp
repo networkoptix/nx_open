@@ -15,7 +15,6 @@
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QFileInfo>
 #include <QtCore/QSettings>
-#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QGraphicsProxyWidget>
 
 #include <utils/common/util.h>
@@ -31,6 +30,9 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/file_processor.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item.h>
+#include <core/resource/videowall_item_index.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -43,6 +45,7 @@
 
 #include "ui/dialogs/sign_dialog.h" // TODO: move out.
 #include <ui/dialogs/custom_file_dialog.h>  //for QnCustomFileDialog::fileDialogOptions() constant
+#include <ui/dialogs/file_dialog.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -286,7 +289,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(ptzInstrument);
     m_manager->installInstrument(zoomWindowInstrument);
 
-    display()->setLayer(m_dropInstrument->surface(), Qn::UiLayer);
+    display()->setLayer(m_dropInstrument->surface(), Qn::BackLayer);
 
     connect(m_itemLeftClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemLeftClickInstrument,  SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
@@ -379,6 +382,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_motionSelectionInstrument,    SLOT(recursiveEnable()));
     connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_itemLeftClickInstrument,      SLOT(recursiveDisable()));
     connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_itemLeftClickInstrument,      SLOT(recursiveEnable()));
+    connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         this,                           SLOT(at_ptzProcessStarted(QnMediaResourceWidget *)));
 
     connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessStarted(QnMediaResourceWidget *)),                                  m_handScrollInstrument,         SLOT(recursiveDisable()));
     connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessFinished(QnMediaResourceWidget *)),                                 m_handScrollInstrument,         SLOT(recursiveEnable()));
@@ -506,7 +510,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
 
 void QnWorkbenchController::displayWidgetInfo(const QList<QnResourceWidget *> &widgets, bool display){
     foreach(QnResourceWidget *widget, widgets)
-        widget->setOption(QnResourceWidget::DisplayInfo, display);
+        widget->setInfoVisible(display);
 }
 
 void QnWorkbenchController::moveCursor(const QPoint &aAxis, const QPoint &bAxis) {
@@ -645,21 +649,19 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
     if (suggetion.isEmpty())
         suggetion = tr("Recorded Video");
 
-    QString previousDir = qnSettings->lastRecordingDir();
-    QString selectedFilter;
     while (true) {
-        QString filePath = QFileDialog::getSaveFileName(
-            display()->view(),
-            tr("Save Recording As..."),
-            previousDir + QLatin1Char('/') + suggetion,
-            tr("AVI (Audio/Video Interleaved) (*.avi)"),
-            &selectedFilter,
-            QnCustomFileDialog::fileDialogOptions()
-        );
+        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
+                                                      display()->view(),
+                                                      tr("Save Recording As..."),
+                                                      qnSettings->lastRecordingDir() + QLatin1Char('/') + suggetion,
+                                                      tr("AVI (Audio/Video Interleaved) (*.avi)")));
+        dialog->exec();
 
+        QString filePath = dialog->selectedFile();
+        QString selectedExtension = dialog->selectedExtension();
         if (!filePath.isEmpty()) {
-            if (!filePath.endsWith(QLatin1String(".avi"), Qt::CaseInsensitive))
-                filePath += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 4);
+            if (!filePath.endsWith(selectedExtension, Qt::CaseInsensitive))
+                filePath += selectedExtension;
 
             QFile::remove(filePath);
             if (!QFile::rename(recordedFileName, filePath)) {
@@ -702,28 +704,28 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
         break;
     }
     case Qt::Key_Up:
-        if(e->modifiers() == 0)
-            moveCursor(QPoint(0, -1), QPoint(-1, 0));
-        if(e->modifiers() & Qt::AltModifier)
+        if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(0, -15));
+        else
+            moveCursor(QPoint(0, -1), QPoint(-1, 0));
         break;
     case Qt::Key_Down:
-        if(e->modifiers() == 0)
-            moveCursor(QPoint(0, 1), QPoint(1, 0));
-        if(e->modifiers() & Qt::AltModifier)
+        if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(0, 15));
+        else
+            moveCursor(QPoint(0, 1), QPoint(1, 0));
         break;
     case Qt::Key_Left:
-        if(e->modifiers() == 0)
-            moveCursor(QPoint(-1, 0), QPoint(0, -1));
-        if(e->modifiers() & Qt::AltModifier)
+        if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(-15, 0));
+        else
+            moveCursor(QPoint(-1, 0), QPoint(0, -1));
         break;
     case Qt::Key_Right:
-        if(e->modifiers() == 0)
-            moveCursor(QPoint(1, 0), QPoint(0, 1));
-        if(e->modifiers() & Qt::AltModifier)
+        if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(15, 0));
+        else
+            moveCursor(QPoint(1, 0), QPoint(0, 1));
         break;
     case Qt::Key_Plus:
     case Qt::Key_Equal:
@@ -1055,6 +1057,8 @@ void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, co
 
 void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget) {
     QnLayoutItemData data = widget->item()->data();
+    delete widget;
+
     data.uuid = QUuid::createUuid();
     data.resource.id = zoomTargetWidget->resource()->toResource()->getId();
     data.resource.path = zoomTargetWidget->resource()->toResource()->getUniqueId();
@@ -1062,9 +1066,7 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
     data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
-    
-    QnResourceWidget::Buttons buttons = widget->checkedButtons();
-    delete widget;
+
 
     int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
             ? 1
@@ -1074,7 +1076,6 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     if (layout->getItems().size() >= maxItems)
         return;
     layout->addItem(data);
-    display()->widget(data.uuid)->setCheckedButtons(buttons);
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
@@ -1451,4 +1452,19 @@ void QnWorkbenchController::updateLayoutInstruments(const QnLayoutResourcePtr &l
 
     m_moveInstrument->setEnabled(writable && !layout->locked());
     m_resizingInstrument->setEnabled(writable && !layout->locked());
+}
+
+void QnWorkbenchController::at_ptzProcessStarted(QnMediaResourceWidget *widget) {
+    if(widget == NULL)
+        return;
+
+    // skip method if current widget is already raised or zoomed
+    if (display()->widget(Qn::RaisedRole) == widget
+        || display()->widget(Qn::ZoomedRole) == widget)
+        return;
+
+    workbench()->setItem(Qn::RaisedRole, NULL); /* Un-raise currently raised item so that it doesn't interfere with ptz. */
+    display()->scene()->clearSelection();
+    widget->setSelected(true);
+    display()->bringToFront(widget);
 }

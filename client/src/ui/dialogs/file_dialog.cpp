@@ -32,7 +32,9 @@ QString QnFileDialog::getExistingDirectory(QWidget *parent,
                                         const QString &dir,
                                         Options options) {
 #ifdef Q_OS_MAC
-    return mac_getExistingDirectory(parent, caption, dir, options);
+    Q_UNUSED(parent)
+    Q_UNUSED(options)
+    return mac_getExistingDirectory(caption, dir);
 #else
     return QFileDialog::getExistingDirectory(parent, caption, dir, options);
 #endif
@@ -45,8 +47,32 @@ QString QnFileDialog::getOpenFileName(QWidget *parent,
                                  QString *selectedFilter,
                                  QFileDialog::Options options) {
 #ifdef Q_OS_MAC
-    return mac_getOpenFileName(parent, caption, dir, getExtensionsFromFilter(filter), options);
+    Q_UNUSED(parent)
+    Q_UNUSED(options)
+    return mac_getOpenFileName(caption, dir, getExtensionsFromFilter(filter));
 #else
     return QFileDialog::getOpenFileName(parent, caption, dir, filter, selectedFilter, options);
+#endif
+}
+
+QString QnFileDialog::getSaveFileName(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options)
+{
+#ifdef Q_OS_MAC
+    Q_UNUSED(parent)
+    Q_UNUSED(options)
+    return mac_getSaveFileName(caption, dir, getExtensionsFromFilter(filter));
+#else
+    return QFileDialog::getSaveFileName(parent, caption, dir, filter, selectedFilter, options);
+#endif
+}
+
+QStringList QnFileDialog::getOpenFileNames(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options)
+{
+#ifdef Q_OS_MAC
+    Q_UNUSED(parent)
+    Q_UNUSED(options)
+    return mac_getOpenFileNames(caption, dir, getExtensionsFromFilter(filter));
+#else
+    return QFileDialog::getOpenFileNames(parent, caption, dir, filter, selectedFilter, options);
 #endif
 }
