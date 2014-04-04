@@ -424,7 +424,7 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
     case Qn::ResourceStatusRole:
         return QVariant::fromValue<int>(m_status);
     case Qn::NodeTypeRole:
-        return m_type;
+        return qVariantFromValue(m_type);
     case Qn::HelpTopicIdRole:
         if(m_type == Qn::UsersNode) {
             return Qn::MainWindow_Tree_Users_Help;
