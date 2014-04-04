@@ -32,7 +32,7 @@ QnVideowallAttachSettings QnAttachToVideowallDialog::settings() const {
         result.layoutMode = QnVideowallAttachSettings::LayoutClone;
     else
         result.layoutMode = QnVideowallAttachSettings::LayoutNone;
-    result.layoutId = ui->layoutsComboBox->currentData().toInt();
+    result.layoutId = ui->layoutsComboBox->currentData().value<QUuid>();
 
     if (ui->amAllRadioButton->isChecked())
         result.attachMode = QnVideowallAttachSettings::AttachAll;
@@ -87,7 +87,7 @@ void QnAttachToVideowallDialog::loadSettings(const QnVideowallAttachSettings &se
 
 void QnAttachToVideowallDialog::loadLayoutsList(const QnLayoutResourceList &layouts) {
     foreach (const QnLayoutResourcePtr &layout, layouts) {
-        ui->layoutsComboBox->addItem(layout->getName(), layout->getId().toInt());
+        ui->layoutsComboBox->addItem(layout->getName(), layout->getId());
     }
     ui->layoutCustom->setEnabled(!layouts.isEmpty());
 }

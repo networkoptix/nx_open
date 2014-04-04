@@ -16,8 +16,6 @@ class QnVideoWallResource : public QnResource
 public:
     QnVideoWallResource();
 
-    virtual QString getUniqueId() const override;
-
     void setItems(const QnVideoWallItemList &items);
     void setItems(const QnVideoWallItemMap &items);
     QnVideoWallItemMap getItems() const;

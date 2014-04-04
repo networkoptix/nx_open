@@ -12,6 +12,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_control_message.h>
+#include <core/resource/videowall_pc_data.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -31,7 +32,7 @@ public:
     virtual ~QnWorkbenchVideoWallHandler();
 
 private:
-    QnAppServerConnectionPtr connection() const;
+    ec2::AbstractECConnectionPtr connection2() const;
 
     void attachLayout(const QnVideoWallResourcePtr &videoWall, const QnLayoutResourcePtr &layout, const QnVideowallAttachSettings &settings);
     void resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout, bool closeClient);

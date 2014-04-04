@@ -156,7 +156,7 @@ void QnImageButtonWidget::setPixmap(StateFlags flags, const QPixmap &pixmap) {
 }
 
 const QIcon &QnImageButtonWidget::icon() const {
-    return QIcon(); // TODO: #Elric
+    return QIcon(); // TODO: #Elric warning C4172: returning address of local variable or temporary
 }
 
 void QnImageButtonWidget::setIcon(const QIcon &icon) {

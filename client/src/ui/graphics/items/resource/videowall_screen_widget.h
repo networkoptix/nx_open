@@ -2,10 +2,10 @@
 #define VIDEOWALL_RESOURCE_SCREEN_WIDGET_H
 
 #include <core/resource/resource_fwd.h>
-
 #include <core/resource/videowall_pc_data.h>
+#include <utils/common/id.h>
 
-#include "resource_widget.h"
+#include <ui/graphics/items/resource/resource_widget.h>
 
 class QnVideoWallItem;
 class QnCameraThumbnailManager;
@@ -35,7 +35,7 @@ protected:
 private:
     void updateLayout();
 private slots:
-    void at_thumbnailReady(int resourceId, const QPixmap &thumbnail);
+    void at_thumbnailReady(const QnId &resourceId, const QPixmap &thumbnail);
 
     void at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
@@ -59,7 +59,7 @@ private:
 
 
     QnCameraThumbnailManager *m_thumbnailManager;
-    QHash<int, QPixmap> m_thumbs;
+    QHash<QnId, QPixmap> m_thumbs;
 };
 
 #endif // VIDEOWALL_RESOURCE_SCREEN_WIDGET_H

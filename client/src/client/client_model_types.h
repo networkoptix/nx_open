@@ -11,6 +11,7 @@
 #include <QtCore/QDataStream>
 #include <QtGui/QVector3D>
 
+#include <utils/common/id.h>
 #include <utils/common/model_functions_fwd.h>
 #include <recording/time_period.h>
 
@@ -148,7 +149,7 @@ struct QnVideowallAttachSettings {
 
     AttachMode attachMode;
     LayoutMode layoutMode;
-    int layoutId;               /**< for custom layout */
+    QnId layoutId;               /**< for custom layout */
     bool autoFill;
     bool closeClient;
     bool autoRun;
@@ -156,7 +157,6 @@ struct QnVideowallAttachSettings {
     QnVideowallAttachSettings():
         attachMode(AttachScreen),
         layoutMode(LayoutClone),
-        layoutId(0),
         autoFill(true),
         closeClient(false),
         autoRun(true)

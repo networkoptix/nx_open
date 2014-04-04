@@ -9,7 +9,7 @@
 
 #include <api/app_server_connection.h>
 
-#include <core/resource/user_resource.h>
+#include <core/ptz/item_dewarping_params.h>
 #include <nx_ec/ec_api.h>
 
 #include <client/client_globals.h>
@@ -19,6 +19,8 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/dialogs/event_log_dialog.h>
 #include <ui/dialogs/camera_list_dialog.h>
+
+#include <utils/color_space/image_correction.h>
 
 class QAction;
 class QMenu;

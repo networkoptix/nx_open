@@ -3,8 +3,9 @@
 
 #include <QtCore/QUuid>
 #include <QtCore/QCryptographicHash>
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/user_resource.h"
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"
 #include "api/app_server_connection.h"

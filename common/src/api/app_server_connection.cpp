@@ -115,6 +115,14 @@ QString QnAppServerConnectionFactory::authKey()
     return QString();
 }
 
+
+QString QnAppServerConnectionFactory::videoWallKey() {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
+        return factory->m_videoWallKey;
+    return QString();
+}
+
+
 QString QnAppServerConnectionFactory::box()
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
@@ -162,6 +170,13 @@ void QnAppServerConnectionFactory::setAuthKey(const QString &authKey)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_authKey = authKey;
+    }
+}
+
+void QnAppServerConnectionFactory::setVideoWallKey(const QString &key)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_videoWallKey = key;
     }
 }
 

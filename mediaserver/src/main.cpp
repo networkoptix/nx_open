@@ -603,7 +603,7 @@ void initAppServerConnection(const QSettings &settings)
     cl_log.log("Connect to enterprise controller server ", urlNoPassword.toString(), cl_logINFO);
     QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid());
-    QnAppServerConnectionFactory::setClientType(QLatin1String("server"));
+    //QnAppServerConnectionFactory::setClientType(QLatin1String("server")); //TODO :#GDM VW reimplement
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
     QnAppServerConnectionFactory::setBox(lit(QN_ARM_BOX));
@@ -626,7 +626,8 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     appServerEventsUrlQuery.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
     appServerEventsUrlQuery.addQueryItem("version", QN_ENGINE_VERSION);
     appServerEventsUrlQuery.addQueryItem("format", "pb");
-    appServerEventsUrlQuery.addQueryItem("ct", QnAppServerConnectionFactory::clientType());
+    //TODO :#GDM VW reimplement
+    //appServerEventsUrlQuery.addQueryItem("ct", QnAppServerConnectionFactory::clientType());
     appServerEventsUrl.setQuery( appServerEventsUrlQuery );
 
     //QnServerMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());

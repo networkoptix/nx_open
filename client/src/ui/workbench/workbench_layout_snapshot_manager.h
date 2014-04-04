@@ -19,10 +19,10 @@ class QnWorkbenchLayoutReplyProcessor: public QnAbstractReplyProcessor {
     Q_OBJECT
 
 public:
-    QnWorkbenchLayoutReplyProcessor(QnWorkbenchLayoutSnapshotManager *manager, const QnLayoutResourceList &layouts):
+    QnWorkbenchLayoutReplyProcessor(QnWorkbenchLayoutSnapshotManager *manager, const QnLayoutResourceList &resources): 
         QnAbstractReplyProcessor(0),
         m_manager(manager),
-        m_layouts(layouts)
+        m_resources(resources)
     {}
 
 public slots:
@@ -35,7 +35,7 @@ private:
     friend class QnAbstractReplyProcessor;
 
     QPointer<QnWorkbenchLayoutSnapshotManager> m_manager;
-    QnLayoutResourceList m_layouts;
+    QnLayoutResourceList m_resources;
 };
 
 
@@ -46,24 +46,22 @@ private:
  * It also provides some functions for layout and snapshot manipulation.
  */
 class QnWorkbenchLayoutSnapshotManager: public Connective<QObject>, public QnWorkbenchContextAware {
-    Q_OBJECT
+    Q_OBJECT;
     typedef Connective<QObject> base_type;
 
 public:
     QnWorkbenchLayoutSnapshotManager(QObject *parent = NULL);
     virtual ~QnWorkbenchLayoutSnapshotManager();
 
-    int save(const QnLayoutResourcePtr &resource, QObject *object = NULL, const char *slot = NULL);
-    int save(const QnLayoutResourceList &resources, QObject *object = NULL, const char *slot = NULL);
+    int save(const QnLayoutResourcePtr &resource, QObject *object, const char *slot);
+    int save(const QnLayoutResourceList &resources, QObject *object, const char *slot);
 
     void store(const QnLayoutResourcePtr &resource);
     void restore(const QnLayoutResourcePtr &resource);
 
     Qn::ResourceSavingFlags flags(const QnLayoutResourcePtr &resource) const;
     Qn::ResourceSavingFlags flags(QnWorkbenchLayout *layout) const;
-
     void setFlags(const QnLayoutResourcePtr &resource, Qn::ResourceSavingFlags flags);
-    void setFlags(QnWorkbenchLayout *layout, Qn::ResourceSavingFlags flags);
 
     bool isChanged(const QnLayoutResourcePtr &resource) const {
         return flags(resource) & Qn::ResourceIsChanged;
@@ -102,13 +100,13 @@ protected:
     void connectTo(const QnLayoutResourcePtr &resource);
     void disconnectFrom(const QnLayoutResourcePtr &resource);
 
-    void processSaveLayoutsReply(int status, const QnLayoutResourceList &localLayouts, const QnLayoutResourceList &receivedLayouts);
-
     Qn::ResourceSavingFlags defaultFlags(const QnLayoutResourcePtr &resource) const;
 
     ec2::AbstractECConnectionPtr connection2() const;
 
 protected slots:
+    void processReply(int status, const QnLayoutResourceList &resources, int handle);
+
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_layout_storeRequested(const QnLayoutResourcePtr &resource);

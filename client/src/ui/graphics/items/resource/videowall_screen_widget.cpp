@@ -177,7 +177,7 @@ void QnVideowallScreenWidget::updateLayout() {
 }
 
 
-void QnVideowallScreenWidget::at_thumbnailReady(int resourceId, const QPixmap &thumbnail) {
+void QnVideowallScreenWidget::at_thumbnailReady(const QnId &resourceId, const QPixmap &thumbnail) {
     m_thumbs[resourceId] = thumbnail;
     update();
 }

@@ -1,8 +1,6 @@
 TEMPLATE = lib
 QT += core gui network xml sql concurrent multimedia
 
-pb.commands = ${libdir}/bin/protoc.exe --proto_path=${project.build.sourceDirectory}/api/pb --cpp_out=$${MOC_DIR} ${project.build.sourceDirectory}/api/pb/${QMAKE_FILE_BASE}.proto
-
 mac {
   OBJECTIVE_SOURCES += ${basedir}/src/utils/mac_utils.mm
   LIBS += -lobjc -framework Foundation -framework AppKit

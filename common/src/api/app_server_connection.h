@@ -28,6 +28,7 @@ public:
 
     static QString box();
     static QString authKey();
+    static QString videoWallKey();
     static QString clientGuid();
     static QUrl defaultUrl();
     static QUrl publicUrl();
@@ -39,6 +40,7 @@ public:
 
     static void setBox(const QString &box);
     static void setAuthKey(const QString &key);
+    static void setVideoWallKey(const QString &key);
     static void setClientGuid(const QString &guid);
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory *);
@@ -60,6 +62,7 @@ private:
     QMutex m_mutex;
     QString m_clientGuid;
     QString m_authKey;
+    QString m_videoWallKey;
     QUrl m_defaultUrl;
     QUrl m_publicUrl;
     QByteArray m_sessionKey;

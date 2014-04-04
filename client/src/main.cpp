@@ -247,7 +247,8 @@ void initAppServerConnection(const QUuid &videoWallGuid)
         appServerUrl = qnSettings->defaultConnection().url;
 
     QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
-    QnAppServerConnectionFactory::setClientType(QLatin1String("client"));
+    //TODO: #GDM VW reimplement
+    //QnAppServerConnectionFactory::setClientType(QLatin1String("client"));
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
     if (!videoWallGuid.isNull())

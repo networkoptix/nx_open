@@ -1,7 +1,5 @@
 #include "videowall_resource.h"
 
-//#include <core/resource_managment/resource_pool.h>
-//#include <api/serializer/pb_serializer.h>
 #include <utils/common/warnings.h>
 
 QnVideoWallResource::QnVideoWallResource() :
@@ -10,11 +8,6 @@ QnVideoWallResource::QnVideoWallResource() :
 {
     setStatus(Online, true);
     addFlags(QnResource::videowall | QnResource::remote);
-}
-
-QString QnVideoWallResource::getUniqueId() const
-{
-    return getGuid();
 }
 
 void QnVideoWallResource::updateInner(QnResourcePtr other) {

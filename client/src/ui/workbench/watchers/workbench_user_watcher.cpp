@@ -34,7 +34,7 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
 
     m_user = user;
     m_userPassword = QString();
-    m_userPasswordHash = user ? user->getHash() : QString();
+    m_userPasswordHash = user ? user->getHash() : QByteArray();
 
     if (m_user) {
         connect(m_user, &QnResource::resourceChanged, this, &QnWorkbenchUserWatcher::at_user_resourceChanged);
@@ -60,7 +60,7 @@ void QnWorkbenchUserWatcher::setUserPassword(const QString &password) {
         return;
 
     m_userPassword = password;
-    m_userPasswordHash = QString(); //hash will be recalculated
+    m_userPasswordHash = QByteArray(); //hash will be recalculated
 }
 
 void QnWorkbenchUserWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -107,15 +107,15 @@ bool QnWorkbenchUserWatcher::reconnectRequired(const QnUserResourcePtr &user) {
         return m_userPasswordHash != user->getHash();
 
     // password was just changed by the user
-    QStringList values =  user->getHash().split(L'$');
+    QList<QByteArray> values =  user->getHash().split(L'$');
     if (values.size() != 3)
         return true;
 
-    QByteArray salt = values[1].toUtf8();
+    QByteArray salt = values[1];
     QCryptographicHash md5(QCryptographicHash::Md5);
     md5.addData(salt);
     md5.addData(m_userPassword.toUtf8());
-    if (md5.result().toHex() != values[2].toUtf8())
+    if (md5.result().toHex() != values[2])
         return true;
 
     m_userPasswordHash = user->getHash();

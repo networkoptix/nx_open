@@ -403,7 +403,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
 
     /* Check where we're dropping it. */
     QnResourcePoolModelNode *node = this->node(parent);
-    
+
     if(node->type() == Qn::ItemNode)
         node = node->parent(); /* Dropping into an item is the same as dropping into a layout. */
 
@@ -418,45 +418,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
             parameters = QnActionParameters(resources);
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
         menu()->trigger(Qn::DropOnVideoWallItemAction, parameters);
-    } else 
-
-        QnLayoutResourcePtr layout = item.layout.isValid()
-                ? qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>()
-                : QnLayoutResourcePtr();
-
-        // index for actions
-        QnVideoWallItemIndexList indexes;
-        indexes << index;
-
-        // dropping resources
-        QnResourceList medias;
-        foreach( QnResourcePtr res, resources )
-        {
-            if(res.dynamicCast<QnMediaResource>())
-                medias << res;
-        }
-
-        //dropping layouts
-        QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
-
-        if (medias.size() > 0) {
-            if (layout) {
-                menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutResourceRole, layout));
-            }
-            else {
-                //TODO: #GDM VW combine into single action
-                menu()->trigger(Qn::OpenNewTabAction);
-                menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(medias));
-                menu()->trigger(Qn::ResetVideoWallLayoutAction, QnActionParameters(indexes));
-            }
-        }
-        else if (layouts.size() == 1) {
-            menu()->trigger(Qn::ResetVideoWallLayoutAction, QnActionParameters(indexes).withArgument(Qn::LayoutResourceRole, layouts.first()));
-        }
-    } else 
-#endif
-        
-    if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
+    } else if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
         QnResourceList medias;
         foreach( QnResourcePtr res, resources )
         {
@@ -471,11 +433,10 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
             QnVideoWallItemIndexList indexes = qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
             if (!indexes.isEmpty()) {
                 menu()->trigger(Qn::AddVideoWallItemsToUserAction,
-                                QnActionParameters(indexes).withArgument(Qn::UserResourceRole, user));
+                    QnActionParameters(indexes).withArgument(Qn::UserResourceRole, user));
                 return true; //ignore other resources dropped
             }
         }
-
 
         foreach(const QnResourcePtr &resource, resources) {
             if(resource->getParentId() == user->getId())
@@ -484,13 +445,13 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
             QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
             if(!layout)
                 continue; /* Can drop only layout resources on user. */
-            
+
             menu()->trigger(
                 Qn::SaveLayoutAsAction, 
                 QnActionParameters(layout).
-                    withArgument(Qn::UserResourceRole, user).
-                    withArgument(Qn::ResourceNameRole, layout->getName())
-            );
+                withArgument(Qn::UserResourceRole, user).
+                withArgument(Qn::ResourceNameRole, layout->getName())
+                );
         }
 
 
@@ -503,7 +464,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
                 menu()->trigger(Qn::MoveCameraAction, QnActionParameters(cameras).withArgument(Qn::MediaServerResourceRole, server));
         }
     }
-    
+
     return true;
 }
 
@@ -639,11 +600,8 @@ void QnResourcePoolModel::at_videoWall_itemAddedOrChanged(const QnVideoWallResou
     QnResourcePoolModelNode *node = this->node(Qn::VideoWallItemNode, item.uuid, videoWall);
 
     QnResourcePtr resource;
-    if(item.layout.isValid()) {
+    if(!item.layout.isNull())
         resource = resourcePool()->getResourceById(item.layout);
-    } else {
-        resource = QnResourcePtr();
-    }
 
     node->setResource(resource);
     node->setParent(parentNode);
@@ -680,51 +638,3 @@ void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResource
         node->changeInternal();
     }
 }
-
-#ifdef QN_ENABLE_VIDEO_WALL
-void QnResourcePoolModel::at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
-    QnResourcePoolModelNode *parentNode = this->node(videoWall);
-
-    QnResourcePoolModelNode *node = this->node(Qn::VideoWallItemNode, item.uuid, videoWall);
-
-    QnResourcePtr resource;
-    if(item.layout.isValid()) {
-        resource = resourcePool()->getResourceById(item.layout);
-    } else {
-        resource = QnResourcePtr();
-    }
-
-    node->setResource(resource);
-    node->setParent(parentNode);
-    node->update(); // in case of _changed method call
-}
-
-void QnResourcePoolModel::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
-    Q_UNUSED(videoWall)
-    deleteNode(Qn::VideoWallItemNode, item.uuid, videoWall);
-}
-
-void QnResourcePoolModel::at_user_videoWallItemAdded(const QnUserResourcePtr &user, const QUuid &uuid) {
-    QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(uuid);
-    if (index.isNull())
-        return;
-
-    QnResourcePoolModelNode *node = this->node(Qn::UserVideoWallItemNode, uuid, user);
-    QnResourcePoolModelNode *parentNode = this->node(user);
-    node->setParent(parentNode);
-}
-
-void QnResourcePoolModel::at_user_videoWallItemRemoved(const QnUserResourcePtr &user, const QUuid &uuid) {
-    deleteNode(node(Qn::UserVideoWallItemNode, uuid, user));
-}
-#endif
-
-
-
-
-
-
-
-
-
-

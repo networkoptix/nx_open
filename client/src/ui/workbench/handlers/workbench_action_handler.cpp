@@ -2375,8 +2375,8 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
         dialog->submitToResource();
 
         connection2()->getUserManager()->save(
-            user, this,
-            [this, user]( int reqID, ec2::ErrorCode errorCode ) {
+            user, this, 
+            [this, &user]( int reqID, ec2::ErrorCode errorCode ) { //TODO: #GDM fix all QnResourcePtr lambda captures to &
                 at_resources_saved( reqID, errorCode, QnResourceList() << user );
             } );
 

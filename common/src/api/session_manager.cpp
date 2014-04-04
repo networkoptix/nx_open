@@ -410,6 +410,7 @@ void QnSessionManager::at_authCookieChanged(const QNetworkCookie &cookie) {
 }
 
 void QnSessionManager::at_authTimer_timeout() {
-    QnAppServerConnectionFactory::createConnection()->testConnectionAsync();
+    //TODO: #GDM VW reimplement
+    //QnAppServerConnectionFactory::createConnection()->testConnectionAsync();
     m_authTimer->start(defaultTimerIterval);
 }

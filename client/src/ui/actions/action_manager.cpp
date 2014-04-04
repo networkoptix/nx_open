@@ -1168,7 +1168,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Rename")).
         shortcut(tr("F2")).
         autoRepeat(false).
-        condition(new QnEdgeServerCondition(false, this));
         condition(new QnRenameActionCondition(this));
 
     factory().
