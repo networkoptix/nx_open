@@ -192,6 +192,7 @@ void QnLayoutTabBar::mousePressEvent(QMouseEvent *event){
     } else { /* QTabBar ignores event if MiddleButton was clicked. */
         QTabBar::mousePressEvent(event);
     }
+    event->accept();
 }
 
 void QnLayoutTabBar::mouseReleaseEvent(QMouseEvent *event){
@@ -200,8 +201,8 @@ void QnLayoutTabBar::mouseReleaseEvent(QMouseEvent *event){
             emit tabCloseRequested(m_midClickedTab);
         m_midClickedTab = -1;
     }
-
     QTabBar::mouseReleaseEvent(event);
+    event->accept();
 }
 
 void QnLayoutTabBar::at_workbench_layoutsChanged() {

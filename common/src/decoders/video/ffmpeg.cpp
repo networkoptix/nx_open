@@ -505,9 +505,13 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSha
         {
             m_tmpImg.loadFromData(avpkt.data, avpkt.size);
             if (m_tmpImg.width() > 0 && m_tmpImg.height() > 0) {
+                // TODO: #dklychkov Maybe set correct ffmpeg format if possible instead of conversion
+                if (m_tmpImg.format() != QImage::Format_RGBA8888)
+                    m_tmpImg = m_tmpImg.convertToFormat(QImage::Format_RGBA8888);
+
                 got_picture = 1;
                 m_tmpQtFrame.setUseExternalData(true);
-                m_tmpQtFrame.format = PIX_FMT_BGRA;
+                m_tmpQtFrame.format = PIX_FMT_RGBA;
                 m_tmpQtFrame.data[0] = (quint8*) m_tmpImg.constBits();
                 m_tmpQtFrame.data[1] = m_tmpQtFrame.data[2] = m_tmpQtFrame.data[3] = 0;
                 m_tmpQtFrame.linesize[0] = m_tmpImg.bytesPerLine();
@@ -652,7 +656,7 @@ double CLFFmpegVideoDecoder::getSampleAspectRatio() const
 PixelFormat CLFFmpegVideoDecoder::GetPixelFormat() const
 {
     if (m_usedQtImage)
-        return PIX_FMT_BGRA;
+        return PIX_FMT_RGBA;
     // Filter deprecated pixel formats
     switch(m_context->pix_fmt)
     {

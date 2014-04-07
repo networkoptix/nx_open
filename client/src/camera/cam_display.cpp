@@ -522,6 +522,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 qint64 maxSleepTime = needToSleep * 2;
                 if (qAbs(speed) > 1.0)
                     maxSleepTime *= speed;
+                maxSleepTime = qAbs(maxSleepTime);  // needToSleep OR speed can be negative, but maxSleepTime should always be positive
                 if (m_isRealTimeSource)
                     realSleepTime = m_delay.terminatedSleep(needToSleep, maxSleepTime);
                 else

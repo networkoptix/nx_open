@@ -615,6 +615,9 @@ void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
 
 #ifndef Q_OS_MACX
     if(event->button() == Qt::LeftButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
+        QPoint tabBarPos = m_tabBar->mapFrom(this, event->pos());
+        if (m_tabBar->tabAt(tabBarPos) >= 0)
+            return;
         action(Qn::EffectiveMaximizeAction)->toggle();
         event->accept();
     }

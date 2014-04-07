@@ -422,7 +422,7 @@ void QnServerSettingsDialog::at_rebuildButton_clicked()
     if (action == RebuildAction_Start)
     {
         int button = QMessageBox::warning(
-            mainWindow(),
+            this,
             tr("Warning"),
             tr("You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! "
             "Depending on the total size of archive it can take several hours. "
