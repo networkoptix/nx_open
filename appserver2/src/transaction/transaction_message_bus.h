@@ -68,7 +68,8 @@ namespace ec2
             QElapsedTimer lastActivity;
         };
         typedef QMap<QnId, AlivePeerInfo> AlivePeersMap;
-        AlivePeersMap alivePeers() const { return m_alivePeers; }
+        AlivePeersMap alivePeers() const;
+        AlivePeersMap aliveServerPeers() const;
 signals:
         void peerLost(QnId, bool isClient, bool isProxy);
         void peerFound(QnId, bool isClient, bool isProxy);
@@ -138,7 +139,7 @@ signals:
         QMap<QUrl, RemoveUrlConnectInfo> m_removeUrls;
         AbstractHandler* m_handler;
         QTimer* m_timer;
-        QMutex m_mutex;
+        mutable QMutex m_mutex;
         QThread *m_thread;
         QnConnectionMap m_connections;
 

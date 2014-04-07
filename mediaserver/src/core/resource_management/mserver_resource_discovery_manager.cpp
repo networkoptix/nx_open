@@ -23,7 +23,6 @@
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 
-
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 
 QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager( const CameraDriverRestrictionList& cameraDriverRestrictionList )
@@ -33,6 +32,7 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager( const Came
 {
     netStateTime.restart();
     connect(this, SIGNAL(cameraDisconnected(QnResourcePtr, qint64)), qnBusinessRuleConnector, SLOT(at_cameraDisconnected(const QnResourcePtr&, qint64)));
+
 }
 
 QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()

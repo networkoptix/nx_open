@@ -8,6 +8,18 @@ namespace ec2
 {
 
 static const qint64 NO_MUTEX_LOCK = INT64_MAX;
+static QnDistributedMutexManager* m_staticInstance = 0;
+
+QnDistributedMutexManager* QnDistributedMutexManager::instance()
+{
+    return m_staticInstance;
+}
+
+void QnDistributedMutexManager::initStaticInstance(QnDistributedMutexManager* value)
+{
+    delete m_staticInstance;
+    m_staticInstance = value;
+}
 
 QnDistributedMutexManager::QnDistributedMutexManager():
     m_timestamp(1),
@@ -16,6 +28,11 @@ QnDistributedMutexManager::QnDistributedMutexManager():
     connect(qnTransactionBus, &QnTransactionMessageBus::gotLockRequest,    this, &QnDistributedMutexManager::at_gotLockRequest, Qt::DirectConnection);
     connect(qnTransactionBus, &QnTransactionMessageBus::gotLockResponse,   this, &QnDistributedMutexManager::at_gotLockResponse, Qt::DirectConnection);
     connect(qnTransactionBus, &QnTransactionMessageBus::gotUnlockRequest,  this, &QnDistributedMutexManager::at_gotUnlockRequest, Qt::DirectConnection);
+}
+
+void QnDistributedMutexManager::setUserDataHandler(QnMutexUserDataHandler* userDataHandler)
+{
+    m_userDataHandler = userDataHandler;
 }
 
 QnDistributedMutexPtr QnDistributedMutexManager::getLock(const QByteArray& name, int timeoutMs)
@@ -28,8 +45,8 @@ QnDistributedMutexPtr QnDistributedMutexManager::getLock(const QByteArray& name,
     QnDistributedMutexPtr netMutex(new QnDistributedMutex(this));
     m_mutexList.insert(name, netMutex);
 
-    connect(this, &QnDistributedMutexManager::locked,      netMutex.data(), &QnDistributedMutex::locked, Qt::DirectConnection);
-    connect(this, &QnDistributedMutexManager::lockTimeout, netMutex.data(), &QnDistributedMutex::lockTimeout, Qt::DirectConnection);
+    connect(netMutex.data(), &QnDistributedMutex::locked,      this, &QnDistributedMutexManager::locked, Qt::DirectConnection);
+    connect(netMutex.data(), &QnDistributedMutex::lockTimeout, this, &QnDistributedMutexManager::lockTimeout, Qt::DirectConnection);
 
     netMutex->lockAsync(name, timeoutMs);
 
@@ -106,7 +123,7 @@ QnDistributedMutex::~QnDistributedMutex()
 
 bool QnDistributedMutex::isAllPeersReady() const
 {
-    foreach(const QnId& peer, qnTransactionBus->alivePeers().keys())
+    foreach(const QnId& peer, qnTransactionBus->aliveServerPeers().keys())
     {
         if (!m_proccesedPeers.contains(peer))
             return false;
@@ -231,7 +248,7 @@ void QnDistributedMutex::at_gotUnlockRequest(ApiLockData lockData)
 
 void QnDistributedMutex::checkForLocked()
 {
-    if (!m_selfLock.isEmpty() && isAllPeersReady() && m_peerLockInfo.begin().key() == m_selfLock) {
+    if (!m_selfLock.isEmpty() && isAllPeersReady()) {
         timer.stop();
         m_locked = true;
         emit locked(m_name);
@@ -263,5 +280,6 @@ bool QnDistributedMutex::isLocked() const
     QMutexLocker lock(&m_mutex);
     return m_locked;
 }
+
 
 }

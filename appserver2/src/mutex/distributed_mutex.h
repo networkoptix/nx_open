@@ -21,7 +21,7 @@ namespace ec2
         LockRuntimeInfo(const ApiLockData& data): ApiLockData(data) {}
 
         bool operator<(const LockRuntimeInfo& other) const  { return timestamp != other.timestamp ? timestamp < other.timestamp : peer < other.peer; }
-        bool operator==(const LockRuntimeInfo& other) const { return timestamp == other.timestamp && timestamp < other.timestamp; }
+        bool operator==(const LockRuntimeInfo& other) const { return timestamp == other.timestamp && peer == other.peer; }
         bool isEmpty() const { return peer.isNull(); }
         void clear()         { peer = QUuid(); }
     };
@@ -77,6 +77,13 @@ namespace ec2
     };
     typedef QSharedPointer<QnDistributedMutex> QnDistributedMutexPtr;
     
+    /*
+    * This class is using for provide extra information
+    * For camera adding scenario under a mutex, this class should provide information
+    * if peer already contain camera in the lockResponse data.
+    * It requires because of peer can catch mutex, but camera already exists on the other peer,
+    * so that peer should tell about it camera in a response message
+    */
     class QnMutexUserDataHandler
     {
     public:
@@ -89,9 +96,15 @@ namespace ec2
     {
         Q_OBJECT
     public:
+        static const int DEFAULT_TIMEOUT = 1000 * 30;
+
         QnDistributedMutexManager();
-        QnDistributedMutexManager* instance();
-        QnDistributedMutexPtr getLock(const QByteArray& name, int timeoutMs);
+        QnDistributedMutexPtr getLock(const QByteArray& name, int timeoutMs = DEFAULT_TIMEOUT);
+
+        static void initStaticInstance(QnDistributedMutexManager*);
+        static QnDistributedMutexManager* instance();
+
+        void setUserDataHandler(QnMutexUserDataHandler* userDataHandler);
     signals:
         void locked(QByteArray name);
         void lockTimeout(QByteArray name);
