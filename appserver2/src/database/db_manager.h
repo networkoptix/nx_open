@@ -10,6 +10,7 @@
 #include "nx_ec/data/camera_server_item_data.h"
 #include "nx_ec/data/ec2_user_data.h"
 #include "nx_ec/data/ec2_layout_data.h"
+#include "nx_ec/data/ec2_videowall_data.h"
 #include "nx_ec/data/ec2_license.h"
 #include "nx_ec/data/ec2_business_rule_data.h"
 #include "nx_ec/data/ec2_full_data.h"
@@ -80,10 +81,13 @@ namespace ec2
         //getUserList
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList);
 
+        //getVideowallList
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
+
         //getBusinessRuleList
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
 
-        //getBusinessRuleList
+        //getLayoutList
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
 
         //getResourceParams
@@ -124,8 +128,10 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiUserData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiParamList>& tran); // save settings
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallDataList>& tran);
 
-        // delete camera, server, layout, any resource t.e.c
+        // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiIdData>& tran);
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicenseList>& tran);
@@ -172,10 +178,10 @@ namespace ec2
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
         ErrorCode updateStorages(const ApiMediaServerData&);
         ErrorCode removeServer(const QnId& guid);
-        ErrorCode removeLayout(const QnId& guid);
-        ErrorCode removeLayout(qint32 id);
         ErrorCode removeStoragesByServer(const QnId& serverGUID);
 
+        ErrorCode removeLayout(const QnId& guid);
+        ErrorCode removeLayout(qint32 id);
         ErrorCode deleteLayoutItems(const qint32 id);
         ErrorCode saveLayout(const ApiLayoutData& params);
         ErrorCode insertOrReplaceLayout(const ApiLayoutData& data, qint32 internalId);
@@ -185,6 +191,9 @@ namespace ec2
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnId& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
+
+        ErrorCode removeVideowall( const QnId& guid );
+        ErrorCode insertOrReplaceVideowall(const ApiVideowallData& data, qint32 internalId);
 
         ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);

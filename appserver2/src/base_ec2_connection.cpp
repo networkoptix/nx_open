@@ -75,6 +75,12 @@ namespace ec2
     }
 
     template<class T>
+    AbstractVideowallManagerPtr BaseEc2Connection<T>::getVideowallManager()
+    {
+        return m_videowallManager;
+    }
+
+    template<class T>
     AbstractStoredFileManagerPtr BaseEc2Connection<T>::getStoredFileManager()
     {
         return m_storedFileManager;

@@ -1,4 +1,3 @@
-
 #ifndef __USER_MANAGER_H_
 #define __USER_MANAGER_H_
 

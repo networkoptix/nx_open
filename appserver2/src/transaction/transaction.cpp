@@ -87,6 +87,13 @@ namespace ec2
                 case removeLayout:
                     return "removeLayout";
 
+                case saveVideowall:
+                    return "saveVideowall";
+                case getVideowallList:
+                    return "getVideowallList";
+                case removeVideowall:
+                    return "removeVideowall";
+
                 case listDirectory:
                     return "listDirectory";
                 case getStoredFile:

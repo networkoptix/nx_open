@@ -1709,4 +1709,37 @@ void QnDbManager::fillServerInfo( ServerInfo* const serverInfo )
     m_licenseManagerImpl->getHardwareId( serverInfo );
 }
 
+ErrorCode QnDbManager::removeVideowall( const QnId& guid ) {
+    qint32 id = getResourceInternalId(guid);
+
+    ErrorCode err = deleteAddParams(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteTableRecord(id, "vms_videowall", "resource_ptr_id");
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteResourceTable(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::insertOrReplaceVideowall(const ApiVideowallData& data, qint32 internalId) {
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT OR REPLACE INTO vms_videowall (autorun, resource_ptr_id) VALUES\
+                     (:autorun, :internalId)");
+    data.autoBindValues(insQuery);
+    insQuery.bindValue(":internalId", internalId);
+    if (insQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return ErrorCode::failure;
+    }
+}
+
 }

@@ -7,6 +7,7 @@
 #include "ec2_business_rule_data.h"
 #include "ec2_user_data.h"
 #include "ec2_layout_data.h"
+#include "ec2_videowall_data.h"
 #include "ec2_license.h"
 #include "nx_ec/ec_api.h"
 #include "camera_server_item_data.h"
@@ -22,6 +23,7 @@ namespace ec2
         ApiCameraDataList cameras;
         ApiUserDataList users;
         ApiLayoutDataList layouts;
+        ApiVideowallDataList videowalls;
         ApiBusinessRuleDataList rules;
         ApiCameraServerItemDataList cameraHistory;
         ApiLicenseList licenses;
@@ -31,7 +33,7 @@ namespace ec2
     };
 
 QN_DEFINE_STRUCT_SERIALIZATORS (ServerInfo, (mainHardwareIds) (compatibleHardwareIds) (publicIp) (systemName) (sessionKey) (allowCameraChanges) (armBox))
-QN_DEFINE_STRUCT_SERIALIZATORS (ApiFullData, (resTypes) (servers) (cameras) (users) (layouts) (rules) (cameraHistory) (licenses) (serverInfo) )
+QN_DEFINE_STRUCT_SERIALIZATORS (ApiFullData, (resTypes) (servers) (cameras) (users) (layouts) (videowalls) (rules) (cameraHistory) (licenses) (serverInfo) )
 }
 
 #endif // __EC2_FULL_DATA_H_

@@ -1103,7 +1103,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 
     if(!modifiedResources.empty()) {
         detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldDisabledFlags);
-        connection2()->getCameraManager()->save( modifiedResources, processor,\
+        connection2()->getCameraManager()->save( modifiedResources, processor,
             [processor, modifiedResources]( int reqID, ec2::ErrorCode errorCode ) {
                 processor->at_replyReceived( reqID, errorCode, modifiedResources );
             });

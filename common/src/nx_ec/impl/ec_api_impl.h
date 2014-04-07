@@ -176,6 +176,8 @@ namespace ec2
             void emitGetSettingsDone( int reqID, const ErrorCode p1, const QnKvPairList& p2 ) { emit onGetSettingsDone( reqID, p1, p2 ); }
             void emitTestConnectionDone( int reqID, const ErrorCode p1, const QnConnectionInfo& p2 ) { emit onTestConnectionDone( reqID, p1, p2 ); }
             void emitConnectDone( int reqID, const ErrorCode p1, AbstractECConnectionPtr p2 ) { emit onConnectDone( reqID, p1, p2 ); }
+            void emitAddVideowallDone( int reqID, const ErrorCode p1, const QnVideoWallResourceList& p2 ) { emit onAddVideowallDone( reqID, p1, p2 ); }
+            void emitGetVideowallsDone( int reqID, const ErrorCode p1, const QnVideoWallResourceList& p2 ) { emit onGetVideowallsDone( reqID, p1, p2 ); }
         
         signals:
             void onSimpleDone( int reqID, const ErrorCode );
@@ -205,6 +207,8 @@ namespace ec2
             void onGetSettingsDone( int reqID, const ErrorCode, const QnKvPairList& );
             void onTestConnectionDone( int reqID, const ErrorCode, const QnConnectionInfo& );
             void onConnectDone( int reqID, const ErrorCode, AbstractECConnectionPtr );
+            void onAddVideowallDone( int reqID, const ErrorCode, const QnVideoWallResourceList& );
+            void onGetVideowallsDone( int reqID, const ErrorCode, const QnVideoWallResourceList& );
         };
 
 
@@ -267,6 +271,12 @@ namespace ec2
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER( GetLayouts, ErrorCode, QnLayoutResourceList )
 
+
+        //////////////////////////////////////////////////////////
+        ///////// Handlers for AbstractVideowallManager
+        //////////////////////////////////////////////////////////
+        DEFINE_TWO_ARG_HANDLER( GetVideowalls, ErrorCode, QnVideoWallResourceList )
+        DEFINE_TWO_ARG_HANDLER( AddVideowall, ErrorCode, QnVideoWallResourceList )
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractStoredFileManager

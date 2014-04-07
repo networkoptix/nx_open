@@ -1,4 +1,3 @@
-
 #include "user_manager.h"
 
 #include <functional>
