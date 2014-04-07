@@ -597,8 +597,11 @@ void QnPtzManageDialog::at_model_modelReset() {
         int row = m_model->rowNumber(m_lastRowData);
         if (row != -1) {
             QModelIndex index = m_model->index(row, m_lastColumn);
+
+            QAbstractItemView::EditTriggers oldEditTriggers = ui->tableView->editTriggers();
+            ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers); // to prevent field editor from showing
             ui->tableView->setCurrentIndex(index);
-            ui->tableView->closePersistentEditor(index);
+            ui->tableView->setEditTriggers(oldEditTriggers);
         }
     }
 }
