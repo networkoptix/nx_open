@@ -20,11 +20,14 @@ public:
     virtual ~QnDesktopResource();
 
     virtual QString toString() const override;
+    bool isRendererSlow() const;
 
     void addConnection(QnMediaServerResourcePtr mServer);
     void removeConnection(QnMediaServerResourcePtr mServer);
 
     QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/);
+
+    static QUuid getDesktopResourceUuid();
 protected:
     virtual QnAbstractStreamDataProvider *createDataProviderInternal(ConnectionRole role) override;
 private:

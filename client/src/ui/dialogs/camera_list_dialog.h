@@ -20,6 +20,8 @@ namespace Ui {
 class QnCameraListDialog: public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
 
+    typedef QDialog base_type;
+
 public:
     explicit QnCameraListDialog(QWidget *parent = NULL);
     virtual ~QnCameraListDialog();

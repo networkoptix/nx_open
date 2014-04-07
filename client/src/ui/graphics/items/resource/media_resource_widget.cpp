@@ -45,6 +45,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/workaround/gl_native_painting.h>
@@ -147,7 +148,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     fisheyeController.reset(new QnPresetPtzController(fisheyeController));
     fisheyeController.reset(new QnTourPtzController(fisheyeController));
     fisheyeController.reset(new QnActivityPtzController(QnActivityPtzController::Local, fisheyeController));
-    fisheyeController.reset(new QnHomePtzController(fisheyeController));
+
+    // Small hack because widget's zoomRect is set only in Synchronize method, not instantly --gdm
+    if (item && item->zoomRect().isNull())  // zoom items are not allowed to return home
+        fisheyeController.reset(new QnHomePtzController(fisheyeController));
 
     if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {
         serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
@@ -875,13 +879,18 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if (!zoomRect().isNull())
         return result;
 
-    if (resource()->toResource()->hasFlags(QnResource::motion))
+    if (resource()->toResource()->hasFlags(QnResource::motion) && !(options() & DisplayDewarped))
         result |= MotionSearchButton;
+
+    bool isExportedLayout = item() 
+        && item()->layout() 
+        && snapshotManager()->isFile(item()->layout()->resource());
 
     if(m_camera
         && m_camera->hasPtzCapabilities(Qn::ContinuousPtzCapabilities)
         && !m_camera->hasPtzCapabilities(Qn::VirtualPtzCapability)
         && accessController()->hasPermissions(m_resource->toResourcePtr(), Qn::WritePtzPermission)
+        && !isExportedLayout
     ) {
         result |= PtzButton;
     }
@@ -891,11 +900,13 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         result &= ~PtzButton;
     }
 
-    if(item()
-            && item()->layout()
-            && accessController()->hasPermissions(item()->layout()->resource(), Qn::WritePermission | Qn::AddRemoveItemsPermission)
-            )
-        result |= ZoomWindowButton;
+    if (!(qnSettings->lightMode() & Qn::LightModeNoZoomWindows)) {
+        if(item()
+                && item()->layout()
+                && accessController()->hasPermissions(item()->layout()->resource(), Qn::WritePermission | Qn::AddRemoveItemsPermission)
+                )
+            result |= ZoomWindowButton;
+    }
 
     return result;
 }
@@ -966,8 +977,8 @@ void QnMediaResourceWidget::updateAspectRatio() {
 
     if(sourceSize.isEmpty()) {
         qreal aspectRatio = resourceId.isEmpty()
-                            ? -1.0
-                            : qnSettings->resourceAspectRatios().value(resourceId, -1.0);
+                            ? defaultAspectRatio()
+                            : qnSettings->resourceAspectRatios().value(resourceId, defaultAspectRatio());
 
         setAspectRatio(dewarpingRatio * aspectRatio);
     } else {
@@ -1021,11 +1032,15 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
     item()->setDewarpingParams(params); // TODO: #Elric #PTZ move to instrument
 
     setOption(DisplayDewarped, checked);
+    if (checked)
+        setOption(DisplayMotion, false);
 
     if(!checked) {
         /* Stop all ptz activity. */
         ptzController()->continuousMove(QVector3D(0, 0, 0));
     }
+
+    updateButtonsVisibility();
 }
 
 void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {

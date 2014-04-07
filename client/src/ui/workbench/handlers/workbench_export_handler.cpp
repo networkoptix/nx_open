@@ -9,6 +9,7 @@
 
 #include <camera/caching_time_period_loader.h>
 #include <camera/client_video_camera.h>
+#include <camera/client_video_camera_export_tool.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
@@ -142,6 +143,7 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
     exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(false);
+    exportProgressDialog->setAutoSize(false);
     exportProgressDialog->show();
 
     QnLayoutExportTool* tool = new QnLayoutExportTool(layout, exportPeriod, layoutFileName, mode, readOnly, this);
@@ -366,48 +368,39 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnProgressDialog *exportProgressDialog = new QnProgressDialog(mainWindow());
     exportProgressDialog->setWindowTitle(tr("Exporting Video"));
     exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
-    exportProgressDialog->setRange(0, 100);
-    exportProgressDialog->setValue(0);
     exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(false);
 
     QnMediaResourcePtr resource = widget->resource();
     QnClientVideoCamera* camera = new QnClientVideoCamera(resource);
 
-    connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(stopExport()));
-    connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(deleteLater()));
-    connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
-
-    connect(camera,                 SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
-
-    connect(camera,                 &QnClientVideoCamera::exportFinished,   camera,                 &QObject::deleteLater);
-    connect(camera,                 &QnClientVideoCamera::exportFinished,   exportProgressDialog,   &QWidget::hide);
-    connect(camera,                 &QnClientVideoCamera::exportFinished,   exportProgressDialog,   &QObject::deleteLater);
-    connect(camera,                 &QnClientVideoCamera::exportFinished,   this,                   &QnWorkbenchExportHandler::at_camera_exportFinished);
-
-    QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
-
     int timeOffset = 0;
-    if(qnSettings->timeMode() == Qn::ServerTimeMode) {
+    if (qnSettings->timeMode() == Qn::ServerTimeMode) {
         // time difference between client and server
         timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(resource, 0);
     }
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
-    camera->exportMediaPeriodToFile(period.startTimeMs * 1000ll,
-                                    (period.startTimeMs + period.durationMs) * 1000ll,
-                                    fileName,
-                                    selectedExtension.mid(1),
-                                    QnStorageResourcePtr(),
-                                    role,
-                                    timestampPos,
-                                    timeOffset,
-                                    serverTimeZone,
-                                    itemData.zoomRect,
-                                    contrastParams,
-                                    dewarpingParams);
 
+    QnClientVideoCameraExportTool *tool = new QnClientVideoCameraExportTool(
+                                              camera,
+                                              period,
+                                              fileName,
+                                              timestampPos,
+                                              timeOffset,
+                                              serverTimeZone,
+                                              itemData.zoomRect,
+                                              contrastParams, dewarpingParams,
+                                              this);
+
+    connect(exportProgressDialog,   &QnProgressDialog::canceled,    tool,                   &QnClientVideoCameraExportTool::stop);
+
+    connect(tool,   &QnClientVideoCameraExportTool::finished,       this,                   &QnWorkbenchExportHandler::at_camera_exportFinished);
+    connect(tool,   &QnClientVideoCameraExportTool::finished,       exportProgressDialog,   &QnProgressDialog::deleteLater);
+    connect(tool,   &QnClientVideoCameraExportTool::rangeChanged,   exportProgressDialog,   &QnProgressDialog::setRange);
+    connect(tool,   &QnClientVideoCameraExportTool::valueChanged,   exportProgressDialog,   &QnProgressDialog::setValue);
+
+    tool->start();
     exportProgressDialog->show();
-
 }
 
 void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QString &filename) {
@@ -606,17 +599,22 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
 }
 
 
-void QnWorkbenchExportHandler::at_camera_exportFinished(int status, const QString &fileName) {
+void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QString &fileName) {
     unlockFile(fileName);
 
-    if (status != QnClientVideoCamera::NoError) {
-        QMessageBox::warning(mainWindow(), tr("Could not export video"), QnClientVideoCamera::errorString(status), QMessageBox::Ok);
+    QnClientVideoCameraExportTool *tool = qobject_cast<QnClientVideoCameraExportTool*>(sender());
+    if (!tool)
         return;
+
+    tool->deleteLater();
+
+    if (success) {
+        QnAviResourcePtr file(new QnAviResource(fileName));
+        file->setStatus(QnResource::Online);
+        resourcePool()->addResource(file);
+
+        QMessageBox::information(mainWindow(), tr("Export finished"), tr("Export successfully finished."), QMessageBox::Ok);
+    } else if (tool->status() != QnClientVideoCamera::NoError) {
+        QMessageBox::warning(mainWindow(), tr("Could not export video"), QnClientVideoCamera::errorString(tool->status()), QMessageBox::Ok);
     }
-
-    QnAviResourcePtr file(new QnAviResource(fileName));
-    file->setStatus(QnResource::Online);
-    resourcePool()->addResource(file);
-
-    QMessageBox::information(mainWindow(), tr("Export finished"), tr("Export successfully finished."), QMessageBox::Ok);
 }

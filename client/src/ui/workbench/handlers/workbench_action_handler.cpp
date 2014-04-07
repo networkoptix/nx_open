@@ -28,6 +28,7 @@
 #include <utils/common/email.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
+#include <utils/mac_utils.h>
 
 #include <api/session_manager.h>
 
@@ -112,6 +113,7 @@
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
 
+#include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/watchers/workbench_update_watcher.h>
@@ -206,9 +208,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     /* These actions may be activated via context menu. In this case the topmost event loop will be finishing and this somehow affects runModal method of NSSavePanel in MacOS.
      * File dialog execution will be failed. (see a comment in qcocoafiledialoghelper.mm)
      * To make dialogs work we're using queued connection here. */
-    connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()), Qt::QueuedConnection);
-    connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()), Qt::QueuedConnection);
-    connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()), Qt::QueuedConnection);
+    connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
+    connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
+    connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::PreferencesGeneralTabAction),            SIGNAL(triggered()),    this,   SLOT(at_preferencesGeneralTabAction_triggered()));
     connect(action(Qn::PreferencesLicensesTabAction),           SIGNAL(triggered()),    this,   SLOT(at_preferencesLicensesTabAction_triggered()));
@@ -369,7 +371,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
         bool isMediaResource = resource->hasFlags(QnResource::media);
         bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
                 && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
-        bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+        bool isExportedLayout = snapshotManager()->isFile(layout);
 
         bool allowed = isServer || isMediaResource;
         bool forbidden = isExportedLayout && (isServer || isLocalResource);
@@ -462,7 +464,11 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
 
     qDebug() << "Starting new instance with args" << arguments;
 
+#ifdef Q_OS_MACX
+    mac_startDetached(qApp->applicationFilePath(), arguments);
+#else
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
+#endif
 }
 
 void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) {
@@ -922,7 +928,16 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
     QnWorkbenchStreamSynchronizer *synchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
 
-    if (synchronizer->isRunning() && !navigator()->isLive() && parameters.widgets().isEmpty()) {
+    bool hasNonLocalItems = false;
+    foreach (QnWorkbenchItem *item, workbench()->currentLayout()->items()) {
+        QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
+        if (!resource->hasFlags(QnResource::local)) {
+            hasNonLocalItems = true;
+            break;
+        }
+    }
+
+    if (hasNonLocalItems && synchronizer->isRunning() && !navigator()->isLive() && parameters.widgets().isEmpty()) {
         // split resources in two groups: local and non-local and specify different initial time for them
         // TODO: #dklychkov add ability to specify different time for resources and then simplify the code below
         QnResourceList resources = parameters.resources();
@@ -939,7 +954,8 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
         }
         if (!resources.isEmpty()) {
             parameters.setResources(resources);
-            parameters.setArgument(Qn::ItemTimeRole, navigator()->timeSlider()->sliderPosition());
+            if (!parameters.hasArgument(Qn::ItemTimeRole))  // TODO: #dklychkov be careful with existing parameters overwriting, @see bug #3112
+                parameters.setArgument(Qn::ItemTimeRole, navigator()->timeSlider()->sliderPosition());
             menu()->trigger(Qn::OpenInLayoutAction, parameters);
         }
     } else {
@@ -1545,7 +1561,13 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
-    if(context()->user() && !context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true))
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    bool force = parameters.hasArgument(Qn::ForceRole)
+        ? parameters.argument(Qn::ForceRole).toBool()
+        : false;
+
+    //closeAllLayouts should return true in case of force disconnect
+    if( context()->user() && !context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true, force)) 
         return;
 
     // TODO: #GDM Factor out common code from reconnect/disconnect/login actions.
@@ -1725,6 +1747,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(QnTimePeriod(time, step));
         item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
         item.dataByRole[Qn::ItemTimeRole] = time;
+        item.dataByRole[Qn::ItemAspectRatioRole] = desiredAspectRatio;  // set aspect ratio to make thumbnails load in all cases, see #2619
 
         layout->addItem(item);
 
@@ -2308,6 +2331,10 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
             QnConnectionData data = qnSettings->lastUsedConnection();
             data.url.setPassword(newPassword);
             qnSettings->setLastUsedConnection(data);
+
+            // TODO #elric: This is a totally evil hack. Store password hash/salt in user.
+            context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(newPassword);
+
 
             QnAppServerConnectionFactory::setDefaultUrl(data.url);
         }

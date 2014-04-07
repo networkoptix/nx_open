@@ -57,6 +57,9 @@ public:
      */ 
     virtual QString manufacture() const = 0;
 
+
+    /** \returns                        Whether this factory generates virtual resources such as desktop cameras. */
+    virtual bool isVirtualResource() const { return false; }
 protected:
     /**
      * This is the actual function that searches for resources. 

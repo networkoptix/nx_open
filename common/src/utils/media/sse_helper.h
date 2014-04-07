@@ -2,7 +2,7 @@
 #define QN_SSE_HELPER_H
 
 #include <QtCore/QString>
-#include <QtCore/private/qsimd_p.h>
+#include <QtCore/5.2.1/QtCore/private/qsimd_p.h>
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
 #include <xmmintrin.h>

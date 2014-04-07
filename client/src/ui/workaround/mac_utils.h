@@ -12,6 +12,8 @@ void mac_stopFileAccess();
 
 bool mac_isSandboxed();
 
+void mac_setLimits();
+
 QString mac_getExistingDirectory(const QString &caption,
                                     const QString &dir);
 

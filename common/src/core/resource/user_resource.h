@@ -35,6 +35,7 @@ public:
 
 signals:
     void emailChanged(const QnUserResourcePtr &user);
+    void permissionsChanged(const QnUserResourcePtr &user);
 
 protected:
     virtual void updateInner(QnResourcePtr other) override;

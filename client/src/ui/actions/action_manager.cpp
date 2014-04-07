@@ -1081,7 +1081,10 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::EditLayoutSettingsPermission).
         text(tr("Set as Layout Background")).
         autoRepeat(false).
-        condition(new QnSetAsBackgroundActionCondition(this));
+        condition(new QnConjunctionActionCondition(
+            new QnSetAsBackgroundActionCondition(this),
+            new QnLightModeCondition(Qn::LightModeNoLayoutBackground, this),
+            this));
 
     factory(Qn::UserSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
@@ -1114,8 +1117,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::LayoutSettingsAction).
        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
        text(tr("Layout Settings...")).
-       requiredPermissions(Qn::EditLayoutSettingsPermission);
-//       condition(new QnLayoutSettingsActionCondition(this));
+       requiredPermissions(Qn::EditLayoutSettingsPermission).
+       condition(new QnLightModeCondition(Qn::LightModeNoLayoutBackground, this));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
@@ -1236,8 +1239,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CurrentLayoutSettingsAction).
         flags(Qn::Scene | Qn::NoTarget).
         requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::EditLayoutSettingsPermission).
-        text(tr("Layout Settings..."));
-//        condition(new QnLayoutSettingsActionCondition(this));
+        text(tr("Layout Settings...")).
+        condition(new QnLightModeCondition(Qn::LightModeNoLayoutBackground, this));
 
     factory(Qn::StartTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).

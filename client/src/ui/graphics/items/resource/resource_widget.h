@@ -335,6 +335,8 @@ protected:
     void updateOverlayWidgetsGeometry();
     void updateOverlayWidgetsVisibility(bool animate = true);
 
+    void updateInfoVisiblity(bool animate = true);
+
     QnImageButtonBar *buttonBar() const {
         return m_buttonBar;
     }
@@ -365,6 +367,9 @@ protected:
 
     void ensureAboutToBeDestroyedEmitted();
 
+    Q_SLOT virtual void at_itemDataChanged(int role);
+
+    qreal defaultAspectRatio() const;
 private:
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);

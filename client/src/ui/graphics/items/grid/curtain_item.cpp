@@ -20,11 +20,14 @@ QRectF QnCurtainItem::boundingRect() const {
 }
 
 void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
+#ifdef Q_OS_WIN
+    QRectF viewportRect = painter->transform().inverted().mapRect(QRectF(widget->rect()));
+    painter->fillRect(viewportRect, m_color);
+#else
     QnGlNativePainting::begin(painter);
     glPushMatrix();
     glLoadIdentity();
 
-    //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND); 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
@@ -33,9 +36,9 @@ void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
     glVertices(widget->geometry());
     glEnd();
 
-    //glPopAttrib();
     glDisable(GL_BLEND); 
 
     glPopMatrix();
     QnGlNativePainting::end(painter);
+#endif //  Q_OS_WIN
 }

@@ -4,12 +4,14 @@
 
 static const int MAX_JITTER = 60;
 
-QnBufferedScreenGrabber::QnBufferedScreenGrabber(int queueSize,
+QnBufferedScreenGrabber::QnBufferedScreenGrabber(int displayNumber,
+                                                 int queueSize,
                                                  int frameRate,
+                                                 Qn::CaptureMode mode,
                                                  bool captureCursor,
                                                  const QSize& captureResolution,
                                                  QWidget* widget):
-    m_grabber(captureCursor, captureResolution, widget),
+    m_grabber(displayNumber, queueSize, mode, captureCursor, captureResolution, widget),
     m_queue(queueSize),
     m_frameRate(frameRate),
     m_frameIndex(0),

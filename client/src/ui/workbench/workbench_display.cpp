@@ -556,16 +556,22 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         /* Sync new & old geometry. */
         if(oldWidget != NULL) {
             synchronize(oldWidget, true);
-            ensureRaisedConeItem(oldWidget);
-            raisedConeItem(oldWidget)->setEffectEnabled(false);
-            setLayer(raisedConeItem(oldWidget), Qn::RaisedConeBgLayer);
+
+            if (!(qnSettings->lightMode() & Qn::LightModeNoLayoutBackground)) {
+                ensureRaisedConeItem(oldWidget);
+                raisedConeItem(oldWidget)->setEffectEnabled(false);
+                setLayer(raisedConeItem(oldWidget), Qn::RaisedConeBgLayer);
+            }
         }
 
         if(newWidget != NULL) {
             bringToFront(newWidget);
-            ensureRaisedConeItem(newWidget);
-            setLayer(raisedConeItem(newWidget), Qn::RaisedConeLayer);
-            raisedConeItem(newWidget)->setEffectEnabled(!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty());
+
+            if (!(qnSettings->lightMode() & Qn::LightModeNoLayoutBackground)) {
+                ensureRaisedConeItem(newWidget);
+                setLayer(raisedConeItem(newWidget), Qn::RaisedConeLayer);
+                raisedConeItem(newWidget)->setEffectEnabled(!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty());
+            }
 
             synchronize(newWidget, true);
         }
@@ -656,6 +662,9 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
 
 void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
     if (!layout)
+        return;
+
+    if (qnSettings->lightMode() & Qn::LightModeNoLayoutBackground)
         return;
 
     gridBackgroundItem()->update(layout);
@@ -1259,7 +1268,10 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
         QSizeF newWidgetSize = enclosingGeometry.size() * focusExpansion;
         QSizeF maxWidgetSize;
-        if(workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty()) {
+        if (
+            !(qnSettings->lightMode() & Qn::LightModeNoLayoutBackground) &&
+            (workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
+        ) {
             maxWidgetSize = viewportGeometry.size() * 0.33; // TODO: #Elric magic const
         } else {
             maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
@@ -1599,6 +1611,12 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         qSort(widgets.begin(), widgets.end(), WidgetPositionLess());
 
     for(int i = 0; i < widgets.size(); i++) {
+        QnResourceWidget *resourceWidget = widgets[i];
+
+        int checkedButtons = resourceWidget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
+        if(checkedButtons != -1)
+            resourceWidget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
+
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[i]);
         if(!widget)
             continue;
@@ -1644,10 +1662,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             QString timeString = (widget->resource()->toResource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(lit("hh:mm:ss"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
-
-        int checkedButtons = widget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
-        if(checkedButtons != -1)
-            widget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
 
         if(thumbnailed)
             widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(QnMediaResourceWidget::PtzButton));

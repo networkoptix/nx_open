@@ -2,7 +2,7 @@
 #define QN_EVENT_LOOP_H
 
 #include <QtCore/QThread>
-#include <QtCore/private/qthread_p.h>
+#include <QtCore/5.2.1/QtCore/private/qthread_p.h>
 
 /**
  * \param thread                        Thread to check.
