@@ -225,6 +225,7 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     if( m_isClientPeer ) {
         q.removeQueryItem("isClient");
         q.addQueryItem("isClient", QString());
+        setState(ConnectingStage2); // one GET method for client peer is enough
         setReadSync(true);
     }
     remoteAddr.setQuery(q);
