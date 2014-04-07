@@ -464,14 +464,14 @@ void QnNavigationItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 }
 
 void QnNavigationItem::at_liveButton_clicked() {
+    /* Reset speed. It MUST be done before setLive(true) is called. */
+    navigator()->setSpeed(1.0);
+
     navigator()->setLive(true);
 
     /* Move time scrollbar so that maximum is visible. */
     m_timeSlider->finishAnimations();
     m_timeScrollBar->setValue(m_timeScrollBar->maximum());
-
-    /* Reset speed. */
-    navigator()->setSpeed(1.0);
 
     /* Reset button's checked state. */
     if(!m_liveButton->isChecked())
