@@ -110,6 +110,11 @@ QnResourceWidgetFrameColors::QnResourceWidgetFrameColors() {
     selected = QColor(64, 130, 180, 128);
 }
 
+QnLicensesListModelColors::QnLicensesListModelColors() {
+    normal = QColor(255, 255, 255, 255);
+    warning = QColor(Qt::yellow);
+    expired = QColor(Qt::red);
+}
 
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QnTimeSliderColors, 
@@ -170,5 +175,11 @@ QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
 QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QnResourceWidgetFrameColors, 
     (normal)(active)(selected), 
+    QJson::Optional
+)
+
+QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
+    QnLicensesListModelColors, 
+    (normal)(warning)(expired), 
     QJson::Optional
 )
