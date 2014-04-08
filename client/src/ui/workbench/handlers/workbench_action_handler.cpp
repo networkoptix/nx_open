@@ -934,6 +934,10 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
 
     QnWorkbenchStreamSynchronizer *synchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
 
+    /* if synchronizer is running now and we want to add an item to the scene with the specified time, synchronization should be disabled. */
+    if (parameters.hasArgument(Qn::ItemTimeRole) && synchronizer->isRunning())
+        synchronizer->stop();
+
     bool hasNonLocalItems = false;
     foreach (QnWorkbenchItem *item, workbench()->currentLayout()->items()) {
         QnResourcePtr resource = qnResPool->getResourceByUniqId(item->resourceUid());
@@ -960,9 +964,12 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
         }
         if (!resources.isEmpty()) {
             parameters.setResources(resources);
-            if (!parameters.hasArgument(Qn::ItemTimeRole))  // TODO: #dklychkov be careful with existing parameters overwriting, @see bug #3112
-                parameters.setArgument(Qn::ItemTimeRole, navigator()->timeSlider()->sliderPosition());
+            parameters.setArgument(Qn::ItemTimeRole, navigator()->timeSlider()->sliderPosition());
+
+            QnStreamSynchronizationState synchronizerState = synchronizer->state();
+            synchronizer->stop();
             menu()->trigger(Qn::OpenInLayoutAction, parameters);
+            synchronizer->setState(synchronizerState);
         }
     } else {
         menu()->trigger(Qn::OpenInLayoutAction, parameters);

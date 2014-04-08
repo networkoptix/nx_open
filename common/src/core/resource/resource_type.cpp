@@ -19,6 +19,10 @@ QnResourceType::~QnResourceType()
 {
 }
 
+void QnResourceType::setParentId(const QnId &value) {
+    m_parentId = value;
+}
+
 bool QnResourceType::isCamera() const
 {
     if (m_isCameraSet)
@@ -55,6 +59,11 @@ bool QnResourceType::isCamera() const
 
 void QnResourceType::addAdditionalParent(QnId parent)
 {
+    if (parent.isNull()) {
+        qWarning() << "Adding NULL parentId";
+        return;
+    }
+
     if (parent != m_parentId)
         m_additionalParentList << parent;
 }
@@ -62,7 +71,8 @@ void QnResourceType::addAdditionalParent(QnId parent)
 QList<QnId> QnResourceType::allParentList() const
 {
     QList<QnId> result;
-    result << m_parentId;
+    if (!m_parentId.isNull())
+        result << m_parentId;
     result << m_additionalParentList;
     return result;
 }
@@ -89,8 +99,15 @@ const QList<QnParamTypePtr>& QnResourceType::paramTypeList() const
         paramTypeList += m_paramTypeList;
 
         foreach (QnId parentId, allParentList()) {
-            if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId))
+            if (parentId.isNull()) {
+                continue;
+            }
+
+            if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId)) {
                 paramTypeList += parent->paramTypeList();
+            } else {
+                qWarning() << "parentId is" << parentId.toString() << "but there is no such parent in database";
+            }
         }
 
         QSet<QString> paramTypeNames;

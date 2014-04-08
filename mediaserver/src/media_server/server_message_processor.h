@@ -3,7 +3,7 @@
 
 #include <api/common_message_processor.h>
 
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
 #include "nx_ec/impl/ec_api_impl.h"
 
 class QnServerMessageProcessor : public QnCommonMessageProcessor
@@ -17,10 +17,10 @@ public:
 #ifdef PROXY_STRICT_IP
     bool isKnownAddr(const QString& addr) const;
 #endif
-    virtual void updateResource(QnResourcePtr resource) override;
+    virtual void updateResource(const QnResourcePtr &resource) override;
 
 protected:
-    virtual void onResourceStatusChanged(QnResourcePtr , QnResource::Status ) override;
+    virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status ) override;
     virtual void init(ec2::AbstractECConnectionPtr connection);
     virtual void afterRemovingResource(const QnId& id) override;
 private slots:

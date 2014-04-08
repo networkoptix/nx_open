@@ -121,8 +121,16 @@ struct QnResourceWidgetFrameColors {
     QColor selected;
 };
 
+struct QnLicensesListModelColors {
+    QnLicensesListModelColors();
+
+    QColor normal;
+    QColor warning;
+    QColor expired;
+};
+
 QN_DECLARE_FUNCTIONS_FOR_TYPES(
-    (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors)(QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors)(QnHistogramColors)(QnResourceWidgetFrameColors), 
+    (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors)(QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors)(QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors), 
     (metatype)(json)
 );
 

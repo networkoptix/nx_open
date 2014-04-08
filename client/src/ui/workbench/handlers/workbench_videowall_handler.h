@@ -84,7 +84,6 @@ private slots:
     void at_dropOnVideoWallItemAction_triggered();
     void at_pushMyScreenToVideowallAction_triggered();
 
-    void at_videoWall_saved(int status, const QnResourceList &resources, int handle);
     void at_videoWall_layout_saved(int status, const QnResourceList &resources, int handle);
 
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
@@ -213,15 +212,12 @@ private:
         QnLayoutResourcePtr layout;
         bool closeClient;
     };
-    QHash<int, AttachData> m_attaching;
 
     struct ResetData {
         QnVideoWallItemIndexList items;
         bool closeClient;
     };
     QHash<int, ResetData> m_resetting;
-
-    QHash<int, QnLayoutResourcePtr> m_savingReviews;
 
     QnVideowallAttachSettings m_attachSettings;
 };

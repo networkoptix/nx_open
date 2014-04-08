@@ -106,17 +106,21 @@ void QnTwoStepFileDialog::setAcceptMode(QFileDialog::AcceptMode mode) {
 }
 
 QString QnTwoStepFileDialog::selectedFile() const {
-    if (ui->fileNameLineEdit->text().isEmpty())
-        return QString();
-
     QString fileName;
+
     switch (m_mode) {
     case QFileDialog::AnyFile: {
+        if (ui->fileNameLineEdit->text().isEmpty())
+            return QString();
+
         QFileInfo info(QDir(ui->directoryLabel->text()), ui->fileNameLineEdit->text());
         fileName = info.absoluteFilePath();
         break;
     }
     case QFileDialog::ExistingFile: {
+        if (ui->existingFileLabel->text().isEmpty())
+            return QString();
+
         fileName = ui->existingFileLabel->text();
         break;
     }
