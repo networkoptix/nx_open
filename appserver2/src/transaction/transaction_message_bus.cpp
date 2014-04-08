@@ -74,6 +74,9 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& 
         return;
     }
 
+    if (tran.params.serverId == qnCommon->moduleGUID())
+        return; // ignore himself
+
     // proxy alive info from non-direct connected host
     AlivePeersMap::iterator itr = m_alivePeers.find(tran.params.serverId);
     if (tran.params.isAlive && itr == m_alivePeers.end()) {
