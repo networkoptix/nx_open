@@ -7,6 +7,12 @@ QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControlle
     m_mode(mode),
     m_asynchronous(baseController->hasCapabilities(Qn::AsynchronousPtzCapability))
 {
+    // TODO: #Elric
+    // There is a bug here when we operate over a remote controller:
+    // 1. PTZ is not yet initialized for a camera.
+    // 2. This controller is created on a client, PTZ caps not yet initialized => m_asynchronous is set to false.
+    // 3. PTZ is initialized, caps change, m_asynchronous is no longer actual.
+
     m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(lit("ptzActiveObject"), QnPtzObject(), this);
     m_adaptor->setValue(QnPtzObject());
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });

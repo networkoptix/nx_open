@@ -379,6 +379,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_motionSelectionInstrument,    SLOT(recursiveEnable()));
     connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_itemLeftClickInstrument,      SLOT(recursiveDisable()));
     connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_itemLeftClickInstrument,      SLOT(recursiveEnable()));
+    connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         this,                           SLOT(at_ptzProcessStarted(QnMediaResourceWidget *)));
 
     connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessStarted(QnMediaResourceWidget *)),                                  m_handScrollInstrument,         SLOT(recursiveDisable()));
     connect(zoomWindowInstrument,       SIGNAL(zoomWindowProcessFinished(QnMediaResourceWidget *)),                                 m_handScrollInstrument,         SLOT(recursiveEnable()));
@@ -506,7 +507,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
 
 void QnWorkbenchController::displayWidgetInfo(const QList<QnResourceWidget *> &widgets, bool display){
     foreach(QnResourceWidget *widget, widgets)
-        widget->setOption(QnResourceWidget::DisplayInfo, display);
+        widget->setInfoVisible(display);
 }
 
 void QnWorkbenchController::moveCursor(const QPoint &aAxis, const QPoint &bAxis) {
@@ -645,21 +646,19 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
     if (suggetion.isEmpty())
         suggetion = tr("Recorded Video");
 
-    QString previousDir = qnSettings->lastRecordingDir();
-    QString selectedFilter;
     while (true) {
-        QString filePath = QnFileDialog::getSaveFileName(
-            display()->view(),
-            tr("Save Recording As..."),
-            previousDir + QLatin1Char('/') + suggetion,
-            tr("AVI (Audio/Video Interleaved) (*.avi)"),
-            &selectedFilter,
-            QnCustomFileDialog::fileDialogOptions()
-        );
+        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
+                                                      display()->view(),
+                                                      tr("Save Recording As..."),
+                                                      qnSettings->lastRecordingDir() + QLatin1Char('/') + suggetion,
+                                                      tr("AVI (Audio/Video Interleaved) (*.avi)")));
+        dialog->exec();
 
+        QString filePath = dialog->selectedFile();
+        QString selectedExtension = dialog->selectedExtension();
         if (!filePath.isEmpty()) {
-            if (!filePath.endsWith(QLatin1String(".avi"), Qt::CaseInsensitive))
-                filePath += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 4);
+            if (!filePath.endsWith(selectedExtension, Qt::CaseInsensitive))
+                filePath += selectedExtension;
 
             QFile::remove(filePath);
             if (!QFile::rename(recordedFileName, filePath)) {
@@ -702,28 +701,28 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
         break;
     }
     case Qt::Key_Up:
-        if(e->modifiers() == 0)
-            moveCursor(QPoint(0, -1), QPoint(-1, 0));
-        if(e->modifiers() & Qt::AltModifier)
+        if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(0, -15));
+        else
+            moveCursor(QPoint(0, -1), QPoint(-1, 0));
         break;
     case Qt::Key_Down:
-        if(e->modifiers() == 0)
-            moveCursor(QPoint(0, 1), QPoint(1, 0));
-        if(e->modifiers() & Qt::AltModifier)
+        if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(0, 15));
+        else
+            moveCursor(QPoint(0, 1), QPoint(1, 0));
         break;
     case Qt::Key_Left:
-        if(e->modifiers() == 0)
-            moveCursor(QPoint(-1, 0), QPoint(0, -1));
-        if(e->modifiers() & Qt::AltModifier)
+        if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(-15, 0));
+        else
+            moveCursor(QPoint(-1, 0), QPoint(0, -1));
         break;
     case Qt::Key_Right:
-        if(e->modifiers() == 0)
-            moveCursor(QPoint(1, 0), QPoint(0, 1));
-        if(e->modifiers() & Qt::AltModifier)
+        if (e->modifiers() & Qt::AltModifier)
             m_handScrollInstrument->emulate(QPoint(15, 0));
+        else
+            moveCursor(QPoint(1, 0), QPoint(0, 1));
         break;
     case Qt::Key_Plus:
     case Qt::Key_Equal:
@@ -1451,4 +1450,19 @@ void QnWorkbenchController::updateLayoutInstruments(const QnLayoutResourcePtr &l
 
     m_moveInstrument->setEnabled(writable && !layout->locked());
     m_resizingInstrument->setEnabled(writable && !layout->locked());
+}
+
+void QnWorkbenchController::at_ptzProcessStarted(QnMediaResourceWidget *widget) {
+    if(widget == NULL)
+        return;
+
+    // skip method if current widget is already raised or zoomed
+    if (display()->widget(Qn::RaisedRole) == widget
+        || display()->widget(Qn::ZoomedRole) == widget)
+        return;
+
+    workbench()->setItem(Qn::RaisedRole, NULL); /* Un-raise currently raised item so that it doesn't interfere with ptz. */
+    display()->scene()->clearSelection();
+    widget->setSelected(true);
+    display()->bringToFront(widget);
 }

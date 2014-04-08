@@ -47,8 +47,8 @@ private slots:
 
     void at_exportLayoutAction_triggered();
     void at_layout_exportFinished(bool success, const QString &filename);
+    void at_camera_exportFinished(bool success, const QString &fileName);
 
-    void at_camera_exportFinished(int status, const QString &fileName);
 private:
     QSet<QString> m_filesIsUse;
 };

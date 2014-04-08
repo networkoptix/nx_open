@@ -18,6 +18,7 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
+#include <ui/workaround/mac_utils.h>
 
 #include "destruction_guard_item.h"
 
@@ -106,16 +107,14 @@ bool DropInstrument::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
     return this->sceneEvent(watched, event);
 }
 
-#include "ui/workaround/mac_utils.h"
-
 bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
     const QMimeData *mimeData = event->mimeData();
 
 #ifdef Q_OS_MAC
     if (mimeData->hasUrls()) {
-        foreach(QUrl url, mimeData->urls()) {
-            mac_saveFileBookmark(url.path());
-            qDebug() << "URL: " << url.path();
+        foreach(const QUrl &url, mimeData->urls()) {
+            if (url.isLocalFile() && QFile::exists(url.toLocalFile()))
+                mac_saveFileBookmark(url.path());
         }
     }
 #endif
@@ -139,16 +138,20 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
     m_resources << layouts;
     m_resources << servers;
 
-    if (m_resources.empty())
+    if (m_resources.empty()) {
+        event->ignore();
         return false;
+    }
 
     event->acceptProposedAction();
     return true;
 }
 
 bool DropInstrument::dragMoveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
-    if(m_resources.empty())
+    if(m_resources.empty()) {
+        event->ignore();
         return false;
+    }
 
     event->acceptProposedAction();
     return true;

@@ -85,7 +85,7 @@ void QnRestConnectionProcessor::run()
 
     QUrl url = getDecodedUrl();
     QString path = url.path();
-    QList<QPair<QString, QString> > params = QUrlQuery(url.query()).queryItems();
+    QList<QPair<QString, QString> > params = QUrlQuery(url.query()).queryItems(QUrl::FullyDecoded);
 #ifdef USE_NX_HTTP
     int rez = CODE_OK;
     QByteArray contentType = "application/xml";

@@ -106,6 +106,8 @@ void QnTwoStepFileDialog::setAcceptMode(QFileDialog::AcceptMode mode) {
 }
 
 QString QnTwoStepFileDialog::selectedFile() const {
+    if (ui->fileNameLineEdit->text().isEmpty())
+        return QString();
 
     QString fileName;
     switch (m_mode) {
@@ -140,6 +142,11 @@ QString QnTwoStepFileDialog::selectedNameFilter() const {
     }
     Q_ASSERT(false);
     return QString();
+}
+
+int QnTwoStepFileDialog::exec() {
+    ui->optionsGroupBox->setVisible(!ui->optionsLayout->isEmpty());
+    return base_type::exec();
 }
 
 bool QnTwoStepFileDialog::event(QEvent *event) {

@@ -174,7 +174,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_view.reset(new QnGraphicsView(m_scene.data()));
     m_view->setAutoFillBackground(true);
 
-    if (!(qnSettings->lightMode() & Qn::LightModeNoBackground)) {
+    if (!(qnSettings->lightMode() & Qn::LightModeNoSceneBackground)) {
         m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
         m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
     }
@@ -601,6 +601,9 @@ void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
 
 #ifndef Q_OS_MACX
     if(event->button() == Qt::LeftButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
+        QPoint tabBarPos = m_tabBar->mapFrom(this, event->pos());
+        if (m_tabBar->tabAt(tabBarPos) >= 0)
+            return;
         action(Qn::EffectiveMaximizeAction)->toggle();
         event->accept();
     }

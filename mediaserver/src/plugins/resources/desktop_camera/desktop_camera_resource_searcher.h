@@ -32,6 +32,7 @@ public:
     quint32 incCSeq(const TCPSocketPtr socket);
     void releaseConnection(TCPSocketPtr socket);
 
+    virtual bool isVirtualResource() const override { return true; }
 private:
     struct ClientConnectionInfo
     {

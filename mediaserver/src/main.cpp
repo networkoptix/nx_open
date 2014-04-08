@@ -1149,6 +1149,7 @@ void QnMain::run()
     qnStorageMan->loadFullFileCatalog();
 
     initAppServerEventConnection(*MSSettings::roSettings(), m_mediaServer);
+    
     QnServerMessageProcessor::instance()->run();
 
     std::auto_ptr<QnAppserverResourceProcessor> m_processor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );

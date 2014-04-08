@@ -219,6 +219,10 @@ void QnResourceSearchSynchronizer::at_model_rowsInserted(const QModelIndex &pare
 
     for (int row = start; row <= end; ++row) {
         const QModelIndex index = parent.child(row, 0);
+
+        if (index.model()->hasChildren(index))
+            at_model_rowsInserted(index, 0, index.model()->rowCount(index) - 1);
+
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         if(resource.isNull())
             continue;

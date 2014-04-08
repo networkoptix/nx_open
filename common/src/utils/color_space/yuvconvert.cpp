@@ -276,7 +276,8 @@ void yuv420_argb32_simd_intr(unsigned char * dst, const unsigned char * py,
 
 void bgra_to_yv12_simd_intr(const quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height, bool flip)
 {
-    Q_ASSERT( qPower2Ceil((unsigned int)width, 8) == (unsigned int)width );
+    // this assert does not work in layout background setup --gdm
+    //Q_ASSERT( qPower2Ceil((unsigned int)width, 8) == (unsigned int)width );
 
     static const __m128i sse_2000         = _mm_setr_epi16( 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020 ); /* SSE2. */
     static const __m128i sse_00a0         = _mm_setr_epi16( 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210 ); /* SSE2. */

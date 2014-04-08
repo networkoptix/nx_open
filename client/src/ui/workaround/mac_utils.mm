@@ -1,20 +1,25 @@
-#include <QtCore/QString>
-#include <QtCore/QStringList>
-#include <QFileDialog>
+#include <QtCore/QAbstractEventDispatcher>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QFileDialog>
+#include <QtCore/QFile>
+#include <QtCore/QDebug>
+#include <QtCore/qmath.h>
+
+#include <sys/resource.h>
 
 #import <objc/runtime.h>
 #import <Cocoa/Cocoa.h>
 
 #import "mac_utils.h"
 
-static inline NSString* fromQString(const QString &string)
+static NSString* fromQString(const QString &string)
 {
     const QByteArray utf8 = string.toUtf8();
     const char* cString = utf8.constData();
     return [[NSString alloc] initWithUTF8String:cString];
 }
 
-static inline NSArray *fromQStringList(const QStringList &strings) {
+static NSArray *fromQStringList(const QStringList &strings) {
     NSMutableArray *array = [NSMutableArray array];
 
     foreach (const QString& item, strings) {
@@ -24,7 +29,7 @@ static inline NSArray *fromQStringList(const QStringList &strings) {
     return array;
 }
 
-static inline QString toQString(NSString *string)
+static QString toQString(NSString *string)
 {
     if (!string)
         return QString();
@@ -46,6 +51,7 @@ void saveFileBookmark(NSString *path) {
     NSData *data = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope includingResourceValuesForKeys:nil relativeToURL:nil error:&error];
     if (error) {
         NSLog(@"Error securing bookmark for url %@ %@", url, error);
+        return;
     }
 
     NSLog(@"Data length: %d", data.length);
@@ -125,7 +131,11 @@ QString mac_getExistingDirectory(const QString &caption, const QString &dir) {
     if (!sandboxed && !dir.isEmpty())
         [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
-    if ([panel runModal] == NSOKButton) {
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
+    bool ok = ([panel runModal] == NSOKButton);
+    QAbstractEventDispatcher::instance()->interrupt();
+
+    if (ok) {
         if (sandboxed)
             saveFileBookmark(panel.URL.path);
 
@@ -149,7 +159,11 @@ QString mac_getOpenFileName(const QString &caption, const QString &dir, const QS
     if (!sandboxed && !dir.isEmpty())
         [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
-    if ([panel runModal] == NSOKButton) {
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
+    bool ok = ([panel runModal] == NSOKButton);
+    QAbstractEventDispatcher::instance()->interrupt();
+
+    if (ok) {
         if (sandboxed)
             saveFileBookmark(panel.URL.path);
 
@@ -173,7 +187,11 @@ QStringList mac_getOpenFileNames(const QString &caption, const QString &dir, con
     if (!sandboxed && !dir.isEmpty())
         [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
-    if ([panel runModal] == NSOKButton) {
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
+    bool ok = ([panel runModal] == NSOKButton);
+    QAbstractEventDispatcher::instance()->interrupt();
+
+    if (ok) {
         QStringList urls;
         for (int i = 0; i < panel.URLs.count; ++i)
             urls.append(toQString([[[panel URLs] objectAtIndex:i] path]));
@@ -200,9 +218,22 @@ QString mac_getSaveFileName(const QString &caption, const QString &dir, const QS
     if (!sandboxed && !dir.isEmpty())
         [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
 
-    if ([panel runModal] == NSOKButton) {
-        if (sandboxed)
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
+    bool ok = ([panel runModal] == NSOKButton);
+    QAbstractEventDispatcher::instance()->interrupt();
+
+    if (ok) {
+        if (sandboxed) {
+            // This is a hack! We cannot save bookmark for an inexistent file. So we create it before bookmark saving...
+            QFile file(toQString(panel.URL.path));
+            file.open(QFile::WriteOnly);
+            file.close();
+
             saveFileBookmark(panel.URL.path);
+
+            // ... and remove after
+            file.remove();
+        }
 
         return toQString(panel.URL.path);
     }
@@ -288,4 +319,19 @@ bool mac_isFullscreen(void *winId) {
 
     bool isFullScreen = [nswindow styleMask] & NSFullScreenWindowMask;
     return isFullScreen;
+}
+
+void mac_setLimits() {
+    /* In MacOS the default limit to maximum number of file descriptors is 256.
+     * It is NOT enough for our program. Manual tests showed that 4096 was enough
+     * for the scene full of identical elements.
+     * But let it be twice more, just to be sure... */
+    const rlim_t wantedLimit = 8192;
+
+    struct rlimit limit;
+    getrlimit(RLIMIT_NOFILE, &limit);
+
+    if (limit.rlim_cur < wantedLimit)
+        limit.rlim_cur = qMin(wantedLimit, limit.rlim_max);
+    setrlimit(RLIMIT_NOFILE, &limit);
 }

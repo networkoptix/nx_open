@@ -77,6 +77,8 @@ namespace {
     /** Static text should be rescaled no more often than once in this period */
     const qint64 minTextRescaleDelay = 1000;
 
+    const qreal noAspectRatio = -1.0;
+
     //Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
     std::shared_ptr<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() ); // TODO: #Elric get rid of this
 
@@ -107,7 +109,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_item(item),
     m_options(DisplaySelection | DisplayButtons),
     m_localActive(false),
-    m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
     m_frameOpacity(1.0),
     m_frameWidth(-1.0),
@@ -253,6 +254,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
     setChannelLayout(qn_resourceWidget_defaultContentLayout);
 
+    m_aspectRatio = defaultAspectRatio();
+
+    connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
     /* Run handlers. */
     updateTitleText();
     updateButtonsVisibility();
@@ -604,22 +608,17 @@ void QnResourceWidget::setChannelScreenSize(const QSize &size) {
 }
 
 bool QnResourceWidget::isInfoVisible() const {
-    return (options() & DisplayInfo);
+    return options().testFlag(DisplayInfo);
 }
 
 void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
+    if (isInfoVisible() == visible)
+        return;
+
     setOption(DisplayInfo, visible);
+    updateInfoVisiblity(animate);
 
-    qreal opacity = visible ? 1.0 : 0.0;
-
-    if(animate) {
-        opacityAnimator(m_footerWidget, 1.0)->animateTo(opacity);
-    } else {
-        m_footerWidget->setOpacity(opacity);
-    }
-
-    if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
-        infoButton->setChecked(visible);
+    setOverlayVisible(visible || m_mouseInWidget, animate);
 }
 
 Qn::ResourceStatusOverlay QnResourceWidget::statusOverlay() const {
@@ -814,6 +813,22 @@ void QnResourceWidget::updateOverlayWidgetsVisibility(bool animate) {
     }
 }
 
+void QnResourceWidget::updateInfoVisiblity(bool animate)
+{
+    bool visible = isInfoVisible();
+
+    qreal opacity = visible ? 1.0 : 0.0;
+
+    if(animate) {
+        opacityAnimator(m_footerWidget, 1.0)->animateTo(opacity);
+    } else {
+        m_footerWidget->setOpacity(opacity);
+    }
+
+    if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
+        infoButton->setChecked(visible);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Painting
@@ -901,6 +916,12 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
     painter->fillRect(rect, palette().color(QPalette::Highlight));
 }
 
+qreal QnResourceWidget::defaultAspectRatio() const {
+    if (item())
+        return item()->data(Qn::ItemAspectRatioRole, noAspectRatio);
+    return noAspectRatio;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -958,12 +979,14 @@ QVariant QnResourceWidget::itemChange(QGraphicsItem::GraphicsItemChange change, 
 }
 
 void QnResourceWidget::optionsChangedNotify(Options changedFlags){
-    if((changedFlags & DisplayInfo) && (visibleButtons() & InfoButton)) {
-        bool visible = isInfoVisible();
-        setInfoVisible(visible);
-        setOverlayVisible(visible || m_mouseInWidget);
-    }
+    if ((changedFlags & DisplayInfo) && (visibleButtons() & InfoButton))
+        updateInfoVisiblity();
 }
+
+void QnResourceWidget::at_itemDataChanged(int role) {
+    Q_UNUSED(role)
+}
+
 void QnResourceWidget::at_iconButton_visibleChanged() {
     if(m_iconButton->isVisible()) {
         m_headerLayout->insertItem(0, m_iconButton);
@@ -972,7 +995,6 @@ void QnResourceWidget::at_iconButton_visibleChanged() {
     }
 }
 
-void QnResourceWidget::at_infoButton_toggled(bool toggled){
+void QnResourceWidget::at_infoButton_toggled(bool toggled) {
     setInfoVisible(toggled);
-    setOverlayVisible(toggled || m_mouseInWidget);
 }

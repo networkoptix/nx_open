@@ -9,8 +9,8 @@
 
 #include <ui/widgets/properties/camera_settings_widget.h>
 
-QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
-    QDialog(parent, windowFlags),
+QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
+    QDialog(parent),
     QnWorkbenchContextAware(parent),
     m_ignoreAccept(false)
 {

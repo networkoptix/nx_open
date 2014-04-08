@@ -451,8 +451,6 @@ void QnLayoutSettingsDialog::at_imageStored(const QString &filename, bool ok) {
 }
 
 void QnLayoutSettingsDialog::loadPreview() {
-    if (!this->isVisible())
-        return;
     Q_D(QnLayoutSettingsDialog);
     if (!d->imageFileIsAvailable() || d->imageIsLoading())
         return;
