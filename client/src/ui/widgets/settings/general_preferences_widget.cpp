@@ -153,8 +153,7 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
 bool QnGeneralPreferencesWidget::confirm() {
 #ifdef Q_OS_MACX
     // TODO: #dklychkov remove this if the way to restart the app will be found
-    if (mac_isSandboxed())
-        return true;
+    return true;
 #endif
 
     if (m_oldDownmix != ui->downmixAudioCheckBox->isChecked() ||
