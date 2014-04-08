@@ -3,7 +3,7 @@
 
 #include "rest/server/request_handler.h"
 
-class QnRestUploadUpdateHandler : public QnRestRequestHandler
+class QnUploadUpdateRestHandler : public QnRestRequestHandler
 {
 public:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType) override;
