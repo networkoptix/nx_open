@@ -85,6 +85,10 @@ namespace ec2
             m_businessEventManager->triggerNotification( tran );
         }
 
+        void triggerNotification( const QnTransaction<ApiVideowallData>& tran ) {
+            m_videowallManager->triggerNotification( tran );
+        }
+
         void triggerNotification( const QnTransaction<ApiIdData>& tran ) {
             switch( tran.command )
             {
@@ -100,6 +104,8 @@ namespace ec2
                 return m_businessEventManager->triggerNotification( tran );
             case ApiCommand::removeLayout:
                 return m_layoutManager->triggerNotification( tran );
+            case ApiCommand::removeVideowall:
+                return m_videowallManager->triggerNotification( tran );
             default:
                 assert( false );
             }

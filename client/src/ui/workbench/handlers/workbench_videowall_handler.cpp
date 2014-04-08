@@ -1226,7 +1226,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
     videoWall->setTypeByName(lit("Videowall"));
 
     connection2()->getVideowallManager()->save(videoWall,  this, 
-        [this, &videoWall]( int reqID, ec2::ErrorCode errorCode ) {
+        [this, videoWall]( int reqID, ec2::ErrorCode errorCode ) {
             Q_UNUSED(reqID)
             qDebug() << "videowall" << videoWall->getName() << "saved" << (int)errorCode;
     } );
