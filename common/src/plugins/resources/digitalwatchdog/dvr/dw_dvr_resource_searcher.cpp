@@ -34,7 +34,7 @@ DwDvrResourceSearcher& DwDvrResourceSearcher::instance()
     return inst;
 }
 
-QnResourcePtr DwDvrResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr DwDvrResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -57,8 +57,8 @@ QnResourcePtr DwDvrResourceSearcher::createResource(QnId resourceTypeId, const Q
     result = QnVirtualCameraResourcePtr();
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create DW DVR camera resource. TypeID" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create DW DVR camera resource. TypeID" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 
@@ -66,7 +66,7 @@ QnResourcePtr DwDvrResourceSearcher::createResource(QnId resourceTypeId, const Q
 
 QString DwDvrResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnDwDvrResource::MANUFACTURE);
+    return QnDwDvrResource::MANUFACTURE;
 }
 
 QnResourceList DwDvrResourceSearcher::findResources()

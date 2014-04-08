@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <api/model/kvpair.h>
+#include "nx_ec/impl/ec_api_impl.h"
 
 // TODO: #Elric remove this header.
 
@@ -34,7 +35,7 @@ protected:
     virtual void innerValueChanged(const QString &value) = 0;
 
 private slots:
-   void at_connection_replyReceived(int status, const QnKvPairListsById &kvPairs, int handle);
+   void at_connection_replyReceived(int handle, ec2::ErrorCode err, const QnKvPairListsById &kvPairs);
 
 private:
     void load();

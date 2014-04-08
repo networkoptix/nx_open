@@ -21,7 +21,7 @@ namespace nx_http
 
     void MultipartContentParser::processData( const QnByteArrayConstRef& data )
     {
-        for( int offset = 0; offset < data.size(); )
+        for( size_t offset = 0; offset < data.size(); )
         {
             switch( m_state )
             {
@@ -71,6 +71,9 @@ namespace nx_http
                                 m_contentLength = headerValue.toUInt();
                             break;
                         }
+
+                        default:
+                            break;
                     }
                     break;
                 }

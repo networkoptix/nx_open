@@ -24,7 +24,7 @@ struct QN_EXPORT QnParamType
 
     DataType type;
 
-    QnId id;
+    //QnId id;
     QString name;
     QVariant default_value;
 
@@ -78,7 +78,7 @@ struct QN_EXPORT QnParam
     bool isPhysical() const { return m_paramType->isPhysical; }
     bool isReadOnly() const { return m_paramType->isReadOnly; }
     const QString &netHelper() const { return m_paramType->paramNetHelper; }
-    const QnId &paramTypeId() const { return m_paramType->id; }
+    //const QnId &paramTypeId() const { return m_paramType->id; }
 
 private:
     QnParamTypePtr m_paramType;

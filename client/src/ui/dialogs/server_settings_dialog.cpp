@@ -21,6 +21,7 @@
 #include <utils/math/interpolator.h>
 #include <utils/math/color_transformations.h>
 
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -234,7 +235,7 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
 
     result.isWritable = checkBoxItem->flags() & Qt::ItemIsEnabled;
     result.isUsedForWriting = checkBoxItem->checkState() == Qt::Checked;
-    result.storageId = qvariant_cast<int>(checkBoxItem->data(StorageIdRole), -1);
+    result.storageId = qvariant_cast<QString>(checkBoxItem->data(StorageIdRole), QString());
     result.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
     result.path = pathItem->text();
@@ -264,7 +265,10 @@ void QnServerSettingsDialog::updateFromResources()
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
 
+    bool edge = QnMediaServerResource::isEdgeServer(m_server);
     ui->nameLineEdit->setText(m_server->getName());
+    ui->nameLineEdit->setEnabled(!edge);
+
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 
@@ -277,14 +281,17 @@ void QnServerSettingsDialog::submitToResources() {
 
         QnAbstractStorageResourceList storages;
         foreach(const QnStorageSpaceData &item, tableItems()) {
-            if(!item.isUsedForWriting && item.storageId == -1) {
+            if(!item.isUsedForWriting && item.storageId.isNull()) {
                 serverStorageStates.insert(QnServerStorageKey(m_server->getGuid(), item.path), item.reservedSpace);
                 continue;
             }
 
             QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
-            if (item.storageId != -1)
+            if (!item.storageId.isNull())
                 storage->setId(item.storageId);
+            QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
+            if (resType)
+                storage->setTypeId(resType->getId());
             storage->setName(QUuid::createUuid().toString());
             storage->setParentId(m_server->getId());
             storage->setUrl(item.path);
@@ -298,7 +305,9 @@ void QnServerSettingsDialog::submitToResources() {
         qnSettings->setServerStorageStates(serverStorageStates);
     }
 
-    m_server->setName(ui->nameLineEdit->text());
+    bool edge = QnMediaServerResource::isEdgeServer(m_server);
+    if (!edge)
+        m_server->setName(ui->nameLineEdit->text());
 }
 
 void QnServerSettingsDialog::setBottomLabelText(const QString &text) {
@@ -365,7 +374,7 @@ void QnServerSettingsDialog::at_tableBottomLabel_linkActivated() {
         return;
 
     QnStorageSpaceData item = dialog->storage();
-    if(item.storageId != -1)
+    if(!item.storageId.isNull())
         return;
     item.isUsedForWriting = true;
     item.isExternal = true;

@@ -14,7 +14,7 @@
 
 
 static QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
-const char* QnStardotResource::MANUFACTURE = "Stardot";
+const QString QnStardotResource::MANUFACTURE(lit("Stardot"));
 static const int TCP_TIMEOUT = 3000;
 static const int DEFAULT_RTSP_PORT = 554;
 
@@ -49,7 +49,7 @@ QnStardotResource::~QnStardotResource()
 
 QString QnStardotResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnStardotResource::setIframeDistance(int /*frames*/, int /*timems*/)

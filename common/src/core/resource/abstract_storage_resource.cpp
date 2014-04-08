@@ -89,21 +89,6 @@ void QnAbstractStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider
     m_providers.remove(provider);
 }
 
-void QnAbstractStorageResource::deserialize(const QnResourceParameters& parameters)
-{
-    QMutexLocker lock(&m_mutex);
-
-    QnResource::deserialize(parameters);
-
-    const char* SPACELIMIT = "spaceLimit";
-    const char* USEDFORWRITING = "usedForWriting";
-
-    if (parameters.contains(QLatin1String(SPACELIMIT)))
-        setSpaceLimit(parameters[QLatin1String(SPACELIMIT)].toLongLong());
-    if(parameters.contains(QLatin1String(USEDFORWRITING)))
-        setUsedForWriting(parameters[QLatin1String(USEDFORWRITING)].toInt());
-}
-
 float QnAbstractStorageResource::getAvarageWritingUsage() const
 {
     return 0.0;

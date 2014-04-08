@@ -49,17 +49,17 @@ public:
     };
 
     QnScheduleTask()
-        : m_id(0), m_resourceId(0)
+        : m_resourceId() //, m_id(0)
     {}
     QnScheduleTask(const Data& data)
-        : m_id(0), m_resourceId(0), m_data(data)
+        : m_resourceId(), m_data(data) // m_id(0)
     {
     }
 
-    QnScheduleTask(QnId id, QnId resourceId, int dayOfWeek, int startTime, int endTime,
+    QnScheduleTask(QnId resourceId, int dayOfWeek, int startTime, int endTime,
                    Qn::RecordingType recordType =  Qn::RecordingType_Never, int beforeThreshold = 0, int afterThreshold = 0,
                    Qn::StreamQuality streamQuality = Qn::QualityHighest, int fps = 10, bool doRecordAudio = false)
-        : m_id(id), m_resourceId(resourceId),
+        : m_resourceId(resourceId),
           m_data(dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio)
     {}
 
@@ -68,7 +68,6 @@ public:
     const Data& getData() const { return m_data; }
     void setData(const Data& data) { m_data = data; }
 
-    QnId getId() const { return m_id; }
     QnId getResourceId() const { return m_resourceId; }
     int getDayOfWeek() const { return m_data.m_dayOfWeek; }
     int getStartTime() const { return m_data.m_startTime; }
@@ -107,7 +106,7 @@ public:
     bool containTimeMs(int weekTimeMs) const;
 
 private:
-    QnId m_id;
+    //QnId m_id;
     QnId m_resourceId;
 
     Data m_data;

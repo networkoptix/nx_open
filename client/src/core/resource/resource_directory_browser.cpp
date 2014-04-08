@@ -10,11 +10,11 @@
 #include "plugins/resources/archive/filetypesupport.h"
 #include "core/resource/layout_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
-#include "api/serializer/pb_serializer.h"
 #include "client/client_globals.h"
 
 #include <utils/common/warnings.h>
 #include <utils/local_file_cache.h>
+#include "nx_ec/data/ec2_layout_data.h"
 
 namespace {
     const int maxResourceCount = 1024;
@@ -24,18 +24,15 @@ QnResourceDirectoryBrowser::QnResourceDirectoryBrowser() {
     m_resourceReady = false;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createResource(QnId resourceTypeId, const QnResourceParameters &parameters) {
+QnResourcePtr QnResourceDirectoryBrowser::createResource(QnId resourceTypeId, const QnResourceParams& params) {
     QnResourcePtr result;
 
     if (!isResourceTypeSupported(resourceTypeId)) {
         return result;
     }
 
-    if (parameters.contains(QLatin1String("file"))) {
-        result = createArchiveResource(parameters[QLatin1String("file")]);
-        result->setTypeId(resourceTypeId);
-        result->deserialize(parameters);
-    }
+    result = createArchiveResource(params.url);
+    result->setTypeId(resourceTypeId);
 
     return result;
 }
@@ -123,34 +120,37 @@ void QnResourceDirectoryBrowser::findResources(const QString& directory, QnResou
 }
 
 QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xfile) {
-    QnLayoutResourcePtr layout;
     QnLayoutFileStorageResource layoutStorage;
     layoutStorage.setUrl(xfile);
     QIODevice* layoutFile = layoutStorage.open(QLatin1String("layout.pb"), QIODevice::ReadOnly);
     if (layoutFile == 0)
-        return layout;
+        return QnLayoutResourcePtr();
     QByteArray layoutData = layoutFile->readAll();
     delete layoutFile;
-    QnApiPbSerializer serializer;
-    QList<QnLayoutItemDataList> orderedItems;
-    try {
-        serializer.deserializeLayout(layout, layoutData, &orderedItems);
-        if (layout == 0)
-            return layout;
-    } catch(...) {
-        return layout;
+    
+    QnLayoutResourcePtr layout(new QnLayoutResource());
+    ec2::ApiLayoutData apiLayout;
+    InputBinaryStream<QByteArray> stream(layoutData);
+    if (deserialize(apiLayout, &stream))
+        apiLayout.toResource(layout);
+    else
+        return QnLayoutResourcePtr();
+    QnLayoutItemDataList orderedItems;
+    foreach(const ec2::ApiLayoutItemData& item, apiLayout.items) {
+        orderedItems << QnLayoutItemData();
+        item.toResource(orderedItems.last());
     }
 
     QIODevice *uuidFile = layoutStorage.open(QLatin1String("uuid.bin"), QIODevice::ReadOnly);
     if (uuidFile) {
         QByteArray data = uuidFile->readAll();
         delete uuidFile;
-        layout->setGuid(QUuid(data.data()).toString());
+        layout->setGuid(QUuid(data.data()));
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByGuid(layout->getGuid()).dynamicCast<QnLayoutResource>();
         if (existingLayout)
             return existingLayout;
     } else {
-        layout->setGuid(QUuid::createUuid().toString());
+        layout->setGuid(QUuid::createUuid());
     }
 
     QIODevice* rangeFile = layoutStorage.open(QLatin1String("range.bin"), QIODevice::ReadOnly);
@@ -190,8 +190,9 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
 
 
     layout->setParentId(0);
-    layout->setId(QnId::generateSpecialId());
+    layout->setId(QnId::createUuid());
     layout->setName(QFileInfo(xfile).fileName());
+    layout->addFlags(QnResource::local);
 
     layout->addFlags(QnResource::url);
     layout->setUrl(xfile);
@@ -205,7 +206,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QTextStream itemTimeZones(itemTimeZonesIO);
 
     // TODO: #Elric here is bad place to add resources to pool. need refactor
-    QnLayoutItemDataList& items = orderedItems[0];
+    QnLayoutItemDataList& items = orderedItems;
     for (int i = 0; i < items.size(); ++i)
     {
         QnLayoutItemData& item = items[i];

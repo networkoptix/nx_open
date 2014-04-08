@@ -10,14 +10,13 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 
-static const QString nxEntControllerId = lit("Enterprise Controller");
 
 /*!
     This string represents client during search with NetworkOptixModuleFinder class.
     It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from version.h)
 */
 static const QString nxClientId = lit("client.exe");
-static const QString nxMediaServerId = lit("mediaserver.exe");
+static const QString nxMediaServerId = lit("Media Server");
 
 static const QHostAddress defaultModuleRevealMulticastGroup = QHostAddress(lit("239.255.11.11"));
 static const unsigned int defaultModuleRevealMulticastGroupPort = 5007;
@@ -61,6 +60,7 @@ public:
     QString type;
     QString version;
     QString customization;
+    QString name;
     //!random string, unique for particular module instance
     QString seed;
     TypeSpecificParamMap typeSpecificParameters;

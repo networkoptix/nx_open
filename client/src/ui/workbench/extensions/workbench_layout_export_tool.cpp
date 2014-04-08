@@ -3,8 +3,6 @@
 #include <QtCore/QBuffer>
 
 
-#include <api/serializer/pb_serializer.h>
-
 #include <client/client_settings.h>
 
 #include <camera/caching_time_period_loader.h>
@@ -32,6 +30,7 @@
 #ifdef Q_OS_WIN
 #include <launcher/nov_launcher_win.h>
 #endif
+#include "nx_ec/data/ec2_layout_data.h"
 
 QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
                                        const QnTimePeriod &period,
@@ -57,7 +56,7 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
 
     // If exporting layout, create new guid. If layout just renamed, keep guid
     if (mode == Qn::LayoutExport)
-        m_layout->setGuid(QUuid::createUuid().toString());
+        m_layout->setGuid(QUuid::createUuid());
 }
 
 bool QnLayoutExportTool::start() {
@@ -132,9 +131,12 @@ bool QnLayoutExportTool::start() {
     itemTimeZonesStream.flush();
     delete itemTimezonesIO;
 
-    QnApiPbSerializer serializer;
     QByteArray layoutData;
-    serializer.serializeLayout(m_layout, layoutData);
+    ec2::ApiLayoutData layoutObject;
+    layoutObject.fromResource(m_layout);
+    OutputBinaryStream<QByteArray> stream(&layoutData);
+    serialize(layoutObject, &stream);
+
 
     QIODevice* device = m_storage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
     device->write(layoutData);
@@ -157,7 +159,7 @@ bool QnLayoutExportTool::start() {
     delete device;
 
     device = m_storage->open(QLatin1String("uuid.bin"), QIODevice::WriteOnly);
-    device->write(m_layout->getGuid().toUtf8());
+    device->write(m_layout->getGuid().toByteArray());
     delete device;
 
     foreach (const QnMediaResourcePtr resource, m_resources) {

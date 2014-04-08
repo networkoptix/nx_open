@@ -113,9 +113,16 @@ public:
 };
 
 QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate(): 
-    state(Stopped),
+    q(nullptr),
     usingThreadController(false),
-    usingBlockingController(false)
+    usingBlockingController(false),
+    index(-1),
+    state(Stopped),
+    usingDefaultMoveTimer(false),
+    needPositionUpdate(false),
+    waitingForNewPosition(false),
+    lastPositionRequestTime(0),
+    newPositionRequestTime(0)
 {}
 
 QnTourPtzExecutorPrivate::~QnTourPtzExecutorPrivate() {

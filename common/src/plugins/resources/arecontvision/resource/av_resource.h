@@ -18,7 +18,7 @@ class QnPlAreconVisionResource : public QnPhysicalCameraResource
     Q_OBJECT
 
 public:
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     QnPlAreconVisionResource();
 

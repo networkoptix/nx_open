@@ -192,6 +192,12 @@ public:
     };
     Q_DECLARE_FLAGS(MotionTypes, MotionType);
 
+    enum PanicMode {PM_None, PM_BusinessEvents, PM_User};
+    enum ServerFlags { 
+        SF_None     = 0, 
+        SF_Edge     = 1,
+        SF_RemoteEC = 2
+    };
 
     enum TimePeriodType {
         NullTimePeriod      = 0x1,  /**< No period. */
@@ -240,11 +246,18 @@ public:
         UserResourceRole,                           /**< Role for QnUserResourcePtr. */
         LayoutResourceRole,                         /**< Role for QnLayoutResourcePtr. */
         MediaServerResourceRole,                    /**< Role for QnMediaServerResourcePtr. */
+        VideoWallResourceRole,                      /**< Role for QnVideoWallResourcePtr */
+
         ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
         ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (QnResource::Flags). */
         ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
         ResourceStatusRole,                         /**< Role for resource status. Value of type int (QnResource::Status). */
         ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
+
+        VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QUuid. */
+        VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QUuid. */
+        VideoWallPcGuidRole,                        /**< Role for videowall pc unique id. Value of type QUuid. */
+        VideoWallPcScreenIndicesRole,               /**< Role for videowall pc screen indices. Value of type QList<int>. */
 
         /* Layout-based. */
         LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type QSizeF. */
@@ -279,7 +292,6 @@ public:
         ItemCheckedButtonsRole,                     /**< Role for buttons that are checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
-
 
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */

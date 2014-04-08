@@ -49,7 +49,8 @@ void QnWorkbenchNotificationsHandler::clear() {
 
 void QnWorkbenchNotificationsHandler::requestSmtpSettings() {
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)
-        QnAppServerConnectionFactory::createConnection()->getSettingsAsync(this, SLOT(updateSmtpSettings(int,QnKvPairList,int)));
+        QnAppServerConnectionFactory::getConnection2()->getSettingsAsync(
+            this, &QnWorkbenchNotificationsHandler::updateSmtpSettings );
 }
 
 void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -71,8 +72,8 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
 
     int healthMessage = eventType - BusinessEventType::SystemHealthMessage;
     if (healthMessage >= 0) {
-        int resourceId = params.getEventResourceId();
-        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
+        QnId resourceId = params.getEventResourceId();
+        QnResourcePtr resource = qnResPool->getResourceById(resourceId);
         addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resource);
         return;
     }
@@ -125,13 +126,12 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     return false;
 }
 
-void QnWorkbenchNotificationsHandler::updateSmtpSettings(int status, const QnKvPairList &settings, int handle) {
+void QnWorkbenchNotificationsHandler::updateSmtpSettings( int handle, ec2::ErrorCode errorCode, const QnEmail::Settings &settings ) {
     Q_UNUSED(handle)
-    if (status != 0)
+    if (errorCode != ec2::ErrorCode::ok)
         return;
 
-    QnEmail::Settings email(settings);
-    bool isInvalid = email.server.isEmpty() || email.user.isEmpty() || email.password.isEmpty();
+    bool isInvalid = settings.server.isEmpty() || settings.user.isEmpty() || settings.password.isEmpty();
     setSystemHealthEventVisible(QnSystemHealth::SmtpIsNotSet, isInvalid);
 }
 

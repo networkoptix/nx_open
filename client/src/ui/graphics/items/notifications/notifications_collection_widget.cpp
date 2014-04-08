@@ -275,8 +275,8 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget 
 
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
-    int resourceId = params.getEventResourceId();
-    QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
+    QnId resourceId = params.getEventResourceId();
+    QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (!resource)
         return;
 
@@ -420,7 +420,7 @@ QnNotificationWidget* QnNotificationsCollectionWidget::findItem(QnSystemHealth::
     return NULL;
 }
 
-QnNotificationWidget* QnNotificationsCollectionWidget::findItem(int businessRuleId, const QnResourcePtr &resource, bool useResource) {
+QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QnId& businessRuleId, const QnResourcePtr &resource, bool useResource) {
     foreach (QnNotificationWidget *item, m_itemsByBusinessRuleId.values(businessRuleId))
         if (!useResource || resource == item->property(itemResourcePropertyName).value<QnResourcePtr>())
             return item;
@@ -584,7 +584,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
     }
 
     //TODO: #GDM REMOVE DEBUG
-    for (int i = 0; i < BusinessEventType::Count; i++) {
+    for (int i = 1; i < BusinessEventType::Count; i++) {
         BusinessEventType::Value eventType = BusinessEventType::Value(i);
 
         QnBusinessEventParameters params;
@@ -682,7 +682,7 @@ void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationWidget *
     foreach (QnSystemHealth::MessageType messageType, m_itemsByMessageType.keys(item))
         m_itemsByMessageType.remove(messageType, item);
 
-    foreach (int ruleId, m_itemsByBusinessRuleId.keys(item))
+    foreach (const QnId& ruleId, m_itemsByBusinessRuleId.keys(item))
         m_itemsByBusinessRuleId.remove(ruleId, item);
 
     foreach (QString soundPath, m_itemsByLoadingSound.keys(item))

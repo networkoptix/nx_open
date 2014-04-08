@@ -11,8 +11,10 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include "utils/common/id.h"
 
 namespace {
     static const QString plainTextDelimiter(lit("\n"));
@@ -45,8 +47,8 @@ QString QnBusinessStringsHelper::actionName(BusinessActionType::Value value) {
     case PlaySound:             return tr("Play sound");
     case PlaySoundRepeated:     return tr("Repeat sound");
     case SayText:               return tr("Speak");
+    default:                    return tr("Unknown (%1)").arg(static_cast<int>(value));
     }
-    return tr("Unknown (%1)").arg(static_cast<int>(value));
 }
 
 QString QnBusinessStringsHelper::eventName(BusinessEventType::Value value) {
@@ -295,8 +297,8 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
 }
 
 QString QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params, bool useIp) {
-    int id = params.getEventResourceId();
-    QnResourcePtr res = id > 0 ? qnResPool->getResourceById(id, QnResourcePool::AllResources) : QnResourcePtr();
+    QnId id = params.getEventResourceId();
+    QnResourcePtr res = !id.isNull() ? qnResPool->getResourceById(id) : QnResourcePtr();
     return getFullResourceName(res, useIp);
 }
 
@@ -388,9 +390,9 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(const QnAbstract
 }
 
 QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &params, bool isPublic) {
-    int id = params.getEventResourceId();
-    QnNetworkResourcePtr res = id > 0 ? 
-                            qnResPool->getResourceById(id, QnResourcePool::AllResources).dynamicCast<QnNetworkResource>() : 
+    QnId id = params.getEventResourceId();
+    QnNetworkResourcePtr res = !id.isNull() ? 
+                            qnResPool->getResourceById(id).dynamicCast<QnNetworkResource>() : 
                             QnNetworkResourcePtr();
     if (!res)
         return QString();

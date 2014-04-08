@@ -83,6 +83,7 @@ public:
     bool isAnalog() const;
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
+    void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
 
     virtual QStringList getRelayOutputList() const;
     virtual QStringList getInputPortList() const;

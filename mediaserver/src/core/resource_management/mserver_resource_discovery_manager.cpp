@@ -127,11 +127,10 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                         {
                             QByteArray errorString;
                             QnVirtualCameraResourceList cameras;
-                            QnAppServerConnectionPtr connect = QnAppServerConnectionFactory::createConnection();
-                            if (connect->addCamera(cameraResource, cameras) != 0)
-                            {
-                                qCritical() << "QnResourceDiscoveryManager::findNewResources(): Can't add camera. Reason: " << connect->getLastError();
-                            }
+                            ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
+                            const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
+                            if( errorCode != ec2::ErrorCode::ok )
+                                NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
                         }
 
                     }
@@ -333,11 +332,10 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     if (cameraResource)
                     {
                         QnVirtualCameraResourceList cameras;
-                        QnAppServerConnectionPtr connect = QnAppServerConnectionFactory::createConnection();
-                        if (connect->addCamera(cameraResource, cameras) != 0)
-                        {
-                            qCritical() << "QnResourceDiscoveryManager::findNewResources(): Can't add camera. Reason: " << connect->getLastError();
-                        }
+                        ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
+                        const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
+                        if( errorCode != ec2::ErrorCode::ok )
+                            NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
                     }
 
                     continue;

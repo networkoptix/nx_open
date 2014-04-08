@@ -1,146 +1,252 @@
 #include "common_message_processor.h"
 
-#include <api/message_source.h>
 #include <api/app_server_connection.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/videowall_resource.h>
 
 #include <business/business_event_rule.h>
 
 #include <core/resource_management/resource_pool.h>
+#include "common/common_module.h"
+#include "utils/common/synctime.h"
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     QObject(parent)
 {
 }
 
-void QnCommonMessageProcessor::run() {
-    m_source = QSharedPointer<QnMessageSource>(new QnMessageSource(m_url, m_reconnectTimeout));
-    m_source->setAuthKey(m_authKey);
+void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
+{
+    if (m_connection) {
+        m_connection->disconnect(this);
+        //emit connectionClosed();
+    }
+    m_connection = connection;
 
-    connect(m_source.data(), SIGNAL(connectionOpened(QnMessage)), this, SLOT(at_connectionOpened(QnMessage)));
-    connect(m_source.data(), SIGNAL(connectionClosed(QString)), this, SLOT(at_connectionClosed(QString)));
-    connect(m_source.data(), SIGNAL(connectionReset()),          this, SIGNAL(connectionReset()));
-    connect(m_source.data(), SIGNAL(messageReceived(QnMessage)), this, SLOT(at_messageReceived(QnMessage)));
+    if (!connection)
+        return;
 
-    m_source->startRequest();
+    connect( connection.get(), &ec2::AbstractECConnection::initNotification,
+        this, &QnCommonMessageProcessor::on_gotInitialNotification );
+    connect( connection.get(), &ec2::AbstractECConnection::runtimeInfoChanged,
+        this, &QnCommonMessageProcessor::on_runtimeInfoChanged );
+
+    connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::statusChanged,
+        this, &QnCommonMessageProcessor::on_resourceStatusChanged );
+    connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::disabledChanged,
+        this, &QnCommonMessageProcessor::on_resourceDisabledChanged );
+    connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::resourceChanged,
+        this, [this](const QnResourcePtr &resource){updateResource(resource);});
+    connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::resourceParamsChanged,
+        this, &QnCommonMessageProcessor::on_resourceParamsChanged );
+    connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::resourceRemoved,
+        this, &QnCommonMessageProcessor::on_resourceRemoved );
+
+    connect( connection->getMediaServerManager().get(), &ec2::AbstractMediaServerManager::addedOrUpdated,
+        this, [this](const QnMediaServerResourcePtr &server){updateResource(server);});
+    connect( connection->getMediaServerManager().get(), &ec2::AbstractMediaServerManager::removed,
+        this, &QnCommonMessageProcessor::on_resourceRemoved );
+
+    connect( connection->getCameraManager().get(), &ec2::AbstractCameraManager::cameraAddedOrUpdated,
+        this, [this](const QnVirtualCameraResourcePtr &camera){updateResource(camera);});
+    connect( connection->getCameraManager().get(), &ec2::AbstractCameraManager::cameraHistoryChanged,
+        this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
+    connect( connection->getCameraManager().get(), &ec2::AbstractCameraManager::cameraRemoved,
+        this, &QnCommonMessageProcessor::on_resourceRemoved );
+
+    connect( connection->getLicenseManager().get(), &ec2::AbstractLicenseManager::licenseChanged,
+        this, &QnCommonMessageProcessor::on_licenseChanged );
+
+    connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::addedOrUpdated,
+        this, &QnCommonMessageProcessor::on_businessEventAddedOrUpdated );
+    connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::removed,
+        this, &QnCommonMessageProcessor::on_businessEventRemoved );
+    connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::businessActionBroadcasted,
+        this, &QnCommonMessageProcessor::on_businessActionBroadcasted );
+    connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::businessRuleReset,
+        this, &QnCommonMessageProcessor::on_businessRuleReset );
+    connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::gotBroadcastAction,
+        this, &QnCommonMessageProcessor::on_broadcastBusinessAction );
+
+    connect( connection->getUserManager().get(), &ec2::AbstractUserManager::addedOrUpdated,
+        this, [this](const QnUserResourcePtr &user){updateResource(user);});
+    connect( connection->getUserManager().get(), &ec2::AbstractUserManager::removed,
+        this, &QnCommonMessageProcessor::on_resourceRemoved );
+
+    connect( connection->getLayoutManager().get(), &ec2::AbstractLayoutManager::addedOrUpdated,
+        this, [this](const QnLayoutResourcePtr &layout){updateResource(layout);});
+    connect( connection->getLayoutManager().get(), &ec2::AbstractLayoutManager::removed,
+        this, &QnCommonMessageProcessor::on_resourceRemoved );
+
+    connect( connection->getStoredFileManager().get(), &ec2::AbstractStoredFileManager::added,
+        this, &QnCommonMessageProcessor::fileAdded );
+    connect( connection->getStoredFileManager().get(), &ec2::AbstractStoredFileManager::updated,
+        this, &QnCommonMessageProcessor::fileUpdated );
+    connect( connection->getStoredFileManager().get(), &ec2::AbstractStoredFileManager::removed,
+        this, &QnCommonMessageProcessor::fileRemoved );
+
+    connect( connection.get(), &ec2::AbstractECConnection::panicModeChanged,
+        this, &QnCommonMessageProcessor::on_panicModeChanged );
+
+    connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::addedOrUpdated,
+        this, [this](const QnVideoWallResourcePtr &videowall){updateResource(videowall);});
+    connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::removed,
+        this, &QnCommonMessageProcessor::on_resourceRemoved );
+
+    connection->startReceivingNotifications(true);
 }
 
-void QnCommonMessageProcessor::stop() {
-    if (m_source) {
-        m_source->stop();
+
+void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
+{
+    m_rules.clear();
+    foreach(QnBusinessEventRulePtr bRule, fullData.bRules)
+        m_rules[bRule->id()] = bRule;
+
+    onGotInitialNotification(fullData);
+}
+
+void QnCommonMessageProcessor::on_runtimeInfoChanged( const ec2::QnRuntimeInfo& runtimeInfo )
+{
+    QnAppServerConnectionFactory::setPublicIp(runtimeInfo.publicIp);
+    QnAppServerConnectionFactory::setSessionKey(runtimeInfo.sessionKey);
+}
+
+void QnCommonMessageProcessor::on_resourceStatusChanged( const QnId& resourceId, QnResource::Status status )
+{
+    QnResourcePtr resource = qnResPool->getResourceById(resourceId);
+    if (resource)
+        onResourceStatusChanged(resource, status);
+}
+
+void QnCommonMessageProcessor::on_resourceDisabledChanged( const QnId& resourceId, bool disabled )
+{
+    if (QnResourcePtr resource = qnResPool->getResourceById(resourceId)) {
+        resource->setDisabled(disabled);
     }
 }
 
-void QnCommonMessageProcessor::init(const QUrl &url, const QString &authKey, int reconnectTimeout) {
-    m_url = url;
-    m_authKey = authKey;
-    m_reconnectTimeout = reconnectTimeout;
+void QnCommonMessageProcessor::on_resourceParamsChanged( const QnId& resourceId, const QnKvPairList& kvPairs )
+{
+    QnResourcePtr resource = qnResPool->getResourceById(resourceId);
+    if (!resource)
+        return;
+
+    foreach (const QnKvPair &pair, kvPairs)
+        resource->setProperty(pair.name(), pair.value());
 }
 
-void QnCommonMessageProcessor::loadRuntimeInfo(const QnMessage &message) {
-    if (!message.systemName.isEmpty())
-        QnAppServerConnectionFactory::setSystemName(message.systemName);
-    if (!message.publicIp.isEmpty())
-        QnAppServerConnectionFactory::setPublicIp(message.publicIp);
-    if (!message.sessionKey.isEmpty())
-        QnAppServerConnectionFactory::setSessionKey(message.sessionKey);
+void QnCommonMessageProcessor::on_resourceRemoved( const QnId& resourceId )
+{
+    //beforeRemovingResource(resourceId);
+
+    if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId)) 
+    {
+        // delete dependent objects
+        foreach(QnResourcePtr subRes, qnResPool->getResourcesByParentId(resourceId))
+            qnResPool->removeResource(subRes);
+        qnResPool->removeResource(ownResource);
+    }
+    
+    afterRemovingResource(resourceId);
 }
 
-void QnCommonMessageProcessor::handleConnectionOpened(const QnMessage &message) {
-    // TODO: #Elric this is a hack to update system name before emitting connectionOpened
-    // as it is used in handers.
-
-    if(message.messageType == Qn::Message_Type_Initial)
-        loadRuntimeInfo(message); 
-
-    emit connectionOpened();
+void QnCommonMessageProcessor::on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory) {
+    QnCameraHistoryPool::instance()->addCameraHistoryItem(*cameraHistory.data());
 }
 
-void QnCommonMessageProcessor::handleConnectionClosed(const QString &errorString) {
-    qDebug() << "Connection aborted:" << errorString;
-    emit connectionClosed();
+void QnCommonMessageProcessor::on_licenseChanged(const QnLicensePtr &license) {
+    qnLicensePool->addLicense(license);
 }
 
-void QnCommonMessageProcessor::handleMessage(const QnMessage &message) {
-    switch(message.messageType) {
-    case Qn::Message_Type_Initial: {
-        loadRuntimeInfo(message);
-        updateKvPairs(message.kvPairs);
-        break;
+void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &businessRule){
+    m_rules[businessRule->id()] = businessRule;
+    emit businessRuleChanged(businessRule);
+}
+
+void QnCommonMessageProcessor::on_businessEventRemoved(const QnId &id) {
+    m_rules.remove(id);
+    emit businessRuleDeleted(id);
+}
+
+void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction )
+{
+    // nothing to do for a while
+}
+
+void QnCommonMessageProcessor::on_businessRuleReset( const QnBusinessEventRuleList& rules )
+{
+    m_rules.clear();
+    foreach(QnBusinessEventRulePtr bRule, rules)
+        m_rules[bRule->id()] = bRule;
+
+    emit businessRuleReset(rules);
+}
+
+void QnCommonMessageProcessor::on_broadcastBusinessAction( const QnAbstractBusinessActionPtr& action )
+{
+    emit businessActionReceived(action);
+}
+
+void QnCommonMessageProcessor::on_panicModeChanged(Qn::PanicMode mode) {
+    QnResourceList resList = qnResPool->getAllResourceByTypeName(lit("Server"));
+    foreach(QnResourcePtr res, resList) {
+        QnMediaServerResourcePtr mServer = res.dynamicCast<QnMediaServerResource>();
+        if (mServer)
+            mServer->setPanicMode(mode);
     }
-    case Qn::Message_Type_Ping: {
-        break;
-    }
-    case Qn::Message_Type_RuntimeInfoChange: {
-        loadRuntimeInfo(message);
-        break;
-    }
-    case Qn::Message_Type_BusinessRuleInsertOrUpdate: {
-        emit businessRuleChanged(message.businessRule);
-        break;
-    }
-    case Qn::Message_Type_BusinessRuleReset: {
-        emit businessRuleReset(message.businessRules);
-        break;
-    }
-    case Qn::Message_Type_BusinessRuleDelete: {
-        emit businessRuleDeleted(message.resourceId.toInt());
-        break;
-    }
-    case Qn::Message_Type_BroadcastBusinessAction: {
-        emit businessActionReceived(message.businessAction);
-        break;
-    }
-    case Qn::Message_Type_FileAdd: {
-        emit fileAdded(message.filename);
-        break;
-    }
-    case Qn::Message_Type_FileRemove: {
-        emit fileRemoved(message.filename);
-        break;
-    }
-    case Qn::Message_Type_FileUpdate: {
-        emit fileUpdated(message.filename);
-        break;
-    }
-    case Qn::Message_Type_KvPairChange: {
-        updateKvPairs(message.kvPairs);
-        break;
-    }
-    case Qn::Message_Type_KvPairDelete: {
-        foreach (int resourceId, message.kvPairs.keys()) {
-            QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
-            if (!resource)
-                continue;
-            QnKvPairList values = message.kvPairs[resourceId];
-            foreach (const QnKvPair &pair, values)
-                resource->setProperty(pair.name(), QString());
+}
+
+// todo: ec2 relate logic. remove from this class
+void QnCommonMessageProcessor::afterRemovingResource(const QnId& id) {
+    foreach(QnBusinessEventRulePtr bRule, m_rules.values())
+    {
+        if (bRule->eventResources().contains(id) || bRule->actionResources().contains(id))
+        {
+            QnBusinessEventRulePtr updatedRule(bRule->clone());
+            updatedRule->removeResource(id);
+            emit businessRuleChanged(updatedRule);
         }
-        break;
-    }
-    default:
-        break;
     }
 }
 
-void QnCommonMessageProcessor::updateKvPairs(const QnKvPairListsById &kvPairs) {
-    foreach (int resourceId, kvPairs.keys()) {
-        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
-        if (!resource)
-            continue;
-        QnKvPairList values = kvPairs[resourceId];
-        foreach (const QnKvPair &pair, values)
-            resource->setProperty(pair.name(), pair.value());
-    }
+void QnCommonMessageProcessor::updateHardwareIds(const ec2::QnFullResourceData& fullData)
+{
+    qnLicensePool->setMainHardwareIds(fullData.serverInfo.mainHardwareIds);
+    qnLicensePool->setCompatibleHardwareIds(fullData.serverInfo.compatibleHardwareIds);
 }
 
-void QnCommonMessageProcessor::at_connectionOpened(const QnMessage &message) {
-    handleConnectionOpened(message);
+void QnCommonMessageProcessor::processResources(const QnResourceList& resources)
+{
+    qnResPool->beginTran();
+    foreach (const QnResourcePtr& resource, resources)
+        updateResource(resource);
+    qnResPool->commit();
 }
 
-void QnCommonMessageProcessor::at_connectionClosed(const QString &errorString) {
-    handleConnectionClosed(errorString);
+void QnCommonMessageProcessor::processLicenses(const QnLicenseList& licenses)
+{
+    qnLicensePool->replaceLicenses(licenses);
 }
 
-void QnCommonMessageProcessor::at_messageReceived(const QnMessage &message) {
-    handleMessage(message);
+void QnCommonMessageProcessor::processCameraServerItems(const QnCameraHistoryList& cameraHistoryList)
+{
+    foreach(QnCameraHistoryPtr history, cameraHistoryList)
+        QnCameraHistoryPool::instance()->addCameraHistory(history);
+}
+
+
+void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
+{
+    QnAppServerConnectionFactory::setBox(fullData.serverInfo.armBox);
+
+    updateHardwareIds(fullData);
+    processResources(fullData.resources);
+    processLicenses(fullData.licenses);
+    processCameraServerItems(fullData.cameraHistory);
+
+    qnSyncTime->reset();
 }

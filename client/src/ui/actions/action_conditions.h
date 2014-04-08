@@ -39,7 +39,7 @@ public:
      * 
      * \param parent                    Context-aware parent.
      */
-    QnActionCondition(QObject *parent = NULL);
+    QnActionCondition(QObject *parent);
 
     /**
      * Main condition checking function.
@@ -78,6 +78,21 @@ public:
     virtual Qn::ActionVisibility check(const QnWorkbenchLayoutList &layouts);
 };
 
+/** Base condition class for actions that should be hidden in videowall review mode
+ *  and visible in all other cases - or vise versa. */
+class QnVideoWallReviewModeCondition: public QnActionCondition {
+public:
+    QnVideoWallReviewModeCondition(bool hide, QObject* parent):
+        QnActionCondition(parent),
+        m_hide(hide)
+    {}
+protected:
+    bool isVideoWallReviewMode() const;
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+private:
+    /** Flag that describes if action should be visible or hidden in videowall review mode. */
+    bool m_hide;
+};
 
 /**
  * Condition wich is a conjunction of two or more conditions.
@@ -107,7 +122,7 @@ private:
  */
 class QnItemZoomedActionCondition: public QnActionCondition {
 public:
-    QnItemZoomedActionCondition(bool requiredZoomedState, QObject *parent = NULL):
+    QnItemZoomedActionCondition(bool requiredZoomedState, QObject *parent):
         QnActionCondition(parent),
         m_requiredZoomedState(requiredZoomedState)
     {}
@@ -121,13 +136,13 @@ private:
 
 class QnSmartSearchActionCondition: public QnActionCondition {
 public:
-    QnSmartSearchActionCondition(bool requiredGridDisplayValue, QObject *parent = NULL): 
+    QnSmartSearchActionCondition(bool requiredGridDisplayValue, QObject *parent):
         QnActionCondition(parent),
         m_hasRequiredGridDisplayValue(true),
         m_requiredGridDisplayValue(requiredGridDisplayValue)
     {}
 
-    QnSmartSearchActionCondition(QObject *parent = NULL):
+    QnSmartSearchActionCondition(QObject *parent):
         QnActionCondition(parent),
         m_hasRequiredGridDisplayValue(false),
         m_requiredGridDisplayValue(false)
@@ -142,13 +157,13 @@ private:
 
 class QnDisplayInfoActionCondition: public QnActionCondition {
 public:
-    QnDisplayInfoActionCondition(bool requiredDisplayInfoValue, QObject *parent = NULL):
+    QnDisplayInfoActionCondition(bool requiredDisplayInfoValue, QObject *parent):
         QnActionCondition(parent),
         m_hasRequiredDisplayInfoValue(true),
         m_requiredDisplayInfoValue(requiredDisplayInfoValue)
     {}
 
-    QnDisplayInfoActionCondition(QObject *parent = NULL):
+    QnDisplayInfoActionCondition(QObject *parent):
         QnActionCondition(parent),
         m_hasRequiredDisplayInfoValue(false),
         m_requiredDisplayInfoValue(false)
@@ -163,14 +178,14 @@ private:
 
 class QnClearMotionSelectionActionCondition: public QnActionCondition {
 public:
-    QnClearMotionSelectionActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnClearMotionSelectionActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 };
 
 class QnCheckFileSignatureActionCondition: public QnActionCondition {
 public:
-    QnCheckFileSignatureActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnCheckFileSignatureActionCondition(QObject *parent): QnActionCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 };
 
@@ -180,7 +195,7 @@ public:
  */
 class QnResourceActionCondition: public QnActionCondition {
 public:
-    QnResourceActionCondition(const QnResourceCriterion &criterion, Qn::MatchMode matchMode = Qn::All, QObject *parent = NULL);
+    QnResourceActionCondition(const QnResourceCriterion &criterion, Qn::MatchMode matchMode, QObject *parent);
 
     virtual ~QnResourceActionCondition();
 
@@ -207,17 +222,36 @@ private:
  */
 class QnResourceRemovalActionCondition: public QnActionCondition {
 public:
-    QnResourceRemovalActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnResourceRemovalActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+
+/** 
+ * Base class for edge-specific action conditions.
+ */
+class QnEdgeServerCondition: public QnActionCondition {
+public:
+    QnEdgeServerCondition(bool isEdgeServer, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_isEdgeServer(isEdgeServer)
+    {}
+    
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+private:
+    /** If this flag is true action is visible for edge servers only, 
+     *  in the other case - action is hidden for edge servers.
+     */
+    bool m_isEdgeServer;
 };
 
 /**
  * Condition for resource rename.
  */
-class QnRenameActionCondition: public QnActionCondition {
+class QnRenameActionCondition: public QnEdgeServerCondition {
 public:
-    QnRenameActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnRenameActionCondition(QObject *parent = NULL): QnEdgeServerCondition(false, parent) {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
@@ -228,7 +262,7 @@ public:
  */
 class QnLayoutItemRemovalActionCondition: public QnActionCondition {
 public:
-    QnLayoutItemRemovalActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnLayoutItemRemovalActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
 };
@@ -239,7 +273,7 @@ public:
  */
 class QnSaveLayoutActionCondition: public QnActionCondition {
 public:
-    QnSaveLayoutActionCondition(bool isCurrent, QObject *parent = NULL): QnActionCondition(parent), m_current(isCurrent) {}
+    QnSaveLayoutActionCondition(bool isCurrent, QObject *parent): QnActionCondition(parent), m_current(isCurrent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 
@@ -253,7 +287,7 @@ private:
  */
 class QnLayoutCountActionCondition: public QnActionCondition {
 public:
-    QnLayoutCountActionCondition(int minimalRequiredCount, QObject *parent = NULL): QnActionCondition(parent), m_minimalRequiredCount(minimalRequiredCount) {}
+    QnLayoutCountActionCondition(int minimalRequiredCount, QObject *parent): QnActionCondition(parent), m_minimalRequiredCount(minimalRequiredCount) {}
 
     virtual Qn::ActionVisibility check(const QnWorkbenchLayoutList &layouts) override;
 
@@ -267,7 +301,7 @@ private:
  */
 class QnTakeScreenshotActionCondition: public QnActionCondition {
 public:
-    QnTakeScreenshotActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnTakeScreenshotActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 };
@@ -278,7 +312,7 @@ public:
  */
 class QnAdjustVideoActionCondition: public QnActionCondition {
 public:
-    QnAdjustVideoActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnAdjustVideoActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 };
@@ -289,7 +323,7 @@ public:
  */
 class QnTimePeriodActionCondition: public QnActionCondition {
 public:
-    QnTimePeriodActionCondition(Qn::TimePeriodTypes periodTypes, Qn::ActionVisibility nonMatchingVisibility, bool centralItemRequired, QObject *parent = NULL):
+    QnTimePeriodActionCondition(Qn::TimePeriodTypes periodTypes, Qn::ActionVisibility nonMatchingVisibility, bool centralItemRequired, QObject *parent):
         QnActionCondition(parent),
         m_periodTypes(periodTypes),
         m_nonMatchingVisibility(nonMatchingVisibility),
@@ -306,7 +340,7 @@ private:
 
 class QnExportActionCondition: public QnActionCondition {
 public:
-    QnExportActionCondition(bool centralItemRequired, QObject *parent = NULL):
+    QnExportActionCondition(bool centralItemRequired, QObject *parent):
         QnActionCondition(parent),
         m_centralItemRequired(centralItemRequired)
     {}
@@ -319,51 +353,51 @@ private:
 
 class QnPreviewActionCondition: public QnExportActionCondition {
 public:
-    QnPreviewActionCondition(QObject *parent = NULL): QnExportActionCondition(true, parent) {}
+    QnPreviewActionCondition(QObject *parent): QnExportActionCondition(true, parent) {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 class QnPanicActionCondition: public QnActionCondition {
 public:
-    QnPanicActionCondition(QObject *parent = NULL):
+    QnPanicActionCondition(QObject *parent):
         QnActionCondition(parent)
     {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
-class QnToggleTourActionCondition: public QnActionCondition {
+class QnToggleTourActionCondition: public QnVideoWallReviewModeCondition {
 public:
-    QnToggleTourActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnToggleTourActionCondition(QObject *parent): QnVideoWallReviewModeCondition(true, parent) {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 class QnArchiveActionCondition: public QnActionCondition {
 public:
-    QnArchiveActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnArchiveActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
 class QnToggleTitleBarActionCondition: public QnActionCondition {
 public:
-    QnToggleTitleBarActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnToggleTitleBarActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 class QnNoArchiveActionCondition: public QnActionCondition {
 public:
-    QnNoArchiveActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnNoArchiveActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 class QnOpenInFolderActionCondition: public QnActionCondition {
 public:
-    QnOpenInFolderActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnOpenInFolderActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 
@@ -372,21 +406,21 @@ public:
 
 class QnLayoutSettingsActionCondition: public QnActionCondition {
 public:
-    QnLayoutSettingsActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnLayoutSettingsActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
 class QnCreateZoomWindowActionCondition: public QnActionCondition {
 public:
-    QnCreateZoomWindowActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnCreateZoomWindowActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 };
 
 class QnTreeNodeTypeCondition: public QnActionCondition {
 public:
-    QnTreeNodeTypeCondition(Qn::NodeType nodeType, QObject *parent = NULL): QnActionCondition(parent), m_nodeType(nodeType) {}
+    QnTreeNodeTypeCondition(Qn::NodeType nodeType, QObject *parent): QnActionCondition(parent), m_nodeType(nodeType) {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 
@@ -396,14 +430,14 @@ private:
 
 class QnOpenInCurrentLayoutActionCondition: public QnActionCondition {
 public:
-    QnOpenInCurrentLayoutActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnOpenInCurrentLayoutActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
 class QnOpenInNewEntityActionCondition: public QnActionCondition {
 public: 
-    QnOpenInNewEntityActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnOpenInNewEntityActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
     virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
@@ -411,40 +445,40 @@ public:
 
 class QnSetAsBackgroundActionCondition: public QnActionCondition {
 public:
-    QnSetAsBackgroundActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+    QnSetAsBackgroundActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
     virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
 };
 
-class QnChangeResolutionActionCondition: public QnActionCondition {
+class QnChangeResolutionActionCondition: public QnVideoWallReviewModeCondition {
 public:
-    QnChangeResolutionActionCondition(QObject* parent = NULL): QnActionCondition(parent) {}
+    QnChangeResolutionActionCondition(QObject* parent): QnVideoWallReviewModeCondition(true, parent) {}
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 /** Display action only if user is logged in. */
 class QnLoggedInCondition: public QnActionCondition {
 public:
-    QnLoggedInCondition(QObject* parent = NULL): QnActionCondition(parent) {}
+    QnLoggedInCondition(QObject* parent): QnActionCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 class QnCheckForUpdatesActionCondition: public QnActionCondition {
 public:
-    QnCheckForUpdatesActionCondition(QObject* parent = NULL): QnActionCondition(parent) {}
+    QnCheckForUpdatesActionCondition(QObject* parent): QnActionCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 class QnShowcaseActionCondition: public QnActionCondition {
 public:
-    QnShowcaseActionCondition(QObject* parent = NULL): QnActionCondition(parent) {}
+    QnShowcaseActionCondition(QObject* parent): QnActionCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 class QnPtzActionCondition: public QnActionCondition {
 public:
-    QnPtzActionCondition(Qn::PtzCapabilities capabilities, bool disableIfPtzDialogVisible = false, QObject* parent = NULL):
+    QnPtzActionCondition(Qn::PtzCapabilities capabilities, bool disableIfPtzDialogVisible, QObject* parent):
         QnActionCondition(parent),
         m_capabilities(capabilities),
         m_disableIfPtzDialogVisible(disableIfPtzDialogVisible)
@@ -459,6 +493,25 @@ private:
 private:
     Qn::PtzCapabilities m_capabilities;
     bool m_disableIfPtzDialogVisible;
+};
+
+class QnIdentifyVideoWallActionCondition: public QnActionCondition {
+public:
+    QnIdentifyVideoWallActionCondition(QObject* parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+class QnResetVideoWallLayoutActionCondition: public QnActionCondition {
+public:
+    QnResetVideoWallLayoutActionCondition(QObject* parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
+class QnRotateItemCondition: public QnActionCondition {
+public:
+    QnRotateItemCondition(QObject* parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 };
 
 class QnLightModeCondition: public QnActionCondition {

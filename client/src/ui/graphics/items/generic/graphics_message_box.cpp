@@ -61,7 +61,7 @@ void QnGraphicsMessageBoxItem::paint(QPainter *painter, const QStyleOptionGraphi
 // -------------------------------------------------------------------------- //
 // QnGraphicsMessageBox
 // -------------------------------------------------------------------------- //
-QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString &text, int timeoutMsec):
+QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString &text, int timeoutMsec, int fontSize):
     base_type(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool)
 {
     m_label = new GraphicsLabel(this);
@@ -78,7 +78,7 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
     setRoundingRadius(defaultRoundingRadius);
 
     QFont font = this->font();
-    font.setPixelSize(defaultFontSize);
+    font.setPixelSize(fontSize == 0 ? defaultFontSize : fontSize);
     setFont(font);
 
     setAcceptedMouseButtons(Qt::NoButton);
@@ -117,11 +117,11 @@ int QnGraphicsMessageBox::timeout() const {
     return m_timeout;
 }
 
-QnGraphicsMessageBox* QnGraphicsMessageBox::information(const QString &text) {
+QnGraphicsMessageBox* QnGraphicsMessageBox::information(const QString &text, int timeoutMsec, int fontSize) {
     if (!instance)
         return NULL;
 
-    QnGraphicsMessageBox* box = new QnGraphicsMessageBox(instance, text);
+    QnGraphicsMessageBox* box = new QnGraphicsMessageBox(instance, text, timeoutMsec, fontSize);
     instance->addItem(box);
     return box;
 }

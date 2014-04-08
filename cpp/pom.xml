@@ -21,6 +21,7 @@
         <libtype/>
         <!--<product.title>${project.name}</product.title>		-->
         <postfix.libs/>
+        <linux.arm.oslibs>${linux.oslibs}</linux.arm.oslibs>
     </properties>
 
     <build>

@@ -16,7 +16,7 @@ QnPlAxisResourceSearcher& QnPlAxisResourceSearcher::instance()
     return inst;
 }
 
-QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -37,9 +37,8 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, cons
     result = QnVirtualCameraResourcePtr( new QnPlAxisResource() );
     result->setTypeId(resourceTypeId);
 
-    NX_LOG(lit("Create Axis camera resource. TypeID %1, Parameters %2.").arg(resourceTypeId.toString()).arg(toDebugString(parameters)), cl_logDEBUG1);
+    NX_LOG(lit("Create Axis camera resource. TypeID %1.").arg(resourceTypeId.toString()), cl_logDEBUG1);
 
-    result->deserialize(parameters);
 
     return result;
 
@@ -47,7 +46,7 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, cons
 
 QString QnPlAxisResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlAxisResource::MANUFACTURE);
+    return QnPlAxisResource::MANUFACTURE;
 }
 
 
@@ -104,7 +103,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
 
 
     QnId typeId = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
-    if (!typeId.isValid())
+    if (typeId.isNull())
         return QList<QnResourcePtr>();
 
     QnPlAxisResourcePtr resource(new QnPlAxisResource());
@@ -204,7 +203,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
     QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
     QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
         return local_results;
 
     resource->setTypeId(rt);
@@ -245,7 +244,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
             QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
             QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), firstResource->getName());
-            if (!rt.isValid())
+            if (rt.isNull())
                 return;
 
             resource->setTypeId(rt);

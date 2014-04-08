@@ -27,6 +27,8 @@ public:
         Media,
         User,
         Users,
+        VideoWall,
+        VideoWallItem,
         TypeMask = 0xFF,
 
         Offline = (QnResource::Offline + 1) << 8,
@@ -35,7 +37,7 @@ public:
         Locked = (QnResource::Locked + 1) << 8,
         StatusMask = 0xFF00
     };
-    Q_DECLARE_FLAGS(Key, KeyPart);
+    Q_DECLARE_FLAGS(Key, KeyPart)
 
     QnResourceIconCache(QObject *parent = NULL);
 
@@ -59,7 +61,7 @@ private:
     QHash<Key, QIcon> m_cache;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceIconCache::Key);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceIconCache::Key)
 
 #define qnResIconCache QnResourceIconCache::instance()
 

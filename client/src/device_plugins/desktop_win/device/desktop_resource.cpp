@@ -24,7 +24,7 @@ QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveRe
     setUrl(name);
     m_desktopDataProvider = 0;
     setGuid(desktopResourceUuid.toString()); // only one desktop resource is allowed)
-    setDisabled(true);
+  //  setDisabled(true);
     //Q_ASSERT_X(instance == 0, "Only one instance of desktop camera now allowed!", Q_FUNC_INFO);
     //instance = this;
 }
@@ -103,16 +103,16 @@ bool QnDesktopResource::isRendererSlow() const
 
 void QnDesktopResource::addConnection(QnMediaServerResourcePtr mServer)
 {
-    if (m_connectionPool.contains(mServer->getGuid()))
+    if (m_connectionPool.contains(mServer->getGuid().toString()))
         return;
     QnDesktopCameraConnectionPtr connection = QnDesktopCameraConnectionPtr(new QnDesktopCameraConnection(this, mServer));
-    m_connectionPool[mServer->getGuid()] = connection;
+    m_connectionPool[mServer->getGuid().toString()] = connection;
     connection->start();
 }
 
 void QnDesktopResource::removeConnection(QnMediaServerResourcePtr mServer)
 {
-    m_connectionPool.remove(mServer->getGuid());
+    m_connectionPool.remove(mServer->getGuid().toString());
 }
 
 static std::shared_ptr<QnEmptyResourceAudioLayout> emptyAudioLayout( new QnEmptyResourceAudioLayout() );

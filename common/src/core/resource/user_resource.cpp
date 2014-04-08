@@ -10,16 +10,16 @@ QnUserResource::QnUserResource():
 
 QString QnUserResource::getUniqueId() const
 {
-    return getGuid();
+    return getGuid().toString();
 }
 
-QString QnUserResource::getHash() const
+QByteArray QnUserResource::getHash() const
 {
     QMutexLocker locker(&m_mutex);
     return m_hash;
 }
 
-void QnUserResource::setHash(const QString& hash)
+void QnUserResource::setHash(const QByteArray& hash)
 {
     QMutexLocker locker(&m_mutex);
     m_hash = hash;
@@ -37,13 +37,13 @@ void QnUserResource::setPassword(const QString& password)
     m_password = password;
 }
 
-void QnUserResource::setDigest(const QString& digest)
+void QnUserResource::setDigest(const QByteArray& digest)
 {
     QMutexLocker locker(&m_mutex);
     m_digest = digest;
 }
 
-QString QnUserResource::getDigest() const
+QByteArray QnUserResource::getDigest() const
 {
     QMutexLocker locker(&m_mutex);
     return m_digest;
@@ -94,6 +94,58 @@ void QnUserResource::setEmail(const QString& email)
     emit emailChanged(::toSharedPointer(this));
 }
 
+QSet<QUuid> QnUserResource::videoWallItems() const {
+    QMutexLocker locker(&m_mutex);
+    return m_videoWallItemUuids;
+}
+
+void QnUserResource::setVideoWallItems(QSet<QUuid> uuids) {
+    QMutexLocker locker(&m_mutex);
+
+    foreach(const QUuid &uuid, m_videoWallItemUuids)
+        if(!uuids.contains(uuid))
+            removeVideoWallItemUnderLock(uuid);
+
+    foreach(const QUuid &uuid, uuids) {
+        if(!m_videoWallItemUuids.contains(uuid)) {
+            addVideoWallItemUnderLock(uuid);
+        }
+    }
+}
+
+void QnUserResource::addVideoWallItem(const QUuid &uuid) {
+    QMutexLocker locker(&m_mutex);
+    addVideoWallItemUnderLock(uuid);
+}
+
+void QnUserResource::removeVideoWallItem(const QUuid &uuid) {
+    QMutexLocker locker(&m_mutex);
+    removeVideoWallItemUnderLock(uuid);
+}
+
+void QnUserResource::addVideoWallItemUnderLock(const QUuid &uuid) {
+    if(m_videoWallItemUuids.contains(uuid))
+        return;
+
+    m_videoWallItemUuids << uuid;
+
+    m_mutex.unlock();
+    emit videoWallItemAdded(::toSharedPointer(this), uuid);
+    m_mutex.lock();
+}
+
+void QnUserResource::removeVideoWallItemUnderLock(const QUuid &uuid) {
+    if (!m_videoWallItemUuids.contains(uuid))
+        return;
+
+    m_videoWallItemUuids.remove(uuid);
+
+    m_mutex.unlock();
+    emit videoWallItemRemoved(::toSharedPointer(this), uuid);
+    m_mutex.lock();
+}
+
+
 void QnUserResource::updateInner(QnResourcePtr other)
 {
     base_type::updateInner(other);
@@ -106,5 +158,6 @@ void QnUserResource::updateInner(QnResourcePtr other)
         setPermissions(localOther->getPermissions());
         setAdmin(localOther->isAdmin());
         setEmail(localOther->getEmail());
+        setVideoWallItems(localOther->videoWallItems());
     }
 }

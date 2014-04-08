@@ -47,8 +47,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/file_processor.h>
-
-#include <device_plugins/server_camera/appserver.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item.h>
 
 #include <plugins/resources/archive/archive_stream_reader.h>
 #include <plugins/resources/archive/avi_files/avi_resource.h>
@@ -149,11 +149,11 @@ detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkben
     assert(oldDisabledFlags.size() == resources.size());
 }
 
-void detail::QnResourceStatusReplyProcessor::at_replyReceived(int status, const QnResourceList &resources, int handle) {
+void detail::QnResourceStatusReplyProcessor::at_replyReceived( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources ) {
     Q_UNUSED(handle);
 
     if(m_handler)
-        m_handler.data()->at_resources_statusSaved(status, resources, m_oldDisabledFlags);
+        m_handler.data()->at_resources_statusSaved(errorCode, resources, m_oldDisabledFlags);
 
     deleteLater();
 }
@@ -339,8 +339,8 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
         delete loginDialog();
 }
 
-QnAppServerConnectionPtr QnWorkbenchActionHandler::connection() const {
-    return QnAppServerConnectionFactory::createConnection();
+ec2::AbstractECConnectionPtr QnWorkbenchActionHandler::connection2() const {
+    return QnAppServerConnectionFactory::getConnection2();
 }
 
 bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) const {
@@ -368,13 +368,14 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     {
         //TODO: #GDM refactor duplicated code
         bool isServer = resource->hasFlags(QnResource::server);
+        bool isVideowall = resource->hasFlags(QnResource::videowall);
         bool isMediaResource = resource->hasFlags(QnResource::media);
         bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
                 && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
         bool isExportedLayout = snapshotManager()->isFile(layout);
 
-        bool allowed = isServer || isMediaResource;
-        bool forbidden = isExportedLayout && (isServer || isLocalResource);
+        bool allowed = isServer || isMediaResource || isVideowall;
+        bool forbidden = isExportedLayout && (isServer || isLocalResource || isVideowall);
         if(!allowed || forbidden)
             return;
     }
@@ -527,10 +528,17 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     cameraSettingsDialog()->widget()->submitToResources();
 
     if (hasDbChanges) {
-        connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+        connection2()->getCameraManager()->save( cameras, this, 
+            [this, cameras]( int reqID, ec2::ErrorCode errorCode ) {
+                at_resources_saved( reqID, errorCode, cameras );
+            } );
+        /*
         foreach(const QnResourcePtr &camera, cameras) {
-            connection()->saveAsync(camera->getId(), camera->getProperties());
+            connection2()->getResourceManager()->save(
+                camera->getId(), camera->getProperties(),
+                this, &QnWorkbenchActionHandler::at_resources_properties_saved  );
         }
+        */
     }
 
     if (hasCameraChanges) {
@@ -714,7 +722,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     //}
 
     // we should not change state when using "Open in New Window"
-    if (m_delayedDrops.isEmpty()) {
+    if (m_delayedDrops.isEmpty() && !qnSettings->isVideoWallMode()) {
         QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());
         workbench()->update(state);
 
@@ -926,6 +934,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
+
     QnWorkbenchStreamSynchronizer *synchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
 
     /* if synchronizer is running now and we want to add an item to the scene with the specified time, synchronization should be disabled. */
@@ -976,12 +985,18 @@ void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
-    // TODO: #Elric server & media resources only!
-    QnResourceList resources = menu()->currentParameters(sender()).resources();
-    if(resources.isEmpty())
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
+
+    QnResourceList filtered;
+    foreach (const QnResourcePtr &resource, parameters.resources()) {
+        if (resource->hasFlags(QnResource::media | QnResource::server))    //servers are handled in "Monitor" action set
+            filtered << resource;
+    }
+    if (filtered.isEmpty())
         return;
 
-    openResourcesInNewWindow(resources);
+    openResourcesInNewWindow(filtered);
 }
 
 void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
@@ -995,6 +1010,8 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
             layout = new QnWorkbenchLayout(layoutResource, workbench());
             workbench()->addLayout(layout);
         }
+        /* Explicit set that we do not control videowall through this layout */
+        layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QUuid()));
 
         workbench()->setCurrentLayout(layout);
     }
@@ -1093,7 +1110,10 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 
     if(!modifiedResources.empty()) {
         detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldDisabledFlags);
-        connection()->saveAsync(modifiedResources, processor, SLOT(at_replyReceived(int, const QnResourceList &, int)));
+        connection2()->getCameraManager()->save( modifiedResources, processor,
+            [processor, modifiedResources]( int reqID, ec2::ErrorCode errorCode ) {
+                processor->at_replyReceived( reqID, errorCode, modifiedResources );
+            });
     }
 }
 
@@ -1105,18 +1125,23 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     foreach(QnLayoutResourcePtr r, layouts)
         resources.removeOne(r);
 
+    QnVideoWallResourceList videowalls = resources.filtered<QnVideoWallResource>();
+    foreach(QnVideoWallResourcePtr r, videowalls)
+        resources.removeOne(r);
+
     if (workbench()->currentLayout()->resource()->locked() &&
             !resources.empty() &&
-            layouts.empty()) {
+            layouts.empty() &&
+            videowalls.empty()) {
         QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
         return;
     }
 
     if (!resources.empty()) {
         parameters.setResources(resources);
-        if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters))
+        if (menu()->canTrigger(Qn::OpenInCurrentLayoutAction, parameters)) {
             menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
-        else {
+        } else {
             QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
             if (layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout)) {
                 bool hasLocal = false;
@@ -1128,21 +1153,27 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
                         break;
                 }
                 if (hasLocal)
-                    QMessageBox::warning(mainWindow(),
+                    QMessageBox::warning(mainWindow(), 
                                          tr("Cannot add item"),
                                          tr("Cannot add a local file to Multi-Video"));
             }
         }
     }
+
     if(!layouts.empty())
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
+
+    if (!videowalls.empty())
+        menu()->trigger(Qn::OpenVideoWallsReviewAction, videowalls);
 }
 
 void QnWorkbenchActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnLayoutResourceList layouts = parameters.resources().filtered<QnLayoutResource>();
-    if(layouts.empty()) /* That's media drop, open new layout. */
+    QnVideoWallResourceList videowalls = parameters.resources().filtered<QnVideoWallResource>();
+
+    if(layouts.empty() && (videowalls.size() != parameters.resources().size())) /* There are some media in the drop, open new layout. */
         menu()->trigger(Qn::OpenNewTabAction);
 
     menu()->trigger(Qn::DropResourcesAction, parameters);
@@ -1480,7 +1511,10 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
         menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectionInfoRole, loginDialog()->currentInfo()));
 }
 
-void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
+void QnWorkbenchActionHandler::at_reconnectAction_triggered() 
+{
+    QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
+
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     const QnConnectionData connectionData = qnSettings->lastUsedConnection();
@@ -1489,10 +1523,10 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     QnConnectionInfoPtr connectionInfo = parameters.argument<QnConnectionInfoPtr>(Qn::ConnectionInfoRole);
     if(connectionInfo.isNull()) {
-        QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(connectionData.url);
 
         QnConnectionRequestResult result;
-        connection->connectAsync(&result, SLOT(processReply(int, const QVariant &, int)));
+        QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
+            connectionData.url, &result, &QnConnectionRequestResult::processEc2Reply );
         if(result.exec() != 0)
             return;
 
@@ -1523,7 +1557,6 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectionInfo->proxyPort);
 
-    QnClientMessageProcessor::instance()->stop(); // TODO: #Elric blocks gui thread.
     QnSessionManager::instance()->stop();
 
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo->version);
@@ -1556,7 +1589,6 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     notificationsHandler()->clear();
 
     QnSessionManager::instance()->start();
-    QnClientMessageProcessor::instance()->run();
 
     QnResourceDiscoveryManager::instance()->start();
 
@@ -1581,7 +1613,6 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
 
     menu()->trigger(Qn::ClearCameraSettingsAction);
 
-    QnClientMessageProcessor::instance()->stop(); // TODO: #Elric blocks gui thread.
 //    QnSessionManager::instance()->stop(); // omfg... logic sucks
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance()->stop();
@@ -1735,8 +1766,9 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setGuid(QUuid::createUuid().toString());
+    layout->setGuid(QUuid::createUuid());
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
+    layout->setTypeByName(lit("Layout"));
     if(context()->user())
         layout->setParentId(context()->user()->getId());
 
@@ -1881,7 +1913,10 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraOpenRequested() {
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras){
-    connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+    connection2()->getCameraManager()->save( cameras, this,
+        [this, cameras]( int reqID, ec2::ErrorCode errorCode ) {
+            at_resources_saved( reqID, errorCode, cameras ); 
+    } );
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_rejected() {
@@ -1963,7 +1998,10 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         return;
 
     // TODO: #Elric move submitToResources here.
-    connection()->saveAsync(server, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+    connection2()->getMediaServerManager()->save( server, this,
+        [this]( int reqID, ec2::ErrorCode errorCode, QnMediaServerResourcePtr savedServerRes ) {
+            at_resources_saved( reqID, errorCode, QnResourceList() << savedServerRes );
+        } );
 }
 
 void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
@@ -2108,7 +2146,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         return;
 
     Qn::NodeType nodeType = parameters.hasArgument(Qn::NodeTypeRole)
-            ? static_cast<Qn::NodeType>(parameters.argument(Qn::NodeTypeRole).toInt())
+            ? parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>()
             : Qn::ResourceNode;
 
     QnVirtualCameraResourcePtr camera;
@@ -2150,10 +2188,19 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
             cam->setGroupName(name);
             modified << cam;
         }
-        connection()->saveAsync(modified, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+        connection2()->getCameraManager()->save(modified, this, 
+            [this, modified]( int reqID, ec2::ErrorCode errorCode ) {
+                at_resources_saved( reqID, errorCode, modified );
+            } );
+
+
+
     } else {
         resource->setName(name);
-        connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+        connection2()->getResourceManager()->save( resource, this,
+            [this, resource]( int reqID, ec2::ErrorCode errorCode ) {
+                at_resources_saved( reqID, errorCode, QnResourceList() << resource );
+            });
     }
 }
 
@@ -2197,7 +2244,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             }
         }
 
-        connection()->deleteAsync(resource, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
+        connection2()->getResourceManager()->remove( resource->getId(), this, &QnWorkbenchActionHandler::at_resource_deleted );
     }
 }
 
@@ -2216,14 +2263,19 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
         return;
 
     dialog->submitToResource();
-    user->setGuid(QUuid::createUuid().toString());
+    user->setId(QUuid::createUuid());
+    user->setTypeByName(lit("User"));
 
-    connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+    connection2()->getUserManager()->save(
+        user, this,
+        [this, user]( int reqID, ec2::ErrorCode errorCode ) {
+            at_resources_saved( reqID, errorCode, QnResourceList() << user );
+        } );
     user->setPassword(QString()); // forget the password now
 }
 
 void QnWorkbenchActionHandler::at_exitAction_triggered() {
-    if(context()->user()) { // TODO: #Elric factor out
+    if(context()->user() && !qnSettings->isVideoWallMode()) { // TODO: #Elric factor out
         QnWorkbenchState state;
         workbench()->submit(state);
 
@@ -2329,7 +2381,11 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     if(permissions & Qn::SavePermission) {
         dialog->submitToResource();
 
-        connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+        connection2()->getUserManager()->save(
+            user, this, 
+            [this, &user]( int reqID, ec2::ErrorCode errorCode ) { //TODO: #GDM fix all QnResourcePtr lambda captures to &
+                at_resources_saved( reqID, errorCode, QnResourceList() << user );
+            } );
 
         QString newPassword = user->getPassword();
         user->setPassword(QString());
@@ -2553,36 +2609,44 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
     layout->setBackgroundSize(QSize(w, h));
 }
 
-void QnWorkbenchActionHandler::at_resources_saved(int status, const QnResourceList &resources, int handle) {
+void QnWorkbenchActionHandler::at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources ) {
     Q_UNUSED(handle);
 
-    if(status == 0)
+    if( errorCode == ec2::ErrorCode::ok )
         return;
 
-    if (resources.isEmpty())
-        return;
-
-    QnResourceListDialog::exec(
-                mainWindow(),
-                resources,
-                tr("Error"),
-                tr("Could not save the following %n items to Enterprise Controller.", "", resources.size()),
-                QDialogButtonBox::Ok
-                );
-
+    if (!resources.isEmpty()) {
+        QnResourceListDialog::exec(
+            mainWindow(),
+            resources,
+            tr("Error"),
+            tr("Could not save the following %n items to Enterprise Controller.", "", resources.size()),
+            QDialogButtonBox::Ok
+        );
+    } else { // Note that we may get reply of size 0 if EC is down.
+        QMessageBox::warning(
+                    mainWindow(),
+                    tr("Changes are not applied"),
+                    tr("Could not save changes to Enterprise Controller."));
+    }
 }
 
-void QnWorkbenchActionHandler::at_resource_deleted(const QnHTTPRawResponse& response, int handle) {
+void QnWorkbenchActionHandler::at_resources_properties_saved( int /*handle*/, ec2::ErrorCode /*errorCode */)
+{
+    //TODO/IMPL
+}
+
+void QnWorkbenchActionHandler::at_resource_deleted( int handle, ec2::ErrorCode errorCode ) {
     Q_UNUSED(handle);
 
-    if(response.status == 0)
+    if( errorCode == ec2::ErrorCode::ok )
         return;
 
-    QMessageBox::critical(mainWindow(), tr("Could not delete resource"), tr("An error has occurred while trying to delete a resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(response.errorString.data())));
+    QMessageBox::critical(mainWindow(), tr("Could not delete resource"), tr("An error has occurred while trying to delete a resource from Enterprise Controller. \n\nError description: '%2'").arg(ec2::toString(errorCode)));
 }
 
-void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {
-    if(status == 0 || resources.isEmpty())
+void QnWorkbenchActionHandler::at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {
+    if(errorCode == ec2::ErrorCode::ok || resources.isEmpty())
         return;
 
     QnResourceListDialog::exec(
@@ -2625,13 +2689,16 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
 
     foreach(QnMediaServerResourcePtr resource, resources)
     {
-        bool isPanicMode = resource->getPanicMode() != QnMediaServerResource::PM_None;
+        bool isPanicMode = resource->getPanicMode() != Qn::PM_None;
         if(isPanicMode != checked) {
-            QnMediaServerResource::PanicMode val = QnMediaServerResource::PM_None;
+            Qn::PanicMode val = Qn::PM_None;
             if (checked)
-                val = QnMediaServerResource::PM_User;
+                val = Qn::PM_User;
             resource->setPanicMode(val);
-            connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QnResourceList &, int)));
+            connection2()->getMediaServerManager()->save( resource, this,
+                [this, resource]( int reqID, ec2::ErrorCode errorCode ) {
+                    at_resources_saved( reqID, errorCode, QnResourceList() << resource );
+                });
         }
     }
 }

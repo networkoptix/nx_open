@@ -38,9 +38,10 @@ public:
      * see: BusinessActionType::requiresCameraResource()
      * see: BusinessActionType::requiresUserResource()
      */
-    void setResources(const QnResourceList& resources);
+    void setResources(const QVector<QnId>& resources);
 
-    const QnResourceList& getResources() const;
+    const QVector<QnId>& getResources() const;
+    QnResourceList getResourceObjects() const;
 
     void setParams(const QnBusinessActionParameters& params);
     const QnBusinessActionParameters& getParams() const;
@@ -72,7 +73,7 @@ protected:
     BusinessActionType::Value m_actionType;
     Qn::ToggleState m_toggleState;
     bool m_receivedFromRemoteHost;
-    QnResourceList m_resources;
+    QVector<QnId> m_resources;
     QnBusinessActionParameters m_params;
     QnBusinessEventParameters m_runtimeParams;
     QnId m_businessRuleId; // business rule that generated this action

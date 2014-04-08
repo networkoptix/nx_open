@@ -44,7 +44,7 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     m_cameraControlDisabled = !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
 
-    connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
+    connect(this, &QnResource::disabledChanged, this, &QnSecurityCamResource::at_disabledChanged, Qt::DirectConnection);
 
     QnMediaResource::initMediaResource();
 
@@ -232,21 +232,21 @@ bool QnSecurityCamResource::hasDualStreaming() const {
     QVariant val;
     if (!getParam(lit("hasDualStreaming"), val, QnDomainMemory))
         return false;
-    return val.toInt();
+    return val.toBool();
 }
 
 bool QnSecurityCamResource::isDtsBased() const {
     QVariant val;
     if (!getParam(lit("dts"), val, QnDomainMemory))
         return false;
-    return val.toInt();
+    return val.toBool();
 }
 
 bool QnSecurityCamResource::isAnalog() const {
     QVariant val;
     if (!getParam(lit("analog"), val, QnDomainMemory))
         return false;
-    return val.toInt();
+    return val.toBool();
 }
 
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {
@@ -260,6 +260,18 @@ Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
     if (sval == lit("noSharing"))
         return Qn::noSharing;
     return Qn::sharePixels;
+}
+
+void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value) 
+{
+    QString strVal;
+    if (value == Qn::shareFps)
+        strVal = lit("shareFps");
+    else if (value == Qn::noSharing)
+        strVal = lit("noSharing");
+    else
+        strVal = lit("sharePixels");
+    setParam(lit("streamFpsSharing"), strVal, QnDomainDatabase);
 }
 
 QStringList QnSecurityCamResource::getRelayOutputList() const {
@@ -333,7 +345,7 @@ bool QnSecurityCamResource::isAudioSupported() const {
     QVariant val;
     if (!getParam(lit("isAudioSupported"), val, QnDomainMemory))
         return false;
-    return val.toUInt() > 0;
+    return val.toBool();
 }
 
 Qn::MotionType QnSecurityCamResource::getCameraBasedMotionType() const {

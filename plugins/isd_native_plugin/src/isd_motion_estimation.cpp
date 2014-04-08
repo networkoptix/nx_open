@@ -38,20 +38,22 @@ static const int MIN_SQUARE_BY_SENS[10] =
     sensitivityToMask[9]*1, // max sens: 9
 };
 
-ISDMotionEstimation::ISDMotionEstimation():
-    m_resultMotion(0),
-    m_scaledMask(0),
-    m_filteredFrame(0),
-    m_linkedNums(0),
-    m_motionSensScaledMask(0),
-    m_totalFrames(1),
-    m_motionMask(0),
-    m_motionSensMask(0),
 
-    m_lastImgWidth(0),
-    m_lastImgHeight(0),
+ISDMotionEstimation::ISDMotionEstimation():
+    m_resultMotion(nullptr),
+    m_scaledMask(nullptr),
+    m_frameDeltaBuffer(nullptr),
+    m_filteredFrame(nullptr),
+    m_linkedNums(nullptr),
+    m_motionSensScaledMask(nullptr),
+    m_totalFrames(1),
+    m_motionMask(nullptr),
+    m_motionSensMask(nullptr),
+
     m_scaleXStep(0),
     m_scaleYStep(0),
+    m_lastImgWidth(0),
+    m_lastImgHeight(0),
     m_isNewMask(false)
 {
     m_frameDeltaBuffer = 0;

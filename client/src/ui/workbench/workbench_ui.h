@@ -2,6 +2,7 @@
 #define QN_WORKBENCH_UI_H
 
 #include <QtCore/QObject>
+#include <QtCore/QTimer>
 
 #include <utils/common/disconnective.h>
 
@@ -29,6 +30,7 @@ class HoverFocusProcessor;
 class QnNavigationItem;
 class QnResourceBrowserWidget;
 class QnProxyLabel;
+class QnDebugProxyLabel;
 
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
@@ -145,6 +147,7 @@ public slots:
 
     void setTreeVisible(bool visible = true, bool animate = true);
     void setSliderVisible(bool visible = true, bool animate = true);
+    void setSliderHidden();
     void setTitleVisible(bool visible = true, bool animate = true);
     void setNotificationsVisible(bool visible = true, bool animate = true);
     void setCalendarVisible(bool visible = true, bool animate = true);
@@ -342,6 +345,7 @@ private:
     bool m_inactive;
 
     QnProxyLabel *m_fpsItem;
+    QnDebugProxyLabel* m_debugOverlayLabel;
 
     /* In freespace mode? */
     bool m_inFreespace;
@@ -375,6 +379,8 @@ private:
     QnImageButtonWidget *m_sliderShowButton;
 
     AnimatorGroup *m_sliderOpacityAnimatorGroup;
+
+    QTimer* m_sliderAutoHideTimer;
 
     qreal m_lastThumbnailsHeight;
 

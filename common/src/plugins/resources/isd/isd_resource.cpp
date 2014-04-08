@@ -6,7 +6,7 @@
 #include "isd_resource.h"
 
 
-const char* QnPlIsdResource::MANUFACTURE = "ISD";
+const QString QnPlIsdResource::MANUFACTURE(lit("ISD"));
 QString QnPlIsdResource::MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 
 static QStringList getValues(const QString& line)
@@ -44,7 +44,7 @@ bool QnPlIsdResource::isResourceAccessible()
 
 QString QnPlIsdResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)

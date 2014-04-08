@@ -44,10 +44,10 @@ public:
     ~CLSimpleHTTPClient();
 
     CLHttpStatus doGET(const QString& request, bool recursive = true);
-    CLHttpStatus doPOST(const QString& request, const QString& body);
+    CLHttpStatus doPOST(const QString& request, const QString& body, bool recursive = true);
 
     CLHttpStatus doGET(const QByteArray& request, bool recursive = true);
-    CLHttpStatus doPOST(const QByteArray& request, const QString& body);
+    CLHttpStatus doPOST(const QByteArray& request, const QString& body, bool recursive = true);
 
     void addHeader(const QByteArray& key, const QByteArray& value);
 
@@ -91,7 +91,7 @@ private:
     void getAuthInfo();
 
     QByteArray basicAuth() const;
-    QString digestAccess(const QString&) const;
+    QString digestAccess(const QString& method, const QString& url) const;
 
     int readHeaders();
     void addExtraHeaders(QByteArray& request);

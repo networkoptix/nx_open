@@ -49,8 +49,14 @@ Q_DECLARE_METATYPE(QnBusiness::EventReason)
 
 namespace BusinessEventType {
     enum Value {
+        /** Event type is not defined. Used in rules. */
+        NotDefined,
+
         /** Motion has occured on a camera. */
         Camera_Motion,
+
+        /** Camera input signal is received. */
+        Camera_Input,
 
         /** Camera was disconnected. */
         Camera_Disconnect,
@@ -64,9 +70,6 @@ namespace BusinessEventType {
         /** Found some cameras with same IP address. */
         Camera_Ip_Conflict,
 
-        /** Camera input signal is received. */
-        Camera_Input,
-
         /** Connection to mediaserver lost. */
         MediaServer_Failure,
 
@@ -76,14 +79,11 @@ namespace BusinessEventType {
         /** Media server started */
         MediaServer_Started,
 
-        /** Event type is not defined. Used in rules. */
-        NotDefined,
-
         /**
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        Count = NotDefined,
+        Count,
 
         /** System health message. */
         SystemHealthMessage = 500,
@@ -100,16 +100,7 @@ namespace BusinessEventType {
 
 namespace BusinessActionType {
     enum Value {
-        CameraRecording,    // start camera recording
-        PanicRecording,     // activate panic recording mode
-        // these actions can be executed from any endpoint. actually these actions call specified function at ec
-        /*!
-            parameters:\n
-                - emailAddress (string, required)
-        */
-        SendMail,
-
-        ShowPopup,
+        NotDefined,
 
         //!change camera output state
         /*!
@@ -118,6 +109,26 @@ namespace BusinessActionType {
                 - relayAutoResetTimeout (uint, optional)    - timeout (in milliseconds) to reset camera state back
         */
         CameraOutput,
+
+        Bookmark,           // mark part of camera archive as undeleted
+
+        CameraRecording,    // start camera recording
+
+        PanicRecording,     // activate panic recording mode
+        // these actions can be executed from any endpoint. actually these actions call specified function at ec
+        /*!
+            parameters:\n
+                - emailAddress (string, required)
+        */
+        SendMail,
+
+        /**
+         *  Write a record to the server's log
+         */
+        Diagnostics,
+
+        ShowPopup,
+
         CameraOutputInstant,
 
         /*!
@@ -125,7 +136,6 @@ namespace BusinessActionType {
                 - soundUrl (string, required)               - url of sound, contains path to sound on the EC
         */
         PlaySound,
-        PlaySoundRepeated,
 
         /*!
             parameters:\n
@@ -133,22 +143,20 @@ namespace BusinessActionType {
         */
         SayText,
 
-        /**
-         *  Write a record to the server's log
-         */
-        Diagnostics,
+        PlaySoundRepeated,
 
-        Bookmark,           // mark part of camera archive as undeleted
+
 
         // media server based actions
-        NotDefined,
 
         /**
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        Count = Bookmark
+        Count
     };
+
+    bool isNotImplemented(Value value);
 }
 
 #endif // QN_BUSINESS_FWD_H

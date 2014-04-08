@@ -31,6 +31,8 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnB
                                                                        const QnAbstractBusinessEventPtr &event,
                                                                        const QnBusinessAggregationInfo &aggregationInfo) {
     QnAbstractBusinessActionPtr result = instantiateAction(rule, event);
+    if (!result)
+        return result;
     result->setAggregationCount(aggregationInfo.totalCount());
 
     if (QnSendMailBusinessActionPtr sendMailAction = result.dynamicCast<QnSendMailBusinessAction>()) {
