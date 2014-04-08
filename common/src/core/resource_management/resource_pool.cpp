@@ -146,7 +146,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
         if (!resource->hasFlags(QnResource::foreigner))
         {
-            if (resource->getStatus() != QnResource::Offline && !resource->isDisabled())
+            if (resource->getStatus() != QnResource::Offline)
                 resource->init();
         }
 
@@ -294,18 +294,16 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
     return QnNetworkResourcePtr(0);
 }
 
-QnResourceList QnResourcePool::getAllEnabledCameras(const QnResourcePtr &mServer, Filter searchFilter) const {
+QnResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer) const 
+{
     QnId parentId = mServer ? mServer->getId() : QnId();
     QnResourceList result;
     QMutexLocker locker(&m_resourcesMtx);
-    foreach (const QnResourcePtr &resource, m_resources) {
+    foreach (const QnResourcePtr &resource, m_resources) 
+    {
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
-        if (camResource != 0 && !camResource->isDisabled() && 
-            ( !camResource->hasFlags(QnResource::foreigner) || searchFilter == AllResources))
-        {
-            if (parentId.isNull() || camResource->getParentId() == parentId)
+        if (camResource && (parentId.isNull() || camResource->getParentId() == parentId))
             result << camResource;
-        }
     }
 
     return result;
@@ -368,25 +366,6 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QStri
     }
 
     return result;
-}
-
-QnNetworkResourcePtr QnResourcePool::getEnabledResourceByPhysicalId(const QString &physicalId) const {
-    foreach(const QnNetworkResourcePtr &resource, getAllNetResourceByPhysicalId(physicalId))
-        if(!resource->isDisabled())
-            return resource;
-    return QnNetworkResourcePtr();
-}
-
-QnResourcePtr QnResourcePool::getEnabledResourceByUniqueId(const QString &uniqueId) const {
-    QnResourcePtr resource = getResourceByUniqId(uniqueId);
-    if(!resource || !resource->isDisabled())
-        return resource;
-
-    QnNetworkResourcePtr networkResource = resource.dynamicCast<QnNetworkResource>();
-    if(!networkResource)
-        return QnResourcePtr();
-
-    return getEnabledResourceByPhysicalId(networkResource->getPhysicalId());
 }
 
 QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const
@@ -488,7 +467,7 @@ int QnResourcePool::activeCamerasByClass(bool analog) const
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera || camera->isDisabled() || camera->isScheduleDisabled() || camera->isAnalog() != analog)
+        if (!camera || camera->hasFlags(QnResource::foreigner) || camera->isScheduleDisabled() || camera->isAnalog() != analog)
             continue;
         count++;
     }

@@ -80,7 +80,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         QnResourcePtr rpResource = qnResPool->getResourceByUniqId((*it)->getUniqueId());
         QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
 
-        if (rpResource)
+        if (rpResource && !rpResource->hasFlags(QnResource::foreigner))
         {
             // if such res in ResourcePool
             QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
@@ -433,8 +433,7 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
         if (res->hasFlags(QnResource::server_live_cam)) // if this is camera from mediaserver on the client
             continue;
 
-        if( res->isDisabled() ||                        //camera is enabled on some other server
-            res->hasFlags(QnResource::foreigner) )      //this camera belongs to some other mediaserver
+        if( res->hasFlags(QnResource::foreigner) )      //this camera belongs to some other mediaserver
         {
             continue;
         }
@@ -495,7 +494,7 @@ void QnMServerResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res, 
         disconnect(rpNetRes.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)), this, SLOT(onInitAsyncFinished(QnResourcePtr, bool)));
         connect(rpNetRes.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)), this, SLOT(onInitAsyncFinished(QnResourcePtr, bool)));
 
-        if (!rpNetRes->isDisabled())
+        if (!rpNetRes->hasFlags(QnResource::foreigner))
         {
             if (rpNetRes->getStatus() == QnResource::Offline) 
             {

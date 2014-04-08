@@ -162,7 +162,7 @@ void QnServerMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool is
         res->setStatus(QnResource::Offline);
         if (isClient) {
             // This media server hasn't own DB
-            foreach(QnResourcePtr camera, qnResPool->getAllEnabledCameras(res, QnResourcePool::AllResources))
+            foreach(QnResourcePtr camera, qnResPool->getAllCameras(res))
                 camera->setStatus(QnResource::Offline);
         }
     }

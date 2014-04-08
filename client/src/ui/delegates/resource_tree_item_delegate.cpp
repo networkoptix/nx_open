@@ -79,17 +79,8 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
     decorationRect.moveLeft(decorationRect.left() - decorationRect.width());
     bool recording = false, scheduled = false;
     if(resource) {
-        if(!resource->isDisabled()) {
-            if(resource->getStatus() == QnResource::Recording && resource.dynamicCast<QnVirtualCameraResource>())
-                recording = true;
-        } else if(QnNetworkResourcePtr camera = resource.dynamicCast<QnNetworkResource>()) {
-            foreach(const QnNetworkResourcePtr &otherCamera, QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(camera)) {
-                if(!otherCamera->isDisabled() && otherCamera->getStatus() == QnResource::Recording) {
-                    recording = true;
-                    break;
-                }
-            }
-        }
+        if(resource->getStatus() == QnResource::Recording && resource.dynamicCast<QnVirtualCameraResource>())
+            recording = true;
 
         if(!recording)
             if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())

@@ -76,34 +76,6 @@ QString QnServerCamera::getUniqueIdForServer(const QnResourcePtr mServer) const
     return getPhysicalId() + mServer->getId().toString();
 }
 
-QnServerCameraPtr QnServerCamera::findEnabledSibling()
-{
-    if (!isDisabled())
-        return toSharedPointer().dynamicCast<QnServerCamera>();
-
-    {
-        QMutexLocker lock(&m_mutex);
-        if (m_activeCamera && !m_activeCamera->isDisabled())
-            return m_activeCamera;
-    }
-
-    QnNetworkResourceList resList = qnResPool->getAllNetResourceByPhysicalId(getPhysicalId());
-    foreach(const QnNetworkResourcePtr& netRes, resList)
-    {
-        if (!netRes->isDisabled()) {
-            QnServerCameraPtr cam = netRes.dynamicCast<QnServerCamera>();
-            if (cam) {
-                QMutexLocker lock(&m_mutex);
-                m_activeCamera = cam;
-                return m_activeCamera;
-            }
-        }
-    }
-
-    return QnServerCameraPtr();
-}
-
-
 // --------------------------- QnServerCameraFactory -----------------------------
 
 QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const QnResourceParams&)

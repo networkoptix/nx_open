@@ -204,7 +204,7 @@ signals:
         qint64 timestamp );
 
 protected slots:
-    virtual void at_disabledChanged();
+    virtual void at_parentIdChanged();
 
 protected:
     void updateInner(QnResourcePtr other) override;

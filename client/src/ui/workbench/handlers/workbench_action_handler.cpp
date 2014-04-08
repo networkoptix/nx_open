@@ -141,19 +141,16 @@ static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
 // -------------------------------------------------------------------------- //
 // QnResourceStatusReplyProcessor
 // -------------------------------------------------------------------------- //
-detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources, const QList<int> &oldDisabledFlags):
+detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources):
     m_handler(handler),
-    m_resources(resources),
-    m_oldDisabledFlags(oldDisabledFlags)
-{
-    assert(oldDisabledFlags.size() == resources.size());
-}
+    m_resources(resources)
+{}
 
 void detail::QnResourceStatusReplyProcessor::at_replyReceived( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources ) {
     Q_UNUSED(handle);
 
     if(m_handler)
-        m_handler.data()->at_resources_statusSaved(errorCode, resources, m_oldDisabledFlags);
+        m_handler.data()->at_resources_statusSaved(errorCode, resources);
 
     deleteLater();
 }
@@ -1045,49 +1042,23 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
     QnVirtualCameraResourceList serverCameras = resourcePool()->getResourcesWithParentId(server->getId()).filtered<QnVirtualCameraResource>();
 
     QnVirtualCameraResourceList modifiedResources;
-    QnResourceList errorResources;
-    QList<int> oldDisabledFlags;
+    QnResourceList errorResources; // TODO: #Elric check server cameras
+
+    // TODO: #Elric implement proper rollback in case of an error
 
     foreach(const QnResourcePtr &resource, resources) {
         if(resource->getParentId() == server->getId())
             continue; /* Moving resource into its owner does nothing. */
 
-        QnVirtualCameraResourcePtr sourceCamera = resource.dynamicCast<QnVirtualCameraResource>();
-        if(!sourceCamera)
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if(!camera)
             continue;
 
-        QString physicalId = sourceCamera->getPhysicalId();
+        camera->setParentId(server->getId());
+        modifiedResources.push_back(camera);
 
-        QnVirtualCameraResourcePtr replacedCamera;
-        foreach(const QnVirtualCameraResourcePtr &otherCamera, serverCameras) {
-            if(otherCamera->getPhysicalId() == physicalId) {
-                replacedCamera = otherCamera;
-                break;
-            }
-        }
-
-        if(replacedCamera) {
-            oldDisabledFlags.push_back(replacedCamera->isDisabled());
-            replacedCamera->setScheduleDisabled(sourceCamera->isScheduleDisabled());
-            replacedCamera->setScheduleTasks(sourceCamera->getScheduleTasks());
-            replacedCamera->setAuth(sourceCamera->getAuth());
-            replacedCamera->setAudioEnabled(sourceCamera->isAudioEnabled());
-            replacedCamera->setMotionRegionList(sourceCamera->getMotionRegionList(), QnDomainMemory);
-            replacedCamera->setName(sourceCamera->getName());
-            replacedCamera->setDisabled(false);
-
-            oldDisabledFlags.push_back(sourceCamera->isDisabled());
-            sourceCamera->setDisabled(true);
-
-            modifiedResources.push_back(sourceCamera);
-            modifiedResources.push_back(replacedCamera);
-
-            QnResourcePtr newServer = resourcePool()->getResourceById(sourceCamera->getParentId());
-            if (newServer->getStatus() == QnResource::Offline)
-                sourceCamera->setStatus(QnResource::Offline);
-        } else {
-            errorResources.push_back(resource);
-        }
+        if (server->getStatus() == QnResource::Offline)
+            camera->setStatus(QnResource::Offline);
     }
 
     if(!errorResources.empty()) {
@@ -1096,17 +1067,20 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
             errorResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Camera(s) cannot be moved to server '%1'. It might have been offline since the server is up.").arg(server->getName()),
+            tr("Camera(s) cannot be moved to server '%1'. It might have been offline since the server is up.").arg(server->getName()), // TODO: #Elric need saner error message
             QDialogButtonBox::Ok
         );
     }
 
     if(!modifiedResources.empty()) {
-        detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources, oldDisabledFlags);
-        connection2()->getCameraManager()->save( modifiedResources, processor,
-            [processor, modifiedResources]( int reqID, ec2::ErrorCode errorCode ) {
-                processor->at_replyReceived( reqID, errorCode, modifiedResources );
-            });
+        detail::QnResourceStatusReplyProcessor *processor = new detail::QnResourceStatusReplyProcessor(this, modifiedResources);
+        connection2()->getCameraManager()->save(
+            modifiedResources, 
+            processor,
+            [processor, modifiedResources](int reqID, ec2::ErrorCode errorCode) {
+                processor->at_replyReceived(reqID, errorCode, modifiedResources);
+            }
+        );
     }
 }
 
@@ -2638,7 +2612,7 @@ void QnWorkbenchActionHandler::at_resource_deleted( int handle, ec2::ErrorCode e
     QMessageBox::critical(mainWindow(), tr("Could not delete resource"), tr("An error has occurred while trying to delete a resource from Enterprise Controller. \n\nError description: '%2'").arg(ec2::toString(errorCode)));
 }
 
-void QnWorkbenchActionHandler::at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {
+void QnWorkbenchActionHandler::at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources) {
     if(errorCode == ec2::ErrorCode::ok || resources.isEmpty())
         return;
 
@@ -2649,9 +2623,6 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(ec2::ErrorCode errorCode
         tr("Could not save changes made to the following %n resource(s).", "", resources.size()),
         QDialogButtonBox::Ok
     );
-
-    for(int i = 0; i < resources.size(); i++)
-        resources[i]->setDisabled(oldDisabledFlags[i]);
 }
 
 void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {

@@ -826,7 +826,8 @@ void QnMain::at_connectionOpened()
 void QnMain::at_timer()
 {
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
-    foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras()) 
+    QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
+    foreach(QnResourcePtr res, qnResPool->getAllCameras(mServer)) 
     {
         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
         if (cam)

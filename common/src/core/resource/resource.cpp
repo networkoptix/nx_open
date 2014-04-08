@@ -34,7 +34,6 @@ QnResource::QnResource():
     m_initMutex(QMutex::Recursive),
     m_resourcePool(NULL),
     m_flags(0),
-    m_disabled(false),
     m_status(Offline),
     m_initialized(false),
     m_lastInitTime(0),
@@ -112,7 +111,6 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
 
     silenceMode |= other->hasFlags(QnResource::foreigner);
     setStatus(other->m_status, silenceMode);
-    setDisabled(other->m_disabled);
     emit resourceChanged(toSharedPointer(this));
 
     QnParamList paramList = other->getResourceParamList();
@@ -136,12 +134,25 @@ QnId QnResource::getParentId() const
 
 void QnResource::setParentId(QnId parent)
 {
+    bool initializedChanged = false;
+    QnId oldParentId;
     {
         QMutexLocker locker(&m_mutex);
+        if (m_parentId == parent)
+            return;
+        oldParentId = m_parentId;
         m_parentId = parent;
+        if (m_initialized) {
+            m_initialized = false;
+            initializedChanged = true;
+        }
     }
     
-    emit parentIdChanged(toSharedPointer(this));
+    if (!oldParentId.isNull())
+        emit parentIdChanged(toSharedPointer(this));
+
+    if (initializedChanged)
+        emit this->initializedChanged(toSharedPointer(this));
 }
 
 
@@ -534,7 +545,7 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
         }
     }
 
-    if (oldStatus == Offline && newStatus == Online && !m_disabled && !hasFlags(foreigner))
+    if (oldStatus == Offline && newStatus == Online && !hasFlags(foreigner))
         init();
 
 
@@ -774,42 +785,6 @@ void QnResource::addCommandToProc(QnAbstractDataPacketPtr data)
 int QnResource::commandProcQueueSize()
 {
     return QnResourceCommandProcessor_instance()->queueSize();
-}
-
-bool QnResource::isDisabled() const
-{
-    //QMutexLocker mutexLocker(&m_mutex);
-
-    return m_disabled;
-}
-
-void QnResource::setDisabled(bool disabled)
-{
-    if (m_disabled == disabled)
-        return;
-
-    bool disabledChanged = false;
-    bool initializedChanged = false;
-
-    {
-        QMutexLocker mutexLocker(&m_mutex);
-
-        if(m_disabled != disabled) {
-            m_disabled = disabled;
-            disabledChanged = true;
-        }
-
-        if(m_initialized) {
-            m_initialized = false;
-            initializedChanged = true;
-        }
-    }
-
-    if (disabledChanged)
-        emit this->disabledChanged(toSharedPointer(this));
-
-    if (initializedChanged)
-        emit this->initializedChanged(toSharedPointer(this));
 }
 
 bool QnResource::init()

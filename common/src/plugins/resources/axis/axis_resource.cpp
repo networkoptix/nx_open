@@ -65,8 +65,7 @@ void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 
 bool QnPlAxisResource::startInputPortMonitoring()
 {
-    if( isDisabled()
-        || hasFlags(QnResource::foreigner)      //we do not own camera
+    if( hasFlags(QnResource::foreigner)      //we do not own camera
         || m_inputPortNameToIndex.empty() )
     {
         return false;

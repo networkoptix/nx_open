@@ -79,10 +79,8 @@ public:
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
-    QnNetworkResourcePtr getEnabledResourceByPhysicalId(const QString &mac) const;
-    QnResourceList getAllEnabledCameras(const QnResourcePtr &mServer = QnResourcePtr(), Filter searchFilter = OnlyFriends) const;
+    QnResourceList getAllCameras(const QnResourcePtr &mServer) const;
     QnResourceList getResourcesByParentId(const QnId& parentId) const;
-    QnResourcePtr getEnabledResourceByUniqueId(const QString &uniqueId) const;
 
     // returns list of resources with such flag
     QnResourceList getResourcesWithFlag(QnResource::Flag flag) const;

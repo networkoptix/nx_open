@@ -29,7 +29,6 @@ public:
 
     QString getUniqueIdForServer(const QnResourcePtr mServer) const;
 
-    QnServerCameraPtr findEnabledSibling();
     virtual Status getStatus() const override;
 
     void setTmpStatus(Status value);

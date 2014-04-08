@@ -857,8 +857,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         adjustGeometryLater(item, animate); /* Changing item flags here may confuse the callee, so we do it through the event loop. */
 
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
-    if(widgets(widget->resource()).size() == 1)
-        connect(widget->resource(),     SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_resource_disabledChanged(const QnResourcePtr &)), Qt::QueuedConnection);
 
     QColor frameColor = item->data(Qn::ItemFrameDistinctionColorRole).value<QColor>();
     if(frameColor.isValid())
@@ -912,8 +910,6 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     removeZoomLinksInternal(item);
 
     disconnect(widget, NULL, this, NULL);
-    if(widgets(widget->resource()).size() == 1)
-        disconnect(widget->resource(), NULL, this, NULL);
 
     for(int i = 0; i <= Qn::ItemRoleCount; i++)
         if(widget == m_widgetByRole[i])
@@ -1874,20 +1870,6 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
             if(!(permissions & Qn::ReadPermission))
                 workbench()->removeLayout(layout);
         }
-    }
-}
-
-void QnWorkbenchDisplay::at_resource_disabledChanged(const QnResourcePtr &resource) {
-    QnResourcePtr enabledResource = resourcePool()->getEnabledResourceByUniqueId(resource->getUniqueId());
-    if(!enabledResource || enabledResource == resource)
-        return;
-
-    foreach(QnResourceWidget *widget, widgets(resource)) {
-        QnWorkbenchItem *item = widget->item();
-
-        removeItemInternal(item, true, false);
-        addItemInternal(item, false);
-        addZoomLinkInternal(item, item->zoomTargetItem());
     }
 }
 

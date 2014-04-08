@@ -147,8 +147,7 @@ bool QnPlSonyResource::startInputPortMonitoring()
 {
     QMutexLocker lk( &m_inputPortMutex );
 
-    if( isDisabled()
-        || hasFlags(QnResource::foreigner) )     //we do not own camera
+    if( hasFlags(QnResource::foreigner) )     //we do not own camera
     {
         return false;
     }
