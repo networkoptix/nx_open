@@ -88,7 +88,7 @@ void QnCalendarWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd)
 
     qint64 dayWindowStart = QDateTime(QDateTime::fromMSecsSinceEpoch(windowStart).date(), QTime()).toMSecsSinceEpoch();
     qint64 dayWindowEnd = QDateTime(QDateTime::fromMSecsSinceEpoch(windowEnd + DAY - 1).date(), QTime()).toMSecsSinceEpoch();
-    QnTimePeriod dayWindow = QnTimePeriod(dayWindowStart, dayWindowEnd - dayWindowStart);
+    QnTimePeriod dayWindow = QnTimePeriod(dayWindowStart - m_localOffset, dayWindowEnd - dayWindowStart);
     if(m_selectedDaysPeriod == dayWindow)
         return;
 

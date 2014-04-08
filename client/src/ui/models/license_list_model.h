@@ -3,11 +3,16 @@
 
 #include <QtGui/QStandardItemModel>
 
+#include <client/client_color_types.h>
+
 #include <licensing/license.h> // TODO: #Elric use fwd
 
-class QnLicenseListModel: public QStandardItemModel {
+#include <ui/customization/customized.h>
+
+class QnLicenseListModel: public Customized<QStandardItemModel> {
     Q_OBJECT
-    typedef QStandardItemModel base_type;
+    Q_PROPERTY(QnLicensesListModelColors colors READ colors WRITE setColors)
+    typedef Customized<QStandardItemModel> base_type;
 
 public:
     enum Column {
@@ -30,13 +35,16 @@ public:
 
     QnLicensePtr license(const QModelIndex &index) const;
 
+    const QnLicensesListModelColors colors() const;
+    void setColors(const QnLicensesListModelColors &colors);
 private:
     void rebuild();
 
     static QString columnTitle(Column column);
-    static QStandardItem *createItem(Column column, const QnLicensePtr &license);
+    static QStandardItem *createItem(Column column, const QnLicensePtr &license, const QnLicensesListModelColors &colors);
 
 private:
+    QnLicensesListModelColors m_colors;
     QList<Column> m_columns;
     QList<QnLicensePtr> m_licenses;
 };

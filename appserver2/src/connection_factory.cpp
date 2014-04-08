@@ -132,6 +132,12 @@ namespace ec2
         //AbstractUserManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeUser );
 
+        //AbstractVideowallManager::getVideowalls
+        registerGetFuncHandler<nullptr_t, ApiVideowallDataList>( restProcessorPool, ApiCommand::getVideowallList );
+        //AbstractVideowallManager::save
+        registerUpdateFuncHandler<ApiVideowallData>( restProcessorPool, ApiCommand::saveVideowall );
+        //AbstractVideowallManager::remove
+        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeVideowall );
 
         //AbstractLayoutManager::getLayouts
         registerGetFuncHandler<nullptr_t, ApiLayoutDataList>( restProcessorPool, ApiCommand::getLayoutList );

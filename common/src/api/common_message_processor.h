@@ -21,7 +21,7 @@ public:
 
     virtual void init(ec2::AbstractECConnectionPtr connection);
 
-    virtual void updateResource(QnResourcePtr resource) = 0;
+    virtual void updateResource(const QnResourcePtr &resource) = 0;
 
 signals:
     void connectionOpened();
@@ -33,54 +33,39 @@ signals:
     void fileRemoved(const QString &filename);
 
     void businessRuleChanged(const QnBusinessEventRulePtr &rule);
-    void businessRuleDeleted(QnId id);
-    void businessRuleReset(QnBusinessEventRuleList rules);
+    void businessRuleDeleted(const QnId &id);
+    void businessRuleReset(const QnBusinessEventRuleList &rules);
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
-    virtual void onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status) = 0;
+    virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) = 0;
     
-    virtual void afterRemovingResource(const QnId& id);
+    virtual void afterRemovingResource(const QnId &id);
 
-    void updateHardwareIds(const ec2::QnFullResourceData& fullData);
-    virtual void processResources(const QnResourceList& resources);
-    void processLicenses(const QnLicenseList& licenses);
-    void processCameraServerItems(const QnCameraHistoryList& cameraHistoryList);
+    void updateHardwareIds(const ec2::QnFullResourceData &fullData);
+    virtual void processResources(const QnResourceList &resources);
+    void processLicenses(const QnLicenseList &licenses);
+    void processCameraServerItems(const QnCameraHistoryList &cameraHistoryList);
 public slots:
-    void on_businessEventAddedOrUpdated( QnBusinessEventRulePtr camera );
+    void on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &rule);
 private slots:
-    void on_gotInitialNotification( ec2::QnFullResourceData fullData );
-    void on_runtimeInfoChanged( const ec2::QnRuntimeInfo& runtimeInfo );
+    void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
+    void on_runtimeInfoChanged(const ec2::QnRuntimeInfo &runtimeInfo);
 
-    void on_resourceStatusChanged( const QnId& resourceId, QnResource::Status status );
-    void on_resourceDisabledChanged( const QnId& resourceId, bool disabled );
-    void on_resourceChanged( QnResourcePtr resource );
-    void on_resourceParamsChanged( const QnId& resourceId, const QnKvPairList& kvPairs );
-    void on_resourceRemoved( const QnId& resourceId );
+    void on_resourceStatusChanged(const QnId &resourceId, QnResource::Status status );
+    void on_resourceDisabledChanged(const QnId &resourceId, bool disabled );
+    void on_resourceParamsChanged(const QnId& resourceId, const QnKvPairList& kvPairs );
+    void on_resourceRemoved(const QnId& resourceId );
 
-    void on_mediaServerAddedOrUpdated( QnMediaServerResourcePtr camera );
-    void on_mediaServerRemoved( QnId id );
+    void on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory);
 
-    void on_cameraAddedOrUpdated( QnVirtualCameraResourcePtr camera );
-    void on_cameraHistoryChanged( QnCameraHistoryItemPtr cameraHistory );
-    void on_cameraRemoved( QnId id );
+    void on_licenseChanged(const QnLicensePtr &license);
 
-    void on_licenseChanged(QnLicensePtr license);
+    void on_businessEventRemoved(const QnId &id);
+    void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);
+    void on_businessRuleReset(const QnBusinessEventRuleList &rules);
+    void on_broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
 
-    void on_businessEventRemoved( QnId id );
-    void on_businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
-    void on_businessRuleReset( const QnBusinessEventRuleList& rules );
-    void on_broadcastBusinessAction( const QnAbstractBusinessActionPtr& action );
-
-    void on_userAddedOrUpdated( QnUserResourcePtr camera );
-    void on_userRemoved( QnId id );
-
-    void on_layoutAddedOrUpdated( QnLayoutResourcePtr camera );
-    void on_layoutRemoved( QnId id );
-
-    void on_storedFileAdded( QString filename );
-    void on_storedFileUpdated( QString filename );
-    void on_storedFileRemoved( QString filename );
     void on_panicModeChanged(Qn::PanicMode mode);
 protected:
     ec2::AbstractECConnectionPtr m_connection;

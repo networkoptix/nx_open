@@ -21,14 +21,12 @@ void QnClientMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
 }
 
-void QnClientMessageProcessor::onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status)
-{
+void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
     resource->setStatus(status);
     checkForTmpStatus(resource);
 }
 
-void QnClientMessageProcessor::updateResource(QnResourcePtr resource)
-{
+void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
     QnResourcePtr ownResource;
 
     ownResource = qnResPool->getResourceById(resource->getId());
@@ -140,7 +138,8 @@ void QnClientMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool is
     if (m_opened) {
         m_opened = false;
         emit connectionClosed();
-        foreach(QnResourcePtr res, qnResPool->getAllResourceByTypeName(lit("Server")))
+        QString serverTypeName = lit("Server");
+        foreach(QnResourcePtr res, qnResPool->getAllResourceByTypeName(serverTypeName))
             res->setStatus(QnResource::Offline);
         foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras())
             res->setStatus(QnResource::Offline);

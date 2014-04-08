@@ -85,7 +85,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& businessRuleList);
 
         //getLayoutList
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
@@ -192,6 +192,7 @@ namespace ec2
         ErrorCode removeUser( const QnId& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
 
+        ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall( const QnId& guid );
         ErrorCode insertOrReplaceVideowall(const ApiVideowallData& data, qint32 internalId);
 

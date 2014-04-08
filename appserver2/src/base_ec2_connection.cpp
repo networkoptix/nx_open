@@ -26,6 +26,7 @@ namespace ec2
         m_userManager( new QnUserManager<T>(m_queryProcessor, resCtx) ),
         m_businessEventManager( new QnBusinessEventManager<T>(m_queryProcessor, resCtx) ),
         m_layoutManager( new QnLayoutManager<T>(m_queryProcessor, resCtx) ),
+        m_videowallManager( new QnVideowallManager<T>(m_queryProcessor, resCtx) ),
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) )
     {
         connect (QnTransactionMessageBus::instance(), SIGNAL(peerFound(QnId, bool, bool)), this, SIGNAL(remotePeerFound(QnId, bool, bool)), Qt::DirectConnection);

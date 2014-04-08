@@ -330,6 +330,14 @@
         }
     },
     
+    "QnLicenseListModel": {
+        "colors": {
+            "normal": "#f0f0f0",
+            "warning": "#ffff00",
+            "expired": "#ff0000"
+        }
+    },
+    
     "QnShadowItem": {
         "color": "#00000080"
     }
