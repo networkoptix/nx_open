@@ -25,7 +25,7 @@ public:
     void setId(const QnId& value) { m_id = value; }
     QnId getId() const { return m_id;}
 
-    void setParentId(QnId value) { m_parentId = value; }
+    void setParentId(const QnId &value);
     QnId getParentId() const { return m_parentId;}
 
     void setName(const QString& value) { m_name = value; }

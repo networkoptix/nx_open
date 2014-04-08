@@ -242,6 +242,9 @@ bool QnDbManager::createDatabase()
             return false;
         if (!execSQLFile(QLatin1String(":/update_2.2_stage2.sql")))
             return false;
+
+        if (!execSQLFile(QLatin1String(":/update_2.2_stage3.sql")))
+            return false;
     }
     lock.commit();
 #ifdef DB_DEBUG
@@ -864,6 +867,21 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLayoutDat
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowallData>& tran) {
+    ErrorCode result = saveVideowall(tran.params);
+    return result;
+}
+
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowallDataList>& tran) {
+    foreach(const ApiVideowallData& videowall, tran.params.data)
+    {
+        ErrorCode err = saveVideowall(videowall);
+        if (err != ErrorCode::ok)
+            return err;
+    }
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceParams>& tran)
 {
     qint32 internalId = getResourceInternalId(tran.params.id);
@@ -1446,6 +1464,24 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList
     return ErrorCode::ok;
 }
 
+//getVideowallList
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList) {
+    QSqlQuery query(m_sdb);
+    QString filter; // todo: add data filtering by user here
+    query.setForwardOnly(true);
+    query.prepare(QString("SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentGuid, r.name, r.url, r.status,r. disabled, \
+                          l.autorun, l.resource_ptr_id as id \
+                          FROM vms_videowall l \
+                          JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.id").arg(filter));
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
+
+    videowallList.loadFromQuery(query);
+    return ErrorCode::ok;
+}
+
 //getBusinessRules
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& businessRuleList)
 {
@@ -1531,6 +1567,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullData& data)
     if ((err = doQueryNoLock(dummy, data.layouts)) != ErrorCode::ok)
         return err;
 
+    if ((err = doQueryNoLock(dummy, data.videowalls)) != ErrorCode::ok)
+        return err;
+
     if ((err = doQueryNoLock(dummy, data.rules)) != ErrorCode::ok)
         return err;
 
@@ -1557,6 +1596,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullData& data)
     mergeObjectListData<ApiCameraData>(data.cameras.data,      kvPairs, &ApiCameraData::addParams,      &ApiResourceParamWithRef::resourceId);
     mergeObjectListData<ApiUserData>(data.users.data,          kvPairs, &ApiUserData::addParams,        &ApiResourceParamWithRef::resourceId);
     mergeObjectListData<ApiLayoutData>(data.layouts.data,      kvPairs, &ApiLayoutData::addParams,      &ApiResourceParamWithRef::resourceId);
+    mergeObjectListData<ApiVideowallData>(data.videowalls.data,kvPairs, &ApiVideowallData::addParams,   &ApiResourceParamWithRef::resourceId);
 
     //filling serverinfo
     fillServerInfo( &data.serverInfo );
@@ -1707,6 +1747,17 @@ void QnDbManager::fillServerInfo( ServerInfo* const serverInfo )
 {
     serverInfo->armBox = QLatin1String(QN_ARM_BOX);
     m_licenseManagerImpl->getHardwareId( serverInfo );
+}
+
+ErrorCode QnDbManager::saveVideowall(const ApiVideowallData& params) {
+    qint32 internalId;
+
+    ErrorCode result = insertOrReplaceResource(params, &internalId);
+    if (result != ErrorCode::ok)
+        return result;
+
+    result = insertOrReplaceVideowall(params, internalId);
+    return result;
 }
 
 ErrorCode QnDbManager::removeVideowall( const QnId& guid ) {

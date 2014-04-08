@@ -1221,8 +1221,12 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
     videoWall->setName(dialog->name());
     videoWall->setParentId(0);
 
-    // TODO: #GDM VW reimplement
-    // connection()->saveAsync(videoWall); //TODO: #GDM VW show message if not successfull
+    connection2()->getVideowallManager()->save(videoWall,  this, 
+        [this, videoWall]( int reqID, ec2::ErrorCode errorCode ) {
+            Q_UNUSED(reqID)
+            qDebug() << "videowall" << videoWall->getName() << "saved" << (int)errorCode;
+    } );
+    //TODO: #GDM VW show message if not successful
 }
 
 void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
