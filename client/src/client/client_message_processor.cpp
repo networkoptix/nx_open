@@ -140,7 +140,8 @@ void QnClientMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool is
     if (m_opened) {
         m_opened = false;
         emit connectionClosed();
-        foreach(QnResourcePtr res, qnResPool->getAllResourceByTypeName(QLatin1String("Server")))
+        QString serverTypeName = lit("Server");
+        foreach(QnResourcePtr res, qnResPool->getAllResourceByTypeName(serverTypeName))
             res->setStatus(QnResource::Offline);
         foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras())
             res->setStatus(QnResource::Offline);
