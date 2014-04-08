@@ -874,12 +874,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 if (time > 0 && time != DATETIME_NOW)
                     time *= 1000;
                 if (time > 0) {
-                    // jump to time preventing synchronizer from touching other items
-                    QnAbstractArchiveReader *reader = mediaWidget->display()->archiveReader();
-                    QnAbstractNavigator *navDelegate = reader->navDelegate();
-                    reader->setNavDelegate(0);
-                    reader->jumpTo(time, time);
-                    reader->setNavDelegate(navDelegate);
+                    mediaWidget->display()->archiveReader()->jumpTo(time, time);
                 } else {
                     if(m_widgets.size() == 1 && !mediaWidget->resource()->toResource()->hasFlags(QnResource::live))
                         mediaWidget->display()->archiveReader()->jumpTo(0, 0);
