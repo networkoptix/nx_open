@@ -243,8 +243,14 @@ bool QnDbManager::createDatabase()
         if (!execSQLFile(QLatin1String(":/update_2.2_stage2.sql")))
             return false;
 
-        if (!execSQLFile(QLatin1String(":/update_2.2_stage3.sql")))
-            return false;
+        { //Videowall-related scripts
+            if (!execSQLFile(QLatin1String(":/update_2.2_stage3.sql")))
+                return false;
+            QMap<int, QnId> guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'Videowall'");
+            if (!updateTableGuids("vms_resourcetype", "guid", guids))
+                return false;
+        }
+
     }
     lock.commit();
 #ifdef DB_DEBUG

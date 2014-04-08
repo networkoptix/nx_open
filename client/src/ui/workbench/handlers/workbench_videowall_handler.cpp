@@ -1216,13 +1216,17 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
     if(!dialog->exec())
         return;
 
+    QString name = dialog->name();
+    if (name.isEmpty())
+        return;
+
     QnVideoWallResourcePtr videoWall(new QnVideoWallResource());
-    videoWall->setGuid(QUuid::createUuid().toString());
-    videoWall->setName(dialog->name());
-    videoWall->setParentId(0);
+    videoWall->setId(QUuid::createUuid());
+    videoWall->setName(name);
+    videoWall->setTypeByName(lit("Videowall"));
 
     connection2()->getVideowallManager()->save(videoWall,  this, 
-        [this, videoWall]( int reqID, ec2::ErrorCode errorCode ) {
+        [this, &videoWall]( int reqID, ec2::ErrorCode errorCode ) {
             Q_UNUSED(reqID)
             qDebug() << "videowall" << videoWall->getName() << "saved" << (int)errorCode;
     } );
