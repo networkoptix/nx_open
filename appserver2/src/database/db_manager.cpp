@@ -1164,6 +1164,8 @@ ErrorCode QnDbManager::removeResource(const QnId& id)
         result = removeUser(id);
     else if (objectType == "Layout")
         result = removeLayout(id);
+    else if (objectType == "Videowall")
+        result = removeVideowall(id);
     else {
         Q_ASSERT_X(0, "Unknown object type", Q_FUNC_INFO);
         return ErrorCode::notImplemented;

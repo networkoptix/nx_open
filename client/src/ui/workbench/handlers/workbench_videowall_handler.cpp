@@ -35,6 +35,7 @@
 #include <ui/common/ui_resource_name.h>
 #include <ui/dialogs/layout_name_dialog.h> //TODO: #GDM VW refactor
 #include <ui/dialogs/attach_to_videowall_dialog.h>
+#include <ui/dialogs/resource_list_dialog.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -1227,8 +1228,18 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
 
     connection2()->getVideowallManager()->save(videoWall,  this, 
         [this, videoWall]( int reqID, ec2::ErrorCode errorCode ) {
-            Q_UNUSED(reqID)
-            qDebug() << "videowall" << videoWall->getName() << "saved" << (int)errorCode;
+            Q_UNUSED(reqID);
+            if (errorCode == ec2::ErrorCode::ok)
+                return;
+
+            //TODO: #GDM VW make common place to call this dialog from different handlers
+            QnResourceListDialog::exec(
+                mainWindow(),
+                QnResourceList() << videoWall,
+                tr("Error"),
+                tr("Could not save the following %n items to Enterprise Controller.", "", 1),
+                QDialogButtonBox::Ok
+                );
     } );
     //TODO: #GDM VW show message if not successful
 }

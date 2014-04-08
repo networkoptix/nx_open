@@ -63,8 +63,7 @@ void QnServerMessageProcessor::updateAllIPList(const QnId& id, const QList<QStri
 }
 #endif
 
-void QnServerMessageProcessor::updateResource(QnResourcePtr resource)
-{
+void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>();
 
     bool isServer = resource.dynamicCast<QnMediaServerResource>();
@@ -168,7 +167,6 @@ void QnServerMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool is
     }
 }
 
-void QnServerMessageProcessor::onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status)
-{
+void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
     resource->setStatus(status, true);
 }
