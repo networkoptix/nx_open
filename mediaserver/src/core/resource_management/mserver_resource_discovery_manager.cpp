@@ -80,7 +80,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         QnResourcePtr rpResource = qnResPool->getResourceByUniqId((*it)->getUniqueId());
         QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
 
-        if (rpResource && !rpResource->hasFlags(QnResource::foreigner))
+        if (rpResource)
         {
             // if such res in ResourcePool
             QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
