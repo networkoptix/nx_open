@@ -177,7 +177,9 @@ void QnDistributedMutex::lockAsync(const QByteArray& name, int timeoutMs)
     //QMutexLocker lock(&m_mutex);
     
     m_name = name;
-    m_selfLock = LockRuntimeInfo(qnCommon->moduleGUID(), m_owner->newTimestamp());
+    m_selfLock = LockRuntimeInfo(qnCommon->moduleGUID(), m_owner->newTimestamp(), name);
+    if (m_owner->m_userDataHandler)
+        m_selfLock.userData = m_owner->m_userDataHandler->getUserData(name);
     sendTransaction(m_selfLock, ApiCommand::lockRequest);
     timer.start(timeoutMs);
     m_peerLockInfo.insert(m_selfLock, 0);

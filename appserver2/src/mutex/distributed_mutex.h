@@ -14,9 +14,10 @@ namespace ec2
 
     struct LockRuntimeInfo: public ApiLockData
     {
-        LockRuntimeInfo(const QUuid& _peer = QUuid(), qint64 _timestamp = 0) {
+        LockRuntimeInfo(const QUuid& _peer = QUuid(), qint64 _timestamp = 0, const QByteArray& _name = QByteArray()) {
             peer = _peer;
             timestamp = _timestamp;
+            name = _name;
         }
         LockRuntimeInfo(const ApiLockData& data): ApiLockData(data) {}
 
