@@ -32,8 +32,8 @@ namespace ec2
     };
 
     struct ApiVideowallScreenData {
-        QnId pc;
-        int index;
+        QnId pc_guid;
+        int pc_index;
         int desktop_x;
         int desktop_y;
         int desktop_w;
@@ -42,6 +42,17 @@ namespace ec2
         int layout_y;
         int layout_w;
         int layout_h;
+
+        void toScreen(QnVideoWallPcData::PcScreen& screen) const;
+        void fromScreen(const QnVideoWallPcData::PcScreen& screen);
+        QN_DECLARE_STRUCT_SQL_BINDER();
+    };
+
+    #define ApiVideowallScreenDataFields (pc_guid) (pc_index) (desktop_x) (desktop_y) (desktop_w) (desktop_h) (layout_x) (layout_y) (layout_w) (layout_h)
+    QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiVideowallScreenData, ApiVideowallScreenDataFields)
+
+    struct ApiVideowallScreenDataWithRef: public ApiVideowallScreenData {
+        QnId videowall_guid;
     };
 
     struct ApiVideowallData: public ApiResourceData
@@ -50,6 +61,7 @@ namespace ec2
     
         bool autorun;
         std::vector<ApiVideowallItemData> items;
+        std::vector<ApiVideowallScreenData> screens;
 
         void toResource(QnVideoWallResourcePtr resource) const;
         void fromResource(const QnVideoWallResourcePtr &resource);

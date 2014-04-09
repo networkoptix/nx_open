@@ -1501,6 +1501,23 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     QN_QUERY_TO_DATA_OBJECT(queryItems, ApiVideowallItemDataWithRef, items, ApiVideowallItemDataFields (videowall_guid));
     mergeObjectListData(videowallList.data, items, &ApiVideowallData::items, &ApiVideowallItemDataWithRef::videowall_guid);
     
+    QSqlQuery queryScreens(m_sdb);
+    queryScreens.setForwardOnly(true);
+    queryScreens.prepare("SELECT \
+                         pc.videowall_guid, \
+                         screen.pc_guid, screen.pc_index, \
+                         screen.desktop_x, screen.desktop_y, screen.desktop_w, screen.desktop_h \
+                         screen.layout_x, screen.layout_y, screen.layout_w, screen.layout_h \
+                         FROM vms_videowall_screen screen \
+                         JOIN vms_videowall_pcs pc on pc.pc_guid = screen.pc_guid");
+    if (!queryScreens.exec()) {
+        qWarning() << Q_FUNC_INFO << queryScreens.lastError().text();
+        return ErrorCode::failure;
+    }
+    std::vector<ApiVideowallScreenDataWithRef> screens;
+    QN_QUERY_TO_DATA_OBJECT(queryItems, ApiVideowallScreenDataWithRef, screens, ApiVideowallScreenDataFields (videowall_guid));
+    mergeObjectListData(videowallList.data, screens, &ApiVideowallData::screens, &ApiVideowallScreenDataWithRef::videowall_guid);
+
     return ErrorCode::ok;
 }
 

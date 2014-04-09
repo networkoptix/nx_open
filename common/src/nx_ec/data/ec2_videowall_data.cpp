@@ -23,27 +23,65 @@ namespace ec2
         h           = item.geometry.height();
     }
 
+    void ApiVideowallScreenData::toScreen(QnVideoWallPcData::PcScreen& screen) const {
+        screen.index            = pc_index;
+        screen.desktopGeometry  = QRect(desktop_x, desktop_y, desktop_w, desktop_h);
+        screen.layoutGeometry   = QRect(layout_x, layout_y, layout_w, layout_h);
+    }
+
+    void ApiVideowallScreenData::fromScreen(const QnVideoWallPcData::PcScreen& screen) {
+        pc_index    = screen.index;
+        desktop_x   = screen.desktopGeometry.x();
+        desktop_y   = screen.desktopGeometry.y();
+        desktop_w   = screen.desktopGeometry.width();
+        desktop_h   = screen.desktopGeometry.height();
+        layout_x    = screen.layoutGeometry.x();
+        layout_y    = screen.layoutGeometry.y();
+        layout_w    = screen.layoutGeometry.width();
+        layout_h    = screen.layoutGeometry.height();
+    }
+
     void ApiVideowallData::toResource(QnVideoWallResourcePtr resource) const {
         ApiResourceData::toResource(resource);
         resource->setAutorun(autorun);
         QnVideoWallItemList outItems;
-        for (int i = 0; i < items.size(); ++i) {
+        for (const ApiVideowallItemData &item : items) {
             outItems << QnVideoWallItem();
-            items[i].toItem(outItems.last());
+            item.toItem(outItems.last());
         }
         resource->setItems(outItems);
+
+        QnVideoWallPcDataMap pcs;
+        for (const ApiVideowallScreenData &screen : screens) {
+            QnVideoWallPcData::PcScreen outScreen;
+            screen.toScreen(outScreen);
+            pcs[screen.pc_guid].screens << outScreen;
+        }
+        resource->setPcs(pcs);
+
     }
     
     void ApiVideowallData::fromResource(const QnVideoWallResourcePtr &resource) {
         ApiResourceData::fromResource(resource);
         autorun = resource->isAutorun();
+
         const QnVideoWallItemMap& resourceItems = resource->getItems();
         items.clear();
-        items.reserve( resourceItems.size() );
-        for( const QnVideoWallItem& item: resourceItems )
-        {
-            items.push_back( ApiVideowallItemData() );
-            items.back().fromItem( item );
+        items.reserve(resourceItems.size());
+        for (const QnVideoWallItem &item: resourceItems) {
+            ApiVideowallItemData itemData;
+            itemData.fromItem(item);
+            items.push_back(itemData);
+        }
+
+        screens.clear();
+        for (const QnVideoWallPcData &pc: resource->getPcs()) {
+            for (const QnVideoWallPcData::PcScreen &screen: pc.screens) {
+                ApiVideowallScreenData screenData;
+                screenData.fromScreen(screen);
+                screenData.pc_guid = pc.uuid;
+                screens.push_back(screenData);
+            }
         }
     }
 
