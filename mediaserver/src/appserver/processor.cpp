@@ -87,6 +87,7 @@ void QnAppserverResourceProcessor::addNewCamera(QnVirtualCameraResourcePtr camer
         return;
     }
 
+    QMutexLocker lock(&m_mutex);
     QByteArray name = cameraResource->getPhysicalId().toUtf8();
     if (m_lockInProgress.contains(name))
         return; // camera already adding (in progress)
@@ -97,6 +98,8 @@ void QnAppserverResourceProcessor::addNewCamera(QnVirtualCameraResourcePtr camer
 
 void QnAppserverResourceProcessor::at_mutexLocked(QByteArray name)
 {
+    QMutexLocker lock(&m_mutex);
+
     LockData data = m_lockInProgress.value(name);
     if (!data.mutex) {
         Q_ASSERT_X(0, "It should not be!!!", Q_FUNC_INFO);
@@ -127,6 +130,8 @@ void QnAppserverResourceProcessor::addNewCameraInternal(QnVirtualCameraResourceP
 
 void QnAppserverResourceProcessor::at_mutexTimeout(QByteArray name)
 {
+    QMutexLocker lock(&m_mutex);
+
     m_lockInProgress.remove(name);
 }
 

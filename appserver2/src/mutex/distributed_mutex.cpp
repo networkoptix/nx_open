@@ -252,8 +252,10 @@ void QnDistributedMutex::checkForLocked()
 {
     if (!m_selfLock.isEmpty() && isAllPeersReady()) {
         timer.stop();
-        m_locked = true;
-        emit locked(m_name);
+        if (!m_locked) {
+            m_locked = true;
+            emit locked(m_name);
+        }
     }
 }
 

@@ -38,6 +38,7 @@ private:
     };
     QMap<QString, LockData> m_lockInProgress;
     ec2::QnMutexCameraDataHandler* m_cameraDataHandler;
+    QMutex m_mutex;
 private:
     void updateResourceStatusAsync(const QnResourcePtr &resource);
     bool isSetStatusInProgress(const QnResourcePtr &resource);

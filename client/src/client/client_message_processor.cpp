@@ -95,8 +95,8 @@ void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr
     int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
     resource->apiConnection()->setProxyAddr(resource->getApiUrl(), url, port);
     disconnect(resource.data(), NULL, this, NULL);
-    connect(resource.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), 
-             this, SLOT(at_serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)));
+    //connect(resource.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), 
+    //         this, SLOT(at_serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)));
     resource->determineOptimalNetIF();
 }
 
