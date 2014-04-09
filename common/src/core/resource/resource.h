@@ -369,6 +369,9 @@ protected:
     mutable QnParamList m_resourceParamList;
 
     static bool m_appStopping;
+
+    /** Url of this resource, if any. */
+    QString m_url; 
 private:
     /** Resource pool this this resource belongs to. */
     QnResourcePool *m_resourcePool;
@@ -396,9 +399,6 @@ private:
 
     /** Status of this resource. */
     Status m_status;
-
-    /** Url of this resource, if any. */
-    QString m_url; 
 
     QDateTime m_lastDiscoveredTime;
     QDateTime m_lastStatusUpdateTime;

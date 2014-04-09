@@ -24,7 +24,7 @@ QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveRe
     setUrl(name);
     m_desktopDataProvider = 0;
     setGuid(desktopResourceUuid.toString()); // only one desktop resource is allowed)
-    setDisabled(true);
+    setDisabled(true); // #3087
     //Q_ASSERT_X(instance == 0, "Only one instance of desktop camera now allowed!", Q_FUNC_INFO);
     //instance = this;
 }
