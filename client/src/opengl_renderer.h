@@ -57,6 +57,7 @@ private:
     QHash<const QGLContext*,QnOpenGLRenderer> m_container;
 };
 
+void loadImageData( int texture_wigth , int texture_height , int image_width , int image_heigth , int gl_bytes_per_pixel , int gl_format , const uchar* pixels );
 
 
 

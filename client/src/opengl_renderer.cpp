@@ -15,6 +15,7 @@ QnOpenGLRenderer::QnOpenGLRenderer(const QGLContext* a_context , QObject *parent
     m_texturePerVertexColoredProgram.reset(new QnPerVertexColoredGLShaderProgramm(a_context,parent));
     m_texturePerVertexColoredProgram->compile();
 
+    
 
     m_indices_for_render_quads[0] = 0;
     m_indices_for_render_quads[1] = 1;
@@ -275,4 +276,20 @@ QnOpenGLRenderer& QnOpenGLRendererManager::instance(const QGLContext* a_context)
 
     manager->getContainer().insert(a_context,QnOpenGLRenderer(a_context));
     return *(manager->getContainer().find(a_context));
+}
+
+void loadImageData( int texture_wigth , int texture_height , int image_width , int image_heigth , int gl_bytes_per_pixel , int gl_format , const uchar* pixels )
+{
+    if ( texture_wigth >= image_width )
+    {
+        glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0 , image_width, qMin(image_heigth,texture_height), gl_format, GL_UNSIGNED_BYTE, pixels );
+    } else if (texture_wigth < image_width)
+    {        
+        int h = qMin(image_heigth,texture_height);
+        for( int y = 0; y < h; y++ )
+        {
+            const uchar *row = pixels + (y*image_width) * gl_bytes_per_pixel;
+            glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , texture_wigth, 1, gl_format, GL_UNSIGNED_BYTE, row );
+        }
+    }
 }

@@ -21,7 +21,7 @@
 #include <utils/media/sse_helper.h>
 #include <utils/color_space/yuvconvert.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
-
+#include "opengl_renderer.h"
 
 //#define PERFORMANCE_TEST
 
@@ -129,7 +129,9 @@ public:
 
         m_contentSize = contentSize;
 
-        QSize textureSize = QSize( qPower2Ceil((unsigned)stride / pixelSize, ROUND_COEFF), height );
+        //QSize textureSize = QSize( qPower2Ceil((unsigned)stride / pixelSize, ROUND_COEFF), height );
+        QSize textureSize = QSize( minPow2(stride / pixelSize) , minPow2(height) );
+            
 
         if( m_textureSize.width() < textureSize.width() || m_textureSize.height() < textureSize.height() || m_internalFormat != internalFormat )
         {
@@ -331,6 +333,13 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
 
 //            glPixelStorei( GL_UNPACK_ROW_LENGTH, m_buffers[i].pitch );
             Q_ASSERT( m_buffers[i].pitch >= qPower2Ceil(r_w[i],ROUND_COEFF) );
+
+            #ifndef USE_PBO
+                loadImageData(texture->textureSize().width(),texture->textureSize().height(),m_buffers[i].pitch,h[i],1,GL_LUMINANCE,m_buffers[i].buffer.data());
+            #else
+                glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,qPower2Ceil(r_w[i],ROUND_COEFF),h[i],GL_LUMINANCE, GL_UNSIGNED_BYTE,NULL);
+            #endif
+            /*
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
                             qPower2Ceil(r_w[i],ROUND_COEFF),
@@ -341,7 +350,7 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
 #else
                             NULL
 #endif
-                            );
+                            );*/
 
 #ifdef USE_PBO
             d->glBindBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
@@ -364,12 +373,21 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
                 texture->ensureInitialized( m_fullRect.width() / 2, m_fullRect.height() / 2, m_buffers[i].pitch, 2, GL_LUMINANCE_ALPHA );
             glBindTexture( GL_TEXTURE_2D, texture->id() );
 //            glPixelStorei( GL_UNPACK_ROW_LENGTH, i == 0 ? m_buffers[0].pitch : (m_buffers[1].pitch/2) );
+
+            loadImageData(  texture->textureSize().width(),
+                            texture->textureSize().height(),
+                            i == 0 ? m_buffers[0].pitch : (m_buffers[1].pitch/2),
+                            i == 0 ? m_fullRect.height() : m_fullRect.height() / 2,
+                            i == 0 ? 1 : 2,
+                            i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,
+                            m_buffers[i].buffer.data() );
+            /*
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
                             i == 0 ? qPower2Ceil((unsigned int)m_fullRect.width(),ROUND_COEFF) : m_fullRect.width() / 2,
                             i == 0 ? m_fullRect.height() : m_fullRect.height() / 2,
                             i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,
-                            GL_UNSIGNED_BYTE, m_buffers[i].buffer.data() );
+                            GL_UNSIGNED_BYTE, m_buffers[i].buffer.data() );*/
             glCheckError("glTexSubImage2D");
             //glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
             //glCheckError("glPixelStorei");
@@ -463,23 +481,8 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
 
 //        glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
         glCheckError("glPixelStorei");
-        int width = qPower2Ceil(r_w[0],ROUND_COEFF);
-        int height = h[0];
-        int gl_format = glRGBFormat(m_format);
-        if ( width == lineInPixelsSize )
-        {
-            glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0 , lineInPixelsSize, height, gl_format, GL_UNSIGNED_BYTE, pixels );
-        } else if (width > lineInPixelsSize)
-        {        
-            for( int y = 0; y < height; y++ )
-            {
-                const uchar *row = pixels + (y*width) * bytesPerPixel;
-                glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , lineInPixelsSize, 1, gl_format, GL_UNSIGNED_BYTE, row );
-            }
-        } else
-        {
-            qDebug()<<"Error! Bad using fuction loadImageData";
-        }
+        
+        loadImageData(texture->textureSize().width(),texture->textureSize().height(),lineInPixelsSize,h[0],bytesPerPixel,glRGBFormat(m_format),pixels);
         /*
         glTexSubImage2D(GL_TEXTURE_2D, 0,
             0, 0,

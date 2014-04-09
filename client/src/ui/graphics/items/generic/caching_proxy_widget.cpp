@@ -177,6 +177,9 @@ void CachingProxyWidget::ensureTextureSynchronized() {
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, m_image.bits());
     unsigned int row_width = m_image.bytesPerLine() * 8 / m_image.depth();
 
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, NULL);
+    loadImageData(m_image.width(), m_image.height(),row_width,m_image.height(),4,GL_BGRA_EXT,m_image.bits());
+    /*
     if ( m_image.width() == row_width )
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, m_image.bits());
     else
@@ -187,7 +190,7 @@ void CachingProxyWidget::ensureTextureSynchronized() {
             const uchar *row = m_image.bits() + (y*row_width) * 4;
             glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , m_image.width(), 1, GL_BGRA_EXT, GL_UNSIGNED_BYTE, row );
         }
-    }
+    }*/
 
 
 

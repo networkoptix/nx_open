@@ -32,6 +32,7 @@ extern "C"
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/graphics/opengl/gl_context_data.h>
+#include "opengl_renderer.h"
 
 #include "decodedpicturetoopengluploadercontextpool.h"
 
@@ -182,6 +183,7 @@ public:
         QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
 
         /* Maximal texture size. */
+        qDebug()<<extensions;
         int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
         NX_LOG(QString(QLatin1String("OpenGL max texture size: %1.")).arg(maxTextureSize), cl_logINFO);
 
@@ -191,7 +193,8 @@ public:
             clampConstant = GL_CLAMP_TO_EDGE;
 
         /* Check for non-power of 2 textures. */
-        supportsNonPower2Textures = extensions.contains("GL_ARB_texture_non_power_of_two");
+        //supportsNonPower2Textures = extensions.contains("GL_ARB_texture_non_power_of_two");
+        supportsNonPower2Textures = false;
     }
 
     ~DecodedPictureToOpenGLUploaderPrivate()
@@ -292,7 +295,9 @@ public:
             m_id = std::numeric_limits<GLuint>::max();
         }
     }
-
+    const QSize &textureSize() const {
+        return m_textureSize;
+    }
     const QVector2D &texCoords() const {
         return m_texCoords;
     }
@@ -331,6 +336,8 @@ public:
 
         bool result = false;
         if(m_textureSize.width() < textureSize.width() || m_textureSize.height() < textureSize.height() || m_internalFormat != internalFormat) {
+            //qDebug()<<"glTexImage2D"<<m_renderer->supportsNonPower2Textures<<textureSize.width()<<textureSize.height()<<m_textureSize.width()<<m_textureSize.height()<<m_internalFormat<<internalFormat;
+
             m_textureSize = textureSize;
             m_internalFormat = internalFormat;
 
@@ -346,7 +353,8 @@ public:
             textureSize = m_textureSize;
         }
 
-        int roundedWidth = qPower2Ceil((unsigned) width, ROUND_COEFF);
+        //int roundedWidth = qPower2Ceil((unsigned) width, ROUND_COEFF);
+        int roundedWidth = textureSize.width();
 
         m_texCoords = QVector2D(width  / (float) textureSize.width(), height / (float) textureSize.height());
 
@@ -368,7 +376,7 @@ public:
             GLint textureHeight = 0;
             //                glGetTexLevelParameteriv( GL_TEXTURE_2D, 0,  GL_TEXTURE_HEIGHT, &textureHeight );
             //Q_ASSERT( textureSize == QSize(textureWidth, textureHeight) );
-
+            
             glBindTexture(GL_TEXTURE_2D, m_id);
             if (roundedWidth < textureSize.width()) {
                 glTexSubImage2D(
@@ -467,7 +475,7 @@ public:
     {
         if( m_format == format )
             return;
-
+        m_format = format;
         for( size_t i = 0; i < MAX_PLANE_COUNT; ++i )
             m_textures[i]->deinitialize();
     }
@@ -1896,25 +1904,7 @@ static bool isYuvFormat( PixelFormat format )
     return format == PIX_FMT_YUV422P || format == PIX_FMT_YUV420P || format == PIX_FMT_YUV444P;
 }
 
-void loadImageData( int width_to_load ,int w , int h , int gl_bytes_per_pixel , int gl_format , const uchar* pixels )
-{
-    if ( w == width_to_load )
-    {
-        glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0 , width_to_load, h, gl_format, GL_UNSIGNED_BYTE, pixels );
-    } else if (w > width_to_load)
-    {        
-        for( int y = 0; y < h; y++ )
-        {
-            const uchar *row = pixels + (y*w) * gl_bytes_per_pixel;
-            glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , width_to_load, 1, gl_format, GL_UNSIGNED_BYTE, row );
-        }
-    } else
-    {
-        qDebug()<<"Error! Bad using fuction loadImageData"<<w<<width_to_load;
-    }
-}
 
-        
         
 
 static int glRGBFormat( PixelFormat format )
@@ -2137,7 +2127,8 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             Q_ASSERT( lineSizes_i >= qPower2Ceil(r_w_i,ROUND_COEFF) );
 
             #ifndef USE_PBO
-				loadImageData(qPower2Ceil(r_w_i,ROUND_COEFF),lineSizes_i,h[i],1,GL_LUMINANCE,planes[i]);
+				//loadImageData(qPower2Ceil(r_w_i,ROUND_COEFF),lineSizes_i,h[i],1,GL_LUMINANCE,planes[i]);
+                loadImageData(texture->textureSize().width(),texture->textureSize().height(),lineSizes_i,h[i],1,GL_LUMINANCE,planes[i]);
             #else
 				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,qPower2Ceil(r_w_i,ROUND_COEFF),h[i],GL_LUMINANCE, GL_UNSIGNED_BYTE, NULL);
 			#endif
@@ -2186,17 +2177,19 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             if( i == Y_PLANE_INDEX )
                 texture->ensureInitialized( width, height, lineSizes[i], 1, GL_LUMINANCE, 1, -1 );
             else
-                texture->ensureInitialized( width / 2, height / 2, lineSizes[i], 2, GL_LUMINANCE_ALPHA, 2, -1 );
+                texture->ensureInitialized( width / 2, height / 2, lineSizes[i]/2, 2, GL_LUMINANCE_ALPHA, 2, -1 );
 
             glBindTexture( GL_TEXTURE_2D, texture->id() );
             const uchar* pixels = planes[i];
 //            glPixelStorei( GL_UNPACK_ROW_LENGTH, i == 0 ? lineSizes[0] : (lineSizes[1]/2) );
 
-            loadImageData(i == 0 ? qPower2Ceil(width,ROUND_COEFF) : width / 2,
-                          i == 0 ? lineSizes[0] : (lineSizes[1]/2),
-                          i == 0 ? height : height / 2,
-                          glBytesPerPixel(format),
-                          i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,pixels);
+            loadImageData(  texture->textureSize().width(),
+                            texture->textureSize().height(),
+                            i == 0 ? lineSizes[0] : (lineSizes[1]/2),
+                            i == 0 ? height : height / 2,
+                            i == 0 ? 1 : 2,
+                            i == 0 ? GL_LUMINANCE : GL_LUMINANCE_ALPHA,
+                            pixels);
             /*
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
@@ -2245,7 +2238,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             }
             pixels = m_yuv2rgbBuffer;
         }
-
+        
         int lineInPixelsSize = lineSizes[0];
         switch (format)
         {
@@ -2300,18 +2293,19 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                 lineInPixelsSize /= 4; // RGBA, BGRA
                 break;
         }
-
+        
 //        glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
         glCheckError("glPixelStorei");
         int w = qPower2Ceil(r_w[0],ROUND_COEFF);
         int gl_bytes_per_pixel = glBytesPerPixel(format);
         int gl_format = glRGBFormat(format);
-        loadImageData(w,lineInPixelsSize,h[0],gl_bytes_per_pixel,gl_format,pixels);
-
         
+        loadImageData(texture->textureSize().width(),texture->textureSize().height(),lineInPixelsSize,h[0],gl_bytes_per_pixel,gl_format,pixels);
+        
+        //glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0 , lineInPixelsSize, h[0], gl_format, GL_UNSIGNED_BYTE, pixels );
         //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, qPower2Ceil(r_w[0],ROUND_COEFF), h[0], glRGBFormat(format), GL_UNSIGNED_BYTE, pixels);
         
-        bitrateCalculator.bytesProcessed( qPower2Ceil(r_w[0],ROUND_COEFF)*h[0]*4 );
+        bitrateCalculator.bytesProcessed( w*h[0]*4 );
         glCheckError("glTexSubImage2D");
 
 //        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
