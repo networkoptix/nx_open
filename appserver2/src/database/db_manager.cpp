@@ -1490,9 +1490,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     QSqlQuery queryScreens(m_sdb);
     queryScreens.setForwardOnly(true);
     queryScreens.prepare("SELECT \
-                         pc.videowall_guid, \
+                         pc.videowall_guid, pc.pc_guid, \
                          screen.pc_guid, screen.pc_index, \
-                         screen.desktop_x, screen.desktop_y, screen.desktop_w, screen.desktop_h \
+                         screen.desktop_x, screen.desktop_y, screen.desktop_w, screen.desktop_h, \
                          screen.layout_x, screen.layout_y, screen.layout_w, screen.layout_h \
                          FROM vms_videowall_screen screen \
                          JOIN vms_videowall_pcs pc on pc.pc_guid = screen.pc_guid");
