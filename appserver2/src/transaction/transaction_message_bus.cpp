@@ -311,7 +311,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
             
         case ApiCommand::saveVideowall:
-            return deliveryTransaction<ApiVideowallData>(abstractTran, stream);
+            return deliveryTransaction<ApiVideowall>(abstractTran, stream);
         case ApiCommand::removeVideowall:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
           

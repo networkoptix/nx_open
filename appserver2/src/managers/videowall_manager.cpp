@@ -27,13 +27,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiVideowallDataList& videowalls) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiVideowallList& videowalls) {
             QnVideoWallResourceList outData;
             if( errorCode == ErrorCode::ok )
                 videowalls.toResourceList(outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiVideowallDataList, decltype(queryDoneHandler)> ( ApiCommand::getVideowallList, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiVideowallList, decltype(queryDoneHandler)> ( ApiCommand::getVideowallList, nullptr, queryDoneHandler);
         return reqID;
     }
 
@@ -65,9 +65,9 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiVideowallData> QnVideowallManager<T>::prepareTransaction( ApiCommand::Value command, const QnVideoWallResourcePtr& resource )
+    QnTransaction<ApiVideowall> QnVideowallManager<T>::prepareTransaction( ApiCommand::Value command, const QnVideoWallResourcePtr& resource )
     {
-        QnTransaction<ApiVideowallData> tran(command, true);
+        QnTransaction<ApiVideowall> tran(command, true);
         tran.params.fromResource( resource );
         return tran;
     }

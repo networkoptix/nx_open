@@ -96,13 +96,13 @@ namespace ec2
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserList& userList);
 
         //getVideowallList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallList& videowallList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleList& userList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutList& layoutList);
 
         //getResourceParams
         ErrorCode doQueryNoLock(const QnId& resourceId, ApiResourceParams& params);
@@ -142,8 +142,8 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiUser>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiParamList>& tran); // save settings
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallDataList>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowall>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallList>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiIdData>& tran);
@@ -206,7 +206,11 @@ namespace ec2
         ErrorCode removeUser( const QnId& guid );
         ErrorCode insertOrReplaceUser(const ApiUser& data, qint32 internalId);
 
-        ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
+        ErrorCode saveVideowall(const ApiVideowall& params);
+        ErrorCode removeVideowall( const QnId& guid );
+        ErrorCode insertOrReplaceVideowall(const ApiVideowall& data, qint32 internalId);
+
+        ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRule& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);
         ErrorCode removeBusinessRule( const QnId& id );
         ErrorCode updateBusinessRule(const ApiBusinessRule& rule);

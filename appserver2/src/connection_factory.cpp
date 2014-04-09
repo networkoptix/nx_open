@@ -133,9 +133,9 @@ namespace ec2
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeUser );
 
         //AbstractVideowallManager::getVideowalls
-        registerGetFuncHandler<nullptr_t, ApiVideowallDataList>( restProcessorPool, ApiCommand::getVideowallList );
+        registerGetFuncHandler<nullptr_t, ApiVideowallList>( restProcessorPool, ApiCommand::getVideowallList );
         //AbstractVideowallManager::save
-        registerUpdateFuncHandler<ApiVideowallData>( restProcessorPool, ApiCommand::saveVideowall );
+        registerUpdateFuncHandler<ApiVideowall>( restProcessorPool, ApiCommand::saveVideowall );
         //AbstractVideowallManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeVideowall );
 

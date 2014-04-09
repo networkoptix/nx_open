@@ -85,7 +85,7 @@ namespace ec2
             m_businessEventManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiVideowallData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiVideowall>& tran ) {
             m_videowallManager->triggerNotification( tran );
         }
 

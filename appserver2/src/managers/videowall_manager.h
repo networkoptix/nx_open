@@ -22,7 +22,7 @@ namespace ec2
         virtual int save( const QnVideoWallResourcePtr& resource, impl::AddVideowallHandlerPtr handler ) override;
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
-        void triggerNotification( const QnTransaction<ApiVideowallData>& tran )
+        void triggerNotification( const QnTransaction<ApiVideowall>& tran )
         {
             assert( tran.command == ApiCommand::saveVideowall);
             QnVideoWallResourcePtr VideoWallResource(new QnVideoWallResource());
@@ -40,7 +40,7 @@ namespace ec2
         QueryProcessorType* const m_queryProcessor;
         ResourceContext m_resCtx;
 
-        QnTransaction<ApiVideowallData> prepareTransaction( ApiCommand::Value command, const QnVideoWallResourcePtr& resource );
+        QnTransaction<ApiVideowall> prepareTransaction( ApiCommand::Value command, const QnVideoWallResourcePtr& resource );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& resource );
     };
 }

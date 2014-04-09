@@ -7,30 +7,23 @@
 namespace ec2
 {
 
-    struct ApiVideowallData: public ApiResourceData
-    {
-        ApiVideowallData(): autorun(false) {}
-    
-        bool autorun;
+    struct ApiVideowall;
 
+    #include "ec2_videowall_data_i.h"
+    struct ApiVideowall: ApiVideowallData, ApiResource
+    {
         void toResource(QnVideoWallResourcePtr resource) const;
         void fromResource(QnVideoWallResourcePtr resource);
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define ApiVideowallDataFields (autorun)
-    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS(ApiVideowallData, ec2::ApiResourceData, ApiVideowallDataFields)
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiVideowall, ApiVideowallDataFields);
 
-
-    struct ApiVideowallDataList: public ApiData
+    struct ApiVideowallList: ApiVideowallListData
     {
-        std::vector<ApiVideowallData> data;
-
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData) const;
     };
-
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallDataList, (data) )
 }
 
 #endif // __EC2_VIDEOWALL_DATA_H_

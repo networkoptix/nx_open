@@ -85,7 +85,7 @@ namespace ec2
             //!ApiIdData
             removeLayout,
             
-            //!ApiVideowallData
+            //!ApiVideowall
             saveVideowall,
             getVideowallList,
             //!ApiIdData

@@ -4,20 +4,20 @@
 namespace ec2
 {
 
-    void ApiVideowallData::toResource(QnVideoWallResourcePtr resource) const
+    void ApiVideowall::toResource(QnVideoWallResourcePtr resource) const
     {
-        ApiResourceData::toResource(resource);
+        ApiResource::toResource(resource);
         resource->setAutorun(autorun);
     }
     
-    void ApiVideowallData::fromResource(QnVideoWallResourcePtr resource)
+    void ApiVideowall::fromResource(QnVideoWallResourcePtr resource)
     {
-        ApiResourceData::fromResource(resource);
+        ApiResource::fromResource(resource);
         autorun = resource->isAutorun();
     }
 
     template <class T>
-    void ApiVideowallDataList::toResourceList(QList<T>& outData) const
+    void ApiVideowallList::toResourceList(QList<T>& outData) const
     {
         outData.reserve(outData.size() + data.size());
         for(int i = 0; i < data.size(); ++i) 
@@ -27,12 +27,12 @@ namespace ec2
             outData << videowall;
         }
     }
-    template void ApiVideowallDataList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData) const;
-    template void ApiVideowallDataList::toResourceList<QnVideoWallResourcePtr>(QList<QnVideoWallResourcePtr>& outData) const;
+    template void ApiVideowallList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData) const;
+    template void ApiVideowallList::toResourceList<QnVideoWallResourcePtr>(QList<QnVideoWallResourcePtr>& outData) const;
 
-    void ApiVideowallDataList::loadFromQuery(QSqlQuery& query)
+    void ApiVideowallList::loadFromQuery(QSqlQuery& query)
     {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiVideowallData, data, ApiVideowallDataFields ApiResourceDataFields)
+        QN_QUERY_TO_DATA_OBJECT(query, ApiVideowall, data, ApiVideowallDataFields ApiResourceFields)
     }
 
 }

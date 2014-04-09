@@ -873,13 +873,13 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLayoutLis
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowallData>& tran) {
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowall>& tran) {
     ErrorCode result = saveVideowall(tran.params);
     return result;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowallDataList>& tran) {
-    foreach(const ApiVideowallData& videowall, tran.params.data)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowallList>& tran) {
+    foreach(const ApiVideowall& videowall, tran.params.data)
     {
         ErrorCode err = saveVideowall(videowall);
         if (err != ErrorCode::ok)
@@ -1473,7 +1473,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserList& us
 }
 
 //getVideowallList
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList) {
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallList& videowallList) {
     QSqlQuery query(m_sdb);
     QString filter; // todo: add data filtering by user here
     query.setForwardOnly(true);
@@ -1600,10 +1600,10 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfo& data)
     QN_QUERY_TO_DATA_OBJECT(queryParams, ApiResourceParamWithRef, kvPairs, ApiResourceParamFields (resourceId));
 
 
-    mergeObjectListData<ApiMediaServerData>(data.servers.data, kvPairs, &ApiMediaServerData::addParams, &ApiResourceParamWithRef::resourceId);
-    mergeObjectListData<ApiCameraData>(data.cameras.data,      kvPairs, &ApiCameraData::addParams,      &ApiResourceParamWithRef::resourceId);
-    mergeObjectListData<ApiUserData>(data.users.data,          kvPairs, &ApiUserData::addParams,        &ApiResourceParamWithRef::resourceId);
-    mergeObjectListData<ApiLayoutData>(data.layouts.data,      kvPairs, &ApiLayoutData::addParams,      &ApiResourceParamWithRef::resourceId);
+    mergeObjectListData<ApiMediaServer>(data.servers.data, kvPairs, &ApiMediaServer::addParams, &ApiResourceParamWithRef::resourceId);
+    mergeObjectListData<ApiCamera>(data.cameras.data,      kvPairs, &ApiCamera::addParams,      &ApiResourceParamWithRef::resourceId);
+    mergeObjectListData<ApiUser>(data.users.data,          kvPairs, &ApiUser::addParams,        &ApiResourceParamWithRef::resourceId);
+    mergeObjectListData<ApiLayout>(data.layouts.data,      kvPairs, &ApiLayout::addParams,      &ApiResourceParamWithRef::resourceId);
 
     //filling serverinfo
     fillServerInfo( &data.serverInfo );
@@ -1756,7 +1756,7 @@ void QnDbManager::fillServerInfo( ServerInfo* const serverInfo )
     m_licenseManagerImpl->getHardwareId( serverInfo );
 }
 
-ErrorCode QnDbManager::saveVideowall(const ApiVideowallData& params) {
+ErrorCode QnDbManager::saveVideowall(const ApiVideowall& params) {
     qint32 internalId;
 
     ErrorCode result = insertOrReplaceResource(params, &internalId);
@@ -1785,7 +1785,7 @@ ErrorCode QnDbManager::removeVideowall( const QnId& guid ) {
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertOrReplaceVideowall(const ApiVideowallData& data, qint32 internalId) {
+ErrorCode QnDbManager::insertOrReplaceVideowall(const ApiVideowall& data, qint32 internalId) {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO vms_videowall (autorun, resource_ptr_id) VALUES\
                      (:autorun, :internalId)");

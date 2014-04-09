@@ -1,9 +1,10 @@
-    struct ApiFullInfoData: public ApiData {
+    struct ApiFullInfoData: ApiData {
         ApiResourceTypeList resTypes;
         ApiMediaServerList servers;
         ApiCameraList cameras;
         ApiUserList users;
         ApiLayoutList layouts;
+        ApiVideowallList videowalls;
         ApiBusinessRuleList rules;
         ApiCameraServerItemList cameraHistory;
         ApiLicenseList licenses;
