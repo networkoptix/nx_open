@@ -19,7 +19,7 @@
 #endif
 
 void QnPerformanceTest::detectLightMode() {
-    if (qnSettings->lightModeOverride() != -1) {
+    if (qnSettings->lightModeOverride() != 0) {
         qnSettings->setLightMode(qnSettings->lightModeOverride());
         return;
     }
