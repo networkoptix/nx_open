@@ -135,7 +135,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
         return;
 
     if (m_handler && !m_handler->processByteArray(sender, serializedTran)) {
-        qWarning() << "Can't handle transaction" << ApiCommand::Value(tran.command) << "reopen connection";
+        qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
         sender->setState(QnTransactionTransport::Error);
         return;
     }

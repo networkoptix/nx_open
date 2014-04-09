@@ -87,7 +87,6 @@ void QnTransactionTcpProcessor::run()
 
     query = QUrlQuery(d->request.requestLine.url.query());
     bool fail = query.hasQueryItem("canceled") || !QnTransactionTransport::tryAcquireConnected(remoteGuid, false);
-    d->chunkedMode = true;
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
     d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
     sendResponse("HTTP", fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
