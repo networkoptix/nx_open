@@ -1485,8 +1485,22 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
     }
-
     videowallList.loadFromQuery(query);
+
+    QSqlQuery queryItems(m_sdb);
+    queryItems.setForwardOnly(true);
+    queryItems.prepare("SELECT \
+                       item.guid, item.pc_guid, item.layout_guid, item.videowall_guid, \
+                       item.name, item.x, item.y, item.w, item.h \
+                       FROM vms_videowall_item item");
+    if (!queryItems.exec()) {
+        qWarning() << Q_FUNC_INFO << queryItems.lastError().text();
+        return ErrorCode::failure;
+    }
+    std::vector<ApiVideowallItemDataWithRef> items;
+    QN_QUERY_TO_DATA_OBJECT(queryItems, ApiVideowallItemDataWithRef, items, ApiVideowallItemDataFields (videowall_guid));
+    mergeObjectListData(videowallList.data, items, &ApiVideowallData::items, &ApiVideowallItemDataWithRef::videowall_guid);
+    
     return ErrorCode::ok;
 }
 
