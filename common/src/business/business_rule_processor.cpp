@@ -28,6 +28,7 @@
 #include "nx_ec/data/ec2_email.h"
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
+#include "common/common_module.h"
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
@@ -624,8 +625,10 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( QnBusinessE
         if( businessRule->eventType() == BusinessEventType::Camera_Input)
         {
             QnResourceList resList = businessRule->eventResourceObjects();
-            if (resList.isEmpty())
-                resList = qnResPool->getAllEnabledCameras();
+            if (resList.isEmpty()) {
+                QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
+                resList = qnResPool->getAllCameras(mServer);
+            }
 
             for( QnResourceList::const_iterator it = resList.constBegin(); it != resList.constEnd(); ++it )
             {

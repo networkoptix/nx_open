@@ -29,7 +29,7 @@ namespace ec2
 
     typedef QList<QByteArray> ByteArrayList;
     #include "server_info_i.h"
-    
+
     struct QnFullResourceData
     {
         ServerInfo serverInfo;
@@ -502,6 +502,60 @@ namespace ec2
     /*!
         \note All methods are asynchronous if other not specified
     */
+    class AbstractVideowallManager
+    :
+        public QObject
+    {
+        Q_OBJECT
+
+    public:
+        virtual ~AbstractVideowallManager() {}
+
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnUserResourceList&)
+        */
+        template<class TargetType, class HandlerType> int getVideowalls( QnVideoWallResourceList& videowalls, TargetType* target, HandlerType handler ) {
+            return getVideowalls( getVideowalls, std::static_pointer_cast<impl::GetVideowallsHandler>(
+                std::make_shared<impl::CustomGetVideowallsHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+        ErrorCode getVideowallsSync(QnVideoWallResourceList* const videowallList ) {
+            using namespace std::placeholders;
+            int(AbstractVideowallManager::*fn)(impl::GetVideowallsHandlerPtr) = &AbstractVideowallManager::getVideowalls;
+            return impl::doSyncCall<impl::GetVideowallsHandler>( std::bind(fn, this, _1), videowallList );
+        }
+
+
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class TargetType, class HandlerType> int save( const QnVideoWallResourcePtr& resource, TargetType* target, HandlerType handler ) {
+            return save( resource, std::static_pointer_cast<impl::AddVideowallHandler>(
+                std::make_shared<impl::CustomAddVideowallHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class TargetType, class HandlerType> int remove( const QnId& id, TargetType* target, HandlerType handler ) {
+            return remove( id, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+    signals:
+        void addedOrUpdated( QnVideoWallResourcePtr videowall );
+        void removed( QnId id );
+
+    private:
+        virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) = 0;
+        virtual int save( const QnVideoWallResourcePtr& resource, impl::AddVideowallHandlerPtr handler ) = 0;
+        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
+    };
+    typedef std::shared_ptr<AbstractVideowallManager> AbstractVideowallManagerPtr;
+
+
+    /*!
+        \note All methods are asynchronous if other not specified
+    */
     class AbstractStoredFileManager
     :
         public QObject
@@ -584,6 +638,7 @@ namespace ec2
         virtual AbstractBusinessEventManagerPtr getBusinessEventManager() = 0;
         virtual AbstractUserManagerPtr getUserManager() = 0;
         virtual AbstractLayoutManagerPtr getLayoutManager() = 0;
+        virtual AbstractVideowallManagerPtr getVideowallManager() = 0;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() = 0;
 
         /*!

@@ -3,7 +3,6 @@
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QFileDialog>
 
 #include <QtMultimedia/QAudioDeviceInfo>
 

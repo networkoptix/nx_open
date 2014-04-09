@@ -4,12 +4,18 @@
 
 #include <QtCore/QMetaObject>
 
-#include "utils/common/warnings.h"
-#include "utils/common/checked_cast.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource/layout_resource.h"
-#include "core/resource/user_resource.h"
-#include "core/resource/camera_resource.h"
+#include <core/resource/media_server_resource.h>
+#include <core/resource/network_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item.h>
+#include <core/resource/videowall_item_index.h>
+
+#include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
+
 
 #ifdef QN_RESOURCE_POOL_DEBUG
 #   define TRACE(...) qDebug << __VA_ARGS__;
@@ -135,12 +141,11 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     {
         connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(statusChanged(const QnResourcePtr &)),     Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
-        connect(resource.data(), SIGNAL(disabledChanged(const QnResourcePtr &)),    this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),    this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
 
         if (!resource->hasFlags(QnResource::foreigner))
         {
-            if (resource->getStatus() != QnResource::Offline && !resource->isDisabled())
+            if (resource->getStatus() != QnResource::Offline)
                 resource->init();
         }
 
@@ -242,8 +247,7 @@ QnResourceList QnResourcePool::getResources() const
     return m_resources.values();
 }
 
-QnResourcePtr QnResourcePool::getResourceById(QnId id) const
-{
+QnResourcePtr QnResourcePool::getResourceById(QnId id) const {
     QMutexLocker locker(&m_resourcesMtx);
 
     QHash<QString, QnResourcePtr>::const_iterator resIter = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByID(id) );
@@ -289,19 +293,16 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
     return QnNetworkResourcePtr(0);
 }
 
-QnResourceList QnResourcePool::getAllEnabledCameras(QnResourcePtr mServer, Filter searchFilter) const
+QnResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer) const 
 {
     QnId parentId = mServer ? mServer->getId() : QnId();
     QnResourceList result;
     QMutexLocker locker(&m_resourcesMtx);
-    foreach (const QnResourcePtr &resource, m_resources) {
+    foreach (const QnResourcePtr &resource, m_resources) 
+    {
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
-        if (camResource != 0 && !camResource->isDisabled() && 
-            ( !camResource->hasFlags(QnResource::foreigner) || searchFilter == AllResources))
-        {
-            if (parentId.isNull() || camResource->getParentId() == parentId)
+        if (camResource && (parentId.isNull() || camResource->getParentId() == parentId))
             result << camResource;
-        }
     }
 
     return result;
@@ -364,25 +365,6 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QStri
     }
 
     return result;
-}
-
-QnNetworkResourcePtr QnResourcePool::getEnabledResourceByPhysicalId(const QString &physicalId) const {
-    foreach(const QnNetworkResourcePtr &resource, getAllNetResourceByPhysicalId(physicalId))
-        if(!resource->isDisabled())
-            return resource;
-    return QnNetworkResourcePtr();
-}
-
-QnResourcePtr QnResourcePool::getEnabledResourceByUniqueId(const QString &uniqueId) const {
-    QnResourcePtr resource = getResourceByUniqId(uniqueId);
-    if(!resource || !resource->isDisabled())
-        return resource;
-
-    QnNetworkResourcePtr networkResource = resource.dynamicCast<QnNetworkResource>();
-    if(!networkResource)
-        return QnResourcePtr();
-
-    return getEnabledResourceByPhysicalId(networkResource->getPhysicalId());
 }
 
 QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const
@@ -484,7 +466,7 @@ int QnResourcePool::activeCamerasByClass(bool analog) const
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera || camera->isDisabled() || camera->isScheduleDisabled() || camera->isAnalog() != analog)
+        if (!camera || camera->hasFlags(QnResource::foreigner) || camera->isScheduleDisabled() || camera->isAnalog() != analog)
             continue;
         count++;
     }
@@ -514,4 +496,24 @@ bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHas
         (*resourcePool)[uniqueId] = resource;
         return true;
     }
+}
+
+QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QUuid &uuid) const {
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
+        if (!videoWall || !videoWall->hasItem(uuid))
+            continue;
+        return QnVideoWallItemIndex(videoWall, uuid);
+    }
+    return QnVideoWallItemIndex();
+}
+
+QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<QUuid> &uuids) const {
+    QnVideoWallItemIndexList result;
+    foreach (const QUuid &uuid, uuids) {
+        QnVideoWallItemIndex index = getVideoWallItemByUuid(uuid);
+        if (!index.isNull())
+            result << index;
+    }
+    return result;
 }

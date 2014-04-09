@@ -13,12 +13,14 @@ public:
 
     bool isSupported() const;
 
-protected:
     bool isAutoStartEnabled();
     void setAutoStartEnabled(bool autoStartEnabled);
 
-private:
-    QString autoStartPath() const;
+protected:
+    virtual int settingsKey() const;
+    virtual QString autoStartPath() const;
+    virtual QString autoStartKey() const;
+
     QString fromRegistryFormat(const QString &path) const;
     QString toRegistryFormat(const QString &path) const;
 

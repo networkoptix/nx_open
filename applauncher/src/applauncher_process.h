@@ -49,6 +49,9 @@ public:
 
     int run();
 
+    QString devModeKey() const;
+    void setDevModeKey(const QString &devModeKey);
+
 private:
     struct KillProcessTask
     {
@@ -74,6 +77,7 @@ private:
     std::atomic<unsigned int> m_prevInstallationID;
     std::map<unsigned int, std::shared_ptr<InstallationProcess>> m_activeInstallations;
     std::map<qint64, KillProcessTask> m_killProcessTasks;
+    QString m_devModeKey;
 
     bool sendTaskToRunningLauncherInstance();
     bool getVersionToLaunch( QString* const versionToLaunch, QString* const appArgs );

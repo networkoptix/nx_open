@@ -239,25 +239,28 @@ void addTestData()
 }
 #endif
 
-void initAppServerConnection()
+void initAppServerConnection(const QUuid &videoWallGuid)
 {
     QUrl appServerUrl = qnSettings->lastUsedConnection().url;
 
     if(!appServerUrl.isValid())
         appServerUrl = qnSettings->defaultConnection().url;
 
-    // TODO: #Ivan. Enable it when removing all places on receiving messages.
-    // QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
+    QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
+    //TODO: #GDM VW reimplement
+    //QnAppServerConnectionFactory::setClientType(QLatin1String("client"));
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
+    if (!videoWallGuid.isNull())
+        QnAppServerConnectionFactory::setVideoWallKey(videoWallGuid.toString());
 }
 
 /** Initialize log. */
-void initLog(const QString &logLevel) {
+void initLog(const QString &logLevel, const QString fileNameSuffix) {
     QnLog::initLog(logLevel);
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     QString logFileLocation = dataLocation + QLatin1String("/log");
-    QString logFileName = logFileLocation + QLatin1String("/log_file");
+    QString logFileName = logFileLocation + QLatin1String("/log_file") + fileNameSuffix;
     if (!QDir().mkpath(logFileLocation))
         cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
     if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
@@ -318,6 +321,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool noVersionMismatchCheck = false;
     QString lightMode;
     bool noVSync = false;
+    QString sVideoWallGuid;
+    QString sVideoWallItemGuid;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -338,10 +343,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #endif
     commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString());
     commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
+    commandLineParser.addParameter(&sVideoWallGuid,         "--videowall",                  NULL,   QString());
+    commandLineParser.addParameter(&sVideoWallItemGuid,     "--videowall-instance",         NULL,   QString());
 
-    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
-
-    initLog(logLevel);
+    commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
     ec2::DummyHandler dummyEc2RequestHandler;
 
@@ -350,7 +355,26 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnSettings->setDevMode(true);
     }
 
-    // TODO: #Elric why QString???
+    QUuid videoWallGuid(sVideoWallGuid);
+    QUuid videoWallItemGuid(sVideoWallItemGuid);
+
+    QString logFileNameSuffix;
+    if (!videoWallGuid.isNull()) {
+        qnSettings->setVideoWallMode(true);
+        noSingleApplication = true;
+        noFullScreen = true;
+        noVersionMismatchCheck = true;
+        qnSettings->setLightModeOverride(Qn::LightModeVideoWall);
+
+        logFileNameSuffix = videoWallItemGuid.isNull() 
+            ? videoWallGuid.toString() 
+            : videoWallItemGuid.toString();
+        logFileNameSuffix.replace(QRegExp(lit("[{}]")), lit("_"));
+    }
+
+    initLog(logLevel, logFileNameSuffix);
+
+	// TODO: #Elric why QString???
     if (!lightMode.isEmpty()) {
         bool ok;
         int lightModeOverride = lightMode.toInt(&ok);
@@ -359,6 +383,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     QnPerformanceTest::detectLightMode();
+
+#ifdef Q_OS_MACX
+    if (mac_isSandboxed())
+        qnSettings->setLightMode(qnSettings->lightMode() | Qn::LightModeNoNewWindow);
+#endif
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
@@ -418,7 +447,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     /* Initialize connections. */
-    initAppServerConnection();
+    initAppServerConnection(videoWallGuid);
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
     ec2::ResourceContext resCtx(
@@ -454,6 +483,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
 
     // Create and start SessionManager
+    if (qnSettings->isVideoWallMode())
+        QnSessionManager::instance()->setAuthCookieEnabled();
     QnSessionManager::instance()->start();
 
     ffmpegInit();
@@ -544,7 +575,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     context->menu()->registerAlias(Qn::EffectiveMaximizeAction, effectiveMaximizeActionId);
 
     /* Create main window. */
-    QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
+    Qt::WindowFlags flags = qnSettings->isVideoWallMode()
+            ? Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint
+            : static_cast<Qt::WindowFlags>(0);
+    QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data(), NULL, flags));
     context->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());
@@ -561,6 +595,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     mainWindow->show();
     if (!noFullScreen)
         context->action(Qn::EffectiveMaximizeAction)->trigger();
+    else
+        mainWindow->updateDecorationsState();
 
     if(noVersionMismatchCheck)
         context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
@@ -602,7 +638,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
                 QLatin1String(QN_BETA) == QLatin1String("true"))
             context->action(Qn::BetaVersionMessageAction)->trigger();
 
-    if (argc <= 1) {
+        //TODO: #GDM VW make sure this will not spoil various "Open new Window" and "Open .. in new window" actions
+//    if (argc <= 1) {
         /* If no input files were supplied --- open connection settings dialog. */
         if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
             context->menu()->trigger(Qn::ConnectToServerAction,
@@ -610,21 +647,23 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         } else if (instantDrop.isEmpty()) {
             context->menu()->trigger(Qn::ReconnectAction);
         }
-    }
+//    }
 
-    /* Drop resources if needed. */
-    if(!delayedDrop.isEmpty()) {
-        qnSettings->setLayoutsOpenedOnLogin(false);
+    if (!videoWallGuid.isNull()) {
+        context->menu()->trigger(Qn::DelayedOpenVideoWallItemAction, QnActionParameters()
+                             .withArgument(Qn::VideoWallGuidRole, videoWallGuid)
+                             .withArgument(Qn::VideoWallItemGuidRole, videoWallItemGuid));
+    } else {
+        /* Drop resources if needed. */
+        if(!delayedDrop.isEmpty()) {
+            QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
+            context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+        }
 
-        QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
-        context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
-    }
-
-    if (!instantDrop.isEmpty()){
-        qnSettings->setLayoutsOpenedOnLogin(false);
-
-        QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
-        context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+        if (!instantDrop.isEmpty()){
+            QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
+            context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+        }
     }
 
 #ifdef _DEBUG
@@ -664,6 +703,10 @@ int main(int argc, char **argv)
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
     win32_exception::installGlobalUnhandledExceptionHandler();
+#endif
+
+#ifdef Q_OS_MAC
+    mac_setLimits();
 #endif
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));

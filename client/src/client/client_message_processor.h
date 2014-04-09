@@ -15,8 +15,8 @@ public:
     QnClientMessageProcessor();
     virtual void init(ec2::AbstractECConnectionPtr connection) override;
 protected:
-    virtual void onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status) override;
-    virtual void updateResource(QnResourcePtr resource) override;
+    virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) override;
+    virtual void updateResource(const QnResourcePtr &resource) override;
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
     virtual void processResources(const QnResourceList& resources) override;
 private:

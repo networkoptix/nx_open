@@ -17,6 +17,8 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(Media,                   qnSkin->icon("tree/media.png"));
     m_cache.insert(User,                    qnSkin->icon("tree/user.png"));
     m_cache.insert(Users,                   qnSkin->icon("tree/users.png"));
+    m_cache.insert(VideoWall,               qnSkin->icon("tree/videowall.png"));
+    m_cache.insert(VideoWallItem,           qnSkin->icon("tree/screen.png"));
 
     m_cache.insert(Server | Offline,        qnSkin->icon("tree/server_offline.png"));
     m_cache.insert(Camera | Offline,        qnSkin->icon("tree/camera_offline.png"));
@@ -87,6 +89,8 @@ QnResourceIconCache::Key QnResourceIconCache::key(QnResource::Flags flags, QnRes
         key = Media;
     } else if ((flags & QnResource::user) == QnResource::user) {
         key = User;
+    } else if ((flags & QnResource::videowall) == QnResource::videowall) {
+        key = VideoWall;
     }
 
     return Key(key | ((status + 1) << 8));

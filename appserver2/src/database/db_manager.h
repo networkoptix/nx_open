@@ -10,6 +10,7 @@
 #include "nx_ec/data/camera_server_item_data.h"
 #include "nx_ec/data/ec2_user_data.h"
 #include "nx_ec/data/ec2_layout_data.h"
+#include "nx_ec/data/ec2_videowall_data.h"
 #include "nx_ec/data/ec2_license.h"
 #include "nx_ec/data/ec2_business_rule_data.h"
 #include "nx_ec/data/ec2_full_data.h"
@@ -34,6 +35,20 @@ namespace ec2
 
         static QnDbManager* instance();
         
+        template <class T>
+        ErrorCode executeNestedTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
+        {
+            ErrorCode result = executeTransactionNoLock(tran);
+            if (result != ErrorCode::ok)
+                return result;
+            return transactionLog->saveTransaction( tran, serializedTran);
+        }
+
+        void beginTran();
+        void commit();
+        void rollback();
+
+
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
@@ -80,11 +95,14 @@ namespace ec2
         //getUserList
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserList& userList);
 
-        //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleList& userList);
+        //getVideowallList
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutList& layoutList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
+
+        //getBusinessRuleList
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
 
         //getResourceParams
         ErrorCode doQueryNoLock(const QnId& resourceId, ApiResourceParams& params);
@@ -124,8 +142,10 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiUser>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiParamList>& tran); // save settings
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallDataList>& tran);
 
-        // delete camera, server, layout, any resource t.e.c
+        // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiIdData>& tran);
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicenseList>& tran);
@@ -172,10 +192,10 @@ namespace ec2
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServer& data, qint32 internalId);
         ErrorCode updateStorages(const ApiMediaServer&);
         ErrorCode removeServer(const QnId& guid);
-        ErrorCode removeLayout(const QnId& guid);
-        ErrorCode removeLayout(qint32 id);
         ErrorCode removeStoragesByServer(const QnId& serverGUID);
 
+        ErrorCode removeLayout(const QnId& guid);
+        ErrorCode removeLayout(qint32 id);
         ErrorCode deleteLayoutItems(const qint32 id);
         ErrorCode saveLayout(const ApiLayout& params);
         ErrorCode insertOrReplaceLayout(const ApiLayout& data, qint32 internalId);
@@ -186,7 +206,7 @@ namespace ec2
         ErrorCode removeUser( const QnId& guid );
         ErrorCode insertOrReplaceUser(const ApiUser& data, qint32 internalId);
 
-        ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRule& businessRule);
+        ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);
         ErrorCode removeBusinessRule( const QnId& id );
         ErrorCode updateBusinessRule(const ApiBusinessRule& rule);

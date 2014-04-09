@@ -74,6 +74,9 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& 
         return;
     }
 
+    if (tran.params.serverId == qnCommon->moduleGUID())
+        return; // ignore himself
+
     // proxy alive info from non-direct connected host
     AlivePeersMap::iterator itr = m_alivePeers.find(tran.params.serverId);
     if (tran.params.isAlive && itr == m_alivePeers.end()) {
@@ -307,6 +310,11 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
         case ApiCommand::removeLayout:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
             
+        case ApiCommand::saveVideowall:
+            return deliveryTransaction<ApiVideowallData>(abstractTran, stream);
+        case ApiCommand::removeVideowall:
+            return deliveryTransaction<ApiIdData>(abstractTran, stream);
+          
         case ApiCommand::addStoredFile:
         case ApiCommand::updateStoredFile:
             return deliveryTransaction<ApiStoredFileData>(abstractTran, stream);
@@ -582,6 +590,25 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
             transport->setState(QnTransactionTransport::Error);
         }
     }
+}
+
+QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::alivePeers() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_alivePeers;
+}
+
+QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::aliveServerPeers() const
+{
+    QMutexLocker lock(&m_mutex);
+    AlivePeersMap result;
+    for(AlivePeersMap::const_iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
+    {
+        if (!itr.value().isClient)
+            result.insert(itr.key(), itr.value());
+    }
+    
+    return result;
 }
 
 template class QnTransactionMessageBus::CustomHandler<RemoteEC2Connection>;

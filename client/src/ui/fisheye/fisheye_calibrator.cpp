@@ -298,7 +298,7 @@ int QnFisheyeCalibrator::findYThreshold(QImage frame)
     int h = frame.height();
     static const int MAX_Y_THRESHOLD = 64;
     static const int MIN_Y_THRESHOLD = 28;
-    static const int DETECT_BORDER_DELTA = 11;
+    static const int DETECT_BORDER_DELTA = 14;
     QVector<int> borders;
     for (int y = 0; y < frame.height(); ++y)
     {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN" sourcelanguage="en">
+<TS version="2.0" language="zh_CN" sourcelanguage="en">
 <context>
     <name>ConnectionTestingDialog</name>
     <message>
@@ -47,12 +47,12 @@ Application will now quit.</source>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="70"/>
         <source>Request timed out.</source>
-        <translation type="unfinished"></translation>
+        <translation>请求超时。</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="98"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>登录或者您输入的密码不正确，请重试。</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="101"/>
@@ -60,12 +60,15 @@ Application will now quit.</source>
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>连接到企业控制器不能成立。 
+您已输入连接的详细信息不正确，请重试。 
+
+如果此错误仍然存在，请与您的VMS系统管理员。</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="106"/>
         <source>You are trying to connect to incompatible Enterprise Controller.</source>
-        <translation type="unfinished"></translation>
+        <translation>你正在试图连接到不兼容的企业级控制器。</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="111"/>
@@ -73,7 +76,10 @@ If this error persists, please contact your VMS administrator.</source>
  - Client version: %1.
  - EC version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>企业级控制器具有不同的版本： 
+  - 客户端版本：%1。 
+  - EC版本：%2。 
+不支持兼容模式版本低于%3。</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="120"/>
@@ -81,7 +87,10 @@ Compatibility mode for versions lower than %3 is not supported.</source>
  - Client version: %1.
  - EC version: %2.
 You will be asked to restart the client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>企业级控制器具有不同的版本： 
+  - 客户端版本：%1。 
+  - EC版本：%2。 
+你在兼容模式下会被要求重新启动客户端。</translation>
     </message>
     <message>
         <location filename="../src/connection_testing_dialog.cpp" line="133"/>
@@ -290,43 +299,44 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/systraywindow.cpp" line="126"/>
         <source>%1 Tray Assistant</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 托盘助理</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="232"/>
         <source>Access denied.</source>
-        <translation type="unfinished"></translation>
+        <translation>访问被拒绝。</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="235"/>
         <source>Specified database does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>指定的数据库不存在。</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="238"/>
         <source>Specified parameter is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>指定的参数无效。</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="242"/>
         <source>Could not access installed services</source>
-        <translation type="unfinished"></translation>
+        <translation>无法访问已安装的服务</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="242"/>
         <source>An error has occurred while trying to access installed services:
  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>已经在尝试访问已安装的服务时发生错误： 
+ %1</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="641"/>
         <source>Show &amp;Media Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>显示&amp;媒体服务器日志</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="646"/>
         <source>Show &amp;Enterprise Controller Log</source>
-        <translation type="unfinished"></translation>
+        <translation>显示&amp;企业控制器日志</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="654"/>
@@ -376,7 +386,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/systraywindow.cpp" line="989"/>
         <source>%1 port is already used by another process</source>
-        <translation type="unfinished"></translation>
+        <translation>%1端口已经被另一个进程使用</translation>
     </message>
     <message>
         <source>media proxy</source>
@@ -437,11 +447,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Login</source>
-        <translation type="vanished">登录</translation>
+        <translation>登录</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="vanished">密码</translation>
+        <translation>密码</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="92"/>
@@ -450,7 +460,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Port</source>
-        <translation type="vanished">端口</translation>
+        <translation>端口</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="69"/>
@@ -460,17 +470,17 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="80"/>
         <source>Host:</source>
-        <translation type="unfinished"></translation>
+        <translation>主机:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="130"/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>登录:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="140"/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>密码:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="165"/>
@@ -480,17 +490,17 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="185"/>
         <source>Cameras RTP transport:</source>
-        <translation type="unfinished"></translation>
+        <translation>摄像机RTP传输:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="108"/>
         <location filename="../src/settings.ui" line="338"/>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>端口:</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation type="vanished">主机</translation>
+        <translation>主机</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="179"/>
@@ -514,7 +524,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/settings.ui" line="263"/>
         <location filename="../src/settings.ui" line="357"/>
         <source>Use specified IP or host name:</source>
-        <translation type="unfinished"></translation>
+        <translation>使用指定的IP地址或主机名:</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="290"/>
@@ -524,7 +534,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/settings.ui" line="302"/>
         <source>Enterprise controller network settings</source>
-        <translation type="unfinished">系统控制器网络设置</translation>
+        <translation>系统控制器设置</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="348"/>
@@ -541,7 +551,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Cameras RTP transport</source>
-        <translation type="vanished">摄像机RTP传输</translation>
+        <translation>摄像机RTP传输</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="195"/>
@@ -564,7 +574,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Use specified IP or host name</source>
-        <translation type="vanished">使用指定的IP地址或主机名</translation>
+        <translation>使用指定的IP地址或主机名</translation>
     </message>
     <message>
         <location filename="../src/settings.ui" line="253"/>

@@ -40,6 +40,7 @@ protected:
 
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void reject() override;
+    virtual void accept() override;
 
 private slots:
     void updateUi();

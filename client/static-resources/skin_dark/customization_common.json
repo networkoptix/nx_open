@@ -198,6 +198,14 @@
         "palette": { "default": { "window": "black" } }
     },
     
+    "QnVideowallScreenWidget": {
+        "palette": { "default": { "window": "#000000ff" } }
+    },
+    
+    "QnVideowallItemWidget": {
+        "palette": { "default": { "window": "#000000ff" } }
+    },
+    
     "ZoomWindowInstrument": {
         "colors": ["#c02020", "#20c020", "#4040ff"]
     },
@@ -319,6 +327,14 @@
             "title": "#404040",
             "invalid": "#401010",
             "warning": "#404010"
+        }
+    },
+    
+    "QnLicenseListModel": {
+        "colors": {
+            "normal": "#f0f0f0",
+            "warning": "#ffff00",
+            "expired": "#ff0000"
         }
     },
     

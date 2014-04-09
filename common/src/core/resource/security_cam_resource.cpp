@@ -11,6 +11,7 @@
 #include <business/business_event_connector.h>
 
 #include "user_resource.h"
+#include "common/common_module.h"
 
 #define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
 
@@ -44,7 +45,7 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     m_cameraControlDisabled = !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
 
-    connect(this, &QnResource::disabledChanged, this, &QnSecurityCamResource::at_disabledChanged, Qt::DirectConnection);
+    connect(this, &QnResource::parentIdChanged, this, &QnSecurityCamResource::at_parentIdChanged, Qt::DirectConnection);
 
     QnMediaResource::initMediaResource();
 
@@ -310,11 +311,9 @@ void QnSecurityCamResource::inputPortListenerDetached() {
         m_inputPortListenerCount.fetchAndAddOrdered( 1 );   //no reduce below 0
 }
 
-void QnSecurityCamResource::at_disabledChanged() {
-    if(hasFlags(QnResource::foreigner))
-        return; // we do not own camera
-
-    if(isDisabled())
+void QnSecurityCamResource::at_parentIdChanged() 
+{
+    if(getParentId() != qnCommon->moduleGUID())
         stopInputPortMonitoring();
     else
         startInputPortMonitoring();

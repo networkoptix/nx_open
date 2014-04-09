@@ -64,6 +64,8 @@ public:
 
     QString getVersion() const;
 
+    void cancel();
+
 signals:
     void installationDone( InstallationProcess* installationProcess );
 

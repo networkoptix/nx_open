@@ -14,7 +14,6 @@ void ApiResource::fromResource(const QnResourcePtr& resource)
 	name = resource->getName();
 	url = resource->getUrl();
 	status = resource->getStatus();
-	disabled = resource->isDisabled();
 
     QnParamList params = resource->getResourceParamList();
     foreach(const QnParam& param, resource->getResourceParamList().list())
@@ -33,7 +32,6 @@ void ApiResource::toResource(QnResourcePtr resource) const
 	resource->setName(name);
 	resource->setUrl(url);
 	resource->setStatus(status, true);
-	resource->setDisabled(disabled);
 
     foreach(const ApiResourceParam& param, addParams) {
         if (param.isResTypeParam)

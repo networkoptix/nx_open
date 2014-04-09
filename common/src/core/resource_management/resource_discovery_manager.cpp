@@ -468,7 +468,8 @@ void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher 
 #endif
 
     searcher->setShouldBeUsed(
-        searcher->isLocal() ||
+        searcher->isLocal() ||                  // local resources should always be found
+        searcher->isVirtualResource() ||        // virtual resources should always be found
         (!disabledVendorsForAutoSearch.contains(searcher->manufacture()) && !disabledVendorsForAutoSearch.contains(lit("all")))
     );
 }

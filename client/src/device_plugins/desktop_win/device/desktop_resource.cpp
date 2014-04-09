@@ -8,6 +8,10 @@
 #include "core/resource/media_server_resource.h"
 #include "device_plugins/desktop_camera/desktop_camera_connection.h"
 
+namespace {
+    const QUuid desktopResourceUuid(lit("{B3B2235F-D279-4d28-9012-00DE1002A61D}"));
+}
+
 //static QnDesktopResource* instance = 0;
 
 QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveResource() 
@@ -19,7 +23,8 @@ QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveRe
     setName(name);
     setUrl(name);
     m_desktopDataProvider = 0;
-    setGuid(lit("{B3B2235F-D279-4d28-9012-00DE1002A61D}")); // only one desktop resource is allowed)
+    setGuid(desktopResourceUuid.toString()); // only one desktop resource is allowed)
+  //  setDisabled(true);
     //Q_ASSERT_X(instance == 0, "Only one instance of desktop camera now allowed!", Q_FUNC_INFO);
     //instance = this;
 }
@@ -116,6 +121,10 @@ QnConstResourceAudioLayoutPtr QnDesktopResource::getAudioLayout(const QnAbstract
     if (!m_desktopDataProvider)
         return emptyAudioLayout;
     return m_desktopDataProvider->getAudioLayout();
+}
+
+QUuid QnDesktopResource::getDesktopResourceUuid() {
+    return desktopResourceUuid;
 }
 
 

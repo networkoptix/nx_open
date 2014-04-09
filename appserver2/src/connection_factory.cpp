@@ -17,8 +17,8 @@
 #include "rest/ec2_update_http_handler.h"
 #include "transaction/transaction.h"
 #include "http/ec2_transaction_tcp_listener.h"
+#include "mutex/distributed_mutex.h"
 #include "version.h"
-
 
 namespace ec2
 {
@@ -32,11 +32,13 @@ namespace ec2
         qRegisterMetaType<QnFullResourceData>( "QnFullResourceData" );
 
         ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
+        ec2::QnDistributedMutexManager::initStaticInstance( new ec2::QnDistributedMutexManager() );
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     {
         m_directConnection.reset();
+        ec2::QnDistributedMutexManager::initStaticInstance(0);
         ec2::QnTransactionMessageBus::initStaticInstance(0);
     }
 
@@ -130,6 +132,12 @@ namespace ec2
         //AbstractUserManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeUser );
 
+        //AbstractVideowallManager::getVideowalls
+        registerGetFuncHandler<nullptr_t, ApiVideowallDataList>( restProcessorPool, ApiCommand::getVideowallList );
+        //AbstractVideowallManager::save
+        registerUpdateFuncHandler<ApiVideowallData>( restProcessorPool, ApiCommand::saveVideowall );
+        //AbstractVideowallManager::remove
+        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeVideowall );
 
         //AbstractLayoutManager::getLayouts
         registerGetFuncHandler<nullptr_t, ApiLayoutList>( restProcessorPool, ApiCommand::getLayoutList );

@@ -34,7 +34,7 @@ void ApiResourceType::toResource(QnResourceTypePtr resource) const
 	if (!parentId.empty())
 		resource->setParentId(parentId[0]);
 	for (int i = 1; i < parentId.size(); ++i)
-		resource->addAdditionalParent(parentId[0]);
+		resource->addAdditionalParent(parentId[i]);
     foreach(const ApiPropertyType& p, propertyTypeList) {
         QnParamTypePtr param(new QnParamType());
         p.toResource(param);

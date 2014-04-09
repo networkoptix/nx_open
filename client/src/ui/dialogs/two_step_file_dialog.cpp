@@ -106,15 +106,21 @@ void QnTwoStepFileDialog::setAcceptMode(QFileDialog::AcceptMode mode) {
 }
 
 QString QnTwoStepFileDialog::selectedFile() const {
-
     QString fileName;
+
     switch (m_mode) {
     case QFileDialog::AnyFile: {
+        if (ui->fileNameLineEdit->text().isEmpty())
+            return QString();
+
         QFileInfo info(QDir(ui->directoryLabel->text()), ui->fileNameLineEdit->text());
         fileName = info.absoluteFilePath();
         break;
     }
     case QFileDialog::ExistingFile: {
+        if (ui->existingFileLabel->text().isEmpty())
+            return QString();
+
         fileName = ui->existingFileLabel->text();
         break;
     }
@@ -140,6 +146,11 @@ QString QnTwoStepFileDialog::selectedNameFilter() const {
     }
     Q_ASSERT(false);
     return QString();
+}
+
+int QnTwoStepFileDialog::exec() {
+    ui->optionsGroupBox->setVisible(!ui->optionsLayout->isEmpty());
+    return base_type::exec();
 }
 
 bool QnTwoStepFileDialog::event(QEvent *event) {

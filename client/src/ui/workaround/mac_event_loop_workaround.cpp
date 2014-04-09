@@ -30,4 +30,5 @@ bool QnMacEventLoopWorkaround::eventFilter(QObject *object, QEvent *event) {
 void QnMacEventLoopWorkaround::updateWatchedWidget() {
     m_updateEventToPass = new QEvent(QEvent::UpdateRequest);
     QCoreApplication::sendEvent(m_watched, m_updateEventToPass);
+    delete m_updateEventToPass;
 }

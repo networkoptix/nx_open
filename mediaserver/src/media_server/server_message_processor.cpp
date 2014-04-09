@@ -63,8 +63,7 @@ void QnServerMessageProcessor::updateAllIPList(const QnId& id, const QList<QStri
 }
 #endif
 
-void QnServerMessageProcessor::updateResource(QnResourcePtr resource)
-{
+void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>();
 
     bool isServer = resource.dynamicCast<QnMediaServerResource>();
@@ -162,13 +161,12 @@ void QnServerMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool is
         res->setStatus(QnResource::Offline);
         if (isClient) {
             // This media server hasn't own DB
-            foreach(QnResourcePtr camera, qnResPool->getAllEnabledCameras(res, QnResourcePool::AllResources))
+            foreach(QnResourcePtr camera, qnResPool->getAllCameras(res))
                 camera->setStatus(QnResource::Offline);
         }
     }
 }
 
-void QnServerMessageProcessor::onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status)
-{
+void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
     resource->setStatus(status, true);
 }

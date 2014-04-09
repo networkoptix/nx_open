@@ -419,8 +419,9 @@ void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget) {
     connect(widget, &QnResourceWidget::aboutToBeDestroyed,              this, &ZoomWindowInstrument::at_widget_aboutToBeDestroyed);
     connect(widget, &QnResourceWidget::optionsChanged,                  this, &ZoomWindowInstrument::at_widget_optionsChanged);
 
-    // TODO: #Elric hack =(
-    if(!widget->zoomRect().isNull() && widget->frameDistinctionColor() == qnGlobals->frameColor())
+    /* Initialize frame color if zoom window was loaded from a layout and
+     * not created through this instrument. */
+    if(!widget->zoomRect().isNull() && !widget->frameDistinctionColor().isValid())
         widget->setFrameDistinctionColor(nextZoomWindowColor());
 }
 

@@ -48,7 +48,9 @@ QAtomicInt QnSessionManager::s_handle(1);
 QnSessionManager::QnSessionManager(QObject *parent): 
     QObject(parent),
     m_accessManager(NULL),
-    m_thread(new QThread())
+    m_thread(new QThread()),
+    m_authCookieEnabled(false),
+    m_authTimer(new QTimer(this))
 {
     qRegisterMetaType<AsyncRequestInfo>();
 
@@ -56,11 +58,17 @@ QnSessionManager::QnSessionManager(QObject *parent):
             this, SLOT(at_asyncRequestQueued(int, AsyncRequestInfo, QUrl, QString, QnRequestHeaderList, QnRequestParamList, QByteArray)));
     connect(this, SIGNAL(aboutToBeStopped()), this, SLOT(at_aboutToBeStopped()));
     connect(this, SIGNAL(aboutToBeStarted()), this, SLOT(at_aboutToBeStarted()));
+    connect(this, &QnSessionManager::authCookieChanged, this, &QnSessionManager::at_authCookieChanged);
+    connect(m_authTimer, SIGNAL(timeout()),   this, SLOT(at_authTimer_timeout()));
 
     m_thread->setObjectName( QLatin1String("QnSessionManagerThread") ); /* Name will be shown in debugger. */
     Q_ASSERT(parent == 0);
     this->moveToThread(m_thread.data());
+
     m_thread->start();
+
+    // SessionManager is not calculation intensive, but needs to be responsible
+    m_thread->setPriority(QThread::HighestPriority);
 }
 
 QnSessionManager::~QnSessionManager() {
@@ -92,6 +100,18 @@ void QnSessionManager::at_replyReceived(QNetworkReply * reply)
         int n = errorString.lastIndexOf(QLatin1String(":"));
         errorString = errorString.mid(n + 1).trimmed();
     }
+
+    QVariant cookieHeader = reply->header(QNetworkRequest::SetCookieHeader);
+    if (cookieHeader.isValid()) {
+        QList<QNetworkCookie> cookies = cookieHeader.value< QList<QNetworkCookie> >();
+        foreach (const QNetworkCookie &cookie, cookies) {
+            if (cookie.name() == "authinfo") {
+                emit authCookieChanged(cookie); //signal-slot connection for miltithread safety
+                break;
+            }
+        }
+    }
+
     AsyncRequestInfo reqInfo = m_handleInProgress.value(reply);
     m_handleInProgress.remove(reply);
     //emit requestFinished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toLatin1()), handle);
@@ -118,6 +138,18 @@ void QnSessionManager::stop() {
 bool QnSessionManager::isReady() const {
     QMutexLocker locker(&m_accessManagerMutex);
     return m_accessManager != 0;
+}
+
+void QnSessionManager::setAuthCookieEnabled(bool value) {
+    m_authCookieEnabled = value;
+}
+
+bool QnSessionManager::authCookieEnabled() const {
+    return m_authCookieEnabled;
+}
+
+QNetworkCookie QnSessionManager::authCookie() const {
+    return m_authCookie;
 }
 
 QByteArray QnSessionManager::formatNetworkError(int error) {
@@ -178,6 +210,7 @@ void QnSessionManager::at_SyncRequestFinished(const QnHTTPRawResponse& response,
 {
     QMutexLocker lock(&m_syncReplyMutex);
     QnSessionManagerSyncReply* reply = m_syncReplyInProgress.value(handle);
+    assert(reply);
     if (reply)
         reply->requestFinished(response, handle);
 }
@@ -362,3 +395,22 @@ void QnSessionManager::at_sslErrors(QNetworkReply* reply, const QList<QSslError>
     reply->ignoreSslErrors();
 }
 
+/** If cookie expired but still not changed, request again in 1 minute. */
+const qint64 defaultTimerIterval = 60000;
+
+/** Lag on EC between cookie expiration time and new cookie generation. */
+const qint64 ecLagIterval = 10000;
+
+void QnSessionManager::at_authCookieChanged(const QNetworkCookie &cookie) {
+    if (m_authCookie == cookie)
+        return;
+    m_authCookie = cookie;
+    qint64 expireAt = QDateTime::currentDateTime().msecsTo(cookie.expirationDate()) + ecLagIterval;
+    m_authTimer->start(expireAt > 0 ? expireAt : defaultTimerIterval);
+}
+
+void QnSessionManager::at_authTimer_timeout() {
+    //TODO: #GDM VW reimplement
+    //QnAppServerConnectionFactory::createConnection()->testConnectionAsync();
+    m_authTimer->start(defaultTimerIterval);
+}

@@ -238,16 +238,19 @@ namespace Qn {
      * Flags describing the client light mode.
      */
     enum LightModeFlag {
-        LightModeNoAnimation        = 0x01,
-        LightModeSmallWindow        = 0x02,
-        LightModeNoBackground       = 0x04,
-        LightModeNoOpacity          = 0x08,
-        LightModeNoNotifications    = 0x10,
-        LightModeSingleItem         = 0x20,
-        LightModeNoShadows          = 0x40,
-        LightModeNoMultisampling    = 0x80,
-        LightModeNoNewWindow        = 0x100,
+        LightModeNoAnimation        = 0x0001,           /**< Disable all client animations. */
+        LightModeSmallWindow        = 0x0002,           /**< Decrease minimum window size. */
+        LightModeNoSceneBackground  = 0x0004,           /**< Disable gradient scene background. */
+        LightModeNoOpacity          = 0x0008,           /**< Disable opacity in ui widgets. */
+        LightModeNoNotifications    = 0x0010,           /**< Disable notifications panel. */
+        LightModeSingleItem         = 0x0020,           /**< Limit number of simultaneous items on the scene to 1. */
+        LightModeNoShadows          = 0x0040,           /**< Disable shadows on ui elements. */
+        LightModeNoMultisampling    = 0x0080,           /**< Disable OpenGL multisampling. */
+        LightModeNoNewWindow        = 0x0100,           /**< Disable opening of new windows. */
+        LightModeNoLayoutBackground = 0x0200,           /**< Disable layout background. */
+        LightModeNoZoomWindows      = 0x0400,           /**< Disable zoom windows. */
 
+        LightModeVideoWall          = LightModeNoSceneBackground | LightModeNoNotifications | LightModeNoShadows /*| LightModeNoAnimation*/,
         LightModeFull               = 0xFFFFFFFF
 
     };
@@ -267,6 +270,7 @@ Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(Qn::ItemRole)
 Q_DECLARE_METATYPE(Qn::TimeMode)
 Q_DECLARE_METATYPE(Qn::ClientSkin)
+Q_DECLARE_TYPEINFO(Qn::NodeType, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(Qn::NodeType)
 
 #endif // QN_CLIENT_GLOBALS_H

@@ -11,6 +11,7 @@
 #include "nx_ec/data/ec2_user_data.h"
 #include "nx_ec/data/ec2_resource_data.h"
 #include "nx_ec/data/ec2_layout_data.h"
+#include "nx_ec/data/ec2_videowall_data.h"
 #include "nx_ec/data/camera_server_item_data.h"
 #include "nx_ec/data/ec2_stored_file_data.h"
 #include "nx_ec/data/ec2_full_data.h"
@@ -49,15 +50,15 @@ namespace ec2
             return saveMultiTransaction<ApiLicenseList, ApiLicense>(multiTran);
         }
 
-        ErrorCode saveTransaction(const QnTransaction<ApiLayoutList>& multiTran, const QByteArray& /*serializedTran*/) {
-            return saveMultiTransaction<ApiLayoutList, ApiLayout>(multiTran);
+        ErrorCode saveTransaction(const QnTransaction<ApiLayoutDataList>& multiTran, const QByteArray& /*serializedTran*/) {
+            return saveMultiTransaction<ApiLayoutDataList, ApiLayoutData>(multiTran);
         }
 
-        ErrorCode saveTransaction(const QnTransaction<ApiCameraList>& multiTran, const QByteArray& /*serializedTran*/) {
-            return saveMultiTransaction<ApiCameraList, ApiCamera>(multiTran);
+        ErrorCode saveTransaction(const QnTransaction<ApiCameraDataList>& multiTran, const QByteArray& /*serializedTran*/) {
+            return saveMultiTransaction<ApiCameraDataList, ApiCameraData>(multiTran);
         }
 
-        ErrorCode saveTransaction(const QnTransaction<ApiFullInfo>& , const QByteArray&) {
+        ErrorCode saveTransaction(const QnTransaction<ApiFullData>& , const QByteArray&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -73,11 +74,11 @@ namespace ec2
         bool contains(const QnAbstractTransaction& tran, const QUuid& hash);
         QUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
 
-        QUuid transactionHash(const QnTransaction<ApiCamera>& tran)              { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiMediaServer>& tran)         { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiUser>& tran)                { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiLayout>& tran)              { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiBusinessRule>& tran)        { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiCameraData>& tran)              { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiMediaServerData>& tran)         { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiUserData>& tran)                { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiLayoutData>& tran)              { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiBusinessRuleData>& tran)        { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiIdData>& tran)                  { return makeHash(tran.params.id.toRfc4122(), "ApiIdData"); }
         QUuid transactionHash(const QnTransaction<ApiSetResourceDisabledData>& tran) { return makeHash(tran.params.id.toRfc4122(), "disabled"); }
         QUuid transactionHash(const QnTransaction<ApiCameraServerItem>&)         { return QUuid::createUuid() ; }
@@ -91,32 +92,14 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiLicense>& tran)                 { return makeHash(tran.params.key, "ApiLicense"); }    //TODO
         QUuid transactionHash(const QnTransaction<ApiResetBusinessRuleData>& /*tran*/)   { return makeHash("reset_brule", ADD_HASH_DATA); }
         
-        QUuid transactionHash(const QnTransaction<ApiFullInfo>& )                { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
-        QUuid transactionHash(const QnTransaction<ApiCameraList>& )          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
-        QUuid transactionHash(const QnTransaction<ApiLayoutList>& )          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const QnTransaction<ApiFullData>& )                { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const QnTransaction<ApiCameraDataList>& )          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const QnTransaction<ApiLayoutDataList>& )          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiLicenseList>&)              { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiBusinessActionData>& )      { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiEmailSettingsData>& )       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiEmailData>& )               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
-        template <class DataList, class Data>
-        ErrorCode saveMultiTransaction(const QnTransaction<DataList>& multiTran)
-        {
-            foreach(const Data& data, multiTran.params.data)
-            {
-                QnTransaction<Data> tran(multiTran.command, true);
-                tran.id.peerGUID = multiTran.id.peerGUID;
-                tran.params = data;
-                QByteArray serializedTran;
-                OutputBinaryStream<QByteArray> stream(&serializedTran);
-                serialize( tran, &stream );
-                ErrorCode result = saveTransaction(tran, serializedTran);
-                if (result != ErrorCode::ok) {
-                    return result;
-                }
-            }
-            return ErrorCode::ok;
-        }
     private:
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);
     private:

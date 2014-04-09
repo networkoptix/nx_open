@@ -5,11 +5,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
-#ifdef QN_ENABLE_VIDEO_WALL
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
-#endif
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
@@ -65,6 +63,8 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
     default:
         break;
     }
+
+    m_editable.checked = false;
 }
 
 /**
@@ -85,6 +85,8 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
            nodeType == Qn::EdgeNode);
 
     setResource(resource);
+
+    m_editable.checked = false;
 }
 
 /**
@@ -102,6 +104,8 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
     m_checked(Qt::Unchecked)
 {
     assert(model != NULL);
+
+    m_editable.checked = false;
 }
 
 QnResourcePoolModelNode::~QnResourcePoolModelNode() {
@@ -162,7 +166,6 @@ void QnResourcePoolModelNode::update() {
             m_displayName = getResourceName(m_resource);
         }
     } else if (m_type == Qn::VideoWallItemNode || m_type == Qn::UserVideoWallItemNode) {
-#ifdef QN_ENABLE_VIDEO_WALL
         m_status = QnResource::Online;
         m_searchString = QString();
         m_flags = QnResource::videowall_item;
@@ -181,7 +184,6 @@ void QnResourcePoolModelNode::update() {
         } else {
             m_displayName = m_name = QString();
         }
-#endif
     }
 
     /* Update bastard state. */
@@ -190,14 +192,12 @@ void QnResourcePoolModelNode::update() {
     case Qn::ItemNode:
         bastard = m_resource.isNull();
         break;
-#ifdef QN_ENABLE_VIDEO_WALL
     case Qn::VideoWallItemNode:
         bastard = false;
         break;
     case Qn::UserVideoWallItemNode:
         bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditVideoWallPermission);
         break;
-#endif
     case Qn::ResourceNode:
         bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
         if(!bastard)
@@ -358,17 +358,16 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
     switch(m_type) {
     case Qn::ResourceNode:
     case Qn::EdgeNode:
-        if(m_model->context()->menu()->canTrigger(Qn::RenameAction, QnActionParameters(m_resource)))
+        if (!m_editable.checked) {
+            m_editable.value = m_model->context()->menu()->canTrigger(Qn::RenameAction, QnActionParameters(m_resource));
+            m_editable.checked = true;
+        }
+        if(m_editable.value)
             result |= Qt::ItemIsEditable;
         /* Fall through. */
     case Qn::ItemNode:
-#ifdef QN_ENABLE_VIDEO_WALL
         if(m_flags & (QnResource::media | QnResource::layout | QnResource::server | QnResource::user | QnResource::videowall))
             result |= Qt::ItemIsDragEnabled;
-#else
-        if(m_flags & (QnResource::media | QnResource::layout | QnResource::server | QnResource::user))
-            result |= Qt::ItemIsDragEnabled;
-#endif
         break;
     case Qn::VideoWallItemNode:
     case Qn::UserVideoWallItemNode:
@@ -425,7 +424,7 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
     case Qn::ResourceStatusRole:
         return QVariant::fromValue<int>(m_status);
     case Qn::NodeTypeRole:
-        return QVariant::fromValue<int>(m_type);
+        return qVariantFromValue(m_type);
     case Qn::HelpTopicIdRole:
         if(m_type == Qn::UsersNode) {
             return Qn::MainWindow_Tree_Users_Help;
@@ -470,12 +469,10 @@ bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int colum
 
     QnActionParameters parameters;
     if (m_type == Qn::VideoWallItemNode || m_type == Qn::UserVideoWallItemNode) {
-#ifdef QN_ENABLE_VIDEO_WALL
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
         if (index.isNull())
             return false;
         parameters = QnActionParameters(QnVideoWallItemIndexList() << index).withArgument(Qn::ResourceNameRole, value.toString());
-#endif
     } else if (m_type == Qn::RecorderNode) {
         //sending first camera to get groupId and check WriteName permission
         if (this->children().isEmpty())
@@ -487,7 +484,7 @@ bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int colum
     } else {
         parameters = QnActionParameters(m_resource).withArgument(Qn::ResourceNameRole, value.toString());
     }
-    parameters.setArgument(Qn::NodeTypeRole, static_cast<int>(m_type));
+    parameters.setArgument(Qn::NodeTypeRole, m_type);
 
     m_model->context()->menu()->trigger(Qn::RenameAction, parameters);
     return true;

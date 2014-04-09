@@ -68,7 +68,7 @@ signals:
     void thumbnailClicked();
 
 private slots:
-    void at_provider_imageChanged(const QImage &image);
+    void at_provider_imageChanged(const QImage &image); // TODO: #GDM why nothing is connected to this slot?
 
 private:
     QnProxyLabel* m_textLabel;
@@ -100,6 +100,8 @@ public:
     QnResourceList selectedResources() const;
 
     QnLayoutItemIndexList selectedLayoutItems() const;
+
+    QnVideoWallItemIndexList selectedVideoWallItems() const;
 
     virtual Qn::ActionScope currentScope() const override;
 

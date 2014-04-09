@@ -16,6 +16,7 @@ namespace ec2
         cameras.toResourceList(outData.resources, ctx.resFactory);
         users.toResourceList(outData.resources);
         layouts.toResourceList(outData.resources);
+        videowalls.toResourceList(outData.resources);
         licenses.toResourceList(outData.licenses);
 
         outData.bRules = rules.toResourceList(ctx.pool);

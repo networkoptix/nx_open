@@ -18,17 +18,15 @@ public:
     void selectResource(const QnResourcePtr &resource);
     void setThumbnailSize(const QSize &size);
 signals:
-    void thumbnailReady(QnId resourceId, const QPixmap& thumbnail);
+    void thumbnailReady(const QnId &resourceId, const QPixmap& thumbnail);
 
 private slots:
+    void at_resPool_statusChanged(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
     void at_thumbnailReceived(int status, const QImage& thumbnail, int handle);
 
 private:
-    Q_SIGNAL void thumbnailReadyDelayed(QnId resourceId, const QPixmap& thumbnail);
-    int loadThumbnailForResource(const QnResourcePtr &resource);
-    void forceRefreshThumbnails();
-
+    Q_SIGNAL void thumbnailReadyDelayed(const QnId &resourceId, const QPixmap& thumbnail);
     enum ThumbnailStatus {
         None,
         Loading,
@@ -37,6 +35,11 @@ private:
         NoSignal,
         Refreshing
     };
+
+    int loadThumbnailForResource(const QnResourcePtr &resource);
+
+    bool isUpdateRequired(const QnResourcePtr &resource, const ThumbnailStatus status) const;
+    void forceRefreshThumbnails();
 
     struct ThumbnailData {
         ThumbnailData(): status(None), loadingHandle(0) {}
