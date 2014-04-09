@@ -16,8 +16,6 @@ public:
     QnAviResource(const QString& file);
     ~QnAviResource();
 
-    virtual void deserialize(const QnResourceParameters&) override;
-
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
     virtual QString toString() const;
 

@@ -64,7 +64,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIn
     if(!index.isValid())
         return true;
 
-    Qn::NodeType nodeType = static_cast<Qn::NodeType>(index.data(Qn::NodeTypeRole).value<int>());
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
     if(nodeType == Qn::UsersNode)
         return false; /* We don't want users in search. */
 

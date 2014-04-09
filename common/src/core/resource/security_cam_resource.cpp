@@ -11,6 +11,7 @@
 #include <business/business_event_connector.h>
 
 #include "user_resource.h"
+#include "common/common_module.h"
 
 #define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
 
@@ -44,7 +45,7 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     m_cameraControlDisabled = !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
 
-    connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
+    connect(this, &QnResource::parentIdChanged, this, &QnSecurityCamResource::at_parentIdChanged, Qt::DirectConnection);
 
     QnMediaResource::initMediaResource();
 
@@ -232,21 +233,21 @@ bool QnSecurityCamResource::hasDualStreaming() const {
     QVariant val;
     if (!getParam(lit("hasDualStreaming"), val, QnDomainMemory))
         return false;
-    return val.toInt();
+    return val.toBool();
 }
 
 bool QnSecurityCamResource::isDtsBased() const {
     QVariant val;
     if (!getParam(lit("dts"), val, QnDomainMemory))
         return false;
-    return val.toInt();
+    return val.toBool();
 }
 
 bool QnSecurityCamResource::isAnalog() const {
     QVariant val;
     if (!getParam(lit("analog"), val, QnDomainMemory))
         return false;
-    return val.toInt();
+    return val.toBool();
 }
 
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {
@@ -260,6 +261,18 @@ Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
     if (sval == lit("noSharing"))
         return Qn::noSharing;
     return Qn::sharePixels;
+}
+
+void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value) 
+{
+    QString strVal;
+    if (value == Qn::shareFps)
+        strVal = lit("shareFps");
+    else if (value == Qn::noSharing)
+        strVal = lit("noSharing");
+    else
+        strVal = lit("sharePixels");
+    setParam(lit("streamFpsSharing"), strVal, QnDomainDatabase);
 }
 
 QStringList QnSecurityCamResource::getRelayOutputList() const {
@@ -298,11 +311,9 @@ void QnSecurityCamResource::inputPortListenerDetached() {
         m_inputPortListenerCount.fetchAndAddOrdered( 1 );   //no reduce below 0
 }
 
-void QnSecurityCamResource::at_disabledChanged() {
-    if(hasFlags(QnResource::foreigner))
-        return; // we do not own camera
-
-    if(isDisabled())
+void QnSecurityCamResource::at_parentIdChanged() 
+{
+    if(getParentId() != qnCommon->moduleGUID())
         stopInputPortMonitoring();
     else
         startInputPortMonitoring();
@@ -333,7 +344,7 @@ bool QnSecurityCamResource::isAudioSupported() const {
     QVariant val;
     if (!getParam(lit("isAudioSupported"), val, QnDomainMemory))
         return false;
-    return val.toUInt() > 0;
+    return val.toBool();
 }
 
 Qn::MotionType QnSecurityCamResource::getCameraBasedMotionType() const {

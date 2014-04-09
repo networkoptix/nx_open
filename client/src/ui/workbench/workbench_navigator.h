@@ -72,6 +72,9 @@ public:
     qreal minimalSpeed() const;
     qreal maximalSpeed() const;
 
+    qint64 position() const;
+    void setPosition(qint64 position);
+
     QnResourceWidget *currentWidget() const;
     WidgetFlags currentWidgetFlags() const;
 
@@ -96,6 +99,7 @@ signals:
     void playingSupportedChanged();
     void speedChanged();
     void speedRangeChanged();
+    void positionChanged();
 
 protected:
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;

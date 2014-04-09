@@ -14,7 +14,7 @@ class QnPlIqResourceSearcher : public QnMdnsResourceSearcher
 public:
     static QnPlIqResourceSearcher& instance();
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
 
     // return the manufacture of the server
     virtual QString manufacture() const;

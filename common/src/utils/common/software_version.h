@@ -11,6 +11,9 @@
 #include <boost/array.hpp>
 #include <boost/operators.hpp>
 
+#include <nx_ec/binary_serialization_helper.h>
+
+
 class QnSoftwareVersion: public boost::equality_comparable1<QnSoftwareVersion, boost::less_than_comparable1<QnSoftwareVersion> > {
 public:
     enum Format {
@@ -118,5 +121,21 @@ private:
 };
 
 Q_DECLARE_METATYPE(QnSoftwareVersion)
+
+template<class T>
+bool deserialize( QnSoftwareVersion& version, InputBinaryStream<T>* const inputStream )
+{
+    QString versionStr;
+    if( !deserialize( versionStr, inputStream ) )
+        return false;
+    version = QnSoftwareVersion(versionStr);
+    return true;
+}
+
+template<class T>
+void serialize( const QnSoftwareVersion& version, OutputBinaryStream<T>* outputBinaryStream )  
+{
+    serialize<T>( version.toString(), outputBinaryStream );
+}
 
 #endif // QN_SOFTWARE_VERSION_H

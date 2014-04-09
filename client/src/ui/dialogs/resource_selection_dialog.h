@@ -11,6 +11,7 @@
 
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include "utils/common/id.h"
 
 namespace Ui {
     class ResourceSelectionDialog;
@@ -48,7 +49,7 @@ protected:
 
 private slots:
     void at_resourceModel_dataChanged();
-    void at_thumbnailReady(int resourceId, const QPixmap &thumbnail);
+    void at_thumbnailReady(QnId resourceId, const QPixmap &thumbnail);
 
     QModelIndex itemIndexAt(const QPoint &pos) const;
     void updateThumbnail(const QModelIndex &index);
@@ -61,7 +62,7 @@ private:
     QnResourceSelectionDialogDelegate* m_delegate;
     QnCameraThumbnailManager *m_thumbnailManager;
     SelectionTarget m_target;
-    int m_tooltipResourceId;
+    QnId m_tooltipResourceId;
 
     int m_screenshotIndex;
 

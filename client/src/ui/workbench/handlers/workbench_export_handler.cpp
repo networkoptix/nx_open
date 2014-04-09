@@ -357,6 +357,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             removeLayoutFromPool(existingLayout);
 
         QnLayoutResourcePtr newLayout(new QnLayoutResource());
+        newLayout->setTypeByName(lit("Layout"));
 
         itemData.uuid = QUuid::createUuid();
         newLayout->addItem(itemData);

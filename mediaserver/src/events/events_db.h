@@ -5,12 +5,13 @@
 #include "business/actions/abstract_business_action.h"
 #include "business/events/abstract_business_event.h"
 #include "recording/time_period.h"
+#include "utils/db/db_helper.h"
 
 namespace pb {
     class BusinessActionList;
 }
 
-class QnEventsDB
+class QnEventsDB: public QnDbHelper
 {
 public:
     void setEventLogPeriod(qint64 periodUsec);
@@ -49,12 +50,9 @@ private:
         const BusinessEventType::Value& eventType, 
         const BusinessActionType::Value& actionType,
         const QnId& businessRuleId) const;
-    bool isObjectExists(const QString& objectType, const QString& objectName);
 private:
-    QSqlDatabase m_sdb;
     qint64 m_lastCleanuptime;
     qint64 m_eventKeepPeriod;
-    mutable QMutex m_mutex;
     static QnEventsDB* m_instance;
 };
 

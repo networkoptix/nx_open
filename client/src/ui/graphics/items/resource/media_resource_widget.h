@@ -42,7 +42,7 @@ public:
     /**
      * \returns                         Resource associated with this widget.
      */
-    QnMediaResourcePtr resource() const;
+    const QnMediaResourcePtr &resource() const;
 
     /**
      * \returns                         Display associated with this widget.
@@ -82,6 +82,8 @@ public:
     void clearMotionSelection();
 
     bool isMotionSelectionEmpty() const;
+
+    void setMotionSelection(const QList<QRegion> &regions);
 
     /**
      * \returns                         Current motion selection regions.
@@ -168,6 +170,7 @@ private slots:
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
 
+    void at_item_imageEnhancementChanged();
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
 

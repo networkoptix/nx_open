@@ -34,7 +34,6 @@ QnResource::QnResource():
     m_initMutex(QMutex::Recursive),
     m_resourcePool(NULL),
     m_flags(0),
-    m_disabled(false),
     m_status(Offline),
     m_initialized(false),
     m_lastInitTime(0),
@@ -63,18 +62,17 @@ void QnResource::setResourcePool(QnResourcePool *resourcePool)
     m_resourcePool = resourcePool;
 }
 
-void QnResource::setGuid(const QString& guid)
+void QnResource::setGuid(const QUuid& guid)
 {
     QMutexLocker mutexLocker(&m_mutex);
 
-    m_guid = guid;
+    m_id = guid;
 }
 
-QString QnResource::getGuid() const
+QUuid QnResource::getGuid() const
 {
     QMutexLocker mutexLocker(&m_mutex);
-
-    return m_guid;
+    return m_id;
 }
 
 QnResourcePtr QnResource::toSharedPointer() const
@@ -84,7 +82,7 @@ QnResourcePtr QnResource::toSharedPointer() const
 
 void QnResource::updateInner(QnResourcePtr other)
 {
-    Q_ASSERT(getUniqueId() == other->getUniqueId()); // unique id MUST be the same
+    Q_ASSERT(getGuid() == other->getGuid() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
     m_id = other->m_id; //TODO: #Elric this is WRONG!!!!!!!!!11111111
     m_typeId = other->m_typeId;
@@ -113,7 +111,6 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
 
     silenceMode |= other->hasFlags(QnResource::foreigner);
     setStatus(other->m_status, silenceMode);
-    setDisabled(other->m_disabled);
     emit resourceChanged(toSharedPointer(this));
 
     QnParamList paramList = other->getResourceParamList();
@@ -129,36 +126,6 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         consumer->afterUpdate();
 }
 
-void QnResource::deserialize(const QnResourceParameters& parameters)
-{
-    bool signalsBlocked = blockSignals(true);
-
-    QMutexLocker locker(&m_mutex);
-
-    if (parameters.contains(QLatin1String("id")))
-        setId(parameters[QLatin1String("id")]);
-
-    if (parameters.contains(QLatin1String("typeId")))
-        setTypeId(parameters[QLatin1String("typeId")]);
-
-    if (parameters.contains(QLatin1String("parentId")))
-        setParentId(parameters[QLatin1String("parentId")]);
-
-    if (parameters.contains(QLatin1String("name")))
-        setName(parameters[QLatin1String("name")]);
-
-    if (parameters.contains(QLatin1String("url")))
-        setUrl(parameters[QLatin1String("url")]);
-
-    if (parameters.contains(QLatin1String("status")))
-        m_status = (QnResource::Status)parameters[QLatin1String("status")].toInt();
-
-    if (parameters.contains(QLatin1String("disabled")))
-        m_disabled = parameters[QLatin1String("disabled")].toInt();
-
-    blockSignals(signalsBlocked);
-}
-
 QnId QnResource::getParentId() const
 {
     QMutexLocker locker(&m_mutex);
@@ -167,12 +134,25 @@ QnId QnResource::getParentId() const
 
 void QnResource::setParentId(QnId parent)
 {
+    bool initializedChanged = false;
+    QnId oldParentId;
     {
         QMutexLocker locker(&m_mutex);
+        if (m_parentId == parent)
+            return;
+        oldParentId = m_parentId;
         m_parentId = parent;
+        if (m_initialized) {
+            m_initialized = false;
+            initializedChanged = true;
+        }
     }
     
-    emit parentIdChanged(toSharedPointer(this));
+    if (!oldParentId.isNull())
+        emit parentIdChanged(toSharedPointer(this));
+
+    if (initializedChanged)
+        emit this->initializedChanged(toSharedPointer(this));
 }
 
 
@@ -385,6 +365,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         return true;
     }
 
+
     getResourceParamList(); // paramList loaded once. No more changes, instead of param value. So, use mutex for value only
     if (!m_resourceParamList.contains(name))
     {
@@ -392,6 +373,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         emit asyncParamSetDone(toSharedPointer(this), name, val, false);
         return false;
     }
+
 
     m_mutex.lock();
     QnParam param = m_resourceParamList[name];
@@ -520,6 +502,13 @@ void QnResource::setTypeId(QnId id)
     m_typeId = id;
 }
 
+void QnResource::setTypeByName(const QString& resTypeName)
+{
+    QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(resTypeName);
+    if (resType)
+        setTypeId(resType->getId());
+}
+
 QnResource::Status QnResource::getStatus() const
 {
     QMutexLocker mutexLocker(&m_mutex);
@@ -556,15 +545,15 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
         }
     }
 
-    if (oldStatus == Offline && newStatus == Online && !m_disabled)
+    if (oldStatus == Offline && newStatus == Online && !hasFlags(foreigner))
         init();
 
 
-    if (hasFlags(foreigner)) {
-        qWarning() << "Status changed for foreign resource!";
-    }
+    //if (hasFlags(foreigner)) {
+    //    qWarning() << "Status changed for foreign resource!";
+    //}
 
-    Q_ASSERT_X(!hasFlags(foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
+    //Q_ASSERT_X(!hasFlags(foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
 
     emit statusChanged(toSharedPointer(this));
 
@@ -597,7 +586,7 @@ QnId QnResource::getId() const
     return m_id;
 }
 
-void QnResource::setId(QnId id) {
+void QnResource::setId(const QnId& id) {
     QMutexLocker mutexLocker(&m_mutex);
 
     if(m_id == id)
@@ -796,42 +785,6 @@ void QnResource::addCommandToProc(QnAbstractDataPacketPtr data)
 int QnResource::commandProcQueueSize()
 {
     return QnResourceCommandProcessor_instance()->queueSize();
-}
-
-bool QnResource::isDisabled() const
-{
-    //QMutexLocker mutexLocker(&m_mutex);
-
-    return m_disabled;
-}
-
-void QnResource::setDisabled(bool disabled)
-{
-    if (m_disabled == disabled)
-        return;
-
-    bool disabledChanged = false;
-    bool initializedChanged = false;
-
-    {
-        QMutexLocker mutexLocker(&m_mutex);
-
-        if(m_disabled != disabled) {
-            m_disabled = disabled;
-            disabledChanged = true;
-        }
-
-        if(m_initialized) {
-            m_initialized = false;
-            initializedChanged = true;
-        }
-    }
-
-    if (disabledChanged)
-        emit this->disabledChanged(toSharedPointer(this));
-
-    if (initializedChanged)
-        emit this->initializedChanged(toSharedPointer(this));
 }
 
 bool QnResource::init()

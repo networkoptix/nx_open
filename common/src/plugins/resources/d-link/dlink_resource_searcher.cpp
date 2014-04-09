@@ -26,7 +26,7 @@ QnPlDlinkResourceSearcher& QnPlDlinkResourceSearcher::instance()
     return inst;
 }
 
-QnResourcePtr QnPlDlinkResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnPlDlinkResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -48,9 +48,9 @@ QnResourcePtr QnPlDlinkResourceSearcher::createResource(QnId resourceTypeId, con
     result = QnVirtualCameraResourcePtr( new QnPlDlinkResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create DLink camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create DLink camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
 
-    result->deserialize(parameters);
+    //result->deserialize(parameters);
 
     return result;
 }
@@ -142,7 +142,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             QnPlDlinkResourcePtr resource ( new QnPlDlinkResource() );
 
             QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-            if (!rt.isValid())
+            if (rt.isNull())
                 continue;
 
             resource->setTypeId(rt);
@@ -164,7 +164,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
 QString QnPlDlinkResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlDlinkResource::MANUFACTURE);
+    return QnPlDlinkResource::MANUFACTURE;
 }
 
 
@@ -215,7 +215,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, c
 
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
         return QList<QnResourcePtr>();
 
     QnNetworkResourcePtr resource ( new QnPlDlinkResource() );

@@ -4,6 +4,7 @@
 
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
+#include <api/global_settings.h>
 
 #include <business/business_action_factory.h>
 #include <business/business_event_rule.h>
@@ -24,8 +25,10 @@
 #include "business_strings_helper.h"
 #include "version.h"
 
+#include "nx_ec/data/ec2_email.h"
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
+#include "common/common_module.h"
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
@@ -53,8 +56,8 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
 
     connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
-    connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleDeleted(int)),
-            this, SLOT(at_businessRuleDeleted(int)));
+    connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleDeleted(QnId)),
+            this, SLOT(at_businessRuleDeleted(QnId)));
     connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleReset(QnBusinessEventRuleList)),
             this, SLOT(at_businessRuleReset(QnBusinessEventRuleList)));
 
@@ -80,7 +83,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusin
 
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
-    QnResourceList resList = action->getResources().filtered<QnNetworkResource>();
+    QnResourceList resList = action->getResourceObjects().filtered<QnNetworkResource>();
     if (resList.isEmpty()) {
         executeActionInternal(action, QnResourcePtr());
     }
@@ -342,7 +345,7 @@ void QnBusinessRuleProcessor::at_timer()
 
 bool QnBusinessRuleProcessor::checkEventCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule)
 {
-    bool resOK = !bEvent->getResource() || rule->eventResources().isEmpty() || containResource(rule->eventResources(), bEvent->getResource()->getId());
+    bool resOK = !bEvent->getResource() || rule->eventResources().isEmpty() || rule->eventResources().contains(bEvent->getResource()->getId());
     if (!resOK)
         return false;
 
@@ -414,7 +417,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
 
     QStringList log;
     QStringList recipients;
-    foreach (const QnUserResourcePtr &user, action->getResources().filtered<QnUserResource>()) {
+    foreach (const QnUserResourcePtr &user, action->getResourceObjects().filtered<QnUserResource>()) {
         QString email = user->getEmail();
         log << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(user->getEmail());
         if (!email.isEmpty() && QnEmail::isValid(email))
@@ -433,7 +436,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
 
     if( recipients.isEmpty() )
     {
-        cl_log.log( lit("Action SendMail (rule %1) missing valid recipients. Ignoring...").arg(action->getBusinessRuleId()), cl_logWARNING );
+        cl_log.log( lit("Action SendMail (rule %1) missing valid recipients. Ignoring...").arg(action->getBusinessRuleId().toString()), cl_logWARNING );
         cl_log.log( lit("All recipients: ") + log.join(QLatin1String("; ")), cl_logWARNING );
         return false;
     }
@@ -446,7 +449,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     QnPartialInfo partialInfo(action->getRuntimeParams().getEventType());
 
     assert(!partialInfo.attrName.isEmpty());
-    contextMap[partialInfo.attrName] = lit("true");
+//    contextMap[partialInfo.attrName] = lit("true");
 
     QnEmailAttachmentList attachments;
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
@@ -456,7 +459,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     contextMap[tpCompanyName] = lit(QN_ORGANIZATION_NAME);
     contextMap[tpCompanyUrl] = lit(QN_COMPANY_URL);
     contextMap[tpSupportEmail] = lit(QN_SUPPORT_MAIL_ADDRESS);
-    contextMap[tpSystemName] = QnAppServerConnectionFactory::systemName();
+    contextMap[tpSystemName] = QnGlobalSettings::instance()->systemName();
     attachments.append(partialInfo.attachments);
 
     QImage screenshot = this->getEventScreenshot(action->getRuntimeParams(), QSize(640, 480));
@@ -469,17 +472,16 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
         }
     }
 
-    QString messageBody = renderTemplateFromFile(lit(":/email_templates"), lit("container.mustache"), contextMap);
+    QString messageBody = renderTemplateFromFile(lit(":/email_templates"), partialInfo.attrName + lit(".mustache"), contextMap);
 
-    const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();    
-    if (appServerConnection->sendEmailAsync(
-                recipients,
-                QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
-                messageBody,
-                attachments,
-                EMAIL_SEND_TIMEOUT,
+    if (QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->sendEmail(
+                ec2::ApiEmailData(recipients,
+                    QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
+                    messageBody,
+                    EMAIL_SEND_TIMEOUT,
+                    attachments),
                 this,
-                SLOT(at_sendEmailFinished(int,bool,int))) == -1)
+                &QnBusinessRuleProcessor::at_sendEmailFinished ) == ec2::INVALID_REQ_ID)
         return false;
 
     /*
@@ -491,32 +493,31 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     return true;
 }
 
-void QnBusinessRuleProcessor::at_sendEmailFinished(int status, bool result, int handle)
+void QnBusinessRuleProcessor::at_sendEmailFinished(int handle, ec2::ErrorCode errorCode)
 {
-    Q_UNUSED(status)
     Q_UNUSED(handle)
-    if (result)
+    if (errorCode == ec2::ErrorCode::ok)
         return;
 
     QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
 
     broadcastBusinessAction(action);
 
-    cl_log.log(lit("Error processing action SendMail."), cl_logWARNING);
+    cl_log.log(lit("Error processing action SendMail. %1").arg(ec2::toString(errorCode)), cl_logWARNING);
 }
 
-void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished(const QnHTTPRawResponse &response, int handle)
+void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished( int handle, ec2::ErrorCode errorCode )
 {
-    if (response.status == 0)
+    if (errorCode == ec2::ErrorCode::ok)
         return;
 
-    qWarning() << "error delivering broadcast action message #" << handle << "error:" << response.errorString;
+    qWarning() << "error delivering broadcast action message #" << handle << "error:" << ec2::toString(errorCode);
 }
 
 bool QnBusinessRuleProcessor::broadcastBusinessAction(QnAbstractBusinessActionPtr action)
 {
-    const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
-    appServerConnection->broadcastBusinessAction(action, this, "at_broadcastBusinessActionFinished");
+    QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->broadcastBusinessAction(
+        action, this, &QnBusinessRuleProcessor::at_broadcastBusinessActionFinished );
     return true;
 }
 
@@ -577,7 +578,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
         {
             // terminate all actions. If instant action, terminate all resources on which it was started
             QnAbstractBusinessEventPtr bEvent;
-            if (resId.isValid())
+            if (!resId.isNull())
                 bEvent = runtimeRule.resources.value(resId);
             else
                 bEvent = runtimeRule.resources.begin().value(); // for continues action resourceID is not specified and only one record is used
@@ -600,7 +601,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
     }
 }
 
-void QnBusinessRuleProcessor::at_businessRuleDeleted(int id)
+void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
 {
     QMutexLocker lock(&m_mutex);
 
@@ -623,9 +624,11 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( QnBusinessE
     {
         if( businessRule->eventType() == BusinessEventType::Camera_Input)
         {
-            QnResourceList resList = businessRule->eventResources();
-            if (resList.isEmpty())
-                resList = qnResPool->getAllEnabledCameras();
+            QnResourceList resList = businessRule->eventResourceObjects();
+            if (resList.isEmpty()) {
+                QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
+                resList = qnResPool->getAllCameras(mServer);
+            }
 
             for( QnResourceList::const_iterator it = resList.constBegin(); it != resList.constEnd(); ++it )
             {
@@ -642,7 +645,7 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( QnBusinessE
 
     //notifying resources about recording action
     {
-        const QnResourceList& resList = businessRule->actionResources();
+        const QnResourceList& resList = businessRule->actionResourceObjects();
         if( businessRule->actionType() == BusinessActionType::CameraRecording)
         {
             for( QnResourceList::const_iterator it = resList.begin(); it != resList.end(); ++it )

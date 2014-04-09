@@ -9,6 +9,8 @@
 #include <core/resource/resource_fwd.h>
 #include <health/system_health.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <nx_ec/ec_api.h>
+#include <utils/common/email.h>
 
 class QnWorkbenchUserEmailWatcher;
 class QnBusinessEventsFilterResourcePropertyAdaptor;
@@ -34,7 +36,7 @@ signals:
 
 public slots:
     void clear();
-    void updateSmtpSettings(int status, const QnKvPairList &settings, int handle);
+    void updateSmtpSettings( int handle, ec2::ErrorCode errorCode, const QnEmail::Settings& settings );
 
 private slots:
     void at_context_userChanged();

@@ -196,7 +196,7 @@ void QnServerStreamRecorder::beforeProcessData(QnConstAbstractMediaDataPtr media
 
     const QnScheduleTask task = currentScheduleTask();
     bool isRecording = task.getRecordingType() != Qn::RecordingType_Never && qnStorageMan->isWritableStoragesAvailable();
-    if (!m_device->isDisabled()) {
+    if (!m_device->hasFlags(QnResource::foreigner)) {
         if (isRecording) {
             if(m_device->getStatus() == QnResource::Online)
                 m_device->setStatus(QnResource::Recording);
@@ -370,7 +370,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
 {
     QMutexLocker lock(&m_scheduleMutex);
 
-    if (m_mediaServer && m_mediaServer->getPanicMode() != QnMediaServerResource::PM_None)
+    if (m_mediaServer && m_mediaServer->getPanicMode() != Qn::PM_None)
     {
         if (!m_usedPanicMode)
         {
@@ -390,7 +390,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 
     m_usedSpecialRecordingMode = m_usedPanicMode = false;
-    QnScheduleTask noRecordTask(0, m_device->getId(), 1, 0, 0, Qn::RecordingType_Never, 0, 0);
+    QnScheduleTask noRecordTask(QnId(), 1, 0, 0, Qn::RecordingType_Never, 0, 0);
 
     if (!m_schedule.isEmpty())
     {

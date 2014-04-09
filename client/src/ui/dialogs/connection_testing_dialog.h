@@ -5,10 +5,10 @@
 #include <QtCore/QTimer>
 
 #include <api/model/connection_info.h>
-
 #include <core/resource/resource_fwd.h>
-
+#include <nx_ec/ec_api.h>
 #include <ui/dialogs/button_box_dialog.h>
+
 
 class QDataWidgetMapper;
 class QStandardItemModel;
@@ -33,7 +33,7 @@ signals:
 private:
     Q_SLOT void tick();
 
-    Q_SLOT void at_ecConnection_result(int status, QnConnectionInfoPtr connectionInfo, int requestHandle);
+    Q_SLOT void at_ecConnection_result(int reqID, ec2::ErrorCode errorCode, QnConnectionInfo connectionInfo);
     Q_SLOT void at_resource_result(bool success);
 
     /**

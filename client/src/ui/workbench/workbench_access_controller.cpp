@@ -2,16 +2,22 @@
 
 #include <cassert>
 
-#include <utils/common/checked_cast.h>
+#include <client/client_settings.h>
 
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item.h>
+#include <core/resource/videowall_item_index.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_criterion.h>
 
 #include <plugins/resources/archive/abstract_archive_resource.h>
+
+#include <utils/common/checked_cast.h>
 
 #include "workbench_context.h"
 #include "workbench_layout_snapshot_manager.h"
@@ -44,6 +50,9 @@ bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, 
 }
 
 Qn::Permissions QnWorkbenchAccessController::globalPermissions() const {
+    if (qnSettings->isVideoWallMode())
+        return Qn::GlobalViewerPermissions;
+
     return permissions(m_user);
 }
 
@@ -79,9 +88,6 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     if(!resource)
         return 0;
 
-    if(resource->isDisabled())
-        return 0;
-
     if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
         return calculatePermissions(user);
 
@@ -99,6 +105,9 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
 
     if(QnAbstractArchiveResourcePtr archive = resource.dynamicCast<QnAbstractArchiveResource>())
         return calculatePermissions(archive);
+
+    if(QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>())
+        return calculatePermissions(videoWall);
 
     return 0;
 }
@@ -142,6 +151,18 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
         return Qn::FullLayoutPermissions;
     } else {
         QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
+
+        if (m_user) {
+            foreach (QUuid uuid, m_user->videoWallItems()) {
+                QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(uuid);
+                if (index.isNull())
+                    continue;
+                QnVideoWallItem item = index.videowall()->getItem(uuid);
+                if (item.layout == layout->getId())
+                    return user == m_user ? Qn::FullLayoutPermissions : Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
+            }
+        }
+
         if(user != m_user)
             return 0; /* Viewer can't view other's layouts. */
 
@@ -186,6 +207,20 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnMediaS
         return 0;
     }
 }
+
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoWallResourcePtr &videoWall) {
+    assert(videoWall);
+
+    if(m_userPermissions & Qn::GlobalEditVideoWallPermission) {
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+    } else {
+        foreach(const QnVideoWallItem &item, videoWall->getItems())
+            if (m_user && m_user->videoWallItems().contains(item.uuid))
+                return Qn::ReadPermission;
+        return 0;
+    }
+}
+
 
 void QnWorkbenchAccessController::updatePermissions(const QnResourcePtr &resource) {
     setPermissionsInternal(resource, calculatePermissions(resource));

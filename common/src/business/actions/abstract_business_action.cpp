@@ -25,8 +25,10 @@ namespace BusinessActionType {
         case Bookmark:
         case CameraRecording:
             return true;
+
+        default:
+            return false;
         }
-        return false;
     }
 
     bool requiresUserResource(Value val) {
@@ -46,8 +48,10 @@ namespace BusinessActionType {
 
         case SendMail:
             return true;
+
+        default:
+            return false;
         }
-        return false;
     }
 
     bool hasToggleState(Value val) {
@@ -67,9 +71,13 @@ namespace BusinessActionType {
         case PanicRecording:
         case PlaySoundRepeated:
             return true;
+
+        default:
+            return false;
         }
-        return false;
     }
+
+    bool isNotImplemented(Value value) { return value == Bookmark; }
 }
 
 QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters& runtimeParams):
@@ -85,12 +93,24 @@ QnAbstractBusinessAction::~QnAbstractBusinessAction()
 {
 }
 
-void QnAbstractBusinessAction::setResources(const QnResourceList& resources) {
+void QnAbstractBusinessAction::setResources(const QVector<QnId>& resources) {
     m_resources = resources;
 }
 
-const QnResourceList& QnAbstractBusinessAction::getResources() const {
+const QVector<QnId>& QnAbstractBusinessAction::getResources() const {
     return m_resources;
+}
+
+QnResourceList QnAbstractBusinessAction::getResourceObjects() const
+{
+    QnResourceList result;
+    foreach(const QnId& id, m_resources)
+    {
+        QnResourcePtr res = qnResPool->getResourceById(id);
+        if (res)
+            result << res;
+    }
+    return result;
 }
 
 void QnAbstractBusinessAction::setParams(const QnBusinessActionParameters& params) {

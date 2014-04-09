@@ -118,7 +118,7 @@ QnServerStreamRecorder* QnRecordingManager::createRecorder(QnResourcePtr res, Qn
 
 bool QnRecordingManager::isResourceDisabled(QnResourcePtr res) const
 {
-    if (res->isDisabled())
+    if (res->hasFlags(QnResource::foreigner))
         return true;
 
     QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource>(res);
@@ -140,10 +140,12 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     }
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(res->getParentId()));
-    QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getGuid());
-    QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    if (appServerConnection->addCameraHistoryItem(cameraHistoryItem) != 0) {
-        qCritical() << "ECS server error during execute method addCameraHistoryItem: " << appServerConnection->getLastError();
+    QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getGuid().toString());
+
+    ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
+    ec2::ErrorCode errCode = appServerConnection->getCameraManager()->addCameraHistoryItemSync(cameraHistoryItem);
+    if (errCode != ec2::ErrorCode::ok && errCode != ec2::ErrorCode::skipped) {
+        qCritical() << "ECS server error during execute method addCameraHistoryItem: " << ec2::toString(errCode);
         return false;
     }
     return true;
@@ -217,7 +219,7 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
     QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
 
-    if (!cameraRes->isInitialized() && !cameraRes->isDisabled() && !cameraRes->isScheduleDisabled())
+    if (!cameraRes->isInitialized() && !cameraRes->hasFlags(QnResource::foreigner) && !cameraRes->isScheduleDisabled())
         cameraRes->initAsync(true);
 
     bool someRecordingIsPresent = false;
@@ -335,7 +337,7 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
 
             startOrStopRecording(res, camera, recorders.recorderHiRes, recorders.recorderLowRes);
         }
-        else if (!res->isDisabled())
+        else if (!res->hasFlags(QnResource::foreigner))
         {
             QnServerStreamRecorder* recorderHiRes = createRecorder(res, camera, QnResource::Role_LiveVideo);
             QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);
@@ -376,7 +378,7 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (dynamic_cast<QnVirtualCameraResource*>(sender())->toSharedPointer());
     if (camera) {
-        if (!camera->isInitialized() && !camera->isDisabled()) {
+        if (!camera->isInitialized() && !camera->hasFlags(QnResource::foreigner)) {
             camera->initAsync(false);
         }
 
@@ -425,7 +427,7 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
         if(status == QnResource::Online || status == QnResource::Recording)
             m_onlineCameras.insert(camera); // TODO: merge into at_camera_statusChanged
 
-        if (!camera->isInitialized() && !camera->isDisabled() && !camera->isScheduleDisabled())
+        if (!camera->isInitialized() && !camera->hasFlags(QnResource::foreigner) && !camera->isScheduleDisabled())
             camera->initAsync(true);
 
         connect(camera.data(), SIGNAL(statusChanged(const QnResourcePtr &)),            this, SLOT(at_camera_statusChanged(const QnResourcePtr &)));

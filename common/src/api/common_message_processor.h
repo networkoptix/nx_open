@@ -10,9 +10,7 @@
 #include <business/business_fwd.h>
 
 #include <utils/common/singleton.h>
-
-class QnMessage;
-class QnMessageSource;
+#include "nx_ec/ec_api.h"
 
 class QnCommonMessageProcessor: public QObject, public Singleton<QnCommonMessageProcessor>
 {
@@ -21,46 +19,56 @@ public:
     explicit QnCommonMessageProcessor(QObject *parent = 0);
     virtual ~QnCommonMessageProcessor() {}
 
-    virtual void run();
-    virtual void stop();
+    virtual void init(ec2::AbstractECConnectionPtr connection);
 
-    virtual void init(const QUrl &url, const QString &authKey, int reconnectTimeout = EVENT_RECONNECT_TIMEOUT);
+    virtual void updateResource(const QnResourcePtr &resource) = 0;
 
 signals:
     void connectionOpened();
     void connectionClosed();
-    void connectionReset();
+    void connectionReset( QnCommonMessageProcessor* );
 
     void fileAdded(const QString &filename);
     void fileUpdated(const QString &filename);
     void fileRemoved(const QString &filename);
 
     void businessRuleChanged(const QnBusinessEventRulePtr &rule);
-    void businessRuleDeleted(int id);
-    void businessRuleReset(QnBusinessEventRuleList rules);
-
+    void businessRuleDeleted(const QnId &id);
+    void businessRuleReset(const QnBusinessEventRuleList &rules);
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
 protected:
-    virtual void loadRuntimeInfo(const QnMessage &message);
-    virtual void handleConnectionOpened(const QnMessage &message);
-    virtual void handleConnectionClosed(const QString &errorString);
-    virtual void handleMessage(const QnMessage &message);
-    virtual void updateKvPairs(const QnKvPairListsById &kvPairs);
+    virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
+    virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) = 0;
+    
+    virtual void afterRemovingResource(const QnId &id);
 
+    void updateHardwareIds(const ec2::QnFullResourceData &fullData);
+    virtual void processResources(const QnResourceList &resources);
+    void processLicenses(const QnLicenseList &licenses);
+    void processCameraServerItems(const QnCameraHistoryList &cameraHistoryList);
+public slots:
+    void on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &rule);
 private slots:
-    void at_connectionOpened(const QnMessage &message);
-    void at_connectionClosed(const QString &errorString);
-    void at_messageReceived(const QnMessage &message);
+    void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
+    void on_runtimeInfoChanged(const ec2::QnRuntimeInfo &runtimeInfo);
 
+    void on_resourceStatusChanged(const QnId &resourceId, QnResource::Status status );
+    void on_resourceParamsChanged(const QnId& resourceId, const QnKvPairList& kvPairs );
+    void on_resourceRemoved(const QnId& resourceId );
+
+    void on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory);
+
+    void on_licenseChanged(const QnLicensePtr &license);
+
+    void on_businessEventRemoved(const QnId &id);
+    void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);
+    void on_businessRuleReset(const QnBusinessEventRuleList &rules);
+    void on_broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
+
+    void on_panicModeChanged(Qn::PanicMode mode);
 protected:
-    QSharedPointer<QnMessageSource> m_source;
-
-    static const int EVENT_RECONNECT_TIMEOUT = 3000;
-
-private:
-    QUrl m_url;
-    QString m_authKey;
-    int m_reconnectTimeout;
+    ec2::AbstractECConnectionPtr m_connection;
+    QMap<QnId, QnBusinessEventRulePtr> m_rules;
 };
 
 #endif // COMMON_MESSAGE_PROCESSOR_H

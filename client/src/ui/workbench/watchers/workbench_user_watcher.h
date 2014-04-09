@@ -58,7 +58,7 @@ private:
     QnUserResourceList m_users;
     QString m_userName;
     QString m_userPassword;
-    QString m_userPasswordHash;
+    QByteArray m_userPasswordHash;
     QnUserResourcePtr m_user;
 };
 

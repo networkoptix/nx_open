@@ -18,7 +18,7 @@ class QnStardotResource : public QnPhysicalCameraResource
     Q_OBJECT
 
 public:
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     QnStardotResource();
     ~QnStardotResource();

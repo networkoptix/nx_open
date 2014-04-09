@@ -3,43 +3,67 @@
 
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
+#include <QUuid>
 
+#include <utils/network/socket.h>
+#include <common/common_globals.h>
+
+typedef QUuid QnId;
+
+/*
 class QnId {
 public:
-    QnId() : m_id(0) {}
-    QnId(const int value) : m_id(value) {}
-    QnId(const QString &other) : m_id(other.toInt()) {}
-    QnId(const char *other) : m_id(QByteArray(other).toInt()) {}
-    void markUnloaded() { if (m_id > 0) m_id = -m_id; }
-    void markLoaded() { if (m_id < 0) m_id = -m_id; }
-    bool isLoaded() const { return m_id > 0; }
-    QnId asLoaded() const { return QnId(qAbs(m_id)); }
-    bool isValid() const { return m_id != 0; }
-    bool isSpecial() const; // local generated ID. Id still unique
-    operator uint() const { return uint(m_id); }
-    QString toString() const { return QString::number(m_id); }
-    int toInt() const { return m_id; }
+    QnId() : m_id() {}
+    QnId(const QString& val) : m_id(val) {}
+    QnId(const QByteArray& val) : m_id(val) {}
+    QnId(const QUuid& val) : m_id(val) {}
+    QnId(const QnId &other) : m_id(other.m_id) {}
 
-    /**
-     * Generates a new unassigned id.
-     *
-     * \returns                         Newly generated id.
-     * 
-     * \note                            This function is thread-safe.
-     */
-    static QnId generateSpecialId();
+    operator QString() { return m_id.toString(); }
+    QString toString() const { return m_id.toString(); }
 
-    QnId &operator=(const QnId &other)
-    {
-        m_id = other.m_id;
-        return *this;
-    }
+    bool isValid() const { return !m_id.isNull(); }
+    QByteArray serialize() const { return m_id.toRfc4122(); }
+
+    static QnId createId() { return QnId(QUuid::createUuid()); }
+    QnId &operator=(const QnId &other) { m_id = other.m_id; return *this; }
+    bool operator==(const QnId &other) const { return m_id == other.m_id; }
+    bool operator!=(const QnId &other) const { return m_id != other.m_id; }
+    bool operator<(const QnId &other) const { return m_id < other.m_id; }
 
 private:
-    int m_id;
+    friend uint qHash(const QnId &t);
+
+    QUuid m_id;
 };
 
+inline uint qHash(const QnId &t) { return qHash(t.m_id); }
 Q_DECLARE_TYPEINFO(QnId, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(QnId);
+
+QN_DECLARE_FUNCTIONS_FOR_TYPES((QnId), (json))
+*/
+
+
+inline QnId intToGuid(qint32 value)
+{
+    QByteArray data(16, 0);
+    *((quint32*) data.data()) = htonl(value);
+    return QnId::fromRfc4122(data);
+}
+
+inline int guidToInt(const QnId& guid)
+{
+    QByteArray data = guid.toRfc4122();
+    return ntohl(*((quint32*) data.data()));
+}
+
+inline QString guidToSqlString(const QnId& guid)
+{
+    QByteArray data = guid.toRfc4122().toHex();
+    return QString(lit("x'%1'")).arg(QString::fromLocal8Bit(data));
+}
+
+
 
 #endif // QN_ID_H

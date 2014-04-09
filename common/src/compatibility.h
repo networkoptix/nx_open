@@ -5,7 +5,9 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
+#include <nx_ec/binary_serialization_helper.h>
 #include <utils/common/software_version.h>
+
 
 // Presense of an entry in global table means
 // that component of ver1 is compatible (or has compatibility mode)
@@ -15,6 +17,8 @@ QString stripVersion(const QString& version);
 
 struct QnCompatibilityItem
 {
+    QnCompatibilityItem() {}
+
     QnCompatibilityItem(QString v1, QString c1, QString v2)
         : ver1(v1), comp1(c1), ver2(v2)
     {
@@ -29,6 +33,8 @@ struct QnCompatibilityItem
     QString comp1;
     QString ver2;
 };
+
+QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(QnCompatibilityItem, (ver1)(comp1)(ver2))
 
 inline uint qHash(const QnCompatibilityItem &item)
 {

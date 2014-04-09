@@ -34,6 +34,7 @@
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
+#include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/help/help_topics.h>
 #include <utils/math/color_transformations.h>
 #include <ui/style/globals.h>
@@ -51,7 +52,6 @@
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 
-#include "resource_status_overlay_widget.h"
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
 
@@ -127,6 +127,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_resource->toResource(),   &QnResource::mediaDewarpingParamsChanged,       this, &QnMediaResourceWidget::updateDewarpingParams);
     connect(this,                       &QnResourceWidget::zoomTargetWidgetChanged,     this, &QnMediaResourceWidget::updateDisplay);
     connect(item,                       &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnMediaResourceWidget::updateFisheye);
+    connect(item,                       &QnWorkbenchItem::imageEnhancementChanged,      this, &QnMediaResourceWidget::at_item_imageEnhancementChanged);
     connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateFisheye);
     connect(this,                       &QnResourceWidget::zoomRectChanged,             this, &QnMediaResourceWidget::updateFisheye);
     connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateButtonsVisibility);
@@ -268,7 +269,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
 
 }
 
-QnMediaResourcePtr QnMediaResourceWidget::resource() const {
+const QnMediaResourcePtr &QnMediaResourceWidget::resource() const {
     return m_resource;
 }
 
@@ -341,6 +342,17 @@ void QnMediaResourceWidget::clearMotionSelection() {
     for (int i = 0; i < m_motionSelection.size(); ++i)
         m_motionSelection[i] = QRegion();
 
+    invalidateMotionSelectionCache();
+    emit motionSelectionChanged();
+}
+
+void QnMediaResourceWidget::setMotionSelection(const QList<QRegion> &regions) {
+    if (regions.size() != m_motionSelection.size()) {
+        qWarning() << "invalid motion selection list";
+        return;
+    }
+
+    m_motionSelection = regions;
     invalidateMotionSelectionCache();
     emit motionSelectionChanged();
 }
@@ -931,7 +943,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     } else if (resource->hasFlags(QnResource::ARCHIVE) && resource->getStatus() == QnResource::Offline) {
         return Qn::NoDataOverlay;
     } else if (m_display->isPaused() && (options() & DisplayActivity)) {
-        return Qn::PausedOverlay;
+        if (!qnSettings->isVideoWallMode())
+            return Qn::PausedOverlay;
+        return Qn::EmptyOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Offline) {
         return Qn::OfflineOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Unauthorized) {
@@ -1135,4 +1149,8 @@ void QnMediaResourceWidget::updateCustomAspectRatio() {
 
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
     menu()->trigger(Qn::CameraDiagnosticsAction, m_camera);
+}
+
+void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
+    setImageEnhancement(item()->imageEnhancement());
 }

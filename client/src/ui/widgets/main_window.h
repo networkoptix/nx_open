@@ -55,6 +55,7 @@ public:
 
     QWidget *viewport() const;
 
+    void updateDecorationsState();
 public slots:
     void handleMessage(const QString &message);
 
@@ -85,7 +86,6 @@ protected slots:
 
     void toggleTitleVisibility();
 
-    void updateDecorationsState();
     void updateDwmState();
 
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);

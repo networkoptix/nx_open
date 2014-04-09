@@ -40,7 +40,7 @@ void QnVMax480ChunkReader::run()
     {
         QnResource::Status status = m_res->getStatus();
 
-        if (m_res->isDisabled())
+        if (m_res->hasFlags(QnResource::foreigner))
             break;
 
         if (status == QnResource::Offline || status == QnResource::Unauthorized)

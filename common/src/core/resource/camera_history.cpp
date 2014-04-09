@@ -6,8 +6,9 @@ extern "C"
     #include <libavutil/avutil.h>
 }
 
-#include "core/resource_management/resource_pool.h"
-#include "media_server_resource.h"
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/network_resource.h>
+#include <core/resource/media_server_resource.h>
 #include "utils/common/warnings.h"
 #include "utils/common/util.h"
 
@@ -46,7 +47,7 @@ QnCameraTimePeriodList QnCameraHistory::getOnlineTimePeriods() const
     for (QnCameraTimePeriodList::const_iterator itr = m_fullTimePeriods.constBegin(); itr != m_fullTimePeriods.constEnd(); ++itr)
     {
         QnResourcePtr resource = qnResPool->getResourceByGuid(itr->mediaServerGuid);
-        if (resource && !resource->isDisabled() && (resource->getStatus() == QnResource::Online || resource->getStatus() == QnResource::Recording))
+        if (resource && resource->getStatus() == QnResource::Online)
             result << *itr;        
     }
     return result;

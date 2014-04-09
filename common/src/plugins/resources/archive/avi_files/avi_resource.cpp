@@ -28,18 +28,6 @@ QnAviResource::~QnAviResource()
 {
 }
 
-void QnAviResource::deserialize(const QnResourceParameters& parameters)
-{
-    QnAbstractArchiveResource::deserialize(parameters);
-
-    if (parameters.contains(QLatin1String("file")))
-    {
-        QString file = parameters[QLatin1String("file")];
-        setUrl(QDir::cleanPath(file));
-        setName(QnFile::fileName(file));
-    }
-}
-
 QString QnAviResource::toString() const
 {
     return getName();

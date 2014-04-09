@@ -115,6 +115,7 @@ private:
     Qn::Permissions calculatePermissions(const QnVirtualCameraResourcePtr &camera);
     Qn::Permissions calculatePermissions(const QnAbstractArchiveResourcePtr &archive);
     Qn::Permissions calculatePermissions(const QnMediaServerResourcePtr &server);
+    Qn::Permissions calculatePermissions(const QnVideoWallResourcePtr &videoWall);
 
 private:
     struct PermissionsData {

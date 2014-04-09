@@ -44,6 +44,7 @@ public:
     void enableSync(qint64 currentTime, float currentSpeed);
 
     virtual bool isEnabled() const;
+    virtual qreal getSpeed() const;
 
     //virtual bool setMotionRegion(const QRegion& region);
     //virtual bool setSendMotion(bool value);

@@ -25,6 +25,7 @@
 #include "unused.h"
 #include "json_fwd.h"
 #include "json_context.h"
+#include "id.h"
 
 namespace QJsonDetail {
     void serialize_json(const QJsonValue &value, QByteArray *target, QJsonDocument::JsonFormat format = QJsonDocument::Compact);

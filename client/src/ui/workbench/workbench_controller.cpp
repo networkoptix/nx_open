@@ -30,6 +30,9 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/file_processor.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item.h>
+#include <core/resource/videowall_item_index.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -286,7 +289,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(ptzInstrument);
     m_manager->installInstrument(zoomWindowInstrument);
 
-    display()->setLayer(m_dropInstrument->surface(), Qn::UiLayer);
+    display()->setLayer(m_dropInstrument->surface(), Qn::BackLayer);
 
     connect(m_itemLeftClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemLeftClickInstrument,  SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
@@ -1054,16 +1057,16 @@ void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, co
 
 void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget) {
     QnLayoutItemData data = widget->item()->data();
+    delete widget;
+
     data.uuid = QUuid::createUuid();
-    data.resource.id = zoomTargetWidget->resource()->toResource()->getId().toInt();
+    data.resource.id = zoomTargetWidget->resource()->toResource()->getId();
     data.resource.path = zoomTargetWidget->resource()->toResource()->getUniqueId();
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
     data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
-    
-    QnResourceWidget::Buttons buttons = widget->checkedButtons();
-    delete widget;
+
 
     int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
             ? 1
@@ -1073,7 +1076,6 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     if (layout->getItems().size() >= maxItems)
         return;
     layout->addItem(data);
-    display()->widget(data.uuid)->setCheckedButtons(buttons);
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {

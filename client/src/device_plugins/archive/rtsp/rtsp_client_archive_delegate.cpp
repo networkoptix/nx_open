@@ -2,25 +2,31 @@
 #include "rtsp_client_archive_delegate.h"
 
 #include <QtCore/QBuffer>
+#include <QtNetwork/QNetworkCookie>
 
 extern "C"
 {
     #include <libavcodec/avcodec.h>
 }
 
-#include "core/datapacket/media_data_packet.h"
-#include "core/resource_management/resource_pool.h"
-#include "utils/network/rtp_stream_parser.h"
-#include "utils/media/ffmpeg_helper.h"
-#include "utils/network/ffmpeg_sdp.h"
-#include "utils/common/util.h"
-#include "utils/common/sleep.h"
-#include "utils/common/synctime.h"
-#include "core/resource/camera_history.h"
-#include "core/resource/media_server_resource.h"
-#include "redass/redass_controller.h"
-#include "device_plugins/server_camera/server_camera.h"
-#include "api/app_server_connection.h"
+#include <api/app_server_connection.h>
+#include <api/session_manager.h>
+
+#include <core/datapacket/media_data_packet.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/media_server_resource.h>
+
+#include <device_plugins/server_camera/server_camera.h>
+
+#include <redass/redass_controller.h>
+
+#include <utils/common/util.h>
+#include <utils/common/sleep.h>
+#include <utils/common/synctime.h>
+#include <utils/media/ffmpeg_helper.h>
+#include <utils/network/rtp_stream_parser.h>
+#include <utils/network/ffmpeg_sdp.h>
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
@@ -153,7 +159,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
             if (server && server->getStatus() != QnResource::Offline)
             {
                 otherRtspSession.setProxyAddr(server->getProxyHost(), server->getProxyPort());
-                otherRtspSession.setAdditionAttribute("x-server-guid", server->getGuid().toUtf8());
+                otherRtspSession.setAdditionAttribute("x-server-guid", server->getGuid().toByteArray());
                 if (otherRtspSession.open(getUrl(otherCamera)).errorCode == CameraDiagnostics::ErrorCode::noError) {
                     if ((quint64)otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
                     {
@@ -169,34 +175,9 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
         return 0;
 }
 
-QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resource, qint64 time)
+QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resource, qint64)
 {
-    QnServerCameraPtr camRes = qSharedPointerDynamicCast<QnServerCamera>(resource);
-    if (!camRes)
-        return resource;
-    QString physicalId = camRes->getPhysicalId();
-
-    if (time == DATETIME_NOW)
-    {
-        QnServerCameraPtr activeCam = camRes->findEnabledSibling();
-        return activeCam ? activeCam : camRes;
-    }
-
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
-    if (!history)
-        return resource;
-    QnMediaServerResourcePtr mediaServer = history->getMediaServerOnTime(time, m_rtspSession.getScale() >= 0, m_serverTimePeriod, false);
-    if (!mediaServer)
-        return resource;
-
-    // get camera resource from other server. Unique id is physicalId + serverID
-    QnResourcePtr newResource = qnResPool->getResourceByUniqId(physicalId + mediaServer->getId().toString());
-    if (newResource && newResource != resource) {
-        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(resource->getParentId()));
-        if (mediaServer)
-            qDebug() << "switch to media server " << mediaServer->getUrl();
-    }
-    return newResource ? newResource : resource;
+    return resource;
 }
 
 bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
@@ -231,7 +212,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     m_rtspSession.setTransport(QLatin1String("TCP"));
 
     m_rtspSession.setProxyAddr(server->getProxyHost(), server->getProxyPort());
-    m_rtspSession.setAdditionAttribute("x-server-guid", server->getGuid().toUtf8());
+    m_rtspSession.setAdditionAttribute("x-server-guid", server->getGuid().toByteArray());
     m_rtpData = 0;
 
     bool globalTimeBlocked = false;
@@ -462,7 +443,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
         if (m_tcpMode)
         {
             if (blockSize < 4) {
-                qWarning() << Q_FUNC_INFO << __LINE__ << "strange RTP/TCP packet. len < 4. Ignored";
+//                qWarning() << Q_FUNC_INFO << __LINE__ << "strange RTP/TCP packet. len < 4. Ignored";
                 return result;
             }
             rtpChannelNum = m_rtpDataBuffer[1];
@@ -821,6 +802,9 @@ void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
     auth.setPassword(password);
     
     m_rtspSession.setAuth(auth, RTPSession::authDigest);
+
+    if (QnSessionManager::instance()->authCookieEnabled())
+        m_rtspSession.setAdditionAttribute("cookie", QnSessionManager::instance()->authCookie().toRawForm(QNetworkCookie::NameAndValueOnly));
 }
 
 void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)

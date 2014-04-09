@@ -20,6 +20,7 @@ typedef QnSharedResourcePointerList<QnResource> QnResourceList;
 class QnVirtualCameraResource;
 typedef QnSharedResourcePointer<QnVirtualCameraResource> QnVirtualCameraResourcePtr;
 typedef QnSharedResourcePointerList<QnVirtualCameraResource> QnVirtualCameraResourceList;
+typedef QSharedPointer<QnVirtualCameraResourceList> QnVirtualCameraResourceListPtr;
 
 class QnPhysicalCameraResource;
 typedef QnSharedResourcePointer<QnPhysicalCameraResource> QnPhysicalCameraResourcePtr;
@@ -105,5 +106,12 @@ typedef QSharedPointer<QnDesktopResource> QnDesktopResourcePtr;
 
 class QnThirdPartyResource;
 typedef QSharedPointer<QnThirdPartyResource> QnThirdPartyResourcePtr;
+
+class QnVideoWallResource;
+typedef QnSharedResourcePointer<QnVideoWallResource> QnVideoWallResourcePtr;
+typedef QnSharedResourcePointerList<QnVideoWallResource> QnVideoWallResourceList;
+
+class QnVideoWallItemIndex;
+typedef QList<QnVideoWallItemIndex> QnVideoWallItemIndexList;
 
 #endif // QN_RESOURCE_FWD_H

@@ -6,10 +6,10 @@
 #include <QtGui/QIntValidator>
 
 #include <api/model/kvpair.h>
-
+#include <nx_ec/ec_api.h>
 #include <ui/workbench/workbench_context_aware.h>
-
 #include <utils/common/email.h>
+
 
 namespace Ui {
     class SmtpSettingsWidget;
@@ -41,9 +41,9 @@ private slots:
 
     void at_timer_timeout();
 
-    void at_settings_received(int status, const QnKvPairList &values, int handle);
+    void at_settings_received( int handle, ec2::ErrorCode errorCode, const QnEmail::Settings& settings );
 
-    void at_finishedTestEmailSettings(int status, bool result, int handle);
+    void at_finishedTestEmailSettings(int handle, ec2::ErrorCode errorCode);
 
     void at_advancedCheckBox_toggled(bool toggled);
     void at_simpleEmail_textChanged(const QString &value);

@@ -30,7 +30,7 @@ public:
         QByteArray resolutionStr;
     };
 
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     QnPlAxisResource();
     ~QnPlAxisResource();

@@ -72,7 +72,12 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
         controller.reset(new QnWorkaroundPtzController(controller));
 
     camera->setPtzCapabilities(controller->getCapabilities());
-    QnAppServerConnectionFactory::createConnection()->saveAsync(camera, NULL, NULL);
+    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addCamera(camera, this, &QnServerPtzControllerPool::at_addCameraDone);
     
     return controller;
+}
+
+void QnServerPtzControllerPool::at_addCameraDone(int, ec2::ErrorCode, const QnVirtualCameraResourceList &)
+{
+
 }

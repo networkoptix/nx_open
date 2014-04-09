@@ -12,9 +12,13 @@ void QnLocalFileProcessor::processResources(const QnResourceList &resources)
 }
 
 
-QnServerCamera::QnServerCamera()
+QnServerCamera::QnServerCamera(const QnId& resourceTypeId): QnVirtualCameraResource()
 {
+    setTypeId(resourceTypeId);
     addFlags(server_live_cam);
+    if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
+        addFlags(QnResource::motion);
+    m_tmpStatus = NotDefined;
 }
 
 bool QnServerCamera::isResourceAccessible()
@@ -72,37 +76,9 @@ QString QnServerCamera::getUniqueIdForServer(const QnResourcePtr mServer) const
     return getPhysicalId() + mServer->getId().toString();
 }
 
-QnServerCameraPtr QnServerCamera::findEnabledSibling()
-{
-    if (!isDisabled())
-        return toSharedPointer().dynamicCast<QnServerCamera>();
-
-    {
-        QMutexLocker lock(&m_mutex);
-        if (m_activeCamera && !m_activeCamera->isDisabled())
-            return m_activeCamera;
-    }
-
-    QnNetworkResourceList resList = qnResPool->getAllNetResourceByPhysicalId(getPhysicalId());
-    foreach(const QnNetworkResourcePtr& netRes, resList)
-    {
-        if (!netRes->isDisabled()) {
-            QnServerCameraPtr cam = netRes.dynamicCast<QnServerCamera>();
-            if (cam) {
-                QMutexLocker lock(&m_mutex);
-                m_activeCamera = cam;
-                return m_activeCamera;
-            }
-        }
-    }
-
-    return QnServerCameraPtr();
-}
-
-
 // --------------------------- QnServerCameraFactory -----------------------------
 
-QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const QnResourceParams&)
 {
     QnResourcePtr resource;
 
@@ -121,10 +97,9 @@ QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const Q
         if (!resourceType->isCamera())
             return resource;
 
-        resource = QnResourcePtr(new QnServerCamera());
-        resource->setTypeId(resourceTypeId);
+        resource = QnResourcePtr(new QnServerCamera(resourceTypeId));
     }
-    resource->deserialize(parameters);
+    //resource->deserialize(parameters);
     return resource;
 }
 
@@ -135,3 +110,22 @@ QnServerCameraFactory& QnServerCameraFactory::instance()
     return _instance;
 }
 
+
+QnResource::Status QnServerCamera::getStatus() const
+{
+    if (m_tmpStatus != NotDefined)
+        return m_tmpStatus;
+    else
+        return QnResource::getStatus();
+}
+
+void QnServerCamera::setTmpStatus(Status value)
+{
+    if (value != m_tmpStatus) {
+        Status oldStatus = getStatus();
+        m_tmpStatus = value;
+        Status newStatus = getStatus();
+        if (oldStatus != newStatus)
+            emit statusChanged(toSharedPointer(this));
+    }
+}

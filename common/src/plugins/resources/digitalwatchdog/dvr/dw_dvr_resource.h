@@ -3,7 +3,7 @@
 class QnDwDvrResource : public QnPhysicalCameraResource
 {
 public:
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     virtual QString getDriverName() const override;
     virtual void setMotionMaskPhysical(int channel) override;

@@ -50,19 +50,19 @@ void QnBusinessEventParameters::setEventTimestamp(qint64 value) {
     m_timestamp = value;
 }
 
-int QnBusinessEventParameters::getEventResourceId() const {
+QnId QnBusinessEventParameters::getEventResourceId() const {
     return m_resourceId;
 }
 
-void QnBusinessEventParameters::setEventResourceId(int value) {
+void QnBusinessEventParameters::setEventResourceId(const QnId& value) {
     m_resourceId = value;
 }
 
-int QnBusinessEventParameters::getActionResourceId() const {
+QnId QnBusinessEventParameters::getActionResourceId() const {
     return m_actionResourceId;
 }
 
-void QnBusinessEventParameters::setActionResourceId(int value) {
+void QnBusinessEventParameters::setActionResourceId(const QnId& value) {
     m_actionResourceId = value;
 }
 
@@ -163,10 +163,10 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
                     result.m_timestamp = toInt64(field);
                     break;
                 case eventResourceParam:
-                    result.m_resourceId = toInt(field);
+                    result.m_resourceId = QnId(field);
                     break;
                 case actionResourceParam:
-                    result.m_actionResourceId = toInt(field);
+                    result.m_actionResourceId = QnId(field);
                     break;
 
                 // event specific params.
@@ -214,6 +214,15 @@ static void serializeStringParam(QByteArray& result, const QString& value, const
     result += DELIMITER;
 }
 
+static void serializeQnIdParam(QByteArray& result, const QnId& value)
+{
+    if (value != QnId()) {
+        QByteArray data = value.toByteArray();
+        result += data;
+    }
+    result += DELIMITER;
+}
+
 void serializeStringListParam(QByteArray& result, const QStringList& value)
 {
     if (!value.isEmpty()) {
@@ -234,8 +243,8 @@ QByteArray QnBusinessEventParameters::serialize() const
 
     serializeIntParam(result, m_eventType, m_defaultParams.m_eventType);
     serializeIntParam(result, m_timestamp, m_defaultParams.m_timestamp);
-    serializeIntParam(result, m_resourceId, m_defaultParams.m_resourceId);
-    serializeIntParam(result, m_actionResourceId, m_defaultParams.m_actionResourceId);
+    serializeQnIdParam(result, m_resourceId);
+    serializeQnIdParam(result, m_actionResourceId);
     serializeStringParam(result, m_inputPort, m_defaultParams.m_inputPort);
     serializeIntParam(result, m_reasonCode, m_defaultParams.m_reasonCode);
     serializeStringParam(result, m_reasonParamsEncoded, m_defaultParams.m_reasonParamsEncoded);
@@ -269,10 +278,10 @@ QnBusinessParams QnBusinessEventParameters::toBusinessParams() const
         result.insert(PARAM_NAMES[eventTimestampParam], m_timestamp);
 
     if (m_resourceId != m_defaultParams.m_resourceId)
-        result.insert(PARAM_NAMES[eventResourceParam], m_resourceId.toInt());
+        result.insert(PARAM_NAMES[eventResourceParam], m_resourceId.toString());
 
     if (m_actionResourceId != m_defaultParams.m_actionResourceId)
-        result.insert(PARAM_NAMES[actionResourceParam], m_actionResourceId.toInt());
+        result.insert(PARAM_NAMES[actionResourceParam], m_actionResourceId.toString());
 
     if (m_inputPort != m_defaultParams.m_inputPort)
         result.insert(PARAM_NAMES[inputPortIdParam], m_inputPort);
@@ -329,10 +338,10 @@ QnBusinessEventParameters QnBusinessEventParameters::fromBusinessParams(const Qn
                 result.m_timestamp = itr.value().toLongLong();
                 break;
             case eventResourceParam:
-                result.m_resourceId = itr.value().toInt();
+                result.m_resourceId = itr.value().toString();
                 break;
             case actionResourceParam:
-                result.m_actionResourceId = itr.value().toInt();
+                result.m_actionResourceId = itr.value().toString();
                 break;
 
                 // event specific params.

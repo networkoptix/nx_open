@@ -38,20 +38,6 @@ void QnEventsDB::setEventLogPeriod(qint64 periodUsec)
     m_eventKeepPeriod = periodUsec;
 }
 
-bool QnEventsDB::isObjectExists(const QString& objectType, const QString& objectName)
-{
-    QSqlQuery tableList(m_sdb);
-    QString request;
-    request = QString(lit("SELECT * FROM sqlite_master WHERE type='%1' and name='%2'")).arg(objectType).arg(objectName);
-    tableList.prepare(request);
-    if (!tableList.exec())
-        return false;
-    int fieldNo = tableList.record().indexOf(lit("name"));
-    tableList.next();
-    QString value = tableList.value(fieldNo).toString();
-    return !value.isEmpty();
-}
-
 bool QnEventsDB::createDatabase()
 {
     if (!isObjectExists(lit("table"), lit("runtime_actions")))
@@ -60,8 +46,8 @@ bool QnEventsDB::createDatabase()
         ddlQuery.prepare(
             "CREATE TABLE \"runtime_actions\" "
             "(timestamp INTEGER NOT NULL, action_type SMALLINT NOT NULL, "
-            "action_params TEXT, runtime_params TEXT, business_rule_id INTEGER, toggle_state SMALLINT, aggregation_count INTEGER, "
-            "event_type SMALLINT, event_resource_id INTEGER, action_resource_id INTEGER)"
+            "action_params TEXT, runtime_params TEXT, business_rule_guid BLOB(16), toggle_state SMALLINT, aggregation_count INTEGER, "
+            "event_type SMALLINT, event_resource_GUID BLOB(16), action_resource_guid BLOB(16))"
         );
         if (!ddlQuery.exec())
             return false;
@@ -70,7 +56,7 @@ bool QnEventsDB::createDatabase()
     if (!isObjectExists(lit("index"), lit("timeAndCamIdx"))) {
         QSqlQuery ddlQuery(m_sdb);
         ddlQuery.prepare(
-            "CREATE INDEX \"timeAndCamIdx\" ON \"runtime_actions\" (timestamp,event_resource_id)"
+            "CREATE INDEX \"timeAndCamIdx\" ON \"runtime_actions\" (timestamp,event_resource_guid)"
         );
         if (!ddlQuery.exec())
             return false;
@@ -98,51 +84,52 @@ bool QnEventsDB::cleanupEvents()
 
 bool QnEventsDB::removeLogForRes(QnId resId)
 {
-    QMutexLocker lock(&m_mutex);
+    QWriteLocker lock(&m_mutex);
 
     if (!m_sdb.isOpen())
         return false;
 
     QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM runtime_actions where event_resource_id = :id1 or action_resource_id = :id2");
+    delQuery.prepare("DELETE FROM runtime_actions where event_resource_guid = :id1 or action_resource_guid = :id2");
 
 
-    delQuery.bindValue(":id1", resId.toInt());
-    delQuery.bindValue(":id2", resId.toInt());
+    delQuery.bindValue(":id1", resId.toRfc4122());
+    delQuery.bindValue(":id2", resId.toRfc4122());
 
     return delQuery.exec();
 }
 
 bool QnEventsDB::saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePtr actionRes)
 {
-    QMutexLocker lock(&m_mutex);
+    QWriteLocker lock(&m_mutex);
 
     if (!m_sdb.isOpen())
         return false;
 
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT INTO runtime_actions (timestamp, action_type, action_params, runtime_params, business_rule_id, toggle_state, aggregation_count, event_type, event_resource_id, action_resource_id) "
-        "VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_id, :toggle_state, :aggregation_count, :event_type, :event_resource_id, :action_resource_id);");
+    insQuery.prepare("INSERT INTO runtime_actions (timestamp, action_type, action_params, runtime_params, business_rule_guid, toggle_state, aggregation_count, event_type, "
+        "event_resource_guid, action_resource_guid) "
+        "VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_guid, :toggle_state, :aggregation_count, :event_type, :event_resource_guid, :action_resource_guid);");
 
     qint64 timestampUsec = action->getRuntimeParams().getEventTimestamp();
-    int eventResId = action->getRuntimeParams().getEventResourceId();
+    QnId eventResId = action->getRuntimeParams().getEventResourceId();
     
     QnBusinessEventParameters actionRuntime = action->getRuntimeParams();
     if (actionRes)
-        actionRuntime.setActionResourceId(actionRes->getId().toInt());
+        actionRuntime.setActionResourceId(actionRes->getId());
     int eventType = (int) actionRuntime.getEventType();
 
     insQuery.bindValue(":timestamp", timestampUsec/1000000);
     insQuery.bindValue(":action_type", (int) action->actionType());
     insQuery.bindValue(":action_params", action->getParams().serialize());
     insQuery.bindValue(":runtime_params", actionRuntime.serialize());
-    insQuery.bindValue(":business_rule_id", action->getBusinessRuleId().toInt());
+    insQuery.bindValue(":business_rule_guid", action->getBusinessRuleId().toRfc4122());
     insQuery.bindValue(":toggle_state", (int) action->getToggleState());
     insQuery.bindValue(":aggregation_count", action->getAggregationCount());
 
     insQuery.bindValue(":event_type", eventType);
-    insQuery.bindValue(":event_resource_id", eventResId);
-    insQuery.bindValue(":action_resource_id", actionRes ? QVariant(actionRes->getId().toInt()) : QVariant());
+    insQuery.bindValue(":event_resource_guid", eventResId.toRfc4122());
+    insQuery.bindValue(":action_resource_guid", actionRes ? actionRes->getId().toRfc4122() : QByteArray());
 
     bool rez = insQuery.exec();
     if (rez)
@@ -171,15 +158,15 @@ QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
     }
 
     if (resList.size() == 1)
-        request += QString(lit(" and event_resource_id = %1 ")).arg(resList[0]->getId().toInt());
+        request += QString(lit(" and event_resource_guid = %1 ")).arg(guidToSqlString(resList[0]->getId()));
     else if (resList.size() > 1) {
         QString idList;
         foreach(QnResourcePtr res, resList) {
             if (!idList.isEmpty())
                 idList += QLatin1Char(',');
-            idList += QString::number(res->getId());
+            idList += guidToSqlString(res->getId());
         }
-        request += QString(lit(" and event_resource_id in (%1) ")).arg(idList);
+        request += QString(lit(" and event_resource_guid in (%1) ")).arg(idList);
     }
 
     if (eventType != BusinessEventType::NotDefined && eventType != BusinessEventType::AnyBusinessEvent)
@@ -200,8 +187,8 @@ QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
     }
     if (actionType != BusinessActionType::NotDefined)
         request += QString(lit( " and action_type = %1 ")).arg((int) actionType);
-    if (businessRuleId.isValid())
-        request += QString(lit( " and  business_rule_id = %1 ")).arg(businessRuleId.toInt());
+    if (!businessRuleId.isNull())
+        request += QString(lit( " and  business_rule_guid = %1 ")).arg(guidToSqlString(businessRuleId));
 
     return request;
 }
@@ -220,7 +207,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
     QList<QnAbstractBusinessActionPtr> result;
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
-    QMutexLocker lock(&m_mutex);
+    QReadLocker lock(&m_mutex);
 
     QSqlQuery query(request);
     if (!query.exec())
@@ -230,7 +217,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
      int actionTypeIdx = rec.indexOf("action_type");
      int actionParamIdx = rec.indexOf("action_params");
      int runtimeParamIdx = rec.indexOf("runtime_params");
-     int businessRuleIdx = rec.indexOf("business_rule_id");
+     int businessRuleIdx = rec.indexOf("business_rule_guid");
      int toggleStateIdx = rec.indexOf("toggle_state");
      int aggregationCntIdx = rec.indexOf("aggregation_count");
 
@@ -241,7 +228,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
         QnBusinessEventParameters runtimeParams = QnBusinessEventParameters::deserialize(query.value(runtimeParamIdx).toByteArray());
         QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
         action->setParams(actionParams);
-        action->setBusinessRuleId(query.value(businessRuleIdx).toInt());
+        action->setBusinessRuleId(query.value(businessRuleIdx).toByteArray());
         action->setToggleState( (Qn::ToggleState) query.value(toggleStateIdx).toInt());
         action->setAggregationCount(query.value(aggregationCntIdx).toInt());
 
@@ -255,7 +242,13 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
 
 inline void appendIntToBA(QByteArray& ba, int value)
 {
+    value = htonl(value);
     ba.append((const char*) &value, sizeof(int));
+}
+
+inline void appendQnIdToBA(QByteArray& ba, const QnId& value)
+{
+    ba.append(value.toRfc4122());
 }
 
 void QnEventsDB::getAndSerializeActions(
@@ -272,7 +265,7 @@ void QnEventsDB::getAndSerializeActions(
 
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
-    QMutexLocker lock(&m_mutex);
+    QReadLocker lock(&m_mutex);
 
     QSqlQuery actionsQuery(request);
     if (!actionsQuery.exec())
@@ -282,11 +275,11 @@ void QnEventsDB::getAndSerializeActions(
     int actionTypeIdx = rec.indexOf(lit("action_type"));
     int actionParamIdx = rec.indexOf(lit("action_params"));
     int runtimeParamIdx = rec.indexOf(lit("runtime_params"));
-    int businessRuleIdx = rec.indexOf(lit("business_rule_id"));
+    int businessRuleIdx = rec.indexOf(lit("business_rule_guid"));
 //    int toggleStateIdx = rec.indexOf(lit("toggle_state"));
     int aggregationCntIdx = rec.indexOf(lit("aggregation_count"));
     int eventTypeIdx = rec.indexOf(lit("event_type"));
-    int eventResIdx = rec.indexOf(lit("event_resource_id"));
+    int eventResIdx = rec.indexOf(lit("event_resource_guid"));
     int timestampIdx = rec.indexOf(lit("timestamp"));
     rec.field(timestampIdx).setType(QVariant::LongLong);
 
@@ -300,7 +293,7 @@ void QnEventsDB::getAndSerializeActions(
         BusinessEventType::Value eventType = (BusinessEventType::Value) actionsQuery.value(eventTypeIdx).toInt();
         if (eventType == BusinessEventType::Camera_Motion) 
         {
-            QnId eventResId = actionsQuery.value(eventResIdx).toInt();
+            QnId eventResId = QnId::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes = qnResPool->getResourceById(eventResId).dynamicCast<QnNetworkResource>();
             if (camRes) {
                 if (qnStorageMan->isArchiveTimeExists(camRes->getPhysicalId(), actionsQuery.value(timestampIdx).toInt()*1000ll))
@@ -311,7 +304,7 @@ void QnEventsDB::getAndSerializeActions(
 
         appendIntToBA(result, flags);
         appendIntToBA(result, actionsQuery.value(actionTypeIdx).toInt());
-        appendIntToBA(result, actionsQuery.value(businessRuleIdx).toInt());
+        result.append(actionsQuery.value(businessRuleIdx).toByteArray());
         appendIntToBA(result, actionsQuery.value(aggregationCntIdx).toInt());
         //appendIntToBA(result, actionsQuery.value(toggleStateIdx).toInt());
         QByteArray runtimeParams = actionsQuery.value(runtimeParamIdx).toByteArray();
@@ -327,6 +320,7 @@ void QnEventsDB::getAndSerializeActions(
         //ba->set_actionparams(actionsQuery.value(actionParamIdx).toByteArray());
         //ba->set_runtimeparams(actionsQuery.value(runtimeParamIdx).toByteArray());
     }
+    sizeField = htonl(sizeField);
     memcpy(result.data(), &sizeField, sizeof(int));
 
     qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";
@@ -349,7 +343,7 @@ void QnEventsDB::migrate()
     int actionTypeIdx = rec.indexOf("action_type");
     int actionParamIdx = rec.indexOf("action_params");
     int runtimeParamIdx = rec.indexOf("runtime_params");
-    int businessRuleIdx = rec.indexOf("business_rule_id");
+    int businessRuleIdx = rec.indexOf("business_rule_guid");
     int toggleStateIdx = rec.indexOf("toggle_state");
     int aggregationCntIdx = rec.indexOf("aggregation_count");
 
@@ -368,7 +362,7 @@ void QnEventsDB::migrate()
 
         QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
         action->setParams(actionParams);
-        action->setBusinessRuleId(query.value(businessRuleIdx).toInt());
+        action->setBusinessRuleId(query.value(businessRuleIdx).toString());
         action->setToggleState( (Qn::ToggleState) query.value(toggleStateIdx).toInt());
         action->setAggregationCount(query.value(aggregationCntIdx).toInt());
 

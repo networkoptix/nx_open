@@ -3,6 +3,9 @@
 
 #include "business_rules_view_model.h"
 
+#include <nx_ec/ec_api.h>
+
+
 enum QnBusinessRulesActualModelChange {
     RulesLoaded,
     RuleSaved
@@ -25,8 +28,8 @@ signals:
     void beforeModelChanged();
     void afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
     
-    void businessRuleChanged(int id);
-    void businessRuleDeleted(int id);
+    void businessRuleChanged(QnId id);
+    void businessRuleDeleted(QnId id);
 public slots:
     /*
     * Load data from DB
@@ -35,11 +38,11 @@ public slots:
 
     void saveRule(int row);
 private slots:
-    void at_resources_received(int status, const QnBusinessEventRuleList &rules, int handle);
-    void at_resources_saved(int status, const QnBusinessEventRuleList &rules, int handle);
+    void at_resources_received( int reqID, ec2::ErrorCode errorCode, const QnBusinessEventRuleList& rules );
+    void at_resources_saved( int handle, ec2::ErrorCode errorCode, QnBusinessEventRulePtr rule );
 
     void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
-    void at_message_ruleDeleted(int id);
+    void at_message_ruleDeleted(QnId id);
     void at_message_ruleReset(QnBusinessEventRuleList rules);
 
 private:
