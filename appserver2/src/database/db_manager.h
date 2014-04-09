@@ -177,7 +177,7 @@ namespace ec2
         ErrorCode insertResource(const ApiResource& data, qint32* internalId);
         ErrorCode insertOrReplaceResource(const ApiResource& data, qint32* internalId);
         //ErrorCode insertOrReplaceResource(const ApiResource& data);
-        ErrorCode deleteResourceTable(const qint32 id);
+        ErrorCode deleteRecordFromResourceTable(const qint32 id);
         ErrorCode removeResource(const QnId& id);
 
         ErrorCode insertAddParams(const std::vector<ApiResourceParam>& params, qint32 internalId);
@@ -196,7 +196,6 @@ namespace ec2
 
         ErrorCode removeLayout(const QnId& guid);
         ErrorCode removeLayout(qint32 id);
-        ErrorCode deleteLayoutItems(const qint32 id);
         ErrorCode saveLayout(const ApiLayout& params);
         ErrorCode insertOrReplaceLayout(const ApiLayout& data, qint32 internalId);
         ErrorCode updateLayoutItems(const ApiLayout& data, qint32 internalLayoutId);
@@ -209,6 +208,9 @@ namespace ec2
         ErrorCode saveVideowall(const ApiVideowall& params);
         ErrorCode removeVideowall( const QnId& guid );
         ErrorCode insertOrReplaceVideowall(const ApiVideowall& data, qint32 internalId);
+        ErrorCode deleteVideowallItems(const QnId &videowall_guid);
+        ErrorCode updateVideowallItems(const ApiVideowallData& data);
+        ErrorCode updateVideowallScreens(const ApiVideowallData& data);
 
         ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRule& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);
