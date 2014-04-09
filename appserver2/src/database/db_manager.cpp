@@ -1060,20 +1060,6 @@ ErrorCode QnDbManager::removeServer(const QnId& guid)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::deleteLayoutItems(const qint32 id)
-{
-    QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_layoutitem where layout_id = :id");
-    delQuery.bindValue(QLatin1String(":id"), id);
-    if (delQuery.exec()) {
-        return ErrorCode::ok;
-    }
-    else {
-        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
-        return ErrorCode::failure;
-    }
-}
-
 ErrorCode QnDbManager::removeLayout(const QnId& id)
 {
     return removeLayout(getResourceInternalId(id));
@@ -1085,7 +1071,7 @@ ErrorCode QnDbManager::removeLayout(qint32 internalId)
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteLayoutItems(internalId);
+    err = removeLayoutItems(internalId);
     if (err != ErrorCode::ok)
         return err;
 

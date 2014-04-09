@@ -196,7 +196,6 @@ namespace ec2
 
         ErrorCode removeLayout(const QnId& guid);
         ErrorCode removeLayout(qint32 id);
-        ErrorCode deleteLayoutItems(const qint32 id);
         ErrorCode saveLayout(const ApiLayoutData& params);
         ErrorCode insertOrReplaceLayout(const ApiLayoutData& data, qint32 internalId);
         ErrorCode updateLayoutItems(const ApiLayoutData& data, qint32 internalLayoutId);
