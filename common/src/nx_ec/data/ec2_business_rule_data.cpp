@@ -6,7 +6,7 @@
 namespace ec2
 {
 
-void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource, QnResourcePool* resourcePool) const
+void ApiBusinessRule::toResource(QnBusinessEventRulePtr resource, QnResourcePool* /* resourcePool */) const
 {
     resource->setId(id);
     resource->setEventType(eventType);
@@ -31,7 +31,7 @@ void ApiBusinessRuleData::toResource(QnBusinessEventRulePtr resource, QnResource
     resource->setSystem(system);
 }
 
-void ApiBusinessRuleData::fromResource(const QnBusinessEventRulePtr& resource)
+void ApiBusinessRule::fromResource(const QnBusinessEventRulePtr& resource)
 {
     id = resource->id();
     eventType = resource->eventType();
@@ -51,7 +51,7 @@ void ApiBusinessRuleData::fromResource(const QnBusinessEventRulePtr& resource)
     system = resource->system();
 }
 
-QnBusinessEventRuleList ApiBusinessRuleDataList::toResourceList(QnResourcePool* resourcePool) const
+QnBusinessEventRuleList ApiBusinessRuleList::toResourceList(QnResourcePool* resourcePool) const
 {
     QnBusinessEventRuleList outData;
     outData.reserve(outData.size() + data.size());
@@ -64,18 +64,18 @@ QnBusinessEventRuleList ApiBusinessRuleDataList::toResourceList(QnResourcePool* 
     return outData;
 }
 
-void ApiBusinessRuleDataList::fromResourceList(const QnBusinessEventRuleList& inData)
+void ApiBusinessRuleList::fromResourceList(const QnBusinessEventRuleList& inData)
 {
     data.reserve(inData.size());
     foreach(const QnBusinessEventRulePtr& bRule, inData) {
-        data.push_back(ApiBusinessRuleData());
+        data.push_back(ApiBusinessRule());
         data.back().fromResource(bRule);
     }
 }
 
-void ApiBusinessRuleDataList::loadFromQuery(QSqlQuery& query)
+void ApiBusinessRuleList::loadFromQuery(QSqlQuery& query)
 {
-    QN_QUERY_TO_DATA_OBJECT(query, ApiBusinessRuleData, data, ApiBusinessRuleFields)
+    QN_QUERY_TO_DATA_OBJECT(query, ApiBusinessRule, data, ApiBusinessRuleFields)
 }
 
 void ApiBusinessActionData::fromResource(const QnAbstractBusinessActionPtr& resource)
@@ -92,7 +92,7 @@ void ApiBusinessActionData::fromResource(const QnAbstractBusinessActionPtr& reso
     aggregationCount = resource->getAggregationCount();
 }
 
-QnAbstractBusinessActionPtr  ApiBusinessActionData::toResource(QnResourcePool* resourcePool) const
+QnAbstractBusinessActionPtr  ApiBusinessActionData::toResource(QnResourcePool* /* resourcePool */) const
 {
     QnBusinessParams bParams = deserializeBusinessParams(runtimeParams);
     QnAbstractBusinessActionPtr resource = QnBusinessActionFactory::createAction((BusinessActionType::Value) actionType, QnBusinessEventParameters::fromBusinessParams(bParams));

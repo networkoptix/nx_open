@@ -22,13 +22,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiLayoutDataList& layouts) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiLayoutList& layouts) {
             QnLayoutResourceList outData;
             if( errorCode == ErrorCode::ok )
                 layouts.toResourceList(outData);
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiLayoutDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiLayoutList, decltype(queryDoneHandler)>
             ( ApiCommand::getLayoutList, nullptr, queryDoneHandler );
         return reqID;
     }
@@ -74,9 +74,9 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiLayoutDataList> QnLayoutManager<T>::prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts )
+    QnTransaction<ApiLayoutList> QnLayoutManager<T>::prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts )
     {
-        QnTransaction<ApiLayoutDataList> tran(command, true);
+        QnTransaction<ApiLayoutList> tran(command, true);
         tran.params.fromResourceList(layouts);
         return tran;
     }

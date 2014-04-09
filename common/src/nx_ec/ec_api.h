@@ -27,24 +27,9 @@
 namespace ec2
 {
 
-    struct ServerInfo
-    {
-        QList<QByteArray> mainHardwareIds;
-        QList<QByteArray> compatibleHardwareIds;
-
-        /* QByteArray hardwareId1;
-        QByteArray oldHardwareId;
-        QByteArray hardwareId2;
-        QByteArray hardwareId3; */
-
-        QString publicIp;
-        QString systemName;
-        QString sessionKey;
-
-        QString armBox;
-        bool allowCameraChanges;
-    };
-
+    typedef QList<QByteArray> ByteArrayList;
+    #include "server_info_i.h"
+    
     struct QnFullResourceData
     {
         ServerInfo serverInfo;
@@ -514,7 +499,7 @@ namespace ec2
     };
     typedef std::shared_ptr<AbstractLayoutManager> AbstractLayoutManagerPtr;
 
-       /*!
+    /*!
         \note All methods are asynchronous if other not specified
     */
     class AbstractVideowallManager

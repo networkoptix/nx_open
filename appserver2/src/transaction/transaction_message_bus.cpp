@@ -261,7 +261,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
     switch (abstractTran.command)
     {
         case ApiCommand::getAllDataList:
-            return deliveryTransaction<ApiFullData>(abstractTran, stream);
+            return deliveryTransaction<ApiFullInfo>(abstractTran, stream);
 
         //!ApiSetResourceStatusData
         case ApiCommand::setResourceStatus:
@@ -273,45 +273,45 @@ bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTr
         case ApiCommand::setResourceParams:
             return deliveryTransaction<ApiResourceParams>(abstractTran, stream);
         case ApiCommand::saveResource:
-            return deliveryTransaction<ApiResourceData>(abstractTran, stream);
+            return deliveryTransaction<ApiResource>(abstractTran, stream);
         case ApiCommand::removeResource:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
         case ApiCommand::setPanicMode:
             return deliveryTransaction<ApiPanicModeData>(abstractTran, stream);
             
         case ApiCommand::saveCamera:
-            return deliveryTransaction<ApiCameraData>(abstractTran, stream);
+            return deliveryTransaction<ApiCamera>(abstractTran, stream);
         case ApiCommand::saveCameras:
-            return deliveryTransaction<ApiCameraDataList>(abstractTran, stream);
+            return deliveryTransaction<ApiCameraList>(abstractTran, stream);
         case ApiCommand::removeCamera:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
         case ApiCommand::addCameraHistoryItem:
-            return deliveryTransaction<ApiCameraServerItemData>(abstractTran, stream);
+            return deliveryTransaction<ApiCameraServerItem>(abstractTran, stream);
 
         case ApiCommand::saveMediaServer:
-            return deliveryTransaction<ApiMediaServerData>(abstractTran, stream);
+            return deliveryTransaction<ApiMediaServer>(abstractTran, stream);
         case ApiCommand::removeMediaServer:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
         case ApiCommand::saveUser:
-            return deliveryTransaction<ApiUserData>(abstractTran, stream);
+            return deliveryTransaction<ApiUser>(abstractTran, stream);
         case ApiCommand::removeUser:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
         case ApiCommand::saveBusinessRule:
-            return deliveryTransaction<ApiBusinessRuleData>(abstractTran, stream);
+            return deliveryTransaction<ApiBusinessRule>(abstractTran, stream);
         case ApiCommand::removeBusinessRule:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
         case ApiCommand::saveLayouts:
-            return deliveryTransaction<ApiLayoutDataList>(abstractTran, stream);
+            return deliveryTransaction<ApiLayoutList>(abstractTran, stream);
         case ApiCommand::saveLayout:
-            return deliveryTransaction<ApiLayoutData>(abstractTran, stream);
+            return deliveryTransaction<ApiLayout>(abstractTran, stream);
         case ApiCommand::removeLayout:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
-
+            
         case ApiCommand::saveVideowall:
-            return deliveryTransaction<ApiVideowallData>(abstractTran, stream);
+            return deliveryTransaction<ApiVideowall>(abstractTran, stream);
         case ApiCommand::removeVideowall:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
           
@@ -531,7 +531,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         return;
     }
 
-    QnTransaction<ApiFullData> tran;
+    QnTransaction<ApiFullInfo> tran;
     if (isClient) 
     {
         /*

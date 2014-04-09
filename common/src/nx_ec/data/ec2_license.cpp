@@ -8,10 +8,6 @@
 
 namespace ec2
 {
-    ApiLicense::ApiLicense()
-    {
-    }
-
     void ApiLicense::fromResource( const QnLicense& lic )
     {
         key = lic.key();
