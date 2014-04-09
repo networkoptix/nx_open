@@ -1257,8 +1257,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
         return ErrorCode::failure;
     }
 
-	data.loadFromQuery(queryTypes);
-    mergeIdListData<ApiResourceType>(queryParents, data.data, &ApiResourceType::parentId);
+    data.loadFromQuery(queryTypes);
+    mergeIdListData(queryParents, data.data, &ApiResourceType::parentId);
 
     std::vector<ApiPropertyType> allProperties;
     QN_QUERY_TO_DATA_OBJECT(queryProperty, ApiPropertyType, allProperties, ApiPropertyTypeFields);

@@ -29,7 +29,7 @@ namespace ec2
 
     typedef QList<QByteArray> ByteArrayList;
     #include "server_info_i.h"
-
+    
     struct QnFullResourceData
     {
         ServerInfo serverInfo;
