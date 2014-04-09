@@ -16,7 +16,6 @@ QString QnDesktopCameraResource::getDriverName() const
 QnDesktopCameraResource::QnDesktopCameraResource(): QnPhysicalCameraResource()
 {
     setFlags(flags() | no_last_gop);
-    setDisabled(true);  // #3087
 }
 
 QnDesktopCameraResource::~QnDesktopCameraResource()

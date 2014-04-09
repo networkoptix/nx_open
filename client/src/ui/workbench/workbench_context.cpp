@@ -41,8 +41,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
 
     m_layoutWatcher = instance<QnWorkbenchLayoutWatcher>();
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
-#if 0
-    // #3087
+#ifdef Q_OS_WIN
     instance<QnWorkbenchDesktopCameraWatcher>();
 #endif
 
