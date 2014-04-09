@@ -209,8 +209,8 @@ namespace ec2
         ErrorCode removeVideowall( const QnId& guid );
         ErrorCode insertOrReplaceVideowall(const ApiVideowall& data, qint32 internalId);
         ErrorCode deleteVideowallItems(const QnId &videowall_guid);
-        ErrorCode updateVideowallItems(const ApiVideowallData& data);
-        ErrorCode updateVideowallScreens(const ApiVideowallData& data);
+        ErrorCode updateVideowallItems(const ApiVideowall& data);
+        ErrorCode updateVideowallScreens(const ApiVideowall& data);
 
         ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRule& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);

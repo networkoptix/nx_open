@@ -1792,7 +1792,7 @@ ErrorCode QnDbManager::saveVideowall(const ApiVideowall& params) {
     return result;
 }
 
-ErrorCode QnDbManager::updateVideowallItems(const ApiVideowallData& data) {
+ErrorCode QnDbManager::updateVideowallItems(const ApiVideowall& data) {
     ErrorCode result = deleteVideowallItems(data.id);
     if (result != ErrorCode::ok)
         return result;
@@ -1802,7 +1802,7 @@ ErrorCode QnDbManager::updateVideowallItems(const ApiVideowallData& data) {
                      (guid, pc_guid, layout_guid, videowall_guid, name, x, y, w, h) \
                      VALUES \
                      (:guid, :pc_guid, :layout_guid, :videowall_guid, :name, :x, :y, :w, :h)");
-    foreach(const ApiVideowallItemData& item, data.items)
+    foreach(const ApiVideowallItem& item, data.items)
     {
         item.autoBindValues(insQuery);
         insQuery.bindValue(":videowall_guid", data.id);
@@ -1816,7 +1816,7 @@ ErrorCode QnDbManager::updateVideowallItems(const ApiVideowallData& data) {
 
 }
 
-ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowallData& data) {
+ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowall& data) {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO vms_videowall_screen \
                      (pc_guid, pc_index, \
@@ -1828,7 +1828,7 @@ ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowallData& data) {
                      :layout_x, :layout_y, :layout_w, :layout_h)");
 
     QSet<QnId> pcUuids;
-    foreach(const ApiVideowallScreenData& screen, data.screens)
+    foreach(const ApiVideowallScreen& screen, data.screens)
     {
         screen.autoBindValues(insQuery);
         pcUuids << screen.pc_guid;

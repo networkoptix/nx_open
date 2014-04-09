@@ -10,7 +10,7 @@
     };
 
     #define ApiVideowallItemDataFields (guid) (pc_guid) (layout_guid) (name) (x) (y) (w) (h)
-    QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiVideowallItemData, ApiVideowallItemDataFields)
+    QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallItemData, ApiVideowallItemDataFields)
 
     struct ApiVideowallScreenData {
         QnId pc_guid;
@@ -34,8 +34,8 @@
     
         bool autorun;
 
-        std::vector<ApiVideowallItemData> items;
-        std::vector<ApiVideowallScreenData> screens;
+        std::vector<ApiVideowallItem> items;
+        std::vector<ApiVideowallScreen> screens;
     };
 
     #define ApiVideowallDataFields (autorun)
