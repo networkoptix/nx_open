@@ -737,10 +737,10 @@ int QnMediaServerConnection::doRebuildArchiveAsync(RebuildAction action, QObject
     return sendAsyncGetRequest(RebuildArchiveObject, params, QN_STRINGIZE_TYPE(QnRebuildArchiveReply), target, slot);
 }
 
-int QnMediaServerConnection::uploadUpdateAsync(const QString &fileName, QObject *target, const char *slot) {
+int QnMediaServerConnection::uploadUpdateAsync(const QString &updateId, const QByteArray &data, QObject *target, const char *slot) {
     QnRequestParamList params;
-    params << QnRequestParam("update_id", fileName);
-    return sendAsyncGetRequest(UpdateObject, params, NULL, target, slot);
+    params << QnRequestParam("update_id", updateId);
+    return sendAsyncPostRequest(UploadUpdateObject, params, data, NULL, target, slot);
 }
 
 int QnMediaServerConnection::updateAsync(const QString &updateId, QObject *target, const char *slot) {
