@@ -177,7 +177,7 @@ namespace ec2
         ErrorCode insertResource(const ApiResourceData& data, qint32* internalId);
         ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
         //ErrorCode insertOrReplaceResource(const ApiResourceData& data);
-        ErrorCode deleteResourceTable(const qint32 id);
+        ErrorCode deleteRecordFromResourceTable(const qint32 id);
         ErrorCode removeResource(const QnId& id);
 
         ErrorCode insertAddParams(const std::vector<ApiResourceParam>& params, qint32 internalId);

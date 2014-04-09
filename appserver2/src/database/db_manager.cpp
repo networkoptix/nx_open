@@ -798,7 +798,7 @@ ErrorCode QnDbManager::removeUser( const QnId& guid )
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteResourceTable(internalId);
+    err = deleteRecordFromResourceTable(internalId);
     if (err != ErrorCode::ok)
         return err;
 
@@ -936,7 +936,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiPanicMode
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::deleteResourceTable(const qint32 id)
+ErrorCode QnDbManager::deleteRecordFromResourceTable(const qint32 id)
 {
     QSqlQuery delQuery(m_sdb);
     delQuery.prepare("DELETE FROM vms_resource where id = ?");
@@ -1030,7 +1030,7 @@ ErrorCode QnDbManager::removeCamera(const QnId& guid)
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteResourceTable(id);
+    err = deleteRecordFromResourceTable(id);
     if (err != ErrorCode::ok)
         return err;
 
@@ -1053,7 +1053,7 @@ ErrorCode QnDbManager::removeServer(const QnId& guid)
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteResourceTable(id);
+    err = deleteRecordFromResourceTable(id);
     if (err != ErrorCode::ok)
         return err;
 
@@ -1093,7 +1093,7 @@ ErrorCode QnDbManager::removeLayout(qint32 internalId)
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteResourceTable(internalId);
+    err = deleteRecordFromResourceTable(internalId);
     return err;
 }
 
@@ -1810,7 +1810,7 @@ ErrorCode QnDbManager::removeVideowall( const QnId& guid ) {
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteResourceTable(id);
+    err = deleteRecordFromResourceTable(id);
     if (err != ErrorCode::ok)
         return err;
 
