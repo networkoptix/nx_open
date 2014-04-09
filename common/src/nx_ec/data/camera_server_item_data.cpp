@@ -3,26 +3,26 @@
 namespace ec2
 {
 
-void ApiCameraServerItemData::fromResource(const QnCameraHistoryItem& item)
+void ApiCameraServerItem::fromResource(const QnCameraHistoryItem& item)
 {
     physicalId = item.physicalId;
     serverGuid = item.mediaServerGuid;
     timestamp = item.timestamp;
 }
 
-void ApiCameraServerItemData::toResource(QnCameraHistoryItem* const item)
+void ApiCameraServerItem::toResource(QnCameraHistoryItem* const item)
 {
     item->physicalId = physicalId;
     item->mediaServerGuid = serverGuid;
     item->timestamp = timestamp;
 }
 
-void ApiCameraServerItemDataList::loadFromQuery(QSqlQuery& query) 
+void ApiCameraServerItemList::loadFromQuery(QSqlQuery& query) 
 { 
-    QN_QUERY_TO_DATA_OBJECT(query, ApiCameraServerItemData, data, ApiCameraServerItemFields) 
+    QN_QUERY_TO_DATA_OBJECT(query, ApiCameraServerItem, data, ApiCameraServerItemFields) 
 }
 
-void ApiCameraServerItemDataList::toResourceList(QnCameraHistoryList& cameraServerItems) const
+void ApiCameraServerItemList::toResourceList(QnCameraHistoryList& cameraServerItems) const
 {
     typedef QMap<qint64, QString> TimestampGuid;
     typedef QMap<QString, TimestampGuid> HistoryType;
@@ -31,9 +31,9 @@ void ApiCameraServerItemDataList::toResourceList(QnCameraHistoryList& cameraServ
     HistoryType history;
 
     // Fill temporary history map
-    for (std::vector<ApiCameraServerItemData>::const_iterator ci = data.begin(); ci != data.end(); ++ci)
+    for (std::vector<ApiCameraServerItem>::const_iterator ci = data.begin(); ci != data.end(); ++ci)
     {
-        const ApiCameraServerItemData& pb_item = *ci;
+        const ApiCameraServerItem& pb_item = *ci;
         history[pb_item.physicalId][pb_item.timestamp] = pb_item.serverGuid;
     }
 

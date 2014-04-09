@@ -60,13 +60,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-		auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraDataList& cameras) {
+		auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraList& cameras) {
 			QnVirtualCameraResourceList outData;
 			if( errorCode == ErrorCode::ok )
 				cameras.toResourceList(outData, m_resCtx.resFactory);
 			handler->done( reqID, errorCode, outData);
 		};
-		m_queryProcessor->template processQueryAsync<QnId, ApiCameraDataList, decltype(queryDoneHandler)>
+		m_queryProcessor->template processQueryAsync<QnId, ApiCameraList, decltype(queryDoneHandler)>
 			( ApiCommand::getCameras, mediaServerId, queryDoneHandler );
 		return reqID;
     }
@@ -76,13 +76,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraServerItemDataList& cameraHistory) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraServerItemList& cameraHistory) {
             QnCameraHistoryList outData;
             if( errorCode == ErrorCode::ok )
                 cameraHistory.toResourceList(outData);
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> (
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiCameraServerItemList, decltype(queryDoneHandler)> (
             ApiCommand::getCameraHistoryList, nullptr, queryDoneHandler );
         return reqID;
     }
@@ -124,31 +124,31 @@ namespace ec2
 
 
     template<class QueryProcessorType>
-    QnTransaction<ApiCameraData> QnCameraManager<QueryProcessorType>::prepareTransaction(
+    QnTransaction<ApiCamera> QnCameraManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
         const QnVirtualCameraResourcePtr& resource )
     {
-		QnTransaction<ApiCameraData> tran(command, true);
+		QnTransaction<ApiCamera> tran(command, true);
 		tran.params.fromResource(resource);
         return tran;
     }
 
     template<class QueryProcessorType>
-    QnTransaction<ApiCameraDataList> QnCameraManager<QueryProcessorType>::prepareTransaction(
+    QnTransaction<ApiCameraList> QnCameraManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
         const QnVirtualCameraResourceList& cameras )
     {
-        QnTransaction<ApiCameraDataList> tran(command, true);
+        QnTransaction<ApiCameraList> tran(command, true);
         tran.params.fromResourceList(cameras);
         return tran;
     }
 
     template<class QueryProcessorType>
-    QnTransaction<ApiCameraServerItemData> QnCameraManager<QueryProcessorType>::prepareTransaction(
+    QnTransaction<ApiCameraServerItem> QnCameraManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
         const QnCameraHistoryItem& historyItem )
     {
-        QnTransaction<ApiCameraServerItemData> tran(command, true);
+        QnTransaction<ApiCameraServerItem> tran(command, true);
         tran.params.fromResource(historyItem);
         return tran;
     }

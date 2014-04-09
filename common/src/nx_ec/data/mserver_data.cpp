@@ -25,28 +25,28 @@ static QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
     return addListStrings.join(QLatin1String(";"));
 }
 
-void ApiStorageData::fromResource(QnAbstractStorageResourcePtr resource)
+void ApiStorage::fromResource(QnAbstractStorageResourcePtr resource)
 {
-    ApiResourceData::fromResource(resource);
+    ApiResource::fromResource(resource);
     spaceLimit = resource->getSpaceLimit();
     usedForWriting = resource->isUsedForWriting();
 }
 
-void ApiStorageData::toResource(QnAbstractStorageResourcePtr resource) const
+void ApiStorage::toResource(QnAbstractStorageResourcePtr resource) const
 {
-    ApiResourceData::toResource(resource);
+    ApiResource::toResource(resource);
     resource->setSpaceLimit(spaceLimit);
     resource->setUsedForWriting(usedForWriting);
 }
 
-void ApiStorageDataList::loadFromQuery(QSqlQuery& query)
+void ApiStorageList::loadFromQuery(QSqlQuery& query)
 {
-    QN_QUERY_TO_DATA_OBJECT(query, ApiStorageData, data, ApiStorageDataFields ApiResourceDataFields)
+    QN_QUERY_TO_DATA_OBJECT(query, ApiStorage, data, ApiStorageFields ApiResourceFields)
 }
 
-void ApiMediaServerData::fromResource(QnMediaServerResourcePtr resource)
+void ApiMediaServer::fromResource(QnMediaServerResourcePtr resource)
 {
-    ApiResourceData::fromResource(resource);
+    ApiResource::fromResource(resource);
 
     netAddrList = serializeNetAddrList(resource->getNetAddrList());
     apiUrl = resource->getApiUrl();
@@ -62,9 +62,9 @@ void ApiMediaServerData::fromResource(QnMediaServerResourcePtr resource)
         storages[i].fromResource(storageList[i]);
 }
 
-void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, const ResourceContext& ctx) const
+void ApiMediaServer::toResource(QnMediaServerResourcePtr resource, const ResourceContext& ctx) const
 {
-    ApiResourceData::toResource(resource);
+    ApiResource::toResource(resource);
 
     QList<QHostAddress> resNetAddrList;
     deserializeNetAddrList(resNetAddrList, netAddrList);
@@ -82,7 +82,7 @@ void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, const Res
         return;
 
     QnAbstractStorageResourceList storagesRes;
-    foreach(const ApiStorageData& storage, storages) {
+    foreach(const ApiStorage& storage, storages) {
         QnAbstractStorageResourcePtr storageRes = ctx.resFactory->createResource(resType->getId(), QnResourceParams(storage.url, QString())).dynamicCast<QnAbstractStorageResource>();
         
         storage.toResource(storageRes);
@@ -91,7 +91,7 @@ void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, const Res
     resource->setStorages(storagesRes);
 }
 
-template <class T> void ApiMediaServerDataList::toResourceList(QList<T>& outData, const ResourceContext& ctx) const
+template <class T> void ApiMediaServerList::toResourceList(QList<T>& outData, const ResourceContext& ctx) const
 {
     outData.reserve(outData.size() + data.size());
     for(int i = 0; i < data.size(); ++i) 
@@ -101,13 +101,13 @@ template <class T> void ApiMediaServerDataList::toResourceList(QList<T>& outData
         outData << server;
     }
 }
-template void ApiMediaServerDataList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData, const ResourceContext& ctx) const;
-template void ApiMediaServerDataList::toResourceList<QnMediaServerResourcePtr>(QList<QnMediaServerResourcePtr>& outData, const ResourceContext& ctx) const;
+template void ApiMediaServerList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData, const ResourceContext& ctx) const;
+template void ApiMediaServerList::toResourceList<QnMediaServerResourcePtr>(QList<QnMediaServerResourcePtr>& outData, const ResourceContext& ctx) const;
 
 
-void ApiMediaServerDataList::loadFromQuery(QSqlQuery& query)
+void ApiMediaServerList::loadFromQuery(QSqlQuery& query)
 {
-    QN_QUERY_TO_DATA_OBJECT(query, ApiMediaServerData, data, medisServerDataFields ApiResourceDataFields)
+    QN_QUERY_TO_DATA_OBJECT(query, ApiMediaServer, data, medisServerDataFields ApiResourceFields)
 }
 
 }

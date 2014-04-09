@@ -3,7 +3,7 @@
 
 namespace ec2 {
 
-void ApiResourceData::fromResource(const QnResourcePtr& resource)
+void ApiResource::fromResource(const QnResourcePtr& resource)
 {
     Q_ASSERT(!resource->getId().isNull());
     Q_ASSERT(!resource->getTypeId().isNull());
@@ -23,7 +23,7 @@ void ApiResourceData::fromResource(const QnResourcePtr& resource)
     }
 }
 
-void ApiResourceData::toResource(QnResourcePtr resource) const
+void ApiResource::toResource(QnResourcePtr resource) const
 {
 	resource->setId(id);
 	//resource->setGuid(guid);
@@ -41,13 +41,13 @@ void ApiResourceData::toResource(QnResourcePtr resource) const
     }
 }
 
-void ApiResourceDataList::loadFromQuery(QSqlQuery& /*query*/)
+void ApiResourceList::loadFromQuery(QSqlQuery& /*query*/)
 {
     //TODO/IMPL
     assert( false );
 }
 
-void ApiResourceDataList::toResourceList( QnResourceFactory* resFactory, QnResourceList& resList ) const
+void ApiResourceList::toResourceList( QnResourceFactory* resFactory, QnResourceList& resList ) const
 {
 	resList.reserve(data.size());
 	for(int i = 0; i < data.size(); ++i) {

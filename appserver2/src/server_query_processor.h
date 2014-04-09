@@ -82,17 +82,17 @@ namespace ec2
         }
 
         template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiLayoutDataList>& tran, HandlerType handler )
+        void processUpdateAsync(QnTransaction<ApiLayoutListData>& tran, HandlerType handler )
         {
             Q_ASSERT(tran.command == ApiCommand::saveLayouts);
-            return processMultiUpdateAsync<ApiLayoutDataList, ApiLayoutData>(tran, handler, ApiCommand::saveLayout);
+            return processMultiUpdateAsync<ApiLayoutListData, ApiLayoutData>(tran, handler, ApiCommand::saveLayout);
         }
 
         template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiCameraDataList>& tran, HandlerType handler )
+        void processUpdateAsync(QnTransaction<ApiCameraListData>& tran, HandlerType handler )
         {
             Q_ASSERT(tran.command == ApiCommand::saveCameras);
-            return processMultiUpdateAsync<ApiCameraDataList, ApiCameraData>(tran, handler, ApiCommand::saveCamera);
+            return processMultiUpdateAsync<ApiCameraListData, ApiCameraData>(tran, handler, ApiCommand::saveCamera);
         }
 
         template<class QueryDataType, class subDataType, class HandlerType>

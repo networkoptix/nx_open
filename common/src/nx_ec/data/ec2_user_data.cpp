@@ -4,9 +4,9 @@
 namespace ec2
 {
 
-    void ApiUserData::toResource(QnUserResourcePtr resource) const
+    void ApiUser::toResource(QnUserResourcePtr resource) const
     {
-        ApiResourceData::toResource(resource);
+        ApiResource::toResource(resource);
         resource->setAdmin(isAdmin);
         resource->setEmail(email);
         resource->setHash(hash);
@@ -15,9 +15,9 @@ namespace ec2
         resource->setDigest(digest);
     }
     
-    void ApiUserData::fromResource(QnUserResourcePtr resource)
+    void ApiUser::fromResource(QnUserResourcePtr resource)
     {
-        ApiResourceData::fromResource(resource);
+        ApiResource::fromResource(resource);
         QString password = resource->getPassword();
         
         if (!password.isEmpty()) {
@@ -41,7 +41,7 @@ namespace ec2
     }
 
     template <class T>
-    void ApiUserDataList::toResourceList(QList<T>& outData) const
+    void ApiUserList::toResourceList(QList<T>& outData) const
     {
         outData.reserve(outData.size() + data.size());
         for(int i = 0; i < data.size(); ++i) 
@@ -51,12 +51,12 @@ namespace ec2
             outData << user;
         }
     }
-    template void ApiUserDataList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData) const;
-    template void ApiUserDataList::toResourceList<QnUserResourcePtr>(QList<QnUserResourcePtr>& outData) const;
+    template void ApiUserList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData) const;
+    template void ApiUserList::toResourceList<QnUserResourcePtr>(QList<QnUserResourcePtr>& outData) const;
 
-    void ApiUserDataList::loadFromQuery(QSqlQuery& query)
+    void ApiUserList::loadFromQuery(QSqlQuery& query)
     {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiUserData, data, ApiUserDataFields ApiResourceDataFields)
+        QN_QUERY_TO_DATA_OBJECT(query, ApiUser, data, ApiUserFields ApiResourceFields)
     }
 
 }

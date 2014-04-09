@@ -23,7 +23,7 @@ namespace ec2
 
             //!ApiResourceTypeList
             getResourceTypes,
-            //!ApiResourceData
+            //!ApiResource
             getResource,
             //!ApiSetResourceStatusData
             setResourceStatus,
@@ -32,41 +32,41 @@ namespace ec2
             //!ApiResourceParams
             setResourceParams,
             getResourceParams,
-            //!ApiResourceData
+            //!ApiResource
             saveResource,
             removeResource,
             //!ApiPanicModeData
             setPanicMode,
-            //!ApiFullData,
+            //!ApiFullInfo,
             getAllDataList,
             
-            //!ApiCameraData
+            //!ApiCamera
             saveCamera,
-            //!ApiCameraDataList
+            //!ApiCameraList
             saveCameras,
             //!ApiIdData
             removeCamera,
             getCameras,
-            //!ApiCameraServerItemDataList
+            //!ApiCameraServerItemList
             getCameraHistoryList,
-            //!ApiCameraServerItemData
+            //!ApiCameraServerItem
             addCameraHistoryItem,
 
             getMediaServerList,
-            //!ApiMediaServerData
+            //!ApiMediaServer
             saveMediaServer,
             //!ApiIdData
             removeMediaServer,
 
-            //!ApiUserData
+            //!ApiUser
             saveUser,
             getUserList,
             //!ApiIdData
             removeUser,
 
-            //!ApiBusinessRuleDataList
+            //!ApiBusinessRuleList
             getBusinessRuleList,
-            //!ApiBusinessRuleData
+            //!ApiBusinessRule
             saveBusinessRule,
             //!ApiIdData
             removeBusinessRule,
@@ -76,16 +76,16 @@ namespace ec2
             //!ApiResetBusinessRuleData
             resetBusinessRules,
 
-            //!ApiLayoutData
+            //!ApiLayout
             saveLayouts,
-            //!ApiLayoutDataList
+            //!ApiLayoutList
             saveLayout,
-            //!ApiLayoutDataList
+            //!ApiLayoutList
             getLayoutList,
             //!ApiIdData
             removeLayout,
             
-            //!ApiVideowallData
+            //!ApiVideowall
             saveVideowall,
             getVideowallList,
             //!ApiIdData

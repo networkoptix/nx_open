@@ -37,7 +37,7 @@ namespace ec2
             emit removed( QnId(tran.params.id) );
         }
 
-        void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran )
+        void triggerNotification( const QnTransaction<ApiBusinessRule>& tran )
         {
             assert( tran.command == ApiCommand::saveBusinessRule);
             QnBusinessEventRulePtr businessRule( new QnBusinessEventRule() );
@@ -56,7 +56,7 @@ namespace ec2
         QueryProcessorType* const m_queryProcessor;
         ResourceContext m_resCtx;
 
-        QnTransaction<ApiBusinessRuleData> prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource );
+        QnTransaction<ApiBusinessRule> prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
         QnTransaction<ApiBusinessActionData> prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource );
         QnTransaction<ApiEmailSettingsData> prepareTransaction( ApiCommand::Value command, const QnEmail::Settings& resource );

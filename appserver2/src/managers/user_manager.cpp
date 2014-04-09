@@ -27,13 +27,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiUserDataList& users) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiUserList& users) {
             QnUserResourceList outData;
             if( errorCode == ErrorCode::ok )
                 users.toResourceList(outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUserList, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiUserList, decltype(queryDoneHandler)> ( ApiCommand::getUserList, nullptr, queryDoneHandler);
         return reqID;
     }
 
@@ -65,9 +65,9 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiUserData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource )
+    QnTransaction<ApiUser> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource )
     {
-        QnTransaction<ApiUserData> tran(command, true);
+        QnTransaction<ApiUser> tran(command, true);
         tran.params.fromResource( resource );
         return tran;
     }

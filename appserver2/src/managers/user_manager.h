@@ -22,7 +22,7 @@ namespace ec2
         virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) override;
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
-        void triggerNotification( const QnTransaction<ApiUserData>& tran )
+        void triggerNotification( const QnTransaction<ApiUser>& tran )
         {
             assert( tran.command == ApiCommand::saveUser);
             QnUserResourcePtr userResource(new QnUserResource());
@@ -40,7 +40,7 @@ namespace ec2
         QueryProcessorType* const m_queryProcessor;
         ResourceContext m_resCtx;
 
-        QnTransaction<ApiUserData> prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource );
+        QnTransaction<ApiUser> prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& resource );
     };
 }

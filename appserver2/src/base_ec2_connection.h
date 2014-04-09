@@ -73,11 +73,11 @@ namespace ec2
             m_businessEventManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiCameraData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiCamera>& tran ) {
             m_cameraManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiCameraDataList>& tran ) {
+        void triggerNotification( const QnTransaction<ApiCameraList>& tran ) {
             m_cameraManager->triggerNotification( tran );
         }
 
@@ -85,7 +85,7 @@ namespace ec2
             m_businessEventManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiVideowallData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiVideowall>& tran ) {
             m_videowallManager->triggerNotification( tran );
         }
 
@@ -111,11 +111,11 @@ namespace ec2
             }
         }
 
-        void triggerNotification( const QnTransaction<ApiMediaServerData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiMediaServer>& tran ) {
             m_mediaServerManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiResourceData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiResource>& tran ) {
             m_resourceManager->triggerNotification( tran );
         }
 
@@ -131,23 +131,23 @@ namespace ec2
             m_resourceManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiCameraServerItem>& tran ) {
             return m_cameraManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiUserData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiUser>& tran ) {
             return m_userManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiBusinessRule>& tran ) {
             return m_businessEventManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiLayoutData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiLayout>& tran ) {
             return m_layoutManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran ) {
+        void triggerNotification( const QnTransaction<ApiLayoutList>& tran ) {
             return m_layoutManager->triggerNotification( tran );
         }
 
@@ -155,7 +155,7 @@ namespace ec2
             return m_storedFileManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiFullData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiFullInfo>& tran ) {
             QnFullResourceData fullResData;
             tran.params.toResourceList( fullResData, m_resCtx );
             emit initNotification(fullResData);
