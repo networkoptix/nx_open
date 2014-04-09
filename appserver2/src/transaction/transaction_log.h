@@ -46,22 +46,6 @@ namespace ec2
             return saveToDB(tran, transactionHash(tran), serializedTran);
         }
 
-        ErrorCode saveTransaction(const QnTransaction<ApiLicenseList>& multiTran, const QByteArray& /*serializedTran*/) {
-            return saveMultiTransaction<ApiLicenseList, ApiLicense>(multiTran);
-        }
-
-        ErrorCode saveTransaction(const QnTransaction<ApiLayoutDataList>& multiTran, const QByteArray& /*serializedTran*/) {
-            return saveMultiTransaction<ApiLayoutDataList, ApiLayoutData>(multiTran);
-        }
-
-        ErrorCode saveTransaction(const QnTransaction<ApiCameraDataList>& multiTran, const QByteArray& /*serializedTran*/) {
-            return saveMultiTransaction<ApiCameraDataList, ApiCameraData>(multiTran);
-        }
-
-        ErrorCode saveTransaction(const QnTransaction<ApiVideowallDataList>& multiTran, const QByteArray& /*serializedTran*/) {
-            return saveMultiTransaction<ApiVideowallDataList, ApiVideowallData>(multiTran);
-        }
-
         ErrorCode saveTransaction(const QnTransaction<ApiFullData>& , const QByteArray&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
@@ -106,24 +90,6 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiEmailSettingsData>& )       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiEmailData>& )               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
-        template <class DataList, class Data>
-        ErrorCode saveMultiTransaction(const QnTransaction<DataList>& multiTran)
-        {
-            foreach(const Data& data, multiTran.params.data)
-            {
-                QnTransaction<Data> tran(multiTran.command, true);
-                tran.id.peerGUID = multiTran.id.peerGUID;
-                tran.params = data;
-                QByteArray serializedTran;
-                OutputBinaryStream<QByteArray> stream(&serializedTran);
-                serialize( tran, &stream );
-                ErrorCode result = saveTransaction(tran, serializedTran);
-                if (result != ErrorCode::ok) {
-                    return result;
-                }
-            }
-            return ErrorCode::ok;
-        }
     private:
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);
     private:

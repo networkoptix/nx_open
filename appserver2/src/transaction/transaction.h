@@ -104,6 +104,8 @@ namespace ec2
 
             //!ApiLicenseList
             addLicenses,
+            //!ApiLicense
+            addLicense,
             //!ApiLicenseList
             getLicenses,
 

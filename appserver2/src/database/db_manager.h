@@ -34,7 +34,21 @@ namespace ec2
         bool init();
 
         static QnDbManager* instance();
-        
+
+        template <class T>
+        ErrorCode executeNestedTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
+        {
+            ErrorCode result = executeTransactionNoLock(tran);
+            if (result != ErrorCode::ok)
+                return result;
+            return transactionLog->saveTransaction( tran, serializedTran);
+        }
+
+        void beginTran();
+        void commit();
+        void rollback();
+
+
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
