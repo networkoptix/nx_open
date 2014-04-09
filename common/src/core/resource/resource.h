@@ -50,7 +50,6 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
     Q_PROPERTY(QString searchString READ toSearchString)
     Q_PROPERTY(QnId parentId READ getParentId WRITE setParentId)
     Q_PROPERTY(Status status READ getStatus WRITE setStatus)
-    Q_PROPERTY(bool disabled READ isDisabled WRITE setDisabled)
     Q_PROPERTY(Flags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
@@ -141,9 +140,6 @@ public:
     QnId getTypeId() const;
     void setTypeId(QnId id);
     void setTypeByName(const QString& resTypeName);
-
-    bool isDisabled() const;
-    void setDisabled(bool disabled = true);
 
     virtual Status getStatus() const;
     virtual void setStatus(Status newStatus, bool silenceMode = false);
@@ -267,7 +263,6 @@ public:
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param) const;
     void statusChanged(const QnResourcePtr &resource);
-    void disabledChanged(const QnResourcePtr &resource);
     void nameChanged(const QnResourcePtr &resource);
     void parentIdChanged(const QnResourcePtr &resource);
     void flagsChanged(const QnResourcePtr &resource);
@@ -379,8 +374,6 @@ private:
     /** Flags of this resource that determine its type. */
     Flags m_flags;
     
-    /** Disable flag of the resource. */
-    bool m_disabled;
 
     /** Status of this resource. */
     Status m_status;

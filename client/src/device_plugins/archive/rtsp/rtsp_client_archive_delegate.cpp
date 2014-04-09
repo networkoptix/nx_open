@@ -175,34 +175,9 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
         return 0;
 }
 
-QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resource, qint64 time)
+QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resource, qint64)
 {
-    QnServerCameraPtr camRes = qSharedPointerDynamicCast<QnServerCamera>(resource);
-    if (!camRes)
-        return resource;
-    QString physicalId = camRes->getPhysicalId();
-
-    if (time == DATETIME_NOW)
-    {
-        QnServerCameraPtr activeCam = camRes->findEnabledSibling();
-        return activeCam ? activeCam : camRes;
-    }
-
-    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
-    if (!history)
-        return resource;
-    QnMediaServerResourcePtr mediaServer = history->getMediaServerOnTime(time, m_rtspSession.getScale() >= 0, m_serverTimePeriod, false);
-    if (!mediaServer)
-        return resource;
-
-    // get camera resource from other server. Unique id is physicalId + serverID
-    QnResourcePtr newResource = qnResPool->getResourceByUniqId(physicalId + mediaServer->getId().toString());
-    if (newResource && newResource != resource) {
-        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(resource->getParentId()));
-        if (mediaServer)
-            qDebug() << "switch to media server " << mediaServer->getUrl();
-    }
-    return newResource ? newResource : resource;
+    return resource;
 }
 
 bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)

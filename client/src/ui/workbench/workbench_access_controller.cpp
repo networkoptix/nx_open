@@ -88,9 +88,6 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     if(!resource)
         return 0;
 
-    if(resource->isDisabled())
-        return 0;
-
     if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
         return calculatePermissions(user);
 

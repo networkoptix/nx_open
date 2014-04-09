@@ -107,6 +107,8 @@ namespace ec2
 
                 case addLicenses:
                     return "addLicenses";
+                case addLicense:
+                    return "addLicense";
                 case getLicenses:
                     return "getLicenses";
 

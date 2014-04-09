@@ -20,12 +20,13 @@ protected:
     {
     public:
         QnDbTransaction(QSqlDatabase& m_sdb, QReadWriteLock& mutex);
-    private:
-        friend class QnDbTransactionLocker;
 
         void beginTran();
         void rollback();
         void commit();
+    private:
+        friend class QnDbTransactionLocker;
+
     private:
         QSqlDatabase& m_sdb;
         QReadWriteLock& m_mutex;

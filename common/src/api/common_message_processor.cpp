@@ -36,8 +36,6 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 
     connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::statusChanged,
         this, &QnCommonMessageProcessor::on_resourceStatusChanged );
-    connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::disabledChanged,
-        this, &QnCommonMessageProcessor::on_resourceDisabledChanged );
     connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::resourceChanged,
         this, [this](const QnResourcePtr &resource){updateResource(resource);});
     connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::resourceParamsChanged,
@@ -120,13 +118,6 @@ void QnCommonMessageProcessor::on_resourceStatusChanged( const QnId& resourceId,
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (resource)
         onResourceStatusChanged(resource, status);
-}
-
-void QnCommonMessageProcessor::on_resourceDisabledChanged( const QnId& resourceId, bool disabled )
-{
-    if (QnResourcePtr resource = qnResPool->getResourceById(resourceId)) {
-        resource->setDisabled(disabled);
-    }
 }
 
 void QnCommonMessageProcessor::on_resourceParamsChanged( const QnId& resourceId, const QnKvPairList& kvPairs )

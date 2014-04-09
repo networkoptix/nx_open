@@ -1801,4 +1801,19 @@ ErrorCode QnDbManager::insertOrReplaceVideowall(const ApiVideowallData& data, qi
     }
 }
 
+void QnDbManager::beginTran()
+{
+    m_tran.beginTran();
+}
+
+void QnDbManager::commit()
+{
+    m_tran.commit();
+}
+
+void QnDbManager::rollback()
+{
+    m_tran.rollback();
+}
+
 }

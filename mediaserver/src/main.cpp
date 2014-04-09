@@ -826,7 +826,8 @@ void QnMain::at_connectionOpened()
 void QnMain::at_timer()
 {
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
-    foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras()) 
+    QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
+    foreach(QnResourcePtr res, qnResPool->getAllCameras(mServer)) 
     {
         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
         if (cam)
@@ -1269,7 +1270,7 @@ void QnMain::run()
         SLOT(at_peerLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
         Qt::DirectConnection );
     QUrl url = ec2Connection->connectionInfo().ecUrl;
-#if 0
+#if 1
     if (url.scheme() == "file") {
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
         qnCommon->setCloudMode(true);

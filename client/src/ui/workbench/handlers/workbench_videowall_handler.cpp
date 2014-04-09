@@ -1646,7 +1646,7 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
     QRegExp desktopCameraNameRegExp(QString(lit("Desktop_camera_\\{.{36,36}\\}_%1")).arg(context()->user()->getName()));
     QnVirtualCameraResourcePtr desktopCamera;
 
-    foreach (const QnResourcePtr &resource, qnResPool->getAllEnabledCameras()) {
+    foreach (const QnResourcePtr &resource, qnResPool->getAllCameras(QnResourcePtr())) {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
         if (!camera)
             continue;

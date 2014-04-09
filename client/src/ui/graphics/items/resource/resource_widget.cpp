@@ -239,9 +239,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
 
     /* Initialize resource. */
-    m_resource = qnResPool->getEnabledResourceByUniqueId(item->resourceUid());
-    if(!m_resource)
-        m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
+    m_resource = qnResPool->getResourceByUniqId(item->resourceUid());
     connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
     setChannelLayout(qn_resourceWidget_defaultContentLayout);
 

@@ -53,7 +53,6 @@ private slots:
     void on_runtimeInfoChanged(const ec2::QnRuntimeInfo &runtimeInfo);
 
     void on_resourceStatusChanged(const QnId &resourceId, QnResource::Status status );
-    void on_resourceDisabledChanged(const QnId &resourceId, bool disabled );
     void on_resourceParamsChanged(const QnId& resourceId, const QnKvPairList& kvPairs );
     void on_resourceRemoved(const QnId& resourceId );
 

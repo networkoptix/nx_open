@@ -134,11 +134,13 @@ void QnVirtualCameraResource::unLockDTSFactory()
 
 QString QnVirtualCameraResource::getUniqueId() const
 {
+    return getPhysicalId();
+    /*
     if (hasFlags(foreigner))
         return getPhysicalId() + getParentId().toString();
     else 
         return getPhysicalId();
-
+    */
 }
 
 void QnVirtualCameraResource::save()

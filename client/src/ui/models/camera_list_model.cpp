@@ -146,7 +146,7 @@ void QnCameraListModel::setServer(const QnMediaServerResourcePtr & server) {
     while (!m_cameras.isEmpty())
         removeCamera(m_cameras.first());
     
-    QnResourceList resources = resourcePool()->getAllEnabledCameras(m_server); 
+    QnResourceList resources = resourcePool()->getAllCameras(m_server); 
     foreach(const QnResourcePtr &resource, resources)
         addCamera(resource);
 
@@ -225,7 +225,6 @@ void QnCameraListModel::at_resource_resourceChanged(const QnResourcePtr &resourc
 
 bool QnCameraListModel::cameraFits(const QnVirtualCameraResourcePtr &camera) const {
     return camera 
-        && !camera-> isDisabled() 
         && !camera->hasFlags(QnResource::foreigner)
         && (!m_server  || camera->getParentId() == m_server->getId());
 }

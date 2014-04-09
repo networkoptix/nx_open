@@ -322,14 +322,6 @@ QnResourcePtr QnEventLogModel::getResourceById(const QnId &id) {
         return resource;
 
     resource = qnResPool->getResourceById(id);
-    if (resource && resource->isDisabled()) {
-        QnServerCameraPtr localCam = resource.dynamicCast<QnServerCamera>();
-        if (localCam) {
-            localCam = localCam->findEnabledSibling();
-            if (localCam)
-                resource = localCam;
-        }
-    }
     if (resource)
         m_resourcesHash.insert(id, resource);
 
