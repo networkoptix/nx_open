@@ -33,8 +33,7 @@ void QnTransactionLog::init()
 
     m_relativeOffset = 0;
     QSqlQuery queryTime(m_dbManager->getDB());
-    queryTime.prepare("SELECT max(timestamp) FROM transaction_log where peer_guid = ?");
-    queryTime.bindValue(0, qnCommon->moduleGUID().toRfc4122());
+    queryTime.prepare("SELECT max(timestamp) FROM transaction_log");
     if (queryTime.exec() && queryTime.next()) {
         m_relativeOffset = queryTime.value(0).toLongLong();
     }
