@@ -26,7 +26,8 @@ QnLayoutResourcePtr QnLayoutResource::clone() const {
     QMutexLocker locker(&m_mutex);
 
     QnLayoutResourcePtr result(new QnLayoutResource());
-    result->setGuid(QUuid::createUuid().toString());
+    result->setId(QUuid::createUuid());
+    result->setTypeId(getTypeId());
     result->setName(m_name);
     result->setParentId(m_parentId);
     result->setCellSpacing(m_cellSpacing);
@@ -109,7 +110,7 @@ QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {
 
 QString QnLayoutResource::getUniqueId() const
 {
-    return getGuid().toString();
+    return getId().toString();
 }
 
 void QnLayoutResource::updateInner(QnResourcePtr other) {

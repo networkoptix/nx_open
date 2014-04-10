@@ -10,7 +10,7 @@ QnUserResource::QnUserResource():
 
 QString QnUserResource::getUniqueId() const
 {
-    return getGuid().toString();
+    return getId().toString();
 }
 
 QByteArray QnUserResource::getHash() const

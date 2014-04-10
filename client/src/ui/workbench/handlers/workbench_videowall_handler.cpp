@@ -581,7 +581,7 @@ bool QnWorkbenchVideoWallHandler::startVideoWall(const QnVideoWallResourcePtr &v
 
     QStringList arguments;
     arguments << QLatin1String("--videowall");
-    arguments << videoWall->getGuid().toString();
+    arguments << videoWall->getId().toString();
     openNewWindow(arguments);
     return true;
 }
@@ -660,7 +660,7 @@ void QnWorkbenchVideoWallHandler::sendMessage(QnVideoWallControlMessage message,
     qDebug() << "SENDER: sending message" << message;
 #endif
     foreach (QnVideoWallItemIndex index, targetList()) {
-        message.videoWallGuid = index.videowall()->getGuid();
+        message.videoWallGuid = index.videowall()->getId();
         message.instanceGuid = index.uuid();
         // TODO: #GDM VW reimplement
         //connection()->sendVideoWallControlMessage(message);
@@ -922,7 +922,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
     }
     case QnVideoWallControlMessage::Identify:
     {
-        QnVideoWallResourcePtr videoWall = qnResPool->getResourceByGuid(m_videoWallMode.guid).dynamicCast<QnVideoWallResource>();
+        QnVideoWallResourcePtr videoWall = qnResPool->getResourceById(m_videoWallMode.guid).dynamicCast<QnVideoWallResource>();
         if (!videoWall)
             return;
 
@@ -1014,7 +1014,7 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen() {
 
     m_videoWallMode.opening = false;
 
-    QnVideoWallResourcePtr videoWall = qnResPool->getResourceByGuid(m_videoWallMode.guid).dynamicCast<QnVideoWallResource>();
+    QnVideoWallResourcePtr videoWall = qnResPool->getResourceById(m_videoWallMode.guid).dynamicCast<QnVideoWallResource>();
     if (!videoWall || videoWall->getItems().isEmpty()) {
         if (!videoWall)
             qWarning() << "Warning: videowall not exists, cannot start videowall on this pc";
@@ -1176,8 +1176,8 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
     }
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setGuid(QUuid::createUuid().toString());
-    layout->setTypeId(qnResTypePool->getResourceTypeByName(lit("Layout"))->getId());
+    layout->setId(QUuid::createUuid());
+    layout->setTypeByName(lit("Layout"));
     if (filtered.size() == 1)
         layout->setName(generateUniqueLayoutName(context()->user(),
                                                  filtered.first()->getName(),
@@ -1331,7 +1331,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
 
     attachLayout(videoWall, targetLayout, m_attachSettings);
 
-    QnVideowallAutoStarter(videoWall->getGuid(), this).setAutoStartEnabled(m_attachSettings.autoRun);
+    QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(m_attachSettings.autoRun);
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered() {
@@ -1410,7 +1410,7 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered() {
         return;
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::Exit);
-    message.videoWallGuid = videoWall->getGuid();
+    message.videoWallGuid = videoWall->getId();
     foreach (const QnVideoWallItem &item, videoWall->getItems()) {
         message.instanceGuid = item.uuid;
         //TODO: #GDM VW reimplement
@@ -1470,7 +1470,7 @@ void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered() {
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::Identify);
     foreach (const QnVideoWallItemIndex &item, items) {
-        message.videoWallGuid = item.videowall()->getGuid();
+        message.videoWallGuid = item.videowall()->getId();
         message.instanceGuid = item.uuid();
         //TODO: #GDM VW reimplement
         // connection()->sendVideoWallControlMessage(message);
@@ -1533,7 +1533,8 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
 
         /* Construct and add a new layout. */
         QnLayoutResourcePtr layout(new QnLayoutResource());
-        layout->setGuid(QUuid::createUuid().toString());
+        layout->setId(QUuid::createUuid());
+        layout->setTypeByName(lit("Layout"));
         layout->setName(videoWall->getName());
         if(context()->user())
             layout->setParentId(context()->user()->getId());
@@ -1694,7 +1695,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_layout_saved(int status, const Qn
 
 void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &resource) {
     if (m_videoWallMode.active) {
-        if (resource->getGuid() != m_videoWallMode.guid.toString())
+        if (resource->getId() != m_videoWallMode.guid)
             return;
 
         if (m_videoWallMode.ready)
@@ -1715,15 +1716,15 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
 
 void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
     if (m_videoWallMode.active) {
-        if (resource->getGuid() != m_videoWallMode.guid.toString())
+        if (resource->getId() != m_videoWallMode.guid)
             return;
 
-        QnVideowallAutoStarter(resource->getGuid(), this).setAutoStartEnabled(false); //TODO: #GDM VW clean nonexistent videowalls sometimes
+        QnVideowallAutoStarter(resource->getId(), this).setAutoStartEnabled(false); //TODO: #GDM VW clean nonexistent videowalls sometimes
         closeInstance();
     } else {
         if (QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>()) {
             disconnect(videoWall, NULL, this, NULL);
-            QnVideowallAutoStarter(videoWall->getGuid(), this).setAutoStartEnabled(false); //TODO: #GDM VW clean nonexistent videowalls sometimes
+            QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false); //TODO: #GDM VW clean nonexistent videowalls sometimes
         }
 
     }
@@ -1839,13 +1840,13 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved(const QnVideoWallReso
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_activeMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
-    if (videoWall->getGuid() != m_videoWallMode.guid.toString() || item.uuid != m_videoWallMode.instanceGuid)
+    if (videoWall->getId() != m_videoWallMode.guid || item.uuid != m_videoWallMode.instanceGuid)
         return;
     openVideoWallItem(videoWall);
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_activeMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
-    if (videoWall->getGuid() != m_videoWallMode.guid.toString() || item.uuid != m_videoWallMode.instanceGuid)
+    if (videoWall->getId() != m_videoWallMode.guid || item.uuid != m_videoWallMode.instanceGuid)
         return;
     closeInstance();
 }

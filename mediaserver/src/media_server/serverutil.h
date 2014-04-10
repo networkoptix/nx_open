@@ -6,7 +6,7 @@
 // TODO: #Elric this belongs together with server_settings
 
 QString authKey();
-QString serverGuid();
+QUuid serverGuid();
 void setUseAlternativeGuid(bool value);
 
 QString getDataDirectory();

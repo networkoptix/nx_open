@@ -62,19 +62,6 @@ void QnResource::setResourcePool(QnResourcePool *resourcePool)
     m_resourcePool = resourcePool;
 }
 
-void QnResource::setGuid(const QUuid& guid)
-{
-    QMutexLocker mutexLocker(&m_mutex);
-
-    m_id = guid;
-}
-
-QUuid QnResource::getGuid() const
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_id;
-}
-
 QnResourcePtr QnResource::toSharedPointer() const
 {
     return QnFromThisToShared<QnResource>::toSharedPointer();
@@ -82,7 +69,7 @@ QnResourcePtr QnResource::toSharedPointer() const
 
 void QnResource::updateInner(QnResourcePtr other)
 {
-    Q_ASSERT(getGuid() == other->getGuid() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
+    Q_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
     m_id = other->m_id; //TODO: #Elric this is WRONG!!!!!!!!!11111111
     m_typeId = other->m_typeId;

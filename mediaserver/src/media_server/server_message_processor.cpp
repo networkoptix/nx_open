@@ -64,7 +64,7 @@ void QnServerMessageProcessor::updateAllIPList(const QnId& id, const QList<QStri
 #endif
 
 void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>();
 
     bool isServer = resource.dynamicCast<QnMediaServerResource>();
     bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -99,7 +99,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
 
     bool needUpdateServer = false;
     // We are always online
-    if (isServer && resource->getGuid() == serverGuid()) {
+    if (isServer && resource->getId() == serverGuid()) {
         if (resource->getStatus() != QnResource::Online) {
             qWarning() << "XYZ1: Received message that our status is " << resource->getStatus();
             resource->setStatus(QnResource::Online);
@@ -111,7 +111,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     else
         qnResPool->addResource(resource);
 
-    if (isServer && resource->getGuid() == serverGuid())
+    if (isServer && resource->getId() == serverGuid())
         syncStoragesToSettings(ownMediaServer);
 
 }
