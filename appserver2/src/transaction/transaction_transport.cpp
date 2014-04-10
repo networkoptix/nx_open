@@ -205,6 +205,14 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     }
 
     QUrlQuery q = QUrlQuery(remoteAddr.query());
+    if (m_state == ConnectingStage1)
+    {
+        q.removeQueryItem("time");
+        qint64 localTime = -1;
+        if (QnTransactionLog::instance())
+            localTime = QnTransactionLog::instance()->getRelativeTime();
+        q.addQueryItem("time", QByteArray::number(localTime));
+    }
     if( m_isClientPeer ) {
         q.removeQueryItem("isClient");
         q.addQueryItem("isClient", QString());
@@ -316,7 +324,7 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remoteGuid, true);
         if (lockOK) {
             if (QnTransactionLog::instance()) {
-                qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
+                qint64 localTime = QUrlQuery(client->url().query()).queryItemValue("time").toLongLong();
                 qint64 remoteTime = itrTime->second.toLongLong();
                 if (remoteTime != -1)
                     setTimeDiff(remoteTime - localTime);
