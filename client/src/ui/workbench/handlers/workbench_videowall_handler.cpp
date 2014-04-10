@@ -12,6 +12,7 @@
 #include <client/client_settings.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_type.h>
 #include <core/resource/resource_name.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -1176,6 +1177,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid().toString());
+    layout->setTypeId(qnResTypePool->getResourceTypeByName(lit("Layout"))->getId());
     if (filtered.size() == 1)
         layout->setName(generateUniqueLayoutName(context()->user(),
                                                  filtered.first()->getName(),
@@ -1190,6 +1192,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 
     layout->setCellSpacing(0, 0);
     layout->setCellAspectRatio(desiredAspectRatio);
+    layout->addFlags(QnResource::local); // TODO: #Elric #EC2
 
     /* Calculate size of the resulting matrix. */
     const int matrixWidth = qMax(1, qRound(std::sqrt(desiredAspectRatio * filtered.size())));
