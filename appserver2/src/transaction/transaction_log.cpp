@@ -100,20 +100,11 @@ QnTranState QnTransactionLog::getTransactionsState()
 
 bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& hash)
 {
-    /*
-    QReadLocker lock(&m_dbManager->getMutex());
     if (m_state.value(tran.id.peerGUID) >= tran.id.sequence)
-        return true; // transaction from this peer already processed;
-
-    QMap<QUuid, QnAbstractTransaction>::iterator itr = m_updateHistory.find(hash);
-    if (itr == m_updateHistory.end())
-        return false;
-    QnAbstractTransaction& lastTran = *itr;
-    qAbs(tran.timestamp - lastTran.timestamp);
-    */
-
-    return m_state.value(tran.id.peerGUID) >= tran.id.sequence ||
-           m_updateHistory.value(hash) > tran.timestamp;
+        return true;
+    const qint64 lastTime = m_updateHistory.value(hash);
+    return lastTime > tran.timestamp ||
+           (lastTime == tran.timestamp && tran.id.peerGUID > qnCommon->moduleGUID());
 }
 
 ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result)
