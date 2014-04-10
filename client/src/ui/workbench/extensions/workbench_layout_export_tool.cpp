@@ -320,7 +320,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     itemData.contrastParams,
                                     itemData.dewarpingParams);
 
-    emit stageChanged(tr("Exporting %1 to \"%2\"...").arg(resource->toResource()->getUrl()).arg(m_targetFilename));
+    emit stageChanged(tr("Exporting to \"%2\"...").arg(m_targetFilename));
     return true;
 }
 
