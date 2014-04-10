@@ -508,6 +508,12 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
+class QnDetachFromVideoWallActionCondition: public QnActionCondition {
+public:
+    QnDetachFromVideoWallActionCondition(QObject* parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 class QnRotateItemCondition: public QnActionCondition {
 public:
     QnRotateItemCondition(QObject* parent): QnActionCondition(parent) {}
