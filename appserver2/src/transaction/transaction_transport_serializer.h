@@ -25,23 +25,21 @@ namespace ec2
         void serializeTran(QByteArray& buffer, const QnTransaction<T>& tran, const ProcessedPeers& peers = ProcessedPeers())
         {
             OutputBinaryStream<QByteArray> stream(&buffer);
-            stream.write("00000000\r\n",10);
+            stream.write("0000",4);
             serialize(updatePeers(peers), &stream);
             serialize( tran, &stream );
-            stream.write("\r\n",2); // chunk end
-            quint32 payloadSize = buffer.size() - 12;
-            toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
+            quint32* lenField = (quint32*) buffer.data();
+            *lenField = htonl(buffer.size());
         }
 
         void serializeTran(QByteArray& buffer, const QByteArray& serializedTran, const ProcessedPeers& peers = ProcessedPeers())
         {
             OutputBinaryStream<QByteArray> stream(&buffer);
-            stream.write("00000000\r\n",10);
+            stream.write("0000", 4);
             serialize(updatePeers(peers), &stream);
             stream.write(serializedTran.data(), serializedTran.size());
-            stream.write("\r\n",2); // chunk end
-            quint32 payloadSize = buffer.size() - 12;
-            toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
+            quint32* lenField = (quint32*) buffer.data();
+            *lenField = htonl(buffer.size());
         }
 
         

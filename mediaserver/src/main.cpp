@@ -454,7 +454,7 @@ QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, 
     foreach(QnMediaServerResourcePtr server, servers)
     {
         *pm = server->getPanicMode();
-        if (server->getGuid() == serverGuid())
+        if (server->getId() == serverGuid())
             return server;
     }
 
@@ -602,7 +602,7 @@ void initAppServerConnection(const QSettings &settings)
     urlNoPassword.setPassword("");
     cl_log.log("Connect to enterprise controller server ", urlNoPassword.toString(), cl_logINFO);
     QnAppServerConnectionFactory::setAuthKey(authKey());
-    QnAppServerConnectionFactory::setClientGuid(serverGuid());
+    QnAppServerConnectionFactory::setClientGuid(serverGuid().toString());
     //QnAppServerConnectionFactory::setClientType(QLatin1String("server")); //TODO :#GDM VW reimplement
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
@@ -818,8 +818,8 @@ void QnMain::at_serverSaved(int, ec2::ErrorCode err)
 void QnMain::at_connectionOpened()
 {
     if (m_firstRunningTime)
-        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(), m_firstRunningTime*1000, QnBusiness::MServerIssueStarted);
-    qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch());
+        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), m_firstRunningTime*1000, QnBusiness::MServerIssueStarted);
+    qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch());
     m_firstRunningTime = 0;
 }
 
@@ -1143,7 +1143,7 @@ void QnMain::run()
 
     QUrl proxyServerUrl = ec2Connection->connectionInfo().ecUrl;
     proxyServerUrl.setPort(connectInfo->proxyPort);
-    m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid());
+    m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid().toString());
     m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
 
 
@@ -1157,7 +1157,7 @@ void QnMain::run()
 
         if (!server) {
             server = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
-            server->setGuid(serverGuid());
+            server->setId(serverGuid());
             server->setPanicMode(pm);
         }
         server->setVersion(QnSoftwareVersion(QN_ENGINE_VERSION));
@@ -1513,8 +1513,8 @@ protected:
         if (primaryGuidAbsent)
             MSSettings::roSettings()->setValue("separateGuidForRemoteEC", 1);
 
-        QString guid = serverGuid();
-        if (guid.isEmpty())
+        QUuid guid = serverGuid();
+        if (guid.isNull())
         {
             cl_log.log("Can't save guid. Run once as administrator.", cl_logERROR);
             qApp->quit();

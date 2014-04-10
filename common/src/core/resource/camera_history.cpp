@@ -17,7 +17,7 @@ QnId QnCameraTimePeriod::getServerId() const
 {
     QnId id;
 
-    QnResourcePtr resource = qnResPool->getResourceByGuid(mediaServerGuid);
+    QnResourcePtr resource = qnResPool->getResourceById(mediaServerGuid);
     if (resource)
         id = resource->getId();
 
@@ -46,7 +46,7 @@ QnCameraTimePeriodList QnCameraHistory::getOnlineTimePeriods() const
     QnCameraTimePeriodList result;
     for (QnCameraTimePeriodList::const_iterator itr = m_fullTimePeriods.constBegin(); itr != m_fullTimePeriods.constEnd(); ++itr)
     {
-        QnResourcePtr resource = qnResPool->getResourceByGuid(itr->mediaServerGuid);
+        QnResourcePtr resource = qnResPool->getResourceById(itr->mediaServerGuid);
         if (resource && resource->getStatus() == QnResource::Online)
             result << *itr;        
     }

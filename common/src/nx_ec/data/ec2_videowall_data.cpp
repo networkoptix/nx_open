@@ -55,7 +55,9 @@ namespace ec2
         for (const ApiVideowallScreen &screen : screens) {
             QnVideoWallPcData::PcScreen outScreen;
             screen.toScreen(outScreen);
-            pcs[screen.pc_guid].screens << outScreen;
+            QnVideoWallPcData& outPc = pcs[screen.pc_guid];
+            outPc.uuid = screen.pc_guid;
+            outPc.screens << outScreen;
         }
         resource->setPcs(pcs);
 

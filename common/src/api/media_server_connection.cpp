@@ -400,7 +400,7 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     setNameMapper(new QnEnumNameMapper(QnEnumNameMapper::create<RequestObject>())); // TODO: #Elric no new
 
     QnRequestHeaderList extraHeaders;
-    extraHeaders << QnRequestHeader(lit("x-server-guid"), mserver->getGuid().toString());
+    extraHeaders << QnRequestHeader(lit("x-server-guid"), mserver->getId().toString());
     if (!videoWallKey.isEmpty())
         extraHeaders << QnRequestHeader(lit("X-NetworkOptix-VideoWall"), videoWallKey);
     setExtraHeaders(extraHeaders);

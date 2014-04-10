@@ -127,11 +127,8 @@ public:
     QnId getParentId() const;
     void setParentId(QnId parent);
 
-    void setGuid(const QUuid& guid);
-    QUuid getGuid() const;
-
     // device unique identifier
-    virtual QString getUniqueId() const { return getGuid().toString(); };
+    virtual QString getUniqueId() const { return getId().toString(); };
     virtual void setUniqId(const QString& value);
 
 

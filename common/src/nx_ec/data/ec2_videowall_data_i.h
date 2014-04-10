@@ -38,7 +38,7 @@
         std::vector<ApiVideowallScreen> screens;
     };
 
-    #define ApiVideowallDataFields (autorun)
+    #define ApiVideowallDataFields (autorun) (items) (screens)
     QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiVideowallData, ApiResourceData, ApiVideowallDataFields);
 
     QN_DEFINE_API_OBJECT_LIST_DATA(ApiVideowall)

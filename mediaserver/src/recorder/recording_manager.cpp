@@ -140,7 +140,7 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     }
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(res->getParentId()));
-    QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getGuid().toString());
+    QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getId().toString());
 
     ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
     ec2::ErrorCode errCode = appServerConnection->getCameraManager()->addCameraHistoryItemSync(cameraHistoryItem);
@@ -383,7 +383,7 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
         }
 
         QnResourcePtr mServer = qnResPool->getResourceById(camera->getParentId());
-        if (!mServer || mServer->getGuid() != serverGuid())
+        if (!mServer || mServer->getId() != serverGuid())
             return; // it is camera from other server
 
         updateCamera(camera);
@@ -438,7 +438,7 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
     }
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(resource);
-    if (server && server->getGuid() == serverGuid())
+    if (server && server->getId() == serverGuid())
         connect(server.data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_server_resourceChanged(const QnResourcePtr &)), Qt::QueuedConnection);
 }
 

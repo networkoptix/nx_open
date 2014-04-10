@@ -68,12 +68,7 @@ QnAbstractStreamDataProvider* QnServerCamera::createLiveDataProvider()
 
 QString QnServerCamera::getUniqueId() const
 {
-    return getPhysicalId() + getParentId().toString();
-}
-
-QString QnServerCamera::getUniqueIdForServer(const QnResourcePtr mServer) const
-{
-    return getPhysicalId() + mServer->getId().toString();
+    return getPhysicalId();
 }
 
 // --------------------------- QnServerCameraFactory -----------------------------

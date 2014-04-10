@@ -448,17 +448,6 @@ QStringList QnResourcePool::allTags() const
     return result;
 }
 
-QnResourcePtr QnResourcePool::getResourceByGuid(const QUuid& guid) const
-{
-    QMutexLocker locker(&m_resourcesMtx);
-    foreach (const QnResourcePtr &resource, m_resources) {
-        if (resource->getGuid() == guid)
-            return resource;
-    }
-
-    return QnNetworkResourcePtr(0);
-}
-
 int QnResourcePool::activeCamerasByClass(bool analog) const
 {
     int count = 0;
