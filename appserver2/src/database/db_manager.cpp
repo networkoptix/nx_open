@@ -1501,7 +1501,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallLis
         return ErrorCode::failure;
     }
     std::vector<ApiVideowallScreenDataWithRef> screens;
-    QN_QUERY_TO_DATA_OBJECT(queryItems, ApiVideowallScreenDataWithRef, screens, ApiVideowallScreenDataFields (videowall_guid));
+    QN_QUERY_TO_DATA_OBJECT(queryScreens, ApiVideowallScreenDataWithRef, screens, ApiVideowallScreenDataFields (videowall_guid));
     mergeObjectListData(videowallList.data, screens, &ApiVideowallData::screens, &ApiVideowallScreenDataWithRef::videowall_guid);
 
     return ErrorCode::ok;
@@ -1621,6 +1621,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfo& data)
     mergeObjectListData<ApiCamera>(data.cameras.data,      kvPairs, &ApiCamera::addParams,      &ApiResourceParamWithRef::resourceId);
     mergeObjectListData<ApiUser>(data.users.data,          kvPairs, &ApiUser::addParams,        &ApiResourceParamWithRef::resourceId);
     mergeObjectListData<ApiLayout>(data.layouts.data,      kvPairs, &ApiLayout::addParams,      &ApiResourceParamWithRef::resourceId);
+    mergeObjectListData<ApiVideowall>(data.videowalls.data,kvPairs, &ApiVideowall::addParams,   &ApiResourceParamWithRef::resourceId);
 
     //filling serverinfo
     fillServerInfo( &data.serverInfo );
@@ -1805,7 +1806,7 @@ ErrorCode QnDbManager::updateVideowallItems(const ApiVideowall& data) {
     foreach(const ApiVideowallItem& item, data.items)
     {
         item.autoBindValues(insQuery);
-        insQuery.bindValue(":videowall_guid", data.id);
+        insQuery.bindValue(":videowall_guid", data.id.toRfc4122());
 
         if (!insQuery.exec()) {
             qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
@@ -1824,7 +1825,7 @@ ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowall& data) {
                      layout_x, layout_y, layout_w, layout_h) \
                      VALUES \
                      (:pc_guid, :pc_index, \
-                     :desktop_x, :desktop_y, :desktop_w, desktop_h, \
+                     :desktop_x, :desktop_y, :desktop_w, :desktop_h, \
                      :layout_x, :layout_y, :layout_w, :layout_h)");
 
     QSet<QnId> pcUuids;
@@ -1842,10 +1843,10 @@ ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowall& data) {
     insPcQuery.prepare("INSERT OR REPLACE INTO vms_videowall_pcs \
                        (videowall_guid, pc_guid) VALUES (:videowall_guid, :pc_guid)");
     foreach (const QnId &pcUuid, pcUuids) {
-        insQuery.bindValue(":videowall_guid", data.id);
-        insQuery.bindValue(":pc_guid", pcUuid);
-        if (!insQuery.exec()) {
-            qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        insPcQuery.bindValue(":videowall_guid", data.id.toRfc4122());
+        insPcQuery.bindValue(":pc_guid", pcUuid.toRfc4122());
+        if (!insPcQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << insPcQuery.lastError().text();
             return ErrorCode::failure;
         }
     }
