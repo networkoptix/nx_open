@@ -1818,36 +1818,44 @@ ErrorCode QnDbManager::updateVideowallItems(const ApiVideowall& data) {
 }
 
 ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowall& data) {
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO vms_videowall_screen \
-                     (pc_guid, pc_index, \
-                     desktop_x, desktop_y, desktop_w, desktop_h, \
-                     layout_x, layout_y, layout_w, layout_h) \
-                     VALUES \
-                     (:pc_guid, :pc_index, \
-                     :desktop_x, :desktop_y, :desktop_w, :desktop_h, \
-                     :layout_x, :layout_y, :layout_w, :layout_h)");
+    if (data.screens.size() == 0)
+        return ErrorCode::ok;
 
     QSet<QnId> pcUuids;
-    foreach(const ApiVideowallScreen& screen, data.screens)
+
     {
-        screen.autoBindValues(insQuery);
-        pcUuids << screen.pc_guid;
-        if (!insQuery.exec()) {
-            qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-            return ErrorCode::failure;
+        QSqlQuery query(m_sdb);
+        query.prepare("INSERT OR REPLACE INTO vms_videowall_screen \
+                      (pc_guid, pc_index, \
+                      desktop_x, desktop_y, desktop_w, desktop_h, \
+                      layout_x, layout_y, layout_w, layout_h) \
+                      VALUES \
+                      (:pc_guid, :pc_index, \
+                      :desktop_x, :desktop_y, :desktop_w, :desktop_h, \
+                      :layout_x, :layout_y, :layout_w, :layout_h)");
+
+        foreach(const ApiVideowallScreen& screen, data.screens)
+        {
+            screen.autoBindValues(query);
+            pcUuids << screen.pc_guid;
+            if (!query.exec()) {
+                qWarning() << Q_FUNC_INFO << query.lastError().text();
+                return ErrorCode::failure;
+            }
         }
     }
 
-    QSqlQuery insPcQuery(m_sdb);
-    insPcQuery.prepare("INSERT OR REPLACE INTO vms_videowall_pcs \
-                       (videowall_guid, pc_guid) VALUES (:videowall_guid, :pc_guid)");
-    foreach (const QnId &pcUuid, pcUuids) {
-        insPcQuery.bindValue(":videowall_guid", data.id.toRfc4122());
-        insPcQuery.bindValue(":pc_guid", pcUuid.toRfc4122());
-        if (!insPcQuery.exec()) {
-            qWarning() << Q_FUNC_INFO << insPcQuery.lastError().text();
-            return ErrorCode::failure;
+    {
+        QSqlQuery query(m_sdb);
+        query.prepare("INSERT OR REPLACE INTO vms_videowall_pcs \
+                      (videowall_guid, pc_guid) VALUES (:videowall_guid, :pc_guid)");
+        foreach (const QnId &pcUuid, pcUuids) {
+            query.bindValue(":videowall_guid", data.id.toRfc4122());
+            query.bindValue(":pc_guid", pcUuid.toRfc4122());
+            if (!query.exec()) {
+                qWarning() << Q_FUNC_INFO << query.lastError().text();
+                return ErrorCode::failure;
+            }
         }
     }
     return ErrorCode::ok;
@@ -1865,7 +1873,6 @@ ErrorCode QnDbManager::deleteVideowallItems(const QnId &videowall_guid) {
             qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
             return ErrorCode::failure;
         }
-        return ErrorCode::ok;
     }
 
     { // delete unused PCs
@@ -1875,8 +1882,8 @@ ErrorCode QnDbManager::deleteVideowallItems(const QnId &videowall_guid) {
             qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
             return ErrorCode::failure;
         }
-        return ErrorCode::ok;
     }
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::removeVideowall( const QnId& guid ) {
