@@ -93,6 +93,10 @@ void QnResource::updateInner(QnResourcePtr other)
     m_flags = other->m_flags;
     m_name = other->m_name;
     m_parentId = other->m_parentId;
+
+    m_status = other->m_status;
+    if (m_status == Offline)
+        m_initialized = false;
 }
 
 void QnResource::update(QnResourcePtr other, bool silenceMode)

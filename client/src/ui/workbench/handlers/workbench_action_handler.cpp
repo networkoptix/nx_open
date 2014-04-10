@@ -1062,6 +1062,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
             continue;
 
         camera->setParentId(server->getId());
+        camera->setStatus(QnResource::Offline);
         modifiedResources.push_back(camera);
 
         if (server->getStatus() == QnResource::Offline)
