@@ -194,8 +194,8 @@ namespace ec2
         ErrorCode removeServer(const QnId& guid);
         ErrorCode removeStoragesByServer(const QnId& serverGUID);
 
-        ErrorCode removeLayout(const QnId& guid);
-        ErrorCode removeLayout(qint32 id);
+        ErrorCode removeLayout(const QnId& id);
+        ErrorCode removeLayoutInternal(const QnId& id, const qint32 &internalId);
         ErrorCode saveLayout(const ApiLayout& params);
         ErrorCode insertOrReplaceLayout(const ApiLayout& data, qint32 internalId);
         ErrorCode updateLayoutItems(const ApiLayout& data, qint32 internalLayoutId);
@@ -206,11 +206,12 @@ namespace ec2
         ErrorCode insertOrReplaceUser(const ApiUser& data, qint32 internalId);
 
         ErrorCode saveVideowall(const ApiVideowall& params);
-        ErrorCode removeVideowall( const QnId& guid );
+        ErrorCode removeVideowall(const QnId& id);
         ErrorCode insertOrReplaceVideowall(const ApiVideowall& data, qint32 internalId);
         ErrorCode deleteVideowallItems(const QnId &videowall_guid);
         ErrorCode updateVideowallItems(const ApiVideowall& data);
         ErrorCode updateVideowallScreens(const ApiVideowall& data);
+        ErrorCode removeLayoutFromVideowallItems(const QnId &layout_id);
 
         ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRule& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);
@@ -224,6 +225,7 @@ namespace ec2
         void mergeRuleResource(QSqlQuery& query, ApiBusinessRuleList& data, std::vector<qint32> ApiBusinessRule::*resList);
 
         qint32 getResourceInternalId( const QnId& guid );
+        QnId getResourceGuid(const qint32 &internalId);
         qint32 getBusinessRuleInternalId( const QnId& guid );
     private:
         QMap<int, QnId> getGuidList(const QString& request);
