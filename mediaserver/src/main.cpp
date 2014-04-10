@@ -583,6 +583,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
+    m_startMessageSent(false),
     m_firstRunningTime(0),
     m_rtspListener(0),
     m_restServer(0),
@@ -795,7 +796,12 @@ void QnMain::at_connectionOpened()
 {
     if (m_firstRunningTime)
         qnBusinessRuleConnector->at_mserverFailure(m_mediaServer, m_firstRunningTime*1000, QnBusiness::MServerIssueStarted);
-    qnBusinessRuleConnector->at_mserverStarted(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch());
+
+    if (!m_startMessageSent) {
+        qnBusinessRuleConnector->at_mserverStarted(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch());
+        m_startMessageSent = true;
+    }
+
     m_firstRunningTime = 0;
 }
 
