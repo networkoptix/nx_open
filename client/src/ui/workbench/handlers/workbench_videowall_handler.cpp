@@ -1320,6 +1320,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
         targetLayout = currentLayout->clone();
         targetLayout->setName(generateUniqueLayoutName(context()->user(), tr("VideoWall Layout"),  tr("VideoWall Layout %1")));
         targetLayout->setParentId(context()->user()->getId());
+        targetLayout->addFlags(QnResource::local);
         targetLayout->setCellSpacing(QSizeF(0.0, 0.0));
         targetLayout->setUserCanEdit(true);
         resourcePool()->addResource(targetLayout);
