@@ -129,5 +129,6 @@ extern "C" {
 #include <QtGui/QResizeEvent>
 #include <QFileSystemWatcher>
 #include <QtCore/QUrlQuery>
+#include <QtCore/QUuid>
 
 #endif

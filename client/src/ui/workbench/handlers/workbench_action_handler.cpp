@@ -1741,7 +1741,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setGuid(QUuid::createUuid());
+    layout->setId(QUuid::createUuid());
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
     layout->setTypeByName(lit("Layout"));
     if(context()->user())

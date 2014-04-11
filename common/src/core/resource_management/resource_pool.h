@@ -62,7 +62,6 @@ public:
     QnResourceList getResources() const;
 
     QnResourcePtr getResourceById(QnId id) const;
-    QnResourcePtr getResourceByGuid(const QUuid &guid) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
     void updateUniqId(QnResourcePtr res, const QString &newUniqId);

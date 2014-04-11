@@ -282,7 +282,7 @@ void QnServerSettingsDialog::submitToResources() {
         QnAbstractStorageResourceList storages;
         foreach(const QnStorageSpaceData &item, tableItems()) {
             if(!item.isUsedForWriting && item.storageId.isNull()) {
-                serverStorageStates.insert(QnServerStorageKey(m_server->getGuid(), item.path), item.reservedSpace);
+                serverStorageStates.insert(QnServerStorageKey(m_server->getId(), item.path), item.reservedSpace);
                 continue;
             }
 
@@ -510,7 +510,7 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
         QnStorageSpaceData &item = items[i];
 
         if(item.reservedSpace == -1)
-            item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getGuid(), item.path) , -1);
+            item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getId(), item.path) , -1);
 
         /* Note that if freeSpace is -1, then we'll also get -1 in reservedSpace, which is the desired behavior. */
         if(item.reservedSpace == -1)

@@ -925,7 +925,8 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).    //TODO: #GDM VW User permission!
         text(tr("Detach Layout")).
-        autoRepeat(false);
+        autoRepeat(false).
+        condition(new QnDetachFromVideoWallActionCondition(this));
 
     factory(Qn::SaveLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
