@@ -637,6 +637,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
+    m_startMessageSent(false),
     m_firstRunningTime(0),
     m_moduleFinder(0),
     m_rtspListener(0),
@@ -819,7 +820,10 @@ void QnMain::at_connectionOpened()
 {
     if (m_firstRunningTime)
         qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), m_firstRunningTime*1000, QnBusiness::MServerIssueStarted);
-    qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch());
+    if (!m_startMessageSent) {
+        qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch());
+        m_startMessageSent = true;
+    }
     m_firstRunningTime = 0;
 }
 
@@ -1317,7 +1321,8 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
 #endif
 #ifdef ENABLE_ACTI
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnActiResourceSearcher::instance());
+    QnActiResourceSearcher actiResourceSearcherInstance;
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&actiResourceSearcherInstance);
 #endif
 #ifdef ENABLE_STARDOT
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnStardotResourceSearcher::instance());
@@ -1356,11 +1361,6 @@ void QnMain::run()
 #ifndef EDGE_SERVER
     updateDisabledVendorsIfNeeded();
     QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
-    if (disabledVendors .size() > 0)
-        qWarning() << "Some autodiscovery is disabled: " << disabledVendors;
-#endif
-
-    connect(QnServerMessageProcessor::instance(), &QnServerMessageProcessor::connectionReset, this, &QnMain::loadResourcesFromECS);
 
     //QnCommonMessageProcessor::instance()->init(ec2Connection); // start receiving notifications
 

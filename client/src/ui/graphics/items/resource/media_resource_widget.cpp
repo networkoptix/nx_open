@@ -483,6 +483,7 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
     if(m_display) {
         connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
         connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
+        connect(m_resource->toResource(),SIGNAL(videoLayoutChanged(const QnResourcePtr &)), this, SLOT(at_videoLayoutChanged()));
 
         setChannelLayout(m_display->videoLayout());
         m_display->addRenderer(m_renderer);
@@ -494,6 +495,11 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
     }
 
     emit displayChanged();
+}
+
+void QnMediaResourceWidget::at_videoLayoutChanged()
+{
+    setChannelLayout(m_display->videoLayout());
 }
 
 void QnMediaResourceWidget::updateDisplay() {

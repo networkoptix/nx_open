@@ -6,11 +6,11 @@
 #ifndef ILP_STREAM_READER_H
 #define ILP_STREAM_READER_H
 
-#include <condition_variable>
 #include <memory>
-#include <mutex>
 
+#include <QtCore/QMutex>
 #include <QtCore/QUrl>
+#include <QtCore/QWaitCondition>
 
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
@@ -68,8 +68,8 @@ private:
     qint64 m_prevFrameClock;
     qint64 m_frameDurationMSec;
     bool m_terminated;
-    std::condition_variable m_cond;
-    std::mutex m_mutex;
+    QWaitCondition m_cond;
+    QMutex m_mutex;
  
     void gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame );
     /*!
