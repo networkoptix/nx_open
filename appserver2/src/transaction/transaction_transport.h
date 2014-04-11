@@ -8,6 +8,7 @@
 #include "utils/network/aio/aioeventhandler.h"
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/common/id.h"
+#include "transaction.h"
 
 namespace ec2
 {
@@ -46,11 +47,14 @@ public:
     void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
     bool isReadSync() const       { return m_readSync; }
     void setReadSync(bool value)  {m_readSync = value;}
-    bool isWriteSync() const      { return m_writeSync; }
+    bool isWriteSync(ApiCommand::Value command) const;
     void setWriteSync(bool value) { m_writeSync = value; }
     void setTimeDiff(qint64 diff) { m_timeDiff = diff; }
     qint64 timeDiff() const       { return m_timeDiff; }
     QUrl remoteAddr() const       { return m_remoteAddr; }
+
+    void setTranSequence(int seq) { m_tranSequence = seq;}
+    int tranSequence() const      { return m_tranSequence; }
 
     // This is multi thread getters/setters
     void setState(State state);
@@ -82,6 +86,7 @@ private:
     qint64 m_timeDiff;
     QUrl m_remoteAddr;
     bool m_connected;
+    int m_tranSequence;
 
     static QSet<QUuid> m_existConn;
     typedef QMap<QUuid, QPair<bool, bool>> ConnectingInfoMap;

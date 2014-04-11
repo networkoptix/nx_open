@@ -28,7 +28,8 @@ QnTransactionTransport::QnTransactionTransport(bool isOriginator, bool isClient,
     m_chunkLen(0), 
     m_sendOffset(0), 
     m_timeDiff(0),
-    m_connected(false)
+    m_connected(false),
+    m_tranSequence(-1)
 {
 }
 
@@ -391,4 +392,9 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
     m_readBufferLen = bufferLen;
 }
 
+bool QnTransactionTransport::isWriteSync(ApiCommand::Value command) const
+{
+     // allow to send system command immediately, without tranSyncRequest
+    return ApiCommand::isSystem(command) ? true : m_writeSync;
+}
 }

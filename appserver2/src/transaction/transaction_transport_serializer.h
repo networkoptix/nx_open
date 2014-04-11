@@ -22,21 +22,21 @@ namespace ec2
         QnTransactionTransportSerializer(QnTransactionMessageBus& owner);
 
         template <class T>
-        void serializeTran(QByteArray& buffer, const QnTransaction<T>& tran, const ProcessedPeers& peers = ProcessedPeers())
+        void serializeTran(QByteArray& buffer, const QnTransaction<T>& tran, const ProcessedPeers& peers)
         {
             OutputBinaryStream<QByteArray> stream(&buffer);
             stream.write("0000",4);
-            serialize(updatePeers(peers), &stream);
+            serialize(peers, &stream);
             serialize( tran, &stream );
             quint32* lenField = (quint32*) buffer.data();
             *lenField = htonl(buffer.size());
         }
 
-        void serializeTran(QByteArray& buffer, const QByteArray& serializedTran, const ProcessedPeers& peers = ProcessedPeers())
+        void serializeTran(QByteArray& buffer, const QByteArray& serializedTran, const ProcessedPeers& peers)
         {
             OutputBinaryStream<QByteArray> stream(&buffer);
             stream.write("0000", 4);
-            serialize(updatePeers(peers), &stream);
+            serialize(peers, &stream);
             stream.write(serializedTran.data(), serializedTran.size());
             quint32* lenField = (quint32*) buffer.data();
             *lenField = htonl(buffer.size());
@@ -46,7 +46,6 @@ namespace ec2
         static bool deserializeTran(const quint8* chunkPayload, int len,  ProcessedPeers& peers, QByteArray& tranData);
 
     private:
-        ProcessedPeers updatePeers(const ProcessedPeers& opaque);
         static void toFormattedHex(quint8* dst, quint32 payloadSize);
     private:
         QnTransactionMessageBus& m_owner;
