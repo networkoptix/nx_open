@@ -297,8 +297,10 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         if (needStopHi) {
             NX_LOG(QString(lit("Recording stopped for camera %1")).arg(res->getUniqueId()), cl_logINFO);
         }
-        if(!needStopHi && !needStopLow && res->getStatus() == QnResource::Recording)
-            res->setStatus(QnResource::Online); // may be recording thread was not runned, so reset status to online
+        if (!res->hasFlags(QnResource::foreigner)) {
+            if(!needStopHi && !needStopLow && res->getStatus() == QnResource::Recording)
+                res->setStatus(QnResource::Online); // may be recording thread was not runned, so reset status to online
+        }
     }
 
     return someRecordingIsPresent;
