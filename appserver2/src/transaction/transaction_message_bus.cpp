@@ -118,7 +118,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
         m_lastTranSeq[tran.id.peerGUID] = tran.id.sequence;
     }
 
-    // process special transactions
+    // process system transactions
     switch(tran.command)
     {
     case ApiCommand::lockRequest:
@@ -155,11 +155,10 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     }
     
     QMutexLocker lock(&m_mutex);
-
+    
     // proxy incoming transaction to other peers.
     QByteArray chunkData;
-    processedPeers += peersToSend(tran.command);
-    m_serializer.serializeTran(chunkData, serializedTran, processedPeers);
+    m_serializer.serializeTran(chunkData, serializedTran, processedPeers + peersToSend(tran.command));
 
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
