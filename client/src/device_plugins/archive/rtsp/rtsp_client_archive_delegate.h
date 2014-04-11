@@ -23,6 +23,7 @@ public:
     virtual ~QnRtspClientArchiveDelegate();
 
     void setResource(QnResourcePtr resource);
+    void setServer(QnResourcePtr mServer);
     virtual bool open(QnResourcePtr resource);
     virtual void close();
     virtual qint64 startTime();
@@ -65,10 +66,10 @@ private:
     void reopen();
 
     // determine camera's video server on specified time
-    QnResourcePtr getResourceOnTime(QnResourcePtr resource, qint64 time);
+    QnResourcePtr getServerOnTime(qint64 time);
     QnResourcePtr getNextMediaServerFromTime(QnResourcePtr resource, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
-    QString getUrl(QnResourcePtr server);
+    QString getUrl(QnResourcePtr server, QnResourcePtr camera);
     qint64 checkMinTimeFromOtherServer(QnResourcePtr resource);
     void updateRtpParam(QnResourcePtr resource);
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
@@ -83,6 +84,7 @@ private:
     std::shared_ptr<QnDefaultResourceVideoLayout> m_defaultVideoLayout;
     bool m_opened;
     QnResourcePtr m_resource;
+    QnResourcePtr m_server;
     //bool m_waitBOF;
     int m_lastPacketFlags;
     bool m_closing;

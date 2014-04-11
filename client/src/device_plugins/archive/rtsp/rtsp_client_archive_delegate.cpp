@@ -70,12 +70,15 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
 
 void QnRtspClientArchiveDelegate::setResource(QnResourcePtr resource)
 {
-    if (m_isMultiserverAllowed)
-        resource = getResourceOnTime(resource, m_position != DATETIME_NOW ? m_position/1000 : m_position);
     m_resource = resource;
+    m_server = qnResPool->getResourceById(m_resource->getParentId());
     updateRtpParam(resource);
 }
 
+void QnRtspClientArchiveDelegate::setServer(QnResourcePtr mServer)
+{
+    m_server = mServer;
+}
 
 QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate()
 {
@@ -100,13 +103,13 @@ QnResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime(QnResource
     return newResource;
 }
 
-QString QnRtspClientArchiveDelegate::getUrl(QnResourcePtr resource)
+QString QnRtspClientArchiveDelegate::getUrl(QnResourcePtr _server, QnResourcePtr camera)
 {
-    QnResourcePtr server = qnResPool->getResourceById(resource->getParentId());
+    QnResourcePtr server = _server ? _server : qnResPool->getResourceById(camera->getParentId());
     if (!server)
         return QString();
     QString url = server->getUrl() + QLatin1Char('/');
-    QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(camera);
     if (netResource != 0)
         url += netResource->getPhysicalId();
     else
@@ -149,22 +152,18 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
     }
 
     qint64 minTime = DATETIME_NOW;
-    foreach(QnMediaServerResourcePtr otherMediaServer, checkServers)
+    foreach(QnMediaServerResourcePtr server, checkServers)
     {
-        QnResourcePtr otherCamera = qnResPool->getResourceByUniqId(physicalId + otherMediaServer->getId().toString());
         RTPSession otherRtspSession;
-        if (otherCamera)
+
+        if (server && server->getStatus() != QnResource::Offline)
         {
-            QnMediaServerResourcePtr server = qnResPool->getResourceById(otherCamera->getParentId()).dynamicCast<QnMediaServerResource>();
-            if (server && server->getStatus() != QnResource::Offline)
-            {
-                otherRtspSession.setProxyAddr(server->getProxyHost(), server->getProxyPort());
-                otherRtspSession.setAdditionAttribute("x-server-guid", server->getId().toByteArray());
-                if (otherRtspSession.open(getUrl(otherCamera)).errorCode == CameraDiagnostics::ErrorCode::noError) {
-                    if ((quint64)otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
-                    {
-                        minTime = qMin(minTime, otherRtspSession.startTime());
-                    }
+            otherRtspSession.setProxyAddr(server->getProxyHost(), server->getProxyPort());
+            otherRtspSession.setAdditionAttribute("x-server-guid", server->getId().toByteArray());
+            if (otherRtspSession.open(getUrl(server, m_resource)).errorCode == CameraDiagnostics::ErrorCode::noError) {
+                if ((quint64)otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
+                {
+                    minTime = qMin(minTime, otherRtspSession.startTime());
                 }
             }
         }
@@ -175,9 +174,29 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
         return 0;
 }
 
-QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resource, qint64)
+QnResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 time)
 {
-    return resource;
+    QnServerCameraPtr camRes = qSharedPointerDynamicCast<QnServerCamera>(m_resource);
+    if (!camRes)
+        return QnResourcePtr();
+    QString physicalId = camRes->getPhysicalId();
+    QnResourcePtr currentServer = qnResPool->getResourceById(camRes->getParentId());
+
+    if (time == DATETIME_NOW)
+        return currentServer;
+
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
+    if (!history)
+        return currentServer;
+
+    QnMediaServerResourcePtr mediaServer = history->getMediaServerOnTime(time, m_rtspSession.getScale() >= 0, m_serverTimePeriod, false);
+    if (!mediaServer)
+        return currentServer;
+    
+    if (mediaServer != m_server)
+        qDebug() << "switch to media server " << mediaServer->getUrl();
+    return mediaServer;
+
 }
 
 bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
@@ -198,11 +217,11 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     m_customVideoLayout.reset();
 
     updateRtpParam(resource);
+    m_resource = resource;
     if (m_isMultiserverAllowed)
-        resource = getResourceOnTime(resource, m_position != DATETIME_NOW ? m_position/1000 : m_position);
+        m_server = getServerOnTime(m_position != DATETIME_NOW ? m_position/1000 : m_position);
 
     m_closing = false;
-    m_resource = resource;
     QnMediaServerResourcePtr server = qnResPool->getResourceById(resource->getParentId()).dynamicCast<QnMediaServerResource>();
     if (server == 0 || server->getStatus() == QnResource::Offline)
         return false;
@@ -221,7 +240,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
         globalTimeBlocked = true;
     }
     
-    const bool isOpened = m_rtspSession.open(getUrl(resource), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
+    const bool isOpened = m_rtspSession.open(getUrl(m_server, m_resource), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
         qint64 endTime = m_position;
@@ -548,7 +567,7 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
     m_lastSeekTime = m_position = time;
     QnResourcePtr newResource;
     if (m_isMultiserverAllowed) {
-        newResource = getResourceOnTime(m_resource, m_position/1000);
+        m_server = getServerOnTime(m_position/1000);
         if (newResource)
         {
             if (newResource != m_resource)

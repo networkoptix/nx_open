@@ -42,15 +42,14 @@ public:
     void setPhysicalId(const QString& physicalId);
 
     QnMediaServerResourcePtr getMediaServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod, bool gotOfflineCameras);
-    QnNetworkResourcePtr getCameraOnTime(qint64 timestamp, bool searchForward, bool gotOfflineCameras);
     QnMediaServerResourcePtr getNextMediaServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
-    QnNetworkResourceList getAllCamerasWithSamePhysicalId(const QnTimePeriod& timePeriod);
-    QnNetworkResourceList getAllCamerasWithSamePhysicalId();
+    QnResourceList getAllCameraServers(const QnTimePeriod& timePeriod);
+    QnResourceList getAllCameraServers();
 
     /**
      * Exclude offline or disabled resources
      */
-    QnNetworkResourceList getOnlineCamerasWithSamePhysicalId(const QnTimePeriod& timePeriod);
+    QnResourceList getOnlineCameraServers(const QnTimePeriod& timePeriod);
 
     void addTimePeriod(const QnCameraTimePeriod& period);
     qint64 getMinTime() const;
@@ -61,7 +60,7 @@ private:
     QnCameraTimePeriodList::const_iterator getMediaServerOnTimeItr(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, bool searchForward);
     QnMediaServerResourcePtr getNextMediaServerFromTime(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, QnTimePeriod& currentPeriod);
     QnMediaServerResourcePtr getPrevMediaServerFromTime(const QnCameraTimePeriodList& timePeriods, qint64 timestamp, QnTimePeriod& currentPeriod);
-    QnNetworkResourceList getCamerasWithSamePhysicalIdInternal(const QnTimePeriod& timePeriod, const QnCameraTimePeriodList cameraHistory);
+    QnResourceList getAllCameraServersInternal(const QnTimePeriod& timePeriod, const QnCameraTimePeriodList cameraHistory);
 
 private:
     Q_DISABLE_COPY(QnCameraHistory);
@@ -92,14 +91,15 @@ public:
     //QnNetworkResourcePtr getCurrentCamera(const QnNetworkResourcePtr &resource);
     //QnResourcePtr getCurrentCamera(const QnResourcePtr &resource);
 
-    QnNetworkResourceList getAllCamerasWithSamePhysicalId(const QnNetworkResourcePtr &camera);
-    QnNetworkResourceList getAllCamerasWithSamePhysicalId(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
-    QnNetworkResourceList getOnlineCamerasWithSamePhysicalId(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
+    QnResourceList getAllCameraServers(const QnNetworkResourcePtr &camera);
+    QnResourceList getAllCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
+    QnResourceList getOnlineCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
     qint64 getMinTime(QnNetworkResourcePtr camera);
 
 signals:
     void currentCameraChanged(const QnNetworkResourcePtr &camera);
-
+private:
+    QnResourceList getCurrentServer(const QnNetworkResourcePtr &camera);
 private:
     typedef QMap<QString, QnCameraHistoryPtr> CameraHistoryMap;
     CameraHistoryMap m_cameraHistory;

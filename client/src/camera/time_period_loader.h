@@ -33,7 +33,7 @@ public:
      * \param parent                    Parent object for the loader to create.
      * \returns                         Newly created time period loader.
      */
-    static QnTimePeriodLoader *newInstance(QnResourcePtr resource, QObject *parent = NULL);
+    static QnTimePeriodLoader *newInstance(QnMediaServerResourcePtr serverResource, QnResourcePtr resource, QObject *parent = NULL);
     
     virtual int load(const QnTimePeriod &timePeriod, const QList<QRegion> &motionRegions = QList<QRegion>()) override;
 
