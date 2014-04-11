@@ -161,7 +161,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
         QnTransactionTransportPtr transport = *itr;
-        if (!processedPeers.contains(transport->remoteGuid()) && transport->isWriteSync(tran.command))
+        if (!processedPeers.contains(transport->remoteGuid()) && transport->isReadyToSend(tran.command))
             transport->addData(chunkData);
     }
 }
@@ -173,7 +173,7 @@ void QnTransactionMessageBus::sendTransactionInternal(const QnAbstractTransactio
     {
         QnTransactionTransportPtr transport = *itr;
         if (dstPeer.isNull() || transport->remoteGuid() == dstPeer) {
-            if (transport->isWriteSync(tran.command)) {
+            if (transport->isReadyToSend(tran.command)) {
                 transport->addData(chunkData);
                 dataQueued = true;
             }
@@ -186,7 +186,7 @@ void QnTransactionMessageBus::sendTransactionInternal(const QnAbstractTransactio
         for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
         {
             QnTransactionTransportPtr transport = *itr;
-            if (transport->isWriteSync(tran.command)) {
+            if (transport->isReadyToSend(tran.command)) {
                 transport->addData(chunkData);
             }
         }
@@ -254,6 +254,7 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         {
             QnTransaction<int> tran(ApiCommand::tranSyncResponse, false);
             tran.params = 0;
+            tran.fillSequence();
             QByteArray chunkData;
             m_serializer.serializeTran(chunkData, tran, ProcessedPeers() << sender->remoteGuid());
             sender->addData(chunkData);
@@ -374,7 +375,7 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     transport->setReadSync(false);
     QnTransaction<QnTranState> requestTran(ApiCommand::tranSyncRequest, false);
     requestTran.params = transactionLog->getTransactionsState();
-    
+    requestTran.fillSequence();
     QByteArray syncRequest;
     m_serializer.serializeTran(syncRequest, requestTran, ProcessedPeers() << transport->remoteGuid());
     transport->addData(syncRequest);
@@ -404,6 +405,7 @@ void QnTransactionMessageBus::sendServerAliveMsg(const QnId& serverId, bool isAl
     tran.params.serverId = serverId;
     tran.params.isAlive = isAlive;
     tran.params.isClient = isClient;
+    tran.fillSequence();
     sendTransaction(tran);
     if (isAlive)
         emit peerFound(serverId, isClient, false);
@@ -621,7 +623,7 @@ QSet<QUuid> QnTransactionMessageBus::peersToSend(ApiCommand::Value command) cons
     for(QnConnectionMap::const_iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
         QnTransactionTransportPtr transport = *itr;
-        if (transport->isWriteSync(command))
+        if (transport->isReadyToSend(command))
             result << itr.key();
     }
 

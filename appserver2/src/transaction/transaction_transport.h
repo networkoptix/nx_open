@@ -47,7 +47,7 @@ public:
     void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
     bool isReadSync() const       { return m_readSync; }
     void setReadSync(bool value)  {m_readSync = value;}
-    bool isWriteSync(ApiCommand::Value command) const;
+    bool isReadyToSend(ApiCommand::Value command) const;
     void setWriteSync(bool value) { m_writeSync = value; }
     void setTimeDiff(qint64 diff) { m_timeDiff = diff; }
     qint64 timeDiff() const       { return m_timeDiff; }

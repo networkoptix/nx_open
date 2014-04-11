@@ -392,7 +392,7 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
     m_readBufferLen = bufferLen;
 }
 
-bool QnTransactionTransport::isWriteSync(ApiCommand::Value command) const
+bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
 {
      // allow to send system command immediately, without tranSyncRequest
     return ApiCommand::isSystem(command) ? true : m_writeSync;
