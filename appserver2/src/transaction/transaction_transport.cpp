@@ -28,8 +28,7 @@ QnTransactionTransport::QnTransactionTransport(bool isOriginator, bool isClient,
     m_chunkLen(0), 
     m_sendOffset(0), 
     m_timeDiff(0),
-    m_connected(false),
-    m_tranSequence(-1)
+    m_connected(false)
 {
 }
 

@@ -162,6 +162,8 @@ signals:
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
+        // lock control
+        QMap<QnId, int> m_lastLockSeq;
     };
 }
 #define qnTransactionBus QnTransactionMessageBus::instance()
