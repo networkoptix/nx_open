@@ -89,3 +89,13 @@ QString QnNotificationSoundModel::titleByFilename(const QString &filename) const
 bool QnNotificationSoundModel::loaded() const {
     return m_loaded;
 }
+
+void QnNotificationSoundModel::sort(int column, Qt::SortOrder order) {
+    if (rowCount() > 0) {
+        QList<QStandardItem*> noSoundRow = takeRow(0);
+        QStandardItemModel::sort(column, order);
+        insertRow(0, noSoundRow);
+    } else {
+        QStandardItemModel::sort(column, order);
+    }
+}

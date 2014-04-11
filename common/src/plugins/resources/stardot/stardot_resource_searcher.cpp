@@ -151,12 +151,6 @@ QnResourceList QnStardotResourceSearcher::findResources()
 
 }
 
-QnStardotResourceSearcher& QnStardotResourceSearcher::instance()
-{
-    static QnStardotResourceSearcher inst;
-    return inst;
-}
-
 QnResourcePtr QnStardotResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;

@@ -171,6 +171,7 @@ private slots:
     void at_ptzController_changed(Qn::PtzDataFields fields);
 
     void at_item_imageEnhancementChanged();
+    void at_videoLayoutChanged();
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
 

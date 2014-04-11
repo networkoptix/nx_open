@@ -2588,7 +2588,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1027"/>
         <source>Delete</source>
-        <translation></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1044"/>

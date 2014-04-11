@@ -25,13 +25,6 @@ void QnTestCameraResourceSearcher::clearSocketList()
     m_sockList.clear();
 }
 
-
-QnTestCameraResourceSearcher& QnTestCameraResourceSearcher::instance()
-{
-    static QnTestCameraResourceSearcher inst;
-    return inst;
-}
-
 bool QnTestCameraResourceSearcher::updateSocketList()
 {
     qint64 curretTime = getUsecTimer();

@@ -10,12 +10,6 @@ QnPlAxisResourceSearcher::QnPlAxisResourceSearcher()
 {
 }
 
-QnPlAxisResourceSearcher& QnPlAxisResourceSearcher::instance()
-{
-    static QnPlAxisResourceSearcher inst;
-    return inst;
-}
-
 QnResourcePtr QnPlAxisResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
