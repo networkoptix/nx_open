@@ -48,6 +48,7 @@ private:
 private:
     int m_argc;
     char** m_argv;
+    bool m_startMessageSent;
     qint64 m_firstRunningTime;
 
     QnRtspListener* m_rtspListener;

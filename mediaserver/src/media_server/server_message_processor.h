@@ -1,6 +1,7 @@
 #ifndef QN_SERVER_MESSAGE_PROCESSOR_H
 #define QN_SERVER_MESSAGE_PROCESSOR_H
 
+#include <QtCore/QWaitCondition>
 #include <api/common_message_processor.h>
 
 #include <core/resource/resource.h>
@@ -15,6 +16,8 @@ public:
 
     void run();
 
+    void resume();
+
 protected:
     virtual void loadRuntimeInfo(const QnMessage &message) override;
     virtual void handleConnectionOpened(const QnMessage &message) override;
@@ -22,6 +25,7 @@ protected:
     virtual void handleMessage(const QnMessage &message) override;
 
 private:
+    void pause();
     void updateResource(const QnResourcePtr& resource);
 
 private slots:
@@ -33,6 +37,10 @@ signals:
 
 private:
     QScopedPointer<QThread> m_thread;
+
+    bool m_paused;
+    QMutex m_mutex;
+    QWaitCondition m_cond;
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H

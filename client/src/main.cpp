@@ -335,7 +335,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
     commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
 #endif
-    commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString());
+    commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString(), lit("full"));
     commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
@@ -353,6 +353,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         int lightModeOverride = lightMode.toInt(&ok);
         if (ok)
             qnSettings->setLightModeOverride(lightModeOverride);
+        else
+            qnSettings->setLightModeOverride(Qn::LightModeFull);
     }
 
     QnPerformanceTest::detectLightMode();

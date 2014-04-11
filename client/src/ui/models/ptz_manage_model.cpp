@@ -253,6 +253,10 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
         if (!ok || ((hotkey > 9 || hotkey < 0) && hotkey != QnPtzHotkey::NoHotkey))
             return false;
 
+        int oldHotkey = m_hotkeys.key(data.id(), QnPtzHotkey::NoHotkey);
+        if (oldHotkey == hotkey)
+            return false;
+
         // preset that is assigned to this hotkey
         QnPtzManageModel::RowData existing;
         int existingIndex = -1;
@@ -315,7 +319,6 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
         }
 
         // set updated hotkey
-        int oldHotkey = m_hotkeys.key(data.id(), QnPtzHotkey::NoHotkey);
         if(oldHotkey != QnPtzHotkey::NoHotkey) {
             if(existingIndex != -1) {
                 m_hotkeys.insert(oldHotkey, existing.id());

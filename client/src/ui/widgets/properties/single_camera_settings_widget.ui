@@ -239,6 +239,45 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="arGroupBox">
+         <property name="title">
+          <string>Aspect Ratio Control</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QCheckBox" name="arOverrideCheckBox">
+            <property name="text">
+             <string>Force aspect ratio to:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="arComboBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="currentIndex">
+             <number>-1</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="enableAudioCheckBox">
          <property name="text">
           <string>Enable audio</string>
