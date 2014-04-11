@@ -11,10 +11,9 @@
 
 class QnPlDroidResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
-    QnPlDroidResourceSearcher();
 
 public:
-    static QnPlDroidResourceSearcher& instance();
+    QnPlDroidResourceSearcher();
 
     QnResourceList findResources(void);
 

@@ -26,12 +26,6 @@ QnPlIqResourceSearcher::QnPlIqResourceSearcher()
 {
 }
 
-QnPlIqResourceSearcher& QnPlIqResourceSearcher::instance()
-{
-    static QnPlIqResourceSearcher inst;
-    return inst;
-}
-
 QnResourcePtr QnPlIqResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;

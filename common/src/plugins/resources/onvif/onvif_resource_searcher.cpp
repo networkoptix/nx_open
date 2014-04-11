@@ -53,12 +53,6 @@ OnvifResourceSearcher::~OnvifResourceSearcher()
 
 }
 
-OnvifResourceSearcher& OnvifResourceSearcher::instance()
-{
-    static OnvifResourceSearcher inst;
-    return inst;
-}
-
 bool OnvifResourceSearcher::isProxy() const
 {
     return false;
