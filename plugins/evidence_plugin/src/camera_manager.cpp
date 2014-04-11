@@ -488,18 +488,54 @@ int CameraManager::readCameraOptions()
         DEFAULT_CAMERA_API_PORT,
         m_credentials );
 
-    //TODO/IMPL set following parmeters:
-        //root.Network.RTSP.Enabled=yes
+    //reading parameters
+    if( http.get( QLatin1String("/cgi-bin/admin/param.cgi?action=list") ) != QNetworkReply::NoError )
+        return nxcip::NX_NETWORK_ERROR;
+    if( http.statusCode() != SyncHttpClient::HTTP_OK )
+        return http.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
+    QList<QByteArray> paramList = http.readWholeMessageBody().split( '\n' );
+    bool rtspEnabled = false;
+    for( const QByteArray& paramVal: paramList )
+    {
+        const QList<QByteArray>& paramValueList = paramVal.split( '=' );
+        if( paramValueList.size() < 2 )
+            continue;
+        if( paramValueList[0] == "root.Network.RTSP.Port" )
+            m_rtspPort = paramValueList[1].toInt();
+        else if( paramValueList[0] == "root.Network.RTSP.Enabled" )
+            rtspEnabled = paramValueList[1] == "yes";
+        else if( paramValueList[0] == "root.Image.I0.Appearance.Resolution" )
+            m_currentResolutionCoded = QString::fromLatin1( paramValueList[1] ).split(',');
+        else if( paramValueList[0] == "root.Input.NbrOfInputs" )
+            m_inputPortCount = paramValueList[1].toInt();
+        else if( paramValueList[0].startsWith("root.Input.I") )
+        {
+            const int portNumber = paramValueList[0].mid( sizeof("root.Input.I")-1 ).toInt();
+            const QByteArray& inputFieldName = paramValueList[0].mid(paramValueList[0].lastIndexOf('.')+1);
+            if( inputFieldName == "Name" )
+                ;
+            else if( inputFieldName == "Trig" )
+                ;
+        }
+        else if( paramValueList[0] == "root.Output.NbrOfOutputs" )
+            m_outputPortCount = paramValueList[1].toInt();
+        else if( paramValueList[0].startsWith("root.Output.O") )
+        {
+            const int portNumber = paramValueList[0].mid( sizeof("root.Output.O")-1 ).toInt();
+            const QByteArray& outputFieldName = paramValueList[0].mid(paramValueList[0].lastIndexOf('.')+1);
+            if( outputFieldName == "Name" )
+                ;
+            else if( outputFieldName == "Trig" )
+                ;
+        }
+    }
 
-    int result = fetchCameraParameter( &http, "Network.RTSP.Port", &m_rtspPort );
-    if( result != nxcip::NX_NO_ERROR )
-        return result;
-
-    QByteArray currentResolutionStr;
-    result = fetchCameraParameter( &http, "Image.I0.Appearance.Resolution", &currentResolutionStr );
-    if( result != nxcip::NX_NO_ERROR )
-        return result;
-    m_currentResolutionCoded = QString::fromLatin1( currentResolutionStr ).split(',');
+#if 0
+    if( m_inputPortCount > 0 )
+        m_cameraCapabilities |= nxcip::BaseCameraManager::relayInputCapability;
+    if( m_outputPortCount > 0 )
+        m_cameraCapabilities |= nxcip::BaseCameraManager::relayOutputCapability;
+#endif
 
     //"/cgi-bin/admin/param.cgi?action=list&group=Image.I0.Appearance.Resolution"
     if( http.get( QLatin1String("/cgi-bin/admin/param.cgi?action=options") ) != QNetworkReply::NoError )
@@ -507,8 +543,7 @@ int CameraManager::readCameraOptions()
     if( http.statusCode() != SyncHttpClient::HTTP_OK )
         return http.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
 
-    const QByteArray& body = http.readWholeMessageBody();
-    QList<QByteArray> paramList = body.split( '\n' );
+    paramList = http.readWholeMessageBody().split( '\n' );
     int hiStreamMaxFps = DEFAULT_HI_STREAM_FRAMERATE;
     int loStreamMaxFps = DEFAULT_LO_STREAM_FRAMERATE;
     QByteArray resolutionListStr;
@@ -516,15 +551,15 @@ int CameraManager::readCameraOptions()
     {
         const QList<QByteArray>& paramValueList = paramVal.split( '=' );
         if( paramValueList[0] == "root.Framerate.H264" )
-            hiStreamMaxFps = paramValueList[1].mid( paramValueList[1].indexOf('-') ).toInt();
+            hiStreamMaxFps = paramValueList[1].mid( paramValueList[1].indexOf('-')+1 ).toInt();
         else if( paramValueList[0] == "root.Framerate.H264_2" )
-            loStreamMaxFps = paramValueList[1].mid( paramValueList[1].indexOf('-') ).toInt();
+            loStreamMaxFps = paramValueList[1].mid( paramValueList[1].indexOf('-')+1 ).toInt();
         else if( paramValueList[0] == "root.Image.I0.Appearance.Resolution" )
             resolutionListStr = paramValueList[1];
         else if( paramValueList[0] == "root.Image.I0.Appearance.H264Bitrate" )
-            m_hiStreamMaxBitrateKbps = paramValueList[1].mid( paramValueList[1].indexOf('-') ).toInt();
+            m_hiStreamMaxBitrateKbps = paramValueList[1].mid( paramValueList[1].indexOf('-')+1 ).toInt();
         else if( paramValueList[0] == "root.Image.I0.Appearance.H264_2Bitrate" )
-            m_loStreamMaxBitrateKbps = paramValueList[1].mid( paramValueList[1].indexOf('-') ).toInt();
+            m_loStreamMaxBitrateKbps = paramValueList[1].mid( paramValueList[1].indexOf('-')+1 ).toInt();
     }
 
     parseResolutionList( resolutionListStr, hiStreamMaxFps, loStreamMaxFps );
