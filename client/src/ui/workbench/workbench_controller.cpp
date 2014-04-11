@@ -1061,6 +1061,7 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
     data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
+    data.dewarpingParams.panoFactor = 1; // zoom target must always be dewarped by 90 degrees
     
     QnResourceWidget::Buttons buttons = widget->checkedButtons();
     delete widget;
