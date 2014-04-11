@@ -112,6 +112,12 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     if (itr != m_alivePeers.end())
         itr.value().lastActivity.restart();
 
+    if (isSystem(tran.command)) {
+        if (m_lastTranSeq[tran.id.peerGUID] >= tran.id.sequence)
+            return; // already processed
+        m_lastTranSeq[tran.id.peerGUID] = tran.id.sequence;
+    }
+
     // process special transactions
     switch(tran.command)
     {
@@ -222,11 +228,6 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnAbstractT
         *needProxy = true;
         return;
     }
-
-    
-    if (m_lastLockSeq[params.peer] >= tran.id.sequence)
-        return; // already processed
-    m_lastLockSeq[params.peer] = tran.id.sequence;
 
     if(tran.command == ApiCommand::lockRequest)
         emit gotLockRequest(params);
@@ -456,7 +457,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
                 break;
             }
         }
-        m_lastLockSeq[transport->remoteGuid()] = 0;
+        m_lastTranSeq[transport->remoteGuid()] = 0;
         transport->setState(QnTransactionTransport::ReadyForStreaming);
         // if sync already done or in progress do not send new request
         if (!transport->isClientPeer())

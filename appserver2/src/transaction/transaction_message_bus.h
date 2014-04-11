@@ -159,11 +159,10 @@ signals:
         AlivePeersMap m_alivePeers;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectionsToRemove;
+        QMap<QnId, int> m_lastTranSeq;
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
-        // lock control
-        QMap<QnId, int> m_lastLockSeq;
     };
 }
 #define qnTransactionBus QnTransactionMessageBus::instance()
