@@ -8,6 +8,7 @@
 #include <QtWidgets/QWidget>
 
 #include "help_topic_accessor.h"
+#include "version.h"
 
 namespace {
     const char *relativeUrlForTopic(int topic) {
@@ -49,7 +50,11 @@ void QnHelpHandler::setHelpTopic(int topic) {
 }
 
 QUrl QnHelpHandler::urlForTopic(int topic) const {
-    return QUrl::fromLocalFile(m_helpRoot + QLatin1String("/") + QLatin1String(relativeUrlForTopic(topic)));
+    QString filePath = m_helpRoot + QLatin1String("/") + QLatin1String(relativeUrlForTopic(topic));
+    if (QFile::exists(filePath))
+        return QUrl::fromLocalFile(filePath);
+    else
+        return QUrl(lit(QN_HELP_URL) + lit("/") + QLatin1String(relativeUrlForTopic(topic)));
 }
 
 bool QnHelpHandler::eventFilter(QObject *watched, QEvent *event) {

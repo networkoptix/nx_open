@@ -22,9 +22,11 @@
 
 QnServerMessageProcessor::QnServerMessageProcessor():
     base_type(),
-    m_thread(new QThread()) {
+    m_thread(new QThread()),
+    m_paused(false) {
 
     connect(this, SIGNAL(aboutToBeStarted()), this, SLOT(at_aboutToBeStarted()));
+    connect(this, SIGNAL(aboutToBePaused()), this, SLOT(at_aboutToBePaused()));
     m_thread->setObjectName( QLatin1String("QnServerMessageProcessor") ); /* Name will be shown in debugger. */
     this->moveToThread(m_thread.data());
 
@@ -35,6 +37,23 @@ void QnServerMessageProcessor::run() {
     emit aboutToBeStarted();
 }
 
+// Should be called from this object's thread
+void QnServerMessageProcessor::pause() {
+    QMutexLocker _lock(&m_mutex);
+
+    m_paused = true;
+    while (m_paused) {
+        m_cond.wait(&m_mutex);
+    }
+}
+
+// Should be called from other thread
+void QnServerMessageProcessor::resume() {
+    QMutexLocker _lock(&m_mutex);
+    m_paused = false;
+    m_cond.wakeOne();
+}
+
 void QnServerMessageProcessor::at_aboutToBeStarted() {
     assert(QThread::currentThread() == this->thread());
 
@@ -42,6 +61,9 @@ void QnServerMessageProcessor::at_aboutToBeStarted() {
     m_thread->setPriority(QThread::HighestPriority);
 
     base_type::run();
+
+    // We start in paused state. Server's responsibility to call resume()
+    pause();
 }
 
 void QnServerMessageProcessor::handleConnectionOpened(const QnMessage &message) {

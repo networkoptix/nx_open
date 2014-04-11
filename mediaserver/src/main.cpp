@@ -583,6 +583,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
+    m_startMessageSent(false),
     m_firstRunningTime(0),
     m_rtspListener(0),
     m_restServer(0),
@@ -794,8 +795,13 @@ void QnMain::at_serverSaved(int status, const QnResourceList &, int)
 void QnMain::at_connectionOpened()
 {
     if (m_firstRunningTime)
-        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(), m_firstRunningTime*1000, QnBusiness::MServerIssueStarted);
-    qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch());
+        qnBusinessRuleConnector->at_mserverFailure(m_mediaServer, m_firstRunningTime*1000, QnBusiness::MServerIssueStarted);
+
+    if (!m_startMessageSent) {
+        qnBusinessRuleConnector->at_mserverStarted(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch());
+        m_startMessageSent = true;
+    }
+
     m_firstRunningTime = 0;
 }
 
@@ -1146,6 +1152,9 @@ void QnMain::run()
 
     initAppServerEventConnection(*MSSettings::roSettings(), m_mediaServer);
     
+    // Connects need to be here, before running message processor. Otherwise some events may get lost
+    connect(QnServerMessageProcessor::instance(), SIGNAL(connectionReset()), this, SLOT(loadResourcesFromECS()));
+    connect(QnServerMessageProcessor::instance(), SIGNAL(connectionOpened()), this, SLOT(at_connectionOpened()), Qt::DirectConnection);
     QnServerMessageProcessor::instance()->run();
 
     std::auto_ptr<QnAppserverResourceProcessor> m_processor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
@@ -1188,7 +1197,8 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
 #endif
 #ifdef ENABLE_ACTI
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnActiResourceSearcher::instance());
+    QnActiResourceSearcher actiResourceSearcherInstance;
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&actiResourceSearcherInstance);
 #endif
 #ifdef ENABLE_STARDOT
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnStardotResourceSearcher::instance());
@@ -1227,12 +1237,12 @@ void QnMain::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS();
+    messageProcessor->resume();
+
     updateDisabledVendorsIfNeeded();
     QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
     qWarning() << lit("disabled vendors amount") << disabledVendors .size();
     qWarning() << disabledVendors;
-
-    connect(QnServerMessageProcessor::instance(), SIGNAL(connectionReset()), this, SLOT(loadResourcesFromECS()));
 
     /*
     QnScheduleTaskList scheduleTasks;
@@ -1266,7 +1276,6 @@ void QnMain::run()
     at_timer();
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
-    connect(QnServerMessageProcessor::instance(), SIGNAL(connectionOpened()), this, SLOT(at_connectionOpened()), Qt::DirectConnection);
     timer.start(60 * 1000);
 
 
