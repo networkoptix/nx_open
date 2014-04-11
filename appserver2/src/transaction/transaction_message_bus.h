@@ -86,7 +86,7 @@ signals:
         class AbstractHandler
         {
         public:
-            virtual bool processByteArray(QnTransactionTransport* sender, const QByteArray& data) = 0;
+            virtual bool processTransaction(QnTransactionTransport* sender, QnAbstractTransaction& tran, InputBinaryStream<QByteArray>& stream) = 0;
             virtual void* getHandler() const = 0;
             virtual ~AbstractHandler() {}
         };
@@ -97,7 +97,7 @@ signals:
         public:
             CustomHandler(T* handler): m_handler(handler) {}
 
-            virtual bool processByteArray(QnTransactionTransport* sender, const QByteArray& data) override;
+            virtual bool processTransaction(QnTransactionTransport* sender, QnAbstractTransaction& tran, InputBinaryStream<QByteArray>& stream) override;
             virtual void* getHandler() const override { return m_handler; }
         private:
             template <class T2> bool deliveryTransaction(const QnAbstractTransaction&  abstractTran, InputBinaryStream<QByteArray>& stream);

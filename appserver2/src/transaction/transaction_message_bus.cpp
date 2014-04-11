@@ -104,7 +104,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     }
     tran.timestamp -= sender->timeDiff();
 
-    qDebug() << "got transaction " << ApiCommand::toString(tran.command);
+    qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "with time=" << tran.timestamp;
 
     AlivePeersMap:: iterator itr = m_alivePeers.find(tran.id.peerGUID);
     if (itr != m_alivePeers.end())
@@ -117,7 +117,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     case ApiCommand::lockResponse:
     case ApiCommand::unlockRequest:
         onGotDistributedMutexTransaction(tran, stream);
-
+        return;
     case ApiCommand::tranSyncRequest:
         onGotTransactionSyncRequest(sender, stream);
         return;
@@ -128,18 +128,18 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
         onGotServerAliveInfo(tran, stream);
         break; // do not return. proxy this transaction
     default:
+        // general transaction
+        if (!sender->isReadSync())
+            return;
+
+        if (m_handler && !m_handler->processTransaction(sender, tran, stream)) {
+            qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
+            sender->setState(QnTransactionTransport::Error);
+            return;
+        }
         break;
     }
     
-    if (!sender->isReadSync())
-        return;
-
-    if (m_handler && !m_handler->processByteArray(sender, serializedTran)) {
-        qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
-        sender->setState(QnTransactionTransport::Error);
-        return;
-    }
-
     QMutexLocker lock(&m_mutex);
 
     // proxy incoming transaction to other peers.
@@ -250,14 +250,8 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
 }
 
 template <class T>
-bool QnTransactionMessageBus::CustomHandler<T>::processByteArray(QnTransactionTransport* /*sender*/, const QByteArray& data)
+bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransactionTransport* /*sender*/, QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream)
 {
-    Q_ASSERT(data.size() > 4);
-    InputBinaryStream<QByteArray> stream(data);
-    QnAbstractTransaction  abstractTran;
-    if (!deserialize(abstractTran, &stream))
-        return false; // bad data
-
     switch (abstractTran.command)
     {
         case ApiCommand::getAllDataList:
