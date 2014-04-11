@@ -1197,7 +1197,8 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlAxisResourceSearcher::instance());
 #endif
 #ifdef ENABLE_ACTI
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnActiResourceSearcher::instance());
+    QnActiResourceSearcher actiResourceSearcherInstance;
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&actiResourceSearcherInstance);
 #endif
 #ifdef ENABLE_STARDOT
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnStardotResourceSearcher::instance());
