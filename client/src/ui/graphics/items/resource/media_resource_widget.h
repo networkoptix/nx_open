@@ -167,7 +167,7 @@ private slots:
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
-
+    void at_videoLayoutChanged();
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
 
