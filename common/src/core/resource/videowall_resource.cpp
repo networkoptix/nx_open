@@ -15,9 +15,11 @@ void QnVideoWallResource::updateInner(QnResourcePtr other) {
 
     QnVideoWallResourcePtr localOther = other.dynamicCast<QnVideoWallResource>();
     if(localOther) {
+        m_mutex.unlock(); //mutex is locked in QnResource::update
         setItems(localOther->getItems());
         setPcs(localOther->getPcs());
         setAutorun(localOther->isAutorun());
+        m_mutex.lock();
     }
 }
 
