@@ -328,7 +328,7 @@ namespace nxcip
         // {9A1BDA18-563C-42de-8E23-B9244FD00658}
     static const nxpl::NX_GUID IID_CameraMediaEncoder2 = { { 0x9a, 0x1b, 0xda, 0x18, 0x56, 0x3c, 0x42, 0xde, 0x8e, 0x23, 0xb9, 0x24, 0x4f, 0xd0, 0x6, 0x58 } };
 
-    //!Extends \a CameraMediaEncoder by adding funtionality for plugin to directly provide live media stream
+    //!Extends \a CameraMediaEncoder by adding functionality for plugin to directly provide live media stream
     class CameraMediaEncoder2
     :
         public CameraMediaEncoder
@@ -348,7 +348,7 @@ namespace nxcip
     };
 
 
-    class CameraPTZManager;
+    class CameraPtzManager;
     class CameraMotionDataProvider;
     class CameraRelayIOManager;
     class DtsArchiveReader;
@@ -441,7 +441,7 @@ namespace nxcip
             \note Increases \a CameraPTZManager instance reference counter
             \note Most likely will return same pointer on multiple requests
         */
-        virtual CameraPTZManager* getPTZManager() const = 0;
+        virtual CameraPtzManager* getPTZManager() const = 0;
         //!MUST return not-NULL if \a hardwareMotionCapability is present
         /*!
             \note Increases \a CameraMotionDataProvider instance reference counter
@@ -643,113 +643,143 @@ namespace nxcip
         by the camera's PTZ manager, the smoother will be the client's experience.
 
         These levels are as follows:
-        - Basic PTZ. Manager must support continuous movement.
-        - Basic PTZ with saved positions. Manager must additionally support absolute positioning in physical space.
-        - Advanced PTZ. On this support level user can zoom in by selecting a region on an
+        - Continuous PTZ. Manager must support continuous movement.
+        - Absolute PTZ. Manager must additionally support absolute positioning.
+          This adds support for saved positions and tours.
+        - Advanced PTZ. Manager must additionally support absolute positioning in
+          logical space --- that is, in degrees for pan, tilt and fov. 
+          On this support level user can zoom in by selecting a region on an
           image from camera and can center the camera on an object by clicking on it.
-          Manager must additionally support absolute positioning in logical space.
 
         Logical space for absolute positioning is defined as follows:
         - Pan is in degrees, from -180 to 180.
         - Tilt is in degrees, from -90 to 90. -90 corresponds to camera pointing straight down, 90 - straight up.
-        - Zoom is set as width-based 35mm-equivalent focal lenght, see http://en.wikipedia.org/wiki/35_mm_equivalent_focal_length.
+        - Fov is in degrees, from 0 to 360.
     */
-    class CameraPTZManager
+    class CameraPtzManager
     :
         public nxpl::PluginInterface
     {
     public:
-        virtual ~CameraPTZManager() {}
+        virtual ~CameraPtzManager() {}
 
         enum Capability
         {
-            ContinuousPanCapability             = 0x001,    //!< Camera supports continuous pan.
-            ContinuousTiltCapability            = 0x002,    //!< Camera supports continuous tilt.
-            ContinuousZoomCapability            = 0x004,    //!< Camera supports continuous zoom.
+            ContinuousPanCapability             = 0x00000001,   //!< Camera supports continuous pan.
+            ContinuousTiltCapability            = 0x00000002,   //!< Camera supports continuous tilt.
+            ContinuousZoomCapability            = 0x00000004,   //!< Camera supports continuous zoom.
             
-            AbsolutePanCapability               = 0x010,    //!< Camera supports absolute pan.
-            AbsoluteTiltCapability              = 0x020,    //!< Camera supports absolute tilt.
-            AbsoluteZoomCapability              = 0x040,    //!< Camera supports absolute zoom.
-            LogicalPositionSpaceCapability      = 0x080,    //!< Camera supports absolute positioning in logical space ---
-                                                            //! degrees for pan, tilt and fov (zoom).
+            AbsolutePanCapability               = 0x00000010,   //!< Camera supports absolute pan.
+            AbsoluteTiltCapability              = 0x00000020,   //!< Camera supports absolute tilt.
+            AbsoluteZoomCapability              = 0x00000040,   //!< Camera supports absolute zoom.
+            
+			FlipPtzCapability                   = 0x00000100,   //!< Camera supports flip state queries.
+			LimitsPtzCapability                 = 0x00000200,   //!< Camera supports coordinate space limits queries.
 
-            AutomaticStateUpdateCapability      = 0x100    //!< Camera updates its ptz-related state (e.g. flip & mirror) automatically, and
-                                                            //! the user doesn't have to call \a updateState when it changes.
+			DevicePositioningPtzCapability      = 0x00001000,   //!< Camera supports absolute positioning in device-specific coordinate space.
+			LogicalPositioningPtzCapability     = 0x00002000,   //!< Camera supports absolute positioning in logical space ---
+																//! degrees for pan, tilt and fov (zoom).
+
+			ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
+			AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
         };
 
-        //!Returns bitset of \a Capability enumeration members
+		enum CoordinateSpace
+		{
+			DevicePtzCoordinateSpace,	//!< Device-specific coordinate space.
+			LogicalPtzCoordinateSpace	//!< Logical coordinate space --- degrees for pan, tilt and fov (zoom).
+		};
+
+		enum Orientation
+		{
+			Horizontal = 0x1,
+			Vertical = 0x2
+		};
+
+		struct Limits {
+			double minPan;
+			double maxPan;
+			double minTilt;
+			double maxTilt;
+			double minFov;
+			double maxFov;
+		};
+
+        //!Returns bitset of \a Capability enumeration members.
         virtual int getCapabilities() const = 0;
 
-        //!Start continuous movement
+        //!Starts or stops continuous PTZ movement. 
         /*!
-            All velocities are in range [-1..1]
-            \return 0 on success, otherwise - error code
+			Speed is specified in image-based coordinate space and all of its 
+			components are expected to be in range <tt>[-1, 1]</tt>. This means that 
+			implementation must handle flipped / mirrored state of the video stream. 
+		 
+			Passing zero in speed should stop PTZ movement.
+		
+			This function is expected to be implemented if this controller has
+			at least one of the <tt>Qn::ContinuousPtzCapabilities</tt>.
+		  
+			\param panSpeed
+			\param tiltSpeed
+			\param zoomSpeed
+			\returns                    NX_NO_ERROR on success, error code otherwise.
         */
-        virtual int startMove( double panSpeed, double tiltSpeed, double zoomSpeed ) = 0;
+        virtual int continuousMove( double panSpeed, double tiltSpeed, double zoomSpeed ) = 0;
 
-        //!Stop continuous movement
-        /*!
-            \return 0 on success, otherwise - error code
-        */
-        virtual int stopMove() = 0;
+		//!Sets camera PTZ position in the given coordinate space. 
+		/*!
+			Note that for the function to succeed, this controller must have a 
+			capability corresponding to the provided coordinate space, 
+			that is <tt>DevicePositioningPtzCapability</tt> or 
+			<tt>LogicalPositioningPtzCapability</tt>.
+     
+			This function is expected to be implemented if this controller has
+			at least one of the <tt>AbsolutePtzCapabilities</tt>.
+     
+			\param space                Coordinate space of the provided position.
+			\param pan
+			\param tilt
+			\param zoom
+			\param speed                Movement speed, in range [0, 1].
+			\returns                    NX_NO_ERROR on success, error code otherwise.
+		*/
+        virtual int absoluteMove( CoordinateSpace space, double pan, double tilt, double zoom, double speed ) = 0;
 
-        //!Move to absolute physical position
-        /*!
-            All values are in device-specific ranges. See \a getPhysicalPosition().
-            \return 0 on success, otherwise - error code
-        */
-        virtual int setPhysicalPosition( double pan, double tilt, double zoom ) = 0;
+		//!Gets PTZ position from camera in the given coordinate space.
+		/*!
+			This function is expected to be implemented if this controller has
+			at least one of the <tt>AbsolutePtzCapabilities</tt>.
+		 
+			\param space                Coordinate space to get position in.
+			\param[out] pan
+			\param[out] tilt
+			\param[out] zoom
+			\returns                    NX_NO_ERROR on success, error code otherwise.
+			\see absoluteMove
+		*/
+		virtual int getPosition( CoordinateSpace space, double *pan, double *tilt, double *zoom ) = 0;
 
-        //!Get absolute physical position.
-        /*!
-            All returned values are in device-specific ranges and can be safely used only in
-            subsequent calls to \a setPhysicalPosition().
-            \return 0 on success, otherwise - error code
-        */
-        virtual int getPhysicalPosition( double* pan, double* tilt, double* zoom ) const = 0;
+		//!Gets PTZ limits of the camera.
+		/*!
+			This function is expected to be implemented only if this controller has 
+			<tt>LimitsPtzCapability<tt>.
+		 
+			\param space                Coordinate space to get limits in.
+			\param[out] limits          Ptz limits.
+			\returns                    NX_NO_ERROR on success, error code otherwise.
+		*/
+		virtual int getLimits( CoordinateSpace space, Limits *limits ) = 0;
 
-        //!Move to absolute logical position
-        /*!
-            Pan, tilt and fov values are in degrees. 
-            This function must be implemented if \a LogicalPositionSpaceCapability is present.
-            \return 0 on success, otherwise - error code
-        */
-        virtual int setLogicalPosition( double pan, double tilt, double fov ) = 0;
-
-        //!Get absolute logical position
-        /*!
-            Pan, tilt and fov values are in degrees. 
-            This function must be implemented if \a LogicalPositionSpaceCapability is present.
-            \return 0 on success, otherwise - error code
-        */
-        virtual int getLogicalPosition( double* pan, double* tilt, double* fov ) const = 0;
-
-        struct LogicalPtzLimits {
-            double minPan;
-            double maxPan;
-            double minTilt;
-            double maxTilt;
-            double minFov;
-            double maxFov;
-        };
-
-        //!Get PTZ limits in logical space
-        /*!
-            This function must be implemented if \a LogicalPositionSpaceCapability is present.
-            \return 0 on success, otherwise - error code
-        */
-        virtual int getLogicalLimits(LogicalPtzLimits *limits) = 0;
-        
-        //!Updates stored camera state (e.g. flip & mirror) so that movement commands work properly
-        /*!
-            This function is needed mainly for cameras that do not automatically
-            adjust for flip, mirror and other changes in settings. 
-            In case camera's state was changed, user can manually trigger camera 
-            state update so that movement commands would work OK.
-
-            This function must be implemented if \a AutomaticStateUpdateCapability is not present.
-        */
-        virtual int updateState() = 0;
+		//!Gets the camera streams's flipped state. 
+		/*!
+			This function is expected to be implemented only if this controller has
+			<tt>FlipPtzCapability</tt>.
+			
+			\param[out] flip			Flipped state of the camera's video stream,
+										a bitset of \a Orientation enumeration members.
+			\returns                    NX_NO_ERROR on success, error code otherwise.
+		*/
+		virtual int getFlip( int *flip ) = 0;
     };
 
 

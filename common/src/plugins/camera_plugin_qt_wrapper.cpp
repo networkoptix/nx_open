@@ -238,7 +238,7 @@ namespace nxcip_qt
     }
 
     //!See nxcip::BaseCameraManager::getPTZManager
-    nxcip::CameraPTZManager* BaseCameraManager::getPTZManager() const
+    nxcip::CameraPtzManager* BaseCameraManager::getPTZManager() const
     {
         QMutexLocker lk( &m_mutex );
         return m_intf->getPTZManager();
