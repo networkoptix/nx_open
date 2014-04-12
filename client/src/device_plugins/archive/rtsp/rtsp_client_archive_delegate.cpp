@@ -95,12 +95,7 @@ QnResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime(QnResource
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(physicalId);
     if (!history)
         return QnResourcePtr();
-    QnMediaServerResourcePtr mediaServer = history->getNextMediaServerOnTime(time, m_rtspSession.getScale() >= 0, m_serverTimePeriod);
-    if (!mediaServer)
-        return QnResourcePtr();
-    // get camera resource from other server. Unique id is physicalId + serverID
-    QnResourcePtr newResource = qnResPool->getResourceByUniqId(physicalId + mediaServer->getId().toString());
-    return newResource;
+    return history->getNextMediaServerOnTime(time, m_rtspSession.getScale() >= 0, m_serverTimePeriod);
 }
 
 QString QnRtspClientArchiveDelegate::getUrl(QnResourcePtr _server, QnResourcePtr camera)
@@ -201,7 +196,8 @@ QnResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 time)
 
 bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
 {
-    bool rez = openInternal(resource);
+    m_resource = resource;
+    bool rez = openInternal();
     if (!rez) {
         for (int i = 0; i < REOPEN_TIMEOUT/10 && !m_closing; ++i)
             QnSleep::msleep(10);
@@ -209,20 +205,19 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
     return rez;
 }
 
-bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
+bool QnRtspClientArchiveDelegate::openInternal()
 {
     if (m_opened)
         return true;
 
     m_customVideoLayout.reset();
 
-    updateRtpParam(resource);
-    m_resource = resource;
+    updateRtpParam(m_resource);
     if (m_isMultiserverAllowed)
         m_server = getServerOnTime(m_position != DATETIME_NOW ? m_position/1000 : m_position);
 
     m_closing = false;
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(resource->getParentId()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(m_resource->getParentId()).dynamicCast<QnMediaServerResource>();
     if (server == 0 || server->getStatus() == QnResource::Offline)
         return false;
 
@@ -258,7 +253,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     m_opened = m_rtspSession.isOpened();
     m_sendedCSec = m_rtspSession.lastSendedCSeq();
 
-    qint64 globalMinTime = checkMinTimeFromOtherServer(resource);
+    qint64 globalMinTime = checkMinTimeFromOtherServer(m_resource);
     if ((quint64)globalMinTime !=AV_NOPTS_VALUE)
         m_globalMinArchiveTime = globalMinTime;
     else if (globalTimeBlocked)
@@ -272,7 +267,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
         if (!vLayout.isEmpty()) {
             m_customVideoLayout = QnCustomResourceVideoLayout::fromString(vLayout);
 
-            QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource> (resource);
+            QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource> (m_resource);
             if (mediaRes) {
                 // TODO: 
                 // #Elric we need to create another layout instance, but
@@ -364,7 +359,7 @@ void QnRtspClientArchiveDelegate::reopen()
         QnSleep::msleep(10);
 
     if (m_resource)
-        openInternal(m_resource);
+        openInternal();
 }
 
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
@@ -386,20 +381,20 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
     {
         if ((quint64)m_lastSeekTime == AV_NOPTS_VALUE)
             m_lastSeekTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
-        QnResourcePtr newResource = getNextMediaServerFromTime(m_resource, m_lastSeekTime/1000);
-        if (newResource) {
+        QnResourcePtr newServer = getNextMediaServerFromTime(m_resource, m_lastSeekTime/1000);
+        if (newServer) {
             qDebug() << "Reached the edge for archive in a current server. packetTime=" << QDateTime::fromMSecsSinceEpoch(timeMs).toString() <<
                 "period: " << QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.startTimeMs).toString() << "-" << 
                 QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.endTimeMs()).toString();
 
-
+            m_server = newServer;
             m_lastSeekTime = m_serverTimePeriod.startTimeMs*1000;
             if (m_rtspSession.getScale() > 0)
                 m_position = m_serverTimePeriod.startTimeMs*1000;
             else
                 m_position = (m_serverTimePeriod.endTimeMs()-1)*1000;
             close();
-            openInternal(newResource);
+            openInternal();
 
             result = getNextData();
             if (result)
@@ -578,7 +573,7 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
         m_rtspSession.setAdditionAttribute("x-no-find-iframe", "1");
 
     if (!m_opened && m_resource) {
-        if (!openInternal(m_resource) && m_isMultiserverAllowed)
+        if (!openInternal() && m_isMultiserverAllowed)
         {
             // Try next server in the list immediatly, It is improve seek time if current server is offline and next server is exists
             while (!m_closing)
@@ -593,7 +588,7 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
                     else
                         m_position = (m_serverTimePeriod.endTimeMs()-1)*1000;
                     close();
-                    if (openInternal(m_resource))
+                    if (openInternal())
                         break;
                 }
                 else {
@@ -689,7 +684,7 @@ void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
     if (!m_opened && m_resource) {
         m_rtspSession.setScale(qAbs(m_rtspSession.getScale()) * sign);
         m_position = displayTime;
-        openInternal(m_resource);
+        openInternal();
     }
     else {
         m_rtspSession.sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession.getScale()) * sign);

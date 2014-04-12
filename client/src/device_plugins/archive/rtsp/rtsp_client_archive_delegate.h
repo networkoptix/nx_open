@@ -62,7 +62,7 @@ signals:
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum);
     void processMetadata(const quint8* data, int dataSize);
-    bool openInternal(QnResourcePtr resource);
+    bool openInternal();
     void reopen();
 
     // determine camera's video server on specified time
