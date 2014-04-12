@@ -132,6 +132,9 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
         else
             return;
     }
+    case ApiCommand::clientInstanceId:
+        //TODO: #GDM VW save clientInstanceId to corresponding connection
+        return;
     case ApiCommand::tranSyncRequest:
         onGotTransactionSyncRequest(sender, stream);
         return;

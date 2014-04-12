@@ -21,6 +21,8 @@ namespace ec2
             testConnection,
             connect,
 
+            clientInstanceId,
+
             //!ApiResourceTypeList
             getResourceTypes,
             //!ApiResource

@@ -18,13 +18,6 @@ namespace ec2
     public:
         QnVideowallManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
 
-        virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) override;
-        virtual int save( const QnVideoWallResourcePtr& resource, impl::AddVideowallHandlerPtr handler ) override;
-        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
-
-        virtual int sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler) override;
-        virtual int sendInstanceId(const QUuid& guid, impl::SimpleHandlerPtr handler) override;
-
         void triggerNotification( const QnTransaction<ApiVideowall>& tran )
         {
             assert( tran.command == ApiCommand::saveVideowall);
@@ -46,6 +39,13 @@ namespace ec2
             emit controlMessage(message);
         }
 
+    protected:
+        virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) override;
+        virtual int save( const QnVideoWallResourcePtr& resource, impl::AddVideowallHandlerPtr handler ) override;
+        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
+
+        virtual int sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler) override;
+        virtual int sendInstanceId(const QUuid& guid, impl::SimpleHandlerPtr handler) override;
     private:
         QueryProcessorType* const m_queryProcessor;
         ResourceContext m_resCtx;

@@ -78,9 +78,9 @@ namespace ec2
     int QnVideowallManager<T>::sendInstanceId(const QnId& id, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-      /*  auto tran = prepareTransaction( ApiCommand::removeVideowall, id );
+        auto tran = prepareTransaction( ApiCommand::clientInstanceId, id );
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );*/
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
         return reqID;
     }
 

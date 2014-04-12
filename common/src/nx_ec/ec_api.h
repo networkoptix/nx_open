@@ -563,7 +563,7 @@ namespace ec2
         void removed(const QUuid &id);
         void controlMessage(const QnVideoWallControlMessage &message);
 
-    private:
+    protected:
         virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) = 0;
         virtual int save( const QnVideoWallResourcePtr& resource, impl::AddVideowallHandlerPtr handler ) = 0;
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
