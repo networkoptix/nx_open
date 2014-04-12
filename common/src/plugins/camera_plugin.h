@@ -673,113 +673,113 @@ namespace nxcip
             AbsoluteTiltCapability              = 0x00000020,   //!< Camera supports absolute tilt.
             AbsoluteZoomCapability              = 0x00000040,   //!< Camera supports absolute zoom.
             
-			FlipPtzCapability                   = 0x00000100,   //!< Camera supports flip state queries.
-			LimitsPtzCapability                 = 0x00000200,   //!< Camera supports coordinate space limits queries.
+            FlipPtzCapability                   = 0x00000100,   //!< Camera supports flip state queries.
+            LimitsPtzCapability                 = 0x00000200,   //!< Camera supports coordinate space limits queries.
 
-			DevicePositioningPtzCapability      = 0x00001000,   //!< Camera supports absolute positioning in device-specific coordinate space.
-			LogicalPositioningPtzCapability     = 0x00002000,   //!< Camera supports absolute positioning in logical space ---
-																//! degrees for pan, tilt and fov (zoom).
+            DevicePositioningPtzCapability      = 0x00001000,   //!< Camera supports absolute positioning in device-specific coordinate space.
+            LogicalPositioningPtzCapability     = 0x00002000,   //!< Camera supports absolute positioning in logical space ---
+                                                                //! degrees for pan, tilt and fov (zoom).
 
-			ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
-			AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
+            ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
+            AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
         };
 
-		enum CoordinateSpace
-		{
-			DevicePtzCoordinateSpace,	//!< Device-specific coordinate space.
-			LogicalPtzCoordinateSpace	//!< Logical coordinate space --- degrees for pan, tilt and fov (zoom).
-		};
+        enum CoordinateSpace
+        {
+            DevicePtzCoordinateSpace,    //!< Device-specific coordinate space.
+            LogicalPtzCoordinateSpace    //!< Logical coordinate space --- degrees for pan, tilt and fov (zoom).
+        };
 
-		enum Orientation
-		{
-			Horizontal = 0x1,
-			Vertical = 0x2
-		};
+        enum Orientation
+        {
+            Horizontal = 0x1,
+            Vertical = 0x2
+        };
 
-		struct Limits {
-			double minPan;
-			double maxPan;
-			double minTilt;
-			double maxTilt;
-			double minFov;
-			double maxFov;
-		};
+        struct Limits {
+            double minPan;
+            double maxPan;
+            double minTilt;
+            double maxTilt;
+            double minFov;
+            double maxFov;
+        };
 
         //!Returns bitset of \a Capability enumeration members.
         virtual int getCapabilities() const = 0;
 
         //!Starts or stops continuous PTZ movement. 
         /*!
-			Speed is specified in image-based coordinate space and all of its 
-			components are expected to be in range <tt>[-1, 1]</tt>. This means that 
-			implementation must handle flipped / mirrored state of the video stream. 
-		 
-			Passing zero in speed should stop PTZ movement.
-		
-			This function is expected to be implemented if this controller has
-			at least one of the <tt>Qn::ContinuousPtzCapabilities</tt>.
-		  
-			\param panSpeed
-			\param tiltSpeed
-			\param zoomSpeed
-			\returns                    NX_NO_ERROR on success, error code otherwise.
+            Speed is specified in image-based coordinate space and all of its 
+            components are expected to be in range <tt>[-1, 1]</tt>. This means that 
+            implementation must handle flipped / mirrored state of the video stream. 
+         
+            Passing zero in speed should stop PTZ movement.
+        
+            This function is expected to be implemented if this controller has
+            at least one of the <tt>Qn::ContinuousPtzCapabilities</tt>.
+          
+            \param panSpeed
+            \param tiltSpeed
+            \param zoomSpeed
+            \returns                    NX_NO_ERROR on success, error code otherwise.
         */
         virtual int continuousMove( double panSpeed, double tiltSpeed, double zoomSpeed ) = 0;
 
-		//!Sets camera PTZ position in the given coordinate space. 
-		/*!
-			Note that for the function to succeed, this controller must have a 
-			capability corresponding to the provided coordinate space, 
-			that is <tt>DevicePositioningPtzCapability</tt> or 
-			<tt>LogicalPositioningPtzCapability</tt>.
+        //!Sets camera PTZ position in the given coordinate space. 
+        /*!
+            Note that for the function to succeed, this controller must have a 
+            capability corresponding to the provided coordinate space, 
+            that is <tt>DevicePositioningPtzCapability</tt> or 
+            <tt>LogicalPositioningPtzCapability</tt>.
      
-			This function is expected to be implemented if this controller has
-			at least one of the <tt>AbsolutePtzCapabilities</tt>.
+            This function is expected to be implemented if this controller has
+            at least one of the <tt>AbsolutePtzCapabilities</tt>.
      
-			\param space                Coordinate space of the provided position.
-			\param pan
-			\param tilt
-			\param zoom
-			\param speed                Movement speed, in range [0, 1].
-			\returns                    NX_NO_ERROR on success, error code otherwise.
-		*/
+            \param space                Coordinate space of the provided position.
+            \param pan
+            \param tilt
+            \param zoom
+            \param speed                Movement speed, in range [0, 1].
+            \returns                    NX_NO_ERROR on success, error code otherwise.
+        */
         virtual int absoluteMove( CoordinateSpace space, double pan, double tilt, double zoom, double speed ) = 0;
 
-		//!Gets PTZ position from camera in the given coordinate space.
-		/*!
-			This function is expected to be implemented if this controller has
-			at least one of the <tt>AbsolutePtzCapabilities</tt>.
-		 
-			\param space                Coordinate space to get position in.
-			\param[out] pan
-			\param[out] tilt
-			\param[out] zoom
-			\returns                    NX_NO_ERROR on success, error code otherwise.
-			\see absoluteMove
-		*/
-		virtual int getPosition( CoordinateSpace space, double *pan, double *tilt, double *zoom ) = 0;
+        //!Gets PTZ position from camera in the given coordinate space.
+        /*!
+            This function is expected to be implemented if this controller has
+            at least one of the <tt>AbsolutePtzCapabilities</tt>.
+         
+            \param space                Coordinate space to get position in.
+            \param[out] pan
+            \param[out] tilt
+            \param[out] zoom
+            \returns                    NX_NO_ERROR on success, error code otherwise.
+            \see absoluteMove
+        */
+        virtual int getPosition( CoordinateSpace space, double *pan, double *tilt, double *zoom ) = 0;
 
-		//!Gets PTZ limits of the camera.
-		/*!
-			This function is expected to be implemented only if this controller has 
-			<tt>LimitsPtzCapability<tt>.
-		 
-			\param space                Coordinate space to get limits in.
-			\param[out] limits          Ptz limits.
-			\returns                    NX_NO_ERROR on success, error code otherwise.
-		*/
-		virtual int getLimits( CoordinateSpace space, Limits *limits ) = 0;
+        //!Gets PTZ limits of the camera.
+        /*!
+            This function is expected to be implemented only if this controller has 
+            <tt>LimitsPtzCapability<tt>.
+         
+            \param space                Coordinate space to get limits in.
+            \param[out] limits          Ptz limits.
+            \returns                    NX_NO_ERROR on success, error code otherwise.
+        */
+        virtual int getLimits( CoordinateSpace space, Limits *limits ) = 0;
 
-		//!Gets the camera streams's flipped state. 
-		/*!
-			This function is expected to be implemented only if this controller has
-			<tt>FlipPtzCapability</tt>.
-			
-			\param[out] flip			Flipped state of the camera's video stream,
-										a bitset of \a Orientation enumeration members.
-			\returns                    NX_NO_ERROR on success, error code otherwise.
-		*/
-		virtual int getFlip( int *flip ) = 0;
+        //!Gets the camera streams's flipped state. 
+        /*!
+            This function is expected to be implemented only if this controller has
+            <tt>FlipPtzCapability</tt>.
+            
+            \param[out] flip            Flipped state of the camera's video stream,
+                                        a bitset of \a Orientation enumeration members.
+            \returns                    NX_NO_ERROR on success, error code otherwise.
+        */
+        virtual int getFlip( int *flip ) = 0;
     };
 
 
