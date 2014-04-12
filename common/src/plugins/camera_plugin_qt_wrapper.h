@@ -148,7 +148,7 @@ namespace nxcip_qt
         //!See nxcip::BaseCameraManager::setAudioEnabled
         int setAudioEnabled( bool audioEnabled );
 
-        //!See nxcip::BaseCameraManager::getPTZManager
+        //!See nxcip::BaseCameraManager::getPtzManager
         nxcip::CameraPtzManager* getPtzManager() const;
         //!See nxcip::BaseCameraManager::getCameraRelayIOManager
         nxcip::CameraRelayIOManager* getCameraRelayIOManager() const;
