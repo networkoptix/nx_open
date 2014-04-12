@@ -1,5 +1,6 @@
 #include "ec2_videowall_data.h"
-#include "core/resource/videowall_resource.h"
+
+#include <core/resource/videowall_resource.h>
 
 namespace ec2
 {
@@ -104,4 +105,25 @@ namespace ec2
         QN_QUERY_TO_DATA_OBJECT(query, ApiVideowall, data, ApiVideowallDataFields ApiResourceFields)
     }
 
+
+    void ApiVideowallControlMessage::toMessage(QnVideoWallControlMessage &message) const {
+        message.operation = static_cast<QnVideoWallControlMessage::QnVideoWallControlOperation>(operation);
+        message.videoWallGuid = videowall_guid;
+        message.instanceGuid = instance_guid;
+        message.params.clear();
+        for (std::pair<QString, QString> pair : params)
+            message.params[pair.first] = pair.second;
+    }
+
+    void ApiVideowallControlMessage::fromMessage(const QnVideoWallControlMessage &message) {
+        operation = static_cast<int>(message.operation);
+        videowall_guid = message.videoWallGuid;
+        instance_guid = message.instanceGuid;
+        params.clear();
+        auto iter = message.params.constBegin();
+        while (iter != message.params.constEnd()) {
+            params.insert(std::pair<QString, QString>(iter.key(), iter.value()));
+            ++iter;
+        }
+    }
 }

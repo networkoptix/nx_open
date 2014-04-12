@@ -91,6 +91,9 @@ namespace ec2
             //!ApiIdData
             removeVideowall,
 
+            //!ApiVideoWallControlMessage
+            videowallControl,
+
             //!
             listDirectory,
             //!ApiStoredFileData

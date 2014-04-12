@@ -89,6 +89,7 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiBusinessActionData>& )      { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiEmailSettingsData>& )       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiEmailData>& )               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const QnTransaction<ApiVideowallControlMessage>& ) { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
     private:
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);

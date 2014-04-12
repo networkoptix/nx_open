@@ -18,6 +18,7 @@
 #include "rest/server/rest_connection_processor.h"
 #include "network/universal_tcp_listener.h"
 #include "utils/common/email.h"
+#include <core/resource/videowall_control_message.h>
 
 //!Contains API classes for the new enterprise controller
 /*!
@@ -541,14 +542,34 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class TargetType, class HandlerType> int sendControlMessage(const QnVideoWallControlMessage& message, TargetType* target, HandlerType handler ) {
+            return sendControlMessage(message, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class TargetType, class HandlerType> int sendInstanceId(const QUuid& guid, TargetType* target, HandlerType handler ) {
+            return sendInstanceId(guid, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
     signals:
-        void addedOrUpdated( QnVideoWallResourcePtr videowall );
-        void removed( QnId id );
+        void addedOrUpdated(const QnVideoWallResourcePtr &videowall);
+        void removed(const QUuid &id);
+        void controlMessage(const QnVideoWallControlMessage &message);
 
     private:
         virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) = 0;
         virtual int save( const QnVideoWallResourcePtr& resource, impl::AddVideowallHandlerPtr handler ) = 0;
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
+
+        virtual int sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendInstanceId(const QUuid& guid, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractVideowallManager> AbstractVideowallManagerPtr;
 

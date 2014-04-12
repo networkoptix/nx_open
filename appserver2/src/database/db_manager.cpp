@@ -889,6 +889,11 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowall
     return result;
 }
 
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowallControlMessage> &tran) {
+    ErrorCode result = ErrorCode::ok;
+    return result;
+}
+
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowallList>& tran) {
     foreach(const ApiVideowall& videowall, tran.params.data)
     {

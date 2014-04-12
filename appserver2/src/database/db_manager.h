@@ -144,6 +144,7 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiParamList>& tran); // save settings
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowall>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallList>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallControlMessage> &tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiIdData>& tran);
