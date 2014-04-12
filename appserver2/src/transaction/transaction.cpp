@@ -138,6 +138,17 @@ namespace ec2
                     return "unknown";
             }
         }
+
+        bool isSystem( Value val )
+        {
+            return  val == lockRequest   ||
+                    val == lockResponse  ||
+                    val == unlockRequest ||
+                    val == tranSyncRequest ||
+                    val == tranSyncResponse ||
+                    val == serverAliveInfo;
+        }
+
     }
 
     QnAbstractTransaction::QnAbstractTransaction(ApiCommand::Value _command, bool _persistent)

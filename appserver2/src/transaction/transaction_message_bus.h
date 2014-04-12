@@ -10,6 +10,7 @@
 #include "transaction_transport_serializer.h"
 #include "transaction_transport.h"
 #include "nx_ec/data/ec2_lock_data.h"
+#include "common/common_module.h"
 
 namespace ec2
 {
@@ -47,16 +48,18 @@ namespace ec2
         template <class T>
         void sendTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
+            QMutexLocker lock(&m_mutex);
             QByteArray buffer;
-            m_serializer.serializeTran(buffer, serializedTran);
+            m_serializer.serializeTran(buffer, serializedTran, peersToSend(tran.command) << qnCommon->moduleGUID());
             sendTransactionInternal(tran, buffer);
         }
 
         template <class T>
         void sendTransaction(const QnTransaction<T>& tran, const QnId& dstPeer = QnId())
         {
+            QMutexLocker lock(&m_mutex);
             QByteArray buffer;
-            m_serializer.serializeTran(buffer, tran);
+            m_serializer.serializeTran(buffer, tran, peersToSend(tran.command) << qnCommon->moduleGUID());
             sendTransactionInternal(tran, buffer, dstPeer);
         }
 
@@ -68,8 +71,17 @@ namespace ec2
             QElapsedTimer lastActivity;
         };
         typedef QMap<QnId, AlivePeerInfo> AlivePeersMap;
+
+        /*
+        * Return all alive peers
+        */
         AlivePeersMap alivePeers() const;
+
+        /*
+        * Return all alive server peers
+        */
         AlivePeersMap aliveServerPeers() const;
+
 signals:
         void peerLost(QnId, bool isClient, bool isProxy);
         void peerFound(QnId, bool isClient, bool isProxy);
@@ -112,7 +124,7 @@ signals:
         void sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData, const QnId& dstPeer = QnId());
         bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
         void onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
-        void onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, InputBinaryStream<QByteArray>&);
+        void onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, InputBinaryStream<QByteArray>&, bool *needProxy);
         void queueSyncRequest(QnTransactionTransport* transport);
 
         void connectToPeerEstablished(const QnId& id, bool isClient);
@@ -120,6 +132,7 @@ signals:
         void sendServerAliveMsg(const QnId& id, bool isAlive, bool isClient);
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream);
+        QSet<QUuid> peersToSend(ApiCommand::Value command) const;
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
@@ -146,6 +159,7 @@ signals:
         AlivePeersMap m_alivePeers;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectionsToRemove;
+        QMap<QnId, int> m_lastTranSeq;
 
         // alive control
         QElapsedTimer m_aliveSendTimer;

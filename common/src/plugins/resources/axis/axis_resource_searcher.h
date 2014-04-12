@@ -9,10 +9,9 @@
 
 class QnPlAxisResourceSearcher : public QnMdnsResourceSearcher
 {
-    QnPlAxisResourceSearcher();
 
 public:
-    static QnPlAxisResourceSearcher& instance();
+    QnPlAxisResourceSearcher();
 
     virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params) override;
 

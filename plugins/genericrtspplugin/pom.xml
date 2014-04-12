@@ -23,12 +23,12 @@
 	<properties>
 		<product.title>${genericrtspplugin.name}</product.title>	
 		<!--Global libs-->
-        <qt.libs>core</qt.libs>
-		<global.libs/>
+		<qt.libs>core</qt.libs>
+		<global.libs>-lcommon</global.libs>
 		<!--Specific os libs used-->
 		<windows.oslibs></windows.oslibs>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>        
+		<windows.oslibs.release></windows.oslibs.release>
+		<windows.oslibs.debug></windows.oslibs.debug>        
 		<!--Global defines-->
 		<global.defines/>
 		<linux.defines/>

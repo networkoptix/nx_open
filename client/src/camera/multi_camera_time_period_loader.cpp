@@ -34,10 +34,11 @@ int QnMultiCameraTimePeriodLoader::load(const QnTimePeriod &period, const QList<
     QList<int> handles;
     
     // sometime camera moved between media server. Get all servers for requested time period
-    QList<QnNetworkResourcePtr> cameraList = QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(m_resource.dynamicCast<QnNetworkResource>(), period);
-    foreach(const QnNetworkResourcePtr& camera, cameraList)
+    QnNetworkResourcePtr camera = m_resource.dynamicCast<QnNetworkResource>();
+    QnResourceList serverList = QnCameraHistoryPool::instance()->getAllCameraServers(camera, period);
+    foreach(const QnResourcePtr& server, serverList)
     {
-        int handle = loadInternal(camera, period, motionRegions);
+        int handle = loadInternal(server.dynamicCast<QnMediaServerResource>(), camera, period, motionRegions);
         if (handle > 0)
             handles << handle;
     }
@@ -55,21 +56,22 @@ void QnMultiCameraTimePeriodLoader::discardCachedData() {
         loader->discardCachedData();
 }
 
-int QnMultiCameraTimePeriodLoader::loadInternal(QnNetworkResourcePtr networkResource, const QnTimePeriod &period, const QList<QRegion> &motionRegions)
+int QnMultiCameraTimePeriodLoader::loadInternal(QnMediaServerResourcePtr mServer, QnNetworkResourcePtr networkResource, const QnTimePeriod &period, const QList<QRegion> &motionRegions)
 {
     QMutexLocker lock(&m_mutex);
     QnTimePeriodLoader *loader;
-    QMap<QnNetworkResourcePtr, QnTimePeriodLoader *>::iterator itr = m_cache.find(networkResource);
+    QString cacheKey = mServer->getId().toString() + networkResource->getId().toString();
+    QMap<QString, QnTimePeriodLoader *>::iterator itr = m_cache.find(cacheKey);
     if (itr != m_cache.end()) {
         loader = itr.value();
     } else {
-        loader = QnTimePeriodLoader::newInstance(networkResource, this);
+        loader = QnTimePeriodLoader::newInstance(mServer, networkResource, this);
         if (!loader)
             return -1;
         
         connect(loader, SIGNAL(ready(const QnTimePeriodList &, int)), this, SLOT(onDataLoaded(const QnTimePeriodList &, int)));
         connect(loader, SIGNAL(failed(int, int)), this, SLOT(onLoadingFailed(int, int)));
-        m_cache.insert(networkResource, loader);
+        m_cache.insert(cacheKey, loader);
     }
     return loader->load(period, motionRegions);
 }

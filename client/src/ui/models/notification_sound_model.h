@@ -30,6 +30,10 @@ public:
     void updateTitle(const QString &filename, const QString &title);
 
     bool loaded() const;
+
+    // Override standard sort to avoid '<No Sound>' item from being sorted
+    virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
+
 signals:
     void listUnloaded();
     void listLoaded();

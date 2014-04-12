@@ -344,6 +344,8 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) c
 void QnResource::parameterValueChangedNotify(const QnParam &param) {
     if(param.name() == lit("ptzCapabilities"))
         emit ptzCapabilitiesChanged(::toSharedPointer(this));
+    else if(param.name() == lit("VideoLayout"))
+        emit videoLayoutChanged(::toSharedPointer(this));
 
     emit parameterValueChanged(::toSharedPointer(this), param);
 }

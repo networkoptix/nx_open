@@ -90,12 +90,6 @@ void QnActiResourceSearcher::at_httpConnectionDone(nx_http::AsyncHttpClientPtr r
     m_httpInProgress.remove(host);
 }
 
-QnActiResourceSearcher& QnActiResourceSearcher::instance()
-{
-    static QnActiResourceSearcher inst;
-    return inst;
-}
-
 QnResourcePtr QnActiResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;

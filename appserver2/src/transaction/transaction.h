@@ -134,6 +134,7 @@ namespace ec2
         };
 
         QString toString( Value val );
+        bool isSystem( Value val );
     }
 
     class QnAbstractTransaction

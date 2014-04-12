@@ -14,12 +14,6 @@ QnPlDroidResourceSearcher::QnPlDroidResourceSearcher()
     m_lastReadSocketTime = 0;
 }
 
-QnPlDroidResourceSearcher& QnPlDroidResourceSearcher::instance()
-{
-    static QnPlDroidResourceSearcher inst;
-    return inst;
-}
-
 QnResourceList QnPlDroidResourceSearcher::findResources(void)
 {
 
