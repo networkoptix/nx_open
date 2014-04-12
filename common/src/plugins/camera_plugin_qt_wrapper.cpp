@@ -237,11 +237,11 @@ namespace nxcip_qt
         return m_intf->setAudioEnabled( audioEnabled ? 1 : 0 );
     }
 
-    //!See nxcip::BaseCameraManager::getPTZManager
-    nxcip::CameraPTZManager* BaseCameraManager::getPTZManager() const
+    //!See nxcip::BaseCameraManager::getPtzManager
+    nxcip::CameraPtzManager* BaseCameraManager::getPtzManager() const
     {
         QMutexLocker lk( &m_mutex );
-        return m_intf->getPTZManager();
+        return m_intf->getPtzManager();
     }
 
     //!See nxcip::BaseCameraManager::getCameraRelayIOManager

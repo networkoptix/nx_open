@@ -1066,6 +1066,12 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
     data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
+    data.dewarpingParams.panoFactor = 1; // zoom target must always be dewarped by 90 degrees
+
+    // TODO: #Elric Strange magic with enabled flag in ItemDewarpingParams and MediaDewarpingParams.
+    // Maybe we should do this less hacky...
+    if (zoomTargetWidget->dewarpingParams().enabled)
+        buttons |= QnMediaResourceWidget::FishEyeButton;
 
 
     int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
