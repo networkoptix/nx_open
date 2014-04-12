@@ -441,7 +441,7 @@ namespace nxcip
             \note Increases \a CameraPTZManager instance reference counter
             \note Most likely will return same pointer on multiple requests
         */
-        virtual CameraPtzManager* getPTZManager() const = 0;
+        virtual CameraPtzManager* getPtzManager() const = 0;
         //!MUST return not-NULL if \a hardwareMotionCapability is present
         /*!
             \note Increases \a CameraMotionDataProvider instance reference counter
