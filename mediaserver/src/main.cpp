@@ -40,6 +40,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
 
 #include <events/mserver_business_rule_processor.h>
 
@@ -739,67 +740,91 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
 {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
-    QnVirtualCameraResourceList cameras;
     ec2::ErrorCode rez;
 
-    //reading media servers list
-    QnMediaServerResourceList mediaServerList;
-    while( ec2Connection->getMediaServerManager()->getServersSync( &mediaServerList) != ec2::ErrorCode::ok )
     {
-        NX_LOG( lit("QnMain::run(). Can't get media servers."), cl_logERROR );
-        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+        //reading media servers list
+        QnMediaServerResourceList mediaServerList;
+        while( ec2Connection->getMediaServerManager()->getServersSync( &mediaServerList) != ec2::ErrorCode::ok )
+        {
+            NX_LOG( lit("QnMain::run(). Can't get media servers."), cl_logERROR );
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+        }
+        foreach(const QnMediaServerResourcePtr &mediaServer, mediaServerList) 
+            messageProcessor->updateResource(mediaServer);
     }
-    foreach(const QnMediaServerResourcePtr &mediaServer, mediaServerList) 
-        messageProcessor->updateResource(mediaServer);
     
 
-    // read camera list
-    QnManualCameraInfoMap manualCameras;
-    while ((rez = ec2Connection->getCameraManager()->getCamerasSync(QnId(), &cameras)) != ec2::ErrorCode::ok)
     {
-        qDebug() << "QnMain::run(): Can't get cameras. Reason: " << ec2::toString(rez);
-        QnSleep::msleep(10000);
-    }
-    foreach(const QnSecurityCamResourcePtr &camera, cameras) {
-        messageProcessor->updateResource(camera);
-        if (camera->isManuallyAdded()) {
-            QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
-            manualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+        // read camera list
+        QnVirtualCameraResourceList cameras;
+        while ((rez = ec2Connection->getCameraManager()->getCamerasSync(QnId(), &cameras)) != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get cameras. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(10000);
         }
-    }
-    QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
 
-    QnCameraHistoryList cameraHistoryList;
-    while (( rez = ec2Connection->getCameraManager()->getCameraHistoryListSync(&cameraHistoryList)) != ec2::ErrorCode::ok)
+        QnManualCameraInfoMap manualCameras;
+        foreach(const QnSecurityCamResourcePtr &camera, cameras) {
+            messageProcessor->updateResource(camera);
+            if (camera->isManuallyAdded()) {
+                QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
+                manualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+            }
+        }
+        QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
+    }
+
     {
-        qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);
-        QnSleep::msleep(1000);
+        QnCameraHistoryList cameraHistoryList;
+        while (( rez = ec2Connection->getCameraManager()->getCameraHistoryListSync(&cameraHistoryList)) != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(1000);
+        }
+
+        foreach(QnCameraHistoryPtr history, cameraHistoryList)
+            QnCameraHistoryPool::instance()->addCameraHistory(history);
     }
 
-    foreach(QnCameraHistoryPtr history, cameraHistoryList)
-        QnCameraHistoryPool::instance()->addCameraHistory(history);
-
-    //loading business rules
-    QnUserResourceList users;
-    while(( rez = ec2Connection->getUserManager()->getUsersSync(&users))  != ec2::ErrorCode::ok)
     {
-        qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);
-        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+        //loading users
+        QnUserResourceList users;
+        while(( rez = ec2Connection->getUserManager()->getUsersSync(&users))  != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+        }
+
+        foreach(const QnUserResourcePtr &user, users)
+            messageProcessor->updateResource(user);
     }
 
-    foreach(const QnUserResourcePtr &user, users)
-        messageProcessor->updateResource(user);
-
-    //loading business rules
-    QnBusinessEventRuleList rules;
-    while( (rez = ec2Connection->getBusinessEventManager()->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )
     {
-        qDebug() << "QnMain::run(): Can't get business rules. Reason: " << ec2::toString(rez);
-        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+        //loading videowalls
+        QnVideoWallResourceList videowalls;
+        while(( rez = ec2Connection->getVideowallManager()->getVideowallsSync(&videowalls))  != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get videowalls. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+        }
+
+        foreach(const QnVideoWallResourcePtr &videowall, videowalls)
+            messageProcessor->updateResource(videowall);
     }
 
-    foreach(const QnBusinessEventRulePtr &rule, rules)
-        messageProcessor->on_businessEventAddedOrUpdated(rule);
+    {
+        //loading business rules
+        QnBusinessEventRuleList rules;
+        while( (rez = ec2Connection->getBusinessEventManager()->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )
+        {
+            qDebug() << "QnMain::run(): Can't get business rules. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+        }
+
+        foreach(const QnBusinessEventRulePtr &rule, rules)
+            messageProcessor->on_businessEventAddedOrUpdated(rule);
+    }
 }
 
 void QnMain::at_localInterfacesChanged()
