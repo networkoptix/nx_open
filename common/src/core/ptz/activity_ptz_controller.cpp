@@ -4,15 +4,8 @@
 
 QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_mode(mode),
-    m_asynchronous(baseController->hasCapabilities(Qn::AsynchronousPtzCapability))
+    m_mode(mode)
 {
-    // TODO: #Elric
-    // There is a bug here when we operate over a remote controller:
-    // 1. PTZ is not yet initialized for a camera.
-    // 2. This controller is created on a client, PTZ caps not yet initialized => m_asynchronous is set to false.
-    // 3. PTZ is initialized, caps change, m_asynchronous is no longer actual.
-
     m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(lit("ptzActiveObject"), QnPtzObject(), this);
     m_adaptor->setValue(QnPtzObject());
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });
@@ -21,8 +14,6 @@ QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControlle
      * exactly what we need for local mode. */
     if(m_mode != Local)
         m_adaptor->setResource(resource());
-
-    // TODO: #Elric #PTZ better async support
 }
 
 QnActivityPtzController::~QnActivityPtzController() {
@@ -109,7 +100,7 @@ bool QnActivityPtzController::getActiveObject(QnPtzObject *activeObject) {
 
 bool QnActivityPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
     // TODO: #Elric #PTZ this is a hack. Need to do it better.
-    if(m_asynchronous) {
+    if(baseController()->hasCapabilities(Qn::AsynchronousPtzCapability)) {
         return baseController()->getData(query, data);
     } else {
         return base_type::getData(query, data);
