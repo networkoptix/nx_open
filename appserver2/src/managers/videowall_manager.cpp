@@ -95,7 +95,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiIdData> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnId &id)
     {
-        QnTransaction<ApiIdData> tran(command, true);
+        QnTransaction<ApiIdData> tran(command, false);
         tran.params.id = id;
         return tran;
     }
@@ -103,7 +103,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiVideowallControlMessage> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnVideoWallControlMessage &message)
     {
-        QnTransaction<ApiVideowallControlMessage> tran(command, true);
+        QnTransaction<ApiVideowallControlMessage> tran(command, false);
         tran.params.fromMessage(message);
         return tran;
     }

@@ -362,7 +362,7 @@ private:
             V value;
             if( !deserialize(key, binStream) || !deserialize(value, binStream))
                 return false;
-            field.insert(std::pair(key, value));
+            field.insert(std::pair<K, V>(key, value));
         }
         return true;
     }
