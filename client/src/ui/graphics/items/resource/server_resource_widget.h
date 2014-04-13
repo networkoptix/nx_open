@@ -139,8 +139,6 @@ private:
     /** Button bars with corresponding buttons */
     QnImageButtonBar *m_legendButtonBar[ButtonBarCount];
 
-    QHash<QString, QnImageButtonWidget *> m_legendButtonByKey;
-
     struct GraphData {
         GraphData(): bar(NULL), button(NULL), mask(0), visible(false), opacity(1.0) {}
 

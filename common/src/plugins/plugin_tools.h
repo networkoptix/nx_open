@@ -4,6 +4,8 @@
 
 #ifdef _WIN32
 #include <Windows.h>
+#undef min
+#undef max
 #endif
 
 #include <cstdlib>

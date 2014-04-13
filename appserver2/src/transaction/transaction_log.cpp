@@ -35,7 +35,7 @@ void QnTransactionLog::init()
     QSqlQuery queryTime(m_dbManager->getDB());
     queryTime.prepare("SELECT max(timestamp) FROM transaction_log");
     if (queryTime.exec() && queryTime.next()) {
-        m_relativeOffset = queryTime.value(0).toLongLong();
+        m_relativeOffset = qMax(0ll, queryTime.value(0).toLongLong());
     }
 
     QSqlQuery querySequence(m_dbManager->getDB());
@@ -102,7 +102,11 @@ bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& 
 {
     if (m_state.value(tran.id.peerGUID) >= tran.id.sequence)
         return true;
-    const qint64 lastTime = m_updateHistory.value(hash);
+    QMap<QUuid, qint64>::iterator itr = m_updateHistory.find(hash);
+    if (itr == m_updateHistory.end())
+        return false;
+
+    const qint64 lastTime = itr.value();
     return lastTime > tran.timestamp ||
            (lastTime == tran.timestamp && tran.id.peerGUID > qnCommon->moduleGUID());
 }

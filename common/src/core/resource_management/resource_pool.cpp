@@ -258,7 +258,7 @@ QnResourceList QnResourcePool::getResources() const
     return m_resources.values();
 }
 
-QnResourcePtr QnResourcePool::getResourceById(QnId id) const {
+QnResourcePtr QnResourcePool::getResourceById(const QnId &id) const {
     QMutexLocker locker(&m_resourcesMtx);
 
     QHash<QString, QnResourcePtr>::const_iterator resIter = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByID(id) );

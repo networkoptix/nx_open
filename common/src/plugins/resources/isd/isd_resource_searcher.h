@@ -9,10 +9,9 @@
 
 class QnPlISDResourceSearcher : public QnMdnsResourceSearcher
 {
-    QnPlISDResourceSearcher();
 
 public:
-    static QnPlISDResourceSearcher& instance();
+    QnPlISDResourceSearcher();
 
     virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
 

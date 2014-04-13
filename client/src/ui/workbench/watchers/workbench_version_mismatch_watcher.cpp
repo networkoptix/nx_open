@@ -55,28 +55,32 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
     if(m_mismatchData.isEmpty())
         return;
 
-    QnVersionMismatchData firstNonClient;
+    QnSoftwareVersion latest;
+    QnSoftwareVersion latestMs;
     foreach(const QnVersionMismatchData &data, m_mismatchData) {
-        if (data.component == Qn::ClientComponent)
+        latest = qMax(data.version, latest);
+        if (data.component != Qn::MediaServerComponent)
             continue;
-        firstNonClient = data;
-        break;
+        latestMs = qMax(data.version, latestMs);
     }
+    if (versionMismatches(latest, latestMs))
+        latestMs = latest;
 
-    if (firstNonClient.component == Qn::AnyComponent) //not found
-        return;
-
-    foreach(const QnVersionMismatchData &second, m_mismatchData) {
-        if (second.component == Qn::ClientComponent)
-            continue;
-
-        if(versionMismatches(firstNonClient.version,
-                             second.version,
-                             firstNonClient.component == Qn::MediaServerComponent && second.component == Qn::MediaServerComponent)) {
-            m_hasMismatches = true;
+    foreach(const QnVersionMismatchData &data, m_mismatchData) {
+        switch (data.component) {
+        case Qn::MediaServerComponent:
+            m_hasMismatches |= QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMs, true);
+            break;
+        case Qn::EnterpriseControllerComponent:
+            m_hasMismatches |= QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latest);
+            break;
+        default:
             break;
         }
+        if (m_hasMismatches)
+            break;
     }
+
 }
 
 void QnWorkbenchVersionMismatchWatcher::updateMismatchData() {

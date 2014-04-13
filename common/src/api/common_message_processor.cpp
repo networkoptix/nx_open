@@ -93,6 +93,8 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
         this, [this](const QnVideoWallResourcePtr &videowall){updateResource(videowall);});
     connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::removed,
         this, &QnCommonMessageProcessor::on_resourceRemoved );
+    connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::controlMessage,
+        this, &QnCommonMessageProcessor::videowallControlMessageReceived );
 
     connection->startReceivingNotifications(true);
 }

@@ -11,10 +11,10 @@
 
 class QnDesktopCameraResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
-    QnDesktopCameraResourceSearcher();
 public:
     static QnDesktopCameraResourceSearcher& instance();
     
+    QnDesktopCameraResourceSearcher();
     virtual ~QnDesktopCameraResourceSearcher();
 
     virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params) override;

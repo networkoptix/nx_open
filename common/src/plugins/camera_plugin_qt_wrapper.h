@@ -16,9 +16,9 @@
 #include "camera_plugin.h"
 
 
-//!Contains wrappers for convinient use of \a nxcip classes
+//!Contains wrappers for convenient use of \a nxcip classes
 /*!
-    All these classes DO NOT increment ref counter at instanciation and DO decrement at destruction
+    All these classes DO NOT increment ref counter at instantiation and DO decrement at destruction
 */
 namespace nxcip_qt
 {
@@ -148,8 +148,8 @@ namespace nxcip_qt
         //!See nxcip::BaseCameraManager::setAudioEnabled
         int setAudioEnabled( bool audioEnabled );
 
-        //!See nxcip::BaseCameraManager::getPTZManager
-        nxcip::CameraPTZManager* getPTZManager() const;
+        //!See nxcip::BaseCameraManager::getPtzManager
+        nxcip::CameraPtzManager* getPtzManager() const;
         //!See nxcip::BaseCameraManager::getCameraRelayIOManager
         nxcip::CameraRelayIOManager* getCameraRelayIOManager() const;
 

@@ -18,10 +18,6 @@ namespace ec2
     public:
         QnVideowallManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
 
-        virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) override;
-        virtual int save( const QnVideoWallResourcePtr& resource, impl::AddVideowallHandlerPtr handler ) override;
-        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
-
         void triggerNotification( const QnTransaction<ApiVideowall>& tran )
         {
             assert( tran.command == ApiCommand::saveVideowall);
@@ -36,12 +32,27 @@ namespace ec2
             emit removed( QnId(tran.params.id) );
         }
 
+        void triggerNotification(const QnTransaction<ApiVideowallControlMessage>& tran) {
+            assert(tran.command == ApiCommand::videowallControl);
+            QnVideoWallControlMessage message;
+            tran.params.toMessage(message);
+            emit controlMessage(message);
+        }
+
+    protected:
+        virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) override;
+        virtual int save( const QnVideoWallResourcePtr& resource, impl::AddVideowallHandlerPtr handler ) override;
+        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
+
+        virtual int sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler) override;
+        virtual int sendInstanceId(const QUuid& guid, impl::SimpleHandlerPtr handler) override;
     private:
         QueryProcessorType* const m_queryProcessor;
         ResourceContext m_resCtx;
 
-        QnTransaction<ApiVideowall> prepareTransaction( ApiCommand::Value command, const QnVideoWallResourcePtr& resource );
-        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& resource );
+        QnTransaction<ApiVideowall> prepareTransaction(ApiCommand::Value command, const QnVideoWallResourcePtr &resource);
+        QnTransaction<ApiIdData> prepareTransaction(ApiCommand::Value command, const QnId& id);
+        QnTransaction<ApiVideowallControlMessage> prepareTransaction(ApiCommand::Value command, const QnVideoWallControlMessage &message);
     };
 }
 

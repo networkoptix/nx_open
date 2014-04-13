@@ -241,7 +241,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered() {
     if(!getDevicePosition(controller, &position))
         return;
 
-    qreal startZ = 0.0;
+    qreal startZ = -1.0;
     qreal endZ = 1.0;
 
     for(int i = 0; i <= 20; i++) {

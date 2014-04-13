@@ -10,15 +10,6 @@ namespace ec2
 
     }
 
-    ProcessedPeers QnTransactionTransportSerializer::updatePeers(const ProcessedPeers& opaque)
-    {
-        ProcessedPeers result = opaque;
-        result << qnCommon->moduleGUID();
-        foreach(const QnId& id, m_owner.alivePeers().keys())
-        	result += id;
-        return result;
-    }
-
     bool QnTransactionTransportSerializer::deserializeTran(const quint8* chunkPayload, int len,  ProcessedPeers& peers, QByteArray& tranData)
     {
         QByteArray srcData = QByteArray::fromRawData((const char*) chunkPayload, len);

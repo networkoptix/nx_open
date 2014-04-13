@@ -8,10 +8,9 @@
 
 class QnStardotResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
-    QnStardotResourceSearcher();
 
 public:
-    static QnStardotResourceSearcher& instance();
+    QnStardotResourceSearcher();
 
     QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
 

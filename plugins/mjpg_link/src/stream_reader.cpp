@@ -19,12 +19,13 @@
 #include <sys/stat.h>
 
 #include <algorithm>
-#include <chrono>
 #include <fstream>
 #include <functional>
 #include <memory>
 
 #include <QtCore/QDateTime>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QMutexLocker>
 #include <QtCore/QThread>
 
 #include <utils/common/log.h>
@@ -179,9 +180,9 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
 void StreamReader::interrupt()
 {
-    std::unique_lock<std::mutex> lk( m_mutex );
+    QMutexLocker lk( &m_mutex );
     m_terminated = true;
-    m_cond.notify_all();
+    m_cond.wakeAll();
 }
 
 void StreamReader::setFps( float fps )
@@ -213,11 +214,16 @@ bool StreamReader::waitForNextFrameTime()
         const qint64 msecToSleep = m_frameDurationMSec - (currentTime - m_prevFrameClock);
         if( msecToSleep > 0 )
         {
-            std::unique_lock<std::mutex> lk( m_mutex );
-            if( m_cond.wait_until(
-                    lk,
-                    std::chrono::steady_clock::now() + std::chrono::milliseconds(msecToSleep),
-                    [this](){ return m_terminated; } ) )   //returns true, if terminated
+            QMutexLocker lk( &m_mutex );
+            QElapsedTimer monotonicTimer;
+            monotonicTimer.start();
+            qint64 msElapsed = monotonicTimer.elapsed();
+            while( !m_terminated && (msElapsed < msecToSleep) )
+            {
+                m_cond.wait( lk.mutex(), msecToSleep - msElapsed );
+                msElapsed = monotonicTimer.elapsed();
+            }
+            if( m_terminated )
             {
                 //call has been interrupted
                 m_terminated = false;

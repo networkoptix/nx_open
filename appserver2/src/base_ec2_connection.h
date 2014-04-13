@@ -23,6 +23,7 @@
 #include "managers/videowall_manager.h"
 
 #include "nx_ec/data/ec2_full_data.h"
+#include "nx_ec/data/ec2_videowall_data.h"
 
 
 namespace ec2
@@ -176,6 +177,10 @@ namespace ec2
                 tran.params.toResourceList(newSettings);
                 emit settingsChanged(newSettings);
             }
+        }
+
+        void triggerNotification(const QnTransaction<ApiVideowallControlMessage> &tran) {
+            return m_videowallManager->triggerNotification(tran);
         }
 
         void triggerNotification( const QnTransaction<ApiEmailSettingsData>&  ) {

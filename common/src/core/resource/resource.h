@@ -269,6 +269,7 @@ signals:
     void mediaDewarpingParamsChanged(const QnResourcePtr &resource);
     void propertyChanged(const QnResourcePtr &resource, const QString &key);
     void initializedChanged(const QnResourcePtr &resource);
+    void videoLayoutChanged(const QnResourcePtr &resource);
 
     //!Emitted on completion of every async get started with getParamAsync
     /*!
@@ -358,6 +359,9 @@ protected:
 
     /** Name of this resource. */
     QString m_name;
+
+    /** Url of this resource, if any. */
+    QString m_url; 
 private:
     /** Resource pool this this resource belongs to. */
     QnResourcePool *m_resourcePool;
@@ -374,9 +378,6 @@ private:
 
     /** Status of this resource. */
     Status m_status;
-
-    /** Url of this resource, if any. */
-    QString m_url; 
 
     QDateTime m_lastDiscoveredTime;
     QDateTime m_lastStatusUpdateTime;

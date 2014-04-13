@@ -266,6 +266,7 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
 {
     QMutexLocker lock(&m_mutex);
 
+    QString oldUrl = m_url;
     QnResource::updateInner(other);
     bool netAddrListChanged = false;
 
@@ -276,7 +277,6 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
         m_serverFlags = localOther->m_serverFlags;
         netAddrListChanged = m_netAddrList != localOther->m_netAddrList;
         m_netAddrList = localOther->m_netAddrList;
-        setApiUrl(localOther->m_apiUrl);
         m_streamingUrl = localOther->getStreamingUrl();
         m_version = localOther->getVersion();
 
@@ -296,8 +296,12 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
 
         setStorages(otherStorages);
     }
-    if (netAddrListChanged)
+    if (netAddrListChanged) {
+        m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes
         determineOptimalNetIF();
+    } else {
+        m_url = oldUrl; //rollback changed value to autodetected
+    }
 }
 
 

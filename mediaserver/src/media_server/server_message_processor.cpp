@@ -1,8 +1,11 @@
 #include "server_message_processor.h"
+
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
+
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"
 
@@ -69,8 +72,9 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     bool isServer = resource.dynamicCast<QnMediaServerResource>();
     bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
     bool isUser = resource.dynamicCast<QnUserResource>();
+    bool isVideowall = resource.dynamicCast<QnVideoWallResource>();
 
-    if (!isServer && !isCamera && !isUser)
+    if (!isServer && !isCamera && !isUser && !isVideowall)
         return;
 
     //storing all servers' cameras too
