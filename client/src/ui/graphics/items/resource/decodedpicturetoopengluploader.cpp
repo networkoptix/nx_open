@@ -21,7 +21,6 @@
 //    #endif
 //#define GL_GLEXT_PROTOTYPES 1
 #include <QtGui/qopengl.h>
-
 extern "C"
 {
     #include <libavcodec/avcodec.h>
@@ -335,8 +334,8 @@ public:
         );
 
         bool result = false;
-        if(m_textureSize.width() < textureSize.width() || m_textureSize.height() < textureSize.height() || m_internalFormat != internalFormat) {
-            //qDebug()<<"glTexImage2D"<<m_renderer->supportsNonPower2Textures<<textureSize.width()<<textureSize.height()<<m_textureSize.width()<<m_textureSize.height()<<m_internalFormat<<internalFormat;
+        if(m_textureSize.width() != textureSize.width() || m_textureSize.height() != textureSize.height() || m_internalFormat != internalFormat) {
+            qDebug()<<"glTexImage2D"<<m_renderer->supportsNonPower2Textures<<textureSize.width()<<textureSize.height()<<m_textureSize.width()<<m_textureSize.height()<<m_internalFormat<<internalFormat;
 
             m_textureSize = textureSize;
             m_internalFormat = internalFormat;
@@ -347,6 +346,7 @@ public:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_renderer->clampConstant);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_renderer->clampConstant);
+
 
             result = true;
         } else {
@@ -371,9 +371,9 @@ public:
             size_t fillSize = qMax(textureSize.height(), textureSize.width()) * ROUND_COEFF * internalFormatPixelSize * 16;
             uchar *filler = m_renderer->filler(fillValue, fillSize);
 
-            GLint textureWidth = 0;
+            //GLint textureWidth = 0;
             //                glGetTexLevelParameteriv( GL_TEXTURE_2D, 0,  GL_TEXTURE_WIDTH, &textureWidth );
-            GLint textureHeight = 0;
+            //GLint textureHeight = 0;
             //                glGetTexLevelParameteriv( GL_TEXTURE_2D, 0,  GL_TEXTURE_HEIGHT, &textureHeight );
             //Q_ASSERT( textureSize == QSize(textureWidth, textureHeight) );
             
@@ -1353,6 +1353,8 @@ DecodedPictureToOpenGLUploader::~DecodedPictureToOpenGLUploader()
 #endif
 
     delete[] m_rgbaBuf;
+    if ( m_yuv2rgbBuffer )
+        qFreeAligned(m_yuv2rgbBuffer);
 }
 
 void DecodedPictureToOpenGLUploader::pleaseStop()
@@ -1774,6 +1776,7 @@ void DecodedPictureToOpenGLUploader::cancelUploadingInGUIThread()
             }
             m_emptyBuffers.push_back( (*it)->picture() );
             delete *it;
+
             it = m_framesWaitingUploadInGUIThread.erase( it );
         }
 
@@ -2209,7 +2212,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     else
     {
         QMutexLocker lk( &m_uploadMutex );
-
+        
         //software conversion data to rgb
 
         int bytesPerPixel = 1;
@@ -2232,6 +2235,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
             int size = 4 * lineSizes[0] * h[0];
             if (m_yuv2rgbBufferLen < size)
             {
+                qDebug()<<"reallocMemory"<<m_yuv2rgbBufferLen<<size;
                 m_yuv2rgbBufferLen = size;
                 qFreeAligned(m_yuv2rgbBuffer);
                 m_yuv2rgbBuffer = (uchar*)qMallocAligned(size, CL_MEDIA_ALIGNMENT);
@@ -2310,7 +2314,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
 //        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         glCheckError("glPixelStorei");
-
+        
         glBindTexture( GL_TEXTURE_2D, 0 );
 
         emptyPictureBuf->setColorFormat( PIX_FMT_RGBA );
