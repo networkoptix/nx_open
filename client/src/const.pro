@@ -227,7 +227,6 @@ FORMS += \
     ui/widgets/properties/single_camera_settings_widget.ui \
     ui/widgets/properties/multiple_camera_settings_widget.ui \
 
-# CL_TRIAL_MODE 
 DEFINES += CL_FORCE_LOGO
 #DEFINES += CL_CUSTOMIZATION_PRESET=\\\"trinity\\\"
 # or
