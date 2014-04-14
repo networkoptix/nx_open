@@ -298,6 +298,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
     if (resource->toResource()->hasFlags(QnResource::utc))
         role = QnStreamRecorder::Role_FileExportWithEmptyContext;
     QnLayoutItemData itemData = m_layout->getItem(uniqId);
+    qreal overridenAspectRatio = resource->toResourcePtr()->getProperty(Qn::customAspectRatioKey).toFloat();
 
     int timeOffset = 0;
     if(qnSettings->timeMode() == Qn::ServerTimeMode) {
@@ -316,7 +317,8 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     timeOffset, serverTimeZone,
                                     itemData.zoomRect,
                                     itemData.contrastParams,
-                                    itemData.dewarpingParams);
+                                    itemData.dewarpingParams,
+                                    overridenAspectRatio);
 
     emit stageChanged(tr("Exporting %1 to \"%2\"...").arg(resource->toResource()->getUrl()).arg(m_targetFilename));
     return true;

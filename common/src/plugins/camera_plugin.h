@@ -14,7 +14,7 @@
     - \a nxcip::BaseCameraManager. Mandatory. Used to get camera properties and get pointers to other interfaces
     - \a nxcip::CameraMediaEncoder. Optional. Used to get media stream from camera
     - \a nxcip::CameraRelayIOManager. Optional. Used to receive relay input port change state events and change relay output port state
-    - \a nxcip::CameraPTZManager. Optional. Used for pan-tilt-zoom control
+    - \a nxcip::CameraPtzManager. Optional. Used for pan-tilt-zoom control
 
     \note all text values are NULL-terminated utf-8
     \note If not specified in interface's description, plugin interfaces are used in multithreaded environment the following way:\n
@@ -438,7 +438,7 @@ namespace nxcip
 
         //!MUST return not-NULL if \a ptzCapability is present
         /*!
-            \note Increases \a CameraPTZManager instance reference counter
+            \note Increases \a CameraPtzManager instance reference counter
             \note Most likely will return same pointer on multiple requests
         */
         virtual CameraPtzManager* getPtzManager() const = 0;

@@ -11,6 +11,7 @@ QnClientVideoCameraExportTool::QnClientVideoCameraExportTool(
         QRectF sourceRect,
         const ImageCorrectionParams &imageCorrectionParams,
         const QnItemDewarpingParams &itemDewarpingParams,
+        qreal overridenAspectRatio,
         QObject *parent) :
     QObject(parent),
     m_camera(camera),
@@ -22,6 +23,7 @@ QnClientVideoCameraExportTool::QnClientVideoCameraExportTool(
     m_sourceRect(sourceRect),
     m_imageCorrectionParams(imageCorrectionParams),
     m_itemDewarpingParams(itemDewarpingParams),
+    m_overridenAspectRatio(overridenAspectRatio),
     m_status(QnClientVideoCamera::NoError)
 {
     connect(camera,     &QnClientVideoCamera::exportProgress,   this,   &QnClientVideoCameraExportTool::valueChanged);
@@ -43,7 +45,8 @@ void QnClientVideoCameraExportTool::start() {
                 m_serverTimeZoneMs,
                 m_sourceRect,
                 m_imageCorrectionParams,
-                m_itemDewarpingParams);
+                m_itemDewarpingParams,
+                m_overridenAspectRatio);
 }
 
 int QnClientVideoCameraExportTool::status() const {

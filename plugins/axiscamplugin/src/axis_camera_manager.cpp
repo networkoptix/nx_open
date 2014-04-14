@@ -129,7 +129,7 @@ int AxisCameraManager::setAudioEnabled( int audioEnabled )
 }
 
 //!Implementation of nxcip::BaseCameraManager::getPTZManager
-nxcip::CameraPTZManager* AxisCameraManager::getPTZManager() const
+nxcip::CameraPtzManager* AxisCameraManager::getPtzManager() const
 {
     //TODO/IMPL
     return NULL;
