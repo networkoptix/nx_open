@@ -244,8 +244,9 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
 
         bool camerasFound = ui->camerasTable->rowCount() > 0;
         ui->camerasTable->setEnabled(camerasFound);
-        ui->addButton->setEnabled(camerasFound);
-        if (camerasFound)
+        bool canAdd = addingAllowed();
+        ui->addButton->setEnabled(canAdd);
+        if (canAdd)
             ui->addButton->setFocus();
         else
             ui->backToScanButton->setFocus();
@@ -375,6 +376,17 @@ bool QnCameraAdditionDialog::ensureServerOnline() {
     return false;
 }
 
+bool QnCameraAdditionDialog::addingAllowed() const {
+    int rowCount = ui->camerasTable->rowCount();
+    for (int row = 0; row < rowCount; ++row) {
+        QTableWidgetItem* item = ui->camerasTable->item(row, CheckBoxColumn);
+        if (!(item->flags() & Qt::ItemIsEnabled))
+            continue;
+        if (item->checkState() == Qt::Checked)
+            return true;
+    }
+    return false;
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -603,7 +615,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     connect(ui->closeButton,    SIGNAL(clicked()),          &loop, SLOT(quit()));
     loop.exec();
 
-    ui->addButton->setEnabled(true);
+    ui->addButton->setEnabled(addingAllowed());
     ui->scanButton->setEnabled(m_server);
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
 
