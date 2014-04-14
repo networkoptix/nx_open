@@ -76,6 +76,8 @@ public:
     QnMediaDewarpingParams getDewarpingParams() const;
     void setDewarpingParams(const QnMediaDewarpingParams& params);
 
+    /** Name of the resource property key intended for the CustomAspectRatio value storage. */
+    static QString customAspectRatioKey();
 protected:
     void initMediaResource();
     void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields);

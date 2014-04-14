@@ -158,3 +158,7 @@ void QnMediaResource::updateInner(QnResourcePtr other, QSet<QByteArray>&)
     if (other_casted)
         m_dewarpingParams = other_casted->m_dewarpingParams;
 }
+
+QString QnMediaResource::customAspectRatioKey() {
+    return lit("overrideAr");
+}

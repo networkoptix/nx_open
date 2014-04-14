@@ -10,10 +10,10 @@
 #include <utils/common/string.h>
 
 namespace {
-    static const qreal speedLowest  = 0.01;
-    static const qreal speedLow     = 0.25;
+    static const qreal speedLowest  = 0.15;
+    static const qreal speedLow     = 0.30;
     static const qreal speedNormal  = 0.5;
-    static const qreal speedHigh    = 0.75;
+    static const qreal speedHigh    = 0.72;
     static const qreal speedHighest = 1.0;
 
     static const QList<qreal> allSpeedValues(QList<qreal>()

@@ -376,9 +376,9 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         }
 
         if (ui->arOverrideCheckBox->isChecked())
-            m_camera->setProperty(Qn::customAspectRatioKey, QString::number(ui->arComboBox->itemData(ui->arComboBox->currentIndex()).toDouble()));
+            m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->arComboBox->itemData(ui->arComboBox->currentIndex()).toDouble()));
         else
-            m_camera->setProperty(Qn::customAspectRatioKey, QString());
+            m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString());
 
         ui->expertSettingsWidget->submitToResources(QnVirtualCameraResourceList() << m_camera);
 
@@ -466,7 +466,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased);
 
-        QString arOverride = m_camera->getProperty(Qn::customAspectRatioKey);
+        QString arOverride = m_camera->getProperty(QnMediaResource::customAspectRatioKey());
         ui->arOverrideCheckBox->setChecked(!arOverride.isEmpty());
         if (!arOverride.isEmpty()) 
         {

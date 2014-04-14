@@ -348,7 +348,6 @@ public:
 
 } // namespace Qn
 
-
 /** 
  * \def lit
  * Helper macro to mark strings that are not to be translated. 
@@ -363,7 +362,5 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 
 QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner), (metatype))
 QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities), (metatype)(lexical)(json))
-
-
 
 #endif // QN_COMMON_GLOBALS_H
