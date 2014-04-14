@@ -240,6 +240,7 @@ qint64 QnCameraHistoryPool::getMinTime(QnNetworkResourcePtr camera)
 void QnCameraHistoryPool::addCameraHistory(QnCameraHistoryPtr history)
 {
     QnCameraHistoryPtr oldHistory, newHistory;
+    QnTimePeriod emptyTimePeriod;
 
     {
         QMutexLocker lock(&m_mutex);
@@ -252,7 +253,7 @@ void QnCameraHistoryPool::addCameraHistory(QnCameraHistoryPtr history)
         m_cameraHistory[key] = history;
     }
     
-    if(!oldHistory || (oldHistory->getMediaServerOnTime(DATETIME_NOW, true, QnTimePeriod(), true) != newHistory->getMediaServerOnTime(DATETIME_NOW, true, QnTimePeriod(), true))) {
+    if(!oldHistory || (oldHistory->getMediaServerOnTime(DATETIME_NOW, true, emptyTimePeriod, true) != newHistory->getMediaServerOnTime(DATETIME_NOW, true, emptyTimePeriod, true))) {
         QnNetworkResourcePtr camera = qnResPool->getNetResourceByPhysicalId(history->getPhysicalId());
         if (camera)
             emit currentCameraChanged(camera);
@@ -263,6 +264,7 @@ void QnCameraHistoryPool::addCameraHistoryItem(const QnCameraHistoryItem &histor
 {
     QnResourcePtr oldServer, newServer;
     QnCameraHistoryPtr cameraHistory;
+    QnTimePeriod emptyTimePeriod;
 
     {
         QMutexLocker lock(&m_mutex);
@@ -272,7 +274,7 @@ void QnCameraHistoryPool::addCameraHistoryItem(const QnCameraHistoryItem &histor
         if (iter != m_cameraHistory.constEnd()) {
             cameraHistory = iter.value();
 
-            oldServer = cameraHistory->getMediaServerOnTime(DATETIME_NOW, true, QnTimePeriod(), true);
+            oldServer = cameraHistory->getMediaServerOnTime(DATETIME_NOW, true, emptyTimePeriod, true);
         } else {
             cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
             cameraHistory->setPhysicalId(historyItem.physicalId);
@@ -284,7 +286,7 @@ void QnCameraHistoryPool::addCameraHistoryItem(const QnCameraHistoryItem &histor
 
         m_cameraHistory[historyItem.physicalId] = cameraHistory;
         
-        newServer = cameraHistory->getMediaServerOnTime(DATETIME_NOW, true, QnTimePeriod(), true);
+        newServer = cameraHistory->getMediaServerOnTime(DATETIME_NOW, true, emptyTimePeriod, true);
     }
 
     if(oldServer != newServer) {
