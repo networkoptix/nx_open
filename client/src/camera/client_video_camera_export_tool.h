@@ -20,6 +20,7 @@ public:
             QRectF sourceRect,
             const ImageCorrectionParams &imageCorrectionParams,
             const QnItemDewarpingParams &itemDewarpingParams,
+            qreal overridenAspectRatio,
             QObject *parent = 0);
 
     /**
@@ -75,6 +76,7 @@ private:
     QRectF m_sourceRect;
     ImageCorrectionParams m_imageCorrectionParams;
     QnItemDewarpingParams m_itemDewarpingParams;
+    qreal m_overridenAspectRatio;
 
     int m_status;
 };
