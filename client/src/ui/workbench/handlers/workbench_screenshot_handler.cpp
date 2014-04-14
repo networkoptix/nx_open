@@ -216,6 +216,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.mediaDewarpingParams = widget->dewarpingParams();
     parameters.imageCorrectionParams = widget->item()->imageEnhancement();
     parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
+    parameters.customAspectRatio = display->camDisplay()->overridenAspectRatio();
 
     QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, display.data());
     if (!imageProvider)
@@ -318,16 +319,31 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
     QnScreenshotParameters parameters = loader->parameters();
 
-    QImage resized;
+    QImage resizedToAr = image;
+    qreal sourceAr = (qreal)image.width() / image.height();
+    if (!qFuzzyIsNull(parameters.customAspectRatio) && !qFuzzyEquals(parameters.customAspectRatio, sourceAr)) {
+        QSizeF targetSize = image.size();
+        if (parameters.customAspectRatio > sourceAr)
+            targetSize.setHeight(targetSize.width() / parameters.customAspectRatio);
+        else
+            targetSize.setWidth(targetSize.height() * parameters.customAspectRatio);
+
+        resizedToAr = QImage(targetSize.toSize(), QImage::Format_ARGB32);
+        resizedToAr.fill(qRgba(0, 0, 0, 0));
+
+        QScopedPointer<QPainter> painter(new QPainter(&resizedToAr));
+        painter->setCompositionMode(QPainter::CompositionMode_Source);
+        painter->drawImage(resizedToAr.rect(), image, image.rect());
+    }
+
+    QImage resized = resizedToAr;
     if (!parameters.zoomRect.isNull()) {
-        resized = QImage(image.width() * parameters.zoomRect.width(), image.height() * parameters.zoomRect.height(), QImage::Format_ARGB32);
+        resized = QImage(resizedToAr.width() * parameters.zoomRect.width(), resizedToAr.height() * parameters.zoomRect.height(), QImage::Format_ARGB32);
         resized.fill(qRgba(0, 0, 0, 0));
 
         QScopedPointer<QPainter> painter(new QPainter(&resized));
         painter->setCompositionMode(QPainter::CompositionMode_Source);
-        painter->drawImage(QPointF(0, 0), image, QnGeometry::cwiseMul(parameters.zoomRect, image.size()));
-    } else {
-        resized = image;
+        painter->drawImage(QPointF(0, 0), resizedToAr, QnGeometry::cwiseMul(parameters.zoomRect, resizedToAr.size()));
     }
 
     QScopedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(resized));
