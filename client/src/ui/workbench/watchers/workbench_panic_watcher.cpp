@@ -6,7 +6,7 @@
 #include <core/resource_management/resource_pool.h>
 
 QnWorkbenchPanicWatcher::QnWorkbenchPanicWatcher(QObject *parent):
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_panicMode(false)
 {
@@ -43,7 +43,7 @@ void QnWorkbenchPanicWatcher::at_resourcePool_resourceAdded(const QnResourcePtr 
     if(!server)
         return;
 
-    connect(server.data(), SIGNAL(panicModeChanged(const QnMediaServerResourcePtr &)), this, SLOT(at_resource_panicModeChanged(const QnMediaServerResourcePtr &)));
+    connect(server, &QnMediaServerResource::panicModeChanged, this, &QnWorkbenchPanicWatcher::at_resource_panicModeChanged);
 
     m_servers.insert(server);
     if(server->getPanicMode() != QnMediaServerResource::PM_None)
@@ -65,11 +65,15 @@ void QnWorkbenchPanicWatcher::at_resourcePool_resourceRemoved(const QnResourcePt
     updatePanicMode();
 }
 
-void QnWorkbenchPanicWatcher::at_resource_panicModeChanged(const QnMediaServerResourcePtr &resource) {
-    if(resource->getPanicMode() != QnMediaServerResource::PM_None) {
-        m_panicServers.insert(resource);
+void QnWorkbenchPanicWatcher::at_resource_panicModeChanged(const QnResourcePtr &resource) {
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if(!server)
+        return;
+
+    if(server->getPanicMode() != QnMediaServerResource::PM_None) {
+        m_panicServers.insert(server);
     } else {
-        m_panicServers.remove(resource);
+        m_panicServers.remove(server);
     }
 
     updatePanicMode();
