@@ -12,14 +12,18 @@ extern "C"
 
 #include <core/ptz/media_dewarping_params.h>
 #include "core/resource/resource_media_layout.h"
-#include "utils/media/ffmpeg_helper.h"
 #include "core/resource/storage_resource.h"
-#include "plugins/storage/file_storage/layout_storage_resource.h"
-#include "utils/media/nalUnits.h"
-#include "avi_resource.h"
-#include "motion/light_motion_archive_connection.h"
 #include "core/resource/media_resource.h"
+
+#include <plugins/resources/archive/avi_files/avi_resource.h>
+#include <plugins/resources/archive/avi_files/avi_archive_custom_data.h>
+#include "plugins/storage/file_storage/layout_storage_resource.h"
+
+#include "motion/light_motion_archive_connection.h"
 #include "export/sign_helper.h"
+
+#include "utils/media/ffmpeg_helper.h"
+#include "utils/media/nalUnits.h"
 #include <utils/common/json.h>
 
 class QnAviAudioLayout: public QnResourceAudioLayout
@@ -399,6 +403,13 @@ QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
                 if (mediaRes)
                     mediaRes->setDewarpingParams(QnMediaDewarpingParams::deserialized(dewarpInfo->value));
             }
+
+            AVDictionaryEntry* customInfo = av_dict_get(m_formatContext->metadata,getTagName(Tag_Custom, format), 0, 0);
+            if (customInfo) {
+                QnAviArchiveCustomData data = QJson::deserialized<QnAviArchiveCustomData>(customInfo->value);
+                m_resource->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(data.overridenAr));
+            }
+
         }
     }
     return m_videoLayout;
@@ -619,6 +630,7 @@ const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
 {
     if (formatName == QLatin1String("avi"))
     {
+        // list of all RIFF tag names and information about their usability can be found at http://ru.wikipedia.org/wiki/RIFF
         switch(tag)
         {
         case Tag_startTime:
@@ -633,6 +645,8 @@ const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
             return "copyright"; // "ICOP";
         case Tag_Dewarping:
             return "title";
+        case Tag_Custom:
+            return "IENG"; //IENG 
         }
     }
     else {
@@ -647,9 +661,11 @@ const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
         case Tag_Software:
             return "software";
         case Tag_Signature:
-            return "signature"; // "ICOP";
+            return "signature";
         case Tag_Dewarping:
             return "dewarp";
+        case Tag_Custom:
+            return "custom_data";
         }
     }
     return "";

@@ -125,7 +125,7 @@ int CameraManager::setAudioEnabled( int audioEnabled )
 }
 
 //!Implementation of nxcip::BaseCameraManager::getPTZManager
-nxcip::CameraPTZManager* CameraManager::getPTZManager() const
+nxcip::CameraPtzManager* CameraManager::getPtzManager() const
 {
     return NULL;
 }

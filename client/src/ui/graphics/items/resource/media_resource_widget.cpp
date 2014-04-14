@@ -976,7 +976,8 @@ void QnMediaResourceWidget::at_resource_resourceChanged() {
 }
 
 void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key) {
-    if (resource != m_camera ||  key != Qn::customAspectRatioKey)
+    Q_UNUSED(resource);
+    if (key != QnMediaResource::customAspectRatioKey())
         return;
     updateCustomAspectRatio();
 }
@@ -1142,15 +1143,11 @@ void QnMediaResourceWidget::updateFisheye() {
 }
 
 void QnMediaResourceWidget::updateCustomAspectRatio() {
-    if (!m_camera || !m_display)
+    if (!m_display)
         return;
 
-    QString customAr = m_camera->getProperty(Qn::customAspectRatioKey);
-    if (!customAr.isEmpty())
-        m_display->camDisplay()->setOverridenAspectRatio(customAr.toDouble());
-    else
-        m_display->camDisplay()->setOverridenAspectRatio(0.0);
-
+    QString customAr = m_resource->toResource()->getProperty(QnMediaResource::customAspectRatioKey());
+    m_display->camDisplay()->setOverridenAspectRatio(customAr.toDouble());
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {

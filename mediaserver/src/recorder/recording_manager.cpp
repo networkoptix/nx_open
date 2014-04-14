@@ -485,7 +485,11 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
 bool QnRecordingManager::isCameraRecoring(QnResourcePtr camera)
 {
     QMutexLocker lock(&m_mutex);
-    return m_recordMap.contains(camera) && m_recordMap.value(camera).recorderHiRes->isRunning();
+    QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.find(camera);
+    if (itr == m_recordMap.end())
+        return false;
+    return (itr.value().recorderHiRes && itr.value().recorderHiRes->isRunning()) ||
+           (itr.value().recorderLowRes && itr.value().recorderLowRes->isRunning());
 }
 
 void QnRecordingManager::onTimer()
