@@ -77,6 +77,7 @@ private:
     State m_state;
     std::vector<quint8> m_readBuffer;
     int m_readBufferLen;
+    int m_chunkHeaderLen;
     quint32 m_chunkLen;
     int m_sendOffset;
     QQueue<QByteArray> m_dataToSend;
@@ -92,6 +93,7 @@ private:
     void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
     void closeSocket();
     static void ensureSize(std::vector<quint8>& buffer, std::size_t size);
+    int getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size);
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();
