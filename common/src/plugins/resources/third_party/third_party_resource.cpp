@@ -339,7 +339,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
         //setPtzCapability( Qn::AbsolutePtzCapability, true );
-        //TODO/IMPL requesting nxcip::CameraPTZManager interface and setting capabilities
+        //TODO/IMPL requesting nxcip::CameraPtzManager interface and setting capabilities
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
         setAudioEnabled( true );
