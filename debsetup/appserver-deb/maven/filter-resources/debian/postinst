@@ -60,6 +60,10 @@ function validate_password {
     [ "$IS_ADMIN_PW_SET" = "true" -o -n "$1" ]
 }
 
+function validate_recoveryPassword {
+    [ -n "$1" ]
+}
+
 function validate_port {
     port_is_ok $1
 }
@@ -102,14 +106,28 @@ function ask_for_value {
 case "$1" in
   configure)
       IS_ADMIN_PW_SET="false"
-      [ -f $VAR_DIR/db/ecs.db ] && $BIN_DIR/dbconfig isadminpw && IS_ADMIN_PW_SET="true"
+      IS_RECOVERY="false"
+      if [ -f $VAR_DIR/db/ecs.db ]; then
+        status=0
+        $BIN_DIR/dbconfig isadminpw || status=$?
+        if [ $status -eq 0 ]; then
+            IS_ADMIN_PW_SET="true"
+        elif [ $status -eq 2 ]; then
+            IS_RECOVERY="true"
+        fi
+      fi
 
       ECS_PORT="$($CFG_HELPER port)"
       [ -z "$ECS_PORT" ] && ECS_PORT=$ECS_PORT_DEFAULT
       ECS_PORT=$(ask_for_value port "$ECS_PORT")
       $CFG_HELPER port "$ECS_PORT"
 
-      ECS_PASSWORD=$(ask_for_value password "")
+      if [ "$IS_RECOVERY" != "true" ]
+      then
+          ECS_PASSWORD=$(ask_for_value password "")
+      else
+          ECS_PASSWORD=$(ask_for_value recoveryPassword "")
+      fi
 
       ECS_ALLOW_CAMERA_CHANGES="$($CFG_HELPER allowCameraChanges)"
       [ -z "$ECS_ALLOW_CAMERA_CHANGES" ] && ECS_ALLOW_CAMERA_CHANGES=$ALLOW_CAMERA_CHANGES_DEFAULT
@@ -134,7 +152,7 @@ case "$1" in
           cp -p $VAR_DIR/db/ecs.db{,.$dbversion}
       fi
 
-      "$BIN_DIR/dbsync"
+      "$BIN_DIR/dbsync" || true
 
       if [ -n "$ECS_PASSWORD" ]
       then
