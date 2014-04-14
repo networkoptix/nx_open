@@ -142,7 +142,7 @@ protected:
     void paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor);
 
     void ensureMotionSensitivity() const;
-    void invalidateMotionSensitivity();
+    Q_SLOT void invalidateMotionSensitivity();
 
     void ensureBinaryMotionMask() const;
     void invalidateBinaryMotionMask();
