@@ -85,7 +85,7 @@ public:
     // we need to get mac anyway to differentiate one device from another
     virtual bool updateMACAddress() { return true; }
 
-    virtual void updateInner(QnResourcePtr other) override;
+    virtual void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) override;
 
     virtual bool shoudResolveConflicts() const;
 

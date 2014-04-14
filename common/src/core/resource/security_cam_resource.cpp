@@ -80,9 +80,9 @@ QnResourcePtr QnSecurityCamResource::toResourcePtr() {
 QnSecurityCamResource::~QnSecurityCamResource() {
 }
 
-void QnSecurityCamResource::updateInner(QnResourcePtr other) {
-    QnNetworkResource::updateInner(other);
-    QnMediaResource::updateInner(other);
+void QnSecurityCamResource::updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) {
+    QnNetworkResource::updateInner(other, modifiedFields);
+    QnMediaResource::updateInner(other, modifiedFields);
 
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)

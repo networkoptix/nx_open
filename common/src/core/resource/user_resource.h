@@ -38,7 +38,7 @@ signals:
     void permissionsChanged(const QnUserResourcePtr &user);
 
 protected:
-    virtual void updateInner(QnResourcePtr other) override;
+    virtual void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) override;
 
 private:
     QString m_password;

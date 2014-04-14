@@ -94,9 +94,9 @@ void QnUserResource::setEmail(const QString& email)
     emit emailChanged(::toSharedPointer(this));
 }
 
-void QnUserResource::updateInner(QnResourcePtr other)
+void QnUserResource::updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields)
 {
-    base_type::updateInner(other);
+    base_type::updateInner(other, modifiedFields);
 
     QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
     if(localOther) {

@@ -206,7 +206,7 @@ protected slots:
     virtual void at_disabledChanged();
 
 protected:
-    void updateInner(QnResourcePtr other) override;
+    void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) override;
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role) override;
     virtual void initializationDone() override;

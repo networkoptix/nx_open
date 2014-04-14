@@ -322,7 +322,7 @@ public:
     QnResourcePtr toSharedPointer() const;
 
 protected:
-    virtual void updateInner(QnResourcePtr other);
+    virtual void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields);
 
     // should just do physical job ( network or so ) do not care about memory domain
     virtual bool getParamPhysical(const QnParam &param, QVariant &val);
@@ -353,6 +353,8 @@ private:
     void initAndEmit();
 
     void updateUrlName(const QString &oldUrl, const QString &newUrl);
+    bool emitDynamicSignal(const char *signal, void **arguments);
+    void afterUpdateInner(QSet<QByteArray>& modifiedFields);
 
     friend class InitAsyncTask;
 

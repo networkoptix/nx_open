@@ -78,7 +78,7 @@ public:
 
 protected:
     void initMediaResource();
-    void updateInner(QnResourcePtr other);
+    void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields);
 
 protected:
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
