@@ -15,11 +15,9 @@ void QnVideoWallResource::updateInner(QnResourcePtr other) {
 
     QnVideoWallResourcePtr localOther = other.dynamicCast<QnVideoWallResource>();
     if(localOther) {
-        m_mutex.unlock(); //mutex is locked in QnResource::update
-        setItems(localOther->getItems());
-        setPcs(localOther->getPcs());
-        setAutorun(localOther->isAutorun());
-        m_mutex.lock();
+        setItemsUnderLock(localOther->m_itemByUuid);
+        setPcsUnderLock(localOther->m_pcByUuid);
+        m_autorun = localOther->m_autorun;
     }
 }
 
@@ -34,7 +32,10 @@ void QnVideoWallResource::setItems(const QnVideoWallItemList& items) {
 
 void QnVideoWallResource::setItems(const QnVideoWallItemMap &items) {
     QMutexLocker locker(&m_mutex);
+    setItemsUnderLock(items);
+}
 
+void QnVideoWallResource::setItemsUnderLock(const QnVideoWallItemMap &items) {
     foreach(const QnVideoWallItem &item, m_itemByUuid)
         if(!items.contains(item.uuid))
             removeItemUnderLock(item.uuid);
@@ -148,7 +149,10 @@ void QnVideoWallResource::setPcs(const QnVideoWallPcDataList& pcs) {
 
 void QnVideoWallResource::setPcs(const QnVideoWallPcDataMap &pcs) {
     QMutexLocker locker(&m_mutex);
+    setPcsUnderLock(pcs);
+}
 
+void QnVideoWallResource::setPcsUnderLock(const QnVideoWallPcDataMap &pcs) {
     foreach(const QnVideoWallPcData &pc, m_pcByUuid)
         if(!pcs.contains(pc.uuid))
             removePcUnderLock(pc.uuid);

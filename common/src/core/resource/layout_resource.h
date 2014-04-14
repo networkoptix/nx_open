@@ -99,6 +99,8 @@ protected:
     virtual void updateInner(QnResourcePtr other) override;
 
 private:
+    void setItemsUnderLock(const QnLayoutItemDataMap &items);
+
     void addItemUnderLock(const QnLayoutItemData &item);
     void updateItemUnderLock(const QUuid &itemUuid, const QnLayoutItemData &item);
     void removeItemUnderLock(const QUuid &itemUuid);

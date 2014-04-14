@@ -54,6 +54,9 @@ protected:
     virtual void updateInner(QnResourcePtr other) override;
 
 private:
+    void setItemsUnderLock(const QnVideoWallItemMap &items);
+    void setPcsUnderLock(const QnVideoWallPcDataMap &pcs);
+
     void addItemUnderLock(const QnVideoWallItem &item);
     void updateItemUnderLock(const QUuid &itemUuid, const QnVideoWallItem &item);
     void removeItemUnderLock(const QUuid &itemUuid);
