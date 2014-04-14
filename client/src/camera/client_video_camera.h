@@ -66,8 +66,7 @@ public:
                                  qint64 timeOffsetMs = 0, qint64 serverTimeZoneMs = Qn::InvalidUtcOffset,
                                  QRectF srcRect = QRectF(),
                                  const ImageCorrectionParams& contrastParams = ImageCorrectionParams(),
-                                 const QnItemDewarpingParams& itemDewarpingParams = QnItemDewarpingParams(),
-                                 const qreal overridenAspectRatio = 0.0);
+                                 const QnItemDewarpingParams& itemDewarpingParams = QnItemDewarpingParams());
 
     void setResource(QnMediaResourcePtr resource);
     QString exportedFileName() const;

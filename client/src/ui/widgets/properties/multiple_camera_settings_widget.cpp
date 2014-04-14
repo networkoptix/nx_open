@@ -169,9 +169,9 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
             camera->setScheduleTasks(scheduleTasks);
 
         if (overrideAr)
-            camera->setProperty(Qn::customAspectRatioKey, QString::number(ui->arComboBox->itemData(ui->arComboBox->currentIndex()).toDouble()));
+            camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->arComboBox->itemData(ui->arComboBox->currentIndex()).toDouble()));
         else if (clearAr)
-            camera->setProperty(Qn::customAspectRatioKey, QString());
+            camera->setProperty(QnMediaResource::customAspectRatioKey(), QString());
     }
     ui->expertSettingsWidget->submitToResources(m_cameras);
 
@@ -213,7 +213,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
         bool firstCamera = true;
 
-        bool isFirstAr   = true;
         bool sameArOverride = true;
         QString arOverride;
 
@@ -237,7 +236,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
                 ui->enableAudioCheckBox->setCheckState(Qt::PartiallyChecked);
             }
 
-            QString changedAr = camera->getProperty(Qn::customAspectRatioKey);
+            QString changedAr = camera->getProperty(QnMediaResource::customAspectRatioKey());
             if (firstCamera) {
                 arOverride = changedAr;
             } else {
