@@ -55,6 +55,16 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->expertSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
 
+    connect(ui->arOverrideCheckBox, &QCheckBox::stateChanged, this, [this](int state){ ui->arComboBox->setEnabled(state == Qt::Checked);} );
+    connect(ui->arOverrideCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dbDataChanged()));
+
+    ui->arComboBox->addItem(tr("4:3"),  4.0 / 3);
+    ui->arComboBox->addItem(tr("16:9"), 16.0 / 9);
+    ui->arComboBox->addItem(tr("1:1"),  1.0);
+    ui->arComboBox->setCurrentIndex(0);
+    connect(ui->arComboBox,         SIGNAL(currentIndexChanged(int)),    this,          SLOT(at_dbDataChanged()));
+
+
     /* Set up context help. */
     setHelpTopic(this,                  Qn::CameraSettings_Multi_Help);
     setHelpTopic(ui->tabRecording,      Qn::CameraSettings_Recording_Help);
@@ -135,6 +145,9 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
         foreach(const QnScheduleTask::Data &data, ui->cameraScheduleWidget->scheduleTasks())
             scheduleTasks.append(QnScheduleTask(data));
 
+    bool overrideAr = ui->arOverrideCheckBox->checkState() == Qt::Checked;
+    bool clearAr = ui->arOverrideCheckBox->checkState() == Qt::Unchecked;
+
     foreach(QnVirtualCameraResourcePtr camera, m_cameras) {
         QString cameraLogin = camera->getAuth().user();
         if (!login.isEmpty() || !m_loginWasEmpty)
@@ -154,6 +167,11 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
 
         if (m_hasScheduleChanges)
             camera->setScheduleTasks(scheduleTasks);
+
+        if (overrideAr)
+            camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->arComboBox->itemData(ui->arComboBox->currentIndex()).toDouble()));
+        else if (clearAr)
+            camera->setProperty(QnMediaResource::customAspectRatioKey(), QString());
     }
     ui->expertSettingsWidget->submitToResources(m_cameras);
 
@@ -194,7 +212,11 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, true);
 
         bool firstCamera = true;
-        foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
+
+        bool sameArOverride = true;
+        QString arOverride;
+
+        foreach (const QnVirtualCameraResourcePtr &camera, m_cameras) 
         {
             logins.insert(camera->getAuth().user());
             passwords.insert(camera->getAuth().password());
@@ -214,8 +236,33 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
                 ui->enableAudioCheckBox->setCheckState(Qt::PartiallyChecked);
             }
 
+            QString changedAr = camera->getProperty(QnMediaResource::customAspectRatioKey());
+            if (firstCamera) {
+                arOverride = changedAr;
+            } else {
+                sameArOverride &= changedAr == arOverride;
+            }
+
             firstCamera = false;
         }
+
+        ui->arOverrideCheckBox->setTristate(!sameArOverride);
+        if (sameArOverride) {
+            ui->arOverrideCheckBox->setChecked(!arOverride.isEmpty());
+
+            // float is important here
+            float ar = arOverride.toFloat();
+            int idx = -1;
+            for (int i = 0; i < ui->arComboBox->count(); ++i) {
+                if (qFuzzyEquals(ar, ui->arComboBox->itemData(i).toFloat())) {
+                    idx = i;
+                    break;
+                }
+            }
+            ui->arComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
+        }
+        else
+            ui->arOverrideCheckBox->setCheckState(Qt::PartiallyChecked);
 
         ui->expertSettingsWidget->updateFromResources(m_cameras);
 

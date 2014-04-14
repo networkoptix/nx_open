@@ -315,8 +315,7 @@ ErrorCode QnDbManager::insertResource(const ApiResource& data, qint32* internalI
     return insertAddParams(data.addParams, *internalId);
 }
 
-qint32 QnDbManager::getResourceInternalId( const QnId& guid )
-{
+qint32 QnDbManager::getResourceInternalId( const QnId& guid ) {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare("SELECT id from vms_resource where guid = ?");
@@ -324,6 +323,16 @@ qint32 QnDbManager::getResourceInternalId( const QnId& guid )
     if (!query.exec() || !query.next())
         return 0;
     return query.value(0).toInt();
+}
+
+QnId QnDbManager::getResourceGuid(const qint32 &internalId) {
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare("SELECT guid from vms_resource where id = ?");
+    query.bindValue(0, internalId);
+    if (!query.exec() || !query.next())
+        return QnId();
+    return QnId::fromRfc4122(query.value(0).toByteArray());
 }
 
 ErrorCode QnDbManager::insertOrReplaceResource(const ApiResource& data, qint32* internalId)
@@ -781,7 +790,9 @@ ErrorCode QnDbManager::removeUser( const QnId& guid )
 
     ErrorCode err;
     while (query.next()) {
-        err = removeLayout(query.value("resource_ptr_id").toInt());
+        qint32 layoutInternalId = query.value("resource_ptr_id").toInt();
+        QnId layoutId = getResourceGuid(layoutInternalId);
+        err = removeLayoutInternal(layoutId, layoutInternalId);
         if (err != ErrorCode::ok)
             return err;
     }
@@ -1062,16 +1073,19 @@ ErrorCode QnDbManager::removeServer(const QnId& guid)
 
 ErrorCode QnDbManager::removeLayout(const QnId& id)
 {
-    return removeLayout(getResourceInternalId(id));
+    return removeLayoutInternal(id, getResourceInternalId(id));
 }
 
-ErrorCode QnDbManager::removeLayout(qint32 internalId)
-{
+ErrorCode QnDbManager::removeLayoutInternal(const QnId& id, const qint32 &internalId) {
     ErrorCode err = deleteAddParams(internalId);
     if (err != ErrorCode::ok)
         return err;
 
     err = removeLayoutItems(internalId);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = removeLayoutFromVideowallItems(id);
     if (err != ErrorCode::ok)
         return err;
 
@@ -1886,7 +1900,7 @@ ErrorCode QnDbManager::deleteVideowallItems(const QnId &videowall_guid) {
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::removeVideowall( const QnId& guid ) {
+ErrorCode QnDbManager::removeVideowall(const QnId& guid) {
     qint32 id = getResourceInternalId(guid);
 
     ErrorCode err = deleteAddParams(id);
@@ -1918,6 +1932,20 @@ ErrorCode QnDbManager::insertOrReplaceVideowall(const ApiVideowall& data, qint32
         return ErrorCode::ok;
     
     qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+    return ErrorCode::failure;
+}
+
+ErrorCode QnDbManager::removeLayoutFromVideowallItems(const QnId &layout_id) {
+    QByteArray emptyId = QUuid().toRfc4122();
+
+    QSqlQuery query(m_sdb);
+    query.prepare("UPDATE vms_videowall_item set layout_guid = :empty_id WHERE layout_guid = :layout_id");
+    query.bindValue(":empty_id", emptyId);
+    query.bindValue(":layout_id", layout_id.toRfc4122());
+    if (query.exec())
+        return ErrorCode::ok;
+
+    qWarning() << Q_FUNC_INFO << query.lastError().text();
     return ErrorCode::failure;
 }
 

@@ -262,21 +262,20 @@ void QnMediaServerResource::determineOptimalNetIF_testProxy() {
     m_runningIfRequests.insert(requestNum, QLatin1String("proxy"));
 }
 
-void QnMediaServerResource::updateInner(QnResourcePtr other) 
-{
-    QMutexLocker lock(&m_mutex);
-
-    QnResource::updateInner(other);
+void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
+    QString oldUrl = m_url;
+    QnResource::updateInner(other, modifiedFields);
     bool netAddrListChanged = false;
 
     QnMediaServerResourcePtr localOther = other.dynamicCast<QnMediaServerResource>();
     if(localOther) {
-        setPanicMode(localOther->getPanicMode());
+        if (m_panicMode != localOther->m_panicMode)
+            modifiedFields << "panicModeChanged";
+        m_panicMode = localOther->m_panicMode;
 
         m_serverFlags = localOther->m_serverFlags;
         netAddrListChanged = m_netAddrList != localOther->m_netAddrList;
         m_netAddrList = localOther->m_netAddrList;
-        setApiUrl(localOther->m_apiUrl);
         m_streamingUrl = localOther->getStreamingUrl();
         m_version = localOther->getVersion();
 
@@ -296,8 +295,12 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
 
         setStorages(otherStorages);
     }
-    if (netAddrListChanged)
+    if (netAddrListChanged) {
+        m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes
         determineOptimalNetIF();
+    } else {
+        m_url = oldUrl; //rollback changed value to autodetected
+    }
 }
 
 

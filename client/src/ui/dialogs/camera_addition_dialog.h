@@ -75,6 +75,7 @@ private:
 
     bool serverOnline() const;
     bool ensureServerOnline();
+    bool addingAllowed() const;
 
 private slots: 
     void at_startIPLineEdit_textChanged(QString value);

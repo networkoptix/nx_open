@@ -8,6 +8,7 @@
 #include "utils/network/aio/aioeventhandler.h"
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/common/id.h"
+#include "transaction.h"
 
 namespace ec2
 {
@@ -46,7 +47,7 @@ public:
     void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
     bool isReadSync() const       { return m_readSync; }
     void setReadSync(bool value)  {m_readSync = value;}
-    bool isWriteSync() const      { return m_writeSync; }
+    bool isReadyToSend(ApiCommand::Value command) const;
     void setWriteSync(bool value) { m_writeSync = value; }
     void setTimeDiff(qint64 diff) { m_timeDiff = diff; }
     qint64 timeDiff() const       { return m_timeDiff; }
@@ -76,6 +77,7 @@ private:
     State m_state;
     std::vector<quint8> m_readBuffer;
     int m_readBufferLen;
+    int m_chunkHeaderLen;
     quint32 m_chunkLen;
     int m_sendOffset;
     QQueue<QByteArray> m_dataToSend;
@@ -91,6 +93,7 @@ private:
     void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
     void closeSocket();
     static void ensureSize(std::vector<quint8>& buffer, std::size_t size);
+    int getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size);
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();

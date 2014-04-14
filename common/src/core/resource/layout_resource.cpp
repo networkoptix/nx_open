@@ -60,7 +60,10 @@ void QnLayoutResource::setItems(const QnLayoutItemDataList& items) {
 
 void QnLayoutResource::setItems(const QnLayoutItemDataMap &items) {
     QMutexLocker locker(&m_mutex);
+    setItemsUnderLock(items);
+}
 
+void QnLayoutResource::setItemsUnderLock(const QnLayoutItemDataMap &items) {
     foreach(const QnLayoutItemData &item, m_itemByUuid)
         if(!items.contains(item.uuid))
             removeItemUnderLock(item.uuid);
@@ -113,19 +116,19 @@ QString QnLayoutResource::getUniqueId() const
     return getId().toString();
 }
 
-void QnLayoutResource::updateInner(QnResourcePtr other) {
-    base_type::updateInner(other);
+void QnLayoutResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
+    base_type::updateInner(other, modifiedFields);
 
     QnLayoutResourcePtr localOther = other.dynamicCast<QnLayoutResource>();
     if(localOther) {
-        setItems(localOther->getItems());
-        setCellAspectRatio(localOther->cellAspectRatio());
-        setCellSpacing(localOther->cellSpacing());
-        setUserCanEdit(localOther->userCanEdit());
-        setBackgroundImageFilename(localOther->backgroundImageFilename());
-        setBackgroundSize(localOther->backgroundSize());
-        setBackgroundOpacity(localOther->backgroundOpacity());
-        setLocked(localOther->locked());
+        setItemsUnderLock(localOther->m_itemByUuid);
+        m_cellAspectRatio = localOther->m_cellAspectRatio;
+        m_cellSpacing = localOther->m_cellSpacing;
+        m_userCanEdit = localOther->m_userCanEdit;
+        m_backgroundImageFilename = localOther->m_backgroundImageFilename;
+        m_backgroundSize = localOther->m_backgroundSize;
+        m_backgroundOpacity = localOther->m_backgroundOpacity;
+        m_locked = localOther->m_locked;
     }
 }
 

@@ -7,10 +7,9 @@
 
 class QnPlIpWebCamResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
-    QnPlIpWebCamResourceSearcher();
 
 public:
-    static QnPlIpWebCamResourceSearcher& instance();
+    QnPlIpWebCamResourceSearcher();
 
     QnResourceList findResources();
 

@@ -13,12 +13,6 @@ QnPlIpWebCamResourceSearcher::QnPlIpWebCamResourceSearcher()
 {
 }
 
-QnPlIpWebCamResourceSearcher& QnPlIpWebCamResourceSearcher::instance()
-{
-    static QnPlIpWebCamResourceSearcher inst;
-    return inst;
-}
-
 QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;

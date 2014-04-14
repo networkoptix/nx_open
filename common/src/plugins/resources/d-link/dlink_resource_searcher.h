@@ -8,10 +8,9 @@
 
 class QnPlDlinkResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
-    QnPlDlinkResourceSearcher();
 
 public:
-    static QnPlDlinkResourceSearcher& instance();
+    QnPlDlinkResourceSearcher();
 
     QnResourceList findResources(void);
 

@@ -36,6 +36,8 @@ signals:
     void businessRuleDeleted(const QnId &id);
     void businessRuleReset(const QnBusinessEventRuleList &rules);
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
+
+    void videowallControlMessageReceived(const QnVideoWallControlMessage &message);
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) = 0;

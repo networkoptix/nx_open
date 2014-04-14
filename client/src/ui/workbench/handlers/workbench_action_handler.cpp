@@ -1062,6 +1062,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
             continue;
 
         camera->setParentId(server->getId());
+        camera->setStatus(QnResource::Offline);
         modifiedResources.push_back(camera);
 
         if (server->getStatus() == QnResource::Offline)
@@ -1485,10 +1486,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
         menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectionInfoRole, loginDialog()->currentInfo()));
 }
 
-void QnWorkbenchActionHandler::at_reconnectAction_triggered() 
-{
-    QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
-
+void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     const QnConnectionData connectionData = qnSettings->lastUsedConnection();
@@ -1504,8 +1502,10 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered()
         if(result.exec() != 0)
             return;
 
+        QnAppServerConnectionFactory::setEc2Connection( result.connection());
         connectionInfo = result.reply<QnConnectionInfoPtr>();
     }
+    QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
 
     // TODO: #Elric maybe we need to check server-client compatibility here? --done //GDM
     { // I think we should move this common code to common place --gdm

@@ -29,15 +29,11 @@ QnTimePeriodLoader::QnTimePeriodLoader(const QnMediaServerConnectionPtr &connect
         qnNullWarning(resource);
 }
 
-QnTimePeriodLoader *QnTimePeriodLoader::newInstance(QnResourcePtr resource, QObject *parent) {
+QnTimePeriodLoader *QnTimePeriodLoader::newInstance(QnMediaServerResourcePtr serverResource, QnResourcePtr resource, QObject *parent) {
     QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-    if (!networkResource)
+    if (!networkResource || !serverResource)
         return NULL;
-
-    QnMediaServerResourcePtr serverResource = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(resource->getParentId()));
-    if (!serverResource)
-        return NULL;
-
+    
     QnMediaServerConnectionPtr serverConnection = serverResource->apiConnection();
     if (!serverConnection)
         return NULL;

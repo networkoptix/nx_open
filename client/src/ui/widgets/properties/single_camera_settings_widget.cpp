@@ -122,6 +122,16 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_fisheyeSettingsChanged()));
     connect(ui->fisheyeCheckBox,        &QCheckBox::toggled,                    this,   &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
 
+    connect(ui->arOverrideCheckBox, &QCheckBox::stateChanged, this, [this](int state){ ui->arComboBox->setEnabled(state == Qt::Checked);} );
+    connect(ui->arOverrideCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dbDataChanged()));
+
+    ui->arComboBox->addItem(tr("4:3"),  4.0 / 3);
+    ui->arComboBox->addItem(tr("16:9"), 16.0 / 9);
+    ui->arComboBox->addItem(tr("1:1"),  1.0);
+    ui->arComboBox->setCurrentIndex(0);
+    connect(ui->arComboBox,         SIGNAL(currentIndexChanged(int)),    this,          SLOT(at_dbDataChanged()));
+
+
     updateFromResource();
 }
 
@@ -365,6 +375,11 @@ void QnSingleCameraSettingsWidget::submitToResource() {
             submitMotionWidgetToResource();
         }
 
+        if (ui->arOverrideCheckBox->isChecked())
+            m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->arComboBox->itemData(ui->arComboBox->currentIndex()).toDouble()));
+        else
+            m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString());
+
         ui->expertSettingsWidget->submitToResources(QnVirtualCameraResourceList() << m_camera);
 
         QnMediaDewarpingParams dewarpingParams = m_camera->getDewarpingParams();
@@ -450,6 +465,22 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased);
+
+        QString arOverride = m_camera->getProperty(QnMediaResource::customAspectRatioKey());
+        ui->arOverrideCheckBox->setChecked(!arOverride.isEmpty());
+        if (!arOverride.isEmpty()) 
+        {
+            // float is important here
+            float ar = arOverride.toFloat();
+            int idx = -1;
+            for (int i = 0; i < ui->arComboBox->count(); ++i) {
+                if (qFuzzyEquals(ar, ui->arComboBox->itemData(i).toFloat())) {
+                    idx = i;
+                    break;
+                }
+            }
+            ui->arComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
+        }
 
         if (!dtsBased) {
             ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & Qn::MT_SoftwareGrid);

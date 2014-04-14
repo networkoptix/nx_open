@@ -138,6 +138,7 @@ namespace ec2
         registerUpdateFuncHandler<ApiVideowall>( restProcessorPool, ApiCommand::saveVideowall );
         //AbstractVideowallManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeVideowall );
+        registerUpdateFuncHandler<ApiVideowallControlMessage>( restProcessorPool, ApiCommand::videowallControl );
 
         //AbstractLayoutManager::getLayouts
         registerGetFuncHandler<nullptr_t, ApiLayoutList>( restProcessorPool, ApiCommand::getLayoutList );

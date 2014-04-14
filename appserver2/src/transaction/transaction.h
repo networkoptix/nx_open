@@ -21,6 +21,8 @@ namespace ec2
             testConnection,
             connect,
 
+            clientInstanceId,
+
             //!ApiResourceTypeList
             getResourceTypes,
             //!ApiResource
@@ -91,6 +93,9 @@ namespace ec2
             //!ApiIdData
             removeVideowall,
 
+            //!ApiVideoWallControlMessage
+            videowallControl,
+
             //!
             listDirectory,
             //!ApiStoredFileData
@@ -134,6 +139,7 @@ namespace ec2
         };
 
         QString toString( Value val );
+        bool isSystem( Value val );
     }
 
     class QnAbstractTransaction

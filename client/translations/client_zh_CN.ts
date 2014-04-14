@@ -68,7 +68,7 @@
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="42"/>
         <source>Gamma</source>
-        <translation>Gamma</translation>
+        <translation>伽玛</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui" line="93"/>

@@ -269,7 +269,7 @@ bool QnFisheyePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QV
         QVector3D distance = m_endPosition - m_startPosition;
         qreal panTiltTime = QVector2D(distance.x() / m_unitSpeed.x(), distance.y() / m_unitSpeed.y()).length();
         qreal zoomTime = distance.z() / m_unitSpeed.z();
-        m_relativeSpeed = 1.0 / qMax(panTiltTime, zoomTime);
+        m_relativeSpeed = qBound(0.0, speed, 1.0) / qMax(panTiltTime, zoomTime);
         
         startListening();
     }

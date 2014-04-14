@@ -4,6 +4,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_pc_data.h>
+#include <core/resource/videowall_control_message.h>
 
 #include <nx_ec/data/ec2_resource_data.h>
 
@@ -52,6 +53,11 @@ namespace ec2
     {
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData) const;
+    };
+
+    struct ApiVideowallControlMessage: ApiVideowallControlMessageData {
+        void toMessage(QnVideoWallControlMessage &message) const;
+        void fromMessage(const QnVideoWallControlMessage &message);
     };
 }
 

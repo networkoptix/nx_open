@@ -211,20 +211,17 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         at_resPool_resourceAdded(resource);
 
     if (m_videoWallMode.active) {
-
         /* Videowall reaction actions */
 
         connect(action(Qn::DelayedOpenVideoWallItemAction), &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
 
         //TODO: #GDM VW may be we should override ::instance() ?
-        QnClientMessageProcessor* clientMessageProcessor = static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance());
-
-        // TODO: #GDM VW reimplement
-//         connect(clientMessageProcessor,   &QnClientMessageProcessor::videoWallControlMessageReceived,
-//                 this,                     &QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived);
+        QnCommonMessageProcessor* clientMessageProcessor = QnClientMessageProcessor::instance();
+        connect(clientMessageProcessor,   &QnCommonMessageProcessor::videowallControlMessageReceived,
+                this,                     &QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived);
 
         //connect(clientMessageProcessor, SIGNAL(connectionClosed()) TODO: #GDM VW reinitialize window state if someone control us?
-        connect(clientMessageProcessor,   &QnClientMessageProcessor::connectionOpened,  this,   &QnWorkbenchVideoWallHandler::at_connection_opened);
+        connect(clientMessageProcessor,   &QnCommonMessageProcessor::connectionOpened,  this,   &QnWorkbenchVideoWallHandler::at_connection_opened);
     } else {
 
         /* Control videowall actions */
@@ -485,7 +482,7 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
     connection2()->getVideowallManager()->save(videoWall,  this, 
         [this, attachData, videoWall]( int reqID, ec2::ErrorCode errorCode ) {
             Q_UNUSED(reqID);
-            if (errorCode == ec2::ErrorCode::ok)
+            if (errorCode != ec2::ErrorCode::ok)
                 return;
 
             if (attachData.items.isEmpty())
@@ -642,8 +639,7 @@ void QnWorkbenchVideoWallHandler::closeInstance() {
 }
 
 void QnWorkbenchVideoWallHandler::sendInstanceGuid() {
-    // TODO: #GDM VW reimplement
-    // connection()->sendVideoWallInstanceId(m_videoWallMode.instanceGuid);
+    connection2()->getVideowallManager()->sendInstanceId(m_videoWallMode.instanceGuid, this, [](){});
 }
 
 void QnWorkbenchVideoWallHandler::sendMessage(QnVideoWallControlMessage message, bool cached) {
@@ -662,8 +658,7 @@ void QnWorkbenchVideoWallHandler::sendMessage(QnVideoWallControlMessage message,
     foreach (QnVideoWallItemIndex index, targetList()) {
         message.videoWallGuid = index.videowall()->getId();
         message.instanceGuid = index.uuid();
-        // TODO: #GDM VW reimplement
-        //connection()->sendVideoWallControlMessage(message);
+        connection2()->getVideowallManager()->sendControlMessage(message, this, [](){});
     }
 }
 
@@ -1136,12 +1131,11 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::findExistingResourceLayout(cons
             continue;
         QnLayoutItemData data = layout->getItems().values().first();
         QnResourcePtr existingResource;
-        //TODO :#GDM VW reimplement
-        //if(data.resource.id.isValid()) {
+        if(!data.resource.id.isNull()) {
             existingResource = qnResPool->getResourceById(data.resource.id);
-//         } else {
-//             existingResource = qnResPool->getResourceByUniqId(data.resource.path);
-//         }
+        } else {
+            existingResource = qnResPool->getResourceByUniqId(data.resource.path);
+        }
         if (existingResource == resource)
             return layout;
     }
@@ -1414,8 +1408,7 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered() {
     message.videoWallGuid = videoWall->getId();
     foreach (const QnVideoWallItem &item, videoWall->getItems()) {
         message.instanceGuid = item.uuid;
-        //TODO: #GDM VW reimplement
-        // connection()->sendVideoWallControlMessage(message);
+        connection2()->getVideowallManager()->sendControlMessage(message, this, [](){});
     }
 }
 
@@ -1473,8 +1466,7 @@ void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered() {
     foreach (const QnVideoWallItemIndex &item, items) {
         message.videoWallGuid = item.videowall()->getId();
         message.instanceGuid = item.uuid();
-        //TODO: #GDM VW reimplement
-        // connection()->sendVideoWallControlMessage(message);
+        connection2()->getVideowallManager()->sendControlMessage(message, this, [](){});
     }
 }
 
@@ -1535,6 +1527,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         /* Construct and add a new layout. */
         QnLayoutResourcePtr layout(new QnLayoutResource());
         layout->setId(QUuid::createUuid());
+        layout->addFlags(QnResource::local);
         layout->setTypeByName(lit("Layout"));
         layout->setName(videoWall->getName());
         if(context()->user())

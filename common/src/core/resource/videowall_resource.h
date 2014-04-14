@@ -51,9 +51,12 @@ signals:
 
     void autorunChanged(const QnVideoWallResourcePtr &resource, bool value);
 protected:
-    virtual void updateInner(QnResourcePtr other) override;
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
 private:
+    void setItemsUnderLock(const QnVideoWallItemMap &items);
+    void setPcsUnderLock(const QnVideoWallPcDataMap &pcs);
+
     void addItemUnderLock(const QnVideoWallItem &item);
     void updateItemUnderLock(const QUuid &itemUuid, const QnVideoWallItem &item);
     void removeItemUnderLock(const QUuid &itemUuid);

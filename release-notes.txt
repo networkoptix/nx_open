@@ -73,6 +73,7 @@ Improvements:
 26. Added a new action "Zoom to selection" to the timeline context menu.
     If click on it, the selection has been zoomed. If there are no selection on timeline, "Zoom to selection" is not available.
 27. Ability to view client logs and clear cache.
+28. Added dewarping for pictures.
     
 Bugs Fixed:
 1. Tray tool. Incorrect EC port in the list if it has been changed.Fixed.

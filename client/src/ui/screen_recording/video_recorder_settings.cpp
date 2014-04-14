@@ -191,21 +191,15 @@ void QnVideoRecorderSettings::setDecoderQuality(Qn::DecoderQuality decoderQualit
     settings.setValue(QLatin1String("decoderQuality"), decoderQuality);
 }
 
-Qn::Resolution QnVideoRecorderSettings::resolution() const
-{
+Qn::Resolution QnVideoRecorderSettings::resolution() const {
     Qn::Resolution rez = Qn::QuaterNativeResolution;
-    if (settings.contains(QLatin1String("resolution")))
-        rez = (Qn::Resolution) settings.value(QLatin1String("resolution")).toInt();
-#ifdef CL_TRIAL_MODE
-    if ( rez < Qn::Exact640x480Resolution)
-        rez = Qn::Exact640x480Resolution;
-#endif
+    if (settings.contains(lit("resolution")))
+        rez = (Qn::Resolution) settings.value(lit("resolution")).toInt();
     return rez;
 }
 
-void QnVideoRecorderSettings::setResolution(Qn::Resolution resolution)
-{
-    settings.setValue(QLatin1String("resolution"), resolution);
+void QnVideoRecorderSettings::setResolution(Qn::Resolution resolution) {
+    settings.setValue(lit("resolution"), resolution);
 }
 
 int QnVideoRecorderSettings::screen() const
