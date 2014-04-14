@@ -152,9 +152,13 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
-void QnMediaResource::updateInner(QnResourcePtr other)
+void QnMediaResource::updateInner(QnResourcePtr other, QSet<QByteArray>&)
 {
     QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);
     if (other_casted)
         m_dewarpingParams = other_casted->m_dewarpingParams;
+}
+
+QString QnMediaResource::customAspectRatioKey() {
+    return lit("overrideAr");
 }

@@ -25,6 +25,7 @@ struct QnScreenshotParameters {
     QnMediaDewarpingParams mediaDewarpingParams;
     ImageCorrectionParams imageCorrectionParams;
     QRectF zoomRect;
+    qreal customAspectRatio;
 
     QString timeString() const;
 };

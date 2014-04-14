@@ -106,7 +106,7 @@ int GenericRTSPCameraManager::setAudioEnabled( int audioEnabled )
 }
 
 //!Implementation of nxcip::BaseCameraManager::getPTZManager
-nxcip::CameraPTZManager* GenericRTSPCameraManager::getPTZManager() const
+nxcip::CameraPtzManager *GenericRTSPCameraManager::getPtzManager() const
 {
     return NULL;
 }

@@ -51,8 +51,8 @@ QnResourcePtr QnAbstractArchiveResource::toResourcePtr()
     return toSharedPointer();
 }
 
-void QnAbstractArchiveResource::updateInner(QnResourcePtr other)
+void QnAbstractArchiveResource::updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields)
 {
-    QnResource::updateInner(other);
-    QnMediaResource::updateInner(other);
+    QnResource::updateInner(other, modifiedFields);
+    QnMediaResource::updateInner(other, modifiedFields);
 }
