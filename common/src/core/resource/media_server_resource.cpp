@@ -257,17 +257,19 @@ void QnMediaServerResource::determineOptimalNetIF_testProxy() {
     m_runningIfRequests.insert(requestNum, QLatin1String("proxy"));
 }
 
-void QnMediaServerResource::updateInner(QnResourcePtr other) 
+void QnMediaServerResource::updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) 
 {
     QMutexLocker lock(&m_mutex);
 
     QString oldUrl = m_url;
-    QnResource::updateInner(other);
+    QnResource::updateInner(other, modifiedFields);
     bool netAddrListChanged = false;
 
     QnMediaServerResourcePtr localOther = other.dynamicCast<QnMediaServerResource>();
     if(localOther) {
-        setPanicMode(localOther->getPanicMode());
+        if (m_panicMode != localOther->m_panicMode)
+            modifiedFields << "panicModeChanged";
+        m_panicMode = localOther->m_panicMode;
 
         m_reserve = localOther->m_reserve;
         netAddrListChanged = m_netAddrList != localOther->m_netAddrList;

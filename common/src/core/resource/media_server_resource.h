@@ -38,7 +38,7 @@ public:
     QnAbstractStorageResourceList getStorages() const;
     void setStorages(const QnAbstractStorageResourceList& storages);
 
-    virtual void updateInner(QnResourcePtr other) override;
+    virtual void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) override;
 
     void determineOptimalNetIF();
     void setPrimaryIF(const QString& primaryIF);
@@ -57,7 +57,6 @@ public:
 
     QnSoftwareVersion getVersion() const;
     void setVersion(const QnSoftwareVersion& version);
-
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
     void determineOptimalNetIF_testProxy();

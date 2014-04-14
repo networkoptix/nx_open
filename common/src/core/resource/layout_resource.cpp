@@ -85,8 +85,8 @@ QString QnLayoutResource::getUniqueId() const
     return getGuid();
 }
 
-void QnLayoutResource::updateInner(QnResourcePtr other) {
-    base_type::updateInner(other);
+void QnLayoutResource::updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) {
+    base_type::updateInner(other, modifiedFields);
 
     QnLayoutResourcePtr localOther = other.dynamicCast<QnLayoutResource>();
     if(localOther) {

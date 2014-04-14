@@ -5096,7 +5096,8 @@ At least %3 licenses are required.</source>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="117"/>
         <source>The software is licensed to %1 cameras and %2 analog cameras.
 %3 licenses and %4 analog licenses are currently in use.</source>
-        <translation>Система лицензирована на работу с %1 IP и с %2 аналоговыми камерами. Требуется еще по крайней мере %3 профессиональных и %4 аналоговых лицензий.</translation>
+        <translation type="unfinished">Система лицензирована на работу с %1 IP и с %2 аналоговыми камерами. 
+Используется %3 цифровых и %4 аналоговых лицензий.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="125"/>
