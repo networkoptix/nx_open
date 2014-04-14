@@ -421,32 +421,24 @@ void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QStr
 }
 
 
-bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layout)
-{
-    bool nonUtcExists = false;
-    bool utcExists = false;
-    bool imageExists = false;
+bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layout) {
+    bool hasImage = false;
+    bool hasLocal = false;
+    bool hasRemote = false;
 
-    QnLayoutItemDataMap items = layout->getItems();
-    for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
-    {
-        QnLayoutItemData& item = itr.value();
-        QnResourcePtr layoutItemRes = qnResPool->getResourceByUniqId(item.resource.path);
-        if (layoutItemRes)
-        {
-            imageExists |= layoutItemRes->hasFlags(QnResource::still_image);
-            bool isLocalItem = layoutItemRes->hasFlags(QnResource::local)
-                    || layoutItemRes->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
-            if (isLocalItem && layoutItemRes->getStatus() == QnResource::Offline)
-                continue; // skip unaccessible local resources because is not possible to check utc flag
-            if (layoutItemRes->hasFlags(QnResource::utc))
-                utcExists = true;
-            else
-                nonUtcExists = true;
-        }
+    foreach (const QnLayoutItemData &item, layout->getItems()) {
+        QnResourcePtr resource = qnResPool->getResourceByUniqId(item.resource.path);
+        if (!resource)
+            continue;
+        hasImage |= resource->hasFlags(QnResource::still_image);
+        hasLocal |= resource->hasFlags(QnResource::local)
+                    || resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
+        hasRemote |= resource->hasFlags(QnResource::remote);
+        if (hasImage || (hasLocal && hasRemote))
+            break;
     }
 
-    if (imageExists) {
+    if (hasImage) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save a layout"),
@@ -455,7 +447,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         );
         return false;
     }
-    else if (nonUtcExists && utcExists) {
+    else if (hasLocal && hasRemote) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save a layout"),
