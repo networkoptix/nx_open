@@ -142,7 +142,6 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     connect(ui->backToScanButton,   SIGNAL(clicked()),                              this,   SLOT(at_backToScanButton_clicked()));
     connect(m_header,               SIGNAL(checkStateChanged(Qt::CheckState)),      this,   SLOT(at_header_checkStateChanged(Qt::CheckState)));
     connect(ui->portAutoCheckBox,   SIGNAL(toggled(bool)),                          this,   SLOT(at_portAutoCheckBox_toggled(bool)));
-    connect(qnResPool,              SIGNAL(resourceChanged(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceChanged(const QnResourcePtr &)));
     connect(qnResPool,              SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceRemoved(const QnResourcePtr &)));
 
     setWarningStyle(ui->validateLabelSearch);
@@ -166,6 +165,9 @@ void QnCameraAdditionDialog::setServer(const QnMediaServerResourcePtr &server) {
     if (m_server == server)
         return;
 
+    if (m_server)
+        disconnect(m_server, NULL, this, NULL);
+
     m_server = server;
     if (server) {
         setWindowTitle(tr("Add cameras to %1").arg(getResourceName(server)));
@@ -173,6 +175,8 @@ void QnCameraAdditionDialog::setServer(const QnMediaServerResourcePtr &server) {
         setState(server->getStatus() == QnResource::Offline
                  ? InitialOffline
                  : Initial);
+
+        connect(m_server, &QnResource::statusChanged, this, &QnCameraAdditionDialog::at_server_statusChanged);
     } else {
         setWindowTitle(tr("Add cameras..."));
         ui->serverNameLabel->setText(tr("select target mediaserver in the tree"));
@@ -662,7 +666,7 @@ void QnCameraAdditionDialog::at_portAutoCheckBox_toggled(bool toggled) {
     ui->portStackedWidget->setCurrentWidget(toggled ? ui->pageAuto : ui->pagePort);
 }
 
-void QnCameraAdditionDialog::at_resPool_resourceChanged(const QnResourcePtr &resource) {
+void QnCameraAdditionDialog::at_server_statusChanged(const QnResourcePtr &resource) {
     if (resource != m_server)
         return;
 

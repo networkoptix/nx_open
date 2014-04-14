@@ -189,6 +189,7 @@ signals:
     void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
     void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
     void groupNameChanged(const QnSecurityCamResourcePtr &resource);
+    void motionRegionChanged(const QnResourcePtr &resource);
 
     //!Emitted on camera input port state has been changed
     /*!
