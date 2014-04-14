@@ -262,7 +262,7 @@ void QnMediaServerResource::determineOptimalNetIF_testProxy() {
     m_runningIfRequests.insert(requestNum, QLatin1String("proxy"));
 }
 
-void QnMediaServerResource::updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) 
+void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) 
 {
     QMutexLocker lock(&m_mutex);
 

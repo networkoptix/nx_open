@@ -88,7 +88,7 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
-void QnResource::updateInner(QnResourcePtr other, QSet<QByteArray>& )
+void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
     Q_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 

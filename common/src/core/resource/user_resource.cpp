@@ -146,7 +146,7 @@ void QnUserResource::removeVideoWallItemUnderLock(const QUuid &uuid) {
 }
 
 
-void QnUserResource::updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields)
+void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
     base_type::updateInner(other, modifiedFields);
 

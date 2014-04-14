@@ -80,7 +80,7 @@ public:
     static QString customAspectRatioKey();
 protected:
     void initMediaResource();
-    void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields);
+    void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
 
 protected:
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;

@@ -10,8 +10,8 @@ QnVideoWallResource::QnVideoWallResource() :
     addFlags(QnResource::videowall | QnResource::remote);
 }
 
-void QnVideoWallResource::updateInner(QnResourcePtr other) {
-    base_type::updateInner(other);
+void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
+    base_type::updateInner(other, modifiedFields);
 
     QnVideoWallResourcePtr localOther = other.dynamicCast<QnVideoWallResource>();
     if(localOther) {

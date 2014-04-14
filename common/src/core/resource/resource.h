@@ -305,7 +305,7 @@ public:
     QnResourcePtr toSharedPointer() const;
 
 protected:
-    virtual void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields);
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
 
     // should just do physical job ( network or so ) do not care about memory domain
     virtual bool getParamPhysical(const QnParam &param, QVariant &val);

@@ -50,7 +50,7 @@ signals:
     void videoWallItemRemoved(const QnUserResourcePtr &user, const QUuid &uuid);
 
 protected:
-    virtual void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) override;
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
 private:
     void addVideoWallItemUnderLock(const QUuid &uuid);

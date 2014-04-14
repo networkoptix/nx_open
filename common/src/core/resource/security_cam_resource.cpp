@@ -81,7 +81,7 @@ QnResourcePtr QnSecurityCamResource::toResourcePtr() {
 QnSecurityCamResource::~QnSecurityCamResource() {
 }
 
-void QnSecurityCamResource::updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) {
+void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
     QnNetworkResource::updateInner(other, modifiedFields);
     QnMediaResource::updateInner(other, modifiedFields);
 

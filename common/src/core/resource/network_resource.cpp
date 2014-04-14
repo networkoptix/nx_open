@@ -177,7 +177,7 @@ unsigned int QnNetworkResource::getNetworkTimeout() const
     return m_networkTimeout;
 }
 
-void QnNetworkResource::updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields)
+void QnNetworkResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
     QMutexLocker mutexLocker(&m_mutex);
     QnResource::updateInner(other, modifiedFields);

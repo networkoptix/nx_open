@@ -29,7 +29,7 @@ public:
     //!Implementation of QnMediaResource::toResource
     virtual QnResourcePtr toResourcePtr() override;
 
-    void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) override;
+    void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 };
 
 #endif //abstract_archive_device_h1838

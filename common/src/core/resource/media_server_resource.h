@@ -37,7 +37,7 @@ public:
     QnAbstractStorageResourceList getStorages() const;
     void setStorages(const QnAbstractStorageResourceList& storages);
 
-    virtual void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) override;
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
     void determineOptimalNetIF();
     void setPrimaryIF(const QString& primaryIF);
