@@ -175,7 +175,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QGroupBox" name="groupBox">
+       <widget class="QGroupBox" name="tourGroupBox">
         <property name="title">
          <string>Details</string>
         </property>

@@ -424,7 +424,6 @@ void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QStr
 bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layout) {
     bool hasImage = false;
     bool hasLocal = false;
-    bool hasRemote = false;
 
     foreach (const QnLayoutItemData &item, layout->getItems()) {
         QnResourcePtr resource = qnResPool->getResourceByUniqId(item.resource.path);
@@ -433,8 +432,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         hasImage |= resource->hasFlags(QnResource::still_image);
         hasLocal |= resource->hasFlags(QnResource::local)
                     || resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
-        hasRemote |= resource->hasFlags(QnResource::remote);
-        if (hasImage || (hasLocal && hasRemote))
+        if (hasImage || hasLocal)
             break;
     }
 
@@ -447,11 +445,11 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         );
         return false;
     }
-    else if (hasLocal && hasRemote) {
+    else if (hasLocal) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save a layout"),
-            tr("Current layout contains several cameras and local files. You have to keep only cameras or only local files."),
+            tr("Current layout contains local files. Local files are not allowed for Multi-Video export."),
             QMessageBox::Ok
         );
         return false;
