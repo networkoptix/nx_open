@@ -18,6 +18,9 @@
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 
+#include "business/actions/system_health_business_action.h"
+#include "business/business_rule_processor.h"
+
 #include "utils/network/simple_http_client.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor():
@@ -174,6 +177,14 @@ void QnServerMessageProcessor::handleMessage(const QnMessage &message) {
 
     case Qn::Message_Type_KvPairChange: {
         updateKvPairs(message.kvPairs);
+        break;
+    }
+
+    case Qn::Message_Type_EmailFailure: {
+        QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
+
+        qnBusinessRuleProcessor->broadcastBusinessAction(action);
+
         break;
     }
 
