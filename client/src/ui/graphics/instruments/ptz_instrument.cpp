@@ -529,8 +529,11 @@ void PtzInstrument::dragMove(DragInfo *info) {
         selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
         break;
     case VirtualMovement: {
-        if(m_pendingMouseReturn && (info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() < 64) {
-            m_pendingMouseReturn = false;
+        if (m_pendingMouseReturn) {
+            if ((info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() < 64)
+                m_pendingMouseReturn = false;
+            else
+                QCursor::setPos(info->mousePressScreenPos()); // see comments below
             break;
         }
 
