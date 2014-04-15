@@ -294,6 +294,11 @@ QPoint QnMediaResourceWidget::channelGridOffset(int channel) const {
     return cwiseMul(channelLayout()->position(channel), QSize(MD_WIDTH, MD_HEIGHT));
 }
 
+void QnMediaResourceWidget::suspendHomePtzController() {
+    if (m_homePtzController)
+        m_homePtzController->suspend();
+}
+
 const QList<QRegion> &QnMediaResourceWidget::motionSelection() const {
     return m_motionSelection;
 }
@@ -1009,8 +1014,10 @@ void QnMediaResourceWidget::updateAspectRatio() {
 void QnMediaResourceWidget::at_camDisplay_liveChanged() {
     bool isLive = m_display->camDisplay()->isRealTimeSource();
 
-    if(!isLive)
+    if (!isLive) {
         buttonBar()->setButtonsChecked(PtzButton, false);
+        suspendHomePtzController();
+    }
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked() {
@@ -1048,8 +1055,7 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
     if(!checked) {
         /* Stop all ptz activity. */
         ptzController()->continuousMove(QVector3D(0, 0, 0));
-        if (m_homePtzController)
-            m_homePtzController->suspend();
+        suspendHomePtzController();
     }
 
     updateButtonsVisibility();

@@ -154,6 +154,8 @@ protected:
 
     Q_SIGNAL void updateInfoTextLater();
 
+    void suspendHomePtzController();
+
 private slots:
     void at_resource_resourceChanged();
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
