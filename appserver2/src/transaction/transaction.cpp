@@ -140,7 +140,7 @@ namespace ec2
                     return "unlockRequest";
 
                 default:
-                    return "unknown " + val;
+                    return "unknown " + QString::number((int)val);
             }
         }
 
