@@ -30,6 +30,8 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 
 class QnPtzToursDialogItemDelegate: public QStyledItemDelegate {
@@ -123,6 +125,8 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     connect(ui->getPreviewButton,   &QPushButton::clicked,  this,   &QnPtzManageDialog::at_getPreviewButton_clicked);
 
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked,   this, &QnAbstractPtzDialog::saveChanges);
+
+    setHelpTopic(ui->tourGroupBox, Qn::PtzManagement_Tour_Help);
 
     //TODO: implement preview receiving and displaying
 

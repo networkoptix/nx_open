@@ -70,7 +70,7 @@ void QnWorkbenchPanicWatcher::at_resource_panicModeChanged(const QnResourcePtr &
     if (!server)
         return;
 
-    if(server->getPanicMode() != Qn::PM_None) {
+    if(server->getPanicMode() != QnMediaServerResource::PM_None) {
         m_panicServers.insert(server);
     } else {
         m_panicServers.remove(server);
