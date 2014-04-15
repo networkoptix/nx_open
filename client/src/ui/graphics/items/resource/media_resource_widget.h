@@ -17,6 +17,7 @@
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
+class QnFisheyeHomePtzController;
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -218,6 +219,7 @@ private:
     QStaticText m_sensStaticText[10];
 
     QnPtzControllerPtr m_ptzController;
+    QnFisheyeHomePtzController *m_homePtzController;
 
     QnMediaDewarpingParams m_dewarpingParams;
 };
