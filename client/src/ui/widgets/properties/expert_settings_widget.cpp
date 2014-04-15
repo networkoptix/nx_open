@@ -54,6 +54,7 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     connect(ui->qualitySlider, SIGNAL(valueChanged(int)), this, SLOT(at_dataChanged()));
 
     setHelpTopic(ui->qualityGroupBox, Qn::CameraSettings_SecondStream_Help);
+    setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
 }
 
 QnAdvancedSettingsWidget::~QnAdvancedSettingsWidget()
