@@ -9,6 +9,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <utils/common/connective.h>
+
 namespace Ui {
     class CameraAdditionDialog;
 }
@@ -35,9 +37,9 @@ private:
 };
 
 
-class QnCameraAdditionDialog: public QDialog {
+class QnCameraAdditionDialog: public Connective<QDialog> {
     Q_OBJECT
-    typedef QDialog base_type;
+    typedef Connective<QDialog> base_type;
 public:
     enum State {
         NoServer,           /**< No server is selected. */
@@ -91,7 +93,7 @@ private slots:
     void at_backToScanButton_clicked();
     void at_subnetCheckbox_toggled(bool toggled);
     void at_portAutoCheckBox_toggled(bool toggled);
-    void at_resPool_resourceChanged(const QnResourcePtr &resource);
+    void at_server_statusChanged(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
 
     void at_searchRequestReply(int status, const QVariant &reply, int handle);

@@ -8,8 +8,12 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchPanicWatcher: public QObject, public QnWorkbenchContextAware {
-    Q_OBJECT;
+#include <utils/common/connective.h>
+
+class QnWorkbenchPanicWatcher: public Connective<QObject>, public QnWorkbenchContextAware {
+    Q_OBJECT
+
+    typedef Connective<QObject> base_type;
 public:
     QnWorkbenchPanicWatcher(QObject *parent = NULL);
     virtual ~QnWorkbenchPanicWatcher();
@@ -27,7 +31,7 @@ private slots:
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
-    void at_resource_panicModeChanged(const QnMediaServerResourcePtr &resource);
+    void at_resource_panicModeChanged(const QnResourcePtr &resource);
 
 private:
     QSet<QnMediaServerResourcePtr> m_servers, m_panicServers;
