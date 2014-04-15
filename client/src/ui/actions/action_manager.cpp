@@ -1232,6 +1232,11 @@ QnActionManager::QnActionManager(QObject *parent):
        requiredPermissions(Qn::EditLayoutSettingsPermission).
        condition(new QnLightModeCondition(Qn::LightModeNoLayoutBackground, this));
 
+    factory(Qn::VideowallSettingsAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        text(tr("Videowall Settings...")).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::videowall), Qn::ExactlyOne, this));
+
     factory(Qn::OpenInCameraSettingsDialogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in Camera Settings Dialog"));

@@ -49,7 +49,7 @@ signals:
     void pcRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
     void pcChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallPcData &pc);
 
-    void autorunChanged(const QnVideoWallResourcePtr &resource, bool value);
+    void autorunChanged(const QnResourcePtr &resource);
 protected:
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
