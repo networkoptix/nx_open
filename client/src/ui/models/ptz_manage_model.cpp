@@ -81,13 +81,12 @@ const QStringList & QnPtzManageModel::removedPresets() const {
     return m_removedPresets;
 }
 
-const QList<QnPtzPresetItemModel> & QnPtzManageModel::presetModels() const {
-    return m_presets;
+QnPtzPresetList QnPtzManageModel::presets() const {
+    return m_ptzPresetsCache;
 }
 
-
-const QnPtzPresetList& QnPtzManageModel::presets() const {
-    return m_ptzPresetsCache;
+const QList<QnPtzPresetItemModel> & QnPtzManageModel::presetModels() const {
+    return m_presets;
 }
 
 void QnPtzManageModel::setPresets(const QnPtzPresetList &presets) {

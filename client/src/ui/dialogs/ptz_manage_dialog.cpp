@@ -290,6 +290,14 @@ void QnPtzManageDialog::saveData() {
     }
 
     m_adaptor->setValue(m_model->hotkeys());
+
+    // reset active ptz object if the current active ptz object is an empty tour
+    QnPtzObject ptzObject;
+    if (controller()->getActiveObject(&ptzObject) && ptzObject.type == Qn::TourPtzObject) {
+        QnPtzManageModel::RowData rowData = m_model->rowData(ptzObject.id);
+        if (!rowData.tourModel.tour.isValid(m_model->presets()))
+            controller()->continuousMove(QVector3D(0, 0, 0)); // #TODO: #dklychkov evil hack to reset active object. We should implement an adequate way to do this
+    }
 }
 
 Qn::PtzDataFields QnPtzManageDialog::requiredFields() const {
