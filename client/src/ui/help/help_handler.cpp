@@ -1,14 +1,16 @@
 #include "help_handler.h"
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QTimer>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QCursor>
 #include <QtGui/QHelpEvent>
 #include <QtWidgets/QWhatsThis>
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QMessageBox>
 
 #include "help_topic_accessor.h"
-#include "version.h"
+#include "online_help_detector.h"
 
 namespace {
     const char *relativeUrlForTopic(int topic) {
@@ -29,6 +31,8 @@ QnHelpHandler::QnHelpHandler(QObject *parent):
     m_topic(Qn::Empty_Help)
 {
     m_helpRoot = qApp->applicationDirPath() + QLatin1String("/../help");
+
+    QnOnlineHelpDetector *helpUrlDetector = new QnOnlineHelpDetector(this);
 }
 
 QnHelpHandler::~QnHelpHandler() {
@@ -53,8 +57,28 @@ QUrl QnHelpHandler::urlForTopic(int topic) const {
     QString filePath = m_helpRoot + QLatin1String("/") + QLatin1String(relativeUrlForTopic(topic));
     if (QFile::exists(filePath))
         return QUrl::fromLocalFile(filePath);
-    else
-        return QUrl(lit(QN_HELP_URL) + lit("/") + QLatin1String(relativeUrlForTopic(topic)));
+    else if (!m_onlineHelpRoot.isEmpty())
+        return QUrl(m_onlineHelpRoot + lit("/") + QLatin1String(relativeUrlForTopic(topic)));
+    else {
+        QMessageBox::warning(0, tr("Error"), tr("Error")); // TODO: #dklychkov place something more detailed in the future
+    }
+}
+
+void QnHelpHandler::at_helpUrlDetector_urlFetched(const QString &helpUrl) {
+    QnOnlineHelpDetector *detector = qobject_cast<QnOnlineHelpDetector*>(sender());
+    if (!detector)
+        return;
+
+    detector->deleteLater();
+    m_onlineHelpRoot = helpUrl;
+}
+
+void QnHelpHandler::at_helpUrlDetector_error() {
+    QnOnlineHelpDetector *detector = qobject_cast<QnOnlineHelpDetector*>(sender());
+    if (!detector)
+        return;
+
+    QTimer::singleShot(30 * 1000, detector, SLOT(fetchHelpUrl()));
 }
 
 bool QnHelpHandler::eventFilter(QObject *watched, QEvent *event) {
