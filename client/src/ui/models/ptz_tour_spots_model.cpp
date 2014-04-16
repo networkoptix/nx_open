@@ -59,25 +59,25 @@ QList<quint64> QnPtzTourSpotsModel::stayTimeValues() {
     return allStayTimeValues;
 }
 
+int QnPtzTourSpotsModel::speedToIndex(qreal speed) {
+    int index = -1;
+    qreal minDiff = 1.0;
+    for (int i = 0; i < allSpeedValues.size(); i++) {
+        qreal diff = qAbs(allSpeedValues[i] - speed);
+        if (diff < minDiff) {
+            minDiff = diff;
+            index = i;
+        }
+    }
+    return index;
+}
+
 QString QnPtzTourSpotsModel::speedToString(qreal speed) {
     static QList<QString> names(QList<QString>() << tr("Lowest") << tr("Low") << tr("Normal") << tr("High") << tr("Highest"));
     Q_ASSERT(names.size() == allSpeedValues.size());
 
-    qreal value = qBound(speedLowest, speed, speedHighest);
-    for (int i = 1; i < allSpeedValues.size(); ++i) {
-        if (allSpeedValues[i] < value)
-            continue;
-
-        qreal prev = value - allSpeedValues[i - 1];
-        qreal cur = allSpeedValues[i] - value;
-        if (prev < cur)
-            return names[i - 1];
-        return names[i];
-    }
-
-    //should never come here
-    Q_ASSERT(false);
-    return names[allSpeedValues.indexOf(speedNormal)];
+    int index = speedToIndex(speed);
+    return index == -1 ? QString() : names[index];
 }
 
 QString QnPtzTourSpotsModel::timeToString(quint64 time) {

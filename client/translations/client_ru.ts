@@ -8048,7 +8048,7 @@ Please wait for the camera to go online.</source>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="588"/>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="629"/>
         <source>Recording in...</source>
-        <translation>Запись в...</translation>
+        <translation>Запись через...</translation>
     </message>
     <message>
         <source>Cancelled</source>

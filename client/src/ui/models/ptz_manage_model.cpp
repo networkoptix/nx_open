@@ -3,9 +3,11 @@
 #include <common/common_globals.h>
 
 #include <ui/style/globals.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/dialogs/message_box.h>
 #include <utils/common/container.h>
-#include "utils/common/string.h"
+#include <utils/common/string.h>
 
 QnPtzManageModel::QnPtzManageModel(QObject *parent) :
     base_type(parent),
@@ -558,6 +560,8 @@ QVariant QnPtzManageModel::titleData(RowType rowType,  int column, int role) con
             f.setBold(true);
             return f;
         }
+    case Qn::HelpTopicIdRole:
+        return rowType == PresetTitleRow ? Qn::PtzPresets_Help : Qn::PtzManagement_Tour_Help;
         
     default:
         break;
@@ -602,6 +606,8 @@ QVariant QnPtzManageModel::presetData(const QnPtzPresetItemModel &presetModel, i
         return QVariant::fromValue<QnPtzPreset>(presetModel.preset);
     case Qn::ValidRole:
         return true;
+    case Qn::HelpTopicIdRole:
+        return column == HomeColumn ? Qn::PtzManagement_HomePosition_Help : Qn::PtzPresets_Help;
     default:
         break;
     }
@@ -658,6 +664,8 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
     case Qn::ValidRole:
         //TODO: some gradations required: fully invalid, only warning (eg. hotkey duplicates)
         return tourIsValid(tourModel);
+    case Qn::HelpTopicIdRole:
+        return column == HomeColumn ? Qn::PtzManagement_HomePosition_Help : Qn::PtzManagement_Tour_Help;
     default:
         break;
     }

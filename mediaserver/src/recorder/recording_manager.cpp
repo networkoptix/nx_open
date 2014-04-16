@@ -129,6 +129,9 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     QString physicalId = netRes->getPhysicalId();
+    if (m_updatedHistory.contains(physicalId))
+        return true;
+
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if (QnCameraHistoryPool::instance()->getMinTime(netRes) == (qint64)AV_NOPTS_VALUE)
     {
@@ -140,12 +143,13 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     }
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(res->getParentId()));
-    QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getGuid());
+    QnCameraHistoryItem cameraHistoryItem(physicalId, currentTime, server->getGuid());
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
     if (appServerConnection->addCameraHistoryItem(cameraHistoryItem) != 0) {
         qCritical() << "ECS server error during execute method addCameraHistoryItem: " << appServerConnection->getLastError();
         return false;
     }
+    m_updatedHistory << physicalId;
     return true;
 }
 
@@ -376,6 +380,9 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (dynamic_cast<QnVirtualCameraResource*>(sender())->toSharedPointer());
     if (camera) {
+        if (camera->isDisabled())
+            m_updatedHistory.remove(camera->getPhysicalId());
+
         if (!camera->isInitialized() && !camera->isDisabled()) {
             camera->initAsync(false);
         }

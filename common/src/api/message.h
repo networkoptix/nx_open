@@ -41,6 +41,7 @@ namespace Qn {
         Message_Type_KvPairChange = 16,
         Message_Type_KvPairDelete = 17,
         Message_Type_Command = 18,
+        Message_Type_EmailFailure = 19,
 
         Message_Type_Count
     };

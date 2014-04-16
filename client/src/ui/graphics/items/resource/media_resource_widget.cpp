@@ -25,6 +25,7 @@
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/home_ptz_controller.h>
 #include <core/ptz/viewport_ptz_controller.h>
+#include <core/ptz/fisheye_home_ptz_controller.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -150,8 +151,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     fisheyeController.reset(new QnActivityPtzController(QnActivityPtzController::Local, fisheyeController));
 
     // Small hack because widget's zoomRect is set only in Synchronize method, not instantly --gdm
-    if (item && item->zoomRect().isNull())  // zoom items are not allowed to return home
-        fisheyeController.reset(new QnHomePtzController(fisheyeController));
+    if (item && item->zoomRect().isNull()) { // zoom items are not allowed to return home
+        m_homePtzController = new QnFisheyeHomePtzController(fisheyeController);
+        fisheyeController.reset(m_homePtzController);
+    }
 
     if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {
         serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
@@ -289,6 +292,11 @@ QSize QnMediaResourceWidget::motionGridSize() const {
 
 QPoint QnMediaResourceWidget::channelGridOffset(int channel) const {
     return cwiseMul(channelLayout()->position(channel), QSize(MD_WIDTH, MD_HEIGHT));
+}
+
+void QnMediaResourceWidget::suspendHomePtzController() {
+    if (m_homePtzController)
+        m_homePtzController->suspend();
 }
 
 const QList<QRegion> &QnMediaResourceWidget::motionSelection() const {
@@ -1006,8 +1014,10 @@ void QnMediaResourceWidget::updateAspectRatio() {
 void QnMediaResourceWidget::at_camDisplay_liveChanged() {
     bool isLive = m_display->camDisplay()->isRealTimeSource();
 
-    if(!isLive)
+    if (!isLive) {
         buttonBar()->setButtonsChecked(PtzButton, false);
+        suspendHomePtzController();
+    }
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked() {
@@ -1045,6 +1055,7 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
     if(!checked) {
         /* Stop all ptz activity. */
         ptzController()->continuousMove(QVector3D(0, 0, 0));
+        suspendHomePtzController();
     }
 
     updateButtonsVisibility();

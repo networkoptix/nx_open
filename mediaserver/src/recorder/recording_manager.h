@@ -69,6 +69,7 @@ private:
     QMap<QnResourcePtr, Recorders> m_recordMap;
     QTimer m_scheduleWatchingTimer;
     QMap<QnSecurityCamResourcePtr, qint64> m_delayedStop;
+    QSet<QString> m_updatedHistory;
 };
 
 class QnServerDataProviderFactory: public QnDataProviderFactory
