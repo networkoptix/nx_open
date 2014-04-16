@@ -287,7 +287,8 @@ QnUpnpResourceSearcherAsync::QnUpnpResourceSearcherAsync()
 
 QnUpnpResourceSearcherAsync::~QnUpnpResourceSearcherAsync()
 {
-    UPNPDeviceSearcher::instance()->cancelHandlerRegistration( this );
+    if (UPNPDeviceSearcher::instance())
+        UPNPDeviceSearcher::instance()->cancelHandlerRegistration( this );
 }
 
 QnResourceList QnUpnpResourceSearcherAsync::findResources()
