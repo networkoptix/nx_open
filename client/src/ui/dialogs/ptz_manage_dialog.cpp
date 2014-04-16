@@ -290,6 +290,17 @@ void QnPtzManageDialog::saveData() {
     }
 
     m_adaptor->setValue(m_model->hotkeys());
+
+    // reset active ptz object if the current active ptz object is an empty tour
+    QnPtzObject ptzObject;
+    if (controller()->getActiveObject(&ptzObject) && ptzObject.type == Qn::TourPtzObject) {
+        QnPtzManageModel::RowData rowData = m_model->rowData(ptzObject.id);
+        if (rowData.tourModel.tour.spots.isEmpty()) {
+            QVector3D position;
+            controller()->getPosition(Qn::LogicalPtzCoordinateSpace, &position);
+            controller()->absoluteMove(Qn::LogicalPtzCoordinateSpace, position, 2.0);
+        }
+    }
 }
 
 Qn::PtzDataFields QnPtzManageDialog::requiredFields() const {
