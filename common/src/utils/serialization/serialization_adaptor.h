@@ -9,6 +9,7 @@
 #include <boost/preprocessor/arithmetic/inc.hpp>
 #include <boost/preprocessor/comparison/not_equal.hpp>
 #include <boost/preprocessor/tuple/size.hpp>
+#include <boost/preprocessor/repetition/repeat.hpp>
 
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/mpl/equal_to.hpp>
@@ -280,7 +281,7 @@ namespace Qss {                                                                 
  * 
  */
 #define QSS_DEFINE_CLASS_ADAPTOR(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)       \
-    QSS_DEFINE_CLASS_ADAPTOR_I(CLASS, QSS_ENUM_SEQ(MEMBER_SEQ), BOOST_PP_VARIADIC_SEQ_NIL __VA_ARGS__)
+    QSS_DEFINE_CLASS_ADAPTOR_I(CLASS, MEMBER_SEQ, BOOST_PP_VARIADIC_SEQ_NIL __VA_ARGS__)
 
 #define QSS_DEFINE_CLASS_ADAPTOR_I(CLASS, MEMBER_SEQ, GLOBAL_SEQ)               \
 template<class T>                                                               \
@@ -288,13 +289,13 @@ struct QssBinding;                                                              
                                                                                 \
 template<>                                                                      \
 struct QssBinding<CLASS> {                                                      \
-    BOOST_PP_SEQ_FOR_EACH(QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_I, GLOBAL_SEQ, MEMBER_SEQ) \
+    BOOST_PP_SEQ_FOR_EACH_I(QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_I, GLOBAL_SEQ, MEMBER_SEQ) \
                                                                                 \
     template<class T, class Visitor>                                            \
     static bool visit_members(T &&value, Visitor &&visitor) {                   \
         if(!QssDetail::initialize_visitor(std::forward<Visitor>(visitor), std::forward<T>(value))) \
             return false;                                                       \
-        BOOST_PP_SEQ_FOR_EACH(QSS_DEFINE_CLASS_ADAPTOR_FUNCTION_STEP_I, ~, MEMBER_SEQ) \
+        BOOST_PP_REPEAT(BOOST_PP_SEQ_SIZE(MEMBER_SEQ), QSS_DEFINE_CLASS_ADAPTOR_FUNCTION_STEP_I, ~) \
         return true;                                                            \
     }                                                                           \
 };                                                                              \
@@ -310,11 +311,8 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 }
 
 
-#define QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_I(R, GLOBAL_SEQ, PROPERTY_TUPLE)   \
-    QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_II(                                    \
-        BOOST_PP_TUPLE_ELEM(0, PROPERTY_TUPLE),                                 \
-        GLOBAL_SEQ BOOST_PP_TUPLE_ELEM(1, PROPERTY_TUPLE)                       \
-    )
+#define QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_I(R, GLOBAL_SEQ, INDEX, PROPERTY_SEQ) \
+    QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_II(INDEX, GLOBAL_SEQ PROPERTY_SEQ)
 
 #define QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_II(INDEX, PROPERTY_SEQ)            \
     struct BOOST_PP_CAT(MemberAdaptor, INDEX) {                                 \
@@ -340,12 +338,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     }
 
 
-#define QSS_DEFINE_CLASS_ADAPTOR_FUNCTION_STEP_I(R, DATA, PROPERTY_TUPLE)       \
-    QSS_DEFINE_CLASS_ADAPTOR_FUNCTION_STEP_II(                                  \
-        BOOST_PP_TUPLE_ELEM(0, PROPERTY_TUPLE)                                  \
-    )
-
-#define QSS_DEFINE_CLASS_ADAPTOR_FUNCTION_STEP_II(INDEX)                        \
+#define QSS_DEFINE_CLASS_ADAPTOR_FUNCTION_STEP_I(Z, INDEX, DATA)                \
     if(!visitor(std::forward<T>(value), Qss::MemberAdaptor<BOOST_PP_CAT(MemberAdaptor, INDEX)>())) \
         return false;
 
@@ -408,46 +401,13 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     QSS_UNROLL_SHORTCUT_SEQ_STEP_II(TAGS_TUPLE, (BOOST_PP_VARIADIC_SEQ_HEAD(PROPERTY_SEQ))) BOOST_PP_VARIADIC_SEQ_TAIL(PROPERTY_SEQ)
 
 #define QSS_UNROLL_SHORTCUT_SEQ_STEP_II(TAGS_TUPLE, VALUES_TUPLE)               \
-    QSS_RANGE_FOR_EACH(QSS_UNROLL_SHORTCUT_SEQ_STEP_STEP_I, (TAGS_TUPLE, VALUES_TUPLE), (0, BOOST_PP_TUPLE_SIZE(TAGS_TUPLE)))
+    BOOST_PP_REPEAT(BOOST_PP_TUPLE_SIZE(TAGS_TUPLE), QSS_UNROLL_SHORTCUT_SEQ_STEP_STEP_I, (TAGS_TUPLE, VALUES_TUPLE))
 
-#define QSS_UNROLL_SHORTCUT_SEQ_STEP_STEP_I(R, DATA, INDEX)                     \
+#define QSS_UNROLL_SHORTCUT_SEQ_STEP_STEP_I(Z, INDEX, DATA)                     \
     QSS_UNROLL_SHORTCUT_SEQ_STEP_STEP_II(BOOST_PP_TUPLE_ELEM(0, DATA), BOOST_PP_TUPLE_ELEM(1, DATA), INDEX)
 
 #define QSS_UNROLL_SHORTCUT_SEQ_STEP_STEP_II(TAGS_TUPLE, VALUES_TUPLE, INDEX)   \
     (BOOST_PP_TUPLE_ELEM(INDEX, TAGS_TUPLE), BOOST_PP_TUPLE_ELEM(INDEX, VALUES_TUPLE))
-
-
-/**
- * \internal
- * 
- * This macro iterates over an integer range defined as a <tt>(begin, end)</tt> 
- * tuple. E.g. for <tt>(1, 3)</tt> range it will expand to:
- * \code
- * MACRO(1)
- * MACRO(2)
- * \endcode
- * 
- * \see BOOST_PP_SEQ_FOR_EACH
- */
-#define QSS_RANGE_FOR_EACH(MACRO, DATA, RANGE)                                  \
-    BOOST_PP_FOR((BOOST_PP_TUPLE_ENUM(RANGE), MACRO, DATA), QSS_RANGE_FOR_EACH_P, QSS_RANGE_FOR_EACH_O, QSS_RANGE_FOR_EACH_M)
-
-#define QSS_RANGE_FOR_EACH_P(R, STATE)                                          \
-    BOOST_PP_NOT_EQUAL(                                                         \
-        BOOST_PP_TUPLE_ELEM(0, STATE),                                          \
-        BOOST_PP_TUPLE_ELEM(1, STATE)                                           \
-    )
-
-#define QSS_RANGE_FOR_EACH_O(R, STATE)                                          \
-    (                                                                           \
-        BOOST_PP_INC(BOOST_PP_TUPLE_ELEM(0, STATE)),                            \
-        BOOST_PP_TUPLE_ELEM(1, STATE),                                          \
-        BOOST_PP_TUPLE_ELEM(2, STATE),                                          \
-        BOOST_PP_TUPLE_ELEM(3, STATE)                                           \
-    )
-
-#define QSS_RANGE_FOR_EACH_M(R, STATE)                                          \
-    BOOST_PP_TUPLE_ELEM(2, STATE)(R, BOOST_PP_TUPLE_ELEM(3, STATE), BOOST_PP_TUPLE_ELEM(0, STATE))
 
 
 /**
@@ -500,38 +460,6 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 #define QSS_TAG_VALUE_I_1(TAG, VALUE) VALUE
 #define QSS_TAG_VALUE_I_2(TAG, VALUE) BOOST_PP_CAT(QSS_TAG_WRAPPER_FOR_, TAG)(VALUE)
-
-
-/**
- * \internal
- *
- * This macro transforms the elements of the provided sequence into
- * <tt>(index, element)</tt> tuples.
- * 
- * Example input: 
- * \code
- * (a)(b)(c)(d)
- * \endcode
- * 
- * Example output:
- * \code
- * ((0, a))((1, b))((2, c))((3, d))
- * \endcode
- * 
- * \param SEQ                           Sequence to transform.
- * \returns                             Transformed sequence.
- */
-#define QSS_ENUM_SEQ(SEQ)                                                       \
-    BOOST_PP_TUPLE_ELEM(                                                        \
-        1,                                                                      \
-        BOOST_PP_SEQ_FOLD_LEFT(QSS_ENUM_SEQ_STEP_I, (0, BOOST_PP_SEQ_NIL), SEQ) \
-    )
-
-#define QSS_ENUM_SEQ_STEP_I(S, STATE, ELEM)                                     \
-    (                                                                           \
-        BOOST_PP_INC(BOOST_PP_TUPLE_ELEM(0, STATE)),                            \
-        BOOST_PP_TUPLE_ELEM(1, STATE)((BOOST_PP_TUPLE_ELEM(0, STATE), ELEM))    \
-    )
 
 
 namespace QssDetail {
