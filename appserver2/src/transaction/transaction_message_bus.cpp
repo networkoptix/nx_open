@@ -235,11 +235,10 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnAbstractT
     }
     else if(tran.command == ApiCommand::lockResponse) 
     {
-        if (params.peer != qnCommon->moduleGUID()) {
+        if (params.originator != qnCommon->moduleGUID()) {
             *needProxy = true;
             return;
         }
-        params.peer = tran.id.peerGUID;
         emit gotLockResponse(params);
     }
 }

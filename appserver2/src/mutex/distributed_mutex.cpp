@@ -71,7 +71,8 @@ void QnDistributedMutexManager::at_gotLockRequest(ApiLockData lockData)
         QnTransaction<ApiLockData> tran(ApiCommand::lockResponse, false);
         tran.params.name = lockData.name;
         tran.params.timestamp = lockData.timestamp;
-        tran.params.peer = lockData.peer;
+        tran.params.originator = lockData.peer;
+        tran.params.peer = qnCommon->moduleGUID();
         if (m_userDataHandler)
             tran.params.userData = m_userDataHandler->getUserData(lockData.name);
         tran.fillSequence();
