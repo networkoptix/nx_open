@@ -604,7 +604,6 @@ void initAppServerConnection(const QSettings &settings)
     cl_log.log("Connect to enterprise controller server ", urlNoPassword.toString(), cl_logINFO);
     QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid().toString());
-    //QnAppServerConnectionFactory::setClientType(QLatin1String("server")); //TODO :#GDM VW reimplement
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
     QnAppServerConnectionFactory::setBox(lit(QN_ARM_BOX));
