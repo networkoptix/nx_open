@@ -142,3 +142,33 @@ bool QJsonDetail::deserialize_json(const QByteArray &value, QJsonValue *target) 
     }
 }
 
+class QnJsonSerializerStorage: public QnSerializerStorage<QnJsonSerializer> {
+public:
+    QnJsonSerializerStorage() {
+        registerSerializer<QString>();
+        registerSerializer<double>();
+        registerSerializer<bool>();
+        registerSerializer<char>();
+        registerSerializer<signed char>();
+        registerSerializer<unsigned char>();
+        registerSerializer<short>();
+        registerSerializer<unsigned short>();
+        registerSerializer<int>();
+        registerSerializer<unsigned int>();
+        registerSerializer<long>();
+        registerSerializer<unsigned long>();
+        registerSerializer<long long>();
+        registerSerializer<unsigned long long>();
+
+        registerSerializer<QColor>();
+        registerSerializer<QBrush>();
+        registerSerializer<QFont>();
+    }
+};
+
+Q_GLOBAL_STATIC(QnJsonSerializerStorage, qn_jsonSerializerStorage_instance)
+
+QnSerializerStorage<QnJsonSerializer> *QJsonDetail::StorageInstance::operator()() const {
+    return qn_jsonSerializerStorage_instance();
+}
+

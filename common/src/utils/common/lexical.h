@@ -9,18 +9,18 @@
 #include "lexical_fwd.h"
 
 #include <utils/serialization/serialization.h>
-#include <utils/serialization/serialization_adaptor.h>
+#include <utils/serialization/fusion.h>
 
 
 namespace QnLexical {
     template<class T>
     void serialize(const T &value, QString *target) {
-        Qss::serialize(value, target);
+        QnSerialization::serialize(value, target);
     }
 
     template<class T>
     bool deserialize(const QString &value, T *target) {
-        return Qss::deserialize(value, target);
+        return QnSerialization::deserialize(value, target);
     }
 
     template<class T>

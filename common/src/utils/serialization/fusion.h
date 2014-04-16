@@ -3,8 +3,8 @@
 
 #include <utility> /* For std::forward and std::declval. */
 
-#include <utils/preprocessor/variadic_seq_for_each.h>
-
+#include <boost/preprocessor/seq/for_each.hpp>
+#include <boost/preprocessor/seq/for_each_i.hpp>
 #include <boost/preprocessor/seq/fold_left.hpp>
 #include <boost/preprocessor/arithmetic/inc.hpp>
 #include <boost/preprocessor/comparison/not_equal.hpp>
@@ -17,6 +17,8 @@
 #include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/and.hpp>
 #include <boost/mpl/integral_c.hpp>
+
+#include <utils/preprocessor/variadic_seq_for_each.h>
 
 namespace QnFusionDetail {
     template<class T, class Visitor>
@@ -49,7 +51,7 @@ namespace QnFusionDetail {
     };
 
     template<class Adaptor, class Tag, class Default>
-    class DefaultGetter<Adaptor, Tag, Default, false> {
+    struct DefaultGetter<Adaptor, Tag, Default, false> {
         typedef Default result_type;
         result_type operator()() const {
             return Default();
@@ -210,6 +212,7 @@ namespace QnFusion {
 
 } // namespace QnFusion
 
+
 /**
  * This macro defines a new fusion tag. It must be used in global namespace.
  * Defined tag can then be accessed from the QnFusion namespace.
@@ -318,7 +321,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     struct BOOST_PP_CAT(MemberAdaptor, INDEX) {                                 \
         template<class Tag>                                                     \
         struct has_tag:                                                         \
-            boost::mpl::false_type                                              \
+            boost::mpl::false_                                                  \
         {};                                                                     \
                                                                                 \
         BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (index, INDEX)) \
@@ -349,14 +352,14 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 #define QN_FUSION_DEFINE_CLASS_ADAPTOR_SHORTCUT(CLASS, TAGS_TUPLE, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
     QN_FUSION_DEFINE_CLASS_ADAPTOR(CLASS, QN_FUSION_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ), ##__VA_ARGS__)
 
-#define QN_FUSION_DEFINE_CLASS_ADAPTOR_SHORTCUT_GSN(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
+#define QN_FUSION_DEFINE_CLASS_ADAPTOR_GSN(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
     QN_FUSION_DEFINE_CLASS_ADAPTOR_SHORTCUT(CLASS, (getter, setter, name), MEMBER_SEQ, ##__VA_ARGS__)
 
 
 /**
  *
  */
-#define QN_FUSION_DEFINE_STRUCT_ADAPTOR(STRUCT, FIELD_SEQ, ... /* GLOBAL_SEQ */)      \
+#define QN_FUSION_DEFINE_STRUCT_ADAPTOR(STRUCT, FIELD_SEQ, ... /* GLOBAL_SEQ */) \
     QN_FUSION_DEFINE_CLASS_ADAPTOR(STRUCT, QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ), ##__VA_ARGS__)
 
 
@@ -365,10 +368,10 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * 
  * Converts a field sequence into a standard member sequence.
  */
-#define QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ)                          \
+#define QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ)                    \
     BOOST_PP_SEQ_FOR_EACH(QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ_STEP_I, STRUCT, FIELD_SEQ)
 
-#define QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ_STEP_I(R, STRUCT, FIELD)                    \
+#define QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ_STEP_I(R, STRUCT, FIELD)              \
     ((getter, &STRUCT::FIELD)(setter, &STRUCT::FIELD)(name, BOOST_PP_STRINGIZE(FIELD)))
 
 
@@ -394,19 +397,19 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * ((getter, &QSize::height)(setter, &QSize::setHeight)(name, lit("height")(optional, true))
  * \endcode
  */
-#define QN_FUSION_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ)                         \
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ)                   \
     BOOST_PP_SEQ_FOR_EACH(QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_I, TAGS_TUPLE, MEMBER_SEQ)
 
-#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_I(R, TAGS_TUPLE, PROPERTY_SEQ)             \
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_I(R, TAGS_TUPLE, PROPERTY_SEQ)       \
     QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_II(TAGS_TUPLE, (BOOST_PP_VARIADIC_SEQ_HEAD(PROPERTY_SEQ))) BOOST_PP_VARIADIC_SEQ_TAIL(PROPERTY_SEQ)
 
-#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_II(TAGS_TUPLE, VALUES_TUPLE)               \
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_II(TAGS_TUPLE, VALUES_TUPLE)         \
     BOOST_PP_REPEAT(BOOST_PP_TUPLE_SIZE(TAGS_TUPLE), QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_I, (TAGS_TUPLE, VALUES_TUPLE))
 
-#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_I(Z, INDEX, DATA)                     \
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_I(Z, INDEX, DATA)               \
     QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_II(BOOST_PP_TUPLE_ELEM(0, DATA), BOOST_PP_TUPLE_ELEM(1, DATA), INDEX)
 
-#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_II(TAGS_TUPLE, VALUES_TUPLE, INDEX)   \
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_II(TAGS_TUPLE, VALUES_TUPLE, INDEX) \
     (BOOST_PP_TUPLE_ELEM(INDEX, TAGS_TUPLE), BOOST_PP_TUPLE_ELEM(INDEX, VALUES_TUPLE))
 
 
@@ -431,11 +434,12 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * \returns                             Type expression that should be used for
  *                                      return type of tag getter function.
  */
-#define QN_FUSION_TAG_TYPE(TAG, VALUE)                                                \
+#define QN_FUSION_TAG_TYPE(TAG, VALUE)                                          \
     BOOST_PP_OVERLOAD(QN_FUSION_TAG_TYPE_I_, ~ BOOST_PP_CAT(QN_FUSION_TAG_IS_TYPED_FOR_, TAG) ~)(TAG, VALUE)
     
 #define QN_FUSION_TAG_TYPE_I_1(TAG, VALUE) decltype(QN_FUSION_TAG_VALUE(TAG, VALUE))
 #define QN_FUSION_TAG_TYPE_I_2(TAG, VALUE) BOOST_PP_CAT(QN_FUSION_TAG_TYPE_FOR_, TAG)
+
 
 /**
  * \internal
@@ -455,17 +459,16 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * \returns                             Expression that should be used in the
  *                                      return statement of tag getter function.
  */
-#define QN_FUSION_TAG_VALUE(TAG, VALUE)                                               \
+#define QN_FUSION_TAG_VALUE(TAG, VALUE)                                         \
     BOOST_PP_OVERLOAD(QN_FUSION_TAG_VALUE_I_, ~ BOOST_PP_CAT(QN_FUSION_TAG_IS_WRAPPED_FOR_, TAG) ~)(TAG, VALUE)
 
 #define QN_FUSION_TAG_VALUE_I_1(TAG, VALUE) VALUE
 #define QN_FUSION_TAG_VALUE_I_2(TAG, VALUE) BOOST_PP_CAT(QN_FUSION_TAG_WRAPPER_FOR_, TAG)(VALUE)
 
 
-namespace QnFusionDetail {
-    /* We place the conditional serialization functions in the same namespace
-     * where ADL lookup takes place. */
-
+namespace QnFusion {
+    ///* We place the conditional serialization functions in the same namespace
+    // * where ADL lookup takes place. */
     // TODO: These go into Qss, then pulled into QnSerializationDetail
 
     template<class T, class D>
@@ -482,21 +485,20 @@ namespace QnFusionDetail {
         return QnFusion::visit_members(*target, visitor);
     }
 
-    template<class T, class D>
+    template<class T, class D, class Context>
     typename boost::enable_if<boost::mpl::and_<QnFusion::has_visit_members<T>, QnFusion::has_serialization_visitor_type<D> >, void>::type
-    serialize(QnFusion::Context<D> *ctx, const T &value, D *target) {
+    serialize(Context *ctx, const T &value, D *target) {
         typename QnFusion::serialization_visitor_type<D>::type visitor(ctx, *target);
         QnFusion::visit_members(value, visitor);
     }
 
-    template<class T, class D>
+    template<class T, class D, class Context>
     typename boost::enable_if<boost::mpl::and_<QnFusion::has_visit_members<T>, QnFusion::has_deserialization_visitor_type<D> >, bool>::type
-    deserialize(QnFusion::Context<D> *ctx, const D &value, T *target) {
+    deserialize(Context *ctx, const D &value, T *target) {
         typename QnFusion::deserialization_visitor_type<D>::type visitor(ctx, value);
         return QnFusion::visit_members(*target, visitor);
     }
 
-} // namespace QnFusionDetail
-
+} // namespace QnFusion
 
 #endif // QN_FUSION_H

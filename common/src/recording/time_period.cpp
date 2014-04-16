@@ -9,8 +9,10 @@
 
 #include "time_period_list.h"
 
+QN_FUSION_DEFINE_STRUCT_ADAPTOR(QnTimePeriod, (startTimeMs)(durationMs))
+
 namespace detail {
-    QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnTimePeriod, (startTimeMs)(durationMs), static)
+    QN_DEFINE_FUSION_JSON_SERIALIZATION_FUNCTIONS(QnTimePeriod, static)
 }
 
 

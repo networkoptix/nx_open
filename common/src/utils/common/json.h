@@ -22,17 +22,23 @@
 #include <QtCore/QJsonDocument>
 
 #include <utils/serialization/serialization.h>
-#include <utils/serialization/serialization_adaptor.h>
+#include <utils/serialization/fusion.h>
 
 #include "unused.h"
 #include "json_fwd.h"
 #include "json_context.h"
 
 
+class QnJsonSerializer;
 namespace QJsonDetail {
     void serialize_json(const QJsonValue &value, QByteArray *target, QJsonDocument::JsonFormat format = QJsonDocument::Compact);
     bool deserialize_json(const QByteArray &value, QJsonValue *target);
+
+    struct StorageInstance { 
+        QnSerializerStorage<QnJsonSerializer> *operator()() const;
+    };
 } // namespace QJsonDetail
+
 
 namespace QJson {
     /**
@@ -44,7 +50,7 @@ namespace QJson {
      */
     template<class T>
     void serialize(QnJsonContext *ctx, const T &value, QJsonValue *target) {
-        Qss::serialize(ctx, value, target);
+        QnSerialization::serialize(ctx, value, target);
     }
 
     template<class T>
@@ -52,7 +58,7 @@ namespace QJson {
         assert(target);
 
         QJsonValue jsonValue;
-        Qss::serialize(ctx, value, &jsonValue);
+        QnSerialization::serialize(ctx, value, &jsonValue);
         *target = jsonValue;
     }
 
@@ -117,12 +123,12 @@ namespace QJson {
      */
     template<class T, class QJsonValue>
     bool deserialize(QnJsonContext *ctx, const QJsonValue &value, T *target, typename boost::enable_if<boost::is_same<QJsonValue, ::QJsonValue> >::type * = NULL) {
-        return Qss::deserialize(ctx, value, target);
+        return QnSerialization::deserialize(ctx, value, target);
     }
 
     template<class T>
     bool deserialize(QnJsonContext *ctx, const QJsonValueRef &value, T *target) {
-        return Qss::deserialize(ctx, value.toValue(), target);
+        return QnSerialization::deserialize(ctx, value.toValue(), target);
     }
 
     template<class T>
@@ -214,6 +220,17 @@ namespace QJson {
 
 } // namespace QJson
 
+
+class QnJsonContext: public QnSerializationContext<QnJsonSerializer> {};
+
+
+class QnJsonSerializer: public QnContextSerializer<QJsonValue, QnJsonContext>, public QnStaticSerializerStorage<QnJsonSerializer, QJsonDetail::StorageInstance> {
+    typedef QnContextSerializer<QJsonValue, QnJsonContext> base_type;
+public:
+    QnJsonSerializer(int type): base_type(type) {}
+};
+
+
 namespace QJsonDetail {
     struct TrueChecker {
         template<class T>
@@ -229,7 +246,8 @@ namespace QJsonDetail {
 
         template<class T, class Adaptor>
         bool operator()(const T &value, const Adaptor &adaptor) {
-            using namespace Qss;
+            unused(adaptor);
+            using namespace QnFusion;
 
             if(invoke(adaptor.get<checker, TrueChecker>(), value))
                 return true; /* Skipped. */
@@ -263,7 +281,7 @@ namespace QJsonDetail {
 
         template<class T, class Adaptor>
         bool operator()(T &target, const Adaptor &adaptor) {
-            using namespace Qss;
+            using namespace QnFusion;
 
             return operator()(target, adaptor.get<setter>(), adaptor);
         }
@@ -286,9 +304,10 @@ namespace QJsonDetail {
 
         template<class T, class MemberType, class Adaptor>
         bool operator()(T &target, MemberType T::*setter, const Adaptor &adaptor) {
-            using namespace Qss;
+            unused(adaptor);
+            using namespace QnFusion;
 
-            return QJson::deserialize(m_ctx, m_object, adaptor.get<name>(), &target.*setter, adaptor.get<optional, boost::mpl::false_>());
+            return QJson::deserialize(m_ctx, m_object, adaptor.get<name>(), &(target.*setter), adaptor.get<optional, boost::mpl::false_>());
         }
 
     private:
@@ -375,21 +394,24 @@ __VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *
 
 #else // Q_MOC_RUN
 
-///* Qt moc chokes on our macro hell, so we make things easier for it. */
-#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(...)
-#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(...)
-#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS_EX(...)
-#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(...)
-
-#define QN_DEFINE_ADAPTED_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)  \
+#define QN_DEFINE_FUSION_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)   \
 __VA_ARGS__ void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target) { \
-    QnFusionDetail::serialize(ctx, value, target)                                    \
+    QnFusion::serialize(ctx, value, target);                                    \
 }                                                                               \
                                                                                 \
 __VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *target) { \
-    return QnFusionDetail::deserialize(ctx, value, target);                          \
+    return QnFusion::deserialize(ctx, value, target);                           \
 }
 
+#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(STRUCT, FIELD_SEQ, ... /* PREFIX */) \
+    QN_FUSION_DEFINE_STRUCT_ADAPTOR(STRUCT, FIELD_SEQ)                          \
+    QN_DEFINE_FUSION_JSON_SERIALIZATION_FUNCTIONS(STRUCT, ##__VA_ARGS__)
+
+
+///* Qt moc chokes on our macro hell, so we make things easier for it. */
+#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(...)
+#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS_EX(...)
+#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(...)
 
 #define QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)  \
 __VA_ARGS__ void serialize(QnJsonContext *, const TYPE &value, QJsonValue *target) { \
