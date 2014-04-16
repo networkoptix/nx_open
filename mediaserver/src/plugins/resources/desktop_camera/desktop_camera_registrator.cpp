@@ -24,7 +24,8 @@ void QnDesktopCameraRegistrator::run()
     parseRequest();
     sendResponse("HTTP", 200, QByteArray());
     QByteArray userName = d->request.headers["user-name"];
-    QnDesktopCameraResourceSearcher::instance().registerCamera(d->socket, userName);
+    if (QnDesktopCameraResourceSearcher::instance())
+        QnDesktopCameraResourceSearcher::instance()->registerCamera(d->socket, userName);
     d->socket.clear();
 }
 
