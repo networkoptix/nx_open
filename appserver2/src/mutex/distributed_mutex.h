@@ -62,7 +62,7 @@ namespace ec2
     private:
         bool isAllPeersReady() const;
         void checkForLocked();
-        void sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QnId& dstPeer = QnId());
+        void sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QnId& dstPeer);
     private:
         QByteArray m_name;
         LockRuntimeInfo m_selfLock;
@@ -116,7 +116,7 @@ namespace ec2
 
         void at_gotLockRequest(ApiLockData lockInfo);
         void at_gotLockResponse(ApiLockData lockInfo);
-        void at_gotUnlockRequest(ApiLockData lockInfo);
+        //void at_gotUnlockRequest(ApiLockData lockInfo);
         void at_newPeerFound(QnId peer);
         void at_peerLost(QnId peer);
         void releaseMutex(const QByteArray& name);

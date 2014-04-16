@@ -228,19 +228,19 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnAbstractT
     if (!deserialize(params, &stream)) {
         qWarning() << "Bad stream! Ignore transaction " << ApiCommand::toString(tran.command);
     }
-    if (params.peer != qnCommon->moduleGUID()) {
+    
+    if(tran.command == ApiCommand::lockRequest) {
         *needProxy = true;
-        return;
-    }
-
-    if(tran.command == ApiCommand::lockRequest)
         emit gotLockRequest(params);
-    else if(tran.command == ApiCommand::unlockRequest)
-        emit gotUnlockRequest(params);
-    else if(tran.command == ApiCommand::lockResponse)
+    }
+    else if(tran.command == ApiCommand::lockResponse) 
+    {
+        if (params.peer != qnCommon->moduleGUID()) {
+            *needProxy = true;
+            return;
+        }
         emit gotLockResponse(params);
-    else
-        Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid command type!");
+    }
 }
 
 void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>&)
