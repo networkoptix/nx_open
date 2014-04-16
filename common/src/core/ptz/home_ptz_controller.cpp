@@ -46,7 +46,7 @@ bool QnHomePtzController::continuousMove(const QVector3D &speed) {
     if(!base_type::continuousMove(speed))
         return false;
 
-    m_executor->restart();
+    restartExecutor();
     return true;
 }
 
@@ -54,7 +54,7 @@ bool QnHomePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVect
     if(!base_type::absoluteMove(space, position, speed))
         return false;
 
-    m_executor->restart();
+    restartExecutor();
     return true;
 }
 
@@ -62,7 +62,7 @@ bool QnHomePtzController::viewportMove(qreal aspectRatio, const QRectF &viewport
     if(!base_type::viewportMove(aspectRatio, viewport, speed))
         return false;
 
-    m_executor->restart();
+    restartExecutor();
     return true;
 }
 
@@ -70,7 +70,7 @@ bool QnHomePtzController::activatePreset(const QString &presetId, qreal speed) {
     if(!base_type::activatePreset(presetId, speed))
         return false;
 
-    m_executor->restart();
+    restartExecutor();
     return true;
 }
 
@@ -98,12 +98,16 @@ bool QnHomePtzController::getHomeObject(QnPtzObject *homeObject) {
     return true;
 }
 
+void QnHomePtzController::restartExecutor() {
+    m_executor->restart();
+}
+
 void QnHomePtzController::at_adaptor_valueChanged() {
     m_executor->setHomePosition(m_adaptor->value());
     
     /* Restart only if it's running right now. */
     if(m_executor->isRunning())
-        m_executor->restart(); 
+        restartExecutor();
 
     emit changed(Qn::HomeObjectPtzField);
 }
