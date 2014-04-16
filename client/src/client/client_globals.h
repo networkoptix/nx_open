@@ -213,9 +213,6 @@ namespace Qn {
         CommonNotification,
         ImportantNotification,
         CriticalNotification,
-        SystemNotification,
-        SoundNotification,
-
         LevelCount
     };
 
