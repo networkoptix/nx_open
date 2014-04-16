@@ -55,6 +55,7 @@ private:
     QnResourcePoolModelNode *node(const QUuid &uuid);
     QnResourcePoolModelNode *node(const QModelIndex &index) const;
     QnResourcePoolModelNode *node(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource);
+    QnResourcePoolModelNode *node(const QnResourcePtr &resource, const QString &groupId, const QString &groupName);
     QnResourcePoolModelNode *expectedParent(QnResourcePoolModelNode *node);
     bool isIgnored(const QnResourcePtr &resource) const;
 
@@ -88,6 +89,8 @@ private:
 
     typedef QPair<QnResourcePtr, QUuid> NodeKey;
 
+    typedef QHash<QString, QnResourcePoolModelNode *> RecorderHash;
+
     /** Root nodes array */
     QnResourcePoolModelNode *m_rootNodes[Qn::NodeTypeCount];
 
@@ -99,6 +102,9 @@ private:
 
     /** Mapping for resource nodes, by resource. */
     QHash<QnResourcePtr, QnResourcePoolModelNode *> m_resourceNodeByResource;
+
+    /** Mapping for recorder nodes, by resource. */
+    QHash<QnResourcePtr, RecorderHash> m_recorderHashByResource;
 
     /** Mapping for item nodes, by item id. */
     QHash<QUuid, QnResourcePoolModelNode *> m_itemNodeByUuid;
