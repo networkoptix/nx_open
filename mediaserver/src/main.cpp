@@ -626,8 +626,6 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     appServerEventsUrlQuery.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
     appServerEventsUrlQuery.addQueryItem("version", QN_ENGINE_VERSION);
     appServerEventsUrlQuery.addQueryItem("format", "pb");
-    //TODO :#GDM VW reimplement
-    //appServerEventsUrlQuery.addQueryItem("ct", QnAppServerConnectionFactory::clientType());
     appServerEventsUrl.setQuery( appServerEventsUrlQuery );
 
     //QnServerMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
