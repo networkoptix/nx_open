@@ -1547,16 +1547,15 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     }
 #endif
 
-    // don't remove local resources
-    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
-    resourcePool()->setLayoutsUpdated(false);
-    resourcePool()->removeResources(remoteResources);
     // Also remove layouts that were just added and have no 'remote' flag set.
-    //TODO: #Elric hack.
     foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
         if(!(snapshotManager()->flags(layout) & Qn::ResourceIsLocal))
             resourcePool()->removeResource(layout);
-    resourcePool()->setLayoutsUpdated(true);
+
+    // don't remove local resources
+    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    resourcePool()->removeResources(remoteResources);
+    
 
     qnLicensePool->reset();
 
@@ -1591,16 +1590,14 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance()->stop();
 
-    // don't remove local resources
-    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
-    resourcePool()->setLayoutsUpdated(false);
-    resourcePool()->removeResources(remoteResources);
     // Also remove layouts that were just added and have no 'remote' flag set.
-    //TODO: #Elric hack.
     foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
         if(!(snapshotManager()->flags(layout) & Qn::ResourceIsLocal))
             resourcePool()->removeResource(layout);
-    resourcePool()->setLayoutsUpdated(true);
+
+    // don't remove local resources
+    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    resourcePool()->removeResources(remoteResources);
 
     qnLicensePool->reset();
 
