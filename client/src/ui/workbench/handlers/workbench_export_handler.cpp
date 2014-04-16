@@ -143,7 +143,6 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
     exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(false);
-    exportProgressDialog->setAutoSize(false);
     exportProgressDialog->show();
 
     QnLayoutExportTool* tool = new QnLayoutExportTool(layout, exportPeriod, layoutFileName, mode, readOnly, this);
@@ -390,7 +389,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                                               timeOffset,
                                               serverTimeZone,
                                               itemData.zoomRect,
-                                              contrastParams, dewarpingParams,
+                                              contrastParams,
+                                              dewarpingParams,
                                               this);
 
     connect(exportProgressDialog,   &QnProgressDialog::canceled,    tool,                   &QnClientVideoCameraExportTool::stop);
@@ -421,32 +421,22 @@ void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QStr
 }
 
 
-bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layout)
-{
-    bool nonUtcExists = false;
-    bool utcExists = false;
-    bool imageExists = false;
+bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layout) {
+    bool hasImage = false;
+    bool hasLocal = false;
 
-    QnLayoutItemDataMap items = layout->getItems();
-    for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
-    {
-        QnLayoutItemData& item = itr.value();
-        QnResourcePtr layoutItemRes = qnResPool->getResourceByUniqId(item.resource.path);
-        if (layoutItemRes)
-        {
-            imageExists |= layoutItemRes->hasFlags(QnResource::still_image);
-            bool isLocalItem = layoutItemRes->hasFlags(QnResource::local)
-                    || layoutItemRes->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
-            if (isLocalItem && layoutItemRes->getStatus() == QnResource::Offline)
-                continue; // skip unaccessible local resources because is not possible to check utc flag
-            if (layoutItemRes->hasFlags(QnResource::utc))
-                utcExists = true;
-            else
-                nonUtcExists = true;
-        }
+    foreach (const QnLayoutItemData &item, layout->getItems()) {
+        QnResourcePtr resource = qnResPool->getResourceByUniqId(item.resource.path);
+        if (!resource)
+            continue;
+        hasImage |= resource->hasFlags(QnResource::still_image);
+        hasLocal |= resource->hasFlags(QnResource::local)
+                    || resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
+        if (hasImage || hasLocal)
+            break;
     }
 
-    if (imageExists) {
+    if (hasImage) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save a layout"),
@@ -455,11 +445,11 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         );
         return false;
     }
-    else if (nonUtcExists && utcExists) {
+    else if (hasLocal) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save a layout"),
-            tr("Current layout contains several cameras and local files. You have to keep only cameras or only local files."),
+            tr("Current layout contains local files. Local files are not allowed for Multi-Video export."),
             QMessageBox::Ok
         );
         return false;

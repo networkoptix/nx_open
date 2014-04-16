@@ -127,11 +127,8 @@ public:
     QnId getParentId() const;
     void setParentId(QnId parent);
 
-    void setGuid(const QUuid& guid);
-    QUuid getGuid() const;
-
     // device unique identifier
-    virtual QString getUniqueId() const { return getGuid().toString(); };
+    virtual QString getUniqueId() const { return getId().toString(); };
     virtual void setUniqId(const QString& value);
 
 
@@ -272,6 +269,7 @@ signals:
     void mediaDewarpingParamsChanged(const QnResourcePtr &resource);
     void propertyChanged(const QnResourcePtr &resource, const QString &key);
     void initializedChanged(const QnResourcePtr &resource);
+    void videoLayoutChanged(const QnResourcePtr &resource);
 
     //!Emitted on completion of every async get started with getParamAsync
     /*!
@@ -307,7 +305,7 @@ public:
     QnResourcePtr toSharedPointer() const;
 
 protected:
-    virtual void updateInner(QnResourcePtr other);
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
 
     // should just do physical job ( network or so ) do not care about memory domain
     virtual bool getParamPhysical(const QnParam &param, QVariant &val);
@@ -338,6 +336,8 @@ private:
     void initAndEmit();
 
     void updateUrlName(const QString &oldUrl, const QString &newUrl);
+    bool emitDynamicSignal(const char *signal, void **arguments);
+    void afterUpdateInner(QSet<QByteArray>& modifiedFields);
 
     friend class InitAsyncTask;
 
@@ -361,6 +361,9 @@ protected:
 
     /** Name of this resource. */
     QString m_name;
+
+    /** Url of this resource, if any. */
+    QString m_url; 
 private:
     /** Resource pool this this resource belongs to. */
     QnResourcePool *m_resourcePool;
@@ -377,9 +380,6 @@ private:
 
     /** Status of this resource. */
     Status m_status;
-
-    /** Url of this resource, if any. */
-    QString m_url; 
 
     QDateTime m_lastDiscoveredTime;
     QDateTime m_lastStatusUpdateTime;

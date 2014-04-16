@@ -136,7 +136,7 @@ bool NetworkOptixModuleFinder::processDiscoveryRequest(AbstractDatagramSocket* u
     response.version = qApp->applicationVersion();
     QString moduleName = qApp->applicationName();
     if (moduleName.startsWith(qApp->organizationName()))
-        moduleName = moduleName.mid(qApp->organizationName().length());
+        moduleName = moduleName.mid(qApp->organizationName().length()).trimmed();
     
     response.type = moduleName;
     response.customization = QString::fromLatin1(QN_CUSTOMIZATION_NAME);

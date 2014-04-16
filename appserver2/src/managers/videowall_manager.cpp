@@ -27,13 +27,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiVideowallDataList& videowalls) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiVideowallList& videowalls) {
             QnVideoWallResourceList outData;
             if( errorCode == ErrorCode::ok )
                 videowalls.toResourceList(outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiVideowallDataList, decltype(queryDoneHandler)> ( ApiCommand::getVideowallList, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiVideowallList, decltype(queryDoneHandler)> ( ApiCommand::getVideowallList, nullptr, queryDoneHandler);
         return reqID;
     }
 
@@ -65,18 +65,46 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiVideowallData> QnVideowallManager<T>::prepareTransaction( ApiCommand::Value command, const QnVideoWallResourcePtr& resource )
+    int QnVideowallManager<T>::sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler)
     {
-        QnTransaction<ApiVideowallData> tran(command, true);
+        const int reqID = generateRequestID();
+        auto tran = prepareTransaction( ApiCommand::videowallControl, message );
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+        return reqID;
+    }
+
+    template<class T>
+    int QnVideowallManager<T>::sendInstanceId(const QnId& id, impl::SimpleHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+        auto tran = prepareTransaction( ApiCommand::clientInstanceId, id );
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+        return reqID;
+    }
+
+    template<class T>
+    QnTransaction<ApiVideowall> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnVideoWallResourcePtr &resource)
+    {
+        QnTransaction<ApiVideowall> tran(command, true);
         tran.params.fromResource( resource );
         return tran;
     }
 
     template<class T>
-    QnTransaction<ApiIdData> QnVideowallManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
+    QnTransaction<ApiIdData> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnId &id)
     {
-        QnTransaction<ApiIdData> tran(command, true);
+        QnTransaction<ApiIdData> tran(command, false);
         tran.params.id = id;
+        return tran;
+    }
+
+    template<class T>
+    QnTransaction<ApiVideowallControlMessage> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnVideoWallControlMessage &message)
+    {
+        QnTransaction<ApiVideowallControlMessage> tran(command, false);
+        tran.params.fromMessage(message);
         return tran;
     }
 

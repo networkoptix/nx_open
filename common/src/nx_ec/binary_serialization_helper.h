@@ -340,6 +340,33 @@ private:
         return true;
     }
 
+    template <class T, class K, class V>
+    void serialize(const std::map<K, V>& field, OutputBinaryStream<T>* binStream) 
+    {
+        serialize((qint32) field.size(), binStream);
+        for(typename std::map<K, V>::const_iterator itr = field.begin(); itr != field.end(); ++itr) {
+            serialize(itr->first, binStream);
+            serialize(itr->second, binStream);
+        }
+    }
+
+    template <class T, class K, class V>
+    bool deserialize(std::map<K, V>& field, InputBinaryStream<T>* binStream) 
+    {
+        qint32 size = 0;
+        if( !deserialize(size, binStream) )
+            return false;
+        for( qint32 i = 0; i < size; ++i )
+        {
+            K key;
+            V value;
+            if( !deserialize(key, binStream) || !deserialize(value, binStream))
+                return false;
+            field.insert(std::pair<K, V>(key, value));
+        }
+        return true;
+    }
+
     template <class T, class T2>
     void serialize(const QList<T2>& field, OutputBinaryStream<T>* binStream) 
     {
@@ -475,12 +502,19 @@ private:
 #define QN_DEFINE_STRUCT_SERIALIZATORS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
     QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ); 
 
+#define QN_DEFINE_API_OBJECT_LIST_DATA(TYPE) \
+    struct TYPE ## ListData: public ApiData { \
+        std::vector<TYPE> data; \
+    }; \
+    QN_DEFINE_STRUCT_SERIALIZATORS (TYPE ## ListData, (data) )
+
 #else // Q_MOC_RUN
 
 /* Qt moc chokes on our macro hell, so we make things easier for it. */
 #define QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(...)
 #define QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(...)
 #define QN_DEFINE_STRUCT_SERIALIZATORS(...)
+#define QN_DEFINE_API_OBJECT_LIST_DATA(...)
 
 #endif // Q_MOC_RUN
 

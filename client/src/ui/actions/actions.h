@@ -533,6 +533,11 @@ namespace Qn {
         PictureSettingsAction,
 
         /**
+         * Opens videowall settings dialog.
+         */
+        VideowallSettingsAction,
+
+        /**
          * Opens event log dialog with filter for current camera(s) issues
          */
         CameraIssuesAction,

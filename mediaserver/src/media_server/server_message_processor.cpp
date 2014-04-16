@@ -1,8 +1,11 @@
 #include "server_message_processor.h"
+
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
+
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"
 
@@ -64,13 +67,14 @@ void QnServerMessageProcessor::updateAllIPList(const QnId& id, const QList<QStri
 #endif
 
 void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>();
 
     bool isServer = resource.dynamicCast<QnMediaServerResource>();
     bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
     bool isUser = resource.dynamicCast<QnUserResource>();
+    bool isVideowall = resource.dynamicCast<QnVideoWallResource>();
 
-    if (!isServer && !isCamera && !isUser)
+    if (!isServer && !isCamera && !isUser && !isVideowall)
         return;
 
     //storing all servers' cameras too
@@ -99,7 +103,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
 
     bool needUpdateServer = false;
     // We are always online
-    if (isServer && resource->getGuid() == serverGuid()) {
+    if (isServer && resource->getId() == serverGuid()) {
         if (resource->getStatus() != QnResource::Online) {
             qWarning() << "XYZ1: Received message that our status is " << resource->getStatus();
             resource->setStatus(QnResource::Online);
@@ -111,7 +115,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     else
         qnResPool->addResource(resource);
 
-    if (isServer && resource->getGuid() == serverGuid())
+    if (isServer && resource->getId() == serverGuid())
         syncStoragesToSettings(ownMediaServer);
 
 }

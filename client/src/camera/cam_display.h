@@ -101,6 +101,7 @@ public:
     int getAvarageFps() const;
     virtual bool isBuffering() const override;
 
+    qreal overridenAspectRatio() const;
     void setOverridenAspectRatio(qreal aspectRatio);
 
 public slots:

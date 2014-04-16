@@ -18,6 +18,7 @@
 #include "rest/server/rest_connection_processor.h"
 #include "network/universal_tcp_listener.h"
 #include "utils/common/email.h"
+#include <core/resource/videowall_control_message.h>
 
 //!Contains API classes for the new enterprise controller
 /*!
@@ -27,24 +28,9 @@
 namespace ec2
 {
 
-    struct ServerInfo
-    {
-        QList<QByteArray> mainHardwareIds;
-        QList<QByteArray> compatibleHardwareIds;
-
-        /* QByteArray hardwareId1;
-        QByteArray oldHardwareId;
-        QByteArray hardwareId2;
-        QByteArray hardwareId3; */
-
-        QString publicIp;
-        QString systemName;
-        QString sessionKey;
-
-        QString armBox;
-        bool allowCameraChanges;
-    };
-
+    typedef QList<QByteArray> ByteArrayList;
+    #include "server_info_i.h"
+    
     struct QnFullResourceData
     {
         ServerInfo serverInfo;
@@ -514,7 +500,7 @@ namespace ec2
     };
     typedef std::shared_ptr<AbstractLayoutManager> AbstractLayoutManagerPtr;
 
-       /*!
+    /*!
         \note All methods are asynchronous if other not specified
     */
     class AbstractVideowallManager
@@ -556,14 +542,34 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-    signals:
-        void addedOrUpdated( QnVideoWallResourcePtr videowall );
-        void removed( QnId id );
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class TargetType, class HandlerType> int sendControlMessage(const QnVideoWallControlMessage& message, TargetType* target, HandlerType handler ) {
+            return sendControlMessage(message, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
 
-    private:
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class TargetType, class HandlerType> int sendInstanceId(const QUuid& guid, TargetType* target, HandlerType handler ) {
+            return sendInstanceId(guid, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+    signals:
+        void addedOrUpdated(const QnVideoWallResourcePtr &videowall);
+        void removed(const QUuid &id);
+        void controlMessage(const QnVideoWallControlMessage &message);
+
+    protected:
         virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) = 0;
         virtual int save( const QnVideoWallResourcePtr& resource, impl::AddVideowallHandlerPtr handler ) = 0;
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
+
+        virtual int sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendInstanceId(const QUuid& guid, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractVideowallManager> AbstractVideowallManagerPtr;
 
@@ -643,7 +649,7 @@ namespace ec2
             \note Calling entity MUST connect to all interesting signals prior to calling this method so that received data is consistent
         */
         virtual void startReceivingNotifications( bool fullSyncRequired) = 0;
-        virtual void addRemotePeer(const QUrl& url, bool isClient) = 0;
+        virtual void addRemotePeer(const QUrl& url, bool isClient, const QUuid& peerGuid) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
 
         virtual AbstractResourceManagerPtr getResourceManager() = 0;

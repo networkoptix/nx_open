@@ -655,11 +655,13 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
                                                       tr("Save Recording As..."),
                                                       qnSettings->lastRecordingDir() + QLatin1Char('/') + suggetion,
                                                       tr("AVI (Audio/Video Interleaved) (*.avi)")));
-        dialog->exec();
+        dialog->setFileMode(QFileDialog::AnyFile);
+        dialog->setAcceptMode(QFileDialog::AcceptSave);
+        int dialogResult = dialog->exec();
 
         QString filePath = dialog->selectedFile();
-        QString selectedExtension = dialog->selectedExtension();
-        if (!filePath.isEmpty()) {
+        if (dialogResult == QDialog::Accepted && !filePath.isEmpty()) {
+            QString selectedExtension = dialog->selectedExtension();
             if (!filePath.endsWith(selectedExtension, Qt::CaseInsensitive))
                 filePath += selectedExtension;
 
@@ -1066,7 +1068,7 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
     data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
-
+    data.dewarpingParams.panoFactor = 1; // zoom target must always be dewarped by 90 degrees
 
     int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
             ? 1

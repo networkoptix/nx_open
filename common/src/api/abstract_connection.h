@@ -119,6 +119,7 @@ public:
     const QVariant &reply() const { return m_reply; }
     template<class T>
     T reply() const { return m_reply.value<T>(); }
+    ec2::AbstractECConnectionPtr connection() const { return m_connection; }
 
     /**
      * Starts an event loop waiting for the reply.
@@ -151,8 +152,11 @@ public slots:
         m_finished = true;
         m_handle = handle;
         m_status = (int)errorCode;
+        m_connection = connection;
         if( connection )
             m_reply = QVariant::fromValue( QnConnectionInfoPtr(new QnConnectionInfo(connection->connectionInfo())) );
+
+        emit replyProcessed();
     }
 
 private:
@@ -160,6 +164,7 @@ private:
     int m_status;
     int m_handle;
     QVariant m_reply;
+    ec2::AbstractECConnectionPtr m_connection;
 };
 
 

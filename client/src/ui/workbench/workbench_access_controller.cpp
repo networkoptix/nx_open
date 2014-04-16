@@ -262,7 +262,6 @@ void QnWorkbenchAccessController::at_context_userChanged(const QnUserResourcePtr
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     connect(resource.data(), SIGNAL(parentIdChanged(const QnResourcePtr &)),    this, SLOT(updatePermissions(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SLOT(updatePermissions(const QnResourcePtr &)));
-    connect(resource.data(), SIGNAL(disabledChanged(const QnResourcePtr &)),    this, SLOT(updatePermissions(const QnResourcePtr &)));
 
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         connect(layout.data(), SIGNAL(userCanEditChanged(const QnLayoutResourcePtr &)), this, SLOT(updatePermissions(const QnLayoutResourcePtr &)));

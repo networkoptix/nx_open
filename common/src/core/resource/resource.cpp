@@ -62,27 +62,35 @@ void QnResource::setResourcePool(QnResourcePool *resourcePool)
     m_resourcePool = resourcePool;
 }
 
-void QnResource::setGuid(const QUuid& guid)
-{
-    QMutexLocker mutexLocker(&m_mutex);
-
-    m_id = guid;
-}
-
-QUuid QnResource::getGuid() const
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_id;
-}
-
 QnResourcePtr QnResource::toSharedPointer() const
 {
     return QnFromThisToShared<QnResource>::toSharedPointer();
 }
 
-void QnResource::updateInner(QnResourcePtr other)
+void QnResource::afterUpdateInner(QSet<QByteArray>& modifiedFields)
 {
-    Q_ASSERT(getGuid() == other->getGuid() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
+    emit resourceChanged(toSharedPointer(this));
+    //modifiedFields << "resourceChanged";
+
+    const QnResourcePtr & _t1 = toSharedPointer(this);
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    foreach(const QByteArray& signalName, modifiedFields)
+        emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
+}
+
+bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
+{
+    QByteArray theSignal = QMetaObject::normalizedSignature(signal);
+    int signalId = metaObject()->indexOfSignal(theSignal);
+    if (signalId == -1)
+        return false;
+    metaObject()->activate(this, signalId, arguments);
+    return true;
+}
+
+void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+{
+    Q_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
     m_id = other->m_id; //TODO: #Elric this is WRONG!!!!!!!!!11111111
     m_typeId = other->m_typeId;
@@ -93,25 +101,29 @@ void QnResource::updateInner(QnResourcePtr other)
     m_flags = other->m_flags;
     m_name = other->m_name;
     m_parentId = other->m_parentId;
+
+    m_status = other->m_status;
+    if (m_status == Offline)
+        m_initialized = false;
 }
 
 void QnResource::update(QnResourcePtr other, bool silenceMode)
 {
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->beforeUpdate();
-
+    QSet<QByteArray> modifiedFields;
     {
         QMutex *m1 = &m_mutex, *m2 = &other->m_mutex;
         if(m1 > m2)
             std::swap(m1, m2);
         QMutexLocker mutexLocker1(m1); 
         QMutexLocker mutexLocker2(m2); 
-        updateInner(other); 
+        updateInner(other, modifiedFields);
     }
 
     silenceMode |= other->hasFlags(QnResource::foreigner);
     setStatus(other->m_status, silenceMode);
-    emit resourceChanged(toSharedPointer(this));
+    afterUpdateInner(modifiedFields);
 
     QnParamList paramList = other->getResourceParamList();
     foreach(QnParam param, paramList.list())
@@ -353,6 +365,8 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) c
 void QnResource::parameterValueChangedNotify(const QnParam &param) {
     if(param.name() == lit("ptzCapabilities"))
         emit ptzCapabilitiesChanged(::toSharedPointer(this));
+    else if(param.name() == lit("VideoLayout"))
+        emit videoLayoutChanged(::toSharedPointer(this));
 
     emit parameterValueChanged(::toSharedPointer(this), param);
 }

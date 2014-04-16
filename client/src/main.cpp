@@ -341,7 +341,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
     commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
 #endif
-    commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString());
+    commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString(), lit("full"));
     commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
     commandLineParser.addParameter(&sVideoWallGuid,         "--videowall",                  NULL,   QString());
     commandLineParser.addParameter(&sVideoWallItemGuid,     "--videowall-instance",         NULL,   QString());
@@ -380,6 +380,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         int lightModeOverride = lightMode.toInt(&ok);
         if (ok)
             qnSettings->setLightModeOverride(lightModeOverride);
+        else
+            qnSettings->setLightModeOverride(Qn::LightModeFull);
     }
 
     QnPerformanceTest::detectLightMode();
@@ -539,11 +541,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlPulseSearcher::instance());
 #endif
 
-#ifdef Q_OS_WIN
-    //    QnResourceDiscoveryManager::instance()->addDeviceServer(&DesktopDeviceServer::instance());
-#endif // Q_OS_WIN
-
-
     /* Load translation. */
     QnClientTranslationManager *translationManager = qnCommon->instance<QnClientTranslationManager>();
     QnTranslation translation;
@@ -601,7 +598,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if(noVersionMismatchCheck)
         context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
-    /* Initialize desctop camera searcher. */
+    /* Initialize desktop camera searcher. */
 #ifdef Q_OS_WIN
     QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
     QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);

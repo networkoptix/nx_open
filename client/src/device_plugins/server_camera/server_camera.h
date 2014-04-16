@@ -27,7 +27,7 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
 
-    QString getUniqueIdForServer(const QnResourcePtr mServer) const;
+    //QString getUniqueIdForServer(const QnResourcePtr mServer) const;
 
     virtual Status getStatus() const override;
 

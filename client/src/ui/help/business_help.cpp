@@ -41,11 +41,13 @@ int QnBusiness::actionHelpId(BusinessActionType::Value type) {
     case BusinessActionType::ShowPopup:
         return Qn::EventsActions_ShowNotification_Help;
     case BusinessActionType::PlaySound:
-    case BusinessActionType::PlaySoundRepeated:
         return Qn::EventsActions_PlaySound_Help;
+    case BusinessActionType::PlaySoundRepeated:
+        return Qn::EventsActions_PlaySoundRepeated_Help;
     case BusinessActionType::SayText:
         return Qn::EventsActions_Speech_Help;
     case BusinessActionType::Diagnostics:
+        return Qn::EventsActions_Diagnostics_Help;
     case BusinessActionType::Bookmark:
         return -1;
     default:

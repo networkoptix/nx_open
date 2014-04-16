@@ -228,12 +228,6 @@ namespace Qn {
         LayoutExport
     };
 
-
-    /**
-     * Custom resource properties names.
-     */
-    const QString customAspectRatioKey = lit("overrideAr");
-
     /**
      * Flags describing the client light mode.
      */

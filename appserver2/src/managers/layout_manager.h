@@ -30,7 +30,7 @@ namespace ec2
             emit removed( QnId(tran.params.id) );
         }
 
-        void triggerNotification( const QnTransaction<ApiLayoutData>& tran )
+        void triggerNotification( const QnTransaction<ApiLayout>& tran )
         {
             assert( tran.command == ApiCommand::saveLayout);
             QnLayoutResourcePtr layoutResource(new QnLayoutResource());
@@ -38,10 +38,10 @@ namespace ec2
             emit addedOrUpdated( layoutResource );
         }
 
-        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran )
+        void triggerNotification( const QnTransaction<ApiLayoutList>& tran )
         {
             assert(tran.command == ApiCommand::saveLayouts );
-            foreach(const ApiLayoutData& layout, tran.params.data) 
+            foreach(const ApiLayout& layout, tran.params.data) 
             {
                 QnLayoutResourcePtr layoutResource(new QnLayoutResource());
                 layout.toResource( layoutResource );
@@ -51,7 +51,7 @@ namespace ec2
 
     private:
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
-        QnTransaction<ApiLayoutDataList> prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts );
+        QnTransaction<ApiLayoutList> prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts );
 
     private:
         QueryProcessorType* const m_queryProcessor;

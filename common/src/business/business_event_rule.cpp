@@ -232,7 +232,7 @@ void QnBusinessEventRule::removeResource(const QnId& resId)
 
 QnBusinessEventRuleList QnBusinessEventRule::getDefaultRules()
 {
-    QnResourcePtr admin = qnResPool->getResourceByGuid("e3219e00-cb8f-496c-81a0-28abc1b3a830");
+    QnResourcePtr admin = qnResPool->getResourceById(QUuid("e3219e00-cb8f-496c-81a0-28abc1b3a830"));
 
     QnBusinessEventRuleList result;
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(1,  30,    "{ \"userGroup\" : 0 }",  0, BusinessActionType::ShowPopup,   BusinessEventType::Camera_Disconnect));

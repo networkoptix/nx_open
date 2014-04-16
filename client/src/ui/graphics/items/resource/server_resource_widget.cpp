@@ -708,7 +708,7 @@ void QnServerResourceWidget::updateColors() {
         if (m_graphDataByKey.contains(key)) {
             GraphData &data = m_graphDataByKey[key];
             data.color = getColor(stats.deviceType, indexes[stats.deviceType]++);
-            if (LegendButtonWidget *legendButton = dynamic_cast<LegendButtonWidget *>(m_legendButtonByKey[key]))
+            if (LegendButtonWidget *legendButton = dynamic_cast<LegendButtonWidget *>(data.button))
                 legendButton->setColor(data.color);
         }
     }

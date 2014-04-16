@@ -136,6 +136,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     setHelpTopic(ui->ipAddressLabel,      ui->ipAddressLineEdit,              Qn::ServerSettings_General_Help);
     setHelpTopic(ui->portLabel,           ui->portLineEdit,                   Qn::ServerSettings_General_Help);
     setHelpTopic(ui->storagesGroupBox,                                        Qn::ServerSettings_Storages_Help);
+    setHelpTopic(ui->rebuildGroupBox,                                         Qn::ServerSettings_ArchiveRestoring_Help);
 
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
     connect(ui->pingButton,             SIGNAL(clicked()),              this,   SLOT(at_pingButton_clicked()));
@@ -282,7 +283,7 @@ void QnServerSettingsDialog::submitToResources() {
         QnAbstractStorageResourceList storages;
         foreach(const QnStorageSpaceData &item, tableItems()) {
             if(!item.isUsedForWriting && item.storageId.isNull()) {
-                serverStorageStates.insert(QnServerStorageKey(m_server->getGuid(), item.path), item.reservedSpace);
+                serverStorageStates.insert(QnServerStorageKey(m_server->getId(), item.path), item.reservedSpace);
                 continue;
             }
 
@@ -510,7 +511,7 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
         QnStorageSpaceData &item = items[i];
 
         if(item.reservedSpace == -1)
-            item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getGuid(), item.path) , -1);
+            item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getId(), item.path) , -1);
 
         /* Note that if freeSpace is -1, then we'll also get -1 in reservedSpace, which is the desired behavior. */
         if(item.reservedSpace == -1)

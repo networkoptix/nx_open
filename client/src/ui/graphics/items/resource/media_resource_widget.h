@@ -17,6 +17,7 @@
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
+class QnFisheyeHomePtzController;
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -142,7 +143,7 @@ protected:
     void paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor);
 
     void ensureMotionSensitivity() const;
-    void invalidateMotionSensitivity();
+    Q_SLOT void invalidateMotionSensitivity();
 
     void ensureBinaryMotionMask() const;
     void invalidateBinaryMotionMask();
@@ -154,6 +155,8 @@ protected:
     QPoint channelGridOffset(int channel) const;
 
     Q_SIGNAL void updateInfoTextLater();
+
+    void suspendHomePtzController();
 
 private slots:
     void at_resource_resourceChanged();
@@ -171,6 +174,7 @@ private slots:
     void at_ptzController_changed(Qn::PtzDataFields fields);
 
     void at_item_imageEnhancementChanged();
+    void at_videoLayoutChanged();
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
 
@@ -221,6 +225,7 @@ private:
     QStaticText m_sensStaticText[10];
 
     QnPtzControllerPtr m_ptzController;
+    QnFisheyeHomePtzController *m_homePtzController;
 
     QnMediaDewarpingParams m_dewarpingParams;
 };

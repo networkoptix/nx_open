@@ -13,7 +13,17 @@ Default:
 Description: Enterprise Controller password:
  If upgrading leave empty to keep the old password
 
+Template: ${deb.customization.company.name}-entcontroller/recoveryPassword
+Type: string
+Default: 
+Description: Enterprise Controller password:
+ Your database had unrecoverable error and was reset. Please set new non-empty password.
+
 Template: ${deb.customization.company.name}-entcontroller/password_invalid
+Type: error
+Description: The password should not be empty
+
+Template: ${deb.customization.company.name}-entcontroller/recoveryPassword_invalid
 Type: error
 Description: The password should not be empty
 

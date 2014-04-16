@@ -207,7 +207,7 @@ void QnEventLogDialog::updateData()
     BusinessActionType::Value actionType = BusinessActionType::NotDefined;
     {
         int idx = ui->actionComboBox->currentIndex();
-        actionType = (BusinessActionType::Value) m_actionTypesModel->item(idx)->data().toInt();
+        actionType = (BusinessActionType::Value) m_actionTypesModel->index(idx, 0).data(Qt::UserRole+1).toInt();
     }
 
     query(ui->dateEditFrom->dateTime().toMSecsSinceEpoch(),
@@ -438,10 +438,12 @@ void QnEventLogDialog::setCameraList(const QnResourceList &cameras)
 
 void QnEventLogDialog::setActionType(BusinessActionType::Value value)
 {
-    if (value == BusinessActionType::NotDefined)
-        ui->actionComboBox->setCurrentIndex(0);
-    else
-        ui->actionComboBox->setCurrentIndex(int(value) + 1);
+    for (int i = 0; i < m_actionTypesModel->rowCount(); ++i)
+    {
+        QModelIndex idx = m_actionTypesModel->index(i, 0);
+        if (idx.data(Qt::UserRole + 1).toInt() == value)
+            ui->actionComboBox->setCurrentIndex(i);
+    }
 }
 
 void QnEventLogDialog::at_resetFilterAction_triggered()

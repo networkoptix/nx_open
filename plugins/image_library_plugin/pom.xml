@@ -24,7 +24,7 @@
 		<product.title>${project.name}</product.title>	
 		<!--Global libs-->
         <qt.libs>core</qt.libs>
-		<global.libs/>
+	<global.libs>-lappserver2 -lcommon</global.libs>
 		<!--Specific os libs used-->
 		<windows.oslibs></windows.oslibs>
         <windows.oslibs.release></windows.oslibs.release>

@@ -50,13 +50,13 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
     m_currentCamera(0)
 {
     m_layout.reset(new QnLayoutResource());
-    m_layout->setId(layout->getId());
-    m_layout->setGuid(layout->getGuid()); //before update() uuid's must be the same
+    m_layout->setId(layout->getId()); //before update() uuid's must be the same
+    m_layout->setTypeId(layout->getTypeId());
     m_layout->update(layout);
 
     // If exporting layout, create new guid. If layout just renamed, keep guid
     if (mode == Qn::LayoutExport)
-        m_layout->setGuid(QUuid::createUuid());
+        m_layout->setId(QUuid::createUuid());
 }
 
 bool QnLayoutExportTool::start() {
@@ -66,7 +66,7 @@ bool QnLayoutExportTool::start() {
     }
 
 #ifdef Q_OS_WIN
-    if (m_targetFilename.endsWith(QLatin1String(".exe")))
+    if (m_targetFilename.endsWith(lit(".exe")))
     {
         if (QnNovLauncher::createLaunchingFile(m_realFilename) != 0)
         {
@@ -132,7 +132,7 @@ bool QnLayoutExportTool::start() {
     delete itemTimezonesIO;
 
     QByteArray layoutData;
-    ec2::ApiLayoutData layoutObject;
+    ec2::ApiLayout layoutObject;
     layoutObject.fromResource(m_layout);
     OutputBinaryStream<QByteArray> stream(&layoutData);
     serialize(layoutObject, &stream);
@@ -159,7 +159,7 @@ bool QnLayoutExportTool::start() {
     delete device;
 
     device = m_storage->open(QLatin1String("uuid.bin"), QIODevice::WriteOnly);
-    device->write(m_layout->getGuid().toByteArray());
+    device->write(m_layout->getId().toByteArray());
     delete device;
 
     foreach (const QnMediaResourcePtr resource, m_resources) {
@@ -271,7 +271,7 @@ void QnLayoutExportTool::finishExport(bool success) {
         }
         else {
             QnLayoutResourcePtr layout =  QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl());
-            if (!resourcePool()->getResourceByGuid(layout->getUniqueId())) {
+            if (!resourcePool()->getResourceById(layout->getUniqueId())) {
                 layout->setStatus(QnResource::Online);
                 resourcePool()->addResource(layout);
             }
@@ -320,7 +320,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     itemData.contrastParams,
                                     itemData.dewarpingParams);
 
-    emit stageChanged(tr("Exporting %1 to \"%2\"...").arg(resource->toResource()->getUrl()).arg(m_targetFilename));
+    emit stageChanged(tr("Exporting to \"%2\"...").arg(m_targetFilename));
     return true;
 }
 

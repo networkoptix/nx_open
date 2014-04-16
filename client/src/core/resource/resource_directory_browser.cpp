@@ -129,14 +129,14 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     delete layoutFile;
     
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    ec2::ApiLayoutData apiLayout;
+    ec2::ApiLayout apiLayout;
     InputBinaryStream<QByteArray> stream(layoutData);
     if (deserialize(apiLayout, &stream))
         apiLayout.toResource(layout);
     else
         return QnLayoutResourcePtr();
     QnLayoutItemDataList orderedItems;
-    foreach(const ec2::ApiLayoutItemData& item, apiLayout.items) {
+    foreach(const ec2::ApiLayoutItem& item, apiLayout.items) {
         orderedItems << QnLayoutItemData();
         item.toResource(orderedItems.last());
     }
@@ -145,12 +145,12 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     if (uuidFile) {
         QByteArray data = uuidFile->readAll();
         delete uuidFile;
-        layout->setGuid(QUuid(data.data()));
-        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByGuid(layout->getGuid()).dynamicCast<QnLayoutResource>();
+        layout->setId(QUuid(data.data()));
+        QnLayoutResourcePtr existingLayout = qnResPool->getResourceById(layout->getId()).dynamicCast<QnLayoutResource>();
         if (existingLayout)
             return existingLayout;
     } else {
-        layout->setGuid(QUuid::createUuid());
+        layout->setId(QUuid::createUuid());
     }
 
     QIODevice* rangeFile = layoutStorage.open(QLatin1String("range.bin"), QIODevice::ReadOnly);

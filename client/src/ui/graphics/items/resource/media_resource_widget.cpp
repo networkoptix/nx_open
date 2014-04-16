@@ -25,6 +25,7 @@
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/home_ptz_controller.h>
 #include <core/ptz/viewport_ptz_controller.h>
+#include <core/ptz/fisheye_home_ptz_controller.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -122,15 +123,17 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
     m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
     connect(m_renderer,                 &QnResourceWidgetRenderer::sourceSizeChanged,   this, &QnMediaResourceWidget::updateAspectRatio);
-    connect(m_resource->toResource(),   &QnResource::resourceChanged,                   this, &QnMediaResourceWidget::at_resource_resourceChanged);
-    connect(m_resource->toResource(),   &QnResource::propertyChanged,                   this, &QnMediaResourceWidget::at_resource_propertyChanged);
-    connect(m_resource->toResource(),   &QnResource::mediaDewarpingParamsChanged,       this, &QnMediaResourceWidget::updateDewarpingParams);
+    connect(base_type::resource(),      &QnResource::propertyChanged,                   this, &QnMediaResourceWidget::at_resource_propertyChanged);
+    connect(base_type::resource(),      &QnResource::mediaDewarpingParamsChanged,       this, &QnMediaResourceWidget::updateDewarpingParams);
     connect(this,                       &QnResourceWidget::zoomTargetWidgetChanged,     this, &QnMediaResourceWidget::updateDisplay);
     connect(item,                       &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnMediaResourceWidget::updateFisheye);
     connect(item,                       &QnWorkbenchItem::imageEnhancementChanged,      this, &QnMediaResourceWidget::at_item_imageEnhancementChanged);
     connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateFisheye);
     connect(this,                       &QnResourceWidget::zoomRectChanged,             this, &QnMediaResourceWidget::updateFisheye);
     connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateButtonsVisibility);
+    if (m_camera)
+        connect(m_camera,               &QnVirtualCameraResource::motionRegionChanged,  this, &QnMediaResourceWidget::invalidateMotionSensitivity);
+
     updateDewarpingParams();
     updateDisplay();
 
@@ -151,8 +154,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     fisheyeController.reset(new QnActivityPtzController(QnActivityPtzController::Local, fisheyeController));
 
     // Small hack because widget's zoomRect is set only in Synchronize method, not instantly --gdm
-    if (item && item->zoomRect().isNull())  // zoom items are not allowed to return home
-        fisheyeController.reset(new QnHomePtzController(fisheyeController));
+    if (item && item->zoomRect().isNull()) { // zoom items are not allowed to return home
+        m_homePtzController = new QnFisheyeHomePtzController(fisheyeController);
+        fisheyeController.reset(m_homePtzController);
+    }
 
     if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {
         serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
@@ -238,7 +243,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         statusOverlayWidget()->setDiagnosticsVisible(true);
     }
 
-    connect(resource()->toResource(), &QnResource::resourceChanged, this, &QnMediaResourceWidget::updateButtonsVisibility);
+    connect(resource()->toResource(), &QnResource::resourceChanged, this, &QnMediaResourceWidget::updateButtonsVisibility); //TODO: #GDM get rid of resourceChanged
 
     connect(this, &QnResourceWidget::zoomRectChanged, this, &QnMediaResourceWidget::at_zoomRectChanged);
     connect(context->instance<QnWorkbenchRenderWatcher>(), &QnWorkbenchRenderWatcher::widgetChanged, this, &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
@@ -290,6 +295,11 @@ QSize QnMediaResourceWidget::motionGridSize() const {
 
 QPoint QnMediaResourceWidget::channelGridOffset(int channel) const {
     return cwiseMul(channelLayout()->position(channel), QSize(MD_WIDTH, MD_HEIGHT));
+}
+
+void QnMediaResourceWidget::suspendHomePtzController() {
+    if (m_homePtzController)
+        m_homePtzController->suspend();
 }
 
 const QList<QRegion> &QnMediaResourceWidget::motionSelection() const {
@@ -483,6 +493,7 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
     if(m_display) {
         connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
         connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
+        connect(m_resource->toResource(),SIGNAL(videoLayoutChanged(const QnResourcePtr &)), this, SLOT(at_videoLayoutChanged()));
 
         setChannelLayout(m_display->videoLayout());
         m_display->addRenderer(m_renderer);
@@ -494,6 +505,11 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
     }
 
     emit displayChanged();
+}
+
+void QnMediaResourceWidget::at_videoLayoutChanged()
+{
+    setChannelLayout(m_display->videoLayout());
 }
 
 void QnMediaResourceWidget::updateDisplay() {
@@ -970,7 +986,8 @@ void QnMediaResourceWidget::at_resource_resourceChanged() {
 }
 
 void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key) {
-    if (resource != m_camera ||  key != Qn::customAspectRatioKey)
+    Q_UNUSED(resource);
+    if (key != QnMediaResource::customAspectRatioKey())
         return;
     updateCustomAspectRatio();
 }
@@ -1013,8 +1030,10 @@ void QnMediaResourceWidget::updateAspectRatio() {
 void QnMediaResourceWidget::at_camDisplay_liveChanged() {
     bool isLive = m_display->camDisplay()->isRealTimeSource();
 
-    if(!isLive)
+    if (!isLive) {
         buttonBar()->setButtonsChecked(PtzButton, false);
+        suspendHomePtzController();
+    }
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked() {
@@ -1052,6 +1071,7 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
     if(!checked) {
         /* Stop all ptz activity. */
         ptzController()->continuousMove(QVector3D(0, 0, 0));
+        suspendHomePtzController();
     }
 
     updateButtonsVisibility();
@@ -1136,15 +1156,11 @@ void QnMediaResourceWidget::updateFisheye() {
 }
 
 void QnMediaResourceWidget::updateCustomAspectRatio() {
-    if (!m_camera || !m_display)
+    if (!m_display)
         return;
 
-    QString customAr = m_camera->getProperty(Qn::customAspectRatioKey);
-    if (!customAr.isEmpty())
-        m_display->camDisplay()->setOverridenAspectRatio(customAr.toDouble());
-    else
-        m_display->camDisplay()->setOverridenAspectRatio(0.0);
-
+    QString customAr = m_resource->toResource()->getProperty(QnMediaResource::customAspectRatioKey());
+    m_display->camDisplay()->setOverridenAspectRatio(customAr.toDouble());
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {

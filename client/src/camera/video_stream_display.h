@@ -64,6 +64,7 @@ public:
     QSize getMaxScreenSize() const;
     bool selfSyncUsed() const;
 
+    qreal overridenAspectRatio() const;
     void setOverridenAspectRatio(qreal aspectRatio);
 private:
     friend class QnCamDisplay;

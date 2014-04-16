@@ -91,7 +91,7 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
         for (int i = 0; i < resList.size(); ++i)
         {
             QnMediaServerResourcePtr routeToServer = getDestMServer(action, resList[i]);
-            if (routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getGuid() != getGuid())
+            if (routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getId() != getGuid())
             {
                 // delivery to other server
                 QUrl serverUrl = routeToServer->getApiUrl();

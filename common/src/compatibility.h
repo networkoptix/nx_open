@@ -15,26 +15,7 @@
 
 QString stripVersion(const QString& version);
 
-struct QnCompatibilityItem
-{
-    QnCompatibilityItem() {}
-
-    QnCompatibilityItem(QString v1, QString c1, QString v2)
-        : ver1(v1), comp1(c1), ver2(v2)
-    {
-    }
-
-    bool operator==(const QnCompatibilityItem& other) const
-    {
-        return ver1 == other.ver1 && comp1 == other.comp1 && ver2 == other.ver2;
-    }
-
-    QString ver1;
-    QString comp1;
-    QString ver2;
-};
-
-QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(QnCompatibilityItem, (ver1)(comp1)(ver2))
+#include "compatibility_i.h"
 
 inline uint qHash(const QnCompatibilityItem &item)
 {

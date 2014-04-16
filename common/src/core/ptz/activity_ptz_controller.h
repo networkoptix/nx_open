@@ -40,7 +40,6 @@ public:
 
 private:
     const Mode m_mode;
-    const bool m_asynchronous;
     QnResourcePropertyAdaptor<QnPtzObject> *m_adaptor;
 };
 

@@ -14,35 +14,22 @@
 
 namespace ec2
 {
-    class ApiLicense
-    :
-        public ApiData
+    struct ApiLicense;
+    #include "ec2_license_i.h"
+
+    struct ApiLicense : ApiLicenseData
     {
     public:
-        QByteArray key;
-        QByteArray licenseBlock;
-
-        ApiLicense();
-
         void fromResource( const QnLicense& lic );
         void toResource( QnLicense& license ) const;
     };
 	
-	#define ApiLicenseFields (key)(licenseBlock)
-	QN_DEFINE_STRUCT_SERIALIZATORS( ApiLicense, ApiLicenseFields )
-	
-    class ApiLicenseList
-    :
-        public ApiData
+    struct ApiLicenseList : ApiLicenseListData
     {
     public:
-        std::vector<ApiLicense> data;
-
         void fromResourceList( const QnLicenseList& licList );
         void toResourceList( QnLicenseList& licenseList ) const;
     };
-
-	QN_DEFINE_STRUCT_SERIALIZATORS( ApiLicenseList, (data) )
 }
 
 #endif  //EC2_LICENSE_H

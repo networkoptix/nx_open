@@ -27,12 +27,6 @@ void QnFlexWatchResourceSearcher::clearSocketList()
     m_sockList.clear();
 }
 
-QnFlexWatchResourceSearcher& QnFlexWatchResourceSearcher::instance()
-{
-    static QnFlexWatchResourceSearcher inst;
-    return inst;
-}
-
 bool QnFlexWatchResourceSearcher::updateSocketList()
 {
     qint64 curretTime = getUsecTimer();

@@ -13,6 +13,8 @@
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 
+#include <api/app_server_connection.h>
+
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/network/http/asynchttpclient.h>
 
@@ -88,6 +90,8 @@ namespace ec2
                 requestUrl.setUserName(QString());
                 requestUrl.setPassword(QString());
             }
+            if (!QnAppServerConnectionFactory::videoWallKey().isEmpty())
+                httpClient->addRequestHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videoWallKey().toUtf8());
 
             requestUrl.setPath( QString::fromLatin1("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;

@@ -230,6 +230,17 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
                     if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
                         layoutResource->removeItem(data);
 
+        if (resource.dynamicCast<QnLayoutResource>()) {
+            foreach (const QnVideoWallResourcePtr &videowall, getResources().filtered<QnVideoWallResource>()) { // TODO: #Elric this is way beyond what one may call 'suboptimal'.
+                foreach (QnVideoWallItem item, videowall->getItems()) {
+                    if (item.layout != resource->getId())
+                        continue;
+                    item.layout = QUuid();
+                    videowall->updateItem(item.uuid, item);
+                }
+            }
+        }
+
         TRACE("RESOURCE REMOVED" << resource->metaObject()->className() << resource->getName());
     }
 
@@ -247,7 +258,7 @@ QnResourceList QnResourcePool::getResources() const
     return m_resources.values();
 }
 
-QnResourcePtr QnResourcePool::getResourceById(QnId id) const {
+QnResourcePtr QnResourcePool::getResourceById(const QnId &id) const {
     QMutexLocker locker(&m_resourcesMtx);
 
     QHash<QString, QnResourcePtr>::const_iterator resIter = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByID(id) );
@@ -446,17 +457,6 @@ QStringList QnResourcePool::allTags() const
         result << resource->getTags();
 
     return result;
-}
-
-QnResourcePtr QnResourcePool::getResourceByGuid(const QUuid& guid) const
-{
-    QMutexLocker locker(&m_resourcesMtx);
-    foreach (const QnResourcePtr &resource, m_resources) {
-        if (resource->getGuid() == guid)
-            return resource;
-    }
-
-    return QnNetworkResourcePtr(0);
 }
 
 int QnResourcePool::activeCamerasByClass(bool analog) const

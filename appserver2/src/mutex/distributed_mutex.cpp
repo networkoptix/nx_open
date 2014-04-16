@@ -74,6 +74,7 @@ void QnDistributedMutexManager::at_gotLockRequest(ApiLockData lockData)
         tran.params.peer = qnCommon->moduleGUID();
         if (m_userDataHandler)
             tran.params.userData = m_userDataHandler->getUserData(lockData.name);
+        tran.fillSequence();
         qnTransactionBus->sendTransaction(tran);
     }
 }
@@ -139,7 +140,7 @@ void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCom
     tran.params.timestamp = lockInfo.timestamp;
     if (m_owner->m_userDataHandler)
         tran.params.userData = m_owner->m_userDataHandler->getUserData(lockInfo.name);
-
+    tran.fillSequence();
     qnTransactionBus->sendTransaction(tran, dstPeer);
 }
 

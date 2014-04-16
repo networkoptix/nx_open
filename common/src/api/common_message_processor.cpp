@@ -93,6 +93,8 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
         this, [this](const QnVideoWallResourcePtr &videowall){updateResource(videowall);});
     connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::removed,
         this, &QnCommonMessageProcessor::on_resourceRemoved );
+    connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::controlMessage,
+        this, &QnCommonMessageProcessor::videowallControlMessageReceived );
 
     connection->startReceivingNotifications(true);
 }
@@ -163,7 +165,7 @@ void QnCommonMessageProcessor::on_businessEventRemoved(const QnId &id) {
     emit businessRuleDeleted(id);
 }
 
-void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction )
+void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBusinessActionPtr& /* businessAction */ )
 {
     // nothing to do for a while
 }

@@ -10,7 +10,7 @@ QnUserResource::QnUserResource():
 
 QString QnUserResource::getUniqueId() const
 {
-    return getGuid().toString();
+    return getId().toString();
 }
 
 QByteArray QnUserResource::getHash() const
@@ -146,9 +146,9 @@ void QnUserResource::removeVideoWallItemUnderLock(const QUuid &uuid) {
 }
 
 
-void QnUserResource::updateInner(QnResourcePtr other)
+void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
-    base_type::updateInner(other);
+    base_type::updateInner(other, modifiedFields);
 
     QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
     if(localOther) {

@@ -24,8 +24,8 @@ QnTransactionTransport::QnTransactionTransport(bool isOriginator, bool isClient,
     m_isClientPeer(isClient),
     m_socket(socket),
     m_state(NotDefined), 
-    m_readBufferLen(0), 
-    m_chunkHeaderLen(0), 
+    m_readBufferLen(0),
+    m_chunkHeaderLen(0),
     m_chunkLen(0), 
     m_sendOffset(0), 
     m_timeDiff(0),
@@ -160,7 +160,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                         {
                             QSet<QnId> processedPeers;
                             QByteArray serializedTran;
-                            QnTransactionTransportSerializer::deserializeTran(rBuffer + m_chunkHeaderLen, m_chunkLen, processedPeers, serializedTran);
+                            QnTransactionTransportSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, processedPeers, serializedTran);
                             emit gotTransaction(serializedTran, processedPeers);
                             m_readBufferLen = m_chunkHeaderLen = 0;
                         }
@@ -222,6 +222,14 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     }
 
     QUrlQuery q = QUrlQuery(remoteAddr.query());
+    if (m_state == ConnectingStage1)
+    {
+        q.removeQueryItem("time");
+        qint64 localTime = -1;
+        if (QnTransactionLog::instance())
+            localTime = QnTransactionLog::instance()->getRelativeTime();
+        q.addQueryItem("time", QByteArray::number(localTime));
+    }
     if( m_isClientPeer ) {
         q.removeQueryItem("isClient");
         q.addQueryItem("isClient", QString());
@@ -333,10 +341,10 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remoteGuid, true);
         if (lockOK) {
             if (QnTransactionLog::instance()) {
-                qint64 localTime = QnTransactionLog::instance()->getRelativeTime();
+                qint64 localTime = QUrlQuery(client->url().query()).queryItemValue("time").toLongLong();
                 qint64 remoteTime = itrTime->second.toLongLong();
                 if (remoteTime != -1)
-                    setTimeDiff(localTime - remoteTime);
+                    setTimeDiff(remoteTime - localTime);
             }
             setState(ConnectingStage2);
         }
@@ -375,7 +383,7 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         {
             QSet<QnId> processedPeers;
             QByteArray serializedTran;
-            QnTransactionTransportSerializer::deserializeTran(buffer + m_chunkHeaderLen, m_chunkLen, processedPeers, serializedTran);
+            QnTransactionTransportSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, processedPeers, serializedTran);
             emit gotTransaction(serializedTran, processedPeers);
 
             buffer += fullChunkLen;
@@ -394,4 +402,9 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
     m_readBufferLen = bufferLen;
 }
 
+bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
+{
+     // allow to send system command immediately, without tranSyncRequest
+    return ApiCommand::isSystem(command) ? true : m_writeSync;
+}
 }

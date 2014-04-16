@@ -38,7 +38,7 @@ public:
     QnAbstractStorageResourceList getStorages() const;
     void setStorages(const QnAbstractStorageResourceList& storages);
 
-    virtual void updateInner(QnResourcePtr other) override;
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
     void determineOptimalNetIF();
     void setPrimaryIF(const QString& primaryIF);
@@ -69,7 +69,7 @@ private slots:
 
 signals:
     void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
-    void panicModeChanged(const QnMediaServerResourcePtr &resource);
+    void panicModeChanged(const QnResourcePtr &resource);
 
 private:
     QnMediaServerConnectionPtr m_restConnection;

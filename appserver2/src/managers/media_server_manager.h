@@ -25,7 +25,7 @@ namespace ec2
         //!Implementation of QnMediaServerManager::remove
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
-        void triggerNotification( const QnTransaction<ApiMediaServerData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiMediaServer>& tran ) {
             assert( tran.command == ApiCommand::saveMediaServer);
             QnMediaServerResourcePtr mserverRes(new QnMediaServerResource(m_resCtx.resTypePool));
             tran.params.toResource( mserverRes, m_resCtx);
@@ -42,7 +42,7 @@ namespace ec2
         QueryProcessorType* const m_queryProcessor;
         ResourceContext m_resCtx;
 
-        QnTransaction<ApiMediaServerData> prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource );
+        QnTransaction<ApiMediaServer> prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
     };
 }

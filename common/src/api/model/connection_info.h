@@ -9,22 +9,14 @@
 
 #include "compatibility.h"
 
-struct QnConnectionInfo {
-    QnConnectionInfo(): proxyPort(0) {}
+typedef QnSoftwareVersion SoftwareVersionType;
 
-    QUrl ecUrl;
-    QnSoftwareVersion version;
-    QList<QnCompatibilityItem> compatibilityItems;
-    int proxyPort;
-    QString ecsGuid;
-    QString publicIp;
-    QString brand;
+#include "connection_info_i.h"
 
-};
+typedef QnConnectionInfoData QnConnectionInfo;
 
 Q_DECLARE_METATYPE( QnConnectionInfo );
 
-QN_DEFINE_STRUCT_SERIALIZATORS (QnConnectionInfo, (ecUrl) (version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand))
 
 // TODO: #Elric remove shared pointer?
 typedef QSharedPointer<QnConnectionInfo> QnConnectionInfoPtr;

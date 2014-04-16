@@ -30,9 +30,9 @@ QnScheduleTask ScheduleTask::toResource(const QnId& resourceId) const
 	return QnScheduleTask(resourceId, dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio);
 }
 
-void ApiCameraData::toResource(QnVirtualCameraResourcePtr resource) const
+void ApiCamera::toResource(QnVirtualCameraResourcePtr resource) const
 {
-	ApiResourceData::toResource(resource);
+	ApiResource::toResource(resource);
 
 	resource->setScheduleDisabled(scheduleDisabled);
 	resource->setMotionType(motionType);
@@ -69,9 +69,10 @@ void ApiCameraData::toResource(QnVirtualCameraResourcePtr resource) const
 	resource->setVendor(vendor);
 }
 
-void ApiCameraData::fromResource(const QnVirtualCameraResourcePtr& resource)
+
+void ApiCamera::fromResource(const QnVirtualCameraResourcePtr& resource)
 {
-    ApiResourceData::fromResource(resource);
+    ApiResource::fromResource(resource);
 
 	scheduleDisabled = resource->isScheduleDisabled();
 	motionType = resource->getMotionType();
@@ -100,7 +101,7 @@ void ApiCameraData::fromResource(const QnVirtualCameraResourcePtr& resource)
 }
 
 template <class T> 
-void ApiCameraDataList::toResourceList(QList<T>& outData, QnResourceFactory* factory) const
+void ApiCameraList::toResourceList(QList<T>& outData, QnResourceFactory* factory) const
 {
     outData.reserve(outData.size() + data.size());
     for(int i = 0; i < data.size(); ++i) 
@@ -113,7 +114,7 @@ void ApiCameraDataList::toResourceList(QList<T>& outData, QnResourceFactory* fac
     }
 }
 
-void ApiCameraDataList::fromResourceList(const QList<QnVirtualCameraResourcePtr>& cameras)
+void ApiCameraList::fromResourceList(const QList<QnVirtualCameraResourcePtr>& cameras)
 {
     data.resize(cameras.size());
     for(int i = 0; i < cameras.size(); ++i)
@@ -121,13 +122,13 @@ void ApiCameraDataList::fromResourceList(const QList<QnVirtualCameraResourcePtr>
 }
 
 
-template void ApiCameraDataList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData, QnResourceFactory* factory) const;
-template void ApiCameraDataList::toResourceList<QnVirtualCameraResourcePtr>(QList<QnVirtualCameraResourcePtr>& outData, QnResourceFactory* factory) const;
+template void ApiCameraList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData, QnResourceFactory* factory) const;
+template void ApiCameraList::toResourceList<QnVirtualCameraResourcePtr>(QList<QnVirtualCameraResourcePtr>& outData, QnResourceFactory* factory) const;
 
 
-void ApiCameraDataList::loadFromQuery(QSqlQuery& query)
+void ApiCameraList::loadFromQuery(QSqlQuery& query)
 {
-    QN_QUERY_TO_DATA_OBJECT(query, ApiCameraData, data, apiCameraDataFields ApiResourceDataFields)
+    QN_QUERY_TO_DATA_OBJECT(query, ApiCamera, data, apiCameraDataFields ApiResourceFields)
 }
 
 }
