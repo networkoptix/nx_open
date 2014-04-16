@@ -541,11 +541,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlPulseSearcher::instance());
 #endif
 
-#ifdef Q_OS_WIN
-    //    QnResourceDiscoveryManager::instance()->addDeviceServer(&DesktopDeviceServer::instance());
-#endif // Q_OS_WIN
-
-
     /* Load translation. */
     QnClientTranslationManager *translationManager = qnCommon->instance<QnClientTranslationManager>();
     QnTranslation translation;
@@ -603,7 +598,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if(noVersionMismatchCheck)
         context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
-    /* Initialize desctop camera searcher. */
+    /* Initialize desktop camera searcher. */
 #ifdef Q_OS_WIN
     QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
     QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);

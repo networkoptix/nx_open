@@ -24,6 +24,7 @@ public:
     explicit QnPtzTourSpotsModel(QObject *parent = 0);
     virtual ~QnPtzTourSpotsModel();
 
+    static int speedToIndex(qreal speed);
     static QString speedToString(qreal speed);
     static QList<qreal> speedValues();
 
