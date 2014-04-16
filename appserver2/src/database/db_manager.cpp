@@ -1050,9 +1050,26 @@ ErrorCode QnDbManager::removeCamera(const QnId& guid)
 
 ErrorCode QnDbManager::removeServer(const QnId& guid)
 {
+    ErrorCode err;
     qint32 id = getResourceInternalId(guid);
 
-    ErrorCode err = deleteAddParams(id);
+    QSqlQuery queryCameras(m_sdb);
+    queryCameras.setForwardOnly(true);
+    queryCameras.prepare("SELECT r.guid from vms_camera c JOIN vms_resource r on r.id = c.resource_ptr_id WHERE r.parent_guid = ?");
+    queryCameras.addBindValue(guid.toRfc4122());
+
+    ApiCameraList cameraList;
+    if (!queryCameras.exec()) {
+        qWarning() << Q_FUNC_INFO << queryCameras.lastError().text();
+        return ErrorCode::failure;
+    }
+    while(queryCameras.next()) {
+        err = removeCamera(QUuid::fromRfc4122(queryCameras.value(0).toByteArray()));
+        if (err != ErrorCode::ok)
+            return err;
+    }
+
+    err = deleteAddParams(id);
     if (err != ErrorCode::ok)
         return err;
 
@@ -1331,14 +1348,14 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraList& camer
     QSqlQuery queryScheduleTask(m_sdb);
     QString filterStr2;
     if (!mServerId.isNull()) 
-        filterStr2 = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(mServerId));
+        filterStr2 = QString("AND r.parent_guid = %1").arg(guidToSqlString(mServerId));
     
     queryScheduleTask.setForwardOnly(true);
     queryScheduleTask.prepare(QString("SELECT r.guid as sourceId, st.start_time as startTime, st.end_time as endTime, st.do_record_audio as doRecordAudio, \
                                        st.record_type as recordType, st.day_of_week as dayOfWeek, st.before_threshold as beforeThreshold, st.after_threshold as afterThreshold, \
                                        st.stream_quality as streamQuality, st.fps \
                                        FROM vms_scheduletask st \
-                                       JOIN vms_resource r on r.id = st.source_id %1 ORDER BY r.id").arg(filterStr2));
+                                       JOIN vms_resource r on r.id = st.source_id %1 ORDER BY r.id").arg(filterStr));
 
     QSqlQuery queryParams(m_sdb);
     queryParams.setForwardOnly(true);
