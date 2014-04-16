@@ -5,6 +5,7 @@
 #include <utils/common/util.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/layout_resource.h>
 
 #include <ui/style/globals.h>
 

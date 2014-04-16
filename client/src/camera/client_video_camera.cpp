@@ -2,6 +2,7 @@
 
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "ui/style/skin.h"
+#include <core/resource/media_resource.h>
 #include "core/resource/security_cam_resource.h"
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
@@ -19,7 +20,7 @@ QString QnClientVideoCamera::errorString(int errCode) {
     return QnStreamRecorder::errorString(errCode);
 }
 
-QnClientVideoCamera::QnClientVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamDataProvider* reader) :
+QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader) :
     m_resource(resource),
     m_camdispay(resource, dynamic_cast<QnArchiveStreamReader*>(reader)),
     m_reader(reader),
