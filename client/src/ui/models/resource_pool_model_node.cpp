@@ -503,19 +503,6 @@ void QnResourcePoolModelNode::setModified(bool modified) {
     changeInternal();
 }
 
-// TODO: #GDM
-// This is a node construction method, so it does not really belong here.
-// See other node construction methods, QnResourcePoolModel::node(...).
-QnResourcePoolModelNode* QnResourcePoolModelNode::recorder(const QString &groupId, const QString &groupName) {
-    if (m_recorders.contains(groupId))
-        return m_recorders[groupId];
-
-    QnResourcePoolModelNode* recorder = new QnResourcePoolModelNode(m_model, Qn::RecorderNode, groupName);
-    recorder->setParent(this);
-    m_recorders[groupId] = recorder;
-    return recorder;
-}
-
 void QnResourcePoolModelNode::removeChildInternal(QnResourcePoolModelNode *child) {
     assert(child->parent() == this);
 
