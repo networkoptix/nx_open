@@ -153,13 +153,11 @@ bool QnTourPtzController::activateTour(const QString &tourId) {
         activeTour = records.value(tourId);
         activeTour.optimize();
         
-        if(activeTour.spots.isEmpty())
-            return false;
-
         m_activeTour = activeTour;
     }
 
-    m_executor->startTour(activeTour);
+    if(!activeTour.spots.isEmpty())
+        m_executor->startTour(activeTour);
 
     return true;
 }
