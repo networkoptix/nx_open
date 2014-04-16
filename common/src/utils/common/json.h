@@ -300,7 +300,7 @@ namespace QJsonDetail {
 } // namespace QJsonDetail
 
 
-QSS_REGISTER_VISITORS(QJsonValue, QJsonDetail::SerializationVisitor, QJsonDetail::DeserializationVisitor)
+QN_FUSION_REGISTER_VISITORS(QJsonValue, QJsonDetail::SerializationVisitor, QJsonDetail::DeserializationVisitor)
 
 
 
@@ -383,11 +383,11 @@ __VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *
 
 #define QN_DEFINE_ADAPTED_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)  \
 __VA_ARGS__ void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target) { \
-    QssDetail::serialize(ctx, value, target)                                    \
+    QnFusionDetail::serialize(ctx, value, target)                                    \
 }                                                                               \
                                                                                 \
 __VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *target) { \
-    return QssDetail::deserialize(ctx, value, target);                          \
+    return QnFusionDetail::deserialize(ctx, value, target);                          \
 }
 
 

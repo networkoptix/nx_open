@@ -14,106 +14,170 @@
 // Context -> QnSerializationContext
 // Serializer -> Qn[Basic|Context]Serializer
 
-namespace Qss {
-    template<class D>
-    class Context;
-    template<class D>
-    class Serializer;
-} // namespace Qss
-
-
-namespace QssDetail {
+namespace QnSerializationDetail {
     template<class Context, class T, class D>
     void serialize_value_direct(Context *ctx, const T &value, D *target);
     template<class Context, class T, class D>
     bool deserialize_value_direct(Context *ctx, const D &value, T *target);
+    template<class T, class D>
+    void serialize_value(const T &value, D *target);
+    template<class T, class D>
+    bool deserialize_value(const D &value, T *target);
 } // namespace QssDetail
 
 
-namespace Qss {
-    template<class D>
-    class Context {
-    public:
-        void registerSerializer(Serializer<D> *serializer) {
-            m_serializerByType.insert(serializer->type(), serializer);
-        }
+template<class Serializer>
+class QnSerializationContext {
+public:
+    typedef Serializer serializer_type;
 
-        void unregisterSerializer(int type) {
-            m_serializerByType.remove(type);
-        }
+    void registerSerializer(serializer_type *serializer) {
+        m_serializerByType.insert(serializer->type(), serializer);
+    }
 
-        Serializer<D> *serializer(int type) const {
-            return m_serializerByType.value(type);
-        }
+    void unregisterSerializer(int type) {
+        m_serializerByType.remove(type);
+    }
 
-    private:
-        QnFlatMap<unsigned int, Serializer<D> *> m_serializerByType;
-    };
+    serializer_type *serializer(int type) const {
+        return m_serializerByType.value(type);
+    }
 
-
-    template<class D>
-    class Serializer { // TODO: ContextSerializer & BasicSerializer
-    public:
-        Serializer(int type): m_type(type) {}
-        virtual ~Serializer() {}
-
-        int type() const {
-            return m_type;
-        }
-
-        void serialize(Context<D> *ctx, const QVariant &value, D *target) const {
-            assert(value.userType() == m_type && target);
-
-            serializeInternal(ctx, value.constData(), target);
-        }
-
-        void serialize(Context<D> *ctx, const void *value, D *target) const {
-            assert(value && target);
-
-            serializeInternal(ctx, value, target);
-        }
-
-        bool deserialize(Context<D> *ctx, const D &value, QVariant *target) const {
-            assert(target);
-
-            *target = QVariant(m_type, static_cast<const void *>(NULL));
-            return deserializeInternal(ctx, value, target->data());
-        }
-
-        bool deserialize(Context<D> *ctx, const D &value, void *target) const {
-            assert(target);
-
-            return deserializeInternal(ctx, value, target);
-        }
-
-    protected:
-        virtual void serializeInternal(Context<D> *ctx, const void *value, D *target) const = 0;
-        virtual bool deserializeInternal(Context<D> *ctx, const D &value, void *target) const = 0;
-
-    private:
-        int m_type;
-    };
+private:
+    QnFlatMap<unsigned int, serializer_type *> m_serializerByType;
+};
 
 
-    template<class T, class D>
-    class DefaultSerializer: public Serializer<D> {
-    public:
-        DefaultSerializer(): Serializer(qMetaTypeId<T>()) {}
+template<class D, class Context>
+class QnContextSerializer {
+public:
+    typedef Context context_type;
+    typedef D data_type;
 
-    protected:
-        virtual void serializeInternal(Context<D> *ctx, const void *value, D *target) const override {
-            QssDetail::serialize_value_direct(ctx, *static_cast<const T *>(value), target);
-        }
+    QnContextSerializer(int type): m_type(type) {}
+    virtual ~QnContextSerializer() {}
 
-        virtual bool deserializeInternal(Context<D> *ctx, const D &value, void *target) const override {
-            return QssDetail::deserialize_value_direct(ctx, value, static_cast<T *>(target));
-        }
-    };
+    int type() const {
+        return m_type;
+    }
 
-} // namespace Qss
+    void serialize(context_type *ctx, const QVariant &value, data_type *target) const {
+        assert(ctx && value.userType() == m_type && target);
+
+        serializeInternal(ctx, value.constData(), target);
+    }
+
+    void serialize(context_type *ctx, const void *value, data_type *target) const {
+        assert(ctx && value && target);
+
+        serializeInternal(ctx, value, target);
+    }
+
+    bool deserialize(context_type *ctx, const data_type &value, QVariant *target) const {
+        assert(ctx && target);
+
+        *target = QVariant(m_type, static_cast<const void *>(NULL));
+        return deserializeInternal(ctx, value, target->data());
+    }
+
+    bool deserialize(context_type *ctx, const data_type &value, void *target) const {
+        assert(ctx && target);
+
+        return deserializeInternal(ctx, value, target);
+    }
+
+protected:
+    virtual void serializeInternal(context_type *ctx, const void *value, data_type *target) const = 0;
+    virtual bool deserializeInternal(context_type *ctx, const data_type &value, void *target) const = 0;
+
+private:
+    int m_type;
+};
 
 
-namespace QssDetail {
+template<class D>
+class QnBasicSerializer {
+public:
+    typedef D data_type;
+
+    QnBasicSerializer(int type): m_type(type) {}
+    virtual ~QnBasicSerializer() {}
+
+    int type() const {
+        return m_type;
+    }
+
+    void serialize(const QVariant &value, data_type *target) const {
+        assert(value.userType() == m_type && target);
+
+        serializeInternal(value.constData(), target);
+    }
+
+    void serialize(const void *value, data_type *target) const {
+        assert(value && target);
+
+        serializeInternal(value, target);
+    }
+
+    bool deserialize(const data_type &value, QVariant *target) const {
+        assert(target);
+
+        *target = QVariant(m_type, static_cast<const void *>(NULL));
+        return deserializeInternal(value, target->data());
+    }
+
+    bool deserialize(const data_type &value, void *target) const {
+        assert(target);
+
+        return deserializeInternal(value, target);
+    }
+
+protected:
+    virtual void serializeInternal(const void *value, data_type *target) const = 0;
+    virtual bool deserializeInternal(const data_type &value, void *target) const = 0;
+
+private:
+    int m_type;
+};
+
+
+template<class T, class Base>
+class QnDefaultContextSerializer: public Base {
+public:
+    using Base::context_type;
+    using Base::data_type;
+
+    QnDefaultContextSerializer(): Base(qMetaTypeId<T>()) {}
+
+protected:
+    virtual void serializeInternal(context_type *ctx, const void *value, data_type *target) const override {
+        QnSerializationDetail::serialize_value_direct(ctx, *static_cast<const T *>(value), target);
+    }
+
+    virtual bool deserializeInternal(context_type *ctx, const data_type &value, void *target) const override {
+        return QnSerializationDetail::deserialize_value_direct(ctx, value, static_cast<T *>(target));
+    }
+};
+
+template<class T, class Base>
+class QnDefaultBasicSerializer: public Base {
+public:
+    using Base::data_type;
+
+    QnDefaultBasicSerializer(): Base(qMetaTypeId<T>()) {}
+
+protected:
+    virtual void serializeInternal(const void *value, data_type *target) const override {
+        QnSerializationDetail::serialize_value(*static_cast<const T *>(value), target);
+    }
+
+    virtual bool deserializeInternal(const data_type &value, void *target) const override {
+        return QnSerializationDetail::deserialize_value(value, static_cast<T *>(target));
+    }
+};
+
+
+namespace QnSerializationDetail {
 
     /* Internal interface for (de)serializers that do not use context. */
 
@@ -185,22 +249,22 @@ namespace QssDetail {
         return deserialize_value_direct(ctx, value, target);
     }
 
-} // namespace QssDetail
+} // namespace QnSerializationDetail
 
-namespace Qss {
+namespace QnSerialization {
 
     /* Public interface for (de)serializers that do not use context. */
 
     template<class T, class D>
     void serialize(const T &value, D *target) {
         assert(target);
-        QssDetail::serialize_value(value, target);
+        QnSerializationDetail::serialize_value(value, target);
     }
 
     template<class T, class D>
     bool deserialize(const D &value, T *target) {
         assert(target);
-        return QssDetail::deserialize_value(value, target);
+        return QnSerializationDetail::deserialize_value(value, target);
     }
 
     
@@ -212,13 +276,13 @@ namespace Qss {
     template<class Context, class T, class D>
     void serialize(Context *ctx, const T &value, D *target) {
         assert(ctx && target);
-        QssDetail::serialize_value(ctx, value, target);
+        QnSerializationDetail::serialize_value(ctx, value, target);
     }
 
     template<class Context, class T, class D>
     bool deserialize(Context *ctx, const D &value, T *target) {
         assert(ctx && target);
-        return QssDetail::deserialize_value(ctx, value, target);
+        return QnSerializationDetail::deserialize_value(ctx, value, target);
     }
 
 

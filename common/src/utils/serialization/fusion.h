@@ -1,5 +1,5 @@
-#ifndef QN_SERIALIZATION_FUNCTIONS_H
-#define QN_SERIALIZATION_FUNCTIONS_H
+#ifndef QN_FUSION_H
+#define QN_FUSION_H
 
 #include <utility> /* For std::forward and std::declval. */
 
@@ -18,7 +18,7 @@
 #include <boost/mpl/and.hpp>
 #include <boost/mpl/integral_c.hpp>
 
-namespace QssDetail {
+namespace QnFusionDetail {
     template<class T, class Visitor>
     bool visit_members_internal(T &&value, Visitor &&visitor) {
         return visit_members(std::forward<T>(value), std::forward<Visitor>(visitor)); /* That's the place where ADL kicks in. */
@@ -88,9 +88,9 @@ namespace QssDetail {
     }
    
 
-} // namespace QssDetail
+} // namespace QnFusionDetail
 
-namespace Qss {
+namespace QnFusion {
     /**
      * Main API entry point. Iterates through the members of a previously 
      * registered type.
@@ -116,7 +116,7 @@ namespace Qss {
      */
     template<class T, class Visitor>
     bool visit_members(T &&value, Visitor &&visitor) {
-        return QssDetail::visit_members_internal(std::forward<T>(value), std::forward<Visitor>(visitor));
+        return QnFusionDetail::visit_members_internal(std::forward<T>(value), std::forward<Visitor>(visitor));
     }
 
     /**
@@ -132,9 +132,9 @@ namespace Qss {
         }
 
         template<class Tag, class Default>
-        static typename QssDetail::DefaultGetter<Adaptor, Tag, Default>::result_type
+        static typename QnFusionDetail::DefaultGetter<Adaptor, Tag, Default>::result_type
         get() {
-            return QssDetail::DefaultGetter<Adaptor, Tag, Default>()();
+            return QnFusionDetail::DefaultGetter<Adaptor, Tag, Default>()();
         }
     };
 
@@ -142,7 +142,7 @@ namespace Qss {
      * \param D                         Data type.
      * \returns                         Serialization visitor type that was
      *                                  registered for the given data type.
-     * \see QSS_REGISTER_VISITORS
+     * \see QN_FUSION_REGISTER_VISITORS
      */
     template<class D>
     struct serialization_visitor_type {};
@@ -151,24 +151,24 @@ namespace Qss {
      * \param D                         Data type.
      * \returns                         Deserialization visitor type that was
      *                                  registered for the given data type.
-     * \see QSS_REGISTER_VISITORS
+     * \see QN_FUSION_REGISTER_VISITORS
      */
     template<class D>
     struct deserialization_visitor_type {};
 
     template<class D>
     struct has_serialization_visitor_type:
-        QssDetail::has_type<serialization_visitor_type<D> >
+        QnFusionDetail::has_type<serialization_visitor_type<D> >
     {};
 
     template<class D>
     struct has_deserialization_visitor_type:
-        QssDetail::has_type<deserialization_visitor_type<D> >
+        QnFusionDetail::has_type<deserialization_visitor_type<D> >
     {};
 
     template<class T>
     struct has_visit_members: 
-        QssDetail::has_visit_members<T>
+        QnFusionDetail::has_visit_members<T>
     {};
 
     /**
@@ -208,57 +208,57 @@ namespace Qss {
         setter(object, value);
     }
 
-} // namespace Qss
+} // namespace QnFusion
 
 /**
- * This macro defines a new Qss tag. It must be used in global namespace.
- * Defined tag can then be accessed from the Qss namespace.
+ * This macro defines a new fusion tag. It must be used in global namespace.
+ * Defined tag can then be accessed from the QnFusion namespace.
  * 
  * \param TAG                           Tag to define.
  */
-#define QSS_DEFINE_TAG(TAG)                                                     \
-namespace Qss { struct TAG {}; }
+#define QN_FUSION_DEFINE_TAG(TAG)                                               \
+namespace QnFusion { struct TAG {}; }
 
-QSS_DEFINE_TAG(index)
-QSS_DEFINE_TAG(getter)
-QSS_DEFINE_TAG(setter)
-QSS_DEFINE_TAG(checker)
-QSS_DEFINE_TAG(name)
-QSS_DEFINE_TAG(optional)
+QN_FUSION_DEFINE_TAG(index)
+QN_FUSION_DEFINE_TAG(getter)
+QN_FUSION_DEFINE_TAG(setter)
+QN_FUSION_DEFINE_TAG(checker)
+QN_FUSION_DEFINE_TAG(name)
+QN_FUSION_DEFINE_TAG(optional)
 
-#define QSS_TAG_IS_TYPED_FOR_index ,
-#define QSS_TAG_TYPE_FOR_index int
+#define QN_FUSION_TAG_IS_TYPED_FOR_index ,
+#define QN_FUSION_TAG_TYPE_FOR_index int
 
-#define QSS_TAG_IS_TYPED_FOR_name ,
-#define QSS_TAG_TYPE_FOR_name QString
-#define QSS_TAG_IS_WRAPPED_FOR_name ,
-#define QSS_TAG_WRAPPER_FOR_name lit
+#define QN_FUSION_TAG_IS_TYPED_FOR_name ,
+#define QN_FUSION_TAG_TYPE_FOR_name QString
+#define QN_FUSION_TAG_IS_WRAPPED_FOR_name ,
+#define QN_FUSION_TAG_WRAPPER_FOR_name lit
 
-#define QSS_TAG_IS_TYPED_FOR_optional ,
-#define QSS_TAG_TYPE_FOR_optional bool
+#define QN_FUSION_TAG_IS_TYPED_FOR_optional ,
+#define QN_FUSION_TAG_TYPE_FOR_optional bool
 
 
 /**
- * This macro registers Qss visitors that are to be used when serializing
+ * This macro registers fusion visitors that are to be used when serializing
  * and deserializing to/from the given data class. This macro must be used 
  * in global namespace.
  * 
- * Defining the visitors makes all Qss adapted classes instantly (de)serializable
+ * Defining the visitors makes all fusion adapted classes instantly (de)serializable
  * to/from the given data class.
  * 
  * \param DATA_CLASS                    Data class to define visitors for.
  * \param SERIALIZATION_VISITOR         Serialization visitor class.
  * \param DESERIALIZATION_VISITOR       Deserialization visitor class.
  */
-#define QSS_REGISTER_VISITORS(DATA_CLASS, SERIALIZATION_VISITOR, DESERIALIZATION_VISITOR) \
-    QSS_REGISTER_SERIALIZATION_VISITOR(DATA_CLASS, SERIALIZATION_VISITOR)       \
-    QSS_REGISTER_DESERIALIZATION_VISITOR(DATA_CLASS, DESERIALIZATION_VISITOR)
+#define QN_FUSION_REGISTER_VISITORS(DATA_CLASS, SERIALIZATION_VISITOR, DESERIALIZATION_VISITOR) \
+    QN_FUSION_REGISTER_SERIALIZATION_VISITOR(DATA_CLASS, SERIALIZATION_VISITOR) \
+    QN_FUSION_REGISTER_DESERIALIZATION_VISITOR(DATA_CLASS, DESERIALIZATION_VISITOR)
 
 /**
- * \see QSS_REGISTER_VISITORS
+ * \see QN_FUSION_REGISTER_VISITORS
  */
-#define QSS_REGISTER_SERIALIZATION_VISITOR(DATA_CLASS, SERIALIZATION_VISITOR)   \
-namespace Qss {                                                                 \
+#define QN_FUSION_REGISTER_SERIALIZATION_VISITOR(DATA_CLASS, SERIALIZATION_VISITOR) \
+namespace QnFusion {                                                            \
     template<>                                                                  \
     struct serialization_visitor_type<DATA_CLASS>:                              \
         boost::mpl::identity<SERIALIZATION_VISITOR>                             \
@@ -266,10 +266,10 @@ namespace Qss {                                                                 
 }
 
 /**
- * \see QSS_REGISTER_VISITORS
+ * \see QN_FUSION_REGISTER_VISITORS
  */
-#define QSS_REGISTER_DESERIALIZATION_VISITOR(DATA_CLASS, DESERIALIZATION_VISITOR) \
-namespace Qss {                                                                 \
+#define QN_FUSION_REGISTER_DESERIALIZATION_VISITOR(DATA_CLASS, DESERIALIZATION_VISITOR) \
+namespace QnFusion {                                                            \
     template<>                                                                  \
     struct deserialization_visitor_type<DATA_CLASS>:                            \
         boost::mpl::identity<DESERIALIZATION_VISITOR>                           \
@@ -280,84 +280,84 @@ namespace Qss {                                                                 
 /**
  * 
  */
-#define QSS_DEFINE_CLASS_ADAPTOR(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)       \
-    QSS_DEFINE_CLASS_ADAPTOR_I(CLASS, MEMBER_SEQ, BOOST_PP_VARIADIC_SEQ_NIL __VA_ARGS__)
+#define QN_FUSION_DEFINE_CLASS_ADAPTOR(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
+    QN_FUSION_DEFINE_CLASS_ADAPTOR_I(CLASS, MEMBER_SEQ, BOOST_PP_VARIADIC_SEQ_NIL __VA_ARGS__)
 
-#define QSS_DEFINE_CLASS_ADAPTOR_I(CLASS, MEMBER_SEQ, GLOBAL_SEQ)               \
+#define QN_FUSION_DEFINE_CLASS_ADAPTOR_I(CLASS, MEMBER_SEQ, GLOBAL_SEQ)         \
 template<class T>                                                               \
-struct QssBinding;                                                              \
+struct QnFusionBinding;                                                         \
                                                                                 \
 template<>                                                                      \
-struct QssBinding<CLASS> {                                                      \
-    BOOST_PP_SEQ_FOR_EACH_I(QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_I, GLOBAL_SEQ, MEMBER_SEQ) \
+struct QnFusionBinding<CLASS> {                                                 \
+    BOOST_PP_SEQ_FOR_EACH_I(QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_I, GLOBAL_SEQ, MEMBER_SEQ) \
                                                                                 \
     template<class T, class Visitor>                                            \
     static bool visit_members(T &&value, Visitor &&visitor) {                   \
-        if(!QssDetail::initialize_visitor(std::forward<Visitor>(visitor), std::forward<T>(value))) \
+        if(!QnFusionDetail::initialize_visitor(std::forward<Visitor>(visitor), std::forward<T>(value))) \
             return false;                                                       \
-        BOOST_PP_REPEAT(BOOST_PP_SEQ_SIZE(MEMBER_SEQ), QSS_DEFINE_CLASS_ADAPTOR_FUNCTION_STEP_I, ~) \
+        BOOST_PP_REPEAT(BOOST_PP_SEQ_SIZE(MEMBER_SEQ), QN_FUSION_DEFINE_CLASS_ADAPTOR_FUNCTION_STEP_I, ~) \
         return true;                                                            \
     }                                                                           \
 };                                                                              \
                                                                                 \
 template<class Visitor>                                                         \
 bool visit_members(const CLASS &value, Visitor &&visitor) {                     \
-    return QssBinding<CLASS>::visit_members(value, std::forward<Visitor>(visitor)); \
+    return QnFusionBinding<CLASS>::visit_members(value, std::forward<Visitor>(visitor)); \
 }                                                                               \
                                                                                 \
 template<class Visitor>                                                         \
 bool visit_members(CLASS &value, Visitor &&visitor) {                           \
-    return QssBinding<CLASS>::visit_members(value, std::forward<Visitor>(visitor)); \
+    return QnFusionBinding<CLASS>::visit_members(value, std::forward<Visitor>(visitor)); \
 }
 
 
-#define QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_I(R, GLOBAL_SEQ, INDEX, PROPERTY_SEQ) \
-    QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_II(INDEX, GLOBAL_SEQ PROPERTY_SEQ)
+#define QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_I(R, GLOBAL_SEQ, INDEX, PROPERTY_SEQ) \
+    QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_II(INDEX, GLOBAL_SEQ PROPERTY_SEQ)
 
-#define QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_II(INDEX, PROPERTY_SEQ)            \
+#define QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_II(INDEX, PROPERTY_SEQ)      \
     struct BOOST_PP_CAT(MemberAdaptor, INDEX) {                                 \
         template<class Tag>                                                     \
         struct has_tag:                                                         \
             boost::mpl::false_type                                              \
         {};                                                                     \
                                                                                 \
-        BOOST_PP_VARIADIC_SEQ_FOR_EACH(QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (index, INDEX)) \
+        BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (index, INDEX)) \
     };
 
-#define QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_STEP_I(R, DATA, PROPERTY_TUPLE)    \
-    QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_STEP_II PROPERTY_TUPLE
+#define QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_STEP_I(R, DATA, PROPERTY_TUPLE) \
+    QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_STEP_II PROPERTY_TUPLE
 
-#define QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_STEP_II(TAG, VALUE)                \
+#define QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_STEP_II(TAG, VALUE)          \
     template<>                                                                  \
-    struct has_tag<Qss::TAG>:                                                   \
+    struct has_tag<QnFusion::TAG>:                                              \
         boost::mpl::true_                                                       \
     {};                                                                         \
                                                                                 \
-    static QSS_TAG_TYPE(TAG, VALUE) get(const Qss::TAG &) {                     \
-        return QSS_TAG_VALUE(TAG, VALUE);                                       \
+    static QN_FUSION_TAG_TYPE(TAG, VALUE) get(const QnFusion::TAG &) {          \
+        return QN_FUSION_TAG_VALUE(TAG, VALUE);                                 \
     }
 
 
-#define QSS_DEFINE_CLASS_ADAPTOR_FUNCTION_STEP_I(Z, INDEX, DATA)                \
-    if(!visitor(std::forward<T>(value), Qss::MemberAdaptor<BOOST_PP_CAT(MemberAdaptor, INDEX)>())) \
+#define QN_FUSION_DEFINE_CLASS_ADAPTOR_FUNCTION_STEP_I(Z, INDEX, DATA)          \
+    if(!visitor(std::forward<T>(value), QnFusion::MemberAdaptor<BOOST_PP_CAT(MemberAdaptor, INDEX)>())) \
         return false;
 
 
 /**
  * 
  */
-#define QSS_DEFINE_CLASS_ADAPTOR_SHORTCUT(CLASS, TAGS_TUPLE, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
-    QSS_DEFINE_CLASS_ADAPTOR(CLASS, QSS_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ), ##__VA_ARGS__)
+#define QN_FUSION_DEFINE_CLASS_ADAPTOR_SHORTCUT(CLASS, TAGS_TUPLE, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
+    QN_FUSION_DEFINE_CLASS_ADAPTOR(CLASS, QN_FUSION_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ), ##__VA_ARGS__)
 
-#define QSS_DEFINE_CLASS_ADAPTOR_SHORTCUT_GSN(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
-    QSS_DEFINE_CLASS_ADAPTOR_SHORTCUT(CLASS, (getter, setter, name), MEMBER_SEQ, ##__VA_ARGS__)
+#define QN_FUSION_DEFINE_CLASS_ADAPTOR_SHORTCUT_GSN(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
+    QN_FUSION_DEFINE_CLASS_ADAPTOR_SHORTCUT(CLASS, (getter, setter, name), MEMBER_SEQ, ##__VA_ARGS__)
 
 
 /**
  *
  */
-#define QSS_DEFINE_STRUCT_ADAPTOR(STRUCT, FIELD_SEQ, ... /* GLOBAL_SEQ */)      \
-    QSS_DEFINE_CLASS_ADAPTOR(STRUCT, QSS_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ), ##__VA_ARGS__)
+#define QN_FUSION_DEFINE_STRUCT_ADAPTOR(STRUCT, FIELD_SEQ, ... /* GLOBAL_SEQ */)      \
+    QN_FUSION_DEFINE_CLASS_ADAPTOR(STRUCT, QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ), ##__VA_ARGS__)
 
 
 /**
@@ -365,10 +365,10 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * 
  * Converts a field sequence into a standard member sequence.
  */
-#define QSS_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ)                          \
-    BOOST_PP_SEQ_FOR_EACH(QSS_FIELD_SEQ_TO_MEMBER_SEQ_STEP_I, STRUCT, FIELD_SEQ)
+#define QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ)                          \
+    BOOST_PP_SEQ_FOR_EACH(QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ_STEP_I, STRUCT, FIELD_SEQ)
 
-#define QSS_FIELD_SEQ_TO_MEMBER_SEQ_STEP_I(R, STRUCT, FIELD)                    \
+#define QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ_STEP_I(R, STRUCT, FIELD)                    \
     ((getter, &STRUCT::FIELD)(setter, &STRUCT::FIELD)(name, BOOST_PP_STRINGIZE(FIELD)))
 
 
@@ -380,7 +380,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * For example, the following invocation:
  * 
  * \code
- * QSS_UNROLL_SHORTCUT_SEQ(
+ * QN_FUSION_UNROLL_SHORTCUT_SEQ(
  *     (getter, setter, name),
  *     ((&QSize::width, &QSize::setWidth, lit("width"))
  *     ((&QSize::height, &QSize::setHeight, lit("height"))(optional, true))
@@ -394,19 +394,19 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * ((getter, &QSize::height)(setter, &QSize::setHeight)(name, lit("height")(optional, true))
  * \endcode
  */
-#define QSS_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ)                         \
-    BOOST_PP_SEQ_FOR_EACH(QSS_UNROLL_SHORTCUT_SEQ_STEP_I, TAGS_TUPLE, MEMBER_SEQ)
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ)                         \
+    BOOST_PP_SEQ_FOR_EACH(QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_I, TAGS_TUPLE, MEMBER_SEQ)
 
-#define QSS_UNROLL_SHORTCUT_SEQ_STEP_I(R, TAGS_TUPLE, PROPERTY_SEQ)             \
-    QSS_UNROLL_SHORTCUT_SEQ_STEP_II(TAGS_TUPLE, (BOOST_PP_VARIADIC_SEQ_HEAD(PROPERTY_SEQ))) BOOST_PP_VARIADIC_SEQ_TAIL(PROPERTY_SEQ)
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_I(R, TAGS_TUPLE, PROPERTY_SEQ)             \
+    QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_II(TAGS_TUPLE, (BOOST_PP_VARIADIC_SEQ_HEAD(PROPERTY_SEQ))) BOOST_PP_VARIADIC_SEQ_TAIL(PROPERTY_SEQ)
 
-#define QSS_UNROLL_SHORTCUT_SEQ_STEP_II(TAGS_TUPLE, VALUES_TUPLE)               \
-    BOOST_PP_REPEAT(BOOST_PP_TUPLE_SIZE(TAGS_TUPLE), QSS_UNROLL_SHORTCUT_SEQ_STEP_STEP_I, (TAGS_TUPLE, VALUES_TUPLE))
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_II(TAGS_TUPLE, VALUES_TUPLE)               \
+    BOOST_PP_REPEAT(BOOST_PP_TUPLE_SIZE(TAGS_TUPLE), QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_I, (TAGS_TUPLE, VALUES_TUPLE))
 
-#define QSS_UNROLL_SHORTCUT_SEQ_STEP_STEP_I(Z, INDEX, DATA)                     \
-    QSS_UNROLL_SHORTCUT_SEQ_STEP_STEP_II(BOOST_PP_TUPLE_ELEM(0, DATA), BOOST_PP_TUPLE_ELEM(1, DATA), INDEX)
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_I(Z, INDEX, DATA)                     \
+    QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_II(BOOST_PP_TUPLE_ELEM(0, DATA), BOOST_PP_TUPLE_ELEM(1, DATA), INDEX)
 
-#define QSS_UNROLL_SHORTCUT_SEQ_STEP_STEP_II(TAGS_TUPLE, VALUES_TUPLE, INDEX)   \
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_II(TAGS_TUPLE, VALUES_TUPLE, INDEX)   \
     (BOOST_PP_TUPLE_ELEM(INDEX, TAGS_TUPLE), BOOST_PP_TUPLE_ELEM(INDEX, VALUES_TUPLE))
 
 
@@ -419,23 +419,23 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * To override the default return value for some tag <tt>some_tag</tt>, use
  * the following code:
  * \code
- * #define QSS_TAG_IS_TYPED_FOR_some_tag ,
- * #define QSS_TAG_TYPE_FOR_some_tag QString // Or your custom type
+ * #define QN_FUSION_TAG_IS_TYPED_FOR_some_tag ,
+ * #define QN_FUSION_TAG_TYPE_FOR_some_tag QString // Or your custom type
  * \endcode
  * 
  * This might be useful when <tt>decltype</tt> cannot be used because
  * <tt>VALUE</tt> might be a lambda.
  *
- * \param TAG                           Qss tag.
+ * \param TAG                           Fusion tag.
  * \param VALUE                         Value specified by the user for this tag.
  * \returns                             Type expression that should be used for
  *                                      return type of tag getter function.
  */
-#define QSS_TAG_TYPE(TAG, VALUE)                                                \
-    BOOST_PP_OVERLOAD(QSS_TAG_TYPE_I_, ~ BOOST_PP_CAT(QSS_TAG_IS_TYPED_FOR_, TAG) ~)(TAG, VALUE)
+#define QN_FUSION_TAG_TYPE(TAG, VALUE)                                                \
+    BOOST_PP_OVERLOAD(QN_FUSION_TAG_TYPE_I_, ~ BOOST_PP_CAT(QN_FUSION_TAG_IS_TYPED_FOR_, TAG) ~)(TAG, VALUE)
     
-#define QSS_TAG_TYPE_I_1(TAG, VALUE) decltype(QSS_TAG_VALUE(TAG, VALUE))
-#define QSS_TAG_TYPE_I_2(TAG, VALUE) BOOST_PP_CAT(QSS_TAG_TYPE_FOR_, TAG)
+#define QN_FUSION_TAG_TYPE_I_1(TAG, VALUE) decltype(QN_FUSION_TAG_VALUE(TAG, VALUE))
+#define QN_FUSION_TAG_TYPE_I_2(TAG, VALUE) BOOST_PP_CAT(QN_FUSION_TAG_TYPE_FOR_, TAG)
 
 /**
  * \internal
@@ -446,57 +446,57 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * To override the default return value for some tag <tt>some_tag</tt>, use
  * the following code:
  * \code
- * #define QSS_TAG_IS_WRAPPED_FOR_some_tag ,
- * #define QSS_TAG_WRAPPER_FOR_some_tag QLatin1Literal // Or your custom wrapper macro
+ * #define QN_FUSION_TAG_IS_WRAPPED_FOR_some_tag ,
+ * #define QN_FUSION_TAG_WRAPPER_FOR_some_tag QLatin1Literal // Or your custom wrapper macro
  * \endcode
  * 
- * \param TAG                           Qss tag.
+ * \param TAG                           Fusion tag.
  * \param VALUE                         Value specified by the user for this tag.
  * \returns                             Expression that should be used in the
  *                                      return statement of tag getter function.
  */
-#define QSS_TAG_VALUE(TAG, VALUE)                                               \
-    BOOST_PP_OVERLOAD(QSS_TAG_VALUE_I_, ~ BOOST_PP_CAT(QSS_TAG_IS_WRAPPED_FOR_, TAG) ~)(TAG, VALUE)
+#define QN_FUSION_TAG_VALUE(TAG, VALUE)                                               \
+    BOOST_PP_OVERLOAD(QN_FUSION_TAG_VALUE_I_, ~ BOOST_PP_CAT(QN_FUSION_TAG_IS_WRAPPED_FOR_, TAG) ~)(TAG, VALUE)
 
-#define QSS_TAG_VALUE_I_1(TAG, VALUE) VALUE
-#define QSS_TAG_VALUE_I_2(TAG, VALUE) BOOST_PP_CAT(QSS_TAG_WRAPPER_FOR_, TAG)(VALUE)
+#define QN_FUSION_TAG_VALUE_I_1(TAG, VALUE) VALUE
+#define QN_FUSION_TAG_VALUE_I_2(TAG, VALUE) BOOST_PP_CAT(QN_FUSION_TAG_WRAPPER_FOR_, TAG)(VALUE)
 
 
-namespace QssDetail {
+namespace QnFusionDetail {
     /* We place the conditional serialization functions in the same namespace
      * where ADL lookup takes place. */
 
     // TODO: These go into Qss, then pulled into QnSerializationDetail
 
     template<class T, class D>
-    typename boost::enable_if<boost::mpl::and_<Qss::has_visit_members<T>, Qss::has_serialization_visitor_type<D> >, void>::type
+    typename boost::enable_if<boost::mpl::and_<QnFusion::has_visit_members<T>, QnFusion::has_serialization_visitor_type<D> >, void>::type
     serialize(const T &value, D *target) {
-        typename Qss::serialization_visitor_type<D>::type visitor(*target);
-        Qss::visit_members(value, visitor);
+        typename QnFusion::serialization_visitor_type<D>::type visitor(*target);
+        QnFusion::visit_members(value, visitor);
     }
 
     template<class T, class D>
-    typename boost::enable_if<boost::mpl::and_<Qss::has_visit_members<T>, Qss::has_deserialization_visitor_type<D> >, bool>::type
+    typename boost::enable_if<boost::mpl::and_<QnFusion::has_visit_members<T>, QnFusion::has_deserialization_visitor_type<D> >, bool>::type
     deserialize(const D &value, T *target) {
-        typename Qss::deserialization_visitor_type<D>::type visitor(value);
-        return Qss::visit_members(*target, visitor);
+        typename QnFusion::deserialization_visitor_type<D>::type visitor(value);
+        return QnFusion::visit_members(*target, visitor);
     }
 
     template<class T, class D>
-    typename boost::enable_if<boost::mpl::and_<Qss::has_visit_members<T>, Qss::has_serialization_visitor_type<D> >, void>::type
-    serialize(Qss::Context<D> *ctx, const T &value, D *target) {
-        typename Qss::serialization_visitor_type<D>::type visitor(ctx, *target);
-        Qss::visit_members(value, visitor);
+    typename boost::enable_if<boost::mpl::and_<QnFusion::has_visit_members<T>, QnFusion::has_serialization_visitor_type<D> >, void>::type
+    serialize(QnFusion::Context<D> *ctx, const T &value, D *target) {
+        typename QnFusion::serialization_visitor_type<D>::type visitor(ctx, *target);
+        QnFusion::visit_members(value, visitor);
     }
 
     template<class T, class D>
-    typename boost::enable_if<boost::mpl::and_<Qss::has_visit_members<T>, Qss::has_deserialization_visitor_type<D> >, bool>::type
-    deserialize(Qss::Context<D> *ctx, const D &value, T *target) {
-        typename Qss::deserialization_visitor_type<D>::type visitor(ctx, value);
-        return Qss::visit_members(*target, visitor);
+    typename boost::enable_if<boost::mpl::and_<QnFusion::has_visit_members<T>, QnFusion::has_deserialization_visitor_type<D> >, bool>::type
+    deserialize(QnFusion::Context<D> *ctx, const D &value, T *target) {
+        typename QnFusion::deserialization_visitor_type<D>::type visitor(ctx, value);
+        return QnFusion::visit_members(*target, visitor);
     }
 
-} // namespace QssDetail
+} // namespace QnFusionDetail
 
 
-#endif // QN_SERIALIZATION_FUNCTIONS_H
+#endif // QN_FUSION_H
