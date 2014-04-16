@@ -10,10 +10,12 @@
 #include <boost/preprocessor/comparison/not_equal.hpp>
 #include <boost/preprocessor/tuple/size.hpp>
 
+#include <boost/type_traits/is_convertible.hpp>
 #include <boost/mpl/equal_to.hpp>
 #include <boost/mpl/sizeof.hpp>
 #include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/and.hpp>
+#include <boost/mpl/integral_c.hpp>
 
 namespace QssDetail {
     template<class T, class Visitor>
@@ -53,24 +55,59 @@ namespace QssDetail {
         }
     };
 
-} // namespace QssDetail
+    template<class Visitor, class T>
+    boost::type_traits::yes_type has_visitor_initializer_test(const Visitor &, const T &, const decltype(std::declval<Visitor>()(std::declval<T>())) * = NULL);
+    boost::type_traits::no_type has_visitor_initializer_test(...);
 
+    template<class Visitor, class T>
+    struct has_visitor_initializer: 
+        boost::mpl::equal_to<
+            boost::mpl::sizeof_<boost::type_traits::yes_type>, 
+            boost::mpl::size_t<sizeof(has_visitor_initializer_test(std::declval<Visitor>(), std::declval<T>()))>
+        > 
+    {};
+
+    template<class Visitor, class T, bool hasInitializer = has_visitor_initializer<Visitor, T>::value>
+    struct VisitorInitializer {
+        bool operator()(Visitor &&visitor, T &&value) const {
+            return visitor(std::forward<T>(value));
+        }
+    };
+
+    template<class Visitor, class T>
+    struct VisitorInitializer<Visitor, T, false> {
+        bool operator()(Visitor &&, T &&) const {
+            return true;
+        }
+    };
+
+    template<class Visitor, class T>
+    bool initialize_visitor(Visitor &&visitor, T &&value) {
+        return VisitorInitializer<Visitor, T>()(std::forward<Visitor>(visitor), std::forward<T>(value));
+    }
+   
+
+} // namespace QssDetail
 
 namespace Qss {
     /**
-     * Main API entry point. Iterates through the members of previously 
+     * Main API entry point. Iterates through the members of a previously 
      * registered type.
      * 
      * Visitor is expected to define <tt>operator()</tt> of the following form:
      * \code
-     * template<class T, class Member>
-     * bool operator()(const T &, const Member &);
+     * template<class T, class Adaptor>
+     * bool operator()(const T &, const Adaptor &);
      * \endcode
      *
-     * Here <tt>Member</tt> template parameter presents an interface defined
+     * Here <tt>Adaptor</tt> template parameter presents an interface defined
      * by <tt>MemberAdaptor</tt> class. Return value of false indicates that
      * iteration should be stopped, and in this case the function will
      * return false.
+     *
+     * Visitor can also optionally define <tt>operator()(const T &)</tt> that will then 
+     * be invoked before the iteration takes place. If this operator returns 
+     * false, then iteration won't start and the function will also return false.
      *
      * \param value                     Value to iterate through.
      * \param visitor                   Visitor class to apply to members.
@@ -243,7 +280,7 @@ namespace Qss {                                                                 
  * 
  */
 #define QSS_DEFINE_CLASS_ADAPTOR(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)       \
-    QSS_DEFINE_CLASS_ADAPTOR_I(CLASS, QSS_ENUM_SEQ(MEMBER_SEQ), BOOST_PP_SEQ_NIL __VA_ARGS__)
+    QSS_DEFINE_CLASS_ADAPTOR_I(CLASS, QSS_ENUM_SEQ(MEMBER_SEQ), BOOST_PP_VARIADIC_SEQ_NIL __VA_ARGS__)
 
 #define QSS_DEFINE_CLASS_ADAPTOR_I(CLASS, MEMBER_SEQ, GLOBAL_SEQ)               \
 template<class T>                                                               \
@@ -255,6 +292,8 @@ struct QssBinding<CLASS> {                                                      
                                                                                 \
     template<class T, class Visitor>                                            \
     static bool visit_members(T &&value, Visitor &&visitor) {                   \
+        if(!QssDetail::initialize_visitor(std::forward<Visitor>(visitor), std::forward<T>(value))) \
+            return false;                                                       \
         BOOST_PP_SEQ_FOR_EACH(QSS_DEFINE_CLASS_ADAPTOR_FUNCTION_STEP_I, ~, MEMBER_SEQ) \
         return true;                                                            \
     }                                                                           \
@@ -293,7 +332,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 #define QSS_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_STEP_II(TAG, VALUE)                \
     template<>                                                                  \
     struct has_tag<Qss::TAG>:                                                   \
-        boost::mpl::true_type                                                   \
+        boost::mpl::true_                                                       \
     {};                                                                         \
                                                                                 \
     static QSS_TAG_TYPE(TAG, VALUE) get(const Qss::TAG &) {                     \
@@ -315,10 +354,29 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * 
  */
 #define QSS_DEFINE_CLASS_ADAPTOR_SHORTCUT(CLASS, TAGS_TUPLE, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
-    QSS_DEFINE_CLASS_ADAPTOR(CLASS, QSS_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ), __VA_ARGS__)
+    QSS_DEFINE_CLASS_ADAPTOR(CLASS, QSS_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ), ##__VA_ARGS__)
 
 #define QSS_DEFINE_CLASS_ADAPTOR_SHORTCUT_GSN(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
-    QSS_DEFINE_CLASS_ADAPTOR_SHORTCUT(CLASS, (getter, setter, name), MEMBER_SEQ, __VA_ARGS__)
+    QSS_DEFINE_CLASS_ADAPTOR_SHORTCUT(CLASS, (getter, setter, name), MEMBER_SEQ, ##__VA_ARGS__)
+
+
+/**
+ *
+ */
+#define QSS_DEFINE_STRUCT_ADAPTOR(STRUCT, FIELD_SEQ, ... /* GLOBAL_SEQ */)      \
+    QSS_DEFINE_CLASS_ADAPTOR(STRUCT, QSS_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ), ##__VA_ARGS__)
+
+
+/**
+ * \internal
+ * 
+ * Converts a field sequence into a standard member sequence.
+ */
+#define QSS_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ)                          \
+    BOOST_PP_SEQ_FOR_EACH(QSS_FIELD_SEQ_TO_MEMBER_SEQ_STEP_I, STRUCT, FIELD_SEQ)
+
+#define QSS_FIELD_SEQ_TO_MEMBER_SEQ_STEP_I(R, STRUCT, FIELD)                    \
+    ((getter, &STRUCT::FIELD)(setter, &STRUCT::FIELD)(name, BOOST_PP_STRINGIZE(FIELD)))
 
 
 /**
@@ -496,14 +554,14 @@ namespace QssDetail {
 
     template<class T, class D>
     typename boost::enable_if<boost::mpl::and_<Qss::has_visit_members<T>, Qss::has_serialization_visitor_type<D> >, void>::type
-    serialize(Context<D> *ctx, const T &value, D *target) {
+    serialize(Qss::Context<D> *ctx, const T &value, D *target) {
         typename Qss::serialization_visitor_type<D>::type visitor(ctx, *target);
         Qss::visit_members(value, visitor);
     }
 
     template<class T, class D>
     typename boost::enable_if<boost::mpl::and_<Qss::has_visit_members<T>, Qss::has_deserialization_visitor_type<D> >, bool>::type
-    deserialize(Context<D> *ctx, const D &value, T *target) {
+    deserialize(Qss::Context<D> *ctx, const D &value, T *target) {
         typename Qss::deserialization_visitor_type<D>::type visitor(ctx, value);
         return Qss::visit_members(*target, visitor);
     }
