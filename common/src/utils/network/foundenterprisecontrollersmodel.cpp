@@ -156,6 +156,7 @@ int	FoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) const
 void FoundEnterpriseControllersModel::remoteModuleFound(
     const QString& moduleID,
     const QString& /*moduleVersion*/,
+    const QString& /*systemName*/,
     const TypeSpecificParamMap& moduleParameters,
     const QString& /*localInterfaceAddress*/,
     const QString& remoteHostAddressVal,
@@ -164,7 +165,7 @@ void FoundEnterpriseControllersModel::remoteModuleFound(
 {
     QMutexLocker lk( &m_mutex );
 
-    if( moduleID != nxEntControllerId )
+    if( moduleID != nxMediaServerId )
         return;
     if( !moduleParameters.contains(QString::fromLatin1("port")) )
         return;
@@ -215,7 +216,7 @@ void FoundEnterpriseControllersModel::remoteModuleLost(
     Q_UNUSED(isLocal)
     QMutexLocker lk( &m_mutex );
 
-    if( moduleID != nxEntControllerId )
+    if( moduleID != nxMediaServerId )
         return;
 
     vector<FoundModuleData>::iterator it = std::find_if( m_foundModules.begin(), m_foundModules.end(), IsSeedEqualPred(seed) );

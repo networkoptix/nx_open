@@ -67,6 +67,8 @@ appserver/setup/build
 appserver/version_maven.py
 appserver/version.py
 
+appserver2/arm
+
 applauncher/bin
 applauncher/build
 applauncher/src/Info.plist
@@ -239,6 +241,7 @@ ios-client/Podfile
 ios-client/Pods
 ios-client/HDWitness/Settings.bundle/Root.plist
 ios-client/Podfile.lock
+ios-client/.ruby-version
 
 launcher/x86
 launcher/x64
@@ -269,7 +272,13 @@ nx_sdk/nx_sdk
 
 libonvif/.build/
 
+plugins/*/arm
+debsetup/*/arm
+edge_firmware/isd/*.tar.gz
+
 .vagrant
 **/Makefile
+
 android-client/android-main/AndroidManifest.xml
 android-client/android-main/res/**
+

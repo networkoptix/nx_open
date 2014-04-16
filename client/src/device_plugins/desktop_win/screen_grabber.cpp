@@ -379,8 +379,8 @@ void QnScreenGrabber::drawCursor(quint32* data, int width, int height, int leftO
                 yPos = height - yPos;
 
             quint8 maskBits[MAX_CURSOR_SIZE*MAX_CURSOR_SIZE*2/8 * 16];
-            quint8 lpbiData[sizeof(BITMAPINFO) + 128]; // 2 additional colors
-            quint8 lpbiColorData[sizeof(BITMAPINFO) + 128]; // 4 additional colors
+            quint8 lpbiData[sizeof(BITMAPINFO) + 256 * sizeof(RGBQUAD)];
+            quint8 lpbiColorData[sizeof(BITMAPINFO) + 256 * sizeof(RGBQUAD)];
 
             BITMAPINFO* lpbi = (BITMAPINFO*) &lpbiData;
             BITMAPINFO* lpbiColor = (BITMAPINFO*) &lpbiColorData;
@@ -388,13 +388,13 @@ void QnScreenGrabber::drawCursor(quint32* data, int width, int height, int leftO
             memset(lpbiColor, 0, sizeof(BITMAPINFO));
             lpbi->bmiHeader.biSize = sizeof(BITMAPINFO);
             lpbiColor->bmiHeader.biSize = sizeof(BITMAPINFO);
-            if (GetDIBits(m_cursorDC, icInfo.hbmMask, 0, 0, 0, lpbi, 0) == 0)
+            if (GetDIBits(m_cursorDC, icInfo.hbmMask, 0, 0, 0, lpbi, DIB_RGB_COLORS) == 0)
             {
                 DeleteObject(icInfo.hbmMask);
                 DeleteObject(icInfo.hbmColor);
                 return;
             }
-            if (lpbi->bmiHeader.biClrUsed > 2 || GetDIBits(m_cursorDC, icInfo.hbmMask, 0, lpbi->bmiHeader.biHeight, maskBits, lpbi, 0) == 0)
+            if (lpbi->bmiHeader.biClrUsed > 2 || GetDIBits(m_cursorDC, icInfo.hbmMask, 0, lpbi->bmiHeader.biHeight, maskBits, lpbi, DIB_RGB_COLORS) == 0)
             {
                 DeleteObject(icInfo.hbmMask);
                 DeleteObject(icInfo.hbmColor);
@@ -451,7 +451,7 @@ void QnScreenGrabber::drawCursor(quint32* data, int width, int height, int leftO
             }
             if (icInfo.hbmColor)
             {
-                if (GetDIBits(m_cursorDC, icInfo.hbmColor, 0, 0, 0, lpbiColor, 0) == 0)
+                if (GetDIBits(m_cursorDC, icInfo.hbmColor, 0, 0, 0, lpbiColor, DIB_RGB_COLORS) == 0)
                 {
                     DeleteObject(icInfo.hbmMask);
                     DeleteObject(icInfo.hbmColor);
@@ -464,7 +464,7 @@ void QnScreenGrabber::drawCursor(quint32* data, int width, int height, int leftO
                     m_colorBits.reset( new quint8[lpbiColor->bmiHeader.biSizeImage] );
                 }
 
-                if (GetDIBits(m_cursorDC, icInfo.hbmColor, 0, lpbiColor->bmiHeader.biHeight, m_colorBits.get(), lpbiColor, 0) == 0)
+                if (GetDIBits(m_cursorDC, icInfo.hbmColor, 0, lpbiColor->bmiHeader.biHeight, m_colorBits.get(), lpbiColor, DIB_RGB_COLORS) == 0)
                 {
                     DeleteObject(icInfo.hbmMask);
                     DeleteObject(icInfo.hbmColor);

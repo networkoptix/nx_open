@@ -2588,7 +2588,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1027"/>
         <source>Delete</source>
-        <translation></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1044"/>
@@ -5096,7 +5096,8 @@ At least %3 licenses are required.</source>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="117"/>
         <source>The software is licensed to %1 cameras and %2 analog cameras.
 %3 licenses and %4 analog licenses are currently in use.</source>
-        <translation>Система лицензирована на работу с %1 IP и с %2 аналоговыми камерами. Требуется еще по крайней мере %3 профессиональных и %4 аналоговых лицензий.</translation>
+        <translation type="unfinished">Система лицензирована на работу с %1 IP и с %2 аналоговыми камерами. 
+Используется %3 цифровых и %4 аналоговых лицензий.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="125"/>
@@ -8047,7 +8048,7 @@ Please wait for the camera to go online.</source>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="588"/>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="629"/>
         <source>Recording in...</source>
-        <translation>Запись в...</translation>
+        <translation>Запись через...</translation>
     </message>
     <message>
         <source>Cancelled</source>

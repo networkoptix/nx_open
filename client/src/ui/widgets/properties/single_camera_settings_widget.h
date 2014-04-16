@@ -183,7 +183,7 @@ private:
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
     mutable QnMediaServerConnectionPtr m_serverConnection;
 
-    QHash<int, QnImageProvider*> m_imageProvidersByResourceId;
+    QHash<QnId, QnImageProvider*> m_imageProvidersByResourceId;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

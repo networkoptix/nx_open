@@ -52,10 +52,13 @@ public:
     bool supports(Qn::PtzCommand command);
 
     /**
-     * Starts PTZ movement. Speed is specified in image-based coordinate space and
-     * all of its components are expected to be in range <tt>[-1, 1]</tt>. 
-     * This means that implementation must handle flipped / mirrored state of 
-     * the video stream. 
+     * Starts or stops continuous PTZ movement. 
+     * 
+     * Speed is specified in image-based coordinate space and all of its 
+     * components are expected to be in range <tt>[-1, 1]</tt>. This means that 
+     * implementation must handle flipped / mirrored state of the video stream. 
+     * 
+     * Passing zero in speed should stop PTZ movement.
      * 
      * This function is expected to be implemented if this controller has
      * at least one of the <tt>Qn::ContinuousPtzCapabilities</tt>.
@@ -112,7 +115,7 @@ public:
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) = 0;
 
     /**
-     * Gets PTZ limits of the camera in standard PTZ space. 
+     * Gets PTZ limits of the camera. 
      * 
      * This function is expected to be implemented only if this controller has 
      * <tt>Qn::LimitsPtzCapability<tt>.

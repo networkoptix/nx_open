@@ -36,6 +36,19 @@ else {
   win* {
     LIBS = ${windows.oslibs.release}
   }
+
+  !win32 {
+      contains( DEFINES, debug_in_release ) {
+         QMAKE_CXXFLAGS += -ggdb3
+         QMAKE_CFLAGS += -ggdb3
+         QMAKE_LFLAGS += -ggdb3
+      }
+      contains( DEFINES, enable_gprof ) {
+         QMAKE_CXXFLAGS += -pg
+         QMAKE_CFLAGS += -pg
+         QMAKE_LFLAGS += -pg
+      }
+  }
 }
 
 win* {
@@ -121,7 +134,7 @@ unix: {
   DEFINES += override=
   DEFINES += QN_EXPORT=  
   arm {
-    QMAKE_CXXFLAGS += -std=c++0x
+    QMAKE_CXXFLAGS += -std=c++0x 
   } else {
     QMAKE_CXXFLAGS += -std=c++11
   }
@@ -129,12 +142,13 @@ unix: {
 
 ## LINUX
 unix:!mac {
-  LIBS += ${linux.oslibs}
   !arm {
+    LIBS += ${linux.oslibs}
     QMAKE_CXXFLAGS += -msse2
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedefs
   } else {
     LIBS -= -lssl
+    LIBS += ${linux.arm.oslibs}
   } 
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
@@ -148,4 +162,6 @@ mac {
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}
   CONFIG -= app_bundle objective_c
+
+  INCLUDEPATH += ${qt.dir}/lib/QtCore.framework/Headers/$$QT_VERSION/QtCore/
 }

@@ -28,25 +28,6 @@ QnNetworkResource::~QnNetworkResource()
 {
 }
 
-void QnNetworkResource::deserialize(const QnResourceParameters& parameters)
-{
-    QnResource::deserialize(parameters);
-
-    const char* MAC = "mac";
-    const char* PHYSICALID = "physicalId";
-    const char* LOGIN = "login";
-    const char* PASSWORD = "password";
-
-    if (parameters.contains(QLatin1String(MAC)))
-        setMAC(parameters[QLatin1String(MAC)]);
-
-    if (parameters.contains(QLatin1String(PHYSICALID)))
-        setPhysicalId(parameters[QLatin1String(PHYSICALID)]);
-
-    if (parameters.contains(QLatin1String(LOGIN)) && parameters.contains(QLatin1String(PASSWORD)))
-        setAuth(parameters[QLatin1String(LOGIN)], parameters[QLatin1String(PASSWORD)]);
-}
-
 QString QnNetworkResource::getUniqueId() const
 {
     return getPhysicalId();
@@ -196,10 +177,10 @@ unsigned int QnNetworkResource::getNetworkTimeout() const
     return m_networkTimeout;
 }
 
-void QnNetworkResource::updateInner(QnResourcePtr other)
+void QnNetworkResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    QnResource::updateInner(other);
+    QnResource::updateInner(other, modifiedFields);
     QnNetworkResourcePtr other_casted = qSharedPointerDynamicCast<QnNetworkResource>(other);
     if (other_casted)
     {

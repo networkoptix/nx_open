@@ -247,9 +247,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 QnId OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manufacturer, const QString&  model) const
 {
     QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
-    if (rt.isValid())
+    if (!rt.isNull())
         return rt;
-    else if (isAnalogOnvifResource(manufacturer, model) && onvifAnalogTypeId.isValid())
+    else if (isAnalogOnvifResource(manufacturer, model) && !onvifAnalogTypeId.isNull())
         return onvifAnalogTypeId;
     else 
         return onvifTypeId; // no child resourceType found. Use root ONVIF resource type

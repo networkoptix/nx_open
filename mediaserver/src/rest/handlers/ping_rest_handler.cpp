@@ -10,7 +10,7 @@ int QnPingRestHandler::executeGet(const QString& path, const QnRequestParamList&
     Q_UNUSED(params)
     Q_UNUSED(contentType)
 
-    result.append(QString("<pong>%1</pong>\n").arg(serverGuid()).toUtf8());
+    result.append(QString("<pong>%1</pong>\n").arg(serverGuid().toString()).toUtf8());
     return CODE_OK;
 }
 

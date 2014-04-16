@@ -5,7 +5,9 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
+#include <nx_ec/binary_serialization_helper.h>
 #include <utils/common/software_version.h>
+
 
 // Presense of an entry in global table means
 // that component of ver1 is compatible (or has compatibility mode)
@@ -13,22 +15,7 @@
 
 QString stripVersion(const QString& version);
 
-struct QnCompatibilityItem
-{
-    QnCompatibilityItem(QString v1, QString c1, QString v2)
-        : ver1(v1), comp1(c1), ver2(v2)
-    {
-    }
-
-    bool operator==(const QnCompatibilityItem& other) const
-    {
-        return ver1 == other.ver1 && comp1 == other.comp1 && ver2 == other.ver2;
-    }
-
-    QString ver1;
-    QString comp1;
-    QString ver2;
-};
+#include "compatibility_i.h"
 
 inline uint qHash(const QnCompatibilityItem &item)
 {

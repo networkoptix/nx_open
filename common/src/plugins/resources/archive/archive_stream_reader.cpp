@@ -875,7 +875,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
                 if (result == 0)
                     return result;
             }
-            else if (!m_eof)
+            else
             {
                 m_eof = true;
                 return createEmptyPacket(isReverseMode());
@@ -1018,8 +1018,6 @@ void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipTime)
     if (m_navDelegate) {
         return m_navDelegate->setSkipFramesToTime(skipTime);
     }
-
-    qDebug() << "setSkipFramesToTime(" << QDateTime::fromMSecsSinceEpoch(skipTime / 1000).toString(QLatin1String("hh:mm:ss.zzz"));
 
     setSkipFramesToTime(skipTime, true);
     emit skipFramesTo(skipTime);

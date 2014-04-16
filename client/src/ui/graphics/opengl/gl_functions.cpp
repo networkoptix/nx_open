@@ -3,7 +3,8 @@
 #include <boost/preprocessor/stringize.hpp>
 
 #include <QtCore/QMutex>
-#include <QOpenGLContext>
+#include <QtCore/QRegExp>
+#include <QtGui/QOpenGLContext>
 
 #include <utils/common/warnings.h>
 
@@ -64,6 +65,10 @@ public:
         m_maxTextureSize = maxTextureSize;
     }
     
+    // This function is for MacOS workaround for wrong max texture size of Intel HD3000
+    void overrideMaxTextureSize(GLint maxTextureSize) {
+        m_maxTextureSize = maxTextureSize;
+    }
 
 private:
     QMutex m_mutex;
@@ -92,6 +97,13 @@ public:
         QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
         if (vendor.contains("Tungsten Graphics") && renderer.contains("Gallium 0.1, Poulsbo on EMGD"))
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
+#ifdef Q_OS_MACX
+        /* Intel HD 3000 driver handles textures with size > 4096 incorrectly (see bug #3141).
+         * To fix that we have to override maximum texture size to 4096 for this graphics adapter. */
+        if (vendor.contains("Intel") && QRegExp(lit(".*Intel.+3000.*")).exactMatch(QString::fromLatin1(renderer)))
+            qn_glFunctionsGlobal()->overrideMaxTextureSize(4096);
+#endif
+
         
 #ifdef Q_OS_LINUX
         QDir atiProcDir(lit("/proc/ati"));

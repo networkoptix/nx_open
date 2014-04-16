@@ -35,7 +35,7 @@
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
 
 
-const char* QnPlOnvifResource::MANUFACTURE = "OnvifDevice";
+const QString QnPlOnvifResource::MANUFACTURE(lit("OnvifDevice"));
 static const float MAX_EPS = 0.01f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
@@ -340,7 +340,7 @@ bool QnPlOnvifResource::isResourceAccessible()
 
 QString QnPlOnvifResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 bool QnPlOnvifResource::hasDualStreaming() const
@@ -348,7 +348,7 @@ bool QnPlOnvifResource::hasDualStreaming() const
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
     this_casted->getParam(DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toInt();
+    return mediaVariant.toBool();
 }
 
 const QSize QnPlOnvifResource::getVideoSourceSize() const
@@ -1146,18 +1146,6 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
     QString mediaUrlSource = onvifR->getMediaUrl();
 
     bool result = QnPhysicalCameraResource::mergeResourcesIfNeeded(source);
-
-    if (getGroupId() != onvifR->getGroupId())
-    {
-        setGroupId(onvifR->getGroupId());
-        result = true; // groupID can be changed for onvif resource because if not auth info, maxChannels is not accessible
-    }
-
-    if (getGroupName().isEmpty() && getGroupName() != onvifR->getGroupName())
-    {
-        setGroupName(onvifR->getGroupName());
-        result = true;
-    }
 
     if (onvifUrlSource.size() != 0 && QUrl(onvifUrlSource).host().size() != 0 && getDeviceOnvifUrl() != onvifUrlSource)
     {
@@ -2245,8 +2233,7 @@ QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal()
 
 bool QnPlOnvifResource::startInputPortMonitoring()
 {
-    if( isDisabled()
-        || hasFlags(QnResource::foreigner) )     //we do not own camera
+    if( hasFlags(QnResource::foreigner) )     //we do not own camera
     {
         return false;
     }

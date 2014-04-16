@@ -6,7 +6,7 @@
 
 #include <api/api_fwd.h>
 #include <core/resource/resource_fwd.h>
-
+#include <nx_ec/ec_api.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 
@@ -17,10 +17,10 @@ public:
     explicit QnWorkbenchLayoutsHandler(QObject *parent = 0);
 
     void renameLayout(const QnLayoutResourcePtr &layout, const QString &newName);
-    bool closeAllLayouts(bool waitForReply = false);
+    bool closeAllLayouts(bool waitForReply = false, bool force = false);
 
 protected:
-    QnAppServerConnectionPtr connection() const;
+    ec2::AbstractECConnectionPtr connection2() const;
 
 private slots:
     void at_newUserLayoutAction_triggered();
@@ -60,8 +60,8 @@ private:
     void removeLayouts(const QnLayoutResourceList &layouts);
 
     void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *target, const char *slot);
-    bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false);
-    bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false);
+    bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false, bool force = false);
+    bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false, bool force = false);
 };
 
 #endif // WORKBENCH_LAYOUTS_HANDLER_H

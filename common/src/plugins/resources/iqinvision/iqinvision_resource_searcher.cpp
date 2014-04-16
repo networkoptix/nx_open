@@ -26,13 +26,7 @@ QnPlIqResourceSearcher::QnPlIqResourceSearcher()
 {
 }
 
-QnPlIqResourceSearcher& QnPlIqResourceSearcher::instance()
-{
-    static QnPlIqResourceSearcher inst;
-    return inst;
-}
-
-QnResourcePtr QnPlIqResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnPlIqResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -54,9 +48,9 @@ QnResourcePtr QnPlIqResourceSearcher::createResource(QnId resourceTypeId, const 
     result = QnVirtualCameraResourcePtr( new QnPlIqResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create IQE camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create IQE camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
 
-    result->deserialize(parameters);
+    //result->deserialize(parameters);
 
     return result;
 
@@ -64,7 +58,7 @@ QnResourcePtr QnPlIqResourceSearcher::createResource(QnId resourceTypeId, const 
 
 QString QnPlIqResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlIqResource::MANUFACTURE);
+    return QnPlIqResource::MANUFACTURE;
 }
 
 
@@ -149,13 +143,13 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList
     QnPlIqResourcePtr resource ( new QnPlIqResource() );
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
     {
         // try with default camera name
         name = QLatin1String("IQA32N");
         rt = qnResTypePool->getResourceTypeId(manufacture(), name);
 
-        if (!rt.isValid())
+        if (rt.isNull())
             return local_results;
     }
 
@@ -209,7 +203,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const Q
 
     QString nameStr = QString::fromLatin1(name);
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr);
-    if (!rt.isValid()) {
+    if (rt.isNull()) {
         qWarning() << "Unregistered IQvision camera type:" << name;
         return;
     }

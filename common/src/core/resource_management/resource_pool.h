@@ -5,10 +5,12 @@
 #include <QtCore/QHash>
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
+#include <QtCore/QUuid>
+#include <QtNetwork/QHostAddress>
 
-#include "core/resource/resource.h"
-#include "core/resource_management/resource_criterion.h"
-#include "core/resource/network_resource.h"
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_criterion.h>
 
 class QnResource;
 class QnNetworkResource;
@@ -48,8 +50,10 @@ public:
     // keeps database ID ( if possible )
     void addResources(const QnResourceList &resources);
 
-    inline void addResource(const QnResourcePtr &resource)
-    { addResources(QnResourceList() << resource); }
+    void addResource(const QnResourcePtr &resource);
+
+    void beginTran();
+    void commit();
 
     void removeResources(const QnResourceList &resources);
     inline void removeResource(const QnResourcePtr &resource)
@@ -57,8 +61,7 @@ public:
 
     QnResourceList getResources() const;
 
-    QnResourcePtr getResourceById(QnId id, Filter searchFilter = OnlyFriends) const;
-    QnResourcePtr getResourceByGuid(QString guid) const;
+    QnResourcePtr getResourceById(const QnId &id) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
     void updateUniqId(QnResourcePtr res, const QString &newUniqId);
@@ -75,9 +78,8 @@ public:
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
-    QnNetworkResourcePtr getEnabledResourceByPhysicalId(const QString &mac) const;
-    QnResourceList getAllEnabledCameras(QnResourcePtr mServer = QnResourcePtr()) const;
-    QnResourcePtr getEnabledResourceByUniqueId(const QString &uniqueId) const;
+    QnResourceList getAllCameras(const QnResourcePtr &mServer) const;
+    QnResourceList getResourcesByParentId(const QnId& parentId) const;
 
     // returns list of resources with such flag
     QnResourceList getResourcesWithFlag(QnResource::Flag flag) const;
@@ -86,6 +88,20 @@ public:
     QnResourceList getResourcesWithTypeId(QnId id) const;
 
     QnUserResourcePtr getAdministrator() const;
+
+    /**
+     * @brief getVideoWallItemByUuid            Find videowall item by uuid.
+     * @param uuid                              Unique id of the item.
+     * @return                                  Pair of videowall containing the item and item's uuid.
+     */
+    QnVideoWallItemIndex getVideoWallItemByUuid(const QUuid &uuid) const;
+
+    /**
+     * @brief getVideoWallItemsByUuid           Find list of videowall items by their uuid.
+     * @param uuids                             Unique ids of the items.
+     * @return                                  List of pairs of videowall containing the item and item's uuid.
+     */
+    QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QUuid> &uuids) const;
 
     QStringList allTags() const;
 
@@ -117,12 +133,9 @@ signals:
 private:
     mutable QMutex m_resourcesMtx;
     bool m_updateLayouts;
+    bool m_tranInProgress;
+    QnResourceList m_tmpResources;
     QHash<QString, QnResourcePtr> m_resources;
-    //!Resources with flag \a QnResource::foreign set
-    /*!
-        Using separate dictionary to minimize existing code modification
-    */
-    QHash<QString, QnResourcePtr> m_foreignResources;
 
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource

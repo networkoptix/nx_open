@@ -928,12 +928,12 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged()
     }
 }
 
-void QnRtspConnectionProcessor::at_camera_disabledChanged()
+void QnRtspConnectionProcessor::at_camera_parentIdChanged()
 {
     Q_D(QnRtspConnectionProcessor);
 
     QMutexLocker lock(&d->mutex);
-    if (d->mediaRes->toResource()->isDisabled()) {
+    if (d->mediaRes->toResource()->hasFlags(QnResource::foreigner)) {
         m_needStop = true;
         d->socket->close();
     }
@@ -947,15 +947,15 @@ void QnRtspConnectionProcessor::createDataProvider()
     if (d->mediaRes) {
         camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
         QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
-        if (cameraRes && !cameraRes->isInitialized() && !cameraRes->isDisabled())
+        if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(QnResource::foreigner))
             cameraRes->initAsync(true);
     }
     if (camera && d->liveMode == Mode_Live)
     {
-        if (!d->liveDpHi && !d->mediaRes->toResource()->isDisabled()) {
+        if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(QnResource::foreigner)) {
             d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
             if (d->liveDpHi) {
-                connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_camera_disabledChanged()), Qt::DirectConnection);
+                connect(d->liveDpHi->getResource().data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(at_camera_parentIdChanged()), Qt::DirectConnection);
                 connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
                 d->liveDpHi->startIfNotRunning();
             }
@@ -1158,7 +1158,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor->lockDataQueue();
 
         int copySize = 0;
-        if (!getResource()->toResource()->isDisabled() && (status == QnResource::Online || status == QnResource::Recording)) {
+        if (!getResource()->toResource()->hasFlags(QnResource::foreigner) && (status == QnResource::Online || status == QnResource::Recording)) {
             copySize = d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, 0, d->lastPlayCSeq);
         }
 

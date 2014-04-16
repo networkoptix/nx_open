@@ -64,9 +64,13 @@ void QnLoadingProgressPainter::paint() {
 }
 
 void QnLoadingProgressPainter::paint(qreal progress, qreal opacity) {
-    if(!m_initialized)
+    if(!m_initialized || !isAvailable())
         return;
     QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().rotate(360.0 * static_cast<int>(std::fmod(progress, 1.0) * m_sectorCount) / m_sectorCount, 0.0, 0.0, 1.0);
     QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(QVector4D(1.0, 1.0, 1.0, opacity));
     QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawPerVertexColoredPolygon(m_buffer,m_vertexCount);
+}
+
+bool QnLoadingProgressPainter::isAvailable() const {
+    return hasOpenGLFeature(QOpenGLFunctions::Shaders) && hasOpenGLFeature(QOpenGLFunctions::Buffers);
 }

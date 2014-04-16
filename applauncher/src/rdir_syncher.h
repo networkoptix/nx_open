@@ -142,7 +142,9 @@ public:
     bool startAsync();
     //!Returns current state
     State state() const;
-    
+
+    void cancel();
+
     //!Returns description of last error
     QString lastErrorText() const;
 

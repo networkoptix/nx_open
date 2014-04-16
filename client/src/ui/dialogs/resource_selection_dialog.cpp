@@ -62,7 +62,7 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent):
 
 void QnResourceSelectionDialog::init(SelectionTarget target) {
     m_delegate = NULL;
-    m_tooltipResourceId = 0;
+    m_tooltipResourceId = QnId();
     m_screenshotIndex = 0;
     m_target = target;
     m_updating = false;
@@ -112,7 +112,7 @@ void QnResourceSelectionDialog::init(SelectionTarget target) {
         connect(ui->resourcesWidget->treeView(), SIGNAL(entered(QModelIndex)), this, SLOT(updateThumbnail(QModelIndex)));
         m_thumbnailManager = new QnCameraThumbnailManager(this);
         m_thumbnailManager->setThumbnailSize(ui->screenshotLabel->contentSize());
-        connect(m_thumbnailManager, SIGNAL(thumbnailReady(int,QPixmap)), this, SLOT(at_thumbnailReady(int, QPixmap)));
+        connect(m_thumbnailManager, SIGNAL(thumbnailReady(QnId,QPixmap)), this, SLOT(at_thumbnailReady(int, QPixmap)));
         updateThumbnail(QModelIndex());
     }
 
@@ -246,7 +246,7 @@ void QnResourceSelectionDialog::at_resourceModel_dataChanged() {
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_delegate || m_delegate->validate(selectedResources()));
 }
 
-void QnResourceSelectionDialog::at_thumbnailReady(int resourceId, const QPixmap &thumbnail) {
+void QnResourceSelectionDialog::at_thumbnailReady(QnId resourceId, const QPixmap &thumbnail) {
     if (m_tooltipResourceId != resourceId)
         return;
     m_screenshotIndex = 1 - m_screenshotIndex;

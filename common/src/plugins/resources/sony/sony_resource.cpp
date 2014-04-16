@@ -26,7 +26,7 @@ QnPlSonyResource::~QnPlSonyResource() {
 CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
 {
     CameraDiagnostics::Result result = QnPlOnvifResource::updateResourceCapabilities();
-    if (!result)
+    if (!result || isCameraControlDisabled())
         return result;
 
     std::string confToken = getPrimaryVideoEncoderId().toStdString();
@@ -147,8 +147,7 @@ bool QnPlSonyResource::startInputPortMonitoring()
 {
     QMutexLocker lk( &m_inputPortMutex );
 
-    if( isDisabled()
-        || hasFlags(QnResource::foreigner) )     //we do not own camera
+    if( hasFlags(QnResource::foreigner) )     //we do not own camera
     {
         return false;
     }

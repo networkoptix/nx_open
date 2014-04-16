@@ -9,6 +9,7 @@
 
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/resource.h"
+#include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
 
 #include "utils/network/nettools.h"
@@ -93,7 +94,7 @@ public:
     static QList<QByteArray> getLocalUsingCameras()
     {
         QList<QByteArray> result;
-        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceByGuid(serverGuid()));
+        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
         if (mediaServer) {
             QnResourceList resList = qnResPool->getResourcesWithParentId(mediaServer->getId());
             for (int i = 0; i < resList.size(); ++i) {
@@ -243,7 +244,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
     if (!conflictList.isEmpty()) {
         QList<QByteArray> cList = conflictList.toList();
         cList.insert(0, localAppServerHost());
-        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceByGuid(serverGuid()));
+        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
         if (mediaServer)
             qnBusinessRuleConnector->at_mediaServerConflict(mediaServer, qnSyncTime->currentUSecsSinceEpoch(), cList);
     }

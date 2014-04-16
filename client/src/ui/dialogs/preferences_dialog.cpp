@@ -34,12 +34,10 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui->tabWidget->addTab(m_pages[NotificationsPage], tr("Notifications"));
 
     bool isAdmin = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
-#ifndef CL_TRIAL_MODE
     if (isAdmin) {
         m_pages[LicensesPage] = new QnLicenseManagerWidget(this);
         ui->tabWidget->addTab(m_pages[LicensesPage], tr("Licenses"));
     }
-#endif
 
     if (isAdmin) {
         m_pages[ServerPage] = new QnServerSettingsWidget(this);

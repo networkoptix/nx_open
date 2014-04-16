@@ -29,6 +29,7 @@ class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> >, protecte
     Q_PROPERTY(bool checked READ isChecked WRITE setChecked NOTIFY toggled USER true)
     Q_PROPERTY(bool cached READ isCached WRITE setCached)
     Q_PROPERTY(qreal animationSpeed READ animationSpeed WRITE setAnimationSpeed)
+    Q_PROPERTY(QIcon icon READ icon WRITE setIcon)
 
     typedef Animated<Clickable<GraphicsWidget> > base_type;
 
@@ -46,8 +47,11 @@ public:
     QnImageButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnImageButtonWidget();
 
+    // TODO: #Elric get rid of these, leave only icon.
     const QPixmap &pixmap(StateFlags flags) const;
     void setPixmap(StateFlags flags, const QPixmap &pixmap);
+    
+    const QIcon &icon() const;
     void setIcon(const QIcon &icon);
 
     bool isCheckable() const { return m_checkable; }

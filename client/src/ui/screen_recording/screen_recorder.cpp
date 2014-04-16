@@ -49,6 +49,7 @@ void QnScreenRecorder::startRecording() {
         return;
     }
 
+#ifdef Q_OS_WIN
     QnVideoRecorderSettings recorderSettings;
 
     QString filePath = recorderSettings.recordingFolder() + QLatin1String("/video_recording.avi");
@@ -61,7 +62,7 @@ void QnScreenRecorder::startRecording() {
         secondAudioDevice = QnAudioDeviceInfo();
     }
 
-    QnDesktopResourcePtr res = qnResPool->getResourceByGuid(QnDesktopResource().getGuid()).dynamicCast<QnDesktopResource>();
+    QnDesktopResourcePtr res = qnResPool->getResourceById(QnDesktopResource::getDesktopResourceUuid().toString()).dynamicCast<QnDesktopResource>();
     if (!res) {
         emit error(tr("Screen capturing subsystem is not initialized yet. Please try again later."));
         return;
@@ -89,6 +90,7 @@ void QnScreenRecorder::startRecording() {
     m_recorder->start();
     m_recording = true;
     emit recordingStarted();
+#endif
 }
 
 void QnScreenRecorder::cleanupRecorder()

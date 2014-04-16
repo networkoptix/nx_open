@@ -789,6 +789,10 @@ bool QnVideoStreamDisplay::selfSyncUsed() const
     return m_bufferedFrameDisplayer;
 }
 
+qreal QnVideoStreamDisplay::overridenAspectRatio() const {
+    return m_overridenAspectRatio;
+}
+
 void QnVideoStreamDisplay::setOverridenAspectRatio(qreal aspectRatio) {
     m_overridenAspectRatio = aspectRatio;
 }

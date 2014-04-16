@@ -24,8 +24,6 @@ public:
     QnNetworkResource();
     virtual ~QnNetworkResource();
 
-    virtual void deserialize(const QnResourceParameters& parameters) override;
-
     virtual QString getUniqueId() const;
 
     virtual QString getHostAddress() const;
@@ -85,7 +83,7 @@ public:
     // we need to get mac anyway to differentiate one device from another
     virtual bool updateMACAddress() { return true; }
 
-    virtual void updateInner(QnResourcePtr other) override;
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
     virtual bool shoudResolveConflicts() const;
 

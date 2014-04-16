@@ -15,6 +15,7 @@
 
 #include "networkoptixmodulerevealcommon.h"
 #include "aio/pollset.h"
+#include "system_socket.h"
 
 class AbstractDatagramSocket;
 
@@ -46,10 +47,11 @@ public:
         \param keepAliveMultiply if 0, default value is used
     */
     NetworkOptixModuleFinder(
+        bool clientOnly,
         const QHostAddress& multicastGroupAddress = defaultModuleRevealMulticastGroup,
         const unsigned int multicastGroupPort = defaultModuleRevealMulticastGroupPort,
         const unsigned int pingTimeoutMillis = defaultPingTimeoutMillis,
-        const unsigned int keepAliveMultiply = defaultKeepAliveMultiply );
+        const unsigned int keepAliveMultiply = defaultKeepAliveMultiply);
     virtual ~NetworkOptixModuleFinder();
 
     //!Returns true, if object has been successfully initialized (socket is created and binded to local address)
@@ -85,6 +87,7 @@ signals:
     void moduleFound(
         const QString& moduleType,
         const QString& moduleVersion,
+        const QString& systemName,
         const TypeSpecificParamMap& moduleParameters,
         const QString& localInterfaceAddress,
         const QString& remoteHostAddress,
@@ -103,7 +106,9 @@ signals:
 
 protected:
     virtual void run() override;
-
+private:
+    bool processDiscoveryRequest(AbstractDatagramSocket* udpSocket);
+    bool processDiscoveryResponse(AbstractDatagramSocket* udpSocket);
 private:
     class ModuleContext
     {
@@ -121,7 +126,8 @@ private:
     };
 
     PollSet m_pollSet;
-    std::vector<AbstractDatagramSocket*> m_sockets;
+    std::vector<AbstractDatagramSocket*> m_clientSockets;
+    UDPSocket* m_serverSocket;
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;

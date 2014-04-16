@@ -3,7 +3,6 @@
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QFileDialog>
 
 #include <QtMultimedia/QAudioDeviceInfo>
 
@@ -40,11 +39,6 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     m_dwm(new QnDwm(this))
 {
     ui->setupUi(this);
-
-#ifdef CL_TRIAL_MODE
-    for (int i = 0; i < (int) QnVideoRecorderSettings::Res640x480; ++i)
-        ui->resolutionComboBox->removeItem(0);
-#endif
 
     QDesktopWidget *desktop = qApp->desktop();
     for (int i = 0; i < desktop->screenCount(); i++) {
@@ -202,22 +196,13 @@ void QnRecordingSettingsWidget::setDecoderQuality(Qn::DecoderQuality q)
     ui->qualityComboBox->setCurrentIndex(q);
 }
 
-Qn::Resolution QnRecordingSettingsWidget::resolution() const
-{
+Qn::Resolution QnRecordingSettingsWidget::resolution() const {
     int index = ui->resolutionComboBox->currentIndex();
-#ifdef CL_TRIAL_MODE
-    index += (int) QnVideoRecorderSettings::Res640x480; // prev elements are skipped
-#endif
     return (Qn::Resolution) index;
 }
 
-void QnRecordingSettingsWidget::setResolution(Qn::Resolution r)
-{
-#ifdef CL_TRIAL_MODE
-    ui->resolutionComboBox->setCurrentIndex(r - (int) Qn::Exact640x480Resolution);
-#else
+void QnRecordingSettingsWidget::setResolution(Qn::Resolution r) {
     ui->resolutionComboBox->setCurrentIndex(r);
-#endif
 }
 
 int QnRecordingSettingsWidget::screen() const

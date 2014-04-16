@@ -14,6 +14,7 @@
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <utils/common/warnings.h>
 
 #ifdef _WIN32
@@ -154,7 +155,7 @@ void QnGridBackgroundItem::setMapper(QnWorkbenchGridMapper *mapper) {
 void QnGridBackgroundItem::update(const QnLayoutResourcePtr &layout) {
     Q_D(QnGridBackgroundItem);
 
-    bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+    bool isExportedLayout = snapshotManager()->isFile(layout);
     qreal opacity = qBound(0.0, layout->backgroundOpacity(), 1.0);
     bool hasChanges =
             (d->imageIsLocal != isExportedLayout) ||

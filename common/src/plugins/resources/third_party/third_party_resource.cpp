@@ -339,7 +339,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
         //setPtzCapability( Qn::AbsolutePtzCapability, true );
-        //TODO/IMPL requesting nxcip::CameraPTZManager interface and setting capabilities
+        //TODO/IMPL requesting nxcip::CameraPtzManager interface and setting capabilities
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
         setAudioEnabled( true );
@@ -354,10 +354,12 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     }
     else
         setMotionType( Qn::MT_SoftwareGrid );
-    //if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
-    //    setCameraCapability( Qn:: );
-    //if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
-    //    setCameraCapability( Qn:: );
+    if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
+		setStreamFpsSharingMethod(Qn::shareFps);
+    else if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
+		setStreamFpsSharingMethod(Qn::sharePixels);
+    else 
+        setStreamFpsSharingMethod(Qn::noSharing);
 
     QVector<EncoderData> encoderDataTemp;
     encoderDataTemp.resize( m_encoderCount );
@@ -416,12 +418,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 
     //TODO/IMPL initializing PTZ
 
-    // TODO: #Elric this is totally evil, copypasta from ONVIF resource.
-    {
-        QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-        if (conn->saveSync(::toSharedPointer(this).staticCast<QnVirtualCameraResource>()) != 0)
-            qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
-    }
+    save();
 
     return CameraDiagnostics::NoErrorResult();
 }

@@ -173,8 +173,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     case QnBusiness::EventColumn:
     {
         QComboBox* comboBox = new QComboBox(parent);
-        for (int i = 0; i < BusinessEventType::Count; i++) {
-            BusinessEventType::Value val = (BusinessEventType::Value)i;
+        for (int i = 1; i < BusinessEventType::Count; i++) {
+            BusinessEventType::Value val = (BusinessEventType::Value) i;
             comboBox->addItem(QnBusinessStringsHelper::eventName(val), val);
         }
         return comboBox;
@@ -183,9 +183,11 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     {
         bool instant = index.data(Qn::ActionIsInstantRole).toBool();
         QComboBox* comboBox = new QComboBox(parent);
-        for (int i = 0; i < BusinessActionType::Count; i++) {
+        for (int i = 1; i < BusinessActionType::Count; i++) {
             BusinessActionType::Value val = (BusinessActionType::Value)i;
             if (instant && BusinessActionType::hasToggleState(val))
+                continue;
+            if (BusinessActionType::isNotImplemented(val))
                 continue;
             comboBox->addItem(QnBusinessStringsHelper::actionName(val), val);
         }

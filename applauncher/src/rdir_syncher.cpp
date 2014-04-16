@@ -120,6 +120,17 @@ RDirSyncher::State RDirSyncher::state() const
 {
     return m_state;
 }
+
+void RDirSyncher::cancel()
+{
+    m_state = sInterrupted;
+    // remove all non-running tasks and let the all other task finish
+    std::remove_if(m_syncTasks.begin(), m_syncTasks.end(), [](const SynchronizationTask& task) { return !task.running; } );
+
+    // cancel all active operations
+    for (auto val: m_runningOperations)
+        val.second->pleaseStop();
+}
     
 QString RDirSyncher::lastErrorText() const
 {
@@ -289,6 +300,9 @@ void RDirSyncher::startOperations( std::list<RSyncEventTrigger*>& eventsToTrigge
     //starting multiple operations
     while( m_runningOperations.size() < MAX_SIMULTANEOUS_DOWNLOADS )
     {
+        if (m_state == sInterrupted)
+            break;
+
         //starting next task
         std::shared_ptr<detail::RDirSynchronizationOperation> newOperation;
         switch( startNextOperation( &newOperation ) )

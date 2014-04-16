@@ -275,8 +275,8 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget 
 
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
-    int resourceId = params.getEventResourceId();
-    QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
+    QnId resourceId = params.getEventResourceId();
+    QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (!resource)
         return;
 
@@ -295,7 +295,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         QString soundUrl = businessAction->getParams().getSoundUrl();
         m_itemsByLoadingSound.insert(soundUrl, item);
         context()->instance<QnAppServerNotificationCache>()->downloadFile(soundUrl);
-        item->setNotificationLevel(Qn::SoundNotification);
+        item->setNotificationLevel(Qn::CommonNotification);
     } else {
         item->setNotificationLevel(QnNotificationLevels::notificationLevel(eventType));
     }
@@ -394,8 +394,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters &)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters &)), Qt::QueuedConnection);
 
-    bool locked = item->notificationLevel() == Qn::SoundNotification; //this will be auto-deleted when event stops
-    m_list->addItem(item, locked);
+    m_list->addItem(item, businessAction->actionType() == BusinessActionType::PlaySoundRepeated);
 }
 
 void QnNotificationsCollectionWidget::hideBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -420,7 +419,7 @@ QnNotificationWidget* QnNotificationsCollectionWidget::findItem(QnSystemHealth::
     return NULL;
 }
 
-QnNotificationWidget* QnNotificationsCollectionWidget::findItem(int businessRuleId, const QnResourcePtr &resource, bool useResource) {
+QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QnId& businessRuleId, const QnResourcePtr &resource, bool useResource) {
     foreach (QnNotificationWidget *item, m_itemsByBusinessRuleId.values(businessRuleId))
         if (!useResource || resource == item->property(itemResourcePropertyName).value<QnResourcePtr>())
             return item;
@@ -496,13 +495,9 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     QString resourceName = getResourceName(resource);
     item->setText(QnSystemHealthStringsHelper::messageName(message, resourceName));
     item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, resourceName));
-    item->setNotificationLevel(Qn::SystemNotification);
+    item->setNotificationLevel(QnNotificationLevels::notificationLevel(message));
     item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
     setHelpTopic(item, QnBusiness::healthHelpId(message));
-
-    // TODO: #GDM please implement this properly. This code fixes #2892, but in a terribly wrong way =).
-    if(message == QnSystemHealth::ArchiveRebuildFinished)
-        item->setNotificationLevel(Qn::SoundNotification);
 
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)), Qt::QueuedConnection);
@@ -584,7 +579,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
     }
 
     //TODO: #GDM REMOVE DEBUG
-    for (int i = 0; i < BusinessEventType::Count; i++) {
+    for (int i = 1; i < BusinessEventType::Count; i++) {
         BusinessEventType::Value eventType = BusinessEventType::Value(i);
 
         QnBusinessEventParameters params;
@@ -682,7 +677,7 @@ void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationWidget *
     foreach (QnSystemHealth::MessageType messageType, m_itemsByMessageType.keys(item))
         m_itemsByMessageType.remove(messageType, item);
 
-    foreach (int ruleId, m_itemsByBusinessRuleId.keys(item))
+    foreach (const QnId& ruleId, m_itemsByBusinessRuleId.keys(item))
         m_itemsByBusinessRuleId.remove(ruleId, item);
 
     foreach (QString soundPath, m_itemsByLoadingSound.keys(item))

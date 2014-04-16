@@ -210,7 +210,7 @@ void QnDayTimeWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd) 
 
 void QnDayTimeWidget::paintCell(QPainter *painter, const QRect &rect, const QTime &time) {
     QnTimePeriod period(QDateTime(m_date, time).toMSecsSinceEpoch(), HOUR); 
-    if (period.startTimeMs > m_currentTime)
+    if (period.startTimeMs - m_localOffset > m_currentTime)
         period = QnTimePeriod();
 
     m_delegate->paintCell(
@@ -241,7 +241,7 @@ void QnDayTimeWidget::updateEnabled() {
         for(int col = 0; col < m_tableWidget->columnCount(); col++) {
             QTableWidgetItem *item = m_tableWidget->item(row, col);
             QTime time = item->data(Qt::UserRole).toTime();
-            QnTimePeriod period(QDateTime(m_date, time).toMSecsSinceEpoch(), HOUR);
+            QnTimePeriod period(QDateTime(m_date, time).toMSecsSinceEpoch() - m_localOffset, HOUR);
 
             item->setFlags(m_enabledPeriod.intersects(period) ? (Qt::ItemIsSelectable | Qt::ItemIsEnabled) : Qt::NoItemFlags);
         }
@@ -270,5 +270,6 @@ void QnDayTimeWidget::setLocalOffset(qint64 localOffset) {
     m_localOffset = localOffset;
 
     m_tableWidget->update();
+    updateEnabled();
 }
 

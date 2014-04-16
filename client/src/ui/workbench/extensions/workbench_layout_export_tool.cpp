@@ -3,8 +3,6 @@
 #include <QtCore/QBuffer>
 
 
-#include <api/serializer/pb_serializer.h>
-
 #include <client/client_settings.h>
 
 #include <camera/caching_time_period_loader.h>
@@ -32,6 +30,7 @@
 #ifdef Q_OS_WIN
 #include <launcher/nov_launcher_win.h>
 #endif
+#include "nx_ec/data/ec2_layout_data.h"
 
 QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
                                        const QnTimePeriod &period,
@@ -51,13 +50,13 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
     m_currentCamera(0)
 {
     m_layout.reset(new QnLayoutResource());
-    m_layout->setId(layout->getId());
-    m_layout->setGuid(layout->getGuid()); //before update() uuid's must be the same
+    m_layout->setId(layout->getId()); //before update() uuid's must be the same
+    m_layout->setTypeId(layout->getTypeId());
     m_layout->update(layout);
 
     // If exporting layout, create new guid. If layout just renamed, keep guid
     if (mode == Qn::LayoutExport)
-        m_layout->setGuid(QUuid::createUuid().toString());
+        m_layout->setId(QUuid::createUuid());
 }
 
 bool QnLayoutExportTool::start() {
@@ -67,7 +66,7 @@ bool QnLayoutExportTool::start() {
     }
 
 #ifdef Q_OS_WIN
-    if (m_targetFilename.endsWith(QLatin1String(".exe")))
+    if (m_targetFilename.endsWith(lit(".exe")))
     {
         if (QnNovLauncher::createLaunchingFile(m_realFilename) != 0)
         {
@@ -132,9 +131,12 @@ bool QnLayoutExportTool::start() {
     itemTimeZonesStream.flush();
     delete itemTimezonesIO;
 
-    QnApiPbSerializer serializer;
     QByteArray layoutData;
-    serializer.serializeLayout(m_layout, layoutData);
+    ec2::ApiLayout layoutObject;
+    layoutObject.fromResource(m_layout);
+    OutputBinaryStream<QByteArray> stream(&layoutData);
+    serialize(layoutObject, &stream);
+
 
     QIODevice* device = m_storage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
     device->write(layoutData);
@@ -157,7 +159,7 @@ bool QnLayoutExportTool::start() {
     delete device;
 
     device = m_storage->open(QLatin1String("uuid.bin"), QIODevice::WriteOnly);
-    device->write(m_layout->getGuid().toUtf8());
+    device->write(m_layout->getId().toByteArray());
     delete device;
 
     foreach (const QnMediaResourcePtr resource, m_resources) {
@@ -174,16 +176,23 @@ bool QnLayoutExportTool::start() {
         }
     }
 
+
     if (!m_layout->backgroundImageFilename().isEmpty()) {
-        QnAppServerImageCache cache(this);
-        QImage backround(cache.getFullPath(m_layout->backgroundImageFilename()));
-        if (!backround.isNull()) {
+        bool exportedLayout = snapshotManager()->isFile(m_layout);  // we have changed background to an exported layout
+        QScopedPointer<QnAppServerImageCache> cache;
+        if (exportedLayout)
+            cache.reset(new QnLocalFileCache());
+        else
+            cache.reset(new QnAppServerImageCache());
+
+        QImage background(cache->getFullPath(m_layout->backgroundImageFilename()));
+        if (!background.isNull()) {
             device = m_storage->open(m_layout->backgroundImageFilename(), QIODevice::WriteOnly);
-            backround.save(device, "png");
+            background.save(device, "png");
             delete device;
 
-            QnLocalFileCache cache;
-            cache.storeImage(m_layout->backgroundImageFilename(), backround);
+            QnLocalFileCache localCache;
+            localCache.storeImage(m_layout->backgroundImageFilename(), background);
         }
     }
 
@@ -262,7 +271,7 @@ void QnLayoutExportTool::finishExport(bool success) {
         }
         else {
             QnLayoutResourcePtr layout =  QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl());
-            if (!resourcePool()->getResourceByGuid(layout->getUniqueId())) {
+            if (!resourcePool()->getResourceById(layout->getUniqueId())) {
                 layout->setStatus(QnResource::Online);
                 resourcePool()->addResource(layout);
             }
@@ -311,7 +320,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     itemData.contrastParams,
                                     itemData.dewarpingParams);
 
-    emit stageChanged(tr("Exporting %1 to \"%2\"...").arg(resource->toResource()->getUrl()).arg(m_targetFilename));
+    emit stageChanged(tr("Exporting to \"%2\"...").arg(m_targetFilename));
     return true;
 }
 

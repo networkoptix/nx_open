@@ -8,50 +8,28 @@
 
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QMetaType>
-#include <QtCore/QString>
-
-static const QString nxEntControllerId = lit("Enterprise Controller");
 
 /*!
     This string represents client during search with NetworkOptixModuleFinder class.
     It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from version.h)
 */
 static const QString nxClientId = lit("client.exe");
-static const QString nxMediaServerId = lit("mediaserver.exe");
+static const QString nxMediaServerId = lit("Media Server");
 
 static const QHostAddress defaultModuleRevealMulticastGroup = QHostAddress(lit("239.255.11.11"));
 static const unsigned int defaultModuleRevealMulticastGroupPort = 5007;
-
-//!Number of simple functions to serialize simple types (local byte order is used)
-namespace Serialization
-{
-    bool serialize( const quint64& val, quint8** const bufStart, const quint8* bufEnd );
-    bool deserialize( quint64* const val, const quint8** const bufStart, const quint8* bufEnd );
-
-    bool serialize( const qint64& val, quint8** const bufStart, const quint8* bufEnd );
-    bool deserialize( qint64* const val, const quint8** const bufStart, const quint8* bufEnd );
-
-    bool serialize( const quint16& val, quint8** const bufStart, const quint8* bufEnd );
-    bool deserialize( quint16* const val, const quint8** const bufStart, const quint8* bufEnd );
-
-    bool serialize( const quint32& val, quint8** const bufStart, const quint8* bufEnd );
-    bool deserialize( quint32* const val, const quint8** const bufStart, const quint8* bufEnd );
-
-    bool serialize( const QString& val, quint8** const bufStart, const quint8* bufEnd );
-    bool deserialize( QString* const val, const quint8** const bufStart, const quint8* bufEnd );
-}
 
 //!This request is sent by host which tries to find other modules
 class RevealRequest
 {
 public:
-    bool serialize( quint8** const bufStart, const quint8* bufEnd );
-    bool deserialize( const quint8** bufStart, const quint8* bufEnd );
+    bool serialize(quint8 ** const bufStart, const quint8 *bufEnd);
+    bool deserialize(const quint8 **bufStart, const quint8 *bufEnd);
 };
 
 typedef QMap<QString, QString> TypeSpecificParamMap;
 
-Q_DECLARE_METATYPE(TypeSpecificParamMap);
+Q_DECLARE_METATYPE(TypeSpecificParamMap)
 
 //!Sent in response to RevealRequest by module which reveals itself
 class RevealResponse
@@ -61,14 +39,13 @@ public:
     QString type;
     QString version;
     QString customization;
+    QString name;
     //!random string, unique for particular module instance
     QString seed;
     TypeSpecificParamMap typeSpecificParameters;
 
-    RevealResponse();
-
-    bool serialize( quint8** const bufStart, const quint8* bufEnd );
-    bool deserialize( const quint8** bufStart, const quint8* bufEnd );
+    bool serialize(quint8 ** const bufStart, const quint8 *bufEnd);
+    bool deserialize(const quint8 **bufStart, const quint8 *bufEnd);
 };
 
 #endif  //NETWORKOPTIXMODULEREVEALCOMMON_H

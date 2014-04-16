@@ -1,23 +1,22 @@
 #ifndef QN_CONNECTION_INFO_H
 #define QN_CONNECTION_INFO_H
 
-#include <QtCore/QSharedPointer>
 #include <QtCore/QMetaType>
+#include <QtCore/QSharedPointer>
 
+#include <nx_ec/binary_serialization_helper.h>
 #include <utils/common/software_version.h>
 
 #include "compatibility.h"
 
-struct QnConnectionInfo {
-    QnConnectionInfo() {}
+typedef QnSoftwareVersion SoftwareVersionType;
 
-    QnSoftwareVersion version;
-    QList<QnCompatibilityItem> compatibilityItems;
-    int proxyPort;
-    QString ecsGuid;
-    QString publicIp;
-    QString brand;
-};
+#include "connection_info_i.h"
+
+typedef QnConnectionInfoData QnConnectionInfo;
+
+Q_DECLARE_METATYPE( QnConnectionInfo );
+
 
 // TODO: #Elric remove shared pointer?
 typedef QSharedPointer<QnConnectionInfo> QnConnectionInfoPtr;

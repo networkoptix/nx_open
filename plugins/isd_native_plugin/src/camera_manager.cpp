@@ -18,7 +18,7 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_info( info ),
     m_capabilities( 
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
-        nxcip::BaseCameraManager::shareFpsCapability |
+        //nxcip::BaseCameraManager::shareFpsCapability |
         nxcip::BaseCameraManager::hardwareMotionCapability),
     m_motionMask( nullptr ),
     m_audioEnabled( false )
@@ -125,7 +125,7 @@ int CameraManager::setAudioEnabled( int audioEnabled )
 }
 
 //!Implementation of nxcip::BaseCameraManager::getPTZManager
-nxcip::CameraPTZManager* CameraManager::getPTZManager() const
+nxcip::CameraPtzManager* CameraManager::getPtzManager() const
 {
     return NULL;
 }

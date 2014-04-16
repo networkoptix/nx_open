@@ -8,6 +8,10 @@
 #include "core/resource/media_server_resource.h"
 #include "device_plugins/desktop_camera/desktop_camera_connection.h"
 
+namespace {
+    const QUuid desktopResourceUuid(lit("{B3B2235F-D279-4d28-9012-00DE1002A61D}"));
+}
+
 //static QnDesktopResource* instance = 0;
 
 QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveResource() 
@@ -15,11 +19,12 @@ QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveRe
     m_mainWidget = mainWindow;
     addFlags(local_live_cam);
 
-    const QString name = QLatin1String("Desktop");
+    const QString name = lit("Desktop");
     setName(name);
     setUrl(name);
     m_desktopDataProvider = 0;
-    setGuid(lit("{B3B2235F-D279-4d28-9012-00DE1002A61D}")); // only one desktop resource is allowed)
+    setId(desktopResourceUuid); // only one desktop resource is allowed)
+  //  setDisabled(true);
     //Q_ASSERT_X(instance == 0, "Only one instance of desktop camera now allowed!", Q_FUNC_INFO);
     //instance = this;
 }
@@ -75,13 +80,6 @@ void QnDesktopResource::createSharedDataProvider()
     float encodingQuality = QnVideoRecorderSettings::qualityToNumeric(recorderSettings.decoderQuality());
     Qn::CaptureMode captureMode = recorderSettings.captureMode();
 
-    QPixmap logo;
-#if defined(CL_TRIAL_MODE) || defined(CL_FORCE_LOGO)
-    //QString logoName = QString("logo_") + QString::number(encodingSize.width()) + QString("_") + QString::number(encodingSize.height()) + QString(".png");
-    QString logoName = QLatin1String("logo_1920_1080.png");
-    logo = qnSkin->pixmap(logoName); // hint: comment this line to remove logo
-#endif
-
     m_desktopDataProvider = new QnDesktopDataProvider(toSharedPointer(),
         screen,
         audioDevice.isNull() ? 0 : &audioDevice,
@@ -91,7 +89,7 @@ void QnDesktopResource::createSharedDataProvider()
         encodingSize,
         encodingQuality,
         m_mainWidget,
-        logo);
+        QPixmap());
 #else
 #endif
 }
@@ -105,16 +103,16 @@ bool QnDesktopResource::isRendererSlow() const
 
 void QnDesktopResource::addConnection(QnMediaServerResourcePtr mServer)
 {
-    if (m_connectionPool.contains(mServer->getGuid()))
+    if (m_connectionPool.contains(mServer->getId()))
         return;
     QnDesktopCameraConnectionPtr connection = QnDesktopCameraConnectionPtr(new QnDesktopCameraConnection(this, mServer));
-    m_connectionPool[mServer->getGuid()] = connection;
+    m_connectionPool[mServer->getId()] = connection;
     connection->start();
 }
 
 void QnDesktopResource::removeConnection(QnMediaServerResourcePtr mServer)
 {
-    m_connectionPool.remove(mServer->getGuid());
+    m_connectionPool.remove(mServer->getId());
 }
 
 static std::shared_ptr<QnEmptyResourceAudioLayout> emptyAudioLayout( new QnEmptyResourceAudioLayout() );
@@ -123,6 +121,10 @@ QnConstResourceAudioLayoutPtr QnDesktopResource::getAudioLayout(const QnAbstract
     if (!m_desktopDataProvider)
         return emptyAudioLayout;
     return m_desktopDataProvider->getAudioLayout();
+}
+
+QUuid QnDesktopResource::getDesktopResourceUuid() {
+    return desktopResourceUuid;
 }
 
 

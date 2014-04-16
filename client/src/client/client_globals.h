@@ -9,14 +9,24 @@ namespace Qn {
      * Type of a node in resource tree displayed to the user.
      */
     enum NodeType {
-        RootNode,
-        LocalNode,
-        ServersNode,
-        UsersNode,
-        ResourceNode,   /**< Node that represents a resource. */
-        ItemNode,       /**< Node that represents a layout item. */
-        BastardNode,    /**< Node that contains hidden resources. */
-        RecorderNode,   /**< Node that represents a recorder (VMAX, etc). */
+        RootNode,               /**< Root node for the tree. */
+        LocalNode,              /**< Root node for local resources. */
+        ServersNode,            /**< Root node for remote resources. */
+        UsersNode,              /**< Root node for user resources. */
+
+        BastardNode,            /**< Root node for hidden resources. */
+
+        ResourceNode,           /**< Node that represents a resource. Has only resource. */
+        ItemNode,               /**< Node that represents a layout item. Has both guid and resource. */
+        RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
+        EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
+
+        VideoWallItemNode,      /**< Node that represents a video wall item. Has a guid and can have resource. */
+        VideoWallHistoryNode,   /**< Node that represents a video wall history item. Has both guid and resource. */
+
+        UserVideoWallNode,      /**< Node that represents a video wall having items that user is allowed to edit. Has both guid and resource. */
+        UserVideoWallItemNode,  /**< Node that represents a video wall item that user is allowed to edit. Has a guid. */
+
         NodeTypeCount
     };
 
@@ -203,9 +213,6 @@ namespace Qn {
         CommonNotification,
         ImportantNotification,
         CriticalNotification,
-        SystemNotification,
-        SoundNotification,
-
         LevelCount
     };
 
@@ -218,26 +225,23 @@ namespace Qn {
         LayoutExport
     };
 
-
-    /**
-     * Custom resource properties names.
-     */
-    const QString customAspectRatioKey = lit("overrideAr");
-
     /**
      * Flags describing the client light mode.
      */
     enum LightModeFlag {
-        LightModeNoAnimation        = 0x01,
-        LightModeSmallWindow        = 0x02,
-        LightModeNoBackground       = 0x04,
-        LightModeNoOpacity          = 0x08,
-        LightModeNoNotifications    = 0x10,
-        LightModeSingleItem         = 0x20,
-        LightModeNoShadows          = 0x40,
-        LightModeNoMultisampling    = 0x80,
-        LightModeNoNewWindow        = 0x100,
+        LightModeNoAnimation        = 0x0001,           /**< Disable all client animations. */
+        LightModeSmallWindow        = 0x0002,           /**< Decrease minimum window size. */
+        LightModeNoSceneBackground  = 0x0004,           /**< Disable gradient scene background. */
+        LightModeNoOpacity          = 0x0008,           /**< Disable opacity in ui widgets. */
+        LightModeNoNotifications    = 0x0010,           /**< Disable notifications panel. */
+        LightModeSingleItem         = 0x0020,           /**< Limit number of simultaneous items on the scene to 1. */
+        LightModeNoShadows          = 0x0040,           /**< Disable shadows on ui elements. */
+        LightModeNoMultisampling    = 0x0080,           /**< Disable OpenGL multisampling. */
+        LightModeNoNewWindow        = 0x0100,           /**< Disable opening of new windows. */
+        LightModeNoLayoutBackground = 0x0200,           /**< Disable layout background. */
+        LightModeNoZoomWindows      = 0x0400,           /**< Disable zoom windows. */
 
+        LightModeVideoWall          = LightModeNoSceneBackground | LightModeNoNotifications | LightModeNoShadows /*| LightModeNoAnimation*/,
         LightModeFull               = 0xFFFFFFFF
 
     };
@@ -257,5 +261,7 @@ Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(Qn::ItemRole)
 Q_DECLARE_METATYPE(Qn::TimeMode)
 Q_DECLARE_METATYPE(Qn::ClientSkin)
+Q_DECLARE_TYPEINFO(Qn::NodeType, Q_PRIMITIVE_TYPE);
+Q_DECLARE_METATYPE(Qn::NodeType)
 
 #endif // QN_CLIENT_GLOBALS_H

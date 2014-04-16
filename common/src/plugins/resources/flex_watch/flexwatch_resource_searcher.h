@@ -9,12 +9,9 @@
 
 class QnFlexWatchResourceSearcher : public OnvifResourceSearcher
 {
+public:
     QnFlexWatchResourceSearcher();
     virtual ~QnFlexWatchResourceSearcher();
-
-public:
-    static QnFlexWatchResourceSearcher& instance();
-
 
     // returns all available devices
     virtual QnResourceList findResources() override;

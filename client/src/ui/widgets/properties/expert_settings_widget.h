@@ -27,7 +27,6 @@ private slots:
 
     void at_restoreDefaultsButton_clicked();
     void at_qualitySlider_valueChanged(int value);
-    void at_arOverrideCheckBox_stateChanged(int state);
 private:
     Qn::SecondStreamQuality sliderPosToQuality(int pos);
     int qualityToSliderPos(Qn::SecondStreamQuality quality);

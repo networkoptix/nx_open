@@ -99,7 +99,7 @@ void QnStorageManager::rebuildCatalogIndexInternal()
     {
         QMutexLocker lock(&m_mutexCatalog);
         m_rebuildProgress = 0;
-        m_catalogLoaded = false;
+        //m_catalogLoaded = false;
         m_rebuildCancelled = false;
         /*
         foreach(DeviceFileCatalogPtr catalog,  m_devFileCatalogHi)
@@ -387,7 +387,7 @@ void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList>& cameras,
         if (!cameras.last().isEmpty())
         {
             QnTimePeriod& lastPeriod = cameras.last().last();
-            bool isActive = !camera->isDisabled() && (camera->getStatus() == QnResource::Online || camera->getStatus() == QnResource::Recording);
+            bool isActive = !camera->hasFlags(QnResource::foreigner) && (camera->getStatus() == QnResource::Online || camera->getStatus() == QnResource::Recording);
             if (lastPeriod.durationMs == -1 && !isActive)
             {
                 lastPeriod.durationMs = 0;
@@ -525,7 +525,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
 
     if (toDelete > 0) {
         if (!m_diskFullWarned[storage->getId()]) {
-            QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceByGuid(serverGuid()));
+            QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
             emit storageFailure(storage, QnBusiness::StorageIssueNotEnoughSpace);
             m_diskFullWarned[storage->getId()] = true;
         }

@@ -83,6 +83,7 @@ public:
     bool isAnalog() const;
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
+    void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
 
     virtual QStringList getRelayOutputList() const;
     virtual QStringList getInputPortList() const;
@@ -173,6 +174,9 @@ public:
         qint64 msEndTime,
         int detailLevel );
     
+    // in some cases I just want to update couple of field from just discovered resource
+    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -184,6 +188,8 @@ signals:
     void scheduleDisabledChanged(const QnSecurityCamResourcePtr &resource);
     void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
     void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+    void groupNameChanged(const QnSecurityCamResourcePtr &resource);
+    void motionRegionChanged(const QnResourcePtr &resource);
 
     //!Emitted on camera input port state has been changed
     /*!
@@ -199,10 +205,10 @@ signals:
         qint64 timestamp );
 
 protected slots:
-    virtual void at_disabledChanged();
+    virtual void at_parentIdChanged();
 
 protected:
-    void updateInner(QnResourcePtr other) override;
+    void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResource::ConnectionRole role) override;
     virtual void initializationDone() override;

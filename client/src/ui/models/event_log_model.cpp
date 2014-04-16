@@ -314,7 +314,7 @@ QnResourcePtr QnEventLogModel::getResource(const Column &column, const QnBusines
 }
 
 QnResourcePtr QnEventLogModel::getResourceById(const QnId &id) {
-    if (!id.isValid())
+    if (id.isNull())
         return QnResourcePtr();
 
     QnResourcePtr resource = m_resourcesHash.value(id);
@@ -322,14 +322,6 @@ QnResourcePtr QnEventLogModel::getResourceById(const QnId &id) {
         return resource;
 
     resource = qnResPool->getResourceById(id);
-    if (resource && resource->isDisabled()) {
-        QnServerCameraPtr localCam = resource.dynamicCast<QnServerCamera>();
-        if (localCam) {
-            localCam = localCam->findEnabledSibling();
-            if (localCam)
-                resource = localCam;
-        }
-    }
     if (resource)
         m_resourcesHash.insert(id, resource);
 
@@ -471,7 +463,7 @@ bool QnEventLogModel::hasMotionUrl(const QModelIndex &index) const {
     const QnBusinessActionData &action = m_index->at(index.row());
     if (!action.hasFlags(QnBusinessActionData::MotionExists))
         return false;
-    if (!action.getRuntimeParams().getEventResourceId())
+    if (action.getRuntimeParams().getEventResourceId().isNull())
         return false;
 
     return true;

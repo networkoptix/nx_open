@@ -39,11 +39,7 @@ namespace {
 
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
-    base_type(parent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
-#ifdef Q_OS_MAC
-    | Qt::Tool
-#endif
-    ),
+    base_type(parent),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::EventLogDialog),
     m_eventTypesModel(new QStandardItemModel()),
@@ -87,8 +83,10 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context)
         m_actionTypesModel->appendRow(anyActionItem);
 
 
-        for (int i = 0; i < BusinessActionType::Count; i++) {
-            BusinessActionType::Value val = (BusinessActionType::Value)i;
+        for (int i = 1; i < BusinessActionType::Count; i++) {
+            BusinessActionType::Value val = (BusinessActionType::Value) i;
+            if (BusinessActionType::isNotImplemented(val))
+                continue;
 
             QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
             item->setData(val);
@@ -209,7 +207,7 @@ void QnEventLogDialog::updateData()
     BusinessActionType::Value actionType = BusinessActionType::NotDefined;
     {
         int idx = ui->actionComboBox->currentIndex();
-        actionType = (BusinessActionType::Value) m_actionTypesModel->item(idx)->data().toInt();
+        actionType = (BusinessActionType::Value) m_actionTypesModel->index(idx, 0).data(Qt::UserRole+1).toInt();
     }
 
     query(ui->dateEditFrom->dateTime().toMSecsSinceEpoch(),
@@ -440,10 +438,12 @@ void QnEventLogDialog::setCameraList(const QnResourceList &cameras)
 
 void QnEventLogDialog::setActionType(BusinessActionType::Value value)
 {
-    if (value == BusinessActionType::NotDefined)
-        ui->actionComboBox->setCurrentIndex(0);
-    else
-        ui->actionComboBox->setCurrentIndex(int(value) + 1);
+    for (int i = 0; i < m_actionTypesModel->rowCount(); ++i)
+    {
+        QModelIndex idx = m_actionTypesModel->index(i, 0);
+        if (idx.data(Qt::UserRole + 1).toInt() == value)
+            ui->actionComboBox->setCurrentIndex(i);
+    }
 }
 
 void QnEventLogDialog::at_resetFilterAction_triggered()

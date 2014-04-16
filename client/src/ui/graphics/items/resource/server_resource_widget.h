@@ -26,6 +26,8 @@ class QnServerResourceWidget: public QnResourceWidget, public AnimationTimerList
     typedef QnResourceWidget base_type;
 
 public:
+    typedef QHash<QString, bool> HealthMonitoringButtons;
+
     static const Button PingButton = static_cast<Button>(0x08);
     static const Button ShowLogButton = static_cast<Button>(0x10);
     static const Button CheckIssuesButton = static_cast<Button>(0x20);
@@ -44,6 +46,9 @@ public:
     const QnStatisticsColors &colors() const;
     void setColors(const QnStatisticsColors &colors);
 
+    HealthMonitoringButtons checkedHealthMonitoringButtons() const;
+    void setCheckedHealthMonitoringButtons(const HealthMonitoringButtons &buttons);
+
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
 
@@ -55,6 +60,7 @@ protected:
 
     virtual void tick(int deltaMSecs) override;
 
+    virtual void at_itemDataChanged(int role) override;
 private slots:
     void at_statistics_received();
     void at_pingButton_clicked();
@@ -84,6 +90,7 @@ private:
 
     QColor getColor(QnStatisticsDeviceType deviceType, int index);
 
+    void updateCheckedHealthMonitoringButtons();
 private:
     //TODO: #GDM move all required fields to inner class
     friend class StatisticsOverlayWidget;
@@ -131,8 +138,6 @@ private:
 
     /** Button bars with corresponding buttons */
     QnImageButtonBar *m_legendButtonBar[ButtonBarCount];
-
-    QHash<QString, QnImageButtonWidget *> m_legendButtonByKey;
 
     struct GraphData {
         GraphData(): bar(NULL), button(NULL), mask(0), visible(false), opacity(1.0) {}

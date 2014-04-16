@@ -30,7 +30,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     m_lastMotionState(false),
     m_queuedSize(0),
     m_lastMediaTime(AV_NOPTS_VALUE),
-    m_diskErrorWarned(false)
+    m_diskErrorWarned(false),
+    m_rebuildBlocked(false)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
@@ -102,6 +103,18 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr nonConstData)
     if (!isRunning()) 
         return;
 
+    bool halfQueueReached = m_queuedSize >= MAX_BUFFERED_SIZE/2 || m_dataQueue.size() >= 500;
+    if (!m_rebuildBlocked && halfQueueReached)
+    {
+        m_rebuildBlocked = true;
+        DeviceFileCatalog::rebuildPause(this);
+    }
+    else if (m_rebuildBlocked && !halfQueueReached)
+    {
+        m_rebuildBlocked = false;
+        DeviceFileCatalog::rebuildResume(this);
+    }
+
     bool rez = m_queuedSize <= MAX_BUFFERED_SIZE && m_dataQueue.size() < 1000;
     if (!rez) {
         emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageIssueNotEnoughSpeed, m_storage);
@@ -152,8 +165,6 @@ void QnServerStreamRecorder::updateStreamParams()
                 liveProvider->setFps(camera->getMaxFps()-5);
                 liveProvider->setQuality(Qn::QualityHighest);
             }
-        }
-        else {
             liveProvider->setSecondaryQuality(camera->isCameraControlDisabled() ? Qn::SSQualityNotDefined : camera->secondaryStreamQuality());
         }
         liveProvider->setCameraControlDisabled(camera->isCameraControlDisabled());
@@ -185,7 +196,7 @@ void QnServerStreamRecorder::beforeProcessData(QnConstAbstractMediaDataPtr media
 
     const QnScheduleTask task = currentScheduleTask();
     bool isRecording = task.getRecordingType() != Qn::RecordingType_Never && qnStorageMan->isWritableStoragesAvailable();
-    if (!m_device->isDisabled()) {
+    if (!m_device->hasFlags(QnResource::foreigner)) {
         if (isRecording) {
             if(m_device->getStatus() == QnResource::Online)
                 m_device->setStatus(QnResource::Recording);
@@ -359,7 +370,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
 {
     QMutexLocker lock(&m_scheduleMutex);
 
-    if (m_mediaServer && m_mediaServer->getPanicMode() != QnMediaServerResource::PM_None)
+    if (m_mediaServer && m_mediaServer->getPanicMode() != Qn::PM_None)
     {
         if (!m_usedPanicMode)
         {
@@ -379,7 +390,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 
     m_usedSpecialRecordingMode = m_usedPanicMode = false;
-    QnScheduleTask noRecordTask(0, m_device->getId(), 1, 0, 0, Qn::RecordingType_Never, 0, 0);
+    QnScheduleTask noRecordTask(QnId(), 1, 0, 0, Qn::RecordingType_Never, 0, 0);
 
     if (!m_schedule.isEmpty())
     {
@@ -479,6 +490,11 @@ void QnServerStreamRecorder::endOfRun()
     QnStreamRecorder::endOfRun();
     if(m_device->getStatus() == QnResource::Recording)
         m_device->setStatus(QnResource::Online);
+
+    if (m_rebuildBlocked) {
+        m_rebuildBlocked = false;
+        DeviceFileCatalog::rebuildResume(this);
+    }
 
     QMutexLocker lock(&m_queueSizeMutex);
     m_dataQueue.clear();

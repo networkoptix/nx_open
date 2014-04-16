@@ -337,10 +337,11 @@ public:
         if(m_textureSize.width() != textureSize.width() || m_textureSize.height() != textureSize.height() || m_internalFormat != internalFormat) {
             qDebug()<<"glTexImage2D"<<m_renderer->supportsNonPower2Textures<<textureSize.width()<<textureSize.height()<<m_textureSize.width()<<m_textureSize.height()<<m_internalFormat<<internalFormat;
 
-            m_textureSize = textureSize;
+			m_textureSize = textureSize;
             m_internalFormat = internalFormat;
 
             glBindTexture(GL_TEXTURE_2D, m_id);
+            
             glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, textureSize.width(), textureSize.height(), 0, internalFormat, GL_UNSIGNED_BYTE, NULL);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

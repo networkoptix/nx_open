@@ -2,7 +2,6 @@
 #include "ui_database_management_widget.h"
 
 #include <QtWidgets/QMessageBox>
-#include <QtWidgets/QFileDialog>
 #include <QtCore/QFileInfo>
 
 #include "client/client_settings.h"
@@ -15,6 +14,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/file_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace {
@@ -39,7 +39,15 @@ QnDatabaseManagementWidget::~QnDatabaseManagementWidget() {
 }
 
 void QnDatabaseManagementWidget::at_backupButton_clicked() {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QnCustomFileDialog::fileDialogOptions());
+    // TODO: #dklychkov file name filter string duplicates the value of dbExtension variable
+    QScopedPointer<QnCustomFileDialog> fileDialog(new QnCustomFileDialog(
+                                                      this,
+                                                      tr("Save Database Backup..."),
+                                                      qnSettings->lastDatabaseBackupDir(),
+                                                      tr("Database Backup Files (*.db)")));
+    fileDialog->exec();
+
+    QString fileName = fileDialog->selectedFile();
     if(fileName.isEmpty())
         return;
 
@@ -60,24 +68,34 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
     dialog->setLabelText(tr("Database backup is being downloaded from the server. Please wait."));
     dialog->setModal(true);
 
-    //TODO: #GDM replace with QnAppServerReplyProcessor
-    QScopedPointer<QnDatabaseManagementWidgetReplyProcessor> processor(new QnDatabaseManagementWidgetReplyProcessor());
-    connect(processor, SIGNAL(activated()), dialog, SLOT(reset()));
-    
-    QnAppServerConnectionFactory::createConnection()->dumpDatabaseAsync(processor.data(), "activate");
+    ec2::ErrorCode errorCode;
+    QByteArray databaseData;
+    auto dumpDatabaseHandler = 
+        [&dialog, &errorCode, &databaseData]( int /*reqID*/, ec2::ErrorCode _errorCode, const QByteArray& dbData ) {
+            errorCode = _errorCode;
+            databaseData = dbData;
+            dialog->reset(); 
+    };
+    QnAppServerConnectionFactory::getConnection2()->dumpDatabaseAsync( dialog.data(), dumpDatabaseHandler );
     dialog->exec();
     if(dialog->wasCanceled())
-        return;
+        return;    //TODO: #ak is running request finish OK?
 
-    // TODO: #Elric check error code
-    file.write(processor->response.data);
+    if( errorCode != ec2::ErrorCode::ok )
+    {
+        NX_LOG( lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)), cl_logERROR );
+        QMessageBox::information(this, tr("Information"), tr("Failed to dump EC database to '%1'").arg(fileName));
+        return;
+    }
+
+    file.write( databaseData );
     file.close();
 
     QMessageBox::information(this, tr("Information"), tr("Database was successfully backed up into file '%1'.").arg(fileName));
 }
 
 void QnDatabaseManagementWidget::at_restoreButton_clicked() {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QnCustomFileDialog::fileDialogOptions());
+    QString fileName = QnFileDialog::getOpenFileName(this, tr("Open Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QnCustomFileDialog::fileDialogOptions());
     if(fileName.isEmpty())
         return;
     qnSettings->setLastDatabaseBackupDir(QFileInfo(fileName).absolutePath());
@@ -104,23 +122,25 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     dialog->setLabelText(tr("Database backup is being uploaded to the server. Please wait."));
     dialog->setModal(true);
 
-    //TODO: #GDM replace with QnAppServerReplyProcessor
-    QScopedPointer<QnDatabaseManagementWidgetReplyProcessor> processor(new QnDatabaseManagementWidgetReplyProcessor());
-    connect(processor, SIGNAL(activated()), dialog, SLOT(reset()));
-
-    QnAppServerConnectionFactory::createConnection()->restoreDatabaseAsync(data, processor.data(), "activate");
+    ec2::ErrorCode errorCode;
+    auto restoreDatabaseHandler = 
+        [&dialog, &errorCode]( int /*reqID*/, ec2::ErrorCode _errorCode ) {
+            errorCode = _errorCode;
+            dialog->reset(); 
+    };
+    QnAppServerConnectionFactory::getConnection2()->restoreDatabaseAsync( data, dialog.data(), restoreDatabaseHandler );
     dialog->exec();
     if(dialog->wasCanceled())
-        return; // TODO: #Elric make non-cancellable.
+        return; // TODO: #Elric make non-cancellable.   TODO: #ak is running request finish OK?
 
-    if(processor->response.status == 0) {
+    if( errorCode == ec2::ErrorCode::ok ) {
         QMessageBox::information(this,
                                  tr("Information"),
                                  tr("Database was successfully restored from file '%1'.").arg(fileName));
         menu()->trigger(Qn::ReconnectAction);
     } else {
+        NX_LOG( lit("Failed to restore EC database from file '$1'. $2").arg(fileName).arg(ec2::toString(errorCode)), cl_logERROR );
         QMessageBox::critical(this, tr("Error"), tr("An error has occured while restoring the database from file '%1'.")
                               .arg(fileName));
     }
 }
-

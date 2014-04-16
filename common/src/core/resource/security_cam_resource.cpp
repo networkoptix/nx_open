@@ -11,6 +11,7 @@
 #include <business/business_event_connector.h>
 
 #include "user_resource.h"
+#include "common/common_module.h"
 
 #define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
 
@@ -44,7 +45,7 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     m_cameraControlDisabled = !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
 
-    connect(this, SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_disabledChanged()), Qt::DirectConnection);
+    connect(this, &QnResource::parentIdChanged, this, &QnSecurityCamResource::at_parentIdChanged, Qt::DirectConnection);
 
     QnMediaResource::initMediaResource();
 
@@ -80,9 +81,9 @@ QnResourcePtr QnSecurityCamResource::toResourcePtr() {
 QnSecurityCamResource::~QnSecurityCamResource() {
 }
 
-void QnSecurityCamResource::updateInner(QnResourcePtr other) {
-    QnNetworkResource::updateInner(other);
-    QnMediaResource::updateInner(other);
+void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
+    QnNetworkResource::updateInner(other, modifiedFields);
+    QnMediaResource::updateInner(other, modifiedFields);
 
     QnSecurityCamResourcePtr other_casted = qSharedPointerDynamicCast<QnSecurityCamResource>(other);
     if (other_casted)
@@ -91,17 +92,26 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other) {
         int numChannels = layout->channelCount();
 
         m_motionType = other_casted->m_motionType;
-        for (int i = 0; i < numChannels; ++i) 
+        
+        bool motionRegionChanged = false;
+        for (int i = 0; i < numChannels; ++i) {
+            if (m_motionMaskList[i] == other_casted->m_motionMaskList[i])
+                continue;
             setMotionRegion(other_casted->m_motionMaskList[i], QnDomainPhysical, i);
+            motionRegionChanged = true;
+        }
+        if (motionRegionChanged)
+            modifiedFields << "motionRegionChanged";
+
         m_scheduleTasks = other_casted->m_scheduleTasks;
         m_groupId = other_casted->m_groupId;
         m_groupName = other_casted->m_groupName;
         m_secondaryQuality = other_casted->m_secondaryQuality;
         m_cameraControlDisabled = other_casted->m_cameraControlDisabled;
         m_statusFlags = other_casted->m_statusFlags;
-        m_scheduleDisabled = other_casted->isScheduleDisabled();
-        m_audioEnabled = other_casted->isAudioEnabled();
-        m_manuallyAdded = other_casted->isManuallyAdded();
+        m_scheduleDisabled = other_casted->m_scheduleDisabled;
+        m_audioEnabled = other_casted->m_audioEnabled;
+        m_manuallyAdded = other_casted->m_manuallyAdded;
         m_model = other_casted->m_model;
         m_firmware = other_casted->m_firmware;
         m_vendor = other_casted->m_vendor;
@@ -232,21 +242,21 @@ bool QnSecurityCamResource::hasDualStreaming() const {
     QVariant val;
     if (!getParam(lit("hasDualStreaming"), val, QnDomainMemory))
         return false;
-    return val.toInt();
+    return val.toBool();
 }
 
 bool QnSecurityCamResource::isDtsBased() const {
     QVariant val;
     if (!getParam(lit("dts"), val, QnDomainMemory))
         return false;
-    return val.toInt();
+    return val.toBool();
 }
 
 bool QnSecurityCamResource::isAnalog() const {
     QVariant val;
     if (!getParam(lit("analog"), val, QnDomainMemory))
         return false;
-    return val.toInt();
+    return val.toBool();
 }
 
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {
@@ -260,6 +270,18 @@ Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
     if (sval == lit("noSharing"))
         return Qn::noSharing;
     return Qn::sharePixels;
+}
+
+void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value) 
+{
+    QString strVal;
+    if (value == Qn::shareFps)
+        strVal = lit("shareFps");
+    else if (value == Qn::noSharing)
+        strVal = lit("noSharing");
+    else
+        strVal = lit("sharePixels");
+    setParam(lit("streamFpsSharing"), strVal, QnDomainDatabase);
 }
 
 QStringList QnSecurityCamResource::getRelayOutputList() const {
@@ -298,11 +320,9 @@ void QnSecurityCamResource::inputPortListenerDetached() {
         m_inputPortListenerCount.fetchAndAddOrdered( 1 );   //no reduce below 0
 }
 
-void QnSecurityCamResource::at_disabledChanged() {
-    if(hasFlags(QnResource::foreigner))
-        return; // we do not own camera
-
-    if(isDisabled())
+void QnSecurityCamResource::at_parentIdChanged() 
+{
+    if(getParentId() != qnCommon->moduleGUID())
         stopInputPortMonitoring();
     else
         startInputPortMonitoring();
@@ -333,7 +353,7 @@ bool QnSecurityCamResource::isAudioSupported() const {
     QVariant val;
     if (!getParam(lit("isAudioSupported"), val, QnDomainMemory))
         return false;
-    return val.toUInt() > 0;
+    return val.toBool();
 }
 
 Qn::MotionType QnSecurityCamResource::getCameraBasedMotionType() const {
@@ -437,7 +457,14 @@ QString QnSecurityCamResource::getGroupName() const {
 }
 
 void QnSecurityCamResource::setGroupName(const QString& value) {
-    SAFE(m_groupName = value)
+    {
+        QMutexLocker locker(&m_mutex);
+        if(m_groupName == value)
+            return;
+        m_groupName = value;
+    }
+
+    emit groupNameChanged(::toSharedPointer(this));
 }
 
 QString QnSecurityCamResource::getGroupId() const {
@@ -591,4 +618,26 @@ QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(
     Q_UNUSED( detailLevel );
 
     return QnTimePeriodList();
+}
+
+bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) {
+    QnSecurityCamResourcePtr camera = source.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return false;
+
+    bool result = base_type::mergeResourcesIfNeeded(source);
+
+    if (getGroupId() != camera->getGroupId())
+    {
+        setGroupId(camera->getGroupId());
+        result = true; // groupID can be changed for onvif resource because if not auth info, maxChannels is not accessible
+    }
+
+    if (getGroupName().isEmpty() && getGroupName() != camera->getGroupName())
+    {
+        setGroupName(camera->getGroupName());
+        result = true;
+    }
+
+    return result;
 }

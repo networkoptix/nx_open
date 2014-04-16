@@ -12,6 +12,7 @@ public:
     QnMacAddress(const unsigned char *mac);
     QnMacAddress(const QString &mac);
     QnMacAddress(const QLatin1String &mac);
+    QnMacAddress(const QByteArray &mac);
     ~QnMacAddress();
 
     bool isNull() const;

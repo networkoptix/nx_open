@@ -62,17 +62,17 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr action)
 {
-    QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceByGuid(serverGuid()));
+    QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
     if (!mediaServer)
         return false;
-    if (mediaServer->getPanicMode() == QnMediaServerResource::PM_User)
+    if (mediaServer->getPanicMode() == Qn::PM_User)
         return true; // ignore panic business action if panic mode turn on by user
-
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    QnMediaServerResource::PanicMode val = QnMediaServerResource::PM_None;
+    
+    Qn::PanicMode val = Qn::PM_None;
     if (action->getToggleState() == Qn::OnState)
-        val =  QnMediaServerResource::PM_BusinessEvents;
-    conn->setPanicMode(val);
+        val =  Qn::PM_BusinessEvents;
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    conn->setPanicModeSync(val);
     mediaServer->setPanicMode(val);
     return true;
 }
@@ -97,7 +97,7 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(QnRecordingBusinessA
 
 QString QnMServerBusinessRuleProcessor::getGuid() const
 {
-    return serverGuid();
+    return serverGuid().toString();
 }
 
 bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource )
@@ -111,7 +111,7 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
     if( !securityCam )
     {
         cl_log.log( lit("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
-            arg(resource->getId()), cl_logWARNING );
+            arg(resource->getId().toString()), cl_logWARNING );
         return false;
     }
     QString relayOutputId = action->getRelayOutputId();

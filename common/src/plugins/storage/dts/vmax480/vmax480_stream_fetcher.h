@@ -121,5 +121,5 @@ private:
     bool m_needStop;
 };
 
-#endif #ifdef ENABLE_VMAX
+#endif //#ifdef ENABLE_VMAX
 #endif // __VMAX480_STREAM_FETCHER_H__

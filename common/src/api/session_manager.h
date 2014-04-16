@@ -5,6 +5,9 @@
 #include <QtCore/QUrl>
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
+#include <QtCore/QTimer>
+
+#include <QtNetwork/QNetworkCookie>
 
 #include "utils/common/request_param.h"
 
@@ -53,6 +56,11 @@ public:
     void start();
     bool isReady() const;
 
+    void setAuthCookieEnabled(bool value = true);
+    bool authCookieEnabled() const;
+
+    QNetworkCookie authCookie() const;
+
     // Synchronous requests return status
     int sendSyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QnHTTPRawResponse& response);
     int sendSyncGetRequest(const QUrl& url, const QString &objectName, QnHTTPRawResponse& response);
@@ -82,10 +90,14 @@ private slots:
     void at_sslErrors(QNetworkReply* reply, const QList<QSslError> &errors);
     void at_replyReceived(QNetworkReply * reply);
     void at_SyncRequestFinished(const QnHTTPRawResponse& response, int handle);
+    void at_authCookieChanged(const QNetworkCookie &cookie);
+    void at_authTimer_timeout();
+
 signals:
     void aboutToBeStopped();
     void aboutToBeStarted();
     void asyncRequestQueued(int operation, AsyncRequestInfo reqInfo, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data);
+    void authCookieChanged(const QNetworkCookie &cookie);
     //void requestFinished(const QnHTTPRawResponse& response, int handle);
 private:
     QNetworkAccessManager *m_accessManager;
@@ -97,6 +109,10 @@ private:
 
     QHash<int, QnSessionManagerSyncReply*>  m_syncReplyInProgress;
     QMutex m_syncReplyMutex;
+
+    bool m_authCookieEnabled;
+    QNetworkCookie m_authCookie;
+    QTimer* m_authTimer;
 };
 
 #endif // __SESSION_MANAGER_H__

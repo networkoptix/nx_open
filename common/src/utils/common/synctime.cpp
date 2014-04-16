@@ -19,10 +19,10 @@ public:
     QnSyncTimeTask(QnSyncTime* owner): m_owner(owner) {}
 
     void run() {
-        QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-        qint64 rez = appServerConnection->getCurrentTime();
-        if (rez > 0) 
-            m_owner->updateTime(rez);
+        ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
+        qint64 time;
+        if (appServerConnection && appServerConnection->getCurrentTimeSync(&time) == ec2::ErrorCode::ok) 
+            m_owner->updateTime(time);
     }
 
 private:
@@ -36,6 +36,7 @@ private:
 // -------------------------------------------------------------------------- //
 QnSyncTime::QnSyncTime()
 {
+    m_lastReceivedTime = 0;
     reset();
 }
 
@@ -64,7 +65,6 @@ qint64 QnSyncTime::currentUSecsSinceEpoch()
 
 void QnSyncTime::reset()
 {
-    m_lastReceivedTime = 0;
     m_gotTimeTask = 0;
     m_lastWarnTime = 0;
     m_lastLocalTime = 0;

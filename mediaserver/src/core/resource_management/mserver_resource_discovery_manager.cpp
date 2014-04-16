@@ -23,7 +23,6 @@
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 
-
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 
 QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager( const CameraDriverRestrictionList& cameraDriverRestrictionList )
@@ -33,6 +32,7 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager( const Came
 {
     netStateTime.restart();
     connect(this, SIGNAL(cameraDisconnected(QnResourcePtr, qint64)), qnBusinessRuleConnector, SLOT(at_cameraDisconnected(const QnResourcePtr&, qint64)));
+
 }
 
 QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
@@ -127,11 +127,10 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                         {
                             QByteArray errorString;
                             QnVirtualCameraResourceList cameras;
-                            QnAppServerConnectionPtr connect = QnAppServerConnectionFactory::createConnection();
-                            if (connect->addCamera(cameraResource, cameras) != 0)
-                            {
-                                qCritical() << "QnResourceDiscoveryManager::findNewResources(): Can't add camera. Reason: " << connect->getLastError();
-                            }
+                            ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
+                            const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
+                            if( errorCode != ec2::ErrorCode::ok )
+                                NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
                         }
 
                     }
@@ -333,11 +332,10 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     if (cameraResource)
                     {
                         QnVirtualCameraResourceList cameras;
-                        QnAppServerConnectionPtr connect = QnAppServerConnectionFactory::createConnection();
-                        if (connect->addCamera(cameraResource, cameras) != 0)
-                        {
-                            qCritical() << "QnResourceDiscoveryManager::findNewResources(): Can't add camera. Reason: " << connect->getLastError();
-                        }
+                        ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
+                        const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
+                        if( errorCode != ec2::ErrorCode::ok )
+                            NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
                     }
 
                     continue;
@@ -435,8 +433,7 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
         if (res->hasFlags(QnResource::server_live_cam)) // if this is camera from mediaserver on the client
             continue;
 
-        if( res->isDisabled() ||                        //camera is enabled on some other server
-            res->hasFlags(QnResource::foreigner) )      //this camera belongs to some other mediaserver
+        if( res->hasFlags(QnResource::foreigner) )      //this camera belongs to some other mediaserver
         {
             continue;
         }
@@ -497,7 +494,7 @@ void QnMServerResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res, 
         disconnect(rpNetRes.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)), this, SLOT(onInitAsyncFinished(QnResourcePtr, bool)));
         connect(rpNetRes.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)), this, SLOT(onInitAsyncFinished(QnResourcePtr, bool)));
 
-        if (!rpNetRes->isDisabled())
+        if (!rpNetRes->hasFlags(QnResource::foreigner))
         {
             if (rpNetRes->getStatus() == QnResource::Offline) 
             {

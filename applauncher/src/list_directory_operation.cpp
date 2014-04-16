@@ -236,7 +236,9 @@ namespace detail
         {
             //downloading has been interrupted unexpectedly
             setResult( ResultCode::downloadFailure );
-            setErrorText( httpClient->response()->statusLine.reasonPhrase );
+            const nx_http::HttpResponse *response = httpClient->response();
+            if (response)
+                setErrorText(response->statusLine.reasonPhrase);
             m_httpClient->terminate();
             m_httpClient.reset();
             m_handler->operationDone( shared_from_this() );
