@@ -652,6 +652,8 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
                                                       tr("Save Recording As..."),
                                                       qnSettings->lastRecordingDir() + QLatin1Char('/') + suggetion,
                                                       tr("AVI (Audio/Video Interleaved) (*.avi)")));
+        dialog->setFileMode(QFileDialog::AnyFile);
+        dialog->setAcceptMode(QFileDialog::AcceptSave);
         int dialogResult = dialog->exec();
 
         QString filePath = dialog->selectedFile();
