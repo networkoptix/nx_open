@@ -189,6 +189,7 @@ public:
 
         /* Check for non-power of 2 textures. */
         supportsNonPower2Textures = extensions.contains("GL_ARB_texture_non_power_of_two");
+        
     }
 
     ~DecodedPictureToOpenGLUploaderPrivate()
@@ -327,11 +328,13 @@ public:
         );
 
         bool result = false;
-        if(m_textureSize.width() < textureSize.width() || m_textureSize.height() < textureSize.height() || m_internalFormat != internalFormat) {
-            m_textureSize = textureSize;
+        if(m_textureSize.width() != textureSize.width() || m_textureSize.height() != textureSize.height() || m_internalFormat != internalFormat) {
+                        
+			m_textureSize = textureSize;
             m_internalFormat = internalFormat;
 
             glBindTexture(GL_TEXTURE_2D, m_id);
+            
             glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, textureSize.width(), textureSize.height(), 0, internalFormat, GL_UNSIGNED_BYTE, NULL);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -468,7 +471,7 @@ public:
     {
         if( m_format == format )
             return;
-
+        m_format = format;
         for( size_t i = 0; i < MAX_PLANE_COUNT; ++i )
             m_textures[i]->deinitialize();
     }
