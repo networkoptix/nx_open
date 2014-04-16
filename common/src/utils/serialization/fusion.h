@@ -283,22 +283,22 @@ namespace QnFusion {                                                            
 /**
  * 
  */
-#define QN_FUSION_DEFINE_CLASS_ADAPTOR(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
-    QN_FUSION_DEFINE_CLASS_ADAPTOR_I(CLASS, MEMBER_SEQ, BOOST_PP_VARIADIC_SEQ_NIL __VA_ARGS__)
+#define QN_FUSION_ADAPT_CLASS(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)          \
+    QN_FUSION_ADAPT_CLASS_I(CLASS, MEMBER_SEQ, BOOST_PP_VARIADIC_SEQ_NIL __VA_ARGS__)
 
-#define QN_FUSION_DEFINE_CLASS_ADAPTOR_I(CLASS, MEMBER_SEQ, GLOBAL_SEQ)         \
+#define QN_FUSION_ADAPT_CLASS_I(CLASS, MEMBER_SEQ, GLOBAL_SEQ)                  \
 template<class T>                                                               \
 struct QnFusionBinding;                                                         \
                                                                                 \
 template<>                                                                      \
 struct QnFusionBinding<CLASS> {                                                 \
-    BOOST_PP_SEQ_FOR_EACH_I(QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_I, GLOBAL_SEQ, MEMBER_SEQ) \
+    BOOST_PP_SEQ_FOR_EACH_I(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_I, GLOBAL_SEQ, MEMBER_SEQ) \
                                                                                 \
     template<class T, class Visitor>                                            \
     static bool visit_members(T &&value, Visitor &&visitor) {                   \
         if(!QnFusionDetail::initialize_visitor(std::forward<Visitor>(visitor), std::forward<T>(value))) \
             return false;                                                       \
-        BOOST_PP_REPEAT(BOOST_PP_SEQ_SIZE(MEMBER_SEQ), QN_FUSION_DEFINE_CLASS_ADAPTOR_FUNCTION_STEP_I, ~) \
+        BOOST_PP_REPEAT(BOOST_PP_SEQ_SIZE(MEMBER_SEQ), QN_FUSION_ADAPT_CLASS_FUNCTION_STEP_I, ~) \
         return true;                                                            \
     }                                                                           \
 };                                                                              \
@@ -314,23 +314,23 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 }
 
 
-#define QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_I(R, GLOBAL_SEQ, INDEX, PROPERTY_SEQ) \
-    QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_II(INDEX, GLOBAL_SEQ PROPERTY_SEQ)
+#define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_I(R, GLOBAL_SEQ, INDEX, PROPERTY_SEQ) \
+    QN_FUSION_ADAPT_CLASS_OBJECT_STEP_II(INDEX, GLOBAL_SEQ PROPERTY_SEQ)
 
-#define QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_II(INDEX, PROPERTY_SEQ)      \
+#define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_II(INDEX, PROPERTY_SEQ)               \
     struct BOOST_PP_CAT(MemberAdaptor, INDEX) {                                 \
         template<class Tag>                                                     \
         struct has_tag:                                                         \
             boost::mpl::false_                                                  \
         {};                                                                     \
                                                                                 \
-        BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (index, INDEX)) \
+        BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (index, INDEX)) \
     };
 
-#define QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_STEP_I(R, DATA, PROPERTY_TUPLE) \
-    QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_STEP_II PROPERTY_TUPLE
+#define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_I(R, DATA, PROPERTY_TUPLE)       \
+    QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_II PROPERTY_TUPLE
 
-#define QN_FUSION_DEFINE_CLASS_ADAPTOR_OBJECT_STEP_STEP_II(TAG, VALUE)          \
+#define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_II(TAG, VALUE)                   \
     template<>                                                                  \
     struct has_tag<QnFusion::TAG>:                                              \
         boost::mpl::true_                                                       \
@@ -341,7 +341,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     }
 
 
-#define QN_FUSION_DEFINE_CLASS_ADAPTOR_FUNCTION_STEP_I(Z, INDEX, DATA)          \
+#define QN_FUSION_ADAPT_CLASS_FUNCTION_STEP_I(Z, INDEX, DATA)                   \
     if(!visitor(std::forward<T>(value), QnFusion::MemberAdaptor<BOOST_PP_CAT(MemberAdaptor, INDEX)>())) \
         return false;
 
@@ -349,18 +349,21 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 /**
  * 
  */
-#define QN_FUSION_DEFINE_CLASS_ADAPTOR_SHORTCUT(CLASS, TAGS_TUPLE, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
-    QN_FUSION_DEFINE_CLASS_ADAPTOR(CLASS, QN_FUSION_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ), ##__VA_ARGS__)
+#define QN_FUSION_ADAPT_CLASS_SHORT(CLASS, TAGS_TUPLE, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
+    QN_FUSION_ADAPT_CLASS(CLASS, QN_FUSION_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ), ##__VA_ARGS__)
 
-#define QN_FUSION_DEFINE_CLASS_ADAPTOR_GSN(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
-    QN_FUSION_DEFINE_CLASS_ADAPTOR_SHORTCUT(CLASS, (getter, setter, name), MEMBER_SEQ, ##__VA_ARGS__)
+#define QN_FUSION_ADAPT_CLASS_GSN(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
+    QN_FUSION_ADAPT_CLASS_SHORT(CLASS, (getter, setter, name), MEMBER_SEQ, ##__VA_ARGS__)
+
+#define QN_FUSION_ADAPT_CLASS_GSNC(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
+    QN_FUSION_ADAPT_CLASS_SHORT(CLASS, (getter, setter, name, checker), MEMBER_SEQ, ##__VA_ARGS__)
 
 
 /**
  *
  */
-#define QN_FUSION_DEFINE_STRUCT_ADAPTOR(STRUCT, FIELD_SEQ, ... /* GLOBAL_SEQ */) \
-    QN_FUSION_DEFINE_CLASS_ADAPTOR(STRUCT, QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ), ##__VA_ARGS__)
+#define QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ, ... /* GLOBAL_SEQ */) \
+    QN_FUSION_ADAPT_CLASS(STRUCT, QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ), ##__VA_ARGS__)
 
 
 /**

@@ -346,7 +346,7 @@ QnCustomizerPrivate::QnCustomizerPrivate() {
     accessorByClassName.insert(QLatin1String("QGraphicsObject"), new QnCustomizationAccessorWrapper<QnGraphicsObjectCustomizationAccessor>());
 
     /* QnJsonSerializer does locking, so we use local cache to avoid it. */
-    foreach(QnJsonSerializer *serializer, QnJsonSerializer::allSerializers())
+    foreach(QnJsonSerializer *serializer, QnJsonSerializer::serializers())
         serializerByType.insert(serializer->type(), serializer);
     serializerByType.insert(QMetaType::QColor, colorSerializer.data());
     serializerByType.insert(customizationHashType, customizationHashSerializer.data());

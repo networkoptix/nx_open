@@ -223,12 +223,14 @@ namespace QJson {
 
 class QnJsonContext: public QnSerializationContext<QnJsonSerializer> {};
 
-
 class QnJsonSerializer: public QnContextSerializer<QJsonValue, QnJsonContext>, public QnStaticSerializerStorage<QnJsonSerializer, QJsonDetail::StorageInstance> {
     typedef QnContextSerializer<QJsonValue, QnJsonContext> base_type;
 public:
     QnJsonSerializer(int type): base_type(type) {}
 };
+
+template<class T>
+class QnDefaultJsonSerializer: public QnDefaultContextSerializer<T, QnJsonSerializer> {};
 
 
 namespace QJsonDetail {
@@ -404,7 +406,7 @@ __VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *
 }
 
 #define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(STRUCT, FIELD_SEQ, ... /* PREFIX */) \
-    QN_FUSION_DEFINE_STRUCT_ADAPTOR(STRUCT, FIELD_SEQ)                          \
+    QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ)                                   \
     QN_DEFINE_FUSION_JSON_SERIALIZATION_FUNCTIONS(STRUCT, ##__VA_ARGS__)
 
 
