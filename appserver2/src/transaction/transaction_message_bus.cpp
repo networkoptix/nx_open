@@ -239,6 +239,7 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnAbstractT
             *needProxy = true;
             return;
         }
+        params.peer = tran.id.peerGUID;
         emit gotLockResponse(params);
     }
 }
