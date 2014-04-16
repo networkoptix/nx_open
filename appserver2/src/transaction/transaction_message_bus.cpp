@@ -269,7 +269,7 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
 
             foreach(const QByteArray& serializedTran, transactions) {
                 QByteArray chunkData;
-                m_serializer.serializeTran(chunkData, serializedTran, ProcessedPeers() << sender->remoteGuid());
+                m_serializer.serializeTran(chunkData, serializedTran, ProcessedPeers() << sender->remoteGuid() << qnCommon->moduleGUID());
                 sender->addData(chunkData);
             }
             return true;
@@ -593,7 +593,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     {
         transport->setWriteSync(true);
         QByteArray buffer;
-        m_serializer.serializeTran(buffer, tran, ProcessedPeers() << transport->remoteGuid());
+        m_serializer.serializeTran(buffer, tran, ProcessedPeers() << transport->remoteGuid() << qnCommon->moduleGUID());
         transport->addData(buffer);
     }
     
