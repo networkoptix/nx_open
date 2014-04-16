@@ -67,7 +67,7 @@ void QnPtzTourItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
     case QnPtzTourSpotsModel::TimeColumn:
     case QnPtzTourSpotsModel::SpeedColumn:
         if (QComboBox *comboBox = dynamic_cast<QComboBox *>(editor))
-            comboBox->setCurrentIndex(comboBox->findData(index.data(Qt::EditRole)));
+            comboBox->setCurrentIndex(QnPtzTourSpotsModel::speedToIndex(index.data(Qt::EditRole).toReal()));
         return;
     default:
         break;
