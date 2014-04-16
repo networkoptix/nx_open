@@ -68,7 +68,7 @@ namespace Qss {
      * \endcode
      *
      * Here <tt>Member</tt> template parameter presents an interface defined
-     * by <tt>AdaptorWrapper</tt> class. Return value of false indicates that
+     * by <tt>MemberAdaptor</tt> class. Return value of false indicates that
      * iteration should be stopped, and in this case the function will
      * return false.
      *
@@ -184,6 +184,7 @@ namespace Qss { struct TAG {}; }
 QSS_DEFINE_TAG(index)
 QSS_DEFINE_TAG(getter)
 QSS_DEFINE_TAG(setter)
+QSS_DEFINE_TAG(checker)
 QSS_DEFINE_TAG(name)
 QSS_DEFINE_TAG(optional)
 
@@ -197,6 +198,7 @@ QSS_DEFINE_TAG(optional)
 
 #define QSS_TAG_IS_TYPED_FOR_optional ,
 #define QSS_TAG_TYPE_FOR_optional bool
+
 
 /**
  * This macro registers Qss visitors that are to be used when serializing
@@ -489,6 +491,20 @@ namespace QssDetail {
     typename boost::enable_if<boost::mpl::and_<Qss::has_visit_members<T>, Qss::has_deserialization_visitor_type<D> >, bool>::type
     deserialize(const D &value, T *target) {
         typename Qss::deserialization_visitor_type<D>::type visitor(value);
+        return Qss::visit_members(*target, visitor);
+    }
+
+    template<class T, class D>
+    typename boost::enable_if<boost::mpl::and_<Qss::has_visit_members<T>, Qss::has_serialization_visitor_type<D> >, void>::type
+    serialize(Context<D> *ctx, const T &value, D *target) {
+        typename Qss::serialization_visitor_type<D>::type visitor(ctx, *target);
+        Qss::visit_members(value, visitor);
+    }
+
+    template<class T, class D>
+    typename boost::enable_if<boost::mpl::and_<Qss::has_visit_members<T>, Qss::has_deserialization_visitor_type<D> >, bool>::type
+    deserialize(Context<D> *ctx, const D &value, T *target) {
+        typename Qss::deserialization_visitor_type<D>::type visitor(ctx, value);
         return Qss::visit_members(*target, visitor);
     }
 
