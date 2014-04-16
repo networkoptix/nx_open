@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include <boost/mpl/bool.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <utils/common/adl_wrapper.h>
 #include <utils/common/flat_map.h>

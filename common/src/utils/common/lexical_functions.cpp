@@ -86,12 +86,12 @@ void serialize(const QColor &value, QString *target) {
 
 bool deserialize(const QString &value, QColor *target) {
     QString trimmedName = value.trimmed();
-    if(trimmedName.startsWith(QLatin1String("QColor"))) {
+    if(trimmedName.startsWith(lit("QColor"))) {
         /* QColor(R, G, B, A) format. */
-        trimmedName = trimmedName.mid(trimmedName.indexOf(QLatin1Char('(')) + 1);
-        trimmedName = trimmedName.left(trimmedName.lastIndexOf(QLatin1Char(')')));
+        trimmedName = trimmedName.mid(trimmedName.indexOf(L'(') + 1);
+        trimmedName = trimmedName.left(trimmedName.lastIndexOf(L')'));
 
-        QStringList args = trimmedName.split(QLatin1Char(','));
+        QStringList args = trimmedName.split(L',');
         if(args.size() < 3 || args.size() > 4)
             return false;
 

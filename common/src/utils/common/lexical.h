@@ -8,38 +8,19 @@
 #include "adl_wrapper.h"
 #include "lexical_fwd.h"
 
-namespace QnLexicalDetail {
-    template<class T>
-    void serialize_value(const T &value, QString *target) {
-        serialize(value, target); /* That's the place where ADL kicks in. */
-    }
-
-    template<class T>
-    bool deserialize_value(const QString &value, T *target) {
-        /* That's the place where ADL kicks in.
-         * 
-         * Note that we wrap a string into a wrapper so that
-         * ADL would find only overloads with QString as the first parameter. 
-         * Otherwise other overloads could be discovered. */
-        return deserialize(adlWrap(value), target);
-    }
-
-} // namespace QnLexicalDetail
+#include <utils/serialization/serialization.h>
+#include <utils/serialization/serialization_functions.h>
 
 
 namespace QnLexical {
     template<class T>
     void serialize(const T &value, QString *target) {
-        assert(target);
-
-        QnLexicalDetail::serialize_value(value, target);
+        Qss::serialize(value, target);
     }
 
     template<class T>
     bool deserialize(const QString &value, T *target) {
-        assert(target);
-
-        return QnLexicalDetail::deserialize_value(value, target);
+        return Qss::deserialize(value, target);
     }
 
     template<class T>

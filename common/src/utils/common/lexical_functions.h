@@ -51,7 +51,7 @@ inline bool deserialize(const QString &value, TYPE *target) {                   
     TYPE result = value.TYPE_GETTER(&ok);                                       \
     if(ok)                                                                      \
         *target = result;                                                       \
-    return ok;                                                              \
+    return ok;                                                                  \
 }
 
 QN_DEFINE_DIRECT_LEXICAL_SERIALIZATION_FUNCTIONS(int,                   toInt)
