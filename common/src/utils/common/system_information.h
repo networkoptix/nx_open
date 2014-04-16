@@ -1,0 +1,39 @@
+#ifndef SYSTEM_INFORMATION_H
+#define SYSTEM_INFORMATION_H
+
+#include <QtCore/QString>
+#include <QtCore/QRegExp>
+#include <QtCore/QMetaType>
+
+#include <nx_ec/binary_serialization_helper.h>
+
+class QnSystemInformation {
+public:
+    QnSystemInformation(const QString &platform, const QString &arch) :
+        arch(arch),
+        platform(platform)
+    {}
+
+    QnSystemInformation(const QString &infoString) {
+        QRegExp infoRegExp(lit("(.+) (.+)"));
+        QnSystemInformation info;
+        if (infoRegExp.exactMatch(infoString)) {
+            platform = infoRegExp.cap(1);
+            arch = infoRegExp.cap(2);
+        }
+    }
+
+    QnSystemInformation() {}
+
+    QString toString() const {
+        return platform + lit(" ") + arch;
+    }
+
+    QString arch;
+    QString platform;
+};
+
+Q_DECLARE_METATYPE(QnSystemInformation)
+QN_DEFINE_STRUCT_SERIALIZATORS(QnSystemInformation, (arch) (platform))
+
+#endif // SYSTEM_INFORMATION_H

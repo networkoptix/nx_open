@@ -116,6 +116,7 @@
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
+#include <utils/common/system_information.h>
 #include <utils/network/multicodec_rtp_reader.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
@@ -1165,6 +1166,7 @@ void QnMain::run()
             server->setPanicMode(pm);
         }
         server->setVersion(QnSoftwareVersion(QN_ENGINE_VERSION));
+        server->setSystemInfo(QnSystemInformation(QN_APPLICATION_PLATFORM, QN_APPLICATION_ARCH));
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
         bool isLocal = appserverHostString.isEmpty() || QUrl(appserverHostString).scheme() == "file";

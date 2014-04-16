@@ -6,6 +6,7 @@
 #include <api/media_server_connection.h>
 
 #include <utils/common/software_version.h>
+#include <utils/common/system_information.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/abstract_storage_resource.h>
@@ -57,6 +58,9 @@ public:
     QnSoftwareVersion getVersion() const;
     void setVersion(const QnSoftwareVersion& version);
 
+    QnSystemInformation getSystemInfo() const;
+    void setSystemInfo(const QnSystemInformation &systemInfo);
+
     static bool isEdgeServer(const QnResourcePtr &resource);
 
 private slots:
@@ -79,6 +83,7 @@ private:
     Qn::ServerFlags m_serverFlags;
     Qn::PanicMode m_panicMode;
     QnSoftwareVersion m_version;
+    QnSystemInformation m_systemInfo;
     QMap<int, QString> m_runningIfRequests;
     QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
 };

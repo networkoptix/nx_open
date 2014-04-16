@@ -20,6 +20,7 @@ CREATE UNIQUE INDEX idx_resource_guid     ON vms_resource(guid);
 CREATE INDEX idx_resource_parent          ON vms_resource(parent_guid);
 
 ALTER TABLE "vms_server" ADD flags number;
+ALTER TABLE "vms_server" ADD COLUMN "system_info" varchar(1024)
 
 CREATE TABLE "vms_license_tmp" ("license_block" varchar(2048) NOT NULL, "license_key" varchar(32) NOT NULL UNIQUE, "id" integer PRIMARY KEY autoincrement);
 INSERT INTO "vms_license_tmp" (license_key, license_block)

@@ -43,6 +43,7 @@ namespace ec2
         qint32       panicMode;
         QString      streamingUrl;
         QString      version; 
+        QString      systemInfo;
         QString      authKey;
         std::vector<ApiStorageData>  storages;
         
@@ -51,7 +52,7 @@ namespace ec2
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define medisServerDataFields (apiUrl) (netAddrList) (flags) (panicMode) (streamingUrl) (version) (authKey) (storages)
+    #define medisServerDataFields (apiUrl) (netAddrList) (flags) (panicMode) (streamingUrl) (version) (systemInfo) (authKey) (storages)
     QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ApiMediaServerData, ec2::ApiResourceData, medisServerDataFields)
 
 
