@@ -55,6 +55,10 @@ QList<qreal> QnPtzTourSpotsModel::speedValues() {
     return allSpeedValues;
 }
 
+int QnPtzTourSpotsModel::stayTimeToIndex(quint64 time) {
+    return allStayTimeValues.indexOf(time);
+}
+
 QList<quint64> QnPtzTourSpotsModel::stayTimeValues() {
     return allStayTimeValues;
 }
@@ -80,7 +84,7 @@ QString QnPtzTourSpotsModel::speedToString(qreal speed) {
     return index == -1 ? QString() : names[index];
 }
 
-QString QnPtzTourSpotsModel::timeToString(quint64 time) {
+QString QnPtzTourSpotsModel::stayTimeToString(quint64 time) {
     if (time == 0)
         return tr("Instant");
     return tr("%n seconds", "", time / second);
@@ -214,7 +218,7 @@ QVariant QnPtzTourSpotsModel::data(const QModelIndex &index, int role) const {
             }
             return tr("<Invalid>");
         case TimeColumn:
-            return timeToString(spot.stayTime);
+            return stayTimeToString(spot.stayTime);
         case SpeedColumn:
             return speedToString(spot.speed);
         default:
