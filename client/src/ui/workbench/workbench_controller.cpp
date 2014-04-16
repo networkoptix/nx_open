@@ -142,6 +142,8 @@ namespace {
     /** Opacity of video items when they are dragged / resized. */
     const qreal widgetManipulationOpacity = 0.3;
 
+    /** Countdown value before screen recording starts. */
+    const int recordingCountdownMs = 3000;
 } // anonymous namespace
 
 
@@ -589,9 +591,10 @@ void QnWorkbenchController::startRecording() {
     action(Qn::ToggleScreenRecordingAction)->setChecked(true);
 
     m_countdownCanceled = false;
-    m_recordingCountdownLabel = QnGraphicsMessageBox::information(tr("Recording in..."));
-    connect(m_recordingCountdownLabel, SIGNAL(finished()), this, SLOT(at_recordingAnimation_finished()));
-    connect(m_recordingCountdownLabel, SIGNAL(tick(int)), this, SLOT(at_recordingAnimation_tick(int)));
+    m_recordingCountdownLabel = QnGraphicsMessageBox::information(QString(), recordingCountdownMs);
+    connect(m_recordingCountdownLabel, &QnGraphicsMessageBox::finished, this, &QnWorkbenchController::at_recordingAnimation_finished);
+    connect(m_recordingCountdownLabel, &QnGraphicsMessageBox::tick,     this, &QnWorkbenchController::at_recordingAnimation_tick);
+    at_recordingAnimation_tick(0);
 }
 
 void QnWorkbenchController::stopRecording() {
@@ -628,13 +631,18 @@ void QnWorkbenchController::at_recordingAnimation_tick(int tick) {
         return;
     }
     int left = m_recordingCountdownLabel->timeout() - tick;
-    int n = qMax(1, (left + 500) / 1000);
+    int n = (left + 500) / 1000;
 
-    m_recordingCountdownLabel->setText(tr("Recording in...") + QString::number(n));
+    if (n >= 1)
+        m_recordingCountdownLabel->setText(tr("Recording in...%1").arg(n));
+    else
+        m_recordingCountdownLabel->setOpacity(0.0);
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingStarted() {
-    return;
+    if (!m_recordingCountdownLabel)
+        return;
+    m_recordingCountdownLabel->setOpacity(0.0);
 }
 
 void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {

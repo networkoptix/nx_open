@@ -147,13 +147,6 @@ void QnResourceBrowserToolTipWidget::pointTo(const QPointF &pos) {
     updateTailPos();
 }
 
-void QnResourceBrowserToolTipWidget::at_provider_imageChanged(const QImage &image) {
-    if (!m_thumbnailLabel)
-        return;
-    m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));
-}
-
-
 // -------------------------------------------------------------------------- //
 // QnResourceBrowserWidget
 // -------------------------------------------------------------------------- //
