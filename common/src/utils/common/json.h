@@ -226,14 +226,14 @@ namespace QJsonDetail {
             m_target(target) 
         {}
 
-        template<class T, class Member>
-        bool operator()(const T &value, const Member &member) {
+        template<class T, class Adaptor>
+        bool operator()(const T &value, const Adaptor &adaptor) {
             using namespace Qss;
 
-            if(invoke(member.get<checker, TrueChecker>(), value))
+            if(invoke(adaptor.get<checker, TrueChecker>(), value))
                 return true; /* Skipped. */
 
-            QJson::serialize(m_ctx, invoke(member.get<getter>(), value), member.get<name>(), &m_object);
+            QJson::serialize(m_ctx, invoke(adaptor.get<getter>(), value), adaptor.get<name>(), &m_object);
             return true;
         }
 
@@ -249,62 +249,57 @@ namespace QJsonDetail {
 
     struct DeserializationVisitor {
     public:
+        DeserializationVisitor(QnJsonContext *ctx, const QJsonValue &value):
+            m_ctx(ctx),
+            m_value(value),
+            m_object(value.toObject())
+        {}
 
+        template<class T>
+        bool operator()(T &) {
+            return m_value.isObject();
+        }
+
+        template<class T, class Adaptor>
+        bool operator()(T &target, const Adaptor &adaptor) {
+            using namespace Qss;
+
+            return operator()(target, adaptor.get<setter>(), adaptor);
+        }
 
     private:
+        template<class T, class Setter, class Adaptor>
+        bool operator()(T &target, const Setter &setter, const Adaptor &adaptor) {
+            using namespace Qss;
 
+            typedef typename boost::remove_reference<decltype(invoke(adaptor.get<getter>(), target))>::type member_type;
+
+            bool found = false;
+            member_type member;
+            if(!QJson::deserialize(m_ctx, m_object, adaptor.get<name>(), &member, adaptor.get<optional, boost::mpl::false_>(), &found))
+                return false;
+            if(found)
+                invoke(setter, target, member);
+            return true;
+        }
+
+        template<class T, class MemberType, class Adaptor>
+        bool operator()(T &target, MemberType T::*setter, const Adaptor &adaptor) {
+            using namespace Qss;
+
+            return QJson::deserialize(m_ctx, m_object, adaptor.get<name>(), &target.*setter, adaptor.get<optional, boost::mpl::false_>());
+        }
+
+    private:
+        QnJsonContext *m_ctx;
+        const QJsonValue &m_value;
+        QJsonObject m_object;
     };
 
-    template<class Class, class Getter>
-    inline void serializeMember(QnJsonContext *ctx, const Class &object, const Getter &getter, const QString &key, QJsonObject *target, QJson::Options globalOptions, QJson::Options localOptions = 0) {
-        using namespace QJsonAccessors;
-        unused(globalOptions, localOptions);
-
-        QJson::serialize(ctx, getMember(object, getter), key, target);
-    }
-
-    template<class Class, class Getter, class Checker>
-    inline void serializeMember(QnJsonContext *ctx, const Class &object, const Getter &getter, const QString &key, QJsonObject *target, QJson::Options globalOptions, const Checker &checker, QJson::Options localOptions = 0) {
-        using namespace QJsonAccessors;
-        unused(globalOptions, localOptions);
-
-        if(getMember(object, checker))
-            QJson::serialize(ctx, getMember(object, getter), key, target);
-    }
-
-    template<class Class, class Setter, class T>
-    inline bool deserializeMemberInternal(QnJsonContext *ctx, const QJsonObject &value, const QString &key, Class *object, const Setter &setter, QJson::Options options, const T *) {
-        using namespace QJsonAccessors;
-
-        bool found = false;
-        T member;
-        if(!QJson::deserialize(ctx, value, key, &member, options & QJson::Optional, &found))
-            return false;
-        if(found)
-            setMember(*object, setter, member);
-        return true;
-    }
-
-    template<class Class, class Setter, class T>
-    inline bool deserializeMemberInternal(QnJsonContext *ctx, const QJsonObject &value, const QString &key, Class *object, T Class::*setter, QJson::Options options, const T *) {
-        return QJson::deserialize(ctx, value, key, &object->*setter, options & QJson::Optional);
-    }
-
-    template<class Class, class Setter, class Getter>
-    inline bool deserializeMember(QnJsonContext *ctx, const QJsonObject &value, const QString &key, Class *object, const Getter &getter, const Setter &setter, QJson::Options globalOptions, QJson::Options localOptions = 0) {
-        return deserializeMember(ctx, value, key, object, getter, setter, globalOptions, TrueChecker(), localOptions);
-    }
-
-    template<class Class, class Setter, class Getter, class Checker>
-    inline bool deserializeMember(QnJsonContext *ctx, const QJsonObject &value, const QString &key, Class *object, const Getter &getter, const Setter &setter, QJson::Options globalOptions, const Checker &checker, QJson::Options localOptions = 0) {
-        using namespace QJsonAccessors;
-        unused(getter, checker);
-
-        typedef typename boost::remove_reference<decltype(getMember(*object, getter))>::type member_type;
-        return deserializeMemberInternal(ctx, value, key, object, setter, globalOptions | localOptions, static_cast<const member_type *>(NULL));
-    }
-
 } // namespace QJsonDetail
+
+
+QSS_REGISTER_VISITORS(QJsonValue, QJsonDetail::SerializationVisitor, QJsonDetail::DeserializationVisitor)
 
 
 
