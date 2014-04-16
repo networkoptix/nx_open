@@ -27,7 +27,7 @@ QnDistributedMutexManager::QnDistributedMutexManager():
 {
     connect(qnTransactionBus, &QnTransactionMessageBus::gotLockRequest,    this, &QnDistributedMutexManager::at_gotLockRequest, Qt::DirectConnection);
     connect(qnTransactionBus, &QnTransactionMessageBus::gotLockResponse,   this, &QnDistributedMutexManager::at_gotLockResponse, Qt::DirectConnection);
-    connect(qnTransactionBus, &QnTransactionMessageBus::gotUnlockRequest,  this, &QnDistributedMutexManager::at_gotUnlockRequest, Qt::DirectConnection);
+    //connect(qnTransactionBus, &QnTransactionMessageBus::gotUnlockRequest,  this, &QnDistributedMutexManager::at_gotUnlockRequest, Qt::DirectConnection);
 }
 
 void QnDistributedMutexManager::setUserDataHandler(QnMutexUserDataHandler* userDataHandler)
@@ -89,6 +89,7 @@ void QnDistributedMutexManager::at_gotLockResponse(ApiLockData lockData)
         netMutex->at_gotLockResponse(lockData);
 }
 
+/*
 void QnDistributedMutexManager::at_gotUnlockRequest(ApiLockData lockData)
 {
     QMutexLocker lock(&m_mutex);
@@ -97,6 +98,7 @@ void QnDistributedMutexManager::at_gotUnlockRequest(ApiLockData lockData)
     if (netMutex)
         netMutex->at_gotUnlockRequest(lockData);
 }
+*/
 
 qint64 QnDistributedMutexManager::newTimestamp()
 {
@@ -205,7 +207,7 @@ void QnDistributedMutex::unlock()
     m_delayedResponse.clear();
 
     if (!m_selfLock.isEmpty()) {
-        sendTransaction(m_selfLock, ApiCommand::unlockRequest);
+        //sendTransaction(m_selfLock, ApiCommand::unlockRequest);
         m_selfLock.clear();
     }
     m_locked = false;
@@ -238,6 +240,7 @@ void QnDistributedMutex::at_gotLockRequest(ApiLockData lockData)
     }
 }
 
+/*
 void QnDistributedMutex::at_gotUnlockRequest(ApiLockData lockData)
 {
     QMutexLocker lock(&m_mutex);
@@ -248,6 +251,7 @@ void QnDistributedMutex::at_gotUnlockRequest(ApiLockData lockData)
         checkForLocked();
     }
 }
+*/
 
 void QnDistributedMutex::checkForLocked()
 {

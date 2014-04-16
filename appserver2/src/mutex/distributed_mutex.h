@@ -55,7 +55,7 @@ namespace ec2
     private slots:
         void at_gotLockRequest(ApiLockData lockInfo);
         void at_gotLockResponse(ApiLockData lockInfo);
-        void at_gotUnlockRequest(ApiLockData lockInfo);
+        //void at_gotUnlockRequest(ApiLockData lockInfo);
         void at_newPeerFound(QnId peer);
         void at_peerLost(QnId peer);
         void at_timeout();
