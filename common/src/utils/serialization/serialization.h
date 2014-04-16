@@ -9,6 +9,10 @@
 #include <utils/common/adl_wrapper.h>
 #include <utils/common/flat_map.h>
 
+// TODO: 
+// Qss -> QnSerialization
+// Context -> QnSerializationContext
+// Serializer -> Qn[Basic|Context]Serializer
 
 namespace Qss {
     template<class D>
@@ -19,10 +23,10 @@ namespace Qss {
 
 
 namespace QssDetail {
-    template<class T, class D>
-    void serialize_value_direct(Qss::Context<D> *ctx, const T &value, D *target);
-    template<class T, class D>
-    bool deserialize_value_direct(Qss::Context<D> *ctx, const D &value, T *target);
+    template<class Context, class T, class D>
+    void serialize_value_direct(Context *ctx, const T &value, D *target);
+    template<class Context, class T, class D>
+    bool deserialize_value_direct(Context *ctx, const D &value, T *target);
 } // namespace QssDetail
 
 
@@ -130,13 +134,13 @@ namespace QssDetail {
 
     /* Internal interface for (de)serializers that use context. */
 
-    template<class T, class D>
-    void serialize_value_direct(Qss::Context<D> *ctx, const T &value, D *target) {
+    template<class Context, class T, class D>
+    void serialize_value_direct(Context *ctx, const T &value, D *target) {
         serialize(ctx, value, target); /* That's the place where ADL kicks in. */
     }
 
-    template<class T, class D>
-    bool deserialize_value_direct(Qss::Context<D> *ctx, const D &value, T *target) {
+    template<class Context, class T, class D>
+    bool deserialize_value_direct(Context *ctx, const D &value, T *target) {
         /* That's the place where ADL kicks in.
          * 
          * Note that we wrap a json value into a wrapper so that
@@ -151,8 +155,8 @@ namespace QssDetail {
     template<class T>
     struct is_metatype_defined: boost::mpl::bool_<QMetaTypeId2<T>::Defined> {};
 
-    template<class T, class D>
-    void serialize_value(Qss::Context<D> *ctx, const T &value, D *target, typename boost::enable_if<is_metatype_defined<T> >::type * = NULL) {
+    template<class Context, class T, class D>
+    void serialize_value(Context *ctx, const T &value, D *target, typename boost::enable_if<is_metatype_defined<T> >::type * = NULL) {
         Qss::Serializer<D> *serializer = ctx->serializer(qMetaTypeId<T>());
         if(serializer) {
             serializer->serialize(ctx, static_cast<const void *>(&value), target);
@@ -161,13 +165,13 @@ namespace QssDetail {
         }
     }
 
-    template<class T, class D>
-    void serialize_value(Qss::Context<D> *ctx, const T &value, D *target, typename boost::disable_if<is_metatype_defined<T> >::type * = NULL) {
+    template<class Context, class T, class D>
+    void serialize_value(Context *ctx, const T &value, D *target, typename boost::disable_if<is_metatype_defined<T> >::type * = NULL) {
         serialize_value_direct(ctx, value, target);
     }
 
-    template<class T, class D>
-    bool deserialize_value(Qss::Context<D> *ctx, const D &value, T *target, typename boost::enable_if<is_metatype_defined<T> >::type * = NULL) {
+    template<class Context, class T, class D>
+    bool deserialize_value(Context *ctx, const D &value, T *target, typename boost::enable_if<is_metatype_defined<T> >::type * = NULL) {
         Qss::Serializer<D> *serializer = ctx->serializer(qMetaTypeId<T>());
         if(serializer) {
             return serializer->deserialize(ctx, value, static_cast<void *>(target));
@@ -176,8 +180,8 @@ namespace QssDetail {
         }
     }
 
-    template<class T, class D>
-    bool deserialize_value(Qss::Context<D> *ctx, const D &value, T *target, typename boost::disable_if<is_metatype_defined<T> >::type * = NULL) {
+    template<class Context, class T, class D>
+    bool deserialize_value(Context *ctx, const D &value, T *target, typename boost::disable_if<is_metatype_defined<T> >::type * = NULL) {
         return deserialize_value_direct(ctx, value, target);
     }
 
@@ -205,14 +209,14 @@ namespace Qss {
     // TODO: use template for context, with static_assert, so that the 
     // actual type is passed down the call tree.
 
-    template<class T, class D>
-    void serialize(Context<D> *ctx, const T &value, D *target) {
+    template<class Context, class T, class D>
+    void serialize(Context *ctx, const T &value, D *target) {
         assert(ctx && target);
         QssDetail::serialize_value(ctx, value, target);
     }
 
-    template<class T, class D>
-    bool deserialize(Context<D> *ctx, const D &value, T *target) {
+    template<class Context, class T, class D>
+    bool deserialize(Context *ctx, const D &value, T *target) {
         assert(ctx && target);
         return QssDetail::deserialize_value(ctx, value, target);
     }

@@ -22,6 +22,7 @@
 #include <QtCore/QJsonDocument>
 
 #include <utils/serialization/serialization.h>
+#include <utils/serialization/serialization_adaptor.h>
 
 #include "unused.h"
 #include "json_fwd.h"
@@ -279,7 +280,7 @@ namespace QJsonDetail {
             if(!QJson::deserialize(m_ctx, m_object, adaptor.get<name>(), &member, adaptor.get<optional, boost::mpl::false_>(), &found))
                 return false;
             if(found)
-                invoke(setter, target, member);
+                invoke(setter, target, std::move(member));
             return true;
         }
 
@@ -303,10 +304,7 @@ QSS_REGISTER_VISITORS(QJsonValue, QJsonDetail::SerializationVisitor, QJsonDetail
 
 
 
-
-
-
-#ifndef Q_MOC_RUN
+#if 0
 
 /**
  * This macro generates the necessary boilerplate to (de)serialize struct types.
@@ -374,6 +372,25 @@ __VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *
         return false;
 
 
+
+#else // Q_MOC_RUN
+
+///* Qt moc chokes on our macro hell, so we make things easier for it. */
+#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(...)
+#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(...)
+#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS_EX(...)
+#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(...)
+
+#define QN_DEFINE_ADAPTED_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)  \
+__VA_ARGS__ void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target) { \
+    QssDetail::serialize(ctx, value, target)                                    \
+}                                                                               \
+                                                                                \
+__VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *target) { \
+    return QssDetail::deserialize(ctx, value, target);                          \
+}
+
+
 #define QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)  \
 __VA_ARGS__ void serialize(QnJsonContext *, const TYPE &value, QJsonValue *target) { \
     *target = QnLexical::serialized(value);                                     \
@@ -392,15 +409,6 @@ __VA_ARGS__ bool deserialize(QnJsonContext *, const QJsonValue &value, TYPE *tar
 #define QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */) \
     QN_DEFINE_ENUM_MAPPED_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)  \
     QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)
-
-#else // Q_MOC_RUN
-
-/* Qt moc chokes on our macro hell, so we make things easier for it. */
-#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(...)
-#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(...)
-#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS_EX(...)
-#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(...)
-#define QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(...)
 
 #endif // Q_MOC_RUN
 

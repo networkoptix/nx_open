@@ -4,12 +4,14 @@
 #include "flat_map.h"
 #include "json_serializer.h"
 
+#include <utils/serialization/serialization.h>
+
 class QnJsonSerializer;
 
 namespace QJsonDetail { class ContextAccess; }
 
 
-class QnJsonContext {
+class QnJsonContext: public Qss::Context<QJsonValue> {
 public:
     void registerSerializer(QnJsonSerializer *serializer) {
         m_serializerByType.insert(serializer->type(), serializer);
