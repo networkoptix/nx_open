@@ -514,6 +514,9 @@ void QnTransactionMessageBus::doPeriodicTasks()
         bool isClient = itr.value().isClient;
         if (currentTime - itr.value().lastConnectedTime > RECONNECT_TIMEOUT && !isPeerUsing(url)) 
         {
+            if (m_connections.contains(itr.value().peer))
+                continue;
+
             itr.value().lastConnectedTime = currentTime;
             QnTransactionTransportPtr transport(new QnTransactionTransport(true, isClient));
             connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
@@ -598,10 +601,10 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     m_connections[remoteGuid] = transport;
 }
 
-void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient)
+void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient, const QUuid& peer)
 {
     QMutexLocker lock(&m_mutex);
-    m_removeUrls.insert(url, RemoveUrlConnectInfo(isClient));
+    m_removeUrls.insert(url, RemoveUrlConnectInfo(isClient, peer));
     QTimer::singleShot(0, this, SLOT(doPeriodicTasks()));
 }
 

@@ -24,7 +24,7 @@ namespace ec2
         static QnTransactionMessageBus* instance();
         static void initStaticInstance(QnTransactionMessageBus* instance);
 
-        void addConnectionToPeer(const QUrl& url, bool isClient);
+        void addConnectionToPeer(const QUrl& url, bool isClient, const QUuid& peer = QUuid());
         void removeConnectionFromPeer(const QUrl& url);
         void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& removeGuid, qint64 timediff);
         
@@ -144,8 +144,9 @@ signals:
 
         //RemoveUrlMap m_remoteUrls;
         struct RemoveUrlConnectInfo {
-            RemoveUrlConnectInfo(bool isClient = false): isClient(isClient), lastConnectedTime(0) {}
+            RemoveUrlConnectInfo(bool isClient = false, const QUuid& peer = QUuid()): isClient(isClient), peer(peer), lastConnectedTime(0) {}
             bool isClient;
+            QUuid peer;
             qint64 lastConnectedTime;
         };
 
