@@ -107,7 +107,8 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
 
     if(restartTour) {
         m_executor->stopTour();
-        m_executor->startTour(activeTour);
+        if(!activeTour.spots.isEmpty())
+            m_executor->startTour(activeTour);
     }
 
     emit changed(Qn::ToursPtzField);
@@ -152,6 +153,9 @@ bool QnTourPtzController::activateTour(const QString &tourId) {
         activeTour = records.value(tourId);
         activeTour.optimize();
         
+        if(activeTour.spots.isEmpty())
+            return false;
+
         m_activeTour = activeTour;
     }
 
