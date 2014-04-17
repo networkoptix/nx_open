@@ -2,6 +2,7 @@
 #define __TRANSACTION_TRANSPORT_SERIALIZER_H_
 
 #include "transaction.h"
+#include "common/common_module.h"
 
 /*
 * This class add addition transport header to a transaction
@@ -24,6 +25,7 @@ namespace ec2
         template <class T>
         void serializeTran(QByteArray& buffer, const QnTransaction<T>& tran, const ProcessedPeers& peers)
         {
+            Q_ASSERT(ApiCommand::isSystem(tran.command) || peers.contains(qnCommon->moduleGUID()));
             OutputBinaryStream<QByteArray> stream(&buffer);
             stream.write("00000000\r\n",10);
             stream.write("0000", 4);

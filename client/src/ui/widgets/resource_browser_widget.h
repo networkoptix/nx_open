@@ -67,9 +67,6 @@ public:
 signals:
     void thumbnailClicked();
 
-private slots:
-    void at_provider_imageChanged(const QImage &image); // TODO: #GDM why nothing is connected to this slot?
-
 private:
     QnProxyLabel* m_textLabel;
     QnClickableProxyLabel* m_thumbnailLabel;

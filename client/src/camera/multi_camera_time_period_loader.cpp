@@ -1,5 +1,7 @@
 #include "multi_camera_time_period_loader.h"
 #include "utils/common/warnings.h"
+
+#include <core/resource/network_resource.h>
 #include "core/resource/media_server_resource.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/camera_history.h"

@@ -157,6 +157,7 @@ protected:
     Q_SIGNAL void updateInfoTextLater();
 
     void suspendHomePtzController();
+    void resumeHomePtzController();
 
 private slots:
     void at_resource_resourceChanged();

@@ -2,6 +2,8 @@
 
 #include <QtCore/QMetaType>
 
+#include <core/resource/network_resource.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
 

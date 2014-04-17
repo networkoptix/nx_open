@@ -25,7 +25,6 @@
 
 QnResourcePool::QnResourcePool() : QObject(),
     m_resourcesMtx(QMutex::Recursive),
-    m_updateLayouts(true),
     m_tranInProgress(false)
 {}
 
@@ -52,18 +51,6 @@ QnResourcePool* QnResourcePool::instance()
 {
     //return globalResourcePool();
     return resourcePool_instance;
-}
-
-bool QnResourcePool::isLayoutsUpdated() const {
-    QMutexLocker locker(&m_resourcesMtx);
-
-    return m_updateLayouts;
-}
-
-void QnResourcePool::setLayoutsUpdated(bool updateLayouts) {
-    QMutexLocker locker(&m_resourcesMtx);
-
-    m_updateLayouts = updateLayouts;
 }
 
 void QnResourcePool::beginTran()
@@ -224,11 +211,10 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     foreach (const QnResourcePtr &resource, removedResources) {
         disconnect(resource.data(), NULL, this, NULL);
 
-        if(m_updateLayouts)
-            foreach(const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
-                foreach(const QnLayoutItemData &data, layoutResource->getItems())
-                    if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
-                        layoutResource->removeItem(data);
+        foreach(const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
+            foreach(const QnLayoutItemData &data, layoutResource->getItems())
+                if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
+                    layoutResource->removeItem(data);
 
         if (resource.dynamicCast<QnLayoutResource>()) {
             foreach (const QnVideoWallResourcePtr &videowall, getResources().filtered<QnVideoWallResource>()) { // TODO: #Elric this is way beyond what one may call 'suboptimal'.

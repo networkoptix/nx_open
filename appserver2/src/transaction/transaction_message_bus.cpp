@@ -102,7 +102,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
         sender->setState(QnTransactionTransport::Error);
         return;
     }
-
+    Q_ASSERT(tran.id.peerGUID != qnCommon->moduleGUID());
 
     tran.timestamp -= sender->timeDiff();
 
@@ -166,8 +166,10 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
         QnTransactionTransportPtr transport = *itr;
-        if (!processedPeers.contains(transport->remoteGuid()) && transport->isReadyToSend(tran.command))
+        if (!processedPeers.contains(transport->remoteGuid()) && transport->isReadyToSend(tran.command)) {
+            Q_ASSERT(transport->remoteGuid() != tran.id.peerGUID);
             transport->addData(chunkData);
+        }
     }
 }
 
@@ -226,19 +228,19 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnAbstractT
     if (!deserialize(params, &stream)) {
         qWarning() << "Bad stream! Ignore transaction " << ApiCommand::toString(tran.command);
     }
-    if (params.peer != qnCommon->moduleGUID()) {
+    
+    if(tran.command == ApiCommand::lockRequest) {
         *needProxy = true;
-        return;
-    }
-
-    if(tran.command == ApiCommand::lockRequest)
         emit gotLockRequest(params);
-    else if(tran.command == ApiCommand::unlockRequest)
-        emit gotUnlockRequest(params);
-    else if(tran.command == ApiCommand::lockResponse)
+    }
+    else if(tran.command == ApiCommand::lockResponse) 
+    {
+        if (params.originator != qnCommon->moduleGUID()) {
+            *needProxy = true;
+            return;
+        }
         emit gotLockResponse(params);
-    else
-        Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid command type!");
+    }
 }
 
 void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>&)
@@ -267,7 +269,7 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
 
             foreach(const QByteArray& serializedTran, transactions) {
                 QByteArray chunkData;
-                m_serializer.serializeTran(chunkData, serializedTran, ProcessedPeers() << sender->remoteGuid());
+                m_serializer.serializeTran(chunkData, serializedTran, ProcessedPeers() << sender->remoteGuid() << qnCommon->moduleGUID());
                 sender->addData(chunkData);
             }
             return true;
@@ -591,7 +593,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     {
         transport->setWriteSync(true);
         QByteArray buffer;
-        m_serializer.serializeTran(buffer, tran, ProcessedPeers() << transport->remoteGuid());
+        m_serializer.serializeTran(buffer, tran, ProcessedPeers() << transport->remoteGuid() << qnCommon->moduleGUID());
         transport->addData(buffer);
     }
     

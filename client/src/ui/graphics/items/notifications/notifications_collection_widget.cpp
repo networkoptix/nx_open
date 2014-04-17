@@ -295,7 +295,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         QString soundUrl = businessAction->getParams().getSoundUrl();
         m_itemsByLoadingSound.insert(soundUrl, item);
         context()->instance<QnAppServerNotificationCache>()->downloadFile(soundUrl);
-        item->setNotificationLevel(Qn::SoundNotification);
+        item->setNotificationLevel(Qn::CommonNotification);
     } else {
         item->setNotificationLevel(QnNotificationLevels::notificationLevel(eventType));
     }
@@ -394,8 +394,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters &)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters &)), Qt::QueuedConnection);
 
-    bool locked = item->notificationLevel() == Qn::SoundNotification; //this will be auto-deleted when event stops
-    m_list->addItem(item, locked);
+    m_list->addItem(item, businessAction->actionType() == BusinessActionType::PlaySoundRepeated);
 }
 
 void QnNotificationsCollectionWidget::hideBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
@@ -496,13 +495,9 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     QString resourceName = getResourceName(resource);
     item->setText(QnSystemHealthStringsHelper::messageName(message, resourceName));
     item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, resourceName));
-    item->setNotificationLevel(Qn::SystemNotification);
+    item->setNotificationLevel(QnNotificationLevels::notificationLevel(message));
     item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
     setHelpTopic(item, QnBusiness::healthHelpId(message));
-
-    // TODO: #GDM please implement this properly. This code fixes #2892, but in a terribly wrong way =).
-    if(message == QnSystemHealth::ArchiveRebuildFinished)
-        item->setNotificationLevel(Qn::SoundNotification);
 
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
     connect(item, SIGNAL(actionTriggered(Qn::ActionId, const QnActionParameters&)), this, SLOT(at_item_actionTriggered(Qn::ActionId, const QnActionParameters&)), Qt::QueuedConnection);

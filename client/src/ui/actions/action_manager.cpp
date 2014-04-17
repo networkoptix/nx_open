@@ -559,7 +559,7 @@ QnActionManager::QnActionManager(QObject *parent):
             requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditUsersPermission).
             text(tr("User...")).
             pulledText(tr("New User...")).
-            condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this)). //TODO: #GDM check in the main menu
+            condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this)).
             autoRepeat(false);
 
         factory(Qn::NewVideoWallAction).

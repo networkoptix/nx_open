@@ -150,9 +150,8 @@ void QnGraphicsMessageBox::at_animationIn_finished() {
     animator->setEasingCurve(QEasingCurve::InCubic);
     animator->animateTo(0.6);
     disconnect(animator, 0, this, 0);
-    connect(animator, SIGNAL(animationTick(int)), this, SIGNAL(tick(int)));
-    connect(animator, SIGNAL(finished()), this, SIGNAL(finished()));
-    connect(animator, SIGNAL(finished()), this, SLOT(deleteLater()));
+    connect(animator, &VariantAnimator::animationTick, this, &QnGraphicsMessageBox::tick);
+    connect(animator, &VariantAnimator::finished, this, &QnGraphicsMessageBox::hideImmideately);
 }
 
 /*QSizeF QnGraphicsMessageBox::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {

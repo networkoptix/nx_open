@@ -87,7 +87,7 @@ signals:
         void peerFound(QnId, bool isClient, bool isProxy);
 
         void gotLockRequest(ApiLockData);
-        void gotUnlockRequest(ApiLockData);
+        //void gotUnlockRequest(ApiLockData);
         void gotLockResponse(ApiLockData);
     private:
         friend class QnTransactionTransport;

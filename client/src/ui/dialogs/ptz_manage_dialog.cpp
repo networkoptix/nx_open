@@ -159,6 +159,8 @@ void QnPtzManageDialog::reject() {
 
 void QnPtzManageDialog::accept() {
     saveData();
+
+    clear();
     QDialog::accept(); // here we skip QnAbstractPtzDialog::accept because we don't want call synchronize()
 }
 
@@ -274,6 +276,8 @@ void QnPtzManageDialog::clear() {
     setController(QnPtzControllerPtr());
     m_model->setPresets(QnPtzPresetList());
     m_model->setTours(QnPtzTourList());
+    ui->tourEditWidget->setSpots(QnPtzTourSpotList());
+    ui->tourEditWidget->setPresets(QnPtzPresetList());
 }
 
 void QnPtzManageDialog::saveData() {

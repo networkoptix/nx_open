@@ -6,7 +6,7 @@
 
 #include <api/media_server_connection.h>
 #include <recording/time_period_list.h>
-#include <core/resource/network_resource.h>
+#include <core/resource/resource_fwd.h>
 #include "abstract_time_period_loader.h"
 
 /**

@@ -302,6 +302,11 @@ void QnMediaResourceWidget::suspendHomePtzController() {
         m_homePtzController->suspend();
 }
 
+void QnMediaResourceWidget::resumeHomePtzController() {
+    if (m_homePtzController && options().testFlag(DisplayDewarped) && display()->camDisplay()->isRealTimeSource())
+        m_homePtzController->resume();
+}
+
 const QList<QRegion> &QnMediaResourceWidget::motionSelection() const {
     return m_motionSelection;
 }
@@ -1033,6 +1038,8 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged() {
     if (!isLive) {
         buttonBar()->setButtonsChecked(PtzButton, false);
         suspendHomePtzController();
+    } else {
+        resumeHomePtzController();
     }
 }
 
@@ -1065,10 +1072,10 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
     item()->setDewarpingParams(params); // TODO: #Elric #PTZ move to instrument
 
     setOption(DisplayDewarped, checked);
-    if (checked)
+    if (checked) {
         setOption(DisplayMotion, false);
-
-    if(!checked) {
+        resumeHomePtzController();
+    } else {
         /* Stop all ptz activity. */
         ptzController()->continuousMove(QVector3D(0, 0, 0));
         suspendHomePtzController();
