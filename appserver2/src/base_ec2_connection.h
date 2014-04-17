@@ -191,7 +191,9 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiEmailData>&  ) {
         }
 
-        void triggerNotification(const QnTransaction<ApiUpdateData>&) {}
+        void triggerNotification(const QnTransaction<ApiUpdateData> &transaction) {
+            m_updatesManager->triggerNotification(transaction);
+        }
 
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
     protected:

@@ -134,6 +134,12 @@ void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 {
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnServerMessageProcessor::at_remotePeerFound );
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnServerMessageProcessor::at_remotePeerLost );
+
+    connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateUploaded,
+        this, &QnServerMessageProcessor::at_updateUploaded );
+    connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
+        this, &QnServerMessageProcessor::at_updateInstallationRequested );
+
     QnCommonMessageProcessor::init(connection);
 }
 
@@ -173,4 +179,10 @@ void QnServerMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool is
 
 void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
     resource->setStatus(status, true);
+}
+
+void QnServerMessageProcessor::at_updateUploaded(const QString &updateId, const QByteArray &data) {
+}
+
+void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
 }

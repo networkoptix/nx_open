@@ -26,6 +26,10 @@ protected:
 private slots:
     void at_remotePeerFound(QnId id, bool isClient, bool isProxy);
     void at_remotePeerLost(QnId id, bool isClient, bool isProxy);
+
+    void at_updateUploaded(const QString &updateId, const QByteArray &data);
+    void at_updateInstallationRequested(const QString &updateId);
+
 private:
 #ifdef PROXY_STRICT_IP
     void updateAllIPList(const QnId& id, const QList<QHostAddress>& addrList);

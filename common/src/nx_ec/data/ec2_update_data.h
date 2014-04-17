@@ -11,9 +11,8 @@ class ApiUpdateData : public ApiData {
 public:
     QString updateId;
     QByteArray data;
-    QList<QnId> targets;
 };
-QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(ApiUpdateData, (updateId) (data) (targets))
+QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(ApiUpdateData, (updateId) (data))
 
 }
 

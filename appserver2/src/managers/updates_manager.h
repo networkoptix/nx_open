@@ -15,15 +15,17 @@ public:
     QnUpdatesManager(QueryProcessorType * const queryProcessor);
     virtual ~QnUpdatesManager();
 
+    void triggerNotification(const QnTransaction<ApiUpdateData> &transaction);
+
 protected:
-    virtual int sendUpdatePackage(const QString &updateId, const QByteArray &data, const QList<QnId> &targets, impl::SimpleHandlerPtr handler) override;
-    virtual int installUpdate(const QString &updateId, const QList<QnId> &targets, impl::SimpleHandlerPtr handler) override;
+    virtual int sendUpdatePackage(const QString &updateId, const QByteArray &data, const PeerList &peers, impl::SimpleHandlerPtr handler) override;
+    virtual int installUpdate(const QString &updateId, const PeerList &peers, impl::SimpleHandlerPtr handler) override;
 
 private:
     QueryProcessorType* const m_queryProcessor;
 
-    QnTransaction<ApiUpdateData> prepareTransaction(const QString &updateId, const QByteArray &data, const QList<QnId> &targets) const;
-    QnTransaction<ApiUpdateData> prepareTransaction(const QString &updateId, const QList<QnId> &targets) const;
+    QnTransaction<ApiUpdateData> prepareTransaction(const QString &updateId, const QByteArray &data) const;
+    QnTransaction<ApiUpdateData> prepareTransaction(const QString &updateId) const;
 };
 
 } // namespace ec2
