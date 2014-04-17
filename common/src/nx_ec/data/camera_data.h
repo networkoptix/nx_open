@@ -40,6 +40,10 @@ namespace ec2
     QN_DEFINE_STRUCT_SQL_BINDER(ApiCameraBookmark, ApiCameraBookmarkFields);
     struct ApiCameraBookmarkWithRef: ApiCameraBookmark { QnId cameraId; };
 
+    struct ApiCameraBookmarkTag {QnId bookmarkGuid; QString name; QN_DECLARE_STRUCT_SQL_BINDER(); };
+    #define ApiCameraBookmarkTagFields (bookmarkGuid) (name)
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiCameraBookmarkTag, ApiCameraBookmarkTagFields);
+
     struct ApiCamera: ApiCameraData, ApiResource
     {
         void fromResource(const QnVirtualCameraResourcePtr& resource);

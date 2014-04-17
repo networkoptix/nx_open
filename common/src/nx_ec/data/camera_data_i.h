@@ -18,7 +18,7 @@
     QN_DEFINE_STRUCT_SERIALIZATORS(ScheduleTaskData, apiScheduleTaskFields);
 
     struct ApiCameraBookmarkData {
-        QByteArray guid;
+        QnId guid;
         qint64 startTime;
         qint64 endTime;
         QString name;

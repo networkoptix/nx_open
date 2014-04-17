@@ -608,14 +608,18 @@ ErrorCode QnDbManager::saveCamera(const ApiCamera& params)
 {
     qint32 internalId;
     ErrorCode result = insertOrReplaceResource(params, &internalId);
-    if (result !=ErrorCode::ok)
+    if (result != ErrorCode::ok)
         return result;
 
     result = insertOrReplaceCamera(params, internalId);
-    if (result !=ErrorCode::ok)
+    if (result != ErrorCode::ok)
         return result;
 
     result = updateCameraSchedule(params, internalId);
+    if (result != ErrorCode::ok)
+        return result;
+
+    result = updateCameraBookmarks(params, internalId);
     return result;
 }
 
@@ -992,6 +996,71 @@ ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 id)
     }
 }
 
+ErrorCode QnDbManager::removeCameraBookmarks(qint32 internalId) {
+
+    {
+        QSqlQuery delQuery(m_sdb);
+        delQuery.prepare("DELETE FROM vms_bookmark_tag WHERE bookmark_guid IN (SELECT guid from vms_bookmark WHERE camera_id = :id)");
+        delQuery.bindValue(":id", internalId);
+        if (!delQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+            return ErrorCode::failure;
+        }
+    }
+
+    {
+        QSqlQuery delQuery(m_sdb);
+        delQuery.prepare("DELETE FROM vms_bookmark WHERE camera_id = :id");
+        delQuery.bindValue(":id", internalId);
+        if (!delQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+            return ErrorCode::failure;
+        }
+    }
+
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::updateCameraBookmarks(const ApiCamera& data, qint32 internalId) {
+    ErrorCode result = removeCameraBookmarks(internalId);
+    if (result != ErrorCode::ok)
+        return result;
+
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO vms_bookmark ( \
+                     guid, camera_id, start_time, end_time, \
+                     name, description, color, lock_time \
+                     ) VALUES ( \
+                     :guid, :cameraId, :startTime, :endTime, \
+                     :name, :description, :colorIndex, :lockTime \
+                     )");
+
+
+    QSqlQuery tagQuery(m_sdb);
+    tagQuery.prepare("INSERT INTO vms_bookmark_tag ( bookmark_guid, name ) VALUES ( :bookmark_guid, :name )");
+
+    foreach(const ApiCameraBookmark& bookmark, data.bookmarks) {
+        bookmark.autoBindValues(insQuery);
+        insQuery.bindValue(":cameraId", internalId);
+
+        if (!insQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+            return ErrorCode::failure;
+        }
+
+        tagQuery.bindValue(":bookmark_guid", bookmark.guid.toRfc4122());
+        for (const QString tag: bookmark.tags) {
+            tagQuery.bindValue(":name", tag);
+            if (!tagQuery.exec()) {
+                qWarning() << Q_FUNC_INFO << tagQuery.lastError().text();
+                return ErrorCode::failure;
+            }
+        }
+
+    }
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName)
 {
     QSqlQuery delQuery(m_sdb);
@@ -1025,6 +1094,10 @@ ErrorCode QnDbManager::removeCamera(const QnId& guid)
     qint32 id = getResourceInternalId(guid);
 
     ErrorCode err = deleteAddParams(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = removeCameraBookmarks(id);
     if (err != ErrorCode::ok)
         return err;
 
@@ -1393,6 +1466,47 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraList& camer
     std::vector<ApiResourceParamWithRef> params;
     QN_QUERY_TO_DATA_OBJECT(queryParams, ApiResourceParamWithRef, params, ApiResourceParamFields (resourceId));
     mergeObjectListData<ApiCamera>(cameraList.data, params, &ApiCamera::addParams, &ApiResourceParamWithRef::resourceId);
+
+    {   // load tags
+        
+        QSqlQuery queryTags(m_sdb);
+        queryTags.setForwardOnly(true);
+        queryTags.prepare("SELECT \
+                               tag.bookmark_guid as bookmarkGuid, tag.name \
+                               FROM vms_bookmark_tag tag");
+        if (!queryTags.exec()) {
+            qWarning() << Q_FUNC_INFO << queryTags.lastError().text();
+            return ErrorCode::failure;
+        }
+        std::vector<ApiCameraBookmarkTag> tags;
+        QN_QUERY_TO_DATA_OBJECT(queryTags, ApiCameraBookmarkTag, tags, ApiCameraBookmarkTagFields);
+        
+        // load bookmarks
+        QSqlQuery queryBookmarks(m_sdb);
+        queryBookmarks.setForwardOnly(true);
+        queryBookmarks.prepare("SELECT \
+                               bookmark.guid, bookmark.camera_id as cameraId, bookmark.start_time as startTime, bookmark.end_time as endTime, \
+                               bookmark.name, bookmark.description, bookmark.color as colorIndex, bookmark.lock_time as lockTime \
+                               FROM vms_bookmark bookmark");
+        if (!queryBookmarks.exec()) {
+            qWarning() << Q_FUNC_INFO << queryBookmarks.lastError().text();
+            return ErrorCode::failure;
+        }
+        std::vector<ApiCameraBookmarkWithRef> bookmarks;
+        QN_QUERY_TO_DATA_OBJECT(queryBookmarks, ApiCameraBookmarkWithRef, bookmarks, ApiCameraBookmarkFields (cameraId));
+
+        {   // merge tags
+            int idx = 0;
+            foreach(const ApiCameraBookmarkTag& tag, tags) {
+                for (; idx < bookmarks.size() && tag.bookmarkGuid != bookmarks[idx].guid; idx++);
+                if (idx == bookmarks.size())
+                    break;
+                bookmarks[idx].tags.push_back(tag.name);
+            }
+        }
+
+        mergeObjectListData(cameraList.data, bookmarks, &ApiCamera::bookmarks, &ApiCameraBookmarkWithRef::cameraId);
+    }
 
 	return ErrorCode::ok;
 }
