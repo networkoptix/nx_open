@@ -201,8 +201,9 @@ void QnDistributedMutex::unlock()
     */
 
     foreach(ApiLockData lockData, m_delayedResponse) {
+        QnId srcPeer = lockData.peer;
         lockData.peer = qnCommon->moduleGUID();
-        sendTransaction(lockData, ApiCommand::lockResponse, lockData.peer);
+        sendTransaction(lockData, ApiCommand::lockResponse, srcPeer);
     }
     m_delayedResponse.clear();
 
