@@ -108,7 +108,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_display(NULL),
     m_renderer(NULL),
     m_motionSensitivityValid(false),
-    m_binaryMotionMaskValid(false)
+    m_binaryMotionMaskValid(false),
+    m_homePtzController(NULL)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource)
