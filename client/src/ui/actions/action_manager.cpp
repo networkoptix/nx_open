@@ -1399,7 +1399,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::BookmarkTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Bookmark Selection")).
-        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::InvisibleAction, false, this));
+        condition(new QnExportActionCondition(true, this));
 
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget).

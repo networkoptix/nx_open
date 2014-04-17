@@ -26,39 +26,16 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
 
 void QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
-
-    QnActionTargetProvider *provider = menu()->targetProvider();
-    if(!provider)
+    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
         return;
-    parameters.setItems(provider->currentParameters(Qn::SceneScope).items());
 
-    QnMediaResourceWidget *widget = NULL;
-
-    if(parameters.size() != 1) {
-        if(parameters.size() == 0 && display()->widgets().size() == 1) {
-            widget = dynamic_cast<QnMediaResourceWidget *>(display()->widgets().front());
-        } else {
-            widget = dynamic_cast<QnMediaResourceWidget *>(display()->activeWidget());
-            if (!widget) {
-                QMessageBox::critical(
-                    mainWindow(),
-                    tr("Could not export file"),
-                    tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", "", parameters.size())
-                    );
-                return;
-            }
-        }
-    } else {
-        widget = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
-    }
-    if(!widget)
-        return;
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-    QnVirtualCameraResourcePtr camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+    
     QnCameraBookmark bookmark;
     bookmark.guid = QUuid::createUuid();
-    bookmark.startTime = period.startTimeMs;
-    bookmark.endTime = period.endTimeMs();
+    bookmark.startTimeMs = period.startTimeMs;
+    bookmark.durationMs = period.durationMs;
     camera->addBookmark(bookmark);
 
     QnAppServerConnectionFactory::getConnection2()->getCameraManager()->save(QnVirtualCameraResourceList() << camera, this, [](){});

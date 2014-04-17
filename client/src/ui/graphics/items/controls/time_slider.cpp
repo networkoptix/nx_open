@@ -354,18 +354,27 @@ private:
     QColor currentColor(const boost::array<QColor, Qn::TimePeriodContentCount + 1> &colors) const {
         qreal rc = m_weights[Qn::RecordingContent];
         qreal mc = m_weights[Qn::MotionContent];
-        qreal bc = m_weights[Qn::TimePeriodContentCount];
+        qreal bc = m_weights[Qn::BookmarksContent];
+        qreal nc = m_weights[Qn::TimePeriodContentCount];
         qreal sum = m_pendingLength;
 
-        if(m_weights[Qn::MotionContent] != 0) {
-            /* Make sure motion is noticable even if there isn't much of it. 
+        if (!qFuzzyIsNull(bc)) {
+            /* Make sure motion is noticeable even if there isn't much of it. 
              * Note that these adjustments don't change sum. */
             rc = rc * (1.0 - lineBarMinMotionFraction);
-            mc = sum * lineBarMinMotionFraction + mc * (1.0 - lineBarMinMotionFraction);
-            bc = bc * (1.0 - lineBarMinMotionFraction);
+            bc = sum * lineBarMinMotionFraction + bc * (1.0 - lineBarMinMotionFraction);
+            nc = nc * (1.0 - lineBarMinMotionFraction);
         }
 
-        return linearCombine(rc / sum, colors[Qn::RecordingContent], 1.0, linearCombine(mc / sum, colors[Qn::MotionContent], bc / sum, colors[Qn::TimePeriodContentCount]));
+   /*     if(m_weights[Qn::MotionContent] != 0) {*/
+            /* Make sure motion is noticeable even if there isn't much of it. 
+             * Note that these adjustments don't change sum. */
+       /*     rc = rc * (1.0 - lineBarMinMotionFraction);
+            mc = sum * lineBarMinMotionFraction + mc * (1.0 - lineBarMinMotionFraction);
+            nc = nc * (1.0 - lineBarMinMotionFraction);
+        }*/
+
+        return linearCombine(rc / sum, colors[Qn::RecordingContent], 1.0, linearCombine(bc / sum, colors[Qn::MotionContent], nc / sum, colors[Qn::TimePeriodContentCount]));
     }
 
 private:
@@ -1625,6 +1634,7 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
                 painter,
                 m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),
                 m_lineData[line].timeStorage.aggregated(Qn::MotionContent),
+                m_lineData[line].timeStorage.aggregated(Qn::BookmarksContent),
                 lineRect
             );
 
@@ -1778,7 +1788,7 @@ void QnTimeSlider::drawMarker(QPainter *painter, qint64 pos, const QColor &color
     painter->drawLine(QPointF(x, rect.top()), QPointF(x, rect.bottom()));
 }
 
-void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QRectF &rect) {
+void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QnTimePeriodList &bookmarks, const QRectF &rect) {
     qint64 minimumValue = this->windowStart();
     qint64 maximumValue = this->windowEnd();
 
@@ -1788,7 +1798,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
 
     /* Note that constness of period lists is important here as requesting
      * iterators from a non-const object will result in detach. */
-    const QnTimePeriodList periods[Qn::TimePeriodContentCount] = {recorded, motion};
+    const QnTimePeriodList periods[Qn::TimePeriodContentCount] = {recorded, motion, bookmarks};
 
     QnTimePeriodList::const_iterator pos[Qn::TimePeriodContentCount];
     QnTimePeriodList::const_iterator end[Qn::TimePeriodContentCount];
@@ -1808,7 +1818,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
     chunkPainter.start(value, this->sliderPosition(), m_msecsPerPixel * lineBarMinChunkSize, rect);
 
     while(value != maximumValue) {
-        qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue};
+        qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue, maximumValue};
         for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
             if(pos[i] == end[i]) 
                 continue;
@@ -1822,12 +1832,14 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
                 nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs + pos[i]->durationMs);
         }
 
-        qint64 bestValue = qMin(nextValue[0], nextValue[1]);
+        qint64 bestValue = qMin(qMin(nextValue[0], nextValue[1]), nextValue[2]);
         
         Qn::TimePeriodContent content;
-        if(inside[Qn::MotionContent]) {
+        if (inside[Qn::BookmarksContent]) {
+            content = Qn::BookmarksContent;
+        } else if (inside[Qn::MotionContent]) {
             content = Qn::MotionContent;
-        } else if(inside[Qn::RecordingContent]) {
+        } else if (inside[Qn::RecordingContent]) {
             content = Qn::RecordingContent;
         } else {
             content = Qn::TimePeriodContentCount;
