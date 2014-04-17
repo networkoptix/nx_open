@@ -18,6 +18,9 @@ namespace ec2
             return false;
         if (!deserialize(dstPeers, &stream))
             return false;
+        foreach (const QnId& peer, dstPeers)
+            Q_ASSERT(!peer.isNull());
+
         tranData.append((const char*) chunkPayload + stream.getPos(), len - stream.getPos());
         return true;
     }

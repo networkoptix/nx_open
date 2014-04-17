@@ -67,7 +67,10 @@ namespace ec2
         template <class T>
         void sendTransaction(const QnTransaction<T>& tran, const QnId& dstPeer)
         {
-            sendTransaction(tran, PeerList() << dstPeer);
+            PeerList pList;
+            if (!dstPeer.isNull())
+                pList << dstPeer;
+            sendTransaction(tran, pList);
         }
 
         struct AlivePeerInfo
