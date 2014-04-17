@@ -15,9 +15,8 @@ struct ApiLockData: public ApiData
     QnId peer;
     qint64 timestamp;
     QByteArray userData;
-    QnId originator;
 };
-QN_DEFINE_STRUCT_SERIALIZATORS (ApiLockData, (name) (peer) (timestamp) (userData) (originator) )
+QN_DEFINE_STRUCT_SERIALIZATORS (ApiLockData, (name) (peer) (timestamp) (userData) )
 
 }
 

@@ -71,7 +71,6 @@ void QnDistributedMutexManager::at_gotLockRequest(ApiLockData lockData)
         QnTransaction<ApiLockData> tran(ApiCommand::lockResponse, false);
         tran.params.name = lockData.name;
         tran.params.timestamp = lockData.timestamp;
-        tran.params.originator = lockData.peer;
         tran.params.peer = qnCommon->moduleGUID();
         if (m_userDataHandler)
             tran.params.userData = m_userDataHandler->getUserData(lockData.name);
@@ -147,16 +146,22 @@ void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCom
     qnTransactionBus->sendTransaction(tran, dstPeer);
 }
 
-void QnDistributedMutex::at_newPeerFound(QnId peer)
+void QnDistributedMutex::at_newPeerFound(QnId peer, bool isClient)
 {
-    QMutexLocker lock(&m_mutex);
+    if (isClient)
+        return;
 
+    QMutexLocker lock(&m_mutex);
+    Q_ASSERT(peer != qnCommon->moduleGUID());
     if (!m_selfLock.isEmpty())
         sendTransaction(m_selfLock, ApiCommand::lockRequest, peer);
 }
 
-void QnDistributedMutex::at_peerLost(QnId peer)
+void QnDistributedMutex::at_peerLost(QnId peer, bool isClient)
 {
+    if (isClient)
+        return;
+
     QMutexLocker lock(&m_mutex);
 
     m_proccesedPeers.remove(peer);
@@ -202,8 +207,9 @@ void QnDistributedMutex::unlock()
     */
 
     foreach(ApiLockData lockData, m_delayedResponse) {
+        QnId srcPeer = lockData.peer;
         lockData.peer = qnCommon->moduleGUID();
-        sendTransaction(lockData, ApiCommand::lockResponse, lockData.peer);
+        sendTransaction(lockData, ApiCommand::lockResponse, srcPeer);
     }
     m_delayedResponse.clear();
 

@@ -169,6 +169,8 @@ namespace ec2
         static QAtomicInt m_sequence;
         bool localTransaction; // do not propagate transactions to other server peers
     };
+
+    typedef QSet<QnId> PeerList;
 }
 
 QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (sequence) )

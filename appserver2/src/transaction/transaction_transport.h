@@ -32,7 +32,7 @@ public:
     ~QnTransactionTransport();
 
 signals:
-    void gotTransaction(QByteArray data, QSet<QnId> processedPeers);
+    void gotTransaction(QByteArray data, QSet<QnId> processedPeers, QSet<QnId> dstPeers);
     void stateChanged(State state);
 public:
     void doOutgoingConnect(QUrl remoteAddr);
