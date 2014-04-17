@@ -21,8 +21,7 @@ template<class QueryProcessorType>
 int QnUpdatesManager<QueryProcessorType>::sendUpdatePackage(const QString &updateId, const QByteArray &data, const QList<QnId> &targets, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     QnTransaction<ApiUpdateData> transaction = prepareTransaction(updateId, data, targets);
-//    QnTransactionMessageBus::instance()->sendTransaction(transaction, targets);
-    QnTransactionMessageBus::instance()->sendTransaction(transaction);
+    QnTransactionMessageBus::instance()->sendTransaction(transaction, PeerList::fromList(targets));
     QnScopedThreadRollback ensureFreeThread(1);
     QtConcurrent::run(std::bind(&impl::SimpleHandler::done, handler, reqId, ErrorCode::ok));
     return reqId;
@@ -32,8 +31,7 @@ template<class QueryProcessorType>
 int QnUpdatesManager<QueryProcessorType>::installUpdate(const QString &updateId, const QList<QnId> &targets, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     QnTransaction<ApiUpdateData> transaction = prepareTransaction(updateId, targets);
-//    QnTransactionMessageBus::instance()->sendTransaction(transaction, targets);
-    QnTransactionMessageBus::instance()->sendTransaction(transaction);
+    QnTransactionMessageBus::instance()->sendTransaction(transaction, PeerList::fromList(targets));
     QnScopedThreadRollback ensureFreeThread(1);
     QtConcurrent::run(std::bind(&impl::SimpleHandler::done, handler, reqId, ErrorCode::ok));
     return reqId;
