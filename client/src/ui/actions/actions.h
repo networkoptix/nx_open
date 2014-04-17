@@ -874,6 +874,11 @@ namespace Qn {
          */
         ExportLayoutAction,
 
+        /** 
+         * Bookmark selected range.
+         */
+        BookmarkTimeSelectionAction,
+
         /**
          * Opens new layout for Quick Search.
          *

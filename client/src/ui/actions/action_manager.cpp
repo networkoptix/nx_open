@@ -1396,6 +1396,11 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::ExportPermission).
         condition(new QnExportActionCondition(true, this));
 
+    factory(Qn::BookmarkTimeSelectionAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Bookmark Selection")).
+        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::InvisibleAction, false, this));
+
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget).
         text(tr("Export Multi-Video...")).
