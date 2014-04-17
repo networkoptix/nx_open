@@ -7,10 +7,11 @@
 #include <QtCore/QStringList>
 #include <QtCore/QUuid>
 
-struct QnCameraBookmark {
+#include <recording/time_period.h>
+
+class QnCameraBookmark: public QnTimePeriod {
+public:
     QUuid guid;
-    qint64 startTime;
-    qint64 endTime;
     QString name;
     QString description;
     int colorIndex;         /**< Index of color to be used on the timeline. */
@@ -18,16 +19,15 @@ struct QnCameraBookmark {
     QStringList tags;
 
     QnCameraBookmark():
-        startTime(0),
-        endTime(-1),
+        QnTimePeriod(),
         colorIndex(0),
         lockTime(0)
     {}
 
     friend bool operator==(const QnCameraBookmark &l, const QnCameraBookmark &r) {
         return (l.guid == r.guid
-            && l.startTime == r.startTime
-            && l.endTime == r.endTime
+            && l.startTimeMs == r.startTimeMs 
+            && l.durationMs == r.durationMs
             && l.name == r.name
             && l.description == r.description
             && l.colorIndex == r.colorIndex

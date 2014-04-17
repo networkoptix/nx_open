@@ -10,7 +10,7 @@ CREATE TABLE "vms_bookmark" (
     guid            BLOB(16) NOT NULL UNIQUE PRIMARY KEY,
     camera_id       integer NOT NULL,                       -- inner ID of the related camera resource
     start_time      integer NOT NULL,
-    end_time        integer NULL,
+    duration        integer NOT NULL,
     name            VARCHAR(30) NULL,
     description     VARCHAR(200) NULL,
     color           integer NOT NULL,

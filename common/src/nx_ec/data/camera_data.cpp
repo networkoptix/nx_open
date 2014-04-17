@@ -32,8 +32,8 @@ QnScheduleTask ScheduleTask::toResource(const QnId& resourceId) const
 
 void ApiCameraBookmark::toBookmark(QnCameraBookmark& bookmark) const {
     bookmark.guid = guid;
-    bookmark.startTime = startTime;
-    bookmark.endTime = endTime;
+    bookmark.startTimeMs = startTime;
+    bookmark.durationMs = duration;
     bookmark.name = name;
     bookmark.description = description;
     bookmark.colorIndex = colorIndex;
@@ -45,8 +45,8 @@ void ApiCameraBookmark::toBookmark(QnCameraBookmark& bookmark) const {
 
 void ApiCameraBookmark::fromBookmark(const QnCameraBookmark& bookmark) {
     guid = bookmark.guid.toByteArray();
-    startTime = bookmark.startTime;
-    endTime = bookmark.endTime;
+    startTime = bookmark.startTimeMs;
+    duration = bookmark.durationMs;
     name = bookmark.name;
     description = bookmark.description;
     colorIndex = bookmark.colorIndex;

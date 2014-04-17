@@ -20,14 +20,14 @@
     struct ApiCameraBookmarkData {
         QnId guid;
         qint64 startTime;
-        qint64 endTime;
+        qint64 duration;
         QString name;
         QString description;
         qint16 colorIndex;
         qint64 lockTime;
         std::vector<QString> tags;
     };
-    #define ApiCameraBookmarkFields (guid) (startTime) (endTime) (name) (description) (colorIndex) (lockTime) (tags)
+    #define ApiCameraBookmarkFields (guid) (startTime) (duration) (name) (description) (colorIndex) (lockTime) (tags)
     QN_DEFINE_STRUCT_SERIALIZATORS(ApiCameraBookmarkData, ApiCameraBookmarkFields);
 
     struct ApiCameraData: virtual ApiResourceData 
