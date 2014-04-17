@@ -1297,10 +1297,10 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
 
     m_uploadThread = pool[random(0, pool.size())];    //TODO/IMPL should take 
 #endif
-
-    for( size_t i = 0; i < asyncDepth+MIN_GL_PIC_BUF_COUNT; ++i )
+     m_emptyBuffer = new UploadedPicture(this);
+    /*for( size_t i = 0; i < asyncDepth+MIN_GL_PIC_BUF_COUNT; ++i )
         m_emptyBuffers.push_back( new UploadedPicture( this ) );
-
+        */
 #ifdef SINGLE_STREAM_UPLOAD
     if( !runningUploader )
         runningUploader = this;
@@ -1337,10 +1337,10 @@ DecodedPictureToOpenGLUploader::~DecodedPictureToOpenGLUploader()
 #else
             {}
 #endif
-        while( !(m_emptyBuffers.empty() && m_renderedPictures.empty() && m_picturesWaitingRendering.empty() && m_picturesBeingRendered.empty()) )
+        /*while( !(m_emptyBuffers.empty() && m_renderedPictures.empty() && m_picturesWaitingRendering.empty() && m_picturesBeingRendered.empty()) )
         {
             m_cond.wait( lk.mutex() );
-        }
+        }*/
     }
 
 #ifdef SINGLE_STREAM_UPLOAD
@@ -1373,8 +1373,8 @@ void DecodedPictureToOpenGLUploader::pleaseStop()
         cancelUploadingInGUIThread();   //NOTE this method cannot block if called from GUI thread, so we will never hang GUI thread if called in it
 
         //TODO/IMPL have to remove gl textures now, while QGLContext surely alive
-        while( !m_picturesBeingRendered.empty() )
-            m_cond.wait( lk.mutex() );
+        /*while( !m_picturesBeingRendered.empty() )
+            m_cond.wait( lk.mutex() );*/
 
         const QGLContext* curCtx = QGLContext::currentContext();
         if( curCtx != m_initializedCtx && m_initializedCtx )
@@ -1406,19 +1406,19 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
     m_asyncUploadUsed = decodedPicture->picData.data() && (decodedPicture->picData->type() == QnAbstractPictureDataRef::pstD3DSurface);
 #endif
     m_format = decodedPicture->format;
-    UploadedPicture* emptyPictureBuf = NULL;
+    UploadedPicture* emptyPictureBuf = m_emptyBuffer;
 
     QMutexLocker lk( &m_mutex );
-
+    
     if( m_terminated )
         return;
-
+    /*
     {
         //searching for a non-used picture buffer
         for( ;; )
         {
             if( m_terminated )
-                return;
+                return;*/
 
 #if defined(UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD) && defined(USE_MIN_GL_TEXTURES)
             if( !m_asyncUploadUsed && !m_hardwareDecoderUsed && !m_renderedPictures.empty() )
@@ -1431,7 +1431,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
             }
             else
 #endif
-            if( !m_emptyBuffers.empty() )
+            /*if( !m_emptyBuffers.empty() )
             {
                 emptyPictureBuf = m_emptyBuffers.front();
                 m_emptyBuffers.pop_front();
@@ -1457,9 +1457,9 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 m_picturesWaitingRendering.pop_front();
                 NX_LOG( lit( "Ignoring uploaded frame with pts %1. Playback does not catch up with uploading. (%2, %3)..." ).
                     arg(emptyPictureBuf->pts()).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG1 );
-            }
+            }*/
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
-            else if( !m_asyncUploadUsed && !m_framesWaitingUploadInGUIThread.empty() )
+            /*else if( !m_asyncUploadUsed && !m_framesWaitingUploadInGUIThread.empty() )
             {
                 for( std::deque<AVPacketUploader*>::iterator
                     it = m_framesWaitingUploadInGUIThread.begin();
@@ -1475,9 +1475,9 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                     m_framesWaitingUploadInGUIThread.erase( it );
                     break;
                 }
-            }
+            }*/
 #endif
-
+            /*
             if( emptyPictureBuf == NULL )
             {
                 if( m_asyncUploadUsed )
@@ -1508,7 +1508,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
             break;
         }
     }
-
+    */
     //copying attributes of decoded picture
     emptyPictureBuf->m_sequence = nextPicSequenceValue();
     emptyPictureBuf->m_pts = decodedPicture->pkt_dts;
@@ -1625,7 +1625,8 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
     }
 #endif
 
-    UploadedPicture* pic = NULL;
+    UploadedPicture* pic = m_emptyBuffer;
+    /*
     if( !m_picturesWaitingRendering.empty() )
     {
         pic = m_picturesWaitingRendering.front();
@@ -1660,7 +1661,7 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
     //if needed, uploading aggregation surface to ogl texture(s)
     pic->aggregationSurfaceRect()->ensureUploadedToOGL( opacity() );
 #endif
-
+    */
     //waiting for all gl operations, submitted by uploader are completed by ogl device
     return pic;
 }
@@ -1668,7 +1669,8 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
 quint64 DecodedPictureToOpenGLUploader::nextFrameToDisplayTimestamp() const
 {
     QMutexLocker lk( &m_mutex );
-
+    return m_emptyBuffer->pts();
+    /*
     if( !m_picturesBeingRendered.empty() )
         return m_picturesBeingRendered.front()->pts();
     if( !m_picturesWaitingRendering.empty() )
@@ -1681,7 +1683,7 @@ quint64 DecodedPictureToOpenGLUploader::nextFrameToDisplayTimestamp() const
     if( !m_usedAsyncUploaders.empty() )
         return m_usedAsyncUploaders.front()->pts();
     if( !m_renderedPictures.empty() )
-        return m_renderedPictures.back()->pts();
+        return m_renderedPictures.back()->pts();*/
     return AV_NOPTS_VALUE;
 }
 
@@ -1689,8 +1691,8 @@ void DecodedPictureToOpenGLUploader::waitForAllFramesDisplayed()
 {
     QMutexLocker lk( &m_mutex );
 
-    while( !m_terminated && (!m_framesWaitingUploadInGUIThread.empty() || !m_picturesWaitingRendering.empty() || !m_usedAsyncUploaders.empty() || !m_picturesBeingRendered.empty()) )
-        m_cond.wait( lk.mutex() );
+/*    while( !m_terminated && (!m_framesWaitingUploadInGUIThread.empty() || !m_picturesWaitingRendering.empty() || !m_usedAsyncUploaders.empty() || !m_picturesBeingRendered.empty()) )
+        m_cond.wait( lk.mutex() );*/
 }
 
 void DecodedPictureToOpenGLUploader::ensureAllFramesWillBeDisplayed()
@@ -1718,13 +1720,13 @@ void DecodedPictureToOpenGLUploader::ensureAllFramesWillBeDisplayed()
 #endif
 
     //marking, that skipping frames currently in queue is forbidden and exiting...
-    for( std::deque<UploadedPicture*>::iterator
+    /*for( std::deque<UploadedPicture*>::iterator
         it = m_picturesWaitingRendering.begin();
         it != m_picturesWaitingRendering.end();
         ++it )
     {
         (*it)->m_skippingForbidden = true;
-    }
+    }*/
 }
 
 #ifdef GL_COPY_AGGREGATION
@@ -1745,7 +1747,7 @@ void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
     cancelUploadingInGUIThread();
 #endif
-
+    /*
     for( std::deque<UploadedPicture*>::iterator
         it = m_picturesWaitingRendering.begin();
         it != m_picturesWaitingRendering.end() && !m_picturesWaitingRendering.empty();
@@ -1753,7 +1755,7 @@ void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
     {
         m_emptyBuffers.push_back( *it );
         it = m_picturesWaitingRendering.erase( it );
-    }
+    }*/
 
     m_cond.wakeAll();
 }
@@ -1761,7 +1763,7 @@ void DecodedPictureToOpenGLUploader::discardAllFramesPostedToDisplay()
 void DecodedPictureToOpenGLUploader::cancelUploadingInGUIThread()
 {
     //NOTE m_mutex MUST be locked!
-
+    /*
     while( !m_framesWaitingUploadInGUIThread.empty() )
     {
         for( std::deque<AVPacketUploader*>::iterator
@@ -1784,15 +1786,15 @@ void DecodedPictureToOpenGLUploader::cancelUploadingInGUIThread()
         if( m_framesWaitingUploadInGUIThread.empty() )
             break;
         m_cond.wait( &m_mutex );    //NOTE this CANNOT occur, if in GUI thread now...
-    }
+    }*/
 }
 
 void DecodedPictureToOpenGLUploader::waitForCurrentFrameDisplayed()
 {
     QMutexLocker lk( &m_mutex );
-
+    /*
     while( !m_terminated && (!m_picturesBeingRendered.empty()) )
-        m_cond.wait( lk.mutex() );
+        m_cond.wait( lk.mutex() );*/
 }
 
 void DecodedPictureToOpenGLUploader::pictureDrawingFinished( UploadedPicture* const picture ) const
@@ -1807,7 +1809,7 @@ void DecodedPictureToOpenGLUploader::pictureDrawingFinished( UploadedPicture* co
     NX_LOG( lit( "Finished rendering of picture (pts %1)" ).arg(picture->pts()), cl_logDEBUG2 );
 
     //m_picturesBeingRendered holds only one picture
-    std::deque<UploadedPicture*>::iterator it = std::find( m_picturesBeingRendered.begin(), m_picturesBeingRendered.end(), picture );
+/*    std::deque<UploadedPicture*>::iterator it = std::find( m_picturesBeingRendered.begin(), m_picturesBeingRendered.end(), picture );
     Q_ASSERT( it != m_picturesBeingRendered.end() );
 
 #ifdef GL_COPY_AGGREGATION
@@ -1821,7 +1823,7 @@ void DecodedPictureToOpenGLUploader::pictureDrawingFinished( UploadedPicture* co
 #endif
     m_renderedPictures.push_back( *it );
     m_picturesBeingRendered.erase( it );
-    m_cond.wakeAll();
+    m_cond.wakeAll();*/
 }
 
 void DecodedPictureToOpenGLUploader::setForceSoftYUV( bool value )
@@ -1862,7 +1864,7 @@ void DecodedPictureToOpenGLUploader::setNV12ToRgbShaderUsed( bool nv12SharedUsed
 void DecodedPictureToOpenGLUploader::pictureDataUploadSucceeded( AsyncPicDataUploader* const uploader, UploadedPicture* const picture )
 {
     QMutexLocker lk( &m_mutex );
-    m_picturesWaitingRendering.push_back( picture );
+    //m_picturesWaitingRendering.push_back( picture );
 
     if( uploader )
     {
@@ -1875,6 +1877,7 @@ void DecodedPictureToOpenGLUploader::pictureDataUploadSucceeded( AsyncPicDataUpl
 void DecodedPictureToOpenGLUploader::pictureDataUploadFailed( AsyncPicDataUploader* const uploader, UploadedPicture* const picture )
 {
     QMutexLocker lk( &m_mutex );
+    /*
     //considering picture buffer invalid
     if( picture )
     {
@@ -1889,7 +1892,7 @@ void DecodedPictureToOpenGLUploader::pictureDataUploadFailed( AsyncPicDataUpload
         m_usedAsyncUploaders.erase( std::find( m_usedAsyncUploaders.begin(), m_usedAsyncUploaders.end(), uploader ) );
         m_unusedAsyncUploaders.push_back( uploader );
     }
-    m_cond.wakeAll();   //notifying that uploading finished
+    m_cond.wakeAll();   //notifying that uploading finished*/
 }
 
 void DecodedPictureToOpenGLUploader::pictureDataUploadCancelled( AsyncPicDataUploader* const uploader )
@@ -2460,10 +2463,16 @@ void DecodedPictureToOpenGLUploader::releasePictureBuffers()
 
 void DecodedPictureToOpenGLUploader::releasePictureBuffersNonSafe()
 {
+    for( size_t i = 0; i < m_emptyBuffer->m_pbo.size(); ++i )
+    {
+        d->glDeleteBuffers( 1, &m_emptyBuffer->m_pbo[i].id );
+    }
+
+    /*
     releaseDecodedPicturePool( &m_emptyBuffers );
     releaseDecodedPicturePool( &m_renderedPictures );
     releaseDecodedPicturePool( &m_picturesWaitingRendering );
-    releaseDecodedPicturePool( &m_picturesBeingRendered );
+    releaseDecodedPicturePool( &m_picturesBeingRendered );*/
 }
 
 static void yv12aToRgba(
