@@ -637,7 +637,7 @@ namespace ec2
         virtual ~AbstractUpdatesManager() {}
 
         template<class TargetType, class HandlerType> int sendUpdatePackage(const QString &updateId, const QByteArray &data, const PeerList &peers, TargetType *target, HandlerType handler) {
-            return broadcastUpdatePackage(updateId, data, peers, std::static_pointer_cast<impl::SimpleHandler>(
+            return sendUpdatePackage(updateId, data, peers, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 

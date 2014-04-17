@@ -47,15 +47,14 @@ void QnMediaServerUpdateTool::updateServers() {
 
     QnResourceList servers = qnResPool->getResourcesWithFlag(QnResource::server);
 
-//    connection2()->getUpdatesManager()->sendUpdate
+    QSet<QnId> ids;
+    foreach (const QnResourcePtr &resource, servers) {
+        ids.insert(resource->getId());
+    }
 
-//    foreach (const QnResourcePtr &resource, servers) {
-//        QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-//        m_pendingUploadServers.insert(server->getId().toString(), server);
-//        server->apiConnection()->uploadUpdateAsync(updateId, data, this, SLOT(updateUploaded(int,QString,int)));
-//    }
+    connection2()->getUpdatesManager()->sendUpdatePackage(updateId, data, ids, this, &QnMediaServerUpdateTool::updateUploaded);
 }
 
-void QnMediaServerUpdateTool::updateUploaded(int status, const QString &reply, int handle) {
-
+void QnMediaServerUpdateTool::updateUploaded(int handle, ec2::ErrorCode errorCode) {
+    qDebug() << "uploaded!!!";
 }
