@@ -16,6 +16,7 @@
 #include "nx_ec/data/ec2_stored_file_data.h"
 #include "nx_ec/data/ec2_full_data.h"
 #include "nx_ec/data/ec2_license.h"
+#include "nx_ec/data/ec2_update_data.h"
 #include "utils/db/db_helper.h"
 #include <QSet>
 
@@ -57,6 +58,11 @@ namespace ec2
         }
 
         ErrorCode saveTransaction(const QnTransaction<ApiVideowallControlMessage>& , const QByteArray&) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode saveTransaction(const QnTransaction<ApiUpdateData>& , const QByteArray&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }

@@ -630,6 +630,27 @@ namespace ec2
     };
     typedef std::shared_ptr<AbstractStoredFileManager> AbstractStoredFileManagerPtr;
 
+    class AbstractUpdatesManager : public QObject {
+        Q_OBJECT
+    public:
+        virtual ~AbstractUpdatesManager() {}
+
+        template<class TargetType, class HandlerType> int sendUpdatePackage(const QString &updateId, const QByteArray &data, const QList<QnId> &targets, TargetType *target, HandlerType handler) {
+            return broadcastUpdatePackage(updateId, data, targets, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int installUpdate(const QString &updateId, const QList<QnId> &targets, TargetType *target, HandlerType handler) {
+            return installUpdate(updateId, targets, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+    protected:
+        virtual int sendUpdatePackage(const QString &updateId, const QByteArray &data, const QList<QnId> &targets, impl::SimpleHandlerPtr handler) = 0;
+        virtual int installUpdate(const QString &updateId, const QList<QnId> &targets, impl::SimpleHandlerPtr handler) = 0;
+    };
+    typedef std::shared_ptr<AbstractUpdatesManager> AbstractUpdatesManagerPtr;
+
     /*!
         \note All methods are asynchronous if other not specified
     */
@@ -661,6 +682,7 @@ namespace ec2
         virtual AbstractLayoutManagerPtr getLayoutManager() = 0;
         virtual AbstractVideowallManagerPtr getVideowallManager() = 0;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() = 0;
+        virtual AbstractUpdatesManagerPtr getUpdatesManager() = 0;
 
         /*!
             \param handler Functor with params: (ErrorCode)

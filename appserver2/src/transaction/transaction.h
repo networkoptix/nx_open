@@ -136,6 +136,9 @@ namespace ec2
             lockRequest,
             lockResponse,
             unlockRequest,
+
+            uploadUpdate,
+            installUpdate,
         };
 
         QString toString( Value val );

@@ -21,6 +21,7 @@
 #include "managers/resource_manager.h"
 #include "managers/user_manager.h"
 #include "managers/videowall_manager.h"
+#include "managers/updates_manager.h"
 
 #include "nx_ec/data/ec2_full_data.h"
 #include "nx_ec/data/ec2_videowall_data.h"
@@ -47,6 +48,7 @@ namespace ec2
         virtual AbstractLayoutManagerPtr getLayoutManager() override;
         virtual AbstractVideowallManagerPtr getVideowallManager() override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
+        virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
 
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) override;
@@ -189,6 +191,8 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiEmailData>&  ) {
         }
 
+        void triggerNotification(const QnTransaction<ApiUpdateData>&) {}
+
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
     protected:
         QueryProcessorType* m_queryProcessor;
@@ -202,6 +206,7 @@ namespace ec2
         std::shared_ptr<QnLayoutManager<QueryProcessorType>> m_layoutManager;
         std::shared_ptr<QnVideowallManager<QueryProcessorType>> m_videowallManager;
         std::shared_ptr<QnStoredFileManager<QueryProcessorType>> m_storedFileManager;
+        std::shared_ptr<QnUpdatesManager<QueryProcessorType>> m_updatesManager;
 
     private:
         QnTransaction<ApiPanicModeData> prepareTransaction( ApiCommand::Value cmd, const Qn::PanicMode& mode);

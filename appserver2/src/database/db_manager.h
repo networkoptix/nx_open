@@ -14,6 +14,7 @@
 #include "nx_ec/data/ec2_license.h"
 #include "nx_ec/data/ec2_business_rule_data.h"
 #include "nx_ec/data/ec2_full_data.h"
+#include "nx_ec/data/ec2_update_data.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
 
@@ -170,6 +171,11 @@ namespace ec2
         }
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallControlMessage> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiUpdateData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }

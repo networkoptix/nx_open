@@ -139,6 +139,11 @@ namespace ec2
                 case unlockRequest:
                     return "unlockRequest";
 
+                case uploadUpdate:
+                    return "uploadUpdate";
+                case installUpdate:
+                    return "installUpdate";
+
                 default:
                     return "unknown " + QString::number((int)val);
             }
