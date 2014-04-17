@@ -32,7 +32,7 @@ QnHelpHandler::QnHelpHandler(QObject *parent):
 {
     m_helpRoot = qApp->applicationDirPath() + QLatin1String("/../help");
 
-    QnOnlineHelpDetector *helpUrlDetector = new QnOnlineHelpDetector(this);
+    new QnOnlineHelpDetector(this);
 }
 
 QnHelpHandler::~QnHelpHandler() {
@@ -59,9 +59,10 @@ QUrl QnHelpHandler::urlForTopic(int topic) const {
         return QUrl::fromLocalFile(filePath);
     else if (!m_onlineHelpRoot.isEmpty())
         return QUrl(m_onlineHelpRoot + lit("/") + QLatin1String(relativeUrlForTopic(topic)));
-    else {
+    else
         QMessageBox::warning(0, tr("Error"), tr("Error")); // TODO: #dklychkov place something more detailed in the future
-    }
+
+    return QUrl();
 }
 
 void QnHelpHandler::at_helpUrlDetector_urlFetched(const QString &helpUrl) {
