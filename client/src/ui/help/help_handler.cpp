@@ -32,7 +32,9 @@ QnHelpHandler::QnHelpHandler(QObject *parent):
 {
     m_helpRoot = qApp->applicationDirPath() + QLatin1String("/../help");
 
-    new QnOnlineHelpDetector(this);
+    QnOnlineHelpDetector *helpDetector = new QnOnlineHelpDetector(this);
+    connect(helpDetector,   &QnOnlineHelpDetector::urlFetched,  this,   &QnHelpHandler::at_helpUrlDetector_urlFetched);
+    connect(helpDetector,   &QnOnlineHelpDetector::error,       this,   &QnHelpHandler::at_helpUrlDetector_error);
 }
 
 QnHelpHandler::~QnHelpHandler() {
