@@ -146,16 +146,22 @@ void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCom
     qnTransactionBus->sendTransaction(tran, dstPeer);
 }
 
-void QnDistributedMutex::at_newPeerFound(QnId peer)
+void QnDistributedMutex::at_newPeerFound(QnId peer, bool isClient)
 {
-    QMutexLocker lock(&m_mutex);
+    if (isClient)
+        return;
 
+    QMutexLocker lock(&m_mutex);
+    Q_ASSERT(peer != qnCommon->moduleGUID());
     if (!m_selfLock.isEmpty())
         sendTransaction(m_selfLock, ApiCommand::lockRequest, peer);
 }
 
-void QnDistributedMutex::at_peerLost(QnId peer)
+void QnDistributedMutex::at_peerLost(QnId peer, bool isClient)
 {
+    if (isClient)
+        return;
+
     QMutexLocker lock(&m_mutex);
 
     m_proccesedPeers.remove(peer);
