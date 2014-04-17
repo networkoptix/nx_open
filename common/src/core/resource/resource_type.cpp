@@ -216,35 +216,8 @@ QnId QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, const
             }
         }
     }
-    if (!result.isValid())
-    {
-        bool find_manufacture = false;
-        foreach(QnResourceTypePtr rt, m_resourceTypeMap)
-        {
-            if (rt->getManufacture() == manufacture)
-            {
-                find_manufacture = true;
-                int len = rt->getName().length();
 
-                qDebug()<<"len"<<len<<(len > bestLen)<<rt->getName()<<name.left(len)<<name;
 
-                if (len > bestLen && rt->getName() == name.left(len)) {
-                    result = rt->getId();
-                    bestLen = len;
-                    if (len == name.length())
-                        break;
-                }
-            }
-        }
-        if ( !find_manufacture )
-        {
-            qDebug()<<"neededManufacture"<<manufacture;
-            foreach(QnResourceTypePtr rt, m_resourceTypeMap)
-            {
-                qDebug()<<"supportedManufacture"<<rt->getManufacture();
-            };
-        }
-    };
     return result;
 }
 

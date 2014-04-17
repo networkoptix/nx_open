@@ -14,7 +14,7 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/style/globals.h>
 #include <ui/workaround/gl_native_painting.h>
-
+#include "opengl_renderer.h"
 
 /** @def QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
  *
@@ -162,7 +162,7 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     if(m_statusOverlay == Qn::LoadingOverlay || m_statusOverlay == Qn::PausedOverlay || m_statusOverlay == Qn::EmptyOverlay) {
         qreal unit = qnGlobals->workbenchUnitSize();
 
-        QnGlNativePainting::begin(painter);
+        QnGlNativePainting::begin(QGLContext::currentContext(),painter);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -170,10 +170,13 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
             rect.center() - QPointF(unit / 10, unit / 10),
             QSizeF(unit / 5, unit / 5)
         );
+        QMatrix4x4 m = QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix();
 
-        glPushMatrix();
-        glTranslatef(overlayRect.center().x(), overlayRect.center().y(), 1.0);
-        glScalef(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
+        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().translate(overlayRect.center().x(), overlayRect.center().y(), 1.0);
+        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().scale(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
+//        glPushMatrix();
+//        glTranslatef(overlayRect.center().x(), overlayRect.center().y(), 1.0);
+//        glScalef(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
         //glRotatef(-1.0 * m_overlayRotation, 0.0, 0.0, 1.0);
         if(m_statusOverlay == Qn::LoadingOverlay) {
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
@@ -186,7 +189,8 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         } else if(m_statusOverlay == Qn::PausedOverlay) {
             m_pausedPainter->paint(0.5 * painter->opacity());
         }
-        glPopMatrix();
+        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix() = m;
+//        glPopMatrix();
 
         glDisable(GL_BLEND);
         QnGlNativePainting::end(painter);
