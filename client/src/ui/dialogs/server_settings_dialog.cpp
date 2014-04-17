@@ -133,6 +133,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     /* Set up context help. */
     setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
+    setHelpTopic(ui->nameLabel,           ui->maxCamerasSpinBox,              Qn::ServerSettings_General_Help);
     setHelpTopic(ui->ipAddressLabel,      ui->ipAddressLineEdit,              Qn::ServerSettings_General_Help);
     setHelpTopic(ui->portLabel,           ui->portLineEdit,                   Qn::ServerSettings_General_Help);
     setHelpTopic(ui->storagesGroupBox,                                        Qn::ServerSettings_Storages_Help);
@@ -269,6 +270,8 @@ void QnServerSettingsDialog::updateFromResources()
     bool edge = QnMediaServerResource::isEdgeServer(m_server);
     ui->nameLineEdit->setText(m_server->getName());
     ui->nameLineEdit->setEnabled(!edge);
+    ui->maxCamerasSpinBox->setValue(m_server->getMaxCameras());
+    ui->maxCamerasSpinBox->setEnabled(!edge);
 
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
@@ -307,8 +310,10 @@ void QnServerSettingsDialog::submitToResources() {
     }
 
     bool edge = QnMediaServerResource::isEdgeServer(m_server);
-    if (!edge)
+    if (!edge) {
         m_server->setName(ui->nameLineEdit->text());
+        m_server->setMaxCameras(ui->maxCamerasSpinBox->value());
+    }
 }
 
 void QnServerSettingsDialog::setBottomLabelText(const QString &text) {

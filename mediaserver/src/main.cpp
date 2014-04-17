@@ -158,6 +158,11 @@ static const int DEFAUT_RTSP_PORT = 50000;
 static const int DEFAULT_STREAMING_PORT = 50000;
 
 static const int PROXY_POOL_SIZE = 8;
+#ifdef EDGE_SERVER
+static const int DEFAULT_MAX_CAMERAS = 1;
+#else
+static const int DEFAULT_MAX_CAMERAS = 128;
+#endif
 
 //!TODO: #ak have to do something with settings
 class CmdLineArguments
@@ -1185,6 +1190,7 @@ void QnMain::run()
             server = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
             server->setId(serverGuid());
             server->setPanicMode(pm);
+            server->setMaxCameras(DEFAULT_MAX_CAMERAS);
         }
         server->setVersion(QnSoftwareVersion(QN_ENGINE_VERSION));
 

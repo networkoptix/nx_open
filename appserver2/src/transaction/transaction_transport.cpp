@@ -159,9 +159,10 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                         if (m_readBufferLen == fullChunkLen) 
                         {
                             QSet<QnId> processedPeers;
+                            QSet<QnId> dstPeers;
                             QByteArray serializedTran;
-                            QnTransactionTransportSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, processedPeers, serializedTran);
-                            emit gotTransaction(serializedTran, processedPeers);
+                            QnTransactionTransportSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, processedPeers, dstPeers, serializedTran);
+                            emit gotTransaction(serializedTran, processedPeers, dstPeers);
                             m_readBufferLen = m_chunkHeaderLen = 0;
                         }
                     }
@@ -382,9 +383,10 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         if (bufferLen >= fullChunkLen)
         {
             QSet<QnId> processedPeers;
+            QSet<QnId> dstPeers;
             QByteArray serializedTran;
-            QnTransactionTransportSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, processedPeers, serializedTran);
-            emit gotTransaction(serializedTran, processedPeers);
+            QnTransactionTransportSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, processedPeers, dstPeers, serializedTran);
+            emit gotTransaction(serializedTran, processedPeers, dstPeers);
 
             buffer += fullChunkLen;
             bufferLen -= fullChunkLen;

@@ -24,6 +24,7 @@ namespace ec2
         virtual int addLicenses( const QnLicenseList& licenses, impl::SimpleHandlerPtr handler ) override;
 
         void triggerNotification( const QnTransaction<ApiLicenseList>& tran );
+        void triggerNotification( const QnTransaction<ApiLicense>& tran );
 
     private:
         QueryProcessorType* const m_queryProcessor;

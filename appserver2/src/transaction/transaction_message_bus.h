@@ -14,6 +14,7 @@
 
 namespace ec2
 {
+
     class QnTransactionMessageBus: public QObject
     {
         Q_OBJECT
@@ -50,17 +51,26 @@ namespace ec2
         {
             QMutexLocker lock(&m_mutex);
             QByteArray buffer;
-            m_serializer.serializeTran(buffer, serializedTran, peersToSend(tran.command) << qnCommon->moduleGUID());
+            m_serializer.serializeTran(buffer, serializedTran, TransactionTransportHeader(peersToSend(tran.command) << qnCommon->moduleGUID()));
             sendTransactionInternal(tran, buffer);
         }
 
         template <class T>
-        void sendTransaction(const QnTransaction<T>& tran, const QnId& dstPeer = QnId())
+        void sendTransaction(const QnTransaction<T>& tran, const PeerList& dstPeers = PeerList())
         {
             QMutexLocker lock(&m_mutex);
             QByteArray buffer;
-            m_serializer.serializeTran(buffer, tran, peersToSend(tran.command) << qnCommon->moduleGUID());
-            sendTransactionInternal(tran, buffer, dstPeer);
+            m_serializer.serializeTran(buffer, tran, TransactionTransportHeader(peersToSend(tran.command) << qnCommon->moduleGUID(), dstPeers));
+            sendTransactionInternal(tran, buffer, dstPeers);
+        }
+
+        template <class T>
+        void sendTransaction(const QnTransaction<T>& tran, const QnId& dstPeer)
+        {
+            PeerList pList;
+            if (!dstPeer.isNull())
+                pList << dstPeer;
+            sendTransaction(tran, pList);
         }
 
         struct AlivePeerInfo
@@ -121,10 +131,10 @@ signals:
 
     private:
         //void gotTransaction(const QnId& remoteGuid, bool isConnectionOriginator, const QByteArray& data);
-        void sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData, const QnId& dstPeer = QnId());
+        void sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData, const PeerList& dstPeers = PeerList());
         bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
         void onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
-        void onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, InputBinaryStream<QByteArray>&, bool *needProxy);
+        void onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, InputBinaryStream<QByteArray>&);
         void queueSyncRequest(QnTransactionTransport* transport);
 
         void connectToPeerEstablished(const QnId& id, bool isClient);
@@ -136,7 +146,7 @@ signals:
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
-        void at_gotTransaction(QByteArray serializedTran, QSet<QnId> processedPeers);
+        void at_gotTransaction(QByteArray serializedTran, QSet<QnId> processedPeers, QSet<QnId> dstPeers);
         void doPeriodicTasks();
     private:
         QnTransactionTransportSerializer m_serializer;

@@ -20,7 +20,8 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     m_primaryIFSelected(false),
     m_serverFlags(Qn::SF_None),
     m_panicMode(Qn::PM_None),
-    m_guard(NULL)
+    m_guard(NULL),
+    m_maxCameras(0)
 {
     setTypeId(resTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
@@ -321,6 +322,18 @@ QnSoftwareVersion QnMediaServerResource::getVersion() const
     QMutexLocker lock(&m_mutex);
 
     return m_version;
+}
+
+int QnMediaServerResource::getMaxCameras() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_maxCameras;
+}
+
+void QnMediaServerResource::setMaxCameras(int value)
+{
+    QMutexLocker lock(&m_mutex);
+    m_maxCameras = value;
 }
 
 void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
