@@ -115,6 +115,8 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_model = other_casted->m_model;
         m_firmware = other_casted->m_firmware;
         m_vendor = other_casted->m_vendor;
+
+        setBookmarksUnderLock(other_casted->m_bookmarkByUuid);
     }
 }
 
@@ -640,4 +642,113 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
     }
 
     return result;
+}
+
+// Bookmark methods
+
+void QnSecurityCamResource::setBookmarks(const QnCameraBookmarkList& bookmarks) {
+    QnCameraBookmarkMap map;
+    foreach(const QnCameraBookmark &bookmark, bookmarks)
+        map[bookmark.guid] = bookmark;
+    setBookmarks(map);
+}
+
+void QnSecurityCamResource::setBookmarks(const QnCameraBookmarkMap &bookmarks) {
+    QMutexLocker locker(&m_mutex);
+    setBookmarksUnderLock(bookmarks);
+}
+
+void QnSecurityCamResource::setBookmarksUnderLock(const QnCameraBookmarkMap &bookmarks) {
+    foreach(const QnCameraBookmark &bookmark, m_bookmarkByUuid)
+        if(!bookmarks.contains(bookmark.guid))
+            removeBookmarkUnderLock(bookmark.guid);
+
+    foreach(const QnCameraBookmark &bookmark, bookmarks) {
+        if(m_bookmarkByUuid.contains(bookmark.guid)) {
+            updateBookmarkUnderLock(bookmark.guid, bookmark);
+        } else {
+            addBookmarkUnderLock(bookmark);
+        }
+    }
+}
+
+QnCameraBookmarkMap QnSecurityCamResource::getBookmarks() const {
+    QMutexLocker locker(&m_mutex);
+
+    return m_bookmarkByUuid;
+}
+
+QnCameraBookmark QnSecurityCamResource::getBookmark(const QUuid &bookmarkUuid) const {
+    QMutexLocker locker(&m_mutex);
+
+    return m_bookmarkByUuid.value(bookmarkUuid);
+}
+
+bool QnSecurityCamResource::hasBookmark(const QUuid &bookmarkUuid) const {
+    QMutexLocker locker(&m_mutex);
+
+    return m_bookmarkByUuid.contains(bookmarkUuid);
+}
+
+
+void QnSecurityCamResource::addBookmark(const QnCameraBookmark &bookmark) {
+    QMutexLocker locker(&m_mutex);
+    addBookmarkUnderLock(bookmark);
+}
+
+void QnSecurityCamResource::removeBookmark(const QnCameraBookmark &bookmark) {
+    removeBookmark(bookmark.guid);
+}
+
+void QnSecurityCamResource::removeBookmark(const QUuid &bookmarkUuid) {
+    QMutexLocker locker(&m_mutex);
+    removeBookmarkUnderLock(bookmarkUuid);
+}
+
+void QnSecurityCamResource::updateBookmark(const QUuid &bookmarkUuid, const QnCameraBookmark &bookmark) {
+    QMutexLocker locker(&m_mutex);
+    updateBookmarkUnderLock(bookmarkUuid, bookmark);
+}
+
+void QnSecurityCamResource::addBookmarkUnderLock(const QnCameraBookmark &bookmark) {
+    if(m_bookmarkByUuid.contains(bookmark.guid)) {
+        qnWarning("Bookmark with UUID %1 is already in this videowall resource.", bookmark.guid.toString());
+        return;
+    }
+
+    m_bookmarkByUuid[bookmark.guid] = bookmark;
+
+    m_mutex.unlock();
+    emit bookmarkAdded(::toSharedPointer(this), bookmark);
+    m_mutex.lock();
+}
+
+void QnSecurityCamResource::updateBookmarkUnderLock(const QUuid &bookmarkUuid, const QnCameraBookmark &bookmark) {
+    QnCameraBookmarkMap::iterator pos = m_bookmarkByUuid.find(bookmarkUuid);
+    if(pos == m_bookmarkByUuid.end()) {
+        qnWarning("There is no bookmark with UUID %1 in this videowall.", bookmarkUuid.toString());
+        return;
+    }
+
+    if(*pos == bookmark)
+        return;
+
+    *pos = bookmark;
+
+    m_mutex.unlock();
+    emit bookmarkChanged(::toSharedPointer(this), bookmark);
+    m_mutex.lock();
+}
+
+void QnSecurityCamResource::removeBookmarkUnderLock(const QUuid &bookmarkUuid) {
+    QnCameraBookmarkMap::iterator pos = m_bookmarkByUuid.find(bookmarkUuid);
+    if(pos == m_bookmarkByUuid.end())
+        return;
+
+    QnCameraBookmark bookmark = *pos;
+    m_bookmarkByUuid.erase(pos);
+
+    m_mutex.unlock();
+    emit bookmarkRemoved(::toSharedPointer(this), bookmark);
+    m_mutex.lock();
 }
