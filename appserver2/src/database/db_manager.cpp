@@ -1485,9 +1485,11 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraList& camer
         QSqlQuery queryBookmarks(m_sdb);
         queryBookmarks.setForwardOnly(true);
         queryBookmarks.prepare("SELECT \
-                               bookmark.guid, bookmark.camera_id as cameraId, bookmark.start_time as startTime, bookmark.end_time as endTime, \
+                               r.guid as cameraId, \
+                               bookmark.guid, bookmark.start_time as startTime, bookmark.end_time as endTime, \
                                bookmark.name, bookmark.description, bookmark.color as colorIndex, bookmark.lock_time as lockTime \
-                               FROM vms_bookmark bookmark");
+                               FROM vms_bookmark bookmark \
+                               JOIN vms_resource r on r.id = bookmark.camera_id");
         if (!queryBookmarks.exec()) {
             qWarning() << Q_FUNC_INFO << queryBookmarks.lastError().text();
             return ErrorCode::failure;
