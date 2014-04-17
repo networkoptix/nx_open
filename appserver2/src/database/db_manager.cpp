@@ -463,7 +463,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServer& data, qi
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO vms_server (api_url, auth_key, streaming_url, version, system_info, net_addr_list, flags, panic_mode, resource_ptr_id) VALUES\
-                     (:apiUrl, :authKey, :streamingUrl, :version, :system_info, :netAddrList, :flags, :panicMode, :internalId)");
+                     (:apiUrl, :authKey, :streamingUrl, :version, :systemInfo, :netAddrList, :flags, :panicMode, :internalId)");
     data.autoBindValues(insQuery);
     insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
@@ -1402,7 +1402,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerL
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare(QString("select r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentGuid, r.name, r.url, r.status,r. disabled, \
-                          s.api_url as apiUrl, s.auth_key as authKey, s.streaming_url as streamingUrl, s.version, s.system_info, s.net_addr_list as netAddrList, s.flags, s.panic_mode as panicMode \
+                          s.api_url as apiUrl, s.auth_key as authKey, s.streaming_url as streamingUrl, s.version, s.system_info as systemInfo, s.net_addr_list as netAddrList, s.flags, s.panic_mode as panicMode \
                           from vms_resource r \
                           join vms_server s on s.resource_ptr_id = r.id order by r.guid"));
 
