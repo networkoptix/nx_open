@@ -225,31 +225,34 @@ bool QnDbManager::createDatabase()
 
     if (!isObjectExists(lit("table"), lit("vms_resource")))
     {
-        if (!execSQLFile(QLatin1String(":/01_createdb.sql")))
+        if (!execSQLFile(lit(":/01_createdb.sql")))
             return false;
 
 #ifdef EDGE_SERVER
-        if (!execSQLFile(QLatin1String(":/02_insert_3thparty_vendor.sql")))
+        if (!execSQLFile(lit(":/02_insert_3thparty_vendor.sql")))
             return false;
 #else
-        if (!execSQLFile(QLatin1String(":/02_insert_all_vendors.sql")))
+        if (!execSQLFile(lit(":/02_insert_all_vendors.sql")))
             return false;
 #endif
 
-        if (!execSQLFile(QLatin1String(":/03_update_2.2_stage1.sql")))
+        if (!execSQLFile(lit(":/03_update_2.2_stage1.sql")))
             return false;
         if (!updateGuids())
             return false;
-        if (!execSQLFile(QLatin1String(":/04_update_2.2_stage2.sql")))
+        if (!execSQLFile(lit(":/04_update_2.2_stage2.sql")))
             return false;
 
         { //Videowall-related scripts
-            if (!execSQLFile(QLatin1String(":/05_videowall.sql")))
+            if (!execSQLFile(lit(":/05_videowall.sql")))
                 return false;
             QMap<int, QnId> guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'Videowall'");
             if (!updateTableGuids("vms_resourcetype", "guid", guids))
                 return false;
         }
+
+        if (!execSQLFile(lit(":/06_bookmarks.sql")))
+            return false;
 
     }
     lock.commit();
