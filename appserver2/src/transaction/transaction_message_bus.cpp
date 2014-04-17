@@ -357,6 +357,8 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiParamList>(abstractTran, stream);
         case ApiCommand::addLicenses:
             return deliveryTransaction<ApiLicenseList>(abstractTran, stream);
+        case ApiCommand::addLicense:
+            return deliveryTransaction<ApiLicense>(abstractTran, stream);
 
         case ApiCommand::testEmailSettings:
             abstractTran.localTransaction = true;
