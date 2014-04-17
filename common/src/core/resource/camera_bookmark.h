@@ -13,15 +13,15 @@ struct QnCameraBookmark {
     qint64 endTime;
     QString name;
     QString description;
-    int colorIndex;
-    qint64 lockTime;
+    int colorIndex;         /**< Index of color to be used on the timeline. */
+    qint64 lockTime;        /**< Time during which recorded period should be preserved, ms. */
     QStringList tags;
 
     QnCameraBookmark():
         startTime(0),
         endTime(-1),
         colorIndex(0),
-        lockTime(-1)
+        lockTime(0)
     {}
 
     friend bool operator==(const QnCameraBookmark &l, const QnCameraBookmark &r) {
