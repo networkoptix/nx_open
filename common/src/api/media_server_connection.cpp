@@ -59,8 +59,6 @@ namespace {
         ((ImageObject,              "image"))
         ((CameraDiagnosticsObject,  "doCameraDiagnosticsStep"))
         ((RebuildArchiveObject,     "rebuildArchive"))
-        ((UploadUpdateObject,       "uploadUpdate"))
-        ((UpdateObject,             "update"))
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -382,12 +380,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, info, handle);
         break;
     }
-    case UploadUpdateObject:
-        emitFinished(this, response.status, handle);
-        break;
-    case UpdateObject:
-        emitFinished(this, response.status, handle);
-        break;
     default:
         assert(false); /* We should never get here. */
         break;
@@ -735,18 +727,6 @@ int QnMediaServerConnection::doRebuildArchiveAsync(RebuildAction action, QObject
     else if (action == RebuildAction_Cancel)
         params << QnRequestParam("action",  lit("stop"));
     return sendAsyncGetRequest(RebuildArchiveObject, params, QN_STRINGIZE_TYPE(QnRebuildArchiveReply), target, slot);
-}
-
-int QnMediaServerConnection::uploadUpdateAsync(const QString &updateId, const QByteArray &data, QObject *target, const char *slot) {
-    QnRequestParamList params;
-    params << QnRequestParam("update_id", updateId);
-    return sendAsyncPostRequest(UploadUpdateObject, params, data, NULL, target, slot);
-}
-
-int QnMediaServerConnection::updateAsync(const QString &updateId, QObject *target, const char *slot) {
-    QnRequestParamList params;
-    params << QnRequestParam("update_id", updateId);
-    return sendAsyncGetRequest(UpdateObject, params, NULL, target, slot);
 }
 
 int QnMediaServerConnection::getStorageSpaceAsync(QObject *target, const char *slot) {

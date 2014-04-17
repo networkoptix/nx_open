@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <media_server/server_update_tool.h>
 
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"
@@ -182,7 +183,9 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
 }
 
 void QnServerMessageProcessor::at_updateUploaded(const QString &updateId, const QByteArray &data) {
+    QnServerUpdateTool::instance()->addUpdateFile(updateId, data);
 }
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
+    QnServerUpdateTool::instance()->installUpdate(updateId);
 }
