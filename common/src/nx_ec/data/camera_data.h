@@ -7,12 +7,14 @@
 #include "core/resource/security_cam_resource.h"
 #include "core/misc/schedule_task.h"
 #include "core/resource/camera_resource.h"
+#include <core/resource/camera_bookmark.h>
 #include "utils/common/id.h"
 
 namespace ec2
 {
     struct ScheduleTask;
     struct ApiCamera;
+    struct ApiCameraBookmark;
     #include "camera_data_i.h"
 
     struct ScheduleTask: ScheduleTaskData
@@ -29,6 +31,14 @@ namespace ec2
     {
         QnId sourceId;
     };
+
+    struct ApiCameraBookmark: ApiCameraBookmarkData {
+        void toBookmark(QnCameraBookmark& bookmark) const;
+        void fromBookmark(const QnCameraBookmark& bookmark);
+        QN_DECLARE_STRUCT_SQL_BINDER();
+    };
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiCameraBookmark, ApiCameraBookmarkFields);
+    struct ApiCameraBookmarkWithRef: ApiCameraBookmark { QnId cameraId; };
 
     struct ApiCamera: ApiCameraData, ApiResource
     {

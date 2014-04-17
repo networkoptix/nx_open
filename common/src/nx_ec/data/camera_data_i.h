@@ -17,6 +17,19 @@
     #define apiScheduleTaskFields (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) (beforeThreshold) (afterThreshold) (streamQuality) (fps) 
     QN_DEFINE_STRUCT_SERIALIZATORS(ScheduleTaskData, apiScheduleTaskFields);
 
+    struct ApiCameraBookmarkData {
+        QByteArray guid;
+        qint64 startTime;
+        qint64 endTime;
+        QString name;
+        QString description;
+        qint16 colorIndex;
+        qint64 lockTime;
+        std::vector<QString> tags;
+    };
+    #define ApiCameraBookmarkFields (guid) (startTime) (endTime) (name) (description) (colorIndex) (lockTime) (tags)
+    QN_DEFINE_STRUCT_SERIALIZATORS(ApiCameraBookmarkData, ApiCameraBookmarkFields);
+
     struct ApiCameraData: virtual ApiResourceData 
     {
         ApiCameraData(): scheduleDisabled(false), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryQuality(Qn::SSQualityNotDefined),
@@ -41,10 +54,11 @@
         qint32              statusFlags;
         QByteArray          dewarpingParams;
         QString             vendor;
+        std::vector<ApiCameraBookmark> bookmarks;
     };
 
     #define apiCameraDataFields (scheduleDisabled) (motionType) (region) (mac) (login) (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) \
-                                (firmware) (groupId) (groupName) (secondaryQuality) (controlDisabled) (statusFlags) (dewarpingParams) (vendor)
+                                (firmware) (groupId) (groupName) (secondaryQuality) (controlDisabled) (statusFlags) (dewarpingParams) (vendor) (bookmarks)
     QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiCameraData, ApiResourceData, apiCameraDataFields);
 
     QN_DEFINE_API_OBJECT_LIST_DATA(ApiCamera)

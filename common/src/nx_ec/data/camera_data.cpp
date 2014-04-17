@@ -30,6 +30,33 @@ QnScheduleTask ScheduleTask::toResource(const QnId& resourceId) const
 	return QnScheduleTask(resourceId, dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio);
 }
 
+void ApiCameraBookmark::toBookmark(QnCameraBookmark& bookmark) const {
+    bookmark.guid = guid;
+    bookmark.startTime = startTime;
+    bookmark.endTime = endTime;
+    bookmark.name = name;
+    bookmark.description = description;
+    bookmark.colorIndex = colorIndex;
+    bookmark.lockTime = lockTime;
+    bookmark.tags.clear();
+    for (const QString &tag: tags)
+        bookmark.tags << tag;
+}
+
+void ApiCameraBookmark::fromBookmark(const QnCameraBookmark& bookmark) {
+    guid = bookmark.guid.toByteArray();
+    startTime = bookmark.startTime;
+    endTime = bookmark.endTime;
+    name = bookmark.name;
+    description = bookmark.description;
+    colorIndex = bookmark.colorIndex;
+    lockTime = bookmark.lockTime;
+    tags.clear();
+    tags.reserve(bookmark.tags.size());
+    for (const QString &tag: bookmark.tags)
+        tags.push_back(tag);
+}
+
 void ApiCamera::toResource(QnVirtualCameraResourcePtr resource) const
 {
 	ApiResource::toResource(resource);
@@ -67,6 +94,13 @@ void ApiCamera::toResource(QnVirtualCameraResourcePtr resource) const
 
 	resource->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(dewarpingParams));
 	resource->setVendor(vendor);
+
+    QnCameraBookmarkList outBookmarks;
+    for (int i = 0; i < bookmarks.size(); ++i) {
+        outBookmarks << QnCameraBookmark();
+        bookmarks[i].toBookmark(outBookmarks.last());
+    }
+    resource->setBookmarks(outBookmarks);
 }
 
 
@@ -98,6 +132,15 @@ void ApiCamera::fromResource(const QnVirtualCameraResourcePtr& resource)
 	statusFlags = resource->statusFlags();
 	dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(resource->getDewarpingParams());
 	vendor = resource->getVendor();
+
+    const QnCameraBookmarkMap& cameraBookmarks = resource->getBookmarks();
+    bookmarks.clear();
+    bookmarks.reserve( cameraBookmarks.size() );
+    for( const QnCameraBookmark& bookmark: cameraBookmarks )
+    {
+        bookmarks.push_back(ApiCameraBookmark());
+        bookmarks.back().fromBookmark(bookmark);
+    }
 }
 
 template <class T> 
