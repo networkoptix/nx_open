@@ -31,6 +31,9 @@ void QnOnlineHelpDetector::at_networkReply_finished() {
 
     reply->deleteLater();
 
+    if (reply->error() != QNetworkReply::NoError)
+        return;
+
     QByteArray data = reply->readAll();
     QString url = QString::fromUtf8(data).trimmed();
     if (url.size() < maxUrlLength && QUrl::fromUserInput(url).isValid()) {
