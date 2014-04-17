@@ -7,6 +7,7 @@
 #include <boost/preprocessor/seq/for_each_i.hpp>
 #include <boost/preprocessor/seq/fold_left.hpp>
 #include <boost/preprocessor/arithmetic/inc.hpp>
+#include <boost/preprocessor/variadic/elem.hpp>
 #include <boost/preprocessor/comparison/not_equal.hpp>
 #include <boost/preprocessor/tuple/size.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
@@ -349,16 +350,16 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 /**
  * 
  */
-#define QN_FUSION_ADAPT_CLASS_FUNCTIONS(CLASS, PREFIX, FUNCTION_SEQ, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
-    QN_FUSION_ADAPT_CLASS(CLASS, MEMBER_SEQ, ##__VA_ARGS__)                     \
-    QN_FUSION_DEFINE_FUNCTIONS(CLASS, PREFIX, FUNCTION_SEQ)
+#define QN_FUSION_ADAPT_CLASS_FUNCTIONS(CLASS, FUNCTION_SEQ, MEMBER_SEQ, ... /* GLOBAL_SEQ, PREFIX */) \
+    QN_FUSION_ADAPT_CLASS(CLASS, MEMBER_SEQ, BOOST_PP_VARIADIC_ELEM(0, ##__VA_ARGS__,,)) \
+    QN_FUSION_DEFINE_FUNCTIONS(CLASS, FUNCTION_SEQ, BOOST_PP_VARIADIC_ELEM(1, ##__VA_ARGS__,,))
 
 
 /**
  *
  */
-#define QN_FUSION_DEFINE_FUNCTIONS(CLASS, PREFIX, FUNCTION_SEQ)                 \
-    BOOST_PP_SEQ_FOR_EACH(QN_FUSION_DEFINE_FUNCTIONS_STEP_I, (CLASS, PREFIX), FUNCTION_SEQ)
+#define QN_FUSION_DEFINE_FUNCTIONS(CLASS, FUNCTION_SEQ, ... /* PREFIX */)       \
+    BOOST_PP_SEQ_FOR_EACH(QN_FUSION_DEFINE_FUNCTIONS_STEP_I, (CLASS, ##__VA_ARGS__), FUNCTION_SEQ)
 
 #define QN_FUSION_DEFINE_FUNCTIONS_STEP_I(R, PARAMS, FUNCTION)                  \
     BOOST_PP_CAT(QN_FUSION_DEFINE_FUNCTIONS_, FUNCTION) PARAMS
@@ -367,8 +368,8 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 /**
  * 
  */
-#define QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(CLASS_SEQ, PREFIX, FUNCTION_SEQ)   \
-    BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_I, (PREFIX, FUNCTION_SEQ), CLASS_SEQ)
+#define QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(CLASS_SEQ, FUNCTION_SEQ, ... /* PREFIX */) \
+    BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_I, (FUNCTION_SEQ, ##__VA_ARGS__), CLASS_SEQ)
 
 #define QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_I(R, PARAMS, CLASS)           \
     QN_FUSION_DEFINE_FUNCTIONS(CLASS, BOOST_PP_TUPLE_ENUM(PARAMS))
@@ -393,9 +394,9 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 #define QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ, ... /* GLOBAL_SEQ */)         \
     QN_FUSION_ADAPT_CLASS(STRUCT, QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ), ##__VA_ARGS__)
 
-#define QN_FUSION_ADAPT_STRUCT_FUNCTIONS(STRUCT, PREFIX, FUNCTION_SEQ, FIELD_SEQ, ... /* GLOBAL_SEQ */) \
-    QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ, ##__VA_ARGS__)                    \
-    QN_FUSION_DEFINE_FUNCTIONS(STRUCT, PREFIX, FUNCTION_SEQ)
+#define QN_FUSION_ADAPT_STRUCT_FUNCTIONS(STRUCT, FUNCTION_SEQ, FIELD_SEQ, ... /* GLOBAL_SEQ, PREFIX */) \
+    QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ, BOOST_PP_VARIADIC_ELEM(0, ##__VA_ARGS__,,)) \
+    QN_FUSION_DEFINE_FUNCTIONS(STRUCT, BOOST_PP_VARIADIC_ELEM(1, ##__VA_ARGS__,,))
 
 
 /**

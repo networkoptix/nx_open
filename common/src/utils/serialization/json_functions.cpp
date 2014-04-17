@@ -6,62 +6,16 @@
 #include <QtCore/QVarLengthArray>
 
 #include "enum_name_mapper.h"
+#include "fusion_functions.h"
 
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qt, BrushStyle, static)
 QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::BrushStyle, static)
 
 QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QColor)
 
-QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QSize, 
-    ((&QSize::width, &QSize::setWidth, "width"))
-    ((&QSize::height, &QSize::setHeight, "height"))
-)
-
-QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QSizeF, 
-    ((&QSizeF::width, &QSizeF::setWidth, "width"))
-    ((&QSizeF::height, &QSizeF::setHeight, "height"))
-)
-
-QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QRect, 
-    ((&QRect::left, &QRect::setLeft, "x"))
-    ((&QRect::top, &QRect::setTop, "y"))
-    ((&QRect::width, &QRect::setWidth, "width"))
-    ((&QRect::height, &QRect::setHeight, "height"))
-)
-
-QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QRectF, 
-    ((&QRectF::left, &QRectF::setLeft, "x"))
-    ((&QRectF::top, &QRectF::setTop, "y"))
-    ((&QRectF::width, &QRectF::setWidth, "width"))
-    ((&QRectF::height, &QRectF::setHeight, "height"))
-)
-
-QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QPoint, 
-    ((&QPoint::x, &QPoint::setX, "x"))
-    ((&QPoint::y, &QPoint::setY, "y"))
-)
-
-QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QPointF, 
-    ((&QPointF::x, &QPointF::setX, "x"))
-    ((&QPointF::y, &QPointF::setY, "y"))
-)
-
-QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QVector2D, 
-    ((&QVector2D::x, &QVector2D::setX, "x"))
-    ((&QVector2D::y, &QVector2D::setY, "y"))
-)
-
-QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QVector3D, 
-    ((&QVector3D::x, &QVector3D::setX, "x"))
-    ((&QVector3D::y, &QVector3D::setY, "y"))
-    ((&QVector3D::z, &QVector3D::setZ, "z"))
-)
-
-QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QVector4D, 
-    ((&QVector4D::x, &QVector4D::setX, "x"))
-    ((&QVector4D::y, &QVector4D::setY, "y"))
-    ((&QVector4D::z, &QVector4D::setZ, "z"))
-    ((&QVector4D::w, &QVector4D::setW, "w"))
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
+    (QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QVector2D)(QVector3D)(QVector4D),
+    (json)
 )
 
 void serialize(QnJsonContext *ctx, const QRegion &value, QJsonValue *target) {

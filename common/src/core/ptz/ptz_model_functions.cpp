@@ -14,5 +14,5 @@ QN_DEFINE_STRUCT_FUNCTIONS(QnPtzObject,      (json)(eq),    (type)(id))
 
 QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::Orientations, static)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzData,, (json), (query)(fields)(capabilities)(logicalPosition)(devicePosition)(logicalLimits)(deviceLimits)(flip)(presets)(tours)(activeObject)(homeObject))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzData, (json), (query)(fields)(capabilities)(logicalPosition)(devicePosition)(logicalLimits)(deviceLimits)(flip)(presets)(tours)(activeObject)(homeObject))
 

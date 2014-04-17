@@ -32,7 +32,7 @@ QN_FUSION_ADAPT_CLASS_GSNC(
 )
 
 namespace QnPenDataDetail {
-    QN_FUSION_DEFINE_FUNCTIONS(QnPenData, inline, (json))
+    QN_FUSION_DEFINE_FUNCTIONS(QnPenData, (json), inline)
 }
 
 QnPenData::QnPenData(): 

@@ -21,8 +21,8 @@
 #include <QtGui/QVector4D>
 #include <QtGui/QFont>
 
-#include <utils/common/json.h>
-#include <utils/common/lexical.h>
+#include "json.h"
+#include "lexical.h"
 
 inline void serialize(QnJsonContext *, const QJsonValue &value, QJsonValue *target) {
     *target = value;
