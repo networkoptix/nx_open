@@ -95,7 +95,7 @@ public:
     bool deserialize(context_type *ctx, const data_type &value, QVariant *target) const {
         assert(ctx && target);
 
-        *target = QVariant(m_type, static_cast<const void *>(NULL));
+        *target = QVariant(type(), static_cast<const void *>(NULL));
         return deserializeInternal(ctx, value, target->data());
     }
 

@@ -349,21 +349,53 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 /**
  * 
  */
+#define QN_FUSION_ADAPT_CLASS_FUNCTIONS(CLASS, PREFIX, FUNCTION_SEQ, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
+    QN_FUSION_ADAPT_CLASS(CLASS, MEMBER_SEQ, ##__VA_ARGS__)                     \
+    QN_FUSION_DEFINE_FUNCTIONS(CLASS, PREFIX, FUNCTION_SEQ)
+
+
+/**
+ *
+ */
+#define QN_FUSION_DEFINE_FUNCTIONS(CLASS, PREFIX, FUNCTION_SEQ)                 \
+    BOOST_PP_SEQ_FOR_EACH(QN_FUSION_DEFINE_FUNCTIONS_STEP_I, (CLASS, PREFIX), FUNCTION_SEQ)
+
+#define QN_FUSION_DEFINE_FUNCTIONS_STEP_I(R, PARAMS, FUNCTION)                  \
+    BOOST_PP_CAT(QN_FUSION_DEFINE_FUNCTIONS_, FUNCTION) PARAMS
+
+
+/**
+ * 
+ */
+#define QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(CLASS_SEQ, PREFIX, FUNCTION_SEQ)   \
+    BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_I, (PREFIX, FUNCTION_SEQ), CLASS_SEQ)
+
+#define QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_I(R, PARAMS, CLASS)           \
+    QN_FUSION_DEFINE_FUNCTIONS(CLASS, BOOST_PP_TUPLE_ENUM(PARAMS))
+
+
+/**
+ * 
+ */
 #define QN_FUSION_ADAPT_CLASS_SHORT(CLASS, TAGS_TUPLE, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
     QN_FUSION_ADAPT_CLASS(CLASS, QN_FUSION_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ), ##__VA_ARGS__)
 
-#define QN_FUSION_ADAPT_CLASS_GSN(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
+#define QN_FUSION_ADAPT_CLASS_GSN(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)      \
     QN_FUSION_ADAPT_CLASS_SHORT(CLASS, (getter, setter, name), MEMBER_SEQ, ##__VA_ARGS__)
 
-#define QN_FUSION_ADAPT_CLASS_GSNC(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
+#define QN_FUSION_ADAPT_CLASS_GSNC(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)     \
     QN_FUSION_ADAPT_CLASS_SHORT(CLASS, (getter, setter, name, checker), MEMBER_SEQ, ##__VA_ARGS__)
 
 
 /**
  *
  */
-#define QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ, ... /* GLOBAL_SEQ */) \
+#define QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ, ... /* GLOBAL_SEQ */)         \
     QN_FUSION_ADAPT_CLASS(STRUCT, QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ), ##__VA_ARGS__)
+
+#define QN_FUSION_ADAPT_STRUCT_FUNCTIONS(STRUCT, PREFIX, FUNCTION_SEQ, FIELD_SEQ, ... /* GLOBAL_SEQ */) \
+    QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ, ##__VA_ARGS__)                    \
+    QN_FUSION_DEFINE_FUNCTIONS(STRUCT, PREFIX, FUNCTION_SEQ)
 
 
 /**
@@ -388,23 +420,23 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * \code
  * QN_FUSION_UNROLL_SHORTCUT_SEQ(
  *     (getter, setter, name),
- *     ((&QSize::width, &QSize::setWidth, lit("width"))
- *     ((&QSize::height, &QSize::setHeight, lit("height"))(optional, true))
+ *     ((&QSize::width, &QSize::setWidth, "width"))
+ *     ((&QSize::height, &QSize::setHeight, "height")(optional, true))
  * )
  * \endcode
  * 
  * Will expand into:
  *
  * \code
- * ((getter, &QSize::width)(setter, &QSize::setWidth)(name, lit("width"))
- * ((getter, &QSize::height)(setter, &QSize::setHeight)(name, lit("height")(optional, true))
+ * ((getter, &QSize::width)(setter, &QSize::setWidth)(name, "width"))
+ * ((getter, &QSize::height)(setter, &QSize::setHeight)(name, "height")(optional, true))
  * \endcode
  */
 #define QN_FUSION_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ)                   \
     BOOST_PP_SEQ_FOR_EACH(QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_I, TAGS_TUPLE, MEMBER_SEQ)
 
 #define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_I(R, TAGS_TUPLE, PROPERTY_SEQ)       \
-    QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_II(TAGS_TUPLE, (BOOST_PP_VARIADIC_SEQ_HEAD(PROPERTY_SEQ))) BOOST_PP_VARIADIC_SEQ_TAIL(PROPERTY_SEQ)
+    (QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_II(TAGS_TUPLE, (BOOST_PP_VARIADIC_SEQ_HEAD(PROPERTY_SEQ))) BOOST_PP_VARIADIC_SEQ_TAIL(PROPERTY_SEQ))
 
 #define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_II(TAGS_TUPLE, VALUES_TUPLE)         \
     BOOST_PP_REPEAT(BOOST_PP_TUPLE_SIZE(TAGS_TUPLE), QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_I, (TAGS_TUPLE, VALUES_TUPLE))

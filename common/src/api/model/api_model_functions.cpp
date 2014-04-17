@@ -6,11 +6,11 @@
 #include "storage_status_reply.h"
 #include "time_reply.h"
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnCameraDiagnosticsReply, (performedStep)(errorCode)(errorParams))
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchStatus, (state)(current)(total))
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchSingleCamera, (name)(url)(manufacturer)(vendor)(existsInPool))
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchReply, (status)(processUuid)(cameras))
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnStorageSpaceReply, (storages)(storageProtocols))
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnStorageSpaceData, (path)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting))
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnStorageStatusReply, (pluginExists)(storage))
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnTimeReply, (utcTime)(timeZoneOffset))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraDiagnosticsReply,,         (json), (performedStep)(errorCode)(errorParams))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnManualCameraSearchStatus,,       (json), (state)(current)(total))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnManualCameraSearchSingleCamera,, (json), (name)(url)(manufacturer)(vendor)(existsInPool))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnManualCameraSearchReply,,        (json), (status)(processUuid)(cameras))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStorageSpaceReply,,              (json), (storages)(storageProtocols))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStorageSpaceData,,               (json), (path)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStorageStatusReply,,             (json), (pluginExists)(storage))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTimeReply,,                      (json), (utcTime)(timeZoneOffset))

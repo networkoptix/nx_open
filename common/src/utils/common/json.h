@@ -4,6 +4,7 @@
 #include <cassert>
 #include <limits>
 
+// TODO: #Elric clean up these includes
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/seq/transform.hpp>
@@ -11,6 +12,7 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/type_traits/is_function.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
@@ -305,7 +307,7 @@ namespace QJsonDetail {
         }
 
         template<class T, class MemberType, class Adaptor>
-        bool operator()(T &target, MemberType T::*setter, const Adaptor &adaptor) {
+        bool operator()(T &target, MemberType T::*setter, const Adaptor &adaptor, typename boost::disable_if<boost::is_function<MemberType> >::type * = NULL) {
             unused(adaptor);
             using namespace QnFusion;
 
@@ -404,6 +406,8 @@ __VA_ARGS__ void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *ta
 __VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *target) { \
     return QnFusion::deserialize(ctx, value, target);                           \
 }
+
+#define QN_FUSION_DEFINE_FUNCTIONS_json QN_DEFINE_FUSION_JSON_SERIALIZATION_FUNCTIONS
 
 #define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(STRUCT, FIELD_SEQ, ... /* PREFIX */) \
     QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ)                                   \
