@@ -219,8 +219,11 @@ bool QnPtzManageModel::removeRows(int row, int count, const QModelIndex &parent)
 }
 
 QVariant QnPtzManageModel::data(const QModelIndex &index, int role) const {
-    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent())) {
+        if (role == Qn::HelpTopicIdRole)
+            return Qn::PtzPresets_Help;
         return QVariant();
+    }
     
     RowData data = rowData(index.row());
 
