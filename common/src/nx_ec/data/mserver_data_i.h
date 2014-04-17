@@ -11,7 +11,7 @@
 
     struct ApiMediaServerData: virtual ApiResourceData
     {
-        ApiMediaServerData(): flags(Qn::SF_None), panicMode(0), maxCameras(128) {}
+        ApiMediaServerData(): flags(Qn::SF_None), panicMode(0), maxCameras(0) {}
 
         QString      apiUrl;
         QString      netAddrList;
