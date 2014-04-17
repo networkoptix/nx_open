@@ -12,8 +12,11 @@
 #include <client/client_globals.h>
 
 #include <ui/graphics/opengl/gl_functions.h>
+
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/nv12_to_rgb_shader_program.h>
+
+
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
 
 class CLVideoDecoderOutput;
@@ -155,7 +158,7 @@ private:
      * \param v_array
      * \param tx_array texture vertexes array
      */
-    void drawBindedTexture( const float* v_array, const float* tx_array );
+    void drawBindedTexture( QnAbstractBaseGLShaderProgramm* program , const float* v_array, const float* tx_array );
     void updateTexture( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     bool isYuvFormat() const;
     int glRGBFormat() const;

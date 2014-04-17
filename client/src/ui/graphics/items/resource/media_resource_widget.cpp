@@ -584,7 +584,9 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
-    QnGlNativePainting::begin(painter);
+//	return Qn::NewFrameRendered;
+
+    QnGlNativePainting::begin(m_renderer->glContext(),painter);
 
     qreal opacity = effectiveOpacity();
     bool opaque = qFuzzyCompare(opacity, 1.0);

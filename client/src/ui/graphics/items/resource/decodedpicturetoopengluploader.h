@@ -258,10 +258,14 @@ private:
     mutable QMutex m_uploadMutex;
     mutable QWaitCondition m_cond;
     unsigned int m_previousPicSequence;
+    
+    UploadedPicture*     m_emptyBuffer;
+    /*
     mutable std::deque<UploadedPicture*> m_emptyBuffers;
     mutable std::deque<UploadedPicture*> m_renderedPictures;
     mutable std::deque<UploadedPicture*> m_picturesWaitingRendering;
     mutable std::deque<UploadedPicture*> m_picturesBeingRendered;
+    */
     mutable std::deque<AVPacketUploader*> m_framesWaitingUploadInGUIThread;
     bool m_terminated;
     mutable std::deque<AsyncPicDataUploader*> m_unusedAsyncUploaders;

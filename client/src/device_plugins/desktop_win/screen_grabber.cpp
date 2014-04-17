@@ -255,7 +255,7 @@ void QnScreenGrabber::captureFrameOpenGL(CaptureInfoPtr data)
         return;
 
     //CaptureInfo* data = (CaptureInfo*) opaque;
-    glReadBuffer(GL_FRONT);
+//    glReadBuffer(GL_FRONT);
     if (!m_widget) {
         m_waitCond.wakeOne();
         return;
