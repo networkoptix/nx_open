@@ -1,6 +1,8 @@
 struct TransactionTransportHeader
 {
-    TransactionTransportHeader(PeerList processedPeers, PeerList dstPeers = PeerList()): processedPeers(processedPeers), dstPeers(dstPeers) {}
+    TransactionTransportHeader(PeerList processedPeers = PeerList(), PeerList dstPeers = PeerList())
+        : processedPeers(processedPeers), dstPeers(dstPeers) {}
+    
     PeerList processedPeers;
     PeerList dstPeers;
 };
