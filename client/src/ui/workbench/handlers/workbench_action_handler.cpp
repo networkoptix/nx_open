@@ -28,7 +28,6 @@
 #include <utils/common/email.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
-#include <utils/media_server_update_tool.h>
 
 #include <api/session_manager.h>
 
@@ -83,6 +82,7 @@
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/dialogs/picture_settings_dialog.h>
 #include <ui/dialogs/ping_dialog.h>
+#include <ui/dialogs/system_administration_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -200,7 +200,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::OpenCurrentUserLayoutMenu),              SIGNAL(triggered()),    this,   SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
     connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
-    connect(action(Qn::InstallUpdateManuallyAction),            SIGNAL(triggered()),    this,   SLOT(at_installUpdateManually_triggered()));
     connect(action(Qn::ShowcaseAction),                         SIGNAL(triggered()),    this,   SLOT(at_showcaseAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     /* These actions may be activated via context menu. In this case the topmost event loop will be finishing and this somehow affects runModal method of NSSavePanel in MacOS.
@@ -223,6 +222,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
+    connect(action(Qn::SystemAdministrationAction),             SIGNAL(triggered()),    this,   SLOT(at_systemAdministrationAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
@@ -1290,23 +1290,6 @@ void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
     notifyAboutUpdate(true);
 }
 
-void QnWorkbenchActionHandler::at_installUpdateManually_triggered() {
-    QString filter = tr("All files (*.*)");
-
-    QString fileName = QFileDialog::getOpenFileName(mainWindow(),
-                                                    tr("Select file..."),
-                                                    QString(),
-                                                    filter,
-                                                    0,
-                                                    QnCustomFileDialog::fileDialogOptions());
-    if (fileName.isEmpty())
-        return;
-
-    QnMediaServerUpdateTool *mediaServerUpdateTool = new QnMediaServerUpdateTool(this);
-    mediaServerUpdateTool->setUpdateFile(fileName);
-    mediaServerUpdateTool->updateServers();
-}
-
 void QnWorkbenchActionHandler::at_showcaseAction_triggered() {
     QDesktopServices::openUrl(qnSettings->showcaseUrl());
 }
@@ -1380,6 +1363,12 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     url.setPassword(QString());
     url.setPath(QLatin1String("/web/"));
     QDesktopServices::openUrl(url);
+}
+
+void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
+    QScopedPointer<QnSystemAdministrationDialog> dialog(new QnSystemAdministrationDialog(context(), mainWindow()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {

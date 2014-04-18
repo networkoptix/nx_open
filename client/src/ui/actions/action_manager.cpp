@@ -743,6 +743,10 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
+    factory(Qn::SystemAdministrationAction).
+        flags(Qn::Main | Qn::Tree).
+        text(tr("System Administration"));
+
     factory(Qn::PreferencesServerTabAction).
         flags(Qn::Tree | Qn::NoTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
@@ -763,10 +767,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         text(tr("Check for Updates...")).
         condition(new QnCheckForUpdatesActionCondition(this));
-
-    factory(Qn::InstallUpdateManuallyAction).
-        flags(Qn::Main).
-        text(tr("Install update manually"));
 
     factory(Qn::AboutAction).
         flags(Qn::Main | Qn::GlobalHotkey).

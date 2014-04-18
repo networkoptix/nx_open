@@ -213,7 +213,6 @@ protected slots:
     void at_openLayoutAction_triggered();
     void at_openFolderAction_triggered();
     void at_checkForUpdatesAction_triggered();
-    void at_installUpdateManually_triggered();
     void at_showcaseAction_triggered();
     void at_aboutAction_triggered();
     void at_businessEventsAction_triggered();
@@ -222,6 +221,7 @@ protected slots:
     void at_openBusinessLogAction_triggered();
     void at_cameraListAction_triggered();
     void at_webClientAction_triggered();
+    void at_systemAdministrationAction_triggered();
     void at_preferencesGeneralTabAction_triggered();
     void at_preferencesLicensesTabAction_triggered();
     void at_preferencesServerTabAction_triggered();

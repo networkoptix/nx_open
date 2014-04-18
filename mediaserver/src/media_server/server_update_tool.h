@@ -3,10 +3,17 @@
 
 #include <QtCore/QObject>
 
-class QnServerUpdateTool : public QObject
-{
+#include <utils/common/system_information.h>
+#include <utils/common/software_version.h>
+
+class QnServerUpdateTool : public QObject {
     Q_OBJECT
 public:
+    struct UpdateInformation {
+        QnSystemInformation systemInformation;
+        QnSoftwareVersion version;
+    };
+
     static QnServerUpdateTool *instance();
 
     bool addUpdateFile(const QString &updateId, const QByteArray &data);

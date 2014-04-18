@@ -29,9 +29,17 @@ public:
         return platform + lit(" ") + arch;
     }
 
+    bool operator==(const QnSystemInformation &other) const {
+        return arch == other.arch && platform == other.platform;
+    }
+
     QString arch;
     QString platform;
 };
+
+inline uint qHash(const QnSystemInformation &sysInfo) {
+    return qHash(sysInfo.toString());
+}
 
 Q_DECLARE_METATYPE(QnSystemInformation)
 QN_DEFINE_STRUCT_SERIALIZATORS(QnSystemInformation, (arch) (platform))

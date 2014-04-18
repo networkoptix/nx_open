@@ -319,11 +319,6 @@ namespace Qn {
         CheckForUpdatesAction,
 
         /**
-         * Install an update from the selected file.
-         */
-        InstallUpdateManuallyAction,
-
-        /**
          * Open Showcase page in default browser
          */
         ShowcaseAction,
@@ -355,6 +350,11 @@ namespace Qn {
          * Opens camera list dialog.
          */
         CameraListAction,
+
+        /**
+         * System administration dialog.
+         */
+        SystemAdministrationAction,
 
         //ShowMediaServerLogs,
 
