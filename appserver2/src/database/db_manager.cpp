@@ -1498,8 +1498,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraList& camer
         QN_QUERY_TO_DATA_OBJECT(queryBookmarks, ApiCameraBookmarkWithRef, bookmarks, ApiCameraBookmarkFields (cameraId));
 
         {   // merge tags
-            int idx = 0;
             foreach(const ApiCameraBookmarkTag& tag, tags) {
+                int idx = 0;
                 for (; idx < bookmarks.size() && tag.bookmarkGuid != bookmarks[idx].guid; idx++);
                 if (idx == bookmarks.size())
                     break;
