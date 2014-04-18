@@ -7,7 +7,7 @@
 
 #include <api/model/kvpair.h>
 
-#include <utils/serialization/json.h>
+#include <utils/serialization/json.h> // TODO: #Elric move to cpp
 
 class QnEmail {
     Q_GADGET

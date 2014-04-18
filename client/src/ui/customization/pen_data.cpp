@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include <utils/serialization/json_functions.h>
+#include <utils/fusion/fusion_adaptor.h>
 #include <utils/common/enum_name_mapper.h>
 
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qt, PenStyle, static)

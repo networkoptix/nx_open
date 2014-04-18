@@ -8,6 +8,8 @@
 
 #include <QtCore/QCoreApplication>
 
+#include <utils/fusion/fusion_adaptor.h>
+
 #include "enum_name_mapper.h"
 
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(QnEmail, ConnectionType);

@@ -1,4 +1,5 @@
 #include <utils/serialization/model_functions.h>
+#include <utils/fusion/fusion_adaptor.h>
 
 #include "client_model_types.h"
 

@@ -1,4 +1,5 @@
 #include <utils/serialization/model_functions.h>
+#include <utils/fusion/fusion_adaptor.h>
 
 #include "ptz_tour.h"
 #include "ptz_preset.h"

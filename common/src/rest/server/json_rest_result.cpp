@@ -1,5 +1,7 @@
 #include "json_rest_result.h"
 
+#include <utils/fusion/fusion_adaptor.h>
+
 QnJsonRestResult::QnJsonRestResult(): 
     m_error(NoError) 
 {}

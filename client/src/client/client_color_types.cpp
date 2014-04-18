@@ -4,6 +4,7 @@
 
 #include <utils/math/color_transformations.h>
 #include <utils/serialization/json.h>
+#include <utils/fusion/fusion_adaptor.h>
 #include <utils/math/math.h>
 
 QnTimeSliderColors::QnTimeSliderColors() {

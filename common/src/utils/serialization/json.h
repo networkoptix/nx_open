@@ -19,7 +19,7 @@
 #include <QtCore/QJsonDocument>
 
 #include <utils/common/unused.h>
-#include <utils/fusion/fusion.h> // TODO: #Elric remove
+#include <utils/fusion/fusion_serialization.h>
 
 #include "json_fwd.h"
 #include "serialization.h"
@@ -318,7 +318,7 @@ namespace QJsonDetail {
 } // namespace QJsonDetail
 
 
-QN_FUSION_REGISTER_VISITORS(QJsonValue, QJsonDetail::SerializationVisitor, QJsonDetail::DeserializationVisitor)
+QN_FUSION_REGISTER_SERIALIZATION_VISITORS(QJsonValue, QJsonDetail::SerializationVisitor, QJsonDetail::DeserializationVisitor)
 
 
 

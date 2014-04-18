@@ -12,6 +12,7 @@
 #include <QtGui/QVector4D>
 
 #include "fusion.h"
+#include "fusion_adaptor.h"
 
 QN_FUSION_ADAPT_CLASS_GSN(QSize, 
     ((&QSize::width, &QSize::setWidth, "width"))

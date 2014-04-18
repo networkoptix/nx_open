@@ -1,6 +1,7 @@
 #include "preset_ptz_controller.h"
 
 #include <utils/serialization/model_functions.h>
+#include <utils/fusion/fusion_adaptor.h>
 #include <api/app_server_connection.h>
 #include <api/resource_property_adaptor.h>
 #include <core/resource/resource.h>
