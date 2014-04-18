@@ -102,62 +102,13 @@
         <item>
          <widget class="QLabel" name="tagsListLabel">
           <property name="text">
-           <string>&lt;html&gt;&lt;body&gt;&lt;center&gt;
-&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
-&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
-&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
-&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
-&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
-&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
- &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
-&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
-&lt;/center&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string/>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
           </property>
          </widget>
         </item>
