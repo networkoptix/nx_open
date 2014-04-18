@@ -365,7 +365,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     if (hasDbChanges()) {
         m_camera->setName(ui->nameEdit->text());
         m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
-        m_camera->setUrl(ui->ipAddressEdit->text());
+        //m_camera->setUrl(ui->ipAddressEdit->text());
         m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
 
         if (m_camera->isDtsBased()) {
