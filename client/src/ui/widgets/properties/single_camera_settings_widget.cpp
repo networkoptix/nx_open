@@ -368,7 +368,11 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         m_camera->setUrl(ui->ipAddressEdit->text());
         m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
 
-        m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
+        if (m_camera->isDtsBased()) {
+            m_camera->setScheduleDisabled(!ui->analogViewCheckBox->isChecked());
+        } else {
+            m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
+        }
 
         if (!m_camera->isDtsBased()) {
             if (m_hasScheduleChanges) {
