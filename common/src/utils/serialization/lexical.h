@@ -8,7 +8,7 @@
 #include "lexical_fwd.h"
 
 #include <utils/serialization/serialization.h>
-#include <utils/serialization/fusion.h>
+#include <utils/fusion/fusion.h>
 
 
 namespace QnLexical {

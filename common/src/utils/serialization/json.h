@@ -19,10 +19,10 @@
 #include <QtCore/QJsonDocument>
 
 #include <utils/common/unused.h>
+#include <utils/fusion/fusion.h> // TODO: #Elric remove
 
 #include "json_fwd.h"
 #include "serialization.h"
-#include "fusion.h"
 
 
 class QnJsonSerializer;
