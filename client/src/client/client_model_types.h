@@ -12,7 +12,7 @@
 #include <QtGui/QVector3D>
 
 #include <utils/common/id.h>
-#include <utils/common/model_functions_fwd.h>
+#include <utils/serialization/model_functions_fwd.h>
 #include <recording/time_period.h>
 
 

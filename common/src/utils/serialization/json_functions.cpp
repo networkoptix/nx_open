@@ -5,7 +5,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QVarLengthArray>
 
-#include "enum_name_mapper.h"
+#include <utils/common/enum_name_mapper.h> // TODO: #Elric move into sxn
 #include "fusion_functions.h"
 
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qt, BrushStyle, static)

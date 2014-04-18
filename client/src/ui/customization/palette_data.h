@@ -5,7 +5,7 @@
 #include <QtCore/QExplicitlySharedDataPointer>
 #include <QtGui/QPalette>
 
-#include <utils/common/json_fwd.h>
+#include <utils/serialization/json_fwd.h>
 
 class QnPaletteDataPrivate;
 

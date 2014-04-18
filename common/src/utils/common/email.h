@@ -7,7 +7,7 @@
 
 #include <api/model/kvpair.h>
 
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 
 class QnEmail {
     Q_GADGET

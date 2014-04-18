@@ -6,8 +6,7 @@
 #include <ui/style/skin.h>
 
 #include <utils/common/warnings.h>
-#include <utils/common/json.h>
-#include <utils/common/json_serializer.h>
+#include <utils/serialization/json.h>
 #include <utils/common/flat_map.h>
 #include <utils/common/property_storage.h>
 #include <utils/common/evaluator.h>

@@ -5,7 +5,7 @@
 #include <api/model/storage_space_reply.h>
 #include <platform/core_platform_abstraction.h>
 #include <utils/network/tcp_connection_priv.h> /* For CODE_OK. */
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 
 #include "recorder/storage_manager.h"
 #include "media_server/settings.h"

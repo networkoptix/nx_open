@@ -17,7 +17,7 @@
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 #include <utils/common/enum_name_mapper.h>
 
 #include <api/serializer/serializer.h>

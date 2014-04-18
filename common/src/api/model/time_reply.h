@@ -3,7 +3,7 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/common/json_fwd.h>
+#include <utils/serialization/json_fwd.h>
 
 struct QnTimeReply {
     /** Utc time in msecs since epoch. */

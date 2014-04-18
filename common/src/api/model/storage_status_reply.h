@@ -3,8 +3,8 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/common/json_fwd.h>
-#include "utils/common/id.h"
+#include <utils/serialization/json_fwd.h>
+#include <utils/common/id.h>
 
 struct QnStorageSpaceData {
     QString path;

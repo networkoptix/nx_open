@@ -1,8 +1,8 @@
 #include "media_dewarping_params.h"
 
 #include <utils/common/container.h>
-#include <utils/common/model_functions.h>
-#include <utils/common/json.h>
+#include <utils/serialization/model_functions.h>
+#include <utils/serialization/json.h>
 
 QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnMediaDewarpingParams::ViewMode, static)
 QN_DEFINE_STRUCT_FUNCTIONS(QnMediaDewarpingParams,      (json)(eq)(debug),    (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius))

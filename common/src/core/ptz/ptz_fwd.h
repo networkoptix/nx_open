@@ -4,7 +4,7 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QList>
 
-#include <utils/common/model_functions_fwd.h>
+#include <utils/serialization/model_functions_fwd.h>
 
 class QnPtzMapper;
 typedef QSharedPointer<QnPtzMapper> QnPtzMapperPtr;

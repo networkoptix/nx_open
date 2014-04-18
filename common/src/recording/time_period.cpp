@@ -5,7 +5,7 @@
 
 #include <utils/math/math.h>
 #include <utils/common/util.h>
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 
 #include "time_period_list.h"
 

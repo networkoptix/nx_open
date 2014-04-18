@@ -1,5 +1,5 @@
 #include "ec2_layout_data.h"
-#include "utils/common/json_serializer.h"
+#include "utils/serialization/json.h"
 #include "core/resource/layout_resource.h"
 
 namespace ec2

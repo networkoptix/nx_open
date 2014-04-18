@@ -23,8 +23,8 @@
 
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 
-#include <utils/common/json.h>
-#include <utils/common/model_functions.h>
+#include <utils/serialization/json.h>
+#include <utils/serialization/model_functions.h>
 
 QN_DEFINE_STRUCT_FUNCTIONS(QnStreamSynchronizationState, (json), (started)(time)(speed))
 

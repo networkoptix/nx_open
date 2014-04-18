@@ -3,7 +3,7 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/common/json_fwd.h>
+#include <utils/serialization/json_fwd.h>
 
 /** Struct for adding custom fields to an exported video file. */
 struct QnAviArchiveCustomData {

@@ -5,7 +5,6 @@
 
 #include <QtCore/QString>
 
-#include "adl_wrapper.h"
 #include "lexical_fwd.h"
 
 #include <utils/serialization/serialization.h>

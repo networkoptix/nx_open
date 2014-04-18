@@ -7,7 +7,7 @@
 
 #include <utils/math/defines.h> /* For INT64_MAX. */
 #include <utils/common/unused.h>
-#include <utils/common/model_functions_fwd.h>
+#include <utils/serialization/model_functions_fwd.h>
 
 /**
  * Same as <tt>Q_GADGET</tt>, but doesn't trigger MOC, and can be used in namespaces.

@@ -1,4 +1,4 @@
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 
 #include "camera_diagnostics_reply.h"
 #include "manual_camera_seach_reply.h"

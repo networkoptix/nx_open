@@ -1,7 +1,7 @@
 #include "resource_data.h"
 
 #include <core/ptz/ptz_mapper.h>
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 
 QnPtzMapperPtr QnResourceData::ptzMapper() {
     return m_valueByKey.value(lit("ptzMapper")).value<QnPtzMapperPtr>();

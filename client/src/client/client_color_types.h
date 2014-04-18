@@ -4,7 +4,7 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QColor>
 
-#include <utils/common/model_functions_fwd.h>
+#include <utils/serialization/model_functions_fwd.h>
 
 struct QnTimeSliderColors {
 public:

@@ -3,6 +3,7 @@
 
 #include <utility> /* For std::forward and std::declval. */
 
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/seq/for_each_i.hpp>
 #include <boost/preprocessor/seq/fold_left.hpp>
@@ -11,15 +12,17 @@
 #include <boost/preprocessor/comparison/not_equal.hpp>
 #include <boost/preprocessor/tuple/size.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
-
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/mpl/equal_to.hpp>
 #include <boost/mpl/sizeof.hpp>
 #include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/and.hpp>
 #include <boost/mpl/integral_c.hpp>
+#endif // Q_MOC_RUN
 
 #include <utils/preprocessor/variadic_seq_for_each.h>
+
+#include "fusion_fwd.h"
 
 namespace QnFusionDetail {
     template<class T, class Visitor>
@@ -43,19 +46,19 @@ namespace QnFusionDetail {
 
     BOOST_MPL_HAS_XXX_TRAIT_DEF(type)
 
-    template<class Adaptor, class Tag, class Default, bool hasTag = Adaptor::template has_tag<Tag>::value>
+    template<class Adaptor, class Tag, class T, bool hasTag = Adaptor::template has_tag<Tag>::value>
     struct DefaultGetter {
         typedef decltype(Adaptor::get(Tag())) result_type;
-        result_type operator()() const {
+        result_type operator()(const T &) const {
             return Adaptor::get(Tag());
         }
     };
 
-    template<class Adaptor, class Tag, class Default>
-    struct DefaultGetter<Adaptor, Tag, Default, false> {
-        typedef Default result_type;
-        result_type operator()() const {
-            return Default();
+    template<class Adaptor, class Tag, class T>
+    struct DefaultGetter<Adaptor, Tag, T, false> {
+        typedef T result_type;
+        result_type operator()(const T &defaultValue) const {
+            return defaultValue;
         }
     };
 
@@ -130,14 +133,14 @@ namespace QnFusion {
     struct MemberAdaptor {
         template<class Tag>
         static decltype(Adaptor::get(Tag())) 
-        get() {
+        get(const Tag &) {
             return Adaptor::get(Tag());
         }
 
-        template<class Tag, class Default>
-        static typename QnFusionDetail::DefaultGetter<Adaptor, Tag, Default>::result_type
-        get() {
-            return QnFusionDetail::DefaultGetter<Adaptor, Tag, Default>()();
+        template<class Tag, class T>
+        static typename QnFusionDetail::DefaultGetter<Adaptor, Tag, T>::result_type
+        get(const Tag &, const T &defaultValue) {
+            return QnFusionDetail::DefaultGetter<Adaptor, Tag, T>()(defaultValue);
         }
     };
 
@@ -158,7 +161,7 @@ namespace QnFusion {
      */
     template<class D>
     struct deserialization_visitor_type {};
-
+    
     template<class D>
     struct has_serialization_visitor_type:
         QnFusionDetail::has_type<serialization_visitor_type<D> >
@@ -221,7 +224,19 @@ namespace QnFusion {
  * \param TAG                           Tag to define.
  */
 #define QN_FUSION_DEFINE_TAG(TAG)                                               \
-namespace QnFusion { struct TAG {}; }
+namespace QnFusion {                                                            \
+    struct BOOST_PP_CAT(TAG, _tag) {};                                          \
+    namespace {                                                                 \
+        const BOOST_PP_CAT(TAG, _tag) TAG = {};                                 \
+    }                                                                           \
+}
+
+/**
+ * \param TAG                           Fusion tag.
+ * \returns                             C++ type of the provided fusion tag.
+ */
+#define QN_FUSION_TAG_TYPE(TAG)                                                 \
+    QnFusion::BOOST_PP_CAT(TAG, _tag)
 
 QN_FUSION_DEFINE_TAG(index)
 QN_FUSION_DEFINE_TAG(getter)
@@ -230,16 +245,16 @@ QN_FUSION_DEFINE_TAG(checker)
 QN_FUSION_DEFINE_TAG(name)
 QN_FUSION_DEFINE_TAG(optional)
 
-#define QN_FUSION_TAG_IS_TYPED_FOR_index ,
-#define QN_FUSION_TAG_TYPE_FOR_index int
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_index ,
+#define QN_FUSION_PROPERTY_TYPE_FOR_index int
 
-#define QN_FUSION_TAG_IS_TYPED_FOR_name ,
-#define QN_FUSION_TAG_TYPE_FOR_name QString
-#define QN_FUSION_TAG_IS_WRAPPED_FOR_name ,
-#define QN_FUSION_TAG_WRAPPER_FOR_name lit
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_name ,
+#define QN_FUSION_PROPERTY_TYPE_FOR_name QString
+#define QN_FUSION_PROPERTY_IS_WRAPPED_FOR_name ,
+#define QN_FUSION_PROPERTY_WRAPPER_FOR_name lit
 
-#define QN_FUSION_TAG_IS_TYPED_FOR_optional ,
-#define QN_FUSION_TAG_TYPE_FOR_optional bool
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_optional ,
+#define QN_FUSION_PROPERTY_TYPE_FOR_optional bool
 
 
 /**
@@ -333,12 +348,12 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 #define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_II(TAG, VALUE)                   \
     template<>                                                                  \
-    struct has_tag<QnFusion::TAG>:                                              \
+    struct has_tag<QN_FUSION_TAG_TYPE(TAG)>:                                    \
         boost::mpl::true_                                                       \
     {};                                                                         \
                                                                                 \
-    static QN_FUSION_TAG_TYPE(TAG, VALUE) get(const QnFusion::TAG &) {          \
-        return QN_FUSION_TAG_VALUE(TAG, VALUE);                                 \
+    static QN_FUSION_PROPERTY_TYPE(TAG, VALUE) get(const QN_FUSION_TAG_TYPE(TAG) &) { \
+        return QN_FUSION_PROPERTY_VALUE(TAG, VALUE);                            \
     }
 
 
@@ -350,10 +365,26 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 /**
  * 
  */
-#define QN_FUSION_ADAPT_CLASS_FUNCTIONS(CLASS, FUNCTION_SEQ, MEMBER_SEQ, ... /* GLOBAL_SEQ, PREFIX */) \
-    QN_FUSION_ADAPT_CLASS(CLASS, MEMBER_SEQ, BOOST_PP_VARIADIC_ELEM(0, ##__VA_ARGS__,,)) \
-    QN_FUSION_DEFINE_FUNCTIONS(CLASS, FUNCTION_SEQ, BOOST_PP_VARIADIC_ELEM(1, ##__VA_ARGS__,,))
+#define QN_FUSION_ADAPT_CLASS_SHORT(CLASS, TAGS_TUPLE, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
+    QN_FUSION_ADAPT_CLASS(CLASS, QN_FUSION_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ), ##__VA_ARGS__)
 
+/**
+ * 
+ */
+#define QN_FUSION_ADAPT_CLASS_GSN(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)      \
+    QN_FUSION_ADAPT_CLASS_SHORT(CLASS, (getter, setter, name), MEMBER_SEQ, ##__VA_ARGS__)
+
+/**
+ * 
+ */
+#define QN_FUSION_ADAPT_CLASS_GSNC(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)     \
+    QN_FUSION_ADAPT_CLASS_SHORT(CLASS, (getter, setter, name, checker), MEMBER_SEQ, ##__VA_ARGS__)
+
+/**
+ *
+ */
+#define QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ, ... /* GLOBAL_SEQ */)         \
+    QN_FUSION_ADAPT_CLASS(STRUCT, QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ), ##__VA_ARGS__)
 
 /**
  *
@@ -366,37 +397,35 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 
 /**
- * 
+ * TODO: Note why BOOST_PP_VARIADIC_SEQ_FOR_EACH
  */
 #define QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(CLASS_SEQ, FUNCTION_SEQ, ... /* PREFIX */) \
     BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_I, (FUNCTION_SEQ, ##__VA_ARGS__), CLASS_SEQ)
 
 #define QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_I(R, PARAMS, CLASS)           \
-    QN_FUSION_DEFINE_FUNCTIONS(CLASS, BOOST_PP_TUPLE_ENUM(PARAMS))
+    QN_FUSION_DEFINE_FUNCTIONS(BOOST_PP_TUPLE_ENUM(CLASS), BOOST_PP_TUPLE_ENUM(PARAMS))
 
 
 /**
  * 
  */
-#define QN_FUSION_ADAPT_CLASS_SHORT(CLASS, TAGS_TUPLE, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
-    QN_FUSION_ADAPT_CLASS(CLASS, QN_FUSION_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ), ##__VA_ARGS__)
-
-#define QN_FUSION_ADAPT_CLASS_GSN(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)      \
-    QN_FUSION_ADAPT_CLASS_SHORT(CLASS, (getter, setter, name), MEMBER_SEQ, ##__VA_ARGS__)
-
-#define QN_FUSION_ADAPT_CLASS_GSNC(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)     \
-    QN_FUSION_ADAPT_CLASS_SHORT(CLASS, (getter, setter, name, checker), MEMBER_SEQ, ##__VA_ARGS__)
-
+#define QN_FUSION_ADAPT_CLASS_FUNCTIONS(CLASS, FUNCTION_SEQ, MEMBER_SEQ, ... /* GLOBAL_SEQ, PREFIX */) \
+    QN_FUSION_ADAPT_CLASS(CLASS, MEMBER_SEQ, BOOST_PP_VARIADIC_ELEM(0, ##__VA_ARGS__,,)) \
+    QN_FUSION_DEFINE_FUNCTIONS(CLASS, FUNCTION_SEQ, BOOST_PP_VARIADIC_ELEM(1, ##__VA_ARGS__,,))
 
 /**
- *
+ * 
  */
-#define QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ, ... /* GLOBAL_SEQ */)         \
-    QN_FUSION_ADAPT_CLASS(STRUCT, QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ), ##__VA_ARGS__)
+#define QN_FUSION_ADAPT_CLASS_GSN_FUNCTIONS(CLASS, FUNCTION_SEQ, MEMBER_SEQ, ... /* GLOBAL_SEQ, PREFIX */) \
+    QN_FUSION_ADAPT_CLASS_GSN(CLASS, MEMBER_SEQ, BOOST_PP_VARIADIC_ELEM(0, ##__VA_ARGS__,,)) \
+    QN_FUSION_DEFINE_FUNCTIONS(CLASS, FUNCTION_SEQ, BOOST_PP_VARIADIC_ELEM(1, ##__VA_ARGS__,,))
 
+/**
+ * 
+ */
 #define QN_FUSION_ADAPT_STRUCT_FUNCTIONS(STRUCT, FUNCTION_SEQ, FIELD_SEQ, ... /* GLOBAL_SEQ, PREFIX */) \
     QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ, BOOST_PP_VARIADIC_ELEM(0, ##__VA_ARGS__,,)) \
-    QN_FUSION_DEFINE_FUNCTIONS(STRUCT, BOOST_PP_VARIADIC_ELEM(1, ##__VA_ARGS__,,))
+    QN_FUSION_DEFINE_FUNCTIONS(STRUCT, FUNCTION_SEQ, BOOST_PP_VARIADIC_ELEM(1, ##__VA_ARGS__,,))
 
 
 /**
@@ -452,14 +481,15 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 /**
  * \internal
  *
- * This macro returns a type expression that can be used in return type of a
- * tag getter function. By default it simply returns <tt>decltype(VALUE)</tt>.
+ * This macro returns a type expression that should be used in return type of a
+ * property getter function for the specified tag. By default it simply 
+ * returns <tt>decltype(VALUE)</tt>.
  * 
  * To override the default return value for some tag <tt>some_tag</tt>, use
  * the following code:
  * \code
- * #define QN_FUSION_TAG_IS_TYPED_FOR_some_tag ,
- * #define QN_FUSION_TAG_TYPE_FOR_some_tag QString // Or your custom type
+ * #define QN_FUSION_PROPERTY_IS_TYPED_FOR_some_tag ,
+ * #define QN_FUSION_PROPERTY_TYPE_FOR_some_tag QString // Or your custom type
  * \endcode
  * 
  * This might be useful when <tt>decltype</tt> cannot be used because
@@ -468,38 +498,39 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * \param TAG                           Fusion tag.
  * \param VALUE                         Value specified by the user for this tag.
  * \returns                             Type expression that should be used for
- *                                      return type of tag getter function.
+ *                                      return type of a property getter function.
  */
-#define QN_FUSION_TAG_TYPE(TAG, VALUE)                                          \
-    BOOST_PP_OVERLOAD(QN_FUSION_TAG_TYPE_I_, ~ BOOST_PP_CAT(QN_FUSION_TAG_IS_TYPED_FOR_, TAG) ~)(TAG, VALUE)
+#define QN_FUSION_PROPERTY_TYPE(TAG, VALUE)                                          \
+    BOOST_PP_OVERLOAD(QN_FUSION_PROPERTY_TYPE_I_, ~ BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_TYPED_FOR_, TAG) ~)(TAG, VALUE)
     
-#define QN_FUSION_TAG_TYPE_I_1(TAG, VALUE) decltype(QN_FUSION_TAG_VALUE(TAG, VALUE))
-#define QN_FUSION_TAG_TYPE_I_2(TAG, VALUE) BOOST_PP_CAT(QN_FUSION_TAG_TYPE_FOR_, TAG)
+#define QN_FUSION_PROPERTY_TYPE_I_1(TAG, VALUE) decltype(QN_FUSION_PROPERTY_VALUE(TAG, VALUE))
+#define QN_FUSION_PROPERTY_TYPE_I_2(TAG, VALUE) BOOST_PP_CAT(QN_FUSION_PROPERTY_TYPE_FOR_, TAG)
 
 
 /**
  * \internal
  * 
- * This macro returns an expression that can be used in return statement
- * of a tag getter function. By default it simply returns <tt>VALUE</tt>.
+ * This macro returns an expression that should be used in return statement
+ * of a property getter function for the specified tag. By default it simply 
+ * returns <tt>VALUE</tt>.
  * 
  * To override the default return value for some tag <tt>some_tag</tt>, use
  * the following code:
  * \code
- * #define QN_FUSION_TAG_IS_WRAPPED_FOR_some_tag ,
- * #define QN_FUSION_TAG_WRAPPER_FOR_some_tag QLatin1Literal // Or your custom wrapper macro
+ * #define QN_FUSION_PROPERTY_IS_WRAPPED_FOR_some_tag ,
+ * #define QN_FUSION_PROPERTY_WRAPPER_FOR_some_tag QLatin1Literal // Or your custom wrapper macro
  * \endcode
  * 
  * \param TAG                           Fusion tag.
  * \param VALUE                         Value specified by the user for this tag.
  * \returns                             Expression that should be used in the
- *                                      return statement of tag getter function.
+ *                                      return statement of a property getter function.
  */
-#define QN_FUSION_TAG_VALUE(TAG, VALUE)                                         \
-    BOOST_PP_OVERLOAD(QN_FUSION_TAG_VALUE_I_, ~ BOOST_PP_CAT(QN_FUSION_TAG_IS_WRAPPED_FOR_, TAG) ~)(TAG, VALUE)
+#define QN_FUSION_PROPERTY_VALUE(TAG, VALUE)                                         \
+    BOOST_PP_OVERLOAD(QN_FUSION_PROPERTY_VALUE_I_, ~ BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_WRAPPED_FOR_, TAG) ~)(TAG, VALUE)
 
-#define QN_FUSION_TAG_VALUE_I_1(TAG, VALUE) VALUE
-#define QN_FUSION_TAG_VALUE_I_2(TAG, VALUE) BOOST_PP_CAT(QN_FUSION_TAG_WRAPPER_FOR_, TAG)(VALUE)
+#define QN_FUSION_PROPERTY_VALUE_I_1(TAG, VALUE) VALUE
+#define QN_FUSION_PROPERTY_VALUE_I_2(TAG, VALUE) BOOST_PP_CAT(QN_FUSION_PROPERTY_WRAPPER_FOR_, TAG)(VALUE)
 
 
 namespace QnFusion {

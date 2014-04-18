@@ -3,7 +3,7 @@
 #include <ui/style/globals.h>
 
 #include <utils/math/color_transformations.h>
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 #include <utils/math/math.h>
 
 QnTimeSliderColors::QnTimeSliderColors() {
@@ -117,7 +117,7 @@ QnLicensesListModelColors::QnLicensesListModelColors() {
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnTimeSliderColors,,
+    QnTimeSliderColors,
     (json),
     (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)
         (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)
@@ -126,70 +126,70 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 )
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnTimeScrollBarColors,,
+    QnTimeScrollBarColors,
     (json),
     (indicator)(border)(handle), 
     (optional, true)
 )
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnBackgroundColors,,
+    QnBackgroundColors,
     (json),
     (normal)(panic), 
     (optional, true)
 )
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnCalendarColors,,
+    QnCalendarColors,
     (json),
     (selection)(primaryRecording)(secondaryRecording)(primaryMotion)(secondaryMotion)(separator), 
     (optional, true)
 )
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnStatisticsColors,,
+    QnStatisticsColors,
     (json),
     (grid)(frame)(cpu)(ram)(hdds)(network), 
     (optional, true)
 )
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnScheduleGridColors,,
+    QnScheduleGridColors,
     (json),
     (normalLabel)(weekendLabel)(selectedLabel)(disabledLabel), 
     (optional, true)
 )
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnGridColors,,
+    QnGridColors,
     (json),
     (grid)(allowed)(disallowed), 
     (optional, true)
 )
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnPtzManageModelColors,,
+    QnPtzManageModelColors,
     (json),
     (title)(invalid)(warning), 
     (optional, true)
 )
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnHistogramColors,,
+    QnHistogramColors,
     (json),
     (background)(border)(histogram)(selection)(grid)(text), 
     (optional, true)
 )
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnResourceWidgetFrameColors,,
+    QnResourceWidgetFrameColors,
     (json),
     (normal)(active)(selected), 
     (optional, true)
 )
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnLicensesListModelColors,,
+    QnLicensesListModelColors,
     (json),
     (normal)(warning)(expired), 
     (optional, true)

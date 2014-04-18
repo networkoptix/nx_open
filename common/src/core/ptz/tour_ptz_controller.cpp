@@ -3,7 +3,7 @@
 #include <QtCore/QMetaObject>
 #include <QtCore/QMutexLocker>
 
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 #include <utils/common/long_runnable.h>
 
 #include <api/resource_property_adaptor.h>

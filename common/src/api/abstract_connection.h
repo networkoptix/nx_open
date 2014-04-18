@@ -13,9 +13,9 @@
 
 #include <utils/common/request_param.h>
 #include <utils/common/warnings.h>
-#include <utils/common/json.h>
 #include <utils/common/connective.h>
 #include <utils/common/enum_name_mapper.h>
+#include <utils/serialization/json.h>
 
 #include <nx_ec/ec_api.h>
 #include <rest/server/json_rest_handler.h>

@@ -9,7 +9,7 @@
 #include <QtCore/QRectF>
 #include <QtCore/QMetaType>
 
-#include <utils/common/json_fwd.h>
+#include <utils/serialization/json_fwd.h>
 
 
 struct ImageCorrectionParams

@@ -1,4 +1,4 @@
-#include <utils/common/model_functions.h>
+#include <utils/serialization/model_functions.h>
 
 #include "client_model_types.h"
 

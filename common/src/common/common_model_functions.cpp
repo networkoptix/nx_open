@@ -1,8 +1,8 @@
 #include "common_globals.h"
 
-#include <utils/common/json.h>
-#include <utils/common/lexical.h>
 #include <utils/common/enum_name_mapper.h>
+#include <utils/serialization/json.h>
+#include <utils/serialization/lexical.h>
 
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, PtzCommand)
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, PtzCoordinateSpace)

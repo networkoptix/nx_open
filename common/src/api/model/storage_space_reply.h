@@ -5,7 +5,7 @@
 #include <QtCore/QVariant>
 #include <QtCore/QMetaType>
 
-#include <utils/common/json_fwd.h>
+#include <utils/serialization/json_fwd.h>
 
 #include "storage_status_reply.h"
 

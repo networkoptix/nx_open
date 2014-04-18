@@ -6,7 +6,7 @@
 #include <QtCore/QList>
 #include <QtCore/QUuid>
 
-#include <utils/common/json_fwd.h>
+#include <utils/serialization/json_fwd.h>
 
 /**
  * State of the running manual camera search process.

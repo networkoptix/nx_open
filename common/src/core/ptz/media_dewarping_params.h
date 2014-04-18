@@ -5,7 +5,7 @@
 
 #include <boost/operators.hpp>
 
-#include <utils/common/json_fwd.h>
+#include <utils/serialization/json_fwd.h>
 
 // TODO: #Elric doesn't really belong in this folder
 struct QnMediaDewarpingParams: public boost::equality_comparable1<QnMediaDewarpingParams> {

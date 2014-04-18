@@ -9,7 +9,7 @@
 #include <QtCore/QDataStream>
 #include <QtCore/QHash>
 
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 #include <utils/math/fuzzy.h>
 
 #include "model_functions_fwd.h"

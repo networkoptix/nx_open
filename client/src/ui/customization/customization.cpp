@@ -1,6 +1,6 @@
 #include "customization.h"
 
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 #include <utils/common/warnings.h>
 
 namespace {

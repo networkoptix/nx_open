@@ -4,7 +4,7 @@
 #include <QtCore/QMetaType>
 
 #include <utils/camera/camera_diagnostics.h>
-#include <utils/common/json_fwd.h>
+#include <utils/serialization/json_fwd.h>
 
 
 struct QnCameraDiagnosticsReply

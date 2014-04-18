@@ -3,9 +3,9 @@
 #include <memory>
 
 #include <utils/math/math.h>
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 
-#include <utils/common/model_functions.h>
+#include <utils/serialization/model_functions.h>
 
 QN_DEFINE_STRUCT_FUNCTIONS(ImageCorrectionParams, (json), (blackLevel)(whiteLevel)(gamma)(enabled))
 

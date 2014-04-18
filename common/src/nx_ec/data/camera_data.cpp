@@ -1,7 +1,7 @@
 #include "camera_data.h"
 #include "core/resource/camera_resource.h"
 #include "api/serializer/serializer.h"
-#include "utils/common/json.h"
+#include "utils/serialization/json.h"
 #include <QAuthenticator>
 #include "core/resource/security_cam_resource.h"
 

@@ -1,7 +1,7 @@
 #include "business_action_parameters.h"
 
 #include "utils/common/enum_name_mapper.h"
-#include "utils/common/json.h"
+#include "utils/serialization/json.h"
 
 
 static QLatin1String PARAM_NAMES[] =

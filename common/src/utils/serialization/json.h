@@ -4,30 +4,25 @@
 #include <cassert>
 #include <limits>
 
-// TODO: #Elric clean up these includes
 #ifndef Q_MOC_RUN
-#include <boost/preprocessor/seq/for_each.hpp>
-#include <boost/preprocessor/seq/transform.hpp>
-#include <boost/preprocessor/tuple/enum.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/stringize.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_function.hpp>
 #include <boost/type_traits/remove_reference.hpp>
+#include <boost/type_traits/remove_const.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
-#endif
+#endif // Q_MOC_RUN
 
 #include <QtCore/QJsonValue>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
-#include <utils/serialization/serialization.h>
-#include <utils/serialization/fusion.h>
+#include <utils/common/unused.h>
 
-#include "unused.h"
 #include "json_fwd.h"
+#include "serialization.h"
+#include "fusion.h"
 
 
 class QnJsonSerializer;
@@ -252,10 +247,10 @@ namespace QJsonDetail {
             unused(adaptor);
             using namespace QnFusion;
 
-            if(invoke(adaptor.get<checker, TrueChecker>(), value))
+            if(invoke(adaptor.get(checker, TrueChecker()), value))
                 return true; /* Skipped. */
 
-            QJson::serialize(m_ctx, invoke(adaptor.get<getter>(), value), adaptor.get<name>(), &m_object);
+            QJson::serialize(m_ctx, invoke(adaptor.get(getter), value), adaptor.get(name), &m_object);
             return true;
         }
 
@@ -286,19 +281,20 @@ namespace QJsonDetail {
         bool operator()(T &target, const Adaptor &adaptor) {
             using namespace QnFusion;
 
-            return operator()(target, adaptor.get<setter>(), adaptor);
+            return operator()(target, adaptor.get(setter), adaptor);
         }
 
     private:
         template<class T, class Setter, class Adaptor>
         bool operator()(T &target, const Setter &setter, const Adaptor &adaptor) {
-            using namespace Qss;
+            unused(adaptor);
+            using namespace QnFusion;
 
-            typedef typename boost::remove_reference<decltype(invoke(adaptor.get<getter>(), target))>::type member_type;
+            typedef typename boost::remove_const<boost::remove_reference<decltype(invoke(adaptor.get(getter), target))>::type>::type member_type;
 
             bool found = false;
             member_type member;
-            if(!QJson::deserialize(m_ctx, m_object, adaptor.get<name>(), &member, adaptor.get<optional, boost::mpl::false_>(), &found))
+            if(!QJson::deserialize(m_ctx, m_object, adaptor.get(name), &member, adaptor.get(optional, false), &found))
                 return false;
             if(found)
                 invoke(setter, target, std::move(member));
@@ -310,7 +306,7 @@ namespace QJsonDetail {
             unused(adaptor);
             using namespace QnFusion;
 
-            return QJson::deserialize(m_ctx, m_object, adaptor.get<name>(), &(target.*setter), adaptor.get<optional, boost::mpl::false_>());
+            return QJson::deserialize(m_ctx, m_object, adaptor.get(name), &(target.*setter), adaptor.get(optional, false));
         }
 
     private:

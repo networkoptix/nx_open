@@ -2,7 +2,7 @@
 
 #include "acti_ptz_controller.h"
 
-#include <utils/common/model_functions.h>
+#include <utils/serialization/model_functions.h>
 
 #include "acti_resource.h"
 
