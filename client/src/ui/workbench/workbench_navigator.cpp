@@ -19,6 +19,7 @@ extern "C"
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
 
+#include <camera/resource_display.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -55,7 +56,7 @@ extern "C"
 #include "redass/redass_controller.h"
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_streamSynchronizer(context()->instance<QnWorkbenchStreamSynchronizer>()),
     m_timeSlider(NULL),
@@ -1417,18 +1418,18 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
 
     connect(widget, SIGNAL(aspectRatioChanged()), this, SLOT(updateThumbnailsLoader()));
     connect(widget, SIGNAL(optionsChanged()), this, SLOT(at_widget_optionsChanged()));
-    connect(widget->resource().data(), SIGNAL(flagsChanged(const QnResourcePtr &)), this, SLOT(at_resource_flagsChanged(const QnResourcePtr &)));
+    connect(widget->resource(), SIGNAL(flagsChanged(const QnResourcePtr &)), this, SLOT(at_resource_flagsChanged(const QnResourcePtr &)));
 
     if (QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>()) {
-        connect(camera.data(), &QnVirtualCameraResource::bookmarkAdded, this, [this]() { updateCurrentPeriods(Qn::BookmarksContent); });
-        connect(camera.data(), &QnVirtualCameraResource::bookmarkChanged, this, [this]() { updateCurrentPeriods(Qn::BookmarksContent); });
-        connect(camera.data(), &QnVirtualCameraResource::bookmarkRemoved, this, [this]() { updateCurrentPeriods(Qn::BookmarksContent); });
+        connect(camera, &QnVirtualCameraResource::bookmarkAdded, this, [this]() { updateCurrentPeriods(Qn::BookmarksContent); });
+        connect(camera, &QnVirtualCameraResource::bookmarkChanged, this, [this]() { updateCurrentPeriods(Qn::BookmarksContent); });
+        connect(camera, &QnVirtualCameraResource::bookmarkRemoved, this, [this]() { updateCurrentPeriods(Qn::BookmarksContent); });
     }
 }
 
 void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
     disconnect(widget, NULL, this, NULL);
-    disconnect(widget->resource().data(), NULL, this, NULL);
+    disconnect(widget->resource(), NULL, this, NULL);
 
     if(widget->resource()->flags() & QnResource::sync)
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))

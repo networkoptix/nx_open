@@ -4,16 +4,16 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
-#include <utils/common/long_runnable.h>
 #include <core/resource/resource_fwd.h>
 #include <recording/time_period.h>
-#include <camera/resource_display.h>
-
-#include <ui/actions/action_target_provider.h>
 
 #include <client/client_globals.h>
 
-#include "workbench_context_aware.h"
+#include <ui/actions/action_target_provider.h>
+#include <ui/workbench/workbench_context_aware.h>
+
+#include <utils/common/connective.h>
+#include <utils/common/long_runnable.h>
 
 class QAction;
 
@@ -28,11 +28,12 @@ class QnThumbnailsLoader;
 class QnCalendarWidget;
 class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
+class QnResourceDisplay;
 
-class QnWorkbenchNavigator: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider {
+class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
 
-    typedef QObject base_type;
+    typedef Connective<QObject> base_type;
 
 public:
     enum WidgetFlag {
@@ -230,7 +231,7 @@ private:
      *  It's used to make it possible to unpause video only in the user inactivity state handler.
      */
     bool m_autoPaused;
-    QHash<QnResourceDisplayPtr, bool> m_autoPausedResourceDisplays;
+    QHash<QSharedPointer<QnResourceDisplay>, bool> m_autoPausedResourceDisplays;
 
     qreal m_lastSpeed;
     qreal m_lastMinimalSpeed;
