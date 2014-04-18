@@ -7,12 +7,20 @@
 
 namespace ec2 {
 
-class ApiUpdateData : public ApiData {
+class ApiUpdateUploadData : public ApiData {
 public:
     QString updateId;
     QByteArray data;
 };
-QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(ApiUpdateData, (updateId) (data))
+QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(ApiUpdateUploadData, (updateId) (data))
+
+class ApiUpdateUploadResponceData : public ApiIdData {
+public:
+    QString updateId;
+};
+QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS(ApiUpdateUploadResponceData, (updateId) (id))
+
+typedef QString ApiUpdateInstallData;
 
 }
 

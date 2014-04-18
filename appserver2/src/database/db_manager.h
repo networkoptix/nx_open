@@ -137,7 +137,7 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraServerItem>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiPanicModeData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiStoredFileData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiStoredFilePath>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<QString> &tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResource>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiBusinessRule>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiUser>& tran);
@@ -145,6 +145,7 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiParamList>& tran); // save settings
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowall>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallList>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiUpdateUploadResponceData>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiIdData>& tran);
@@ -175,7 +176,7 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiUpdateData> &) {
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiUpdateUploadData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }

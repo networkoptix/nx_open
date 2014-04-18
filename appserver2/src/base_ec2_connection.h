@@ -169,8 +169,16 @@ namespace ec2
         }
 
         void triggerNotification( const QnTransaction<QString>& tran ) {
-            if( tran.command == ApiCommand::removeStoredFile )
-                m_storedFileManager->triggerNotification( tran );
+            switch (tran.command) {
+            case ApiCommand::removeStoredFile:
+                m_storedFileManager->triggerNotification(tran);
+                break;
+            case ApiCommand::installUpdate:
+                m_updatesManager->triggerNotification(tran);
+                break;
+            default:
+                assert(false); // we should never get here
+            }
         }
 
         void triggerNotification( const QnTransaction<ApiParamList>& tran ) {
@@ -191,8 +199,12 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiEmailData>&  ) {
         }
 
-        void triggerNotification(const QnTransaction<ApiUpdateData> &transaction) {
-            m_updatesManager->triggerNotification(transaction);
+        void triggerNotification(const QnTransaction<ApiUpdateUploadData> &tran) {
+            m_updatesManager->triggerNotification(tran);
+        }
+
+        void triggerNotification(const QnTransaction<ApiUpdateUploadResponceData> &tran) {
+            m_updatesManager->triggerNotification(tran);
         }
 
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }

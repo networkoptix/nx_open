@@ -16,6 +16,7 @@ const qint64 maxUpdateFileSize = 100 * 1024 * 1024; // 100 MB
 QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     QObject(parent)
 {
+    connect(connection2()->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateUploaded, this, &QnMediaServerUpdateTool::at_updateUploaded);
 }
 
 ec2::AbstractECConnectionPtr QnMediaServerUpdateTool::connection2() const {
@@ -47,14 +48,14 @@ void QnMediaServerUpdateTool::updateServers() {
 
     QnResourceList servers = qnResPool->getResourcesWithFlag(QnResource::server);
 
-    QSet<QnId> ids;
-    foreach (const QnResourcePtr &resource, servers) {
+    ec2::PeerList ids;
+    foreach (const QnResourcePtr &resource, servers)
         ids.insert(resource->getId());
-    }
 
-    connection2()->getUpdatesManager()->sendUpdatePackage(updateId, data, ids, this, &QnMediaServerUpdateTool::updateUploaded);
+    connection2()->getUpdatesManager()->sendUpdatePackage(updateId, data, ids,
+                                                          this, [this](int reqID, ec2::ErrorCode errorCode) {});
 }
 
-void QnMediaServerUpdateTool::updateUploaded(int handle, ec2::ErrorCode errorCode) {
+void QnMediaServerUpdateTool::at_updateUploaded(const QString &updateId, const QnId &peerId) {
     qDebug() << "uploaded!!!";
 }

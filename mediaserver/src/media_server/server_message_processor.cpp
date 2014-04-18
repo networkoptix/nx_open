@@ -136,8 +136,8 @@ void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnServerMessageProcessor::at_remotePeerFound );
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnServerMessageProcessor::at_remotePeerLost );
 
-    connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateUploaded,
-        this, &QnServerMessageProcessor::at_updateUploaded );
+    connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateReceived,
+        this, &QnServerMessageProcessor::at_updateReceived );
     connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
         this, &QnServerMessageProcessor::at_updateInstallationRequested );
 
@@ -182,8 +182,12 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     resource->setStatus(status, true);
 }
 
-void QnServerMessageProcessor::at_updateUploaded(const QString &updateId, const QByteArray &data) {
-    QnServerUpdateTool::instance()->addUpdateFile(updateId, data);
+void QnServerMessageProcessor::at_updateReceived(const QString &updateId, const QByteArray &data) {
+    if (!QnServerUpdateTool::instance()->addUpdateFile(updateId, data))
+        return;
+
+    m_connection->getUpdatesManager()->sendUpdateUploadedResponce(updateId, qnCommon->moduleGUID(),
+                                                                this, [this](int reqID, ec2::ErrorCode errorCode) {});
 }
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {

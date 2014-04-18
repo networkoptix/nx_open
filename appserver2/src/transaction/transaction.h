@@ -138,6 +138,7 @@ namespace ec2
             unlockRequest,
 
             uploadUpdate,
+            uploadUpdateResponce,
             installUpdate,
         };
 

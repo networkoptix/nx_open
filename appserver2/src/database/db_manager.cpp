@@ -899,6 +899,10 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowall
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiUpdateUploadResponceData> &tran) {
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceParams>& tran)
 {
     qint32 internalId = getResourceInternalId(tran.params.id);
@@ -1130,16 +1134,24 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiStoredFil
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiStoredFilePath>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<QString>& tran)
 {
-    assert( tran.command == ApiCommand::removeStoredFile );
-
-    QSqlQuery query(m_sdb);
-    query.prepare("DELETE FROM vms_storedFiles WHERE path = :path");
-    query.bindValue(":path", tran.params);
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::failure;
+    switch (tran.command) {
+    case ApiCommand::removeStoredFile: {
+        QSqlQuery query(m_sdb);
+        query.prepare("DELETE FROM vms_storedFiles WHERE path = :path");
+        query.bindValue(":path", tran.params);
+        if (!query.exec()) {
+            qWarning() << Q_FUNC_INFO << query.lastError().text();
+            return ErrorCode::failure;
+        }
+        break;
+    }
+    case ApiCommand::installUpdate:
+        break;
+    default:
+        Q_ASSERT_X(0, "Unsupported transaction", Q_FUNC_INFO);
+        return ErrorCode::notImplemented;
     }
 
     return ErrorCode::ok;

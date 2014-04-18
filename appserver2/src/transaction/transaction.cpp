@@ -141,6 +141,8 @@ namespace ec2
 
                 case uploadUpdate:
                     return "uploadUpdate";
+                case uploadUpdateResponce:
+                    return "uploadUpdateResponce";
                 case installUpdate:
                     return "installUpdate";
 

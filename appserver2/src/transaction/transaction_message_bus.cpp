@@ -366,8 +366,11 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiResetBusinessRuleData>(abstractTran, stream);
 
         case ApiCommand::uploadUpdate:
+            return deliveryTransaction<ApiUpdateUploadData>(abstractTran, stream);
+        case ApiCommand::uploadUpdateResponce:
+            return deliveryTransaction<ApiUpdateUploadResponceData>(abstractTran, stream);
         case ApiCommand::installUpdate:
-            return deliveryTransaction<ApiUpdateData>(abstractTran, stream);
+            return deliveryTransaction<QString>(abstractTran, stream);
 
         case ApiCommand::serverAliveInfo:
             break; // nothing to do

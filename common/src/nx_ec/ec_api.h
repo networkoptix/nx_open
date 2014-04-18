@@ -641,18 +641,25 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int installUpdate(const QString &updateId, const PeerList &peers, TargetType *target, HandlerType handler) {
-            return installUpdate(updateId, peers, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int sendUpdateUploadedResponce(const QString &updateId, const QnId &peerId, TargetType *target, HandlerType handler) {
+            return sendUpdateUploadedResponce(updateId, peerId, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int installUpdate(const QString &updateId, TargetType *target, HandlerType handler) {
+            return installUpdate(updateId, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
     signals:
-        void updateUploaded(const QString &updateId, const QByteArray &data);
+        void updateReceived(const QString &updateId, const QByteArray &data);
+        void updateUploaded(const QString &updateId, const QnId &peerId);
         void updateInstallationRequested(const QString &updateId);
 
     protected:
         virtual int sendUpdatePackage(const QString &updateId, const QByteArray &data, const PeerList &peers, impl::SimpleHandlerPtr handler) = 0;
-        virtual int installUpdate(const QString &updateId, const PeerList &peers, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendUpdateUploadedResponce(const QString &updateId, const QnId &peerId, impl::SimpleHandlerPtr handler) = 0;
+        virtual int installUpdate(const QString &updateId, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractUpdatesManager> AbstractUpdatesManagerPtr;
 

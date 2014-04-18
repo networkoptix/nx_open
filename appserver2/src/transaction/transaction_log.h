@@ -62,7 +62,7 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode saveTransaction(const QnTransaction<ApiUpdateData>& , const QByteArray&) {
+        ErrorCode saveTransaction(const QnTransaction<ApiUpdateUploadData>& , const QByteArray&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -92,6 +92,7 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiResource>& tran)            { return makeHash(tran.params.id.toRfc4122(), "resource"); }
         QUuid transactionHash(const QnTransaction<ApiLicense>& tran)                 { return makeHash(tran.params.key, "ApiLicense"); }    //TODO
         QUuid transactionHash(const QnTransaction<ApiResetBusinessRuleData>& /*tran*/)   { return makeHash("reset_brule", ADD_HASH_DATA); }
+        QUuid transactionHash(const QnTransaction<ApiUpdateUploadResponceData>& tran)              { return makeHash(tran.params.id.toRfc4122(), tran.params.updateId.toUtf8()); }
         
         QUuid transactionHash(const QnTransaction<ApiFullInfo>& )                { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiCameraList>& )          { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
@@ -102,7 +103,7 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiEmailSettingsData>& )       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiEmailData>& )               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiVideowallControlMessage>& ) { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
-        QUuid transactionHash(const QnTransaction<ApiUpdateData>& )              { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const QnTransaction<ApiUpdateUploadData>& )              { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
     private:
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);

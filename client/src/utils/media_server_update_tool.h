@@ -21,7 +21,7 @@ protected:
     ec2::AbstractECConnectionPtr connection2() const;
 
 private slots:
-    void updateUploaded(int handle, ec2::ErrorCode errorCode);
+    void at_updateUploaded(const QString &updateId, const QnId &peerId);
 
 private:
     QString m_updateFile;
