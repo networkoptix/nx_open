@@ -31,6 +31,7 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     setName(tr("Server"));
 
     m_primaryIFSelected = false;
+    m_statusTimer.restart();
 }
 
 QnMediaServerResource::~QnMediaServerResource()
@@ -347,4 +348,18 @@ bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) 
         return (server->getServerFlags() & Qn::SF_Edge);
     return false;
+}
+
+void QnMediaServerResource::setStatus(Status newStatus, bool silenceMode)
+{
+    QMutexLocker lock(&m_mutex);
+    if (getStatus() != newStatus)
+        m_statusTimer.restart();
+    QnResource::setStatus(newStatus, silenceMode);
+}
+
+qint64 QnMediaServerResource::currentStatusTime() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_statusTimer.elapsed();
 }

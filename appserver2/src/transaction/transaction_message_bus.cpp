@@ -102,7 +102,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
         sender->setState(QnTransactionTransport::Error);
         return;
     }
-    Q_ASSERT(tran.id.peerGUID != qnCommon->moduleGUID());
+    //Q_ASSERT(tran.id.peerGUID != qnCommon->moduleGUID());
 
     tran.timestamp -= sender->timeDiff();
 

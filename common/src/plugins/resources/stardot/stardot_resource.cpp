@@ -61,11 +61,6 @@ QnAbstractStreamDataProvider* QnStardotResource::createLiveDataProvider()
     return new QnStardotStreamReader(toSharedPointer());
 }
 
-bool QnStardotResource::shoudResolveConflicts() const 
-{
-    return false;
-}
-
 QSize QnStardotResource::extractResolution(const QByteArray& resolutionStr) const
 {
     QList<QByteArray> params = resolutionStr.split('x');
