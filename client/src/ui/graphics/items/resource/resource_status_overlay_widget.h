@@ -44,6 +44,7 @@ private:
         UnauthorizedText,
         UnauthorizedSubText,
         LoadingText,
+        AnalogLicenseText,
         TextCount
     };
 

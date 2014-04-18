@@ -61,6 +61,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_staticTexts[UnauthorizedText] = tr("Unauthorized");
     m_staticTexts[UnauthorizedSubText] = tr("Please check authentication information<br/>in camera settings");
     m_staticTexts[LoadingText] = tr("Loading...");
+    m_staticTexts[AnalogLicenseText] = tr("Activate analog license to remove this message");
 
     for(int i = 0; i < m_staticTexts.size(); i++) {
         m_staticTexts[i].setPerformanceHint(QStaticText::AggressiveCaching);
@@ -211,6 +212,14 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         paintFlashingText(painter, m_staticTexts[UnauthorizedText], 0.125);
         paintFlashingText(painter, m_staticTexts[UnauthorizedSubText], 0.05, QPointF(0.0, 0.25));
         break;
+    case Qn::AnalogWithoutLicenseOverlay: 
+        {
+            QRectF rect = this->rect();
+            int count = qFloor(qMax(1.0, rect.height() / rect.width()) * 7.5);
+            for (int i = -count; i <= count; i++)
+                paintFlashingText(painter, m_staticTexts[AnalogLicenseText], 0.035, QPointF(0.0, 0.06 * i));
+            break;
+        }
     case Qn::ServerOfflineOverlay:
         paintFlashingText(painter, m_staticTexts[ServerOfflineText], 0.125);
         break;
