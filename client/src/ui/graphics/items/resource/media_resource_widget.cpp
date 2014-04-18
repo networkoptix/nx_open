@@ -108,7 +108,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_display(NULL),
     m_renderer(NULL),
     m_motionSensitivityValid(false),
-    m_binaryMotionMaskValid(false)
+    m_binaryMotionMaskValid(false),
+    m_homePtzController(NULL)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource)
@@ -763,7 +764,9 @@ void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &par
 int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
     Qn::ResourceStatusOverlay statusOverlay = statusOverlayWidget()->statusOverlay();
 
-    if(statusOverlay == Qn::OfflineOverlay) {
+    if (statusOverlay == Qn::AnalogWithoutLicenseOverlay) {
+        return Qn::MainWindow_MediaItem_AnalogLicense_Help;
+    } else if (statusOverlay == Qn::OfflineOverlay) {
         return Qn::MainWindow_MediaItem_Diagnostics_Help;
     } else if(statusOverlay == Qn::UnauthorizedOverlay) {
         return Qn::MainWindow_MediaItem_Unauthorized_Help;
@@ -782,6 +785,8 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
         return Qn::MainWindow_MediaItem_SmartSearch_Help;
     } else if(m_resource->toResource()->flags() & QnResource::local) {
         return Qn::MainWindow_MediaItem_Local_Help;
+    } else if (m_camera && m_camera->isDtsBased()) {
+        return Qn::MainWindow_MediaItem_AnalogCamera_Help;
     } else {
         return Qn::MainWindow_MediaItem_Help;
     }
@@ -965,14 +970,18 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         return Qn::EmptyOverlay;
     } else if (resource->hasFlags(QnResource::ARCHIVE) && resource->getStatus() == QnResource::Offline) {
         return Qn::NoDataOverlay;
-    } else if (m_display->isPaused() && (options() & DisplayActivity)) {
-        if (!qnSettings->isVideoWallMode())
-            return Qn::PausedOverlay;
-        return Qn::EmptyOverlay;
+
+        
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Offline) {
         return Qn::OfflineOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Unauthorized) {
         return Qn::UnauthorizedOverlay;
+    } else if (m_camera && m_camera->isDtsBased() && m_camera->isScheduleDisabled()) {
+        return Qn::AnalogWithoutLicenseOverlay;
+    } else if (m_display->isPaused() && (options() & DisplayActivity)) {
+        if (!qnSettings->isVideoWallMode())
+            return Qn::PausedOverlay;
+        return Qn::EmptyOverlay;
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;

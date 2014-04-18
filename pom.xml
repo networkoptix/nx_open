@@ -36,6 +36,7 @@
         <license.environment>production</license.environment>
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
+        <skip.sign>true</skip.sign>
         <beta>true</beta>
         <box></box>
 
@@ -517,6 +518,7 @@
             </activation>
             <properties>
                 <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>
+                <skip.sign>false</skip.sign>
             </properties>
         </profile>        
     </profiles> 
