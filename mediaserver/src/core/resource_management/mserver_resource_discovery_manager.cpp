@@ -101,7 +101,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         if (rpResource->hasFlags(QnResource::foreigner))
         {
-            if (!canTakeForeignCamera(newNetRes)) 
+            if (!canTakeForeignCamera(rpResource)) 
             {
                 it = resources.erase(it); // do not touch foreign resource
                 continue;
