@@ -1,5 +1,5 @@
-#ifndef QN_LEXICAL_H
-#define QN_LEXICAL_H
+#ifndef QN_SERIALIZATION_LEXICAL_H
+#define QN_SERIALIZATION_LEXICAL_H
 
 #include <cassert>
 
@@ -83,4 +83,4 @@ __VA_ARGS__ bool deserialize(const QString &value, TYPE *target) {              
 
 #include "lexical_functions.h"
 
-#endif // QN_LEXICAL_H
+#endif // QN_SERIALIZATION_LEXICAL_H

@@ -5,6 +5,8 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QtNumeric> /* For qIsFinite. */
 
+#include "json_functions.h"
+
 void QJsonDetail::serialize_json(const QJsonValue &value, QByteArray *target, QJsonDocument::JsonFormat format) {
     switch (value.type()) {
     case QJsonValue::Null:

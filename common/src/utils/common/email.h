@@ -7,7 +7,7 @@
 
 #include <api/model/kvpair.h>
 
-#include <utils/serialization/json.h> // TODO: #Elric move to cpp
+#include <utils/serialization/json_functions.h>
 
 class QnEmail {
     Q_GADGET
@@ -87,19 +87,6 @@ private:
     QString m_email;
 };
 
-inline void serialize(const QnEmail::ConnectionType &value, QJsonValue *target) {
-    QJson::serialize(static_cast<int>(value), target);
-}
-
-inline bool deserialize(const QJsonValue &value, QnEmail::ConnectionType *target) {
-    int tmp;
-    if(!QJson::deserialize(value, &tmp))
-        return false;
-    
-    *target = static_cast<QnEmail::ConnectionType>(tmp);
-    return true;
-}
-
-QN_DECLARE_FUNCTIONS(QnEmail::SmtpServerPreset, (json))
+QN_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (json))
 
 #endif // EMAIL_H

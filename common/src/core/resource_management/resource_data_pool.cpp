@@ -3,7 +3,7 @@
 #include <QtCore/QFile>
 
 #include <utils/common/warnings.h>
-#include <utils/serialization/json.h>
+#include <utils/serialization/json_functions.h>
 #include <core/resource/camera_resource.h>
 
 struct QnResourceDataPoolChunk {

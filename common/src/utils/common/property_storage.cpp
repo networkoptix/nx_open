@@ -7,10 +7,10 @@
 #include <QtCore/QMutex>
 #include <QtGui/QColor>
 
+#include <utils/serialization/json_functions.h>
+
 #include "warnings.h"
 #include "command_line_parser.h"
-
-#include <utils/serialization/json.h>
 
 // -------------------------------------------------------------------------- //
 // QnPropertyStorageLocker

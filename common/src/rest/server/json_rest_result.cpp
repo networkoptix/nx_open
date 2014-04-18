@@ -1,6 +1,7 @@
 #include "json_rest_result.h"
 
 #include <utils/fusion/fusion_adaptor.h>
+#include <utils/serialization/json_functions.h>
 
 QnJsonRestResult::QnJsonRestResult(): 
     m_error(NoError) 

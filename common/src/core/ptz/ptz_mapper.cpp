@@ -1,6 +1,6 @@
 #include "ptz_mapper.h"
 
-#include <utils/serialization/json.h>
+#include <utils/serialization/json_functions.h>
 #include <utils/common/enum_name_mapper.h>
 #include <utils/math/math.h>
 

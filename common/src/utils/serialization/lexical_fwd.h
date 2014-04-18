@@ -1,5 +1,5 @@
-#ifndef QN_LEXICAL_FWD_H
-#define QN_LEXICAL_FWD_H
+#ifndef QN_SERIALIZATION_LEXICAL_FWD_H
+#define QN_SERIALIZATION_LEXICAL_FWD_H
 
 class QString;
 
@@ -13,4 +13,4 @@ class QString;
 __VA_ARGS__ void serialize(const TYPE &value, QString *target);                 \
 __VA_ARGS__ bool deserialize(const QString &value, TYPE *target);
 
-#endif // QN_LEXICAL_FWD_H
+#endif // QN_SERIALIZATION_LEXICAL_FWD_H

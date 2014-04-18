@@ -2,7 +2,7 @@
 
 #include <utils/common/container.h>
 #include <utils/serialization/model_functions.h>
-#include <utils/serialization/json.h>
+#include <utils/serialization/json_functions.h>
 #include <utils/fusion/fusion_adaptor.h>
 
 QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnMediaDewarpingParams::ViewMode, static)

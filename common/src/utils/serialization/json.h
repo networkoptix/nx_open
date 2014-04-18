@@ -1,5 +1,5 @@
-#ifndef QN_JSON_H
-#define QN_JSON_H
+#ifndef QN_SERIALIZATION_JSON_H
+#define QN_SERIALIZATION_JSON_H
 
 #include <cassert>
 #include <limits>
@@ -23,6 +23,7 @@
 
 #include "json_fwd.h"
 #include "serialization.h"
+#include "lexical.h"
 
 
 class QnJsonSerializer;
@@ -322,77 +323,6 @@ QN_FUSION_REGISTER_SERIALIZATION_VISITORS(QJsonValue, QJsonDetail::Serialization
 
 
 
-#if 0
-
-/**
- * This macro generates the necessary boilerplate to (de)serialize struct types.
- * It uses field names for JSON keys.
- *
- * \param TYPE                          Struct type to define (de)serialization functions for.
- * \param FIELD_SEQ                     Preprocessor sequence of all fields of the
- *                                      given type that are to be (de)serialized.
- * \param OPTIONS                       Additional (de)serialization options.
- * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
- */
-#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(TYPE, FIELD_SEQ, OPTIONS, ... /* PREFIX */) \
-    QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS_EX(TYPE, BOOST_PP_SEQ_TRANSFORM(QN_CLASS_FROM_STRUCT_JSON_FIELD_I, TYPE, FIELD_SEQ), OPTIONS, ##__VA_ARGS__)
-
-#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
-    QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(TYPE, FIELD_SEQ, 0, ##__VA_ARGS__)
-
-#define QN_CLASS_FROM_STRUCT_JSON_FIELD_I(R, TYPE, FIELD)                       \
-    (&TYPE::FIELD, &TYPE::FIELD, BOOST_PP_STRINGIZE(FIELD))
-
-
-/**
- * This macro generates the necessary boilerplate to (de)serialize class types.
- * 
- * \param TYPE                          Class type to define (de)serialization functions for.
- * \param FIELD_SEQ                     Preprocessor sequence of field descriptions for
- *                                      the given class type.
- * \param OPTIONS                       Additional (de)serialization options.
- * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
- */
-#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS_EX(TYPE, FIELD_SEQ, OPTIONS, ... /* PREFIX */) \
-__VA_ARGS__ void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target) { \
-    const QJson::Options options = OPTIONS;                                     \
-    QJsonObject result;                                                         \
-    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_CLASS_JSON_SERIALIZATION_STEP_I, ~, FIELD_SEQ) \
-    *target = result;                                                           \
-}                                                                               \
-                                                                                \
-__VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *target) { \
-    if(value.type() != QJsonValue::Object)                                      \
-        return false;                                                           \
-    QJsonObject object = value.toObject();                                      \
-                                                                                \
-    const QJson::Options options = OPTIONS;                                     \
-    TYPE result;                                                                \
-    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_I, ~, FIELD_SEQ) \
-    *target = result;                                                           \
-    return true;                                                                \
-}
-
-#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(TYPE, FIELD_SEQ, ... /* PREFIX */) \
-    QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS_EX(TYPE, FIELD_SEQ, 0, ##__VA_ARGS__)
-
-#define QN_DEFINE_CLASS_JSON_SERIALIZATION_STEP_I(R, DATA, FIELD)               \
-    QN_DEFINE_CLASS_JSON_SERIALIZATION_STEP_II FIELD
-
-#define QN_DEFINE_CLASS_JSON_SERIALIZATION_STEP_II(GETTER, SETTER, NAME, ... /* OPTIONS */) \
-    QJsonDetail::serializeMember(ctx, value, GETTER, QStringLiteral(NAME), &result, options, ##__VA_ARGS__);
-
-#define QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_I(R, DATA, FIELD)             \
-    QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_II FIELD
-
-#define QN_DEFINE_CLASS_JSON_DESERIALIZATION_STEP_II(GETTER, SETTER, NAME, ... /* OPTIONS */) \
-    if(!QJsonDetail::deserializeMember(ctx, object, QStringLiteral(NAME), &result, GETTER, SETTER, options, ##__VA_ARGS__)) \
-        return false;
-
-
-
-#else // Q_MOC_RUN
-
 #define QN_DEFINE_FUSION_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)   \
 __VA_ARGS__ void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target) { \
     QnFusion::serialize(ctx, value, target);                                    \
@@ -401,18 +331,6 @@ __VA_ARGS__ void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *ta
 __VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *target) { \
     return QnFusion::deserialize(ctx, value, target);                           \
 }
-
-#define QN_FUSION_DEFINE_FUNCTIONS_json QN_DEFINE_FUSION_JSON_SERIALIZATION_FUNCTIONS
-
-#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(STRUCT, FIELD_SEQ, ... /* PREFIX */) \
-    QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ)                                   \
-    QN_DEFINE_FUSION_JSON_SERIALIZATION_FUNCTIONS(STRUCT, ##__VA_ARGS__)
-
-
-///* Qt moc chokes on our macro hell, so we make things easier for it. */
-#define QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(...)
-#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS_EX(...)
-#define QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(...)
 
 #define QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)  \
 __VA_ARGS__ void serialize(QnJsonContext *, const TYPE &value, QJsonValue *target) { \
@@ -424,7 +342,6 @@ __VA_ARGS__ bool deserialize(QnJsonContext *, const QJsonValue &value, TYPE *tar
     return QJson::deserialize(value, &string) && QnLexical::deserialize(string, target); \
 }
 
-
 #define QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */) \
     QN_DEFINE_ENUM_CAST_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)    \
     QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__) // TODO: #Elric there is no support for Json int here!!!
@@ -433,8 +350,7 @@ __VA_ARGS__ bool deserialize(QnJsonContext *, const QJsonValue &value, TYPE *tar
     QN_DEFINE_ENUM_MAPPED_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)  \
     QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)
 
-#endif // Q_MOC_RUN
 
-#include "json_functions.h"
+#define QN_FUSION_DEFINE_FUNCTIONS_json QN_DEFINE_FUSION_JSON_SERIALIZATION_FUNCTIONS
 
-#endif // QN_JSON_H
+#endif // QN_SERIALIZATION_JSON_H

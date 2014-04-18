@@ -1,5 +1,5 @@
-#ifndef QN_JSON_FUNCTIONS_H
-#define QN_JSON_FUNCTIONS_H
+#ifndef QN_SERIALIZATION_JSON_FUNCTIONS_H
+#define QN_SERIALIZATION_JSON_FUNCTIONS_H
 
 #include <QtCore/QList>
 #include <QtCore/QVector>
@@ -308,4 +308,4 @@ QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QFont)
 
 void qnJsonFunctionsUnitTest();
 
-#endif // QN_JSON_FUNCTIONS_H
+#endif // QN_SERIALIZATION_JSON_FUNCTIONS_H
