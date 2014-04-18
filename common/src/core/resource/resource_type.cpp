@@ -216,6 +216,8 @@ QnId QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, const
             }
         }
     }
+
+
     return result;
 }
 
