@@ -8,7 +8,7 @@
 
 #include <QtGui/QOpenGLFunctions>
 
-class QOpenGLFunctions_3_2_Core;
+//class QOpenGLFunctions_3_2_Core;
 
 //!Incapsulates OpenGL sync object, defined in ARB_sync extension
 /*!
@@ -36,11 +36,11 @@ public:
     bool trySync();
 
 private:
-    QOpenGLFunctions_3_2_Core* versionFunctions();
+ /*   QOpenGLFunctions_3_2_Core* versionFunctions();*/
     bool arbSyncPresent();
 
     void* m_fenceSyncName;
-    QOpenGLFunctions_3_2_Core* m_versionFunctions;
+ //   QOpenGLFunctions_3_2_Core* m_versionFunctions;
     bool m_versionFunctionsInitialized;
 };
 

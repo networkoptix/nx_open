@@ -116,6 +116,7 @@ public:
     const QList<QnPtzPresetItemModel> &presetModels() const;
     const QStringList &removedPresets() const;
     
+    QnPtzPresetList presets() const;
     void setPresets(const QnPtzPresetList &presets);
     void addPreset();
     void removePreset(const QString &id);
@@ -159,8 +160,6 @@ private:
         DuplicatedLinesTour,
         OtherInvalidTour
     };
-
-    const QnPtzPresetList& presets() const;
 
     qint64 estimatedTimeSecs(const QnPtzTour &tour) const;
     TourState tourState(const QnPtzTourItemModel &tourModel, QString *stateString = NULL) const;

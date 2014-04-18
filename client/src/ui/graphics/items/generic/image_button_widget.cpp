@@ -14,7 +14,9 @@
 #include <ui/animation/variant_animator.h>
 #include <ui/style/globals.h>
 #include <ui/style/icon.h>
+
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
+
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/common/geometry.h>
@@ -26,6 +28,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/math/linear_combination.h>
 #include <utils/math/color_transformations.h>
+#include "opengl_renderer.h"
 
 //#define QN_IMAGE_BUTTON_WIDGET_DEBUG
 
@@ -54,7 +57,7 @@ namespace {
     QPixmap bestPixmap(const QIcon &icon, QIcon::Mode mode, QIcon::State state) {
         return icon.pixmap(QSize(1024, 1024), mode, state);
     }
-
+/*
     void glDrawTexturedRect(const QRectF &rect) {
         GLfloat vertices[] = {
             (GLfloat)rect.left(),   (GLfloat)rect.top(),
@@ -69,6 +72,7 @@ namespace {
             1.0, 1.0,
             0.0, 1.0
         };
+        
 
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -80,7 +84,7 @@ namespace {
 
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glDisableClientState(GL_VERTEX_ARRAY);
-    }
+    }*/
 
     typedef QnGlContextData<QnTextureTransitionShaderProgram, QnGlContextDataForwardingFactory<QnTextureTransitionShaderProgram> > QnTextureTransitionShaderProgramStorage;
     Q_GLOBAL_STATIC(QnTextureTransitionShaderProgramStorage, qn_textureTransitionShaderProgramStorage)
@@ -273,6 +277,7 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 }
 
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
+
     bool isZero = qFuzzyIsNull(progress);
     bool isOne = qFuzzyCompare(progress, 1.0);
 
@@ -287,11 +292,15 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         return;
     }
 
-    QnGlNativePainting::begin(painter);
+    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
+
     glEnable(GL_BLEND);
-    glEnable(GL_TEXTURE_2D);
+    //Deprecated in OpenGL ES2.0
+    //glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glColor(1.0, 1.0, 1.0, painter->opacity());
+
+    //glColor(1.0, 1.0, 1.0, painter->opacity());
+    QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(QVector4D(1.0, 1.0, 1.0, painter->opacity()));
 
     if (isOne || isZero) {
         if (isZero) {
@@ -299,8 +308,8 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         } else {
             checkedBindTexture(widget, endPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         }
-
-        glDrawTexturedRect(rect);
+        QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawBindedTextureOnQuad(rect);
+        //glDrawTexturedRect(rect);
     } else {
 
         glActiveTexture(GL_TEXTURE1);
@@ -309,16 +318,19 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         checkedBindTexture(widget, startPixmap, GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         m_shader->bind();
         m_shader->setProgress(progress);
-        m_shader->setTexture0(0);
         m_shader->setTexture1(1);
+        m_shader->setTexture(0);
+        m_shader->setColor(QVector4D(1.0, 1.0, 1.0, painter->opacity()));
 
-        glDrawTexturedRect(rect);
+        QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawBindedTextureOnQuad(rect,m_shader.data());
+        //glDrawTexturedRect(rect);
 
         m_shader->release();
     }
 
     glDisable(GL_BLEND);
-    glDisable(GL_TEXTURE_2D);
+    //Deprecated in OpenGL ES2.0
+    //glDisable(GL_TEXTURE_2D);
     QnGlNativePainting::end(painter);
 }
 
