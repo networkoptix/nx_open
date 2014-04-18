@@ -11,14 +11,14 @@ QnAddCameraBookmarkDialog::QnAddCameraBookmarkDialog(QWidget *parent) :
         if (m_tags.contains(link))
             m_tags.removeOne(link);
         else
-            m_tags.append(link);
+            m_tags.append(link.trimmed());
         m_tags.removeDuplicates();
         ui->tagsLineEdit->setText(m_tags.join(lit(", ")));
         updateTagsList();
     });
 
     connect(ui->tagsLineEdit, &QLineEdit::textEdited, this, [this](const QString &text) {
-        m_tags = ui->tagsLineEdit->text().split(L',', QString::SkipEmptyParts);
+        m_tags = ui->tagsLineEdit->text().split(QRegExp(lit("[ ,]")), QString::SkipEmptyParts);
         m_tags.removeDuplicates();
         updateTagsList();
     });

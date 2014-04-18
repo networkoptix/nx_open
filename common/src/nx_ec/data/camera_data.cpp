@@ -54,7 +54,7 @@ void ApiCameraBookmark::fromBookmark(const QnCameraBookmark& bookmark) {
     tags.clear();
     tags.reserve(bookmark.tags.size());
     for (const QString &tag: bookmark.tags)
-        tags.push_back(tag);
+        tags.push_back(tag.trimmed());
 }
 
 void ApiCamera::toResource(QnVirtualCameraResourcePtr resource) const
