@@ -4,7 +4,7 @@
 #include <QObject>
 
 #include <common/common_globals.h>
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
 #include <utils/common/software_version.h>
 
 #include <ui/workbench/workbench_context_aware.h>

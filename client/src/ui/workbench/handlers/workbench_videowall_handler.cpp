@@ -37,6 +37,7 @@
 #include <ui/dialogs/layout_name_dialog.h> //TODO: #GDM VW refactor
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
+#include <ui/dialogs/videowall_settings_dialog.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -241,7 +242,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(action(Qn::SaveVideoWallReviewAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered);
         connect(action(Qn::DropOnVideoWallItemAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered);
         connect(action(Qn::PushMyScreenToVideowallAction),  &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered);
-
+        connect(action(Qn::VideowallSettingsAction),        &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered);
 
 
         connect(display(),     &QnWorkbenchDisplay::widgetAdded,                        this,   &QnWorkbenchVideoWallHandler::at_display_widgetAdded);
@@ -1325,8 +1326,6 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     }
 
     attachLayout(videoWall, targetLayout, m_attachSettings);
-
-    QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(m_attachSettings.autoRun);
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered() {
@@ -1666,6 +1665,24 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
     }
 }
 
+void QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered() {
+    //TODO: #GDM VW move to action condition
+    if (!context()->user())
+        return;
+
+    QnVideoWallResourcePtr videowall = menu()->currentParameters(sender()).resource().dynamicCast<QnVideoWallResource>();
+    if (!videowall)
+        return;
+
+    QScopedPointer<QnVideowallSettingsDialog> dialog(new QnVideowallSettingsDialog(mainWindow()));
+    dialog->loadFromResource(videowall);
+    if (!dialog->exec())
+        return;
+
+    dialog->submitToResource(videowall);
+    connection2()->getVideowallManager()->save(videowall, this, [](){});
+}
+
 void QnWorkbenchVideoWallHandler::at_videoWall_layout_saved(int status, const QnResourceList &resources, int handle) {
     QnLayoutResourcePtr layout;
     if (!resources.isEmpty())
@@ -1688,6 +1705,29 @@ void QnWorkbenchVideoWallHandler::at_videoWall_layout_saved(int status, const Qn
 }
 
 void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &resource) {
+    QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
+    if (!videoWall)
+        return;
+
+    connect(videoWall, &QnVideoWallResource::autorunChanged, this, [this] (const QnResourcePtr &resource) {
+        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
+        if (!videoWall || !videoWall->hasPc(qnSettings->pcUuid()))
+            return;
+        QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(videoWall->isAutorun());
+    });
+
+    connect(videoWall, &QnVideoWallResource::pcAdded, this, [this] (const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc) {
+        if (pc.uuid != qnSettings->pcUuid())
+            return;
+        QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(videoWall->isAutorun());
+    });
+
+    connect(videoWall, &QnVideoWallResource::pcRemoved, this, [this] (const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc) {
+        if (pc.uuid != qnSettings->pcUuid())
+            return;
+        QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false);
+    });
+
     if (m_videoWallMode.active) {
         if (resource->getId() != m_videoWallMode.guid)
             return;
@@ -1697,14 +1737,12 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
         m_videoWallMode.ready = true;
         submitDelayedItemOpen();
     } else {
-        if (QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>()) {
-            connect(videoWall, &QnVideoWallResource::pcAdded,       this, &QnWorkbenchVideoWallHandler::at_videoWall_pcAdded);
-            connect(videoWall, &QnVideoWallResource::pcChanged,     this, &QnWorkbenchVideoWallHandler::at_videoWall_pcChanged);
-            connect(videoWall, &QnVideoWallResource::pcRemoved,     this, &QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved);
-            connect(videoWall, &QnVideoWallResource::itemAdded,     this, &QnWorkbenchVideoWallHandler::at_videoWall_itemAdded);
-            connect(videoWall, &QnVideoWallResource::itemChanged,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged);
-            connect(videoWall, &QnVideoWallResource::itemRemoved,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved);
-        }
+        connect(videoWall, &QnVideoWallResource::pcAdded,       this, &QnWorkbenchVideoWallHandler::at_videoWall_pcAdded);
+        connect(videoWall, &QnVideoWallResource::pcChanged,     this, &QnWorkbenchVideoWallHandler::at_videoWall_pcChanged);
+        connect(videoWall, &QnVideoWallResource::pcRemoved,     this, &QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved);
+        connect(videoWall, &QnVideoWallResource::itemAdded,     this, &QnWorkbenchVideoWallHandler::at_videoWall_itemAdded);
+        connect(videoWall, &QnVideoWallResource::itemChanged,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged);
+        connect(videoWall, &QnVideoWallResource::itemRemoved,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved);
     }
 }
 

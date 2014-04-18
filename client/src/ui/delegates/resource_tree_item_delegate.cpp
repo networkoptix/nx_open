@@ -5,6 +5,7 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 
 #include <client/client_meta_types.h>
 

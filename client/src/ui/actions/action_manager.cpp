@@ -559,7 +559,7 @@ QnActionManager::QnActionManager(QObject *parent):
             requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditUsersPermission).
             text(tr("User...")).
             pulledText(tr("New User...")).
-            condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this)). //TODO: #GDM check in the main menu
+            condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this)).
             autoRepeat(false);
 
         factory(Qn::NewVideoWallAction).
@@ -1231,6 +1231,11 @@ QnActionManager::QnActionManager(QObject *parent):
        text(tr("Layout Settings...")).
        requiredPermissions(Qn::EditLayoutSettingsPermission).
        condition(new QnLightModeCondition(Qn::LightModeNoLayoutBackground, this));
+
+    factory(Qn::VideowallSettingsAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        text(tr("Videowall Settings...")).
+        condition(new QnResourceActionCondition(hasFlags(QnResource::videowall), Qn::ExactlyOne, this));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).

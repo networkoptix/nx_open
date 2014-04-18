@@ -7,19 +7,20 @@
 
 #include <ui/graphics/opengl/gl_functions.h>
 
-#define GL_GLEXT_PROTOTYPES
-#ifdef Q_OS_MACX
-#include <glext.h>
-#else
-#include <GL/glext.h>
-#endif
-
+//#define GL_GLEXT_PROTOTYPES
+//#ifdef Q_OS_MACX
+//#include <glext.h>
+//#else
+//#include <GL/glext.h>
+//#endif
+//#define GL_GLEXT_PROTOTYPES 1
+#include <QtGui/qopengl.h>
 #include <QtGui/QOpenGLFunctions_3_2_Core>
 
 
 GLFence::GLFence() :
     m_fenceSyncName( 0 ),
-    m_versionFunctions(NULL),
+//    m_versionFunctions(NULL),
     m_versionFunctionsInitialized(false)
 {
 }
@@ -29,12 +30,12 @@ GLFence::~GLFence()
     if (!m_fenceSyncName)
         return;
 
-    versionFunctions()->glDeleteSync((GLsync)m_fenceSyncName);
+ //   versionFunctions()->glDeleteSync((GLsync)m_fenceSyncName);
 }
 
 bool GLFence::placeFence()
 {
-    if( arbSyncPresent() )
+   /* if( arbSyncPresent() )
     {
         if( m_fenceSyncName )
             versionFunctions()->glDeleteSync( (GLsync)m_fenceSyncName );
@@ -46,12 +47,13 @@ bool GLFence::placeFence()
         glFlush();
         glFinish();
         return true;
-    }
+    }*/
+    return false;
 }
 
 void GLFence::sync()
 {
-    if( !arbSyncPresent() || !m_fenceSyncName )
+/*    if( !arbSyncPresent() || !m_fenceSyncName )
         return;
 
     for( ;; )
@@ -72,12 +74,12 @@ void GLFence::sync()
                 Q_ASSERT( false );
                 return;
         }
-    }
+    }*/
 }
 
 bool GLFence::trySync()
 {
-    if( !arbSyncPresent() || !m_fenceSyncName )
+ /*   if( !arbSyncPresent() || !m_fenceSyncName )
         return false;
 
     for( ;; )
@@ -100,9 +102,10 @@ bool GLFence::trySync()
                 Q_ASSERT( false );
                 return false;
         }
-    }
+    }*/
+    return false;
 }
-
+/*
 QOpenGLFunctions_3_2_Core* GLFence::versionFunctions() {
     if (m_versionFunctionsInitialized)
         return m_versionFunctions;
@@ -116,8 +119,9 @@ QOpenGLFunctions_3_2_Core* GLFence::versionFunctions() {
     if (!m_versionFunctions->initializeOpenGLFunctions())
         m_versionFunctions = NULL;
     return m_versionFunctions;
-}
+}*/
 
 bool GLFence::arbSyncPresent() {
-    return versionFunctions() != NULL;
+//    return versionFunctions() != NULL;
+    return false;
 }

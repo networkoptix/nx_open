@@ -225,26 +225,26 @@ bool QnDbManager::createDatabase()
 
     if (!isObjectExists(lit("table"), lit("vms_resource")))
     {
-        if (!execSQLFile(QLatin1String(":/createdb.sql")))
+        if (!execSQLFile(QLatin1String(":/01_createdb.sql")))
             return false;
 
 #ifdef EDGE_SERVER
-        if (!execSQLFile(QLatin1String(":/insert_3thparty_vendor.sql")))
+        if (!execSQLFile(QLatin1String(":/02_insert_3thparty_vendor.sql")))
             return false;
 #else
-        if (!execSQLFile(QLatin1String(":/insert_all_vendors.sql")))
+        if (!execSQLFile(QLatin1String(":/02_insert_all_vendors.sql")))
             return false;
 #endif
 
-        if (!execSQLFile(QLatin1String(":/update_2.2_stage1.sql")))
+        if (!execSQLFile(QLatin1String(":/03_update_2.2_stage1.sql")))
             return false;
         if (!updateGuids())
             return false;
-        if (!execSQLFile(QLatin1String(":/update_2.2_stage2.sql")))
+        if (!execSQLFile(QLatin1String(":/04_update_2.2_stage2.sql")))
             return false;
 
         { //Videowall-related scripts
-            if (!execSQLFile(QLatin1String(":/update_2.2_stage3.sql")))
+            if (!execSQLFile(QLatin1String(":/05_videowall.sql")))
                 return false;
             QMap<int, QnId> guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'Videowall'");
             if (!updateTableGuids("vms_resourcetype", "guid", guids))
@@ -462,8 +462,8 @@ ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCamera& data, qint32 inter
 ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServer& data, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO vms_server (api_url, auth_key, streaming_url, version, net_addr_list, flags, panic_mode, resource_ptr_id) VALUES\
-                     (:apiUrl, :authKey, :streamingUrl, :version, :netAddrList, :flags, :panicMode, :internalId)");
+    insQuery.prepare("INSERT OR REPLACE INTO vms_server (api_url, auth_key, streaming_url, version, net_addr_list, flags, panic_mode, max_cameras, redundancy, resource_ptr_id) VALUES\
+                     (:apiUrl, :authKey, :streamingUrl, :version, :netAddrList, :flags, :panicMode, :maxCameras, :redundancy, :internalId)");
     data.autoBindValues(insQuery);
     insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
@@ -1050,9 +1050,26 @@ ErrorCode QnDbManager::removeCamera(const QnId& guid)
 
 ErrorCode QnDbManager::removeServer(const QnId& guid)
 {
+    ErrorCode err;
     qint32 id = getResourceInternalId(guid);
 
-    ErrorCode err = deleteAddParams(id);
+    QSqlQuery queryCameras(m_sdb);
+    queryCameras.setForwardOnly(true);
+    queryCameras.prepare("SELECT r.guid from vms_camera c JOIN vms_resource r on r.id = c.resource_ptr_id WHERE r.parent_guid = ?");
+    queryCameras.addBindValue(guid.toRfc4122());
+
+    ApiCameraList cameraList;
+    if (!queryCameras.exec()) {
+        qWarning() << Q_FUNC_INFO << queryCameras.lastError().text();
+        return ErrorCode::failure;
+    }
+    while(queryCameras.next()) {
+        err = removeCamera(QUuid::fromRfc4122(queryCameras.value(0).toByteArray()));
+        if (err != ErrorCode::ok)
+            return err;
+    }
+
+    err = deleteAddParams(id);
     if (err != ErrorCode::ok)
         return err;
 
@@ -1331,14 +1348,14 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraList& camer
     QSqlQuery queryScheduleTask(m_sdb);
     QString filterStr2;
     if (!mServerId.isNull()) 
-        filterStr2 = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(mServerId));
+        filterStr2 = QString("AND r.parent_guid = %1").arg(guidToSqlString(mServerId));
     
     queryScheduleTask.setForwardOnly(true);
     queryScheduleTask.prepare(QString("SELECT r.guid as sourceId, st.start_time as startTime, st.end_time as endTime, st.do_record_audio as doRecordAudio, \
                                        st.record_type as recordType, st.day_of_week as dayOfWeek, st.before_threshold as beforeThreshold, st.after_threshold as afterThreshold, \
                                        st.stream_quality as streamQuality, st.fps \
                                        FROM vms_scheduletask st \
-                                       JOIN vms_resource r on r.id = st.source_id %1 ORDER BY r.id").arg(filterStr2));
+                                       JOIN vms_resource r on r.id = st.source_id %1 ORDER BY r.id").arg(filterStr));
 
     QSqlQuery queryParams(m_sdb);
     queryParams.setForwardOnly(true);
@@ -1385,7 +1402,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerL
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare(QString("select r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentGuid, r.name, r.url, r.status,r. disabled, \
-                          s.api_url as apiUrl, s.auth_key as authKey, s.streaming_url as streamingUrl, s.version, s.net_addr_list as netAddrList, s.flags, s.panic_mode as panicMode \
+                          s.api_url as apiUrl, s.auth_key as authKey, s.streaming_url as streamingUrl, s.version, s.net_addr_list as netAddrList, s.flags, s.panic_mode as panicMode, s.max_cameras as maxCameras, \
+                          s.redundancy \
                           from vms_resource r \
                           join vms_server s on s.resource_ptr_id = r.id order by r.guid"));
 

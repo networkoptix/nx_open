@@ -147,6 +147,17 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QModelIndex &index) con
     return static_cast<QnResourcePoolModelNode *>(index.internalPointer());
 }
 
+QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource, const QString &groupId, const QString &groupName) {
+    RecorderHash recorderHash = m_recorderHashByResource[resource];
+    if (recorderHash.contains(groupId))
+        return recorderHash[groupId];
+
+    QnResourcePoolModelNode* recorder = new QnResourcePoolModelNode(this, Qn::RecorderNode, groupName);
+    recorder->setParent(m_resourceNodeByResource[resource]);
+    recorderHash[groupId] = recorder;
+    return recorder;
+}
+
 void QnResourcePoolModel::deleteNode(QnResourcePoolModelNode *node) {
     if (
             node->type() == Qn::VideoWallItemNode ||
@@ -227,7 +238,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
             QString groupName = camera->getGroupName();
             QString groupId = camera->getGroupId();
             if(!groupId.isEmpty())
-                parent = parent->recorder(groupId, groupName.isEmpty() ? groupId : groupName);
+                parent = this->node(parentResource, groupId, groupName.isEmpty() ? groupId : groupName);
         }
 
         return parent;
@@ -626,14 +637,14 @@ void QnResourcePoolModel::at_user_videoWallItemRemoved(const QnUserResourcePtr &
     deleteNode(node(Qn::UserVideoWallItemNode, uuid, user));
 }
 
-//TODO: #GDM need complete recorder nodes structure refactor to get rid of this shit
 void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera) {
     const QString groupId = camera->getGroupId();
-    foreach (QnResourcePoolModelNode* node, m_resourceNodeByResource) {
-        if (!node->m_recorders.contains(groupId))
+    foreach (RecorderHash recorderHash, m_recorderHashByResource) {
+        if (!recorderHash.contains(groupId))
             continue;
-        node->m_recorders[groupId]->m_name = camera->getGroupName();
-        node->m_recorders[groupId]->m_displayName = camera->getGroupName();
-        node->changeInternal();
+        QnResourcePoolModelNode* recorder = recorderHash[groupId];
+        recorder->m_name = camera->getGroupName();
+        recorder->m_displayName = camera->getGroupName();
+        recorder->changeInternal();
     }
 }

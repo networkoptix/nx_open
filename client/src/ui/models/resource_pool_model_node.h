@@ -91,12 +91,6 @@ public:
     bool isModified() const;
 
     void setModified(bool modified) ;
-
-    // TODO: #GDM
-    // This is a node construction method, so it does not really belong here.
-    // See other node construction methods, QnResourcePoolModel::node(...).
-    QnResourcePoolModelNode *recorder(const QString &groupId, const QString &groupName) ;
-
 protected:
     void removeChildInternal(QnResourcePoolModelNode *child) ;
     void addChildInternal(QnResourcePoolModelNode *child);
@@ -132,9 +126,6 @@ private:
 
     /** Children of this node. */
     QList<QnResourcePoolModelNode *> m_children;
-
-    /** Recorder children of this node by group id. */
-    QHash<QString, QnResourcePoolModelNode *> m_recorders;
 
     /* Resource-related state. */
 

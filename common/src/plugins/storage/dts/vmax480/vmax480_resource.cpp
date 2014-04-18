@@ -115,11 +115,6 @@ int QnPlVmax480Resource::eventPort() const
     
 }
 
-bool QnPlVmax480Resource::shoudResolveConflicts() const 
-{
-    return false;
-}
-
 QnAbstractStreamDataProvider* QnPlVmax480Resource::createLiveDataProvider()
 {
     return new QnVMax480LiveProvider(toSharedPointer());

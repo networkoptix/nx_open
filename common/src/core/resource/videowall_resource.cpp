@@ -17,7 +17,10 @@ void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArra
     if(localOther) {
         setItemsUnderLock(localOther->m_itemByUuid);
         setPcsUnderLock(localOther->m_pcByUuid);
-        m_autorun = localOther->m_autorun;
+        if (m_autorun != localOther->m_autorun) {
+            m_autorun = localOther->m_autorun;
+            modifiedFields << "autorunChanged";
+        }
     }
 }
 
@@ -258,5 +261,5 @@ void QnVideoWallResource::setAutorun(bool value) {
             return;
         m_autorun = value;
     }
-    emit autorunChanged(::toSharedPointer(this), value);
+    emit autorunChanged(::toSharedPointer(this));
 }

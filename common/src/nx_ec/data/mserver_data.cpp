@@ -54,6 +54,8 @@ void ApiMediaServer::fromResource(QnMediaServerResourcePtr resource)
     panicMode = resource->getPanicMode();
     streamingUrl = resource->getStreamingUrl();
     version = resource->getVersion().toString();
+    maxCameras = resource->getMaxCameras();
+    redundancy = resource->isRedundancy();
     //authKey = resource-> getetAuthKey();
 
     QnAbstractStorageResourceList storageList = resource->getStorages();
@@ -75,6 +77,9 @@ void ApiMediaServer::toResource(QnMediaServerResourcePtr resource, const Resourc
     resource->setPanicMode((Qn::PanicMode) panicMode);
     resource->setStreamingUrl(streamingUrl);
     resource->setVersion(QnSoftwareVersion(version));
+    resource->setMaxCameras(maxCameras);
+    resource->setRedundancy(redundancy);
+
     //resource->setAuthKey(authKey);
 
     QnResourceTypePtr resType = ctx.resTypePool->getResourceTypeByName(QLatin1String("Storage"));

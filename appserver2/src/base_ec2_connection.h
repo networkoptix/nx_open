@@ -55,7 +55,7 @@ namespace ec2
         virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) override;
         virtual int saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
 
-        virtual void addRemotePeer(const QUrl& url, bool isClient) override;
+        virtual void addRemotePeer(const QUrl& url, bool isClient, const QUuid& peerGuid) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
     public:
 
@@ -67,6 +67,10 @@ namespace ec2
         }
 
         void triggerNotification( const QnTransaction<ApiLicenseList>& tran ) {
+            m_licenseManager->triggerNotification( tran );
+        }
+
+        void triggerNotification( const QnTransaction<ApiLicense>& tran ) {
             m_licenseManager->triggerNotification( tran );
         }
 

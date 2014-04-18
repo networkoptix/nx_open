@@ -25,11 +25,6 @@ public:
 
     int httpPort() const override;
 
-    bool shoudResolveConflicts() const override
-    {
-        return false;
-    }
-
 
 protected:
 

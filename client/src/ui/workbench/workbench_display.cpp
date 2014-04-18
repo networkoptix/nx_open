@@ -1647,7 +1647,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             }
         }
 
-        bool paused = widget->item()->data<bool>(Qn::ItemPausedRole);
+        bool paused = widget->item()->data<bool>(Qn::ItemPausedRole, false);
         if(paused) {
             if(widget->display()->archiveReader()) {
                 widget->display()->archiveReader()->pauseMedia();

@@ -175,6 +175,7 @@ namespace Qn {
         NoDataOverlay,
         UnauthorizedOverlay,
         OfflineOverlay,
+        AnalogWithoutLicenseOverlay,
         ServerOfflineOverlay,
 
         OverlayCount
@@ -213,9 +214,6 @@ namespace Qn {
         CommonNotification,
         ImportantNotification,
         CriticalNotification,
-        SystemNotification,
-        SoundNotification,
-
         LevelCount
     };
 
