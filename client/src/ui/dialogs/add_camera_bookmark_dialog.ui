@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QnAddCameraBookmarkDialog</class>
+ <widget class="QDialog" name="QnAddCameraBookmarkDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>556</width>
+    <height>481</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="nameLabel">
+       <property name="text">
+        <string>&amp;Name</string>
+       </property>
+       <property name="buddy">
+        <cstring>nameLineEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="nameLineEdit"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="descriptionLabel">
+       <property name="text">
+        <string>&amp;Description</string>
+       </property>
+       <property name="buddy">
+        <cstring>plainTextEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPlainTextEdit" name="plainTextEdit"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="colorLabel">
+       <property name="text">
+        <string>&amp;Color</string>
+       </property>
+       <property name="buddy">
+        <cstring>colorComboBox</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="colorComboBox"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="timeoutLabel">
+       <property name="text">
+        <string>&amp;Timeout</string>
+       </property>
+       <property name="buddy">
+        <cstring>comboBox</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="comboBox"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="tagsLabel">
+       <property name="text">
+        <string>T&amp;ags</string>
+       </property>
+       <property name="buddy">
+        <cstring>lineEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QWidget" name="tagsWidget" native="true">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QLineEdit" name="lineEdit"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="tagsListLabel">
+          <property name="text">
+           <string>&lt;html&gt;&lt;body&gt;&lt;center&gt;
+&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;&lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+ &lt;a style=&quot;text-decoration:underline;&quot; href=&quot;key&quot;&gt;&lt;font style=&quot;font-size:15px;color:#009933&quot;&gt;key&lt;/font&gt;&lt;\a&gt;
+&lt;span style=&quot;text-decoration:none;&quot;&gt;  &lt;/span&gt;
+&lt;/center&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>nameLineEdit</tabstop>
+  <tabstop>plainTextEdit</tabstop>
+  <tabstop>colorComboBox</tabstop>
+  <tabstop>comboBox</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

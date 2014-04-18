@@ -944,8 +944,12 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodContent type) {
     if (type == Qn::BookmarksContent) {
         if (m_currentWidget) {
             if (QnVirtualCameraResourcePtr camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>()) {
-                foreach (const QnCameraBookmark &bookmark, camera->getBookmarks())
+                qDebug() << "Camera bookmarks list:";
+                foreach (const QnCameraBookmark &bookmark, camera->getBookmarks()) {
                     periods.append(bookmark);
+                    qDebug() << bookmark;
+                }
+                qSort(periods);
             }
         }
     } else if(type == Qn::MotionContent && m_currentWidget && !(m_currentWidget->options() & QnResourceWidget::DisplayMotion)) {

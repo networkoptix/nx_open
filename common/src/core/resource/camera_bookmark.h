@@ -37,6 +37,8 @@ public:
     }
 };
 
+QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark);
+
 Q_DECLARE_METATYPE(QnCameraBookmark);
 Q_DECLARE_TYPEINFO(QnCameraBookmark, Q_MOVABLE_TYPE);
 
