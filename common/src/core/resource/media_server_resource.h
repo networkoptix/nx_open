@@ -57,6 +57,9 @@ public:
     int getMaxCameras() const;
     void setMaxCameras(int value);
 
+    void setRedundancy(bool value);
+    int isRedundancy() const;
+
     QnSoftwareVersion getVersion() const;
     void setVersion(const QnSoftwareVersion& version);
     static bool isEdgeServer(const QnResourcePtr &resource);
@@ -85,6 +88,7 @@ private:
     QMap<int, QString> m_runningIfRequests;
     QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
     int m_maxCameras;
+    bool m_redundancy;
     QElapsedTimer m_statusTimer;
 };
 

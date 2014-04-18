@@ -54,7 +54,7 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(QnResourcePtr camer
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     if (!mServer || mServer->getStatus() == QnResource::Online)
         return false;
-    if (mServer->getMaxCameras() == 0)
+    if (!mServer->isRedundancy())
         return false; // redundancy is disabled
     
     return mServer->currentStatusTime() > MSERVER_OFFLINE_TIMEOUT;

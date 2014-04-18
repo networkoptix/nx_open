@@ -21,7 +21,8 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     m_serverFlags(Qn::SF_None),
     m_panicMode(Qn::PM_None),
     m_guard(NULL),
-    m_maxCameras(0)
+    m_maxCameras(0),
+    m_redundancy(false)
 {
     setTypeId(resTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
@@ -329,6 +330,18 @@ int QnMediaServerResource::getMaxCameras() const
 {
     QMutexLocker lock(&m_mutex);
     return m_maxCameras;
+}
+
+void QnMediaServerResource::setRedundancy(bool value)
+{
+    QMutexLocker lock(&m_mutex);
+    m_redundancy = value;
+}
+
+int QnMediaServerResource::isRedundancy() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_redundancy;
 }
 
 void QnMediaServerResource::setMaxCameras(int value)
