@@ -1,6 +1,6 @@
 #include "ptz_rest_handler.h"
 
-#include <utils/serialization/json.h>
+#include <utils/serialization/json_functions.h>
 #include <utils/serialization/lexical.h>
 #include <utils/network/tcp_connection_priv.h>
 

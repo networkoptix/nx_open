@@ -3,12 +3,11 @@
 #include <memory>
 
 #include <utils/math/math.h>
-#include <utils/serialization/json.h>
-
-#include <utils/serialization/model_functions.h>
+#include <utils/serialization/json_functions.h>
+#include <utils/common/model_functions.h>
 #include <utils/fusion/fusion_adaptor.h>
 
-QN_DEFINE_STRUCT_FUNCTIONS(ImageCorrectionParams, (json), (blackLevel)(whiteLevel)(gamma)(enabled))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ImageCorrectionParams, (json), (blackLevel)(whiteLevel)(gamma)(enabled))
 
 static const int MIN_GAMMA_RANGE = 6;
 static const float NORM_RANGE_START = 0.0; //16.0

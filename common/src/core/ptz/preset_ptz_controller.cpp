@@ -1,6 +1,6 @@
 #include "preset_ptz_controller.h"
 
-#include <utils/serialization/model_functions.h>
+#include <utils/common/model_functions.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/fusion/fusion_adaptor.h>
 #include <api/app_server_connection.h>
@@ -22,7 +22,7 @@ struct QnPtzPresetData {
     QVector3D position;
     Qn::PtzCoordinateSpace space;
 };
-QN_DEFINE_STRUCT_FUNCTIONS(QnPtzPresetData, (json)(eq), (position)(space))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzPresetData, (json)(eq), (position)(space))
 
 struct QnPtzPresetRecord {
     QnPtzPresetRecord() {}
@@ -31,7 +31,7 @@ struct QnPtzPresetRecord {
     QnPtzPreset preset;
     QnPtzPresetData data;
 };
-QN_DEFINE_STRUCT_FUNCTIONS(QnPtzPresetRecord, (json)(eq), (preset)(data))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzPresetRecord, (json)(eq), (preset)(data))
 
 Q_DECLARE_METATYPE(QnPtzPresetRecordHash)
 

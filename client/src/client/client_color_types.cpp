@@ -3,7 +3,7 @@
 #include <ui/style/globals.h>
 
 #include <utils/math/color_transformations.h>
-#include <utils/serialization/json.h>
+#include <utils/serialization/json_functions.h>
 #include <utils/fusion/fusion_adaptor.h>
 #include <utils/math/math.h>
 

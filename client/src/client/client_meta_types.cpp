@@ -3,7 +3,7 @@
 #include <common/common_meta_types.h>
 
 #include <utils/color_space/image_correction.h>
-#include <utils/serialization/json.h>
+#include <utils/serialization/json_functions.h>
 #include <utils/ping_utility.h>
 
 #include <camera/thumbnail.h>

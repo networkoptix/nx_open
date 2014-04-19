@@ -10,7 +10,7 @@ namespace QnDebugSerialization {
             m_stream(stream) 
         {}
 
-        bool operator(const QnFusion::start_tag &) {
+        bool operator()(const QnFusion::start_tag &) {
             m_stream.nospace() << /* TYPENAME */ " {"; // TODO: #Elric
             return true;
         }
@@ -20,13 +20,13 @@ namespace QnDebugSerialization {
             using namespace QnFusion;
 
                                             // TODO: #Elric
-            stream.nospace() << access(name).toLatin1().data()  << ": " << invoke(access(getter), value) << "; ";
+            m_stream.nospace() << access(name).toLatin1().data()  << ": " << invoke(access(getter), value) << "; ";
             return true;
         }
 
-        bool operator(const QnFusion::end_tag &) {
-            stream.nospace() << '}';
-            stream.space();
+        bool operator()(const QnFusion::end_tag &) {
+            m_stream.nospace() << '}';
+            m_stream.space();
             return true;
         }
 
@@ -37,6 +37,15 @@ namespace QnDebugSerialization {
 } // namespace QnDebugSerialization
 
 
+/**
+ * This macro generates <tt>QDebug</tt> stream functions for
+ * the given struct type.
+ *
+ * \param TYPE                          Struct type to define <tt>QDebug</tt> stream functions for.
+ * \param FIELD_SEQ                     Preprocessor sequence of all fields of the
+ *                                      given type that are to be streamed.
+ * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
+ */
 #define QN_FUSION_DEFINE_FUNCTIONS_debug(TYPE, ... /* PREFIX */)                \
 __VA_ARGS__ QDebug &operator<<(QDebug &stream, const TYPE &value) {             \
     QnFusion::visit_members(value, QnDebugSerialization::SerializationVisitor(stream)); \

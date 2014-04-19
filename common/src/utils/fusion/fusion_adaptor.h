@@ -1,5 +1,5 @@
-#ifndef QN_FUSION_ADAPTORS_H
-#define QN_FUSION_ADAPTORS_H
+#ifndef QN_FUSION_ADAPTOR_H
+#define QN_FUSION_ADAPTOR_H
 
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/for_each.hpp>
@@ -236,4 +236,4 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 #define QN_FUSION_PROPERTY_VALUE_I_2(KEY, VALUE) BOOST_PP_CAT(QN_FUSION_PROPERTY_WRAPPER_FOR_, KEY)(VALUE)
 
 
-#endif // QN_FUSION_ADAPTORS_H
+#endif // QN_FUSION_ADAPTOR_H

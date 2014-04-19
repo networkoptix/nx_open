@@ -17,7 +17,7 @@ namespace QnDataStreamSerialization {
         bool operator()(const T &value, const Access &access) {
             using namespace QnFusion;
 
-            m_stream << invoke(adaptor.get(getter));
+            m_stream << invoke(access(getter), value);
             return true;
         }
 
@@ -64,6 +64,15 @@ namespace QnDataStreamSerialization {
 } // namespace QnDataStreamSerialization
 
 
+/**
+ * This macro generates <tt>QDataStream</tt> (de)serialization functions for
+ * the given struct type.
+ * 
+ * \param TYPE                          Struct type to define (de)serialization functions for.
+ * \param FIELD_SEQ                     Preprocessor sequence of all fields of the
+ *                                      given type that are to be (de)serialized.
+ * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
+ */
 #define QN_FUSION_DEFINE_FUNCTIONS_datastream(TYPE, ... /* PREFIX */)           \
 __VA_ARGS__ QDataStream &operator<<(QDataStream &stream, const TYPE &value) {   \
     QnFusion::visit_members(value, QnDataStreamSerialization::SerializationVisitor(stream)); \
@@ -71,7 +80,7 @@ __VA_ARGS__ QDataStream &operator<<(QDataStream &stream, const TYPE &value) {   
 }                                                                               \
                                                                                 \
 __VA_ARGS__ QDataStream &operator>>(QDataStream &stream, TYPE &value) {         \
-    QnFusion::visit_members(value, QnDataStreamSerialization::DeserializationVisitor(stream)) \
+    QnFusion::visit_members(value, QnDataStreamSerialization::DeserializationVisitor(stream)); \
     return stream;                                                              \
 }
 

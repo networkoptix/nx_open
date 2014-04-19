@@ -1,4 +1,4 @@
-#include <utils/serialization/model_functions.h>
+#include <utils/common/model_functions.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/fusion/fusion_adaptor.h>
 
@@ -8,11 +8,11 @@
 #include "ptz_data.h"
 #include "ptz_object.h"
 
-QN_DEFINE_STRUCT_FUNCTIONS(QnPtzPreset,      (json)(eq),    (id)(name))
-QN_DEFINE_STRUCT_FUNCTIONS(QnPtzTourSpot,    (json)(eq),    (presetId)(stayTime)(speed))
-QN_DEFINE_STRUCT_FUNCTIONS(QnPtzTour,        (json)(eq),    (id)(name)(spots))
-QN_DEFINE_STRUCT_FUNCTIONS(QnPtzLimits,      (json)(eq),    (minPan)(maxPan)(minTilt)(maxTilt)(minFov)(maxFov))
-QN_DEFINE_STRUCT_FUNCTIONS(QnPtzObject,      (json)(eq),    (type)(id))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzPreset,      (json)(eq),    (id)(name))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzTourSpot,    (json)(eq),    (presetId)(stayTime)(speed))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzTour,        (json)(eq),    (id)(name)(spots))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzLimits,      (json)(eq),    (minPan)(maxPan)(minTilt)(maxTilt)(minFov)(maxFov))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzObject,      (json)(eq),    (type)(id))
 
 QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::Orientations, static)
 

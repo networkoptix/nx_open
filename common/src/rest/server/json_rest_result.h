@@ -29,7 +29,7 @@ public:
         QJson::serialize(reply, &m_reply);
     }
 
-    QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnJsonRestResult, friend)
+    QN_FUSION_DECLARE_FUNCTIONS(QnJsonRestResult, (json), friend)
 
 private:
     QN_FUSION_ENABLE_PRIVATE();

@@ -1,6 +1,8 @@
 #ifndef QN_SERIALIZATION_LEXICAL_FWD_H
 #define QN_SERIALIZATION_LEXICAL_FWD_H
 
+#include <utils/fusion/fusion_fwd.h>
+
 class QString;
 
 /**
@@ -9,7 +11,7 @@ class QString;
  * \note                                This macro generates function declarations only.
  *                                      Definitions still have to be supplied.
  */
-#define QN_DECLARE_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)      \
+#define QN_FUSION_DECLARE_FUNCTIONS_lexical(TYPE, ... /* PREFIX */)             \
 __VA_ARGS__ void serialize(const TYPE &value, QString *target);                 \
 __VA_ARGS__ bool deserialize(const QString &value, TYPE *target);
 

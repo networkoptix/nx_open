@@ -4,7 +4,7 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QColor>
 
-#include <utils/serialization/model_functions_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 struct QnTimeSliderColors {
 public:
@@ -129,7 +129,7 @@ struct QnLicensesListModelColors {
     QColor expired;
 };
 
-QN_DECLARE_FUNCTIONS_FOR_TYPES(
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors)(QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors)(QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors), 
     (metatype)(json)
 );

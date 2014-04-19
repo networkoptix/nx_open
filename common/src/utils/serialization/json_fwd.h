@@ -1,6 +1,8 @@
 #ifndef QN_JSON_FWD_H
 #define QN_JSON_FWD_H
 
+#include <utils/fusion/fusion_fwd.h>
+
 class QJsonValue;
 class QnJsonContext;
 
@@ -10,7 +12,7 @@ class QnJsonContext;
  * \note                                This macro generates function declarations only.
  *                                      Definitions still have to be supplied.
  */
-#define QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)         \
+#define QN_FUSION_DECLARE_FUNCTIONS_json(TYPE, ... /* PREFIX */)                \
 __VA_ARGS__ void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target); \
 __VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *target);
 

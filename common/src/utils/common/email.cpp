@@ -9,6 +9,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <utils/fusion/fusion_adaptor.h>
+#include <utils/serialization/json_functions.h>
 
 #include "enum_name_mapper.h"
 

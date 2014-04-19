@@ -3,7 +3,7 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/serialization/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 #include <utils/common/id.h>
 
 struct QnStorageSpaceData {
@@ -22,8 +22,6 @@ struct QnStorageStatusReply {
     QnStorageSpaceData storage;
 };
 
-Q_DECLARE_METATYPE(QnStorageStatusReply)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStorageSpaceData)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStorageStatusReply)
+QN_FUSION_DECLARE_FUNCTIONS(QnStorageStatusReply, (json)(metatype))
 
 #endif // QN_CHECK_STORAGE_REPLY_H

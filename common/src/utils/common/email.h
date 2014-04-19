@@ -1,5 +1,5 @@
-#ifndef EMAIL_H
-#define EMAIL_H
+#ifndef QN_EMAIL_H
+#define QN_EMAIL_H
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
@@ -7,7 +7,7 @@
 
 #include <api/model/kvpair.h>
 
-#include <utils/serialization/json_functions.h>
+#include <utils/common/model_functions_fwd.h>
 
 class QnEmail {
     Q_GADGET
@@ -87,6 +87,7 @@ private:
     QString m_email;
 };
 
-QN_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (json))
 
-#endif // EMAIL_H
+#endif // QN_EMAIL_H
+

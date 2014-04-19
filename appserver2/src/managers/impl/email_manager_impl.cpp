@@ -1,6 +1,7 @@
 #include "email_manager_impl.h"
 
 #include "nx_ec/data/ec2_email.h"
+#include <memory>
 
 namespace ec2
 {

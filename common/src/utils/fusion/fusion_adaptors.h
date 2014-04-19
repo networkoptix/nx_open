@@ -1,5 +1,5 @@
-#ifndef QN_FUSION_FUNCTIONS_H
-#define QN_FUSION_FUNCTIONS_H
+#ifndef QN_FUSION_ADAPTORS_H
+#define QN_FUSION_ADAPTORS_H
 
 #include <QtCore/QSize>
 #include <QtCore/QSizeF>
@@ -66,4 +66,4 @@ QN_FUSION_ADAPT_CLASS_GSN(QVector4D,
     ((&QVector4D::w, &QVector4D::setW, "w"))
 )
 
-#endif // QN_FUSION_FUNCTIONS_H
+#endif // QN_FUSION_ADAPTORS_H

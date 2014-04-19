@@ -5,7 +5,7 @@
 
 #include <boost/operators.hpp>
 
-#include <utils/serialization/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 // TODO: #Elric doesn't really belong in this folder
 struct QnMediaDewarpingParams: public boost::equality_comparable1<QnMediaDewarpingParams> {
@@ -58,7 +58,6 @@ public:
     qreal radius;
 };
 
-Q_DECLARE_METATYPE(QnMediaDewarpingParams)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnMediaDewarpingParams)
+QN_FUSION_DECLARE_FUNCTIONS(QnMediaDewarpingParams, (json)(metatype))
 
 #endif // MEDIA_DEWARPING_PARAMS_H
