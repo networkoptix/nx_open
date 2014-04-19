@@ -49,23 +49,14 @@ namespace QnFusionDetail {
         >
     {};
 
-    template<class Visitor, class T, bool hasInitializer = has_operator_call<Visitor, T>::value>
-    struct VisitorInitializer {
-        bool operator()(Visitor &&visitor, T &&value) const {
-            return visitor(std::forward<T>(value));
-        }
-    };
+    template<class T, class Arg>
+    bool safe_operator_call(T &&visitor, Arg &&value, const typename boost::enable_if<has_operator_call<T, Arg> >::type * = NULL) {
+        return visitor(std::forward<Arg>(value));
+    }
 
-    template<class Visitor, class T>
-    struct VisitorInitializer<Visitor, T, false> {
-        bool operator()(Visitor &&, T &&) const {
-            return true;
-        }
-    };
-
-    template<class Visitor, class T>
-    bool initialize_visitor(Visitor &&visitor, T &&value) {
-        return VisitorInitializer<Visitor, T>()(std::forward<Visitor>(visitor), std::forward<T>(value));
+    template<class T, class Arg>
+    bool safe_operator_call(T &&, Arg &&, const typename boost::disable_if<has_operator_call<T, Arg> >::type * = NULL) {
+        return true;
     }
 
 } // namespace QnFusionDetail
@@ -188,6 +179,8 @@ namespace QnFusion {
         setter(object, value);
     }
 
+    struct start_tag {};
+    struct end_tag {};
 
     struct member_setter_tag {};
     struct function_setter_tag {};
@@ -260,8 +253,6 @@ namespace QnFusion {
     struct has_visit_members: 
         QnFusionDetail::has_visit_members<T>
     {};
-
-
 
 } // namespace QnFusion
 

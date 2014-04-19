@@ -3,15 +3,18 @@
 
 #include <QtCore/QDataStream>
 
-namespace QnDataStreamDetail {
+#include <utils/fusion/fusion.h>
+
+namespace QnDataStreamSerialization {
+
     class SerializationVisitor {
     public:
         SerializationVisitor(QDataStream &stream): 
             m_stream(stream) 
         {}
 
-        template<class T, class Adaptor>
-        bool operator()(const T &value, const Adaptor &adaptor) {
+        template<class T, class Access>
+        bool operator()(const T &value, const Access &access) {
             using namespace QnFusion;
 
             m_stream << invoke(adaptor.get(getter));
@@ -28,33 +31,29 @@ namespace QnDataStreamDetail {
             m_stream(stream)
         {}
 
-        template<class T, class Adaptor>
-        bool operator()(T &target, const Adaptor &adaptor) {
+        template<class T, class Access>
+        bool operator()(T &target, const Access &access) {
             using namespace QnFusion;
 
-            return operator()(target, adaptor(setter), adaptor);
+            return operator()(target, access, access(setter_tag));
         }
 
     private:
-        template<class T, class Setter, class Adaptor>
-        bool operator()(T &target, const Setter &setter, const Adaptor &adaptor) {
-            unused(adaptor);
+        template<class T, class Access>
+        bool operator()(T &target, const Access &access, const QnFusion::member_setter_tag &) {
             using namespace QnFusion;
 
-            typedef typename boost::remove_const<boost::remove_reference<decltype(invoke(adaptor(getter), target))>::type>::type member_type;
-
-            member_type member;
-            m_stream >> member;
-            invoke(setter, target, std::move(member));
+            m_stream >> (target.*access(setter));
             return true;
         }
 
-        template<class T, class MemberType, class Adaptor>
-        bool operator()(T &target, MemberType T::*setter, const Adaptor &adaptor, typename boost::disable_if<boost::is_function<MemberType> >::type * = NULL) {
-            unused(adaptor);
+        template<class T, class Access, class Member>
+        bool operator()(T &target, const Access &access, const QnFusion::typed_function_setter_tag<Member> &) {
             using namespace QnFusion;
 
-            m_stream >> (target.*setter);
+            Member member;
+            m_stream >> member;
+            invoke(access(setter), target, std::move(member));
             return true;
         }
 
@@ -62,6 +61,19 @@ namespace QnDataStreamDetail {
         QDataStream &m_stream;
     };
 
-} // namespace QJsonDetail
+} // namespace QnDataStreamSerialization
+
+
+#define QN_FUSION_DEFINE_FUNCTIONS_datastream(TYPE, ... /* PREFIX */)           \
+__VA_ARGS__ QDataStream &operator<<(QDataStream &stream, const TYPE &value) {   \
+    QnFusion::visit_members(value, QnDataStreamSerialization::SerializationVisitor(stream)); \
+    return stream;                                                              \
+}                                                                               \
+                                                                                \
+__VA_ARGS__ QDataStream &operator>>(QDataStream &stream, TYPE &value) {         \
+    QnFusion::visit_members(value, QnDataStreamSerialization::DeserializationVisitor(stream)) \
+    return stream;                                                              \
+}
+
 
 #endif // QN_SERIALIZATION_DATA_STREAM_H

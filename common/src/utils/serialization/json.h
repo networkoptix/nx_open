@@ -243,15 +243,14 @@ namespace QJsonDetail {
             m_target(target) 
         {}
 
-        template<class T, class Adaptor>
-        bool operator()(const T &value, const Adaptor &adaptor) {
-            unused(adaptor);
+        template<class T, class Access>
+        bool operator()(const T &value, const Access &access) {
             using namespace QnFusion;
 
-            if(invoke(adaptor(checker, TrueChecker()), value))
+            if(invoke(access(checker, TrueChecker()), value))
                 return true; /* Skipped. */
 
-            QJson::serialize(m_ctx, invoke(adaptor(getter), value), adaptor(name), &m_object);
+            QJson::serialize(m_ctx, invoke(access(getter), value), access(name), &m_object);
             return true;
         }
 
@@ -278,36 +277,32 @@ namespace QJsonDetail {
             return m_value.isObject();
         }
 
-        template<class T, class Adaptor>
-        bool operator()(T &target, const Adaptor &adaptor) {
+        template<class T, class Access>
+        bool operator()(T &target, const Access &access) {
             using namespace QnFusion;
 
-            return operator()(target, adaptor(setter), adaptor);
+            return operator()(target, access, access(setter_tag));
         }
 
     private:
-        template<class T, class Setter, class Adaptor>
-        bool operator()(T &target, const Setter &setter, const Adaptor &adaptor) {
-            unused(adaptor);
+        template<class T, class Access>
+        bool operator()(T &target, const Access &access, const QnFusion::member_setter_tag &) {
             using namespace QnFusion;
 
-            typedef typename boost::remove_const<boost::remove_reference<decltype(invoke(adaptor(getter), target))>::type>::type member_type;
-
-            bool found = false;
-            member_type member;
-            if(!QJson::deserialize(m_ctx, m_object, adaptor(name), &member, adaptor(optional, false), &found))
-                return false;
-            if(found)
-                invoke(setter, target, std::move(member));
-            return true;
+            return QJson::deserialize(m_ctx, m_object, access(name), &(target.*access(setter)), access(optional, false));
         }
 
-        template<class T, class MemberType, class Adaptor>
-        bool operator()(T &target, MemberType T::*setter, const Adaptor &adaptor, typename boost::disable_if<boost::is_function<MemberType> >::type * = NULL) {
-            unused(adaptor);
+        template<class T, class Access, class Member>
+        bool operator()(T &target, const Access &access, const QnFusion::typed_function_setter_tag<Member> &) {
             using namespace QnFusion;
 
-            return QJson::deserialize(m_ctx, m_object, adaptor(name), &(target.*setter), adaptor(optional, false));
+            bool found = false;
+            Member member;
+            if(!QJson::deserialize(m_ctx, m_object, access(name), &member, access(optional, false), &found))
+                return false;
+            if(found)
+                invoke(access(setter), target, std::move(member));
+            return true;
         }
 
     private:
@@ -321,16 +316,6 @@ namespace QJsonDetail {
 
 QN_FUSION_REGISTER_SERIALIZATION_VISITORS(QJsonValue, QJsonDetail::SerializationVisitor, QJsonDetail::DeserializationVisitor)
 
-
-
-#define QN_DEFINE_FUSION_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)   \
-__VA_ARGS__ void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target) { \
-    QnFusion::serialize(ctx, value, target);                                    \
-}                                                                               \
-                                                                                \
-__VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *target) { \
-    return QnFusion::deserialize(ctx, value, target);                           \
-}
 
 #define QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */)  \
 __VA_ARGS__ void serialize(QnJsonContext *, const TYPE &value, QJsonValue *target) { \
@@ -351,6 +336,14 @@ __VA_ARGS__ bool deserialize(QnJsonContext *, const QJsonValue &value, TYPE *tar
     QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(TYPE, ##__VA_ARGS__)
 
 
-#define QN_FUSION_DEFINE_FUNCTIONS_json QN_DEFINE_FUSION_JSON_SERIALIZATION_FUNCTIONS
+#define QN_FUSION_DEFINE_FUNCTIONS_json(TYPE, ... /* PREFIX */)                 \
+__VA_ARGS__ void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target) { \
+    QnFusion::serialize(ctx, value, target);                                    \
+}                                                                               \
+                                                                                \
+__VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *target) { \
+    return QnFusion::deserialize(ctx, value, target);                           \
+}
+
 
 #endif // QN_SERIALIZATION_JSON_H

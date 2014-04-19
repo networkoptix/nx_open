@@ -13,7 +13,7 @@
 QN_FUSION_ADAPT_STRUCT(QnTimePeriod, (startTimeMs)(durationMs))
 
 namespace detail {
-    QN_DEFINE_FUSION_JSON_SERIALIZATION_FUNCTIONS(QnTimePeriod, static)
+    QN_FUSION_DEFINE_FUNCTIONS(QnTimePeriod, (json), static)
 }
 
 
