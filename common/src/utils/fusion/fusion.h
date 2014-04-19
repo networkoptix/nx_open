@@ -67,11 +67,61 @@ namespace QnFusionDetail {
     bool initialize_visitor(Visitor &&visitor, T &&value) {
         return VisitorInitializer<Visitor, T>()(std::forward<Visitor>(visitor), std::forward<T>(value));
     }
-   
 
 } // namespace QnFusionDetail
 
+
+/**
+ * This macro defines a new fusion key. It must be used in global namespace.
+ * Defined key can then be accessed from the QnFusion namespace.
+ * 
+ * \param KEY                           Key to define.
+ */
+#define QN_FUSION_DEFINE_KEY(KEY)                                               \
+namespace QnFusion {                                                            \
+    struct BOOST_PP_CAT(KEY, _type) {};                                         \
+    namespace {                                                                 \
+        const BOOST_PP_CAT(KEY, _type) KEY = {};                                \
+    }                                                                           \
+}
+
+/**
+ * \param KEY                           Fusion key.
+ * \returns                             C++ type of the provided fusion key.
+ */
+#define QN_FUSION_KEY_TYPE(KEY)                                                 \
+    QnFusion::BOOST_PP_CAT(KEY, _type)
+
+QN_FUSION_DEFINE_KEY(index)
+QN_FUSION_DEFINE_KEY(object_declval)
+QN_FUSION_DEFINE_KEY(getter)
+QN_FUSION_DEFINE_KEY(setter)
+QN_FUSION_DEFINE_KEY(setter_tag)
+QN_FUSION_DEFINE_KEY(checker)
+QN_FUSION_DEFINE_KEY(name)
+QN_FUSION_DEFINE_KEY(optional)
+
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_index ,
+#define QN_FUSION_PROPERTY_TYPE_FOR_index int
+
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_name ,
+#define QN_FUSION_PROPERTY_TYPE_FOR_name QString
+#define QN_FUSION_PROPERTY_IS_WRAPPED_FOR_name ,
+#define QN_FUSION_PROPERTY_WRAPPER_FOR_name lit
+
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_optional ,
+#define QN_FUSION_PROPERTY_TYPE_FOR_optional bool
+
+
 namespace QnFusion {
+    template<class T>
+    struct remove_cvr:
+        std::remove_cv<
+            typename std::remove_reference<T>::type
+        >
+    {};
+
+
     /**
      * Main API entry point. Iterates through the members of a previously 
      * registered type.
@@ -100,44 +150,108 @@ namespace QnFusion {
         return QnFusionDetail::visit_members_internal(std::forward<T>(value), std::forward<Visitor>(visitor));
     }
 
+
+    /**
+     * \fn invoke
+     * 
+     * This set of overloaded functions presents an interface for invoking 
+     * setters and getters returned by member adaptors.
+     */
+
+    template<class Class, class T>
+    T invoke(T Class::*getter, const Class &object) {
+        return object.*getter;
+    }
+
+    template<class Class, class T>
+    T invoke(T (Class::*getter)() const, const Class &object) {
+        return (object.*getter)();
+    }
+
+    template<class Getter, class Class>
+    auto invoke(const Getter &getter, const Class &object) -> decltype(getter(object)) {
+        return getter(object);
+    }
+
+    template<class Class, class T>
+    void invoke(T Class::*setter, Class &object, const T &value) {
+        object.*setter = value;
+    }
+
+    template<class Class, class R, class P, class T>
+    void invoke(R (Class::*setter)(P), Class &object, const T &value) {
+        (object.*setter)(value);
+    }
+
+    template<class Setter, class Class, class T>
+    void invoke(const Setter &setter, Class &object, const T &value) {
+        setter(object, value);
+    }
+
+
+    struct member_setter_tag {};
+    struct function_setter_tag {};
+
+    template<class T>
+    struct typed_member_setter_tag: member_setter_tag {};
+
+    template<class T>
+    struct typed_function_setter_tag: function_setter_tag {};
+
+    template<class Setter, class T>
+    struct setter_category: 
+        boost::mpl::if_<
+            std::is_member_object_pointer<Setter>,
+            typed_member_setter_tag<T>,
+            typed_function_setter_tag<T>
+        >
+    {};
+
+    /**
+     * Extension interface that defines how common keys are handled.
+     */
+    template<class Base>
+    struct AccessExtension: Base {
+    public:
+        using Base::operator();
+
+        template<class Sig>
+        struct result: 
+            Base::template result<Sig>
+        {};
+
+        template<class F>
+        struct result<F(setter_tag_type)>:
+            setter_category<
+                typename result<F(setter_type)>::type,
+                typename remove_cvr<decltype(invoke(std::declval<Base>()(getter), std::declval<Base>()(object_declval)))>::type
+            >
+        {};
+
+        typename result<void(setter_tag_type)>::type operator()(const setter_tag_type &) const {
+            return result<void(setter_tag_type)>::type();
+        }
+    };
+
     /**
      * This class is the external interface that is to be used by visitor
      * classes.
      */
-    template<class Adaptor>
-    struct MemberAdaptor {
+    template<class Base>
+    struct AccessAdaptor {
     public:
-        typedef MemberAdaptor<Adaptor> this_type;
-
-        template<class T>
-        struct result;
-
-        template<class F, class T0>
-        struct result<F(T0)>:
-            Adaptor::template result<Adaptor(T0)>
-        {};
-
-        template<class F, class T0, class T1>
-        struct result<F(T0, T1)>:
-            boost::mpl::if_<
-                QnFusionDetail::has_operator_call<Adaptor, T0>,
-                result<F(T0)>,
-                boost::mpl::identity<T1>
-            >::type
-        {};
-
         template<class Key>
-        typename result<this_type(Key)>::type operator()(const Key &key) const {
-            return Adaptor()(key);
+        decltype(Base()(Key())) operator()(const Key &) const {
+            return Base()(Key());
         }
 
         template<class Key, class T>
-        typename result<this_type(Key, T)>::type operator()(const Key &key, const T &, const typename boost::enable_if<QnFusionDetail::has_operator_call<Adaptor, Key> >::type * = NULL) const {
-            return operator()(key);
+        decltype(Base()(Key())) operator()(const Key &, const T &, const typename boost::enable_if<QnFusionDetail::has_operator_call<Base, Key> >::type * = NULL) const {
+            return Base()(Key());
         }
 
         template<class Key, class T>
-        typename result<this_type(Key, T)>::type operator()(const Key &, const T &defaultValue, const typename boost::disable_if<QnFusionDetail::has_operator_call<Adaptor, Key> >::type * = NULL) const {
+        T operator()(const Key &, const T &defaultValue, const typename boost::disable_if<QnFusionDetail::has_operator_call<Base, Key> >::type * = NULL) const {
             return defaultValue;
         }
     };
@@ -150,47 +264,6 @@ namespace QnFusion {
 
 
 } // namespace QnFusion
-
-
-/**
- * This macro defines a new fusion key. It must be used in global namespace.
- * Defined key can then be accessed from the QnFusion namespace.
- * 
- * \param KEY                           Key to define.
- */
-#define QN_FUSION_DEFINE_KEY(KEY)                                               \
-namespace QnFusion {                                                            \
-    struct BOOST_PP_CAT(KEY, _type) {};                                         \
-    namespace {                                                                 \
-        const BOOST_PP_CAT(KEY, _type) KEY = {};                                \
-    }                                                                           \
-}
-
-/**
- * \param KEY                           Fusion key.
- * \returns                             C++ type of the provided fusion key.
- */
-#define QN_FUSION_KEY_TYPE(KEY)                                                 \
-    QnFusion::BOOST_PP_CAT(KEY, _type)
-
-QN_FUSION_DEFINE_KEY(index)
-QN_FUSION_DEFINE_KEY(getter)
-QN_FUSION_DEFINE_KEY(setter)
-QN_FUSION_DEFINE_KEY(setter_tag)
-QN_FUSION_DEFINE_KEY(checker)
-QN_FUSION_DEFINE_KEY(name)
-QN_FUSION_DEFINE_KEY(optional)
-
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_index ,
-#define QN_FUSION_PROPERTY_TYPE_FOR_index int
-
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_name ,
-#define QN_FUSION_PROPERTY_TYPE_FOR_name QString
-#define QN_FUSION_PROPERTY_IS_WRAPPED_FOR_name ,
-#define QN_FUSION_PROPERTY_WRAPPER_FOR_name lit
-
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_optional ,
-#define QN_FUSION_PROPERTY_TYPE_FOR_optional bool
 
 
 /**

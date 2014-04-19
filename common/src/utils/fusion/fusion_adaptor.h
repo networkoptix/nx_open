@@ -11,47 +11,6 @@
 
 #include "fusion.h"
 
-
-namespace QnFusion {
-    /**
-     * \fn invoke
-     * 
-     * This set of overloaded functions presents an interface for invoking 
-     * setters and getters returned by member adaptors.
-     */
-
-    template<class Class, class T>
-    T invoke(T Class::*getter, const Class &object) {
-        return object.*getter;
-    }
-
-    template<class Class, class T>
-    T invoke(T (Class::*getter)() const, const Class &object) {
-        return (object.*getter)();
-    }
-
-    template<class Getter, class Class>
-    auto invoke(const Getter &getter, const Class &object) -> decltype(getter(object)) {
-        return getter(object);
-    }
-
-    template<class Class, class T>
-    void invoke(T Class::*setter, Class &object, const T &value) {
-        object.*setter = value;
-    }
-
-    template<class Class, class R, class P, class T>
-    void invoke(R (Class::*setter)(P), Class &object, const T &value) {
-        (object.*setter)(value);
-    }
-
-    template<class Setter, class Class, class T>
-    void invoke(const Setter &setter, Class &object, const T &value) {
-        setter(object, value);
-    }
-
-} // namespace QnFusion
-
 /**
  * 
  */
@@ -64,6 +23,7 @@ struct QnFusionBinding;                                                         
                                                                                 \
 template<>                                                                      \
 struct QnFusionBinding<CLASS> {                                                 \
+    typedef CLASS value_type;                                                   \
     BOOST_PP_SEQ_FOR_EACH_I(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_I, GLOBAL_SEQ, MEMBER_SEQ) \
                                                                                 \
     template<class T, class Visitor>                                            \
@@ -90,11 +50,16 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     QN_FUSION_ADAPT_CLASS_OBJECT_STEP_II(INDEX, GLOBAL_SEQ PROPERTY_SEQ)
 
 #define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_II(INDEX, PROPERTY_SEQ)               \
-    struct BOOST_PP_CAT(MemberAdaptor, INDEX) {                                 \
-        typedef BOOST_PP_CAT(MemberAdaptor, INDEX) this_type;                   \
-                                                                                \
+    struct BOOST_PP_CAT(Access, INDEX) {                                        \
         template<class T>                                                       \
         struct result;                                                          \
+                                                                                \
+        template<class F>                                                       \
+        struct result<F(QN_FUSION_KEY_TYPE(object_declval))>:                   \
+            std::add_rvalue_reference<value_type>                               \
+        {};                                                                     \
+                                                                                \
+        result<void(QN_FUSION_KEY_TYPE(object_declval))>::type operator()(const QN_FUSION_KEY_TYPE(object_declval) &) const; \
                                                                                 \
         BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (index, INDEX)) \
     };
@@ -108,13 +73,13 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
         typedef QN_FUSION_PROPERTY_TYPE(KEY, VALUE) type;                       \
     };                                                                          \
                                                                                 \
-    result<this_type(QN_FUSION_KEY_TYPE(KEY))>::type operator()(const QN_FUSION_KEY_TYPE(KEY) &) const { \
+    result<void(QN_FUSION_KEY_TYPE(KEY))>::type operator()(const QN_FUSION_KEY_TYPE(KEY) &) const { \
         return QN_FUSION_PROPERTY_VALUE(KEY, VALUE);                            \
     }
 
 
 #define QN_FUSION_ADAPT_CLASS_FUNCTION_STEP_I(Z, INDEX, DATA)                   \
-    if(!visitor(std::forward<T>(value), QnFusion::MemberAdaptor<BOOST_PP_CAT(MemberAdaptor, INDEX)>())) \
+    if(!visitor(std::forward<T>(value), QnFusion::AccessAdaptor<QnFusion::AccessExtension<BOOST_PP_CAT(Access, INDEX)> >())) \
         return false;
 
 
