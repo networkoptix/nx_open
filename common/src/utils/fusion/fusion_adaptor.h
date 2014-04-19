@@ -7,7 +7,6 @@
 #include <boost/preprocessor/variadic/elem.hpp>
 #include <boost/preprocessor/tuple/size.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
-#include <boost/mpl/integral_c.hpp>
 #endif // Q_MOC_RUN
 
 #include "fusion.h"
@@ -94,11 +93,6 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     struct BOOST_PP_CAT(MemberAdaptor, INDEX) {                                 \
         typedef BOOST_PP_CAT(MemberAdaptor, INDEX) this_type;                   \
                                                                                 \
-        template<class Key>                                                     \
-        struct has_key:                                                         \
-            boost::mpl::identity<boost::mpl::false_>                            \
-        {};                                                                     \
-                                                                                \
         template<class T>                                                       \
         struct result;                                                          \
                                                                                 \
@@ -109,11 +103,6 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_II PROPERTY_TUPLE
 
 #define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_II(KEY, VALUE)                   \
-    template<>                                                                  \
-    struct has_key<QN_FUSION_KEY_TYPE(KEY)>:                                    \
-        boost::mpl::identity<boost::mpl::true_>                                 \
-    {};                                                                         \
-                                                                                \
     template<class F>                                                           \
     struct result<F(QN_FUSION_KEY_TYPE(KEY))> {                                 \
         typedef QN_FUSION_PROPERTY_TYPE(KEY, VALUE) type;                       \

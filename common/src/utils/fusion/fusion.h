@@ -37,19 +37,19 @@ namespace QnFusionDetail {
         > 
     {};
 
-    template<class Visitor, class T>
-    boost::type_traits::yes_type has_visitor_initializer_test(const Visitor &, const T &, const decltype(std::declval<Visitor>()(std::declval<T>())) * = NULL);
-    boost::type_traits::no_type has_visitor_initializer_test(...);
+    template<class T, class Arg>
+    boost::type_traits::yes_type has_operator_call_test(const T &, const Arg &, const decltype(std::declval<T>()(std::declval<Arg>())) * = NULL);
+    boost::type_traits::no_type has_operator_call_test(...);
 
-    template<class Visitor, class T>
-    struct has_visitor_initializer: 
+    template<class T, class Arg>
+    struct has_operator_call:
         boost::mpl::equal_to<
-            boost::mpl::sizeof_<boost::type_traits::yes_type>, 
-            boost::mpl::size_t<sizeof(has_visitor_initializer_test(std::declval<Visitor>(), std::declval<T>()))>
-        > 
+            boost::mpl::sizeof_<boost::type_traits::yes_type>,
+            boost::mpl::size_t<sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg>()))>
+        >
     {};
 
-    template<class Visitor, class T, bool hasInitializer = has_visitor_initializer<Visitor, T>::value>
+    template<class Visitor, class T, bool hasInitializer = has_operator_call<Visitor, T>::value>
     struct VisitorInitializer {
         bool operator()(Visitor &&visitor, T &&value) const {
             return visitor(std::forward<T>(value));
@@ -120,7 +120,7 @@ namespace QnFusion {
         template<class F, class T0, class T1>
         struct result<F(T0, T1)>:
             boost::mpl::if_<
-                typename Adaptor::template has_key<T0>::type,
+                QnFusionDetail::has_operator_call<Adaptor, T0>,
                 result<F(T0)>,
                 boost::mpl::identity<T1>
             >::type
@@ -132,12 +132,12 @@ namespace QnFusion {
         }
 
         template<class Key, class T>
-        typename result<this_type(Key, T)>::type operator()(const Key &key, const T &, const typename boost::enable_if<typename Adaptor::template has_key<Key>::type>::type * = NULL) const {
+        typename result<this_type(Key, T)>::type operator()(const Key &key, const T &, const typename boost::enable_if<QnFusionDetail::has_operator_call<Adaptor, Key> >::type * = NULL) const {
             return operator()(key);
         }
 
         template<class Key, class T>
-        typename result<this_type(Key, T)>::type operator()(const Key &, const T &defaultValue, const typename boost::disable_if<typename Adaptor::template has_key<Key>::type>::type * = NULL) const {
+        typename result<this_type(Key, T)>::type operator()(const Key &, const T &defaultValue, const typename boost::disable_if<QnFusionDetail::has_operator_call<Adaptor, Key> >::type * = NULL) const {
             return defaultValue;
         }
     };
@@ -146,6 +146,8 @@ namespace QnFusion {
     struct has_visit_members: 
         QnFusionDetail::has_visit_members<T>
     {};
+
+
 
 } // namespace QnFusion
 
