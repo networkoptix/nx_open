@@ -6,6 +6,7 @@
 
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/for_each.hpp>
+#include <boost/preprocessor/cat.hpp>
 #include <boost/mpl/equal_to.hpp>
 #include <boost/mpl/sizeof.hpp>
 #include <boost/mpl/and.hpp>
@@ -119,24 +120,24 @@ namespace QnFusion {
         template<class F, class T0, class T1>
         struct result<F(T0, T1)>:
             boost::mpl::if_<
-                typename Adaptor::template has_tag<T0>::type,
+                typename Adaptor::template has_key<T0>::type,
                 result<F(T0)>,
                 boost::mpl::identity<T1>
             >::type
         {};
 
-        template<class Tag>
-        typename result<this_type(Tag)>::type operator()(const Tag &tag) const {
-            return Adaptor()(tag);
+        template<class Key>
+        typename result<this_type(Key)>::type operator()(const Key &key) const {
+            return Adaptor()(key);
         }
 
-        template<class Tag, class T>
-        typename result<this_type(Tag, T)>::type operator()(const Tag &tag, const T &, const typename boost::enable_if<typename Adaptor::template has_tag<Tag>::type>::type * = NULL) const {
-            return operator()(tag);
+        template<class Key, class T>
+        typename result<this_type(Key, T)>::type operator()(const Key &key, const T &, const typename boost::enable_if<typename Adaptor::template has_key<Key>::type>::type * = NULL) const {
+            return operator()(key);
         }
 
-        template<class Tag, class T>
-        typename result<this_type(Tag, T)>::type operator()(const Tag &, const T &defaultValue, const typename boost::disable_if<typename Adaptor::template has_tag<Tag>::type>::type * = NULL) const {
+        template<class Key, class T>
+        typename result<this_type(Key, T)>::type operator()(const Key &, const T &defaultValue, const typename boost::disable_if<typename Adaptor::template has_key<Key>::type>::type * = NULL) const {
             return defaultValue;
         }
     };
@@ -150,32 +151,33 @@ namespace QnFusion {
 
 
 /**
- * This macro defines a new fusion tag. It must be used in global namespace.
- * Defined tag can then be accessed from the QnFusion namespace.
+ * This macro defines a new fusion key. It must be used in global namespace.
+ * Defined key can then be accessed from the QnFusion namespace.
  * 
- * \param TAG                           Tag to define.
+ * \param KEY                           Key to define.
  */
-#define QN_FUSION_DEFINE_TAG(TAG)                                               \
+#define QN_FUSION_DEFINE_KEY(KEY)                                               \
 namespace QnFusion {                                                            \
-    struct BOOST_PP_CAT(TAG, _tag) {};                                          \
+    struct BOOST_PP_CAT(KEY, _type) {};                                         \
     namespace {                                                                 \
-        const BOOST_PP_CAT(TAG, _tag) TAG = {};                                 \
+        const BOOST_PP_CAT(KEY, _type) KEY = {};                                \
     }                                                                           \
 }
 
 /**
- * \param TAG                           Fusion tag.
- * \returns                             C++ type of the provided fusion tag.
+ * \param KEY                           Fusion key.
+ * \returns                             C++ type of the provided fusion key.
  */
-#define QN_FUSION_TAG_TYPE(TAG)                                                 \
-    QnFusion::BOOST_PP_CAT(TAG, _tag)
+#define QN_FUSION_KEY_TYPE(KEY)                                                 \
+    QnFusion::BOOST_PP_CAT(KEY, _type)
 
-QN_FUSION_DEFINE_TAG(index)
-QN_FUSION_DEFINE_TAG(getter)
-QN_FUSION_DEFINE_TAG(setter)
-QN_FUSION_DEFINE_TAG(checker)
-QN_FUSION_DEFINE_TAG(name)
-QN_FUSION_DEFINE_TAG(optional)
+QN_FUSION_DEFINE_KEY(index)
+QN_FUSION_DEFINE_KEY(getter)
+QN_FUSION_DEFINE_KEY(setter)
+QN_FUSION_DEFINE_KEY(setter_tag)
+QN_FUSION_DEFINE_KEY(checker)
+QN_FUSION_DEFINE_KEY(name)
+QN_FUSION_DEFINE_KEY(optional)
 
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_index ,
 #define QN_FUSION_PROPERTY_TYPE_FOR_index int

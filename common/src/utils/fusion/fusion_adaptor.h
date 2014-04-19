@@ -94,8 +94,8 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     struct BOOST_PP_CAT(MemberAdaptor, INDEX) {                                 \
         typedef BOOST_PP_CAT(MemberAdaptor, INDEX) this_type;                   \
                                                                                 \
-        template<class Tag>                                                     \
-        struct has_tag:                                                         \
+        template<class Key>                                                     \
+        struct has_key:                                                         \
             boost::mpl::identity<boost::mpl::false_>                            \
         {};                                                                     \
                                                                                 \
@@ -108,19 +108,19 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 #define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_I(R, DATA, PROPERTY_TUPLE)       \
     QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_II PROPERTY_TUPLE
 
-#define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_II(TAG, VALUE)                   \
+#define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_II(KEY, VALUE)                   \
     template<>                                                                  \
-    struct has_tag<QN_FUSION_TAG_TYPE(TAG)>:                                    \
+    struct has_key<QN_FUSION_KEY_TYPE(KEY)>:                                    \
         boost::mpl::identity<boost::mpl::true_>                                 \
     {};                                                                         \
                                                                                 \
     template<class F>                                                           \
-    struct result<F(QN_FUSION_TAG_TYPE(TAG))> {                                 \
-        typedef QN_FUSION_PROPERTY_TYPE(TAG, VALUE) type;                       \
+    struct result<F(QN_FUSION_KEY_TYPE(KEY))> {                                 \
+        typedef QN_FUSION_PROPERTY_TYPE(KEY, VALUE) type;                       \
     };                                                                          \
                                                                                 \
-    result<this_type(QN_FUSION_TAG_TYPE(TAG))>::type operator()(const QN_FUSION_TAG_TYPE(TAG) &) const { \
-        return QN_FUSION_PROPERTY_VALUE(TAG, VALUE);                            \
+    result<this_type(QN_FUSION_KEY_TYPE(KEY))>::type operator()(const QN_FUSION_KEY_TYPE(KEY) &) const { \
+        return QN_FUSION_PROPERTY_VALUE(KEY, VALUE);                            \
     }
 
 
@@ -132,8 +132,8 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 /**
  * 
  */
-#define QN_FUSION_ADAPT_CLASS_SHORT(CLASS, TAGS_TUPLE, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
-    QN_FUSION_ADAPT_CLASS(CLASS, QN_FUSION_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ), ##__VA_ARGS__)
+#define QN_FUSION_ADAPT_CLASS_SHORT(CLASS, KEYS_TUPLE, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
+    QN_FUSION_ADAPT_CLASS(CLASS, QN_FUSION_UNROLL_SHORTCUT_SEQ(KEYS_TUPLE, MEMBER_SEQ), ##__VA_ARGS__)
 
 /**
  * 
@@ -190,7 +190,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 /**
  * \internal
  * 
- * Unrolls a member sequence that uses tag shortcuts into its standard form.
+ * Unrolls a member sequence that uses key shortcuts into its standard form.
  * 
  * For example, the following invocation:
  * 
@@ -209,75 +209,75 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * ((getter, &QSize::height)(setter, &QSize::setHeight)(name, "height")(optional, true))
  * \endcode
  */
-#define QN_FUSION_UNROLL_SHORTCUT_SEQ(TAGS_TUPLE, MEMBER_SEQ)                   \
-    BOOST_PP_SEQ_FOR_EACH(QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_I, TAGS_TUPLE, MEMBER_SEQ)
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ(KEYS_TUPLE, MEMBER_SEQ)                   \
+    BOOST_PP_SEQ_FOR_EACH(QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_I, KEYS_TUPLE, MEMBER_SEQ)
 
-#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_I(R, TAGS_TUPLE, PROPERTY_SEQ)       \
-    (QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_II(TAGS_TUPLE, (BOOST_PP_VARIADIC_SEQ_HEAD(PROPERTY_SEQ))) BOOST_PP_VARIADIC_SEQ_TAIL(PROPERTY_SEQ))
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_I(R, KEYS_TUPLE, PROPERTY_SEQ)       \
+    (QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_II(KEYS_TUPLE, (BOOST_PP_VARIADIC_SEQ_HEAD(PROPERTY_SEQ))) BOOST_PP_VARIADIC_SEQ_TAIL(PROPERTY_SEQ))
 
-#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_II(TAGS_TUPLE, VALUES_TUPLE)         \
-    BOOST_PP_REPEAT(BOOST_PP_TUPLE_SIZE(TAGS_TUPLE), QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_I, (TAGS_TUPLE, VALUES_TUPLE))
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_II(KEYS_TUPLE, VALUES_TUPLE)         \
+    BOOST_PP_REPEAT(BOOST_PP_TUPLE_SIZE(KEYS_TUPLE), QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_I, (KEYS_TUPLE, VALUES_TUPLE))
 
 #define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_I(Z, INDEX, DATA)               \
     QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_II(BOOST_PP_TUPLE_ELEM(0, DATA), BOOST_PP_TUPLE_ELEM(1, DATA), INDEX)
 
-#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_II(TAGS_TUPLE, VALUES_TUPLE, INDEX) \
-    (BOOST_PP_TUPLE_ELEM(INDEX, TAGS_TUPLE), BOOST_PP_TUPLE_ELEM(INDEX, VALUES_TUPLE))
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_II(KEYS_TUPLE, VALUES_TUPLE, INDEX) \
+    (BOOST_PP_TUPLE_ELEM(INDEX, KEYS_TUPLE), BOOST_PP_TUPLE_ELEM(INDEX, VALUES_TUPLE))
 
 
 /**
  * \internal
  *
  * This macro returns a type expression that should be used in return type of a
- * property getter function for the specified tag. By default it simply 
+ * property getter function for the specified key. By default it simply 
  * returns <tt>decltype(VALUE)</tt>.
  * 
- * To override the default return value for some tag <tt>some_tag</tt>, use
+ * To override the default return value for some key <tt>some_key</tt>, use
  * the following code:
  * \code
- * #define QN_FUSION_PROPERTY_IS_TYPED_FOR_some_tag ,
- * #define QN_FUSION_PROPERTY_TYPE_FOR_some_tag QString // Or your custom type
+ * #define QN_FUSION_PROPERTY_IS_TYPED_FOR_some_key ,
+ * #define QN_FUSION_PROPERTY_TYPE_FOR_some_key QString // Or your custom type
  * \endcode
  * 
  * This might be useful when <tt>decltype</tt> cannot be used because
  * <tt>VALUE</tt> might be a lambda.
  *
- * \param TAG                           Fusion tag.
- * \param VALUE                         Value specified by the user for this tag.
+ * \param KEY                           Fusion key.
+ * \param VALUE                         Value specified by the user for this key.
  * \returns                             Type expression that should be used for
  *                                      return type of a property getter function.
  */
-#define QN_FUSION_PROPERTY_TYPE(TAG, VALUE)                                          \
-    BOOST_PP_OVERLOAD(QN_FUSION_PROPERTY_TYPE_I_, ~ BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_TYPED_FOR_, TAG) ~)(TAG, VALUE)
+#define QN_FUSION_PROPERTY_TYPE(KEY, VALUE)                                          \
+    BOOST_PP_OVERLOAD(QN_FUSION_PROPERTY_TYPE_I_, ~ BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_TYPED_FOR_, KEY) ~)(KEY, VALUE)
     
-#define QN_FUSION_PROPERTY_TYPE_I_1(TAG, VALUE) decltype(QN_FUSION_PROPERTY_VALUE(TAG, VALUE))
-#define QN_FUSION_PROPERTY_TYPE_I_2(TAG, VALUE) BOOST_PP_CAT(QN_FUSION_PROPERTY_TYPE_FOR_, TAG)
+#define QN_FUSION_PROPERTY_TYPE_I_1(KEY, VALUE) decltype(QN_FUSION_PROPERTY_VALUE(KEY, VALUE))
+#define QN_FUSION_PROPERTY_TYPE_I_2(KEY, VALUE) BOOST_PP_CAT(QN_FUSION_PROPERTY_TYPE_FOR_, KEY)
 
 
 /**
  * \internal
  * 
  * This macro returns an expression that should be used in return statement
- * of a property getter function for the specified tag. By default it simply 
+ * of a property getter function for the specified key. By default it simply 
  * returns <tt>VALUE</tt>.
  * 
- * To override the default return value for some tag <tt>some_tag</tt>, use
+ * To override the default return value for some key <tt>some_key</tt>, use
  * the following code:
  * \code
- * #define QN_FUSION_PROPERTY_IS_WRAPPED_FOR_some_tag ,
- * #define QN_FUSION_PROPERTY_WRAPPER_FOR_some_tag QLatin1Literal // Or your custom wrapper macro
+ * #define QN_FUSION_PROPERTY_IS_WRAPPED_FOR_some_key ,
+ * #define QN_FUSION_PROPERTY_WRAPPER_FOR_some_key QLatin1Literal // Or your custom wrapper macro
  * \endcode
  * 
- * \param TAG                           Fusion tag.
- * \param VALUE                         Value specified by the user for this tag.
+ * \param KEY                           Fusion key.
+ * \param VALUE                         Value specified by the user for this key.
  * \returns                             Expression that should be used in the
  *                                      return statement of a property getter function.
  */
-#define QN_FUSION_PROPERTY_VALUE(TAG, VALUE)                                         \
-    BOOST_PP_OVERLOAD(QN_FUSION_PROPERTY_VALUE_I_, ~ BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_WRAPPED_FOR_, TAG) ~)(TAG, VALUE)
+#define QN_FUSION_PROPERTY_VALUE(KEY, VALUE)                                         \
+    BOOST_PP_OVERLOAD(QN_FUSION_PROPERTY_VALUE_I_, ~ BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_WRAPPED_FOR_, KEY) ~)(KEY, VALUE)
 
-#define QN_FUSION_PROPERTY_VALUE_I_1(TAG, VALUE) VALUE
-#define QN_FUSION_PROPERTY_VALUE_I_2(TAG, VALUE) BOOST_PP_CAT(QN_FUSION_PROPERTY_WRAPPER_FOR_, TAG)(VALUE)
+#define QN_FUSION_PROPERTY_VALUE_I_1(KEY, VALUE) VALUE
+#define QN_FUSION_PROPERTY_VALUE_I_2(KEY, VALUE) BOOST_PP_CAT(QN_FUSION_PROPERTY_WRAPPER_FOR_, KEY)(VALUE)
 
 
 #endif // QN_FUSION_ADAPTORS_H
