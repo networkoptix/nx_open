@@ -248,10 +248,10 @@ namespace QJsonDetail {
             unused(adaptor);
             using namespace QnFusion;
 
-            if(invoke(adaptor.get(checker, TrueChecker()), value))
+            if(invoke(adaptor(checker, TrueChecker()), value))
                 return true; /* Skipped. */
 
-            QJson::serialize(m_ctx, invoke(adaptor.get(getter), value), adaptor.get(name), &m_object);
+            QJson::serialize(m_ctx, invoke(adaptor(getter), value), adaptor(name), &m_object);
             return true;
         }
 
@@ -282,7 +282,7 @@ namespace QJsonDetail {
         bool operator()(T &target, const Adaptor &adaptor) {
             using namespace QnFusion;
 
-            return operator()(target, adaptor.get(setter), adaptor);
+            return operator()(target, adaptor(setter), adaptor);
         }
 
     private:
@@ -291,11 +291,11 @@ namespace QJsonDetail {
             unused(adaptor);
             using namespace QnFusion;
 
-            typedef typename boost::remove_const<boost::remove_reference<decltype(invoke(adaptor.get(getter), target))>::type>::type member_type;
+            typedef typename boost::remove_const<boost::remove_reference<decltype(invoke(adaptor(getter), target))>::type>::type member_type;
 
             bool found = false;
             member_type member;
-            if(!QJson::deserialize(m_ctx, m_object, adaptor.get(name), &member, adaptor.get(optional, false), &found))
+            if(!QJson::deserialize(m_ctx, m_object, adaptor(name), &member, adaptor(optional, false), &found))
                 return false;
             if(found)
                 invoke(setter, target, std::move(member));
@@ -307,7 +307,7 @@ namespace QJsonDetail {
             unused(adaptor);
             using namespace QnFusion;
 
-            return QJson::deserialize(m_ctx, m_object, adaptor.get(name), &(target.*setter), adaptor.get(optional, false));
+            return QJson::deserialize(m_ctx, m_object, adaptor(name), &(target.*setter), adaptor(optional, false));
         }
 
     private:

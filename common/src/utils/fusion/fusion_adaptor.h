@@ -92,10 +92,15 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 #define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_II(INDEX, PROPERTY_SEQ)               \
     struct BOOST_PP_CAT(MemberAdaptor, INDEX) {                                 \
+        typedef BOOST_PP_CAT(MemberAdaptor, INDEX) this_type;                   \
+                                                                                \
         template<class Tag>                                                     \
         struct has_tag:                                                         \
-            boost::mpl::false_                                                  \
+            boost::mpl::identity<boost::mpl::false_>                            \
         {};                                                                     \
+                                                                                \
+        template<class T>                                                       \
+        struct result;                                                          \
                                                                                 \
         BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (index, INDEX)) \
     };
@@ -106,10 +111,15 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 #define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_II(TAG, VALUE)                   \
     template<>                                                                  \
     struct has_tag<QN_FUSION_TAG_TYPE(TAG)>:                                    \
-        boost::mpl::true_                                                       \
+        boost::mpl::identity<boost::mpl::true_>                                 \
     {};                                                                         \
                                                                                 \
-    static QN_FUSION_PROPERTY_TYPE(TAG, VALUE) get(const QN_FUSION_TAG_TYPE(TAG) &) { \
+    template<class F>                                                           \
+    struct result<F(QN_FUSION_TAG_TYPE(TAG))> {                                 \
+        typedef QN_FUSION_PROPERTY_TYPE(TAG, VALUE) type;                       \
+    };                                                                          \
+                                                                                \
+    result<this_type(QN_FUSION_TAG_TYPE(TAG))>::type operator()(const QN_FUSION_TAG_TYPE(TAG) &) const { \
         return QN_FUSION_PROPERTY_VALUE(TAG, VALUE);                            \
     }
 

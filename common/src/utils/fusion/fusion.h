@@ -2,6 +2,7 @@
 #define QN_FUSION_H
 
 #include <utility> /* For std::forward and std::declval. */
+#include <type_traits> /* For std::remove_*. */
 
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/for_each.hpp>
@@ -34,22 +35,6 @@ namespace QnFusionDetail {
             boost::mpl::size_t<sizeof(has_visit_members_test(std::declval<T>()))>
         > 
     {};
-
-    template<class Adaptor, class Tag, class T, bool hasTag = Adaptor::template has_tag<Tag>::value>
-    struct DefaultGetter {
-        typedef decltype(Adaptor::get(Tag())) result_type;
-        result_type operator()(const T &) const {
-            return Adaptor::get(Tag());
-        }
-    };
-
-    template<class Adaptor, class Tag, class T>
-    struct DefaultGetter<Adaptor, Tag, T, false> {
-        typedef T result_type;
-        result_type operator()(const T &defaultValue) const {
-            return defaultValue;
-        }
-    };
 
     template<class Visitor, class T>
     boost::type_traits::yes_type has_visitor_initializer_test(const Visitor &, const T &, const decltype(std::declval<Visitor>()(std::declval<T>())) * = NULL);
@@ -120,16 +105,39 @@ namespace QnFusion {
      */
     template<class Adaptor>
     struct MemberAdaptor {
+    public:
+        typedef MemberAdaptor<Adaptor> this_type;
+
+        template<class T>
+        struct result;
+
+        template<class F, class T0>
+        struct result<F(T0)>:
+            Adaptor::template result<Adaptor(T0)>
+        {};
+
+        template<class F, class T0, class T1>
+        struct result<F(T0, T1)>:
+            boost::mpl::if_<
+                typename Adaptor::template has_tag<T0>::type,
+                result<F(T0)>,
+                boost::mpl::identity<T1>
+            >::type
+        {};
+
         template<class Tag>
-        static decltype(Adaptor::get(Tag())) 
-        get(const Tag &) {
-            return Adaptor::get(Tag());
+        typename result<this_type(Tag)>::type operator()(const Tag &tag) const {
+            return Adaptor()(tag);
         }
 
         template<class Tag, class T>
-        static typename QnFusionDetail::DefaultGetter<Adaptor, Tag, T>::result_type
-        get(const Tag &, const T &defaultValue) {
-            return QnFusionDetail::DefaultGetter<Adaptor, Tag, T>()(defaultValue);
+        typename result<this_type(Tag, T)>::type operator()(const Tag &tag, const T &, const typename boost::enable_if<typename Adaptor::template has_tag<Tag>::type>::type * = NULL) const {
+            return operator()(tag);
+        }
+
+        template<class Tag, class T>
+        typename result<this_type(Tag, T)>::type operator()(const Tag &, const T &defaultValue, const typename boost::disable_if<typename Adaptor::template has_tag<Tag>::type>::type * = NULL) const {
+            return defaultValue;
         }
     };
 

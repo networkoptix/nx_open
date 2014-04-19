@@ -32,7 +32,7 @@ namespace QnDataStreamDetail {
         bool operator()(T &target, const Adaptor &adaptor) {
             using namespace QnFusion;
 
-            return operator()(target, adaptor.get(setter), adaptor);
+            return operator()(target, adaptor(setter), adaptor);
         }
 
     private:
@@ -41,7 +41,7 @@ namespace QnDataStreamDetail {
             unused(adaptor);
             using namespace QnFusion;
 
-            typedef typename boost::remove_const<boost::remove_reference<decltype(invoke(adaptor.get(getter), target))>::type>::type member_type;
+            typedef typename boost::remove_const<boost::remove_reference<decltype(invoke(adaptor(getter), target))>::type>::type member_type;
 
             member_type member;
             m_stream >> member;
