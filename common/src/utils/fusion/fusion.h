@@ -334,11 +334,11 @@ namespace QnFusion {
 namespace QnFusionDetail {
     template<class Visitor, class T, class Access>
     bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access) {
-        return dispatch_visit(std::forward<Visitor>(visitor), std::forward<T>(value), access, typename Access::template at<QnFusion::base_type, void *>::type());
+        return dispatch_visit(std::forward<Visitor>(visitor), std::forward<T>(value), access, typename Access::template at<QnFusion::base_type, na>::type());
     }
 
     template<class Visitor, class T, class Access>
-    bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access, void *) {
+    bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access, const na &) {
         return visitor(std::forward<T>(value), access);
     }
 
