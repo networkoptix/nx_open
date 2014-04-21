@@ -85,7 +85,7 @@ void QnOpenGLRenderer::drawColoredQuad( const QRectF &rect , QnColorGLShaderProg
     };
     drawColoredQuad(vertices,shader);
 };
-void QnOpenGLRenderer::drawPerVertexColoredPolygon( unsigned int a_buffer , unsigned int a_vertices_size )
+void QnOpenGLRenderer::drawPerVertexColoredPolygon( unsigned int a_buffer , unsigned int a_vertices_size , unsigned int a_polygon_state)
 {
     QnPerVertexColoredGLShaderProgramm* shader = m_texturePerVertexColoredProgram.data();
 
@@ -116,7 +116,7 @@ void QnOpenGLRenderer::drawPerVertexColoredPolygon( unsigned int a_buffer , unsi
         offset += a_vertices_size*VERTEX_POS_SIZE* sizeof(GLfloat);
         glVertexAttribPointer(VERTEX_COLOR_INDX,VERTEX_COLOR_SIZE, GL_FLOAT,GL_FALSE, 0, (const void*)offset);
 
-        glDrawArrays(GL_TRIANGLE_FAN,0,a_vertices_size);
+        glDrawArrays(a_polygon_state,0,a_vertices_size);
         
         shader->release();
         glCheckError("render");

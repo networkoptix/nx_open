@@ -182,7 +182,7 @@ public:
         QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
 
         /* Maximal texture size. */
-        qDebug()<<extensions;
+        //qDebug()<<extensions;
         int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
         NX_LOG(QString(QLatin1String("OpenGL max texture size: %1.")).arg(maxTextureSize), cl_logINFO);
 
