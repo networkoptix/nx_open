@@ -297,7 +297,7 @@ namespace QnFusion {
 
         template<class Key>
         struct has_key:
-            boost::mpl::not_<boost::is_same<typename at<Key, void>::type, void> > // TODO: #Elric move to base
+            boost::mpl::not_<boost::is_same<typename at<Key, void>::type, void> > // TODO: #Elric move to base?
         {};
 
         template<class Key>
