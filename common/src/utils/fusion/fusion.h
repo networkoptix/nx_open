@@ -260,12 +260,12 @@ namespace QnFusion {
     template<class Base> // TODO: use extensions instead
     struct AccessExtension: Base {
     public:
-        using Base::operator();
+        ///using Base::operator();
 
-        template<class Sig>
+        /*template<class Sig>
         struct result: 
             Base::template result<Sig>
-        {};
+        {};*/
 
         /*template<class F>
         struct result<F(setter_tag_type)>:
