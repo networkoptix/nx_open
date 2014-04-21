@@ -13,15 +13,12 @@
 
 #include <utils/common/log.h>
 
-//#ifdef Q_OS_WIN
-//#define WGL_WGLEXT_PROTOTYPES
-//#include <gl/wglext.h>
-//#else
-//#include <QtX11Extras/QX11Info>
-//#include <GL/glx.h>
-//#include <X11/X.h>
-//#include <X11/Xlib.h>
-//#endif
+#ifdef Q_OS_LINUX
+#include <QtX11Extras/QX11Info>
+#include <GL/glx.h>
+#include <X11/X.h>
+#include <X11/Xlib.h>
+#endif
 
 
 #ifdef Q_OS_WIN
