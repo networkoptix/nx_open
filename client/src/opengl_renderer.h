@@ -26,7 +26,7 @@ public:
     void                drawColoredPolygon( const float* v_array, unsigned int size , QnColorGLShaderProgramm* shader = NULL);
     void                drawColoredPolygon( const QVector<QVector2D>& a_polygon, QnColorGLShaderProgramm* shader = NULL);
     void                drawColoredQuad( const QRectF &rect , QnColorGLShaderProgramm* shader = NULL);
-    void                drawPerVertexColoredPolygon( unsigned int a_buffer , unsigned int a_vertices_size );
+    void                drawPerVertexColoredPolygon( unsigned int a_buffer , unsigned int a_vertices_size , unsigned int a_polygon_state = GL_TRIANGLE_FAN);
     void                drawBindedTextureOnQuad( const float* v_array, const float* tx_array, QnAbstractBaseGLShaderProgramm* shader = NULL );
     void                drawColoredQuad( const float* v_array, QnColorGLShaderProgramm* shader = NULL );
 
@@ -50,7 +50,7 @@ private:
 class QnOpenGLRendererManager: public QObject {
     Q_OBJECT;
 public:
-    static QnOpenGLRenderer &instance(const QGLContext* a_context);
+    static QnOpenGLRenderer& instance(const QGLContext* a_context);
 
     QHash<const QGLContext*,QnOpenGLRenderer>& getContainer(){ return m_container; };
 private:

@@ -35,30 +35,35 @@ bool QnAbstractYv12ToRgbShaderProgram::link()
 QnYv12ToRgbShaderProgram::QnYv12ToRgbShaderProgram(const QGLContext *context, QObject *parent): 
     QnAbstractYv12ToRgbShaderProgram(context, parent) 
 {
-    addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(
-        precision mediump float;
-        varying vec2 vTexCoord;
 
-        uniform sampler2D yTexture;
-        uniform sampler2D uTexture;
-        uniform sampler2D vTexture;
-        uniform float opacity;
+    QByteArray shader(QN_SHADER_SOURCE(
+    varying vec2 vTexCoord;
+
+    uniform sampler2D yTexture;
+    uniform sampler2D uTexture;
+    uniform sampler2D vTexture;
+    uniform float opacity;
 
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
-                                1.0, -0.344, -0.714,  0.529,
-                                1.0,  1.772,  0.0,   -0.886,
-                                0.0,  0.0,    0.0,    opacity);
+        1.0, -0.344, -0.714,  0.529,
+        1.0,  1.772,  0.0,   -0.886,
+        0.0,  0.0,    0.0,    opacity);
 
     void main() 
     {
         // do color transformation yuv->RGB
         gl_FragColor = vec4(texture2D(yTexture, vTexCoord).p,
-                            texture2D(uTexture, vTexCoord).p,
-                            texture2D(vTexture, vTexCoord).p,
-                            1.0) * colorTransform;
+            texture2D(uTexture, vTexCoord).p,
+            texture2D(vTexture, vTexCoord).p,
+            1.0) * colorTransform;
     }
     ));
 
+#ifdef QT_OPENGL_ES_2
+    shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
+
+    addShaderFromSourceCode(QGLShader::Fragment, shader);
     link();
 }
 
@@ -81,31 +86,34 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
 {
     if (!final)
         return;
-    addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(
-        precision mediump float;
-        varying vec2 vTexCoord;
+    QByteArray shader(QN_SHADER_SOURCE(
+    varying vec2 vTexCoord;
 
-        uniform sampler2D yTexture;
-        uniform sampler2D uTexture;
-        uniform sampler2D vTexture;
-        uniform float opacity;
-        uniform float yLevels1;
-        uniform float yLevels2;
-        uniform float yGamma;
+    uniform sampler2D yTexture;
+    uniform sampler2D uTexture;
+    uniform sampler2D vTexture;
+    uniform float opacity;
+    uniform float yLevels1;
+    uniform float yLevels2;
+    uniform float yGamma;
 
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
-                                1.0, -0.344, -0.714,  0.529,
-                                1.0,  1.772,  0.0,   -0.886,
-                                0.0,  0.0,    0.0,    opacity);
+        1.0, -0.344, -0.714,  0.529,
+        1.0,  1.772,  0.0,   -0.886,
+        0.0,  0.0,    0.0,    opacity);
 
     void main() {
         float y = texture2D(yTexture, vTexCoord).p;
         gl_FragColor = vec4(clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0),
-                            texture2D(uTexture, vTexCoord).p,
-                            texture2D(vTexture, vTexCoord).p,
-                            1.0) * colorTransform;
+            texture2D(uTexture, vTexCoord).p,
+            texture2D(vTexture, vTexCoord).p,
+            1.0) * colorTransform;
     }
     ));
+
+#ifdef QT_OPENGL_ES_2
+    shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
 
     link();
 }
@@ -123,34 +131,33 @@ QnFisheyeRectilinearProgram::QnFisheyeRectilinearProgram(const QGLContext *conte
 
 QString QnFisheyeRectilinearProgram::getShaderText()
 {
-    return QString(QLatin1String(QN_SHADER_SOURCE(
-        precision mediump float;
-        varying vec2 vTexCoord;
+    QByteArray shader(QN_SHADER_SOURCE(
+    varying vec2 vTexCoord;
 
-        uniform sampler2D yTexture;
-        uniform sampler2D uTexture;
-        uniform sampler2D vTexture;
-        uniform float opacity;
-        uniform float xShift;
-        uniform float yShift;
-        uniform float fovRot;
-        uniform float dstFov;
-        uniform float aspectRatio;
-        uniform float yPos;
-        uniform float xCenter;
-        uniform float yCenter;
-        uniform float radius;
-        uniform float yLevels1;
-        uniform float yLevels2;
-        uniform float yGamma;
-        uniform float maxX;
-        uniform float maxY;
+    uniform sampler2D yTexture;
+    uniform sampler2D uTexture;
+    uniform sampler2D vTexture;
+    uniform float opacity;
+    uniform float xShift;
+    uniform float yShift;
+    uniform float fovRot;
+    uniform float dstFov;
+    uniform float aspectRatio;
+    uniform float yPos;
+    uniform float xCenter;
+    uniform float yCenter;
+    uniform float radius;
+    uniform float yLevels1;
+    uniform float yLevels2;
+    uniform float yGamma;
+    uniform float maxX;
+    uniform float maxY;
 
     const float PI = 3.1415926535;
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
-                                1.0, -0.344, -0.714,  0.529,
-                                1.0,  1.772,  0.0,   -0.886,
-                                0.0,  0.0,    0.0,    opacity);
+        1.0, -0.344, -0.714,  0.529,
+        1.0,  1.772,  0.0,   -0.886,
+        0.0,  0.0,    0.0,    opacity);
 
     float kx =  2.0*tan(dstFov/2.0);
 
@@ -160,9 +167,9 @@ QString QnFisheyeRectilinearProgram::getShaderText()
     vec3 center = vec3(cos(-yShift) * sin(xShift), cos(-yShift)*cos(xShift), sin(-yShift));
 
     mat3 to3d = mat3(xVect.x,   yVect.x,    center.x,    
-                     xVect.y,   yVect.y,    center.y,
-                     xVect.z,   yVect.z,    center.z); // avoid transpose it is required glsl 1.2
-    
+        xVect.y,   yVect.y,    center.y,
+        xVect.z,   yVect.z,    center.z); // avoid transpose it is required glsl 1.2
+
     vec2 xy1 = vec2(1.0 / maxX, 1.0 / (maxY*aspectRatio));
     vec2 xy2 = vec2(-0.5,       -yPos/ aspectRatio);
 
@@ -176,7 +183,7 @@ QString QnFisheyeRectilinearProgram::getShaderText()
 
         float theta = atan(pos3d.z, pos3d.x) + fovRot;            // fisheye angle
         float r     = acos(pos3d.y / length(pos3d));              // fisheye radius
-        
+
         vec2 pos = vec2(cos(theta), sin(theta)) * r;
         pos = pos * xy3 + xy4;
 
@@ -190,7 +197,13 @@ QString QnFisheyeRectilinearProgram::getShaderText()
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    ))).arg(gammaStr());
+    ));
+
+#ifdef QT_OPENGL_ES_2
+    shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
+
+    return QString(QLatin1String(QN_SHADER_SOURCE(shader))).arg(gammaStr());
 }
 
 // ------------------------- QnFisheyeEquirectangularHProgram -----------------------------
@@ -203,8 +216,7 @@ QnFisheyeEquirectangularHProgram::QnFisheyeEquirectangularHProgram(const QGLCont
 
 QString QnFisheyeEquirectangularHProgram::getShaderText()
 {
-    return QString(QLatin1String(QN_SHADER_SOURCE(
-    precision mediump float;
+    QByteArray shader(QN_SHADER_SOURCE(
     varying vec2 vTexCoord;
     uniform sampler2D yTexture;
     uniform sampler2D uTexture;
@@ -233,8 +245,8 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         0.0,  0.0,    0.0,    opacity);
 
     mat3 perspectiveMatrix = mat3( vec3(1.0, 0.0,              0.0),
-                                   vec3(0.0, cos(-fovRot), -sin(-fovRot)),
-                                   vec3(0.0, sin(-fovRot),  cos(-fovRot)));
+        vec3(0.0, cos(-fovRot), -sin(-fovRot)),
+        vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
     vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
@@ -253,8 +265,8 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
 
         // Vector in 3D space
         vec3 psph = vec3(cosPhi * sin(pos.x),
-                         cosPhi * cosTheta,  // only one difference between H and V shaders: this 2 lines in back order
-                         sin(phi))  * perspectiveMatrix;
+            cosPhi * cosTheta,  // only one difference between H and V shaders: this 2 lines in back order
+            sin(phi))  * perspectiveMatrix;
 
         // Calculate fisheye angle and radius
         float theta   = atan(psph.z, psph.x);
@@ -262,7 +274,7 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
 
         // return from polar coordinates
         pos = vec2(cos(theta), sin(theta)) * r;
-        
+
         // AR and non [0..1] range correction
         pos = pos * xy3 + xy4;
 
@@ -276,7 +288,13 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    ))).arg(gammaStr());
+    ));
+
+#ifdef QT_OPENGL_ES_2
+    shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
+
+    return QString(QLatin1String(QN_SHADER_SOURCE(shader))).arg(gammaStr());
 }
 
 // ----------------------------------------- QnFisheyeEquirectangularVProgram ---------------------------------------
@@ -289,38 +307,37 @@ QnFisheyeEquirectangularVProgram::QnFisheyeEquirectangularVProgram(const QGLCont
 
 QString QnFisheyeEquirectangularVProgram::getShaderText()
 {
-    return QString(QLatin1String(QN_SHADER_SOURCE(
-        precision mediump float;
+    QByteArray shader(QN_SHADER_SOURCE(
         varying vec2 vTexCoord;
-        uniform sampler2D yTexture;
-        uniform sampler2D uTexture;
-        uniform sampler2D vTexture;
-        uniform float opacity;
-        uniform float xShift;
-        uniform float yShift;
-        uniform float fovRot;
-        uniform float dstFov;
-        uniform float aspectRatio;
-        uniform float panoFactor;
-        uniform float yPos;
-        uniform float xCenter;
-        uniform float yCenter;
-        uniform float radius;
-        uniform float yLevels1;
-        uniform float yLevels2;
-        uniform float yGamma;
-        uniform float maxX;
-        uniform float maxY;
+    uniform sampler2D yTexture;
+    uniform sampler2D uTexture;
+    uniform sampler2D vTexture;
+    uniform float opacity;
+    uniform float xShift;
+    uniform float yShift;
+    uniform float fovRot;
+    uniform float dstFov;
+    uniform float aspectRatio;
+    uniform float panoFactor;
+    uniform float yPos;
+    uniform float xCenter;
+    uniform float yCenter;
+    uniform float radius;
+    uniform float yLevels1;
+    uniform float yLevels2;
+    uniform float yGamma;
+    uniform float maxX;
+    uniform float maxY;
 
     const float PI = 3.1415926535;
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
-                                1.0, -0.344, -0.714,  0.529,
-                                1.0,  1.772,  0.0,   -0.886,
-                                0.0,  0.0,    0.0,    opacity);
+        1.0, -0.344, -0.714,  0.529,
+        1.0,  1.772,  0.0,   -0.886,
+        0.0,  0.0,    0.0,    opacity);
 
     mat3 perspectiveMatrix = mat3( vec3(1.0, 0.0,              0.0),
-                                   vec3(0.0, cos(-fovRot), -sin(-fovRot)),
-                                   vec3(0.0, sin(-fovRot),  cos(-fovRot)));
+        vec3(0.0, cos(-fovRot), -sin(-fovRot)),
+        vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
     vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
     vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
@@ -336,11 +353,11 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         float roty = -fovRot * cosTheta;
         float phi   = -(pos.y * (1.0 - roty*xy1.y)  - roty - yShift);
         float cosPhi = cos(phi);
-        
+
         // Vector in 3D space
         vec3 psph = vec3(cosPhi * sin(pos.x),
-                         sin(phi),  // only one difference between H and V shaders: this 2 lines in back order
-                         cosPhi * cosTheta)  * perspectiveMatrix;
+            sin(phi),  // only one difference between H and V shaders: this 2 lines in back order
+            cosPhi * cosTheta)  * perspectiveMatrix;
 
         // Calculate fisheye angle and radius
         float theta    = atan(psph.z, psph.x);
@@ -362,7 +379,13 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         else 
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
-    ))).arg(gammaStr());
+    ));
+
+#ifdef QT_OPENGL_ES_2
+    shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
+
+    return QString(QLatin1String(QN_SHADER_SOURCE(shader))).arg(gammaStr());
 }
 
 // ------------------------- QnAbstractRGBAShaderProgram ------------------------------
@@ -406,8 +429,7 @@ QnFisheyeRGBRectilinearProgram::QnFisheyeRGBRectilinearProgram(const QGLContext 
 
 QString QnFisheyeRGBRectilinearProgram::getShaderText()
 {
-    return QLatin1String(QN_SHADER_SOURCE(
-    precision mediump float;
+    QByteArray shader(QN_SHADER_SOURCE(
     varying vec2 vTexCoord;
     uniform sampler2D rgbaTexture;
     uniform float opacity;
@@ -459,6 +481,12 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
     ));
+
+#ifdef QT_OPENGL_ES_2
+    shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
+
+    return QLatin1String(QN_SHADER_SOURCE(shader));
 }
 
 // ------------------------- QnFisheyeRGBEquirectangularHProgram -----------------------------
@@ -471,8 +499,7 @@ QnFisheyeRGBEquirectangularHProgram::QnFisheyeRGBEquirectangularHProgram(const Q
 
 QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
 {
-    return QLatin1String(QN_SHADER_SOURCE(
-    precision mediump float;
+    QByteArray shader(QN_SHADER_SOURCE(
     varying vec2 vTexCoord;
     uniform sampler2D rgbaTexture;
     uniform float opacity;
@@ -531,6 +558,12 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
     ));
+
+#ifdef QT_OPENGL_ES_2
+    shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
+
+    return QLatin1String(QN_SHADER_SOURCE(shader));
 }
 
 // ----------------------------------------- QnFisheyeRGBEquirectangularVProgram ---------------------------------------
@@ -543,9 +576,8 @@ QnFisheyeRGBEquirectangularVProgram::QnFisheyeRGBEquirectangularVProgram(const Q
 
 QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
 {
-    return QLatin1String(QN_SHADER_SOURCE(
-    precision mediump float;
-    varying vec2 vTexCoord;
+    QByteArray shader(QN_SHADER_SOURCE(
+        varying vec2 vTexCoord;
     uniform sampler2D rgbaTexture;
     uniform float opacity;
     uniform float xShift;
@@ -603,6 +635,12 @@ QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
             gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
     ));
+
+#ifdef QT_OPENGL_ES_2
+    shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
+
+    return QLatin1String(QN_SHADER_SOURCE(shader));
 }
 
 // ============================ QnYv12ToRgbaShaderProgram ==================================
@@ -618,27 +656,32 @@ bool QnYv12ToRgbaShaderProgram::link()
 QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(const QGLContext *context, QObject *parent):
     QnAbstractYv12ToRgbShaderProgram(context, parent) 
 {
-    addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(
-        precision mediump float;
-        varying vec2 vTexCoord;
-        uniform sampler2D yTexture;
-        uniform sampler2D uTexture;
-        uniform sampler2D vTexture;
-        uniform float opacity;
-        uniform sampler2D aTexture;
+    QByteArray shader(QN_SHADER_SOURCE(
+    varying vec2 vTexCoord;
+    uniform sampler2D yTexture;
+    uniform sampler2D uTexture;
+    uniform sampler2D vTexture;
+    uniform float opacity;
+    uniform sampler2D aTexture;
 
-        mat4 colorTransform = mat4( 1.0,  0.0,    1.402,  0.0,
-                                    1.0, -0.344, -0.714,  0.0,
-                                    1.0,  1.772,  0.0,   -0.0,
-                                    0.0,  0.0,    0.0,    opacity);
+    mat4 colorTransform = mat4( 1.0,  0.0,    1.402,  0.0,
+        1.0, -0.344, -0.714,  0.0,
+        1.0,  1.772,  0.0,   -0.0,
+        0.0,  0.0,    0.0,    opacity);
 
-        void main() {
-            gl_FragColor = vec4(texture2D(yTexture, vTexCoord).p,
-                                texture2D(uTexture, vTexCoord).p-0.5,
-                                texture2D(vTexture, vTexCoord).p-0.5,
-                                texture2D(aTexture, vTexCoord).p) * colorTransform;
-        }
+    void main() {
+        gl_FragColor = vec4(texture2D(yTexture, vTexCoord).p,
+            texture2D(uTexture, vTexCoord).p-0.5,
+            texture2D(vTexture, vTexCoord).p-0.5,
+            texture2D(aTexture, vTexCoord).p) * colorTransform;
+    }
     ));
+
+#ifdef QT_OPENGL_ES_2
+    shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
+
+    addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(shader));
 
     link();
 }
