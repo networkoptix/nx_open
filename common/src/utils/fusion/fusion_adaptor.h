@@ -28,15 +28,17 @@ struct QnFusionBinding;                                                         
                                                                                 \
 template<>                                                                      \
 struct QnFusionBinding<CLASS> {                                                 \
-    typedef CLASS value_type;                                                   \
+    template<int n>                                                             \
+    struct at; /* MPL style interface. */                                       \
+                                                                                \
     BOOST_PP_SEQ_FOR_EACH_I(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_I, GLOBAL_SEQ, MEMBER_SEQ) \
                                                                                 \
     template<class T, class Visitor>                                            \
     static bool visit_members(T &&value, Visitor &&visitor) {                   \
-        if(!QnFusionDetail::safe_operator_call(std::forward<Visitor>(visitor), std::forward<T>(value), Access0(), QnFusion::start_tag())) \
+        if(!QnFusionDetail::safe_operator_call(std::forward<Visitor>(visitor), std::forward<T>(value), at<0>(), QnFusion::start_tag())) \
             return false;                                                       \
         BOOST_PP_REPEAT(BOOST_PP_SEQ_SIZE(MEMBER_SEQ), QN_FUSION_ADAPT_CLASS_FUNCTION_STEP_I, ~) \
-        if(!QnFusionDetail::safe_operator_call(std::forward<Visitor>(visitor), std::forward<T>(value), Access0(), QnFusion::end_tag())) \
+        if(!QnFusionDetail::safe_operator_call(std::forward<Visitor>(visitor), std::forward<T>(value), at<0>(), QnFusion::end_tag())) \
             return false;                                                       \
         return true;                                                            \
     }                                                                           \
@@ -57,8 +59,9 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     QN_FUSION_ADAPT_CLASS_OBJECT_STEP_II(INDEX, GLOBAL_SEQ PROPERTY_SEQ)
 
 #define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_II(INDEX, PROPERTY_SEQ)               \
-    struct BOOST_PP_CAT(Access, INDEX) {                                        \
-        typedef BOOST_PP_CAT(Access, INDEX) this_type;                          \
+    template<>                                                                  \
+    struct at<INDEX> {                                                          \
+        typedef at<INDEX> this_type;                                            \
                                                                                 \
         template<class T>                                                       \
         struct result;                                                          \
@@ -81,7 +84,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 
 #define QN_FUSION_ADAPT_CLASS_FUNCTION_STEP_I(Z, INDEX, DATA)                   \
-    if(!visitor(std::forward<T>(value), QnFusion::AccessAdaptor<QnFusion::AccessExtension<BOOST_PP_CAT(Access, INDEX)>>())) \
+    if(!visitor(std::forward<T>(value), QnFusion::AccessAdaptor<QnFusion::AccessExtension<at<INDEX> > >())) \
         return false;
 
 
