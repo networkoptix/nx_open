@@ -61,11 +61,6 @@ public:
     void setNetworkStatus(QnNetworkStatus status);
 
 
-    // return true if device conflicting with something else ( IP conflict )
-    // this function makes sense to call only for resources in the same lan
-    // it does some physical job
-    virtual bool conflicting();
-
     // all data readers and any sockets will use this number as timeout value in ms
     void setNetworkTimeout(unsigned int timeout);
     virtual unsigned int getNetworkTimeout() const;
@@ -84,8 +79,6 @@ public:
     virtual bool updateMACAddress() { return true; }
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
-
-    virtual bool shoudResolveConflicts() const;
 
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);

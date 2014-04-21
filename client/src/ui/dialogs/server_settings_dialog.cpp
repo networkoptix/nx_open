@@ -272,6 +272,8 @@ void QnServerSettingsDialog::updateFromResources()
     ui->nameLineEdit->setEnabled(!edge);
     ui->maxCamerasSpinBox->setValue(m_server->getMaxCameras());
     ui->maxCamerasSpinBox->setEnabled(!edge);
+    ui->checkBoxRedundancy->setChecked(m_server->isRedundancy());
+    ui->checkBoxRedundancy->setEnabled(!edge);
 
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
@@ -313,6 +315,7 @@ void QnServerSettingsDialog::submitToResources() {
     if (!edge) {
         m_server->setName(ui->nameLineEdit->text());
         m_server->setMaxCameras(ui->maxCamerasSpinBox->value());
+        m_server->setRedundancy(ui->checkBoxRedundancy->isChecked());
     }
 }
 

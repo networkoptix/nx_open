@@ -465,8 +465,8 @@ ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCamera& data, qint32 inter
 ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServer& data, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO vms_server (api_url, auth_key, streaming_url, version, net_addr_list, flags, panic_mode, max_cameras, resource_ptr_id) VALUES\
-                     (:apiUrl, :authKey, :streamingUrl, :version, :netAddrList, :flags, :panicMode, :maxCameras, :internalId)");
+    insQuery.prepare("INSERT OR REPLACE INTO vms_server (api_url, auth_key, streaming_url, version, net_addr_list, flags, panic_mode, max_cameras, redundancy, resource_ptr_id) VALUES\
+                     (:apiUrl, :authKey, :streamingUrl, :version, :netAddrList, :flags, :panicMode, :maxCameras, :redundancy, :internalId)");
     data.autoBindValues(insQuery);
     insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
@@ -1521,7 +1521,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerL
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare(QString("select r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentGuid, r.name, r.url, r.status,r. disabled, \
-                          s.api_url as apiUrl, s.auth_key as authKey, s.streaming_url as streamingUrl, s.version, s.net_addr_list as netAddrList, s.flags, s.panic_mode as panicMode, s.max_cameras as maxCameras \
+                          s.api_url as apiUrl, s.auth_key as authKey, s.streaming_url as streamingUrl, s.version, s.net_addr_list as netAddrList, s.flags, s.panic_mode as panicMode, s.max_cameras as maxCameras, \
+                          s.redundancy \
                           from vms_resource r \
                           join vms_server s on s.resource_ptr_id = r.id order by r.guid"));
 
