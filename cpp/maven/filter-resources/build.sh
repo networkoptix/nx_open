@@ -2,9 +2,10 @@
 
 CONFIG=${build.configuration}
 ARTIFACT=${project.artifactId}
+PLATFORM=`uname -s`
 QTCHECK=`ldd ${libdir}/lib/${build.configuration}/libQt5Core.so.5 | grep libglib-2.0.so.0`
 
-if [ -z "$QTCHECK" ]; then
+if [ $PLATFORM == 'Linux' ] && [ -z "$QTCHECK" ]; then
      echo 'invalid QT - does not support libglib. Compilation terminated'
      exit 1
 fi
