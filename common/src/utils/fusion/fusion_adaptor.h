@@ -29,17 +29,26 @@ struct QnFusionBinding;                                                         
 template<>                                                                      \
 struct QnFusionBinding<CLASS> {                                                 \
     template<int n>                                                             \
-    struct at; /* MPL style interface. */                                       \
+    struct at_c;                                                                \
+                                                                                \
+    template<class T>                                                           \
+    struct at:                                                                  \
+        at_c<T::value>                                                          \
+    {};                                                                         \
+                                                                                \
+    struct size {                                                               \
+        enum { value = BOOST_PP_SEQ_SIZE(MEMBER_SEQ) };                         \
+    };                                                                          \
                                                                                 \
     BOOST_PP_SEQ_FOR_EACH_I(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_I, GLOBAL_SEQ, MEMBER_SEQ) \
                                                                                 \
     template<class T, class Visitor>                                            \
     static bool visit_members(T &&value, Visitor &&visitor) {                   \
-        if(!QnFusionDetail::safe_operator_call(std::forward<Visitor>(visitor), std::forward<T>(value), at<0>(), QnFusion::start_tag())) \
-            return false;                                                       \
+        /*if(!QnFusionDetail::safe_operator_call(std::forward<Visitor>(visitor), std::forward<T>(value), at<0>(), QnFusion::start_tag()))*/ \
+            /*return false;                                                     */  \
         BOOST_PP_REPEAT(BOOST_PP_SEQ_SIZE(MEMBER_SEQ), QN_FUSION_ADAPT_CLASS_FUNCTION_STEP_I, ~) \
-        if(!QnFusionDetail::safe_operator_call(std::forward<Visitor>(visitor), std::forward<T>(value), at<0>(), QnFusion::end_tag())) \
-            return false;                                                       \
+        /*if(!QnFusionDetail::safe_operator_call(std::forward<Visitor>(visitor), std::forward<T>(value), at<0>(), QnFusion::end_tag()))*/ \
+            /*return false;                                                       */\
         return true;                                                            \
     }                                                                           \
 };                                                                              \
@@ -60,31 +69,41 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 #define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_II(INDEX, PROPERTY_SEQ)               \
     template<>                                                                  \
-    struct at<INDEX> {                                                          \
-        typedef at<INDEX> this_type;                                            \
+    struct at_c<INDEX> {                                                        \
+        struct type {                                                           \
+            typedef type access_type;                                           \
                                                                                 \
-        template<class T>                                                       \
-        struct result;                                                          \
+            template<class Key, class Default>                                  \
+            struct at {                                                         \
+                typedef Default type;                                           \
+            };                                                                  \
                                                                                 \
-        BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (index, INDEX)) \
+            struct size {                                                       \
+                enum { value = BOOST_PP_VARIADIC_SEQ_SIZE(PROPERTY_SEQ) };      \
+            };                                                                  \
+                                                                                \
+            BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (index, INDEX)) \
+        };                                                                      \
     };
 
 #define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_I(R, DATA, PROPERTY_TUPLE)       \
     QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_II PROPERTY_TUPLE
 
 #define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_II(KEY, VALUE)                   \
-    template<class F>                                                           \
-    struct result<F(QN_FUSION_KEY_TYPE(KEY))> {                                 \
-        typedef QN_FUSION_PROPERTY_TYPE(KEY, VALUE) type;                       \
-    };                                                                          \
+    template<class Default>                                                     \
+    struct at<QN_FUSION_KEY_TYPE(KEY), Default> {                               \
+        struct type {                                                           \
+            typedef QN_FUSION_PROPERTY_TYPE(KEY, VALUE) result_type;            \
                                                                                 \
-    result<void(QN_FUSION_KEY_TYPE(KEY))>::type operator()(const QN_FUSION_KEY_TYPE(KEY) &) const { \
-        return VALUE;                                                           \
-    }
+            result_type operator()() const {                                    \
+                return VALUE;                                                   \
+            }                                                                   \
+        };                                                                      \
+    };
 
 
 #define QN_FUSION_ADAPT_CLASS_FUNCTION_STEP_I(Z, INDEX, DATA)                   \
-    if(!visitor(std::forward<T>(value), QnFusion::AccessAdaptor<QnFusion::AccessExtension<at<INDEX> > >())) \
+    if(!visitor(std::forward<T>(value), QnFusion::AccessAdaptor<at_c<INDEX>::type>())) \
         return false;
 
 

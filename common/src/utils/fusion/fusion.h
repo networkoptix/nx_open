@@ -132,7 +132,7 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_name(KEY, VALUE) (name, lit(VALUE))(c_name, VALUE)
 
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_setter ,
-#define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, (0, QnFusion::access_setter_category<this_type>::type() /* '0,' is here to make sure it's an rvalue. */)) 
+#define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, (0, QnFusion::access_setter_category<access_type>::type() /* '0,' is here to make sure it's an rvalue. */)) 
 
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_classname ,
 #define QN_FUSION_PROPERTY_TYPE_FOR_classname QString
@@ -248,8 +248,11 @@ namespace QnFusion {
     template<class Access>
     struct access_setter_category:
         setter_category<
-            decltype(std::declval<Access>()(setter)),
-            typename remove_cvr<decltype(invoke(std::declval<Access>()(getter), std::declval<Access>()(object_declval)))>::type
+            typename Access::template at<setter_type, void>::type,
+            typename remove_cvr<decltype(invoke(
+                std::declval<typename Access::template at<getter_type, void>::type::result_type>(), 
+                std::declval<typename Access::template at<object_declval_type, void>::type::result_type>()
+            ))>::type
         >
     {};
 
@@ -287,18 +290,28 @@ namespace QnFusion {
     template<class Base>
     struct AccessAdaptor {
     public:
+        template<class Key, class Default> 
+        struct at: 
+            Base::template at<Key, Default>
+        {};
+
         template<class Key>
-        decltype(Base()(Key())) operator()(const Key &) const {
-            return Base()(Key());
+        struct has_key:
+            boost::mpl::not_<boost::is_same<typename at<Key, void>::type, void> > // TODO: #Elric move to base
+        {};
+
+        template<class Key>
+        typename at<Key, void>::type::result_type operator()(const Key &) const {
+            return at<Key, void>::type()();
         }
 
         template<class Key, class T>
-        decltype(Base()(Key())) operator()(const Key &, const T &, const typename boost::enable_if<QnFusionDetail::has_operator_call<Base, Key> >::type * = NULL) const {
-            return Base()(Key());
+        typename at<Key, void>::type::result_type operator()(const Key &, const T &, const typename boost::enable_if<has_key<Key> >::type * = NULL) const {
+            return at<Key, void>::type()();
         }
 
         template<class Key, class T>
-        T operator()(const Key &, const T &defaultValue, const typename boost::disable_if<QnFusionDetail::has_operator_call<Base, Key> >::type * = NULL) const {
+        T operator()(const Key &, const T &defaultValue, const typename boost::disable_if<has_key<Key> >::type * = NULL) const {
             return defaultValue;
         }
     };
