@@ -131,6 +131,9 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_name ,
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_name(KEY, VALUE) (name, lit(VALUE))(c_name, VALUE)
 
+#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_setter ,
+#define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, (0, QnFusion::access_setter_category<this_type>::type() /* '0,' is here to make sure it's an rvalue. */)) 
+
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_classname ,
 #define QN_FUSION_PROPERTY_TYPE_FOR_classname QString
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_classname ,
@@ -242,6 +245,15 @@ namespace QnFusion {
         >
     {};
 
+    template<class Access>
+    struct access_setter_category:
+        setter_category<
+            decltype(std::declval<Access>()(setter)),
+            typename remove_cvr<decltype(invoke(std::declval<Access>()(getter), std::declval<Access>()(object_declval)))>::type
+        >
+    {};
+
+
     /**
      * Extension interface that defines how common keys are handled.
      */
@@ -255,17 +267,17 @@ namespace QnFusion {
             Base::template result<Sig>
         {};
 
-        template<class F>
+        /*template<class F>
         struct result<F(setter_tag_type)>:
             setter_category<
                 typename result<F(setter_type)>::type,
                 typename remove_cvr<decltype(invoke(std::declval<Base>()(getter), std::declval<Base>()(object_declval)))>::type
             >
-        {};
+        {};*/
 
-        typename result<void(setter_tag_type)>::type operator()(const setter_tag_type &) const {
+        /*typename result<void(setter_tag_type)>::type operator()(const setter_tag_type &) const {
             return result<void(setter_tag_type)>::type();
-        }
+        }*/
     };
 
     /**

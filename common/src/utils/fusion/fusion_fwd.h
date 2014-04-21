@@ -9,6 +9,12 @@
 
 #include <utils/preprocessor/variadic_seq_for_each.h>
 
+namespace QnFusion {
+    template<class Setter, class T>
+    struct setter_category;
+} // namespace QnFusion
+
+
 /**
  * 
  */
@@ -20,6 +26,7 @@
 #define QN_FUSION_DECLARE_FUNCTIONS(...)
 #define QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(...)
 #else
+
 
 /**
  *

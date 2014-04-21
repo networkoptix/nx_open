@@ -58,9 +58,10 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 #define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_II(INDEX, PROPERTY_SEQ)               \
     struct BOOST_PP_CAT(Access, INDEX) {                                        \
+        typedef BOOST_PP_CAT(Access, INDEX) this_type;                          \
+                                                                                \
         template<class T>                                                       \
         struct result;                                                          \
-                                                                                \
                                                                                 \
         BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (index, INDEX)) \
     };
@@ -80,7 +81,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 
 #define QN_FUSION_ADAPT_CLASS_FUNCTION_STEP_I(Z, INDEX, DATA)                   \
-    if(!visitor(std::forward<T>(value), QnFusion::AccessAdaptor<QnFusion::AccessExtension<BOOST_PP_CAT(Access, INDEX)> >())) \
+    if(!visitor(std::forward<T>(value), QnFusion::AccessAdaptor<QnFusion::AccessExtension<BOOST_PP_CAT(Access, INDEX)>>())) \
         return false;
 
 
