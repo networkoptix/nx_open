@@ -72,6 +72,10 @@ namespace ec2
             m_licenseManager->triggerNotification( tran );
         }
 
+        void triggerNotification( const QnTransaction<ApiLicense>& tran ) {
+            m_licenseManager->triggerNotification( tran );
+        }
+
         void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran ) {
             m_businessEventManager->triggerNotification( tran );
         }

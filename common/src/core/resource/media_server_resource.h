@@ -55,6 +55,12 @@ public:
     QString getProxyHost();
     int getProxyPort();
 
+    int getMaxCameras() const;
+    void setMaxCameras(int value);
+
+    void setRedundancy(bool value);
+    int isRedundancy() const;
+
     QnSoftwareVersion getVersion() const;
     void setVersion(const QnSoftwareVersion& version);
 
@@ -62,7 +68,8 @@ public:
     void setSystemInfo(const QnSystemInformation &systemInfo);
 
     static bool isEdgeServer(const QnResourcePtr &resource);
-
+    virtual void setStatus(Status newStatus, bool silenceMode = false) override;
+    qint64 currentStatusTime() const;
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
     void determineOptimalNetIF_testProxy();
@@ -86,6 +93,9 @@ private:
     QnSystemInformation m_systemInfo;
     QMap<int, QString> m_runningIfRequests;
     QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
+    int m_maxCameras;
+    bool m_redundancy;
+    QElapsedTimer m_statusTimer;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

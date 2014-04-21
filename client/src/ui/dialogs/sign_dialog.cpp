@@ -57,7 +57,7 @@ public:
     virtual void paintEvent(QPaintEvent *) override
     {
         QPainter painter(this);
-        QnGlNativePainting::begin(&painter);
+        QnGlNativePainting::begin(QGLContext::currentContext(),&painter);
         if (m_renderer)
             m_renderer->paint(0, QRectF(0.0, 0.0, 1.0, 1.0), m_videoRect, 1.0);
         QnGlNativePainting::end(&painter);

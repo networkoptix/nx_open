@@ -20,7 +20,9 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     m_primaryIFSelected(false),
     m_serverFlags(Qn::SF_None),
     m_panicMode(Qn::PM_None),
-    m_guard(NULL)
+    m_guard(NULL),
+    m_maxCameras(0),
+    m_redundancy(false)
 {
     setTypeId(resTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
@@ -30,6 +32,7 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     setName(tr("Server"));
 
     m_primaryIFSelected = false;
+    m_statusTimer.restart();
 }
 
 QnMediaServerResource::~QnMediaServerResource()
@@ -324,6 +327,30 @@ QnSoftwareVersion QnMediaServerResource::getVersion() const
     return m_version;
 }
 
+int QnMediaServerResource::getMaxCameras() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_maxCameras;
+}
+
+void QnMediaServerResource::setRedundancy(bool value)
+{
+    QMutexLocker lock(&m_mutex);
+    m_redundancy = value;
+}
+
+int QnMediaServerResource::isRedundancy() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_redundancy;
+}
+
+void QnMediaServerResource::setMaxCameras(int value)
+{
+    QMutexLocker lock(&m_mutex);
+    m_maxCameras = value;
+}
+
 void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
 {
     QMutexLocker lock(&m_mutex);
@@ -347,4 +374,18 @@ bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) 
         return (server->getServerFlags() & Qn::SF_Edge);
     return false;
+}
+
+void QnMediaServerResource::setStatus(Status newStatus, bool silenceMode)
+{
+    QMutexLocker lock(&m_mutex);
+    if (getStatus() != newStatus)
+        m_statusTimer.restart();
+    QnResource::setStatus(newStatus, silenceMode);
+}
+
+qint64 QnMediaServerResource::currentStatusTime() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_statusTimer.elapsed();
 }

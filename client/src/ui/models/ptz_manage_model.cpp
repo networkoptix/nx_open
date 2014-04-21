@@ -80,13 +80,12 @@ const QStringList & QnPtzManageModel::removedPresets() const {
     return m_removedPresets;
 }
 
-const QList<QnPtzPresetItemModel> & QnPtzManageModel::presetModels() const {
-    return m_presets;
+QnPtzPresetList QnPtzManageModel::presets() const {
+    return m_ptzPresetsCache;
 }
 
-
-const QnPtzPresetList& QnPtzManageModel::presets() const {
-    return m_ptzPresetsCache;
+const QList<QnPtzPresetItemModel> & QnPtzManageModel::presetModels() const {
+    return m_presets;
 }
 
 void QnPtzManageModel::setPresets(const QnPtzPresetList &presets) {
@@ -219,8 +218,11 @@ bool QnPtzManageModel::removeRows(int row, int count, const QModelIndex &parent)
 }
 
 QVariant QnPtzManageModel::data(const QModelIndex &index, int role) const {
-    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent())) {
+        if (role == Qn::HelpTopicIdRole)
+            return Qn::PtzPresets_Help;
         return QVariant();
+    }
     
     RowData data = rowData(index.row());
 
