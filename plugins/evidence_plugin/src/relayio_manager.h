@@ -8,14 +8,14 @@
 
 #include <list>
 #include <map>
-#include <set>
+#include <vector>
 
 #include <QtCore/QAtomicInt>
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
-#include <QtNetwork/QNetworkReply>
 #include <QtCore/QWaitCondition>
 #include <QtCore/QTimer>
+#include <QtNetwork/QNetworkReply>
 
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
@@ -41,8 +41,7 @@ public:
     */
     RelayIOManager(
         CameraManager* cameraManager,
-        unsigned int inputPortCount,
-        unsigned int outputPortCount );
+        const std::vector<QByteArray>& relayParamsStr );
     virtual ~RelayIOManager();
 
     //!Implementation of nxcip::CameraRelayIOManager::queryInterface
@@ -102,6 +101,7 @@ private:
     std::list<nxcip::CameraInputEventHandler*> m_eventHandlers;
     //!For synchronizing access to event handler list
     mutable QMutex m_mutex;
+    //map<port index, http reply>
     std::map<unsigned int, QNetworkReply*> m_inputPortHttpMonitor;
     QWaitCondition m_cond;
     QAtomicInt m_asyncCallCounter;
@@ -109,20 +109,16 @@ private:
     std::map<int, AsyncCallContext> m_awaitedAsyncCallIDs;
     MultipartedParsingState m_multipartedParsingState;
     QTimer m_inputCheckTimer;
+    //!map<port index starting with 1, port state>
+    std::map<int, int> m_inputPortState;
 
     void copyPortList(
         char** idList,
         int* idNum,
         const std::map<QString, unsigned int>& portNameToIndex ) const;
     void callSlotFromOwningThread( const char* slotName, int* const resultCode = NULL );
-    void readRelayPortNotification( const QByteArray& line );
 
 private slots:
-    void startInputPortMonitoringPriv( int asyncCallID );
-    void stopInputPortMonitoringPriv( int asyncCallID );
-    void onMonitorDataAvailable();
-    void onConnectionFinished( QNetworkReply* reply );
-
     void onTimer();
 };
 
