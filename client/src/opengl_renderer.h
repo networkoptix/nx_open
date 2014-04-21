@@ -50,7 +50,7 @@ private:
 class QnOpenGLRendererManager: public QObject {
     Q_OBJECT;
 public:
-    static QnOpenGLRenderer& QnOpenGLRendererManager::instance(const QGLContext* a_context);
+    static QnOpenGLRenderer& instance(const QGLContext* a_context);
 
     QHash<const QGLContext*,QnOpenGLRenderer>& getContainer(){ return m_container; };
 private:
