@@ -65,28 +65,32 @@ QnNv12ToRgbShaderProgram::QnNv12ToRgbShaderProgram(const QGLContext *context, QO
             vTexCoord = aTexCoord;
         }
     ));
-    addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(
-        precision mediump float;
-        uniform sampler2D yTexture;
-        uniform sampler2D uvTexture;
-        uniform mat4 colorTransform;
-        uniform float opacity;
-        varying vec2 vTexCoord;
-                                                                                
-        void main() {
-            vec4 yuv, rgb;
-            yuv.rgba = vec4(
-                texture2D(yTexture, vTexCoord.st).r,
-                texture2D(uvTexture, vTexCoord.st).r,
-                texture2D(uvTexture, vTexCoord.st).a,
-                1.0
+    QByteArray shader(QN_SHADER_SOURCE(
+    uniform sampler2D yTexture;
+    uniform sampler2D uvTexture;
+    uniform mat4 colorTransform;
+    uniform float opacity;
+    varying vec2 vTexCoord;
+
+    void main() {
+        vec4 yuv, rgb;
+        yuv.rgba = vec4(
+            texture2D(yTexture, vTexCoord.st).r,
+            texture2D(uvTexture, vTexCoord.st).r,
+            texture2D(uvTexture, vTexCoord.st).a,
+            1.0
             );
-              
-            rgb = colorTransform * yuv;
-            rgb.a = opacity;
-            gl_FragColor = rgb;
-        }
+
+        rgb = colorTransform * yuv;
+        rgb.a = opacity;
+        gl_FragColor = rgb;
+    }
     ));
+#ifdef QT_OPENGL_ES_2
+    shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
+
+    addShaderFromSourceCode(QGLShader::Fragment, shader);
     link();
 
     m_yTextureLocation = uniformLocation("yTexture");
