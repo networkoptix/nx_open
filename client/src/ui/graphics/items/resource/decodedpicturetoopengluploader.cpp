@@ -1274,7 +1274,7 @@ static DecodedPictureToOpenGLUploader* runningUploader = NULL;
 
 DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     const QGLContext* const mainContext,
-    unsigned int asyncDepth )
+    unsigned int )
 :
     d( new DecodedPictureToOpenGLUploaderPrivate(mainContext) ),
     m_format( PIX_FMT_NONE ),
@@ -1874,7 +1874,7 @@ void DecodedPictureToOpenGLUploader::pictureDataUploadSucceeded( AsyncPicDataUpl
     m_cond.wakeAll();   //notifying that uploading finished
 }
 
-void DecodedPictureToOpenGLUploader::pictureDataUploadFailed( AsyncPicDataUploader* const uploader, UploadedPicture* const picture )
+void DecodedPictureToOpenGLUploader::pictureDataUploadFailed( AsyncPicDataUploader* const, UploadedPicture* const )
 {
     QMutexLocker lk( &m_mutex );
     /*
