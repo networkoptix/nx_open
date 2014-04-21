@@ -94,12 +94,13 @@ namespace nx_http
         }
     }
 
-    void MultipartContentParser::flush()
+    size_t MultipartContentParser::flush()
     {
         if( m_currentFrame.isEmpty() )
-            return;
+            return 0;
 
         //TODO/IMPL: #ak pushing forward incomplete frame
+        return 0;
     }
 
     bool MultipartContentParser::setContentType( const StringType& contentType )
