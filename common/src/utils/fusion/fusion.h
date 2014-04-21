@@ -87,6 +87,31 @@ namespace QnFusionDetail {
         return true;
     }
 
+
+    template<class Base>
+    struct NoStartStopVisitorWrapper: Base {
+    public:
+        template<class T, class Access>
+        bool operator()(const T &value, const Access &access) {
+            return Base::operator()(value, access);
+        }
+
+        template<class T, class Access>
+        bool operator()(const T &value, const Access &access) const {
+            return Base::operator()(value, access);
+        }
+    };
+
+    template<class Visitor>
+    NoStartStopVisitorWrapper<Visitor> &no_start_stop_wrap(Visitor &visitor) {
+        return static_cast<NoStartStopVisitorWrapper<Visitor> &>(visitor);
+    }
+
+    template<class Visitor>
+    NoStartStopVisitorWrapper<Visitor> &no_start_stop_wrap(const Visitor &visitor) {
+        return static_cast<const NoStartStopVisitorWrapper<Visitor> &>(visitor);
+    }
+
 } // namespace QnFusionDetail
 
 
@@ -111,6 +136,7 @@ namespace QnFusion {                                                            
 #define QN_FUSION_KEY_TYPE(KEY)                                                 \
     QnFusion::BOOST_PP_CAT(KEY, _type)
 
+QN_FUSION_DEFINE_KEY(base)
 QN_FUSION_DEFINE_KEY(index)
 QN_FUSION_DEFINE_KEY(object_declval)
 QN_FUSION_DEFINE_KEY(getter)
@@ -122,6 +148,9 @@ QN_FUSION_DEFINE_KEY(c_name)
 QN_FUSION_DEFINE_KEY(classname)
 QN_FUSION_DEFINE_KEY(c_classname)
 QN_FUSION_DEFINE_KEY(optional)
+
+#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_base ,
+#define QN_FUSION_PROPERTY_EXTENSION_FOR_base(KEY, VALUE) (base, std::declval<VALUE>())
 
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_index ,
 #define QN_FUSION_PROPERTY_TYPE_FOR_index int
@@ -258,32 +287,6 @@ namespace QnFusion {
 
 
     /**
-     * Extension interface that defines how common keys are handled.
-     */
-    template<class Base> // TODO: use extensions instead
-    struct AccessExtension: Base {
-    public:
-        ///using Base::operator();
-
-        /*template<class Sig>
-        struct result: 
-            Base::template result<Sig>
-        {};*/
-
-        /*template<class F>
-        struct result<F(setter_tag_type)>:
-            setter_category<
-                typename result<F(setter_type)>::type,
-                typename remove_cvr<decltype(invoke(std::declval<Base>()(getter), std::declval<Base>()(object_declval)))>::type
-            >
-        {};*/
-
-        /*typename result<void(setter_tag_type)>::type operator()(const setter_tag_type &) const {
-            return result<void(setter_tag_type)>::type();
-        }*/
-    };
-
-    /**
      * This class is the external interface that is to be used by visitor
      * classes.
      */
@@ -316,12 +319,37 @@ namespace QnFusion {
         }
     };
 
+
+    /**
+     * 
+     */
     template<class T>
     struct has_visit_members: 
         QnFusionDetail::has_visit_members<T>
     {};
 
 } // namespace QnFusion
+
+
+namespace QnFusionDetail {
+    template<class Visitor, class T, class Access>
+    bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access) {
+        return dispatch_visit(std::forward<Visitor>(visitor), std::forward<T>(value), access, typename Access::template at<QnFusion::base_type, void *>::type());
+    }
+
+    template<class Visitor, class T, class Access>
+    bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access, void *) {
+        return visitor(std::forward<T>(value), access);
+    }
+
+    template<class Visitor, class T, class Access, class Base>
+    bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access, const Base &) {
+        typedef Base::result_type base_type; // TODO: #Elric not the proper way to forward it.
+
+        return QnFusion::visit_members(std::forward<base_type>(value), no_start_stop_wrap(visitor));
+    }
+
+} // namespace QnFusionDetail
 
 
 /**
