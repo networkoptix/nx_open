@@ -7,6 +7,7 @@
 #include <boost/preprocessor/variadic/elem.hpp>
 #include <boost/preprocessor/tuple/size.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
+#include <boost/preprocessor/stringize.hpp>
 #endif // Q_MOC_RUN
 
 #include "fusion.h"
@@ -15,7 +16,11 @@
  * 
  */
 #define QN_FUSION_ADAPT_CLASS(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)          \
-    QN_FUSION_ADAPT_CLASS_I(CLASS, QN_FUSION_EXTEND_MEMBER_SEQ(MEMBER_SEQ), QN_FUSION_EXTEND_PROPERTY_SEQ(BOOST_PP_VARIADIC_SEQ_NIL __VA_ARGS__))
+    QN_FUSION_ADAPT_CLASS_I(                                                    \
+        CLASS,                                                                  \
+        QN_FUSION_EXTEND_MEMBER_SEQ(MEMBER_SEQ),                                \
+        QN_FUSION_EXTEND_PROPERTY_SEQ((object_declval, std::declval<CLASS>())(classname, BOOST_PP_STRINGIZE(CLASS)) __VA_ARGS__) \
+    )
 
 #define QN_FUSION_ADAPT_CLASS_I(CLASS, MEMBER_SEQ, GLOBAL_SEQ)                  \
 template<class T>                                                               \
@@ -56,12 +61,6 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
         template<class T>                                                       \
         struct result;                                                          \
                                                                                 \
-        template<class F>                                                       \
-        struct result<F(QN_FUSION_KEY_TYPE(object_declval))>:                   \
-            std::add_rvalue_reference<value_type>                               \
-        {};                                                                     \
-                                                                                \
-        result<void(QN_FUSION_KEY_TYPE(object_declval))>::type operator()(const QN_FUSION_KEY_TYPE(object_declval) &) const; \
                                                                                 \
         BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (index, INDEX)) \
     };

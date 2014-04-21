@@ -18,9 +18,7 @@ namespace QnDebugSerialization {
         template<class T, class Access>
         bool operator()(const T &value, const Access &access) {
             using namespace QnFusion;
-
-                                            // TODO: #Elric
-            m_stream.nospace() << access(name).toLatin1().data()  << ": " << invoke(access(getter), value) << "; ";
+            m_stream.nospace() << access(c_name) << ": " << invoke(access(getter), value) << "; ";
             return true;
         }
 

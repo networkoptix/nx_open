@@ -93,6 +93,8 @@ QN_FUSION_DEFINE_KEY(setter_tag)
 QN_FUSION_DEFINE_KEY(checker)
 QN_FUSION_DEFINE_KEY(name)
 QN_FUSION_DEFINE_KEY(c_name)
+QN_FUSION_DEFINE_KEY(classname)
+QN_FUSION_DEFINE_KEY(c_classname)
 QN_FUSION_DEFINE_KEY(optional)
 
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_index ,
@@ -103,8 +105,16 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_name ,
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_name(KEY, VALUE) (name, lit(VALUE))(c_name, VALUE)
 
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_classname ,
+#define QN_FUSION_PROPERTY_TYPE_FOR_classname QString
+#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_classname ,
+#define QN_FUSION_PROPERTY_EXTENSION_FOR_classname(KEY, VALUE) (classname, lit(VALUE))(c_classname, VALUE)
+
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_name ,
 #define QN_FUSION_PROPERTY_TYPE_FOR_c_name const char *
+
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_classname ,
+#define QN_FUSION_PROPERTY_TYPE_FOR_c_classname const char *
 
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_optional ,
 #define QN_FUSION_PROPERTY_TYPE_FOR_optional bool
