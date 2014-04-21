@@ -358,23 +358,34 @@ private:
         qreal nc = m_weights[Qn::TimePeriodContentCount];
         qreal sum = m_pendingLength;
 
+        const QColor bookmarkColor(Qt::blue);
+
+        if (!qFuzzyIsNull(bc) && !(qFuzzyIsNull(mc))) {
+            qreal localSum = mc + bc;
+            return linearCombine(mc / localSum, colors[Qn::MotionContent], bc/localSum, bookmarkColor);
+        }
+
         if (!qFuzzyIsNull(bc)) {
-            /* Make sure motion is noticeable even if there isn't much of it. 
+            /* Make sure bookmark is noticeable even if there isn't much of it. 
              * Note that these adjustments don't change sum. */
             rc = rc * (1.0 - lineBarMinMotionFraction);
             bc = sum * lineBarMinMotionFraction + bc * (1.0 - lineBarMinMotionFraction);
             nc = nc * (1.0 - lineBarMinMotionFraction);
-        }
-
-   /*     if(m_weights[Qn::MotionContent] != 0) {*/
+        } else if (!qFuzzyIsNull(mc)) {
             /* Make sure motion is noticeable even if there isn't much of it. 
              * Note that these adjustments don't change sum. */
-       /*     rc = rc * (1.0 - lineBarMinMotionFraction);
+            rc = rc * (1.0 - lineBarMinMotionFraction);
             mc = sum * lineBarMinMotionFraction + mc * (1.0 - lineBarMinMotionFraction);
             nc = nc * (1.0 - lineBarMinMotionFraction);
-        }*/
+        }
 
-        return linearCombine(rc / sum, colors[Qn::RecordingContent], 1.0, linearCombine(bc / sum, colors[Qn::MotionContent], nc / sum, colors[Qn::TimePeriodContentCount]));
+        return 
+            linearCombine(
+                1.0,
+                linearCombine(rc / sum, colors[Qn::RecordingContent], mc / sum, colors[Qn::MotionContent]),
+                1.0, 
+                linearCombine(bc / sum, bookmarkColor, nc / sum, colors[Qn::TimePeriodContentCount])
+            );
     }
 
 private:

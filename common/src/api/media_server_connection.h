@@ -89,7 +89,15 @@ public:
     int getProxyPort() { return m_proxyPort; }
     QString getProxyHost() { return m_proxyAddr; }
 
-    int getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
+    int getTimePeriodsAsync(
+        const QnNetworkResourceList &list,
+        qint64 startTimeMs, 
+        qint64 endTimeMs, 
+        qint64 detail, 
+        Qn::TimePeriodContent periodsType,
+        const QString &filter,
+        QObject *target, 
+        const char *slot);
 
 
     enum RoundMethod { IFrameBeforeTime, Precise, IFrameAfterTime };
@@ -224,7 +232,6 @@ public:
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
 
-    static QnRequestParamList createTimePeriodsRequest(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion> &motionRegions);
     static QnRequestParamList createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params);
     static QnRequestParamList createSetParamsRequest(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params);
 

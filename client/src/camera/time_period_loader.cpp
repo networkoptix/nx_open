@@ -19,8 +19,8 @@ namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
 }
 
-QnTimePeriodLoader::QnTimePeriodLoader(const QnMediaServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent):
-    QnAbstractTimePeriodLoader(resource, parent),
+QnTimePeriodLoader::QnTimePeriodLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &resource, Qn::TimePeriodContent periodsType, QObject *parent):
+    QnAbstractTimePeriodLoader(resource, periodsType, parent),
     m_connection(connection)
 {
     if(!connection)
@@ -30,7 +30,7 @@ QnTimePeriodLoader::QnTimePeriodLoader(const QnMediaServerConnectionPtr &connect
         qnNullWarning(resource);
 }
 
-QnTimePeriodLoader *QnTimePeriodLoader::newInstance(QnMediaServerResourcePtr serverResource, QnResourcePtr resource, QObject *parent) {
+QnTimePeriodLoader *QnTimePeriodLoader::newInstance(const QnMediaServerResourcePtr &serverResource, const QnResourcePtr &resource,  Qn::TimePeriodContent periodsType, QObject *parent) {
     QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
     if (!networkResource || !serverResource)
         return NULL;
@@ -39,17 +39,17 @@ QnTimePeriodLoader *QnTimePeriodLoader::newInstance(QnMediaServerResourcePtr ser
     if (!serverConnection)
         return NULL;
 
-    return new QnTimePeriodLoader(serverConnection, networkResource, parent);
+    return new QnTimePeriodLoader(serverConnection, networkResource, periodsType, parent);
 }
 
-int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion> &motionRegions)
+int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QString &filter)
 {
     QMutexLocker lock(&m_mutex);
-    if (motionRegions != m_motionRegions) {
+    if (filter != m_filter) {
         m_loadedPeriods.clear();
         m_loadedData.clear();
     }
-    m_motionRegions = motionRegions;
+    m_filter = filter;
 
     /* Check whether the requested data is already loaded. */
     foreach(const QnTimePeriod &loadedPeriod, m_loadedPeriods) 
@@ -124,7 +124,8 @@ int QnTimePeriodLoader::sendRequest(const QnTimePeriod &periodToLoad)
         periodToLoad.startTimeMs, 
         periodToLoad.startTimeMs + periodToLoad.durationMs, 
         1, 
-        m_motionRegions,
+        m_periodsType,
+        m_filter,
         this, 
         SLOT(at_replyReceived(int, const QnTimePeriodList &, int))
     );

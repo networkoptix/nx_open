@@ -23,7 +23,7 @@ public:
      * \param resource                  Network resource representing the camera to work with.
      * \param parent                    Parent object.
      */
-    QnTimePeriodLoader(const QnMediaServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent = NULL);
+    QnTimePeriodLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &resource, Qn::TimePeriodContent periodsType, QObject *parent = NULL);
 
     /**
      * Creates a new time period loader for the given camera resource. Returns NULL
@@ -33,9 +33,9 @@ public:
      * \param parent                    Parent object for the loader to create.
      * \returns                         Newly created time period loader.
      */
-    static QnTimePeriodLoader *newInstance(QnMediaServerResourcePtr serverResource, QnResourcePtr resource, QObject *parent = NULL);
+    static QnTimePeriodLoader *newInstance(const QnMediaServerResourcePtr &serverResource, const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, QObject *parent = NULL);
     
-    virtual int load(const QnTimePeriod &timePeriod, const QList<QRegion> &motionRegions = QList<QRegion>()) override;
+    virtual int load(const QnTimePeriod &timePeriod, const QString &filter) override;
 
     virtual void discardCachedData() override;
 
@@ -67,10 +67,12 @@ private:
     /** Video server connection that this loader uses. */
     QnMediaServerConnectionPtr m_connection;
 
-    QnTimePeriodList m_loadedPeriods;
+    QString m_filter;
+    
     QList<LoadingInfo> m_loading;
 
     QnTimePeriodList m_loadedData;
+    QnTimePeriodList m_loadedPeriods;
 
     QList<QRegion> m_motionRegions;
 };

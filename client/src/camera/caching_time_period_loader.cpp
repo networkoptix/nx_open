@@ -2,6 +2,8 @@
 
 #include <QtCore/QMetaType>
 
+#include <api/serializer/serializer.h>
+
 #include <core/resource/network_resource.h>
 
 #include <utils/common/warnings.h>
@@ -83,10 +85,11 @@ bool QnCachingTimePeriodLoader::createLoaders(const QnResourcePtr &resource, QnA
     bool isNetRes = resource.dynamicCast<QnNetworkResource>();
     for(int i = 0; i < Qn::TimePeriodContentCount; i++) 
     {
+        Qn::TimePeriodContent type = static_cast<Qn::TimePeriodContent>(i);
         if (isNetRes)
-            loaders[i] = QnMultiCameraTimePeriodLoader::newInstance(resource);
+            loaders[i] = QnMultiCameraTimePeriodLoader::newInstance(resource, type);
         else
-            loaders[i] = QnLayoutFileTimePeriodLoader::newInstance(resource);
+            loaders[i] = QnLayoutFileTimePeriodLoader::newInstance(resource, type);
         if(!loaders[i]) {
             success = false;
             break;
@@ -190,17 +193,25 @@ void QnCachingTimePeriodLoader::load(Qn::TimePeriodContent type) {
     if(!loader) {
         qnWarning("No valid loader in scope.");
         emit loadingFailed();
-    } else {
-        if(type == Qn::RecordingContent) {
-            m_handles[type] = loader->load(m_loadedPeriod);
-        } else { /* type == Qn::MotionContent */
-            if(!isMotionRegionsEmpty()) {
-                m_handles[type] = loader->load(m_loadedPeriod, m_motionRegions);
-            } else if(!m_periods[type].isEmpty()) {
-                m_periods[type].clear();
-                emit periodsChanged(type);
-            }
+        return;
+    } 
+
+    switch (type) {
+    case Qn::RecordingContent:
+    case Qn::BookmarksContent:
+        m_handles[type] = loader->load(m_loadedPeriod, QString());
+        break;
+    case Qn::MotionContent:
+        if(!isMotionRegionsEmpty()) {
+            QString filter = serializeRegionList(m_motionRegions);
+            m_handles[type] = loader->load(m_loadedPeriod, filter);
+        } else if(!m_periods[type].isEmpty()) {
+            m_periods[type].clear();
+            emit periodsChanged(type);
         }
+        break;
+    default:
+        assert(false); //should never get here
     }
 }
 

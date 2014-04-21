@@ -11,7 +11,7 @@ class QnAbstractTimePeriodLoader: public QObject
 {
     Q_OBJECT
 public:
-    QnAbstractTimePeriodLoader(QnResourcePtr resource, QObject *parent);
+    QnAbstractTimePeriodLoader(const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, QObject *parent);
     virtual ~QnAbstractTimePeriodLoader() {}
 
     /**
@@ -22,7 +22,7 @@ public:
      * 
      * \note                            This function is thread-safe.
      */
-    virtual int load(const QnTimePeriod &period, const QList<QRegion> &motionRegions = QList<QRegion>()) = 0;
+    virtual int load(const QnTimePeriod &period, const QString &filter) = 0;
 
     /**
      * \returns                         Resource that this loader works with.
@@ -57,8 +57,10 @@ signals:
 
 protected:
     /** Resource that this loader gets chunks for. */
-    QnResourcePtr m_resource;
+    const QnResourcePtr m_resource;
 
+    /** Periods type this loader reading. */
+    const Qn::TimePeriodContent m_periodsType;
 signals:
     void delayedReady(const QnTimePeriodList &timePeriods, int handle);
 };

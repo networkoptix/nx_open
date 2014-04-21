@@ -29,15 +29,12 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     bool urlFound = false;
     
     ChunkFormat format = ChunkFormat_Unknown;
-    QList<QRegion> motionRegions;
     QString callback;
+    Qn::TimePeriodContent periodsType;
+    QString filter;
 
     for (int i = 0; i < params.size(); ++i)
     {
-        if (params[i].first == "motionRegions")
-        {
-            parseRegionList(motionRegions, params[i].second);
-        }
         if (params[i].first == "physicalId" || params[i].first == "mac") // use 'mac' name for compatibility with previous client version
         {
             urlFound = true;
@@ -70,6 +67,10 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
         }
         else if (params[i].first == "callback")
             callback = params[i].second;
+        else if (params[i].first == "filter")
+            filter = params[i].second;
+        else if (params[i].first == "periodsType")
+            periodsType = static_cast<Qn::TimePeriodContent>(params[i].second.toInt());
     }
     if (!urlFound)
         errStr += "Parameter physicalId must be provided. \n";
@@ -83,19 +84,35 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     if (resList.isEmpty())
         errStr += errStrPhysicalId;
 
-    if (!errStr.isEmpty())
-    {
+    auto errLog = [&](const QString &errText) {
         result.append("<root>\n");
-        result.append(errStr);
+        result.append(errText);
         result.append("</root>\n");
         return CODE_INVALID_PARAMETER;
+    };
+
+    if (!errStr.isEmpty())
+        return errLog(errStr);
+    
+    QnTimePeriodList periods;
+    switch (periodsType) {
+    case Qn::RecordingContent:
+        periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel);
+        break;
+    case Qn::MotionContent:
+        {
+            QList<QRegion> motionRegions;
+            parseRegionList(motionRegions, filter);
+            periods = QnMotionHelper::instance()->mathImage(motionRegions, resList, startTime, endTime, detailLevel);
+        }
+        break;
+    case Qn::BookmarksContent:
+        //TODO: #GDM implement me!
+        break;
+    default:
+        return errLog("Invalid periodsType parameter.");
     }
 
-    QnTimePeriodList periods;
-    if (motionRegions.isEmpty())
-        periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel);
-    else
-        periods = QnMotionHelper::instance()->mathImage(motionRegions, resList, startTime, endTime, detailLevel);
     
     switch(format) 
     {

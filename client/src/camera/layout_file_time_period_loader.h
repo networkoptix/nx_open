@@ -16,10 +16,10 @@
 class QnLayoutFileTimePeriodLoader: public QnAbstractTimePeriodLoader
 {
 public:
-    QnLayoutFileTimePeriodLoader(QnResourcePtr resource, QObject *parent, const QnTimePeriodList& chunks);
+    QnLayoutFileTimePeriodLoader(const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, const QnTimePeriodList& chunks, QObject *parent);
     virtual ~QnLayoutFileTimePeriodLoader();
-    static QnLayoutFileTimePeriodLoader* newInstance(QnResourcePtr resource, QObject *parent = 0);
-    virtual int load(const QnTimePeriod &period, const QList<QRegion> &motionRegions = QList<QRegion>()) override;
+    static QnLayoutFileTimePeriodLoader* newInstance(const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, QObject *parent = 0);
+    virtual int load(const QnTimePeriod &period, const QString &filter) override;
 private:
     int loadChunks(const QnTimePeriod &period);
     int loadMotion(const QnTimePeriod &period, const QList<QRegion> &motionRegions);

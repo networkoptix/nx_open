@@ -1,11 +1,15 @@
 #include "layout_file_time_period_loader.h"
+
+#include <api/serializer/serializer.h>
+
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 
+
 int QnLayoutFileTimePeriodLoader::m_handle = 0;
 
-QnLayoutFileTimePeriodLoader::QnLayoutFileTimePeriodLoader(QnResourcePtr resource, QObject *parent, const QnTimePeriodList& chunks):
-    QnAbstractTimePeriodLoader(resource, parent),
+QnLayoutFileTimePeriodLoader::QnLayoutFileTimePeriodLoader(const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, const QnTimePeriodList& chunks, QObject *parent):
+    QnAbstractTimePeriodLoader(resource, periodsType, parent),
     m_chunks(chunks)
 {
 }
@@ -15,17 +19,17 @@ QnLayoutFileTimePeriodLoader::~QnLayoutFileTimePeriodLoader()
     //qFreeAligned(m_motionData);
 }
 
-QnLayoutFileTimePeriodLoader* QnLayoutFileTimePeriodLoader::newInstance(QnResourcePtr resource, QObject *parent)
+QnLayoutFileTimePeriodLoader* QnLayoutFileTimePeriodLoader::newInstance(const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, QObject *parent)
 {
     QnAviResourcePtr localFile = resource.dynamicCast<QnAviResource>();
     if (!localFile)
-        return 0;
+        return NULL;
     QnLayoutFileStorageResourcePtr storage = localFile->getStorage().dynamicCast<QnLayoutFileStorageResource>();
     if (!storage)
-        return 0;
+        return NULL;
 
     QnTimePeriodList chunks = storage->getTimePeriods(resource);
-    return new QnLayoutFileTimePeriodLoader(resource, parent, chunks);
+    return new QnLayoutFileTimePeriodLoader(resource, periodsType, chunks, parent);
 }
 
 int QnLayoutFileTimePeriodLoader::loadChunks(const QnTimePeriod &period)
@@ -80,12 +84,27 @@ int QnLayoutFileTimePeriodLoader::loadMotion(const QnTimePeriod &period, const Q
     return m_handle;
 }
 
-int QnLayoutFileTimePeriodLoader::load(const QnTimePeriod &period, const QList<QRegion> &motionRegions)
+int QnLayoutFileTimePeriodLoader::load(const QnTimePeriod &period, const QString &filter)
 {
-    for (int i = 0; i < motionRegions.size(); ++i) 
-    {
-        if (!motionRegions[i].isEmpty())
-            return loadMotion(period, motionRegions);
+    switch (m_periodsType) {
+    case Qn::RecordingContent:
+        return loadChunks(period);
+    case Qn::MotionContent:
+        {
+            QList<QRegion> motionRegions;
+            parseRegionList(motionRegions, filter);
+            for (int i = 0; i < motionRegions.size(); ++i) 
+            {
+                if (!motionRegions[i].isEmpty())
+                    return loadMotion(period, motionRegions);
+            }
+            qWarning() << "empty motion region";
+        }
+        //TODO: #GDM intended fall-through to get assert, make sure it is safe in release
+    case Qn::BookmarksContent:
+        //TODO: #GDM intended fall-through to get assert, make sure it is safe in release
+    default:
+        assert(false);
     }
-    return loadChunks(period);
+    return 0; //should never get here
 }

@@ -425,23 +425,6 @@ void QnMediaServerConnection::setProxyAddr(const QUrl &apiUrl, const QString &ad
     }
 }
 
-QnRequestParamList QnMediaServerConnection::createTimePeriodsRequest(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion>& motionRegions) {
-    QnRequestParamList result;
-
-    foreach(QnNetworkResourcePtr netResource, list)
-        result << QnRequestParam("physicalId", netResource->getPhysicalId());
-    result << QnRequestParam("startTime", QString::number(startTimeUSec));
-    result << QnRequestParam("endTime", QString::number(endTimeUSec));
-    result << QnRequestParam("detail", QString::number(detail));
-    result << QnRequestParam("format", "bin");
-
-    QString regionStr = serializeRegionList(motionRegions);
-    if (!regionStr.isEmpty())
-        result << QnRequestParam("motionRegions", regionStr);
-
-    return result;
-}
-
 int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const
                                                 QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot)
 {
@@ -463,8 +446,27 @@ int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camer
     return sendAsyncGetRequest(ImageObject, params, QN_STRINGIZE_TYPE(QImage), target, slot);
 }
 
-int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot) {
-    return sendAsyncGetRequest(TimePeriodsObject, createTimePeriodsRequest(list, startTimeMs, endTimeMs, detail, motionRegions), QN_STRINGIZE_TYPE(QnTimePeriodList), target, slot);
+int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &list, 
+                                                 qint64 startTimeMs,
+                                                 qint64 endTimeMs, 
+                                                 qint64 detail,
+                                                 Qn::TimePeriodContent periodsType,
+                                                 const QString &filter,
+                                                 QObject *target,
+                                                 const char *slot) 
+{
+    QnRequestParamList params;
+
+    foreach(QnNetworkResourcePtr netResource, list)
+        params << QnRequestParam("physicalId", netResource->getPhysicalId());
+    params << QnRequestParam("startTime", QString::number(startTimeMs));
+    params << QnRequestParam("endTime", QString::number(endTimeMs));
+    params << QnRequestParam("detail", QString::number(detail));
+    params << QnRequestParam("format", "bin");
+    params << QnRequestParam("periodsType", QString::number(static_cast<int>(periodsType)));
+    params << QnRequestParam("filter", filter);
+
+    return sendAsyncGetRequest(TimePeriodsObject, params, QN_STRINGIZE_TYPE(QnTimePeriodList), target, slot);
 }
 
 QnRequestParamList QnMediaServerConnection::createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params) {

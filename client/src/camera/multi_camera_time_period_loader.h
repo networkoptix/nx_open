@@ -16,10 +16,10 @@ class QnMultiCameraTimePeriodLoader: public QnAbstractTimePeriodLoader
 {
     Q_OBJECT
 public:
-    QnMultiCameraTimePeriodLoader(QnResourcePtr resource, QObject *parent = 0);
-    static QnMultiCameraTimePeriodLoader *newInstance(QnResourcePtr resource, QObject *parent = 0);
+    QnMultiCameraTimePeriodLoader(const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, QObject *parent = 0);
+    static QnMultiCameraTimePeriodLoader *newInstance(const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, QObject *parent = 0);
 
-    virtual int load(const QnTimePeriod &period, const QList<QRegion> &motionRegions = QList<QRegion>()) override;
+    virtual int load(const QnTimePeriod &period, const QString &filter) override;
 
     virtual void discardCachedData() override;
 
@@ -28,7 +28,7 @@ private slots:
     void onLoadingFailed(int code, int handle);
 
 private:
-    int loadInternal(QnMediaServerResourcePtr mServer, QnNetworkResourcePtr networkResource, const QnTimePeriod &period, const QList<QRegion> &motionRegions);
+    int loadInternal(QnMediaServerResourcePtr mServer, QnNetworkResourcePtr networkResource, const QnTimePeriod &period, const QString &filter);
 
 private:
     QMutex m_mutex;

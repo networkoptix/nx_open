@@ -12,20 +12,20 @@ namespace {
 
 // ------------------------------------------ QnMultiCameraTimePeriodLoader ----------------------------------------
 
-QnMultiCameraTimePeriodLoader::QnMultiCameraTimePeriodLoader(QnResourcePtr resource, QObject *parent):
-    QnAbstractTimePeriodLoader(resource, parent),
+QnMultiCameraTimePeriodLoader::QnMultiCameraTimePeriodLoader(const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, QObject *parent):
+    QnAbstractTimePeriodLoader(resource, periodsType, parent),
     m_mutex(QMutex::Recursive)
 {}
 
-QnMultiCameraTimePeriodLoader *QnMultiCameraTimePeriodLoader::newInstance(QnResourcePtr resource, QObject *parent)
+QnMultiCameraTimePeriodLoader *QnMultiCameraTimePeriodLoader::newInstance(const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, QObject *parent)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource> (resource);
     if (netRes == NULL)
         return NULL;
-    return new QnMultiCameraTimePeriodLoader(netRes, parent);
+    return new QnMultiCameraTimePeriodLoader(netRes, periodsType, parent);
 }
 
-int QnMultiCameraTimePeriodLoader::load(const QnTimePeriod &period, const QList<QRegion> &motionRegions)
+int QnMultiCameraTimePeriodLoader::load(const QnTimePeriod &period, const QString &filter)
 {
     if (period.isNull()) {
         qnNullWarning(period);
@@ -40,7 +40,7 @@ int QnMultiCameraTimePeriodLoader::load(const QnTimePeriod &period, const QList<
     QnResourceList serverList = QnCameraHistoryPool::instance()->getAllCameraServers(camera, period);
     foreach(const QnResourcePtr& server, serverList)
     {
-        int handle = loadInternal(server.dynamicCast<QnMediaServerResource>(), camera, period, motionRegions);
+        int handle = loadInternal(server.dynamicCast<QnMediaServerResource>(), camera, period, filter);
         if (handle > 0)
             handles << handle;
     }
@@ -58,7 +58,7 @@ void QnMultiCameraTimePeriodLoader::discardCachedData() {
         loader->discardCachedData();
 }
 
-int QnMultiCameraTimePeriodLoader::loadInternal(QnMediaServerResourcePtr mServer, QnNetworkResourcePtr networkResource, const QnTimePeriod &period, const QList<QRegion> &motionRegions)
+int QnMultiCameraTimePeriodLoader::loadInternal(QnMediaServerResourcePtr mServer, QnNetworkResourcePtr networkResource, const QnTimePeriod &period, const QString &filter)
 {
     QMutexLocker lock(&m_mutex);
     QnTimePeriodLoader *loader;
@@ -67,7 +67,7 @@ int QnMultiCameraTimePeriodLoader::loadInternal(QnMediaServerResourcePtr mServer
     if (itr != m_cache.end()) {
         loader = itr.value();
     } else {
-        loader = QnTimePeriodLoader::newInstance(mServer, networkResource, this);
+        loader = QnTimePeriodLoader::newInstance(mServer, networkResource, m_periodsType, this);
         if (!loader)
             return -1;
         
@@ -75,7 +75,7 @@ int QnMultiCameraTimePeriodLoader::loadInternal(QnMediaServerResourcePtr mServer
         connect(loader, SIGNAL(failed(int, int)), this, SLOT(onLoadingFailed(int, int)));
         m_cache.insert(cacheKey, loader);
     }
-    return loader->load(period, motionRegions);
+    return loader->load(period, filter);
 }
 
 void QnMultiCameraTimePeriodLoader::onDataLoaded(const QnTimePeriodList &periods, int handle)
