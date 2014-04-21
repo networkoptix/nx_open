@@ -15,7 +15,7 @@
  * 
  */
 #define QN_FUSION_ADAPT_CLASS(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)          \
-    QN_FUSION_ADAPT_CLASS_I(CLASS, MEMBER_SEQ, BOOST_PP_VARIADIC_SEQ_NIL __VA_ARGS__)
+    QN_FUSION_ADAPT_CLASS_I(CLASS, QN_FUSION_EXTEND_MEMBER_SEQ(MEMBER_SEQ), QN_FUSION_EXTEND_PROPERTY_SEQ(BOOST_PP_VARIADIC_SEQ_NIL __VA_ARGS__))
 
 #define QN_FUSION_ADAPT_CLASS_I(CLASS, MEMBER_SEQ, GLOBAL_SEQ)                  \
 template<class T>                                                               \
@@ -76,7 +76,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     };                                                                          \
                                                                                 \
     result<void(QN_FUSION_KEY_TYPE(KEY))>::type operator()(const QN_FUSION_KEY_TYPE(KEY) &) const { \
-        return QN_FUSION_PROPERTY_VALUE(KEY, VALUE);                            \
+        return VALUE;                                                           \
     }
 
 
@@ -168,7 +168,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 #define QN_FUSION_UNROLL_SHORTCUT_SEQ(KEYS_TUPLE, MEMBER_SEQ)                   \
     BOOST_PP_SEQ_FOR_EACH(QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_I, KEYS_TUPLE, MEMBER_SEQ)
 
-#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_I(R, KEYS_TUPLE, PROPERTY_SEQ)       \
+#define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_I(S, KEYS_TUPLE, PROPERTY_SEQ)       \
     (QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_II(KEYS_TUPLE, (BOOST_PP_VARIADIC_SEQ_HEAD(PROPERTY_SEQ))) BOOST_PP_VARIADIC_SEQ_TAIL(PROPERTY_SEQ))
 
 #define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_II(KEYS_TUPLE, VALUES_TUPLE)         \
@@ -179,6 +179,26 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 #define QN_FUSION_UNROLL_SHORTCUT_SEQ_STEP_STEP_II(KEYS_TUPLE, VALUES_TUPLE, INDEX) \
     (BOOST_PP_TUPLE_ELEM(INDEX, KEYS_TUPLE), BOOST_PP_TUPLE_ELEM(INDEX, VALUES_TUPLE))
+
+
+/**
+ * \internal
+ */
+#define QN_FUSION_EXTEND_MEMBER_SEQ(MEMBER_SEQ)                                 \
+    BOOST_PP_SEQ_FOR_EACH(QN_FUSION_EXTEND_MEMBER_SEQ_STEP_I, ~, MEMBER_SEQ)
+
+#define QN_FUSION_EXTEND_MEMBER_SEQ_STEP_I(R, DATA, PROPERTY_SEQ)               \
+    (QN_FUSION_EXTEND_PROPERTY_SEQ(PROPERTY_SEQ))
+
+
+/**
+ * \internal
+ */
+#define QN_FUSION_EXTEND_PROPERTY_SEQ(PROPERTY_SEQ)                             \
+    BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_EXTEND_PROPERTY_SEQ_STEP_I, ~, PROPERTY_SEQ)
+
+#define QN_FUSION_EXTEND_PROPERTY_SEQ_STEP_I(R, DATA, PROPERTY_TUPLE)           \
+    QN_FUSION_PROPERTY_EXTENSION PROPERTY_TUPLE
 
 
 /**
@@ -206,22 +226,21 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 #define QN_FUSION_PROPERTY_TYPE(KEY, VALUE)                                          \
     BOOST_PP_OVERLOAD(QN_FUSION_PROPERTY_TYPE_I_, ~ BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_TYPED_FOR_, KEY) ~)(KEY, VALUE)
     
-#define QN_FUSION_PROPERTY_TYPE_I_1(KEY, VALUE) decltype(QN_FUSION_PROPERTY_VALUE(KEY, VALUE))
+#define QN_FUSION_PROPERTY_TYPE_I_1(KEY, VALUE) decltype(VALUE)
 #define QN_FUSION_PROPERTY_TYPE_I_2(KEY, VALUE) BOOST_PP_CAT(QN_FUSION_PROPERTY_TYPE_FOR_, KEY)
 
 
 /**
  * \internal
  * 
- * This macro returns an expression that should be used in return statement
- * of a property getter function for the specified key. By default it simply 
- * returns <tt>VALUE</tt>.
+ * This macro returns one or several property pairs that should be used instead
+ * of the original property pair. By default it simply returns <tt>(KEY, VALUE)</tt>.
  * 
  * To override the default return value for some key <tt>some_key</tt>, use
  * the following code:
  * \code
- * #define QN_FUSION_PROPERTY_IS_WRAPPED_FOR_some_key ,
- * #define QN_FUSION_PROPERTY_WRAPPER_FOR_some_key QLatin1Literal // Or your custom wrapper macro
+ * #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_some_key ,
+ * #define QN_FUSION_PROPERTY_EXTENSION_FOR_some_key(KEY, VALUE) (KEY, QLatin1Literal(VALUE)) // Or your custom extension
  * \endcode
  * 
  * \param KEY                           Fusion key.
@@ -229,11 +248,11 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * \returns                             Expression that should be used in the
  *                                      return statement of a property getter function.
  */
-#define QN_FUSION_PROPERTY_VALUE(KEY, VALUE)                                         \
-    BOOST_PP_OVERLOAD(QN_FUSION_PROPERTY_VALUE_I_, ~ BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_WRAPPED_FOR_, KEY) ~)(KEY, VALUE)
+#define QN_FUSION_PROPERTY_EXTENSION(KEY, VALUE)                                         \
+    BOOST_PP_OVERLOAD(QN_FUSION_PROPERTY_EXTENSION_I_, ~ BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_EXTENDED_FOR_, KEY) ~)(KEY, VALUE)
 
-#define QN_FUSION_PROPERTY_VALUE_I_1(KEY, VALUE) VALUE
-#define QN_FUSION_PROPERTY_VALUE_I_2(KEY, VALUE) BOOST_PP_CAT(QN_FUSION_PROPERTY_WRAPPER_FOR_, KEY)(VALUE)
+#define QN_FUSION_PROPERTY_EXTENSION_I_1(KEY, VALUE) (KEY, VALUE)
+#define QN_FUSION_PROPERTY_EXTENSION_I_2(KEY, VALUE) BOOST_PP_CAT(QN_FUSION_PROPERTY_EXTENSION_FOR_, KEY)(KEY, VALUE)
 
 
 #endif // QN_FUSION_ADAPTOR_H
