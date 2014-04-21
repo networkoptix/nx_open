@@ -20,15 +20,15 @@
 #include "fusion_fwd.h"
 
 namespace QnFusionDetail {
+    struct na {};
+
     template<class T, class Visitor>
     bool visit_members_internal(T &&value, Visitor &&visitor) {
         return visit_members(std::forward<T>(value), std::forward<Visitor>(visitor)); /* That's the place where ADL kicks in. */
     }
 
-    struct EmptyVisitor {};
-
     template<class T>
-    boost::type_traits::yes_type has_visit_members_test(const T &, const decltype(visit_members(std::declval<T>(), std::declval<EmptyVisitor>())) * = NULL);
+    boost::type_traits::yes_type has_visit_members_test(const T &, const decltype(visit_members(std::declval<T>(), std::declval<na>())) * = NULL);
     boost::type_traits::no_type has_visit_members_test(...);
 
     template<class T>
@@ -39,25 +39,51 @@ namespace QnFusionDetail {
         > 
     {};
 
-    template<class T, class Arg>
-    boost::type_traits::yes_type has_operator_call_test(const T &, const Arg &, const decltype(std::declval<T>()(std::declval<Arg>())) * = NULL);
+    template<class T>
+    boost::type_traits::yes_type has_operator_call_test(const T &, const decltype(std::declval<T>()()) * = NULL);
+    template<class T, class Arg0>
+    boost::type_traits::yes_type has_operator_call_test(const T &, const Arg0 &, const decltype(std::declval<T>()(std::declval<Arg0>())) * = NULL);
+    template<class T, class Arg0, class Arg1>
+    boost::type_traits::yes_type has_operator_call_test(const T &, const Arg0 &, const Arg1 &, const decltype(std::declval<T>()(std::declval<Arg0>(), std::declval<Arg1>())) * = NULL);
+    template<class T, class Arg0, class Arg1, class Arg2>
+    boost::type_traits::yes_type has_operator_call_test(const T &, const Arg0 &, const Arg1 &, const Arg2 &, const decltype(std::declval<T>()(std::declval<Arg0>(), std::declval<Arg1>(), std::declval<Arg2>())) * = NULL);
     boost::type_traits::no_type has_operator_call_test(...);
 
-    template<class T, class Arg>
+    template<class T, class Arg0, class Arg1, class Arg2>
+    struct sizeof_has_operator_call_test: 
+        boost::mpl::size_t<sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>(), std::declval<Arg1>(), std::declval<Arg2>()))>
+    {};
+
+    template<class T, class Arg0, class Arg1>
+    struct sizeof_has_operator_call_test<T, Arg0, Arg1, na>: 
+        boost::mpl::size_t<sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>(), std::declval<Arg1>()))>
+    {};
+
+    template<class T, class Arg0>
+    struct sizeof_has_operator_call_test<T, Arg0, na, na>: 
+        boost::mpl::size_t<sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>()))>
+    {};
+
+    template<class T>
+    struct sizeof_has_operator_call_test<T, na, na, na>: 
+        boost::mpl::size_t<sizeof(has_operator_call_test(std::declval<T>()))>
+    {};
+
+    template<class T, class Arg0 = na, class Arg1 = na, class Arg2 = na>
     struct has_operator_call:
         boost::mpl::equal_to<
             boost::mpl::sizeof_<boost::type_traits::yes_type>,
-            boost::mpl::size_t<sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg>()))>
+            sizeof_has_operator_call_test<T, Arg0, Arg1, Arg2>
         >
     {};
 
-    template<class T, class Arg>
-    bool safe_operator_call(T &&visitor, Arg &&value, const typename boost::enable_if<has_operator_call<T, Arg> >::type * = NULL) {
-        return visitor(std::forward<Arg>(value));
+    template<class T, class Arg0, class Arg1, class Arg2>
+    bool safe_operator_call(T &&functor, Arg0 &&arg0, Arg1 &&arg1, Arg2 &&arg2, const typename boost::enable_if<has_operator_call<T, Arg0, Arg1, Arg2> >::type * = NULL) {
+        return functor(std::forward<Arg0>(arg0), std::forward<Arg1>(arg1), std::forward<Arg2>(arg2));
     }
 
-    template<class T, class Arg>
-    bool safe_operator_call(T &&, Arg &&, const typename boost::disable_if<has_operator_call<T, Arg> >::type * = NULL) {
+    template<class T, class Arg0, class Arg1, class Arg2>
+    bool safe_operator_call(T &&, Arg0 &&, Arg1 &&, Arg2 &&, const typename boost::disable_if<has_operator_call<T, Arg0, Arg1, Arg2> >::type * = NULL) {
         return true;
     }
 
@@ -219,7 +245,7 @@ namespace QnFusion {
     /**
      * Extension interface that defines how common keys are handled.
      */
-    template<class Base>
+    template<class Base> // TODO: use extensions instead
     struct AccessExtension: Base {
     public:
         using Base::operator();

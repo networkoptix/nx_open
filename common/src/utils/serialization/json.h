@@ -272,8 +272,8 @@ namespace QJsonDetail {
             m_object(value.toObject())
         {}
 
-        template<class T>
-        bool operator()(T &) {
+        template<class T, class Access>
+        bool operator()(const T &, const Access &, const QnFusion::start_tag &) {
             return m_value.isObject();
         }
 

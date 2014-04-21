@@ -10,8 +10,10 @@ namespace QnDebugSerialization {
             m_stream(stream) 
         {}
 
-        bool operator()(const QnFusion::start_tag &) {
-            m_stream.nospace() << /* TYPENAME */ " {"; // TODO: #Elric
+        template<class T, class Access>
+        bool operator()(const T &, const Access &access, const QnFusion::start_tag &) {
+            using namespace QnFusion;
+            m_stream.nospace() << access(c_classname) << " {";
             return true;
         }
 
@@ -22,7 +24,8 @@ namespace QnDebugSerialization {
             return true;
         }
 
-        bool operator()(const QnFusion::end_tag &) {
+        template<class T, class Access>
+        bool operator()(const T &, const Access &, const QnFusion::end_tag &) {
             m_stream.nospace() << '}';
             m_stream.space();
             return true;

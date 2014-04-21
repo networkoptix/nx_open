@@ -33,10 +33,10 @@ struct QnFusionBinding<CLASS> {                                                 
                                                                                 \
     template<class T, class Visitor>                                            \
     static bool visit_members(T &&value, Visitor &&visitor) {                   \
-        if(!QnFusionDetail::safe_operator_call(std::forward<Visitor>(visitor), QnFusion::start_tag())) \
+        if(!QnFusionDetail::safe_operator_call(std::forward<Visitor>(visitor), std::forward<T>(value), Access0(), QnFusion::start_tag())) \
             return false;                                                       \
         BOOST_PP_REPEAT(BOOST_PP_SEQ_SIZE(MEMBER_SEQ), QN_FUSION_ADAPT_CLASS_FUNCTION_STEP_I, ~) \
-        if(!QnFusionDetail::safe_operator_call(std::forward<Visitor>(visitor), QnFusion::end_tag())) \
+        if(!QnFusionDetail::safe_operator_call(std::forward<Visitor>(visitor), std::forward<T>(value), Access0(), QnFusion::end_tag())) \
             return false;                                                       \
         return true;                                                            \
     }                                                                           \

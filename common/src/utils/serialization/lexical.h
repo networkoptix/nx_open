@@ -8,8 +8,6 @@
 #include "lexical_fwd.h"
 
 #include <utils/serialization/serialization.h>
-#include <utils/fusion/fusion.h>
-
 
 namespace QnLexical {
     template<class T>
