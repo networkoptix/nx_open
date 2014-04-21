@@ -2,6 +2,12 @@
 
 CONFIG=${build.configuration}
 ARTIFACT=${project.artifactId}
+QTCHECK=`ldd ${libdir}/lib/${build.configuration}/libQt5Core.so.5 | grep libglib-2.0.so.0`
+
+if [ -z "$QTCHECK" ]; then
+     echo 'invalid QT - does not support libglib. Compilation terminated'
+     exit 1
+fi
 
 export LD_LIBRARY_PATH=${libdir}/lib/${build.configuration}
 export DYLD_LIBRARY_PATH=${libdir}/lib/${build.configuration}

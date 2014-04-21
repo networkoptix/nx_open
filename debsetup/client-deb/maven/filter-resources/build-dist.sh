@@ -14,6 +14,7 @@ TARGET=/opt/$COMPANY_NAME/client/$MINORVERSION
 USRTARGET=/usr
 BINTARGET=$TARGET/bin
 BGTARGET=$TARGET/share/pictures/sample-backgrounds
+HELPTARGET=$TARGET/help
 ICONTARGET=$USRTARGET/share/icons
 LIBTARGET=$TARGET/lib
 INITTARGET=/etc/init
@@ -23,6 +24,7 @@ STAGEBASE=deb
 STAGE=$STAGEBASE/${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}-beta
 BINSTAGE=$STAGE$BINTARGET
 BGSTAGE=$STAGE$BGTARGET
+HELPSTAGE=$STAGE$HELPTARGET
 ICONSTAGE=$STAGE$ICONTARGET
 LIBSTAGE=$STAGE$LIBTARGET
 
@@ -42,7 +44,7 @@ CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 rm -rf $STAGEBASE
 mkdir -p $BINSTAGE/styles
 mkdir -p $BINSTAGE/imageformats
-mkdir -p $BINSTAGE/help
+mkdir -p $HELPSTAGE
 mkdir -p $LIBSTAGE
 mkdir -p $BGSTAGE
 mkdir -p $ICONSTAGE
@@ -62,7 +64,7 @@ cp -P -Rf $ICONS_PATH $ICONSTAGE
 for f in `find $ICONSTAGE -name *.png`; do mv $f `dirname $f`/`basename $f .png`-${customization}.png; done
 
 # Copy help
-cp -r $CLIENT_HELP_PATH/** $BINSTAGE/help
+cp -r $CLIENT_HELP_PATH/** $HELPSTAGE
 
 # Copy backgrounds
 cp -r $CLIENT_BG_PATH/* $BGSTAGE
