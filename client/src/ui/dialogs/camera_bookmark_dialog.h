@@ -8,18 +8,18 @@
 #include <ui/dialogs/button_box_dialog.h>
 
 namespace Ui {
-class QnAddCameraBookmarkDialog;
+class QnCameraBookmarkDialog;
 }
 
-class QnAddCameraBookmarkDialog : public QnButtonBoxDialog
+class QnCameraBookmarkDialog : public QnButtonBoxDialog
 {
     Q_OBJECT
 
     typedef QnButtonBoxDialog base_type;
 
 public:
-    explicit QnAddCameraBookmarkDialog(QWidget *parent = 0);
-    ~QnAddCameraBookmarkDialog();
+    explicit QnCameraBookmarkDialog(QWidget *parent = 0);
+    ~QnCameraBookmarkDialog();
 
     QHash<QString, int> tagsUsage() const;
     void setTagsUsage(const QHash<QString, int> tagsUsage);
@@ -30,7 +30,7 @@ private:
     void updateTagsList();
 
 private:
-    QScopedPointer<Ui::QnAddCameraBookmarkDialog> ui;
+    QScopedPointer<Ui::QnCameraBookmarkDialog> ui;
     QHash<QString, int> m_tagsUsage;
     QStringList m_tags;
 };

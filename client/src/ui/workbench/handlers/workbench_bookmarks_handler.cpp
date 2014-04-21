@@ -12,7 +12,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_target_provider.h>
-#include <ui/dialogs/add_camera_bookmark_dialog.h>
+#include <ui/dialogs/camera_bookmark_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
@@ -46,7 +46,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered() {
     bookmark.startTimeMs = period.startTimeMs;
     bookmark.durationMs = period.durationMs;
 
-    QScopedPointer<QnAddCameraBookmarkDialog> dialog(new QnAddCameraBookmarkDialog(mainWindow()));
+    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
     dialog->setTagsUsage(m_tagsUsage);
     dialog->loadData(bookmark);
     if (!dialog->exec())

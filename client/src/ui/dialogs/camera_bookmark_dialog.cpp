@@ -1,9 +1,9 @@
-#include "add_camera_bookmark_dialog.h"
-#include "ui_add_camera_bookmark_dialog.h"
+#include "camera_bookmark_dialog.h"
+#include "ui_camera_bookmark_dialog.h"
 
-QnAddCameraBookmarkDialog::QnAddCameraBookmarkDialog(QWidget *parent) :
+QnCameraBookmarkDialog::QnCameraBookmarkDialog(QWidget *parent) :
     base_type(parent),
-    ui(new Ui::QnAddCameraBookmarkDialog)
+    ui(new Ui::QnCameraBookmarkDialog)
 {
     ui->setupUi(this);
 
@@ -24,10 +24,10 @@ QnAddCameraBookmarkDialog::QnAddCameraBookmarkDialog(QWidget *parent) :
     });
 }
 
-QnAddCameraBookmarkDialog::~QnAddCameraBookmarkDialog() {}
+QnCameraBookmarkDialog::~QnCameraBookmarkDialog() {}
 
 
-void QnAddCameraBookmarkDialog::updateTagsList() {
+void QnCameraBookmarkDialog::updateTagsList() {
     
     QString html = lit("<html><body><center>");
     QString tag = lit("<a style=\"text-decoration:none;\" href=\"%1\"><font style=\"font-size:%2px;\">%3</font><\a><span style=\"text-decoration:none;\">  </span>");
@@ -65,16 +65,16 @@ void QnAddCameraBookmarkDialog::updateTagsList() {
     update();
 }
 
-QHash<QString, int> QnAddCameraBookmarkDialog::tagsUsage() const {
+QHash<QString, int> QnCameraBookmarkDialog::tagsUsage() const {
     return m_tagsUsage;
 }
 
-void QnAddCameraBookmarkDialog::setTagsUsage(const QHash<QString, int> tagsUsage) {
+void QnCameraBookmarkDialog::setTagsUsage(const QHash<QString, int> tagsUsage) {
     m_tagsUsage = tagsUsage;
     updateTagsList();
 }
 
-void QnAddCameraBookmarkDialog::loadData(const QnCameraBookmark &bookmark) {
+void QnCameraBookmarkDialog::loadData(const QnCameraBookmark &bookmark) {
     ui->nameLineEdit->setText(bookmark.name);
     ui->descriptionTextEdit->setPlainText(bookmark.description);
 
@@ -83,7 +83,7 @@ void QnAddCameraBookmarkDialog::loadData(const QnCameraBookmark &bookmark) {
     ui->tagsLineEdit->setText(m_tags.join(lit(", ")));
 }
 
-void QnAddCameraBookmarkDialog::submitData(QnCameraBookmark &bookmark) const {
+void QnCameraBookmarkDialog::submitData(QnCameraBookmark &bookmark) const {
     bookmark.name = ui->nameLineEdit->text();
     bookmark.description = ui->descriptionTextEdit->toPlainText();
     bookmark.tags = m_tags;
