@@ -10,55 +10,39 @@
 
 namespace ec2
 {
-    struct ApiVideowallItem;
-    struct ApiVideowallScreen;
-    struct ApiVideowall;
-
     #include "ec2_videowall_data_i.h"
 
-    struct ApiVideowallItem : ApiVideowallItemData {
-        void toItem(QnVideoWallItem& item) const;
-        void fromItem(const QnVideoWallItem& item);
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
+    void fromApiToItem(const ApiVideowallItemData &data, QnVideoWallItem& item);
+    void fromItemToApi(const QnVideoWallItem& item, ApiVideowallItemData &data);
 
-    QN_DEFINE_STRUCT_SQL_BINDER (ApiVideowallItem, ApiVideowallItemDataFields)
+    QN_DEFINE_STRUCT_SQL_BINDER (ApiVideowallItemData, ApiVideowallItemDataFields)
 
-    struct ApiVideowallItemDataWithRef: public ApiVideowallItem {
+    struct ApiVideowallItemDataWithRef: public ApiVideowallItemData {
         QnId videowall_guid;
     };
 
-    struct ApiVideowallScreen : ApiVideowallScreenData {
-        void toScreen(QnVideoWallPcData::PcScreen& screen) const;
-        void fromScreen(const QnVideoWallPcData::PcScreen& screen);
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
+    void fromApiToScreen(const ApiVideowallScreenData &data, QnVideoWallPcData::PcScreen& screen);
+    void fromScreenToApi(const QnVideoWallPcData::PcScreen& screen, ApiVideowallScreenData& data);
 
-    QN_DEFINE_STRUCT_SQL_BINDER (ApiVideowallScreen, ApiVideowallScreenDataFields)
+    QN_DEFINE_STRUCT_SQL_BINDER (ApiVideowallScreenData, ApiVideowallScreenDataFields)
 
-    struct ApiVideowallScreenDataWithRef: public ApiVideowallScreen {
+    struct ApiVideowallScreenDataWithRef: public ApiVideowallScreenData {
         QnId videowall_guid;
     };
 
-    struct ApiVideowall: ApiVideowallData, ApiResource
-    {
-        void toResource(QnVideoWallResourcePtr resource) const;
-        void fromResource(const QnVideoWallResourcePtr &resource);
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
+    void fromApiToResource(const ApiVideowallData &data, QnVideoWallResourcePtr resource);
+    void fromResourceToApi(const QnVideoWallResourcePtr &resource, ApiVideowallData &data);
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiVideowall, ApiVideowallDataFields)
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiVideowallData, ApiVideowallDataFields)
 
-    struct ApiVideowallList: ApiVideowallListData
+    struct ApiVideowallList: ApiVideowallDataListData
     {
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData) const;
     };
 
-    struct ApiVideowallControlMessage: ApiVideowallControlMessageData {
-        void toMessage(QnVideoWallControlMessage &message) const;
-        void fromMessage(const QnVideoWallControlMessage &message);
-    };
+    void fromApiToMessage(const ApiVideowallControlMessageData &data, QnVideoWallControlMessage &message);
+    void fromMessageToApi(const QnVideoWallControlMessage &message, ApiVideowallControlMessageData &data);
 }
 
 #endif // __EC2_VIDEOWALL_DATA_H_

@@ -77,10 +77,10 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiMediaServer> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource )
+    QnTransaction<ApiMediaServerData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource )
     {
-        QnTransaction<ApiMediaServer> tran(command, true);
-        tran.params.fromResource(resource);
+        QnTransaction<ApiMediaServerData> tran(command, true);
+        fromResourceToApi(resource, tran.params);
         return tran;
     }
 

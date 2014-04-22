@@ -18,11 +18,11 @@ namespace ec2
     public:
         QnVideowallManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
 
-        void triggerNotification( const QnTransaction<ApiVideowall>& tran )
+        void triggerNotification( const QnTransaction<ApiVideowallData>& tran )
         {
             assert( tran.command == ApiCommand::saveVideowall);
             QnVideoWallResourcePtr VideoWallResource(new QnVideoWallResource());
-            tran.params.toResource( VideoWallResource );
+            fromApiToResource(tran.params, VideoWallResource);
             emit addedOrUpdated( VideoWallResource );
         }
 
@@ -32,10 +32,10 @@ namespace ec2
             emit removed( QnId(tran.params.id) );
         }
 
-        void triggerNotification(const QnTransaction<ApiVideowallControlMessage>& tran) {
+        void triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran) {
             assert(tran.command == ApiCommand::videowallControl);
             QnVideoWallControlMessage message;
-            tran.params.toMessage(message);
+            fromApiToMessage(tran.params, message);
             emit controlMessage(message);
         }
 
@@ -50,9 +50,9 @@ namespace ec2
         QueryProcessorType* const m_queryProcessor;
         ResourceContext m_resCtx;
 
-        QnTransaction<ApiVideowall> prepareTransaction(ApiCommand::Value command, const QnVideoWallResourcePtr &resource);
+        QnTransaction<ApiVideowallData> prepareTransaction(ApiCommand::Value command, const QnVideoWallResourcePtr &resource);
         QnTransaction<ApiIdData> prepareTransaction(ApiCommand::Value command, const QnId& id);
-        QnTransaction<ApiVideowallControlMessage> prepareTransaction(ApiCommand::Value command, const QnVideoWallControlMessage &message);
+        QnTransaction<ApiVideowallControlMessageData> prepareTransaction(ApiCommand::Value command, const QnVideoWallControlMessage &message);
     };
 }
 

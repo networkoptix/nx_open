@@ -1,4 +1,4 @@
-    struct ApiResourceParamData: public ApiData
+    struct ApiResourceParamData: ApiData
     {
         ApiResourceParamData() {}
         ApiResourceParamData(const QString& name, const QString& value, bool isResTypeParam): value(value), name(name), isResTypeParam(isResTypeParam) {}
@@ -6,12 +6,14 @@
         QString value;
         QString name;
         bool isResTypeParam;
+
+        QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
     #define ApiResourceParamFields (value) (name) (isResTypeParam)
     QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceParamData, ApiResourceParamFields);
 
-    struct ApiResourceData: virtual ApiData {
+    struct ApiResourceData: ApiData {
         ApiResourceData(): status(QnResource::Offline), disabled(false) {}
 
         QnId          id;
@@ -21,7 +23,9 @@
         QString       name;
         QString       url;
         QnId          typeId;
-        std::vector<ApiResourceParam> addParams;
+        std::vector<ApiResourceParamData> addParams;
+
+        QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
     #define ApiResourceFields (id) (parentGuid) (status) (disabled) (name) (url) (typeId) (addParams)

@@ -30,21 +30,21 @@ namespace ec2
             emit removed( QnId(tran.params.id) );
         }
 
-        void triggerNotification( const QnTransaction<ApiLayout>& tran )
+        void triggerNotification( const QnTransaction<ApiLayoutData>& tran )
         {
             assert( tran.command == ApiCommand::saveLayout);
             QnLayoutResourcePtr layoutResource(new QnLayoutResource());
-            tran.params.toResource( layoutResource );
+            fromApiToResource(tran.params, layoutResource);
             emit addedOrUpdated( layoutResource );
         }
 
         void triggerNotification( const QnTransaction<ApiLayoutList>& tran )
         {
             assert(tran.command == ApiCommand::saveLayouts );
-            foreach(const ApiLayout& layout, tran.params.data) 
+            foreach(const ApiLayoutData& layout, tran.params.data) 
             {
                 QnLayoutResourcePtr layoutResource(new QnLayoutResource());
-                layout.toResource( layoutResource );
+                fromApiToResource(layout, layoutResource);
                 emit addedOrUpdated( layoutResource );
             }
         }
