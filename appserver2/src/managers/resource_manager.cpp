@@ -25,13 +25,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiResourceTypeList& resTypeList ) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiResourceTypeDataListData& resTypeList ) {
             QnResourceTypeList outResTypeList;
             if( errorCode == ErrorCode::ok )
-				resTypeList.toResourceTypeList(outResTypeList);
+				fromApiToResourceTypeList(resTypeList, outResTypeList);
             handler->done( reqID, errorCode, outResTypeList );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiResourceTypeList, decltype(queryDoneHandler)>
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiResourceTypeDataListData, decltype(queryDoneHandler)>
             ( ApiCommand::getResourceTypes, nullptr, queryDoneHandler );
         return reqID;
     }
@@ -58,7 +58,7 @@ namespace ec2
             outData.insert(resourceId, QnKvPairList());
             if( errorCode == ErrorCode::ok ) {
                 QnKvPairList& outParams = outData.begin().value();
-                foreach(const ApiResourceParam& param, params.params)
+                foreach(const ApiResourceParamData& param, params.params)
                     outParams << QnKvPair(param.name, param.value);
             }
             handler->done( reqID, errorCode, outData);
@@ -142,7 +142,7 @@ namespace ec2
         QnTransaction<ApiResourceParams> tran(command, true);
         tran.params.params.reserve(kvPairs.size());
         foreach(const QnKvPair& pair, kvPairs)
-            tran.params.params.push_back(ApiResourceParam(pair.name(), pair.value(), false));
+            tran.params.params.push_back(ApiResourceParamData(pair.name(), pair.value(), false));
         tran.params.id = id;
         return tran;
     }
@@ -175,10 +175,10 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiResource> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource )
+    QnTransaction<ApiResourceData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource )
     {
-        QnTransaction<ApiResource> tran(command, true);
-        tran.params.fromResource(resource);
+        QnTransaction<ApiResourceData> tran(command, true);
+        fromResourceToApi(resource, tran.params);
         return tran;
     }
 

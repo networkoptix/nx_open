@@ -17,7 +17,7 @@
     #define apiScheduleTaskFields (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) (beforeThreshold) (afterThreshold) (streamQuality) (fps) 
     QN_DEFINE_STRUCT_SERIALIZATORS(ScheduleTaskData, apiScheduleTaskFields);
 
-    struct ApiCameraData: virtual ApiResourceData 
+    struct ApiCameraData: ApiResourceData 
     {
         ApiCameraData(): scheduleDisabled(false), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryQuality(Qn::SSQualityNotDefined),
                          controlDisabled(false), statusFlags(0) {}

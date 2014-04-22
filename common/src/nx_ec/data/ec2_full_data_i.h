@@ -1,5 +1,5 @@
     struct ApiFullInfoData: ApiData {
-        ApiResourceTypeList resTypes;
+        ApiResourceTypeDataListData resTypes;
         ApiMediaServerList servers;
         ApiCameraList cameras;
         ApiUserList users;

@@ -32,7 +32,7 @@ QnScheduleTask ScheduleTask::toResource(const QnId& resourceId) const
 
 void ApiCamera::toResource(QnVirtualCameraResourcePtr resource) const
 {
-	ApiResource::toResource(resource);
+	fromApiToResource(*this, resource);
 
 	resource->setScheduleDisabled(scheduleDisabled);
 	resource->setMotionType(motionType);
@@ -79,7 +79,7 @@ void ApiCamera::toResource(QnVirtualCameraResourcePtr resource) const
 
 void ApiCamera::fromResource(const QnVirtualCameraResourcePtr& resource)
 {
-    ApiResource::fromResource(resource);
+    fromResourceToApi(resource, *this);
 
 	scheduleDisabled = resource->isScheduleDisabled();
 	motionType = resource->getMotionType();

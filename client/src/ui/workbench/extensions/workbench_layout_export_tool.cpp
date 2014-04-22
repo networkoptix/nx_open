@@ -132,8 +132,8 @@ bool QnLayoutExportTool::start() {
     delete itemTimezonesIO;
 
     QByteArray layoutData;
-    ec2::ApiLayout layoutObject;
-    layoutObject.fromResource(m_layout);
+    ec2::ApiLayoutData layoutObject;
+    fromResourceToApi(m_layout, layoutObject);
     OutputBinaryStream<QByteArray> stream(&layoutData);
     serialize(layoutObject, &stream);
 

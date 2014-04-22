@@ -65,10 +65,10 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiUser> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource )
+    QnTransaction<ApiUserData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource )
     {
-        QnTransaction<ApiUser> tran(command, true);
-        tran.params.fromResource( resource );
+        QnTransaction<ApiUserData> tran(command, true);
+        fromResourceToApi(resource, tran.params);
         return tran;
     }
 
