@@ -7,7 +7,7 @@
 #include "nx_ec/data/camera_data.h"
 #include "transaction/transaction.h"
 #include "nx_ec/data/camera_server_item_data.h"
-
+#include "nx_ec/data/ec2_bookmark_data.h"
 
 namespace ec2
 {
@@ -31,6 +31,8 @@ namespace ec2
         virtual int save( const QnVirtualCameraResourceList& cameras, impl::AddCameraHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::remove
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
+        //!Implementation of AbstractCameraManager::getBookmarkTagsUsage
+        virtual int getBookmarkTagsUsage(impl::GetCameraBookmarkTagsUsageHandlerPtr handler) override;
 
         void triggerNotification( const QnTransaction<ApiCamera>& tran )
         {

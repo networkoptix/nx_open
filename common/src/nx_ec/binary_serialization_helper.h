@@ -393,6 +393,16 @@ private:
         }
     }
 
+    template <class T, class K, class V>
+    void serialize(const QHash<K, V>& field, OutputBinaryStream<T>* binStream) 
+    {
+        serialize((qint32) field.size(), binStream);
+        for(typename QHash<K, V>::const_iterator itr = field.begin(); itr != field.end(); ++itr) {
+            serialize(itr.key(), binStream);
+            serialize(itr.value(), binStream);
+        }
+    }
+
     template <class T, class T2>
     bool deserialize(QList<T2>& field, InputBinaryStream<T>* binStream) 
     {
@@ -441,6 +451,22 @@ private:
         return true;
     }
 
+    template <class T, class K, class V>
+    bool deserialize(QHash<K, V>& field, InputBinaryStream<T>* binStream) 
+    {
+        qint32 size = 0;
+        if( !deserialize(size, binStream) )
+            return false;
+        for( qint32 i = 0; i < size; ++i )
+        {
+            K key;
+            V value;
+            if( !deserialize(key, binStream) || !deserialize(value, binStream))
+                return false;
+            field.insert(key, value);
+        }
+        return true;
+    }
 //}
 
 #ifndef Q_MOC_RUN

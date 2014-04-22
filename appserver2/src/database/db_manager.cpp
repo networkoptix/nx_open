@@ -1569,6 +1569,20 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServer
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraBookmarkTagsUsage& tagsUsage) {
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare("SELECT name, count(*) FROM vms_bookmark_tag GROUP BY name");
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
+    while (query.next())
+        tagsUsage[query.value(0).toString()] = query.value(1).toInt();
+
+    return ErrorCode::ok;
+}
+
 //getUsers
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserList& userList)
 {

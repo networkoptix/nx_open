@@ -34,6 +34,8 @@ public:
     }
 };
 
+typedef QHash<QString, int> QnCameraBookmarkTagsUsage;
+
 QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark);
 
 Q_DECLARE_METATYPE(QnCameraBookmark);
@@ -44,5 +46,6 @@ typedef QHash<QUuid, QnCameraBookmark> QnCameraBookmarkMap;
 
 Q_DECLARE_METATYPE(QnCameraBookmarkList);
 Q_DECLARE_METATYPE(QnCameraBookmarkMap);
+Q_DECLARE_METATYPE(QnCameraBookmarkTagsUsage);
 
 #endif //QN_CAMERA_BOOKMARK_H

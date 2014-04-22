@@ -31,6 +31,7 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_history.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
@@ -100,6 +101,8 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnCameraHistoryList>();
     qRegisterMetaType<QnCameraHistoryItemPtr>();
+
+    qRegisterMetaType<QnCameraBookmarkTagsUsage>();
 
     qRegisterMetaType<QnLicensePtr>();
     qRegisterMetaType<QnLicenseList>();

@@ -55,6 +55,8 @@ namespace ec2
                     return "getCameras";
                 case getCameraHistoryList:
                     return "getCameraHistoryList";
+                case getCameraBookmarkTagsUsage:
+                    return "getCameraBookmarkTagsUsage";
                 case addCameraHistoryItem:
                     return "addCameraHistoryItem";
 

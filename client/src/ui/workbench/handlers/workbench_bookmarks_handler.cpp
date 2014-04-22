@@ -55,7 +55,9 @@ void QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered() {
     camera->addBookmark(bookmark);
     QnAppServerConnectionFactory::getConnection2()->getCameraManager()->save(QnVirtualCameraResourceList() << camera, this, [](){});
 
-
+    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->getBookmarkTagsUsage(this, [](int reqID, ec2::ErrorCode code, const QnCameraBookmarkTagsUsage &usage) {
+        // should we notify someone here?
+    });
 
 }
 
@@ -78,14 +80,14 @@ void QnWorkbenchBookmarksHandler::at_resPool_resourceRemoved(const QnResourcePtr
     if (!camera)
         return;
 
-    TagsUsageHash &cameraHash = m_tagsUsageByCamera[camera];
+    QnCameraBookmarkTagsUsage &cameraHash = m_tagsUsageByCamera[camera];
     foreach (const QString &oldTag, cameraHash.keys())
         m_tagsUsage[oldTag] -= cameraHash[oldTag];
     m_tagsUsageByCamera.remove(camera);
 }
 
 void QnWorkbenchBookmarksHandler::at_camera_bookmarkAdded(const QnSecurityCamResourcePtr &camera, const QnCameraBookmark &bookmark) {
-    TagsUsageHash &cameraHash = m_tagsUsageByCamera[camera];
+    QnCameraBookmarkTagsUsage &cameraHash = m_tagsUsageByCamera[camera];
     foreach (const QString &tag, bookmark.tags) {
         m_tagsUsage[tag]++;
         cameraHash[tag]++;
@@ -94,7 +96,7 @@ void QnWorkbenchBookmarksHandler::at_camera_bookmarkAdded(const QnSecurityCamRes
 
 void QnWorkbenchBookmarksHandler::at_camera_bookmarkChanged(const QnSecurityCamResourcePtr &camera, const QnCameraBookmark &bookmark) {
     Q_UNUSED(bookmark);
-    TagsUsageHash &cameraHash = m_tagsUsageByCamera[camera];
+    QnCameraBookmarkTagsUsage &cameraHash = m_tagsUsageByCamera[camera];
     foreach (const QString &oldTag, cameraHash.keys())
         m_tagsUsage[oldTag] -= cameraHash[oldTag];
     cameraHash.clear();
@@ -103,7 +105,7 @@ void QnWorkbenchBookmarksHandler::at_camera_bookmarkChanged(const QnSecurityCamR
 }
 
 void QnWorkbenchBookmarksHandler::at_camera_bookmarkRemoved(const QnSecurityCamResourcePtr &camera, const QnCameraBookmark &bookmark) {
-    TagsUsageHash &cameraHash = m_tagsUsageByCamera[camera];
+    QnCameraBookmarkTagsUsage &cameraHash = m_tagsUsageByCamera[camera];
     foreach (const QString &tag, bookmark.tags) {
         m_tagsUsage[tag]--;
         cameraHash[tag]--;

@@ -43,6 +43,7 @@ namespace ec2
             void emitAddCameraDone( const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( p1, p2 ); }
             void emitGetCamerasDone( const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( p1, p2 ); }
             void emitGetCamerasHistoryDone( const ErrorCode p1, const QnCameraHistoryList& p2 ) { emit onGetCamerasHistoryDone( p1, p2 ); }
+            void emitGetCameraBookmarkTagsUsageDone( const ErrorCode p1, const QnCameraBookmarkTagsUsage& p2 ) { emit onGetCameraBookmarkTagsUsageDone( p1, p2 ); }
             void emitGetUsersDone( const ErrorCode p1, const QnUserResourceList& p2 ) { emit onGetUsersDone( p1, p2 ); }
             void emitGetBusinessRulesDone( const ErrorCode p1, const QnBusinessEventRuleList& p2 ) { emit onGetBusinessRulesDone( p1, p2 ); }
             void emitGetLicensesDone( const ErrorCode p1, const QnLicenseList& p2 ) { emit onGetLicensesDone( p1, p2 ); }
@@ -65,6 +66,7 @@ namespace ec2
             void onAddCameraDone( const ErrorCode, const QnVirtualCameraResourceList& );
             void onGetCamerasDone( const ErrorCode, const QnVirtualCameraResourceList& );
             void onGetCamerasHistoryDone( const ErrorCode, const QnCameraHistoryList& );
+            void onGetCameraBookmarkTagsUsageDone(const ErrorCode, const QnCameraBookmarkTagsUsage&);
             void onGetUsersDone( const ErrorCode, const QnUserResourceList& );
             void onGetBusinessRulesDone( const ErrorCode, const QnBusinessEventRuleList& );
             void onGetLicensesDone( const ErrorCode, const QnLicenseList& );

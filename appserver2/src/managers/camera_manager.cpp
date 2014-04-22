@@ -122,6 +122,22 @@ namespace ec2
         return reqID;
     }
 
+    template<class QueryProcessorType>
+    int QnCameraManager<QueryProcessorType>::getBookmarkTagsUsage(impl::GetCameraBookmarkTagsUsageHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraBookmarkTagsUsage& usage) {
+            QnCameraBookmarkTagsUsage outData;
+            if( errorCode == ErrorCode::ok )
+                outData = usage;
+            handler->done( reqID, errorCode, outData);
+        };
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiCameraBookmarkTagsUsage, decltype(queryDoneHandler)> (
+            ApiCommand::getCameraBookmarkTagsUsage, nullptr, queryDoneHandler );
+        return reqID;
+    }
+
 
     template<class QueryProcessorType>
     QnTransaction<ApiCamera> QnCameraManager<QueryProcessorType>::prepareTransaction(

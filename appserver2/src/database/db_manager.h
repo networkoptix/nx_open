@@ -92,6 +92,9 @@ namespace ec2
         //getCameraServerItems
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServerItemList& historyList);
 
+        //getCameraBookmarkTagsUsage
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraBookmarkTagsUsage& tagsUsage);
+
         //getUserList
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserList& userList);
 

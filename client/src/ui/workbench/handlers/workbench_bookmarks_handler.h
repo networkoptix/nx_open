@@ -31,9 +31,8 @@ private slots:
     void at_camera_bookmarkRemoved(const QnSecurityCamResourcePtr &camera, const QnCameraBookmark &bookmark);
 
 private:
-    typedef QHash<QString, int>  TagsUsageHash;
-    QHash<QnSecurityCamResourcePtr, TagsUsageHash> m_tagsUsageByCamera;
-    TagsUsageHash m_tagsUsage;
+    QHash<QnSecurityCamResourcePtr, QnCameraBookmarkTagsUsage> m_tagsUsageByCamera;
+    QnCameraBookmarkTagsUsage m_tagsUsage;
 };
 
 #endif // WORKBENCH_BOOKMARKS_HANDLER_H

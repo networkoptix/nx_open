@@ -258,6 +258,13 @@ namespace ec2
             return remove(id, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnCameraBookmarkTagsUsage& usage)
+        */
+        template<class TargetType, class HandlerType> int getBookmarkTagsUsage( TargetType* target, HandlerType handler ) {
+            return getBookmarkTagsUsage( std::static_pointer_cast<impl::GetCameraBookmarkTagsUsageHandler>(std::make_shared<impl::CustomGetCameraBookmarkTagsUsageHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
     signals:
         void cameraAddedOrUpdated( QnVirtualCameraResourcePtr camera );
         void cameraHistoryChanged( QnCameraHistoryItemPtr cameraHistory );
@@ -270,6 +277,7 @@ namespace ec2
         virtual int getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler ) = 0;
         virtual int save( const QnVirtualCameraResourceList& cameras, impl::AddCameraHandlerPtr handler ) = 0;
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int getBookmarkTagsUsage( impl::GetCameraBookmarkTagsUsageHandlerPtr handler ) = 0;
     };
     typedef std::shared_ptr<AbstractCameraManager> AbstractCameraManagerPtr;
 
