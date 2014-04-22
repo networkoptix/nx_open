@@ -138,18 +138,27 @@ QnEmail::Settings::Settings(const QnKvPairList &values):
 QnEmail::Settings::~Settings() {
 }
 
+bool QnEmail::Settings::isNull() const {
+    return server.isEmpty();
+}
+
+bool QnEmail::Settings::isValid() const {
+    return !server.isEmpty() && !user.isEmpty() && !password.isEmpty();
+}
+
 QnKvPairList QnEmail::Settings::serialized() const {
     QnKvPairList result;
 
     bool useTls = connectionType == QnEmail::Tls;
     bool useSsl = connectionType == QnEmail::Ssl;
+    bool valid = isValid();
 
     result
     << QnKvPair(nameHost, server)
     << QnKvPair(namePort, port == 0 ? defaultPort(connectionType) : port)
     << QnKvPair(nameUser, user)
     << QnKvPair(nameFrom, user)
-    << QnKvPair(namePassword, password)
+    << QnKvPair(namePassword, valid ? password : QString())
     << QnKvPair(nameTls, useTls)
     << QnKvPair(nameSsl, useSsl)
     << QnKvPair(nameSimple, simple)

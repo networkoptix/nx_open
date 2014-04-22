@@ -18,8 +18,8 @@ bool QnTextureColorGLShaderProgramm::compile()
         vTexColor = aTexCoord;
     }
     ));
-    addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(
-        precision mediump float;
+
+    QByteArray shader(QN_SHADER_SOURCE(
     varying vec2 vTexColor;
     uniform vec4 uColor;
     uniform sampler2D uTexture;
@@ -28,6 +28,13 @@ bool QnTextureColorGLShaderProgramm::compile()
         gl_FragColor = uColor * texColor;
     }
     ));
+
+#ifdef QT_OPENGL_ES_2
+    shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
+
+    addShaderFromSourceCode(QGLShader::Fragment, shader);
+
 
     return link();
 };

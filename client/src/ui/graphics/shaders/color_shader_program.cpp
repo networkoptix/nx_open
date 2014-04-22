@@ -49,13 +49,17 @@ bool QnColorGLShaderProgramm::compile()
         gl_Position = uModelViewProjectionMatrix * aPosition;
     }
     ));
-    addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(
-        precision mediump float;
-    uniform vec4 uColor;
+
+    QByteArray shader(QN_SHADER_SOURCE(
+        uniform vec4 uColor;
     void main() {
         gl_FragColor = uColor;
     }
     ));
+    #ifdef QT_OPENGL_ES_2
+       shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+    #endif
+    addShaderFromSourceCode(QGLShader::Fragment, shader);
 
     return link();
 };
