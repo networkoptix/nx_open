@@ -2,6 +2,7 @@
 #define __API_CAMERA_DATA_H_
 
 #include "ec2_resource_data.h"
+#include "ec2_bookmark_data.h"
 #include "common/common_globals.h"
 #include "core/resource/media_resource.h"
 #include "core/resource/security_cam_resource.h"
@@ -14,7 +15,6 @@ namespace ec2
 {
     struct ScheduleTask;
     struct ApiCamera;
-    struct ApiCameraBookmark;
     #include "camera_data_i.h"
 
     struct ScheduleTask: ScheduleTaskData
@@ -31,18 +31,6 @@ namespace ec2
     {
         QnId sourceId;
     };
-
-    struct ApiCameraBookmark: ApiCameraBookmarkData {
-        void toBookmark(QnCameraBookmark& bookmark) const;
-        void fromBookmark(const QnCameraBookmark& bookmark);
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiCameraBookmark, ApiCameraBookmarkFields);
-    struct ApiCameraBookmarkWithRef: ApiCameraBookmark { QnId cameraId; };
-
-    struct ApiCameraBookmarkTag {QnId bookmarkGuid; QString name; QN_DECLARE_STRUCT_SQL_BINDER(); };
-    #define ApiCameraBookmarkTagFields (bookmarkGuid) (name)
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiCameraBookmarkTag, ApiCameraBookmarkTagFields);
 
     struct ApiCamera: ApiCameraData, ApiResource
     {

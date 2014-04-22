@@ -17,18 +17,6 @@
     #define apiScheduleTaskFields (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) (beforeThreshold) (afterThreshold) (streamQuality) (fps) 
     QN_DEFINE_STRUCT_SERIALIZATORS(ScheduleTaskData, apiScheduleTaskFields);
 
-    struct ApiCameraBookmarkData {
-        QnId guid;
-        qint64 startTime;
-        qint64 duration;
-        QString name;
-        QString description;
-        qint64 timeout;
-        std::vector<QString> tags;
-    };
-    #define ApiCameraBookmarkFields (guid) (startTime) (duration) (name) (description) (timeout) (tags)
-    QN_DEFINE_STRUCT_SERIALIZATORS(ApiCameraBookmarkData, ApiCameraBookmarkFields);
-
     struct ApiCameraData: virtual ApiResourceData 
     {
         ApiCameraData(): scheduleDisabled(false), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryQuality(Qn::SSQualityNotDefined),
