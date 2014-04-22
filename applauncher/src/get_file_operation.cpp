@@ -122,7 +122,8 @@ namespace detail
         m_handler->downloadProgress(
             shared_from_this(),
             -1,
-            m_totalBytesWritten );
+            //m_totalBytesWritten );
+            m_totalBytesDownloaded );
 
         std::unique_lock<std::mutex> lk( m_mutex );
 
