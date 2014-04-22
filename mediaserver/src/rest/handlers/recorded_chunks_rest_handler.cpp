@@ -9,16 +9,6 @@
 #include "motion/motion_helper.h"
 #include "api/serializer/serializer.h"
 
-
-QRect QnRecordedChunksRestHandler::deserializeMotionRect(const QString& rectStr)
-{
-    QList<QString> params = rectStr.split(",");
-    if (params.size() != 4)
-        return QRect();
-    else
-        return QRect(params[0].toInt(), params[1].toInt(), params[2].toInt(), params[3].toInt());
-}
-
 int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
