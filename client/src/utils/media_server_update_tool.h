@@ -31,22 +31,31 @@ public:
 
     enum State {
         Idle,
-        UpdateFound,
-        UpdateImpossible,
-        CheckingFailed,
         CheckingForUpdates,
         DownloadingUpdate,
         UploadingUpdate,
         InstallingUpdate
     };
 
+    enum CheckResult {
+        UpdateFound,
+        InternetProblem,
+        NoNewerVersion,
+        NoSuchBuild,
+        UpdateImpossible
+    };
+
     QnMediaServerUpdateTool(QObject *parent = 0);
 
     State state() const;
 
+    CheckResult updateCheckResult() const;
+
     void updateServers();
 
     QHash<QnSystemInformation, UpdateInformation> availableUpdates() const;
+
+    QnSoftwareVersion targetVersion() const;
 
 signals:
     void stateChanged(int state);
@@ -74,6 +83,7 @@ private:
 
 private:
     State m_state;
+    CheckResult m_checkResult;
     QDir m_localUpdateDir;
     QUrl m_onlineUpdateUrl;
     QString m_updateLocationPrefix;

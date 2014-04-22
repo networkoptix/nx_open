@@ -25,6 +25,7 @@ const QString buildInformationSuffix(lit("update"));
 QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     QObject(parent),
     m_state(Idle),
+    m_checkResult(UpdateFound),
     m_onlineUpdateUrl(QN_UPDATES_URL),
     m_networkAccessManager(new QNetworkAccessManager(this))
 {
@@ -35,12 +36,17 @@ QnMediaServerUpdateTool::State QnMediaServerUpdateTool::state() const {
     return m_state;
 }
 
+QnMediaServerUpdateTool::CheckResult QnMediaServerUpdateTool::updateCheckResult() const {
+    return m_checkResult;
+}
+
 ec2::AbstractECConnectionPtr QnMediaServerUpdateTool::connection2() const {
     return QnAppServerConnectionFactory::getConnection2();
 }
 
 void QnMediaServerUpdateTool::checkOnlineUpdates(const QnSoftwareVersion &version) {
     setState(CheckingForUpdates);
+    m_updates.clear();
     m_targetMustBeNewer = version.isNull();
     m_targetVersion = version;
     QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(QUrl(m_onlineUpdateUrl)));
@@ -49,6 +55,8 @@ void QnMediaServerUpdateTool::checkOnlineUpdates(const QnSoftwareVersion &versio
 
 void QnMediaServerUpdateTool::checkLocalUpdates() {
     QRegExp updateFileRegExp(lit("update_.+_.+_\\d+\\.\\d+\\.\\d+\\.\\d+\\.zip"));
+
+    setState(CheckingForUpdates);
 
     m_updates.clear();
     QStringList entries = m_localUpdateDir.entryList(QStringList() << lit("*.zip"), QDir::Files);
@@ -80,7 +88,7 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
         m_updates.insert(sysInfo, UpdateInformation(version, fileName));
     }
 
-    setState(m_updates.isEmpty() ? Idle : UpdateFound);
+    checkUpdateCoverage();
 }
 
 void QnMediaServerUpdateTool::checkUpdateCoverage() {
@@ -89,7 +97,8 @@ void QnMediaServerUpdateTool::checkUpdateCoverage() {
         QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
         QnSoftwareVersion version = m_updates.value(server->getSystemInfo()).version;
         if (version.isNull()) {
-            setState(UpdateImpossible);
+            m_checkResult = UpdateImpossible;
+            setState(Idle);
             return;
         }
         if ((m_targetMustBeNewer && version > server->getVersion()) || (!m_targetMustBeNewer && version != server->getVersion()))
@@ -97,9 +106,11 @@ void QnMediaServerUpdateTool::checkUpdateCoverage() {
     }
 
     if (m_targetMustBeNewer && !needUpdate)
-        setState(Idle);
+        m_checkResult = NoNewerVersion;
     else
-        setState(UpdateFound);
+        m_checkResult = UpdateFound;
+
+    setState(Idle);
 
     return;
 }
@@ -114,7 +125,8 @@ void QnMediaServerUpdateTool::at_updateReply_finished() {
     reply->deleteLater();
 
     if (reply->error() != QNetworkReply::NoError) {
-        setState(CheckingFailed);
+        m_checkResult = InternetProblem;
+        setState(Idle);
         return;
     }
 
@@ -124,7 +136,8 @@ void QnMediaServerUpdateTool::at_updateReply_finished() {
     QnSoftwareVersion latestVersion = QnSoftwareVersion(map.value(lit("latest_version")).toString());
     QString updatesPrefix = map.value(lit("updates_prefix")).toString();
     if (latestVersion.isNull() || updatesPrefix.isEmpty()) {
-        setState(CheckingFailed);
+        m_checkResult = InternetProblem;
+        setState(Idle);
         return;
     }
 
@@ -145,13 +158,13 @@ void QnMediaServerUpdateTool::at_buildReply_finished() {
     reply->deleteLater();
 
     if (reply->error() != QNetworkReply::NoError) {
-        setState(CheckingFailed);
+        m_checkResult = (reply->error() == QNetworkReply::ContentNotFoundError) ? NoSuchBuild : InternetProblem;
+        setState(Idle);
         return;
     }
 
     QString urlPrefix = m_updateLocationPrefix + m_targetVersion.toString() + lit("/");
 
-    m_updates.clear();
     QByteArray data = reply->readAll();
     QVariantMap platforms = QJsonDocument::fromJson(data).toVariant().toMap();
     for (auto platform = platforms.begin(); platform != platforms.end(); ++platform) {
@@ -190,6 +203,10 @@ void QnMediaServerUpdateTool::updateServers() {
 
 QHash<QnSystemInformation, QnMediaServerUpdateTool::UpdateInformation> QnMediaServerUpdateTool::availableUpdates() const {
     return m_updates;
+}
+
+QnSoftwareVersion QnMediaServerUpdateTool::targetVersion() const {
+    return m_targetVersion;
 }
 
 void QnMediaServerUpdateTool::checkForUpdates() {

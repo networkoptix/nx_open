@@ -1,6 +1,8 @@
 #include "server_updates_widget.h"
 #include "ui_server_updates_widget.h"
 
+#include <QtWidgets/QMessageBox>
+
 #include <core/resource_management/resource_pool.h>
 #include <ui/models/server_updates_model.h>
 #include <ui/dialogs/file_dialog.h>
@@ -37,6 +39,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidge
     connect(m_updateTool,       &QnMediaServerUpdateTool::stateChanged,         this,       &QnServerUpdatesWidget::updateUi);
 
     updateUi();
+    ui->noUpdatesLabel->hide(); // hide it for the first time only
 }
 
 QnServerUpdatesWidget::~QnServerUpdatesWidget() {}
@@ -78,17 +81,37 @@ void QnServerUpdatesWidget::updateUi() {
 
     switch (m_updateTool->state()) {
     case QnMediaServerUpdateTool::Idle:
-        ui->noUpdatesLabel->setText(tr("No updates available"));
+        switch (m_updateTool->updateCheckResult()) {
+        case QnMediaServerUpdateTool::UpdateFound:
+            updateFound = true;
+            break;
+        case QnMediaServerUpdateTool::InternetProblem: {
+            int result = QMessageBox::warning(this,
+                                              tr("Check for updates failed"),
+                                              tr("Cannot check for updates via the Internet.\n"
+                                                 "Do you want to create a download helper to download updates on the computer which is connected to the internet?"),
+                                              QMessageBox::Yes, QMessageBox::No);
+            if (result == QDialog::Accepted)
+                createUpdatesDownloader();
+
+            ui->noUpdatesLabel->setText(tr("Check for updates failed"));
+            break;
+        }
+        case QnMediaServerUpdateTool::NoNewerVersion:
+            ui->noUpdatesLabel->setText(tr("No updates found"));
+            break;
+        case QnMediaServerUpdateTool::NoSuchBuild:
+            QMessageBox::critical(this, tr("Wrong build number"), tr("There is no such build on the update server"));
+            ui->noUpdatesLabel->setText(tr("No updates found"));
+            break;
+        case QnMediaServerUpdateTool::UpdateImpossible:
+            ui->noUpdatesLabel->setText(tr("Update is impossible"));
+            break;
+        }
+        updateUpdatesList();
         break;
     case QnMediaServerUpdateTool::CheckingForUpdates:
         checkingForUpdates = true;
-        break;
-    case QnMediaServerUpdateTool::UpdateFound:
-        updateFound = true;
-        updateUpdatesList();
-        break;
-    case QnMediaServerUpdateTool::UpdateImpossible:
-        ui->noUpdatesLabel->setText(tr("Update is impossible"));
         updateUpdatesList();
         break;
     case QnMediaServerUpdateTool::DownloadingUpdate:
@@ -119,4 +142,8 @@ void QnServerUpdatesWidget::updateUi() {
     ui->cancelButton->setEnabled(cancellable);
     ui->noUpdatesLabel->setVisible(!ui->updateButton->isVisible());
     ui->updateStateWidget->setVisible(applying);
+}
+
+void QnServerUpdatesWidget::createUpdatesDownloader() {
+
 }

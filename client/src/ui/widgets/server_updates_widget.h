@@ -25,6 +25,7 @@ private slots:
 
     void updateUpdatesList();
     void updateUi();
+    void createUpdatesDownloader();
 
 private:
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;
