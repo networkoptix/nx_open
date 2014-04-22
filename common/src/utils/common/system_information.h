@@ -29,6 +29,10 @@ public:
         return platform + lit(" ") + arch;
     }
 
+    bool isValid() const {
+        return !platform.isEmpty() && !arch.isEmpty();
+    }
+
     bool operator==(const QnSystemInformation &other) const {
         return arch == other.arch && platform == other.platform;
     }

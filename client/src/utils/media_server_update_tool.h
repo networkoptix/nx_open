@@ -3,30 +3,60 @@
 
 #include <QtCore/QObject>
 #include <core/resource/media_server_resource.h>
+#include <utils/common/software_version.h>
+#include <utils/common/system_information.h>
 
 // TODO: add tracking to the newly added servers
 
-class QnMediaServerUpdateTool : public QObject
-{
+class QnMediaServerUpdateTool : public QObject {
     Q_OBJECT
 public:
-    explicit QnMediaServerUpdateTool(QObject *parent = 0);
+    struct UpdateInformation {
+        QnSoftwareVersion version;
+        QString fileName;
 
-    QString updateFile() const;
-    void setUpdateFile(const QString &fileName);
+        UpdateInformation(const QnSoftwareVersion &version, const QString &fileName) :
+            version(version), fileName(fileName)
+        {}
+    };
+
+    enum UpdateMode {
+        OnlineUpdate,
+        LocalUpdate
+    };
+
+    QnMediaServerUpdateTool(QObject *parent = 0);
 
     void updateServers();
 
+    void setUpdateMode(UpdateMode mode);
+    void setLocalUpdateDir(const QDir &dir);
+
+    QHash<QnSystemInformation, UpdateInformation> availableUpdates() const;
+
+signals:
+    void updatesListUpdated();
+
+public slots:
+    void checkForUpdates();
+
 protected:
     ec2::AbstractECConnectionPtr connection2() const;
+
+    void checkOnlineUpdates();
+    void checkLocalUpdates();
 
 private slots:
     void at_updateUploaded(const QString &updateId, const QnId &peerId);
 
 private:
-    QString m_updateFile;
+    UpdateMode m_updateMode;
+    QDir m_localUpdateDir;
+    QUrl m_onlineUpdateUrl;
+
     QHash<QString, QnMediaServerResourcePtr> m_pendingUploadServers;
     QHash<QString, QnMediaServerResourcePtr> m_pendingInstallServers;
+    QHash<QnSystemInformation, UpdateInformation> m_updates;
 };
 
 #endif // QN_MEDIA_SERVER_UPDATE_TOOL_H
