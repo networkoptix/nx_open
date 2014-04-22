@@ -51,9 +51,7 @@ void QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked() {
     if (sourceDir.isEmpty())
         return;
 
-    m_updateTool->setLocalUpdateDir(QDir(sourceDir));
-    m_updateTool->setUpdateMode(QnMediaServerUpdateTool::LocalUpdate);
-    m_updateTool->checkForUpdates();
+    m_updateTool->checkForUpdates(sourceDir);
 }
 
 void QnServerUpdatesWidget::updateUpdatesList() {
