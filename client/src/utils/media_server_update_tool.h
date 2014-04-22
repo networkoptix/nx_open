@@ -22,10 +22,23 @@ public:
 
     enum UpdateMode {
         OnlineUpdate,
+        SpecificBuildOnlineUpdate,
         LocalUpdate
     };
 
+    enum State {
+        Idle,
+        CheckingForUpdates,
+        UpdateFound,
+        UpdateImpossible,
+        DownloadingUpdate,
+        UploadingUpdate,
+        InstallingUpdate
+    };
+
     QnMediaServerUpdateTool(QObject *parent = 0);
+
+    State state() const;
 
     void updateServers();
 
@@ -35,7 +48,7 @@ public:
     QHash<QnSystemInformation, UpdateInformation> availableUpdates() const;
 
 signals:
-    void updatesListUpdated();
+    void stateChanged(int state);
 
 public slots:
     void checkForUpdates();
@@ -50,6 +63,10 @@ private slots:
     void at_updateUploaded(const QString &updateId, const QnId &peerId);
 
 private:
+    void setState(State state);
+
+private:
+    State m_state;
     UpdateMode m_updateMode;
     QDir m_localUpdateDir;
     QUrl m_onlineUpdateUrl;

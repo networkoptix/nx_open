@@ -19,9 +19,15 @@ const QString infoEntryName = lit("update.json");
 } // anonymous namespace
 
 QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    m_state(Idle),
+    m_updateMode(OnlineUpdate)
 {
     connect(connection2()->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateUploaded, this, &QnMediaServerUpdateTool::at_updateUploaded);
+}
+
+QnMediaServerUpdateTool::State QnMediaServerUpdateTool::state() const {
+    return m_state;
 }
 
 ec2::AbstractECConnectionPtr QnMediaServerUpdateTool::connection2() const {
@@ -65,7 +71,7 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
         m_updates.insert(sysInfo, UpdateInformation(version, fileName));
     }
 
-    emit updatesListUpdated();
+    setState(m_updates.isEmpty() ? Idle : UpdateFound);
 }
 
 void QnMediaServerUpdateTool::updateServers() {
@@ -106,12 +112,23 @@ QHash<QnSystemInformation, QnMediaServerUpdateTool::UpdateInformation> QnMediaSe
 }
 
 void QnMediaServerUpdateTool::checkForUpdates() {
-    if (m_updateMode == OnlineUpdate)
-        checkOnlineUpdates();
-    else
+    if (m_state != Idle && m_state != UpdateFound && m_state != UpdateImpossible)
+        return;
+
+    if (m_updateMode == LocalUpdate)
         checkLocalUpdates();
+    else
+        checkOnlineUpdates();
 }
 
 void QnMediaServerUpdateTool::at_updateUploaded(const QString &updateId, const QnId &peerId) {
     qDebug() << "uploaded!!!";
+}
+
+void QnMediaServerUpdateTool::setState(State state) {
+    if (m_state == state)
+        return;
+
+    m_state = state;
+    emit stateChanged(state);
 }

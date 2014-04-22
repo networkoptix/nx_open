@@ -23,7 +23,8 @@ private slots:
     void at_installSpecificBuildButton_clicked();
     void at_updateFromLocalSourceButton_clicked();
 
-    void at_updateTool_updatesListUpdated();
+    void updateUpdatesList();
+    void updateUi();
 
 private:
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;

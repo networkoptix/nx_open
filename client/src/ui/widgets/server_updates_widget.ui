@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>495</width>
-    <height>445</height>
+    <width>485</width>
+    <height>435</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -68,14 +68,21 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="updateServersButton">
+      <widget class="QPushButton" name="cancelButton">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="updateButton">
        <property name="text">
         <string>Update</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="noServersUpdatesLabel">
+      <widget class="QLabel" name="noUpdatesLabel">
        <property name="font">
         <font>
          <weight>75</weight>
@@ -90,8 +97,41 @@
      </item>
     </layout>
    </item>
+   <item>
+    <widget class="QWidget" name="updateStateWidget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLabel" name="updateStateLabel">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QProgressBar" name="updateProgessBar"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QnDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::NoButton</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnDialogButtonBox</class>
+   <extends>QDialogButtonBox</extends>
+   <header location="global">ui/widgets/dialog_button_box.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

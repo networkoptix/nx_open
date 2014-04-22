@@ -31,7 +31,9 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidge
     connect(ui->checkForUpdatesButton,              &QPushButton::clicked,      this,       &QnServerUpdatesWidget::at_checkForUpdatesButton_clicked);
     connect(ui->installSpecificBuildButton,         &QPushButton::clicked,      this,       &QnServerUpdatesWidget::at_installSpecificBuildButton_clicked);
 
-    connect(m_updateTool,       &QnMediaServerUpdateTool::updatesListUpdated,   this,       &QnServerUpdatesWidget::at_updateTool_updatesListUpdated);
+    connect(m_updateTool,       &QnMediaServerUpdateTool::stateChanged,         this,       &QnServerUpdatesWidget::updateUi);
+
+    updateUi();
 }
 
 QnServerUpdatesWidget::~QnServerUpdatesWidget() {}
@@ -54,10 +56,61 @@ void QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked() {
     m_updateTool->checkForUpdates();
 }
 
-void QnServerUpdatesWidget::at_updateTool_updatesListUpdated() {
+void QnServerUpdatesWidget::updateUpdatesList() {
     QHash<QnSystemInformation, QnMediaServerUpdateTool::UpdateInformation> updates = m_updateTool->availableUpdates();
     QHash<QnSystemInformation, QnSoftwareVersion> modelUpdates;
     for (auto it = updates.begin(); it != updates.end(); ++it)
         modelUpdates.insert(it.key(), it.value().version);
     m_updatesModel->setUpdates(modelUpdates);
+}
+
+void QnServerUpdatesWidget::updateUi() {
+    bool checkingForUpdates = false;
+    bool updateFound = false;
+    bool applying = false;
+    bool cancellable = false;
+
+    switch (m_updateTool->state()) {
+    case QnMediaServerUpdateTool::Idle:
+        ui->noUpdatesLabel->setText(tr("No updates available"));
+        break;
+    case QnMediaServerUpdateTool::CheckingForUpdates:
+        checkingForUpdates = true;
+        break;
+    case QnMediaServerUpdateTool::UpdateFound:
+        updateFound = true;
+        updateUpdatesList();
+        break;
+    case QnMediaServerUpdateTool::UpdateImpossible:
+        ui->noUpdatesLabel->setText(tr("Update is impossible"));
+        updateUpdatesList();
+        break;
+    case QnMediaServerUpdateTool::DownloadingUpdate:
+        applying = true;
+        cancellable = true;
+        ui->updateStateLabel->setText(tr("Downloading updates"));
+        break;
+    case QnMediaServerUpdateTool::UploadingUpdate:
+        applying = true;
+        cancellable = true;
+        ui->updateStateLabel->setText(tr("Uploading updates to servers"));
+        break;
+    case QnMediaServerUpdateTool::InstallingUpdate:
+        applying = true;
+        ui->updateStateLabel->setText(tr("Installing updates"));
+        break;
+    default:
+        break;
+    }
+
+    if (checkingForUpdates)
+        ui->buttonBox->showProgress(tr("Checking for updates..."));
+    else
+        ui->buttonBox->hideProgress();
+
+    ui->updateButton->setVisible(updateFound);
+    ui->cancelButton->setVisible(applying);
+    ui->cancelButton->setEnabled(cancellable);
+    ui->noUpdatesLabel->setVisible(!ui->updateButton->isVisible());
+    ui->updateStateWidget->setVisible(applying);
 }
