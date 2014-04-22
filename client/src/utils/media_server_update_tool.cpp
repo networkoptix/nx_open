@@ -39,9 +39,10 @@ ec2::AbstractECConnectionPtr QnMediaServerUpdateTool::connection2() const {
     return QnAppServerConnectionFactory::getConnection2();
 }
 
-void QnMediaServerUpdateTool::checkOnlineUpdates() {
+void QnMediaServerUpdateTool::checkOnlineUpdates(const QnSoftwareVersion &version) {
     setState(CheckingForUpdates);
-    m_targetMustBeNewer = true;
+    m_targetMustBeNewer = version.isNull();
+    m_targetVersion = version;
     QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(QUrl(m_onlineUpdateUrl)));
     connect(reply, &QNetworkReply::finished, this, &QnMediaServerUpdateTool::at_updateReply_finished);
 }
@@ -127,7 +128,8 @@ void QnMediaServerUpdateTool::at_updateReply_finished() {
         return;
     }
 
-    m_targetVersion = latestVersion;
+    if (m_targetVersion.isNull())
+        m_targetVersion = latestVersion;
     m_updateLocationPrefix = updatesPrefix;
 
     checkBuildOnline();
@@ -201,8 +203,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QnSoftwareVersion &version) 
     if (m_state >= CheckingForUpdates)
         return;
 
-    m_targetVersion = version;
-    checkBuildOnline();
+    checkOnlineUpdates(version);
 }
 
 void QnMediaServerUpdateTool::checkForUpdates(const QString &path) {

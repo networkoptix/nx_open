@@ -59,7 +59,7 @@ public slots:
 protected:
     ec2::AbstractECConnectionPtr connection2() const;
 
-    void checkOnlineUpdates();
+    void checkOnlineUpdates(const QnSoftwareVersion &version = QnSoftwareVersion());
     void checkLocalUpdates();
     void checkUpdateCoverage();
 

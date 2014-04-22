@@ -5,7 +5,10 @@
 #include <ui/models/server_updates_model.h>
 #include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/build_number_dialog.h>
 #include <utils/media_server_update_tool.h>
+
+#include <version.h>
 
 QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidget *parent) :
     QWidget(parent),
@@ -43,7 +46,12 @@ void QnServerUpdatesWidget::at_checkForUpdatesButton_clicked() {
 }
 
 void QnServerUpdatesWidget::at_installSpecificBuildButton_clicked() {
+    QnBuildNumberDialog dialog(this);
+    if (dialog.exec() == QDialog::Rejected)
+        return;
 
+    QnSoftwareVersion version(lit(QN_APPLICATION_VERSION));
+    m_updateTool->checkForUpdates(QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber()));
 }
 
 void QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked() {
