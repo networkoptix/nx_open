@@ -23,7 +23,7 @@ namespace nx_http
         //!Implementation of AbstractByteStreamFilter::processData
         virtual void processData( const QnByteArrayConstRef& data ) override;
         //!Implementation of AbstractByteStreamFilter::flush
-        virtual void flush() override;
+        virtual size_t flush() override;
 
         bool setContentType( const StringType& contentType );
         void setBoundary( const StringType& boundary );

@@ -40,9 +40,8 @@ public:
         Settings(const QnKvPairList &values);
         ~Settings();
 
-        bool isNull() const {
-            return server.isEmpty();
-        }
+        bool isNull() const;
+        bool isValid() const;
 
         QnKvPairList serialized() const;
 
