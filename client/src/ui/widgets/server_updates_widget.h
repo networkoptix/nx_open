@@ -22,6 +22,7 @@ private slots:
     void at_checkForUpdatesButton_clicked();
     void at_installSpecificBuildButton_clicked();
     void at_updateFromLocalSourceButton_clicked();
+    void at_updateButton_clicked();
 
     void updateUpdatesList();
     void updateUi();

@@ -16,6 +16,7 @@ public:
     struct UpdateInformation {
         QnSoftwareVersion version;
         QString fileName;
+        QString baseFileName;
         QUrl url;
 
         UpdateInformation() {}
@@ -45,6 +46,14 @@ public:
         UpdateImpossible
     };
 
+    enum UpdateResult {
+        UpdateSuccessful,
+        Cancelled,
+        DownloadingFailed,
+        UploadingFailed,
+        InstallationFailed
+    };
+
     QnMediaServerUpdateTool(QObject *parent = 0);
 
     State state() const;
@@ -59,11 +68,13 @@ public:
 
 signals:
     void stateChanged(int state);
+    void progressChanged(int progress);
 
 public slots:
     void checkForUpdates();
     void checkForUpdates(const QnSoftwareVersion &version);
     void checkForUpdates(const QString &path);
+    void cancelUpdate();
 
 protected:
     ec2::AbstractECConnectionPtr connection2() const;
@@ -75,15 +86,22 @@ protected:
 private slots:
     void at_updateReply_finished();
     void at_buildReply_finished();
+    void at_downloadReply_finished();
     void at_updateUploaded(const QString &updateId, const QnId &peerId);
+
+    void at_downloadReply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
+    void downloadNextUpdate();
 
 private:
     void setState(State state);
     void checkBuildOnline();
 
+    void uploadUpdatesToServers();
+
 private:
     State m_state;
     CheckResult m_checkResult;
+    UpdateResult m_updateResult;
     QDir m_localUpdateDir;
     QUrl m_onlineUpdateUrl;
     QString m_updateLocationPrefix;
@@ -93,6 +111,7 @@ private:
     QHash<QString, QnMediaServerResourcePtr> m_pendingUploadServers;
     QHash<QString, QnMediaServerResourcePtr> m_pendingInstallServers;
     QHash<QnSystemInformation, UpdateInformation> m_updates;
+    QHash<QnSystemInformation, UpdateInformation> m_downloadingUpdates;
 
     QNetworkAccessManager *m_networkAccessManager;
 };

@@ -1,6 +1,7 @@
 #include "server_updates_model.h"
 
 #include <ui/common/ui_resource_name.h>
+#include <ui/style/resource_icon_cache.h>
 
 QnServerUpdatesModel::QnServerUpdatesModel(QObject *parent) :
     QAbstractTableModel(parent)
@@ -62,11 +63,19 @@ QVariant QnServerUpdatesModel::data(const QModelIndex &index, int role) const {
             break;
         }
         break;
+    case Qt::DecorationRole:
+        if (index.column() == ResourceNameColumn)
+            return qnResIconCache->icon(server->flags(), server->getStatus());
+        break;
     case Qt::BackgroundRole:
         break;
     }
 
     return QVariant();
+}
+
+QList<QnMediaServerResourcePtr> QnServerUpdatesModel::servers() const {
+    return m_servers;
 }
 
 void QnServerUpdatesModel::setServers(const QList<QnMediaServerResourcePtr> &servers) {

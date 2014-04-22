@@ -19,6 +19,16 @@ const qint64 maxUpdateFileSize = 100 * 1024 * 1024; // 100 MB
 const QString infoEntryName = lit("update.json");
 const QString QN_UPDATES_URL = lit("http://localhost:8000/updates");
 const QString buildInformationSuffix(lit("update"));
+const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
+
+
+QString updateFilePath(const QString &fileName) {
+    QDir dir = QDir::temp();
+    if (!dir.exists(updatesDirName))
+        dir.mkdir(updatesDirName);
+    dir.cd(updatesDirName);
+    return dir.absoluteFilePath(fileName);
+}
 
 } // anonymous namespace
 
@@ -169,14 +179,55 @@ void QnMediaServerUpdateTool::at_buildReply_finished() {
     QVariantMap platforms = QJsonDocument::fromJson(data).toVariant().toMap();
     for (auto platform = platforms.begin(); platform != platforms.end(); ++platform) {
         QVariantMap architectures = platform.value().toMap();
-        for (auto arch = architectures.begin(); arch != architectures.end(); ++arch)
-            m_updates.insert(QnSystemInformation(platform.key(), arch.key()), UpdateInformation(m_targetVersion, urlPrefix + arch.value().toString()));
+        for (auto arch = architectures.begin(); arch != architectures.end(); ++arch) {
+            UpdateInformation info(m_targetVersion, QUrl(urlPrefix + arch.value().toString()));
+            info.baseFileName = arch.value().toString();
+            m_updates.insert(QnSystemInformation(platform.key(), arch.key()), info);
+        }
     }
 
     checkUpdateCoverage();
 }
 
+void QnMediaServerUpdateTool::at_downloadReply_finished() {
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    if (!reply) {
+        Q_ASSERT_X(0, "This function must be called only from QNetworkReply", Q_FUNC_INFO);
+        return;
+    }
+
+    reply->deleteLater();
+
+    if (m_state != DownloadingUpdate)
+        return;
+
+    if (reply->error() != QNetworkReply::NoError) {
+        m_updateResult = DownloadingFailed;
+        setState(Idle);
+        return;
+    }
+
+    auto it = m_downloadingUpdates.begin();
+
+    QByteArray data = reply->readAll();
+    QFile file(updateFilePath(it.value().baseFileName));
+    if (!file.open(QFile::WriteOnly) || file.write(data) != data.size()) {
+        m_updateResult = DownloadingFailed;
+        setState(Idle);
+        return;
+    }
+    file.close();
+    it.value().fileName = file.fileName();
+    m_updates.insert(it.key(), it.value());
+    m_downloadingUpdates.erase(it);
+
+    downloadNextUpdate();
+}
+
 void QnMediaServerUpdateTool::updateServers() {
+    setState(DownloadingUpdate);
+    m_downloadingUpdates = m_updates;
+    downloadNextUpdate();
 //    QFile file(m_updateFile);
 //    if (!file.open(QFile::ReadOnly)) {
 //        // TODO: #dklychkov error handling
@@ -231,8 +282,43 @@ void QnMediaServerUpdateTool::checkForUpdates(const QString &path) {
     checkLocalUpdates();
 }
 
+void QnMediaServerUpdateTool::cancelUpdate() {
+    switch (m_state) {
+    case DownloadingUpdate:
+        m_downloadingUpdates.clear();
+        break;
+    case UploadingUpdate:
+        break;
+    default:
+        break;
+    }
+    setState(Idle);
+}
+
 void QnMediaServerUpdateTool::at_updateUploaded(const QString &updateId, const QnId &peerId) {
     qDebug() << "uploaded!!!";
+}
+
+void QnMediaServerUpdateTool::at_downloadReply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal) {
+    int baseProgress = (m_updates.size() - m_downloadingUpdates.size()) * 100 / m_updates.size();
+    baseProgress += (bytesReceived * (100 / m_updates.size()) / bytesTotal);
+    emit progressChanged(baseProgress);
+}
+
+void QnMediaServerUpdateTool::downloadNextUpdate() {
+    auto it = m_downloadingUpdates.begin();
+
+    while (it != m_downloadingUpdates.end() && !it.value().fileName.isEmpty())
+        it = m_downloadingUpdates.erase(it);
+
+    if (it == m_downloadingUpdates.end()) {
+        uploadUpdatesToServers();
+        return;
+    }
+
+    QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(QUrl(it.value().url)));
+    connect(reply,  &QNetworkReply::finished,           this,   &QnMediaServerUpdateTool::at_downloadReply_finished);
+    connect(reply,  &QNetworkReply::downloadProgress,   this,   &QnMediaServerUpdateTool::at_downloadReply_downloadProgress);
 }
 
 void QnMediaServerUpdateTool::setState(State state) {
@@ -250,4 +336,8 @@ void QnMediaServerUpdateTool::checkBuildOnline() {
     QUrl url(m_updateLocationPrefix + m_targetVersion.toString() + lit("/") + buildInformationSuffix);
     QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(url));
     connect(reply, &QNetworkReply::finished, this, &QnMediaServerUpdateTool::at_buildReply_finished);
+}
+
+void QnMediaServerUpdateTool::uploadUpdatesToServers() {
+    setState(UploadingUpdate);
 }

@@ -24,6 +24,7 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     QVariant data(const QModelIndex &index, int role) const override;
 
+    QList<QnMediaServerResourcePtr> servers() const;
     void setServers(const QList<QnMediaServerResourcePtr> &servers);
     void setUpdates(const QHash<QnSystemInformation, QnSoftwareVersion> &updates);
 

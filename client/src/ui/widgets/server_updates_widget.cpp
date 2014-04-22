@@ -32,14 +32,19 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidge
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::ResourceNameColumn, QHeaderView::Stretch);
 
-    connect(ui->updateFromLocalSourceButton,        &QPushButton::clicked,      this,       &QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked);
-    connect(ui->checkForUpdatesButton,              &QPushButton::clicked,      this,       &QnServerUpdatesWidget::at_checkForUpdatesButton_clicked);
-    connect(ui->installSpecificBuildButton,         &QPushButton::clicked,      this,       &QnServerUpdatesWidget::at_installSpecificBuildButton_clicked);
+    connect(ui->updateFromLocalSourceButton,        &QPushButton::clicked,      this,           &QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked);
+    connect(ui->checkForUpdatesButton,              &QPushButton::clicked,      this,           &QnServerUpdatesWidget::at_checkForUpdatesButton_clicked);
+    connect(ui->installSpecificBuildButton,         &QPushButton::clicked,      this,           &QnServerUpdatesWidget::at_installSpecificBuildButton_clicked);
+    connect(ui->updateButton,                       &QPushButton::clicked,      this,           &QnServerUpdatesWidget::at_updateButton_clicked);
+    connect(ui->cancelButton,                       &QPushButton::clicked,      m_updateTool,   &QnMediaServerUpdateTool::cancelUpdate);
 
-    connect(m_updateTool,       &QnMediaServerUpdateTool::stateChanged,         this,       &QnServerUpdatesWidget::updateUi);
+    connect(m_updateTool,       &QnMediaServerUpdateTool::stateChanged,         this,           &QnServerUpdatesWidget::updateUi);
+    connect(m_updateTool,       &QnMediaServerUpdateTool::progressChanged,      ui->updateProgessBar,   &QProgressBar::setValue);
 
     updateUi();
-    ui->noUpdatesLabel->hide(); // hide it for the first time only
+    // hide them for the first time only
+    ui->noUpdatesLabel->hide();
+    ui->updateButton->hide();
 }
 
 QnServerUpdatesWidget::~QnServerUpdatesWidget() {}
@@ -63,6 +68,26 @@ void QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked() {
         return;
 
     m_updateTool->checkForUpdates(sourceDir);
+}
+
+void QnServerUpdatesWidget::at_updateButton_clicked() {
+    bool haveOffline = false;
+    QList<QnMediaServerResourcePtr> servers = m_updatesModel->servers();
+    foreach (const QnMediaServerResourcePtr &resource, servers) {
+        if (resource->getStatus() == QnResource::Offline) {
+            haveOffline = true;
+            break;
+        }
+    }
+
+    if (haveOffline) {
+        QMessageBox::critical(this, tr("Cannot start update"),
+                              tr("Some servers in your system are offline now.\n"
+                                 "Bring them up to continue update."));
+        return;
+    }
+
+    m_updateTool->updateServers();
 }
 
 void QnServerUpdatesWidget::updateUpdatesList() {
@@ -140,7 +165,7 @@ void QnServerUpdatesWidget::updateUi() {
     ui->updateButton->setVisible(updateFound);
     ui->cancelButton->setVisible(applying);
     ui->cancelButton->setEnabled(cancellable);
-    ui->noUpdatesLabel->setVisible(!ui->updateButton->isVisible());
+    ui->noUpdatesLabel->setVisible(!applying && !ui->updateButton->isVisible());
     ui->updateStateWidget->setVisible(applying);
 }
 
