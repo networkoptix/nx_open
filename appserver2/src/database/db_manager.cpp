@@ -1029,10 +1029,10 @@ ErrorCode QnDbManager::updateCameraBookmarks(const ApiCamera& data, qint32 inter
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT INTO vms_bookmark ( \
                      guid, camera_id, start_time, duration, \
-                     name, description, color, lock_time \
+                     name, description, timeout \
                      ) VALUES ( \
                      :guid, :cameraId, :startTime, :duration, \
-                     :name, :description, :colorIndex, :lockTime \
+                     :name, :description, :timeout \
                      )");
 
 
@@ -1487,7 +1487,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraList& camer
         queryBookmarks.prepare("SELECT \
                                r.guid as cameraId, \
                                bookmark.guid, bookmark.start_time as startTime, bookmark.duration, \
-                               bookmark.name, bookmark.description, bookmark.color as colorIndex, bookmark.lock_time as lockTime \
+                               bookmark.name, bookmark.description, bookmark.timeout \
                                FROM vms_bookmark bookmark \
                                JOIN vms_resource r on r.id = bookmark.camera_id");
         if (!queryBookmarks.exec()) {

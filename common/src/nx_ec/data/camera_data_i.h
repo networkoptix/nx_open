@@ -23,11 +23,10 @@
         qint64 duration;
         QString name;
         QString description;
-        qint16 colorIndex;
-        qint64 lockTime;
+        qint64 timeout;
         std::vector<QString> tags;
     };
-    #define ApiCameraBookmarkFields (guid) (startTime) (duration) (name) (description) (colorIndex) (lockTime) (tags)
+    #define ApiCameraBookmarkFields (guid) (startTime) (duration) (name) (description) (timeout) (tags)
     QN_DEFINE_STRUCT_SERIALIZATORS(ApiCameraBookmarkData, ApiCameraBookmarkFields);
 
     struct ApiCameraData: virtual ApiResourceData 

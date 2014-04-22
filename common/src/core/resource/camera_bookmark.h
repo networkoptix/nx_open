@@ -14,14 +14,12 @@ public:
     QUuid guid;
     QString name;
     QString description;
-    int colorIndex;         /**< Index of color to be used on the timeline. */
-    qint64 lockTime;        /**< Time during which recorded period should be preserved, ms. */
+    qint64 timeout;         /**< Time during which recorded period should be preserved, ms. */
     QStringList tags;
 
     QnCameraBookmark():
         QnTimePeriod(),
-        colorIndex(0),
-        lockTime(0)
+        timeout(-1)
     {}
 
     friend bool operator==(const QnCameraBookmark &l, const QnCameraBookmark &r) {
@@ -30,8 +28,7 @@ public:
             && l.durationMs == r.durationMs
             && l.name == r.name
             && l.description == r.description
-            && l.colorIndex == r.colorIndex
-            && l.lockTime == r.lockTime
+            && l.timeout == r.timeout
             && l.tags == r.tags
             );
     }

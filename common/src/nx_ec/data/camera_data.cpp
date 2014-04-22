@@ -36,8 +36,7 @@ void ApiCameraBookmark::toBookmark(QnCameraBookmark& bookmark) const {
     bookmark.durationMs = duration;
     bookmark.name = name;
     bookmark.description = description;
-    bookmark.colorIndex = colorIndex;
-    bookmark.lockTime = lockTime;
+    bookmark.timeout = timeout;
     bookmark.tags.clear();
     for (const QString &tag: tags)
         bookmark.tags << tag;
@@ -49,8 +48,7 @@ void ApiCameraBookmark::fromBookmark(const QnCameraBookmark& bookmark) {
     duration = bookmark.durationMs;
     name = bookmark.name;
     description = bookmark.description;
-    colorIndex = bookmark.colorIndex;
-    lockTime = bookmark.lockTime;
+    timeout = bookmark.timeout;
     tags.clear();
     tags.reserve(bookmark.tags.size());
     for (const QString &tag: bookmark.tags)

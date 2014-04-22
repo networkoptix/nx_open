@@ -43,7 +43,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered() {
 
     QnCameraBookmark bookmark;
     bookmark.guid = QUuid::createUuid();
-    bookmark.startTimeMs = period.startTimeMs;
+    bookmark.startTimeMs = period.startTimeMs;  //this should be assigned before loading data to the dialog
     bookmark.durationMs = period.durationMs;
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));

@@ -13,8 +13,7 @@ CREATE TABLE "vms_bookmark" (
     duration        integer NOT NULL,
     name            VARCHAR(30) NULL,
     description     VARCHAR(200) NULL,
-    color           integer NOT NULL,
-    lock_time       integer NULL                            -- period of time during which the bookmarked archive part should not be deleted
+    timeout         integer NULL                            -- period of time during which the bookmarked archive part should not be deleted
     );
     
 CREATE UNIQUE INDEX idx_bookmark_guid ON vms_bookmark(guid);

@@ -6,6 +6,7 @@ QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark) {
         << " - " << QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs + bookmark.durationMs).toString(lit("dd hh:mm")) << ')';
     else
         dbg.nospace() << "QnCameraBookmark INSTANT (" << QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs).toString(lit("dd hh:mm")) << ')';
+    dbg.space() << "timeout" << bookmark.timeout;
     dbg.space() << bookmark.name << bookmark.description;
     dbg.space() << bookmark.tags.join(lit(", "));
     return dbg.space();

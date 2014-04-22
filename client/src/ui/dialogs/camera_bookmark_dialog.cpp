@@ -1,6 +1,10 @@
 #include "camera_bookmark_dialog.h"
 #include "ui_camera_bookmark_dialog.h"
 
+namespace {
+    const int defaultTimeoutIdx = 3;
+}
+
 QnCameraBookmarkDialog::QnCameraBookmarkDialog(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnCameraBookmarkDialog)
@@ -78,6 +82,17 @@ void QnCameraBookmarkDialog::loadData(const QnCameraBookmark &bookmark) {
     ui->nameLineEdit->setText(bookmark.name);
     ui->descriptionTextEdit->setPlainText(bookmark.description);
 
+    QDateTime start = QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs);
+    ui->timeoutComboBox->clear();
+    ui->timeoutComboBox->addItem(tr("Do not lock archive"), 0);
+    ui->timeoutComboBox->addItem(tr("1 month"), start.addMonths(1).toMSecsSinceEpoch() - bookmark.startTimeMs);
+    ui->timeoutComboBox->addItem(tr("3 month"), start.addMonths(3).toMSecsSinceEpoch() - bookmark.startTimeMs);
+    ui->timeoutComboBox->addItem(tr("6 month"), start.addMonths(6).toMSecsSinceEpoch() - bookmark.startTimeMs);
+    ui->timeoutComboBox->addItem(tr("year"), start.addYears(1).toMSecsSinceEpoch() - bookmark.startTimeMs);
+
+    int timeoutIdx = ui->timeoutComboBox->findData(bookmark.timeout);
+    ui->timeoutComboBox->setCurrentIndex(timeoutIdx < 0 ? defaultTimeoutIdx : timeoutIdx);
+
     m_tags = bookmark.tags;
     m_tags.removeDuplicates();
     ui->tagsLineEdit->setText(m_tags.join(lit(", ")));
@@ -86,5 +101,6 @@ void QnCameraBookmarkDialog::loadData(const QnCameraBookmark &bookmark) {
 void QnCameraBookmarkDialog::submitData(QnCameraBookmark &bookmark) const {
     bookmark.name = ui->nameLineEdit->text();
     bookmark.description = ui->descriptionTextEdit->toPlainText();
+    bookmark.timeout = ui->timeoutComboBox->currentData().toLongLong();
     bookmark.tags = m_tags;
 }
