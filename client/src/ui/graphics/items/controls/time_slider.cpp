@@ -279,10 +279,12 @@ public:
 
         m_pastColor[Qn::RecordingContent]           = colors.pastRecording;
         m_pastColor[Qn::MotionContent]              = colors.pastMotion;
+        m_pastColor[Qn::BookmarksContent]           = colors.pastBookmark;
         m_pastColor[Qn::TimePeriodContentCount]     = colors.pastBackground;
 
         m_futureColor[Qn::RecordingContent]         = colors.futureRecording;
         m_futureColor[Qn::MotionContent]            = colors.futureMotion;
+        m_futureColor[Qn::BookmarksContent]         = colors.futureBookmark;
         m_futureColor[Qn::TimePeriodContentCount]   = colors.futureBackground;
 
         m_position = m_centralPosition = m_minChunkLength = 0;
@@ -358,11 +360,9 @@ private:
         qreal nc = m_weights[Qn::TimePeriodContentCount];
         qreal sum = m_pendingLength;
 
-        const QColor bookmarkColor(Qt::blue);
-
         if (!qFuzzyIsNull(bc) && !(qFuzzyIsNull(mc))) {
             qreal localSum = mc + bc;
-            return linearCombine(mc / localSum, colors[Qn::MotionContent], bc/localSum, bookmarkColor);
+            return linearCombine(mc / localSum, colors[Qn::MotionContent], bc/localSum, colors[Qn::BookmarksContent]);
         }
 
         if (!qFuzzyIsNull(bc)) {
@@ -384,7 +384,7 @@ private:
                 1.0,
                 linearCombine(rc / sum, colors[Qn::RecordingContent], mc / sum, colors[Qn::MotionContent]),
                 1.0, 
-                linearCombine(bc / sum, bookmarkColor, nc / sum, colors[Qn::TimePeriodContentCount])
+                linearCombine(bc / sum, colors[Qn::BookmarksContent], nc / sum, colors[Qn::TimePeriodContentCount])
             );
     }
 

@@ -26,6 +26,9 @@ public:
     QColor pastMotion;
     QColor futureMotion;
 
+    QColor pastBookmark;
+    QColor futureBookmark;
+
     QColor separator;
 
     QColor dateOverlay;

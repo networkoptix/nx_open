@@ -23,6 +23,9 @@ QnTimeSliderColors::QnTimeSliderColors() {
     pastMotion = QColor(255, 0, 0, 128);
     futureMotion = QColor(255, 0, 0, 64);
 
+    pastBookmark = QColor(0, 0, 255, 128);
+    futureBookmark = QColor(0, 0, 255, 64);
+
     separator = QColor(255, 255, 255, 64);
 
     dateOverlay = QColor(255, 255, 255, 48);
@@ -120,6 +123,7 @@ QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
     QnTimeSliderColors, 
     (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)
         (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)
+        (pastBookmark)(futureBookmark)
         (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute), 
     QJson::Optional
 )
