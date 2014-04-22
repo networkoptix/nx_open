@@ -8,8 +8,9 @@
 
 static const int OUTPUT_BUFFER_SIZE = 16*1024;
 
-GZipUncompressor::GZipUncompressor()
+GZipUncompressor::GZipUncompressor( const std::shared_ptr<AbstractByteStreamFilter>& nextFilter )
 :
+    AbstractByteStreamConverter( nextFilter ),
     m_state( State::init )
 {
     memset( &m_zStream, 0, sizeof(m_zStream) );
@@ -143,7 +144,7 @@ void GZipUncompressor::processData( const QnByteArrayConstRef& data )
     }
 }
 
-void GZipUncompressor::flush()
+size_t GZipUncompressor::flush()
 {
     m_zStream.next_in = 0;
     m_zStream.avail_in = 0;
@@ -151,6 +152,10 @@ void GZipUncompressor::flush()
     m_zStream.avail_out = (uInt)m_outputBuffer.size();
 
     int zResult = inflate(&m_zStream, Z_SYNC_FLUSH);
-    if( zResult == Z_OK || zResult == Z_STREAM_END )
+    if( (zResult == Z_OK || zResult == Z_STREAM_END) && (m_outputBuffer.size() > m_zStream.avail_out) )
+    {
         m_nextFilter->processData( QnByteArrayConstRef(m_outputBuffer, 0, m_outputBuffer.size()-m_zStream.avail_out) );
+        return m_outputBuffer.size() - m_zStream.avail_out;
+    }
+    return 0;
 }

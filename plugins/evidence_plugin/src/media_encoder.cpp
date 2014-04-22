@@ -97,10 +97,11 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
     *infoListSize = std::min<int>(
         resolutionList->size(),
         nxcip::MAX_RESOLUTION_LIST_SIZE);
-    memcpy(
-        infoList,
-        &resolutionList->at(0),
-        sizeof(nxcip::ResolutionInfo) * *infoListSize );
+    if( resolutionList->size() > 0 )
+        memcpy(
+            infoList,
+            &resolutionList->at(0),
+            sizeof(nxcip::ResolutionInfo) * *infoListSize );
 
     return nxcip::NX_NO_ERROR;
 }
