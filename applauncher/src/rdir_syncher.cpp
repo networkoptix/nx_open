@@ -293,7 +293,7 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
     startOperations( eventsToTrigger );
 }
 
-static const int MAX_SIMULTANEOUS_DOWNLOADS = 1;
+static const int MAX_SIMULTANEOUS_DOWNLOADS = 10;
 
 void RDirSyncher::startOperations( std::list<RSyncEventTrigger*>& eventsToTrigger )
 {
