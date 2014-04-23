@@ -41,9 +41,6 @@ namespace QnFusion {
     {};
 
 
-    ///* We place the conditional serialization functions in the same namespace
-    // * where ADL lookup takes place. */
-    // TODO: These go into Qss, then pulled into QnSerializationDetail
 
     template<class T, class D>
     typename boost::enable_if<boost::mpl::and_<QnFusion::has_visit_members<T>, QnFusion::has_serialization_visitor_type<D> >, void>::type

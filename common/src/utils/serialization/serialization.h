@@ -4,7 +4,6 @@
 #include <cassert>
 
 #ifndef Q_MOC_RUN
-#include <boost/mpl/identity.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_and_derived.hpp>
 #endif // Q_MOC_RUN
@@ -332,14 +331,14 @@ namespace QnSerialization {
     }
 
     template<class Serializer, class T>
-    struct default_serializer<Serializer, T, typename boost::enable_if<boost::is_base_and_derived<QnContextSerializerBase, Serializer> >::type>:
-        boost::mpl::identity<QnDefaultContextSerializer<T, Serializer> >
-    {};
+    struct default_serializer<Serializer, T, typename boost::enable_if<boost::is_base_and_derived<QnContextSerializerBase, Serializer> >::type> {
+        typedef QnDefaultContextSerializer<T, Serializer> type;
+    };
 
     template<class Serializer, class T>
-    struct default_serializer<Serializer, T, typename boost::enable_if<boost::is_base_and_derived<QnBasicSerializerBase, Serializer> >::type>:
-        boost::mpl::identity<QnDefaultBasicSerializer<T, Serializer> >
-    {};
+    struct default_serializer<Serializer, T, typename boost::enable_if<boost::is_base_and_derived<QnBasicSerializerBase, Serializer> >::type> {
+        typedef QnDefaultBasicSerializer<T, Serializer> type;
+    };
 
 } // namespace QnSerialization
 
