@@ -24,11 +24,11 @@ public:
     virtual void discardCachedData() override;
 
 private slots:
-    void onDataLoaded(const QnTimePeriodList &periods, int handle);
+    void onDataLoaded(const QnAbstractTimePeriodListPtr &periods, int handle);
     void onLoadingFailed(int code, int handle);
 
 private:
-    int loadInternal(QnMediaServerResourcePtr mServer, QnNetworkResourcePtr networkResource, const QnTimePeriod &period, const QString &filter);
+    int loadInternal(const QnMediaServerResourcePtr &mServer, const QnNetworkResourcePtr &networkResource, const QnTimePeriod &period, const QString &filter);
 
 private:
     QMutex m_mutex;
@@ -36,7 +36,7 @@ private:
     QMap<QString, QnTimePeriodLoader *> m_cache;
 
     QMap<int, QList<int> > m_multiLoadProgress;
-    QMap<int, QVector<QnTimePeriodList> > m_multiLoadPeriod;
+    QMap<int, QVector<QnAbstractTimePeriodListPtr> > m_multiLoadPeriod;
 };
 
 #endif // QN_MULTI_CAMERA_TIME_PERIOD_LOADER_H

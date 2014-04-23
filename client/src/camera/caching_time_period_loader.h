@@ -44,7 +44,7 @@ signals:
     void loadingFailed();
 
 private slots:
-    void at_loader_ready(const QnTimePeriodList &timePeriods, int handle);
+    void at_loader_ready(const QnAbstractTimePeriodListPtr &timePeriods, int handle);
     void at_loader_failed(int status, int handle);
     void at_syncTime_timeChanged();
 

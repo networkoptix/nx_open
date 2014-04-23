@@ -70,8 +70,8 @@ void QnCachingTimePeriodLoader::initLoaders(QnAbstractTimePeriodLoader **loaders
         if(loader) {
             loader->setParent(this);
 
-            connect(loader, SIGNAL(ready(const QnTimePeriodList &, int)),   this,   SLOT(at_loader_ready(const QnTimePeriodList &, int)));
-            connect(loader, SIGNAL(failed(int, int)),                       this,   SLOT(at_loader_failed(int, int)));
+            connect(loader, &QnAbstractTimePeriodLoader::ready,     this,   &QnCachingTimePeriodLoader::at_loader_ready);
+            connect(loader, &QnAbstractTimePeriodLoader::failed,    this,   &QnCachingTimePeriodLoader::at_loader_failed);
         }
     }
 }
@@ -238,10 +238,14 @@ void QnCachingTimePeriodLoader::trim(Qn::TimePeriodContent type, qint64 trimTime
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnCachingTimePeriodLoader::at_loader_ready(const QnTimePeriodList &timePeriods, int handle) {
+void QnCachingTimePeriodLoader::at_loader_ready(const QnAbstractTimePeriodListPtr &timePeriods, int handle) {
+    QnTimePeriodList periods;
+    if (QnGenericTimePeriodList* genericList = dynamic_cast<QnGenericTimePeriodList*>(timePeriods.data()))
+        periods = genericList->m_data;
+
     for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
-        if(handle == m_handles[i] && m_periods[i] != timePeriods) {
-            m_periods[i] = timePeriods;
+        if(handle == m_handles[i] && m_periods[i] != periods) {
+            m_periods[i] = periods;
             emit periodsChanged(static_cast<Qn::TimePeriodContent>(i));
         }
     }

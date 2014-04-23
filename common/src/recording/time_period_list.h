@@ -166,4 +166,19 @@ inline QnTimePeriodListTimeIterator QnTimePeriodList::timeEnd() const {
 
 Q_DECLARE_METATYPE(QnTimePeriodList);
 
+class QnGenericTimePeriodList: public QnAbstractTimePeriodList {
+public:
+    QnGenericTimePeriodList();
+    QnGenericTimePeriodList(const QnTimePeriodList &data);
+    virtual bool isEmpty() const override;
+    virtual void append(const QnAbstractTimePeriodListPtr &other) override;
+    virtual QnTimePeriod last() const override;
+
+    virtual QnAbstractTimePeriodListPtr merged(const QVector<QnAbstractTimePeriodListPtr> &source) override;
+//private:
+    QnTimePeriodList m_data;
+};
+
+typedef QSharedPointer<QnGenericTimePeriodList> QnGenericTimePeriodListPtr;
+
 #endif // QN_TIME_PERIOD_LIST_H

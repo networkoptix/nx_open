@@ -10,6 +10,20 @@
 class QnTimePeriod;
 class QnTimePeriodList;
 
+class QnAbstractTimePeriodList;
+typedef QSharedPointer<QnAbstractTimePeriodList> QnAbstractTimePeriodListPtr;
+
+class QnAbstractTimePeriodList {
+public:
+    QnAbstractTimePeriodList() {}
+    virtual bool isEmpty() const = 0;
+    virtual void append(const QnAbstractTimePeriodListPtr &other) = 0;
+    virtual QnTimePeriod last() const = 0;
+
+    // method is not static because we need to know subclass implementation
+    virtual QnAbstractTimePeriodListPtr merged(const QVector<QnAbstractTimePeriodListPtr> &source) = 0;
+};
+
 class QN_EXPORT QnTimePeriod {
 public:
     /**

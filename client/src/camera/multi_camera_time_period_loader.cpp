@@ -58,7 +58,7 @@ void QnMultiCameraTimePeriodLoader::discardCachedData() {
         loader->discardCachedData();
 }
 
-int QnMultiCameraTimePeriodLoader::loadInternal(QnMediaServerResourcePtr mServer, QnNetworkResourcePtr networkResource, const QnTimePeriod &period, const QString &filter)
+int QnMultiCameraTimePeriodLoader::loadInternal(const QnMediaServerResourcePtr &mServer, const QnNetworkResourcePtr &networkResource, const QnTimePeriod &period, const QString &filter)
 {
     QMutexLocker lock(&m_mutex);
     QnTimePeriodLoader *loader;
@@ -71,16 +71,16 @@ int QnMultiCameraTimePeriodLoader::loadInternal(QnMediaServerResourcePtr mServer
         if (!loader)
             return -1;
         
-        connect(loader, SIGNAL(ready(const QnTimePeriodList &, int)), this, SLOT(onDataLoaded(const QnTimePeriodList &, int)));
-        connect(loader, SIGNAL(failed(int, int)), this, SLOT(onLoadingFailed(int, int)));
+        connect(loader, &QnAbstractTimePeriodLoader::ready, this, &QnMultiCameraTimePeriodLoader::onDataLoaded);
+        connect(loader, &QnAbstractTimePeriodLoader::failed, this, &QnMultiCameraTimePeriodLoader::onLoadingFailed);
         m_cache.insert(cacheKey, loader);
     }
     return loader->load(period, filter);
 }
 
-void QnMultiCameraTimePeriodLoader::onDataLoaded(const QnTimePeriodList &periods, int handle)
+void QnMultiCameraTimePeriodLoader::onDataLoaded(const QnAbstractTimePeriodListPtr &periods, int handle)
 {
-    QnTimePeriodList result;
+    QnAbstractTimePeriodListPtr result;
     int multiHandle = 0;
     {
         QMutexLocker lock(&m_mutex);
@@ -93,7 +93,8 @@ void QnMultiCameraTimePeriodLoader::onDataLoaded(const QnTimePeriodList &periods
                 itr.value().removeOne(handle);
                 if (itr.value().isEmpty()) 
                 {
-                    result = QnTimePeriod::mergeTimePeriods(m_multiLoadPeriod[multiHandle]);
+                    if (!m_multiLoadPeriod[multiHandle].isEmpty())
+                        result = m_multiLoadPeriod[multiHandle].first()->merged(m_multiLoadPeriod[multiHandle]);
                     m_multiLoadPeriod.remove(multiHandle);
                     m_multiLoadProgress.erase(itr);
                     emit ready(result, multiHandle);
@@ -119,7 +120,7 @@ void QnMultiCameraTimePeriodLoader::onLoadingFailed(int status, int handle)
                 {
                     if (!m_multiLoadPeriod[multiHandle].isEmpty())
                     {
-                        QnTimePeriodList result = QnTimePeriod::mergeTimePeriods(m_multiLoadPeriod[multiHandle]);
+                        QnAbstractTimePeriodListPtr result = m_multiLoadPeriod[multiHandle].first()->merged(m_multiLoadPeriod[multiHandle]);
                         m_multiLoadPeriod.remove(multiHandle);
                         m_multiLoadProgress.erase(itr);
                         emit ready(result, multiHandle);

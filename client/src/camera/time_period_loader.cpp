@@ -62,7 +62,8 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QString &filt
             /* Must pass the ready signal through the event queue here as
              * the caller doesn't know request handle yet, and therefore 
              * cannot handle the signal. */
-            emit delayedReady(m_loadedData, handle);
+            QnGenericTimePeriodListPtr result(new QnGenericTimePeriodList(m_loadedData));
+            emit delayedReady(result, handle);
             return handle; 
         }
     }
@@ -176,9 +177,10 @@ void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &ti
                     }
                 }
 
+                QnGenericTimePeriodListPtr result(new QnGenericTimePeriodList(m_loadedData));
                 foreach(int handle, m_loading[i].waitingHandles)
-                    emit ready(m_loadedData, handle);
-                emit ready(m_loadedData, requstHandle);
+                    emit ready(result, handle);
+                emit ready(result, requstHandle);
             }
             else {
                 foreach(int handle, m_loading[i].waitingHandles)

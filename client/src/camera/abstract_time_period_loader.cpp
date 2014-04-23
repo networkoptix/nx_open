@@ -5,5 +5,5 @@ QnAbstractTimePeriodLoader::QnAbstractTimePeriodLoader(const QnResourcePtr &reso
     m_resource(resource),
     m_periodsType(periodsType)
 {
-    connect(this, SIGNAL(delayedReady(const QnTimePeriodList &, int)), this, SIGNAL(ready(const QnTimePeriodList &, int)), Qt::QueuedConnection);
+    connect(this, &QnAbstractTimePeriodLoader::delayedReady, this, &QnAbstractTimePeriodLoader::ready, Qt::QueuedConnection);
 }

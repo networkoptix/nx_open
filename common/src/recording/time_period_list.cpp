@@ -203,3 +203,51 @@ bool QnTimePeriodList::decode(QByteArray &stream)
     return decode((const quint8 *) stream.constData(), stream.size());
 }
 
+
+QnGenericTimePeriodList::QnGenericTimePeriodList() {
+
+}
+
+QnGenericTimePeriodList::QnGenericTimePeriodList(const QnTimePeriodList &data):
+    m_data(data)
+{
+}
+
+bool QnGenericTimePeriodList::isEmpty() const {
+    return m_data.isEmpty();
+}
+
+void QnGenericTimePeriodList::append(const QnAbstractTimePeriodListPtr &other) {
+    if (!other)
+        return;
+    QnTimePeriodList otherList;
+    if (QnGenericTimePeriodList* other_casted = dynamic_cast<QnGenericTimePeriodList*>(other.data()))
+        otherList = other_casted->m_data;
+    if (m_data.isEmpty())
+        return;
+
+    QVector<QnTimePeriodList> allPeriods;
+    if (!otherList.isEmpty() && !m_data.isEmpty() && m_data.last().durationMs == -1) 
+        if (otherList.last().startTimeMs >= m_data.last().startTimeMs) 
+            m_data.last().durationMs = 0;
+    allPeriods << m_data << otherList;
+    m_data = QnTimePeriod::mergeTimePeriods(allPeriods); // union data
+}
+
+QnTimePeriod QnGenericTimePeriodList::last() const {
+    if (m_data.isEmpty())
+        return QnTimePeriod();
+    return m_data.last();
+}
+
+QnAbstractTimePeriodListPtr QnGenericTimePeriodList::merged(const QVector<QnAbstractTimePeriodListPtr> &source) {
+    QVector<QnTimePeriodList> allPeriods;
+
+    foreach (const QnAbstractTimePeriodListPtr &other, source) {
+        if (!other)
+            continue;
+        if (QnGenericTimePeriodList* other_casted = dynamic_cast<QnGenericTimePeriodList*>(other.data()))
+            allPeriods << other_casted->m_data;
+    }
+    return QnGenericTimePeriodListPtr(new QnGenericTimePeriodList(QnTimePeriod::mergeTimePeriods(allPeriods)));
+}

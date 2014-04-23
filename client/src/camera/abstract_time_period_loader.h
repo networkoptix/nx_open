@@ -45,7 +45,7 @@ signals:
      * \param timePeriods               Loaded motion periods.
      * \param handle                    Request handle.
      */
-    void ready(const QnTimePeriodList &timePeriods, int handle);
+    void ready(const QnAbstractTimePeriodListPtr &timePeriods, int handle);
 
     /**
      * This signal is emitted whenever the reader was unable to load motion periods.
@@ -62,7 +62,7 @@ protected:
     /** Periods type this loader reading. */
     const Qn::TimePeriodContent m_periodsType;
 signals:
-    void delayedReady(const QnTimePeriodList &timePeriods, int handle);
+    void delayedReady(const QnAbstractTimePeriodListPtr &timePeriods, int handle);
 };
 
 #endif // __QN_ABSTRACT_TIME_PERIOD_LOADER_H__

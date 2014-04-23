@@ -8,7 +8,7 @@
 
 int QnLayoutFileTimePeriodLoader::m_handle = 0;
 
-QnLayoutFileTimePeriodLoader::QnLayoutFileTimePeriodLoader(const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, const QnTimePeriodList& chunks, QObject *parent):
+QnLayoutFileTimePeriodLoader::QnLayoutFileTimePeriodLoader(const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, const QnAbstractTimePeriodListPtr& chunks, QObject *parent):
     QnAbstractTimePeriodLoader(resource, periodsType, parent),
     m_chunks(chunks)
 {
@@ -29,7 +29,7 @@ QnLayoutFileTimePeriodLoader* QnLayoutFileTimePeriodLoader::newInstance(const Qn
         return NULL;
 
     QnTimePeriodList chunks = storage->getTimePeriods(resource);
-    return new QnLayoutFileTimePeriodLoader(resource, periodsType, chunks, parent);
+    return new QnLayoutFileTimePeriodLoader(resource, periodsType, QnGenericTimePeriodListPtr(new QnGenericTimePeriodList(chunks)), parent);
 }
 
 int QnLayoutFileTimePeriodLoader::loadChunks(const QnTimePeriod &period)
@@ -47,9 +47,6 @@ int QnLayoutFileTimePeriodLoader::loadMotion(const QnTimePeriod &period, const Q
         masks << (char*) qMallocAligned(MD_WIDTH * MD_HEIGHT / 8, CL_MEDIA_ALIGNMENT);
         QnMetaDataV1::createMask(motionRegions[i], masks.last());
     }
-
-    //QnMetaDataV1Light startTime;
-    //QnMetaDataV1Light endTime;
 
     QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>();
     if (!aviRes)
@@ -74,7 +71,9 @@ int QnLayoutFileTimePeriodLoader::loadMotion(const QnTimePeriod &period, const Q
             }
         }
     }
-    QnTimePeriodList result = QnTimePeriod::mergeTimePeriods(periods);
+    QnTimePeriodList merged = QnTimePeriod::mergeTimePeriods(periods);
+    QnAbstractTimePeriodListPtr result(new QnGenericTimePeriodList(merged));
+
     for (int i = 0; i < masks.size(); ++i)
         qFreeAligned(masks[i]);
 
