@@ -13,9 +13,6 @@
 
 namespace ec2
 {
-    struct ScheduleTask;
-    struct ApiCamera;
-
     struct ScheduleTask: ScheduleTaskData
     {
         static ScheduleTask fromResource(const QnResourcePtr& cameraRes, const QnScheduleTask& resScheduleTask);
@@ -24,7 +21,7 @@ namespace ec2
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ScheduleTask, apiScheduleTaskFields);
+    //QN_DEFINE_STRUCT_SQL_BINDER(ScheduleTask, apiScheduleTaskFields);
 
     struct ScheduleTaskWithRef: ScheduleTask
     {
@@ -39,7 +36,7 @@ namespace ec2
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiCamera, apiCameraDataFields);
+    //QN_DEFINE_STRUCT_SQL_BINDER(ApiCamera, apiCameraDataFields);
 
     struct ApiCameraList: ApiCameraListData
     {
@@ -50,7 +47,7 @@ namespace ec2
     };
 }
 
-QN_FUSION_DECLARE_FUNCTIONS(ScheduleTaskData, (binary))
+//QN_FUSION_DECLARE_FUNCTIONS(ScheduleTaskData, (binary))
 
 
 #endif // __API_CAMERA_DATA_H_

@@ -15,6 +15,8 @@ class QnResourceAudioLayout;
 
 namespace Qn {
 
+    // TODO: #Elric move out!
+
     enum StreamQuality {
         QualityLowest,
         QualityLow,

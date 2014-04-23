@@ -19,6 +19,7 @@
 #include "network/universal_tcp_listener.h"
 #include "utils/common/email.h"
 #include <core/resource/videowall_control_message.h>
+#include "data/server_info_i.h"
 
 //!Contains API classes for the new enterprise controller
 /*!
@@ -27,10 +28,6 @@
 */
 namespace ec2
 {
-
-    typedef QList<QByteArray> ByteArrayList;
-    #include "server_info_i.h"
-    
     struct QnFullResourceData
     {
         ServerInfo serverInfo;

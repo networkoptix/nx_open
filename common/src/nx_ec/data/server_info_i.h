@@ -1,6 +1,8 @@
 #ifndef QN_SERVER_INFO_I_H
 #define QN_SERVER_INFO_I_H
 
+#include "api_types_i.h"
+
 namespace ec2 {
 
     struct ServerInfo

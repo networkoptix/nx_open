@@ -10,19 +10,19 @@ namespace ec2
 {
     struct ApiCameraServerItem: ApiCameraServerItemData
     {
-        QN_DECLARE_STRUCT_SQL_BINDER();
+        //QN_DECLARE_STRUCT_SQL_BINDER();
         void fromResource(const QnCameraHistoryItem& item);
         void toResource(QnCameraHistoryItem* const item);
     };
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiCameraServerItem, ApiCameraServerItemFields);
+    //QN_DEFINE_STRUCT_SQL_BINDER(ApiCameraServerItem, ApiCameraServerItemFields);
 
 
-    struct ApiCameraServerItemList: ApiCameraServerItemListData
+    /*struct ApiCameraServerItemList: ApiCameraServerItemListData
     {
         void loadFromQuery(QSqlQuery& query);
         void toResourceList(QnCameraHistoryList& outData) const;
-    };
+    };*/
 }
 
 #endif // __CAMERA_SERVER_ITEM_DATA_H__

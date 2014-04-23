@@ -1,6 +1,8 @@
 #ifndef QN_API_DATA_I_H
 #define QN_API_DATA_I_H
 
+#include "api_types_i.h"
+
 namespace ec2 {
 
     struct ApiData {
