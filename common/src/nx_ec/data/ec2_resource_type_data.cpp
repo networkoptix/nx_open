@@ -1,15 +1,16 @@
 #include "ec2_resource_type_data.h"
 
-//QN_DEFINE_STRUCT_SERIALIZATORS (ApiPropertyTypeData, ApiPropertyTypeFields)
-QN_FUSION_DECLARE_FUNCTIONS(ApiPropertyTypeData, (binary))
-//QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceTypeData, ApiResourceTypeFields);
-QN_FUSION_DECLARE_FUNCTIONS(ApiResourceTypeData, (binary))
-
-QN_DEFINE_API_OBJECT_LIST_DATA(ApiResourceTypeData);
 
 
 namespace ec2
 {
+
+    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiPropertyTypeData, ApiPropertyTypeFields)
+    QN_FUSION_DECLARE_FUNCTIONS(ApiPropertyTypeData, (binary))
+        //QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceTypeData, ApiResourceTypeFields);
+        QN_FUSION_DECLARE_FUNCTIONS(ApiResourceTypeData, (binary))
+
+        //QN_DEFINE_API_OBJECT_LIST_DATA(ApiResourceTypeData);
 
 void fromApiToResource(const ApiPropertyTypeData& data, QnParamTypePtr& resource)
 {
@@ -50,6 +51,7 @@ void fromApiToResource(const ApiResourceTypeData& data, QnResourceTypePtr resour
     }
 }
 
+#if 0
 void loadResourceTypesFromQuery(ApiResourceTypeDataListData &data, QSqlQuery& query)
 {
 	QN_QUERY_TO_DATA_OBJECT(query, ApiResourceTypeData, data.data, (id) (name) (manufacture) );
@@ -64,5 +66,6 @@ void fromApiToResourceTypeList(const ApiResourceTypeDataListData &data, QnResour
 		resTypeList << resType;
 	}
 }
+#endif
 
 }

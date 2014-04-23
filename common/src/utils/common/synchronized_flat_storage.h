@@ -24,25 +24,25 @@ public:
     }
 
     QList<T> values() const {
-        std::unique_lock<std::mutex> guard(&m_mutex);
+        std::unique_lock<std::mutex> guard(m_mutex);
 
         return m_storage.values();
     }
 
     void insert(const Key &key, T value, bool claimOwnership = true) {
-        std::unique_lock<std::mutex> guard(&m_mutex);
+        std::unique_lock<std::mutex> guard(m_mutex);
 
         m_storage.insert(key, value, claimOwnership);
     }
 
     void clear() {
-        std::unique_lock<std::mutex> guard(&m_mutex);
+        std::unique_lock<std::mutex> guard(m_mutex);
 
         m_storage.clear();
     }
 
     bool empty() const {
-        std::unique_lock<std::mutex> guard(&m_mutex);
+        std::unique_lock<std::mutex> guard(m_mutex);
 
         return m_storage.empty();
     }

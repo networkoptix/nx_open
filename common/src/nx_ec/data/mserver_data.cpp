@@ -3,6 +3,15 @@
 #include "core/resource/storage_resource.h"
 #include "core/resource/resource_type.h"
 
+//QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiStorageData, ApiResourceData, ApiStorageFields);
+QN_FUSION_DECLARE_FUNCTIONS(ApiStorageData, (binary))
+
+    //QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiMediaServerData, ApiResourceData, medisServerDataFields);
+    QN_FUSION_DECLARE_FUNCTIONS(ApiMediaServerData, (binary))
+
+    QN_DEFINE_API_OBJECT_LIST_DATA(ApiMediaServerData)
+
+
 namespace ec2
 {
 

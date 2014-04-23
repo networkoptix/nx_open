@@ -1,13 +1,14 @@
 #include "camera_server_item_data.h"
 
-//QN_DEFINE_STRUCT_SERIALIZATORS(ApiCameraServerItemData, ApiCameraServerItemFields);
-QN_FUSION_DECLARE_FUNCTIONS(ApiCameraServerItemData, (binary))
-
-    QN_DEFINE_API_OBJECT_LIST_DATA(ApiCameraServerItem)
-
 
 namespace ec2
 {
+
+    //QN_DEFINE_STRUCT_SERIALIZATORS(ApiCameraServerItemData, ApiCameraServerItemFields);
+    QN_FUSION_DECLARE_FUNCTIONS(ApiCameraServerItemData, (binary))
+
+        //QN_DEFINE_API_OBJECT_LIST_DATA(ApiCameraServerItem)
+
 
 void ApiCameraServerItem::fromResource(const QnCameraHistoryItem& item)
 {
@@ -23,6 +24,7 @@ void ApiCameraServerItem::toResource(QnCameraHistoryItem* const item)
     item->timestamp = timestamp;
 }
 
+#if 0
 void ApiCameraServerItemList::loadFromQuery(QSqlQuery& query) 
 { 
     QN_QUERY_TO_DATA_OBJECT(query, ApiCameraServerItem, data, ApiCameraServerItemFields) 
@@ -70,5 +72,7 @@ void ApiCameraServerItemList::toResourceList(QnCameraHistoryList& cameraServerIt
         cameraServerItems.append(cameraHistory);
     }
 }
+
+#endif
 
 }

@@ -1,3 +1,11 @@
+#ifndef QN_MSERVER_DATA_I_H
+#define QN_MSERVER_DATA_I_H
+
+#include "api_types_i.h"
+#include "ec2_resource_data_i.h"
+
+namespace ec2 {
+
     struct ApiStorageData: ApiResourceData
     {
         ApiStorageData(): spaceLimit(0), usedForWriting(0) {}
@@ -8,9 +16,8 @@
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define ApiStorageFields  (spaceLimit) (usedForWriting)
-    //QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiStorageData, ApiResourceData, ApiStorageFields);
-    QN_FUSION_DECLARE_FUNCTIONS(ApiStorageData, (binary))
+#define ApiStorageData_Fields  (spaceLimit)(usedForWriting)
+
 
     struct ApiMediaServerData: ApiResourceData
     {
@@ -30,9 +37,9 @@
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define medisServerDataFields (apiUrl) (netAddrList) (flags) (panicMode) (streamingUrl) (version) (authKey) (storages) (maxCameras) (redundancy)
-    //QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiMediaServerData, ApiResourceData, medisServerDataFields);
-    QN_FUSION_DECLARE_FUNCTIONS(ApiMediaServerData, (binary))
-
-    QN_DEFINE_API_OBJECT_LIST_DATA(ApiMediaServerData)
+#define ApiMediaServerData_Fields (apiUrl)(netAddrList)(flags)(panicMode)(streamingUrl)(version)(authKey)(storages)(maxCameras)(redundancy)
 	
+} // namespace ec2 
+
+
+#endif // QN_MSERVER_DATA_I_H

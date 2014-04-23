@@ -14,15 +14,15 @@ namespace ec2
     void fromApiToResource(const ApiLayoutData& data, QnLayoutResourcePtr resource);
 
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiLayoutItemData, ApiLayoutItemFields);
+    //QN_DEFINE_STRUCT_SQL_BINDER(ApiLayoutItemData, ApiLayoutItemFields);
 
     struct ApiLayoutItemWithRef: ApiLayoutItemData {
         QnId layoutId;
     };
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiLayoutData, ApiLayoutFields);
+    //QN_DEFINE_STRUCT_SQL_BINDER(ApiLayoutData, ApiLayoutFields);
 
-    struct ApiLayoutList: ApiLayoutDataListData
+    struct ApiLayoutList: std::vector<ApiLayoutData>
     {
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData) const;

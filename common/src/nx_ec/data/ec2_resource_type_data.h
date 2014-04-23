@@ -12,10 +12,10 @@ namespace ec2
 	void fromResourceToApi(const QnResourceTypePtr& resource, ApiResourceTypeData &data);
 	void fromApiToResource(const ApiResourceTypeData &data, QnResourceTypePtr resource);
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceTypeData, ApiResourceTypeFields);
+    //QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceTypeData, ApiResourceTypeFields);
 
-	void loadResourceTypesFromQuery(ApiResourceTypeDataListData &data, QSqlQuery& query);
-	void fromApiToResourceTypeList(const ApiResourceTypeDataListData &data, QnResourceTypeList& resTypeList);
+	//void loadResourceTypesFromQuery(ApiResourceTypeDataListData &data, QSqlQuery& query);
+	//void fromApiToResourceTypeList(const ApiResourceTypeDataListData &data, QnResourceTypeList& resTypeList);
 }
 
 #endif // __EC2_RESOURCE_TYPE_DATA_H_

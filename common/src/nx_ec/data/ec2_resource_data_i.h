@@ -1,6 +1,7 @@
 #ifndef QN_RESOURCE_DATA_I_H
 #define QN_RESOURCE_DATA_I_H
 
+#include "api_types_i.h"
 #include "api_data_i.h"
 
 namespace ec2 {

@@ -5,14 +5,15 @@
 
 #include "ec2_license.h"
 
-//QN_DEFINE_STRUCT_SERIALIZATORS(ApiLicenseData, ApiLicenseFields)
-QN_FUSION_DECLARE_FUNCTIONS(ApiLicenseData, (binary))
-
-    QN_DEFINE_API_OBJECT_LIST_DATA(ApiLicense)
-
-
 namespace ec2
 {
+
+    //QN_DEFINE_STRUCT_SERIALIZATORS(ApiLicenseData, ApiLicenseFields)
+    QN_FUSION_DECLARE_FUNCTIONS(ApiLicenseData, (binary))
+
+        //QN_DEFINE_API_OBJECT_LIST_DATA(ApiLicense)
+
+
     void ApiLicense::fromResource( const QnLicense& lic )
     {
         key = lic.key();
@@ -27,20 +28,20 @@ namespace ec2
 
     void ApiLicenseList::fromResourceList( const QnLicenseList& licList )
     {
-        data.clear();
-        data.resize( licList.size() );
+        clear();
+        resize( licList.size() );
         int i = 0;
         for( const QnLicensePtr& lic: licList )
-            data[i++].fromResource( *lic );
+            (*this)[i++].fromResource( *lic );
     }
 
     void ApiLicenseList::toResourceList( QnLicenseList& licenseList ) const
     {
-        licenseList.reserve(licenseList.size() + data.size());
-        for( int i = 0; i < data.size(); ++i )
+        licenseList.reserve(licenseList.size() + size());
+        for( int i = 0; i < size(); ++i )
         {
             QnLicensePtr license(new QnLicense());
-            data[i].toResource(*license.data());
+            (*this)[i].toResource(*license.data());
             licenseList.push_back( license );
         }
     }

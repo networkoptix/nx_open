@@ -1,6 +1,7 @@
 #ifndef QN_VIDEOWALL_DATA_I_H
 #define QN_VIDEOWALL_DATA_I_H
 
+#include "api_types_i.h"
 #include "ec2_resource_data_i.h"
 
 namespace ec2 {

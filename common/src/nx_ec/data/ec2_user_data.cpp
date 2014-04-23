@@ -1,14 +1,15 @@
 #include "ec2_user_data.h"
 #include "core/resource/user_resource.h"
 
-//QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiUserData, ApiResourceData, ApiUserFields);
-QN_FUSION_DECLARE_FUNCTIONS(ApiUserData, (binary))
-
-QN_DEFINE_API_OBJECT_LIST_DATA(ApiUserData)
-
 
 namespace ec2
 {
+
+    //QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiUserData, ApiResourceData, ApiUserFields);
+    QN_FUSION_DECLARE_FUNCTIONS(ApiUserData, (binary))
+
+        //QN_DEFINE_API_OBJECT_LIST_DATA(ApiUserData)
+
     void fromApiToResource(const ApiUserData& data, QnUserResourcePtr resource)
     {
         fromApiToResource((const ApiResourceData &)data, resource);
@@ -48,20 +49,22 @@ namespace ec2
     template <class T>
     void ApiUserList::toResourceList(QList<T>& outData) const
     {
-        outData.reserve(outData.size() + data.size());
-        for(int i = 0; i < data.size(); ++i) 
+        outData.reserve(outData.size() + size());
+        for(int i = 0; i < size(); ++i) 
         {
             QnUserResourcePtr user(new QnUserResource());
-            fromApiToResource(data[i], user);
+            fromApiToResource((*this)[i], user);
             outData << user;
         }
     }
     template void ApiUserList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData) const;
     template void ApiUserList::toResourceList<QnUserResourcePtr>(QList<QnUserResourcePtr>& outData) const;
 
+#if 0
     void ApiUserList::loadFromQuery(QSqlQuery& query)
     {
         QN_QUERY_TO_DATA_OBJECT(query, ApiUserData, data, ApiUserFields ApiResourceFields)
     }
+#endif
 
 }

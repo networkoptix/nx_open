@@ -2,23 +2,24 @@
 
 #include <core/resource/videowall_resource.h>
 
-//QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallItemData, ApiVideowallItemDataFields)
-QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallItemData, (binary))
-
-    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallScreenData, ApiVideowallScreenDataFields)
-    QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallScreenData, (binary))
-
-    //QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiVideowallData, ApiResourceData, ApiVideowallDataFields);
-    QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallData, (binary))
-
-    QN_DEFINE_API_OBJECT_LIST_DATA(ApiVideowallData)
-
-    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallControlMessageData, ApiVideowallControlMessageDataFields)
-    QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallControlMessageData, (binary))
 
 
 namespace ec2
 {
+
+    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallItemData, ApiVideowallItemDataFields)
+    QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallItemData, (binary))
+
+        //QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallScreenData, ApiVideowallScreenDataFields)
+        QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallScreenData, (binary))
+
+        //QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiVideowallData, ApiResourceData, ApiVideowallDataFields);
+        QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallData, (binary))
+
+        ///QN_DEFINE_API_OBJECT_LIST_DATA(ApiVideowallData)
+
+        //QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallControlMessageData, ApiVideowallControlMessageDataFields)
+        QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallControlMessageData, (binary))
 
     void fromApiToItem(const ApiVideowallItemData &data, QnVideoWallItem& item) {
         item.uuid       = data.guid;
@@ -105,21 +106,23 @@ namespace ec2
 
     template <class T>
     void ApiVideowallList::toResourceList(QList<T>& outData) const {
-        outData.reserve(outData.size() + data.size());
-        for(int i = 0; i < data.size(); ++i) 
+        outData.reserve(outData.size() + size());
+        for(int i = 0; i < size(); ++i) 
         {
             QnVideoWallResourcePtr videowall(new QnVideoWallResource());
-            fromApiToResource(data[i], videowall);
+            fromApiToResource((*this)[i], videowall);
             outData << videowall;
         }
     }
     template void ApiVideowallList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData) const;
     template void ApiVideowallList::toResourceList<QnVideoWallResourcePtr>(QList<QnVideoWallResourcePtr>& outData) const;
 
+#if 0
     void ApiVideowallList::loadFromQuery(QSqlQuery& query) {
         QN_QUERY_TO_DATA_OBJECT(query, ApiVideowallData, data, ApiVideowallDataFields ApiResourceFields)
     }
 
+#endif
 
     void fromApiToMessage(const ApiVideowallControlMessageData &data, QnVideoWallControlMessage &message) {
         message.operation = static_cast<QnVideoWallControlMessage::QnVideoWallControlOperation>(data.operation);

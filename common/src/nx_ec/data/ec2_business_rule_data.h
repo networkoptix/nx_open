@@ -19,16 +19,16 @@ namespace ec2
         QN_DECLARE_STRUCT_SQL_BINDER();
 
     };
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiBusinessRule, ApiBusinessRuleFields);
+    //QN_DEFINE_STRUCT_SQL_BINDER(ApiBusinessRule, ApiBusinessRuleFields);
 
-    struct ApiBusinessRuleList: public ApiBusinessRuleListData
+    struct ApiBusinessRuleList: std::vector<ApiBusinessRule>
     {
         void loadFromQuery(QSqlQuery& query);
         QnBusinessEventRuleList toResourceList(QnResourcePool* resourcePool) const;
         void fromResourceList(const QnBusinessEventRuleList& inData);
     };
 
-    struct ApiBusinessActionData: public ApiData
+    struct ApiBusinessActionData: ApiData
     {
         qint32 actionType;
         Qn::ToggleState toggleState;

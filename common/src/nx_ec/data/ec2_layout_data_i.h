@@ -1,6 +1,7 @@
 #ifndef QN_LAYOUT_DATA_I_H
 #define QN_LAYOUT_DATA_I_H
 
+#include "api_types_i.h"
 #include "api_data_i.h"
 #include "ec2_resource_data_i.h"
 

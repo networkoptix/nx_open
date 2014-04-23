@@ -10,9 +10,9 @@ namespace ec2
     void fromApiToResource(const ApiUserData& data, QnUserResourcePtr resource);
     void fromResourceToApi(const QnUserResourcePtr resource, ApiUserData& data);
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiUserData, ApiUserFields);
+    //QN_DEFINE_STRUCT_SQL_BINDER(ApiUserData, ApiUserFields);
 
-    struct ApiUserList: public ApiUserDataListData
+    struct ApiUserList: public std::vector<ApiUserData>
     {
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData) const;

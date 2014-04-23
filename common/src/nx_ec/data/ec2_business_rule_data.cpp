@@ -3,17 +3,17 @@
 #include "business/business_action_parameters.h"
 #include "business/business_action_factory.h"
 
-//QN_DEFINE_STRUCT_SERIALIZATORS(ApiBusinessRuleData, ApiBusinessRuleFields);
-QN_FUSION_DECLARE_FUNCTIONS(ApiBusinessRuleData, (binary))
-
-    QN_DEFINE_API_OBJECT_LIST_DATA(ApiBusinessRule)
-
-    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiBusinessActionData, ApiBusinessActionDataFields )
-    QN_FUSION_DECLARE_FUNCTIONS(ApiBusinessActionData, (binary))
-
 
 namespace ec2
 {
+
+    //QN_DEFINE_STRUCT_SERIALIZATORS(ApiBusinessRuleData, ApiBusinessRuleFields);
+    QN_FUSION_DECLARE_FUNCTIONS(ApiBusinessRuleData, (binary))
+
+        //QN_DEFINE_API_OBJECT_LIST_DATA(ApiBusinessRule)
+
+        //QN_DEFINE_STRUCT_SERIALIZATORS (ApiBusinessActionData, ApiBusinessActionDataFields )
+        QN_FUSION_DECLARE_FUNCTIONS(ApiBusinessActionData, (binary))
 
 void ApiBusinessRule::toResource(QnBusinessEventRulePtr resource, QnResourcePool* /* resourcePool */) const
 {
@@ -63,11 +63,11 @@ void ApiBusinessRule::fromResource(const QnBusinessEventRulePtr& resource)
 QnBusinessEventRuleList ApiBusinessRuleList::toResourceList(QnResourcePool* resourcePool) const
 {
     QnBusinessEventRuleList outData;
-    outData.reserve(outData.size() + data.size());
-    for(int i = 0; i < data.size(); ++i) 
+    outData.reserve(outData.size() + size());
+    for(int i = 0; i < size(); ++i) 
     {
         QnBusinessEventRulePtr rule(new QnBusinessEventRule());
-        data[i].toResource(rule, resourcePool);
+        (*this)[i].toResource(rule, resourcePool);
         outData << rule;
     }
     return outData;
@@ -75,17 +75,19 @@ QnBusinessEventRuleList ApiBusinessRuleList::toResourceList(QnResourcePool* reso
 
 void ApiBusinessRuleList::fromResourceList(const QnBusinessEventRuleList& inData)
 {
-    data.reserve(inData.size());
+    reserve(inData.size());
     foreach(const QnBusinessEventRulePtr& bRule, inData) {
-        data.push_back(ApiBusinessRule());
-        data.back().fromResource(bRule);
+        push_back(ApiBusinessRule());
+        back().fromResource(bRule);
     }
 }
 
+#if 0
 void ApiBusinessRuleList::loadFromQuery(QSqlQuery& query)
 {
     QN_QUERY_TO_DATA_OBJECT(query, ApiBusinessRule, data, ApiBusinessRuleFields)
 }
+#endif
 
 void ApiBusinessActionData::fromResource(const QnAbstractBusinessActionPtr& resource)
 {

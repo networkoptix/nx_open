@@ -21,7 +21,7 @@ namespace ec2
         void toResource( QnLicense& license ) const;
     };
 	
-    struct ApiLicenseList : ApiLicenseListData
+    struct ApiLicenseList : std::vector<ApiLicense>
     {
     public:
         void fromResourceList( const QnLicenseList& licList );

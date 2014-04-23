@@ -15,7 +15,7 @@
 namespace ec2
 {
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceParamData, ApiResourceParamFields);
+    //QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceParamData, ApiResourceParamFields);
 
     struct ApiParamList
     {
@@ -45,7 +45,7 @@ namespace ec2
     void fromResourceToApi(const QnResourcePtr& resource, ApiResourceData& resourceData);
     void fromApiToResource(const ApiResourceData& resourceData, QnResourcePtr resource);
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceData,  ApiResourceFields)
+    //QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceData,  ApiResourceFields)
 
     struct ApiResourceList: public ApiData {
         void loadFromQuery(QSqlQuery& query);
