@@ -7040,7 +7040,7 @@ AVAILABLE</source>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="511"/>
         <source>ms</source>
         <extracomment>Suffix for displaying milliseconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>мс</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="499"/>
@@ -7052,37 +7052,37 @@ AVAILABLE</source>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="514"/>
         <source>s</source>
         <extracomment>Suffix for displaying seconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>с</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="517"/>
         <source>m</source>
         <extracomment>Suffix for displaying minutes on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>м</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="520"/>
         <source>h</source>
         <extracomment>Suffix for displaying hours on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>ч</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="523"/>
         <source>d</source>
         <extracomment>Suffix for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>д</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="526"/>
         <source>M</source>
         <extracomment>Suffix for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>М</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="529"/>
         <source>y</source>
         <extracomment>Suffix for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>г</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="533"/>
@@ -8550,8 +8550,7 @@ and you do not have the rights to overwrite it.</source>
         <source>yyyy MMM dd
 hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy
-hh:mm:ss</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1252"/>

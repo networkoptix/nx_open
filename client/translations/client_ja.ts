@@ -6857,61 +6857,61 @@ AVAILABLE</source>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="511"/>
         <source>ms</source>
         <extracomment>Suffix for displaying milliseconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>ms</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="499"/>
         <source>auto</source>
         <extracomment>Translate this into &apos;none&apos; or &apos;forced&apos; if you want to switch off automatic detection of AM/PM usage based on user&apos;s system locale. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>自動</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="514"/>
         <source>s</source>
         <extracomment>Suffix for displaying seconds on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>s</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="517"/>
         <source>m</source>
         <extracomment>Suffix for displaying minutes on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>m</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="520"/>
         <source>h</source>
         <extracomment>Suffix for displaying hours on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>h</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="523"/>
         <source>d</source>
         <extracomment>Suffix for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>d</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="526"/>
         <source>M</source>
         <extracomment>Suffix for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>M</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="529"/>
         <source>y</source>
         <extracomment>Suffix for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>y</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="533"/>
         <source>dd MMMM</source>
         <extracomment>Format for displaying days on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="536"/>
         <source>MMMM</source>
         <extracomment>Format for displaying months on timeline. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>MMMM</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="539"/>
@@ -6920,45 +6920,45 @@ AVAILABLE</source>
         <extracomment>Format for displaying years on timeline. Do not translate this string unless you know what you&apos;re doing.
 ----------
 Format for displaying year caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>yyyy</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="543"/>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>MINUTES</comment>
         <extracomment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy hh:mm</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="546"/>
         <source>dd MMMM yyyy hh:mm ap</source>
         <extracomment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy hh:mm ap</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="549"/>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>HOURS</comment>
         <extracomment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy hh:mm</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="552"/>
         <source>dd MMMM yyyy h ap</source>
         <extracomment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy h ap</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="555"/>
         <source>dd MMMM yyyy</source>
         <extracomment>Format for displaying day caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>dd MMMM yyyy</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="558"/>
         <source>MMMM yyyy</source>
         <extracomment>Format for displaying month caption in timeline&apos;s header. Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>MMMM yyyy</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -8258,20 +8258,19 @@ Do you want to continue?</source>
         <source>yyyy MMM dd
 hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation>yyyy MMM dd
-hh:mm:ss</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1252"/>
         <source>hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip for local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation>hh:mm:ss</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1255"/>
         <source>mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip for short local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
-        <translation>mm:ss</translation>
+        <translation></translation>
     </message>
     <message>
         <source>&apos;Live&apos;</source>
