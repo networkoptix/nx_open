@@ -307,7 +307,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiPanicModeData>(abstractTran, stream);
             
         case ApiCommand::saveCamera:
-            return deliveryTransaction<ApiCamera>(abstractTran, stream);
+            return deliveryTransaction<ApiCameraData>(abstractTran, stream);
         case ApiCommand::saveCameras:
             return deliveryTransaction<ApiCameraList>(abstractTran, stream);
         case ApiCommand::removeCamera:

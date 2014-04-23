@@ -1,4 +1,4 @@
-    struct ScheduleTaskData : ApiData
+    struct ScheduleTaskData: ApiData
     {
         ScheduleTaskData(): startTime(0), endTime(0), doRecordAudio(false), recordType(Qn::RecordingType_Run), dayOfWeek(1), 
                         beforeThreshold(0), afterThreshold(0), streamQuality(Qn::QualityNotDefined), fps(0.0) {}
@@ -12,6 +12,8 @@
         qint16   afterThreshold;
         Qn::StreamQuality  streamQuality;
         qint16   fps;
+
+        QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
     #define apiScheduleTaskFields (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) (beforeThreshold) (afterThreshold) (streamQuality) (fps) 
@@ -28,7 +30,7 @@
         QByteArray          mac;
         QString             login;
         QString             password;
-        std::vector<ScheduleTask>  scheduleTask;
+        std::vector<ScheduleTaskData>  scheduleTask;
         bool                audioEnabled;
         QString             physicalId;
         bool                manuallyAdded;
@@ -41,11 +43,13 @@
         qint32              statusFlags;
         QByteArray          dewarpingParams;
         QString             vendor;
-        std::vector<ApiCameraBookmark> bookmarks;
+        std::vector<ApiCameraBookmarkData> bookmarks;
+
+        QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
     #define apiCameraDataFields (scheduleDisabled) (motionType) (region) (mac) (login) (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) \
                                 (firmware) (groupId) (groupName) (secondaryQuality) (controlDisabled) (statusFlags) (dewarpingParams) (vendor) (bookmarks)
     QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiCameraData, ApiResourceData, apiCameraDataFields);
 
-    QN_DEFINE_API_OBJECT_LIST_DATA(ApiCamera)
+    QN_DEFINE_API_OBJECT_LIST_DATA(ApiCameraData)

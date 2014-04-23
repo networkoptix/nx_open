@@ -140,12 +140,12 @@ namespace ec2
 
 
     template<class QueryProcessorType>
-    QnTransaction<ApiCamera> QnCameraManager<QueryProcessorType>::prepareTransaction(
+    QnTransaction<ApiCameraData> QnCameraManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
         const QnVirtualCameraResourcePtr& resource )
     {
-		QnTransaction<ApiCamera> tran(command, true);
-		tran.params.fromResource(resource);
+		QnTransaction<ApiCameraData> tran(command, true);
+        fromResourceToApi(resource, tran.params);
         return tran;
     }
 

@@ -68,7 +68,7 @@ namespace ec2
         bool contains(const QnAbstractTransaction& tran, const QUuid& hash);
         QUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
 
-        QUuid transactionHash(const QnTransaction<ApiCamera>& tran)              { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiCameraData>& tran)              { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiMediaServerData>& tran)         { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiUserData>& tran)            { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiLayoutData>& tran)          { return tran.params.id; }

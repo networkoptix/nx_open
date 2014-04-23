@@ -93,7 +93,7 @@ namespace ec2
 
 
         //AbstractCameraManager::addCamera
-        registerUpdateFuncHandler<ApiCamera>( restProcessorPool, ApiCommand::saveCamera );
+        registerUpdateFuncHandler<ApiCameraData>( restProcessorPool, ApiCommand::saveCamera );
         //AbstractCameraManager::save
         registerUpdateFuncHandler<ApiCameraList>( restProcessorPool, ApiCommand::saveCameras );
         //AbstractCameraManager::getCameras

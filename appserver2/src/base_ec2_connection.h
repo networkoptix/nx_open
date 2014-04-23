@@ -78,7 +78,7 @@ namespace ec2
             m_businessEventManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiCamera>& tran ) {
+        void triggerNotification( const QnTransaction<ApiCameraData>& tran ) {
             m_cameraManager->triggerNotification( tran );
         }
 

@@ -444,7 +444,7 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCamera& data, qint32 internalId)
+ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO vms_camera (audio_enabled, control_disabled, firmware, vendor, manually_added, resource_ptr_id, region, schedule_disabled, motion_type, group_name, group_id,\
@@ -552,7 +552,7 @@ ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::updateCameraSchedule(const ApiCamera& data, qint32 internalId)
+ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 internalId)
 {
 	QSqlQuery delQuery(m_sdb);
 	delQuery.prepare("DELETE FROM vms_scheduletask where source_id = ?");
@@ -567,7 +567,7 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCamera& data, qint32 intern
                      //:sourceId, :startTime, :endTime, :doRecordAudio, :recordType, :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps)");
     insQuery.prepare("INSERT INTO vms_scheduletask VALUES (NULL, ?,?,?,?,?,?,?,?,?,?)");
     insQuery.bindValue(0, internalId);
-	foreach(const ScheduleTask& task, data.scheduleTask) 
+	foreach(const ScheduleTaskData& task, data.scheduleTask) 
 	{
 		task.autoBindValuesOrdered(insQuery, 1);
 		if (!insQuery.exec()) {
@@ -604,7 +604,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiSetResour
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::saveCamera(const ApiCamera& params)
+ErrorCode QnDbManager::saveCamera(const ApiCameraData& params)
 {
     qint32 internalId;
     ErrorCode result = insertOrReplaceResource(params, &internalId);
@@ -623,14 +623,14 @@ ErrorCode QnDbManager::saveCamera(const ApiCamera& params)
     return result;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCamera>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraData>& tran)
 {
     return saveCamera(tran.params);
 }
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraList>& tran)
 {
-    foreach(const ApiCamera& camera, tran.params.data)
+    foreach(const ApiCameraData& camera, tran.params.data)
     {
         ErrorCode result = saveCamera(camera);
         if (result != ErrorCode::ok)
@@ -1021,7 +1021,7 @@ ErrorCode QnDbManager::removeCameraBookmarks(qint32 internalId) {
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::updateCameraBookmarks(const ApiCamera& data, qint32 internalId) {
+ErrorCode QnDbManager::updateCameraBookmarks(const ApiCameraData& data, qint32 internalId) {
     ErrorCode result = removeCameraBookmarks(internalId);
     if (result != ErrorCode::ok)
         return result;
@@ -1039,7 +1039,7 @@ ErrorCode QnDbManager::updateCameraBookmarks(const ApiCamera& data, qint32 inter
     QSqlQuery tagQuery(m_sdb);
     tagQuery.prepare("INSERT INTO vms_bookmark_tag ( bookmark_guid, name ) VALUES ( :bookmark_guid, :name )");
 
-    foreach(const ApiCameraBookmark& bookmark, data.bookmarks) {
+    foreach(const ApiCameraBookmarkData& bookmark, data.bookmarks) {
         bookmark.autoBindValues(insQuery);
         insQuery.bindValue(":cameraId", internalId);
 
@@ -1461,11 +1461,11 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraList& camer
     std::vector<ScheduleTaskWithRef> sheduleTaskList;
     QN_QUERY_TO_DATA_OBJECT(queryScheduleTask, ScheduleTaskWithRef, sheduleTaskList, apiScheduleTaskFields (sourceId) );
 
-    mergeObjectListData(cameraList.data, sheduleTaskList, &ApiCamera::scheduleTask, &ScheduleTaskWithRef::sourceId);
+    mergeObjectListData(cameraList.data, sheduleTaskList, &ApiCameraData::scheduleTask, &ScheduleTaskWithRef::sourceId);
 
     std::vector<ApiResourceParamWithRef> params;
     QN_QUERY_TO_DATA_OBJECT(queryParams, ApiResourceParamWithRef, params, ApiResourceParamFields (resourceId));
-    mergeObjectListData<ApiCamera>(cameraList.data, params, &ApiCamera::addParams, &ApiResourceParamWithRef::resourceId);
+    mergeObjectListData<ApiCameraData>(cameraList.data, params, &ApiCameraData::addParams, &ApiResourceParamWithRef::resourceId);
 
     {   // load tags
         
@@ -1507,7 +1507,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraList& camer
             }
         }
 
-        mergeObjectListData(cameraList.data, bookmarks, &ApiCamera::bookmarks, &ApiCameraBookmarkWithRef::cameraId);
+        mergeObjectListData(cameraList.data, bookmarks, &ApiCameraData::bookmarks, &ApiCameraBookmarkWithRef::cameraId);
     }
 
 	return ErrorCode::ok;
@@ -1783,7 +1783,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfo& data)
 
 
     mergeObjectListData<ApiMediaServerData>(data.servers.data, kvPairs, &ApiMediaServerData::addParams, &ApiResourceParamWithRef::resourceId);
-    mergeObjectListData<ApiCamera>(data.cameras.data,      kvPairs, &ApiCamera::addParams,      &ApiResourceParamWithRef::resourceId);
+    mergeObjectListData<ApiCameraData>(data.cameras.data,      kvPairs, &ApiCameraData::addParams,      &ApiResourceParamWithRef::resourceId);
     mergeObjectListData<ApiUserData>(data.users.data,          kvPairs, &ApiUserData::addParams,        &ApiResourceParamWithRef::resourceId);
     mergeObjectListData<ApiLayoutData>(data.layouts.data,      kvPairs, &ApiLayoutData::addParams,      &ApiResourceParamWithRef::resourceId);
     mergeObjectListData<ApiVideowallData>(data.videowalls.data,kvPairs, &ApiVideowallData::addParams,   &ApiResourceParamWithRef::resourceId);

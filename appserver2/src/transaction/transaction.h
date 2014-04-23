@@ -42,7 +42,7 @@ namespace ec2
             //!ApiFullInfo,
             getAllDataList,
             
-            //!ApiCamera
+            //!ApiCameraData
             saveCamera,
             //!ApiCameraList
             saveCameras,

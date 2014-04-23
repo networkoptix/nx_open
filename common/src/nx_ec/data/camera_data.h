@@ -13,36 +13,24 @@
 
 namespace ec2
 {
-    struct ScheduleTask;
-    struct ApiCamera;
     #include "camera_data_i.h"
 
-    struct ScheduleTask: ScheduleTaskData
-    {
-        static ScheduleTask fromResource(const QnResourcePtr& cameraRes, const QnScheduleTask& resScheduleTask);
-        QnScheduleTask toResource(const QnId& resourceId) const;
+    void fromTaskToApi(const QnScheduleTask& scheduleTask, ScheduleTaskData &data);
+    void fromApiToTask(const ScheduleTaskData &data, QnScheduleTask &scheduleTask);
 
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
+    QN_DEFINE_STRUCT_SQL_BINDER(ScheduleTaskData, apiScheduleTaskFields);
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ScheduleTask, apiScheduleTaskFields);
-
-    struct ScheduleTaskWithRef: ScheduleTask
+    struct ScheduleTaskWithRef: ScheduleTaskData
     {
         QnId sourceId;
     };
 
-    struct ApiCamera: ApiCameraData
-    {
-        void fromResource(const QnVirtualCameraResourcePtr& resource);
-        void toResource(QnVirtualCameraResourcePtr resource) const;
+    void fromResourceToApi(const QnVirtualCameraResourcePtr& resource, ApiCameraData &data);
+    void fromApiToResource(const ApiCameraData &data, QnVirtualCameraResourcePtr& resource);
 
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiCameraData, apiCameraDataFields);
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiCamera, apiCameraDataFields);
-
-    struct ApiCameraList: ApiCameraListData
+    struct ApiCameraList: ApiCameraDataListData
     {
         void loadFromQuery(QSqlQuery& query);
 

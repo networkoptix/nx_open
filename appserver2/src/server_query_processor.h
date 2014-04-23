@@ -92,7 +92,7 @@ namespace ec2
         void processUpdateAsync(QnTransaction<ApiCameraList>& tran, HandlerType handler )
         {
             Q_ASSERT(tran.command == ApiCommand::saveCameras);
-            return processMultiUpdateAsync<ApiCameraList, ApiCamera>(tran, handler, ApiCommand::saveCamera);
+            return processMultiUpdateAsync<ApiCameraList, ApiCameraData>(tran, handler, ApiCommand::saveCamera);
         }
 
         template<class QueryDataType, class subDataType, class HandlerType>

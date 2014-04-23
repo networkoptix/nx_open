@@ -2,29 +2,29 @@
 
 namespace ec2 {
 
-void ApiCameraBookmark::toBookmark(QnCameraBookmark& bookmark) const {
-    bookmark.guid = guid;
-    bookmark.startTimeMs = startTime;
-    bookmark.durationMs = duration;
-    bookmark.name = name;
-    bookmark.description = description;
-    bookmark.timeout = timeout;
+void fromApiToBookmark(const ApiCameraBookmarkData &data, QnCameraBookmark& bookmark) {
+    bookmark.guid = data.guid;
+    bookmark.startTimeMs = data.startTime;
+    bookmark.durationMs = data.duration;
+    bookmark.name = data.name;
+    bookmark.description = data.description;
+    bookmark.timeout = data.timeout;
     bookmark.tags.clear();
-    for (const QString &tag: tags)
+    for (const QString &tag: data.tags)
         bookmark.tags << tag;
 }
 
-void ApiCameraBookmark::fromBookmark(const QnCameraBookmark& bookmark) {
-    guid = bookmark.guid.toByteArray();
-    startTime = bookmark.startTimeMs;
-    duration = bookmark.durationMs;
-    name = bookmark.name;
-    description = bookmark.description;
-    timeout = bookmark.timeout;
-    tags.clear();
-    tags.reserve(bookmark.tags.size());
+void fromBookmarkToApi(const QnCameraBookmark &bookmark, ApiCameraBookmarkData &data) {
+    data.guid = bookmark.guid.toByteArray();
+    data.startTime = bookmark.startTimeMs;
+    data.duration = bookmark.durationMs;
+    data.name = bookmark.name;
+    data.description = bookmark.description;
+    data.timeout = bookmark.timeout;
+    data.tags.clear();
+    data.tags.reserve(bookmark.tags.size());
     for (const QString &tag: bookmark.tags)
-        tags.push_back(tag.trimmed());
+        data.tags.push_back(tag.trimmed().toLower());
 }
 
 }

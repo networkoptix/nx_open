@@ -128,7 +128,7 @@ namespace ec2
 
         // ------------ transactions --------------------------------------
 
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCamera>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraList>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiMediaServerData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutData>& tran);
@@ -190,13 +190,13 @@ namespace ec2
         ErrorCode insertAddParams(const std::vector<ApiResourceParamData>& params, qint32 internalId);
         ErrorCode deleteAddParams(qint32 resourceId);
 
-        ErrorCode saveCamera(const ApiCamera& params);
-        ErrorCode insertOrReplaceCamera(const ApiCamera& data, qint32 internalId);
-        ErrorCode updateCameraSchedule(const ApiCamera& data, qint32 internalId);
+        ErrorCode saveCamera(const ApiCameraData& params);
+        ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
+        ErrorCode updateCameraSchedule(const ApiCameraData& data, qint32 internalId);
         ErrorCode removeCamera(const QnId& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
         ErrorCode removeCameraBookmarks(qint32 internalId);
-        ErrorCode updateCameraBookmarks(const ApiCamera& data, qint32 internalId);
+        ErrorCode updateCameraBookmarks(const ApiCameraData& data, qint32 internalId);
 
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
         ErrorCode updateStorages(const ApiMediaServerData&);

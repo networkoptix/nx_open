@@ -8,112 +8,120 @@
 
 namespace ec2 {
 
-ScheduleTask ScheduleTask::fromResource(const QnResourcePtr& cameraRes, const QnScheduleTask& resScheduleTask)
-{
-	ScheduleTask result;
-	//result.sourceId = cameraRes->getId();
-	result.startTime = resScheduleTask.getStartTime();
-	result.endTime = resScheduleTask.getEndTime();
-	result.doRecordAudio = resScheduleTask.getDoRecordAudio();
-	result.recordType = resScheduleTask.getRecordingType();
-	result.dayOfWeek = resScheduleTask.getDayOfWeek();
-	result.beforeThreshold = resScheduleTask.getBeforeThreshold();
-	result.afterThreshold = resScheduleTask.getAfterThreshold();
-	result.streamQuality = resScheduleTask.getStreamQuality();
-	result.fps = resScheduleTask.getFps();
-
-	return result;
+void fromTaskToApi(const QnScheduleTask& scheduleTask, ScheduleTaskData &data) {
+	data.startTime = scheduleTask.getStartTime();
+	data.endTime = scheduleTask.getEndTime();
+	data.doRecordAudio = scheduleTask.getDoRecordAudio();
+	data.recordType = scheduleTask.getRecordingType();
+	data.dayOfWeek = scheduleTask.getDayOfWeek();
+	data.beforeThreshold = scheduleTask.getBeforeThreshold();
+	data.afterThreshold = scheduleTask.getAfterThreshold();
+	data.streamQuality = scheduleTask.getStreamQuality();
+	data.fps = scheduleTask.getFps();
 }
 
-QnScheduleTask ScheduleTask::toResource(const QnId& resourceId) const
-{
-	return QnScheduleTask(resourceId, dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio);
+void fromApiToTask(const ScheduleTaskData &data, QnScheduleTask &scheduleTask) {
+    QnScheduleTask::Data taskData;
+    taskData.m_startTime = data.startTime;
+    taskData.m_endTime = data.endTime;
+    taskData.m_doRecordAudio = data.doRecordAudio;
+    taskData.m_recordType = data.recordType;
+    taskData.m_dayOfWeek = data.dayOfWeek;
+    taskData.m_beforeThreshold = data.beforeThreshold;
+    taskData.m_afterThreshold = data.afterThreshold;
+    taskData.m_streamQuality = data.streamQuality;
+    taskData.m_fps = data.fps;
+    
+    scheduleTask.setData(taskData);
 }
 
-void ApiCamera::toResource(QnVirtualCameraResourcePtr resource) const
-{
-	fromApiToResource(*this, resource);
+void fromResourceToApi(const QnVirtualCameraResourcePtr& resource, ApiCameraData &data) {
+     fromResourceToApi(resource, (ApiResourceData &)data);
 
-	resource->setScheduleDisabled(scheduleDisabled);
-	resource->setMotionType(motionType);
+    data.scheduleDisabled = resource->isScheduleDisabled();
+    data.motionType = resource->getMotionType();
 
-	QList<QnMotionRegion> regions;
-	parseMotionRegionList(regions, region);
-	resource->setMotionRegionList(regions, QnDomainMemory);
-
-	resource->setMAC(mac);
-	QAuthenticator auth;
-	auth.setUser(login);
-	auth.setPassword(password);
-	resource->setAuth(auth);
-
-
-	QnScheduleTaskList tasks;
-    tasks.reserve(scheduleTask.size());
-	foreach(ScheduleTask task, scheduleTask)
-		tasks.push_back(task.toResource(id));
-	resource->setScheduleTasks(tasks);
-
-	resource->setAudioEnabled(audioEnabled);
-	resource->setPhysicalId(physicalId);
-	resource->setManuallyAdded(manuallyAdded);
-	resource->setModel(model);
-	resource->setFirmware(firmware);
-	resource->setGroupId(groupId);
-	resource->setGroupName(groupName);
-	resource->setSecondaryStreamQuality(secondaryQuality);
-	resource->setCameraControlDisabled(controlDisabled);
-	resource->setStatusFlags((QnSecurityCamResource::StatusFlags) statusFlags);
-
-	resource->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(dewarpingParams));
-	resource->setVendor(vendor);
-
-    QnCameraBookmarkList outBookmarks;
-    for (int i = 0; i < bookmarks.size(); ++i) {
-        outBookmarks << QnCameraBookmark();
-        bookmarks[i].toBookmark(outBookmarks.last());
+    data.region = serializeMotionRegionList(resource->getMotionRegionList()).toLocal8Bit();
+    data.mac = resource->getMAC().toString().toLocal8Bit();
+    data.login = resource->getAuth().user();
+    data.password = resource->getAuth().password();
+    data.scheduleTask.clear();
+    foreach(const QnScheduleTask &task, resource->getScheduleTasks()) {
+        ScheduleTaskData taskData;
+        fromTaskToApi(task, taskData);
+        data.scheduleTask.push_back(taskData);
     }
-    resource->setBookmarks(outBookmarks);
-}
-
-
-void ApiCamera::fromResource(const QnVirtualCameraResourcePtr& resource)
-{
-    fromResourceToApi(resource, *this);
-
-	scheduleDisabled = resource->isScheduleDisabled();
-	motionType = resource->getMotionType();
-
-
-	QList<QnMotionRegion> regions;
-	region = serializeMotionRegionList(resource->getMotionRegionList()).toLocal8Bit();
-	mac = resource->getMAC().toString().toLocal8Bit();
-	login = resource->getAuth().user();
-	password = resource->getAuth().password();
-	scheduleTask.clear();
-	foreach(QnScheduleTask task, resource->getScheduleTasks())
-		scheduleTask.push_back(ScheduleTask::fromResource(resource, task));
-	audioEnabled = resource->isAudioEnabled();
-	physicalId = resource->getPhysicalId();
-	manuallyAdded = resource->isManuallyAdded();
-	model = resource->getModel();
-	firmware = resource->getFirmware();
-	groupId = resource->getGroupId();
-	groupName = resource->getGroupName();
-	secondaryQuality = resource->secondaryStreamQuality();
-	controlDisabled = resource->isCameraControlDisabled();
-	statusFlags = resource->statusFlags();
-	dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(resource->getDewarpingParams());
-	vendor = resource->getVendor();
+    data.audioEnabled = resource->isAudioEnabled();
+    data.physicalId = resource->getPhysicalId();
+    data.manuallyAdded = resource->isManuallyAdded();
+    data.model = resource->getModel();
+    data.firmware = resource->getFirmware();
+    data.groupId = resource->getGroupId();
+    data.groupName = resource->getGroupName();
+    data.secondaryQuality = resource->secondaryStreamQuality();
+    data.controlDisabled = resource->isCameraControlDisabled();
+    data.statusFlags = resource->statusFlags();
+    data.dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(resource->getDewarpingParams());
+    data.vendor = resource->getVendor();
 
     const QnCameraBookmarkMap& cameraBookmarks = resource->getBookmarks();
-    bookmarks.clear();
-    bookmarks.reserve( cameraBookmarks.size() );
+    data.bookmarks.clear();
+    data.bookmarks.reserve( cameraBookmarks.size() );
     for( const QnCameraBookmark& bookmark: cameraBookmarks )
     {
-        bookmarks.push_back(ApiCameraBookmark());
-        bookmarks.back().fromBookmark(bookmark);
+        ApiCameraBookmarkData bookmarkData;
+        fromBookmarkToApi(bookmark, bookmarkData);
+        data.bookmarks.push_back(bookmarkData);
     }
+}
+
+void fromApiToResource(const ApiCameraData &data, QnVirtualCameraResourcePtr& resource) {
+    fromApiToResource((const ApiResourceData &)data, resource);
+
+    resource->setScheduleDisabled(data.scheduleDisabled);
+    resource->setMotionType(data.motionType);
+
+    QList<QnMotionRegion> regions;
+    parseMotionRegionList(regions, data.region);
+    resource->setMotionRegionList(regions, QnDomainMemory);
+
+    resource->setMAC(data.mac);
+    QAuthenticator auth;
+    auth.setUser(data.login);
+    auth.setPassword(data.password);
+    resource->setAuth(auth);
+
+
+    QnScheduleTaskList tasks;
+    tasks.reserve(data.scheduleTask.size());
+    foreach(const ScheduleTaskData &taskData, data.scheduleTask) {
+        QnScheduleTask task(data.id);
+        fromApiToTask(taskData, task);
+        tasks.push_back(task);
+    }
+    resource->setScheduleTasks(tasks);
+
+    resource->setAudioEnabled(data.audioEnabled);
+    resource->setPhysicalId(data.physicalId);
+    resource->setManuallyAdded(data.manuallyAdded);
+    resource->setModel(data.model);
+    resource->setFirmware(data.firmware);
+    resource->setGroupId(data.groupId);
+    resource->setGroupName(data.groupName);
+    resource->setSecondaryStreamQuality(data.secondaryQuality);
+    resource->setCameraControlDisabled(data.controlDisabled);
+    resource->setStatusFlags((QnSecurityCamResource::StatusFlags) data.statusFlags);
+
+    resource->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(data.dewarpingParams));
+    resource->setVendor(data.vendor);
+
+    QnCameraBookmarkList outBookmarks;
+    for (const ApiCameraBookmarkData &bookmarkData : data.bookmarks) {
+        QnCameraBookmark bookmark;
+        fromApiToBookmark(bookmarkData, bookmark);
+        outBookmarks << bookmark;
+    }
+    resource->setBookmarks(outBookmarks);
 }
 
 template <class T> 
@@ -124,7 +132,7 @@ void ApiCameraList::toResourceList(QList<T>& outData, QnResourceFactory* factory
     {
         QnVirtualCameraResourcePtr camera = factory->createResource(data[i].typeId, QnResourceParams(data[i].url, data[i].vendor)).dynamicCast<QnVirtualCameraResource>();
         if (camera) {
-            data[i].toResource(camera);
+            fromApiToResource(data[i], camera);
             outData << camera;
         }
     }
@@ -134,7 +142,7 @@ void ApiCameraList::fromResourceList(const QList<QnVirtualCameraResourcePtr>& ca
 {
     data.resize(cameras.size());
     for(int i = 0; i < cameras.size(); ++i)
-        data[i].fromResource(cameras[i]);
+        fromResourceToApi(cameras[i], data[i]);
 }
 
 
@@ -144,7 +152,7 @@ template void ApiCameraList::toResourceList<QnVirtualCameraResourcePtr>(QList<Qn
 
 void ApiCameraList::loadFromQuery(QSqlQuery& query)
 {
-    QN_QUERY_TO_DATA_OBJECT(query, ApiCamera, data, apiCameraDataFields ApiResourceFields)
+    QN_QUERY_TO_DATA_OBJECT(query, ApiCameraData, data, apiCameraDataFields ApiResourceFields)
 }
 
 }
