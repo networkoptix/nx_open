@@ -33,9 +33,9 @@ namespace ec2
         //!Implementation of AbstractResourceManager::remove
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
-        void triggerNotification( const QnTransaction<ApiResource>& tran ) {
+        void triggerNotification( const QnTransaction<ApiResourceData>& tran ) {
             QnResourcePtr resource( new QnResource() );
-            tran.params.toResource( resource );
+            fromApiToResource(tran.params, resource);
             QnResourcePtr existResource = m_resCtx.pool->getResourceById(tran.params.id);
             if (existResource)
                 resource->setFlags(existResource->flags());
@@ -53,7 +53,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiResourceParams>& tran ) {
             QnKvPairList outData;
 
-            for( const ApiResourceParam& param: tran.params.params )
+            for( const ApiResourceParamData& param: tran.params.params )
                 outData << QnKvPair(param.name, param.value);
             emit resourceParamsChanged( tran.params.id, outData );
         }
@@ -70,7 +70,7 @@ namespace ec2
         QnTransaction<ApiSetResourceDisabledData> prepareTransaction( ApiCommand::Value command, const QnId& id, bool disabled );
         QnTransaction<ApiResourceParams> prepareTransaction(ApiCommand::Value cmd, const QnId& id, const QnKvPairList& kvPairs);
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value cmd, const QnId& id);
-        QnTransaction<ApiResource> prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource );
+        QnTransaction<ApiResourceData> prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource );
     };
 }
 

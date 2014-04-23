@@ -159,6 +159,8 @@ void QnPtzManageDialog::reject() {
 
 void QnPtzManageDialog::accept() {
     saveData();
+
+    clear();
     QDialog::accept(); // here we skip QnAbstractPtzDialog::accept because we don't want call synchronize()
 }
 
@@ -274,6 +276,8 @@ void QnPtzManageDialog::clear() {
     setController(QnPtzControllerPtr());
     m_model->setPresets(QnPtzPresetList());
     m_model->setTours(QnPtzTourList());
+    ui->tourEditWidget->setSpots(QnPtzTourSpotList());
+    ui->tourEditWidget->setPresets(QnPtzPresetList());
 }
 
 void QnPtzManageDialog::saveData() {
@@ -286,6 +290,14 @@ void QnPtzManageDialog::saveData() {
     }
 
     m_adaptor->setValue(m_model->hotkeys());
+
+    // reset active ptz object if the current active ptz object is an empty tour
+    QnPtzObject ptzObject;
+    if (controller()->getActiveObject(&ptzObject) && ptzObject.type == Qn::TourPtzObject) {
+        QnPtzManageModel::RowData rowData = m_model->rowData(ptzObject.id);
+        if (!rowData.tourModel.tour.isValid(m_model->presets()))
+            controller()->continuousMove(QVector3D(0, 0, 0)); // #TODO: #dklychkov evil hack to reset active object. We should implement an adequate way to do this
+    }
 }
 
 Qn::PtzDataFields QnPtzManageDialog::requiredFields() const {
@@ -667,7 +679,7 @@ void QnPtzManageDialog::updateUi() {
         m_cache->downloadFile(selectedRow.id());
     ui->deleteButton->setEnabled(isPreset || isTour);
     ui->goToPositionButton->setEnabled(isPreset || (isTour && !selectedRow.tourModel.tour.spots.isEmpty()));
-    ui->startTourButton->setEnabled(isValidTour && !selectedRow.tourModel.local);
+    ui->startTourButton->setEnabled(isValidTour && !selectedRow.tourModel.modified);
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(isModified());
 }
 

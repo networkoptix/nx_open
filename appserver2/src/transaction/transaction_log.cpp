@@ -107,8 +107,9 @@ bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& 
         return false;
 
     const qint64 lastTime = itr.value();
-    return lastTime > tran.timestamp ||
-           (lastTime == tran.timestamp && tran.id.peerGUID > qnCommon->moduleGUID());
+    bool rez = lastTime > tran.timestamp ||
+        (lastTime == tran.timestamp && tran.id.peerGUID > qnCommon->moduleGUID());
+   return rez;
 }
 
 ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result)

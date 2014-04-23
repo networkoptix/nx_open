@@ -43,8 +43,6 @@ public:
 
     bool isInitialized() const;
 
-    virtual bool shoudResolveConflicts() const override;
-
     AxisResolution getMaxResolution() const;
     AxisResolution getNearestResolution(const QSize& resolution, float aspectRatio) const;
     float getResolutionAspectRatio(const AxisResolution& resolution) const;

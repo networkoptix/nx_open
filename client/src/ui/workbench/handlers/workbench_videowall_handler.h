@@ -83,6 +83,7 @@ private slots:
     void at_saveVideoWallReviewAction_triggered();
     void at_dropOnVideoWallItemAction_triggered();
     void at_pushMyScreenToVideowallAction_triggered();
+    void at_videowallSettingsAction_triggered();
 
     void at_videoWall_layout_saved(int status, const QnResourceList &resources, int handle);
 

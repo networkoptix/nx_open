@@ -56,7 +56,7 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode saveTransaction(const QnTransaction<ApiVideowallControlMessage>& , const QByteArray&) {
+        ErrorCode saveTransaction(const QnTransaction<ApiVideowallControlMessageData>& , const QByteArray&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -69,10 +69,10 @@ namespace ec2
         QUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
 
         QUuid transactionHash(const QnTransaction<ApiCamera>& tran)              { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiMediaServer>& tran)         { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiUser>& tran)                { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiLayout>& tran)              { return tran.params.id; }
-        QUuid transactionHash(const QnTransaction<ApiVideowall>& tran)           { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiMediaServerData>& tran)         { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiUserData>& tran)            { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiLayoutData>& tran)          { return tran.params.id; }
+        QUuid transactionHash(const QnTransaction<ApiVideowallData>& tran)           { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiBusinessRule>& tran)        { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiIdData>& tran)                  { return makeHash(tran.params.id.toRfc4122(), "ApiIdData"); }
         QUuid transactionHash(const QnTransaction<ApiSetResourceDisabledData>& tran) { return makeHash(tran.params.id.toRfc4122(), "disabled"); }
@@ -83,7 +83,7 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiParamList>& /*tran*/)               { return makeHash("settings", ADD_HASH_DATA) ; }
         QUuid transactionHash(const QnTransaction<ApiStoredFileData>& tran)          { return makeHash(tran.params.path.toUtf8()); }
         QUuid transactionHash(const QnTransaction<ApiStoredFilePath>& tran)          { return makeHash(tran.params.toUtf8()); }
-        QUuid transactionHash(const QnTransaction<ApiResource>& tran)            { return makeHash(tran.params.id.toRfc4122(), "resource"); }
+        QUuid transactionHash(const QnTransaction<ApiResourceData>& tran)            { return makeHash(tran.params.id.toRfc4122(), "resource"); }
         QUuid transactionHash(const QnTransaction<ApiLicense>& tran)                 { return makeHash(tran.params.key, "ApiLicense"); }    //TODO
         QUuid transactionHash(const QnTransaction<ApiResetBusinessRuleData>& /*tran*/)   { return makeHash("reset_brule", ADD_HASH_DATA); }
         
@@ -95,7 +95,7 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiBusinessActionData>& )      { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiEmailSettingsData>& )       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiEmailData>& )               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
-        QUuid transactionHash(const QnTransaction<ApiVideowallControlMessage>& ) { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const QnTransaction<ApiVideowallControlMessageData>& ) { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
     private:
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);

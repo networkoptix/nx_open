@@ -72,8 +72,6 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_audioEnabled( false ),
     m_relayIOInfoRead( false ),
     m_cameraCapabilities( 0 ),
-    m_inputPortCount( 0 ),
-    m_outputPortCount( 0 ),
     m_hiStreamMaxBitrateKbps( 0 ),
     m_loStreamMaxBitrateKbps( 0 ),
     m_cameraOptionsRead( false ),
@@ -159,10 +157,15 @@ int CameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
 //!Implementation of nxcip::BaseCameraManager::getCameraCapabilities
 int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
 {
-    //updating info, if needed
-    int result = updateCameraInfo();
-    if( result )
-        return result;
+    {
+        QMutexLocker lk( &m_mutex );
+        if( !m_cameraOptionsRead )
+        {
+            const int errCode = const_cast<CameraManager*>(this)->readCameraOptions();
+            if( errCode != nxcip::NX_NO_ERROR )
+                return errCode;
+        }
+    }
 
     *capabilitiesMask = m_cameraCapabilities;
     return nxcip::NX_NO_ERROR;
@@ -199,19 +202,24 @@ nxcip::CameraMotionDataProvider* CameraManager::getCameraMotionDataProvider() co
 //!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
 nxcip::CameraRelayIOManager* CameraManager::getCameraRelayIOManager() const
 {
-    //updating info, if needed
-    int result = updateCameraInfo();
-    if( result )
-        return NULL;
+    {
+        QMutexLocker lk( &m_mutex );
+        if( !m_cameraOptionsRead )
+        {
+            const int errCode = const_cast<CameraManager*>(this)->readCameraOptions();
+            if( errCode != nxcip::NX_NO_ERROR )
+                return nullptr;
+        }
+    }
 
     if( !((m_cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability) ||
           (m_cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability)) )
     {
-        return NULL;
+        return nullptr;
     }
 
     if( !m_relayIOManager.get() )
-        m_relayIOManager.reset( new RelayIOManager(const_cast<CameraManager*>(this), m_inputPortCount, m_outputPortCount) );
+        m_relayIOManager.reset( new RelayIOManager(const_cast<CameraManager*>(this), m_relayParamsStr) );
     m_relayIOManager->addRef();
     return m_relayIOManager.get();
 }
@@ -299,7 +307,8 @@ int CameraManager::setResolution( int encoderNum, const nxcip::Resolution& resol
     }
 
     QStringList newCurrentResolutionCoded = m_currentResolutionCoded;
-    Q_ASSERT( encoderNum+1 < newCurrentResolutionCoded.size() );
+    if( encoderNum+1 >= newCurrentResolutionCoded.size() )
+        return nxcip::NX_UNSUPPORTED_RESOLUTION;
     newCurrentResolutionCoded[encoderNum+1] = getResolutionCode( resolution );
 
     //TODO/IMPL validating resolution
@@ -322,63 +331,6 @@ int CameraManager::setResolution( int encoderNum, const nxcip::Resolution& resol
         return errorCode;
 
     m_currentResolutionCoded = newCurrentResolutionCoded;
-    return nxcip::NX_NO_ERROR;
-}
-
-int CameraManager::updateCameraInfo() const
-{
-    //TODO/IMPL
-
-#if 0
-    m_cameraCapabilities |= nxcip::BaseCameraManager::audioCapability | nxcip::BaseCameraManager::sharePixelsCapability;
-
-    std::auto_ptr<SyncHttpClient> httpClient;
-    if( std::strlen(m_info.firmware) == 0 )
-    {
-        //reading firmware, since it is unavailable via MDNS
-        if( !httpClient.get() )
-            httpClient.reset( new SyncHttpClient(
-                CameraPlugin::instance()->networkAccessManager(),
-                m_info.url,
-                DEFAULT_CAMERA_API_PORT,
-                m_credentials ) );
-
-        QByteArray firmware;
-        int status = fetchCameraParameter( httpClient.get(), "root.Properties.Firmware.Version", &firmware );
-        if( status != SyncHttpClient::HTTP_OK )
-            return status == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
-
-        firmware = firmware.mid(firmware.indexOf('=')+1);
-        strncpy( m_info.firmware, firmware.constData(), sizeof(m_info.firmware)-1 );
-        m_info.firmware[sizeof(m_info.firmware)-1] = 0;
-    }
-
-    if( !m_relayIOInfoRead )
-    {
-        if( !httpClient.get() )
-            httpClient.reset( new SyncHttpClient(
-                CameraPlugin::instance()->networkAccessManager(),
-                m_info.url,
-                DEFAULT_CAMERA_API_PORT,
-                m_credentials ) );
-
-        //requesting I/O port information (if needed)
-        int status = fetchCameraParameter( httpClient.get(), "Input.NbrOfInputs", &m_inputPortCount );
-        if( status != SyncHttpClient::HTTP_OK )
-            return status == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
-        if( m_inputPortCount > 0 )
-            m_cameraCapabilities |= BaseCameraManager::relayInputCapability;
-
-        status = fetchCameraParameter( httpClient.get(), "Output.NbrOfOutputs", &m_outputPortCount );
-        if( status != SyncHttpClient::HTTP_OK )
-            return status == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
-        if( m_outputPortCount > 0 )
-            m_cameraCapabilities |= BaseCameraManager::relayOutputCapability;
-
-        m_relayIOInfoRead = true;
-    }
-#endif
-
     return nxcip::NX_NO_ERROR;
 }
 
@@ -495,6 +447,8 @@ int CameraManager::readCameraOptions()
         return http.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
     QList<QByteArray> paramList = http.readWholeMessageBody().split( '\n' );
     bool rtspEnabled = false;
+    int inputPortCount = 0;
+    int outputPortCount = 0;
     for( const QByteArray& paramVal: paramList )
     {
         const QList<QByteArray>& paramValueList = paramVal.split( '=' );
@@ -507,35 +461,25 @@ int CameraManager::readCameraOptions()
         else if( paramValueList[0] == "root.Image.I0.Appearance.Resolution" )
             m_currentResolutionCoded = QString::fromLatin1( paramValueList[1] ).split(',');
         else if( paramValueList[0] == "root.Input.NbrOfInputs" )
-            m_inputPortCount = paramValueList[1].toInt();
-        else if( paramValueList[0].startsWith("root.Input.I") )
         {
-            const int portNumber = paramValueList[0].mid( sizeof("root.Input.I")-1 ).toInt();
-            const QByteArray& inputFieldName = paramValueList[0].mid(paramValueList[0].lastIndexOf('.')+1);
-            if( inputFieldName == "Name" )
-                ;
-            else if( inputFieldName == "Trig" )
-                ;
+            inputPortCount = paramValueList[1].toInt();
+            m_relayParamsStr.push_back( paramVal );
         }
+        else if( paramValueList[0].startsWith("root.Input.") )
+            m_relayParamsStr.push_back( paramVal );
         else if( paramValueList[0] == "root.Output.NbrOfOutputs" )
-            m_outputPortCount = paramValueList[1].toInt();
-        else if( paramValueList[0].startsWith("root.Output.O") )
         {
-            const int portNumber = paramValueList[0].mid( sizeof("root.Output.O")-1 ).toInt();
-            const QByteArray& outputFieldName = paramValueList[0].mid(paramValueList[0].lastIndexOf('.')+1);
-            if( outputFieldName == "Name" )
-                ;
-            else if( outputFieldName == "Trig" )
-                ;
+            outputPortCount = paramValueList[1].toInt();
+            m_relayParamsStr.push_back( paramVal );
         }
+        else if( paramValueList[0].startsWith("root.Output.") )
+            m_relayParamsStr.push_back( paramVal );
     }
 
-#if 0
-    if( m_inputPortCount > 0 )
+    if( inputPortCount > 0 )
         m_cameraCapabilities |= nxcip::BaseCameraManager::relayInputCapability;
-    if( m_outputPortCount > 0 )
+    if( outputPortCount > 0 )
         m_cameraCapabilities |= nxcip::BaseCameraManager::relayOutputCapability;
-#endif
 
     //"/cgi-bin/admin/param.cgi?action=list&group=Image.I0.Appearance.Resolution"
     if( http.get( QLatin1String("/cgi-bin/admin/param.cgi?action=options") ) != QNetworkReply::NoError )

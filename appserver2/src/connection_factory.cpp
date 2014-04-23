@@ -17,7 +17,6 @@
 #include "rest/ec2_update_http_handler.h"
 #include "transaction/transaction.h"
 #include "http/ec2_transaction_tcp_listener.h"
-#include "mutex/distributed_mutex.h"
 #include "version.h"
 
 namespace ec2
@@ -32,13 +31,11 @@ namespace ec2
         qRegisterMetaType<QnFullResourceData>( "QnFullResourceData" );
 
         ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
-        ec2::QnDistributedMutexManager::initStaticInstance( new ec2::QnDistributedMutexManager() );
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     {
         m_directConnection.reset();
-        ec2::QnDistributedMutexManager::initStaticInstance(0);
         ec2::QnTransactionMessageBus::initStaticInstance(0);
     }
 
@@ -70,9 +67,9 @@ namespace ec2
         using namespace std::placeholders;
 
         //AbstractResourceManager::getResourceTypes
-        registerGetFuncHandler<nullptr_t, ApiResourceTypeList>( restProcessorPool, ApiCommand::getResourceTypes );
+        registerGetFuncHandler<nullptr_t, ApiResourceTypeDataListData>( restProcessorPool, ApiCommand::getResourceTypes );
         //AbstractResourceManager::getResource
-        //registerGetFuncHandler<nullptr_t, ApiResource>( restProcessorPool, ApiCommand::getResource );
+        //registerGetFuncHandler<nullptr_t, ApiResourceData>( restProcessorPool, ApiCommand::getResource );
         //AbstractResourceManager::setResourceStatus
         registerUpdateFuncHandler<ApiSetResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
         //AbstractResourceManager::setResourceDisabled
@@ -82,7 +79,7 @@ namespace ec2
         //AbstractResourceManager::save
         registerUpdateFuncHandler<ApiResourceParams>( restProcessorPool, ApiCommand::setResourceParams );
         //AbstractResourceManager::save
-        registerUpdateFuncHandler<ApiResource>( restProcessorPool, ApiCommand::saveResource );
+        registerUpdateFuncHandler<ApiResourceData>( restProcessorPool, ApiCommand::saveResource );
         //AbstractResourceManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeResource );
 
@@ -90,7 +87,7 @@ namespace ec2
         //AbstractMediaServerManager::getServers
         registerGetFuncHandler<nullptr_t, ApiMediaServerList>( restProcessorPool, ApiCommand::getMediaServerList );
         //AbstractMediaServerManager::save
-        registerUpdateFuncHandler<ApiMediaServer>( restProcessorPool, ApiCommand::saveMediaServer );
+        registerUpdateFuncHandler<ApiMediaServerData>( restProcessorPool, ApiCommand::saveMediaServer );
         //AbstractMediaServerManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeMediaServer );
 
@@ -128,17 +125,17 @@ namespace ec2
         //AbstractUserManager::getUsers
         registerGetFuncHandler<nullptr_t, ApiUserList>( restProcessorPool, ApiCommand::getUserList );
         //AbstractUserManager::save
-        registerUpdateFuncHandler<ApiUser>( restProcessorPool, ApiCommand::saveUser );
+        registerUpdateFuncHandler<ApiUserData>( restProcessorPool, ApiCommand::saveUser );
         //AbstractUserManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeUser );
 
         //AbstractVideowallManager::getVideowalls
         registerGetFuncHandler<nullptr_t, ApiVideowallList>( restProcessorPool, ApiCommand::getVideowallList );
         //AbstractVideowallManager::save
-        registerUpdateFuncHandler<ApiVideowall>( restProcessorPool, ApiCommand::saveVideowall );
+        registerUpdateFuncHandler<ApiVideowallData>( restProcessorPool, ApiCommand::saveVideowall );
         //AbstractVideowallManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeVideowall );
-        registerUpdateFuncHandler<ApiVideowallControlMessage>( restProcessorPool, ApiCommand::videowallControl );
+        registerUpdateFuncHandler<ApiVideowallControlMessageData>( restProcessorPool, ApiCommand::videowallControl );
 
         //AbstractLayoutManager::getLayouts
         registerGetFuncHandler<nullptr_t, ApiLayoutList>( restProcessorPool, ApiCommand::getLayoutList );

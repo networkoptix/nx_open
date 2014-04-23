@@ -158,6 +158,11 @@ static const int DEFAUT_RTSP_PORT = 50000;
 static const int DEFAULT_STREAMING_PORT = 50000;
 
 static const int PROXY_POOL_SIZE = 8;
+#ifdef EDGE_SERVER
+static const int DEFAULT_MAX_CAMERAS = 1;
+#else
+static const int DEFAULT_MAX_CAMERAS = 128;
+#endif
 
 //!TODO: #ak have to do something with settings
 class CmdLineArguments
@@ -604,7 +609,6 @@ void initAppServerConnection(const QSettings &settings)
     cl_log.log("Connect to enterprise controller server ", urlNoPassword.toString(), cl_logINFO);
     QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid().toString());
-    //QnAppServerConnectionFactory::setClientType(QLatin1String("server")); //TODO :#GDM VW reimplement
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
     QnAppServerConnectionFactory::setBox(lit(QN_ARM_BOX));
@@ -627,8 +631,6 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     appServerEventsUrlQuery.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
     appServerEventsUrlQuery.addQueryItem("version", QN_ENGINE_VERSION);
     appServerEventsUrlQuery.addQueryItem("format", "pb");
-    //TODO :#GDM VW reimplement
-    //appServerEventsUrlQuery.addQueryItem("ct", QnAppServerConnectionFactory::clientType());
     appServerEventsUrl.setQuery( appServerEventsUrlQuery );
 
     //QnServerMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
@@ -901,7 +903,7 @@ void QnMain::at_peerFound(
         int port = moduleParameters.value("port").toInt();
         QString url = QString(lit("http://%1:%2")).arg(remoteHostAddress).arg(port);
         ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-        ec2Connection->addRemotePeer(url, false);
+        ec2Connection->addRemotePeer(url, false, moduleSeed);
     }
 }
 void QnMain::at_peerLost(
@@ -1188,6 +1190,7 @@ void QnMain::run()
             server = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
             server->setId(serverGuid());
             server->setPanicMode(pm);
+            server->setMaxCameras(DEFAULT_MAX_CAMERAS);
         }
         server->setVersion(QnSoftwareVersion(QN_ENGINE_VERSION));
 

@@ -2,16 +2,18 @@
 #include "caching_proxy_widget.h"
 
 #include <cassert>
-
-#ifdef Q_OS_MACX
-#include <Glu.h>
-#else
-#include <GL/glu.h>
-#endif
+//#ifdef Q_OS_MACX
+//#include <Glu.h>
+//#else
+//#include <GL/glu.h>
+//#endif
+//#define GL_GLEXT_PROTOTYPES 1
+#include <QtGui/qopengl.h>
 
 #include <QtCore/QEvent>
 #include <QtCore/QSysInfo>
-
+#include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/opengl/gl_functions.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -19,7 +21,7 @@
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
-
+#include "opengl_renderer.h"
 
 CachingProxyWidget::CachingProxyWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     QGraphicsProxyWidget(parent, windowFlags),
@@ -40,17 +42,18 @@ void CachingProxyWidget::ensureTextureAllocated() {
     glGenTextures(1, &m_texture);
 
     /* Set texture parameters. */
-    glPushAttrib(GL_ENABLE_BIT);
-    glEnable(GL_TEXTURE_2D);
+//    glPushAttrib(GL_ENABLE_BIT);
+    //Deprecated in OpenGL ES2.0
+    //glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, m_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glPopAttrib();
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+//    glPopAttrib();
 }
 
-void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *) {
+void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget * ) {
     if (painter->paintEngine() == NULL) {
         qnWarning("No OpenGL-compatible paint engine was found.");
         return;
@@ -60,7 +63,6 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
         qnWarning("Painting with the paint engine of type '%1' is not supported", static_cast<int>(painter->paintEngine()->type()));
         return;
     }
-
     ensureTextureAllocated();
     
     ensureCurrentWidgetSynchronized();
@@ -71,13 +73,14 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
     if (exposedWidgetRect.isEmpty())
         return;
 
-    QnGlNativePainting::begin(painter);
+    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
     //glPushAttrib(GL_COLOR_BUFFER_BIT | GL_TEXTURE_BIT);
 
     ensureTextureSynchronized();
 
-    glEnable(GL_TEXTURE_2D);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); /* For opacity to work. */
+    //Deprecated in OpenGL ES2.0
+    //glEnable(GL_TEXTURE_2D);
+//    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); /* For opacity to work. */
 
     glBindTexture(GL_TEXTURE_2D, m_texture);
     glEnable(GL_BLEND);
@@ -88,7 +91,10 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
         QPointF(0.0, 0.0),
         QnGeometry::cwiseDiv(vertexRect.size(), m_image.size())
     );
-    glBegin(GL_QUADS);
+
+    QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(QVector4D(1.0f, 1.0f, 1.0f, effectiveOpacity()));
+    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawBindedTextureOnQuad(rect(),QnGeometry::cwiseDiv(vertexRect.size(), m_image.size()));
+ /*   glBegin(GL_QUADS);
     glColor(1.0, 1.0, 1.0, effectiveOpacity());
     glTexCoord(textureRect.topLeft());
     glVertex(vertexRect.topLeft());
@@ -98,10 +104,11 @@ void CachingProxyWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem
     glVertex(vertexRect.bottomRight());
     glTexCoord(textureRect.bottomLeft());
     glVertex(vertexRect.bottomLeft());
-    glEnd();
+    glEnd();*/
 
     glDisable(GL_BLEND);
-    glDisable(GL_TEXTURE_2D);
+    //Deprecated in OpenGL ES2.0
+    // glDisable(GL_TEXTURE_2D);
 
     //glPopAttrib();
     QnGlNativePainting::end(painter);
@@ -159,17 +166,35 @@ void CachingProxyWidget::ensureTextureSynchronized() {
         return;
     
     currentWidget()->render(&m_image, QPoint(0, 0), currentWidget()->rect());
-
-    glEnable(GL_TEXTURE_2D);
+    //Deprecated in OpenGL ES2.0
+    //glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, m_texture);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, m_image.bytesPerLine() * 8 / m_image.depth());
+//    glPixelStorei(GL_UNPACK_ROW_LENGTH, m_image.bytesPerLine() * 8 / m_image.depth());
 
     /* QImage's Format_ARGB32 corresponds to OpenGL's GL_BGRA on little endian architectures.
      * On big endian architectures, conversion is needed. */
     assert(QSysInfo::ByteOrder == QSysInfo::LittleEndian);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, m_image.bits());
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, m_image.bits());
+    unsigned int row_width = m_image.bytesPerLine() * 8 / m_image.depth();
 
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, NULL);
+    loadImageData(m_image.width(), m_image.height(),row_width,m_image.height(),4,GL_BGRA_EXT,m_image.bits());
+    /*
+    if ( m_image.width() == row_width )
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, m_image.bits());
+    else
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, NULL);
+        for( int y = 0; y < m_image.height(); y++ )
+        {
+            const uchar *row = m_image.bits() + (y*row_width) * 4;
+            glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , m_image.width(), 1, GL_BGRA_EXT, GL_UNSIGNED_BYTE, row );
+        }
+    }*/
+
+
+
+//    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 
     /* No need to restore OpenGL state here, it is done by the caller. */
 

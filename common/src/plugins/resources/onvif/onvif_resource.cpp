@@ -1131,11 +1131,6 @@ int QnPlOnvifResource::round(float value)
 }
 
 
-bool QnPlOnvifResource::shoudResolveConflicts() const
-{
-    return false;
-}
-
 bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source)
 {
     QnPlOnvifResourcePtr onvifR = source.dynamicCast<QnPlOnvifResource>();

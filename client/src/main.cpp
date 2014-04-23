@@ -247,8 +247,6 @@ void initAppServerConnection(const QUuid &videoWallGuid)
         appServerUrl = qnSettings->defaultConnection().url;
 
     QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
-    //TODO: #GDM VW reimplement
-    //QnAppServerConnectionFactory::setClientType(QLatin1String("client"));
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
     if (!videoWallGuid.isNull())
@@ -541,11 +539,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlPulseSearcher::instance());
 #endif
 
-#ifdef Q_OS_WIN
-    //    QnResourceDiscoveryManager::instance()->addDeviceServer(&DesktopDeviceServer::instance());
-#endif // Q_OS_WIN
-
-
     /* Load translation. */
     QnClientTranslationManager *translationManager = qnCommon->instance<QnClientTranslationManager>();
     QnTranslation translation;
@@ -603,7 +596,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if(noVersionMismatchCheck)
         context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
-    /* Initialize desctop camera searcher. */
+    /* Initialize desktop camera searcher. */
 #ifdef Q_OS_WIN
     QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
     QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);
@@ -634,22 +627,19 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Process pending events before executing actions. */
     qApp->processEvents();
 
-        // show beta version warning message for the main instance only
-        if (!noSingleApplication &&
-                !qnSettings->isDevMode() &&
-                QLatin1String(QN_BETA) == QLatin1String("true"))
-            context->action(Qn::BetaVersionMessageAction)->trigger();
+    // show beta version warning message for the main instance only
+    if (!noSingleApplication &&
+        !qnSettings->isDevMode() &&
+        QLatin1String(QN_BETA) == lit("true"))
+        context->action(Qn::BetaVersionMessageAction)->trigger();
 
-        //TODO: #GDM VW make sure this will not spoil various "Open new Window" and "Open .. in new window" actions
-//    if (argc <= 1) {
-        /* If no input files were supplied --- open connection settings dialog. */
-        if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
-            context->menu()->trigger(Qn::ConnectToServerAction,
-                                     QnActionParameters().withArgument(Qn::AutoConnectRole, true));
-        } else if (instantDrop.isEmpty()) {
-            context->menu()->trigger(Qn::ReconnectAction);
-        }
-//    }
+    /* If no input files were supplied --- open connection settings dialog. */
+    if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
+        context->menu()->trigger(Qn::ConnectToServerAction,
+            QnActionParameters().withArgument(Qn::AutoConnectRole, true));
+    } else if (instantDrop.isEmpty()) {
+        context->menu()->trigger(Qn::ReconnectAction);
+    }
 
     if (!videoWallGuid.isNull()) {
         context->menu()->trigger(Qn::DelayedOpenVideoWallItemAction, QnActionParameters()

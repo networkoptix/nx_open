@@ -24,10 +24,6 @@
 
 #include <utils/common/warnings.h>
 
-#ifdef Q_OS_MACX
-    #include <utils/network/icmp_mac.h>
-#endif
-
 #include "version.h"
 
 QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
@@ -45,8 +41,6 @@ QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
     connect(m_timeoutTimer, &QTimer::timeout, this, &QnConnectionTestingDialog::tick);
     m_timeoutTimer->setInterval(100);
     m_timeoutTimer->setSingleShot(false);
-
-    connect(this, &QnConnectionTestingDialog::resourceChecked, this, &QnConnectionTestingDialog::at_resource_result, Qt::QueuedConnection); //thread synch
 }
 
 void QnConnectionTestingDialog::testEnterpriseController(const QUrl &url) {
@@ -61,45 +55,6 @@ void QnConnectionTestingDialog::testEnterpriseController(const QUrl &url) {
         url,
         this,
         &QnConnectionTestingDialog::at_ecConnection_result );
-
-    m_timeoutTimer->start();
-}
-
-static void pingResourceAsync(const QString &host, QPointer<QnConnectionTestingDialog> dialog) {
-    bool success = false;
-    if (!dialog)
-        return;
-
-#ifdef Q_OS_MACX
-    success = Icmp::ping(host, 10000);
-#else
-    QScopedPointer<QTcpSocket> socket(new QTcpSocket());
-    socket->connectToHost(host, 80, QAbstractSocket::ReadOnly);
-    if(socket->waitForConnected()) {
-        socket->disconnectFromHost();
-        success = true;
-    }
-#endif
-
-    if(!dialog)
-        return;
-
-    emit dialog.data()->resourceChecked(success);
-
-}
-
-void QnConnectionTestingDialog::testResource(const QnResourcePtr &resource) {
-    if (!resource)
-        return;
-
-    QUrl url = QUrl::fromUserInput(resource->getUrl());
-
-    qnDebug("Testing connectivity for URL '%1'.", url.host());
-
-    ui->groupBox->setTitle(tr("Testing connection to %1").arg(getFullResourceName(resource, true)));
-
-    QPointer<QnConnectionTestingDialog> owner(this);
-    QtConcurrent::run(&pingResourceAsync, url.host(), owner);
 
     m_timeoutTimer->start();
 }
@@ -180,15 +135,6 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
     }
 
     updateUi(success, detail, helpTopicId);
-}
-
-void QnConnectionTestingDialog::at_resource_result(bool success) {
-    if (!m_timeoutTimer->isActive())
-        return;
-    m_timeoutTimer->stop();
-    ui->progressBar->setValue(ui->progressBar->maximum());
-
-    updateUi(success);
 }
 
 void QnConnectionTestingDialog::updateUi(bool success, const QString &details, int helpTopicId) {

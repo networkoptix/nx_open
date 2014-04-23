@@ -85,7 +85,7 @@ namespace ec2
         void processUpdateAsync(QnTransaction<ApiLayoutList>& tran, HandlerType handler )
         {
             Q_ASSERT(tran.command == ApiCommand::saveLayouts);
-            return processMultiUpdateAsync<ApiLayoutList, ApiLayout>(tran, handler, ApiCommand::saveLayout);
+            return processMultiUpdateAsync<ApiLayoutList, ApiLayoutData>(tran, handler, ApiCommand::saveLayout);
         }
 
         template<class HandlerType>

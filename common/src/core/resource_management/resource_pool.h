@@ -115,10 +115,6 @@ public:
         return activeCamerasByClass(true);
     }
 
-    // TODO #GDM: this is a hack. Fix.
-    bool isLayoutsUpdated() const;
-    void setLayoutsUpdated(bool updateLayouts);
-
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();
 
@@ -132,7 +128,6 @@ signals:
 
 private:
     mutable QMutex m_resourcesMtx;
-    bool m_updateLayouts;
     bool m_tranInProgress;
     QnResourceList m_tmpResources;
     QHash<QString, QnResourcePtr> m_resources;

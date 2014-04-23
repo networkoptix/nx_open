@@ -294,6 +294,7 @@ void DeviceSoapWrapper::calcTimeDrift()
 
 bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
 {
+    return true;
     calcTimeDrift();
 
     PasswordList passwords = passwordsData.getPasswordsByManufacturer(manufacturer);

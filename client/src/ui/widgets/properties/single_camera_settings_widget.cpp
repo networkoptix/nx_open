@@ -35,6 +35,7 @@
 #include <ui/widgets/properties/camera_settings_widget_p.h>
 
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
@@ -73,6 +74,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_motionLayout->setContentsMargins(0, 0, 0, 0);
 
     ui->cameraScheduleWidget->setContext(context());
+    connect(context(), &QnWorkbenchContext::userChanged, this, &QnSingleCameraSettingsWidget::updateLicensesButtonVisible);
 
     /* Set up context help. */
     setHelpTopic(this,                                                      Qn::CameraSettings_Help);
@@ -118,6 +120,12 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
     connect(ui->pingButton,             SIGNAL(clicked()),                      this,   SLOT(at_pingButton_clicked()));
+    connect(ui->moreLicensesButton,     &QPushButton::clicked,                  this,   &QnSingleCameraSettingsWidget::moreLicensesRequested);
+
+    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
+    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
+    connect(qnLicensePool,              SIGNAL(licensesChanged()),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
+    connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
 
     connect(ui->expertSettingsWidget,   SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
 
@@ -135,6 +143,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 
 
     updateFromResource();
+    updateLicensesButtonVisible();
 }
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
@@ -356,10 +365,14 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     if (hasDbChanges()) {
         m_camera->setName(ui->nameEdit->text());
         m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
-        m_camera->setUrl(ui->ipAddressEdit->text());
+        //m_camera->setUrl(ui->ipAddressEdit->text());
         m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
 
-        m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
+        if (m_camera->isDtsBased()) {
+            m_camera->setScheduleDisabled(!ui->analogViewCheckBox->isChecked());
+        } else {
+            m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
+        }
 
         if (!m_camera->isDtsBased()) {
             if (m_hasScheduleChanges) {
@@ -444,6 +457,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
+        ui->analogGroupBox->setVisible(false);
     } else {
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
@@ -467,6 +481,9 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased);
+
+        ui->analogGroupBox->setVisible(m_camera->isDtsBased());
+        ui->analogViewCheckBox->setChecked(!m_camera->isScheduleDisabled());
 
         QString arOverride = m_camera->getProperty(QnMediaResource::customAspectRatioKey());
         ui->arOverrideCheckBox->setChecked(!arOverride.isEmpty());
@@ -533,6 +550,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     updateMotionWidgetFromResource();
     updateMotionAvailability();
+    updateLicenseText();
     updateIpAddressText();
     updateWebPageText();
     updateRecordingParamsAvailability();
@@ -803,6 +821,76 @@ void QnSingleCameraSettingsWidget::at_pingButton_clicked() {
     menu()->trigger(Qn::PingAction, QnActionParameters(m_camera));
 }
 
+void QnSingleCameraSettingsWidget::at_analogViewCheckBox_clicked() {
+    ui->cameraScheduleWidget->setScheduleEnabled(ui->analogViewCheckBox->isChecked());
+}
+
+void QnSingleCameraSettingsWidget::updateLicensesButtonVisible() {
+    ui->moreLicensesButton->setVisible(context()->accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
+}
+
+void QnSingleCameraSettingsWidget::updateLicenseText() {
+    if (!m_camera || !m_camera->isDtsBased())
+        return;
+
+    QnLicenseUsageHelper helper;
+
+    int usedDigitalChange = helper.usedDigital();
+    int usedAnalogChange = helper.usedAnalog();
+    helper.propose(QnVirtualCameraResourceList() << m_camera, ui->analogViewCheckBox->isChecked());
+
+    usedDigitalChange = helper.usedDigital() - usedDigitalChange;
+    usedAnalogChange = helper.usedAnalog() - usedAnalogChange;
+
+    { // digital licenses
+        QString usageText = tr("%n license(s) are used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital());
+        ui->digitalLicensesLabel->setText(usageText);
+        QPalette palette = this->palette();
+        if (!helper.isValid() && helper.required() > 0)
+            setWarningStyle(&palette);
+        ui->digitalLicensesLabel->setPalette(palette);
+    }
+
+    { // analog licenses
+        QString usageText = tr("%n analog license(s) are used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
+        ui->analogLicensesLabel->setText(usageText);
+        QPalette palette = this->palette();
+        if (!helper.isValid() && helper.required() > 0)
+            setWarningStyle(&palette);
+        ui->analogLicensesLabel->setPalette(palette);
+        ui->analogLicensesLabel->setVisible(helper.totalAnalog() > 0);
+    }
+
+    if (ui->analogViewCheckBox->checkState() != Qt::Checked) {
+        ui->requiredLicensesLabel->setVisible(false);
+        return;
+    }
+
+    { // required licenses
+        QPalette palette = this->palette();
+        if (!helper.isValid())
+            setWarningStyle(&palette);
+        ui->requiredLicensesLabel->setPalette(palette);
+        ui->requiredLicensesLabel->setVisible(true);
+    }
+
+    if (helper.required() > 0) {
+        ui->requiredLicensesLabel->setText(tr("Activate %n more license(s).", "", helper.required()));
+    } else if (usedDigitalChange > 0 && usedAnalogChange > 0) {
+        ui->requiredLicensesLabel->setText(tr("%1 more licenses and %2 more analog licenses will be used.")
+            .arg(usedDigitalChange)
+            .arg(usedAnalogChange)
+            );
+    } else if (usedDigitalChange > 0) {
+        ui->requiredLicensesLabel->setText(tr("%n more license(s) will be used.", "", usedDigitalChange));
+    } else if (usedAnalogChange > 0) {
+        ui->requiredLicensesLabel->setText(tr("%n more analog license(s) will be used.", "", usedAnalogChange));
+    }
+    else {
+        ui->requiredLicensesLabel->setText(QString());
+    }
+}
+
 void QnSingleCameraSettingsWidget::updateMaxFPS() {
     if (m_inUpdateMaxFps)
         return; /* Do not show message twice. */
@@ -942,6 +1030,7 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplie
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged() {
+    ui->analogViewCheckBox->setChecked(ui->cameraScheduleWidget->isScheduleEnabled());
     m_scheduleEnabledChanged = true;
 }
 

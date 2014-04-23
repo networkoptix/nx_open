@@ -1,4 +1,4 @@
-    struct ApiPropertyTypeData: public ApiData {
+    struct ApiPropertyTypeData: ApiData {
         QnId resource_type_id;
 
         QString name;
@@ -29,15 +29,17 @@
     #define ApiPropertyTypeFields (resource_type_id) (name) (type) (min) (max) (step) (values) (ui_values) (default_value) (group) (sub_group) (description) (ui) (readonly) (netHelper)
     QN_DEFINE_STRUCT_SERIALIZATORS (ApiPropertyTypeData, ApiPropertyTypeFields)
 
-    struct ApiResourceTypeData : public ApiData {
+    struct ApiResourceTypeData: ApiData {
         QnId id;
         QString name;
         QString manufacture;
         std::vector<QnId> parentId;
-        std::vector<ApiPropertyType> propertyTypeList;
+        std::vector<ApiPropertyTypeData> propertyTypeList;
+
+	    QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
     #define ApiResourceTypeFields (id) (name) (manufacture) (parentId) (propertyTypeList)
     QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceTypeData, ApiResourceTypeFields);
 
-    QN_DEFINE_API_OBJECT_LIST_DATA(ApiResourceType)
+    QN_DEFINE_API_OBJECT_LIST_DATA(ApiResourceTypeData);

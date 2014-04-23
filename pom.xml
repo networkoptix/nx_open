@@ -36,6 +36,7 @@
         <license.environment>production</license.environment>
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
+        <skip.sign>true</skip.sign>
         <beta>true</beta>
         <box></box>
 
@@ -62,7 +63,7 @@
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>        
         <toolchain.version>none</toolchain.version>            
 
-        <additional.defines/>
+        <additional.defines></additional.defines>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
         <qtlib1>Core</qtlib1>
@@ -197,7 +198,7 @@
             <activation>        
                 <file>
                     <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
-                    <missing>build_environment/target/buildenv.timestamp</missing>
+                    <missing>build_environment/target/buildenv1.timestamp</missing>
                 </file> 
             </activation>
             <modules>   
@@ -517,6 +518,7 @@
             </activation>
             <properties>
                 <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>
+                <skip.sign>false</skip.sign>
             </properties>
         </profile>        
     </profiles> 

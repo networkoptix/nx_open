@@ -85,10 +85,10 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiVideowall> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnVideoWallResourcePtr &resource)
+    QnTransaction<ApiVideowallData> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnVideoWallResourcePtr &resource)
     {
-        QnTransaction<ApiVideowall> tran(command, true);
-        tran.params.fromResource( resource );
+        QnTransaction<ApiVideowallData> tran(command, true);
+        fromResourceToApi( resource, tran.params );
         return tran;
     }
 
@@ -101,10 +101,10 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiVideowallControlMessage> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnVideoWallControlMessage &message)
+    QnTransaction<ApiVideowallControlMessageData> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnVideoWallControlMessage &message)
     {
-        QnTransaction<ApiVideowallControlMessage> tran(command, false);
-        tran.params.fromMessage(message);
+        QnTransaction<ApiVideowallControlMessageData> tran(command, false);
+        fromMessageToApi(message, tran.params);
         return tran;
     }
 

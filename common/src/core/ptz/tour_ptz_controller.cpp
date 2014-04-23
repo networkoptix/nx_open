@@ -107,7 +107,8 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
 
     if(restartTour) {
         m_executor->stopTour();
-        m_executor->startTour(activeTour);
+        if(activeTour.isValid(presets))
+            m_executor->startTour(activeTour);
     }
 
     emit changed(Qn::ToursPtzField);
@@ -139,6 +140,10 @@ bool QnTourPtzController::removeTour(const QString &tourId) {
 }
 
 bool QnTourPtzController::activateTour(const QString &tourId) {
+    QnPtzPresetList presets;
+    if(!getPresets(&presets))
+        return false;
+
     QnPtzTour activeTour;
     {
         QMutexLocker locker(&m_mutex);
@@ -155,7 +160,8 @@ bool QnTourPtzController::activateTour(const QString &tourId) {
         m_activeTour = activeTour;
     }
 
-    m_executor->startTour(activeTour);
+    if(activeTour.isValid(presets))
+        m_executor->startTour(activeTour);
 
     return true;
 }

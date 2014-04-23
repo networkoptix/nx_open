@@ -21,13 +21,13 @@ class GZipUncompressor
     public AbstractByteStreamConverter
 {
 public:
-    GZipUncompressor();
+    GZipUncompressor( const std::shared_ptr<AbstractByteStreamFilter>& nextFilter = std::shared_ptr<AbstractByteStreamFilter>() );
     virtual ~GZipUncompressor();
 
     //!Implementation of \a AbstractByteStreamFilter::processData
     virtual void processData( const QnByteArrayConstRef& data ) override;
     //!Implementation of \a AbstractByteStreamFilter::flush
-    virtual void flush() override;
+    virtual size_t flush() override;
 
 private:
     enum class State

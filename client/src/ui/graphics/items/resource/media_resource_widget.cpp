@@ -25,6 +25,7 @@
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/home_ptz_controller.h>
 #include <core/ptz/viewport_ptz_controller.h>
+#include <core/ptz/fisheye_home_ptz_controller.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -107,7 +108,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_display(NULL),
     m_renderer(NULL),
     m_motionSensitivityValid(false),
-    m_binaryMotionMaskValid(false)
+    m_binaryMotionMaskValid(false),
+    m_homePtzController(NULL)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource)
@@ -153,8 +155,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     fisheyeController.reset(new QnActivityPtzController(QnActivityPtzController::Local, fisheyeController));
 
     // Small hack because widget's zoomRect is set only in Synchronize method, not instantly --gdm
-    if (item && item->zoomRect().isNull())  // zoom items are not allowed to return home
-        fisheyeController.reset(new QnHomePtzController(fisheyeController));
+    if (item && item->zoomRect().isNull()) { // zoom items are not allowed to return home
+        m_homePtzController = new QnFisheyeHomePtzController(fisheyeController);
+        fisheyeController.reset(m_homePtzController);
+    }
 
     if(QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera)) {
         serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
@@ -292,6 +296,16 @@ QSize QnMediaResourceWidget::motionGridSize() const {
 
 QPoint QnMediaResourceWidget::channelGridOffset(int channel) const {
     return cwiseMul(channelLayout()->position(channel), QSize(MD_WIDTH, MD_HEIGHT));
+}
+
+void QnMediaResourceWidget::suspendHomePtzController() {
+    if (m_homePtzController)
+        m_homePtzController->suspend();
+}
+
+void QnMediaResourceWidget::resumeHomePtzController() {
+    if (m_homePtzController && options().testFlag(DisplayDewarped) && display()->camDisplay()->isRealTimeSource())
+        m_homePtzController->resume();
 }
 
 const QList<QRegion> &QnMediaResourceWidget::motionSelection() const {
@@ -571,7 +585,9 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
-    QnGlNativePainting::begin(painter);
+//	return Qn::NewFrameRendered;
+
+    QnGlNativePainting::begin(m_renderer->glContext(),painter);
 
     qreal opacity = effectiveOpacity();
     bool opaque = qFuzzyCompare(opacity, 1.0);
@@ -748,7 +764,9 @@ void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &par
 int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
     Qn::ResourceStatusOverlay statusOverlay = statusOverlayWidget()->statusOverlay();
 
-    if(statusOverlay == Qn::OfflineOverlay) {
+    if (statusOverlay == Qn::AnalogWithoutLicenseOverlay) {
+        return Qn::MainWindow_MediaItem_AnalogLicense_Help;
+    } else if (statusOverlay == Qn::OfflineOverlay) {
         return Qn::MainWindow_MediaItem_Diagnostics_Help;
     } else if(statusOverlay == Qn::UnauthorizedOverlay) {
         return Qn::MainWindow_MediaItem_Unauthorized_Help;
@@ -767,6 +785,8 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
         return Qn::MainWindow_MediaItem_SmartSearch_Help;
     } else if(m_resource->toResource()->flags() & QnResource::local) {
         return Qn::MainWindow_MediaItem_Local_Help;
+    } else if (m_camera && m_camera->isDtsBased()) {
+        return Qn::MainWindow_MediaItem_AnalogCamera_Help;
     } else {
         return Qn::MainWindow_MediaItem_Help;
     }
@@ -950,14 +970,18 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         return Qn::EmptyOverlay;
     } else if (resource->hasFlags(QnResource::ARCHIVE) && resource->getStatus() == QnResource::Offline) {
         return Qn::NoDataOverlay;
-    } else if (m_display->isPaused() && (options() & DisplayActivity)) {
-        if (!qnSettings->isVideoWallMode())
-            return Qn::PausedOverlay;
-        return Qn::EmptyOverlay;
+
+        
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Offline) {
         return Qn::OfflineOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Unauthorized) {
         return Qn::UnauthorizedOverlay;
+    } else if (m_camera && m_camera->isDtsBased() && m_camera->isScheduleDisabled()) {
+        return Qn::AnalogWithoutLicenseOverlay;
+    } else if (m_display->isPaused() && (options() & DisplayActivity)) {
+        if (!qnSettings->isVideoWallMode())
+            return Qn::PausedOverlay;
+        return Qn::EmptyOverlay;
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
@@ -1022,8 +1046,12 @@ void QnMediaResourceWidget::updateAspectRatio() {
 void QnMediaResourceWidget::at_camDisplay_liveChanged() {
     bool isLive = m_display->camDisplay()->isRealTimeSource();
 
-    if(!isLive)
+    if (!isLive) {
         buttonBar()->setButtonsChecked(PtzButton, false);
+        suspendHomePtzController();
+    } else {
+        resumeHomePtzController();
+    }
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked() {
@@ -1055,12 +1083,13 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked) {
     item()->setDewarpingParams(params); // TODO: #Elric #PTZ move to instrument
 
     setOption(DisplayDewarped, checked);
-    if (checked)
+    if (checked) {
         setOption(DisplayMotion, false);
-
-    if(!checked) {
+        resumeHomePtzController();
+    } else {
         /* Stop all ptz activity. */
         ptzController()->continuousMove(QVector3D(0, 0, 0));
+        suspendHomePtzController();
     }
 
     updateButtonsVisibility();
