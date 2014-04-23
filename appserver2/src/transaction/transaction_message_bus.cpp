@@ -151,6 +151,11 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
                 sender->setState(QnTransactionTransport::Error);
                 return;
             }
+
+            // this is required to allow client place transactions directly into transaction message bus
+            if (tran.command == ApiCommand::getAllDataList)
+                sender->setWriteSync(true);
+
             break;
         }
     }
@@ -605,6 +610,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         QByteArray buffer;
         m_serializer.serializeTran(buffer, tran, PeerList() << transport->remoteGuid() << qnCommon->moduleGUID());
         transport->addData(buffer);
+        transport->setReadSync(true);
     }
     
     QMutexLocker lock(&m_mutex);
