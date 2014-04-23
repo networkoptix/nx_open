@@ -1,4 +1,11 @@
-    struct ApiFullInfoData: ApiData {
+#ifndef QN_FULL_DATA_I_H
+#define QN_FULL_DATA_I_H
+
+#include "api_data_i.h"
+
+namespace ec2 {
+
+struct ApiFullInfoData: ApiData {
         ApiResourceTypeDataListData resTypes;
         ApiMediaServerList servers;
         ApiCameraList cameras;
@@ -11,7 +18,8 @@
         ServerInfo serverInfo;
     };
 
-    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiFullInfoData, (resTypes) (servers) (cameras) (users) (layouts) (videowalls) (rules) (cameraHistory) (licenses) (serverInfo) )
-    //QN_DEFINE_STRUCT_SERIALIZATORS (ServerInfo, (mainHardwareIds) (compatibleHardwareIds) (publicIp) (systemName) (sessionKey) (allowCameraChanges) (armBox))
-    QN_FUSION_DECLARE_FUNCTIONS(ApiFullInfoData, (binary))
-    QN_FUSION_DECLARE_FUNCTIONS(ServerInfo, (binary))
+#define ApiFullInfoData_Fields (resTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(serverInfo)
+
+} // namespace ec2
+
+#endif // QN_FULL_DATA_I_H

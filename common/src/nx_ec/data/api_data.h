@@ -12,9 +12,9 @@ struct TYPE ## ListData: public ApiData {                                       
 QN_FUSION_DECLARE_FUNCTIONS(TYPE ## ListData, (binary))
 
 
-namespace ec2 {
-    #include "api_data_i.h"
-}
+#include "api_data_i.h"
+
+QN_FUSION_DECLARE_FUNCTIONS(ApiIdData, (binary))
 
 #ifndef Q_MOC_RUN
 

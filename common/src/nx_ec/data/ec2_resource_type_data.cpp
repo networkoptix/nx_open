@@ -1,5 +1,13 @@
 #include "ec2_resource_type_data.h"
 
+//QN_DEFINE_STRUCT_SERIALIZATORS (ApiPropertyTypeData, ApiPropertyTypeFields)
+QN_FUSION_DECLARE_FUNCTIONS(ApiPropertyTypeData, (binary))
+//QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceTypeData, ApiResourceTypeFields);
+QN_FUSION_DECLARE_FUNCTIONS(ApiResourceTypeData, (binary))
+
+QN_DEFINE_API_OBJECT_LIST_DATA(ApiResourceTypeData);
+
+
 namespace ec2
 {
 

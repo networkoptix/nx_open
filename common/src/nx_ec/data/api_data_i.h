@@ -1,10 +1,18 @@
-struct ApiData {
-    virtual ~ApiData() {}
-};
+#ifndef QN_API_DATA_I_H
+#define QN_API_DATA_I_H
 
-struct ApiIdData: ApiData {
-    QnId id;
-};
+namespace ec2 {
 
-//QN_DEFINE_STRUCT_SERIALIZATORS(ApiIdData, (id))
-QN_FUSION_DECLARE_FUNCTIONS(ApiIdData, (binary))
+    struct ApiData {
+        virtual ~ApiData() {}
+    };
+
+    struct ApiIdData: ApiData {
+        QnId id;
+    };
+
+#define ApiIdData_Fields (id)
+
+} // namespace ec2
+
+#endif // QN_API_DATA_I_H

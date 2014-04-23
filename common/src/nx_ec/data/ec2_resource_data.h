@@ -9,11 +9,11 @@
 #include <QString>
 #include <vector>
 #include "utils/common/id.h"
+#include "ec2_resource_data_i.h"
 
 
 namespace ec2
 {
-    #include "ec2_resource_data_i.h"
 
     QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceParamData, ApiResourceParamFields);
 

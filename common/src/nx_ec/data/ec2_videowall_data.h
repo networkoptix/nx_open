@@ -7,10 +7,10 @@
 #include <core/resource/videowall_control_message.h>
 
 #include <nx_ec/data/ec2_resource_data.h>
+#include "ec2_videowall_data_i.h"
 
 namespace ec2
 {
-    #include "ec2_videowall_data_i.h"
 
     void fromApiToItem(const ApiVideowallItemData &data, QnVideoWallItem& item);
     void fromItemToApi(const QnVideoWallItem& item, ApiVideowallItemData &data);

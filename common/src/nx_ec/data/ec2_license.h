@@ -10,13 +10,10 @@
 
 #include "api_data.h"
 #include "licensing/license.h"
-
+#include "ec2_license_i.h"
 
 namespace ec2
 {
-    struct ApiLicense;
-    #include "ec2_license_i.h"
-
     struct ApiLicense : ApiLicenseData
     {
     public:

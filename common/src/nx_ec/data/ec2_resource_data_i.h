@@ -1,3 +1,10 @@
+#ifndef QN_RESOURCE_DATA_I_H
+#define QN_RESOURCE_DATA_I_H
+
+#include "api_data_i.h"
+
+namespace ec2 {
+
     struct ApiResourceParamData: ApiData
     {
         ApiResourceParamData() {}
@@ -10,9 +17,8 @@
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define ApiResourceParamFields (value) (name) (isResTypeParam)
-    //QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceParamData, ApiResourceParamFields);
-    QN_FUSION_DECLARE_FUNCTIONS(ApiResourceParamData, (binary))
+#define ApiResourceParamData_Fields (value)(name)(isResTypeParam)
+
 
     struct ApiResourceData: ApiData {
         ApiResourceData(): status(QnResource::Offline), disabled(false) {}
@@ -29,6 +35,8 @@
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define ApiResourceFields (id) (parentGuid) (status) (disabled) (name) (url) (typeId) (addParams)
-    //QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceData,  ApiResourceFields)
-    QN_FUSION_DECLARE_FUNCTIONS(ApiResourceData, (binary))
+#define ApiResourceData_Fields (id)(parentGuid)(status)(disabled)(name)(url)(typeId)(addParams)
+
+} // namespace ec2
+
+#endif // QN_RESOURCE_DATA_I_H

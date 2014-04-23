@@ -5,6 +5,11 @@
 
 #include "ec2_license.h"
 
+//QN_DEFINE_STRUCT_SERIALIZATORS(ApiLicenseData, ApiLicenseFields)
+QN_FUSION_DECLARE_FUNCTIONS(ApiLicenseData, (binary))
+
+    QN_DEFINE_API_OBJECT_LIST_DATA(ApiLicense)
+
 
 namespace ec2
 {

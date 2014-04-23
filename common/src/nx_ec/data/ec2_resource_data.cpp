@@ -1,6 +1,14 @@
 #include "ec2_resource_data.h"
 #include "core/resource/resource.h"
 
+
+//QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceParamData, ApiResourceParamFields);
+QN_FUSION_DECLARE_FUNCTIONS(ApiResourceParamData, (binary))
+
+    //QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceData,  ApiResourceFields)
+    QN_FUSION_DECLARE_FUNCTIONS(ApiResourceData, (binary))
+
+
 namespace ec2 {
 
 void fromResourceToApi(const QnResourcePtr& resource, ApiResourceData& data)

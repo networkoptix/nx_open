@@ -1,6 +1,12 @@
 #include "ec2_user_data.h"
 #include "core/resource/user_resource.h"
 
+//QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiUserData, ApiResourceData, ApiUserFields);
+QN_FUSION_DECLARE_FUNCTIONS(ApiUserData, (binary))
+
+QN_DEFINE_API_OBJECT_LIST_DATA(ApiUserData)
+
+
 namespace ec2
 {
     void fromApiToResource(const ApiUserData& data, QnUserResourcePtr resource)

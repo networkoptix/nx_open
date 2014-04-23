@@ -4,6 +4,12 @@
 
 static const int KV_RESOURCE_PARAMS_COMMON_COUNT = 10;
 
+//QN_DEFINE_STRUCT_SERIALIZATORS (ApiFullInfoData, (resTypes) (servers) (cameras) (users) (layouts) (videowalls) (rules) (cameraHistory) (licenses) (serverInfo) )
+//QN_DEFINE_STRUCT_SERIALIZATORS (ServerInfo, (mainHardwareIds) (compatibleHardwareIds) (publicIp) (systemName) (sessionKey) (allowCameraChanges) (armBox))
+QN_FUSION_DECLARE_FUNCTIONS(ApiFullInfoData, (binary))
+    QN_FUSION_DECLARE_FUNCTIONS(ServerInfo, (binary))
+
+
 namespace ec2
 {
     void ApiFullInfo::toResourceList(QnFullResourceData& outData, const ResourceContext& ctx) const

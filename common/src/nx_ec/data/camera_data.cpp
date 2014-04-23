@@ -5,6 +5,11 @@
 #include <QAuthenticator>
 #include "core/resource/security_cam_resource.h"
 
+//QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiCameraData, ApiResourceData, apiCameraDataFields);
+QN_FUSION_DECLARE_FUNCTIONS(ApiCameraData, (binary))
+
+QN_DEFINE_API_OBJECT_LIST_DATA(ApiCamera)
+
 
 namespace ec2 {
 

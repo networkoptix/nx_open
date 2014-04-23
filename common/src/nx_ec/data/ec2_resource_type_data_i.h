@@ -1,3 +1,9 @@
+#ifndef QN_RESOURCE_TYPE_DATA_I_H
+#define QN_RESOURCE_TYPE_DATA_I_H
+
+#include "api_data_i.h"
+
+namespace ec2 {
     struct ApiPropertyTypeData: ApiData {
         QnId resource_type_id;
 
@@ -26,9 +32,8 @@
         QString netHelper;
     };
 
-    #define ApiPropertyTypeFields (resource_type_id) (name) (type) (min) (max) (step) (values) (ui_values) (default_value) (group) (sub_group) (description) (ui) (readonly) (netHelper)
-    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiPropertyTypeData, ApiPropertyTypeFields)
-    QN_FUSION_DECLARE_FUNCTIONS(ApiPropertyTypeData, (binary))
+#define ApiPropertyTypeData_Fields (resource_type_id)(name)(type)(min)(max)(step)(values)(ui_values)(default_value)(group)(sub_group)(description)(ui)(readonly)(netHelper)
+
 
     struct ApiResourceTypeData: ApiData {
         QnId id;
@@ -40,8 +45,8 @@
 	    QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define ApiResourceTypeFields (id) (name) (manufacture) (parentId) (propertyTypeList)
-    //QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceTypeData, ApiResourceTypeFields);
-    QN_FUSION_DECLARE_FUNCTIONS(ApiResourceTypeData, (binary))
+#define ApiResourceTypeData_Fields (id)(name)(manufacture)(parentId)(propertyTypeList)
 
-    QN_DEFINE_API_OBJECT_LIST_DATA(ApiResourceTypeData);
+} // namespace ec2
+
+#endif // QN_RESOURCE_TYPE_DATA_I_H

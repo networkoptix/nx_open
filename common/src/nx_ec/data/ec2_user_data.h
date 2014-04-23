@@ -3,10 +3,10 @@
 
 #include "ec2_resource_data.h"
 #include "core/resource/resource_fwd.h"
+#include "ec2_user_data_i.h"
 
 namespace ec2
 {
-    #include "ec2_user_data_i.h"
     void fromApiToResource(const ApiUserData& data, QnUserResourcePtr resource);
     void fromResourceToApi(const QnUserResourcePtr resource, ApiUserData& data);
 

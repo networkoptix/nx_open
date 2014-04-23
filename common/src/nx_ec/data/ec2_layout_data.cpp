@@ -2,6 +2,15 @@
 #include "utils/serialization/json.h"
 #include "core/resource/layout_resource.h"
 
+//QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiLayoutData, ApiResourceData, ApiLayoutFields);
+QN_FUSION_DECLARE_FUNCTIONS(ApiLayoutData, (binary))
+
+    QN_DEFINE_API_OBJECT_LIST_DATA(ApiLayoutData);
+
+//QN_DEFINE_STRUCT_SERIALIZATORS(ApiLayoutItemData, ApiLayoutItemFields);
+QN_FUSION_DECLARE_FUNCTIONS(ApiLayoutItemData, (binary))
+
+
 namespace ec2
 {
 

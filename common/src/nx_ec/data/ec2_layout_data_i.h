@@ -1,3 +1,11 @@
+#ifndef QN_LAYOUT_DATA_I_H
+#define QN_LAYOUT_DATA_I_H
+
+#include "api_data_i.h"
+#include "ec2_resource_data_i.h"
+
+namespace ec2 {
+
     struct ApiLayoutItemData: ApiData {
         QByteArray uuid;
         qint32 flags;
@@ -19,9 +27,8 @@
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define ApiLayoutItemFields (uuid) (flags) (left) (top) (right) (bottom) (rotation) (resourceId) (resourcePath) (zoomLeft) (zoomTop) (zoomRight) (zoomBottom) (zoomTargetUuid) (contrastParams) (dewarpingParams)
-    //QN_DEFINE_STRUCT_SERIALIZATORS(ApiLayoutItemData, ApiLayoutItemFields);
-    QN_FUSION_DECLARE_FUNCTIONS(ApiLayoutItemData, (binary))
+    #define ApiLayoutItemData_Fields (uuid)(flags)(left)(top)(right)(bottom)(rotation)(resourceId)(resourcePath) \
+                                    (zoomLeft)(zoomTop)(zoomRight)(zoomBottom)(zoomTargetUuid)(contrastParams)(dewarpingParams)
 
     struct ApiLayoutData : ApiResourceData {
         float cellAspectRatio;
@@ -39,8 +46,10 @@
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define ApiLayoutFields (cellAspectRatio) (cellSpacingWidth) (cellSpacingHeight) (items) (userCanEdit) (locked) (backgroundImageFilename) (backgroundWidth) (backgroundHeight) (backgroundOpacity) (userId)
-    //QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiLayoutData, ApiResourceData, ApiLayoutFields);
-    QN_FUSION_DECLARE_FUNCTIONS(ApiLayoutData, (binary))
 
-    QN_DEFINE_API_OBJECT_LIST_DATA(ApiLayoutData);
+    #define ApiLayoutData_Fields (cellAspectRatio)(cellSpacingWidth)(cellSpacingHeight)(items)(userCanEdit)(locked) \
+                                (backgroundImageFilename)(backgroundWidth)(backgroundHeight)(backgroundOpacity) (userId)
+
+} // namespace ec2
+
+#endif // QN_LAYOUT_DATA_I_H

@@ -9,11 +9,12 @@
 #include "core/resource/camera_resource.h"
 #include "utils/common/id.h"
 
+#include "camera_data_i.h"
+
 namespace ec2
 {
     struct ScheduleTask;
     struct ApiCamera;
-    #include "camera_data_i.h"
 
     struct ScheduleTask: ScheduleTaskData
     {
@@ -48,5 +49,8 @@ namespace ec2
         void fromResourceList(const QList<QnVirtualCameraResourcePtr>& cameras);
     };
 }
+
+QN_FUSION_DECLARE_FUNCTIONS(ScheduleTaskData, (binary))
+
 
 #endif // __API_CAMERA_DATA_H_

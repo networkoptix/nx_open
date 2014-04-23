@@ -6,14 +6,12 @@
 #include "business/business_event_rule.h"
 #include "api_data.h"
 #include "utils/common/id.h"
+#include "ec2_business_rule_data_i.h"
 
 class QnResourcePool;
 
 namespace ec2
 {
-    struct ApiBusinessRule;
-    #include "ec2_business_rule_data_i.h"
-
     struct ApiBusinessRule: ApiBusinessRuleData
     {
         void toResource(QnBusinessEventRulePtr resource, QnResourcePool* resourcePool) const;
@@ -21,13 +19,8 @@ namespace ec2
         QN_DECLARE_STRUCT_SQL_BINDER();
 
     };
-
     QN_DEFINE_STRUCT_SQL_BINDER(ApiBusinessRule, ApiBusinessRuleFields);
-}
 
-
-namespace ec2
-{
     struct ApiBusinessRuleList: public ApiBusinessRuleListData
     {
         void loadFromQuery(QSqlQuery& query);
@@ -50,7 +43,7 @@ namespace ec2
         QnAbstractBusinessActionPtr toResource(QnResourcePool* resourcePool) const;
     };
 
-    #define ApiBusinessActionDataFields (actionType) (toggleState) (receivedFromRemoteHost) (resources) (params) (runtimeParams) (businessRuleId) (aggregationCount)
+    #define ApiBusinessActionData_Fields (actionType)(toggleState)(receivedFromRemoteHost)(resources)(params)(runtimeParams)(businessRuleId)(aggregationCount)
     //QN_DEFINE_STRUCT_SERIALIZATORS (ApiBusinessActionData, ApiBusinessActionDataFields )
     QN_FUSION_DECLARE_FUNCTIONS(ApiBusinessActionData, (binary))
 

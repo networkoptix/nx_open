@@ -3,6 +3,15 @@
 #include "business/business_action_parameters.h"
 #include "business/business_action_factory.h"
 
+//QN_DEFINE_STRUCT_SERIALIZATORS(ApiBusinessRuleData, ApiBusinessRuleFields);
+QN_FUSION_DECLARE_FUNCTIONS(ApiBusinessRuleData, (binary))
+
+    QN_DEFINE_API_OBJECT_LIST_DATA(ApiBusinessRule)
+
+    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiBusinessActionData, ApiBusinessActionDataFields )
+    QN_FUSION_DECLARE_FUNCTIONS(ApiBusinessActionData, (binary))
+
+
 namespace ec2
 {
 

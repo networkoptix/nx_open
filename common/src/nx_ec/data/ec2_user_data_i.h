@@ -1,3 +1,10 @@
+#ifndef QN_USER_DATA_I_H
+#define QN_USER_DATA_I_H
+
+#include "ec2_resource_data_i.h"
+
+namespace ec2 {
+
     struct ApiUserData : ApiResourceData {
         ApiUserData(): isAdmin(false), rights(0) {}
     
@@ -11,8 +18,8 @@
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    #define ApiUserFields (isAdmin) (rights) (email) (digest) (hash)
-    //QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiUserData, ApiResourceData, ApiUserFields);
-    QN_FUSION_DECLARE_FUNCTIONS(ApiUserData, (binary))
+#define ApiUserData_Fields (isAdmin)(rights)(email)(digest)(hash)
 
-    QN_DEFINE_API_OBJECT_LIST_DATA(ApiUserData)
+} // namespace ec2
+
+#endif // QN_USER_DATA_I_H

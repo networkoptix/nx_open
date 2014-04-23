@@ -3,11 +3,10 @@
 
 #include "ec2_resource_data.h"
 #include "core/resource/layout_item_data.h"
+#include "ec2_layout_data_i.h"
 
 namespace ec2
 {
-    #include "ec2_layout_data_i.h"
-
     void fromApiToResource(const ApiLayoutItemData& data, QnLayoutItemData& resource);
     void fromResourceToApi(QnLayoutResourcePtr resource, ApiLayoutData& data);
 

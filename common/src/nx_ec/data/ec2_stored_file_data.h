@@ -1,4 +1,3 @@
-
 #ifndef EC2_STORED_FILE_DATA_H
 #define EC2_STORED_FILE_DATA_H
 

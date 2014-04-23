@@ -3,11 +3,10 @@
 
 #include "core/resource/resource_type.h"
 #include "api_data.h"
+#include "ec2_resource_type_data_i.h"
 
 namespace ec2 
 {
-    #include "ec2_resource_type_data_i.h"
-
     void fromApiToResource(const ApiPropertyTypeData &data, QnParamTypePtr& resource);
 
 	void fromResourceToApi(const QnResourceTypePtr& resource, ApiResourceTypeData &data);

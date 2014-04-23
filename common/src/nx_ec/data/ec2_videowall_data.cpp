@@ -2,6 +2,21 @@
 
 #include <core/resource/videowall_resource.h>
 
+//QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallItemData, ApiVideowallItemDataFields)
+QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallItemData, (binary))
+
+    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallScreenData, ApiVideowallScreenDataFields)
+    QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallScreenData, (binary))
+
+    //QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiVideowallData, ApiResourceData, ApiVideowallDataFields);
+    QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallData, (binary))
+
+    QN_DEFINE_API_OBJECT_LIST_DATA(ApiVideowallData)
+
+    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallControlMessageData, ApiVideowallControlMessageDataFields)
+    QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallControlMessageData, (binary))
+
+
 namespace ec2
 {
 

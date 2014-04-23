@@ -13,11 +13,10 @@
 #include "camera_server_item_data.h"
 #include "ec2_resource_type_data.h"
 #include "ec2_email.h"
+#include "ec2_full_data_i.h"
 
 namespace ec2 
 {
-    #include "ec2_full_data_i.h"
-
     struct ApiFullInfo: public ApiFullInfoData
     {
         void toResourceList(QnFullResourceData&, const ResourceContext&) const;

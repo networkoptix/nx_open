@@ -1,3 +1,11 @@
+#ifndef QN_CAMERA_DATA_I_H
+#define QN_CAMERA_DATA_I_H
+
+#include "api_data_i.h"
+#include "ec2_resource_data_i.h"
+
+namespace ec2 {
+
     struct ScheduleTaskData : ApiData
     {
         ScheduleTaskData(): startTime(0), endTime(0), doRecordAudio(false), recordType(Qn::RecordingType_Run), dayOfWeek(1), 
@@ -14,9 +22,8 @@
         qint16   fps;
     };
 
-    #define apiScheduleTaskFields (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) (beforeThreshold) (afterThreshold) (streamQuality) (fps) 
-    //QN_DEFINE_STRUCT_SERIALIZATORS(ScheduleTaskData, apiScheduleTaskFields);
-    QN_FUSION_DECLARE_FUNCTIONS(ScheduleTaskData, (binary))
+#define ScheduleTaskData_Fields (startTime)(endTime)(doRecordAudio)(recordType)(dayOfWeek)(beforeThreshold)(afterThreshold)(streamQuality)(fps) 
+
 
     struct ApiCameraData: ApiResourceData 
     {
@@ -44,9 +51,8 @@
         QString             vendor;
     };
 
-    #define apiCameraDataFields (scheduleDisabled) (motionType) (region) (mac) (login) (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) \
-                                (firmware) (groupId) (groupName) (secondaryQuality) (controlDisabled) (statusFlags) (dewarpingParams) (vendor)
-    //QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiCameraData, ApiResourceData, apiCameraDataFields);
-    QN_FUSION_DECLARE_FUNCTIONS(ApiCameraData, (binary))
+#define ApiCameraData_Fields (scheduleDisabled)(motionType)(region)(mac)(login)(password)(scheduleTask)(audioEnabled)(physicalId)(manuallyAdded)(model) \
+                            (firmware)(groupId)(groupName)(secondaryQuality)(controlDisabled)(statusFlags)(dewarpingParams)(vendor)
+} // namespace ec2
 
-    QN_DEFINE_API_OBJECT_LIST_DATA(ApiCamera)
+#endif // QN_CAMERA_DATA_I_H

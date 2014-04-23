@@ -3,11 +3,11 @@
 
 #include "ec2_resource_data.h"
 #include "nx_ec/ec_api.h"
+#include "mserver_data_i.h"
 
 
 namespace ec2
 {
-    #include "mserver_data_i.h"
 
     void fromResourceToApi(const QnAbstractStorageResourcePtr &resource, ApiStorageData &data);
     void fromApiToResource(const ApiStorageData &data, QnAbstractStorageResourcePtr &resource);

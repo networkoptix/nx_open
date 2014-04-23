@@ -1,4 +1,3 @@
-
 #ifndef EC2_CONNECTION_DATA_H
 #define EC2_CONNECTION_DATA_H
 
@@ -11,9 +10,7 @@
 namespace ec2
 {
     //!Parameters of connect request
-    struct LoginInfo
-    :
-        public ApiData
+    struct LoginInfo: ApiData 
     {
     };
 
