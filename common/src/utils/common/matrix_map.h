@@ -2,14 +2,17 @@
 #define QN_MATRIX_MAP_H
 
 #include <cassert>
+
 #include <QtCore/QPoint>
 #include <QtCore/QRect>
 #include <QHash>
 #include <QtCore/QSet>
 #include <QtCore/QPair>
+
 #include <utils/common/warnings.h>
 #include <utils/common/range.h>
 #include <utils/common/hash.h>
+#include <utils/common/container.h>
 
 /**
  * Matrix map is an abstraction of an infinite two-dimensional sparse array.
@@ -182,9 +185,9 @@ protected:
                         return false;
                 } else {
                     if(conforms) {
-                        qnInsert(*conforming, conforming->end(), QPoint(c, r));
+                        QnContainer::insert(*conforming, conforming->end(), QPoint(c, r));
                     } else {
-                        qnInsert(*nonconforming, nonconforming->end(), QPoint(c, r));
+                        QnContainer::insert(*nonconforming, nonconforming->end(), QPoint(c, r));
                     }
                 }
             }

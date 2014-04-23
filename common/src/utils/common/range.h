@@ -1,7 +1,3 @@
-/* This file was copied from ArXLib with permission of the copyright holder. 
- * See http://code.google.com/p/arxlib/.
- * 
- * Minimal changes were made to make the code conform to C++03 rules and NetworkOptix naming conventions. */
 
 
 // -------------------------------------------------------------------------- //
@@ -147,7 +143,7 @@ namespace arx { namespace detail {
 
 }} // namespace arx::detail
 
-#define ARX_REGISTER_QT_ITERATOR_WRAPPER(CONTAINER)                             \
+#define QN_REGISTER_QT_STL_MAP_ITERATOR(CONTAINER)                             \
 namespace boost {                                                               \
                                                                                 \
   template<class Key, class T>                                                  \
