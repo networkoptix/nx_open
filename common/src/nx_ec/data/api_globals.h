@@ -19,13 +19,14 @@
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 
+#include <api/model/email_attachment.h>
+
 #include <utils/common/id.h>
+#include <business/business_fwd.h>
 #include <core/misc/schedule_recording_type.h>
 #include <core/resource/media_resource.h>
+#include <utils/common/email.h>
 
-namespace ec2 {
-    typedef QList<QByteArray> ByteArrayList;
-}
 
 #endif // QN_API_TYPES_HEADER
 

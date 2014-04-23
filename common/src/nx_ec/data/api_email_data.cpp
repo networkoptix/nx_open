@@ -2,10 +2,6 @@
 
 namespace ec2 {
 
-    ApiEmailSettingsData::ApiEmailSettingsData()
-    {
-    }
-
     void ApiEmailSettingsData::fromResource( const QnEmail::Settings& settings )
     {
         host = settings.server;

@@ -1,24 +1,45 @@
-#ifndef __API_DATA_H__
-#define __API_DATA_H__
+#ifndef QN_API_DATA_H
+#define QN_API_DATA_H
 
-#include <QtSql/QtSql>
-
-#include <utils/common/id.h>
-#include <utils/common/model_functions_fwd.h>
-
-/*#define QN_DEFINE_API_OBJECT_LIST_DATA(TYPE)                                    \
-struct TYPE ## ListData: public ApiData {                                       \
-    std::vector<TYPE> data;                                                     \
-};                                                                              \
-QN_FUSION_DECLARE_FUNCTIONS(TYPE ## ListData, (binary))*/
-
-
-#include "api_data_i.h"
+#include "api_globals.h"
 
 namespace ec2 {
-    QN_FUSION_DECLARE_FUNCTIONS(ApiIdData, (binary))
-}
+    
+    struct ApiData {
+        virtual ~ApiData() {}
+    };
 
+    struct ApiIdData: ApiData {
+        QnId id;
+    };
+#define ApiIdData_Fields (id)
+
+    QN_FUSION_DECLARE_FUNCTIONS(ApiIdData, (binary))
+
+} // namespace ec2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#if 0
 #ifndef Q_MOC_RUN
 
 #define QN_DECLARE_STRUCT_SQL_BINDER() \
@@ -135,4 +156,6 @@ inline void queryFieldToDataObj(QSqlQuery& query, int idx, QnId& field) { field 
 template <class T> void queryFieldToDataObj(QSqlQuery&, int, std::vector<T>&) { ; } // TODO: #Elric wtf?
 template <class T> void queryFieldToDataObj(QSqlQuery& query, int idx, T& field, typename std::enable_if<std::is_enum<T>::value>::type* = NULL ) { field = (T) query.value(idx).toInt(); }
 
-#endif // __API_DATA_H__
+#endif
+
+#endif // QN_API_DATA_H

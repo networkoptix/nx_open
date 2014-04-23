@@ -1,12 +1,12 @@
-#ifndef QN_FULL_DATA_I_H
-#define QN_FULL_DATA_I_H
+#ifndef __EC2_FULL_DATA_H_
+#define __EC2_FULL_DATA_H_
 
-#include "api_types_i.h"
-#include "api_data_i.h"
+#include "api_globals.h"
+#include "api_data.h"
 
-namespace ec2 {
-
-struct ApiFullInfoData: ApiData {
+namespace ec2 
+{
+    struct ApiFullInfoData: ApiData {
         ApiResourceTypeDataListData resTypes;
         ApiMediaServerList servers;
         ApiCameraList cameras;
@@ -16,11 +16,17 @@ struct ApiFullInfoData: ApiData {
         ApiBusinessRuleList rules;
         ApiCameraServerItemList cameraHistory;
         ApiLicenseList licenses;
-        ServerInfo serverInfo;
+        ApiServerInfoData serverInfo;
     };
-
 #define ApiFullInfoData_Fields (resTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(serverInfo)
 
+
+/*
+    struct ApiFullInfo: public ApiFullInfoData
+    {
+        void toResourceList(QnFullResourceData&, const ResourceContext&) const;
+    };
+*/
 } // namespace ec2
 
-#endif // QN_FULL_DATA_I_H
+#endif // __EC2_FULL_DATA_H_

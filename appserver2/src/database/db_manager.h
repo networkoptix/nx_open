@@ -246,7 +246,7 @@ namespace ec2
         int m_adminUserInternalID;
         ApiResourceTypeDataListData m_cachedResTypes;
 
-        void fillServerInfo( ServerInfo* const serverInfo );
+        void fillServerInfo( ApiServerInfoData* const serverInfo );
     };
 };
 

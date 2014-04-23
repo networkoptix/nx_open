@@ -1,12 +1,11 @@
 #ifndef __EC2_LOCK_DATA_H_
 #define __EC2_LOCK_DATA_H_
 
+#include "api_globals.h"
 #include "api_data.h"
 
 namespace ec2
 {
-
-
     struct ApiLockData: public ApiData
     {
         ApiLockData(): timestamp(0) {}
@@ -18,7 +17,7 @@ namespace ec2
     };
 
 //QN_DEFINE_STRUCT_SERIALIZATORS (ApiLockData, (name) (peer) (timestamp) (userData) )
-QN_FUSION_DECLARE_FUNCTIONS(ApiLockData, (binary))
+//QN_FUSION_DECLARE_FUNCTIONS(ApiLockData, (binary))
 
 }
 

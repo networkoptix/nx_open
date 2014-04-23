@@ -30,7 +30,7 @@ namespace ec2
         ErrorCode getLicenses( ApiLicenseList* const licList );
         ErrorCode addLicenses( const ApiLicenseList& licenses );
 
-        void getHardwareId( ServerInfo* const serverInfo );
+        void getHardwareId( ApiServerInfoData* const serverInfo );
         bool validateLicense(const ApiLicense& license) const;
 
     private:

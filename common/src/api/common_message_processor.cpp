@@ -109,7 +109,7 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResour
     onGotInitialNotification(fullData);
 }
 
-void QnCommonMessageProcessor::on_runtimeInfoChanged( const ec2::QnRuntimeInfo& runtimeInfo )
+void QnCommonMessageProcessor::on_runtimeInfoChanged( const ec2::ApiRuntimeData& runtimeInfo )
 {
     QnAppServerConnectionFactory::setPublicIp(runtimeInfo.publicIp);
     QnAppServerConnectionFactory::setSessionKey(runtimeInfo.sessionKey);

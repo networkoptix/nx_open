@@ -1,20 +1,16 @@
-#ifndef __EC2__EMAIL_DATA_H_
-#define __EC2__EMAIL_DATA_H_
+#ifndef QN_API_EMAIL_DATA_H
+#define QN_API_EMAIL_DATA_H
 
-#include <vector>
-
+#include "api_globals.h"
 #include "api_data.h"
-#include "utils/common/email.h"
-#include <api/model/email_attachment.h>
-
 
 namespace ec2
 {
-    class ApiEmailSettingsData
-    :
-        public ApiData
+    class ApiEmailSettingsData: ApiData
     {
     public:
+        ApiEmailSettingsData(): port(0) {}
+
         QString host;
         int port;
         QString user;
@@ -22,19 +18,15 @@ namespace ec2
         QString password;
         QnEmail::ConnectionType connectionType;
 
-        ApiEmailSettingsData();
-
-        void fromResource( const QnEmail::Settings& settings );
-        void toResource( QnEmail::Settings& settings ) const;
+        /*void fromResource( const QnEmail::Settings& settings );
+        void toResource( QnEmail::Settings& settings ) const;* /*/
     };
-
-	#define ApiEmailSettingsFields (host)(port)(user)(password)(connectionType)
-	//QN_DEFINE_STRUCT_SERIALIZATORS( ApiEmailSettingsData, ApiEmailSettingsFields )
-    QN_FUSION_DECLARE_FUNCTIONS(ApiEmailSettingsData, (binary))
+#define ApiEmailSettingsData_Fields (host)(port)(user)(password)(connectionType)
 	
-    class ApiEmailData
-    :
-        public ApiData
+    //QN_DEFINE_STRUCT_SERIALIZATORS( ApiEmailSettingsData, ApiEmailSettingsFields )
+    //QN_FUSION_DECLARE_FUNCTIONS(ApiEmailSettingsData, (binary))
+	
+    class ApiEmailData: ApiData
     {
     public:
         ApiEmailData() {}
@@ -59,4 +51,4 @@ namespace ec2
 	QN_FUSION_DECLARE_FUNCTIONS(ApiEmailData, (binary))
 }
 
-#endif // __EC2__EMAIL_DATA_H_
+#endif // QN_API_EMAIL_DATA_H

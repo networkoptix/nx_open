@@ -1,14 +1,15 @@
 #ifndef QN_SERVER_INFO_I_H
 #define QN_SERVER_INFO_I_H
 
-#include "api_types_i.h"
+#include "api_globals.h"
+#include "api_data.h"
 
 namespace ec2 {
 
-    struct ServerInfo
+    struct ApiServerInfoData: ApiData
     {
-        ByteArrayList mainHardwareIds;
-        ByteArrayList compatibleHardwareIds;
+        QList<QByteArray> mainHardwareIds;
+        QList<QByteArray> compatibleHardwareIds;
 
         QString publicIp;
         QString systemName;

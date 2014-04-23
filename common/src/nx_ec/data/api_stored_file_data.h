@@ -1,16 +1,12 @@
 #ifndef EC2_STORED_FILE_DATA_H
 #define EC2_STORED_FILE_DATA_H
 
+#include "api_globals.h"
 #include "api_data.h"
-
-#include <utils/common/request_param.h>
-
 
 namespace ec2
 {
-    class ApiStoredFileData
-    :
-        public ApiData
+    class ApiStoredFileData: ApiData
     {
     public:
         QString path;
@@ -18,10 +14,10 @@ namespace ec2
     };
 
     //QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS( ApiStoredFileData, (path) (data) )
-    QN_FUSION_DECLARE_FUNCTIONS(ApiStoredFileData, (binary))
+    //QN_FUSION_DECLARE_FUNCTIONS(ApiStoredFileData, (binary))
 
 
-    typedef std::vector<QString> ApiStoredDirContents;
+    /*typedef std::vector<QString> ApiStoredDirContents;
 
     typedef QString ApiStoredFilePath;
 
@@ -34,7 +30,7 @@ namespace ec2
             if (params[i].first == lit("folder"))
                 *path = params[i].second;
         }
-    }
+    }*/
 }
 
 

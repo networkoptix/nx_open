@@ -1,12 +1,12 @@
-#ifndef QN_CAMERA_DATA_I_H
-#define QN_CAMERA_DATA_I_H
+#ifndef __API_CAMERA_DATA_H_
+#define __API_CAMERA_DATA_H_
 
-#include "api_types_i.h"
-#include "api_data_i.h"
-#include "ec2_resource_data_i.h"
+#include "api_globals.h"
+#include "api_data.h"
+#include "api_resource_data.h"
 
-namespace ec2 {
-
+namespace ec2
+{
     struct ScheduleTaskData : ApiData
     {
         ScheduleTaskData(): startTime(0), endTime(0), doRecordAudio(false), recordType(Qn::RecordingType_Run), dayOfWeek(1), 
@@ -22,11 +22,14 @@ namespace ec2 {
         Qn::StreamQuality  streamQuality;
         qint16   fps;
     };
-
 #define ScheduleTaskData_Fields (startTime)(endTime)(doRecordAudio)(recordType)(dayOfWeek)(beforeThreshold)(afterThreshold)(streamQuality)(fps) 
 
+    struct ScheduleTaskWithRefData: ScheduleTaskData
+    {
+        QnId sourceId;
+    };
 
-    struct ApiCameraData: ApiResourceData 
+    struct ApiCameraData: ApiResourceData
     {
         ApiCameraData(): scheduleDisabled(false), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryQuality(Qn::SSQualityNotDefined),
                          controlDisabled(false), statusFlags(0) {}
@@ -37,7 +40,7 @@ namespace ec2 {
         QByteArray          mac;
         QString             login;
         QString             password;
-        std::vector<ScheduleTask>  scheduleTask;
+        std::vector<ScheduleTaskData>  scheduleTask;
         bool                audioEnabled;
         QString             physicalId;
         bool                manuallyAdded;
@@ -51,9 +54,39 @@ namespace ec2 {
         QByteArray          dewarpingParams;
         QString             vendor;
     };
-
 #define ApiCameraData_Fields (scheduleDisabled)(motionType)(region)(mac)(login)(password)(scheduleTask)(audioEnabled)(physicalId)(manuallyAdded)(model) \
                             (firmware)(groupId)(groupName)(secondaryQuality)(controlDisabled)(statusFlags)(dewarpingParams)(vendor)
+
+    /*struct ScheduleTask: ScheduleTaskData
+    {
+        static ScheduleTask fromResource(const QnResourcePtr& cameraRes, const QnScheduleTask& resScheduleTask);
+        QnScheduleTask toResource(const QnId& resourceId) const;
+
+        QN_DECLARE_STRUCT_SQL_BINDER();
+    };
+
+    //QN_DEFINE_STRUCT_SQL_BINDER(ScheduleTask, apiScheduleTaskFields);
+
+    struct ApiCamera: ApiCameraData
+    {
+        void fromResource(const QnVirtualCameraResourcePtr& resource);
+        void toResource(QnVirtualCameraResourcePtr resource) const;
+
+        QN_DECLARE_STRUCT_SQL_BINDER();
+    };
+
+    //QN_DEFINE_STRUCT_SQL_BINDER(ApiCamera, apiCameraDataFields);
+
+    struct ApiCameraList: ApiCameraListData
+    {
+        void loadFromQuery(QSqlQuery& query);
+
+        template <class T> void toResourceList(QList<T>& outData, QnResourceFactory* factory) const;
+        void fromResourceList(const QList<QnVirtualCameraResourcePtr>& cameras);
+    };*/
 } // namespace ec2
 
-#endif // QN_CAMERA_DATA_I_H
+//QN_FUSION_DECLARE_FUNCTIONS(ScheduleTaskData, (binary))
+
+
+#endif // __API_CAMERA_DATA_H_

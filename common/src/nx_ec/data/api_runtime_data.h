@@ -6,13 +6,12 @@
 #ifndef EC2_RUNTIME_INFO_H
 #define EC2_RUNTIME_INFO_H
 
-#include <QtCore/QByteArray>
-#include <QtCore/QString>
-
+#include "api_globals.h"
+#include "api_data.h"
 
 namespace ec2
 {
-    class QnRuntimeInfo
+    class ApiRuntimeData: ApiData
     {
     public:
         QString publicIp;
@@ -21,7 +20,7 @@ namespace ec2
     };
 
     //QN_DEFINE_STRUCT_SERIALIZATORS( QnRuntimeInfo, (publicIp)(sessionKey)(allowCameraChanges) )
-    QN_FUSION_DECLARE_FUNCTIONS(QnRuntimeInfo, (binary))
+    //QN_FUSION_DECLARE_FUNCTIONS(ApiRuntimeData, (binary))
 }
 
 #endif  //EC2_RUNTIME_INFO_H

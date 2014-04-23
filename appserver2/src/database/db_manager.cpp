@@ -1801,7 +1801,7 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFil
     return ErrorCode::ok;
 }
 
-void QnDbManager::fillServerInfo( ServerInfo* const serverInfo )
+void QnDbManager::fillServerInfo( ApiServerInfoData* const serverInfo )
 {
     serverInfo->armBox = QLatin1String(QN_ARM_BOX);
     m_licenseManagerImpl->getHardwareId( serverInfo );

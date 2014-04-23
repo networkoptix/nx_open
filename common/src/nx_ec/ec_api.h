@@ -30,7 +30,7 @@ namespace ec2
 {
     struct QnFullResourceData
     {
-        ServerInfo serverInfo;
+        ApiServerInfoData serverInfo;
         QnResourceTypeList resTypes;
         QnResourceList resources;
         QnBusinessEventRuleList bRules;
@@ -737,7 +737,7 @@ namespace ec2
             \param cameraHistoryItems
         */
         void initNotification(QnFullResourceData fullData);
-        void runtimeInfoChanged(const ec2::QnRuntimeInfo& runtimeInfo);
+        void runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
 
         void remotePeerFound(QnId id, bool isClient, bool isProxy);
         void remotePeerLost(QnId id, bool isClient, bool isProxy);

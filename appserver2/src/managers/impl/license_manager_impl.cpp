@@ -70,7 +70,7 @@ namespace ec2
         return ErrorCode::notImplemented;
     }
 
-    void LicenseManagerImpl::getHardwareId( ServerInfo* const serverInfo )
+    void LicenseManagerImpl::getHardwareId( ApiServerInfoData* const serverInfo )
     {
         int guidCompatibility = 0;
 
