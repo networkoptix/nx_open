@@ -7,7 +7,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <utils/common/warnings.h>
-#include <utils/common/range.h>
 #include <ui/common/geometry.h>
 #include <ui/style/globals.h>
 

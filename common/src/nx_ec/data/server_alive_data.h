@@ -14,7 +14,8 @@ namespace ec2
         bool isClient;
     };
 
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiServerAliveData, (serverId) (isAlive)(isClient) )
+    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiServerAliveData, (serverId) (isAlive)(isClient) )
+    QN_FUSION_DECLARE_FUNCTIONS(ApiServerAliveData, (binary))
 }
 
 #endif // __SERVER_ALIVE_DATA_H_

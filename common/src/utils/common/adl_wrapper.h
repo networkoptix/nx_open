@@ -24,7 +24,7 @@ private:
 };
 
 template<class T>
-QnAdlWrapper<T> adlWrap(const T &value) {
+QnAdlWrapper<T> adl_wrap(const T &value) {
     return QnAdlWrapper<T>(value);
 }
 

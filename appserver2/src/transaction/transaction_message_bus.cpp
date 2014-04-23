@@ -10,6 +10,7 @@
 #include "nx_ec/data/server_alive_data.h"
 #include "transaction_log.h"
 #include "api/app_server_connection.h"
+#include <utils/serialization/binary_functions.h>
 
 namespace ec2
 {
@@ -66,10 +67,10 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     delete m_timer;
 }
 
-void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream)
+void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, QnInputBinaryStream<QByteArray>& stream)
 {
     QnTransaction<ApiServerAliveData> tran(abstractTran);
-    if (!deserialize(tran.params, &stream)) {
+    if (!QnBinary::deserialize(&stream, &tran.params)) {
         qWarning() << "Got invalid ApiServerAliveData transaction. Ignoring";
         return;
     }
@@ -96,8 +97,8 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
         return;
 
     QnAbstractTransaction tran;
-    InputBinaryStream<QByteArray> stream(serializedTran);
-    if (!deserialize(tran, &stream)) {
+    QnInputBinaryStream<QByteArray> stream(serializedTran);
+    if (!QnBinary::deserialize(&stream, &tran)) {
         qWarning() << Q_FUNC_INFO << "Ignore bad transaction data. size=" << serializedTran.size();
         sender->setState(QnTransactionTransport::Error);
         return;
@@ -215,10 +216,10 @@ void QnTransactionMessageBus::sendTransactionInternal(const QnAbstractTransactio
 
 template <class T>
 template <class T2>
-bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbstractTransaction&  abstractTran, InputBinaryStream<QByteArray>& stream)
+bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbstractTransaction&  abstractTran, QnInputBinaryStream<QByteArray>& stream)
 {
     QnTransaction<T2> tran(abstractTran);
-    if (!deserialize(tran.params, &stream))
+    if (!QnBinary::deserialize(&stream, &tran.params))
         return false;
     
     if (abstractTran.persistent && transactionLog && transactionLog->contains(tran))
@@ -231,10 +232,10 @@ bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbst
     return true;
 }
 
-void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, InputBinaryStream<QByteArray>& stream)
+void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, QnInputBinaryStream<QByteArray>& stream)
 {
     ApiLockData params;
-    if (!deserialize(params, &stream)) {
+    if (!QnBinary::deserialize(&stream, &params)) {
         qWarning() << "Bad stream! Ignore transaction " << ApiCommand::toString(tran.command);
     }
     
@@ -244,17 +245,17 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnAbstractT
         emit gotLockResponse(params);
 }
 
-void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>&)
+void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, QnInputBinaryStream<QByteArray>&)
 {
 	sender->setReadSync(true);
 }
 
-bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream)
+bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, QnInputBinaryStream<QByteArray>& stream)
 {
     sender->setWriteSync(true);
 
     QnTranState params;
-    if (deserialize(params, &stream))
+    if (QnBinary::deserialize(&stream, &params))
     {
 
         QList<QByteArray> transactions;
@@ -283,7 +284,7 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
 }
 
 template <class T>
-bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransactionTransport* /*sender*/, QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream)
+bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransactionTransport* /*sender*/, QnAbstractTransaction& abstractTran, QnInputBinaryStream<QByteArray>& stream)
 {
     switch (abstractTran.command)
     {

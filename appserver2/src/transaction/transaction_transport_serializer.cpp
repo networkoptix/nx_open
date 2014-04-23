@@ -1,6 +1,7 @@
 #include "transaction_transport_serializer.h"
 #include "common/common_module.h"
 #include "transaction_message_bus.h"
+#include <utils/serialization/binary_functions.h>
 
 namespace ec2
 {
@@ -13,10 +14,10 @@ namespace ec2
     bool QnTransactionTransportSerializer::deserializeTran(const quint8* chunkPayload, int len,  PeerList& processedPeers, PeerList& dstPeers, QByteArray& tranData)
     {
         QByteArray srcData = QByteArray::fromRawData((const char*) chunkPayload, len);
-        InputBinaryStream<QByteArray> stream(srcData);
-        if (!deserialize(processedPeers, &stream))
+        QnInputBinaryStream<QByteArray> stream(srcData);
+        if (!QnBinary::deserialize(&stream, &processedPeers))
             return false;
-        if (!deserialize(dstPeers, &stream))
+        if (!QnBinary::deserialize(&stream, &dstPeers))
             return false;
         foreach (const QnId& peer, dstPeers)
             Q_ASSERT(!peer.isNull());

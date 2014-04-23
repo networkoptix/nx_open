@@ -234,8 +234,12 @@ namespace QnSerializationDetail {
          * 
          * Note that we wrap a serialized type into a wrapper so that
          * ADL would find only overloads with it as the first parameter. 
-         * Otherwise other overloads could also be discovered. */
-        return deserialize(adlWrap(value), target);
+         * Otherwise other overloads could also be discovered. 
+         *
+         * Also note that adl_wrap is also looked up via ADL, and thus
+         * ADL wrapping for the data type can actually be disabled by
+         * overloading adl_wrap. */
+        return deserialize(adl_wrap(value), target);
     }
 
     /* Internal interface for (de)serializers that use context. */
@@ -252,7 +256,7 @@ namespace QnSerializationDetail {
          * Note that we wrap a json value into a wrapper so that
          * ADL would find only overloads with QJsonValue as the first parameter. 
          * Otherwise other overloads could be discovered. */
-        return deserialize(ctx, adlWrap(value), target);
+        return deserialize(ctx, adl_wrap(value), target);
     }
 
 

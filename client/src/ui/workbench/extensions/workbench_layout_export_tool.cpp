@@ -31,6 +31,7 @@
 #include <launcher/nov_launcher_win.h>
 #endif
 #include "nx_ec/data/ec2_layout_data.h"
+#include "utils/serialization/binary_functions.h"
 
 QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
                                        const QnTimePeriod &period,
@@ -134,8 +135,8 @@ bool QnLayoutExportTool::start() {
     QByteArray layoutData;
     ec2::ApiLayoutData layoutObject;
     fromResourceToApi(m_layout, layoutObject);
-    OutputBinaryStream<QByteArray> stream(&layoutData);
-    serialize(layoutObject, &stream);
+    QnOutputBinaryStream<QByteArray> stream(&layoutData);
+    QnBinary::serialize(layoutObject, &stream);
 
 
     QIODevice* device = m_storage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);

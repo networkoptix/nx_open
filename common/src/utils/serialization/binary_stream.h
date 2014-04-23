@@ -55,4 +55,18 @@ private:
 };
 
 
+/* Disable ADL wrapping for stream types as they are not convertible to anything
+ * anyway. Also when wrapping is enabled, ADL fails to find template overloads. */
+
+template<class Input>
+QnInputBinaryStream<Input> *adl_wrap(QnInputBinaryStream<Input> *value) {
+    return value;
+}
+
+template<class Output>
+QnOutputBinaryStream<Output> adl_wrap(QnOutputBinaryStream<Output> *value) {
+    return value;
+}
+
+
 #endif // QN_SERIALIZATION_BINARY_STREAM_H

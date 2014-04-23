@@ -242,12 +242,12 @@ bool deserialize(QnInputBinaryStream<Input> *stream, QUuid *target) {
 
 template<class T1, class T2, class Output>
 void serialize(const std::pair<T1, T2> &value, QnOutputBinaryStream<Output> *stream) {
-    QnBinary::serialize(value.first);
-    QnBinary::serialize(value.second);
+    QnBinary::serialize(value.first, stream);
+    QnBinary::serialize(value.second, stream);
 }
 
 template<class T1, class T2, class Input>
-void serialize(QnInputBinaryStream<Input> *stream, const std::pair<T1, T2> *target) {
+bool deserialize(QnInputBinaryStream<Input> *stream, std::pair<T1, T2> *target) {
     return 
         QnBinary::deserialize(stream, &target->first) &&
         QnBinary::deserialize(stream, &target->second);
@@ -270,7 +270,7 @@ bool deserialize( T2& value, QnInputBinaryStream<T> *stream, typename std::enabl
 
 template <class T, class Output>
 void serialize(const std::vector<T> &value, QnOutputBinaryStream<Output> *stream) {
-    QnBinaryDetail::serialize_container(value, stream)
+    QnBinaryDetail::serialize_container(value, stream);
 }
 
 template <class T, class Input>

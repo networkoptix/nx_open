@@ -164,12 +164,12 @@ private:
 namespace boost {                                                               \
     template<class Key, class T>                                                \
     struct range_mutable_iterator<CONTAINER<Key, T> > {                         \
-        typedef QnStlMapIterator<typename CONTAINER<Key, T>::iterator, std::pair<const Key, T>, std::pair<const Key &, T &> > type; \
+        typedef QnStlMapIterator<typename CONTAINER<Key, T>::iterator, std::pair<Key, T>, std::pair<const Key &, T &> > type; \
     };                                                                          \
                                                                                 \
     template<class Key, class T>                                                \
     struct range_const_iterator<CONTAINER<Key, T> > {                           \
-        typedef QnStlMapIterator<typename CONTAINER<Key, T>::const_iterator, std::pair<const Key, T>, std::pair<const Key &, const T &> > type; \
+        typedef QnStlMapIterator<typename CONTAINER<Key, T>::const_iterator, std::pair<Key, T>, std::pair<const Key &, const T &> > type; \
     };                                                                          \
 } /* namespace boost */                                                         \
                                                                                 \
