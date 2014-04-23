@@ -72,7 +72,12 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
         controller.reset(new QnWorkaroundPtzController(controller));
 
     camera->setPtzCapabilities(controller->getCapabilities());
-    QnAppServerConnectionFactory::createConnection()->saveAsync(camera, NULL, NULL);
+
+    /* Note that we're creating the controller synchronously in this method,
+     * so saving the resource synchronously also makes perfect sense. 
+     * This also makes it possible to call this method from threads
+     * without event loop. */
+    QnAppServerConnectionFactory::createConnection()->saveSync(camera);
     
     return controller;
 }
