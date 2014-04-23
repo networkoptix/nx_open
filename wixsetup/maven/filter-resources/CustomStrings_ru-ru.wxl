@@ -155,5 +155,5 @@
     <String Id="InstallDirDlgChange"                                Overridable="yes">&amp;Изменить...</String>
     <String Id="InstallDirDlgTitle"                                 Overridable="yes">{\WixUI_Font_Title}Каталог установки</String>
     <String Id="InstallDirDlgDescription"                           Overridable="yes">Далее - установка по умолчанию, Изменить - выбор папки</String>
-    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Install [ProductName] to:</String>        
+    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Путь для установки [ProductName]:</String>        
 </WixLocalization>

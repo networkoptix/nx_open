@@ -17,17 +17,50 @@
 #include "sync_http_client.h"
 
 
+static const int RELAY_INPUT_CHECK_TIMEOUT_MS = 500;
+
 RelayIOManager::RelayIOManager(
     CameraManager* cameraManager,
-    unsigned int inputPortCount,
-    unsigned int outputPortCount )
+    const std::vector<QByteArray>& relayParamsStr )
 :
     m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
-    m_inputPortCount( inputPortCount ),
-    m_outputPortCount( outputPortCount ),
+    m_inputPortCount( 0 ),
+    m_outputPortCount( 0 ),
     m_multipartedParsingState( waitingDelimiter )
 {
+    for( const QByteArray& paramVal: relayParamsStr )
+    {
+        const QList<QByteArray>& paramValueList = paramVal.split( '=' );
+        if( paramValueList.size() < 2 )
+            continue;
+
+        if( paramValueList[0] == "root.Input.NbrOfInputs" )
+            m_inputPortCount = paramValueList[1].toInt();
+        else if( paramValueList[0].startsWith("root.Input.I") )
+        {
+            const int portNumber = paramValueList[0].mid( sizeof("root.Input.I")-1 ).toInt();
+            const QByteArray& inputFieldName = paramValueList[0].mid(paramValueList[0].lastIndexOf('.')+1);
+            if( inputFieldName == "Name" )
+                m_inputPortNameToIndex[QLatin1String(paramValueList[1])] = portNumber+1;
+            //else if( inputFieldName == "Trig" )
+            //    ;
+        }
+        else if( paramValueList[0] == "root.Output.NbrOfOutputs" )
+            m_outputPortCount = paramValueList[1].toInt();
+        else if( paramValueList[0].startsWith("root.Output.O") )
+        {
+            const int portNumber = paramValueList[0].mid( sizeof("root.Output.O")-1 ).toInt();
+            const QByteArray& outputFieldName = paramValueList[0].mid(paramValueList[0].lastIndexOf('.')+1);
+            if( outputFieldName == "Name" )
+                m_outputPortNameToIndex[QLatin1String(paramValueList[1])] = portNumber+1;
+            //else if( outputFieldName == "Trig" )
+            //    ;
+        }
+    }
+
+
+#if 0
     std::auto_ptr<SyncHttpClient> httpClient;
     if( !httpClient.get() )
         httpClient.reset( new SyncHttpClient(
@@ -60,14 +93,15 @@ RelayIOManager::RelayIOManager(
         else if( portDirection == "output" )
             m_outputPortNameToIndex[portName] = i;
     }
+#endif
 
     //moving to networkAccessManager thread
-    moveToThread( CameraPlugin::instance()->networkAccessManager()->thread() );
+    moveToThread( CameraPlugin::instance()->qtEventLoopThread()  /*CameraPlugin::instance()->networkAccessManager()->thread()*/ );
 
-    m_inputCheckTimer.setInterval( 1000 );
+    m_inputCheckTimer.moveToThread( CameraPlugin::instance()->qtEventLoopThread() );
+    m_inputCheckTimer.setInterval( RELAY_INPUT_CHECK_TIMEOUT_MS );
     m_inputCheckTimer.setSingleShot( false );
-    connect( &m_inputCheckTimer, SIGNAL(timeout()), this, SLOT(onTimer()) );
-    m_inputCheckTimer.moveToThread( CameraPlugin::instance()->networkAccessManager()->thread() );
+    connect( &m_inputCheckTimer, &QTimer::timeout, this, &RelayIOManager::onTimer );
 }
 
 RelayIOManager::~RelayIOManager()
@@ -120,12 +154,12 @@ int RelayIOManager::setRelayOutputState(
     if( it == m_outputPortNameToIndex.end() )
         return nxcip::NX_UNKNOWN_PORT_NAME;
 
-    QString cmd = QString::fromLatin1("axis-cgi/io/port.cgi?action=%1:%2").arg(it->second+1).arg(QLatin1String(activate ? "/" : "\\"));
-    if( autoResetTimeoutMS > 0 )
     {
-        //adding auto-reset
-        cmd += QString::number(autoResetTimeoutMS)+QLatin1String(activate ? "\\" : "/");
+        QMutexLocker lk( &m_mutex );
+        //TODO/IMPL cancelling reset timer
     }
+
+    QString cmd = QString::fromLatin1("cgi-bin/io/output.cgi?action=%1:%2").arg(it->second+1).arg(QLatin1String(activate ? "/" : "\\"));
 
     SyncHttpClient httpClient(
         CameraPlugin::instance()->networkAccessManager(),
@@ -137,6 +171,12 @@ int RelayIOManager::setRelayOutputState(
     if( httpClient.statusCode() != SyncHttpClient::HTTP_OK )
         return httpClient.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR; 
 
+    if( autoResetTimeoutMS > 0 )
+    {
+        //TODO/IMPL launching auto-reset timer
+        QMutexLocker lk( &m_mutex );
+    }
+
     return nxcip::NX_NO_ERROR;
 }
 
@@ -146,18 +186,18 @@ int RelayIOManager::startInputPortMonitoring()
         //this method has surely been called not from thread, object belongs to, 
         //so performing asynchronous call and waiting for its completion
 
-    QMetaObject::invokeMethod( &m_inputCheckTimer, "start", Qt::QueuedConnection );
+    //int result = 0;
+    //callSlotFromOwningThread( "startInputPortMonitoringPriv", &result );
+    //return result;
 
-    int result = 0;
-    callSlotFromOwningThread( "startInputPortMonitoringPriv", &result );
-    return result;
+    //TODO/IMPL checking current port state
+
+    QMetaObject::invokeMethod( &m_inputCheckTimer, "start", Qt::QueuedConnection );
+    return nxcip::NX_NO_ERROR;
 }
 
 void RelayIOManager::stopInputPortMonitoring()
 {
-    //performing async call, see notes in startInputPortMonitoring for details
-    callSlotFromOwningThread( "stopInputPortMonitoringPriv" );
-
     QMetaObject::invokeMethod( &m_inputCheckTimer, "stop", Qt::QueuedConnection );
 }
 
@@ -216,158 +256,27 @@ void RelayIOManager::callSlotFromOwningThread( const char* slotName, int* const 
     m_awaitedAsyncCallIDs.erase( asyncCallIter );
 }
 
-void RelayIOManager::startInputPortMonitoringPriv( int asyncCallID )
+void RelayIOManager::onTimer()
 {
-    connect(
-        CameraPlugin::instance()->networkAccessManager(), SIGNAL(finished(QNetworkReply*)),
-        this, SLOT(onConnectionFinished(QNetworkReply*)) );
-
-    const QAuthenticator& auth = m_cameraManager->credentials();
-    QUrl requestUrl;
-    requestUrl.setScheme( QLatin1String("http") );
-    requestUrl.setHost( QString::fromUtf8(m_cameraManager->cameraInfo().url) );
-    requestUrl.setPort( DEFAULT_CAMERA_API_PORT );
-    for( std::map<QString, unsigned int>::const_iterator
-        it = m_inputPortNameToIndex.begin();
-        it != m_inputPortNameToIndex.end();
-        ++it )
+    SyncHttpClient httpClient(
+        CameraPlugin::instance()->networkAccessManager(),
+        m_cameraManager->cameraInfo().url,
+        DEFAULT_CAMERA_API_PORT,
+        m_cameraManager->credentials() );
+    for( unsigned portNumber = 1; portNumber <= m_inputPortCount; ++portNumber )
     {
-        QMutexLocker lk( &m_mutex );
-        std::pair<std::map<unsigned int, QNetworkReply*>::iterator, bool>
-            p = m_inputPortHttpMonitor.insert( std::make_pair( it->second, (QNetworkReply*)NULL ) );
-        if( !p.second )
-            continue;   //port already monitored
-        lk.unlock();
-
-        //it is safe to proceed futher with no lock because stopInputMonitoring can be only called from current thread 
-            //and forgetHttpClient cannot be called before doGet call
-
-        //requestUrl.setPath( QString::fromLatin1("/axis-cgi/io/port.cgi?monitor=%1").arg(it->second) );
-        requestUrl.setPath( QLatin1String("/axis-cgi/io/port.cgi") );
-
-        QUrlQuery requestUrlQuery( requestUrl.query() );
-        requestUrlQuery.addQueryItem( QLatin1String("monitor"), QString::number(it->second) );
-        requestUrl.setQuery( requestUrlQuery );
-        requestUrl.setUserName( auth.user() );
-        requestUrl.setPassword( auth.password() );
-        QNetworkRequest request;
-        request.setUrl( requestUrl );
-
-        p.first->second = CameraPlugin::instance()->networkAccessManager()->get( request );
-        connect( p.first->second, SIGNAL(readyRead()), this, SLOT(onMonitorDataAvailable()) );
-    }
-
-    //return nxcip::NX_NO_ERROR;
-
-    QMutexLocker lk( &m_mutex );
-    std::map<int, AsyncCallContext>::iterator asyncCallIter = m_awaitedAsyncCallIDs.find( asyncCallID );
-    Q_ASSERT( asyncCallIter != m_awaitedAsyncCallIDs.end() );
-    asyncCallIter->second.resultCode = nxcip::NX_NO_ERROR;
-    asyncCallIter->second.done = true;
-    m_cond.wakeAll();
-}
-
-void RelayIOManager::stopInputPortMonitoringPriv( int asyncCallID )
-{
-    QMutexLocker lk( &m_mutex );
-
-    QNetworkReply* httpClient = NULL;
-    while( !m_inputPortHttpMonitor.empty() )
-    {
-        httpClient = m_inputPortHttpMonitor.begin()->second;
-        m_inputPortHttpMonitor.erase( m_inputPortHttpMonitor.begin() );
-        lk.unlock();    //TODO/IMPL is it really needed?
-        httpClient->deleteLater();
-        lk.relock();
-    }
-
-    disconnect( CameraPlugin::instance()->networkAccessManager(), SIGNAL(finished(QNetworkReply*)), this, SLOT(onConnectionFinished(QNetworkReply*)) );
-
-    std::map<int, AsyncCallContext>::iterator asyncCallIter = m_awaitedAsyncCallIDs.find( asyncCallID );
-    Q_ASSERT( asyncCallIter != m_awaitedAsyncCallIDs.end() );
-    asyncCallIter->second.done = true;
-    m_cond.wakeAll();
-}
-
-void RelayIOManager::onMonitorDataAvailable()
-{
-    QNetworkReply* reply = qobject_cast<QNetworkReply*>(QObject::sender());
-    Q_ASSERT( reply );
-
-    while( reply->canReadLine() )
-    {
-        const QByteArray& line = reply->readLine().trimmed();
-        switch( m_multipartedParsingState )
-        {
-            case waitingDelimiter:
-                if( line.isEmpty() )
-                    continue;
-                m_multipartedParsingState = readingHeaders;
-                break;
-
-            case readingHeaders:
-                if( line.isEmpty() )
-                    m_multipartedParsingState = readingData;
-                //else ignoring header, since we exactly know format
-                break;
-
-            case readingData:
-                if( line.isEmpty() )
-                    m_multipartedParsingState = waitingDelimiter;
-                else
-                    readRelayPortNotification( line );
-                break;
-        }
-    }
-}
-
-void RelayIOManager::onConnectionFinished( QNetworkReply* reply )
-{
-    //removing reply
-    QMutexLocker lk( &m_mutex );
-
-    for( std::map<unsigned int, QNetworkReply*>::iterator
-        it = m_inputPortHttpMonitor.begin();
-        it != m_inputPortHttpMonitor.end();
-        ++it )
-    {
-        if( it->second == reply )
-        {
-            reply->deleteLater();
-            m_inputPortHttpMonitor.erase( it );
+        if( httpClient.get( QString::fromLatin1("/cgi-bin/io/input.cgi?check=%1").arg(portNumber) ) != QNetworkReply::NoError )
             return;
-        }
-    }
-
-    //TODO/IMPL need to reconnect
-}
-
-void RelayIOManager::readRelayPortNotification( const QByteArray& notification )
-{
-    /* notification has format 1I:H, 1I:L, 1I:/, 1I:\  */
-
-    int sepPos = notification.indexOf(':');
-    if( sepPos == -1 || sepPos < 2 || sepPos+1 >= notification.size() )
-        return; //Error parsing notification: event type not found
-
-    const char eventType = notification[sepPos+1];
-    //size_t portTypePos = nx_http::find_first_not_of( notification, "0123456789" );
-    //if( portTypePos == nx_http::BufferNpos )
-    //    return; //Error parsing notification: port type not found
-
-    //const unsigned int portNumber = notification.mid(0, portTypePos).toUInt();
-    //const char portType = notification[portTypePos];
-
-    const unsigned int portNumber = notification.mid(0, 1).toUInt() - 1;    //in notification port numbers start with 1
-    const char portType = notification[1];
-
-    if( portType != 'I' )
-        return;
-
-    switch( eventType )
-    {
-        case '/':
-        case '\\':
+        if( httpClient.statusCode() != SyncHttpClient::HTTP_OK )
+            return; 
+        const QByteArray& body = httpClient.readWholeMessageBody().trimmed();
+        const QList<QByteArray>& paramItems = body.split('=');
+        if( paramItems.size() < 2 )
+            continue;
+        const int newPortState = paramItems[1].toInt();
+        int& currentPortState = m_inputPortState[portNumber];
+        if( currentPortState != newPortState )
+        {
             for( std::list<nxcip::CameraInputEventHandler*>::const_iterator
                 it = m_eventHandlers.begin();
                 it != m_eventHandlers.end();
@@ -387,17 +296,10 @@ void RelayIOManager::readRelayPortNotification( const QByteArray& notification )
                 (*it)->inputPortStateChanged(
                     this,
                     portName.constData(),
-                    eventType == '/' ? 1 : 0,
+                    newPortState,
                     QDateTime::currentMSecsSinceEpoch() );
             }
-            break;
-
-        default:
-            break;
+            currentPortState = newPortState;
+        }
     }
-}
-
-void RelayIOManager::onTimer()
-{
-    //TODO: check input port state
 }

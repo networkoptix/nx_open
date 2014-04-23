@@ -7,6 +7,8 @@ struct ApiVideowallItemData {
     int y;
     int w;
     int h;
+
+    QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
 #define ApiVideowallItemDataFields (guid) (pc_guid) (layout_guid) (name) (x) (y) (w) (h)
@@ -23,24 +25,28 @@ struct ApiVideowallScreenData {
     int layout_y;
     int layout_w;
     int layout_h;
+
+    QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
 #define ApiVideowallScreenDataFields (pc_guid) (pc_index) (desktop_x) (desktop_y) (desktop_w) (desktop_h) (layout_x) (layout_y) (layout_w) (layout_h)
 QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallScreenData, ApiVideowallScreenDataFields)
 
-struct ApiVideowallData: virtual ApiResourceData
+struct ApiVideowallData: ApiResourceData
 {
     ApiVideowallData(): autorun(false) {}
 
     bool autorun;
 
-    std::vector<ApiVideowallItem> items;
-    std::vector<ApiVideowallScreen> screens;
+    std::vector<ApiVideowallItemData> items;
+    std::vector<ApiVideowallScreenData> screens;
+
+    QN_DECLARE_STRUCT_SQL_BINDER();
 };
 
 #define ApiVideowallDataFields (autorun) (items) (screens)
 QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiVideowallData, ApiResourceData, ApiVideowallDataFields);
-QN_DEFINE_API_OBJECT_LIST_DATA(ApiVideowall)
+QN_DEFINE_API_OBJECT_LIST_DATA(ApiVideowallData)
 
 struct ApiVideowallControlMessageData {
     int operation;

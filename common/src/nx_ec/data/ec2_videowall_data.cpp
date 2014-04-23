@@ -5,57 +5,57 @@
 namespace ec2
 {
 
-    void ApiVideowallItem::toItem(QnVideoWallItem& item) const {
-        item.uuid       = guid;
-        item.layout     = layout_guid;
-        item.pcUuid     = pc_guid;
-        item.name       = name;
-        item.geometry   = QRect(x, y, w, h);
+    void fromApiToItem(const ApiVideowallItemData &data, QnVideoWallItem& item) {
+        item.uuid       = data.guid;
+        item.layout     = data.layout_guid;
+        item.pcUuid     = data.pc_guid;
+        item.name       = data.name;
+        item.geometry   = QRect(data.x, data.y, data.w, data.h);
     }
 
-    void ApiVideowallItem::fromItem(const QnVideoWallItem& item) {
-        guid        = item.uuid;
-        layout_guid = item.layout;
-        pc_guid     = item.pcUuid;
-        name        = item.name;
-        x           = item.geometry.x();
-        y           = item.geometry.y();
-        w           = item.geometry.width();
-        h           = item.geometry.height();
+    void fromItemToApi(const QnVideoWallItem& item, ApiVideowallItemData &data) {
+        data.guid        = item.uuid;
+        data.layout_guid = item.layout;
+        data.pc_guid     = item.pcUuid;
+        data.name        = item.name;
+        data.x           = item.geometry.x();
+        data.y           = item.geometry.y();
+        data.w           = item.geometry.width();
+        data.h           = item.geometry.height();
     }
 
-    void ApiVideowallScreen::toScreen(QnVideoWallPcData::PcScreen& screen) const {
-        screen.index            = pc_index;
-        screen.desktopGeometry  = QRect(desktop_x, desktop_y, desktop_w, desktop_h);
-        screen.layoutGeometry   = QRect(layout_x, layout_y, layout_w, layout_h);
+    void fromApiToScreen(const ApiVideowallScreenData &data, QnVideoWallPcData::PcScreen& screen) {
+        screen.index            = data.pc_index;
+        screen.desktopGeometry  = QRect(data.desktop_x, data.desktop_y, data.desktop_w, data.desktop_h);
+        screen.layoutGeometry   = QRect(data.layout_x, data.layout_y, data.layout_w, data.layout_h);
     }
 
-    void ApiVideowallScreen::fromScreen(const QnVideoWallPcData::PcScreen& screen) {
-        pc_index    = screen.index;
-        desktop_x   = screen.desktopGeometry.x();
-        desktop_y   = screen.desktopGeometry.y();
-        desktop_w   = screen.desktopGeometry.width();
-        desktop_h   = screen.desktopGeometry.height();
-        layout_x    = screen.layoutGeometry.x();
-        layout_y    = screen.layoutGeometry.y();
-        layout_w    = screen.layoutGeometry.width();
-        layout_h    = screen.layoutGeometry.height();
+    void fromScreenToApi(const QnVideoWallPcData::PcScreen& screen, ApiVideowallScreenData &data) {
+        data.pc_index    = screen.index;
+        data.desktop_x   = screen.desktopGeometry.x();
+        data.desktop_y   = screen.desktopGeometry.y();
+        data.desktop_w   = screen.desktopGeometry.width();
+        data.desktop_h   = screen.desktopGeometry.height();
+        data.layout_x    = screen.layoutGeometry.x();
+        data.layout_y    = screen.layoutGeometry.y();
+        data.layout_w    = screen.layoutGeometry.width();
+        data.layout_h    = screen.layoutGeometry.height();
     }
 
-    void ApiVideowall::toResource(QnVideoWallResourcePtr resource) const {
-        ApiResource::toResource(resource);
-        resource->setAutorun(autorun);
+    void fromApiToResource(const ApiVideowallData &data, QnVideoWallResourcePtr resource) {
+        fromApiToResource((const ApiResourceData &)data, resource);
+        resource->setAutorun(data.autorun);
         QnVideoWallItemList outItems;
-        for (const ApiVideowallItem &item : items) {
+        for (const ApiVideowallItemData &item : data.items) {
             outItems << QnVideoWallItem();
-            item.toItem(outItems.last());
+            fromApiToItem(item, outItems.last());
         }
         resource->setItems(outItems);
 
         QnVideoWallPcDataMap pcs;
-        for (const ApiVideowallScreen &screen : screens) {
+        for (const ApiVideowallScreenData &screen : data.screens) {
             QnVideoWallPcData::PcScreen outScreen;
-            screen.toScreen(outScreen);
+            fromApiToScreen(screen, outScreen);
             QnVideoWallPcData& outPc = pcs[screen.pc_guid];
             outPc.uuid = screen.pc_guid;
             outPc.screens << outScreen;
@@ -64,26 +64,26 @@ namespace ec2
 
     }
     
-    void ApiVideowall::fromResource(const QnVideoWallResourcePtr &resource) {
-        ApiResource::fromResource(resource);
-        autorun = resource->isAutorun();
+    void fromResourceToApi(const QnVideoWallResourcePtr &resource, ApiVideowallData &data) {
+        fromResourceToApi(resource, (ApiResourceData &)data);
+        data.autorun = resource->isAutorun();
 
         const QnVideoWallItemMap& resourceItems = resource->getItems();
-        items.clear();
-        items.reserve(resourceItems.size());
+        data.items.clear();
+        data.items.reserve(resourceItems.size());
         for (const QnVideoWallItem &item: resourceItems) {
-            ApiVideowallItem itemData;
-            itemData.fromItem(item);
-            items.push_back(itemData);
+            ApiVideowallItemData itemData;
+            fromItemToApi(item, itemData);
+            data.items.push_back(itemData);
         }
 
-        screens.clear();
+        data.screens.clear();
         for (const QnVideoWallPcData &pc: resource->getPcs()) {
             for (const QnVideoWallPcData::PcScreen &screen: pc.screens) {
-                ApiVideowallScreen screenData;
-                screenData.fromScreen(screen);
+                ApiVideowallScreenData screenData;
+                fromScreenToApi(screen, screenData);
                 screenData.pc_guid = pc.uuid;
-                screens.push_back(screenData);
+                data.screens.push_back(screenData);
             }
         }
     }
@@ -94,7 +94,7 @@ namespace ec2
         for(int i = 0; i < data.size(); ++i) 
         {
             QnVideoWallResourcePtr videowall(new QnVideoWallResource());
-            data[i].toResource(videowall);
+            fromApiToResource(data[i], videowall);
             outData << videowall;
         }
     }
@@ -102,27 +102,27 @@ namespace ec2
     template void ApiVideowallList::toResourceList<QnVideoWallResourcePtr>(QList<QnVideoWallResourcePtr>& outData) const;
 
     void ApiVideowallList::loadFromQuery(QSqlQuery& query) {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiVideowall, data, ApiVideowallDataFields ApiResourceFields)
+        QN_QUERY_TO_DATA_OBJECT(query, ApiVideowallData, data, ApiVideowallDataFields ApiResourceFields)
     }
 
 
-    void ApiVideowallControlMessage::toMessage(QnVideoWallControlMessage &message) const {
-        message.operation = static_cast<QnVideoWallControlMessage::QnVideoWallControlOperation>(operation);
-        message.videoWallGuid = videowall_guid;
-        message.instanceGuid = instance_guid;
+    void fromApiToMessage(const ApiVideowallControlMessageData &data, QnVideoWallControlMessage &message) {
+        message.operation = static_cast<QnVideoWallControlMessage::QnVideoWallControlOperation>(data.operation);
+        message.videoWallGuid = data.videowall_guid;
+        message.instanceGuid = data.instance_guid;
         message.params.clear();
-        for (std::pair<QString, QString> pair : params)
+        for (std::pair<QString, QString> pair : data.params)
             message.params[pair.first] = pair.second;
     }
 
-    void ApiVideowallControlMessage::fromMessage(const QnVideoWallControlMessage &message) {
-        operation = static_cast<int>(message.operation);
-        videowall_guid = message.videoWallGuid;
-        instance_guid = message.instanceGuid;
-        params.clear();
+    void fromMessageToApi(const QnVideoWallControlMessage &message, ApiVideowallControlMessageData &data) {
+        data.operation = static_cast<int>(message.operation);
+        data.videowall_guid = message.videoWallGuid;
+        data.instance_guid = message.instanceGuid;
+        data.params.clear();
         auto iter = message.params.constBegin();
         while (iter != message.params.constEnd()) {
-            params.insert(std::pair<QString, QString>(iter.key(), iter.value()));
+            data.params.insert(std::pair<QString, QString>(iter.key(), iter.value()));
             ++iter;
         }
     }

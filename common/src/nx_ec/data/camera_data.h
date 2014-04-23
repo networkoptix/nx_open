@@ -30,7 +30,7 @@ namespace ec2
         QnId sourceId;
     };
 
-    struct ApiCamera: ApiCameraData, ApiResource
+    struct ApiCamera: ApiCameraData
     {
         void fromResource(const QnVirtualCameraResourcePtr& resource);
         void toResource(QnVirtualCameraResourcePtr resource) const;

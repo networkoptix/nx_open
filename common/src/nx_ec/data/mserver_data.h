@@ -7,37 +7,25 @@
 
 namespace ec2
 {
-    struct ApiStorage;
-    struct ApiMediaServer;
-
     #include "mserver_data_i.h"
 
-    struct ApiStorage: ApiStorageData, ApiResource
-    {
-        void fromResource(QnAbstractStorageResourcePtr resource);
-        void toResource(QnAbstractStorageResourcePtr resource) const;
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiStorage, ApiStorageFields);
+    void fromResourceToApi(const QnAbstractStorageResourcePtr &resource, ApiStorageData &data);
+    void fromApiToResource(const ApiStorageData &data, QnAbstractStorageResourcePtr &resource);
 
-
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiStorageData, ApiStorageFields);
 
     struct ApiStorageList: public ApiData {
-        std::vector<ApiStorage> data;
+        std::vector<ApiStorageData> data;
 
         void loadFromQuery(QSqlQuery& query);
     };
 
     QN_DEFINE_STRUCT_SERIALIZATORS (ApiStorageList, (data))
 
-    struct ApiMediaServer: ApiMediaServerData, ApiResource
-    {
-        void fromResource(QnMediaServerResourcePtr resource);
-        void toResource(QnMediaServerResourcePtr resource, const ResourceContext& ctx) const;
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
+    void fromResourceToApi(const QnMediaServerResourcePtr& resource, ApiMediaServerData &data);
+    void fromApiToResource(const ApiMediaServerData &data, QnMediaServerResourcePtr& resource, const ResourceContext& ctx);
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiMediaServer, medisServerDataFields);
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiMediaServerData, medisServerDataFields);
 
     struct ApiPanicModeData: public ApiData
     {
@@ -47,7 +35,7 @@ namespace ec2
     QN_DEFINE_STRUCT_SERIALIZATORS (ApiPanicModeData, (mode))
 
 
-    struct ApiMediaServerList: public ApiMediaServerListData {
+    struct ApiMediaServerList: public ApiMediaServerDataListData {
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData, const ResourceContext& ctx) const;
     };
