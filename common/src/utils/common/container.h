@@ -59,6 +59,23 @@ namespace QnContainer {
     }
 
 
+    template<class Container>
+    void reserve(Container &container, int size, const decltype(&Container::reserve) * = NULL) {
+        container.reserve(size);
+    }
+
+    template<class Container>
+    void reserve(Container &, int) {
+        /* Do nothing. */
+    }
+
+
+    template<class Container>
+    void clear(Container &container) {
+        container.clear();
+    }
+    
+
     template<class List, class Pred>
     int indexOf(const List &list, int from, const Pred &pred) {
         if(from < 0)
