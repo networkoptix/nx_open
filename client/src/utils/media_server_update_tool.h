@@ -97,19 +97,25 @@ private:
     void checkBuildOnline();
 
     void uploadUpdatesToServers();
+    void installUpdatesToServers();
 
 private:
     State m_state;
     CheckResult m_checkResult;
     UpdateResult m_updateResult;
+
     QDir m_localUpdateDir;
     QUrl m_onlineUpdateUrl;
     QString m_updateLocationPrefix;
+
     QnSoftwareVersion m_targetVersion;
     bool m_targetMustBeNewer;
 
-    QHash<QString, QnMediaServerResourcePtr> m_pendingUploadServers;
-    QHash<QString, QnMediaServerResourcePtr> m_pendingInstallServers;
+    QHash<QnId, QnMediaServerResourcePtr> m_pendingUploadServers;
+    QMultiHash<QnSystemInformation, QnId> m_serverIdBySystemInformation;
+
+    QHash<QnId, QnMediaServerResourcePtr> m_pendingInstallServers;
+
     QHash<QnSystemInformation, UpdateInformation> m_updates;
     QHash<QnSystemInformation, UpdateInformation> m_downloadingUpdates;
 

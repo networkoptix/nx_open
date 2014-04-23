@@ -91,11 +91,31 @@ void QnServerUpdatesWidget::at_updateButton_clicked() {
 }
 
 void QnServerUpdatesWidget::updateUpdatesList() {
+    QnServerUpdatesModel::UpdateInformationHash modelUpdates;
+
     QHash<QnSystemInformation, QnMediaServerUpdateTool::UpdateInformation> updates = m_updateTool->availableUpdates();
-    QHash<QnSystemInformation, QnSoftwareVersion> modelUpdates;
-    for (auto it = updates.begin(); it != updates.end(); ++it)
-        modelUpdates.insert(it.key(), it.value().version);
-    m_updatesModel->setUpdates(modelUpdates);
+    QnMediaServerUpdateTool::State toolState = m_updateTool->state();
+
+    for (auto it = updates.begin(); it != updates.end(); ++it) {
+        QnServerUpdatesModel::UpdateInformation updateInfo;
+        updateInfo.version = it.value().version;
+        switch (toolState) {
+        case QnMediaServerUpdateTool::Idle:
+        case QnMediaServerUpdateTool::CheckingForUpdates:
+        case QnMediaServerUpdateTool::DownloadingUpdate:
+            updateInfo.status = updateInfo.version.isNull() ? QnServerUpdatesModel::NotFound : QnServerUpdatesModel::Found;
+            break;
+        case QnMediaServerUpdateTool::UploadingUpdate:
+            updateInfo.status = QnServerUpdatesModel::Uploading;
+            break;
+        case QnMediaServerUpdateTool::InstallingUpdate:
+            updateInfo.status = QnServerUpdatesModel::Installing;
+            break;
+        }
+        modelUpdates.insert(it.key(), updateInfo);
+    }
+
+    m_updatesModel->setUpdatesInformation(modelUpdates);
 }
 
 void QnServerUpdatesWidget::updateUi() {
@@ -133,11 +153,9 @@ void QnServerUpdatesWidget::updateUi() {
             ui->noUpdatesLabel->setText(tr("Update is impossible"));
             break;
         }
-        updateUpdatesList();
         break;
     case QnMediaServerUpdateTool::CheckingForUpdates:
         checkingForUpdates = true;
-        updateUpdatesList();
         break;
     case QnMediaServerUpdateTool::DownloadingUpdate:
         applying = true;
@@ -156,6 +174,8 @@ void QnServerUpdatesWidget::updateUi() {
     default:
         break;
     }
+
+    updateUpdatesList();
 
     if (checkingForUpdates)
         ui->buttonBox->showProgress(tr("Checking for updates..."));

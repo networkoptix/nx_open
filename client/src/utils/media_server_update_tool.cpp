@@ -228,28 +228,6 @@ void QnMediaServerUpdateTool::updateServers() {
     setState(DownloadingUpdate);
     m_downloadingUpdates = m_updates;
     downloadNextUpdate();
-//    QFile file(m_updateFile);
-//    if (!file.open(QFile::ReadOnly)) {
-//        // TODO: #dklychkov error handling
-//        return;
-//    }
-
-//    if (file.size() > maxUpdateFileSize) {
-//        // TODO: #dklychkov error handling
-//        return;
-//    }
-
-//    QString updateId = QFileInfo(file).fileName();
-//    QByteArray data = file.readAll();
-
-//    QnResourceList servers = qnResPool->getResourcesWithFlag(QnResource::server);
-
-//    ec2::PeerList ids;
-//    foreach (const QnResourcePtr &resource, servers)
-//        ids.insert(resource->getId());
-
-//    connection2()->getUpdatesManager()->sendUpdatePackage(updateId, data, ids,
-    //                                                          this, [this](int reqID, ec2::ErrorCode errorCode) {});
 }
 
 QHash<QnSystemInformation, QnMediaServerUpdateTool::UpdateInformation> QnMediaServerUpdateTool::availableUpdates() const {
@@ -296,7 +274,15 @@ void QnMediaServerUpdateTool::cancelUpdate() {
 }
 
 void QnMediaServerUpdateTool::at_updateUploaded(const QString &updateId, const QnId &peerId) {
-    qDebug() << "uploaded!!!";
+    if (updateId != m_targetVersion.toString())
+        return;
+
+    m_pendingInstallServers.insert(peerId, m_pendingUploadServers.take(peerId));
+
+    emit progressChanged(m_pendingInstallServers.size() * 100 / (m_pendingInstallServers.size() + m_pendingUploadServers.size()));
+
+    if (m_pendingUploadServers.isEmpty())
+        installUpdatesToServers();
 }
 
 void QnMediaServerUpdateTool::at_downloadReply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal) {
@@ -340,4 +326,49 @@ void QnMediaServerUpdateTool::checkBuildOnline() {
 
 void QnMediaServerUpdateTool::uploadUpdatesToServers() {
     setState(UploadingUpdate);
+
+    m_pendingUploadServers.clear();
+    m_serverIdBySystemInformation.clear();
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
+        QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
+        if (server->getStatus() == QnResource::Offline)
+            continue;
+
+        m_pendingUploadServers.insert(server->getId(), server);
+        m_serverIdBySystemInformation.insert(server->getSystemInfo(), server->getId());
+    }
+
+    foreach (const QnSystemInformation &info, m_serverIdBySystemInformation.keys()) {
+        if (!m_updates.contains(info)) {
+            m_updateResult = UploadingFailed;
+            setState(Idle);
+            return;
+        }
+
+        const UpdateInformation &updateInfo = m_updates[info];
+        QFile file(updateInfo.fileName);
+        if (!file.open(QFile::ReadOnly)) {
+            m_updateResult = UploadingFailed;
+            setState(Idle);
+            return;
+        }
+
+        QByteArray updateData = file.readAll();
+
+        ec2::PeerList peers;
+        foreach (const QnId &id, m_serverIdBySystemInformation.values(info))
+            peers.insert(id);
+
+        connection2()->getUpdatesManager()->sendUpdatePackage(m_targetVersion.toString(), updateData, peers,
+                                                              this, [this](int reqId, ec2::ErrorCode errorCode){});
+    }
+}
+
+void QnMediaServerUpdateTool::installUpdatesToServers() {
+    setState(InstallingUpdate);
+
+    foreach (const QnMediaServerResourcePtr &server, m_pendingInstallServers) {
+        connection2()->getUpdatesManager()->installUpdate(m_targetVersion.toString(),
+                                                          this, [this](int reqId, ec2::ErrorCode errorCode){});
+    }
 }

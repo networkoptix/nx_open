@@ -17,6 +17,23 @@ public:
         ColumnCount
     };
 
+    enum UpdateStatus {
+        NotFound,
+        Found,
+        Uploading,
+        Installing,
+        Installed
+    };
+
+    struct UpdateInformation {
+        UpdateStatus status;
+        QnSoftwareVersion version;
+        int progress;
+
+        UpdateInformation() : progress(0) {}
+    };
+    typedef QHash<QnSystemInformation, UpdateInformation> UpdateInformationHash;
+
     explicit QnServerUpdatesModel(QObject *parent = 0);
 
     int columnCount(const QModelIndex &parent) const override;
@@ -26,11 +43,11 @@ public:
 
     QList<QnMediaServerResourcePtr> servers() const;
     void setServers(const QList<QnMediaServerResourcePtr> &servers);
-    void setUpdates(const QHash<QnSystemInformation, QnSoftwareVersion> &updates);
+    void setUpdatesInformation(const UpdateInformationHash &updates);
 
 private:
     QList<QnMediaServerResourcePtr> m_servers;
-    QHash<QnSystemInformation, QnSoftwareVersion> m_updates;
+    UpdateInformationHash m_updates;
 };
 
 #endif // SERVER_UPDATES_MODEL_H

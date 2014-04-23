@@ -53,11 +53,23 @@ QVariant QnServerUpdatesModel::data(const QModelIndex &index, int role) const {
         case CurrentVersionColumn:
             return server->getVersion().toString(QnSoftwareVersion::FullFormat);
         case UpdateColumn: {
-            QnSoftwareVersion updateVersion = m_updates.value(server->getSystemInfo());
-            if (updateVersion.isNull())
+            auto it = m_updates.find(server->getSystemInfo());
+            if (it == m_updates.end())
+                break;
+
+            const UpdateInformation &updateInformation = it.value();
+            switch (updateInformation.status) {
+            case NotFound:
                 return tr("Not found");
-            else
-                return updateVersion.toString(QnSoftwareVersion::FullFormat);
+            case Found:
+                return updateInformation.version.toString(QnSoftwareVersion::FullFormat);
+            case Uploading:
+                return QString::number(updateInformation.progress) + lit("%");
+            case Installing:
+                return tr("Installing...");
+            case Installed:
+                return tr("Installed");
+            }
         }
         default:
             break;
@@ -84,9 +96,8 @@ void QnServerUpdatesModel::setServers(const QList<QnMediaServerResourcePtr> &ser
     endResetModel();
 }
 
-void QnServerUpdatesModel::setUpdates(const QHash<QnSystemInformation, QnSoftwareVersion> &updates) {
-    beginResetModel();
+void QnServerUpdatesModel::setUpdatesInformation(const UpdateInformationHash &updates) {
     m_updates = updates;
-    endResetModel();
-
+    if (!m_servers.isEmpty())
+        emit dataChanged(index(0, UpdateColumn), index(m_servers.size() - 1, UpdateColumn));
 }
