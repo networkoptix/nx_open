@@ -6,30 +6,17 @@
 
 namespace ec2 
 {
-    struct ApiPropertyType;
-    struct ApiResourceType;
-
     #include "ec2_resource_type_data_i.h"
 
-    struct ApiPropertyType: ApiPropertyTypeData
-    {
-        void toResource(QnParamTypePtr resource) const;
-    };
+    void fromApiToResource(const ApiPropertyTypeData &data, QnParamTypePtr& resource);
 
-    struct ApiResourceType: ApiResourceTypeData
-    {
-	    void fromResource(const QnResourceTypePtr& resource);
-	    void toResource(QnResourceTypePtr resource) const;
-	    QN_DECLARE_STRUCT_SQL_BINDER();
-    };
+	void fromResourceToApi(const QnResourceTypePtr& resource, ApiResourceTypeData &data);
+	void fromApiToResource(const ApiResourceTypeData &data, QnResourceTypePtr resource);
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceType, ApiResourceTypeFields);
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceTypeData, ApiResourceTypeFields);
 
-    struct ApiResourceTypeList: ApiResourceTypeListData {
-	    void loadFromQuery(QSqlQuery& query);
-	    void toResourceTypeList(QnResourceTypeList& resTypeList) const;
-    };
-
+	void loadResourceTypesFromQuery(ApiResourceTypeDataListData &data, QSqlQuery& query);
+	void fromApiToResourceTypeList(const ApiResourceTypeDataListData &data, QnResourceTypeList& resTypeList);
 }
 
 #endif // __EC2_RESOURCE_TYPE_DATA_H_

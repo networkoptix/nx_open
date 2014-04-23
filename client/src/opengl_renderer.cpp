@@ -68,9 +68,9 @@ void QnOpenGLRenderer::drawBindedTextureOnQuad( const QRectF &rect , const QSize
 
     GLfloat texCoords[] = {
         0.0, 0.0,
-        size.width(), 0.0,
-        size.width(), size.height(),
-        0.0, size.height()
+        (GLfloat)size.width(), 0.0,
+        (GLfloat)size.width(), (GLfloat)size.height(),
+        0.0, (GLfloat)size.height()
     };
     drawBindedTextureOnQuad(vertices,texCoords,shader);
 };
@@ -111,10 +111,11 @@ void QnOpenGLRenderer::drawPerVertexColoredPolygon( unsigned int a_buffer , unsi
             shader->bindAttributeLocation("aColor",VERTEX_COLOR_INDX);
             shader->setWasBind(false);
         };
+        const char* ptr = NULL;
         GLuint offset = 0;
-        glVertexAttribPointer(VERTEX_POS_INDX, VERTEX_POS_SIZE, GL_FLOAT, GL_FALSE, 0, (const void*)offset);
+        glVertexAttribPointer(VERTEX_POS_INDX, VERTEX_POS_SIZE, GL_FLOAT, GL_FALSE, 0, (const void*)(ptr + offset));
         offset += a_vertices_size*VERTEX_POS_SIZE* sizeof(GLfloat);
-        glVertexAttribPointer(VERTEX_COLOR_INDX,VERTEX_COLOR_SIZE, GL_FLOAT,GL_FALSE, 0, (const void*)offset);
+        glVertexAttribPointer(VERTEX_COLOR_INDX,VERTEX_COLOR_SIZE, GL_FLOAT,GL_FALSE, 0, (const void*)(ptr + offset));
 
         glDrawArrays(a_polygon_state,0,a_vertices_size);
         
@@ -290,6 +291,7 @@ void loadImageData( int texture_wigth , int texture_height , int image_width , i
         {
             const uchar *row = pixels + (y*image_width) * gl_bytes_per_pixel;
             glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , texture_wigth, 1, gl_format, GL_UNSIGNED_BYTE, row );
-        }
-    }
+    	}   
+		 
+	}
 }

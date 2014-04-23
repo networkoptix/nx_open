@@ -6,42 +6,24 @@
 
 namespace ec2
 {
-    struct ApiLayoutItem;
-    struct ApiLayout;
     #include "ec2_layout_data_i.h"
 
-    struct ApiLayoutItem: ApiLayoutItemData
-    {
-        void toResource(QnLayoutItemData& resource) const;
-        void fromResource(const QnLayoutItemData& resource);
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
+    void fromApiToResource(const ApiLayoutItemData& data, QnLayoutItemData& resource);
+    void fromResourceToApi(QnLayoutResourcePtr resource, ApiLayoutData& data);
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiLayoutItem, ApiLayoutItemFields);
-}
+    void fromResourceToApi(const QnLayoutItemData& resource, ApiLayoutItemData& data);
+    void fromApiToResource(const ApiLayoutData& data, QnLayoutResourcePtr resource);
 
 
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiLayoutItemData, ApiLayoutItemFields);
 
-namespace ec2
-{
-    struct ApiLayoutItemWithRef: ApiLayoutItem {
+    struct ApiLayoutItemWithRef: ApiLayoutItemData {
         QnId layoutId;
     };
 
-    struct ApiLayout: ApiLayoutData, ApiResource
-    {
-        void toResource(QnLayoutResourcePtr resource) const;
-        void fromResource(QnLayoutResourcePtr resource);
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiLayoutData, ApiLayoutFields);
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiLayout, ApiLayoutFields);
-}
-                                                                                
-
-namespace ec2
-{
-    struct ApiLayoutList: public ApiLayoutListData
+    struct ApiLayoutList: ApiLayoutDataListData
     {
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData) const;
@@ -50,8 +32,8 @@ namespace ec2
             data.reserve( srcData.size() );
             for( const T& layoutRes: srcData )
             {
-                data.push_back( ApiLayout() );
-                data.back().fromResource( layoutRes );
+                data.push_back( ApiLayoutData() );
+                fromResourceToApi(layoutRes, data.back());
             }
         }
     };

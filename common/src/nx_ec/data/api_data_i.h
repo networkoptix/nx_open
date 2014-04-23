@@ -2,7 +2,7 @@
         virtual ~ApiData() {}
     };
 
-    struct ApiIdData: public ApiData {
+    struct ApiIdData: ApiData {
         QnId id;
     };
 

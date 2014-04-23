@@ -13,24 +13,13 @@
 
 namespace ec2
 {
-    struct ApiResourceParam;
-
     #include "ec2_resource_data_i.h"
 
-    struct ApiResourceParam: public ApiResourceParamData
-    {
-        ApiResourceParam() {}
-        ApiResourceParam(const QString& name, const QString& value, bool isResTypeParam)
-            : ApiResourceParamData(name, value, isResTypeParam) {}
-
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
-
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceParam, ApiResourceParamFields);
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceParamData, ApiResourceParamFields);
 
     struct ApiParamList
     {
-        std::vector<ApiResourceParam> data;
+        std::vector<ApiResourceParamData> data;
         void toResourceList(QnKvPairList& resources) const;
         void fromResourceList(const QnKvPairList& resources);
     };
@@ -38,7 +27,7 @@ namespace ec2
     QN_DEFINE_STRUCT_SERIALIZATORS (ApiParamList, (data) )
         
 
-    struct ApiResourceParamWithRef: public ApiResourceParam
+    struct ApiResourceParamWithRef: public ApiResourceParamData
     {
         QnId resourceId;
     };
@@ -46,26 +35,21 @@ namespace ec2
     struct ApiResourceParams
     {
         QnId id;
-        std::vector<ApiResourceParam> params;
+        std::vector<ApiResourceParamData> params;
     };
 
     QN_DEFINE_STRUCT_SERIALIZATORS (ApiResourceParams,  (id) (params) )
 
-    struct ApiResource: virtual ApiResourceData
-    {
-        void fromResource(const QnResourcePtr& resource);
-        void toResource(QnResourcePtr resource) const;
+    void fromResourceToApi(const QnResourcePtr& resource, ApiResourceData& resourceData);
+    void fromApiToResource(const ApiResourceData& resourceData, QnResourcePtr resource);
 
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
-
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiResource,  ApiResourceFields)
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceData,  ApiResourceFields)
 
     struct ApiResourceList: public ApiData {
         void loadFromQuery(QSqlQuery& query);
         void toResourceList( QnResourceFactory* resFactory, QnResourceList& resList ) const;
 
-        std::vector<ApiResource> data;
+        std::vector<ApiResourceData> data;
     };
 
     QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ApiResourceList,  (data))

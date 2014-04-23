@@ -25,62 +25,62 @@ static QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
     return addListStrings.join(QLatin1String(";"));
 }
 
-void ApiStorage::fromResource(QnAbstractStorageResourcePtr resource)
+void fromResourceToApi(const QnAbstractStorageResourcePtr &resource, ApiStorageData &data)
 {
-    ApiResource::fromResource(resource);
-    spaceLimit = resource->getSpaceLimit();
-    usedForWriting = resource->isUsedForWriting();
+    fromResourceToApi(resource, (ApiResourceData &)data);
+    data.spaceLimit = resource->getSpaceLimit();
+    data.usedForWriting = resource->isUsedForWriting();
 }
 
-void ApiStorage::toResource(QnAbstractStorageResourcePtr resource) const
+void fromApiToResource(const ApiStorageData &data, QnAbstractStorageResourcePtr& resource)
 {
-    ApiResource::toResource(resource);
-    resource->setSpaceLimit(spaceLimit);
-    resource->setUsedForWriting(usedForWriting);
+    fromApiToResource((const ApiResourceData &)data, resource);
+    resource->setSpaceLimit(data.spaceLimit);
+    resource->setUsedForWriting(data.usedForWriting);
 }
 
 void ApiStorageList::loadFromQuery(QSqlQuery& query)
 {
-    QN_QUERY_TO_DATA_OBJECT(query, ApiStorage, data, ApiStorageFields ApiResourceFields)
+    QN_QUERY_TO_DATA_OBJECT(query, ApiStorageData, data, ApiStorageFields ApiResourceFields)
 }
 
-void ApiMediaServer::fromResource(QnMediaServerResourcePtr resource)
+void fromResourceToApi(const QnMediaServerResourcePtr& resource, ApiMediaServerData& data)
 {
-    ApiResource::fromResource(resource);
+    fromResourceToApi(resource, (ApiResourceData &)data);
 
-    netAddrList = serializeNetAddrList(resource->getNetAddrList());
-    apiUrl = resource->getApiUrl();
-    flags = resource->getServerFlags();
-    panicMode = resource->getPanicMode();
-    streamingUrl = resource->getStreamingUrl();
-    version = resource->getVersion().toString();
-    systemInfo = resource->getSystemInfo().toString();
-    maxCameras = resource->getMaxCameras();
-    redundancy = resource->isRedundancy();
+    data.netAddrList = serializeNetAddrList(resource->getNetAddrList());
+    data.apiUrl = resource->getApiUrl();
+    data.flags = resource->getServerFlags();
+    data.panicMode = resource->getPanicMode();
+    data.streamingUrl = resource->getStreamingUrl();
+    data.version = resource->getVersion().toString();
+    data.systemInfo = resource->getSystemInfo().toString();
+    data.maxCameras = resource->getMaxCameras();
+    data.redundancy = resource->isRedundancy();
     //authKey = resource-> getetAuthKey();
 
     QnAbstractStorageResourceList storageList = resource->getStorages();
-    storages.resize(storageList.size());
+    data.storages.resize(storageList.size());
     for (int i = 0; i < storageList.size(); ++i)
-        storages[i].fromResource(storageList[i]);
+        fromResourceToApi(storageList[i], data.storages[i]);
 }
 
-void ApiMediaServer::toResource(QnMediaServerResourcePtr resource, const ResourceContext& ctx) const
+void fromApiToResource(const ApiMediaServerData &data, QnMediaServerResourcePtr& resource, const ResourceContext& ctx)
 {
-    ApiResource::toResource(resource);
+    fromApiToResource((const ApiResourceData &)data, resource);
 
     QList<QHostAddress> resNetAddrList;
-    deserializeNetAddrList(resNetAddrList, netAddrList);
+    deserializeNetAddrList(resNetAddrList, data.netAddrList);
 
-    resource->setApiUrl(apiUrl);
+    resource->setApiUrl(data.apiUrl);
     resource->setNetAddrList(resNetAddrList);
-    resource->setServerFlags(flags);
-    resource->setPanicMode((Qn::PanicMode) panicMode);
-    resource->setStreamingUrl(streamingUrl);
-    resource->setVersion(QnSoftwareVersion(version));
-    resource->setSystemInfo(QnSystemInformation(systemInfo));
-    resource->setMaxCameras(maxCameras);
-    resource->setRedundancy(redundancy);
+    resource->setServerFlags(data.flags);
+    resource->setPanicMode((Qn::PanicMode) data.panicMode);
+    resource->setStreamingUrl(data.streamingUrl);
+    resource->setVersion(QnSoftwareVersion(data.version));
+    resource->setSystemInfo(QnSystemInformation(data.systemInfo));
+    resource->setMaxCameras(data.maxCameras);
+    resource->setRedundancy(data.redundancy);
 
     //resource->setAuthKey(authKey);
 
@@ -89,10 +89,10 @@ void ApiMediaServer::toResource(QnMediaServerResourcePtr resource, const Resourc
         return;
 
     QnAbstractStorageResourceList storagesRes;
-    foreach(const ApiStorage& storage, storages) {
+    foreach(const ApiStorageData& storage, data.storages) {
         QnAbstractStorageResourcePtr storageRes = ctx.resFactory->createResource(resType->getId(), QnResourceParams(storage.url, QString())).dynamicCast<QnAbstractStorageResource>();
         
-        storage.toResource(storageRes);
+        fromApiToResource(storage, storageRes);
         storagesRes.push_back(storageRes);
     }
     resource->setStorages(storagesRes);
@@ -104,7 +104,7 @@ template <class T> void ApiMediaServerList::toResourceList(QList<T>& outData, co
     for(int i = 0; i < data.size(); ++i) 
     {
         QnMediaServerResourcePtr server(new QnMediaServerResource(ctx.resTypePool));
-        data[i].toResource(server, ctx);
+        fromApiToResource(data[i], server, ctx);
         outData << server;
     }
 }
@@ -114,7 +114,7 @@ template void ApiMediaServerList::toResourceList<QnMediaServerResourcePtr>(QList
 
 void ApiMediaServerList::loadFromQuery(QSqlQuery& query)
 {
-    QN_QUERY_TO_DATA_OBJECT(query, ApiMediaServer, data, medisServerDataFields ApiResourceFields)
+    QN_QUERY_TO_DATA_OBJECT(query, ApiMediaServerData, data, medisServerDataFields ApiResourceFields)
 }
 
 }

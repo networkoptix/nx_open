@@ -22,7 +22,10 @@ public:
 
     virtual void processData( const QnByteArrayConstRef& data ) = 0;
     //!Implementation SHOULD process any cached data. This method is usually signals end of source data
-    virtual void flush() = 0;
+    /*!
+        \return > 0, if some data has been flushed, 0 if no data to flush
+    */
+    virtual size_t flush() = 0;
 };
 
 /*!

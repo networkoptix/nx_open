@@ -300,7 +300,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
         case ApiCommand::setResourceParams:
             return deliveryTransaction<ApiResourceParams>(abstractTran, stream);
         case ApiCommand::saveResource:
-            return deliveryTransaction<ApiResource>(abstractTran, stream);
+            return deliveryTransaction<ApiResourceData>(abstractTran, stream);
         case ApiCommand::removeResource:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
         case ApiCommand::setPanicMode:
@@ -316,12 +316,12 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiCameraServerItem>(abstractTran, stream);
 
         case ApiCommand::saveMediaServer:
-            return deliveryTransaction<ApiMediaServer>(abstractTran, stream);
+            return deliveryTransaction<ApiMediaServerData>(abstractTran, stream);
         case ApiCommand::removeMediaServer:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
         case ApiCommand::saveUser:
-            return deliveryTransaction<ApiUser>(abstractTran, stream);
+            return deliveryTransaction<ApiUserData>(abstractTran, stream);
         case ApiCommand::removeUser:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
@@ -333,16 +333,16 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
         case ApiCommand::saveLayouts:
             return deliveryTransaction<ApiLayoutList>(abstractTran, stream);
         case ApiCommand::saveLayout:
-            return deliveryTransaction<ApiLayout>(abstractTran, stream);
+            return deliveryTransaction<ApiLayoutData>(abstractTran, stream);
         case ApiCommand::removeLayout:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
             
         case ApiCommand::saveVideowall:
-            return deliveryTransaction<ApiVideowall>(abstractTran, stream);
+            return deliveryTransaction<ApiVideowallData>(abstractTran, stream);
         case ApiCommand::removeVideowall:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
         case ApiCommand::videowallControl:
-            return deliveryTransaction<ApiVideowallControlMessage>(abstractTran, stream);          
+            return deliveryTransaction<ApiVideowallControlMessageData>(abstractTran, stream);          
 
         case ApiCommand::addStoredFile:
         case ApiCommand::updateStoredFile:

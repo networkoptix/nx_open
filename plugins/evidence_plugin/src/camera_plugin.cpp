@@ -32,14 +32,20 @@ CameraPlugin::CameraPlugin()
 
     m_discoveryManager.reset( new CameraDiscoveryManager() );
 
-    m_networkEventLoopThread.setObjectName( "CameraPlugin" );
+    m_networkEventLoopThread.setObjectName( "E-Vidence plugin NetworkAccessManager thread" );
     m_networkEventLoopThread.start();
     m_networkAccessManager.moveToThread( &m_networkEventLoopThread );
+
+    m_qtEventLoopThread.setObjectName( "E-Vidence plugin internal thread" );
+    m_qtEventLoopThread.start();
 }
 
 CameraPlugin::~CameraPlugin()
 {
     m_networkAccessManager.deleteLater();
+
+    m_qtEventLoopThread.quit();
+    m_qtEventLoopThread.wait();
 
     m_networkEventLoopThread.quit();
     m_networkEventLoopThread.wait();
@@ -85,6 +91,11 @@ nxpt::CommonRefManager* CameraPlugin::refManager()
 QNetworkAccessManager* CameraPlugin::networkAccessManager()
 {
     return &m_networkAccessManager;
+}
+
+QThread* CameraPlugin::qtEventLoopThread()
+{
+    return &m_qtEventLoopThread;
 }
 
 CameraPlugin* CameraPlugin::instance()
