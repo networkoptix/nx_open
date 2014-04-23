@@ -7,13 +7,13 @@
  * This is an abstraction layer header that makes it possible to use ec
  * api data types in other projects that do not depend on Qt. 
  * 
- * This can be done by simply defining <tt>QN_API_TYPES_HEADER</tt> to a name 
+ * This can be done by simply defining <tt>QN_API_GLOBALS_HEADER</tt> to a name 
  * of the header file that defines all the types used in api data declarations.
  * If this macro is not defined, then default types from Qt will be used.
  */
 
-#ifdef QN_API_TYPES_HEADER
-#   include QN_API_TYPES_HEADER
+#ifdef QN_API_GLOBALS_HEADER
+#   include QN_API_GLOBALS_HEADER
 #else
 
 #include <QtCore/QString>
