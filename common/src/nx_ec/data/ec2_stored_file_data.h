@@ -4,7 +4,6 @@
 
 #include "api_data.h"
 
-#include <nx_ec/binary_serialization_helper.h>
 #include <utils/common/request_param.h>
 
 
@@ -19,7 +18,8 @@ namespace ec2
         QByteArray data;
     };
 
-    QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS( ApiStoredFileData, (path) (data) )
+    //QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS( ApiStoredFileData, (path) (data) )
+    QN_FUSION_DECLARE_FUNCTIONS(ApiStoredFileData, (binary))
 
 
     typedef std::vector<QString> ApiStoredDirContents;

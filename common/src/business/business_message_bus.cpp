@@ -2,7 +2,9 @@
 
 #include <QtCore/QUrlQuery>
 
-#include "nx_ec/data/ec2_business_rule_data.h"
+#include <nx_ec/data/ec2_business_rule_data.h>
+
+#include <utils/serialization/binary.h>
 
 Q_GLOBAL_STATIC(QnBusinessMessageBus, QnBusinessMessageBus_instance)
 

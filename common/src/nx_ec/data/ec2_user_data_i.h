@@ -12,6 +12,7 @@
     };
 
     #define ApiUserFields (isAdmin) (rights) (email) (digest) (hash)
-    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiUserData, ApiResourceData, ApiUserFields);
+    //QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiUserData, ApiResourceData, ApiUserFields);
+    QN_FUSION_DECLARE_FUNCTIONS(ApiUserData, (binary))
 
     QN_DEFINE_API_OBJECT_LIST_DATA(ApiUserData)

@@ -1,13 +1,14 @@
-
 #ifndef EC2_TRANSACTION_H
 #define EC2_TRANSACTION_H
 
-#include <QString>
 #include <vector>
-#include "nx_ec/binary_serialization_helper.h"
+
+#include <QString>
+
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/ec2_license.h"
 #include "nx_ec/data/ec2_email.h"
+#include "utils/serialization/binary.h"
 
 
 namespace ec2
@@ -170,8 +171,10 @@ namespace ec2
     typedef QSet<QnId> PeerList;
 }
 
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (sequence) )
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent) (timestamp))
+//QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (sequence) )
+//QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent) (timestamp))
+QN_FUSION_DECLARE_FUNCTIONS(ec2::QnAbstractTransaction::ID, (binary))
+QN_FUSION_DECLARE_FUNCTIONS(ec2::QnAbstractTransaction, (binary))
 
 namespace ec2
 {
@@ -186,19 +189,19 @@ namespace ec2
         T params;
     };
 
-    template <class TranParamType, class T2>
-    void serialize( const QnTransaction<TranParamType>& tran, OutputBinaryStream<T2>* stream )
+    template <class T, class Output>
+    void serialize(const QnTransaction<T> &transaction, QnOutputBinaryStream<Output> *stream)
     {
-        serialize( (const QnAbstractTransaction&)tran, stream);
-        serialize(tran.params, stream);
+        QnBinary::serialize(static_cast<const QnAbstractTransaction &>(transaction), stream);
+        QnBinary::serialize(transaction.params, stream);
     }
 
-    template <class TranParamType, class T2>
-    bool deserialize( QnTransaction<TranParamType>& tran, InputBinaryStream<T2>* stream )
+    template <class T, class Input>
+    bool deserialize(QnOutputBinaryStream<Input>* stream, QnTransaction<T> *transaction)
     {
-        return deserialize( (QnAbstractTransaction&)tran, stream) &&
-            deserialize(tran.params, stream);
-            //params.deserialize(stream);
+        return 
+            QnBinary::deserialize(stream, static_cast<QnAbstractTransaction *>(transaction)) &&
+            QnBinary::deserialize(stream, &transaction->params, stream);
     }
 
     int generateRequestID();

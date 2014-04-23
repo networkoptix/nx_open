@@ -15,7 +15,8 @@
     };
 
     #define apiScheduleTaskFields (startTime) (endTime) (doRecordAudio) (recordType) (dayOfWeek) (beforeThreshold) (afterThreshold) (streamQuality) (fps) 
-    QN_DEFINE_STRUCT_SERIALIZATORS(ScheduleTaskData, apiScheduleTaskFields);
+    //QN_DEFINE_STRUCT_SERIALIZATORS(ScheduleTaskData, apiScheduleTaskFields);
+    QN_FUSION_DECLARE_FUNCTIONS(ScheduleTaskData, (binary))
 
     struct ApiCameraData: ApiResourceData 
     {
@@ -45,6 +46,7 @@
 
     #define apiCameraDataFields (scheduleDisabled) (motionType) (region) (mac) (login) (password) (scheduleTask) (audioEnabled) (physicalId) (manuallyAdded) (model) \
                                 (firmware) (groupId) (groupName) (secondaryQuality) (controlDisabled) (statusFlags) (dewarpingParams) (vendor)
-    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiCameraData, ApiResourceData, apiCameraDataFields);
+    //QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiCameraData, ApiResourceData, apiCameraDataFields);
+    QN_FUSION_DECLARE_FUNCTIONS(ApiCameraData, (binary))
 
     QN_DEFINE_API_OBJECT_LIST_DATA(ApiCamera)

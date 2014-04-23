@@ -20,7 +20,8 @@
     };
 
     #define ApiLayoutItemFields (uuid) (flags) (left) (top) (right) (bottom) (rotation) (resourceId) (resourcePath) (zoomLeft) (zoomTop) (zoomRight) (zoomBottom) (zoomTargetUuid) (contrastParams) (dewarpingParams)
-    QN_DEFINE_STRUCT_SERIALIZATORS(ApiLayoutItemData, ApiLayoutItemFields);
+    //QN_DEFINE_STRUCT_SERIALIZATORS(ApiLayoutItemData, ApiLayoutItemFields);
+    QN_FUSION_DECLARE_FUNCTIONS(ApiLayoutItemData, (binary))
 
     struct ApiLayoutData : ApiResourceData {
         float cellAspectRatio;
@@ -39,6 +40,7 @@
     };
 
     #define ApiLayoutFields (cellAspectRatio) (cellSpacingWidth) (cellSpacingHeight) (items) (userCanEdit) (locked) (backgroundImageFilename) (backgroundWidth) (backgroundHeight) (backgroundOpacity) (userId)
-    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiLayoutData, ApiResourceData, ApiLayoutFields);
+    //QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiLayoutData, ApiResourceData, ApiLayoutFields);
+    QN_FUSION_DECLARE_FUNCTIONS(ApiLayoutData, (binary))
 
     QN_DEFINE_API_OBJECT_LIST_DATA(ApiLayoutData);

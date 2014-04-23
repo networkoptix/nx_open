@@ -12,7 +12,8 @@ struct ApiVideowallItemData {
 };
 
 #define ApiVideowallItemDataFields (guid) (pc_guid) (layout_guid) (name) (x) (y) (w) (h)
-QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallItemData, ApiVideowallItemDataFields)
+//QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallItemData, ApiVideowallItemDataFields)
+QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallItemData, (binary))
 
 struct ApiVideowallScreenData {
     QnId pc_guid;
@@ -30,7 +31,8 @@ struct ApiVideowallScreenData {
 };
 
 #define ApiVideowallScreenDataFields (pc_guid) (pc_index) (desktop_x) (desktop_y) (desktop_w) (desktop_h) (layout_x) (layout_y) (layout_w) (layout_h)
-QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallScreenData, ApiVideowallScreenDataFields)
+//QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallScreenData, ApiVideowallScreenDataFields)
+QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallScreenData, (binary))
 
 struct ApiVideowallData: ApiResourceData
 {
@@ -45,7 +47,9 @@ struct ApiVideowallData: ApiResourceData
 };
 
 #define ApiVideowallDataFields (autorun) (items) (screens)
-QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiVideowallData, ApiResourceData, ApiVideowallDataFields);
+//QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(ApiVideowallData, ApiResourceData, ApiVideowallDataFields);
+QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallData, (binary))
+
 QN_DEFINE_API_OBJECT_LIST_DATA(ApiVideowallData)
 
 struct ApiVideowallControlMessageData {
@@ -56,4 +60,5 @@ struct ApiVideowallControlMessageData {
 };
 
 #define ApiVideowallControlMessageDataFields (operation) (videowall_guid) (instance_guid) (params)
-QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallControlMessageData, ApiVideowallControlMessageDataFields)
+//QN_DEFINE_STRUCT_SERIALIZATORS (ApiVideowallControlMessageData, ApiVideowallControlMessageDataFields)
+QN_FUSION_DECLARE_FUNCTIONS(ApiVideowallControlMessageData, (binary))

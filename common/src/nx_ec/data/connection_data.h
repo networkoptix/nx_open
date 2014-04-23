@@ -7,8 +7,6 @@
 #include <api/model/connection_info.h>
 #include <utils/common/request_param.h>
 
-#include "../binary_serialization_helper.h"
-
 
 namespace ec2
 {

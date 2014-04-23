@@ -30,7 +30,7 @@ namespace QnBinaryDetail {
         QnContainer::reserve(*target, size);
 
         for(int i = 0; i < size; i++) {
-            typedef typename boost::range_mutable_iterator<Container>::type::value_type element;
+            typename boost::range_mutable_iterator<Container>::type::value_type element;
             if(!QnBinary::deserialize(stream, &element))
                 return false;
             QnContainer::insert(*target, boost::end(*target), element);

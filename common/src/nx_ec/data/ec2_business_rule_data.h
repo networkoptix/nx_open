@@ -51,14 +51,16 @@ namespace ec2
     };
 
     #define ApiBusinessActionDataFields (actionType) (toggleState) (receivedFromRemoteHost) (resources) (params) (runtimeParams) (businessRuleId) (aggregationCount)
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiBusinessActionData, ApiBusinessActionDataFields )
+    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiBusinessActionData, ApiBusinessActionDataFields )
+    QN_FUSION_DECLARE_FUNCTIONS(ApiBusinessActionData, (binary))
 
     struct ApiResetBusinessRuleData: public ApiData
     {
         ApiBusinessRuleList defaultRules;
     };
 
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiResetBusinessRuleData, (defaultRules) )
+    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiResetBusinessRuleData, (defaultRules) )
+    QN_FUSION_DECLARE_FUNCTIONS(ApiResetBusinessRuleData, (binary))
 }
 
 #endif // __EC2__BUSINESS_RULE_DATA_H_

@@ -13,6 +13,7 @@ namespace ec2
     class QnTransactionMessageBus;
 
 #include "transaction_transport_serializer_i.h"
+#include "utils/serialization/binary_stream.h"
 
 
     class QnTransactionTransportSerializer
@@ -28,11 +29,11 @@ namespace ec2
                 Q_ASSERT(!peer.isNull());
                 Q_ASSERT(peer != qnCommon->moduleGUID());
             }
-            OutputBinaryStream<QByteArray> stream(&buffer);
+            QnOutputBinaryStream<QByteArray> stream(&buffer);
             stream.write("00000000\r\n",10);
             stream.write("0000", 4);
-            serialize(ttHeader, &stream);
-            serialize( tran, &stream );
+            QnBinary::serialize(ttHeader, &stream);
+            QnBinary::serialize( tran, &stream );
             stream.write("\r\n",2); // chunk end
             quint32 payloadSize = buffer.size() - 12;
             quint32* payloadSizePtr = (quint32*) (buffer.data() + 10);
@@ -46,10 +47,10 @@ namespace ec2
                 Q_ASSERT(!peer.isNull());
                 Q_ASSERT(peer != qnCommon->moduleGUID());
             }
-            OutputBinaryStream<QByteArray> stream(&buffer);
+            QnOutputBinaryStream<QByteArray> stream(&buffer);
             stream.write("00000000\r\n",10);
             stream.write("0000", 4);
-            serialize(ttHeader, &stream);
+            QnBinary::serialize(ttHeader, &stream);
             stream.write(serializedTran.data(), serializedTran.size());
             stream.write("\r\n",2); // chunk end
             quint32 payloadSize = buffer.size() - 12;

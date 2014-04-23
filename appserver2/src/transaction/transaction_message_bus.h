@@ -108,7 +108,7 @@ signals:
         class AbstractHandler
         {
         public:
-            virtual bool processTransaction(QnTransactionTransport* sender, QnAbstractTransaction& tran, InputBinaryStream<QByteArray>& stream) = 0;
+            virtual bool processTransaction(QnTransactionTransport* sender, QnAbstractTransaction& tran, QnInputBinaryStream<QByteArray>& stream) = 0;
             virtual void* getHandler() const = 0;
             virtual ~AbstractHandler() {}
         };
@@ -119,10 +119,10 @@ signals:
         public:
             CustomHandler(T* handler): m_handler(handler) {}
 
-            virtual bool processTransaction(QnTransactionTransport* sender, QnAbstractTransaction& tran, InputBinaryStream<QByteArray>& stream) override;
+            virtual bool processTransaction(QnTransactionTransport* sender, QnAbstractTransaction& tran, QnInputBinaryStream<QByteArray>& stream) override;
             virtual void* getHandler() const override { return m_handler; }
         private:
-            template <class T2> bool deliveryTransaction(const QnAbstractTransaction&  abstractTran, InputBinaryStream<QByteArray>& stream);
+            template <class T2> bool deliveryTransaction(const QnAbstractTransaction&  abstractTran, QnInputBinaryStream<QByteArray>& stream);
         private:
             T* m_handler;
         };
@@ -132,16 +132,16 @@ signals:
     private:
         //void gotTransaction(const QnId& remoteGuid, bool isConnectionOriginator, const QByteArray& data);
         void sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData, const PeerList& dstPeers = PeerList());
-        bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
-        void onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
-        void onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, InputBinaryStream<QByteArray>&);
+        bool onGotTransactionSyncRequest(QnTransactionTransport* sender, QnInputBinaryStream<QByteArray>& stream);
+        void onGotTransactionSyncResponse(QnTransactionTransport* sender, QnInputBinaryStream<QByteArray>& stream);
+        void onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, QnInputBinaryStream<QByteArray>&);
         void queueSyncRequest(QnTransactionTransport* transport);
 
         void connectToPeerEstablished(const QnId& id, bool isClient);
         void connectToPeerLost(const QnId& id);
         void sendServerAliveMsg(const QnId& id, bool isAlive, bool isClient);
         bool isPeerUsing(const QUrl& url);
-        void onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream);
+        void onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, QnInputBinaryStream<QByteArray>& stream);
         QSet<QUuid> peersToSend(ApiCommand::Value command) const;
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);

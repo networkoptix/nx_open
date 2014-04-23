@@ -9,8 +9,6 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 
-#include <nx_ec/binary_serialization_helper.h>
-
 
 namespace ec2
 {
@@ -22,7 +20,8 @@ namespace ec2
         bool allowCameraChanges;
     };
 
-    QN_DEFINE_STRUCT_SERIALIZATORS( QnRuntimeInfo, (publicIp)(sessionKey)(allowCameraChanges) )
+    //QN_DEFINE_STRUCT_SERIALIZATORS( QnRuntimeInfo, (publicIp)(sessionKey)(allowCameraChanges) )
+    QN_FUSION_DECLARE_FUNCTIONS(QnRuntimeInfo, (binary))
 }
 
 #endif  //EC2_RUNTIME_INFO_H

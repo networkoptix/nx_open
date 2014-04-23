@@ -3,6 +3,15 @@
 
 #include <QtSql/QtSql>
 
+#include <utils/common/id.h>
+
+#define QN_DEFINE_API_OBJECT_LIST_DATA(TYPE)                                    \
+struct TYPE ## ListData: public ApiData {                                       \
+    std::vector<TYPE> data;                                                     \
+};                                                                              \
+QN_FUSION_DECLARE_FUNCTIONS(TYPE ## ListData, (binary))
+
+
 namespace ec2 {
     #include "api_data_i.h"
 }

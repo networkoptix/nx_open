@@ -3,7 +3,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
-#include <QUuid>
+#include <QtCore/QUuid>
 
 #include <utils/network/socket.h>
 #include <common/common_globals.h>

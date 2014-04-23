@@ -24,7 +24,8 @@ namespace ec2
         void fromResourceList(const QnKvPairList& resources);
     };
 
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiParamList, (data) )
+    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiParamList, (data) )
+    QN_FUSION_DECLARE_FUNCTIONS(ApiParamList, (binary))
         
 
     struct ApiResourceParamWithRef: public ApiResourceParamData
@@ -38,7 +39,8 @@ namespace ec2
         std::vector<ApiResourceParamData> params;
     };
 
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiResourceParams,  (id) (params) )
+    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiResourceParams,  (id) (params) )
+    QN_FUSION_DECLARE_FUNCTIONS(ApiResourceParams, (binary))
 
     void fromResourceToApi(const QnResourcePtr& resource, ApiResourceData& resourceData);
     void fromApiToResource(const ApiResourceData& resourceData, QnResourcePtr resource);
@@ -52,7 +54,8 @@ namespace ec2
         std::vector<ApiResourceData> data;
     };
 
-    QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ApiResourceList,  (data))
+    //QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ApiResourceList,  (data))
+    QN_FUSION_DECLARE_FUNCTIONS(ApiResourceList, (binary))
 
     struct ApiSetResourceStatusData: public ApiData
     {
@@ -62,7 +65,8 @@ namespace ec2
         QN_DECLARE_STRUCT_SQL_BINDER();
     };
 
-    QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiSetResourceStatusData,  (id) (status) )
+    //QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiSetResourceStatusData,  (id) (status) )
+    QN_FUSION_DECLARE_FUNCTIONS(ApiSetResourceStatusData, (binary))
 
 
     typedef std::vector<ApiSetResourceStatusData> ApiSyncResponseData;
@@ -72,7 +76,8 @@ namespace ec2
         bool disabled;
     };
 
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiSetResourceDisabledData,  (id) (disabled) )
+    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiSetResourceDisabledData,  (id) (disabled) )
+    QN_FUSION_DECLARE_FUNCTIONS(ApiSetResourceDisabledData, (binary))
 
 }
 

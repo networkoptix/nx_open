@@ -5,4 +5,5 @@ struct TransactionTransportHeader
     PeerList dstPeers;
 };
 
-QN_DEFINE_STRUCT_SERIALIZATORS(TransactionTransportHeader, (processedPeers) (dstPeers) );
+//QN_DEFINE_STRUCT_SERIALIZATORS(TransactionTransportHeader, (processedPeers) (dstPeers) );
+QN_FUSION_DECLARE_FUNCTIONS(TransactionTransportHeader, (binary))

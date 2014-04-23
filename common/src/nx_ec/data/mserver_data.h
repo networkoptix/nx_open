@@ -20,7 +20,8 @@ namespace ec2
         void loadFromQuery(QSqlQuery& query);
     };
 
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiStorageList, (data))
+    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiStorageList, (data))
+    QN_FUSION_DECLARE_FUNCTIONS(ApiStorageList, (binary))
 
     void fromResourceToApi(const QnMediaServerResourcePtr& resource, ApiMediaServerData &data);
     void fromApiToResource(const ApiMediaServerData &data, QnMediaServerResourcePtr& resource, const ResourceContext& ctx);
@@ -32,7 +33,8 @@ namespace ec2
         Qn::PanicMode mode;
     };
 
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiPanicModeData, (mode))
+    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiPanicModeData, (mode))
+    QN_FUSION_DECLARE_FUNCTIONS(ApiPanicModeData, (binary))
 
 
     struct ApiMediaServerList: public ApiMediaServerDataListData {

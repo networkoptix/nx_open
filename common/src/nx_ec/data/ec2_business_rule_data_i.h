@@ -23,6 +23,8 @@
     };
 
     #define ApiBusinessRuleFields (id) (eventType) (eventResource) (eventCondition) (eventState) (actionType) (actionResource) (actionParams) (aggregationPeriod) (disabled) (comments) (schedule) (system)
-    QN_DEFINE_STRUCT_SERIALIZATORS(ApiBusinessRuleData, ApiBusinessRuleFields);
+    //QN_DEFINE_STRUCT_SERIALIZATORS(ApiBusinessRuleData, ApiBusinessRuleFields);
+    QN_FUSION_DECLARE_FUNCTIONS(ApiBusinessRuleData, (binary))
 
     QN_DEFINE_API_OBJECT_LIST_DATA(ApiBusinessRule)
+    

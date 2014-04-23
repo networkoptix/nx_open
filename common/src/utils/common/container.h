@@ -3,6 +3,14 @@
 #ifndef QN_CONTAINER_H
 #define QN_CONTAINER_H
 
+#include <type_traits> /* For std::true_type, std::false_type. */
+
+#include <boost/iterator/iterator_adaptor.hpp>
+#include <boost/range/mutable_iterator.hpp>
+#include <boost/range/const_iterator.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
+
 template<class T> class QList;
 template<class Key, class T> class QHash;
 template<class Key, class T> class QMultiHash;
@@ -10,6 +18,28 @@ template<class Key, class T> class QMap;
 template<class Key, class T> class QMultiMap;
 template<class T> class QSet;
 
+
+namespace QnContainerDetail {
+    template<class Container>
+    std::true_type has_reserve_test(const Container &, const decltype(&Container::reserve) * = NULL);
+    std::false_type has_reserve_test(...);
+
+    template<class Container>
+    struct has_reserve {
+        typedef decltype(has_reserve_test(std::declval<Container>())) type;
+    };
+
+    template<class Container>
+    void reserve(Container &container, int size, const std::true_type &) {
+        container.reserve(size);
+    }
+
+    template<class Container>
+    void reserve(Container &, int, const std::false_type &) {
+        return;
+    }
+
+} // namespace QnContainerDetail
 
 namespace QnContainer {
 
@@ -60,13 +90,8 @@ namespace QnContainer {
 
 
     template<class Container>
-    void reserve(Container &container, int size, const decltype(&Container::reserve) * = NULL) {
-        container.reserve(size);
-    }
-
-    template<class Container>
-    void reserve(Container &, int) {
-        /* Do nothing. */
+    void reserve(Container &container, int size) {
+        QnContainerDetail::reserve(container, size, QnContainerDetail::has_reserve<Container>::type());
     }
 
 

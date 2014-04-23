@@ -10,7 +10,6 @@
 #include <QtCore/QPair>
 
 #include <utils/common/warnings.h>
-#include <utils/common/range.h>
 #include <utils/common/hash.h>
 #include <utils/common/container.h>
 

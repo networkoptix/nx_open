@@ -9,4 +9,6 @@ struct QnConnectionInfoData {
     QString publicIp;
     QString brand;
 };
-QN_DEFINE_STRUCT_SERIALIZATORS (QnConnectionInfoData, (ecUrl)(version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand))
+
+//QN_DEFINE_STRUCT_SERIALIZATORS (QnConnectionInfoData, (ecUrl)(version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand))
+QN_FUSION_DECLARE_FUNCTIONS(QnConnectionInfoData, (binary))

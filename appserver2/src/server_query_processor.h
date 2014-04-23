@@ -56,8 +56,8 @@ namespace ec2
             std::unique_ptr<ServerQueryProcessor, decltype(scopedGuardFunc)> scopedGuard( this, scopedGuardFunc );
 
             QByteArray serializedTran;
-            OutputBinaryStream<QByteArray> stream( &serializedTran );
-            serialize( tran, &stream );
+            QnOutputBinaryStream<QByteArray> stream( &serializedTran );
+            QnBinary::serialize( tran, &stream );
 
             errorCode = auxManager->executeTransaction(tran);
             if( errorCode != ErrorCode::ok )
@@ -118,8 +118,8 @@ namespace ec2
                 std::unique_ptr<ServerQueryProcessor, decltype(scopedGuardFunc)> scopedGuard( this, scopedGuardFunc );
 
                 QByteArray serializedTran;
-                OutputBinaryStream<QByteArray> stream( &serializedTran );
-                serialize( tran, &stream );
+                QnOutputBinaryStream<QByteArray> stream( &serializedTran );
+                QnBinary::serialize( tran, &stream );
 
                 errorCode = auxManager->executeTransaction(tran);
                 if( errorCode != ErrorCode::ok ) {

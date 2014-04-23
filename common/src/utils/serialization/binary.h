@@ -7,58 +7,7 @@
 #include <utils/fusion/fusion_serialization.h>
 
 #include "binary_fwd.h"
-
-template<>
-class QnInputBinaryStream<QByteArray> {
-public:
-    QnInputBinaryStream( const QByteArray& data )
-    :
-        m_data( data ),
-        pos( 0 )
-    {
-    }
-
-    /*!
-        \return Bytes actually read
-    */
-    int read(void *buffer, int maxSize) {
-        int toRead = qMin(m_data.size() - pos, maxSize);
-        memcpy(buffer, m_data.constData() + pos, toRead);
-        pos += toRead;
-        return toRead;
-    }
-
-    //!Resets internal cursor position
-    void reset() {
-        pos = 0;
-    }
-
-    const QByteArray& buffer() const { return m_data; }
-    int getPos() const { return pos; }
-
-private:
-    const QByteArray& m_data;
-    int pos;
-};
-
-template<>
-class QnOutputBinaryStream<QByteArray> {
-public:
-    QnOutputBinaryStream( QByteArray* const data )
-    :
-        m_data( data )
-    {
-    }
-
-    int write(const void *data, int size) {
-        m_data->append(static_cast<const char *>(data), size);
-        return size;
-    }
-
-private:
-    QByteArray* const m_data;
-};
-
+#include "binary_stream.h"
 
 namespace QnBinary {
     template<class T, class Output>
@@ -146,16 +95,5 @@ __VA_ARGS__ bool deserialize(QnInputBinaryStream<QByteArray> *stream, TYPE *targ
     return QnFusion::deserialize(stream, target);                               \
 }
 
-
-
-#if 0
-
-#define QN_DEFINE_API_OBJECT_LIST_DATA(TYPE) \
-    struct TYPE ## ListData: public ApiData { \
-        std::vector<TYPE> data; \
-    }; \
-    QN_DEFINE_STRUCT_SERIALIZATORS (TYPE ## ListData, (data) )
-
-#endif
 
 #endif // QN_SERIALIZATION_BINARY_H

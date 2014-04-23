@@ -29,7 +29,8 @@ namespace ec2
     };
 
 	#define ApiEmailSettingsFields (host)(port)(user)(password)(connectionType)
-	QN_DEFINE_STRUCT_SERIALIZATORS( ApiEmailSettingsData, ApiEmailSettingsFields )
+	//QN_DEFINE_STRUCT_SERIALIZATORS( ApiEmailSettingsData, ApiEmailSettingsFields )
+    QN_FUSION_DECLARE_FUNCTIONS(ApiEmailSettingsData, (binary))
 	
     class ApiEmailData
     :
@@ -55,7 +56,7 @@ namespace ec2
     };
 
 	#define ApiEmailFields (to)(subject)(body)(timeout)
-	QN_DEFINE_STRUCT_SERIALIZATORS( ApiEmailData, ApiEmailFields )
+	QN_FUSION_DECLARE_FUNCTIONS(ApiEmailData, (binary))
 }
 
 #endif // __EC2__EMAIL_DATA_H_

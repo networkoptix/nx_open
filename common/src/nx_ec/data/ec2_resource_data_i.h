@@ -11,7 +11,8 @@
     };
 
     #define ApiResourceParamFields (value) (name) (isResTypeParam)
-    QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceParamData, ApiResourceParamFields);
+    //QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceParamData, ApiResourceParamFields);
+    QN_FUSION_DECLARE_FUNCTIONS(ApiResourceParamData, (binary))
 
     struct ApiResourceData: ApiData {
         ApiResourceData(): status(QnResource::Offline), disabled(false) {}
@@ -29,4 +30,5 @@
     };
 
     #define ApiResourceFields (id) (parentGuid) (status) (disabled) (name) (url) (typeId) (addParams)
-    QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceData,  ApiResourceFields)
+    //QN_DEFINE_STRUCT_SERIALIZATORS(ApiResourceData,  ApiResourceFields)
+    QN_FUSION_DECLARE_FUNCTIONS(ApiResourceData, (binary))

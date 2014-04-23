@@ -8,6 +8,7 @@
 #include "common/common_module.h"
 #include "managers/impl/license_manager_impl.h"
 #include "nx_ec/data/ec2_business_rule_data.h"
+#include "utils/serialization/binary_stream.h"
 
 
 namespace ec2
@@ -134,8 +135,8 @@ bool QnDbManager::init()
         tran.params.status = QnResource::Offline;
         executeTransactionNoLock(tran);
         QByteArray serializedTran;
-        OutputBinaryStream<QByteArray> stream(&serializedTran);
-        serialize(tran, &stream);
+        QnOutputBinaryStream<QByteArray> stream(&serializedTran);
+        QnBinary::serialize(tran, &stream);
         transactionLog->saveTransaction(tran, serializedTran);
     }
 
