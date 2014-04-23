@@ -5,7 +5,6 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
-#include <nx_ec/binary_serialization_helper.h>
 #include <utils/common/software_version.h>
 
 

@@ -2,7 +2,6 @@
 #define __API_DATA_H__
 
 #include <QtSql/QtSql>
-#include "nx_ec/binary_serialization_helper.h"
 
 namespace ec2 {
     #include "api_data_i.h"

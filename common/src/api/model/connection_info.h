@@ -4,7 +4,6 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 
-#include <nx_ec/binary_serialization_helper.h>
 #include <utils/common/software_version.h>
 
 #include "compatibility.h"
@@ -14,8 +13,7 @@ typedef QnSoftwareVersion SoftwareVersionType;
 #include "connection_info_i.h"
 
 typedef QnConnectionInfoData QnConnectionInfo;
-
-Q_DECLARE_METATYPE( QnConnectionInfo );
+Q_DECLARE_METATYPE(QnConnectionInfo);
 
 
 // TODO: #Elric remove shared pointer?

@@ -87,6 +87,7 @@ namespace QJsonDetail {
         *target = result;
     }
 
+    // TODO: #Elric we've given up the idea that failed deserealization shouldn't touch the target.
     template<class T, class List>
     bool deserialize_list(QnJsonContext *ctx, const QJsonValue &value, List *target) {
         if(value.type() != QJsonValue::Array)

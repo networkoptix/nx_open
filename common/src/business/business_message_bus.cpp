@@ -49,7 +49,7 @@ int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionP
     request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("application/data"));
 
     QByteArray data;
-    OutputBinaryStream<QByteArray> stream(&data);
+    QnOutputBinaryStream<QByteArray> stream(&data);
     ec2::ApiBusinessActionData apiData;
     apiData.fromResource(bAction);
     serialize(apiData, &stream);
