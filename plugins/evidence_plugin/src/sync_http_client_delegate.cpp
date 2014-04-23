@@ -113,7 +113,7 @@ void SyncHttpClientDelegate::onConnectionFinished( QNetworkReply* reply )
 
     if( reply != m_reply )
         return; //this can be signal from old reply (being deleted)
-
+    m_messageBody += m_reply->readAll();
     m_requestState = rsDone;
     m_cond.wakeAll();
 }
@@ -121,6 +121,8 @@ void SyncHttpClientDelegate::onConnectionFinished( QNetworkReply* reply )
 void SyncHttpClientDelegate::readWholeMessageBodyPriv()
 {
     QMutexLocker lk( &m_mutex );
+    if( m_requestState > rsReadingMessageBody )
+        return; //message body has already been read
     m_messageBody = m_reply->readAll();
     m_requestState = rsDone;
     m_cond.wakeAll();

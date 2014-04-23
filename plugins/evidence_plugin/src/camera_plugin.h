@@ -75,6 +75,7 @@ public:
 
     nxpt::CommonRefManager* refManager();
     QNetworkAccessManager* networkAccessManager();
+    QThread* qtEventLoopThread();
 
     static CameraPlugin* instance();
 
@@ -83,6 +84,7 @@ private:
     std::auto_ptr<CameraDiscoveryManager> m_discoveryManager;
     //!Used with QNetworkAccessManager
     QThread m_networkEventLoopThread;
+    QThread m_qtEventLoopThread;
     QNetworkAccessManager m_networkAccessManager;
 };
 

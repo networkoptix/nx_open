@@ -151,8 +151,6 @@ private:
     mutable bool m_relayIOInfoRead;
     mutable std::auto_ptr<RelayIOManager> m_relayIOManager;
     mutable unsigned int m_cameraCapabilities;
-    mutable unsigned int m_inputPortCount;
-    mutable unsigned int m_outputPortCount;
     //!set<pair<hi_stream_res, lo_stream_res> >
     std::set<ResolutionPair, std::greater<ResolutionPair> > m_supportedResolutions;
     std::vector<nxcip::ResolutionInfo> m_hiStreamResolutions;
@@ -164,8 +162,8 @@ private:
     bool m_forceSecondaryStream;
     int m_rtspPort;
     QStringList m_currentResolutionCoded;
+    std::vector<QByteArray> m_relayParamsStr;
 
-    int updateCameraInfo() const;
     int readCameraOptions();
     void parseResolutionList( const QByteArray& resListStr, int hiStreamMaxFps, int loStreamMaxFps );
     void parseResolutionStr( const QByteArray& resStr, nxcip::Resolution* const resolution );

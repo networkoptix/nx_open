@@ -200,7 +200,8 @@ int syncDir( const QString& localDir, const QString& remoteUrl )
         return 1;
     }
 
-    auto syncher = std::make_shared<RDirSyncher>( QUrl(remoteUrl), localDir, nullptr );
+    RDirSyncher::EventReceiver dummyEventReceiver;
+    auto syncher = std::make_shared<RDirSyncher>( QUrl(remoteUrl), localDir, &dummyEventReceiver );
     if( !syncher->startAsync() )
     {
         std::cerr<<"Error: Failed to start synchronizaion"<<std::endl;

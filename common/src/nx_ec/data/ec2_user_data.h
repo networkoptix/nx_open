@@ -6,18 +6,13 @@
 
 namespace ec2
 {
-    struct ApiUser;
     #include "ec2_user_data_i.h"
+    void fromApiToResource(const ApiUserData& data, QnUserResourcePtr resource);
+    void fromResourceToApi(const QnUserResourcePtr resource, ApiUserData& data);
 
-    struct ApiUser: ApiUserData, ApiResource
-    {
-        void toResource(QnUserResourcePtr resource) const;
-        void fromResource(QnUserResourcePtr resource);
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiUser, ApiUserFields);
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiUserData, ApiUserFields);
 
-    struct ApiUserList: public ApiUserListData
+    struct ApiUserList: public ApiUserDataListData
     {
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData) const;
