@@ -79,7 +79,7 @@ namespace QnBinaryDetail {
         QnInputBinaryStream<Input> *m_stream;
     };
 
-} // namespace QJsonDetail
+} // namespace QnBinaryDetail
 
 
 QN_FUSION_REGISTER_SERIALIZATION_VISITOR(QnOutputBinaryStream<QByteArray> *, QnBinaryDetail::SerializationVisitor<QByteArray>)
@@ -88,7 +88,7 @@ QN_FUSION_REGISTER_DESERIALIZATION_VISITOR(QnInputBinaryStream<QByteArray> *, Qn
 
 #define QN_FUSION_DEFINE_FUNCTIONS_binary(TYPE, ... /* PREFIX */)               \
 __VA_ARGS__ void serialize(const TYPE &value, QnOutputBinaryStream<QByteArray> *stream) { \
-    QnFusion::serialize(value, stream);                                         \
+    QnFusion::serialize(value, &stream);                                        \
 }                                                                               \
                                                                                 \
 __VA_ARGS__ bool deserialize(QnInputBinaryStream<QByteArray> *stream, TYPE *target) { \

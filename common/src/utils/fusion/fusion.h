@@ -11,7 +11,6 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/equal_to.hpp>
 #include <boost/mpl/sizeof.hpp>
-#include <boost/mpl/and.hpp>
 #include <boost/mpl/integral_c.hpp>
 #endif // Q_MOC_RUN
 

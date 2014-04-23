@@ -12,7 +12,7 @@ namespace ec2
     void fromResourceToApi(const QnAbstractStorageResourcePtr &resource, ApiStorageData &data);
     void fromApiToResource(const ApiStorageData &data, QnAbstractStorageResourcePtr &resource);
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiStorageData, ApiStorageFields);
+    //QN_DEFINE_STRUCT_SQL_BINDER(ApiStorageData, ApiStorageFields);
 
     struct ApiStorageList: public ApiData {
         std::vector<ApiStorageData> data;
@@ -26,7 +26,7 @@ namespace ec2
     void fromResourceToApi(const QnMediaServerResourcePtr& resource, ApiMediaServerData &data);
     void fromApiToResource(const ApiMediaServerData &data, QnMediaServerResourcePtr& resource, const ResourceContext& ctx);
 
-    QN_DEFINE_STRUCT_SQL_BINDER(ApiMediaServerData, medisServerDataFields);
+    //QN_DEFINE_STRUCT_SQL_BINDER(ApiMediaServerData, medisServerDataFields);
 
     struct ApiPanicModeData: public ApiData
     {
@@ -37,7 +37,7 @@ namespace ec2
     QN_FUSION_DECLARE_FUNCTIONS(ApiPanicModeData, (binary))
 
 
-    struct ApiMediaServerList: public ApiMediaServerDataListData {
+    struct ApiMediaServerList: public std::vector<ApiMediaServerData> {
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData, const ResourceContext& ctx) const;
     };
