@@ -102,8 +102,13 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     };
 
 
+// TODO: 
+// #Elric instead of having visit_members function, expose only a function
+// that returns fusion adaptor for a type. Then implement a processor that
+// uses this adaptor. Then implement visit_members via that processor 
+// (and without macros).
 #define QN_FUSION_ADAPT_CLASS_FUNCTION_STEP_I(Z, INDEX, DATA)                   \
-    if(!visitor(std::forward<T>(value), QnFusion::AccessAdaptor<at_c<INDEX>::type>())) \
+    if(!QnFusionDetail::dispatch_visit(std::forward<Visitor>(visitor), std::forward<T>(value), QnFusion::AccessAdaptor<at_c<INDEX>::type>())) \
         return false;
 
 

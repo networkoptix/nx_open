@@ -87,31 +87,6 @@ namespace QnFusionDetail {
         return true;
     }
 
-
-    template<class Base>
-    struct NoStartStopVisitorWrapper: Base {
-    public:
-        template<class T, class Access>
-        bool operator()(const T &value, const Access &access) {
-            return Base::operator()(value, access);
-        }
-
-        template<class T, class Access>
-        bool operator()(const T &value, const Access &access) const {
-            return Base::operator()(value, access);
-        }
-    };
-
-    template<class Visitor>
-    NoStartStopVisitorWrapper<Visitor> &no_start_stop_wrap(Visitor &visitor) {
-        return static_cast<NoStartStopVisitorWrapper<Visitor> &>(visitor);
-    }
-
-    template<class Visitor>
-    NoStartStopVisitorWrapper<Visitor> &no_start_stop_wrap(const Visitor &visitor) {
-        return static_cast<const NoStartStopVisitorWrapper<Visitor> &>(visitor);
-    }
-
 } // namespace QnFusionDetail
 
 
@@ -332,6 +307,62 @@ namespace QnFusion {
 
 
 namespace QnFusionDetail {
+    template<class T, class R>
+    struct replace_referent {
+        typedef R type;
+    };
+
+    template<class T, class R>
+    struct replace_referent<T &, R> {
+        typedef R &type;
+    };
+
+    template<class T, class R>
+    struct replace_referent<T &&, R> {
+        typedef R &&type;
+    };
+
+    template<class T, class R>
+    struct replace_referent<const T, R> {
+        typedef const R type;
+    };
+
+    template<class T, class R>
+    struct replace_referent<const T &, R> {
+        typedef const R &type;
+    };
+
+    template<class T, class R>
+    struct replace_referent<const T &&, R> {
+        typedef const R &&type;
+    };
+
+
+    template<class Base>
+    struct NoStartStopVisitorWrapper: Base {
+    public:
+        template<class T, class Access>
+        bool operator()(const T &value, const Access &access) {
+            return Base::operator()(value, access);
+        }
+
+        template<class T, class Access>
+        bool operator()(const T &value, const Access &access) const {
+            return Base::operator()(value, access);
+        }
+    };
+
+    template<class Visitor>
+    NoStartStopVisitorWrapper<Visitor> &no_start_stop_wrap(Visitor &visitor) {
+        return static_cast<NoStartStopVisitorWrapper<Visitor> &>(visitor);
+    }
+
+    template<class Visitor>
+    NoStartStopVisitorWrapper<Visitor> &no_start_stop_wrap(const Visitor &visitor) {
+        return static_cast<const NoStartStopVisitorWrapper<Visitor> &>(visitor);
+    }
+
+
     template<class Visitor, class T, class Access>
     bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access) {
         return dispatch_visit(std::forward<Visitor>(visitor), std::forward<T>(value), access, typename Access::template at<QnFusion::base_type, na>::type());
@@ -344,7 +375,7 @@ namespace QnFusionDetail {
 
     template<class Visitor, class T, class Access, class Base>
     bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access, const Base &) {
-        typedef Base::result_type base_type; // TODO: #Elric not the proper way to forward it.
+        typedef typename replace_referent<T, typename std::remove_reference<Base::result_type>::type>::type base_type;
 
         return QnFusion::visit_members(std::forward<base_type>(value), no_start_stop_wrap(visitor));
     }
