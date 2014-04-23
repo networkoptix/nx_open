@@ -6,7 +6,7 @@
 #include <QtCore/QList>
 
 #include <utils/common/software_version.h>
-
+#include <utils/common/model_functions_fwd.h>
 
 // Presense of an entry in global table means
 // that component of ver1 is compatible (or has compatibility mode)

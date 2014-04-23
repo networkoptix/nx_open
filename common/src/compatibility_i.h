@@ -18,4 +18,5 @@ struct QnCompatibilityItem
     QString ver2;
 };
 
-QN_DEFINE_STRUCT_SERIALIZATORS(QnCompatibilityItem, (ver1)(comp1)(ver2))
+//QN_FUSION_DEFINE_FUNCTIONS(QnCompatibilityItem, (binary), (ver1)(comp1)(ver2))
+QN_FUSION_DECLARE_FUNCTIONS(QnCompatibilityItem, (binary))

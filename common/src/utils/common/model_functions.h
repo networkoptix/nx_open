@@ -6,6 +6,7 @@
 #include <utils/serialization/lexical.h>
 #include <utils/serialization/debug.h>
 #include <utils/serialization/data_stream.h>
+#include <utils/serialization/binary.h>
 #include <utils/math/fuzzy.h>
 
 namespace QnHashAutomation {
