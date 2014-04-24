@@ -1,3 +1,4 @@
+#if 0
 #include "ec2_email.h"
 
 namespace ec2 {
@@ -20,3 +21,4 @@ namespace ec2 {
         settings.connectionType = connectionType;
     }
 }
+#endif

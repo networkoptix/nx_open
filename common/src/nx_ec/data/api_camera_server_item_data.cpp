@@ -1,3 +1,4 @@
+#if 0
 #include "camera_server_item_data.h"
 
 
@@ -76,3 +77,4 @@ void ApiCameraServerItemList::toResourceList(QnCameraHistoryList& cameraServerIt
 #endif
 
 }
+#endif

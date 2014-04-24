@@ -27,7 +27,6 @@
 #include <core/resource/media_resource.h>
 #include <utils/common/email.h>
 
-
 #endif // QN_API_TYPES_HEADER
 
 #endif // QN_API_TYPES_I_H

@@ -1,3 +1,4 @@
+#if 0
 #include "mserver_data.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
@@ -125,3 +126,5 @@ void ApiMediaServerList::loadFromQuery(QSqlQuery& query)
 }
 
 }
+
+#endif

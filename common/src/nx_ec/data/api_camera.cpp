@@ -1,4 +1,5 @@
-#include "camera_data.h"
+#if 0
+#include "api_camera.h"
 #include "core/resource/camera_resource.h"
 #include "api/serializer/serializer.h"
 #include "utils/serialization/json.h"
@@ -137,3 +138,4 @@ void ApiCameraList::loadFromQuery(QSqlQuery& query)
 }
 
 }
+#endif

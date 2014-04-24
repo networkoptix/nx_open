@@ -6,7 +6,7 @@
 
 namespace ec2
 {
-    struct ApiCameraServerItemData : ApiData {
+    struct ApiCameraServerItemData: ApiData {
         ApiCameraServerItemData(): timestamp(0) {}
 
         QString  physicalId;

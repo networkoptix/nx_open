@@ -254,9 +254,24 @@ bool deserialize(QnInputBinaryStream<Input> *stream, std::pair<T1, T2> *target) 
 }
 
 
+// TODO: #Elric #ec2 check all enums we're using for explicit values.
+
+template<class T, class Output>
+void serialize(const T &value, QnOutputBinaryStream<Output> *stream, typename std::enable_if<std::is_enum<T>::value>::type * = NULL) {
+    QnBinary::serialize(static_cast<qint32>(value), stream);
+}
+
+template<class T, class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, T *target, typename std::enable_if<std::is_enum<T>::value>::type* = NULL) {
+    qint32 tmp;
+    if(!QnBinary::deserialize(stream, &tmp))
+        return false;
+    *target = static_cast<T>(tmp);
+    return true;
+}
 
 
-/*template<class T, class T2>
+template<class T, class T2>
 bool deserialize( T2& value, QnInputBinaryStream<T> *stream, typename std::enable_if<std::is_enum<T2>::value>::type* = NULL )
 {
     qint32 tmp;
@@ -264,7 +279,7 @@ bool deserialize( T2& value, QnInputBinaryStream<T> *stream, typename std::enabl
         return false;
     value = (T2) ntohl(tmp);
     return true;
-}*/
+}
 
 
 

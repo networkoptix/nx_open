@@ -1,6 +1,8 @@
 #include "business_rule_processor.h"
 
 #include <QtCore/QList>
+#include <QtCore/QBuffer>
+#include <QtGui/QImage>
 
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
@@ -25,9 +27,7 @@
 #include "business_strings_helper.h"
 #include "version.h"
 
-#include "nx_ec/data/ec2_email.h"
-#include <QtCore/QBuffer>
-#include <QtGui/QImage>
+#include "nx_ec/data/api_email_data.h"
 #include "common/common_module.h"
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes

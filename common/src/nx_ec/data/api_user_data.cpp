@@ -1,3 +1,4 @@
+#if 0
 #include "ec2_user_data.h"
 #include "core/resource/user_resource.h"
 
@@ -68,3 +69,5 @@ namespace ec2
 #endif
 
 }
+
+#endif

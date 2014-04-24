@@ -1,3 +1,4 @@
+#if 0
 #include "ec2_business_rule_data.h"
 #include "core/resource_management/resource_pool.h"
 #include "business/business_action_parameters.h"
@@ -123,3 +124,5 @@ QnAbstractBusinessActionPtr  ApiBusinessActionData::toResource(QnResourcePool* /
 }
 
 }
+
+#endif

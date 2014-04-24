@@ -1,3 +1,4 @@
+#if 0
 #include "ec2_resource_data.h"
 #include "core/resource/resource.h"
 
@@ -92,3 +93,5 @@ void ApiParamList::toResourceList(QnKvPairList& resources) const
 
 
 }
+
+#endif

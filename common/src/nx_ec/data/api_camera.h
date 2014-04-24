@@ -7,9 +7,9 @@
 
 namespace ec2
 {
-    struct ScheduleTaskData : ApiData
+    struct ApiScheduleTaskData : ApiData
     {
-        ScheduleTaskData(): startTime(0), endTime(0), doRecordAudio(false), recordType(Qn::RecordingType_Run), dayOfWeek(1), 
+        ApiScheduleTaskData(): startTime(0), endTime(0), doRecordAudio(false), recordType(Qn::RecordingType_Run), dayOfWeek(1), 
                         beforeThreshold(0), afterThreshold(0), streamQuality(Qn::QualityNotDefined), fps(0.0) {}
 
         qint32   startTime;
@@ -24,7 +24,7 @@ namespace ec2
     };
 #define ScheduleTaskData_Fields (startTime)(endTime)(doRecordAudio)(recordType)(dayOfWeek)(beforeThreshold)(afterThreshold)(streamQuality)(fps) 
 
-    struct ScheduleTaskWithRefData: ScheduleTaskData
+    struct ApiScheduleTaskWithRefData: ApiScheduleTaskData
     {
         QnId sourceId;
     };
@@ -40,7 +40,7 @@ namespace ec2
         QByteArray          mac;
         QString             login;
         QString             password;
-        std::vector<ScheduleTaskData>  scheduleTask;
+        std::vector<ApiScheduleTaskData>  scheduleTask;
         bool                audioEnabled;
         QString             physicalId;
         bool                manuallyAdded;
@@ -57,7 +57,7 @@ namespace ec2
 #define ApiCameraData_Fields (scheduleDisabled)(motionType)(region)(mac)(login)(password)(scheduleTask)(audioEnabled)(physicalId)(manuallyAdded)(model) \
                             (firmware)(groupId)(groupName)(secondaryQuality)(controlDisabled)(statusFlags)(dewarpingParams)(vendor)
 
-    /*struct ScheduleTask: ScheduleTaskData
+    /*struct ScheduleTask: ApiScheduleTaskData
     {
         static ScheduleTask fromResource(const QnResourcePtr& cameraRes, const QnScheduleTask& resScheduleTask);
         QnScheduleTask toResource(const QnId& resourceId) const;
@@ -86,7 +86,7 @@ namespace ec2
     };*/
 } // namespace ec2
 
-//QN_FUSION_DECLARE_FUNCTIONS(ScheduleTaskData, (binary))
+//QN_FUSION_DECLARE_FUNCTIONS(ApiScheduleTaskData, (binary))
 
 
 #endif // __API_CAMERA_DATA_H_

@@ -1,3 +1,4 @@
+#if 0
 #include "ec2_full_data.h"
 #include "core/resource/media_server_resource.h"
 
@@ -30,3 +31,4 @@ namespace ec2
         outData.serverInfo = serverInfo;
     }
 }
+#endif

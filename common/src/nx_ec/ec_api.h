@@ -9,17 +9,22 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 
-#include "nx_ec/data/ec2_email.h"
-#include "api/model/connection_info.h"
-#include "api/model/email_attachment.h"
-#include "data/ec2_runtime_info.h"
-#include "impl/ec_api_impl.h"
-#include "impl/sync_handler.h"
-#include "rest/server/rest_connection_processor.h"
-#include "network/universal_tcp_listener.h"
-#include "utils/common/email.h"
+#include <utils/common/email.h>
+
+#include <api/model/connection_info.h>
+#include <api/model/email_attachment.h>
+
 #include <core/resource/videowall_control_message.h>
-#include "data/server_info_i.h"
+
+#include <nx_ec/impl/ec_api_impl.h>
+#include <nx_ec/impl/sync_handler.h>
+#include <nx_ec/data/api_server_info_data.h>
+#include <nx_ec/data/api_email_data.h>
+#include <nx_ec/data/api_runtime_data.h>
+
+
+class QnRestProcessorPool;
+class QnUniversalTcpListener;
 
 //!Contains API classes for the new enterprise controller
 /*!

@@ -10,7 +10,20 @@
 
 typedef QnSoftwareVersion SoftwareVersionType;
 
-#include "connection_info_i.h"
+struct QnConnectionInfoData {
+    QnConnectionInfoData(): proxyPort(0) {}
+
+    QUrl ecUrl;
+    SoftwareVersionType version;
+    QList<QnCompatibilityItem> compatibilityItems;
+    int proxyPort;
+    QString ecsGuid;
+    QString publicIp;
+    QString brand;
+};
+
+//QN_DEFINE_STRUCT_SERIALIZATORS (QnConnectionInfoData, (ecUrl)(version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand))
+QN_FUSION_DECLARE_FUNCTIONS(QnConnectionInfoData, (binary))
 
 typedef QnConnectionInfoData QnConnectionInfo;
 Q_DECLARE_METATYPE(QnConnectionInfo);
