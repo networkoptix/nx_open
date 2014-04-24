@@ -125,12 +125,12 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
         if (res)
             actionKey += QString(L'_') + res->getUniqueId();
 
-        if (action->getToggleState() == Qn::OnState)
+        if (action->getToggleState() == QnBusiness::ActiveState)
         {
             if (++m_actionInProgress[actionKey] > 1)
                 return true; // ignore duplicated start
         }
-        else if (action->getToggleState() == Qn::OffState)
+        else if (action->getToggleState() == QnBusiness::InactiveState)
         {
             if (--m_actionInProgress[actionKey] > 0)
                 return true; // ignore duplicated stop
@@ -243,7 +243,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
 
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
 
-    if (bEvent->getToggleState() == Qn::OffState && !runtimeRule.resources.isEmpty())
+    if (bEvent->getToggleState() == QnBusiness::InactiveState && !runtimeRule.resources.isEmpty())
         return QnAbstractBusinessActionPtr(); // ignore 'Off' event if some event resources still running
 
     if (!runtimeRule.isActionRunning.isEmpty())
@@ -251,15 +251,15 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
         // Toggle event repeated with some interval with state 'on'.
         // if toggled action is used and condition is no longer valid - stop action
         // Or toggle event goes to 'off'. stop action
-        if (!condOK || bEvent->getToggleState() == Qn::OffState)
-            action = QnBusinessActionFactory::instantiateAction(rule, bEvent, Qn::OffState);
+        if (!condOK || bEvent->getToggleState() == QnBusiness::InactiveState)
+            action = QnBusinessActionFactory::instantiateAction(rule, bEvent, QnBusiness::InactiveState);
         else
             return QnAbstractBusinessActionPtr(); // ignore repeating 'On' event
     }
     else if (condOK)
         action = QnBusinessActionFactory::instantiateAction(rule, bEvent);
 
-    bool isActionRunning = action && action->getToggleState() == Qn::OnState;
+    bool isActionRunning = action && action->getToggleState() == QnBusiness::ActiveState;
     if (isActionRunning)
         runtimeRule.isActionRunning.insert(QnId());
     else
@@ -278,7 +278,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
         RunningRuleInfo& runtimeRule = itr.value();
         QnId resId = bEvent->getResource() ? bEvent->getResource()->getId() : QnId();
 
-        if (condOK && bEvent->getToggleState() == Qn::OnState) {
+        if (condOK && bEvent->getToggleState() == QnBusiness::ActiveState) {
             if (runtimeRule.isActionRunning.contains(resId))
                 return QnAbstractBusinessActionPtr(); // action by rule already was ran. Allow separate action for each resource of source event but ingore repeated 'on' state
             else
@@ -291,7 +291,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
     if (!condOK)
         return QnAbstractBusinessActionPtr();
 
-    if (rule->eventState() != Qn::UndefinedState && rule->eventState() != bEvent->getToggleState())
+    if (rule->eventState() != QnBusiness::UndefinedState && rule->eventState() != bEvent->getToggleState())
         return QnAbstractBusinessActionPtr();
 
 
@@ -356,7 +356,7 @@ bool QnBusinessRuleProcessor::checkEventCondition(QnAbstractBusinessEventPtr bEv
     // for continue event put information to m_eventsInProgress
     QnId resId = bEvent->getResource() ? bEvent->getResource()->getId() : QnId();
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
-    if (bEvent->getToggleState() == Qn::OnState)
+    if (bEvent->getToggleState() == QnBusiness::ActiveState)
         runtimeRule.resources[resId] = bEvent;
     else 
         runtimeRule.resources.remove(resId);
@@ -583,7 +583,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
             else
                 bEvent = runtimeRule.resources.begin().value(); // for continues action resourceID is not specified and only one record is used
             if (bEvent) {
-                QnAbstractBusinessActionPtr action = QnBusinessActionFactory::instantiateAction(rule, bEvent, Qn::OffState);
+                QnAbstractBusinessActionPtr action = QnBusinessActionFactory::instantiateAction(rule, bEvent, QnBusiness::InactiveState);
                 if (action)
                     executeAction(action);
             }

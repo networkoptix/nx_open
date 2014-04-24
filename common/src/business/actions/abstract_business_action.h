@@ -53,8 +53,8 @@ public:
     void setBusinessRuleId(const QnId& value);
     QnId getBusinessRuleId() const;
 
-    void setToggleState(Qn::ToggleState value);
-    Qn::ToggleState getToggleState() const;
+    void setToggleState(QnBusiness::EventState value);
+    QnBusiness::EventState getToggleState() const;
 
     void setReceivedFromRemoteHost(bool value);
     bool isReceivedFromRemoteHost() const;
@@ -71,7 +71,7 @@ public:
 
 protected:
     QnBusiness::ActionType m_actionType;
-    Qn::ToggleState m_toggleState;
+    QnBusiness::EventState m_toggleState;
     bool m_receivedFromRemoteHost;
     QVector<QnId> m_resources;
     QnBusinessActionParameters m_params;

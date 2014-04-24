@@ -10,7 +10,7 @@ namespace ec2
 {
     struct ApiBusinessRuleData: ApiData {
         ApiBusinessRuleData(): 
-            eventType(QnBusiness::UndefinedEvent), eventState(Qn::UndefinedState), actionType(QnBusiness::UndefinedAction), 
+            eventType(QnBusiness::UndefinedEvent), eventState(QnBusiness::UndefinedState), actionType(QnBusiness::UndefinedAction), 
             aggregationPeriod(0), disabled(false), system(false) {}
 
         QnId id;
@@ -18,7 +18,7 @@ namespace ec2
         QnBusiness::EventType eventType;
         std::vector<QnId>  eventResource;
         QByteArray eventCondition;
-        Qn::ToggleState eventState;
+        QnBusiness::EventState eventState;
 
         QnBusiness::ActionType actionType;
         std::vector<QnId> actionResource;
@@ -38,7 +38,7 @@ namespace ec2
     struct ApiBusinessActionData: ApiData
     {
         qint32 actionType;
-        Qn::ToggleState toggleState;
+        QnBusiness::EventState toggleState;
         bool receivedFromRemoteHost;
         std::vector<QnId> resources;
         QByteArray params;

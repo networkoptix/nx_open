@@ -229,7 +229,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
         QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
         action->setParams(actionParams);
         action->setBusinessRuleId(query.value(businessRuleIdx).toByteArray());
-        action->setToggleState( (Qn::ToggleState) query.value(toggleStateIdx).toInt());
+        action->setToggleState( (QnBusiness::EventState) query.value(toggleStateIdx).toInt());
         action->setAggregationCount(query.value(aggregationCntIdx).toInt());
 
         result << action;
@@ -363,7 +363,7 @@ void QnEventsDB::migrate()
         QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
         action->setParams(actionParams);
         action->setBusinessRuleId(query.value(businessRuleIdx).toString());
-        action->setToggleState( (Qn::ToggleState) query.value(toggleStateIdx).toInt());
+        action->setToggleState( (QnBusiness::EventState) query.value(toggleStateIdx).toInt());
         action->setAggregationCount(query.value(aggregationCntIdx).toInt());
 
         result << action;

@@ -40,7 +40,7 @@ namespace QnBusiness
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-        Q_ENUMS(EventReason EventType ActionType)
+        Q_ENUMS(EventReason EventState EventType ActionType)
 public:
 #else
     Q_NAMESPACE
@@ -56,6 +56,14 @@ public:
         StorageIoErrorReason,
         StorageTooSlowReason,
         StorageNotEnoughSpaceReason
+    };
+
+    enum EventState {
+        InactiveState,
+        ActiveState,
+
+        /** Also used in event rule to associate non-toggle action with event with any toggle state. */
+        UndefinedState 
     };
 
     enum EventType {
@@ -167,6 +175,6 @@ public:
 
 } // namespace QnBusiness
 
-QN_DECLARE_FUNCTIONS_FOR_TYPES((QnBusiness::EventReason)(QnBusiness::EventType)(QnBusiness::ActionType), (metatype)(lexical)(json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnBusiness::EventReason)(QnBusiness::EventState)(QnBusiness::EventType)(QnBusiness::ActionType), (metatype)(lexical)(json))
 
 #endif // QN_BUSINESS_FWD_H
