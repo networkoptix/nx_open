@@ -2,13 +2,20 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QBuffer>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QProcess>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
+#include <version.h>
+
+void stopServer(int signal);
+
 namespace {
 
     const QString updatesDirSuffix = lit("mediaserver/updates");
+    const QString updateInfoFileName = lit("update.json");
     const int readBufferSize = 1024 * 16;
 
     QDir getUpdatesDir() {
@@ -94,5 +101,39 @@ bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray
 }
 
 bool QnServerUpdateTool::installUpdate(const QString &updateId) {
+    QDir updateDir = getUpdateDir(updateId);
+    if (!updateDir.exists())
+        return false;
+
+    QFile updateInfoFile(updateDir.absoluteFilePath(updateInfoFileName));
+    if (!updateInfoFile.open(QFile::ReadOnly))
+        return false;
+
+    QVariantMap map = QJsonDocument::fromJson(updateInfoFile.readAll()).toVariant().toMap();
+    updateInfoFile.close();
+
+    QString executable = map.value(lit("executable")).toString();
+    if (executable.isEmpty())
+        return false;
+
+    if (map.value(lit("platform")) != lit(QN_APPLICATION_PLATFORM))
+        return false;
+    if (map.value(lit("arch")) != lit(QN_APPLICATION_ARCH))
+        return false;
+
+    QString currentDir = QDir::currentPath();
+    QDir::setCurrent(updateDir.absolutePath());
+
+    QProcess process;
+    process.start(updateDir.absoluteFilePath(executable));
+    process.waitForFinished(10 * 60 * 1000); // wait for ten minutes
+
+    // possibly we'll be killed by updater and wont get here
+
+    if (process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0)
+        stopServer(0); // TODO: #dklychkov make other way to stop server
+
+    QDir::setCurrent(currentDir);
+
     return true;
 }
