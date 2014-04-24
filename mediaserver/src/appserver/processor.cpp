@@ -83,7 +83,6 @@ void QnAppserverResourceProcessor::addNewCamera(QnVirtualCameraResourcePtr camer
 {
     if (!ec2::QnDistributedMutexManager::instance())
     {
-        Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(cameraResource->getUniqueId()).isEmpty());
         addNewCameraInternal(cameraResource);
         return;
     }
@@ -93,6 +92,7 @@ void QnAppserverResourceProcessor::addNewCamera(QnVirtualCameraResourcePtr camer
     if (m_lockInProgress.contains(name))
         return; // camera already adding (in progress)
 
+    Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(name).isEmpty());
     ec2::QnDistributedMutexPtr mutex = ec2::QnDistributedMutexManager::instance()->getLock(name);
     m_lockInProgress.insert(name, LockData(mutex, cameraResource));
 }

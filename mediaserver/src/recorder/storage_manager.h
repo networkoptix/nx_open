@@ -66,7 +66,7 @@ public:
     DeviceFileCatalogPtr getFileCatalog(const QByteArray& mac, const QString& qualityPrefix);
 
     QnTimePeriodList getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel);
-    bool loadFullFileCatalog(QnStorageResourcePtr storage, bool isRebuild = false);
+    bool loadFullFileCatalog(QnStorageResourcePtr storage, bool isRebuild = false, qreal progressCoeff = 1.0);
     void loadFullFileCatalog();
     QVector<DeviceFileCatalog::Chunk> correctChunksFromMediaData(DeviceFileCatalogPtr fileCatalog, QnStorageResourcePtr storage, const QVector<DeviceFileCatalog::Chunk>& chunks);
 
@@ -120,6 +120,7 @@ private:
     void testOfflineStorages();
     void rebuildCatalogIndexInternal();
     bool isCatalogLoaded() const;
+    void addDataToCatalog(DeviceFileCatalogPtr newCatalog, const QByteArray& mac, QnResource::ConnectionRole role);
 
 
     int getFileNumFromCache(const QString& base, const QString& folder);
@@ -129,7 +130,9 @@ private:
     QSet<QnStorageResourcePtr> getWritableStorages() const;
     void changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status);
     DeviceFileCatalogPtr getFileCatalogInternal(const QByteArray& mac, QnResource::ConnectionRole role);
-    //void addDataToCatalog(DeviceFileCatalogPtr newCatalog, const QByteArray& mac, QnResource::ConnectionRole role);
+    void loadFullFileCatalogFromMedia(QnStorageResourcePtr storage, QnResource::ConnectionRole role, qreal progressCoeff);
+    void replaceChunks(const QnTimePeriod& rebuildPeriod, QnStorageResourcePtr storage, DeviceFileCatalogPtr newCatalog, const QByteArray& mac, QnResource::ConnectionRole role);
+    void loadFullFileCatalogInternal(QnResource::ConnectionRole role);
 private:
     StorageMap m_storageRoots;
     typedef QMap<QByteArray, DeviceFileCatalogPtr> FileCatalogMap;
