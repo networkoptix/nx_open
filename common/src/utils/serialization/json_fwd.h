@@ -1,8 +1,6 @@
 #ifndef QN_JSON_FWD_H
 #define QN_JSON_FWD_H
 
-#include <utils/fusion/fusion_fwd.h>
-
 class QJsonValue;
 class QnJsonContext;
 

@@ -6,7 +6,6 @@
 #include <QtWidgets/QWidget>
 
 #include <client/client_color_types.h>
-#include <core/misc/schedule_recording_type.h>
 
 
 //TODO: #Elric omg look at these global constants =)

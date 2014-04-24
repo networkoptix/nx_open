@@ -1,8 +1,6 @@
 #ifndef QN_SERIALIZATION_DEBUG_FWD_H
 #define QN_SERIALIZATION_DEBUG_FWD_H
 
-#include <utils/fusion/fusion_fwd.h>
-
 class QDebug;
 
 #define QN_FUSION_DECLARE_FUNCTIONS_debug(TYPE, ... /* PREFIX */)               \

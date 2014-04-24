@@ -6,11 +6,12 @@
 #include <utils/common/model_functions_fwd.h>
 
 namespace ec2 {
+    struct ApiData;
+
     struct ApiBusinessActionData;
     struct ApiBusinessRuleData;
     struct ApiCameraData;
     struct ApiCameraServerItemData;
-    struct ApiData;
     struct ApiEmailData;
     struct ApiEmailSettingsData;
     struct ApiFullInfoData;
@@ -53,9 +54,42 @@ namespace ec2 {
     typedef std::vector<ApiUserData> ApiUserDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
 
+#define QN_EC2_API_DATA_CLASSES \
+    (ApiBusinessActionData)\
+    (ApiBusinessRuleData)\
+    (ApiCameraData)\
+    (ApiCameraServerItemData)\
+    (ApiEmailData)\
+    (ApiEmailSettingsData)\
+    (ApiFullInfoData)\
+    (ApiIdData)\
+    (ApiLayoutItemData)\
+    (ApiLayoutData)\
+    (ApiLicenseData)\
+    (ApiLockData)\
+    (ApiMediaServerData)\
+    (ApiPanicModeData)\
+    (ApiPropertyTypeData)\
+    (ApiResourceData)\
+    (ApiResourceParamData)\
+    (ApiResourceParamsData)\
+    (ApiResourceTypeData)\
+    (ApiRuntimeData)\
+    (ApiScheduleTaskData)\
+    (ApiServerAliveData)\
+    (ApiServerInfoData)\
+    (ApiSetResourceDisabledData)\
+    (ApiSetResourceStatusData)\
+    (ApiStorageData)\
+    (ApiStoredFileData)\
+    (ApiUserData)\
+    (ApiVideowallControlMessageData)\
+    (ApiVideowallData)\
+    (ApiVideowallItemData)\
+    (ApiVideowallScreenData)\
 
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-        (ApiBusinessRuleData)(ApiBusinessActionData),
+        QN_EC2_API_DATA_CLASSES,
         (binary)(json)
     );
 

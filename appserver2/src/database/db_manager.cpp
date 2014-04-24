@@ -566,7 +566,7 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 in
                      //:sourceId, :startTime, :endTime, :doRecordAudio, :recordType, :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps)");
     insQuery.prepare("INSERT INTO vms_scheduletask VALUES (NULL, ?,?,?,?,?,?,?,?,?,?)");
     insQuery.bindValue(0, internalId);
-	foreach(const ScheduleTaskData& task, data.scheduleTask) 
+	foreach(const ApiScheduleTaskData& task, data.scheduleTask) 
 	{
 		task.autoBindValuesOrdered(insQuery, 1);
 		if (!insQuery.exec()) {
@@ -1651,11 +1651,11 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     QN_QUERY_TO_DATA_OBJECT(queryParams, ApiResourceParamWithRefData, kvPairs, ApiResourceParamFields (resourceId));
 
 
-    mergeObjectListData<ApiMediaServerData>(data.servers.data,  kvPairs, &ApiMediaServerData::addParams, &ApiResourceParamWithRefData::resourceId);
-    mergeObjectListData<ApiCameraData>(data.cameras.data,       kvPairs, &ApiCameraData::addParams,      &ApiResourceParamWithRefData::resourceId);
-    mergeObjectListData<ApiUserData>(data.users.data,           kvPairs, &ApiUserData::addParams,        &ApiResourceParamWithRefData::resourceId);
-    mergeObjectListData<ApiLayoutData>(data.layouts.data,       kvPairs, &ApiLayoutData::addParams,      &ApiResourceParamWithRefData::resourceId);
-    mergeObjectListData<ApiVideowallData>(data.videowalls.data, kvPairs, &ApiVideowallData::addParams,   &ApiResourceParamWithRefData::resourceId);
+    mergeObjectListData<ApiMediaServerData>(data.servers,   kvPairs, &ApiMediaServerData::addParams, &ApiResourceParamWithRefData::resourceId);
+    mergeObjectListData<ApiCameraData>(data.cameras,        kvPairs, &ApiCameraData::addParams,      &ApiResourceParamWithRefData::resourceId);
+    mergeObjectListData<ApiUserData>(data.users,            kvPairs, &ApiUserData::addParams,        &ApiResourceParamWithRefData::resourceId);
+    mergeObjectListData<ApiLayoutData>(data.layouts,        kvPairs, &ApiLayoutData::addParams,      &ApiResourceParamWithRefData::resourceId);
+    mergeObjectListData<ApiVideowallData>(data.videowalls,  kvPairs, &ApiVideowallData::addParams,   &ApiResourceParamWithRefData::resourceId);
 
     //filling serverinfo
     fillServerInfo( &data.serverInfo );
@@ -1682,7 +1682,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResetBusi
     if (!execSQLQuery("DELETE FROM vms_businessrule"))
         return ErrorCode::failure;
 
-    foreach (const ApiBusinessRuleData& rule, tran.params.defaultRules.data)
+    foreach (const ApiBusinessRuleData& rule, tran.params.defaultRules)
     {
         ErrorCode rez = updateBusinessRule(rule);
         if (rez != ErrorCode::ok)

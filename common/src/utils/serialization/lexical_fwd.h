@@ -1,8 +1,6 @@
 #ifndef QN_SERIALIZATION_LEXICAL_FWD_H
 #define QN_SERIALIZATION_LEXICAL_FWD_H
 
-#include <utils/fusion/fusion_fwd.h>
-
 class QString;
 
 /**

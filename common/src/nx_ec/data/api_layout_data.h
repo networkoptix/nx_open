@@ -37,9 +37,15 @@ namespace ec2
 
         //QN_DECLARE_STRUCT_SQL_BINDER();
     };
-
 #define ApiLayoutItemData_Fields (uuid)(flags)(left)(top)(right)(bottom)(rotation)(resourceId)(resourcePath) \
                                     (zoomLeft)(zoomTop)(zoomRight)(zoomBottom)(zoomTargetUuid)(contrastParams)(dewarpingParams)
+
+
+    struct ApiLayoutItemWithRefData: ApiLayoutItemData {
+        QnId layoutId;
+    };
+#define ApiLayoutItemWithRefData_Fields ApiLayoutItemData_Fields (layoutId)
+
 
     struct ApiLayoutData : ApiResourceData {
         float cellAspectRatio;
@@ -56,13 +62,11 @@ namespace ec2
 
         //QN_DECLARE_STRUCT_SQL_BINDER();
     };
-#define ApiLayoutData_Fields (cellAspectRatio)(cellSpacingWidth)(cellSpacingHeight)(items)(userCanEdit)(locked) \
+#define ApiLayoutData_Fields ApiResourceData_Fields (cellAspectRatio)(cellSpacingWidth)(cellSpacingHeight)(items)(userCanEdit)(locked) \
                                 (backgroundImageFilename)(backgroundWidth)(backgroundHeight)(backgroundOpacity) (userId)
 
 
-    struct ApiLayoutItemWithRefData: ApiLayoutItemData {
-        QnId layoutId;
-    };
+
 
     //QN_DEFINE_STRUCT_SQL_BINDER(ApiLayoutData, ApiLayoutFields);
 

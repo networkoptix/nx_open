@@ -18,6 +18,7 @@ namespace ec2 {
         QString armBox;
         bool allowCameraChanges;
     };
+#define ApiServerInfoData_Fields (mainHardwareIds)(compatibleHardwareIds)(publicIp)(systemName)(sessionKey)(armBox)(allowCameraChanges)
 
 } // namespace ec2
 

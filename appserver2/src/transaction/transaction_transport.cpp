@@ -1,6 +1,7 @@
 #include "transaction_transport.h"
 
 #include <QtCore/QUrlQuery>
+#include <QtCore/QTimer>
 
 #include "transaction_message_bus.h"
 #include "utils/network/aio/aioservice.h"

@@ -17,6 +17,7 @@ namespace ec2
         QByteArray sessionKey;
         bool allowCameraChanges;
     };
+#define ApiRuntimeData_Fields (publicIp)(sessionKey)(allowCameraChanges)
 
     //QN_DEFINE_STRUCT_SERIALIZATORS( QnRuntimeInfo, (publicIp)(sessionKey)(allowCameraChanges) )
     //QN_FUSION_DECLARE_FUNCTIONS(ApiRuntimeData, (binary))

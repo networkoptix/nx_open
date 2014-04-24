@@ -16,7 +16,7 @@ namespace ec2
 
         ///QN_DECLARE_STRUCT_SQL_BINDER();
     };
-#define ApiStorageData_Fields  (spaceLimit)(usedForWriting)
+#define ApiStorageData_Fields ApiResourceData_Fields (spaceLimit)(usedForWriting)
 
 
     struct ApiMediaServerData: ApiResourceData
@@ -36,13 +36,14 @@ namespace ec2
 
         //QN_DECLARE_STRUCT_SQL_BINDER();
     };
-#define ApiMediaServerData_Fields (apiUrl)(netAddrList)(flags)(panicMode)(streamingUrl)(version)(authKey)(storages)(maxCameras)(redundancy)
+#define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(netAddrList)(flags)(panicMode)(streamingUrl)(version)(authKey)(storages)(maxCameras)(redundancy)
 
 
     struct ApiPanicModeData: public ApiData
     {
         Qn::PanicMode mode;
     };
+#define ApiPanicModeData_Fields (mode)
 
 
     /*void fromResourceToApi(const QnAbstractStorageResourcePtr &resource, ApiStorageData &data);

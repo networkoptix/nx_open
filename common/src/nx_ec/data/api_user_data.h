@@ -18,7 +18,7 @@ namespace ec2
 
         //QN_DECLARE_STRUCT_SQL_BINDER();
     };
-#define ApiUserData_Fields (isAdmin)(rights)(email)(digest)(hash)
+#define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(rights)(email)(digest)(hash)
 
     /*void fromApiToResource(const ApiUserData& data, QnUserResourcePtr resource);
     void fromResourceToApi(const QnUserResourcePtr resource, ApiUserData& data);*/

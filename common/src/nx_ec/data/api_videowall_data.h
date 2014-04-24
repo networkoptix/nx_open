@@ -50,7 +50,7 @@ namespace ec2
 
         //QN_DECLARE_STRUCT_SQL_BINDER();
     };
-#define ApiVideowallData_Fields (autorun)(items)(screens)
+#define ApiVideowallData_Fields ApiResourceData_Fields (autorun)(items)(screens)
 
 
     struct ApiVideowallControlMessageData {
@@ -69,10 +69,13 @@ namespace ec2
     struct ApiVideowallItemWithRefData: public ApiVideowallItemData {
         QnId videowall_guid;
     };
+#define ApiVideowallItemWithRefData_Fields ApiVideowallItemData_Fields (videowall_guid)
+
 
     struct ApiVideowallScreenWithRefData: public ApiVideowallScreenData {
         QnId videowall_guid;
     };
+#define ApiVideowallScreenWithRefData_Fields ApiVideowallScreenData_Fields (videowall_guid)
 
 
     /*void fromApiToScreen(const ApiVideowallScreenData &data, QnVideoWallPcData::PcScreen& screen);

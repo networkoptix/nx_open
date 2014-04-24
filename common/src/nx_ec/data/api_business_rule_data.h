@@ -56,7 +56,7 @@ namespace ec2
     {
         ApiBusinessRuleDataList defaultRules;
     };
-
+#define ApiResetBusinessRuleData_Fields (defaultRules)
 
     /*struct ApiBusinessRule: ApiBusinessRuleData
     {

@@ -2,7 +2,6 @@
 
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/misc/schedule_recording_type.h>
 
 #include <ui/style/skin.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>

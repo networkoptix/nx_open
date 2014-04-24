@@ -42,7 +42,9 @@ namespace QnBinaryDetail {
         Element element;
         if(!QnBinary::deserialize(stream, &element))
             return false;
+        
         QnContainer::insert(*target, boost::end(*target), std::move(element));
+        return true;
     }
 
     template<class Container, class Element, class Input>
@@ -54,6 +56,8 @@ namespace QnBinaryDetail {
         /* Deserialize mapped value right into container. */
         if(!QnBinary::deserialize(stream, &(*target)[key]))
             return false;
+
+        return true;
     }
 
     template<class Container, class Input>
@@ -302,6 +306,21 @@ bool deserialize(QnInputBinaryStream<Input> *stream, T *target, typename std::en
     if(!QnBinary::deserialize(stream, &tmp))
         return false;
     *target = static_cast<T>(tmp);
+    return true;
+}
+
+
+template<class T, class Output>
+void serialize(const QFlags<T> &value, QnOutputBinaryStream<Output> *stream) {
+    QnBinary::serialize(static_cast<qint32>(value), stream);
+}
+
+template<class T, class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, QFlags<T> *target) {
+    qint32 tmp;
+    if(!QnBinary::deserialize(stream, &tmp))
+        return false;
+    *target = static_cast<QFlags<T> >(tmp);
     return true;
 }
 

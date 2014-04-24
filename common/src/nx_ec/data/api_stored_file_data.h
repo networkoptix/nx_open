@@ -11,6 +11,7 @@ namespace ec2
         QString path;
         QByteArray data;
     };
+#define ApiStoredFileData_Fields (path)(data)
 
     typedef QString ApiStoredFilePath; // TODO: #Elric struct => extendable?
 

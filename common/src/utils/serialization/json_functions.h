@@ -119,7 +119,9 @@ namespace QJsonDetail {
         Element element;
         if(!QJson::deserialize(ctx, value, &element))
             return false;
+        
         QnContainer::insert(*target, boost::end(target), std::move(element));
+        return true;
     }
 
     template<class Container, class Element>

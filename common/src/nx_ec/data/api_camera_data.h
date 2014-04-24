@@ -22,12 +22,15 @@ namespace ec2
         Qn::StreamQuality  streamQuality;
         qint16   fps;
     };
-#define ScheduleTaskData_Fields (startTime)(endTime)(doRecordAudio)(recordType)(dayOfWeek)(beforeThreshold)(afterThreshold)(streamQuality)(fps) 
+#define ApiScheduleTaskData_Fields (startTime)(endTime)(doRecordAudio)(recordType)(dayOfWeek)(beforeThreshold)(afterThreshold)(streamQuality)(fps) 
+
 
     struct ApiScheduleTaskWithRefData: ApiScheduleTaskData
     {
         QnId sourceId;
     };
+#define ApiScheduleTaskWithRefData_Fields ApiScheduleTaskData_Fields (sourceId)
+
 
     struct ApiCameraData: ApiResourceData
     {
@@ -54,7 +57,7 @@ namespace ec2
         QByteArray          dewarpingParams;
         QString             vendor;
     };
-#define ApiCameraData_Fields (scheduleDisabled)(motionType)(region)(mac)(login)(password)(scheduleTask)(audioEnabled)(physicalId)(manuallyAdded)(model) \
+#define ApiCameraData_Fields ApiResourceData_Fields (scheduleDisabled)(motionType)(region)(mac)(login)(password)(scheduleTask)(audioEnabled)(physicalId)(manuallyAdded)(model) \
                             (firmware)(groupId)(groupName)(secondaryQuality)(controlDisabled)(statusFlags)(dewarpingParams)(vendor)
 
     /*struct ScheduleTask: ApiScheduleTaskData

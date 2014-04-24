@@ -25,6 +25,7 @@ namespace ec2
     {
         QnId resourceId;
     };
+#define ApiResourceParamWithRefData_Fields ApiResourceParamData_Fields (resourceId)
 
 
     struct ApiResourceParamsData: ApiData
@@ -32,6 +33,7 @@ namespace ec2
         QnId id;
         std::vector<ApiResourceParamData> params;
     };
+#define ApiResourceParamsData_Fields (id)(params)
 
 
     struct ApiResourceData: ApiData {
@@ -55,6 +57,7 @@ namespace ec2
         QnId id;
         bool disabled;
     };
+#define ApiSetResourceDisabledData_Fields (id)(disabled)
 
 
     struct ApiSetResourceStatusData: ApiData
@@ -64,7 +67,7 @@ namespace ec2
 
         //QN_DECLARE_STRUCT_SQL_BINDER();
     };
-
+#define ApiSetResourceStatusData_Fields (id)(status)
 
     //QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceParamData, ApiResourceParamFields);
 

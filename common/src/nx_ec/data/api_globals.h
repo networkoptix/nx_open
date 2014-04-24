@@ -23,7 +23,6 @@
 
 #include <utils/common/id.h>
 #include <business/business_fwd.h>
-#include <core/misc/schedule_recording_type.h>
 #include <core/resource/media_resource.h>
 #include <utils/common/email.h>
 

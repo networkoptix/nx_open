@@ -17,26 +17,6 @@ namespace Qn {
 
     // TODO: #Elric move out!
 
-    enum StreamQuality {
-        QualityLowest,
-        QualityLow,
-        QualityNormal,
-        QualityHigh,
-        QualityHighest,
-        QualityPreSet,
-        QualityNotDefined,
-
-        StreamQualityCount
-    };
-
-    enum SecondStreamQuality { 
-        SSQualityLow, 
-        SSQualityMedium, 
-        SSQualityHigh, 
-        SSQualityNotDefined,
-        SSQualityDontUse
-    };
-
     QString toDisplayString(Qn::StreamQuality value);
     QString toShortDisplayString(Qn::StreamQuality value);
 

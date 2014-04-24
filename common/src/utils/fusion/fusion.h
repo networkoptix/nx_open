@@ -197,13 +197,13 @@ namespace QnFusion {
      * setters and getters returned by member adaptors.
      */
 
-    template<class Class, class T>
-    T invoke(T Class::*getter, const Class &object) {
+    template<class Base, class Derived, class T>
+    T invoke(T Base::*getter, const Derived &object) {
         return object.*getter;
     }
 
-    template<class Class, class T>
-    T invoke(T (Class::*getter)() const, const Class &object) {
+    template<class Base, class Derived, class T>
+    T invoke(T (Base::*getter)() const, const Derived &object) {
         return (object.*getter)();
     }
 
@@ -212,13 +212,13 @@ namespace QnFusion {
         return getter(object);
     }
 
-    template<class Class, class T>
-    void invoke(T Class::*setter, Class &object, const T &value) {
+    template<class Base, class Derived, class T>
+    void invoke(T Base::*setter, Derived &object, const T &value) {
         object.*setter = value;
     }
 
-    template<class Class, class R, class P, class T>
-    void invoke(R (Class::*setter)(P), Class &object, const T &value) {
+    template<class Base, class Derived, class R, class P, class T>
+    void invoke(R (Base::*setter)(P), Derived &object, const T &value) {
         (object.*setter)(value);
     }
 

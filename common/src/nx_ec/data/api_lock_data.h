@@ -6,7 +6,7 @@
 
 namespace ec2
 {
-    struct ApiLockData: public ApiData
+    struct ApiLockData: ApiData
     {
         ApiLockData(): timestamp(0) {}
 
@@ -15,6 +15,7 @@ namespace ec2
         qint64 timestamp;
         QByteArray userData;
     };
+#define ApiLockData_Fields (name)(peer)(timestamp)(userData)
 
 //QN_DEFINE_STRUCT_SERIALIZATORS (ApiLockData, (name) (peer) (timestamp) (userData) )
 //QN_FUSION_DECLARE_FUNCTIONS(ApiLockData, (binary))

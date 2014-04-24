@@ -29,7 +29,7 @@ namespace ec2
         m_dbManager->init();
         m_transactionLog->init();
 
-        ApiParamList paramList;
+        ApiResourceParamDataList paramList;
         m_dbManager->doQueryNoLock(nullptr, paramList);
 
         QnKvPairList kvPairs;

@@ -7,7 +7,7 @@
 #include "transaction_transport.h"
 #include "transaction_transport_serializer.h"
 #include "utils/common/synctime.h"
-#include "nx_ec/data/server_alive_data.h"
+#include "nx_ec/data/api_server_alive_data.h"
 #include "transaction_log.h"
 #include "api/app_server_connection.h"
 #include <utils/serialization/binary_functions.h>
@@ -289,7 +289,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
     switch (abstractTran.command)
     {
         case ApiCommand::getAllDataList:
-            return deliveryTransaction<ApiFullInfo>(abstractTran, stream);
+            return deliveryTransaction<ApiFullInfoData>(abstractTran, stream);
 
         //!ApiSetResourceStatusData
         case ApiCommand::setResourceStatus:
@@ -299,7 +299,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiSetResourceDisabledData>(abstractTran, stream);
         //!ApiResourceParams
         case ApiCommand::setResourceParams:
-            return deliveryTransaction<ApiResourceParams>(abstractTran, stream);
+            return deliveryTransaction<ApiResourceParamDataList>(abstractTran, stream);
         case ApiCommand::saveResource:
             return deliveryTransaction<ApiResourceData>(abstractTran, stream);
         case ApiCommand::removeResource:
@@ -308,13 +308,13 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiPanicModeData>(abstractTran, stream);
             
         case ApiCommand::saveCamera:
-            return deliveryTransaction<ApiCamera>(abstractTran, stream);
+            return deliveryTransaction<ApiCameraData>(abstractTran, stream);
         case ApiCommand::saveCameras:
-            return deliveryTransaction<ApiCameraList>(abstractTran, stream);
+            return deliveryTransaction<ApiCameraDataList>(abstractTran, stream);
         case ApiCommand::removeCamera:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
         case ApiCommand::addCameraHistoryItem:
-            return deliveryTransaction<ApiCameraServerItem>(abstractTran, stream);
+            return deliveryTransaction<ApiCameraServerItemData>(abstractTran, stream);
 
         case ApiCommand::saveMediaServer:
             return deliveryTransaction<ApiMediaServerData>(abstractTran, stream);
@@ -327,12 +327,12 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
         case ApiCommand::saveBusinessRule:
-            return deliveryTransaction<ApiBusinessRule>(abstractTran, stream);
+            return deliveryTransaction<ApiBusinessRuleData>(abstractTran, stream);
         case ApiCommand::removeBusinessRule:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
         case ApiCommand::saveLayouts:
-            return deliveryTransaction<ApiLayoutList>(abstractTran, stream);
+            return deliveryTransaction<ApiLayoutDataList>(abstractTran, stream);
         case ApiCommand::saveLayout:
             return deliveryTransaction<ApiLayoutData>(abstractTran, stream);
         case ApiCommand::removeLayout:
@@ -355,11 +355,11 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiBusinessActionData>(abstractTran, stream);
 
         case ApiCommand::saveSettings:
-            return deliveryTransaction<ApiParamList>(abstractTran, stream);
+            return deliveryTransaction<ApiResourceParamDataList>(abstractTran, stream);
         case ApiCommand::addLicenses:
-            return deliveryTransaction<ApiLicenseList>(abstractTran, stream);
+            return deliveryTransaction<ApiLicenseDataList>(abstractTran, stream);
         case ApiCommand::addLicense:
-            return deliveryTransaction<ApiLicense>(abstractTran, stream);
+            return deliveryTransaction<ApiLicenseData>(abstractTran, stream);
 
         case ApiCommand::testEmailSettings:
             abstractTran.localTransaction = true;
@@ -567,7 +567,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         return;
     }
 
-    QnTransaction<ApiFullInfo> tran;
+    QnTransaction<ApiFullInfoData> tran;
     if (isClient) 
     {
         /*
