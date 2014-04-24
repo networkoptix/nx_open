@@ -78,66 +78,58 @@ int PtzManager::continuousMove( double panSpeed, double tiltSpeed, double zoomSp
 
 int PtzManager::absoluteMove( CoordinateSpace space, double pan, double tilt, double zoom, double speed )
 {
-    return nxcip::NX_NOT_IMPLEMENTED;
+    if( space != nxcip::CameraPtzManager::DevicePtzCoordinateSpace )
+        return nxcip::NX_NOT_IMPLEMENTED;
 
-
-    //SyncHttpClient httpClient(
-    //    CameraPlugin::instance()->networkAccessManager(),
-    //    m_cameraManager->cameraInfo().url,
-    //    m_cameraManager->apiPort(),
-    //    m_cameraManager->credentials() );
-
-    //if( space != nxcip::CameraPtzManager::LogicalPtzCoordinateSpace )
-    //    return nxcip::NX_NOT_IMPLEMENTED;
-    //return CameraManager::doCameraRequest(
-    //    &httpClient,
-    //    QString::fromLatin1("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3&speed=%4").arg(pan).arg(tilt).arg(toCameraZoomUnits(zoom)).arg(speed * 100).toLatin1() );
+    SyncHttpClient httpClient(
+        CameraPlugin::instance()->networkAccessManager(),
+        m_cameraManager->cameraInfo().url,
+        m_cameraManager->apiPort(),
+        m_cameraManager->credentials() );
+    return CameraManager::doCameraRequest(
+        &httpClient,
+        QString::fromLatin1("com/ptz.cgi?pan=%1&tilt=%2&zoom=%3&speed=%4").arg(pan).arg(tilt).arg(toCameraZoomUnits(zoom)).arg(speed * 100).toLatin1() );
 }
 
 int PtzManager::getPosition( CoordinateSpace space, double* pan, double* tilt, double* zoom )
 {
-    return nxcip::NX_NOT_IMPLEMENTED;
+    if( space != nxcip::CameraPtzManager::DevicePtzCoordinateSpace )
+        return nxcip::NX_NOT_IMPLEMENTED;
 
+    SyncHttpClient httpClient(
+        CameraPlugin::instance()->networkAccessManager(),
+        m_cameraManager->cameraInfo().url,
+        m_cameraManager->apiPort(),
+        m_cameraManager->credentials() );
 
-    //if( space != nxcip::CameraPtzManager::LogicalPtzCoordinateSpace )
-    //    return nxcip::NX_NOT_IMPLEMENTED;
+    std::multimap<QByteArray, QByteArray> params;
+    int result = CameraManager::doCameraRequest( &httpClient, "com/ptz.cgi?query=position", &params );
+    if( result != nxcip::NX_NO_ERROR )
+        return result;
 
-    //SyncHttpClient httpClient(
-    //    CameraPlugin::instance()->networkAccessManager(),
-    //    m_cameraManager->cameraInfo().url,
-    //    m_cameraManager->apiPort(),
-    //    m_cameraManager->credentials() );
-
-    //std::multimap<QByteArray, QByteArray> params;
-    //int result = CameraManager::doCameraRequest( &httpClient, "com/ptz.cgi?query=position", &params );
-    //if( result != nxcip::NX_NO_ERROR )
-    //    return result;
-
-    //auto panIter = params.find( "pan" );
-    //auto tiltIter = params.find( "tilt" );
-    //auto zoomIter = params.find( "zoom" );
-    //if( (panIter != params.end()) && (tiltIter != params.end()) && (zoomIter != params.end()) )
-    //{
-    //    *pan = panIter->second.toDouble();
-    //    *tilt = tiltIter->second.toDouble();
-    //    *zoom = fromCameraZoomUnits(zoomIter->second.toDouble());
-    //    return nxcip::NX_NO_ERROR;
-    //}
-    //else
-    //{
-    //    return nxcip::NX_OTHER_ERROR;
-    //}
+    auto panIter = params.find( "pan" );
+    auto tiltIter = params.find( "tilt" );
+    auto zoomIter = params.find( "zoom" );
+    if( (panIter != params.end()) && (tiltIter != params.end()) && (zoomIter != params.end()) )
+    {
+        *pan = panIter->second.toDouble();
+        *tilt = tiltIter->second.toDouble();
+        *zoom = fromCameraZoomUnits(zoomIter->second.toDouble());
+        return nxcip::NX_NO_ERROR;
+    }
+    else
+    {
+        return nxcip::NX_OTHER_ERROR;
+    }
 }
 
 int PtzManager::getLimits( CoordinateSpace space, Limits* limits )
 {
-    //if( space != nxcip::CameraPtzManager::LogicalPtzCoordinateSpace )
-    //    return nxcip::NX_NOT_IMPLEMENTED;
+    if( space != nxcip::CameraPtzManager::DevicePtzCoordinateSpace )
+        return nxcip::NX_NOT_IMPLEMENTED;
 
-    //*limits = m_limits;
-    //return nxcip::NX_NO_ERROR;
-
-    return nxcip::NX_NOT_IMPLEMENTED;
+    *limits = m_limits;
+    return nxcip::NX_NO_ERROR;
 }
 
 int PtzManager::getFlip( int* flip )
@@ -185,8 +177,11 @@ void PtzManager::readParameters(
 
     m_flip = nxcip::CameraPtzManager::Vertical | nxcip::CameraPtzManager::Horizontal;
     m_capabilities |=
-        nxcip::CameraPtzManager::ContinuousPtzCapabilities;
-        //| nxcip::CameraPtzManager::AbsolutePtzCapabilities
+        nxcip::CameraPtzManager::ContinuousPtzCapabilities
+        | nxcip::CameraPtzManager::AbsolutePtzCapabilities
+        | nxcip::CameraPtzManager::DevicePositioningPtzCapability
+        | nxcip::CameraPtzManager::DevicePtzCoordinateSpace
+        ;
         //| nxcip::CameraPtzManager::LimitsPtzCapability
         //| nxcip::CameraPtzManager::FlipPtzCapability;
 }

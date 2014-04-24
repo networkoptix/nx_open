@@ -376,7 +376,7 @@ int CameraManager::doCameraRequest(
         const QList<QByteArray>& paramAndValue = paramStr.split('=');
         if( paramAndValue.isEmpty() )
             continue;
-        responseParams->insert( std::make_pair( paramAndValue[0], paramAndValue.size() > 1 ? paramAndValue[1] : QByteArray() ) );
+        responseParams->insert( std::make_pair( paramAndValue[0].trimmed(), paramAndValue.size() > 1 ? paramAndValue[1].trimmed() : QByteArray() ) );
     }
 
     return nxcip::NX_NO_ERROR;
