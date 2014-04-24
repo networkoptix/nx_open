@@ -162,16 +162,6 @@ double QnStorageManager::rebuildProgress() const
     return m_rebuildProgress;
 }
 
-void QnStorageManager::loadFullFileCatalog()
-{
-    /*
-    foreach (QnStorageResourcePtr storage, m_storageRoots.values())
-        loadFullFileCatalog(storage, true);
-    */
-    m_catalogLoaded = true;
-    m_rebuildProgress = 1.0;
-};
-
 void QnStorageManager::rebuildCatalogIndexInternal()
 {
     {
@@ -920,4 +910,42 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
     DeviceFileCatalog::Chunk chunk(startDateMs, storageIndex, QnFile::baseName(fileName).toInt(), -1, (qint16) timeZone);
     catalog->addRecord(chunk);
     return true;
+}
+
+// data migration from previous versions
+
+void QnStorageManager::loadFullFileCatalog()
+{
+    loadFullFileCatalogInternal(QnResource::Role_LiveVideo);
+    loadFullFileCatalogInternal(QnResource::Role_SecondaryLiveVideo);
+    m_catalogLoaded = true;
+    m_rebuildProgress = 1.0;
+}
+
+void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole role)
+{
+    QDir dir(closeDirPath(getDataDirectory()) + QString("record_catalog/media/") + DeviceFileCatalog::prefixForRole(role));
+    QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+    foreach(QFileInfo fi, list) 
+    {
+        QByteArray mac = fi.fileName().toUtf8();
+        DeviceFileCatalogPtr catalog = getFileCatalogInternal(mac, role);
+        QString catalogName = closeDirPath(fi.absoluteFilePath()) + lit("title.csv");
+        if (catalog->fromCSVFile(catalogName)) 
+        {
+            foreach(const DeviceFileCatalog::Chunk& chunk, catalog->m_chunks) 
+            {
+                QnStorageResourcePtr storage = m_storageRoots.value(chunk.storageIndex);
+                if (storage) {
+                    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
+                    sdb->addRecord(mac, role, chunk);
+                }
+            }
+            foreach(QnStorageDbPtr sdb, m_chunksDB.values())
+                sdb->flushRecords();
+            QFile::remove(catalogName);
+            QDir dir;
+        }
+        dir.rmdir(fi.absoluteFilePath());
+    }
 }

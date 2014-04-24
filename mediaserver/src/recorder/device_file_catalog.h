@@ -117,6 +117,7 @@ public:
 
     static QVector<Chunk> mergeChunks(const QVector<Chunk>& chunk1, const QVector<Chunk>& chunk2);
     void addChunks(const QVector<Chunk>& chunk);
+    bool fromCSVFile(const QString& fileName);
 private:
     bool fileExists(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);

@@ -905,6 +905,93 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
     return result;
 }
 
+bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
+{
+    QFile file(fileName);
+
+    if (!file.open(QFile::ReadOnly))
+    {
+        cl_log.log("Can't open title file ", file.fileName(), cl_logERROR);
+        return false;
+    }
+
+    // deserializeTitleFile()
+
+    bool needRewriteCatalog = false;
+
+    int timeZoneExist = 0;
+    QByteArray headerLine = file.readLine();
+    if (headerLine.contains("timezone"))
+        timeZoneExist = 1;
+    QByteArray line;
+    bool checkDirOnly = false;
+    do {
+        line = file.readLine();
+        QList<QByteArray> fields = line.split(';');
+        if (fields.size() < 4 + timeZoneExist) {
+            continue;
+        }
+        int coeff = 1; // compabiliy with previous version (convert usec to ms)
+        if (fields[0+timeZoneExist].length() >= 16)
+            coeff = 1000;
+        qint16 timeZone = timeZoneExist ? fields[0].toInt() : -1;
+        qint64 startTime = fields[0+timeZoneExist].toLongLong()/coeff;
+        QString durationStr = fields[3+timeZoneExist].trimmed();
+        int duration = fields[3+timeZoneExist].trimmed().toInt()/coeff;
+        Chunk chunk(startTime, fields[1+timeZoneExist].toInt(), fields[2+timeZoneExist].toInt(), duration, timeZone);
+
+        QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
+        if (fields[3+timeZoneExist].trimmed().isEmpty()) 
+        {
+            // duration unknown. server restart occured. Duration for chunk is unknown
+            if (qnStorageMan->isStorageAvailable(chunk.storageIndex))
+            {
+                needRewriteCatalog = true;
+                //chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs, storage);
+                storage->removeFile(fullFileName(chunk));
+                continue;
+            }
+            else {
+                chunk.durationMs = 0;
+            }
+        }
+
+        //qint64 chunkFileSize = 0;
+        if (!qnStorageMan->isStorageAvailable(chunk.storageIndex)) 
+        {
+             needRewriteCatalog |= addChunk(chunk);
+        }
+        else if (fileExists(chunk, checkDirOnly))
+        {
+            //chunk.setFileSize(chunkFileSize);
+
+            // optimization. Since we have got first file, check dirs only. It is required to check files at begin to determine archive start point
+            checkDirOnly = true; 
+
+            if (chunk.durationMs > QnRecordingManager::RECORDING_CHUNK_LEN*1000 * 2 || chunk.durationMs < 1)
+            {
+                const QString fileName = fullFileName(chunk);
+
+                qWarning() << "File " << fileName << "has invalid duration " << chunk.durationMs/1000.0 << "s and corrupted. Delete file from catalog";
+                storage->removeFile(fileName);
+                needRewriteCatalog = true;
+                continue;
+            }
+            needRewriteCatalog |= addChunk(chunk);
+        }
+        else {
+            needRewriteCatalog = true;
+        }
+
+    } while (!line.isEmpty());
+    
+    if (!timeZoneExist)
+        needRewriteCatalog = true; // update catalog to new version
+
+
+    return true;
+}
+
 bool operator < (qint64 first, const DeviceFileCatalog::Chunk& other)
 { 
     return first < other.startTimeMs;
