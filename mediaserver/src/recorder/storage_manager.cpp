@@ -18,6 +18,7 @@
 
 #include <media_server/serverutil.h>
 #include "file_deletor.h"
+#include "utils/common/synctime.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -135,10 +136,22 @@ bool QnStorageManager::loadFullFileCatalog(QnStorageResourcePtr storage, bool is
         qWarning() << "can't initialize sqlLite database! Actions log is not created!";
         return false;
     }
-    foreach(DeviceFileCatalogPtr c, sdb->loadFullFileCatalog())
+
+    if (!isRebuild)
     {
-        DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->getMac(), c->getRole());
-        fileCatalog->addChunks(correctChunksFromMediaData(fileCatalog, storage, c->m_chunks));
+        // load from database
+        foreach(DeviceFileCatalogPtr c, sdb->loadFullFileCatalog())
+        {
+            DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->getMac(), c->getRole());
+            fileCatalog->addChunks(correctChunksFromMediaData(fileCatalog, storage, c->m_chunks));
+        }
+    }
+    else {
+        // load from media folder
+        loadFullFileCatalogFromMedia(storage, QnResource::Role_LiveVideo);
+        loadFullFileCatalogFromMedia(storage, QnResource::Role_SecondaryLiveVideo);
+        m_catalogLoaded = true;
+        m_rebuildProgress = 1.0;
     }
 
     return true;
@@ -231,33 +244,28 @@ bool QnStorageManager::isCatalogLoaded() const
     return m_catalogLoaded;
 }
 
-/*
-void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole role, bool rebuildMode)
+void QnStorageManager::loadFullFileCatalogFromMedia(QnStorageResourcePtr storage, QnResource::ConnectionRole role)
 {
-#ifdef _TEST_TWO_SERVERS
-    QDir dir(closeDirPath(getDataDirectory()) + QString("test/record_catalog/media/") + DeviceFileCatalog::prefixForRole(role));
-#else
-    QDir dir(closeDirPath(getDataDirectory()) + QString("record_catalog/media/") + DeviceFileCatalog::prefixForRole(role));
-#endif
+    QDir dir(closeDirPath(storage->getUrl()) + DeviceFileCatalog::prefixForRole(role));
+
     QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     foreach(QFileInfo fi, list)
     {
-        if (rebuildMode && m_rebuildState != RebuildState_Started)
+        if (m_rebuildState != RebuildState_Started)
             return; // cancel rebuild
-        if (rebuildMode)
-        {
-            DeviceFileCatalogPtr catalog(new DeviceFileCatalog(fi.fileName(), role));
-            catalog->doRebuildArchive();
-            addDataToCatalog(catalog, fi.fileName(), role);
-            m_rebuildProgress += 0.5 / (double) list.size(); // we load catalog twice (HQ and LQ), so, use 0.5 instead of 1.0 for progress
-        }
-        else {
-            getFileCatalogInternal(fi.fileName(), role);
-        }
+
+        qint64 rebuildEndTime = qnSyncTime->currentMSecsSinceEpoch() - 100 * 1000;
+        DeviceFileCatalogPtr newCatalog(new DeviceFileCatalog(fi.fileName(), role));
+        QnTimePeriod rebuildPeriod = QnTimePeriod(0, rebuildEndTime);
+        newCatalog->doRebuildArchive(storage, rebuildPeriod);
+
+        QByteArray mac = fi.fileName().toUtf8();
+        DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(mac, role);
+        replaceChunks(rebuildPeriod, storage, newCatalog, mac, role);
+
+        m_rebuildProgress += 0.5 / (double) list.size(); // we load catalog twice (HQ and LQ), so, use 0.5 instead of 1.0 for progress
     }
 }
-*/
-
 
 QString QnStorageManager::toCanonicalPath(const QString& path)
 {
@@ -791,54 +799,42 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QByteArray& mac, QnR
     return getFileCatalogInternal(mac, role);
 }
 
-/*
-void QnStorageManager::addDataToCatalog(DeviceFileCatalogPtr newCatalog, const QByteArray& mac, QnResource::ConnectionRole role)
+void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, QnStorageResourcePtr storage, DeviceFileCatalogPtr newCatalog, const QByteArray& mac, QnResource::ConnectionRole role)
 {
     QMutexLocker lock(&m_mutexCatalog);
-    bool hiQuality = role == QnResource::Role_LiveVideo;
-    FileCatalogMap& catalog = hiQuality ? m_devFileCatalogHi : m_devFileCatalogLow;
-    DeviceFileCatalogPtr existingCatalog = catalog[mac];
-    bool isLastRecordRecording = false;
-    if (existingCatalog == 0)
+    int storageIndex = storage->getIndex();
+    
+    // add new recorded chunks to scan data
+    qint64 scannedDataLastTime = newCatalog->m_chunks.isEmpty() ? 0 : newCatalog->m_chunks.last().startTimeMs;
+    qint64 rebuildLastTime = qMax(rebuildPeriod.endTimeMs(), scannedDataLastTime);
+    
+    DeviceFileCatalogPtr ownCatalog = getFileCatalogInternal(mac, role);
+    QVector<DeviceFileCatalog::Chunk>::const_iterator itr = qLowerBound(ownCatalog->m_chunks.begin(), ownCatalog->m_chunks.end(), rebuildLastTime);
+    for (; itr != ownCatalog->m_chunks.end(); ++itr)
     {
-        existingCatalog = catalog[mac] = newCatalog;
-    }
-    else 
-    {
-        existingCatalog->close();
+        if (itr->storageIndex == storageIndex) {
 
-        isLastRecordRecording = existingCatalog->isLastRecordRecording();
-        if (!newCatalog->isEmpty() && !existingCatalog->isEmpty()) {
-            // merge data
-            DeviceFileCatalog::Chunk& newChunk = newCatalog->m_chunks.last();
-            int idx = existingCatalog->m_chunks.size()-1;
-            for (; idx >= 0; --idx)
+            if (!newCatalog->isEmpty()) 
             {
-                DeviceFileCatalog::Chunk oldChunk = existingCatalog->chunkAt(idx);
-                if (oldChunk.startTimeMs < newChunk.startTimeMs)
-                    break;
-            }
-            for (int i = idx+1; i < existingCatalog->m_chunks.size(); ++i)
-            {
-                if (existingCatalog->m_chunks[i].startTimeMs == newChunk.startTimeMs)
-                    newChunk.durationMs = existingCatalog->m_chunks[i].durationMs;
-                else
-                    newCatalog->addChunk(existingCatalog->m_chunks[i]);
+                DeviceFileCatalog::Chunk& lastChunk = newCatalog->m_chunks.last();
+                if (lastChunk.startTimeMs == itr->startTimeMs) {
+                    lastChunk.durationMs = qMax(lastChunk.durationMs, itr->durationMs);
+                        continue;
+                }
             }
 
-            qint64 recordingTime = existingCatalog->getLatRecordingTime();
-            existingCatalog = catalog[mac] = newCatalog;
-            if (recordingTime > 0)
-                existingCatalog->setLatRecordingTime(recordingTime);
-        }
-        else if (existingCatalog->isEmpty())
-        {
-            existingCatalog->m_chunks = newCatalog->m_chunks;
+            newCatalog->addChunk(*itr);
         }
     }
-    existingCatalog->rewriteCatalog(isLastRecordRecording);
+
+    qint64 recordingTime = ownCatalog->getLatRecordingTime();
+    ownCatalog->replaceChunks(storageIndex, newCatalog->m_chunks);
+    if (recordingTime > 0)
+        ownCatalog->setLatRecordingTime(recordingTime);
+
+    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
+    sdb->replaceChunks(mac, role, newCatalog->m_chunks);
 }
-*/
 
 DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QByteArray& mac, QnResource::ConnectionRole role)
 {

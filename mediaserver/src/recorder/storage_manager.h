@@ -120,6 +120,7 @@ private:
     void testOfflineStorages();
     void rebuildCatalogIndexInternal();
     bool isCatalogLoaded() const;
+    void addDataToCatalog(DeviceFileCatalogPtr newCatalog, const QByteArray& mac, QnResource::ConnectionRole role);
 
 
     int getFileNumFromCache(const QString& base, const QString& folder);
@@ -129,7 +130,8 @@ private:
     QSet<QnStorageResourcePtr> getWritableStorages() const;
     void changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status);
     DeviceFileCatalogPtr getFileCatalogInternal(const QByteArray& mac, QnResource::ConnectionRole role);
-    //void addDataToCatalog(DeviceFileCatalogPtr newCatalog, const QByteArray& mac, QnResource::ConnectionRole role);
+    void loadFullFileCatalogFromMedia(QnStorageResourcePtr storage, QnResource::ConnectionRole role);
+    void replaceChunks(const QnTimePeriod& rebuildPeriod, QnStorageResourcePtr storage, DeviceFileCatalogPtr newCatalog, const QByteArray& mac, QnResource::ConnectionRole role);
 private:
     StorageMap m_storageRoots;
     typedef QMap<QByteArray, DeviceFileCatalogPtr> FileCatalogMap;

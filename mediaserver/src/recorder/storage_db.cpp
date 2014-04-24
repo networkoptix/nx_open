@@ -53,24 +53,57 @@ void QnStorageDb::flushRecords()
 {
     beginTran();
     foreach(const DelayedData& data, m_delayedData)
-    {
-        QSqlQuery query(m_sdb);
-        query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)");
-
-        query.addBindValue(data.mac); // unique_id
-        query.addBindValue(data.role); // role
-        query.addBindValue(data.chunk.startTimeMs); // start_time
-        query.addBindValue(data.chunk.timeZone); // timezone
-        query.addBindValue(data.chunk.fileIndex); // file_index
-        query.addBindValue(data.chunk.durationMs); // duration
-        query.addBindValue(data.chunk.getFileSize()); // filesize
-
-        if (!query.exec())
-            qWarning() << Q_FUNC_INFO << query.lastError().text();
-    }
+        addRecordInternal(data.mac, data.role, data.chunk);
     commit();
     m_lastTranTime.restart();
     m_delayedData.clear();
+}
+
+bool QnStorageDb::addRecordInternal(const QByteArray& mac, QnResource::ConnectionRole role, const DeviceFileCatalog::Chunk& chunk)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)");
+
+    query.addBindValue(mac); // unique_id
+    query.addBindValue(role); // role
+    query.addBindValue(chunk.startTimeMs); // start_time
+    query.addBindValue(chunk.timeZone); // timezone
+    query.addBindValue(chunk.fileIndex); // file_index
+    query.addBindValue(chunk.durationMs); // duration
+    query.addBindValue(chunk.getFileSize()); // filesize
+
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return false;
+    }
+    return true;
+}
+
+bool QnStorageDb::replaceChunks(const QByteArray& mac, QnResource::ConnectionRole role, const QVector<DeviceFileCatalog::Chunk>& chunks)
+{
+    beginTran();
+
+    QSqlQuery query(m_sdb);
+    query.prepare("DELETE FROM storage_data WHERE unique_id = ? AND role = ?");
+    query.addBindValue(mac);
+    query.addBindValue(role);
+
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        rollback();
+        return false;
+    }
+
+    foreach(const DeviceFileCatalog::Chunk& chunk, chunks)
+    {
+        if (!addRecordInternal(mac, role, chunk)) {
+            rollback();
+            return false;
+        }
+    }
+
+    commit();
+    return true;
 }
 
 bool QnStorageDb::open(const QString& fileName)
