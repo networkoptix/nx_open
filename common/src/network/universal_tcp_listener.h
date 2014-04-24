@@ -18,11 +18,12 @@ class QnUniversalTcpListener: public QnTcpListener
 {
 private:
 public:
+    typedef QnTCPConnectionProcessor* (*InstanceFunc)(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     struct HandlerInfo
     {
         QByteArray protocol;
         QString path;
-        QnTCPConnectionProcessor* (*instanceFunc)(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+        InstanceFunc instanceFunc;
     };
 
     static const int DEFAULT_RTSP_PORT = 554;
@@ -40,7 +41,24 @@ public:
         m_handlers.append(handler);
     }
 
-    QnTCPConnectionProcessor* createNativeProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const QString& path);
+    typedef bool (*ProxyCond)(void* opaque, const QUrl& url);
+    struct ProxyInfo
+    {
+        ProxyInfo(): proxyHandler(0), proxyCond(0), proxyOpaque(0) {}
+        InstanceFunc proxyHandler;
+        ProxyCond proxyCond;
+        void *proxyOpaque;
+    };
+
+    template <class T>
+    void setProxyHandler(void* opaque, ProxyCond cond)
+    {
+        m_proxyInfo.proxyHandler = handlerInstance<T>;
+        m_proxyInfo.proxyCond = cond;
+        m_proxyInfo.proxyOpaque = opaque;
+    }
+
+    QnTCPConnectionProcessor* createNativeProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const QUrl& url);
 
     /* proxy support functions */
 
@@ -66,6 +84,7 @@ private:
     };
 
     QList<HandlerInfo> m_handlers;
+    ProxyInfo m_proxyInfo;
     QUrl m_proxyServerUrl;
     QString m_selfIdForProxy;
     QMutex m_proxyMutex;
