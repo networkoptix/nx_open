@@ -5,7 +5,7 @@
 #include "business/events/abstract_business_event.h"
 
 struct QnPartialInfo {
-    QnPartialInfo(BusinessEventType::Value value);
+    QnPartialInfo(QnBusiness::EventType value);
 
     QString attrName;
     QnEmailAttachmentList attachments;

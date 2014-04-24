@@ -749,8 +749,8 @@ int QnMediaServerConnection::getStatisticsAsync(QObject *target, const char *slo
 int QnMediaServerConnection::getEventLogAsync(
                   qint64 dateFrom, qint64 dateTo,
                   QnResourceList camList,
-                  BusinessEventType::Value eventType,
-                  BusinessActionType::Value actionType,
+                  QnBusiness::EventType eventType,
+                  QnBusiness::ActionType actionType,
                   QnId businessRuleId,
                   QObject *target, const char *slot)
 {
@@ -765,9 +765,9 @@ int QnMediaServerConnection::getEventLogAsync(
     }
     if (!businessRuleId.isNull())
         params << QnRequestParam( "brule_id", businessRuleId );
-    if (eventType != BusinessEventType::NotDefined)
+    if (eventType != QnBusiness::UndefinedEvent)
         params << QnRequestParam( "event", (int) eventType);
-    if (actionType != BusinessActionType::NotDefined)
+    if (actionType != QnBusiness::UndefinedAction)
         params << QnRequestParam( "action", (int) actionType);
 
     return sendAsyncGetRequest(EventLogObject, params, QN_STRINGIZE_TYPE(QnBusinessActionDataListPtr), target, slot);

@@ -140,8 +140,8 @@ public:
         qint64 dateFrom, 
         qint64 dateTo, 
         QnResourceList cameras,
-        BusinessEventType::Value eventType, 
-        BusinessActionType::Value actionType,
+        QnBusiness::EventType eventType, 
+        QnBusiness::ActionType actionType,
         QnId businessRuleId, 
         QObject *target, 
         const char *slot);

@@ -74,8 +74,8 @@ public:
     bool isModified() const;
     void setModified(bool value);
 
-    BusinessEventType::Value eventType() const;
-    void setEventType(const BusinessEventType::Value value);
+    QnBusiness::EventType eventType() const;
+    void setEventType(const QnBusiness::EventType value);
 
     QnResourceList eventResources() const;
     void setEventResources(const QnResourceList &value);
@@ -86,8 +86,8 @@ public:
     Qn::ToggleState eventState() const;
     void setEventState(Qn::ToggleState state);
 
-    BusinessActionType::Value actionType() const;
-    void setActionType(const BusinessActionType::Value value);
+    QnBusiness::ActionType actionType() const;
+    void setActionType(const QnBusiness::ActionType value);
 
     QnResourceList actionResources() const;
     void setActionResources(const QnResourceList &value);
@@ -136,17 +136,17 @@ private:
 
     static QString toggleStateToModelString(Qn::ToggleState value);
     static QString toggleStateToString(Qn::ToggleState state);
-    static QString eventTypeString(BusinessEventType::Value eventType, Qn::ToggleState eventState, BusinessActionType::Value actionType);
+    static QString eventTypeString(QnBusiness::EventType eventType, Qn::ToggleState eventState, QnBusiness::ActionType actionType);
 private:
     QnId m_id;
     bool m_modified;
 
-    BusinessEventType::Value m_eventType;
+    QnBusiness::EventType m_eventType;
     QnResourceList m_eventResources;
     QnBusinessEventParameters m_eventParams;
     Qn::ToggleState m_eventState;
 
-    BusinessActionType::Value m_actionType;
+    QnBusiness::ActionType m_actionType;
     QnResourceList m_actionResources;
     QnBusinessActionParameters m_actionParams;
 

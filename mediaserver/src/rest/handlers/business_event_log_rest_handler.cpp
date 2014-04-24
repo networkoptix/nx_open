@@ -22,8 +22,8 @@ int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnReque
     QnTimePeriod period(-1,-1);
     QnResourceList resList;
     QString errStr;
-    BusinessEventType::Value  eventType = BusinessEventType::NotDefined;
-    BusinessActionType::Value  actionType = BusinessActionType::NotDefined;
+    QnBusiness::EventType eventType = QnBusiness::UndefinedEvent;
+    QnBusiness::ActionType actionType = QnBusiness::UndefinedAction;
     QnId businessRuleId;
 
     for (int i = 0; i < params.size(); ++i)
@@ -49,14 +49,14 @@ int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnReque
                     errStr = QString("Camera resource %1 not found").arg(params[i].second);
             }
             else if (params[i].first == "event") {
-                eventType = (BusinessEventType::Value) params[i].second.toInt();
-                if (eventType < 0)
-                    errStr = QString("Invalid event type %1. Valid range is [0..%2]").arg(params[i].second).arg(BusinessEventType::NotDefined-1);
+                eventType = (QnBusiness::EventType) params[i].second.toInt();
+                if (eventType < 0 || eventType >= QnBusiness::EventCount)
+                    errStr = QString("Invalid event type %1. Valid range is [0..%2]").arg(params[i].second).arg(QnBusiness::EventCount-1);
             }
             else if (params[i].first == "action") {
-                actionType = (BusinessActionType::Value) params[i].second.toInt();
-                if (actionType < 0 || actionType >= BusinessActionType::Count)
-                    errStr = QString("Invalid action type %1. Valid range is [0..%2]").arg(params[i].second).arg(BusinessActionType::NotDefined-1);
+                actionType = (QnBusiness::ActionType) params[i].second.toInt();
+                if (actionType < 0 || actionType >= QnBusiness::ActionCount)
+                    errStr = QString("Invalid action type %1. Valid range is [0..%2]").arg(params[i].second).arg(QnBusiness::ActionCount-1);
             }
             else if (params[i].first == "brule_id") {
                 businessRuleId = params[i].second;

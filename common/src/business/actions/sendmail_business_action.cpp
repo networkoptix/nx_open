@@ -5,7 +5,7 @@
 #include "sendmail_business_action.h"
 
 QnSendMailBusinessAction::QnSendMailBusinessAction(const QnBusinessEventParameters &runtimeParams):
-    base_type(BusinessActionType::SendMail, runtimeParams)
+    base_type(QnBusiness::SendMailAction, runtimeParams)
 {
 }
 

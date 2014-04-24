@@ -4,19 +4,19 @@
 
 #include <ui/style/globals.h>
 
-Qn::NotificationLevel QnNotificationLevels::notificationLevel(BusinessEventType::Value eventType) {
+Qn::NotificationLevel QnNotificationLevels::notificationLevel(QnBusiness::EventType eventType) {
     switch (eventType) {
-    case BusinessEventType::Camera_Motion:
-    case BusinessEventType::Camera_Input:
-    case BusinessEventType::MediaServer_Started:
+    case QnBusiness::CameraMotionEvent:
+    case QnBusiness::CameraInputEvent:
+    case QnBusiness::ServerStartEvent:
         return Qn::CommonNotification;      
-    case BusinessEventType::Camera_Disconnect:
-    case BusinessEventType::Storage_Failure:
-    case BusinessEventType::Network_Issue:
+    case QnBusiness::CameraDisconnectEvent:
+    case QnBusiness::StorageFailureEvent:
+    case QnBusiness::NetworkIssueEvent:
         return Qn::ImportantNotification;
-    case BusinessEventType::Camera_Ip_Conflict:
-    case BusinessEventType::MediaServer_Failure:
-    case BusinessEventType::MediaServer_Conflict:
+    case QnBusiness::CameraIpConflictEvent:
+    case QnBusiness::ServerFailureEvent:
+    case QnBusiness::ServerConflictEvent:
         return Qn::CriticalNotification;
     default:                                        
         qnWarning("Invalid business event type '%1'.", static_cast<int>(eventType));

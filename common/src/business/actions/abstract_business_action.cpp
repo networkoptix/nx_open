@@ -7,23 +7,23 @@
 
 #include <business/business_strings_helper.h>
 
-namespace BusinessActionType {
-    bool requiresCameraResource(Value val) {
-        switch(val) {
-        case NotDefined:
-        case PanicRecording:
-        case SendMail:
-        case Diagnostics:
-        case ShowPopup:
-        case PlaySound:
-        case PlaySoundRepeated:
-        case SayText:
+namespace QnBusiness {
+    bool requiresCameraResource(ActionType actionType) {
+        switch(actionType) {
+        case UndefinedAction:
+        case PanicRecordingAction:
+        case SendMailAction:
+        case DiagnosticsAction:
+        case ShowPopupAction:
+        case PlaySoundOnceAction:
+        case PlaySoundAction:
+        case SayTextAction:
             return false;
 
-        case CameraOutput:
-        case CameraOutputInstant:
-        case Bookmark:
-        case CameraRecording:
+        case CameraOutputAction:
+        case CameraOutputOnceAction:
+        case BookmarkAction:
+        case CameraRecordingAction:
             return true;
 
         default:
@@ -31,22 +31,22 @@ namespace BusinessActionType {
         }
     }
 
-    bool requiresUserResource(Value val) {
-        switch(val) {
-        case NotDefined:
-        case PanicRecording:
-        case CameraOutput:
-        case CameraOutputInstant:
-        case Bookmark:
-        case CameraRecording:
-        case Diagnostics:
-        case ShowPopup:
-        case PlaySound:
-        case PlaySoundRepeated:
-        case SayText:
+    bool requiresUserResource(ActionType actionType) {
+        switch(actionType) {
+        case UndefinedAction:
+        case PanicRecordingAction:
+        case CameraOutputAction:
+        case CameraOutputOnceAction:
+        case BookmarkAction:
+        case CameraRecordingAction:
+        case DiagnosticsAction:
+        case ShowPopupAction:
+        case PlaySoundOnceAction:
+        case PlaySoundAction:
+        case SayTextAction:
             return false;
 
-        case SendMail:
+        case SendMailAction:
             return true;
 
         default:
@@ -54,22 +54,22 @@ namespace BusinessActionType {
         }
     }
 
-    bool hasToggleState(Value val) {
-        switch(val) {
-        case NotDefined:
-        case CameraOutputInstant:
-        case Bookmark:
-        case SendMail:
-        case Diagnostics:
-        case ShowPopup:
-        case PlaySound:
-        case SayText:
+    bool hasToggleState(ActionType actionType) {
+        switch(actionType) {
+        case UndefinedAction:
+        case CameraOutputOnceAction:
+        case BookmarkAction:
+        case SendMailAction:
+        case DiagnosticsAction:
+        case ShowPopupAction:
+        case PlaySoundOnceAction:
+        case SayTextAction:
             return false;
 
-        case CameraOutput:
-        case CameraRecording:
-        case PanicRecording:
-        case PlaySoundRepeated:
+        case CameraOutputAction:
+        case CameraRecordingAction:
+        case PanicRecordingAction:
+        case PlaySoundAction:
             return true;
 
         default:
@@ -77,10 +77,12 @@ namespace BusinessActionType {
         }
     }
 
-    bool isNotImplemented(Value value) { return value == Bookmark; }
+    bool isNotImplemented(ActionType actionType) { 
+        return actionType == BookmarkAction; 
+    }
 }
 
-QnAbstractBusinessAction::QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters& runtimeParams):
+QnAbstractBusinessAction::QnAbstractBusinessAction(const QnBusiness::ActionType actionType, const QnBusinessEventParameters& runtimeParams):
     m_actionType(actionType),
     m_toggleState(Qn::UndefinedState), 
     m_receivedFromRemoteHost(false),
