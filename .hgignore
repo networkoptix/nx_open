@@ -239,6 +239,7 @@ ios-client/Podfile
 ios-client/Pods
 ios-client/HDWitness/Settings.bundle/Root.plist
 ios-client/Podfile.lock
+ios-client/.ruby-version
 
 launcher/x86
 launcher/x64
