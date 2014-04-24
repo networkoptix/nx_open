@@ -1,10 +1,12 @@
 #ifndef __DISTRIBUTED_MUTEX_H_
 #define __DISTRIBUTED_MUTEX_H_
 
-#include <QObject>
-#include <QUuid>
-#include <QSet>
-#include <QSharedPointer>
+#include <QtCore/QObject>
+#include <QtCore/QUuid>
+#include <QtCore/QSet>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QTimer>
+
 #include "nx_ec/data/api_lock_data.h"
 #include "transaction/transaction.h"
 

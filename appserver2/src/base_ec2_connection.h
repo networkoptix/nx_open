@@ -10,7 +10,7 @@
 
 #include "nx_ec/ec_api.h"
 #include "core/resource_management/resource_pool.h"
-#include "nx_ec/data/mserver_data.h"
+#include "nx_ec/data/api_media_server_data.h"
 #include "transaction/transaction.h"
 #include "managers/business_event_manager.h"
 #include "managers/camera_manager.h"

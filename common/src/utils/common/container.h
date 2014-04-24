@@ -94,7 +94,7 @@ namespace QnContainer {
     }
 
     /**
-     * Qt containers are also notorious for their lack of a unified insertion
+     * Qt containers are notorious for their lack of a unified insertion
      * operation.
      *
      * This problem is solved by introducing proper bindings.
@@ -103,13 +103,13 @@ namespace QnContainer {
      */
 
     template<class T, class Iterator, class Element>
-    typename QSet<T>::iterator insert(QSet<T> &container, const Iterator &, const Element &element) {
-        return container.insert(element);
+    typename QSet<T>::iterator insert(QSet<T> &container, const Iterator &, Element &&element) {
+        return container.insert(std::forward<Element>(element));
     }
 
 #define QN_REGISTER_QT_CONTAINER_INSERT(CONTAINER)                              \
     template<class Key, class T, class Iterator, class Element>                 \
-    void insert(CONTAINER<Key, T> &container, const Iterator &, const Element &element) { \
+    void insert(CONTAINER<Key, T> &container, const Iterator &, Element &&element) { \
         container.insert(element.first, element.second);                        \
     }
 

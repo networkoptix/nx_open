@@ -7,7 +7,7 @@
 #include "database/db_manager.h"
 #include "transaction/transaction_log.h"
 #include "server_query_processor.h"
-#include "nx_ec/data/ec2_business_rule_data.h"
+#include "nx_ec/data/api_business_rule_data.h"
 
 
 namespace ec2
@@ -121,9 +121,9 @@ QnTransaction<ApiBusinessActionData> QnBusinessEventManager<T>::prepareTransacti
 
 
 template<class T>
-QnTransaction<ApiBusinessRule> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource )
+QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource )
 {
-    QnTransaction<ApiBusinessRule> tran(command, true);
+    QnTransaction<ApiBusinessRuleData> tran(command, true);
     tran.params.fromResource(resource);
     return tran;
 }

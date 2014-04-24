@@ -1,7 +1,8 @@
 #ifndef __TRANSACTION_MESSAGE_BUS_H_
 #define __TRANSACTION_MESSAGE_BUS_H_
 
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
+
 #include <nx_ec/ec_api.h>
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_data.h"
@@ -11,6 +12,8 @@
 #include "transaction_transport_serializer.h"
 #include "transaction_transport.h"
 #include "common/common_module.h"
+
+class QTimer;
 
 namespace ec2
 {

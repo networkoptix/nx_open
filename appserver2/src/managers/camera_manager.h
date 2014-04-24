@@ -6,7 +6,7 @@
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_camera_data.h"
 #include "transaction/transaction.h"
-#include "nx_ec/data/camera_server_item_data.h"
+#include "nx_ec/data/api_camera_server_item_data.h"
 
 
 namespace ec2
@@ -32,7 +32,7 @@ namespace ec2
         //!Implementation of AbstractCameraManager::remove
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
-        void triggerNotification( const QnTransaction<ApiCamera>& tran )
+        void triggerNotification( const QnTransaction<ApiCameraData>& tran )
         {
             assert( tran.command == ApiCommand::saveCamera);
             QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
@@ -45,7 +45,7 @@ namespace ec2
             }
         }
 
-        void triggerNotification( const QnTransaction<ApiCameraList>& tran )
+        void triggerNotification( const QnTransaction<ApiCameraDataList>& tran )
         {
             assert( tran.command == ApiCommand::saveCameras );
             foreach(const ApiCamera& camera, tran.params.data) 
@@ -64,7 +64,7 @@ namespace ec2
             emit cameraRemoved( QnId(tran.params.id) );
         }
 
-        void triggerNotification( const QnTransaction<ApiCameraServerItem>& tran )
+        void triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran )
         {
             QnCameraHistoryItemPtr cameraHistoryItem( new QnCameraHistoryItem(
                 tran.params.physicalId,
@@ -77,9 +77,9 @@ namespace ec2
         QueryProcessorType* const m_queryProcessor;
 		ResourceContext m_resCtx;
 
-        QnTransaction<ApiCamera> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourcePtr& resource );
-        QnTransaction<ApiCameraList> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourceList& cameras );
-        QnTransaction<ApiCameraServerItem> prepareTransaction( ApiCommand::Value cmd, const QnCameraHistoryItem& historyItem );
+        QnTransaction<ApiCameraData> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourcePtr& resource );
+        QnTransaction<ApiCameraDataList> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourceList& cameras );
+        QnTransaction<ApiCameraServerItemData> prepareTransaction( ApiCommand::Value cmd, const QnCameraHistoryItem& historyItem );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
     };
 }

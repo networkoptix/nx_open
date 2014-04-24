@@ -124,7 +124,7 @@ namespace ec2
 
 
     template<class QueryProcessorType>
-    QnTransaction<ApiCamera> QnCameraManager<QueryProcessorType>::prepareTransaction(
+    QnTransaction<ApiCameraData> QnCameraManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
         const QnVirtualCameraResourcePtr& resource )
     {
@@ -134,7 +134,7 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    QnTransaction<ApiCameraList> QnCameraManager<QueryProcessorType>::prepareTransaction(
+    QnTransaction<ApiCameraDataList> QnCameraManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
         const QnVirtualCameraResourceList& cameras )
     {
@@ -144,7 +144,7 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    QnTransaction<ApiCameraServerItem> QnCameraManager<QueryProcessorType>::prepareTransaction(
+    QnTransaction<ApiCameraServerItemData> QnCameraManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
         const QnCameraHistoryItem& historyItem )
     {

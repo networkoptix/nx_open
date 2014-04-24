@@ -38,7 +38,7 @@ namespace ec2
             emit addedOrUpdated( layoutResource );
         }
 
-        void triggerNotification( const QnTransaction<ApiLayoutList>& tran )
+        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran )
         {
             assert(tran.command == ApiCommand::saveLayouts );
             foreach(const ApiLayoutData& layout, tran.params.data) 
@@ -51,7 +51,7 @@ namespace ec2
 
     private:
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
-        QnTransaction<ApiLayoutList> prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts );
+        QnTransaction<ApiLayoutDataList> prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts );
 
     private:
         QueryProcessorType* const m_queryProcessor;

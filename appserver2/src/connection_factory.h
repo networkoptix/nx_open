@@ -14,7 +14,7 @@
 #include "nx_ec/data/api_connection_data.h"
 #include "client_query_processor.h"
 #include "server_query_processor.h"
-#include "api_connection.h"
+#include "ec2_connection.h"
 
 
 namespace ec2

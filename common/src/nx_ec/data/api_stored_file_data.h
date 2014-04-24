@@ -6,12 +6,15 @@
 
 namespace ec2
 {
-    class ApiStoredFileData: ApiData
+    struct ApiStoredFileData: ApiData
     {
-    public:
         QString path;
         QByteArray data;
     };
+
+    typedef QString ApiStoredFilePath; // TODO: #Elric struct => extendable?
+
+    typedef std::vector<QString> ApiStoredDirContents;
 
     //QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS( ApiStoredFileData, (path) (data) )
     //QN_FUSION_DECLARE_FUNCTIONS(ApiStoredFileData, (binary))

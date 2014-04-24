@@ -135,7 +135,7 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    QnTransaction<ApiResourceParams> QnResourceManager<QueryProcessorType>::prepareTransaction(
+    QnTransaction<ApiResourceParamsData> QnResourceManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
         const QnId& id, const QnKvPairList& kvPairs)
     {

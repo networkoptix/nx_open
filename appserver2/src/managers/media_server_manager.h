@@ -3,7 +3,7 @@
 #define MEDIA_SERVER_MANAGER_H
 
 #include "core/resource/media_server_resource.h"
-#include "nx_ec/data/mserver_data.h"
+#include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 

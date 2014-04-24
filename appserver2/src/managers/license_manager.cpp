@@ -19,13 +19,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiLicenseList& licenses ) {
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiLicenseDataList& licenses ) {
             QnLicenseList outData;
             if( errorCode == ErrorCode::ok )
                 licenses.toResourceList(outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiLicenseList, decltype(queryDoneHandler)>( ApiCommand::getLicenses, nullptr, queryDoneHandler );
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiLicenseDataList, decltype(queryDoneHandler)>( ApiCommand::getLicenses, nullptr, queryDoneHandler );
         return reqID;
     }
     
@@ -46,15 +46,15 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiLicenseList> QnLicenseManager<T>::prepareTransaction( ApiCommand::Value cmd, const QnLicenseList& licenses )
+    QnTransaction<ApiLicenseDataList> QnLicenseManager<T>::prepareTransaction( ApiCommand::Value cmd, const QnLicenseList& licenses )
     {
-        QnTransaction<ApiLicenseList> tran( cmd, true );
+        QnTransaction<ApiLicenseDataList> tran( cmd, true );
         tran.params.fromResourceList( licenses );
         return tran;
     }
 
     template<class T>
-    void QnLicenseManager<T>::triggerNotification( const QnTransaction<ApiLicenseList>& tran )
+    void QnLicenseManager<T>::triggerNotification( const QnTransaction<ApiLicenseDataList>& tran )
     {
         QnLicenseList licenseList;
         tran.params.toResourceList(licenseList);
@@ -65,7 +65,7 @@ namespace ec2
     }
 
     template<class T>
-    void QnLicenseManager<T>::triggerNotification( const QnTransaction<ApiLicense>& tran )
+    void QnLicenseManager<T>::triggerNotification( const QnTransaction<ApiLicenseData>& tran )
     {
         QnLicensePtr license(new QnLicense());
         tran.params.toResource(*license.data());

@@ -56,10 +56,10 @@ namespace ec2
         ApiLicenseData license;
 
         license.licenseBlock = TEST_LICENSE_NX;
-        licList->data.push_back( license );
+        licList->push_back( license );
 
         license.licenseBlock = TEST_LICENSE_DW;
-        licList->data.push_back( license );
+        licList->push_back( license );
 
         return ErrorCode::ok;
     }

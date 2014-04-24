@@ -81,40 +81,40 @@ namespace ec2
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileData& data);
 
         //getResourceTypes
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataListData& resourceTypeList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
         //getCameras
-        ErrorCode doQueryNoLock(const QnId& mServerId, ApiCameraList& cameraList);
+        ErrorCode doQueryNoLock(const QnId& mServerId, ApiCameraDataList& cameraList);
 
         //getServers
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerList& serverList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
 
         //getCameraServerItems
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServerItemList& historyList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
 
         //getUserList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserList& userList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList);
 
         //getVideowallList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallList& videowallList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleList& userList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutList& layoutList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
 
         //getResourceParams
-        ErrorCode doQueryNoLock(const QnId& resourceId, ApiResourceParams& params);
+        ErrorCode doQueryNoLock(const QnId& resourceId, ApiResourceParamsData& params);
 
         // ApiFullInfo
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiFullInfo& data);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiFullInfoData& data);
 
         //getLicenses
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseList& data);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data);
 
         //getParams
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiParamList& data);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data);
 
 		// --------- misc -----------------------------
 
@@ -125,31 +125,31 @@ namespace ec2
 
         // ------------ transactions --------------------------------------
 
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCamera>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraList>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraDataList>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiMediaServerData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutList>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceStatusData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceDisabledData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceParams>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraServerItem>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceParamsData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraServerItemData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiPanicModeData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiStoredFileData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiStoredFilePath>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiBusinessRule>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiUserData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiParamList>& tran); // save settings
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceParamDataList>& tran); // save settings
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallList>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallDataList>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiIdData>& tran);
 
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicenseList>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicense>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicenseDataList>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicenseData>& tran);
 
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiEmailSettingsData>&) {
@@ -160,7 +160,7 @@ namespace ec2
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiFullInfo>&) {
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiFullInfoData>&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -187,9 +187,9 @@ namespace ec2
         ErrorCode insertAddParams(const std::vector<ApiResourceParamData>& params, qint32 internalId);
         ErrorCode deleteAddParams(qint32 resourceId);
 
-        ErrorCode saveCamera(const ApiCamera& params);
-        ErrorCode insertOrReplaceCamera(const ApiCamera& data, qint32 internalId);
-        ErrorCode updateCameraSchedule(const ApiCamera& data, qint32 internalId);
+        ErrorCode saveCamera(const ApiCameraData& params);
+        ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
+        ErrorCode updateCameraSchedule(const ApiCameraData& data, qint32 internalId);
         ErrorCode removeCamera(const QnId& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
@@ -217,17 +217,15 @@ namespace ec2
         ErrorCode updateVideowallScreens(const ApiVideowallData& data);
         ErrorCode removeLayoutFromVideowallItems(const QnId &layout_id);
 
-        ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRule& businessRule);
+        ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);
         ErrorCode removeBusinessRule( const QnId& id );
-        ErrorCode updateBusinessRule(const ApiBusinessRule& rule);
+        ErrorCode updateBusinessRule(const ApiBusinessRuleData& rule);
 
-        ErrorCode saveLicense(const ApiLicense& license);
+        ErrorCode saveLicense(const ApiLicenseData& license);
 
         bool createDatabase();
         
-        void mergeRuleResource(QSqlQuery& query, ApiBusinessRuleList& data, std::vector<qint32> ApiBusinessRule::*resList);
-
         qint32 getResourceInternalId( const QnId& guid );
         QnId getResourceGuid(const qint32 &internalId);
         qint32 getBusinessRuleInternalId( const QnId& guid );
@@ -244,7 +242,7 @@ namespace ec2
         QnId m_cameraTypeId;
         QnId m_adminUserID;
         int m_adminUserInternalID;
-        ApiResourceTypeDataListData m_cachedResTypes;
+        ApiResourceTypeDataList m_cachedResTypes;
 
         void fillServerInfo( ApiServerInfoData* const serverInfo );
     };

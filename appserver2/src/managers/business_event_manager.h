@@ -56,7 +56,7 @@ namespace ec2
         QueryProcessorType* const m_queryProcessor;
         ResourceContext m_resCtx;
 
-        QnTransaction<ApiBusinessRule> prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource );
+        QnTransaction<ApiBusinessRuleData> prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
         QnTransaction<ApiBusinessActionData> prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource );
         QnTransaction<ApiEmailSettingsData> prepareTransaction( ApiCommand::Value command, const QnEmail::Settings& resource );

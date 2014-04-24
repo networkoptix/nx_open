@@ -11,10 +11,10 @@
 #include <QtCore/QUrlQuery>
 
 #include <core/resource/resource.h>
-#include <nx_ec/data/connection_data.h>
+#include <nx_ec/data/api_connection_data.h>
 #include <utils/common/id.h>
 #include <utils/common/request_param.h>
-#include "nx_ec/data/ec2_stored_file_data.h"
+#include "nx_ec/data/api_stored_file_data.h"
 
 
 namespace ec2

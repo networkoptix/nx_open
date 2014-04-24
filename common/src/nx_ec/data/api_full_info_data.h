@@ -7,15 +7,15 @@
 namespace ec2 
 {
     struct ApiFullInfoData: ApiData {
-        ApiResourceTypeDataListData resTypes;
-        ApiMediaServerList servers;
-        ApiCameraList cameras;
-        ApiUserList users;
-        ApiLayoutList layouts;
-        ApiVideowallList videowalls;
-        ApiBusinessRuleList rules;
-        ApiCameraServerItemList cameraHistory;
-        ApiLicenseList licenses;
+        ApiResourceTypeDataList resTypes;
+        ApiMediaServerDataList servers;
+        ApiCameraDataList cameras;
+        ApiUserDataList users;
+        ApiLayoutDataList layouts;
+        ApiVideowallDataList videowalls;
+        ApiBusinessRuleDataList rules;
+        ApiCameraServerItemDataList cameraHistory;
+        ApiLicenseDataList licenses;
         ApiServerInfoData serverInfo;
     };
 #define ApiFullInfoData_Fields (resTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(serverInfo)

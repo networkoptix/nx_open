@@ -75,38 +75,38 @@ namespace ec2
         }
 
         template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiLicenseList>& tran, HandlerType handler )
+        void processUpdateAsync(QnTransaction<ApiLicenseDataList>& tran, HandlerType handler )
         {
             Q_ASSERT(tran.command == ApiCommand::addLicenses);
-            return processMultiUpdateAsync<ApiLicenseList, ApiLicense>(tran, handler, ApiCommand::addLicense);
+            return processMultiUpdateAsync<ApiLicenseList, ApiLicenseData>(tran, handler, ApiCommand::addLicense);
         }
 
         template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiLayoutList>& tran, HandlerType handler )
+        void processUpdateAsync(QnTransaction<ApiLayoutDataList>& tran, HandlerType handler )
         {
             Q_ASSERT(tran.command == ApiCommand::saveLayouts);
-            return processMultiUpdateAsync<ApiLayoutList, ApiLayoutData>(tran, handler, ApiCommand::saveLayout);
+            return processMultiUpdateAsync<ApiLayoutDataList, ApiLayoutData>(tran, handler, ApiCommand::saveLayout);
         }
 
         template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiCameraList>& tran, HandlerType handler )
+        void processUpdateAsync(QnTransaction<ApiCameraDataList>& tran, HandlerType handler )
         {
             Q_ASSERT(tran.command == ApiCommand::saveCameras);
-            return processMultiUpdateAsync<ApiCameraList, ApiCamera>(tran, handler, ApiCommand::saveCamera);
+            return processMultiUpdateAsync<ApiCameraDataList, ApiCameraData>(tran, handler, ApiCommand::saveCamera);
         }
 
-        template<class QueryDataType, class subDataType, class HandlerType>
+        template<class QueryDataType, class SubDataType, class HandlerType>
         void processMultiUpdateAsync(QnTransaction<QueryDataType>& multiTran, HandlerType handler, ApiCommand::Value command)
         {
             ErrorCode errorCode = ErrorCode::ok;
-            QList<QPair<QnTransaction<subDataType>, QByteArray>> processedTran;
+            QList<QPair<QnTransaction<SubDataType>, QByteArray>> processedTran;
             
             if (multiTran.persistent)
                 dbManager->beginTran();
 
-            foreach(const subDataType& data, multiTran.params.data)
+            foreach(const SubDataType& data, multiTran.params.data)
             {
-                QnTransaction<subDataType> tran(command, multiTran.persistent);
+                QnTransaction<SubDataType> tran(command, multiTran.persistent);
                 tran.params = data;
                 tran.fillSequence();
                 tran.localTransaction = multiTran.localTransaction;
@@ -135,7 +135,7 @@ namespace ec2
                         return;
                     }
                 }
-                processedTran << QPair<QnTransaction<subDataType>, QByteArray>(tran, serializedTran);
+                processedTran << QPair<QnTransaction<SubDataType>, QByteArray>(tran, serializedTran);
             }
 
             if (multiTran.persistent)

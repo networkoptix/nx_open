@@ -51,10 +51,11 @@ namespace ec2
     };
 #define ApiBusinessActionData_Fields (actionType)(toggleState)(receivedFromRemoteHost)(resources)(params)(runtimeParams)(businessRuleId)(aggregationCount)
 
-    /*struct ApiResetBusinessRuleData: public ApiData
+    
+    struct ApiResetBusinessRuleData: public ApiData
     {
-        ApiBusinessRuleList defaultRules;
-    };*/
+        ApiBusinessRuleDataList defaultRules;
+    };
 
 
     /*struct ApiBusinessRule: ApiBusinessRuleData

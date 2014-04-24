@@ -74,9 +74,9 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiLayoutList> QnLayoutManager<T>::prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts )
+    QnTransaction<ApiLayoutDataList> QnLayoutManager<T>::prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts )
     {
-        QnTransaction<ApiLayoutList> tran(command, true);
+        QnTransaction<ApiLayoutDataList> tran(command, true);
         tran.params.fromResourceList(layouts);
         return tran;
     }

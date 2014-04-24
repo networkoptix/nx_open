@@ -6,50 +6,52 @@
 #include <utils/common/model_functions_fwd.h>
 
 namespace ec2 {
-    struct ApiBusinessRuleData;
     struct ApiBusinessActionData;
-    struct ApiScheduleTaskData;
+    struct ApiBusinessRuleData;
     struct ApiCameraData;
     struct ApiCameraServerItemData;
     struct ApiData;
-    struct ApiIdData;
-    struct ApiEmailSettingsData;
     struct ApiEmailData;
+    struct ApiEmailSettingsData;
     struct ApiFullInfoData;
+    struct ApiIdData;
     struct ApiLayoutItemData;
     struct ApiLayoutData;
     struct ApiLicenseData;
     struct ApiLockData;
-    struct ApiStorageData;
     struct ApiMediaServerData;
     struct ApiPanicModeData;
+    struct ApiPropertyTypeData;
+    struct ApiResourceData;
     struct ApiResourceParamData;
     struct ApiResourceParamsData;
-    struct ApiResourceData;
-    struct ApiSetResourceDisabledData;
-    struct ApiSetResourceStatusData;
-    struct ApiPropertyTypeData;
     struct ApiResourceTypeData;
     struct ApiRuntimeData;
+    struct ApiScheduleTaskData;
     struct ApiServerAliveData;
     struct ApiServerInfoData;
+    struct ApiSetResourceDisabledData;
+    struct ApiSetResourceStatusData;
+    struct ApiStorageData;
     struct ApiStoredFileData;
     struct ApiUserData;
+    struct ApiVideowallControlMessageData;
+    struct ApiVideowallData;
     struct ApiVideowallItemData;
     struct ApiVideowallScreenData;
-    struct ApiVideowallData;
-    struct ApiVideowallControlMessageData;
 
-    typedef std::vector<ApiPropertyTypeData> ApiPropertyTypeDataList;
-    typedef std::vector<ApiLicenseData> ApiLicenseDataList;
-    typedef std::vector<ApiResourceTypeData> ApiResourceTypeDataList;
-    typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
-    typedef std::vector<ApiCameraData> ApiCameraDataList;
-    typedef std::vector<ApiUserData> ApiUserDataList;
-    typedef std::vector<ApiLayoutData> ApiLayoutDataList;
-    typedef std::vector<ApiVideowallData> ApiVideowallDataList;
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
+    typedef std::vector<ApiCameraData> ApiCameraDataList;
     typedef std::vector<ApiCameraServerItemData> ApiCameraServerItemDataList;
+    typedef std::vector<ApiLayoutData> ApiLayoutDataList;
+    typedef std::vector<ApiLicenseData> ApiLicenseDataList;
+    typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
+    typedef std::vector<ApiPropertyTypeData> ApiPropertyTypeDataList;
+    typedef std::vector<ApiResourceParamData> ApiResourceParamDataList; // TODO: 
+    typedef std::vector<ApiResourceTypeData> ApiResourceTypeDataList;
+    typedef std::vector<ApiStorageData> ApiStorageDataList;
+    typedef std::vector<ApiUserData> ApiUserDataList;
+    typedef std::vector<ApiVideowallData> ApiVideowallDataList;
 
 
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
@@ -58,5 +60,8 @@ namespace ec2 {
     );
 
 } // namespace ec2
+
+#define QN_QUERY_TO_DATA_OBJECT(...) // TODO: #EC2
+#define QN_QUERY_TO_DATA_OBJECT_FILTERED(...) // TODO: #EC2
 
 #endif // QN_EC2_API_FWD_H
