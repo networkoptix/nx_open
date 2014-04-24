@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
+#include <mutex/distributed_mutex.h>
 
 // TODO: add tracking to the newly added servers
 
@@ -92,6 +93,9 @@ private slots:
     void at_downloadReply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
     void downloadNextUpdate();
 
+    void at_mutexLocked(const QByteArray &);
+    void at_mutexTimeout(const QByteArray &);
+
 private:
     void setState(State state);
     void checkBuildOnline();
@@ -120,6 +124,7 @@ private:
     QHash<QnSystemInformation, UpdateInformation> m_downloadingUpdates;
 
     QNetworkAccessManager *m_networkAccessManager;
+    ec2::QnDistributedMutexPtr m_distributedMutex;
 };
 
 #endif // QN_MEDIA_SERVER_UPDATE_TOOL_H

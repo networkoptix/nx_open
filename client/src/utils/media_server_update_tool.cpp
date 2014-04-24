@@ -20,6 +20,7 @@ const QString infoEntryName = lit("update.json");
 const QString QN_UPDATES_URL = lit("http://localhost:8000/updates");
 const QString buildInformationSuffix(lit("update"));
 const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
+const QByteArray mutexName = "auto_update";
 
 
 QString updateFilePath(const QString &fileName) {
@@ -39,7 +40,9 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     m_onlineUpdateUrl(QN_UPDATES_URL),
     m_networkAccessManager(new QNetworkAccessManager(this))
 {
-    connect(connection2()->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateUploaded, this, &QnMediaServerUpdateTool::at_updateUploaded);
+    connect(connection2()->getUpdatesManager().get(),   &ec2::AbstractUpdatesManager::updateUploaded,   this,   &QnMediaServerUpdateTool::at_updateUploaded);
+    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::locked,        this,   &QnMediaServerUpdateTool::at_mutexLocked, Qt::QueuedConnection);
+    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::lockTimeout,   this,   &QnMediaServerUpdateTool::at_mutexTimeout, Qt::QueuedConnection);
 }
 
 QnMediaServerUpdateTool::State QnMediaServerUpdateTool::state() const {
@@ -307,6 +310,21 @@ void QnMediaServerUpdateTool::downloadNextUpdate() {
     connect(reply,  &QNetworkReply::downloadProgress,   this,   &QnMediaServerUpdateTool::at_downloadReply_downloadProgress);
 }
 
+void QnMediaServerUpdateTool::at_mutexLocked(const QByteArray &) {
+    foreach (const QnMediaServerResourcePtr &server, m_pendingInstallServers) {
+        connection2()->getUpdatesManager()->installUpdate(m_targetVersion.toString(),
+                                                          this, [this](int reqId, ec2::ErrorCode errorCode){});
+    }
+    m_distributedMutex->unlock();
+    m_distributedMutex.clear();
+}
+
+void QnMediaServerUpdateTool::at_mutexTimeout(const QByteArray &) {
+    m_distributedMutex.clear();
+    m_updateResult = InstallationFailed;
+    setState(Idle);
+}
+
 void QnMediaServerUpdateTool::setState(State state) {
     if (m_state == state)
         return;
@@ -367,8 +385,5 @@ void QnMediaServerUpdateTool::uploadUpdatesToServers() {
 void QnMediaServerUpdateTool::installUpdatesToServers() {
     setState(InstallingUpdate);
 
-    foreach (const QnMediaServerResourcePtr &server, m_pendingInstallServers) {
-        connection2()->getUpdatesManager()->installUpdate(m_targetVersion.toString(),
-                                                          this, [this](int reqId, ec2::ErrorCode errorCode){});
-    }
+    m_distributedMutex = ec2::QnDistributedMutexManager::instance()->getLock(mutexName);
 }
