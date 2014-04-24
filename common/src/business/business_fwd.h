@@ -8,6 +8,8 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 
+#include <utils/common/model_functions_fwd.h>
+
 class QnAbstractBusinessEvent;
 typedef QSharedPointer<QnAbstractBusinessEvent> QnAbstractBusinessEventPtr;
 typedef QList<QnAbstractBusinessEventPtr> QnAbstractBusinessEventList;
@@ -161,13 +163,10 @@ public:
         ActionCount // TODO: #Elric remove
     };
 
-    bool isNotImplemented(ActionType actionType);
+    bool isImplemented(ActionType actionType);
 
 } // namespace QnBusiness
 
-Q_DECLARE_METATYPE(QnBusiness::EventReason)
-Q_DECLARE_METATYPE(QnBusiness::EventType)
-Q_DECLARE_METATYPE(QnBusiness::ActionType)
-
+QN_DECLARE_FUNCTIONS_FOR_TYPES((QnBusiness::EventReason)(QnBusiness::EventType)(QnBusiness::ActionType), (metatype)(lexical)(json))
 
 #endif // QN_BUSINESS_FWD_H

@@ -77,8 +77,8 @@ namespace QnBusiness {
         }
     }
 
-    bool isNotImplemented(ActionType actionType) { 
-        return actionType == BookmarkAction; 
+    bool isImplemented(ActionType actionType) { 
+        return actionType != BookmarkAction; 
     }
 }
 

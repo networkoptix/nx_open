@@ -71,7 +71,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
 
     for (int i = 1; i < QnBusiness::ActionCount; i++) {
         QnBusiness::ActionType val = (QnBusiness::ActionType)i;
-        if (QnBusiness::isNotImplemented(val))
+        if (!QnBusiness::isImplemented(val))
             continue;
 
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
