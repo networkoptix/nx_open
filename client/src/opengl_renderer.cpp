@@ -291,6 +291,7 @@ void loadImageData( int texture_wigth , int texture_height , int image_width , i
         {
             const uchar *row = pixels + (y*image_width) * gl_bytes_per_pixel;
             glTexSubImage2D( GL_TEXTURE_2D, 0, 0, y , texture_wigth, 1, gl_format, GL_UNSIGNED_BYTE, row );
-        }
-    }
+    	}   
+		 
+	}
 }
