@@ -40,7 +40,7 @@ public:
     QnTimePeriodList periods(Qn::TimePeriodContent type);
 
 signals:
-    void periodsChanged(Qn::CameraDataType type);
+    void periodsChanged(Qn::TimePeriodContent type);
     void loadingFailed();
 
 private slots:

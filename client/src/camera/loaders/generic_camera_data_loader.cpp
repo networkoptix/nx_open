@@ -169,7 +169,12 @@ void QnGenericCameraDataLoader::handleDataLoaded(int status, const QnAbstractCam
             continue;
         
         if (status == 0) {
-            if (!data->isEmpty()) {
+            if (!m_loadedData && data) {
+                m_loadedData = data;
+                updateLoadedPeriods(m_loading[i].period);
+            }
+            else
+            if (data && !data->isEmpty()) {
                 m_loadedData->append(data);
                 updateLoadedPeriods(m_loading[i].period);
             }

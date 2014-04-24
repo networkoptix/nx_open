@@ -172,8 +172,8 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void at_loader_periodsChanged(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type);
     void at_loader_periodsChanged(Qn::TimePeriodContent type);
+    void updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type);
 
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();

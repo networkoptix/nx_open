@@ -206,10 +206,13 @@ void QnCachingCameraDataLoader::load(Qn::CameraDataType type) {
         if(!isMotionRegionsEmpty()) {
             QString filter = serializeRegionList(m_motionRegions);
             m_handles[type] = loader->load(m_loadedPeriod, filter);
-        } else if(!m_data[type]->isEmpty()) {
+        } else if(m_data[type] && !m_data[type]->isEmpty()) {
             m_data[type]->clear();
-            emit periodsChanged(type);
+            emit periodsChanged(Qn::MotionContent);
         }
+        break;
+    case Qn::BookmarkData:
+        //TODO: #GDM implement me
         break;
     default:
         assert(false); //should never get here
@@ -217,10 +220,14 @@ void QnCachingCameraDataLoader::load(Qn::CameraDataType type) {
 }
 
 void QnCachingCameraDataLoader::trim(Qn::CameraDataType type, qint64 trimTime) {
+    if (!m_data[type])
+        return;
+
     if (!m_data[type]->trimDataSource(trimTime))
         return;
   
-    emit periodsChanged(type);
+    //TODO: #GDM implement
+    //emit periodsChanged(type);
 }
 
 
@@ -228,12 +235,17 @@ void QnCachingCameraDataLoader::trim(Qn::CameraDataType type, qint64 trimTime) {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &data, int handle) {
-    for(int i = 0; i < Qn::CameraDataTypeCount; i++) {
-        if(handle == m_handles[i] && m_data[i].data() == data) {
-            m_data[i] = data;
-            emit periodsChanged(static_cast<Qn::CameraDataType>(i));
+    for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
+        Qn::TimePeriodContent contentType = static_cast<Qn::TimePeriodContent>(i);
+        Qn::CameraDataType dataType = timePeriodToDataType(contentType);
+
+        if(handle == m_handles[dataType] && !(m_data[dataType] && m_data[dataType].data() == data)) {
+            m_data[dataType] = data;
+            emit periodsChanged(contentType);
         }
     }
+
+    //TODO: #GDM implement bookmarksChanged notify
 }
 
 void QnCachingCameraDataLoader::at_loader_failed(int /*status*/, int handle) {

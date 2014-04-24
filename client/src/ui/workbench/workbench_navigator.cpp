@@ -531,7 +531,7 @@ QnCachingCameraDataLoader *QnWorkbenchNavigator::loader(const QnResourcePtr &res
 
     QnCachingCameraDataLoader *loader = QnCachingCameraDataLoader::newInstance(resource, this);
     if(loader)
-        connect(loader, SIGNAL(periodsChanged(Qn::TimePeriodContent)), this, SLOT(at_loader_periodsChanged(Qn::TimePeriodContent)));
+        connect(loader, &QnCachingCameraDataLoader::periodsChanged, this, &QnWorkbenchNavigator::at_loader_periodsChanged);
 
     m_loaderByResource[resource] = loader;
     return loader;
@@ -1269,11 +1269,11 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     }
 }
 
-void QnWorkbenchNavigator::at_loader_periodsChanged(Qn::TimePeriodContent type) {
-    at_loader_periodsChanged(checked_cast<QnCachingCameraDataLoader *>(sender()), type);
+void QnWorkbenchNavigator::at_loader_periodsChanged(Qn::TimePeriodContent  type) {
+    updateLoaderPeriods(checked_cast<QnCachingCameraDataLoader *>(sender()), type);
 }
 
-void QnWorkbenchNavigator::at_loader_periodsChanged(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type) {
+void QnWorkbenchNavigator::updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type) {
     QnResourcePtr resource = loader->resource();
 
     if(m_currentWidget && m_currentWidget->resource() == resource)
