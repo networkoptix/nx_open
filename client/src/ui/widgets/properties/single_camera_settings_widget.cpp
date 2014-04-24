@@ -187,6 +187,8 @@ void QnSingleCameraSettingsWidget::at_proxyAuthenticationRequired ( const QNetwo
     authenticator->setUser(lastUsedConnection.url.userName());
     authenticator->setPassword(lastUsedConnection.url.password());
 }
+
+#ifdef WEBKIT_PRESENT
 void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout , QWebView* advancedWebView)
 {
     if ( qnCommon )
@@ -224,12 +226,16 @@ void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout ,
         }                
     } 
 }
+#endif
+
 void QnSingleCameraSettingsWidget::initAdvancedTab()
 {
     QVariant id;
     QTreeWidget* advancedTreeWidget = 0;
     QStackedLayout* advancedLayout = 0;
+#ifdef WEBKIT_PRESENT
     QWebView* advancedWebView = 0;
+#endif
     setAnyCameraChanges(false);
 
     if (m_camera && m_camera->getParam(lit("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
@@ -264,11 +270,13 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
             sizes[0] = 200;
             sizes[1] = 400;
             advancedSplitter->setSizes(sizes);
+#ifdef WEBKIT_PRESENT
             advancedWebView = new QWebView(ui->advancedTab);
             connect(advancedWebView->page()->networkAccessManager(), SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(at_sslErrors(QNetworkReply*,QList<QSslError>)));
             connect(advancedWebView->page()->networkAccessManager(), SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator *)), this, SLOT(at_authenticationRequired(QNetworkReply*, QAuthenticator *)), Qt::DirectConnection);
             stacked_layout->addWidget(advancedWebView);
             updateWebPage(stacked_layout,advancedWebView);
+#endif
         } else {
             if (m_camera->getUniqueId() == m_widgetsRecreator->getCameraId()) {
                 return;
@@ -283,22 +291,34 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
 
             advancedTreeWidget = m_widgetsRecreator->getRootWidget();
             advancedLayout = m_widgetsRecreator->getRootLayout();
+#ifdef WEBKIT_PRESENT
             advancedWebView = m_widgetsRecreator->getWebView();
+#endif
             cleanAdvancedSettings();
         }
 
-        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id.toString(), *advancedTreeWidget, *advancedLayout, advancedWebView , this);
+        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id.toString(), *advancedTreeWidget, *advancedLayout,
+#ifdef WEBKIT_PRESENT
+            advancedWebView,
+#endif
+            this);
     }
     else if (m_widgetsRecreator)
     {
         advancedTreeWidget = m_widgetsRecreator->getRootWidget();
         advancedLayout = m_widgetsRecreator->getRootLayout();
+#ifdef WEBKIT_PRESENT
         advancedWebView = m_widgetsRecreator->getWebView();
+#endif
         cleanAdvancedSettings();
 
         //Dummy creator: required for cameras, that doesn't support advanced settings
         //m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout, this);
-		m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout,advancedWebView, this);
+		m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout,
+#ifdef WEBKIT_PRESENT
+            advancedWebView,
+#endif
+            this);
     }
 }
 
@@ -364,10 +384,12 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         connect(m_camera, SIGNAL(urlChanged(const QnResourcePtr &)),        this, SLOT(updateWebPageText())); // TODO: #Elric also listen to hostAddress changes?
         connect(m_camera, SIGNAL(resourceChanged(const QnResourcePtr &)),   this, SLOT(updateWebPageText()));
         QStackedLayout* stacked_layout = dynamic_cast<QStackedLayout*>(ui->advancedTab->layout());
+#ifdef WEBKIT_PRESENT
         if ( m_widgetsRecreator && m_widgetsRecreator->getWebView() && stacked_layout)
         {
             updateWebPage(stacked_layout,m_widgetsRecreator->getWebView());
         }        
+#endif
     }
 
     updateFromResource();

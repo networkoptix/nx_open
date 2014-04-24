@@ -6,7 +6,9 @@
 #include <QtCore/QSet>
 #include <QtWidgets/QTreeWidgetItem>
 #include <QtWidgets/QStackedLayout>
+#ifdef WEBKIT_PRESENT
 #include <QtWebKitWidgets/QtWebKitWidgets>
+#endif
 
 #include "plugins/resources/camera_settings/camera_settings.h"
 
@@ -201,7 +203,9 @@ class CameraSettingsWidgetsTreeCreator: public CameraSettingTreeReader<CameraSet
     typedef CameraSettingsWidgetsCreator::SettingsWidgetsById SettingsWidgetsById;
     typedef CameraSettingsWidgetsCreator::EmptyGroupsById EmptyGroupsById;
 
+#ifdef WEBKIT_PRESENT
     QWebView* m_webView;
+#endif
     QTreeWidget& m_rootWidget;
     QStackedLayout& m_rootLayout;
     TreeWidgetItemsById m_treeWidgetsById;
@@ -221,7 +225,15 @@ private:
 
 public:
 
-    CameraSettingsWidgetsTreeCreator(const QString& cameraId, const QString& id, QTreeWidget& rootWidget, QStackedLayout& rootLayout,QWebView* webView, QObject* handler);
+    CameraSettingsWidgetsTreeCreator(
+        const QString& cameraId,
+        const QString& id,
+        QTreeWidget& rootWidget,
+        QStackedLayout& rootLayout,
+#ifdef WEBKIT_PRESENT
+        QWebView* webView,
+#endif
+        QObject* handler);
     ~CameraSettingsWidgetsTreeCreator();
 
     CameraSettingsWidgetsCreator* createElement(const QString& id) override;
@@ -232,7 +244,9 @@ public:
     QString getCameraId() const;
     QTreeWidget* getRootWidget();
     QStackedLayout* getRootLayout();
+#ifdef WEBKIT_PRESENT
     QWebView* getWebView();
+#endif
 };
 
 #endif //camera_advanced_settings_xml_parser_h_1819

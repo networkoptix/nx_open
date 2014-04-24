@@ -8,7 +8,9 @@
 #include "utils/camera_advanced_settings_xml_parser.h"
 #include "ui/workbench/workbench_context_aware.h"
 #include "utils/common/connective.h"
+#ifdef WEBKIT_PRESENT
 #include <QtWebKitWidgets/QtWebKitWidgets>
+#endif
 
 namespace Ui {
     class SingleCameraSettingsWidget;
@@ -150,7 +152,9 @@ private:
     void loadAdvancedSettings();
 
     void cleanAdvancedSettings();
+#ifdef WEBKIT_PRESENT
     void updateWebPage(QStackedLayout* stackedLayout , QWebView* advancedWebView);
+#endif
     Q_SLOT void at_sslErrors(QNetworkReply* reply, const QList<QSslError> &);
     Q_SLOT void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
     Q_SLOT void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
