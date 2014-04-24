@@ -7,11 +7,17 @@
 #include "universal_tcp_listener.h"
 #include "universal_request_processor_p.h"
 #include "authenticate_helper.h"
+#include "utils/common/synctime.h"
 
 
 static const int AUTH_TIMEOUT = 60 * 1000;
 static const int KEEP_ALIVE_TIMEOUT = 60  * 1000;
+static const int AUTHORIZED_TIMEOUT = 60 * 1000;
 static const int MAX_AUTH_RETRY_COUNT = 3;
+
+static QMap<QString, qint64> authorizedList;
+static QMutex authorizationCacheMutex;
+
 
 QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
 {
@@ -41,6 +47,15 @@ QnTCPConnectionProcessor(priv, socket)
 bool QnUniversalRequestProcessor::authenticate()
 {
     Q_D(QnUniversalRequestProcessor);
+
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    QString addr = d->socket->getForeignAddress().address.toString();
+    {
+        QMutexLocker lock(&authorizationCacheMutex);
+        if (currentTime - authorizedList.value(addr) < AUTHORIZED_TIMEOUT)
+            return true;
+    }
+
     int retryCount = 0;
     if (d->needAuth &&  d->protocol.toLower() == "http")
     {
@@ -71,6 +86,9 @@ bool QnUniversalRequestProcessor::authenticate()
                 return false; // close connection
         }
     }
+
+    QMutexLocker lock(&authorizationCacheMutex);
+    authorizedList.insert(addr, currentTime);
     return true;
 }
 
@@ -128,7 +146,7 @@ void QnUniversalRequestProcessor::processRequest()
     {
         QByteArray protocol = header[2].split('/')[0].toUpper();
         QMutexLocker lock(&d->mutex);
-        d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, protocol, QUrl(QString::fromUtf8(header[1])).path());
+        d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, protocol, QUrl(QString::fromUtf8(header[1])));
         if (d->processor && !needToStop()) 
         {
             copyClientRequestTo(*d->processor);
