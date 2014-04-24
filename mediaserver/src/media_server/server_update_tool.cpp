@@ -1,22 +1,69 @@
 #include "server_update_tool.h"
 
 #include <QtCore/QDir>
+#include <QtCore/QBuffer>
+
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
 
 namespace {
 
-    const QString updatesSuffix = lit("mediaserver/updates");
-    const QString updatePrefix = lit("update_");
+    const QString updatesDirSuffix = lit("mediaserver/updates");
+    const int readBufferSize = 1024 * 16;
 
     QDir getUpdatesDir() {
         QDir dir = QDir::temp();
-        if (!dir.exists(updatesSuffix))
-            dir.mkpath(updatesSuffix);
-        dir.cd(updatesSuffix);
+        if (!dir.exists(updatesDirSuffix))
+            dir.mkpath(updatesDirSuffix);
+        dir.cd(updatesDirSuffix);
         return dir;
     }
 
-    QString getUpdateFilePath(const QString &updateId) {
-        return getUpdatesDir().absoluteFilePath(updatePrefix + updateId);
+    QDir getUpdateDir(const QString &updateId) {
+        QDir dir = getUpdatesDir();
+        if (!dir.exists(updateId))
+            dir.mkdir(updateId);
+        dir.cd(updateId);
+        return dir;
+    }
+
+    bool extractZipArchive(QuaZip *zip, const QDir &dir) {
+        if (!dir.exists())
+            return false;
+
+        QuaZipFile file(zip);
+        for (bool more = zip->goToFirstFile(); more; more = zip->goToNextFile()) {
+            QuaZipFileInfo info;
+            zip->getCurrentFileInfo(&info);
+
+            QFileInfo fileInfo(info.name);
+            QString path = fileInfo.path();
+            QString name = fileInfo.fileName();
+
+            if (!path.isEmpty() && !dir.exists(path) && !dir.mkpath(path))
+                return false;
+
+            QFile destFile(dir.absoluteFilePath(info.name));
+            if (!destFile.open(QFile::WriteOnly))
+                return false;
+
+            if (!file.open(QuaZipFile::ReadOnly))
+                return false;
+
+            QByteArray buf(readBufferSize, 0);
+            while (file.bytesAvailable()) {
+                qint64 read = file.read(buf.data(), readBufferSize);
+                if (read != destFile.write(buf.data(), read)) {
+                    file.close();
+                    return false;
+                }
+            }
+            destFile.close();
+            file.close();
+
+            destFile.setPermissions(info.getPermissions());
+        }
+        return zip->getZipError() == UNZ_OK;
     }
 
 } // anonymous namespace
@@ -34,17 +81,18 @@ QnServerUpdateTool *QnServerUpdateTool::instance() {
 }
 
 bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray &data) {
-    QFile file(getUpdateFilePath(updateId));
-    if (!file.open(QFile::WriteOnly))
+    QBuffer buffer(const_cast<QByteArray*>(&data)); // we're goint to read data, so const_cast is ok here
+    QuaZip zip(&buffer);
+    if (!zip.open(QuaZip::mdUnzip))
         return false;
 
-    return data.size() == file.write(data); // file will be closed automatically in ~QFile()
+    bool ok = extractZipArchive(&zip, getUpdateDir(updateId));
+
+    zip.close();
+
+    return ok;
 }
 
 bool QnServerUpdateTool::installUpdate(const QString &updateId) {
-    QString updateFile = getUpdateFilePath(updateId);
-    if (!QFile::exists(updateFile))
-        return false;
-
     return true;
 }
