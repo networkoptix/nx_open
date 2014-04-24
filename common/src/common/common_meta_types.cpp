@@ -18,7 +18,8 @@
 #include <api/model/kvpair.h>
 #include <api/model/connection_info.h>
 
-#include <recording/time_period.h>
+#include <camera/abstract_camera_data.h>
+
 #include <recording/time_period_list.h>
 
 #include <core/resource/resource_fwd.h>
@@ -37,6 +38,8 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_control_message.h>
+
+#include <recording/time_period.h>
 
 #include <core/misc/schedule_task.h>
 #include <core/ptz/ptz_data.h>
@@ -174,6 +177,9 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnConnectionInfo>();
     qRegisterMetaType<Qn::PanicMode>();
+
+    qRegisterMetaType<Qn::CameraDataType>();
+    qRegisterMetaType<QnAbstractCameraDataPtr>();
 
     QnJsonSerializer::registerSerializer<QUuid>();
 

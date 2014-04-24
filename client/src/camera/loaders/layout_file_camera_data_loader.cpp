@@ -1,25 +1,36 @@
-#include "layout_file_time_period_loader.h"
+#include "layout_file_camera_data_loader.h"
 
 #include <api/serializer/serializer.h>
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 
+#include <recording/time_period_list.h>
 
-int QnLayoutFileTimePeriodLoader::m_handle = 0;
-
-QnLayoutFileTimePeriodLoader::QnLayoutFileTimePeriodLoader(const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, const QnAbstractTimePeriodListPtr& chunks, QObject *parent):
-    QnAbstractTimePeriodLoader(resource, periodsType, parent),
-    m_chunks(chunks)
-{
+namespace {
+    QAtomicInt qn_fakeHandle(INT_MAX / 2);
 }
 
-QnLayoutFileTimePeriodLoader::~QnLayoutFileTimePeriodLoader()
+QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
+    QnAbstractCameraDataLoader(resource, dataType, parent)
+{
+
+}
+
+QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnResourcePtr &resource, Qn::CameraDataType dataType, const QnAbstractCameraDataPtr& data, QObject *parent):
+    QnAbstractCameraDataLoader(resource, dataType, parent),
+    m_data(data)
+{
+
+}
+
+
+QnLayoutFileCameraDataLoader::~QnLayoutFileCameraDataLoader()
 {
     //qFreeAligned(m_motionData);
 }
 
-QnLayoutFileTimePeriodLoader* QnLayoutFileTimePeriodLoader::newInstance(const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, QObject *parent)
+QnLayoutFileCameraDataLoader* QnLayoutFileCameraDataLoader::newInstance(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent)
 {
     QnAviResourcePtr localFile = resource.dynamicCast<QnAviResource>();
     if (!localFile)
@@ -28,19 +39,27 @@ QnLayoutFileTimePeriodLoader* QnLayoutFileTimePeriodLoader::newInstance(const Qn
     if (!storage)
         return NULL;
 
-    QnTimePeriodList chunks = storage->getTimePeriods(resource);
-    return new QnLayoutFileTimePeriodLoader(resource, periodsType, QnGenericTimePeriodListPtr(new QnGenericTimePeriodList(chunks)), parent);
+    switch (dataType) {
+    case Qn::RecordedTimePeriod: 
+        {
+            QnTimePeriodList chunks = storage->getTimePeriods(resource);
+            return new QnLayoutFileCameraDataLoader(resource, dataType, QnTimePeriodCameraDataPtr(new QnTimePeriodCameraData(dataType, chunks)), parent);
+        }
+    default:
+        return new QnLayoutFileCameraDataLoader(resource, dataType, parent);
+    }
+   
 }
 
-int QnLayoutFileTimePeriodLoader::loadChunks(const QnTimePeriod &period)
+int QnLayoutFileCameraDataLoader::loadChunks(const QnTimePeriod &period)
 {
     Q_UNUSED(period)
-    ++m_handle;
-    emit delayedReady(m_chunks, m_handle);
-    return m_handle;
+    int handle = qn_fakeHandle.fetchAndAddAcquire(1);
+    emit delayedReady(m_data, handle);
+    return handle;
 }
 
-int QnLayoutFileTimePeriodLoader::loadMotion(const QnTimePeriod &period, const QList<QRegion> &motionRegions)
+int QnLayoutFileCameraDataLoader::loadMotion(const QnTimePeriod &period, const QList<QRegion> &motionRegions)
 {
     QVector<char*> masks;
     for (int i = 0; i < motionRegions.size(); ++i) {
@@ -71,24 +90,24 @@ int QnLayoutFileTimePeriodLoader::loadMotion(const QnTimePeriod &period, const Q
             }
         }
     }
-    QnTimePeriodList merged = QnTimePeriod::mergeTimePeriods(periods);
-    QnAbstractTimePeriodListPtr result(new QnGenericTimePeriodList(merged));
+    QnTimePeriodList merged = QnTimePeriodList::mergeTimePeriods(periods);
+    QnAbstractCameraDataPtr result(new QnTimePeriodCameraData(Qn::MotionTimePeriod, merged));
 
     for (int i = 0; i < masks.size(); ++i)
         qFreeAligned(masks[i]);
 
 
-    ++m_handle;
-    emit delayedReady(result, m_handle);
-    return m_handle;
+    int handle = qn_fakeHandle.fetchAndAddAcquire(1);
+    emit delayedReady(result, handle);
+    return handle;
 }
 
-int QnLayoutFileTimePeriodLoader::load(const QnTimePeriod &period, const QString &filter)
+int QnLayoutFileCameraDataLoader::load(const QnTimePeriod &period, const QString &filter)
 {
-    switch (m_periodsType) {
-    case Qn::RecordingContent:
+    switch (m_dataType) {
+    case Qn::RecordedTimePeriod:
         return loadChunks(period);
-    case Qn::MotionContent:
+    case Qn::MotionTimePeriod:
         {
             QList<QRegion> motionRegions;
             parseRegionList(motionRegions, filter);
@@ -99,8 +118,6 @@ int QnLayoutFileTimePeriodLoader::load(const QnTimePeriod &period, const QString
             }
             qWarning() << "empty motion region";
         }
-        //TODO: #GDM intended fall-through to get assert, make sure it is safe in release
-    case Qn::BookmarksContent:
         //TODO: #GDM intended fall-through to get assert, make sure it is safe in release
     default:
         assert(false);

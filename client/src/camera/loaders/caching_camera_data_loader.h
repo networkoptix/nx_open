@@ -1,28 +1,28 @@
-#ifndef QN_CACHING_TIME_PERIOD_LOADER_H
-#define QN_CACHING_TIME_PERIOD_LOADER_H
+#ifndef QN_CACHING_CAMERA_DATA_LOADER_H
+#define QN_CACHING_CAMERA_DATA_LOADER_H
 
 #include <QtCore/QObject>
+
+#include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
+class QnAbstractCameraDataLoader;
 
-class QnTimePeriodLoader;
-class QnAbstractTimePeriodLoader;
-
-class QnCachingTimePeriodLoader: public QObject {
+class QnCachingCameraDataLoader: public QObject {
     Q_OBJECT;
     Q_PROPERTY(qreal loadingMargin READ loadingMargin WRITE setLoadingMargin);
 
 public:
-    QnCachingTimePeriodLoader(const QnResourcePtr &networkResource, QObject *parent = NULL);
-    virtual ~QnCachingTimePeriodLoader();
+    QnCachingCameraDataLoader(const QnResourcePtr &networkResource, QObject *parent = NULL);
+    virtual ~QnCachingCameraDataLoader();
 
-    static QnCachingTimePeriodLoader *newInstance(const QnResourcePtr &resource, QObject *parent = NULL);
+    static QnCachingCameraDataLoader *newInstance(const QnResourcePtr &resource, QObject *parent = NULL);
 
-    QnResourcePtr resource();
+    QnResourcePtr resource() const;
 
     qreal loadingMargin() const;
     void setLoadingMargin(qreal loadingMargin);
@@ -40,38 +40,38 @@ public:
     QnTimePeriodList periods(Qn::TimePeriodContent type);
 
 signals:
-    void periodsChanged(Qn::TimePeriodContent type);
+    void periodsChanged(Qn::CameraDataType type);
     void loadingFailed();
 
 private slots:
-    void at_loader_ready(const QnAbstractTimePeriodListPtr &timePeriods, int handle);
+    void at_loader_ready(const QnAbstractCameraDataPtr &timePeriods, int handle);
     void at_loader_failed(int status, int handle);
     void at_syncTime_timeChanged();
 
 protected:
-    void load(Qn::TimePeriodContent type);
-    void trim(Qn::TimePeriodContent type, qint64 trimTime);
+    void load(Qn::CameraDataType type);
+    void trim(Qn::CameraDataType type, qint64 trimTime);
 
     QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod) const;
 
 private:
-    QnCachingTimePeriodLoader(QnAbstractTimePeriodLoader **loaders, QObject *parent);
+    QnCachingCameraDataLoader(QnAbstractCameraDataLoader **loaders, QObject *parent);
 
     void init();
-    void initLoaders(QnAbstractTimePeriodLoader **loaders);
-    static bool createLoaders(const QnResourcePtr &resource, QnAbstractTimePeriodLoader **loaders);
+    void initLoaders(QnAbstractCameraDataLoader **loaders);
+    static bool createLoaders(const QnResourcePtr &resource, QnAbstractCameraDataLoader **loaders);
 
 private:
     QnResourcePtr m_resource;
     bool m_resourceIsLocal;
     QnTimePeriod m_loadedPeriod;
-    QnAbstractTimePeriodLoader *m_loaders[Qn::TimePeriodContentCount];
-    int m_handles[Qn::TimePeriodContentCount];
+    QnAbstractCameraDataLoader *m_loaders[Qn::CameraDataTypeCount];
+    int m_handles[Qn::CameraDataTypeCount];
     QList<QRegion> m_motionRegions;
-    QnTimePeriodList m_periods[Qn::TimePeriodContentCount];
+    QnAbstractCameraDataPtr m_data[Qn::CameraDataTypeCount];
     qreal m_loadingMargin;
     qint64 m_updateInterval;
 };
 
 
-#endif // QN_CACHING_TIME_PERIOD_LOADER_H
+#endif // QN_CACHING_CAMERA_DATA_LOADER_H

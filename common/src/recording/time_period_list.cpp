@@ -204,50 +204,158 @@ bool QnTimePeriodList::decode(QByteArray &stream)
 }
 
 
-QnGenericTimePeriodList::QnGenericTimePeriodList() {
+QnTimePeriodCameraData::QnTimePeriodCameraData(Qn::CameraDataType dataType):
+    QnAbstractCameraData(dataType)
+{
 
 }
 
-QnGenericTimePeriodList::QnGenericTimePeriodList(const QnTimePeriodList &data):
+QnTimePeriodCameraData::QnTimePeriodCameraData(Qn::CameraDataType dataType, const QnTimePeriodList &data):
+    QnAbstractCameraData(dataType),
     m_data(data)
 {
 }
 
-bool QnGenericTimePeriodList::isEmpty() const {
-    return m_data.isEmpty();
-}
-
-void QnGenericTimePeriodList::append(const QnAbstractTimePeriodListPtr &other) {
+void QnTimePeriodCameraData::append(const QnAbstractCameraDataPtr &other) {
     if (!other)
         return;
     QnTimePeriodList otherList;
-    if (QnGenericTimePeriodList* other_casted = dynamic_cast<QnGenericTimePeriodList*>(other.data()))
+    if (QnTimePeriodCameraData* other_casted = dynamic_cast<QnTimePeriodCameraData*>(other.data()))
         otherList = other_casted->m_data;
     if (m_data.isEmpty())
         return;
 
     QVector<QnTimePeriodList> allPeriods;
     if (!otherList.isEmpty() && !m_data.isEmpty() && m_data.last().durationMs == -1) 
-        if (otherList.last().startTimeMs >= m_data.last().startTimeMs) 
+        if (otherList.last().startTimeMs >= m_data.last().startTimeMs) // TODO: #Elric should this be otherList.last().startTimeMs?
             m_data.last().durationMs = 0;
     allPeriods << m_data << otherList;
-    m_data = QnTimePeriod::mergeTimePeriods(allPeriods); // union data
+    m_data = QnTimePeriodList::mergeTimePeriods(allPeriods); // union data
 }
 
-QnTimePeriod QnGenericTimePeriodList::last() const {
-    if (m_data.isEmpty())
-        return QnTimePeriod();
-    return m_data.last();
-}
 
-QnAbstractTimePeriodListPtr QnGenericTimePeriodList::merged(const QVector<QnAbstractTimePeriodListPtr> &source) {
+QnAbstractCameraDataPtr QnTimePeriodCameraData::merge(const QVector<QnAbstractCameraDataPtr> &source) {
     QVector<QnTimePeriodList> allPeriods;
+    allPeriods << m_data;
 
-    foreach (const QnAbstractTimePeriodListPtr &other, source) {
+    foreach (const QnAbstractCameraDataPtr &other, source) {
         if (!other)
             continue;
-        if (QnGenericTimePeriodList* other_casted = dynamic_cast<QnGenericTimePeriodList*>(other.data()))
+        if (QnTimePeriodCameraData* other_casted = dynamic_cast<QnTimePeriodCameraData*>(other.data()))
             allPeriods << other_casted->m_data;
     }
-    return QnGenericTimePeriodListPtr(new QnGenericTimePeriodList(QnTimePeriod::mergeTimePeriods(allPeriods)));
+    return QnAbstractCameraDataPtr(new QnTimePeriodCameraData(m_dataType, QnTimePeriodList::mergeTimePeriods(allPeriods)));
+}
+
+bool QnTimePeriodCameraData::operator==(const QnAbstractCameraDataPtr &other) const {
+    if (QnTimePeriodCameraData* other_casted = dynamic_cast<QnTimePeriodCameraData*>(other.data()))
+        return other_casted->m_data == m_data;
+    return false;
+}
+
+QnTimePeriodList QnTimePeriodCameraData::dataSource() const  {
+    return m_data;
+}
+
+void QnTimePeriodCameraData::clear() {
+    m_data.clear();
+}
+
+bool QnTimePeriodCameraData::trimDataSource(qint64 trimTime) {
+    if(m_data.isEmpty())
+        return false;
+
+    QnTimePeriod period = m_data.last();
+    qint64 trimmedDurationMs = qMax(0ll, trimTime - period.startTimeMs);
+    if(period.durationMs != -1 && period.durationMs <= trimmedDurationMs)
+        return false;
+
+    period.durationMs = trimmedDurationMs;
+    if(period.durationMs == 0) {
+        m_data.pop_back();
+    } else {
+        m_data.back() = period;
+    }
+
+    return true;
+}
+
+QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(const QnTimePeriodList &periods, int detailLevelMs)
+{
+    QnTimePeriodList result;
+    if (periods.isEmpty())
+        return result;
+    result << periods[0];
+
+    for (int i = 1; i < periods.size(); ++i)
+    {
+        QnTimePeriod& last = result.last();
+        if(last.durationMs == -1)
+            break;
+
+        if (last.startTimeMs + last.durationMs + detailLevelMs > periods[i].startTimeMs) {
+            if(periods[i].durationMs == -1) {
+                last.durationMs = -1;
+            } else {
+                last.durationMs = qMax(last.durationMs, periods[i].startTimeMs + periods[i].durationMs - last.startTimeMs);
+            }
+        } else {
+            result << periods[i];
+        }
+    }
+
+    return result;
+}
+
+QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodList>& periods)
+{
+    if(periods.size() == 1)
+        return periods[0];
+
+    QVector<int> minIndexes;
+    minIndexes.resize(periods.size());
+    QnTimePeriodList result;
+    int minIndex = 0;
+    while (minIndex != -1)
+    {
+        qint64 minStartTime = 0x7fffffffffffffffll;
+        minIndex = -1;
+        for (int i = 0; i < periods.size(); ++i) 
+        {
+            int startIdx = minIndexes[i];
+            if (startIdx < periods[i].size() && periods[i][startIdx].startTimeMs < minStartTime) {
+                minIndex = i;
+                minStartTime = periods[i][startIdx].startTimeMs;
+            }
+        }
+
+        if (minIndex >= 0)
+        {
+            int& startIdx = minIndexes[minIndex];
+            // add chunk to merged data
+            if (result.isEmpty()) {
+                result << periods[minIndex][startIdx];
+            }
+            else {
+                QnTimePeriod& last = result.last();
+                if (periods[minIndex][startIdx].durationMs == -1) 
+                {
+                    if (last.durationMs == -1)
+                        last.startTimeMs = qMin(last.startTimeMs, periods[minIndex][startIdx].startTimeMs);
+                    else if (periods[minIndex][startIdx].startTimeMs > last.startTimeMs+last.durationMs)
+                        result << periods[minIndex][startIdx];
+                    else 
+                        last.durationMs = -1;
+                    break;
+                }
+                else if (last.startTimeMs <= minStartTime && last.startTimeMs+last.durationMs >= minStartTime)
+                    last.durationMs = qMax(last.durationMs, minStartTime + periods[minIndex][startIdx].durationMs - last.startTimeMs);
+                else {
+                    result << periods[minIndex][startIdx];
+                }
+            } 
+            startIdx++;
+        }
+    }
+    return result;
 }

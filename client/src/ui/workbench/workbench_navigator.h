@@ -23,7 +23,7 @@ class QnTimeScrollBar;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnAbstractArchiveReader;
-class QnCachingTimePeriodLoader;
+class QnCachingCameraDataLoader;
 class QnThumbnailsLoader;
 class QnCalendarWidget;
 class QnDayTimeWidget;
@@ -89,7 +89,7 @@ public:
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
-    QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
+    QnCachingCameraDataLoader *loader(const QnResourcePtr &resource);
 
 signals:
     void currentWidgetAboutToBeChanged();
@@ -123,7 +123,7 @@ protected:
 
     void setPlayingTemporary(bool playing);
 
-    QnCachingTimePeriodLoader *loader(QnResourceWidget *widget);
+    QnCachingCameraDataLoader *loader(QnResourceWidget *widget);
 
     QnThumbnailsLoader *thumbnailLoader(const QnResourcePtr &resource);
     QnThumbnailsLoader *thumbnailLoader(QnResourceWidget *widget);
@@ -172,7 +172,7 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void at_loader_periodsChanged(QnCachingTimePeriodLoader *loader, Qn::TimePeriodContent type);
+    void at_loader_periodsChanged(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type);
     void at_loader_periodsChanged(Qn::TimePeriodContent type);
 
     void at_timeSlider_valueChanged(qint64 value);
@@ -242,7 +242,7 @@ private:
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 
-    QHash<QnResourcePtr, QnCachingTimePeriodLoader *> m_loaderByResource;
+    QHash<QnResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;
     
     QHash<QnResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
 };

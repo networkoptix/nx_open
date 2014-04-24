@@ -36,7 +36,6 @@
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
-#include <camera/caching_time_period_loader.h>
 
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>

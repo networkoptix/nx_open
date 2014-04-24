@@ -1,33 +1,35 @@
-#ifndef __QN_ABSTRACT_TIME_PERIOD_LOADER_H__
-#define __QN_ABSTRACT_TIME_PERIOD_LOADER_H__
+#ifndef __QN_ABSTRACT_CAMERA_DATA_LOADER_H__
+#define __QN_ABSTRACT_CAMERA_DATA_LOADER_H__
 
 #include <QtCore/QObject>
 #include <QtGui/QRegion>
 #include <QtCore/QList>
-#include "recording/time_period_list.h"
+
+#include <camera/abstract_camera_data.h>
+
+#include <common/common_globals.h>
+
 #include <core/resource/resource_fwd.h>
 
-class QnAbstractTimePeriodLoader: public QObject
+class QnTimePeriod;
+
+/** Base class for loading custom camera archive-related data. */
+class QnAbstractCameraDataLoader: public QObject
 {
     Q_OBJECT
 public:
-    QnAbstractTimePeriodLoader(const QnResourcePtr &resource, Qn::TimePeriodContent periodsType, QObject *parent);
-    virtual ~QnAbstractTimePeriodLoader() {}
+    QnAbstractCameraDataLoader(const QnResourcePtr &resource, const Qn::CameraDataType dataType, QObject *parent);
+    virtual ~QnAbstractCameraDataLoader();
 
     /**
-     * \param timePeriod                Time period to get motion periods for.
-     * \param motionRegions             List of regions to look for motion, one region per video channel.
-     *                                  If empty list is provided, then recorded time periods will be returned.
+     * \param timePeriod                Time period to get data for.
+     * \param filter                    Custom data filter.
      * \returns                         Request handle.
-     * 
-     * \note                            This function is thread-safe.
      */
     virtual int load(const QnTimePeriod &period, const QString &filter) = 0;
 
     /**
      * \returns                         Resource that this loader works with.
-     * 
-     * \note                            This function is thread-safe.
      */
     QnResourcePtr resource() const { return m_resource; }
 
@@ -45,7 +47,7 @@ signals:
      * \param timePeriods               Loaded motion periods.
      * \param handle                    Request handle.
      */
-    void ready(const QnAbstractTimePeriodListPtr &timePeriods, int handle);
+    void ready(const QnAbstractCameraDataPtr &data, int handle);
 
     /**
      * This signal is emitted whenever the reader was unable to load motion periods.
@@ -59,10 +61,10 @@ protected:
     /** Resource that this loader gets chunks for. */
     const QnResourcePtr m_resource;
 
-    /** Periods type this loader reading. */
-    const Qn::TimePeriodContent m_periodsType;
+    const Qn::CameraDataType m_dataType;
+
 signals:
-    void delayedReady(const QnAbstractTimePeriodListPtr &timePeriods, int handle);
+    void delayedReady(const QnAbstractCameraDataPtr &data, int handle);
 };
 
-#endif // __QN_ABSTRACT_TIME_PERIOD_LOADER_H__
+#endif // __QN_ABSTRACT_CAMERA_DATA_LOADER_H__

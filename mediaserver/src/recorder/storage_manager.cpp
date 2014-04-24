@@ -431,7 +431,7 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
         }
     }
 
-    return QnTimePeriod::mergeTimePeriods(periods);
+    return QnTimePeriodList::mergeTimePeriods(periods);
 }
 
 void QnStorageManager::clearSpace()

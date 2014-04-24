@@ -7,6 +7,8 @@
 
 #include "time_period.h"
 
+#include <camera/abstract_camera_data.h>
+
 class QnTimePeriodListTimeIterator;
 
 /**
@@ -81,6 +83,9 @@ public:
      * \returns                         Time moved to nearest chunk at usec
      */
     qint64 roundTimeToPeriodUSec(qint64 timeUsec, bool searchForward) const;
+
+    static QnTimePeriodList mergeTimePeriods(const QVector<QnTimePeriodList>& periods);
+    static QnTimePeriodList aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
 };
 
 
@@ -166,19 +171,22 @@ inline QnTimePeriodListTimeIterator QnTimePeriodList::timeEnd() const {
 
 Q_DECLARE_METATYPE(QnTimePeriodList);
 
-class QnGenericTimePeriodList: public QnAbstractTimePeriodList {
+class QnTimePeriodCameraData: public QnAbstractCameraData {
 public:
-    QnGenericTimePeriodList();
-    QnGenericTimePeriodList(const QnTimePeriodList &data);
-    virtual bool isEmpty() const override;
-    virtual void append(const QnAbstractTimePeriodListPtr &other) override;
-    virtual QnTimePeriod last() const override;
+    QnTimePeriodCameraData(Qn::CameraDataType dataType);
+    QnTimePeriodCameraData(Qn::CameraDataType dataType, const QnTimePeriodList &data);
+    virtual void append(const QnAbstractCameraDataPtr &other) override;
+    virtual QnTimePeriodList dataSource() const override;
+    virtual void clear() override;
+    virtual bool trimDataSource(qint64 trimTime) override;
 
-    virtual QnAbstractTimePeriodListPtr merged(const QVector<QnAbstractTimePeriodListPtr> &source) override;
-//private:
+    virtual QnAbstractCameraDataPtr merge(const QVector<QnAbstractCameraDataPtr> &source) override;
+
+    virtual bool operator==(const QnAbstractCameraDataPtr &other) const override;
+private:
     QnTimePeriodList m_data;
 };
 
-typedef QSharedPointer<QnGenericTimePeriodList> QnGenericTimePeriodListPtr;
+typedef QSharedPointer<QnTimePeriodCameraData> QnTimePeriodCameraDataPtr;
 
 #endif // QN_TIME_PERIOD_LIST_H

@@ -238,7 +238,7 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
             QVector<QnTimePeriodList> allPeriods;
             allPeriods << m_chunks[ch];
             allPeriods << dayPeriods;
-            m_chunks[ch] = QnTimePeriod::mergeTimePeriods(allPeriods);
+            m_chunks[ch] = QnTimePeriodList::mergeTimePeriods(allPeriods);
         }
     }
 

@@ -6,6 +6,8 @@
 #include "core/dataprovider/cpull_media_stream_provider.h"
 #include "recording/time_period.h"
 
+class QnTimePeriodList;
+
 class QnAbstractNavigator
 {
 public:
