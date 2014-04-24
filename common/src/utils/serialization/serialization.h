@@ -220,6 +220,8 @@ public:
 
 namespace QnSerializationDetail {
 
+    // TODO: #Elric #ec2 also adl_wrap the value?
+
     /* Internal interface for (de)serializers that do not use context. */
 
     template<class T, class D>

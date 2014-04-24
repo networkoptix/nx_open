@@ -17,6 +17,14 @@ template<class Key, class T> class QMultiHash;
 template<class Key, class T> class QMap;
 template<class Key, class T> class QMultiMap;
 template<class T> class QSet;
+class QJsonObject;
+
+
+namespace QnContainer {
+    struct list_tag {};
+    struct set_tag {};
+    struct map_tag {};
+} // namespace QnContainer
 
 
 namespace QnContainerDetail {
@@ -27,6 +35,42 @@ namespace QnContainerDetail {
     template<class Container>
     struct has_reserve {
         typedef decltype(has_reserve_test(std::declval<Container>())) type;
+    };
+
+    template<class Container>
+    std::true_type has_key_type_test(const Container &, const typename Container::key_type * = NULL);
+    std::false_type has_key_type_test(...);
+
+    template<class Container>
+    struct has_key_type {
+        typedef decltype(has_key_type_test(std::declval<Container>())) type;
+    };
+
+    template<class Container>
+    std::true_type has_mapped_type_test(const Container &, const typename Container::mapped_type * = NULL);
+    std::false_type has_mapped_type_test(...);
+
+    template<class Container>
+    struct has_mapped_type {
+        typedef decltype(has_mapped_type_test(std::declval<Container>())) type;
+    };
+
+    template<class Container, bool hasKeyType = has_key_type<Container>::type::value, bool hasMappedType = has_mapped_type<Container>::type::value>
+    struct container_category;
+
+    template<class Container>
+    struct container_category<Container, false, false> {
+        typedef QnContainer::list_tag type;
+    };
+
+    template<class Container>
+    struct container_category<Container, true, false> {
+        typedef QnContainer::set_tag type;
+    };
+
+    template<class Container>
+    struct container_category<Container, true, true> {
+        typedef QnContainer::map_tag type;
     };
 
     template<class Container>
@@ -41,11 +85,12 @@ namespace QnContainerDetail {
 
 } // namespace QnContainerDetail
 
+
 namespace QnContainer {
 
     template<class Container, class Iterator, class Element>
-    void insert(Container &container, const Iterator &pos, const Element &element) {
-        container.insert(pos, element);
+    typename Container::iterator insert(Container &container, const Iterator &pos, Element &&element) {
+        return container.insert(pos, std::forward<Element>(element));
     }
 
     /**
@@ -58,8 +103,8 @@ namespace QnContainer {
      */
 
     template<class T, class Iterator, class Element>
-    void insert(QSet<T> &container, const Iterator &, const Element &element) {
-        container.insert(element);
+    typename QSet<T>::iterator insert(QSet<T> &container, const Iterator &, const Element &element) {
+        return container.insert(element);
     }
 
 #define QN_REGISTER_QT_CONTAINER_INSERT(CONTAINER)                              \
@@ -118,6 +163,26 @@ namespace QnContainer {
         return indexOf(list, 0, pred);
     }
 
+
+    template<class Container>
+    struct container_category: 
+        QnContainerDetail::container_category<Container>
+    {};
+
+
+    template<class T>
+    struct make_assignable:
+        std::remove_cv<typename std::remove_reference<T>::type>
+    {};
+
+    template<class T1, class T2>
+    struct make_assignable<std::pair<T1, T2> > {
+        typedef std::pair<
+            typename make_assignable<T1>::type,
+            typename make_assignable<T2>::type
+        > type;
+    };
+
 } // namespace QnContainer
 
 
@@ -164,12 +229,12 @@ private:
 namespace boost {                                                               \
     template<class Key, class T>                                                \
     struct range_mutable_iterator<CONTAINER<Key, T> > {                         \
-        typedef QnStlMapIterator<typename CONTAINER<Key, T>::iterator, std::pair<Key, T>, std::pair<const Key &, T &> > type; \
+        typedef QnStlMapIterator<typename CONTAINER<Key, T>::iterator, std::pair<const Key, T>, std::pair<const Key &, T &> > type; \
     };                                                                          \
                                                                                 \
     template<class Key, class T>                                                \
     struct range_const_iterator<CONTAINER<Key, T> > {                           \
-        typedef QnStlMapIterator<typename CONTAINER<Key, T>::const_iterator, std::pair<Key, T>, std::pair<const Key &, const T &> > type; \
+        typedef QnStlMapIterator<typename CONTAINER<Key, T>::const_iterator, std::pair<const Key, T>, std::pair<const Key &, const T &> > type; \
     };                                                                          \
 } /* namespace boost */                                                         \
                                                                                 \
@@ -203,7 +268,41 @@ QN_REGISTER_QT_STL_MAP_ITERATOR(QT_PREPEND_NAMESPACE(QMap));
 QN_REGISTER_QT_STL_MAP_ITERATOR(QT_PREPEND_NAMESPACE(QMultiMap));
 #undef QN_REGISTER_QT_STL_MAP_ITERATOR
 
+#if 0
+/* And the same thing for QJsonObject. */
 
+namespace boost {
+    struct range_mutable_iterator<QJsonObject> {
+        typedef QnStlMapIterator<QJsonObject::iterator, std::pair<const QString, QJsonValue>, std::pair<QString, QJsonValueRef> > type;
+    };
+                                                                                
+    struct range_const_iterator<QJsonObject> {
+        typedef QnStlMapIterator<QJsonObject::const_iterator, std::pair<const QString, QJsonValue>, std::pair<const QString, const QJsonValueRef> > type;
+    };
+} /* namespace boost */
+                                                                                
+
+inline typename boost::range_mutable_iterator<QJsonObject>::type
+range_begin(QJsonObject &x) {
+    return typename boost::range_mutable_iterator<QJsonObject>::type(x.begin());
+}
+                                                                                
+inline typename boost::range_const_iterator<QJsonObject>::type
+range_begin(const QJsonObject &x) {
+    return typename boost::range_const_iterator<QJsonObject>::type(x.begin());
+}
+
+inline typename boost::range_mutable_iterator<QJsonObject>::type
+range_end(QJsonObject &x) {
+    return typename boost::range_mutable_iterator<QJsonObject>::type(x.end());
+}
+
+template<class Key, class T>
+inline typename boost::range_const_iterator<QJsonObject>::type
+range_end(const QJsonObject &x) {
+    return typename boost::range_const_iterator<QJsonObject>::type(x.end());
+}
+#endif
 
 // TODO: #Elric remove
 /* Compatibility layer. */

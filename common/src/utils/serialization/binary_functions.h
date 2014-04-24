@@ -12,16 +12,54 @@
 #include <utils/common/container.h>
 
 namespace QnBinaryDetail {
-    
+
+    template<class Element, class Output, class Tag>
+    void serialize_container_element(const Element &element, QnOutputBinaryStream<Output> *stream, const Tag &) {
+        QnBinary::serialize(element, stream);
+    }
+
+    template<class Element, class Output>
+    void serialize_container_element(const Element &element, QnOutputBinaryStream<Output> *stream, const QnContainer::map_tag &) {
+        QnBinary::serialize(element.first, stream);
+        QnBinary::serialize(element.second, stream);
+    }
+
     template<class Container, class Output>
     void serialize_container(const Container &value, QnOutputBinaryStream<Output> *stream) {
         QnBinary::serialize(static_cast<qint32>(value.size()), stream);
         for(auto pos = boost::begin(value); pos != boost::end(value); ++pos)
-            QnBinary::serialize(*pos, stream);
+            serialize_container_element(*pos, stream, QnContainer::container_category<Container>::type());
     }
 
-    template <class Container, class Input>
+    template<class Container, class Element, class Input>
+    bool deserialize_container_element(QnInputBinaryStream<Input> *stream, Container *target, const std::identity<Element> &, const QnContainer::list_tag &) {
+        /* Deserialize value right into container. */
+        return QnBinary::deserialize(stream, &*QnContainer::insert(*target, boost::end(*target), Element()));
+    }
+
+    template<class Container, class Element, class Input>
+    bool deserialize_container_element(QnInputBinaryStream<Input> *stream, Container *target, const std::identity<Element> &, const QnContainer::set_tag &) {
+        Element element;
+        if(!QnBinary::deserialize(stream, &element))
+            return false;
+        QnContainer::insert(*target, boost::end(*target), std::move(element));
+    }
+
+    template<class Container, class Element, class Input>
+    bool deserialize_container_element(QnInputBinaryStream<Input> *stream, Container *target, const std::identity<Element> &, const QnContainer::map_tag &) {
+        typename Container::key_type key;
+        if(!QnBinary::deserialize(stream, &key))
+            return false;
+
+        /* Deserialize mapped value right into container. */
+        if(!QnBinary::deserialize(stream, &(*target)[key]))
+            return false;
+    }
+
+    template<class Container, class Input>
     bool deserialize_container(QnInputBinaryStream<Input> *stream, Container *target) {
+        typedef QnContainer::make_assignable<std::iterator_traits<boost::range_mutable_iterator<Container>::type>::value_type>::type value_type;
+
         qint32 size;
         if(!QnBinary::deserialize(stream, &size))
             return false;
@@ -29,12 +67,9 @@ namespace QnBinaryDetail {
         QnContainer::clear(*target);
         QnContainer::reserve(*target, size);
 
-        for(int i = 0; i < size; i++) {
-            typename boost::range_mutable_iterator<Container>::type::value_type element;
-            if(!QnBinary::deserialize(stream, &element))
+        for(int i = 0; i < size; i++)
+            if(!deserialize_container_element(stream, target, std::identity<value_type>(), QnContainer::container_category<Container>::type()))
                 return false;
-            QnContainer::insert(*target, boost::end(*target), element);
-        }
         
         return true;
     }
@@ -283,13 +318,13 @@ bool deserialize( T2& value, QnInputBinaryStream<T> *stream, typename std::enabl
 
 
 
-template <class T, class Output>
-void serialize(const std::vector<T> &value, QnOutputBinaryStream<Output> *stream) {
+template <class T, class Allocator, class Output>
+void serialize(const std::vector<T, Allocator> &value, QnOutputBinaryStream<Output> *stream) {
     QnBinaryDetail::serialize_container(value, stream);
 }
 
-template <class T, class Input>
-bool deserialize(QnInputBinaryStream<Input> *stream, std::vector<T> *target) {
+template <class T, class Allocator, class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, std::vector<T, Allocator> *target) {
     return QnBinaryDetail::deserialize_container(stream, target);
 }
 

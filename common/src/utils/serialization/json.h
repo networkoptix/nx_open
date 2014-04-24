@@ -125,7 +125,7 @@ namespace QJson {
 
     template<class T>
     bool deserialize(QnJsonContext *ctx, const QJsonValueRef &value, T *target) {
-        return QnSerialization::deserialize(ctx, value.toValue(), target);
+        return QnSerialization::deserialize(ctx, static_cast<QJsonValue>(value), target);
     }
 
     template<class T>
