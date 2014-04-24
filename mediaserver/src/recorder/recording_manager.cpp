@@ -133,7 +133,9 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     if (QnCameraHistoryPool::instance()->getMinTime(netRes) == (qint64)AV_NOPTS_VALUE)
     {
         // it is first record for camera
-        DeviceFileCatalogPtr catalogHi = qnStorageMan->getFileCatalog(physicalId, QnResource::Role_LiveVideo);
+        DeviceFileCatalogPtr catalogHi = qnStorageMan->getFileCatalog(physicalId.toUtf8(), QnResource::Role_LiveVideo);
+        if (!catalogHi)
+            return false;
         qint64 archiveMinTime = catalogHi->minTime();
         if (archiveMinTime != (qint64)AV_NOPTS_VALUE)
             currentTime = qMin(currentTime,  archiveMinTime);

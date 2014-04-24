@@ -52,7 +52,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
         {
             emit mserverFailure(resource,
                  qnSyncTime->currentUSecsSinceEpoch(),
-                 QnBusiness::MServerIssueTerminated);
+                 QnBusiness::ServerTerminatedReason);
             //qnBusinessRuleConnector->at_mserverFailure(resource,
             //                                           qnSyncTime->currentUSecsSinceEpoch(),
             //                                           QnBusiness::MServerIssueTerminated);

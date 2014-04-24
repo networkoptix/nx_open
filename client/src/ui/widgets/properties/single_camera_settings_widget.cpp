@@ -9,6 +9,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QDesktopServices>
 #include <QtWidgets/QSplitter>
+#include <QtWidgets/QStackedLayout>
 
 #include <camera/single_thumbnail_loader.h>
 
@@ -42,6 +43,12 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/license_usage_helper.h>
+#include <common/common_module.h>
+#include <core/resource/resource_data.h>
+#include <core/resource_management/resource_data_pool.h>
+#include "api/app_server_connection.h"
+#include "api/network_proxy_factory.h"
+#include "client/client_settings.h"
 
 namespace {
     const QSize fisheyeThumbnailSize(0, 0); //unlimited size for better calibration
@@ -164,27 +171,88 @@ QnMediaServerConnectionPtr QnSingleCameraSettingsWidget::getServerConnection() c
     return m_serverConnection;
 }
 
+void QnSingleCameraSettingsWidget::at_sslErrors(QNetworkReply* reply, const QList<QSslError> &)
+{
+    reply->ignoreSslErrors();
+}
+void QnSingleCameraSettingsWidget::at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator)
+{
+    qDebug()<<"at_authenticationRequired"<<m_camera->getAuth().user();
+    authenticator->setUser(m_camera->getAuth().user());
+    authenticator->setPassword(m_camera->getAuth().password());
+}
+void QnSingleCameraSettingsWidget::at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator)
+{
+    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
+    authenticator->setUser(lastUsedConnection.url.userName());
+    authenticator->setPassword(lastUsedConnection.url.password());
+}
+
+#ifdef WEBKIT_PRESENT
+void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout , QWebView* advancedWebView)
+{
+    if ( qnCommon )
+    {
+        QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
+        bool show_url = resourceData.value<bool>(lit("show_url"), false);
+        if ( show_url )
+        {
+            QnMediaServerResourcePtr server = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
+            QString camera_host = m_camera->getHostAddress();
+            int camera_port = m_camera->httpPort();
+            QString url_camera_name = QString(QLatin1String("http://%1:%2")).arg(camera_host).arg(camera_port);
+            QString proxy_url = server->getProxyHost();
+            int proxy_port = server->getProxyPort();
+            proxy_port = 50000;
+            QString proxy_url_path = QString(QLatin1String("http://%1:%2")).arg(proxy_url).arg(proxy_port);
+            QUrl camera_url;
+            camera_url.setHost(camera_host);
+            camera_url.setPort(camera_port);
+            camera_url.setScheme(lit("http"));
+            QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
+            QnNetworkProxyFactory::instance()->removeFromProxyList(m_lastSiteUrl);
+            QnNetworkProxyFactory::instance()->addToProxyList(camera_url, proxy_url, proxy_port);
+            m_lastSiteUrl = camera_url;
+            QNetworkRequest request(camera_url);
+            camera_url.setUserName(qnSettings->lastUsedConnection().url.userName());
+            camera_url.setPassword(qnSettings->lastUsedConnection().url.password());
+            request.setRawHeader("proxy",proxy_url_path.toUtf8());
+            advancedWebView->load(request);
+            advancedWebView->show();
+            stackedLayout->setCurrentIndex(1);
+        } else
+        {
+            stackedLayout->setCurrentIndex(0);
+        }                
+    } 
+}
+#endif
+
 void QnSingleCameraSettingsWidget::initAdvancedTab()
 {
     QVariant id;
     QTreeWidget* advancedTreeWidget = 0;
     QStackedLayout* advancedLayout = 0;
+#ifdef WEBKIT_PRESENT
+    QWebView* advancedWebView = 0;
+#endif
     setAnyCameraChanges(false);
 
     if (m_camera && m_camera->getParam(lit("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
     {
         if (!m_widgetsRecreator)
         {
-            QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->advancedTab->layout());
-            if(!layout) {
+            QStackedLayout* stacked_layout = dynamic_cast<QStackedLayout*>(ui->advancedTab->layout());
+            if(!stacked_layout) 
+            {
                 delete ui->advancedTab->layout();
-                ui->advancedTab->setLayout(layout = new QHBoxLayout());
+                ui->advancedTab->setLayout(stacked_layout = new QStackedLayout());
             }
 
             QSplitter* advancedSplitter = new QSplitter();
             advancedSplitter->setChildrenCollapsible(false);
 
-            layout->addWidget(advancedSplitter);
+            stacked_layout->addWidget(advancedSplitter);
 
             advancedTreeWidget = new QTreeWidget();
             advancedTreeWidget->setColumnCount(1);
@@ -202,6 +270,13 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
             sizes[0] = 200;
             sizes[1] = 400;
             advancedSplitter->setSizes(sizes);
+#ifdef WEBKIT_PRESENT
+            advancedWebView = new QWebView(ui->advancedTab);
+            connect(advancedWebView->page()->networkAccessManager(), SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(at_sslErrors(QNetworkReply*,QList<QSslError>)));
+            connect(advancedWebView->page()->networkAccessManager(), SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator *)), this, SLOT(at_authenticationRequired(QNetworkReply*, QAuthenticator *)), Qt::DirectConnection);
+            stacked_layout->addWidget(advancedWebView);
+            updateWebPage(stacked_layout,advancedWebView);
+#endif
         } else {
             if (m_camera->getUniqueId() == m_widgetsRecreator->getCameraId()) {
                 return;
@@ -216,20 +291,34 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
 
             advancedTreeWidget = m_widgetsRecreator->getRootWidget();
             advancedLayout = m_widgetsRecreator->getRootLayout();
+#ifdef WEBKIT_PRESENT
+            advancedWebView = m_widgetsRecreator->getWebView();
+#endif
             cleanAdvancedSettings();
         }
 
-        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id.toString(), *advancedTreeWidget, *advancedLayout, this);
+        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id.toString(), *advancedTreeWidget, *advancedLayout,
+#ifdef WEBKIT_PRESENT
+            advancedWebView,
+#endif
+            this);
     }
     else if (m_widgetsRecreator)
     {
         advancedTreeWidget = m_widgetsRecreator->getRootWidget();
         advancedLayout = m_widgetsRecreator->getRootLayout();
-
+#ifdef WEBKIT_PRESENT
+        advancedWebView = m_widgetsRecreator->getWebView();
+#endif
         cleanAdvancedSettings();
 
         //Dummy creator: required for cameras, that doesn't support advanced settings
-        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout, this);
+        //m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout, this);
+		m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout,
+#ifdef WEBKIT_PRESENT
+            advancedWebView,
+#endif
+            this);
     }
 }
 
@@ -294,6 +383,13 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         connect(m_camera, SIGNAL(resourceChanged(const QnResourcePtr &)),   this, SLOT(updateIpAddressText()));
         connect(m_camera, SIGNAL(urlChanged(const QnResourcePtr &)),        this, SLOT(updateWebPageText())); // TODO: #Elric also listen to hostAddress changes?
         connect(m_camera, SIGNAL(resourceChanged(const QnResourcePtr &)),   this, SLOT(updateWebPageText()));
+        QStackedLayout* stacked_layout = dynamic_cast<QStackedLayout*>(ui->advancedTab->layout());
+#ifdef WEBKIT_PRESENT
+        if ( m_widgetsRecreator && m_widgetsRecreator->getWebView() && stacked_layout)
+        {
+            updateWebPage(stacked_layout,m_widgetsRecreator->getWebView());
+        }        
+#endif
     }
 
     updateFromResource();

@@ -12,7 +12,7 @@ public:
 
     static QnAbstractBusinessActionPtr instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, const QnBusinessAggregationInfo& aggregationInfo);
 
-    static QnAbstractBusinessActionPtr createAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters &runtimeParams);
+    static QnAbstractBusinessActionPtr createAction(const QnBusiness::ActionType actionType, const QnBusinessEventParameters &runtimeParams);
 };
 
 #endif // BUSINESS_ACTION_FACTORY_H

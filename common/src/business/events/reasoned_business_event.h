@@ -7,7 +7,7 @@ class QnReasonedBusinessEvent : public QnInstantBusinessEvent
 {
     typedef QnInstantBusinessEvent base_type;
 public:
-    explicit QnReasonedBusinessEvent(const BusinessEventType::Value eventType,
+    explicit QnReasonedBusinessEvent(const QnBusiness::EventType eventType,
                                      const QnResourcePtr& resource,
                                      const qint64 timeStamp,
                                      const QnBusiness::EventReason reasonCode,

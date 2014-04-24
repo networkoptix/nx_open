@@ -12,6 +12,8 @@
 #include "device_file_catalog.h"
 #include "core/resource/storage_resource.h"
 #include "business/business_fwd.h"
+#include "utils/db/db_helper.h"
+#include "storage_db.h"
 
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
@@ -60,11 +62,15 @@ public:
         return storage && storage->getStatus() == QnResource::Online; 
     }
 
-    DeviceFileCatalogPtr getFileCatalog(const QString& mac, QnResource::ConnectionRole role);
-    DeviceFileCatalogPtr getFileCatalog(const QString& mac, const QString& qualityPrefix);
+    DeviceFileCatalogPtr getFileCatalog(const QByteArray& mac, QnResource::ConnectionRole role);
+    DeviceFileCatalogPtr getFileCatalog(const QByteArray& mac, const QString& qualityPrefix);
 
     QnTimePeriodList getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel);
-    void loadFullFileCatalog(bool isRebuild = false);
+    bool loadFullFileCatalog(QnStorageResourcePtr storage, bool isRebuild = false, qreal progressCoeff = 1.0);
+    void loadFullFileCatalog();
+    QVector<DeviceFileCatalog::Chunk> correctChunksFromMediaData(DeviceFileCatalogPtr fileCatalog, QnStorageResourcePtr storage, const QVector<DeviceFileCatalog::Chunk>& chunks);
+
+
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
 
     QnStorageResourceList getStorages() const;
@@ -103,11 +109,10 @@ private:
     friend class TestStorageThread;
 
     void clearSpace(QnStorageResourcePtr storage);
+
     int detectStorageIndex(const QString& path);
     QSet<int> getDeprecateIndexList(const QString& p);
-    bool deserializeStorageFile();
-    bool serializeStorageFile();
-    void loadFullFileCatalogInternal(QnResource::ConnectionRole role, bool rebuildMode);
+    //void loadFullFileCatalogInternal(QnResource::ConnectionRole role, bool rebuildMode);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality);
     void getTimePeriodInternal(QVector<QnTimePeriodList>& cameras, QnNetworkResourcePtr camera, qint64 startTime, qint64 endTime, qint64 detailLevel, DeviceFileCatalogPtr catalog);
     bool existsStorageWithID(const QnAbstractStorageResourceList& storages, QnId id) const;
@@ -115,6 +120,7 @@ private:
     void testOfflineStorages();
     void rebuildCatalogIndexInternal();
     bool isCatalogLoaded() const;
+    void addDataToCatalog(DeviceFileCatalogPtr newCatalog, const QByteArray& mac, QnResource::ConnectionRole role);
 
 
     int getFileNumFromCache(const QString& base, const QString& folder);
@@ -123,18 +129,19 @@ private:
     StorageMap getAllStorages() const;
     QSet<QnStorageResourcePtr> getWritableStorages() const;
     void changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status);
-    DeviceFileCatalogPtr getFileCatalogInternal(const QString& mac, QnResource::ConnectionRole role);
-    void addDataToCatalog(DeviceFileCatalogPtr newCatalog, const QString& mac, QnResource::ConnectionRole role);
+    DeviceFileCatalogPtr getFileCatalogInternal(const QByteArray& mac, QnResource::ConnectionRole role);
+    void loadFullFileCatalogFromMedia(QnStorageResourcePtr storage, QnResource::ConnectionRole role, qreal progressCoeff);
+    void replaceChunks(const QnTimePeriod& rebuildPeriod, QnStorageResourcePtr storage, DeviceFileCatalogPtr newCatalog, const QByteArray& mac, QnResource::ConnectionRole role);
+    void loadFullFileCatalogInternal(QnResource::ConnectionRole role);
 private:
     StorageMap m_storageRoots;
-    typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
+    typedef QMap<QByteArray, DeviceFileCatalogPtr> FileCatalogMap;
     FileCatalogMap m_devFileCatalogHi;
     FileCatalogMap m_devFileCatalogLow;
     mutable QMutex m_mutexStorages;
     mutable QMutex m_mutexCatalog;
 
     QMap<QString, QSet<int> > m_storageIndexes;
-    bool m_storageFileReaded;
     bool m_storagesStatisticsReady;
     QTimer m_timer;
 
@@ -154,6 +161,8 @@ private:
 
     friend class RebuildAsyncTask;
     RebuildAsyncTask* m_asyncRebuildTask;
+
+    QMap<QString, QnStorageDbPtr> m_chunksDB;
 };
 
 #define qnStorageMan QnStorageManager::instance()

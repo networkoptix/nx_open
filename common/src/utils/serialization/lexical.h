@@ -78,7 +78,6 @@ __VA_ARGS__ bool deserialize(const QString &value, TYPE *target) {              
     }                                                                           \
 }
 
-
 #include "lexical_functions.h"
 
 #endif // QN_SERIALIZATION_LEXICAL_H

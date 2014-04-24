@@ -107,7 +107,7 @@ void ApiBusinessActionData::fromResource(const QnAbstractBusinessActionPtr& reso
 QnAbstractBusinessActionPtr  ApiBusinessActionData::toResource(QnResourcePool* /* resourcePool */) const
 {
     QnBusinessParams bParams = deserializeBusinessParams(runtimeParams);
-    QnAbstractBusinessActionPtr resource = QnBusinessActionFactory::createAction((BusinessActionType::Value) actionType, QnBusinessEventParameters::fromBusinessParams(bParams));
+    QnAbstractBusinessActionPtr resource = QnBusinessActionFactory::createAction((QnBusiness::ActionType) actionType, QnBusinessEventParameters::fromBusinessParams(bParams));
 
     resource->setToggleState(toggleState);
     resource->setReceivedFromRemoteHost(receivedFromRemoteHost);
