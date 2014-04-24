@@ -1,6 +1,8 @@
 #ifndef QN_EC2_API_FWD_H
 #define QN_EC2_API_FWD_H
 
+#include <vector>
+
 #include <utils/common/model_functions_fwd.h>
 
 namespace ec2 {
@@ -37,6 +39,18 @@ namespace ec2 {
     struct ApiVideowallScreenData;
     struct ApiVideowallData;
     struct ApiVideowallControlMessageData;
+
+    typedef std::vector<ApiPropertyTypeData> ApiPropertyTypeDataList;
+    typedef std::vector<ApiLicenseData> ApiLicenseDataList;
+    typedef std::vector<ApiResourceTypeData> ApiResourceTypeDataList;
+    typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
+    typedef std::vector<ApiCameraData> ApiCameraDataList;
+    typedef std::vector<ApiUserData> ApiUserDataList;
+    typedef std::vector<ApiLayoutData> ApiLayoutDataList;
+    typedef std::vector<ApiVideowallData> ApiVideowallDataList;
+    typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
+    typedef std::vector<ApiCameraServerItemData> ApiCameraServerItemDataList;
+
 
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (ApiBusinessRuleData)(ApiBusinessActionData),

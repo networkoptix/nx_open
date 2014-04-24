@@ -3,7 +3,7 @@
 
 #include "api_globals.h"
 #include "api_data.h"
-#include "adi_resource_data.h"
+#include "api_resource_data.h"
 
 namespace ec2
 {

@@ -5,7 +5,7 @@
 #include <QUuid>
 #include <QSet>
 #include <QSharedPointer>
-#include "nx_ec/data/ec2_lock_data.h"
+#include "nx_ec/data/api_lock_data.h"
 #include "transaction/transaction.h"
 
 namespace ec2

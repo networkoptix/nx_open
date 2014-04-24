@@ -27,7 +27,7 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole)
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole)
     Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes)
 public:
 #else

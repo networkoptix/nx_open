@@ -6,7 +6,7 @@
 
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_data.h"
-#include "nx_ec/data/ec2_layout_data.h"
+#include "nx_ec/data/api_layout_data.h"
 #include "transaction/transaction.h"
 
 

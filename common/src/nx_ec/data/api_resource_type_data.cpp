@@ -1,5 +1,5 @@
 #if 0
-#include "ec2_resource_type_data.h"
+#include "api_resource_type_data.h"
 
 
 

@@ -42,18 +42,18 @@ namespace ec2
         m_brand = lit(QN_PRODUCT_NAME_SHORT);
     }
 
-    bool LicenseManagerImpl::validateLicense(const ApiLicense& license) const {
+    bool LicenseManagerImpl::validateLicense(const ApiLicenseData& license) const {
         QnLicense qlicense;
         license.toResource(qlicense);
 
         return qlicense.isValid(m_hardwareIds, m_brand);
     }
 
-    ErrorCode LicenseManagerImpl::getLicenses( ApiLicenseList* const licList )
+    ErrorCode LicenseManagerImpl::getLicenses( ApiLicenseDataList* const licList )
     {
         //TODO/IMPL
 
-        ApiLicense license;
+        ApiLicenseData license;
 
         license.licenseBlock = TEST_LICENSE_NX;
         licList->data.push_back( license );
@@ -64,7 +64,7 @@ namespace ec2
         return ErrorCode::ok;
     }
 
-    ErrorCode LicenseManagerImpl::addLicenses( const ApiLicenseList& /*licenses*/ )
+    ErrorCode LicenseManagerImpl::addLicenses( const ApiLicenseDataList& /*licenses*/ )
     {
         //TODO/IMPL
         return ErrorCode::notImplemented;

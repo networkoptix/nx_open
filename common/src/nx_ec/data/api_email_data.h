@@ -6,9 +6,8 @@
 
 namespace ec2
 {
-    class ApiEmailSettingsData: ApiData
+    struct ApiEmailSettingsData: ApiData
     {
-    public:
         ApiEmailSettingsData(): port(0) {}
 
         QString host;
@@ -26,9 +25,8 @@ namespace ec2
     //QN_DEFINE_STRUCT_SERIALIZATORS( ApiEmailSettingsData, ApiEmailSettingsFields )
     //QN_FUSION_DECLARE_FUNCTIONS(ApiEmailSettingsData, (binary))
 	
-    class ApiEmailData: ApiData
+    struct ApiEmailData: ApiData
     {
-    public:
         ApiEmailData() {}
 
         ApiEmailData (const QStringList& to_, const QString& subject_, const QString& body_, int timeout_, const QnEmailAttachmentList& attachments_)
@@ -46,9 +44,9 @@ namespace ec2
 
         QnEmailAttachmentList attachments;
     };
+#define ApiEmailData_Fields (to)(subject)(body)(timeout)
 
-	#define ApiEmailFields (to)(subject)(body)(timeout)
-	QN_FUSION_DECLARE_FUNCTIONS(ApiEmailData, (binary))
+	//QN_FUSION_DECLARE_FUNCTIONS(ApiEmailData, (binary))
 }
 
 #endif // QN_API_EMAIL_DATA_H

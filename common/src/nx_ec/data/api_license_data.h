@@ -3,8 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef EC2_LICENSE_H
-#define EC2_LICENSE_H
+#ifndef API_LICENSE_DATA_H
+#define API_LICENSE_DATA_H
 
 #include "api_globals.h"
 #include "api_data.h"
@@ -16,7 +16,6 @@ namespace ec2
         QByteArray licenseBlock;
     };
 #define ApiLicenseData_Fields (key)(licenseBlock)
-
 
 /*    struct ApiLicense : ApiLicenseData
     {
@@ -34,4 +33,4 @@ namespace ec2
     };*/
 }
 
-#endif  //EC2_LICENSE_H
+#endif  //API_LICENSE_DATA_H

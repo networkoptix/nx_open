@@ -3,13 +3,13 @@
 
 #include <QElapsedTimer>
 #include <nx_ec/ec_api.h>
-#include "nx_ec/data/camera_data.h"
-#include "nx_ec/data/ec2_resource_data.h"
+#include "nx_ec/data/api_camera_data.h"
+#include "nx_ec/data/api_resource_data.h"
+#include "nx_ec/data/api_lock_data.h"
 #include "transaction.h"
 #include "utils/network/http/asynchttpclient.h"
 #include "transaction_transport_serializer.h"
 #include "transaction_transport.h"
-#include "nx_ec/data/ec2_lock_data.h"
 #include "common/common_module.h"
 
 namespace ec2

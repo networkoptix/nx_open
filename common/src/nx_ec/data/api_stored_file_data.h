@@ -17,9 +17,8 @@ namespace ec2
     //QN_FUSION_DECLARE_FUNCTIONS(ApiStoredFileData, (binary))
 
 
-    /*typedef std::vector<QString> ApiStoredDirContents;
 
-    typedef QString ApiStoredFilePath;
+    /*typedef QString ApiStoredFilePath;
 
     static const QString FOLDER_NAME_PARAM_NAME( QLatin1String("folder") );
 

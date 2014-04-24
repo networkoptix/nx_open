@@ -4,7 +4,7 @@
 
 #include <core/resource/camera_resource.h>
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/camera_data.h"
+#include "nx_ec/data/api_camera_data.h"
 #include "transaction/transaction.h"
 #include "nx_ec/data/camera_server_item_data.h"
 

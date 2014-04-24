@@ -1,5 +1,5 @@
-#ifndef __EC2_VIDEOWALL_DATA_H_
-#define __EC2_VIDEOWALL_DATA_H_
+#ifndef QN_API_VIDEOWALL_DATA_H
+#define QN_API_VIDEOWALL_DATA_H
 
 #include "api_globals.h"
 #include "api_resource_data.h"
@@ -93,7 +93,8 @@ namespace ec2
     };
 
     void fromApiToMessage(const ApiVideowallControlMessageData &data, QnVideoWallControlMessage &message);
-    void fromMessageToApi(const QnVideoWallControlMessage &message, ApiVideowallControlMessageData &data);
-}
+    void fromMessageToApi(const QnVideoWallControlMessage &message, ApiVideowallControlMessageData &data);*/
 
-#endif // __EC2_VIDEOWALL_DATA_H_
+} // namespace ec2
+
+#endif // QN_API_VIDEOWALL_DATA_H

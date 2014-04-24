@@ -5,7 +5,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "ec2_license.h"
+#include "api_license_data.h"
 
 namespace ec2
 {

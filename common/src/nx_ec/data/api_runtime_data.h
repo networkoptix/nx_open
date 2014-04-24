@@ -11,9 +11,8 @@
 
 namespace ec2
 {
-    class ApiRuntimeData: ApiData
+    struct ApiRuntimeData: ApiData
     {
-    public:
         QString publicIp;
         QByteArray sessionKey;
         bool allowCameraChanges;

@@ -3,7 +3,7 @@
 #include <business/actions/abstract_business_action.h>
 #include <business/business_message_bus.h>
 #include "core/resource_management/resource_pool.h"
-#include "nx_ec/data/ec2_business_rule_data.h"
+#include "nx_ec/data/api_business_rule_data.h"
 #include "utils/serialization/binary_functions.h"
 
 int QnBusinessActionRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)

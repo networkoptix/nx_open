@@ -101,8 +101,6 @@ namespace ec2
     QN_FUSION_DECLARE_FUNCTIONS(ApiSetResourceStatusData, (binary))
 
 
-    typedef std::vector<ApiSetResourceStatusData> ApiSyncResponseData;
-
 
     //QN_DEFINE_STRUCT_SERIALIZATORS (ApiSetResourceDisabledData,  (id) (disabled) )
     QN_FUSION_DECLARE_FUNCTIONS(ApiSetResourceDisabledData, (binary))*/

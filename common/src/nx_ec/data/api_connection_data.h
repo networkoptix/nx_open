@@ -10,7 +10,7 @@ namespace ec2
     {
     };
 
-    /*inline void parseHttpRequestParams( const QnRequestParamList& /*params*/, ec2::LoginInfo* /*loginInfo*/ )
+    ///*inline void parseHttpRequestParams( const QnRequestParamList& /*params*/, ec2::LoginInfo* /*loginInfo*/ )
     //{
         //TODO/IMPL
     //}*/

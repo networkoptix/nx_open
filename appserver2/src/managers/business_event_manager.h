@@ -3,7 +3,7 @@
 
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
-#include "nx_ec/data/ec2_business_rule_data.h"
+#include "nx_ec/data/api_business_rule_data.h"
 
 namespace ec2
 {
@@ -37,7 +37,7 @@ namespace ec2
             emit removed( QnId(tran.params.id) );
         }
 
-        void triggerNotification( const QnTransaction<ApiBusinessRule>& tran )
+        void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran )
         {
             assert( tran.command == ApiCommand::saveBusinessRule);
             QnBusinessEventRulePtr businessRule( new QnBusinessEventRule() );

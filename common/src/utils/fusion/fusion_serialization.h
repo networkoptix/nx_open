@@ -104,7 +104,7 @@ namespace QnFusion {
 namespace QnFusion {                                                            \
     template<>                                                                  \
     struct serialization_visitor_type<DATA_CLASS>:                              \
-        boost::mpl::identity<SERIALIZATION_VISITOR>                             \
+        std::identity<SERIALIZATION_VISITOR>                                    \
     {};                                                                         \
 }
 
@@ -115,7 +115,7 @@ namespace QnFusion {                                                            
 namespace QnFusion {                                                            \
     template<>                                                                  \
     struct deserialization_visitor_type<DATA_CLASS>:                            \
-        boost::mpl::identity<DESERIALIZATION_VISITOR>                           \
+        std::identity<DESERIALIZATION_VISITOR>                                  \
     {};                                                                         \
 }
 

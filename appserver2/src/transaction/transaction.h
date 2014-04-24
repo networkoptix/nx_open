@@ -6,8 +6,8 @@
 #include <QString>
 
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/ec2_license.h"
-#include "nx_ec/data/ec2_email.h"
+#include "nx_ec/data/api_license_data.h"
+#include "nx_ec/data/api_email_data.h"
 #include "utils/serialization/binary.h"
 
 
