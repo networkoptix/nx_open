@@ -124,7 +124,7 @@ QVector<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(D
     return DeviceFileCatalog::mergeChunks(chunks, newChunks);
 }
 
-bool QnStorageManager::loadFullFileCatalog(QnStorageResourcePtr storage, bool isRebuild)
+bool QnStorageManager::loadFullFileCatalog(QnStorageResourcePtr storage, bool isRebuild, qreal progressCoeff)
 {
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     if (!sdb)
@@ -148,8 +148,8 @@ bool QnStorageManager::loadFullFileCatalog(QnStorageResourcePtr storage, bool is
     }
     else {
         // load from media folder
-        loadFullFileCatalogFromMedia(storage, QnResource::Role_LiveVideo);
-        loadFullFileCatalogFromMedia(storage, QnResource::Role_SecondaryLiveVideo);
+        loadFullFileCatalogFromMedia(storage, QnResource::Role_LiveVideo, progressCoeff / 2.0);
+        loadFullFileCatalogFromMedia(storage, QnResource::Role_SecondaryLiveVideo, progressCoeff / 2.0);
         m_catalogLoaded = true;
         m_rebuildProgress = 1.0;
     }
@@ -191,7 +191,7 @@ void QnStorageManager::rebuildCatalogIndexInternal()
     }
 
     foreach (QnStorageResourcePtr storage, m_storageRoots.values())
-        loadFullFileCatalog(storage, true);
+        loadFullFileCatalog(storage, true, 1.0 / m_storageRoots.size());
 
     m_rebuildState = RebuildState_None;
     m_catalogLoaded = true;
@@ -244,10 +244,9 @@ bool QnStorageManager::isCatalogLoaded() const
     return m_catalogLoaded;
 }
 
-void QnStorageManager::loadFullFileCatalogFromMedia(QnStorageResourcePtr storage, QnResource::ConnectionRole role)
+void QnStorageManager::loadFullFileCatalogFromMedia(QnStorageResourcePtr storage, QnResource::ConnectionRole role, qreal progressCoeff)
 {
     QDir dir(closeDirPath(storage->getUrl()) + DeviceFileCatalog::prefixForRole(role));
-
     QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     foreach(QFileInfo fi, list)
     {
@@ -263,7 +262,7 @@ void QnStorageManager::loadFullFileCatalogFromMedia(QnStorageResourcePtr storage
         DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(mac, role);
         replaceChunks(rebuildPeriod, storage, newCatalog, mac, role);
 
-        m_rebuildProgress += 0.5 / (double) list.size(); // we load catalog twice (HQ and LQ), so, use 0.5 instead of 1.0 for progress
+        m_rebuildProgress += progressCoeff / (double) list.size(); // we load catalog twice (HQ and LQ), so, use 0.5 instead of 1.0 for progress
     }
 }
 
