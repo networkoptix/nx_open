@@ -18,6 +18,7 @@ signals:
 public:
     enum RebuildMethod {
         Rebuild_None,    // do not rebuild chunk's database
+        Rebuild_Canceled,
         Rebuild_LQ,      // rebuild LQ chunks only
         Rebuild_HQ,      // rebuild HQ chunks only
         Rebuild_All      // rebuild whole chunks
@@ -26,8 +27,8 @@ public:
     struct Chunk
     {
         Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0),timeZone(-1) {}
-        Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone) : 
-            startTimeMs(_startTime), durationMs(_duration), storageIndex(_storageIndex), fileIndex(_fileIndex), timeZone(_timeZone), fileSizeHi(0), fileSizeLo(0)
+        Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone, quint16 fileSizeHi = 0, quint32 fileSizeLo = 0) : 
+            startTimeMs(_startTime), durationMs(_duration), storageIndex(_storageIndex), fileIndex(_fileIndex), timeZone(_timeZone), fileSizeHi(fileSizeHi), fileSizeLo(fileSizeLo)
         {
             Q_ASSERT_X(startTimeMs == -1 || startTimeMs > 0, Q_FUNC_INFO, "Invalid startTime value");
         }
@@ -53,15 +54,15 @@ public:
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
 
     DeviceFileCatalog(const QString& macAddress, QnResource::ConnectionRole role);
-    void deserializeTitleFile();
+    //void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
-    void updateDuration(int durationMs, qint64 fileSize);
+    Chunk updateDuration(int durationMs, qint64 fileSize);
 
     /** return deleted file size if calcFileSize is true and srcStorage matched with deleted file */
-    void deleteFirstRecord(); 
+    qint64 deleteFirstRecord(); 
     bool isEmpty() const;
     void clear();
-    void deleteRecordsBefore(int idx);
+    QVector<qint64> deleteRecordsBefore(int idx);
     void deleteRecordsByStorage(int storageIndex, qint64 timeMs);
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
     void updateChunkDuration(Chunk& chunk);
@@ -75,6 +76,7 @@ public:
     //bool lastFileDuplicateName() const;
     qint64 firstTime() const;
     QnResource::ConnectionRole getRole() const { return m_role; }
+    QByteArray getMac() const { return m_macAddress.toUtf8(); }
 
     // Detail level determine time duration (in microseconds) visible at 1 screen pixel
     // All information less than detail level is discarded
@@ -95,14 +97,26 @@ public:
     static QSet<void*> m_pauseList;
     qint64 m_rebuildStartTime;
 
-    void beforeRebuildArchive();
-
-    bool readCatalog();
+    //bool readCatalog();
     bool doRebuildArchive();
-    void rewriteCatalog(bool isCatalogUsing);
+    //void rewriteCatalog(bool isCatalogUsing);
     bool isLastRecordRecording() const { return m_lastRecordRecording; }
     qint64 getLatRecordingTime() const;
     void setLatRecordingTime(qint64 value);
+
+    struct ScanFilter
+    {
+        Chunk scanAfter;
+
+        bool isEmpty() const { return scanAfter.durationMs == 0; }
+        bool intersects(const QnTimePeriod& period) const { return QnTimePeriod(scanAfter.startTimeMs, scanAfter.durationMs).intersects(period); }
+    };
+
+    void scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList,
+        const ScanFilter& filter = ScanFilter());
+
+    static QVector<Chunk> mergeChunks(const QVector<Chunk>& chunk1, const QVector<Chunk>& chunk2);
+    void addChunks(const QVector<Chunk>& chunk);
 private:
     bool fileExists(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);
@@ -110,13 +124,13 @@ private:
     QList<QDate> recordedMonthList();
 
     void readStorageData(QnStorageResourcePtr storage, QnResource::ConnectionRole role, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList);
-    void scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList);
     Chunk chunkFromFile(QnStorageResourcePtr storage, const QString& fileName);
+    QnTimePeriod timePeriodFromDir(QnStorageResourcePtr storage, const QString& dirName);
 private:
     friend class QnStorageManager;
 
     mutable QMutex m_mutex;
-    QFile m_file;
+    //QFile m_file;
     QVector<Chunk> m_chunks; 
     int m_firstDeleteCount;
     QString m_macAddress;

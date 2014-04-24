@@ -83,6 +83,7 @@ void QnAppserverResourceProcessor::addNewCamera(QnVirtualCameraResourcePtr camer
 {
     if (!ec2::QnDistributedMutexManager::instance())
     {
+        Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(cameraResource->getUniqueId()).isEmpty());
         addNewCameraInternal(cameraResource);
         return;
     }
