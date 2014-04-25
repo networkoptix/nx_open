@@ -1276,7 +1276,7 @@ void QnMain::run()
 
     
 
-    qnStorageMan->loadFullFileCatalog();
+    qnStorageMan->doMigrateCSVCatalog();
 
     initAppServerEventConnection(*MSSettings::roSettings(), m_mediaServer);
     
