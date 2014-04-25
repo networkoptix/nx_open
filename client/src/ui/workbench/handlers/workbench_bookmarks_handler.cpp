@@ -2,9 +2,12 @@
 
 #include <api/app_server_connection.h>
 
+#include <camera/loaders/caching_camera_data_loader.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 
 #include <recording/time_period.h>
 
@@ -14,6 +17,7 @@
 #include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -48,7 +52,12 @@ void QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered() {
         return;
     dialog->submitData(bookmark);
 
-    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->save(QnVirtualCameraResourceList() << camera, this, [this](){ updateTagsUsage(); });
+    QnMediaServerResourcePtr server = getMediaServerOnTime(camera, bookmark.startTimeMs);
+    if (!server)
+        return; // TODO: #GDM show some diagnostic messages
+
+    int handle = server->apiConnection()->addBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkAdded(int, const QVariant &, int)));
+    m_addingBookmarks[handle] = camera;
 }
 
 
@@ -69,3 +78,35 @@ void QnWorkbenchBookmarksHandler::updateTagsUsage() {
 QnCameraBookmarkTagsUsage QnWorkbenchBookmarksHandler::tagsUsage() const {
     return m_tagsUsage;
 }
+
+
+QnMediaServerResourcePtr QnWorkbenchBookmarksHandler::getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 time) const {
+    QnMediaServerResourcePtr currentServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+
+    if (time == DATETIME_NOW)
+        return currentServer;
+
+    QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(camera->getPhysicalId());
+    if (!history)
+        return currentServer;
+
+    QnTimePeriod period;
+    QnMediaServerResourcePtr mediaServer = history->getMediaServerOnTime(time, true, period, false);
+    if (!mediaServer)
+        return currentServer;
+
+    return mediaServer;
+}
+
+void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QVariant &data, int handle) {
+    QnResourcePtr camera = m_addingBookmarks.take(handle);
+    if (status != 0 || !camera)
+        return;
+
+    QnCachingCameraDataLoader* loader = navigator()->loader(camera);
+    if (!loader)
+        return;
+
+    loader->forceUpdate();
+}
+

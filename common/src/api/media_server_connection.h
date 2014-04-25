@@ -28,7 +28,7 @@
 
 #include "abstract_connection.h"
 
-class QnMediaServerResource;
+class QnCameraBookmark;
 
 typedef QList<QPair<QString, bool> > QnStringBoolPairList;
 typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
@@ -228,6 +228,8 @@ public:
         \returns Request handle
      */
     int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);
+
+    int addBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
 
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;

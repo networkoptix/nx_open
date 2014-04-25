@@ -11,6 +11,8 @@
 #include <recorder/server_stream_recorder.h>
 #include <recorder/recording_manager.h>
 
+#include <device_plugins/server_archive/dualquality_helper.h>
+
 #include "plugins/storage/file_storage/file_storage_resource.h"
 
 #include "utils/common/sleep.h"
@@ -475,7 +477,7 @@ QnStorageResourceList QnStorageManager::getStorages() const
     return m_storageRoots.values().toSet().toList(); // remove storage duplicates. Duplicates are allowed in sake for v1.4 compatibility
 }
 
-void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
+void QnStorageManager::clearSpace(const QnStorageResourcePtr &storage)
 {
     if (storage->getSpaceLimit() == 0)
         return; // unlimited
@@ -960,4 +962,33 @@ void QnStorageManager::loadFullFileCatalogInternal(QnServer::ChunksCatalog catal
 bool QnStorageManager::isStorageAvailable(int storage_index) const {
     QnStorageResourcePtr storage = storageRoot(storage_index);
     return storage && storage->getStatus() == QnResource::Online; 
+}
+
+bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, const QnCameraBookmark &bookmark) {
+
+    QnDualQualityHelper helper;
+    helper.openCamera(cameraGuid);
+
+    DeviceFileCatalog::Chunk chunk;
+    DeviceFileCatalogPtr catalog;
+    helper.findDataForTime(bookmark.startTimeMs, chunk, catalog, DeviceFileCatalog::OnRecordHole_NextChunk, false);
+    if (chunk.startTimeMs < 0)
+        return false; //recorded chunk was not found
+
+    chunk.startTimeMs = bookmark.startTimeMs;
+    chunk.durationMs = bookmark.durationMs;
+
+    DeviceFileCatalogPtr bookmarksCatalog = getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
+    bookmarksCatalog->addChunk(chunk);
+
+    QnStorageResourcePtr storage = storageRoot(chunk.storageIndex);
+    if (!storage)
+        return false;
+
+    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
+    if (!sdb)
+        return false;
+
+    sdb->addRecord(cameraGuid, QnServer::BookmarksCatalog, chunk);
+    return true;
 }

@@ -39,6 +39,7 @@ public:
 
     QnTimePeriodList periods(Qn::TimePeriodContent type);
 
+    void forceUpdate();
 signals:
     void periodsChanged(Qn::TimePeriodContent type);
     void loadingFailed();
@@ -60,7 +61,6 @@ private:
     void init();
     void initLoaders(QnAbstractCameraDataLoader **loaders);
     static bool createLoaders(const QnResourcePtr &resource, QnAbstractCameraDataLoader **loaders);
-
 private:
     QnResourcePtr m_resource;
     bool m_resourceIsLocal;

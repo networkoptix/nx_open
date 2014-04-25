@@ -59,6 +59,8 @@ public:
      * \param stream                    Byte array to compress time periods to. 
      */
     bool encode(QByteArray &stream);
+
+    bool zip(QByteArray &stream);
     
     /** 
      * Decode (decompress) data from a byte array. 
@@ -74,6 +76,9 @@ public:
      * \param[in] dataSize              Size of the compressed data.
      */
     bool decode(const quint8 *data, int dataSize);
+
+    bool unzip(const QByteArray &stream);
+    bool unzip(const quint8 *data, int dataSize);
 
     /** 
      * Find nearest period for specified time.

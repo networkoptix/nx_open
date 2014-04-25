@@ -24,10 +24,14 @@ public:
     QnCameraBookmarkTagsUsage tagsUsage() const;
 private slots:
     void at_bookmarkTimeSelectionAction_triggered();
+    void at_bookmarkAdded(int status, const QVariant &data, int handle);
 
     void updateTagsUsage();
 private:
+    QnMediaServerResourcePtr getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 time) const;
+
     QnCameraBookmarkTagsUsage m_tagsUsage;
+    QHash<int, QnResourcePtr> m_addingBookmarks; 
 };
 
 #endif // WORKBENCH_BOOKMARKS_HANDLER_H

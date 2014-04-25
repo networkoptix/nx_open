@@ -21,6 +21,7 @@
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
+class QnCameraBookmark;
 
 class QnStorageManager: public QObject
 {
@@ -99,6 +100,8 @@ public:
     * Return full path list from storage_index.csv (include absent in DB storages)
     */
     QStringList getAllStoragePathes() const;
+
+    bool addBookmark(const QByteArray &cameraGuid, const QnCameraBookmark &bookmark);
 signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
@@ -108,7 +111,7 @@ public slots:
 private:
     friend class TestStorageThread;
 
-    void clearSpace(QnStorageResourcePtr storage);
+    void clearSpace(const QnStorageResourcePtr &storage);
 
     int detectStorageIndex(const QString& path);
     QSet<int> getDeprecateIndexList(const QString& p);
@@ -120,8 +123,6 @@ private:
     void testOfflineStorages();
     void rebuildCatalogIndexInternal();
     bool isCatalogLoaded() const;
-    void addDataToCatalog(const DeviceFileCatalogPtr &newCatalog, const QByteArray& mac, QnServer::ChunksCatalog catalog);
-
 
     int getFileNumFromCache(const QString& base, const QString& folder);
     void putFileNumToCache(const QString& base, int fileNum);

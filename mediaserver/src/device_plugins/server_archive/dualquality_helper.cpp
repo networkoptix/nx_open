@@ -12,11 +12,15 @@ QnDualQualityHelper::QnDualQualityHelper()
     m_alreadyOnAltChunk = false;
 }
 
-void QnDualQualityHelper::setResource(const QnNetworkResourcePtr &netResource)
-{
-    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getPhysicalId().toUtf8(), QnServer::HiQualityCatalog);
-    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getPhysicalId().toUtf8(), QnServer::LowQualityCatalog);
+void QnDualQualityHelper::setResource(const QnNetworkResourcePtr &netResource) {
+    openCamera(netResource->getPhysicalId().toUtf8());
 }
+
+void QnDualQualityHelper::openCamera(const QByteArray & cameraGuid) {
+    m_catalogHi = qnStorageMan->getFileCatalog(cameraGuid, QnServer::HiQualityCatalog);
+    m_catalogLow = qnStorageMan->getFileCatalog(cameraGuid, QnServer::LowQualityCatalog);
+}
+
 
 void QnDualQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& catalog, DeviceFileCatalog::FindMethod findMethod, bool preciseFind)
 {

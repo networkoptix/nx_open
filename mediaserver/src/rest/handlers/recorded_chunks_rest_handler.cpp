@@ -52,6 +52,8 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
                 format = ChunkFormat_XML;
             else if (params[i].second == "txt")
                 format = ChunkFormat_Text;
+            else if (params[i].second == "zip")
+                format = ChunkFormat_Zip;
             else
                 format = ChunkFormat_Json;
         }
@@ -127,6 +129,10 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
             }
             result.append("</root>\n");
             break;
+        case ChunkFormat_Zip:
+            result.append("ZIP");
+            periods.zip(result);
+            break;
         case ChunkFormat_Json:
         default:
             contentType = "application/json";
@@ -146,6 +152,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
             }
                 
             result.append("]);");
+            break;
     }
 
     return CODE_OK;

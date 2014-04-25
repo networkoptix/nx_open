@@ -359,3 +359,36 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
     }
     return result;
 }
+
+bool QnTimePeriodList::zip(QByteArray &stream) {
+    if (isEmpty())
+        return true;
+
+    QByteArray unzipped;
+    auto iter = this->constBegin();
+    while (iter != this->constEnd()) {
+        unzipped
+            .append(QByteArray::number(iter->startTimeMs, 16))
+            .append(' ')
+            .append(QByteArray::number(iter->durationMs, 16))
+            .append(' ');
+        iter++;
+    }
+    stream.append(qCompress(unzipped));
+    return true;
+}
+
+bool QnTimePeriodList::unzip(const QByteArray &stream) {
+    return unzip((const quint8 *) stream.constData(), stream.size());
+}
+
+bool QnTimePeriodList::unzip(const quint8 *data, int dataSize) {
+    clear();
+
+    QByteArray unzipped = qUncompress(data, dataSize);
+    QList<QByteArray> splitted = unzipped.split(' ');
+    for (int i = 0; i < splitted.size() / 2; ++i) {
+        append(QnTimePeriod(splitted[i*2].toLongLong(0, 16), splitted[i*2 + 1].toLongLong(0, 16)));
+    }
+    return true;
+}

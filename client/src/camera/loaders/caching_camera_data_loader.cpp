@@ -268,4 +268,9 @@ void QnCachingCameraDataLoader::at_syncTime_timeChanged() {
     }
 }
 
+void QnCachingCameraDataLoader::forceUpdate() {
+    m_loaders[Qn::BookmarkTimePeriod]->discardCachedData();
+    load(Qn::BookmarkTimePeriod);
+}
+
 

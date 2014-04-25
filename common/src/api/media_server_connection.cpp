@@ -13,6 +13,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
@@ -60,6 +61,7 @@ namespace {
         ((ImageObject,              "image"))
         ((CameraDiagnosticsObject,  "doCameraDiagnosticsStep"))
         ((RebuildArchiveObject,     "rebuildArchive"))
+        ((BookmarkAddObject,        "cameraBookmarks/add"))
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -209,6 +211,8 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         if(status == 0) {
             if (response.data.startsWith("BIN")) {
                 reply.decode((const quint8*) response.data.constData() + 3, response.data.size() - 3);
+            } else if (response.data.startsWith("ZIP")) {
+                reply.unzip((const quint8*) response.data.constData() + 3, response.data.size() - 3);
             } else {
                 qWarning() << "QnMediaServerConnection: unexpected message received.";
                 status = -1;
@@ -382,6 +386,11 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, info, handle);
         break;
     }
+    case BookmarkAddObject: {
+        qDebug() << "bookmark added" << response.status << response.data;
+        emitFinished(this, response.status, handle);
+        break;
+    }
     default:
         assert(false); /* We should never get here. */
         break;
@@ -464,7 +473,10 @@ int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &li
     params << QnRequestParam("startTime", QString::number(startTimeMs));
     params << QnRequestParam("endTime", QString::number(endTimeMs));
     params << QnRequestParam("detail", QString::number(detail));
-    params << QnRequestParam("format", "bin");
+    if (periodsType == Qn::BookmarkTimePeriod)
+        params << QnRequestParam("format", "zip");
+    else
+        params << QnRequestParam("format", "bin");
     params << QnRequestParam("periodsType", QString::number(static_cast<int>(periodsType)));
     params << QnRequestParam("filter", filter);
 
@@ -773,5 +785,15 @@ int QnMediaServerConnection::getEventLogAsync(
         params << QnRequestParam( "action", (int) actionType);
 
     return sendAsyncGetRequest(EventLogObject, params, QN_STRINGIZE_TYPE(QnBusinessActionDataListPtr), target, slot);
+}
+
+int QnMediaServerConnection::addBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params 
+        << QnRequestParam("id", camera->getPhysicalId())
+        << QnRequestParam("startTime", bookmark.startTimeMs)
+        << QnRequestParam("duration", bookmark.durationMs);    
+
+    return sendAsyncGetRequest(BookmarkAddObject, params, NULL, target, slot);
 }
 
